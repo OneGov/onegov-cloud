@@ -64,6 +64,7 @@ class ApplicationConfig(object):
     def __init__(self, configuration):
         self._cfg = configuration
 
+        assert self.path != '/'
         assert self.path.count('*') <= 1
         assert self.path.count('/') <= 2
         assert self.path.startswith('/')

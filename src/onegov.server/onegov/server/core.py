@@ -4,7 +4,7 @@ from webob.exc import HTTPNotFound
 
 
 class Server(object):
-    """ A WSGI application that hosts multiple Morepath applications in the
+    """ A WSGI application that hosts multiple WSGI applications in the
     same process.
 
     Not to be confused with Morepath's mounting functionality. The morepath
@@ -15,6 +15,19 @@ class Server(object):
     <http://morepath.readthedocs.org/en/latest/app_reuse.html
     #nesting-applications>`_
 
+    Applications are hosted in two ways:
+
+    1. As static applications under a base path ('/app')
+    2. As wildcard applications under a base path with wildcard ('/sites/*')
+
+    There is no further nesting and there is no way to run an application
+    under '/'.
+
+    The idea for this server is to run a number of WSGI applications that
+    are relatively independent, but share a common framework. Though thought
+    to be used with Morepath this module does not try to assume anything but
+    a WSGI application.
+
     """
 
     def __init__(self, config):
@@ -23,8 +36,7 @@ class Server(object):
             a.root for a in config.applications if not a.is_static)
 
     def __call__(self, environ, start_response):
-        request = BaseRequest(environ)
-        path_fragments = request.path.split('/')
+        path_fragments = BaseRequest(environ).path.split('/')
 
         application_root = '/'.join(path_fragments[:2])
         application = self.applications.get(application_root)
@@ -33,12 +45,14 @@ class Server(object):
             return HTTPNotFound()(environ, start_response)
 
         if application_root in self.wildcard_applications:
-            application_id = ''.join(path_fragments[2:3])
             base_path = '/'.join(path_fragments[:3])
+            application_id = ''.join(path_fragments[2:3])
         else:
-            application_id = ''.join(path_fragments[1:2])
             base_path = application_root
+            application_id = ''.join(path_fragments[1:2])
 
+        # happens if the root of a wildcard path is requested
+        # ('/wildcard' from '/wildcard/*') - this is not allowed
         if not application_id:
             return HTTPNotFound()(environ, start_response)
 
