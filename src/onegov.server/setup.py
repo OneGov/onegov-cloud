@@ -33,6 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'click',
+        'PyYAML',
         'webob'
     ],
     extras_require=dict(

@@ -1,3 +1,6 @@
+from onegov.server import errors
+
+
 class CachedApplication(object):
     """ Wraps an application class with a configuration, returning a new
     instance the first time `get()` is called and the same instance very
@@ -18,26 +21,33 @@ class CachedApplication(object):
 
 
 class ApplicationCollection(object):
-    """ Keeps a list of applications and their ids.
+    """ Keeps a list of applications and their roots.
 
     The applications are registered lazily and only instantiated/configured
     once the `get()` is called.
     """
 
-    def __init__(self):
+    def __init__(self, applications=None):
         self.applications = {}
 
-    def register(self, id, application_class, configuration={}):
+        for a in applications or []:
+            self.register(a.root, a.application_class, a.configuration)
+
+    def register(self, root, application_class, configuration={}):
         """ Registers the given path for the given application_class and
         configuration.
 
         """
 
-        self.applications[id] = CachedApplication(
+        if root in self.applications:
+            raise errors.ApplicationConflictError(
+                "tried to register '{}' twice".format(root))
+
+        self.applications[root] = CachedApplication(
             application_class, configuration
         )
 
-    def alias(self, id, alias):
+    def alias(self, root, alias):
         """ Creates an alias for the given path. For example:
 
             collection.register('app', Class)
@@ -45,11 +55,11 @@ class ApplicationCollection(object):
 
             assert collection.get('alias') is collection.get('app')
         """
-        self.applications[alias] = self.applications[id]
+        self.applications[alias] = self.applications[root]
 
-    def get(self, id):
+    def get(self, root):
         """ Returns the applicaton for the given path, creating a new instance
         if none exists already.
 
         """
-        return self.applications[id].get()
+        return self.applications[root].get()

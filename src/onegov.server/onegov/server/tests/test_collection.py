@@ -1,3 +1,6 @@
+import pytest
+
+from onegov.server import errors
 from onegov.server.application import Application
 from onegov.server.collection import ApplicationCollection, CachedApplication
 
@@ -27,3 +30,11 @@ def test_collection_alias():
     collection.alias('foo', 'bar')
 
     assert collection.get('bar') is collection.get('foo')
+
+
+def test_collection_conflict():
+    collection = ApplicationCollection()
+    collection.register('foo', Application)
+
+    with pytest.raises(errors.ApplicationConflictError):
+        collection.register('foo', Application)
