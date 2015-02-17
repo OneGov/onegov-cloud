@@ -27,8 +27,8 @@ Onegov Server uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/seantis/onegov.server.png
-  :target: https://travis-ci.org/seantis/onegov.server
+.. image:: https://travis-ci.org/OneGov/onegov.server.png
+  :target: https://travis-ci.org/OneGov/onegov.server
   :alt: Build Status
 
 Coverage
