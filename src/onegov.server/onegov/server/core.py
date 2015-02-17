@@ -17,11 +17,11 @@ class Server(object):
 
     Applications are hosted in two ways:
 
-    1. As static applications under a base path ('/app')
-    2. As wildcard applications under a base path with wildcard ('/sites/*')
+    1. As static applications under a base path (`/app`)
+    2. As wildcard applications under a base path with wildcard (`/sites/*`)
 
     There is no further nesting and there is no way to run an application
-    under '/'.
+    under `/`.
 
     The idea for this server is to run a number of WSGI applications that
     are relatively independent, but share a common framework. Though thought
