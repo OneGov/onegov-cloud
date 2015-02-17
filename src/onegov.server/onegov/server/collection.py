@@ -62,4 +62,9 @@ class ApplicationCollection(object):
         if none exists already.
 
         """
-        return self.applications[root].get()
+        application = self.applications.get(root)
+
+        if application is None:
+            return None
+        else:
+            return application.get()

@@ -39,7 +39,8 @@ setup(
     extras_require=dict(
         test=[
             'pytest',
-            'pytest-cov'
+            'pytest-cov',
+            'webtest'
         ],
     ),
     classifiers=[

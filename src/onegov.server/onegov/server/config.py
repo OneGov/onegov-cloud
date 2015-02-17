@@ -1,3 +1,4 @@
+import inspect
 import pydoc
 import yaml
 
@@ -35,8 +36,10 @@ class Config(object):
         `/sites/one/login` is passed to WildcardApp as `/login`, while
         `/application/one/login` is passed to StaticApp as `/one/login`.
 
-        Note that the `class` is expected to be a string and it is loaded
-        lazily.
+        Note that the `class` may be a string or a class. If it's a string
+        the class is dynamically loaded immediately.
+
+        Nested paths are *not* supported. So `/namespace/path` is invalid.
 
         """
         self.applications = [
@@ -62,6 +65,7 @@ class ApplicationConfig(object):
         self._cfg = configuration
 
         assert self.path.count('*') <= 1
+        assert self.path.count('/') <= 2
         assert self.path.startswith('/')
 
     @property
@@ -70,7 +74,10 @@ class ApplicationConfig(object):
 
     @property
     def application_class(self):
-        return pydoc.locate(self._cfg['class'])
+        if inspect.isclass(self._cfg['class']):
+            return self._cfg['class']
+        else:
+            return pydoc.locate(self._cfg['class'])
 
     @property
     def configuration(self):
