@@ -24,14 +24,6 @@ def test_collection():
     assert collection.get('foo').foo == 'bar'
 
 
-def test_collection_alias():
-    collection = ApplicationCollection()
-    collection.register('foo', Application)
-    collection.alias('foo', 'bar')
-
-    assert collection.get('bar') is collection.get('foo')
-
-
 def test_collection_conflict():
     collection = ApplicationCollection()
     collection.register('foo', Application)

@@ -47,16 +47,6 @@ class ApplicationCollection(object):
             application_class, configuration
         )
 
-    def alias(self, root, alias):
-        """ Creates an alias for the given path. For example:
-
-            collection.register('app', Class)
-            collection.alias('app', 'alias')
-
-            assert collection.get('alias') is collection.get('app')
-        """
-        self.applications[alias] = self.applications[root]
-
     def get(self, root):
         """ Returns the applicaton for the given path, creating a new instance
         if none exists already.
