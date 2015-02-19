@@ -166,7 +166,7 @@ def run(config_file):
 
     while True:
         try:
-            server.join(1.0)
+            server.join(0.2)
         except KeyboardInterrupt:
             observer.stop()
             server.stop()
