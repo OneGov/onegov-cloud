@@ -23,7 +23,7 @@ class CustomWSGIRequestHandler(WSGIRequestHandler):
     def parse_request(self):
         self._started = datetime.utcnow()
 
-        return super(CustomWSGIRequestHandler, self).parse_request()
+        return WSGIRequestHandler.parse_request(self)
 
     def log_request(self, status, bytes):
         duration = datetime.utcnow() - self._started
@@ -36,14 +36,34 @@ class CustomWSGIRequestHandler(WSGIRequestHandler):
 class WsgiProcess(multiprocessing.Process):
     """ Runs the WSGI reference server in a separate process. """
 
-    def __init__(self, app_factory):
+    def __init__(self, app_factory, host='127.0.0.1', port=8080):
         multiprocessing.Process.__init__(self)
         self.app_factory = app_factory
-        self.stdin_fileno = sys.stdin.fileno()
+
+        self.host = host
+
+        # if the port is set to 0, a random port will be selected by the os
+        self._port = port
+        self._actual_port = multiprocessing.Value('i', port)
+        self._ready = multiprocessing.Value('i', 0)
+
+        try:
+            self.stdin_fileno = sys.stdin.fileno()
+        except ValueError:
+            pass  # in testing, stdin is not always real
+
+    @property
+    def ready(self):
+        return self._ready.value == 1
+
+    @property
+    def port(self):
+        return self._actual_port.value
 
     def run(self):
         # use the parent's process stdin to be able to provide pdb correctly
-        sys.stdin = os.fdopen(self.stdin_fileno)
+        if hasattr(self, 'stdin_fileno'):
+            sys.stdin = os.fdopen(self.stdin_fileno)
 
         # when pressing ctrl+c exit immediately
         signal.signal(signal.SIGINT, lambda *args: sys.exit(0))
@@ -52,11 +72,15 @@ class WsgiProcess(multiprocessing.Process):
         # the process is restarted during a pdb session
         os.system("stty sane")
 
-        print("starting onegov server on https://127.0.0.1:8080")
-
         server = make_server(
-            '127.0.0.1', 8080, self.app_factory(),
+            self.host, self.port, self.app_factory(),
             handler_class=CustomWSGIRequestHandler)
+
+        self._actual_port.value = server.socket.getsockname()[1]
+        self._ready.value = 1
+
+        print("started onegov server on https://{}:{}".format(
+            self.host, self.port))
 
         server.serve_forever()
 
@@ -67,11 +91,13 @@ class WsgiServer(FileSystemEventHandler):
 
     """
 
-    def __init__(self, app_factory):
+    def __init__(self, app_factory, host='127.0.0.1', port=8080):
         self.app_factory = app_factory
+        self._host = host
+        self._port = port
 
     def spawn(self):
-        return WsgiProcess(self.app_factory)
+        return WsgiProcess(self.app_factory, self._host, self._port)
 
     def join(self, timeout=None):
         if self.process.is_alive():

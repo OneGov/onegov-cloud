@@ -43,6 +43,7 @@ setup(
             'morepath',
             'pytest',
             'pytest-cov',
+            'requests',
             'webtest'
         ],
     ),
