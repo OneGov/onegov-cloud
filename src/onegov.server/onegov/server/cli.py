@@ -6,11 +6,27 @@ import os
 import signal
 import sys
 
+from datetime import datetime
 from onegov.server.core import Server
 from onegov.server.config import Config
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
-from wsgiref.simple_server import make_server
+from wsgiref.simple_server import make_server, WSGIRequestHandler
+
+
+class CustomWSGIRequestHandler(WSGIRequestHandler):
+
+    def parse_request(self):
+        self._started = datetime.utcnow()
+
+        return super(CustomWSGIRequestHandler, self).parse_request()
+
+    def log_request(self, status, bytes):
+        duration = datetime.utcnow() - self._started
+        duration = int(round(duration.total_seconds() * 1000, 0))
+
+        print("{} - {} {} - {} ms - {} bytes".format(
+            status, self.command, self.path, duration, bytes))
 
 
 class WsgiProcess(multiprocessing.Process):
@@ -26,7 +42,11 @@ class WsgiProcess(multiprocessing.Process):
 
         os.system("stty sane")
 
-        server = make_server('127.0.0.1', 8080, self.app_factory())
+        print("starting onegov server on https://127.0.0.1:8080")
+        server = make_server(
+            '127.0.0.1', 8080, self.app_factory(),
+            handler_class=CustomWSGIRequestHandler)
+
         server.serve_forever()
 
 
