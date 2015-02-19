@@ -7,8 +7,8 @@ import signal
 import sys
 
 from datetime import datetime
-from onegov.server.core import Server
-from onegov.server.config import Config
+from onegov.server import Server
+from onegov.server import Config
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from wsgiref.simple_server import make_server, WSGIRequestHandler
