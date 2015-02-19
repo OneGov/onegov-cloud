@@ -15,6 +15,10 @@ from wsgiref.simple_server import make_server, WSGIRequestHandler
 
 
 class CustomWSGIRequestHandler(WSGIRequestHandler):
+    """ Measures the time it takes to respond to a request and prints it
+    at the end of the request.
+
+    """
 
     def parse_request(self):
         self._started = datetime.utcnow()
@@ -30,6 +34,7 @@ class CustomWSGIRequestHandler(WSGIRequestHandler):
 
 
 class WsgiProcess(multiprocessing.Process):
+    """ Runs the WSGI reference server in a separate process. """
 
     def __init__(self, app_factory):
         multiprocessing.Process.__init__(self)
@@ -37,12 +42,18 @@ class WsgiProcess(multiprocessing.Process):
         self.stdin_fileno = sys.stdin.fileno()
 
     def run(self):
+        # use the parent's process stdin to be able to provide pdb correctly
         sys.stdin = os.fdopen(self.stdin_fileno)
+
+        # when pressing ctrl+c exit immediately
         signal.signal(signal.SIGINT, lambda *args: sys.exit(0))
 
+        # reset the tty every time, fixing problems that might occur if
+        # the process is restarted during a pdb session
         os.system("stty sane")
 
         print("starting onegov server on https://127.0.0.1:8080")
+
         server = make_server(
             '127.0.0.1', 8080, self.app_factory(),
             handler_class=CustomWSGIRequestHandler)
@@ -51,6 +62,10 @@ class WsgiProcess(multiprocessing.Process):
 
 
 class WsgiServer(FileSystemEventHandler):
+    """ Wraps the WSGI process, providing the ability to restart the process
+    and acting as an event-handler for watchdog.
+
+    """
 
     def __init__(self, app_factory):
         self.app_factory = app_factory
@@ -74,6 +89,8 @@ class WsgiServer(FileSystemEventHandler):
         self.process.terminate()
 
     def on_any_event(self, event):
+        """ If anything of significance changed, restart the process. """
+
         if event.src_path.endswith('pyc'):
             return
 
@@ -102,6 +119,13 @@ def run(config_file):
     foreground.
 
     Use this *for debugging/development only*.
+
+    Example::
+
+        onegov-server --config-file test.yml
+
+    The onegov-server will load 'onegov.yml' by default and it will restart
+    when any file in the current folder or any of its subfolders changes.
     """
 
     def wsgi_factory():
