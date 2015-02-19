@@ -8,7 +8,7 @@ from onegov.server.config import Config, ApplicationConfig
 def test_static_application_config():
     cfg = ApplicationConfig({
         'path': '/application/',
-        'class': 'onegov.server.application.Application',
+        'application': 'onegov.server.application.Application',
     })
 
     assert cfg.path == '/application'
@@ -21,7 +21,7 @@ def test_static_application_config():
 def test_wildcard_application_config():
     cfg = ApplicationConfig({
         'path': '/application/*',
-        'class': 'onegov.server.application.Application',
+        'application': 'onegov.server.application.Application',
         'configuration': {
             'foo': 'bar'
         }
@@ -38,11 +38,11 @@ def test_config_from_yaml():
     yaml = textwrap.dedent("""
         applications:
           - path: /static
-            class: onegov.server.application.Application
+            application: onegov.server.application.Application
             configuration:
               foo: bar
           - path: /wildcard/*
-            class: onegov.server.application.Application
+            application: onegov.server.application.Application
             configuration:
               bar: foo
     """)

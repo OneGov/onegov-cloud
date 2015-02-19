@@ -1,3 +1,5 @@
+import inspect
+
 from onegov.server import errors
 
 
@@ -58,3 +60,12 @@ class ApplicationCollection(object):
             return None
         else:
             return application.get()
+
+    def morepath_applications(self):
+        """ Iterates through the applications that depend on morepath. """
+
+        for app in self.applications.values():
+            for base in inspect.getmro(app.application_class):
+                if base.__module__.startswith('morepath.'):
+                    yield app
+                    break

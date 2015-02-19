@@ -30,3 +30,24 @@ def test_collection_conflict():
 
     with pytest.raises(errors.ApplicationConflictError):
         collection.register('foo', Application)
+
+
+def test_morepath_applications():
+
+    from morepath.app import App as MorepathApplication
+
+    class MorepathApp(Application, MorepathApplication):
+        pass
+
+    class WsgiApp(Application):
+        pass
+
+    collection = ApplicationCollection()
+    collection.register('foo', WsgiApp)
+
+    assert len(list(collection.morepath_applications())) == 0
+
+    collection = ApplicationCollection()
+    collection.register('foo', MorepathApp)
+
+    assert len(list(collection.morepath_applications())) == 1

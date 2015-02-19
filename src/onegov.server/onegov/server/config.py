@@ -13,7 +13,7 @@ class Config(object):
                 'applications': [
                     {
                         'path': '/application',
-                        'class': 'my.module.StaticApp',
+                        'application': 'my.module.StaticApp',
                         'configuration': {
                             'my': 'custom',
                             'config': 'values'
@@ -21,7 +21,7 @@ class Config(object):
                     },
                     {
                         'path': '/sites/*',
-                        'class': 'my.module.WildcardApp',
+                        'application': 'my.module.WildcardApp',
                     }
                 ]
             }
@@ -36,8 +36,8 @@ class Config(object):
         `/sites/one/login` is passed to WildcardApp as `/login`, while
         `/application/one/login` is passed to StaticApp as `/one/login`.
 
-        Note that the `class` may be a string or a class. If it's a string
-        the class is dynamically loaded immediately.
+        Note that the `application` may be a string or a class. If it's a
+        string, the application class is dynamically loaded immediately.
 
         Nested paths are *not* supported. So `/namespace/path` is invalid.
 
@@ -75,10 +75,10 @@ class ApplicationConfig(object):
 
     @property
     def application_class(self):
-        if inspect.isclass(self._cfg['class']):
-            return self._cfg['class']
+        if inspect.isclass(self._cfg['application']):
+            return self._cfg['application']
         else:
-            return pydoc.locate(self._cfg['class'])
+            return pydoc.locate(self._cfg['application'])
 
     @property
     def configuration(self):

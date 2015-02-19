@@ -33,16 +33,23 @@ setup(
     platforms='any',
     install_requires=[
         'click',
+        'morepath',
         'PyYAML',
-        'webob'
+        'watchdog',
+        'webob',
     ],
     extras_require=dict(
         test=[
+            'morepath',
             'pytest',
             'pytest-cov',
             'webtest'
         ],
     ),
+    entry_points="""
+        [console_scripts]
+        onegov-server=onegov.server.cli:run
+    """,
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',

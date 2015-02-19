@@ -1,3 +1,5 @@
+import pydoc
+
 from onegov.server.collection import ApplicationCollection
 from webob import BaseRequest
 from webob.exc import HTTPNotFound
@@ -28,12 +30,34 @@ class Server(object):
     to be used with Morepath this module does not try to assume anything but
     a WSGI application.
 
+    Since most of the time we *will* be running morepath applications, this
+    server automatically configures morepath for the applications that depend
+    on it.
+
     """
 
     def __init__(self, config):
         self.applications = ApplicationCollection(config.applications)
         self.wildcard_applications = set(
             a.root for a in config.applications if not a.is_static)
+
+        self.configure_morepath()
+
+    def configure_morepath(self):
+        """ Configures morepath automatically, if any application uses it. """
+
+        morepath_applications = set(
+            self.applications.morepath_applications())
+
+        if morepath_applications:
+
+            # it's safe to say that we got morepath available here
+            import morepath
+
+            config = morepath.setup()
+            for app in morepath_applications:
+                config.scan(pydoc.locate(app.application_class.__module__))
+            config.commit()
 
     def __call__(self, environ, start_response):
         request = BaseRequest(environ)

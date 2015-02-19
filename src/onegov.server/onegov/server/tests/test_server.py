@@ -20,11 +20,11 @@ def test_application_mapping():
         'applications': [
             {
                 'path': '/static',
-                'class': EchoApplication
+                'application': EchoApplication
             },
             {
                 'path': '/wildcard/*',
-                'class': EchoApplication
+                'application': EchoApplication
             }
         ]
     }))
@@ -64,11 +64,11 @@ def test_path_prefix():
         'applications': [
             {
                 'path': '/static',
-                'class': EchoApplication
+                'application': EchoApplication
             },
             {
                 'path': '/wildcard/*',
-                'class': EchoApplication
+                'application': EchoApplication
             },
         ]
     }))
