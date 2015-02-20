@@ -115,3 +115,44 @@ def test_environ_changes():
     assert c.get('/wildcard/wildcard').body == b'/wildcard/wildcard, '
     assert c.get('/wildcard/wildcard/wildcard').body\
         == b'/wildcard/wildcard, /wildcard'
+
+
+def test_invalid_host_request():
+
+    class HelloApplication(Application):
+
+        def __call__(self, environ, start_response):
+            response = Response()
+            response.text = u'hello'
+
+            return response(environ, start_response)
+
+    server = Server(Config({
+        'applications': [
+            {
+                'path': '/static',
+                'application': HelloApplication,
+            }
+        ]
+    }))
+
+    c = Client(server)
+
+    response = c.get('/static')
+    assert response.body == b'hello'
+
+    response = c.get(
+        '/static', headers={'X_VHM_HOST': 'https://example.org'}, status=403)
+    assert response.status_code == 403
+
+    response = c.get(
+        '/static', headers={'HOST': 'example.org:8080'}, status=403)
+    assert response.status_code == 403
+
+    server.applications.get('/static').allowed_hosts.add('example.org')
+
+    response = c.get('/static', headers={'X_VHM_HOST': 'https://example.org'})
+    assert response.body == b'hello'
+
+    response = c.get('/static', headers={'HOST': 'example.org:8080'})
+    assert response.body == b'hello'

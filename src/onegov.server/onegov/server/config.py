@@ -1,5 +1,6 @@
 import inspect
 import pydoc
+import re
 import yaml
 
 
@@ -83,6 +84,14 @@ class ApplicationConfig(object):
     @property
     def configuration(self):
         return self._cfg.get('configuration', {})
+
+    @property
+    def valid_hosts_expression(self):
+        valid_hosts = self._cfg.get('valid_hosts')
+        if valid_hosts:
+            return re.compile(valid_hosts)
+        else:
+            return None
 
     @property
     def root(self):

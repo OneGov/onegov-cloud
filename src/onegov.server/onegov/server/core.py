@@ -2,7 +2,35 @@ import pydoc
 
 from onegov.server.collection import ApplicationCollection
 from webob import BaseRequest
-from webob.exc import HTTPNotFound
+from webob.exc import HTTPNotFound, HTTPForbidden
+
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+
+
+local_hostnames = {
+    '127.0.0.1',
+    '::1',
+    'localhost'
+}
+
+
+class Request(BaseRequest):
+
+    hostname_keys = ('HTTP_HOST', 'HTTP_X_VHM_HOST')
+
+    @property
+    def hostnames(self):
+        for key in self.hostname_keys:
+            if key in self.environ:
+                hostname = urlparse(self.environ[key]).hostname
+
+                if hostname is None:
+                    yield self.environ[key].split(':')[0]
+                else:
+                    yield hostname
 
 
 class Server(object):
@@ -60,14 +88,21 @@ class Server(object):
             config.commit()
 
     def __call__(self, environ, start_response):
-        request = BaseRequest(environ)
+        request = Request(environ)
         path_fragments = request.path.split('/')
 
+        # try to find the application that handles this path
         application_root = '/'.join(path_fragments[:2])
         application = self.applications.get(application_root)
 
         if application is None:
             return HTTPNotFound()(environ, start_response)
+
+        # make sure the application accepts the given hostname
+        for host in request.hostnames:
+            if host not in local_hostnames:
+                if not application.is_allowed_hostname(host):
+                    return HTTPForbidden()(environ, start_response)
 
         if application_root in self.wildcard_applications:
             base_path = '/'.join(path_fragments[:3])
