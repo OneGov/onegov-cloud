@@ -28,8 +28,7 @@ def test_virtual_host_request():
     config.commit()
 
     app = App()
-    app.configure_application(
-        valid_hostname=r'^(localhost|blog.example.org|example.org)')
+    app.configure_application()
 
     c = Client(app)
 
@@ -70,42 +69,3 @@ def test_virtual_host_request():
         'X_VHM_ROOT': '/blog',
         'X_VHM_HOST': 'https://blog.example.org/'})
     assert response.body == b'https://blog.example.org/ - blog'
-
-
-def test_invalid_host_request():
-    config = setup()
-
-    class App(Framework):
-        testing_config = config
-
-    @App.path(path='/')
-    class Root(object):
-        pass
-
-    @App.view(model=Root)
-    def view_root(self, request):
-        return request.link(self)
-
-    config.commit()
-
-    app = App()
-    app.configure_application(valid_hostname=r'^(localhost|example.org)')
-
-    c = Client(app)
-
-    response = c.get('/')
-    assert response.body == b'/'
-
-    response = c.get('/', headers={'X_VHM_HOST': 'https://example.org'})
-    assert response.body == b'https://example.org/'
-
-    response = c.get('/', headers={'HTTP_HOST': 'https://example.org'})
-    assert response.body == b'/'
-
-    response = c.get(
-        '/', headers={'X_VHM_HOST': 'https://google.ch'}, status=403)
-    assert response.status_code == 403
-
-    response = c.get(
-        '/', headers={'HTTP_HOST': 'https://google.ch'}, status=403)
-    assert response.status_code == 403
