@@ -156,3 +156,38 @@ def test_invalid_host_request():
 
     response = c.get('/static', headers={'HOST': 'example.org:8080'})
     assert response.body == b'hello'
+
+
+def test_aliases():
+
+    class EchoApplication(Application):
+
+        def __call__(self, environ, start_response):
+            response = Response()
+            response.text = u''.join((self.application_id))
+
+            return response(environ, start_response)
+
+    server = Server(Config({
+        'applications': [
+            {
+                'path': '/sites/*',
+                'application': EchoApplication,
+            }
+        ]
+    }))
+
+    application = server.applications.get('/sites')
+
+    c = Client(server)
+
+    response = c.get('/sites/main')
+    assert response.body == b'main'
+
+    response = c.get('/sites/blog')
+    assert response.body == b'blog'
+
+    application.alias('main', 'blog')
+
+    response = c.get('/sites/blog')
+    assert response.body == b'main'

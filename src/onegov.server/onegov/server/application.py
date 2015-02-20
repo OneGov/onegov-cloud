@@ -1,5 +1,7 @@
 import re
 
+from onegov.server import errors
+
 
 class Application(object):
     """ WSGI applications inheriting from this class can be served by
@@ -15,6 +17,9 @@ class Application(object):
     #: Additional allowed hosts may be added to this set. Those are not
     #: expressions, but straight hostnames.
     allowed_hosts = None
+
+    #: Use :meth:`alias` instead of manipulating this dictionary.
+    _aliases = None
 
     def __call__(self, environ, start_respnose):
         raise NotImplementedError
@@ -38,6 +43,8 @@ class Application(object):
 
         self.allowed_hosts = set(
             configuration.get('allowed_hosts', []))
+
+        self._aliases = {}
 
     def set_application_id(self, application_id):
         """ Sets the application id before __call__ is called. That is, before
@@ -100,3 +107,42 @@ class Application(object):
                 return True
 
         return hostname in self.allowed_hosts
+
+    def alias(self, application_id, alias):
+        """ Adds an alias under which this application is available on the
+        server. The alias is *for* your current `application_id`.
+
+        The alias only works for wildcard applications - it has no effect
+        on static applications!
+
+        This is how it works:
+
+        An application running under `/sites/main` can be made available
+        under `/sites/blog` by running `self.alias('main', 'blog')`.
+
+        Aliases must be unique, so this method will fail with a
+        :class:`onegov.server.errors.ApplicationConflictError` if an alias
+        is already in use by another application running under the same path.
+
+        Note that an application opened through an alias will still have
+        the application_id set to the actual root, not the alias. So
+        `/sites/blog` in the example above would still lead to an
+        application_id of `main` instead of `blog`.
+
+        This is mainly meant to be used for dynamic DNS setups. Say you have
+        an application available through test.onegov.dev (pointing to
+        `/sites/test`). You now want to make this site available through
+        example.org. You can do this as follows:
+
+        self.allowed_hosts.add('example.org')
+        self.alias('example_org')
+
+        If your server has a catch-all rule that sends unknown domains to
+        `/sites/domain_without_dots`, then you can add domains dynamically
+        and the customer just points the DNS to your ip address.
+        """
+        if alias in self._aliases:
+            raise errors.ApplicationConflictError(
+                "the alias '{}' is already in use".format(alias))
+
+        self._aliases[alias] = application_id

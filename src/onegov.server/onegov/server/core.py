@@ -23,6 +23,7 @@ class Request(BaseRequest):
 
     @property
     def hostnames(self):
+        """ Iterates through the hostnames of the request. """
         for key in self.hostname_keys:
             if key in self.environ:
                 hostname = urlparse(self.environ[key]).hostname
@@ -107,6 +108,11 @@ class Server(object):
         if application_root in self.wildcard_applications:
             base_path = '/'.join(path_fragments[:3])
             application_id = ''.join(path_fragments[2:3])
+
+            # dealias the application id
+            if application_id in application._aliases:
+                application_id = application._aliases[application_id]
+
         else:
             base_path = application_root
             application_id = ''.join(path_fragments[1:2])
