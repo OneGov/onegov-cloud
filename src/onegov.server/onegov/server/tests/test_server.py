@@ -80,3 +80,38 @@ def test_path_prefix():
     c.get('/wildcard/info').body == b'/wildcard/info, '
     c.get('/wildcard/info/test').body == b'/wildcard/info, /test'
     c.get('/wildcard/x/y/z').body == b'/wildcard/x, /y/z'
+
+
+def test_environ_changes():
+
+    class EchoApplication(Application):
+
+        def __call__(self, environ, start_response):
+            response = Response()
+            response.text = u', '.join((
+                environ['SCRIPT_NAME'],
+                environ['PATH_INFO']
+            ))
+
+            return response(environ, start_response)
+
+    server = Server(Config({
+        'applications': [
+            {
+                'path': '/static',
+                'application': EchoApplication
+            },
+            {
+                'path': '/wildcard/*',
+                'application': EchoApplication
+            },
+        ]
+    }))
+
+    c = Client(server)
+    assert c.get('/static').body == b'/static, '
+    assert c.get('/static/static').body == b'/static, /static'
+    assert c.get('/static/static/static').body == b'/static, /static/static'
+    assert c.get('/wildcard/wildcard').body == b'/wildcard/wildcard, '
+    assert c.get('/wildcard/wildcard/wildcard').body\
+        == b'/wildcard/wildcard, /wildcard'

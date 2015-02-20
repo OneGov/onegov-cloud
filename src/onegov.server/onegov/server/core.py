@@ -81,8 +81,8 @@ class Server(object):
         if not application_id:
             return HTTPNotFound()(environ, start_response)
 
+        environ['PATH_INFO'] = request.path[len(base_path):]
         environ['SCRIPT_NAME'] = base_path
-        environ['PATH_INFO'] = request.path.replace(base_path, '')
 
         application.set_application_base_path(base_path)
         application.set_application_id(application_id)
