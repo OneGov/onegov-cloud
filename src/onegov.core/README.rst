@@ -1,0 +1,49 @@
+Onegov Core
+===========
+
+Contains code shared by all OneGov applications.
+
+Run the Tests
+-------------
+    
+Install tox and run it::
+
+    pip install tox
+    tox
+
+Limit the tests to a specific python version::
+
+    tox -e py27
+
+Conventions
+-----------
+
+Onegov Core follows PEP8 as close as possible. To test for it run::
+
+    tox -e pep8
+
+Onegov Core uses `Semantic Versioning <http://semver.org/>`_
+
+Build Status
+------------
+
+.. image:: https://travis-ci.org/seantis/onegov.core.png
+  :target: https://travis-ci.org/seantis/onegov.core
+  :alt: Build Status
+
+Coverage
+--------
+
+.. image:: https://coveralls.io/repos/seantis/onegov.core/badge.png?branch=master
+  :target: https://coveralls.io/r/seantis/onegov.core?branch=master
+  :alt: Project Coverage
+
+Latests PyPI Release
+--------------------
+.. image:: https://pypip.in/v/onegov.core/badge.png
+  :target: https://crate.io/packages/onegov.core
+  :alt: Latest PyPI Release
+
+License
+-------
+onegov.core is released under GPLv2
