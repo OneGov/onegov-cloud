@@ -10,14 +10,16 @@ class CachedApplication(object):
 
     """
 
-    def __init__(self, application_class, configuration={}):
+    def __init__(self, application_class, namespace, configuration={}):
         self.application_class = application_class
         self.configuration = configuration
+        self.namespace = namespace
         self.instance = None
 
     def get(self):
         if self.instance is None:
             self.instance = self.application_class()
+            self.instance.namespace = self.namespace
             self.instance.configure_application(**self.configuration)
         return self.instance
 
@@ -33,9 +35,10 @@ class ApplicationCollection(object):
         self.applications = {}
 
         for a in applications or []:
-            self.register(a.root, a.application_class, a.configuration)
+            self.register(
+                a.root, a.application_class, a.namespace, a.configuration)
 
-    def register(self, root, application_class, configuration={}):
+    def register(self, root, application_class, namespace, configuration={}):
         """ Registers the given path for the given application_class and
         configuration.
 
@@ -46,7 +49,7 @@ class ApplicationCollection(object):
                 "tried to register '{}' twice".format(root))
 
         self.applications[root] = CachedApplication(
-            application_class, configuration
+            application_class, namespace, configuration
         )
 
     def get(self, root):

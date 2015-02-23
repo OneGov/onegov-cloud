@@ -1,6 +1,8 @@
 import tempfile
 import textwrap
+import pytest
 
+from onegov.server import errors
 from onegov.server.application import Application
 from onegov.server.config import Config, ApplicationConfig
 
@@ -9,6 +11,7 @@ def test_static_application_config():
     cfg = ApplicationConfig({
         'path': '/application/',
         'application': 'onegov.server.application.Application',
+        'namespace': 'test'
     })
 
     assert cfg.path == '/application'
@@ -22,6 +25,7 @@ def test_wildcard_application_config():
     cfg = ApplicationConfig({
         'path': '/application/*',
         'application': 'onegov.server.application.Application',
+        'namespace': 'test',
         'configuration': {
             'foo': 'bar'
         }
@@ -39,10 +43,12 @@ def test_config_from_yaml():
         applications:
           - path: /static
             application: onegov.server.application.Application
+            namespace: static
             configuration:
               foo: bar
           - path: /wildcard/*
             application: onegov.server.application.Application
+            namespace: wildcard
             configuration:
               bar: foo
     """)
@@ -65,3 +71,21 @@ def test_config_from_yaml():
     assert config.applications[1].root == '/wildcard'
     assert config.applications[1].application_class is Application
     assert config.applications[1].configuration == {'bar': 'foo'}
+
+
+def test_unique_namespace():
+    with pytest.raises(errors.ApplicationConflictError):
+        Config({
+            'applications': [
+                {
+                    'path': '/one/*',
+                    'application': 'onegov.server.application.Application',
+                    'namespace': 'test',
+                },
+                {
+                    'path': '/two/*',
+                    'application': 'onegov.server.application.Application',
+                    'namespace': 'test',
+                }
+            ]
+        })

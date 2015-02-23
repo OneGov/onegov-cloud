@@ -126,6 +126,7 @@ class Server(object):
         environ['SCRIPT_NAME'] = base_path
 
         application.set_application_base_path(base_path)
-        application.set_application_id(application_id)
+        application.set_application_id(
+            application.namespace + '/' + application_id)
 
         return application(environ, start_response)

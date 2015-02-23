@@ -5,3 +5,7 @@ class OnegovServerError(Exception):
 
 class ApplicationConflictError(OnegovServerError):
     pass
+
+
+class ApplicationConfigError(OnegovServerError):
+    pass

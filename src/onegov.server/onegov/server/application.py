@@ -18,6 +18,10 @@ class Application(object):
     #: expressions, but straight hostnames.
     allowed_hosts = None
 
+    #: The namespace of the application, set before the application is
+    #: configured in :meth:`configure_application`.
+    namespace = None
+
     #: Use :meth:`alias` instead of manipulating this dictionary.
     _aliases = None
 
@@ -50,27 +54,34 @@ class Application(object):
         """ Sets the application id before __call__ is called. That is, before
         each request.
 
-        The application is is the last fragment of the base_path. That is
-        `app` for all requests in the following config::
+        The application id consists of two values, delimitd by a '/'. The first
+        value is the namespace of the application, the second value is the
+        last fragment of the base_path.
+
+        That is `namespace/app` for all requests in the following config::
 
             {
                 'applications': [
                     {
-                        path: '/app'
+                        path: '/app',
+                        namespace: 'namespace'
                     }
                 ]
             }
 
-        And `blog` for a `/sites/blog` request in the following config::
+        And `namespace/blog` for a `/sites/blog` request in the following
+        config::
 
             {
                 'applications': [
                     {
-                        path: '/sites/*'
+                        path: '/sites/*',
+                        namespace: 'namespace'
                     }
                 ]
             }
         """
+        assert application_id.startswith(self.namespace + '/')
         self.application_id = application_id
 
     def set_application_base_path(self, base_path):
@@ -110,7 +121,7 @@ class Application(object):
 
     def alias(self, application_id, alias):
         """ Adds an alias under which this application is available on the
-        server. The alias is *for* your current `application_id`.
+        server.
 
         The alias only works for wildcard applications - it has no effect
         on static applications!

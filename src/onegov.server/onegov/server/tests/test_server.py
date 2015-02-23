@@ -20,26 +20,30 @@ def test_application_mapping():
         'applications': [
             {
                 'path': '/static',
-                'application': EchoApplication
+                'application': EchoApplication,
+                'namespace': 'stag'
             },
             {
                 'path': '/wildcard/*',
-                'application': EchoApplication
+                'application': EchoApplication,
+                'namespace': 'wild'
             }
         ]
     }))
 
     c = Client(server)
-    c.get('/static').body == b'/static, static'
-    c.get('/static/').body == b'/static, static'
-    c.get('/static/site').body == b'/static, static'
-    c.get('/static/site/').body == b'/static, static'
-    c.get('/wildcard/blog').body == b'/wildcard/blog, blog'
-    c.get('/wildcard/blog/').body == b'/wildcard/blog, blog'
-    c.get('/wildcard/blog/login').body == b'/wildcard/blog, blog'
-    c.get('/wildcard/blog/login/').body == b'/wildcard/blog, blog'
-    c.get('/wildcard/monitor/refresh').body == b'/wildcard/monitor, monitor'
-    c.get('/wildcard/monitor/refresh/').body == b'/wildcard/monitor, monitor'
+    c.get('/static').body == b'/static, stag/static'
+    c.get('/static/').body == b'/static, stag/static'
+    c.get('/static/site').body == b'/static, stag/static'
+    c.get('/static/site/').body == b'/static, stag/static'
+    c.get('/wildcard/blog').body == b'/wildcard/blog, wild/blog'
+    c.get('/wildcard/blog/').body == b'/wildcard/blog, wild/blog'
+    c.get('/wildcard/blog/login').body == b'/wildcard/blog, wild/blog'
+    c.get('/wildcard/blog/login/').body == b'/wildcard/blog, wild/blog'
+    c.get('/wildcard/monitor/refresh').body\
+        == b'/wildcard/monitor, wild/monitor'
+    c.get('/wildcard/monitor/refresh/').body\
+        == b'/wildcard/monitor, wild/monitor'
 
     c.get('/', status=404)
     c.get('/wildcard', status=404)
@@ -64,11 +68,13 @@ def test_path_prefix():
         'applications': [
             {
                 'path': '/static',
-                'application': EchoApplication
+                'application': EchoApplication,
+                'namespace': 'static'
             },
             {
                 'path': '/wildcard/*',
-                'application': EchoApplication
+                'application': EchoApplication,
+                'namespace': 'wildcard'
             },
         ]
     }))
@@ -99,11 +105,13 @@ def test_environ_changes():
         'applications': [
             {
                 'path': '/static',
-                'application': EchoApplication
+                'application': EchoApplication,
+                'namespace': 'static'
             },
             {
                 'path': '/wildcard/*',
-                'application': EchoApplication
+                'application': EchoApplication,
+                'namespace': 'wildcard'
             },
         ]
     }))
@@ -132,6 +140,7 @@ def test_invalid_host_request():
             {
                 'path': '/static',
                 'application': HelloApplication,
+                'namespace': 'static'
             }
         ]
     }))
@@ -173,6 +182,7 @@ def test_aliases():
             {
                 'path': '/sites/*',
                 'application': EchoApplication,
+                'namespace': 'aliases'
             }
         ]
     }))
@@ -182,12 +192,12 @@ def test_aliases():
     c = Client(server)
 
     response = c.get('/sites/main')
-    assert response.body == b'main'
+    assert response.body == b'aliases/main'
 
     response = c.get('/sites/blog')
-    assert response.body == b'blog'
+    assert response.body == b'aliases/blog'
 
     application.alias('main', 'blog')
 
     response = c.get('/sites/blog')
-    assert response.body == b'main'
+    assert response.body == b'aliases/main'

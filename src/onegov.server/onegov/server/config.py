@@ -2,49 +2,30 @@ import inspect
 import pydoc
 import yaml
 
+from onegov.server import errors
+
 
 class Config(object):
     """ Represents the configuration of the server. """
 
     def __init__(self, configuration):
-        """ Load the given configuration, which is expected to look thusly:
+        """ Load the given configuration, which is a list of dictionaries.
+        Each dictionary is loaded by the :class:`ApplicationConfig` class.
 
-            {
-                'applications': [
-                    {
-                        'path': '/application',
-                        'application': 'my.module.StaticApp',
-                        'configuration': {
-                            'my': 'custom',
-                            'config': 'values'
-                        }
-                    },
-                    {
-                        'path': '/sites/*',
-                        'application': 'my.module.WildcardApp',
-                    }
-                ]
-            }
-
-        There are two types of applications, static applications without a
-        wildcard (*) in their path. And wildcard applications with a wildcard
-        in their path.
-
-        Static applications exist once. Wildcard applications exist
-        once for every path. That is to say `/sites/one` and `/sites/two` in
-        the example above are two different applications and a path of
-        `/sites/one/login` is passed to WildcardApp as `/login`, while
-        `/application/one/login` is passed to StaticApp as `/one/login`.
-
-        Note that the `application` may be a string or a class. If it's a
-        string, the application class is dynamically loaded immediately.
-
-        Nested paths are *not* supported. So `/namespace/path` is invalid.
+        See :class:`ApplicationConfig` for a documentation of all configuration
+        values.
 
         """
         self.applications = [
             ApplicationConfig(a) for a in configuration.get('applications')
         ]
+
+        unique_namespaces = set(a.namespace for a in self.applications)
+        all_namespaces = list(a.namespace for a in self.applications)
+
+        if len(unique_namespaces) != len(all_namespaces):
+            raise errors.ApplicationConflictError(
+                "Not all namespaces are unique")
 
     @staticmethod
     def from_yaml_file(yaml_file):
@@ -57,7 +38,62 @@ class Config(object):
 
 
 class ApplicationConfig(object):
-    """ Represents an application config entry. """
+    """ Represents an application config entry loaded from a dictionary like
+    this::
+
+        {
+            'path': '/application',
+            'application': 'my.module.StaticApp',
+            'namespace': 'my-namespace'
+            'configuration': {
+                'my': 'custom',
+                'config': 'values'
+            }
+        }
+
+    It may contain the following keys:
+
+    :path:
+        The path of the application is the prefix under which the application
+        is running. For each path onegov.server loads and caches an
+        application.
+
+        Applications are basically WSGI containers that are run independently
+        in the same process.
+
+        See :class:`onegov.server.Application` for more.
+
+        There are two types of applications, static applications without a
+        wildcard (`*`) in their path and wildcard applications *with* a
+        wildcard in their path.
+
+        Static applications always have the same application_id (`ns/static`,
+        if the path is `/static` and the namespace is `ns`).
+
+        Wildcard applications have the application_id set to the wildcard
+        part of the path: (`/wildcard/*` can result in an applicaiton_id of
+        `ns/blog` if `/wildcard/blog` is opened and the namespace is `ns`).
+
+        See also: :meth:`onegov.server.Application.set_application_id`.
+
+        Nested paths are not supported. `/static` works and `/wildcard/*`
+        works, but not `/static/site` or `/wildcard/site/*`.
+
+    :application:
+        The application class or string to an application class that inherits
+        from :class:`onegov.server.Application`.
+
+        If `application` is a string, the class it points to is loaded
+        immediately.
+
+    :namespace:
+        Each application has a namespace that must be unique. It is used
+        make the application_id unique.
+
+    :configuration:
+        A dictionary that is passed to the application once it is initialized.
+        See :meth:`onegov.server.Application.configure_application`.
+    """
 
     __slots__ = ['_cfg']
 
@@ -69,16 +105,28 @@ class ApplicationConfig(object):
         assert self.path.count('/') <= 2
         assert self.path.startswith('/')
 
+        assert '/' not in self.namespace
+
     @property
     def path(self):
         return self._cfg['path'].rstrip('/')
 
     @property
+    def namespace(self):
+        return self._cfg['namespace']
+
+    @property
     def application_class(self):
         if inspect.isclass(self._cfg['application']):
-            return self._cfg['application']
+            application_class = self._cfg['application']
         else:
-            return pydoc.locate(self._cfg['application'])
+            application_class = pydoc.locate(self._cfg['application'])
+
+        if application_class is None:
+            raise errors.ApplicationConfigError(
+                "The application class could not be found.")
+
+        return application_class
 
     @property
     def configuration(self):

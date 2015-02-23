@@ -6,7 +6,7 @@ from onegov.server.collection import ApplicationCollection, CachedApplication
 
 
 def test_cached_application():
-    cached = CachedApplication(Application)
+    cached = CachedApplication(Application, 'ns')
     assert cached.get() is cached.get()
 
 
@@ -18,7 +18,7 @@ def test_collection():
             self.foo = foo
 
     collection = ApplicationCollection()
-    collection.register('foo', MyApplication, {'foo': 'bar'})
+    collection.register('foo', MyApplication, 'test', {'foo': 'bar'})
 
     assert collection.get('foo') is collection.get('foo')
     assert collection.get('foo').foo == 'bar'
@@ -26,10 +26,10 @@ def test_collection():
 
 def test_collection_conflict():
     collection = ApplicationCollection()
-    collection.register('foo', Application)
+    collection.register('foo', Application, 'ns1')
 
     with pytest.raises(errors.ApplicationConflictError):
-        collection.register('foo', Application)
+        collection.register('foo', Application, 'ns2')
 
 
 def test_morepath_applications():
@@ -43,11 +43,11 @@ def test_morepath_applications():
         pass
 
     collection = ApplicationCollection()
-    collection.register('foo', WsgiApp)
+    collection.register('foo', WsgiApp, 'foo')
 
     assert len(list(collection.morepath_applications())) == 0
 
     collection = ApplicationCollection()
-    collection.register('foo', MorepathApp)
+    collection.register('foo', MorepathApp, 'bar')
 
     assert len(list(collection.morepath_applications())) == 1
