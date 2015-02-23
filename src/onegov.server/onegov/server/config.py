@@ -61,7 +61,7 @@ class ApplicationConfig(object):
         Applications are basically WSGI containers that are run independently
         in the same process.
 
-        See :class:`onegov.server.Application` for more.
+        See :class:`~.application.Application` for more.
 
         There are two types of applications, static applications without a
         wildcard (`*`) in their path and wildcard applications *with* a
@@ -74,14 +74,14 @@ class ApplicationConfig(object):
         part of the path: (`/wildcard/*` can result in an applicaiton_id of
         `ns/blog` if `/wildcard/blog` is opened and the namespace is `ns`).
 
-        See also: :meth:`onegov.server.Application.set_application_id`.
+        See also: :meth:`~.application.Application.set_application_id`.
 
         Nested paths are not supported. `/static` works and `/wildcard/*`
         works, but not `/static/site` or `/wildcard/site/*`.
 
     :application:
         The application class or string to an application class that inherits
-        from :class:`onegov.server.Application`.
+        from :class:`~.application.Application`.
 
         If `application` is a string, the class it points to is loaded
         immediately.
@@ -92,7 +92,7 @@ class ApplicationConfig(object):
 
     :configuration:
         A dictionary that is passed to the application once it is initialized.
-        See :meth:`onegov.server.Application.configure_application`.
+        See :meth:`.application.Application.configure_application`.
     """
 
     __slots__ = ['_cfg']
