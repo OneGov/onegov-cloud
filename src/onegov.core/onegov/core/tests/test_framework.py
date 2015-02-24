@@ -3,6 +3,14 @@ from onegov.core import Framework
 from webtest import TestApp as Client
 
 
+def test_set_application_id():
+    app = Framework()
+    app.namespace = 'namespace'
+    app.set_application_id('namespace/id')
+
+    assert app.schema == 'namespace-id'
+
+
 def test_virtual_host_request():
     config = setup()
 

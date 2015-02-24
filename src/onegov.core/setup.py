@@ -36,12 +36,16 @@ setup(
     install_requires=[
         'cached_property',
         'morepath',
-        'onegov.server'
+        'more.transaction',
+        'onegov.server',
+        'sqlalchemy>=0.9',
+        'zope.sqlalchemy'
     ],
     extras_require=dict(
         test=[
             'pytest',
             'pytest-cov',
+            'testing.postgresql',
             'webtest'
         ],
     ),
