@@ -38,6 +38,7 @@ setup(
         'morepath',
         'more.transaction',
         'onegov.server',
+        'psycopg2',
         'sqlalchemy>=0.9',
         'zope.sqlalchemy'
     ],
