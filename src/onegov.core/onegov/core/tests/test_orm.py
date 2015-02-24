@@ -1,4 +1,5 @@
 import json
+import transaction
 
 from morepath import setup
 from onegov.core.orm import SessionManager
@@ -74,7 +75,7 @@ def test_schema_bound_session(dsn):
     session = mgr.session()
 
     session.add(Document(title='Welcome to Foo'))
-    session.commit()
+    transaction.commit()
 
     assert session.query(Document).one().title == 'Welcome to Foo'
 

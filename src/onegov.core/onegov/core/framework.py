@@ -10,16 +10,29 @@ class Framework(TransactionApp, ServerApplication):
 
     request_class = VirtualHostRequest
 
+    #: holds the database connection string, *if* there is a database connected
+    dsn = None
+
+    @property
+    def has_database_connection(self):
+        return self.dsn is not None
+
     def configure_application(self, **configuration):
         super(Framework, self).configure_application(**configuration)
+
         self.dsn = configuration.get('dsn')
-        self.session_manager = SessionManager()
-        self.session_manager.setup(self.dsn, configuration.get('base', Base))
+
+        if self.dsn:
+            self.declarative_base = configuration.get('base', Base)
+            self.session_manager = SessionManager()
+            self.session_manager.setup(self.dsn, self.declarative_base)
 
     def set_application_id(self, application_id):
         super(Framework, self).set_application_id(application_id)
         self.schema = application_id.replace('/', '-')
-        self.session_manager.set_current_schema(self.schema)
+
+        if self.has_database_connection:
+            self.session_manager.set_current_schema(self.schema)
 
     @cached_property
     def session(self):

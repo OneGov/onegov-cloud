@@ -6,6 +6,7 @@ from webtest import TestApp as Client
 def test_set_application_id():
     app = Framework()
     app.namespace = 'namespace'
+    app.configure_application()
     app.set_application_id('namespace/id')
 
     assert app.schema == 'namespace-id'
