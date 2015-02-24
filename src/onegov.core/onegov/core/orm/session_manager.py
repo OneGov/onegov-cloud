@@ -192,6 +192,18 @@ class SessionManager(object):
         """
         return self.session_factory()
 
+    def is_schema_found_on_database(self, schema):
+        """ Returns True if the given schema exists on the database. """
+
+        assert self.is_valid_schema(schema)
+
+        result = self.engine.execute(
+            "SELECT EXISTS(SELECT 1 FROM information_schema.schemata "
+            "WHERE schema_name = '{}')".format(schema)
+        )
+
+        return result.first()[0]
+
     def ensure_schema_exists(self, schema):
         """ Makes sure the schema exists on the database. If it doesn't, it
         is created.
@@ -207,10 +219,10 @@ class SessionManager(object):
             # allowed to be switched to. Nobody should have influence on these
             # schemas anyway, but we want to be very sure.
             assert self.is_valid_schema(schema)
-            self.engine.execute(
-                'CREATE SCHEMA IF NOT EXISTS "{}"'.format(schema))
-            self.engine.execute(
-                'COMMIT')
+
+            if not self.is_schema_found_on_database(schema):
+                self.engine.execute('CREATE SCHEMA "{}"'.format(schema))
+                self.engine.execute("COMMIT")
 
             conn = self.engine.execution_options(schema=schema)
 
