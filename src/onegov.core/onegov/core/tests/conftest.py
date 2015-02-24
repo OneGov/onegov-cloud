@@ -21,7 +21,7 @@ def dsn(postgres_server_url):
         if schema in ('information_schema', 'public'):
             continue
 
-        engine.execute("DROP SCHEMA {} CASCADE".format(schema))
+        engine.execute('DROP SCHEMA "{}" CASCADE'.format(schema))
 
     engine.raw_connection().invalidate()
     engine.dispose()

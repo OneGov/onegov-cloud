@@ -1,6 +1,7 @@
 import threading
 import transaction
 import re
+import zope.sqlalchemy
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -151,6 +152,8 @@ class SessionManager(object):
             scopefunc=self._scopefunc
         )
 
+        zope.sqlalchemy.register(self.session_factory)
+
         def activate_schema(conn, cursor, stmt, params, context, executemany):
             if 'schema' in conn._execution_options:
                 schema = conn._execution_options['schema']
@@ -160,7 +163,7 @@ class SessionManager(object):
             # it's important that we check the schema every time before we
             # use it in an SQL statement!
             assert self.is_valid_schema(schema)
-            cursor.execute('SET search_path TO {}'.format(schema))
+            cursor.execute('SET search_path TO "{}"'.format(schema))
 
         event.listen(self.engine, "before_cursor_execute", activate_schema)
 

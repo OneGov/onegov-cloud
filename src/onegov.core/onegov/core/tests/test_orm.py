@@ -1,6 +1,12 @@
+import json
+
+from morepath import setup
 from onegov.core.orm import SessionManager
+from onegov.core.framework import Framework
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
+from webtest import TestApp as Client
+from webob.exc import HTTPUnauthorized
 
 
 def test_is_valid_schema():
@@ -109,3 +115,103 @@ def test_session_scope(dsn):
     assert bar_session is bar_session_2
 
     mgr.dispose()
+
+
+def test_orm_scenario(dsn):
+    # test a somewhat complete ORM scenario in which create and read data
+    # for different applications
+    Base = declarative_base()
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=False)
+
+    class DocumentCollection(object):
+
+        def __init__(self, session):
+            self.session = session
+
+        def query(self):
+            return self.session.query(Document)
+
+        def all(self):
+            return self.query().all()
+
+        def get(self, id):
+            return self.query().filter(Document.id == id).first()
+
+        def add(self, title):
+            document = Document(title=title)
+            self.session.add(document)
+            self.session.flush()
+
+            return document
+
+    @App.path(model=DocumentCollection, path='documents')
+    def get_documents(app):
+        return DocumentCollection(app.session())
+
+    @App.json(model=DocumentCollection)
+    def documents_default(self, request):
+        return {d.id: d.title for d in self.all()}
+
+    @App.json(model=DocumentCollection, name='add', request_method='POST')
+    def documents_add(self, request):
+        self.add(title=request.params.get('title'))
+
+    @App.json(model=DocumentCollection, name='error')
+    def documents_error(self, request):
+        # tries to create a document that should not be created since the
+        # request as a whole fails
+        self.add('error')
+
+        raise HTTPUnauthorized()
+
+    # this is required for the transactions to actually work, usually this
+    # would be onegov.server's job
+    import more.transaction
+    config.scan(more.transaction)
+
+    config.commit()
+
+    app = App()
+    app.configure_application(dsn=dsn, base=Base)
+    app.namespace = 'municipalities'
+
+    c = Client(app)
+
+    # let's try to add some documents to new york
+    app.set_application_id('municipalities/new-york')
+
+    assert json.loads(c.get('/documents').text) == {}
+    c.post('/documents/add', {'title': 'Welcome to the big apple!'})
+
+    assert json.loads(c.get('/documents').text) == {
+        '1': "Welcome to the big apple!"
+    }
+
+    # after that, we switch to chicago, where a different set of documents
+    # should exist
+    app.set_application_id('municipalities/chicago')
+
+    assert json.loads(c.get('/documents').text) == {}
+    c.post('/documents/add', {'title': 'Welcome to the windy city!'})
+
+    assert json.loads(c.get('/documents').text) == {
+        '1': "Welcome to the windy city!"
+    }
+
+    # finally, let's see if the transaction is rolled back if there's an
+    # error during the course of the request
+    c.get('/documents/error', expect_errors=True)
+    assert json.loads(c.get('/documents').text) == {
+        '1': "Welcome to the windy city!"
+    }
+
+    app.session_manager.dispose()
