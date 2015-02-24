@@ -83,7 +83,7 @@ class Server(object):
             # it's safe to say that we got morepath available here
             import morepath
 
-            config = morepath.setup()
+            config = morepath.autoconfig()
             for app in morepath_applications:
                 config.scan(pydoc.locate(app.application_class.__module__))
             config.commit()
