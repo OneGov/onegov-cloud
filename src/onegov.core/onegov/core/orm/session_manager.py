@@ -10,6 +10,21 @@ from sqlalchemy.pool import SingletonThreadPool
 class SessionManager(object):
     """ Holds sessions and creates schemas before binding sessions to schemas.
 
+    It currently works by keeping the currently used schema in a global
+    variable. So this class is not threadsafe, nor should it be used
+    with multiple instances.
+
+    This is unfortunate, but it's good enough for our current use case. That
+    is to say, this sucks, but it works because:
+
+        - Every request has one schema associated with it.
+        - Concurrency is enabled using multiple WSGI processes.
+
+    Refactoring this to be threadsafe and to be independent is not *that* easy
+    because SQLAlchemy doesn't have straight-forward facilities to implement
+    this kind of thing (schema bound sessions with connections that connect
+    to the bound schema only).
+
     """
 
     # describes the accepted characters in a schema name
