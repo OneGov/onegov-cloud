@@ -47,9 +47,8 @@ class Framework(TransactionApp, ServerApplication):
         self.dsn = configuration.get('dsn')
 
         if self.dsn:
-            self.declarative_base = configuration.get('base', Base)
-            self.session_manager = SessionManager()
-            self.session_manager.setup(self.dsn, self.declarative_base)
+            self.session_manager = SessionManager(
+                self.dsn, configuration.get('base', Base))
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the

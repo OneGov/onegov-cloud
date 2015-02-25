@@ -45,22 +45,71 @@ class SessionManager(object):
     # defines the currently used schema (global variable)
     __current_schema = None
 
-    def __init__(self):
+    def __init__(self, dsn, base, engine_config={}, session_config={}):
+        """ Configures the data source name/dsn/database url and sets up the
+        connection to the database.
 
-        #: the engine used in the current thread
-        self.engine = None
+        :dsn:
+            Database connection string including user, password, host, port
+            and database name.
 
-        #: schemas that were created
+            See: `<http://docs.sqlalchemy.org/en/latest/core/engines.html\
+            #database-urls>`_
+
+        :base:
+            Declarative base used to define the SQLAlchemy database models.
+
+        :engine_config:
+            Additional configuration passed to SQLAlchemy's `create_engine`.
+
+            See: `<http://docs.sqlalchemy.org/en/latest/core/engines.html\
+            #sqlalchemy.create_engine>`
+
+        :session_config:
+            Additional configuration passed to SQLAlchemy's sessionmaker.
+
+            See: `<http://docs.sqlalchemy.org/en/latest/orm/session_api.html\
+            #sqlalchemy.orm.session.sessionmaker>`
+
+        Example::
+
+            from sqlalchemy.ext.declarative import declarative_base
+
+            Base = declarative_base()
+            manager.setup(
+                'postgres://user:password@localhost:5432/dbname', Base)
+
+        Note, to connect to another database you need to create a new
+        SessionManager instance.
+
+        """
+        assert 'postgres' in dsn, "Onegov only supports Postgres!"
+
+        self.dsn = dsn
+        self.base = base
         self.created_schemas = set()
 
-        #: dsn associated with this configuration
-        self.dsn = None
+        self.engine = create_engine(
+            self.dsn,
+            poolclass=SingletonThreadPool,
+            **engine_config
+        )
+        self.session_factory = scoped_session(
+            sessionmaker(bind=self.engine, **session_config),
+            scopefunc=self._scopefunc
+        )
 
-        #: the SQLAlchemy base to operate on
-        self.base = None
+        zope.sqlalchemy.register(self.session_factory)
 
-        #: the session factory to use
-        self.session_factory = None
+        def activate_schema(conn, cursor, stmt, params, context, executemany):
+            if 'schema' in conn._execution_options:
+                schema = conn._execution_options['schema']
+            else:
+                schema = self.__current_schema
+
+            cursor.execute("SET search_path TO %s", (schema, ))
+
+        event.listen(self.engine, "before_cursor_execute", activate_schema)
 
     def _scopefunc(self):
         """ Returns the scope of the scoped_session used to create new
@@ -103,74 +152,6 @@ class SessionManager(object):
 
         return self._valid_schema_name.match(schema) and True or False
 
-    def setup(self, dsn, base, engine_config={}, session_config={}):
-        """ Configures the data source name/dsn/database url and sets up the
-        connection to the database.
-
-        :dsn:
-            Database connection string including user, password, host, port
-            and database name.
-
-            See: `<http://docs.sqlalchemy.org/en/latest/core/engines.html\
-            #database-urls>`_
-
-        :base:
-            Declarative base used to define the SQLAlchemy database models.
-
-        :engine_config:
-            Additional configuration passed to SQLAlchemy's `create_engine`.
-
-            See: `<http://docs.sqlalchemy.org/en/latest/core/engines.html\
-            #sqlalchemy.create_engine>`
-
-        :session_config:
-            Additional configuration passed to SQLAlchemy's sessionmaker.
-
-            See: `<http://docs.sqlalchemy.org/en/latest/orm/session_api.html\
-            #sqlalchemy.orm.session.sessionmaker>`
-
-        Example::
-
-            from sqlalchemy.ext.declarative import declarative_base
-
-            Base = declarative_base()
-            manager.setup(
-                'postgres://user:password@localhost:5432/dbname', Base)
-
-        Note that the dsn can only be configured once, as other things depend
-        on it. It might be possible to add this feature, so get in touch if
-        you have a use case for this.
-
-        """
-
-        assert self.dsn is None or self.dsn == dsn
-        assert 'postgres' in dsn, "Onegov only supports Postgres!"
-
-        self.dsn = dsn
-        self.base = base
-
-        self.engine = create_engine(
-            self.dsn,
-            poolclass=SingletonThreadPool,
-            **engine_config
-        )
-        self.session_factory = scoped_session(
-            sessionmaker(bind=self.engine, **session_config),
-            scopefunc=self._scopefunc
-        )
-
-        zope.sqlalchemy.register(self.session_factory)
-
-        def activate_schema(conn, cursor, stmt, params, context, executemany):
-            if 'schema' in conn._execution_options:
-                schema = conn._execution_options['schema']
-            else:
-                schema = self.__current_schema
-
-            cursor.execute("SET search_path TO %s", (schema, ))
-
-        event.listen(self.engine, "before_cursor_execute", activate_schema)
-
     def set_current_schema(self, schema):
         """ Sets the current schema in use. Note that this is a *global*
         setting and will affect all sessions in use!
@@ -204,7 +185,7 @@ class SessionManager(object):
 
         This means that a session retrieved thusly::
 
-            mgr = SessionManager()
+            mgr = SessionManager('postgres://...')
             mgr.set_current_schema('foo')
             session = mgr.session()
 

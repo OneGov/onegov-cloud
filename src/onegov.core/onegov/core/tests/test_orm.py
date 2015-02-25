@@ -10,8 +10,8 @@ from webtest import TestApp as Client
 from webob.exc import HTTPUnauthorized
 
 
-def test_is_valid_schema():
-    mgr = SessionManager()
+def test_is_valid_schema(dsn):
+    mgr = SessionManager(dsn, None)
     assert not mgr.is_valid_schema('pg_test')
     assert not mgr.is_valid_schema('-- or 1=1')
     assert not mgr.is_valid_schema('0')
@@ -31,8 +31,7 @@ def test_create_schema(dsn):
         id = Column(Integer, primary_key=True)
         title = Column(Text)
 
-    mgr = SessionManager()
-    mgr.setup(dsn, Base)
+    mgr = SessionManager(dsn, Base)
 
     # we need a schema to use the session manager and it can't be 'public'
     mgr.set_current_schema('testing')
@@ -72,9 +71,7 @@ def test_schema_bound_session(dsn):
         id = Column(Integer, primary_key=True)
         title = Column(Text)
 
-    mgr = SessionManager()
-    mgr.setup(dsn, Base)
-
+    mgr = SessionManager(dsn, Base)
     mgr.set_current_schema('foo')
     session = mgr.session()
 
@@ -99,8 +96,7 @@ def test_schema_bound_session(dsn):
 def test_session_scope(dsn):
     Base = declarative_base()
 
-    mgr = SessionManager()
-    mgr.setup(dsn, Base)
+    mgr = SessionManager(dsn, Base)
 
     mgr.set_current_schema('foo')
     foo_session = mgr.session()
