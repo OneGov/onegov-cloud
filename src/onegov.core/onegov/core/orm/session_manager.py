@@ -43,7 +43,7 @@ class SessionManager(object):
     _reserved_schemas = {'information_schema', 'public'}
 
     # defines the currently used schema (global variable)
-    __current_schema = 'global'
+    __current_schema = 'public'
 
     def __init__(self):
 
