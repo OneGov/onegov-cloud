@@ -230,8 +230,9 @@ class SessionManager(object):
                 #
                 # this is the *only* place where this happens - if anyone
                 # knows how to do this using sqlalchemy/psycopg2, come forward!
-                self.engine.execute('CREATE SCHEMA "{}"'.format(schema))
-                self.engine.execute('COMMIT')
+                conn = self.engine.execution_options(schema=None)
+                conn.execute('CREATE SCHEMA "{}"'.format(schema))
+                conn.execute('COMMIT')
 
             conn = self.engine.execution_options(schema=schema)
 
