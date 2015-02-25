@@ -59,8 +59,7 @@ def test_create_schema(dsn):
     mgr.ensure_schema_exists('new')
 
     assert 'new' in existing_schemas()
-    assert 'document' in schema_tables('test')
-    assert 'document' not in schema_tables('public')
+    assert 'document' in schema_tables('new')
 
 
 def test_schema_bound_session(dsn):
