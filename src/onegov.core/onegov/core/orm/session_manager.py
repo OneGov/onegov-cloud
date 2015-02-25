@@ -107,7 +107,8 @@ class SessionManager(object):
             else:
                 schema = self.__current_schema
 
-            cursor.execute("SET search_path TO %s", (schema, ))
+            if schema is not None:
+                cursor.execute("SET search_path TO %s", (schema, ))
 
         event.listen(self.engine, "before_cursor_execute", activate_schema)
 
@@ -200,7 +201,8 @@ class SessionManager(object):
     def is_schema_found_on_database(self, schema):
         """ Returns True if the given schema exists on the database. """
 
-        result = self.engine.execute(text(
+        conn = self.engine.execution_options(schema=None)
+        result = conn.execute(text(
             "SELECT EXISTS(SELECT 1 FROM information_schema.schemata "
             "WHERE schema_name = :schema)"
         ), schema=schema)
