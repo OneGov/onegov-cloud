@@ -33,6 +33,9 @@ def test_create_schema(dsn):
     mgr = SessionManager()
     mgr.setup(dsn, Base)
 
+    # we need a schema to use the session manager and it can't be 'public'
+    mgr.set_current_schema('testing')
+
     def existing_schemas():
         # DO NOT copy this query, it's insecure (which is fine in testing)
         return set(
@@ -50,11 +53,12 @@ def test_create_schema(dsn):
             ))
         )
 
-    assert 'test' not in existing_schemas()
+    assert 'testing' in existing_schemas()
+    assert 'new' not in existing_schemas()
 
-    mgr.ensure_schema_exists('test')
+    mgr.ensure_schema_exists('new')
 
-    assert 'test' in existing_schemas()
+    assert 'new' in existing_schemas()
     assert 'document' in schema_tables('test')
     assert 'document' not in schema_tables('public')
 

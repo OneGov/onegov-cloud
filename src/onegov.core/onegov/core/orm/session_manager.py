@@ -43,7 +43,7 @@ class SessionManager(object):
     _reserved_schemas = {'information_schema', 'public'}
 
     # defines the currently used schema (global variable)
-    __current_schema = 'public'
+    __current_schema = None
 
     def __init__(self):
 
@@ -88,6 +88,9 @@ class SessionManager(object):
         sideeffects.
 
         """
+        if not schema:
+            return False
+
         if schema.startswith(self._invalid_prefixes):
             return False
 
