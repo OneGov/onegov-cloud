@@ -3,7 +3,7 @@ import transaction
 import re
 import zope.sqlalchemy
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import SingletonThreadPool
 
@@ -31,8 +31,8 @@ class SessionManager(object):
     # describes the accepted characters in a schema name
     _valid_schema_name = re.compile(r'^[a-z0-9_-]+$')
 
-    # holds prefixes with which a schema may not begin
-    _invalid_prefixes = ('pg_', ) + tuple(str(i) for i in range(0, 10))
+    # describes the prefixes with which a schema may not begin
+    _invalid_prefixes = re.compile(r'^([0-9]|pg_)+')
 
     # holds schemas that may never be used:
     # - information_schema is a sql standard schema that's for internal use
@@ -91,10 +91,14 @@ class SessionManager(object):
         if not schema:
             return False
 
-        if schema.startswith(self._invalid_prefixes):
+        if schema in self._reserved_schemas:
             return False
 
-        if schema in self._reserved_schemas:
+        if self._invalid_prefixes.match(schema):
+            return False
+
+        # only one consecutive '-' is allowed (-- constitues a comment)
+        if '--' in schema:
             return False
 
         return self._valid_schema_name.match(schema) and True or False
@@ -163,10 +167,7 @@ class SessionManager(object):
             else:
                 schema = self.__current_schema
 
-            # it's important that we check the schema every time before we
-            # use it in an SQL statement!
-            assert self.is_valid_schema(schema)
-            cursor.execute('SET search_path TO "{}"'.format(schema))
+            cursor.execute("SET search_path TO %s", (schema, ))
 
         event.listen(self.engine, "before_cursor_execute", activate_schema)
 
@@ -191,6 +192,8 @@ class SessionManager(object):
         anyway.
 
         """
+        assert self.is_valid_schema(schema)
+
         self.__current_schema = schema
         self.ensure_schema_exists(schema)
 
@@ -216,12 +219,10 @@ class SessionManager(object):
     def is_schema_found_on_database(self, schema):
         """ Returns True if the given schema exists on the database. """
 
-        assert self.is_valid_schema(schema)
-
-        result = self.engine.execute(
+        result = self.engine.execute(text(
             "SELECT EXISTS(SELECT 1 FROM information_schema.schemata "
-            "WHERE schema_name = '{}')".format(schema)
-        )
+            "WHERE schema_name = :schema)"
+        ), schema=schema)
 
         return result.first()[0]
 
@@ -234,23 +235,26 @@ class SessionManager(object):
 
         if schema not in self.created_schemas:
 
-            # I haven't figured out yet how to safely create a DDL statement
-            # in SQLAlchemy. This is why the schema is checked for validity
-            # (a-z only, without any spaces) and only checked schemas are later
-            # allowed to be switched to. Nobody should have influence on these
-            # schemas anyway, but we want to be very sure.
+            # this is important because CREATE SCHEMA is done in a possibly
+            # dangerous way!
             assert self.is_valid_schema(schema)
 
             if not self.is_schema_found_on_database(schema):
+                # psycopg2 doesn't know how to correctly build a CREATE
+                # SCHEMA statement, so we need to do it manually.
+                # self.is_valid_schema should've checked that no sql
+                # injections are possible.
+                #
+                # this is the *only* place where this happens - if anyone
+                # knows how to do this using sqlalchemy/psycopg2, come forward!
                 self.engine.execute('CREATE SCHEMA "{}"'.format(schema))
-                self.engine.execute("COMMIT")
+                self.engine.execute('COMMIT')
 
             conn = self.engine.execution_options(schema=schema)
 
             self.base.metadata.schema = schema
             self.base.metadata.create_all(conn)
 
-            conn.execute('COMMIT')
             transaction.commit()
 
             self.created_schemas.add(schema)

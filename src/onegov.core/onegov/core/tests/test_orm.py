@@ -17,6 +17,7 @@ def test_is_valid_schema():
     assert not mgr.is_valid_schema('0')
     assert not mgr.is_valid_schema('information_schema')
     assert not mgr.is_valid_schema('public')
+    assert not mgr.is_valid_schema('my--schema')
     assert mgr.is_valid_schema('my_schema')
     assert mgr.is_valid_schema('my-schema')
 
