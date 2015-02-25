@@ -3,6 +3,7 @@ from more.transaction import TransactionApp
 from onegov.core.orm import Base, SessionManager
 from onegov.core.request import VirtualHostRequest
 from onegov.server import Application as ServerApplication
+from uuid import uuid4 as new_uuid
 
 
 class Framework(TransactionApp, ServerApplication):
@@ -28,7 +29,7 @@ class Framework(TransactionApp, ServerApplication):
         """
         return self.dsn is not None
 
-    def configure_application(self, **configuration):
+    def configure_application(self, **cfg):
         """ Configures the application, supporting the following parameters:
 
         :dsn:
@@ -40,15 +41,32 @@ class Framework(TransactionApp, ServerApplication):
             The declarative base class used. By default,
             :attr:`onegov.core.orm.Base`is used.
 
+        :identity_secure:
+            True if the identity cookie is only transmitted over https. Only
+            set this to False during development!
+
+        :identity_secret_key:
+            A random string used to sign the identity. By default a random
+            string is generated. The drawback of this is the fact that
+            users will be logged out every time the application restarts.
+
+            So provide your own if you don't want that, but be sure to have
+            a really long, really random key that you will never share
+            with anyone!
+
         """
 
-        super(Framework, self).configure_application(**configuration)
+        super(Framework, self).configure_application(**cfg)
 
-        self.dsn = configuration.get('dsn')
+        self.dsn = cfg.get('dsn')
 
         if self.dsn:
             self.session_manager = SessionManager(
-                self.dsn, configuration.get('base', Base))
+                self.dsn, cfg.get('base', Base))
+
+        self.identity_secure = cfg.get('identity_secure', True)
+        self.identity_secret_key = cfg.get(
+            'identity_secret_key', new_uuid().hex)
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the

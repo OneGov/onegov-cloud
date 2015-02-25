@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'cached_property',
         'morepath',
+        'more.itsdangerous',
         'more.transaction',
         'onegov.server',
         'psycopg2',
