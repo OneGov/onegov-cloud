@@ -1,3 +1,6 @@
+import hashlib
+import morepath
+
 from cached_property import cached_property
 from more.transaction import TransactionApp
 from onegov.core.orm import Base, SessionManager
@@ -80,7 +83,26 @@ class Framework(TransactionApp, ServerApplication):
         if self.has_database_connection:
             self.session_manager.set_current_schema(self.schema)
 
+    @property
+    def application_id_hash(self):
+        """ The application_id as hash, use this if the applicaiton_id can
+        be read by the user -> this obfuscates things slightly.
+
+        """
+        # sha-1 should be enough, because even if somebody was able to get
+        # the cleartext value I honestly couldn't tell you what it could be
+        # used for...
+        return hashlib.sha1(self.application_id.encode('utf-8')).hexdigest()
+
     @cached_property
     def session(self):
         """ Alias for self.session_manager.session. """
         return self.session_manager.session
+
+    def application_bound_identity(self, userid, role):
+        """ Returns a new morepath identity for the given userid and role,
+        bound to this application.
+
+        """
+        return morepath.security.Identity(
+            userid, role=role, application_id=self.application_id_hash)
