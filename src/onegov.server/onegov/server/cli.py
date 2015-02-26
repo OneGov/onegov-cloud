@@ -5,6 +5,8 @@ import multiprocessing
 import os
 import signal
 import sys
+import time
+import traceback
 
 from datetime import datetime
 from onegov.server import Server
@@ -72,9 +74,20 @@ class WsgiProcess(multiprocessing.Process):
         # the process is restarted during a pdb session
         os.system("stty sane")
 
-        server = make_server(
-            self.host, self.port, self.app_factory(),
-            handler_class=CustomWSGIRequestHandler)
+        try:
+            server = make_server(
+                self.host, self.port, self.app_factory(),
+                handler_class=CustomWSGIRequestHandler)
+        except:
+            # if there's an error, print it
+            print(traceback.format_exc())
+
+            # and just never start the server (but don't stop the
+            # process either). this makes this work:
+            # 1. save -> import error
+            # 2. save corrected version -> server restarted
+            while True:
+                time.sleep(10.0)
 
         self._actual_port.value = server.socket.getsockname()[1]
         self._ready.value = 1
