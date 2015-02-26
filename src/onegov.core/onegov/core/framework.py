@@ -39,7 +39,7 @@ class Framework(TransactionApp, ServerApplication):
 
         :base:
             The declarative base class used. By default,
-            :attr:`onegov.core.orm.Base`is used.
+            :attr:`onegov.core.orm.Base` is used.
 
         :identity_secure:
             True if the identity cookie is only transmitted over https. Only
