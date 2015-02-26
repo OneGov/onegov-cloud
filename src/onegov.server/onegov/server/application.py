@@ -93,7 +93,7 @@ class Application(object):
 
         The base_path of wildcard applications includes the path matched
         by the wildcard. For example, if the application is configured to run
-        under '/sites/*', the base_path would be `/sites/blog` if
+        under `/sites/*`, the base_path would be `/sites/blog` if
         `/sites/blog/login` was requested.
 
         """

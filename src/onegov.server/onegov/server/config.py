@@ -134,8 +134,8 @@ class ApplicationConfig(object):
 
     @property
     def root(self):
-        """ The path without the wildcard such that '/app' and '/app/*' produce
-        the same root (/app).
+        """ The path without the wildcard such that `/app` and `/app/*` produce
+        the same root (`/app`).
 
         """
         return self.path.rstrip('/*')
