@@ -1,5 +1,3 @@
-import pydoc
-
 from onegov.server.collection import ApplicationCollection
 from webob import BaseRequest
 from webob.exc import HTTPNotFound, HTTPForbidden
@@ -82,11 +80,7 @@ class Server(object):
 
             # it's safe to say that we got morepath available here
             import morepath
-
-            config = morepath.autoconfig()
-            for app in morepath_applications:
-                config.scan(pydoc.locate(app.application_class.__module__))
-            config.commit()
+            morepath.autosetup()
 
     def __call__(self, environ, start_response):
         request = Request(environ)
