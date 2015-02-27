@@ -114,7 +114,10 @@ class WsgiServer(FileSystemEventHandler):
 
     def join(self, timeout=None):
         if self.process.is_alive():
-            self.process.join(timeout)
+            try:
+                self.process.join(timeout)
+            except AssertionError:
+                pass
 
     def start(self):
         self.process = self.spawn()
