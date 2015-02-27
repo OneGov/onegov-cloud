@@ -3,13 +3,16 @@ import morepath
 
 from cached_property import cached_property
 from more.transaction import TransactionApp
+from more.webassets import WebassetsApp
+from more.webassets.core import webassets_injector_tween
+from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core.orm import Base, SessionManager
 from onegov.core.request import VirtualHostRequest
 from onegov.server import Application as ServerApplication
 from uuid import uuid4 as new_uuid
 
 
-class Framework(TransactionApp, ServerApplication):
+class Framework(TransactionApp, WebassetsApp, ServerApplication):
     """ Baseclass for Morepath OneGov applications. """
 
     request_class = VirtualHostRequest
@@ -95,6 +98,15 @@ class Framework(TransactionApp, ServerApplication):
         return hashlib.sha1(self.application_id.encode('utf-8')).hexdigest()
 
     @cached_property
+    def webassets_url(self):
+        """ The webassets url needs to be unique so we can fix it before
+        returning the generated html. See :func:`fix_webassets_url_factory`.
+
+        """
+
+        return '7da9c72a3b5f9e060b898ef7cd714b8a'  # do *not* change this hash!
+
+    @cached_property
     def session(self):
         """ Alias for self.session_manager.session. """
         return self.session_manager.session
@@ -106,3 +118,46 @@ class Framework(TransactionApp, ServerApplication):
         """
         return morepath.security.Identity(
             userid, role=role, application_id=self.application_id_hash)
+
+
+@Framework.tween_factory(over=webassets_injector_tween)
+def fix_webassets_url_factory(app, handler):
+    def fix_webassets_url(request):
+        """ more.webassets is not aware of our virtual hosting situation
+        introduced by onegov.server - therefore it doesn't produce the right
+        urls. This is something Morepath would have to fix.
+
+        This is why we fix the html here, after it has been created, changing
+        the url to the fixed version. We do this by examining the unique
+        assets url.
+
+        This means that someone could theoretically have something replaced
+        that is not meant to be replaced, but that would be incredibly
+        unlikely.
+
+        If someone intentionally does we would at best have some broken urls
+        on the site.
+
+        """
+        response = handler(request)
+
+        if not response.content_type:
+            return response
+
+        if request.method not in METHODS:
+            return response
+
+        if response.content_type.lower() not in CONTENT_TYPES:
+            return response
+
+        original_url = '/' + request.app.webassets_url
+        adjusted_url = request.transform(request.script_name + original_url)
+
+        response.body = response.body.replace(
+            original_url.encode('utf-8'),
+            adjusted_url.encode('utf-8')
+        )
+
+        return response
+
+    return fix_webassets_url

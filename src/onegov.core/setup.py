@@ -38,6 +38,7 @@ setup(
         'morepath',
         'more.itsdangerous',
         'more.transaction',
+        'more.webassets',
         'onegov.server',
         'psycopg2',
         'sqlalchemy>=0.9',

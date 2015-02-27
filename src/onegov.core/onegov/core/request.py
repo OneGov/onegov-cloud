@@ -1,9 +1,9 @@
 from cached_property import cached_property
-from morepath.request import Request
+from more.webassets.core import IncludeRequest
 from onegov.core import utils
 
 
-class VirtualHostRequest(Request):
+class VirtualHostRequest(IncludeRequest):
     """ Extends the default Morepath request with virtual host support.
 
     This might be supported by Morepath directly in the future:

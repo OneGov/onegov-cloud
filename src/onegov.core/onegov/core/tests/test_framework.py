@@ -1,6 +1,7 @@
 from morepath import setup
 from onegov.core import Framework
 from webtest import TestApp as Client
+from onegov.server import Config, Server
 
 
 def test_set_application_id():
@@ -78,3 +79,54 @@ def test_virtual_host_request():
         'X_VHM_ROOT': '/blog',
         'X_VHM_HOST': 'https://blog.example.org/'})
     assert response.body == b'https://blog.example.org/ - blog'
+
+
+def test_fix_webassets_url():
+    config = setup()
+
+    import more.webassets
+    import onegov.core
+    config.scan(more.webassets)
+    config.scan(onegov.core)
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.html(model=Root)
+    def view_root(self, request):
+        return '/' + request.app.webassets_url + '/jquery.js'
+
+    config.commit()
+
+    class TestServer(Server):
+
+        def configure_morepath(self, *args, **kwargs):
+            pass
+
+    server = TestServer(Config({
+        'applications': [
+            {
+                'path': '/towns/*',
+                'application': App,
+                'namespace': 'towns'
+            }
+        ]
+    }))
+
+    client = Client(server)
+
+    # more.webassets doesn't know about virtual hosting (that is to say
+    # Morepath does not know about it).
+    #
+    # Since it wants to create urls for the root of the application ('/'),
+    # it will create something like '/xxx/jquery.js'
+    #
+    # We really want '/towns/test/xxx' here, which is something the onegov
+    # core Framework application fixes through a tween.
+    response = client.get('/towns/test')
+    assert response.body\
+        == b'/towns/test/7da9c72a3b5f9e060b898ef7cd714b8a/jquery.js'
