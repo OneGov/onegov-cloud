@@ -35,12 +35,15 @@ setup(
     platforms='any',
     install_requires=[
         'cached_property',
+        'dogpile.cache',
         'morepath',
         'more.itsdangerous',
         'more.transaction',
         'more.webassets',
         'onegov.server',
         'psycopg2',
+        'pylibmc',
+        'pylru',
         'sqlalchemy>=0.9',
         'zope.sqlalchemy'
     ],

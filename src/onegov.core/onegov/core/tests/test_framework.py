@@ -1,7 +1,7 @@
 from morepath import setup
 from onegov.core import Framework
-from webtest import TestApp as Client
 from onegov.server import Config, Server
+from webtest import TestApp as Client
 
 
 def test_set_application_id():

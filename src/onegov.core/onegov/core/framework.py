@@ -1,11 +1,13 @@
 import hashlib
 import morepath
+import pylru
 
 from cached_property import cached_property
 from more.transaction import TransactionApp
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
+from onegov.core import cache
 from onegov.core.orm import Base, SessionManager
 from onegov.core.request import VirtualHostRequest
 from onegov.server import Application as ServerApplication
@@ -60,6 +62,23 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             a really long, really random key that you will never share
             with anyone!
 
+        :memcached_url:
+            The memcached url (default is 127.0.0.1:11211). If no memcached
+            instance is found unning on that url, a dictionary is used
+            for the cache instead.
+
+        :memcached_connections:
+            The maximum number of memcached connections that are available.
+            Defaults to 100.
+
+            This limit prevents a sophisticated attacker from starting a denial
+            of service attack should he figure out a way to spawn lots of
+            applications.
+
+            Normally you want the combined memcached connection limit of all
+            configured applications to be lower than the actual connection
+            limit configured on memcached.
+
         """
 
         super(Framework, self).configure_application(**cfg)
@@ -74,6 +93,20 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         self.identity_secret_key = cfg.get(
             'identity_secret_key', new_uuid().hex)
 
+        self.memcached_url = cfg.get('memcached_url', '127.0.0.1:11211')
+        self.memcached_connections = int(cfg.get('memcached_connections', 100))
+
+        def on_cache_ejected(key, value):
+            getattr(value, 'disconnect_all', lambda: None)()
+
+        self._cache_backends = pylru.lrucache(
+            self.memcached_connections, on_cache_ejected)
+
+        self.cache_backend = 'dogpile.cache.pylibmc'
+        self.cache_backend_arguments = {
+            'url': self.memcached_url
+        }
+
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
         application id and makes sure it exists, *if* a database connection
@@ -85,6 +118,27 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         if self.has_database_connection:
             self.session_manager.set_current_schema(self.schema)
+
+    @property
+    def cache(self):
+        """ Returns the cache backend for this application.
+
+        The cache backend is a dogpile.cache backend. See:
+        `<https://dogpilecache.readthedocs.org/>`_
+
+        Once the `memcached_connections` limit defined in
+        :meth:`configure_application` is reached, the backends are removed,
+        with the least recently used one being discarded first.
+
+        """
+        if self.application_id not in self._cache_backends:
+            self._cache_backends[self.application_id] = cache.create_backend(
+                namespace=self.application_id,
+                backend=self.cache_backend,
+                arguments=self.cache_backend_arguments,
+                expiration_time=None)
+
+        return self._cache_backends[self.application_id]
 
     @property
     def application_id_hash(self):
