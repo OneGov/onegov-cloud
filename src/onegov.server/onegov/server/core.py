@@ -1,3 +1,5 @@
+import logging.config
+
 from onegov.server.collection import ApplicationCollection
 from webob import BaseRequest
 from webob.exc import HTTPNotFound, HTTPForbidden
@@ -68,7 +70,12 @@ class Server(object):
         self.wildcard_applications = set(
             a.root for a in config.applications if not a.is_static)
 
+        self.configure_logging(config.logging)
         self.configure_morepath()
+
+    def configure_logging(self, config):
+        config.setdefault('version', 1)
+        logging.config.dictConfig(config)
 
     def configure_morepath(self):
         """ Configures morepath automatically, if any application uses it. """
