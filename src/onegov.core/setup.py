@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 
 from setuptools import setup, find_packages
 
@@ -7,6 +8,21 @@ description = (
     'Contains code shared by all OneGov applications.'
 )
 version = '0.0.1'
+
+dependencies = {
+    'cached_property',
+    'dogpile.cache',
+    'morepath',
+    'more.itsdangerous',
+    'more.transaction',
+    'more.webassets',
+    'onegov.server',
+    'psycopg2',
+    'pylibmc',
+    'pylru',
+    'sqlalchemy>=0.9',
+    'zope.sqlalchemy'
+}
 
 
 def get_long_description():
@@ -18,6 +34,12 @@ def get_long_description():
 
     return '\n'.join((readme, history))
 
+if os.environ.get('READTHEDOCS', None) == 'True':
+    # on readthedocs.org we can't install c modules which is why we have
+    # to mock them and exclude them from the setup
+    # see also: http://docs.readthedocs.org/en/latest/faq.html
+
+    dependencies -= {'pylibmc'}
 
 setup(
     name=name,
@@ -33,20 +55,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=[
-        'cached_property',
-        'dogpile.cache',
-        'morepath',
-        'more.itsdangerous',
-        'more.transaction',
-        'more.webassets',
-        'onegov.server',
-        'psycopg2',
-        'pylibmc',
-        'pylru',
-        'sqlalchemy>=0.9',
-        'zope.sqlalchemy'
-    ],
+    install_requires=list(dependencies),
     extras_require=dict(
         test=[
             'pytest',
