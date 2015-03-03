@@ -32,8 +32,8 @@ class Application(object):
         """ Called *once* when the application is instantiated, with the
         configuration values defined for this application.
 
-        This will be called *before* set_application_base_path is called, as
-        this happens *before* the request.
+        This will be called *before* :meth:`set_application_base_path` is
+        called, as this happens *before* the request.
 
         Be sure to call this method from any subclasses you create. The server
         adds its own configuration here!
@@ -143,10 +143,10 @@ class Application(object):
         This is mainly meant to be used for dynamic DNS setups. Say you have
         an application available through test.onegov.dev (pointing to
         `/sites/test`). You now want to make this site available through
-        example.org. You can do this as follows:
+        example.org. You can do this as follows::
 
-        self.allowed_hosts.add('example.org')
-        self.alias('example_org')
+            self.allowed_hosts.add('example.org')
+            self.alias('example_org')
 
         If your server has a catch-all rule that sends unknown domains to
         `/sites/domain_without_dots`, then you can add domains dynamically

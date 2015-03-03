@@ -74,6 +74,13 @@ class Server(object):
         self.configure_morepath()
 
     def configure_logging(self, config):
+        """ Configures the python logging.
+
+        :config:
+            A dictionary that is understood by python's
+            `logging.config.dictConfig` method.
+
+        """
         config.setdefault('version', 1)
         logging.config.dictConfig(config)
 
