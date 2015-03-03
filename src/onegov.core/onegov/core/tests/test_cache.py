@@ -1,3 +1,4 @@
+from onegov.core import cache
 from onegov.core import Framework
 from morepath import setup
 from webtest import TestApp as Client
@@ -65,3 +66,20 @@ def test_cache():
 
     app.set_application_id('towns/arlington')
     assert client.get('/').text == '4'
+
+
+def test_unreachable_backend_proxy():
+
+    region = cache.create_backend('ns', 'dogpile.cache.pylibmc', arguments={
+        'url': '127.0.0.1:12345'
+    })
+
+    region.delete('test')
+    region.set('test', 'value')
+    assert region.get('test') is cache.NO_VALUE
+
+    region.delete_multi(['foo', 'bar'])
+    region.set_multi({
+        'foo': 1, 'bar': 2
+    })
+    assert region.get_multi(['foo', 'bar']) == [cache.NO_VALUE, cache.NO_VALUE]

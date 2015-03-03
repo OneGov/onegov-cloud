@@ -39,6 +39,7 @@ import pylibmc
 from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE
 from dogpile.cache.proxy import ProxyBackend
+from onegov.core import compat
 from onegov.core import log
 
 
@@ -53,12 +54,16 @@ DEFAULT_BACKEND_ARGUMENTS = {
 }
 
 
-def create_backend(namespace, backend, arguments, expiration_time):
+def create_backend(namespace, backend, arguments={}, expiration_time=None):
 
     prefix = '{}:'.format(namespace)
 
     _arguments = DEFAULT_BACKEND_ARGUMENTS.get(backend, {})
     _arguments.update(arguments)
+
+    if backend == 'dogpile.cache.pylibmc':
+        if isinstance(arguments['url'], compat.string_types):
+            arguments['url'] = [arguments['url']]
 
     return make_region(key_mangler=lambda key: prefix + key).configure(
         backend,
