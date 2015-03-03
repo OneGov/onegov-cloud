@@ -80,17 +80,36 @@ class IgnoreUnreachableBackend(ProxyBackend):
         try:
             return self.proxied.get(key)
         except pylibmc.Error:
-            log.exception("Error reading cache-key '{}'".format(key))
+            log.exception("Error reading from memcached")
             return NO_VALUE
 
     def set(self, key, value):
         try:
             self.proxied.set(key, value)
         except pylibmc.Error:
-            log.exception("Error writing cache-key '{}'".format(key))
+            log.exception("Error writing to memcached")
 
     def delete(self, key):
         try:
             self.proxied.delete(key)
         except pylibmc.Error:
-            log.exception("Error deleting cache-key '{}'".format(key))
+            log.exception("Error deleting from memcached")
+
+    def get_multi(self, keys):
+        try:
+            return self.proxied.get_multi(keys)
+        except pylibmc.Error:
+            log.exception("Error reading from memcached")
+            return [NO_VALUE] * len(keys)
+
+    def set_multi(self, mapping):
+        try:
+            self.proxied.set_multi(mapping)
+        except pylibmc.Error:
+            log.exception("Error writing to memcached")
+
+    def delete_multi(self, keys):
+        try:
+            self.proxied.delete_multi(keys)
+        except pylibmc.Error:
+            log.exception("Error deleting from memcached")
