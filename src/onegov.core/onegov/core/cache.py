@@ -4,9 +4,9 @@ Onegov.core uses dogpile for caching:
 `<https://dogpilecache.readthedocs.org/>`_
 
 Unlike dogpile onegov.core does not provide a global region however.
-The cache regions are available through the app::
+The cache is available through the app::
 
-    request.app.forever.set('key', 'value')
+    request.app.cache.set('key', 'value')
 
 Global caches in a multi-tennant application are a security vulnerability
 waiting to be discovered. Therefore we do not do that!
@@ -28,6 +28,10 @@ on all morepath views::
         return '<html>...'
 
 But no such method exists yet.
+
+Currently there is one cache per app that never expires (though values will
+eventually be discarded by memcache if the cache is full).
+
 """
 
 import pylibmc
