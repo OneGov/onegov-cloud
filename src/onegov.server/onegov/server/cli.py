@@ -16,6 +16,50 @@ from watchdog.observers import Observer
 from wsgiref.simple_server import make_server, WSGIRequestHandler
 
 
+@click.command()
+@click.option(
+    '--config-file',
+    '-c',
+    help="Configuration file to use",
+    type=click.Path(exists=True),
+    default="onegov.yml"
+)
+def run(config_file):
+    """ Runs the onegov server with the given configuration file in the
+    foreground.
+
+    Use this *for debugging/development only*.
+
+    Example::
+
+        onegov-server --config-file test.yml
+
+    The onegov-server will load 'onegov.yml' by default and it will restart
+    when any file in the current folder or any of its subfolders changes.
+    """
+
+    def wsgi_factory():
+        return Server(Config.from_yaml_file(config_file))
+
+    server = WsgiServer(wsgi_factory)
+    server.start()
+
+    observer = Observer()
+    observer.schedule(server, '.', recursive=True)
+    observer.start()
+
+    while True:
+        try:
+            server.join(0.2)
+        except KeyboardInterrupt:
+            observer.stop()
+            server.stop()
+            sys.exit(0)
+
+    observer.join()
+    server.join()
+
+
 class CustomWSGIRequestHandler(WSGIRequestHandler):
     """ Measures the time it takes to respond to a request and prints it
     at the end of the request.
@@ -146,47 +190,3 @@ class WsgiServer(FileSystemEventHandler):
             return
 
         self.restart()
-
-
-@click.command()
-@click.option(
-    '--config-file',
-    '-c',
-    help="Configuration file to use",
-    type=click.Path(exists=True),
-    default="onegov.yml"
-)
-def run(config_file):
-    """ Runs the onegov server with the given configuration file in the
-    foreground.
-
-    Use this *for debugging/development only*.
-
-    Example::
-
-        onegov-server --config-file test.yml
-
-    The onegov-server will load 'onegov.yml' by default and it will restart
-    when any file in the current folder or any of its subfolders changes.
-    """
-
-    def wsgi_factory():
-        return Server(Config.from_yaml_file(config_file))
-
-    server = WsgiServer(wsgi_factory)
-    server.start()
-
-    observer = Observer()
-    observer.schedule(server, '.', recursive=True)
-    observer.start()
-
-    while True:
-        try:
-            server.join(0.2)
-        except KeyboardInterrupt:
-            observer.stop()
-            server.stop()
-            sys.exit(0)
-
-    observer.join()
-    server.join()
