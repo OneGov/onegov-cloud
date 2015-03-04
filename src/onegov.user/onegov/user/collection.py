@@ -80,8 +80,8 @@ class UserCollection(object):
     def delete(self, username):
         """ Deletes the user if it exists.
 
-        If the user does not exist, an :class:`
-        onegov.user.errors.UnkownUserError` is raised.
+        If the user does not exist, an
+        :class:`onegov.user.errors.UnknownUserError` is raised.
 
         """
         user = self.by_username(username)
