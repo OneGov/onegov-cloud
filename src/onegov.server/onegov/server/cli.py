@@ -1,3 +1,51 @@
+""" The onegov.server can be run through the 'onegov-server' command after
+installation.
+
+Said command runs the onegov server with the given configuration file in the
+foreground.
+
+Use this **for debugging/development only**.
+
+Example::
+
+    onegov-server --config-file test.yml
+
+The onegov-server will load 'onegov.yml' by default and it will restart
+when any file in the current folder or any of its subfolders changes.
+
+A onegov.yml file looks like this:
+
+.. code-block:: yaml
+
+    applications:
+      - path: /apps/*
+        application: my.app.TestApp
+        namespace: apps
+        configuration:
+          allowed_hosts_expression: '^[a-z]+.apps.dev'
+          dsn: postgres://username:password@localhost:5432/db
+          identity_secure: false
+          identity_secret: very-secret-key
+
+    logging:
+      formatters:
+        simpleFormater:
+          format: '%(asctime)s - %(levelname)s: %(message)s'
+          datefmt: '%Y-%m-%d %H:%M:%S'
+
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simpleFormater
+        level: DEBUG
+        stream: ext://sys.stdout
+
+    loggers:
+      onegov.core:
+        level: DEBUG
+        handlers: [console]
+"""
+
 from __future__ import print_function
 
 import click
@@ -28,7 +76,7 @@ def run(config_file):
     """ Runs the onegov server with the given configuration file in the
     foreground.
 
-    Use this *for debugging/development only*.
+    Use this **for debugging/development only**.
 
     Example::
 
@@ -36,7 +84,11 @@ def run(config_file):
 
     The onegov-server will load 'onegov.yml' by default and it will restart
     when any file in the current folder or any of its subfolders changes.
+
     """
+    # <- the docs are currently duplicated somewhat at the top of the module
+    # because click does not play well with sphinx yet
+    # see https://github.com/mitsuhiko/click/issues/127
 
     def wsgi_factory():
         return Server(Config.from_yaml_file(config_file))
