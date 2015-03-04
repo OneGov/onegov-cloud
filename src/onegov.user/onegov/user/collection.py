@@ -1,6 +1,6 @@
 from onegov.user.model import User
 from onegov.user.errors import UnknownUserError
-from sqlalchemy.sql import exists
+from sqlalchemy import sql
 
 
 class UserCollection(object):
@@ -51,7 +51,9 @@ class UserCollection(object):
         care about finding out anything about the user.
 
         """
-        query = self.session.query(exists().where(User.username == username))
+        query = self.session.query(sql.exists().where(
+            User.username == username))
+
         return query.scalar()
 
     def by_username(self, username):
