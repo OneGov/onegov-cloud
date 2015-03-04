@@ -1,9 +1,10 @@
 import json
 import transaction
+import uuid
 
 from morepath import setup
 from onegov.core.orm import SessionManager
-from onegov.core.orm.types import JSON
+from onegov.core.orm.types import JSON, UUID
 from onegov.core.framework import Framework
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
@@ -254,5 +255,27 @@ def test_json_type(dsn):
     assert session.query(Test).filter(Test.id == 2).one().data == {
         'foo': 'rab'
     }
+
+    mgr.dispose()
+
+
+def test_uuid_type(dsn):
+    Base = declarative_base()
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        id = Column(UUID, primary_key=True, default=uuid.uuid4)
+
+    mgr = SessionManager(dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    test = Test()
+    session.add(test)
+    transaction.commit()
+
+    assert isinstance(session.query(Test).one().id, uuid.UUID)
 
     mgr.dispose()
