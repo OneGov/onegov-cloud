@@ -34,8 +34,8 @@ Build Status
 Coverage
 --------
 
-.. image:: https://coveralls.io/repos/seantis/onegov.server/badge.png?branch=master
-  :target: https://coveralls.io/r/seantis/onegov.server?branch=master
+.. image:: https://coveralls.io/repos/OneGov/onegov.server/badge.png?branch=master
+  :target: https://coveralls.io/r/OneGov/onegov.server?branch=master
   :alt: Project Coverage
 
 Latests PyPI Release
