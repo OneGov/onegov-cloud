@@ -10,6 +10,17 @@ def get_roles_setting():
     or replace the existing ones entirely, though it's not something that
     one should do carelessly.
 
+    The default roles are:
+
+    **admin**
+        Has access to everything
+
+    **editor**
+        Has access to most things
+
+    **anonymous**
+        Has access to public things
+
     """
     return {
         # the admin role has access to everything
