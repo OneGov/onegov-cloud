@@ -27,8 +27,8 @@ Onegov Core uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/seantis/onegov.core.png
-  :target: https://travis-ci.org/seantis/onegov.core
+.. image:: https://travis-ci.org/OneGov/onegov.core.png
+  :target: https://travis-ci.org/OneGov/onegov.core
   :alt: Build Status
 
 Coverage
