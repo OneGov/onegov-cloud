@@ -17,6 +17,8 @@ dependencies = {
     'more.transaction',
     'more.webassets',
     'onegov.server',
+    'passlib',
+    'py-bcrypt',
     'psycopg2',
     'pylibmc',
     'pylru',
