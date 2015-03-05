@@ -24,6 +24,7 @@ dependencies = {
     'pylibmc',
     'pylru',
     'sqlalchemy>=0.9',
+    'unidecode',
     'zope.sqlalchemy'
 }
 
