@@ -1,5 +1,6 @@
 from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from sqlalchemy import Column, Text
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -7,7 +8,7 @@ from sqlalchemy.orm import deferred
 from uuid import uuid4
 
 
-class User(Base):
+class User(Base, TimestampMixin):
     """ Defines a generic user. """
 
     __tablename__ = 'users'
