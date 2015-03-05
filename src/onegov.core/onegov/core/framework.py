@@ -1,3 +1,21 @@
+""" The Framework provides a base Morepath application that offers certain
+features for applications deriving from it:
+
+ * Virtual hosting in conjunction with :mod:`onegov.server`.
+ * Access to an SQLAlchemy session bound to a specific Postgres schema.
+ * A cache backed by memcached, shared by multiple processes.
+ * An identity policy with basic rules, permissions and role.
+ * The ability to serve static files and css/js assets.
+
+Using the framework does not really differ from using Morepath::
+
+    from onegov.core import Framework
+
+    class MyApplication(Framework):
+        pass
+
+"""
+
 import hashlib
 import inspect
 import morepath
