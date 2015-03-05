@@ -1,4 +1,7 @@
 import pytest
+import tempfile
+import shutil
+
 
 from sqlalchemy import create_engine
 from testing.postgresql import Postgresql
@@ -32,3 +35,10 @@ def postgres_server_url():
     postgres = Postgresql()
     yield postgres.url()
     postgres.stop()
+
+
+@pytest.yield_fixture
+def tempdir():
+    directory = tempfile.mkdtemp()
+    yield directory
+    shutil.rmtree(directory)

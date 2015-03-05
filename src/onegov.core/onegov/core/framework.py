@@ -1,5 +1,7 @@
 import hashlib
+import inspect
 import morepath
+import os.path
 import pylru
 
 from cached_property import cached_property
@@ -164,6 +166,29 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def session(self):
         """ Alias for self.session_manager.session. """
         return self.session_manager.session
+
+    @cached_property
+    def static_files(self):
+        """ Absolute path to the static files. Defaults to the folder
+        of the application + ``/static``.
+
+        """
+        app_path = os.path.dirname(inspect.getfile(self.__class__))
+        return os.path.join(app_path, 'static')
+
+    @cached_property
+    def serve_static_files(self):
+        """ Returns True if ``/static`` files should be served. Needs to be
+        enabled manually.
+
+        Note that even if the static files are not served, ``/static`` path
+        is still served, it just won't return anything but a 404.
+
+        Note also that static files are served **publicly**. You can override
+        this in your application, but doing that and testing for it is on you!
+
+        See also: :mod:`onegov.core.static`. """
+        return False
 
     def application_bound_identity(self, userid, role):
         """ Returns a new morepath identity for the given userid and role,
