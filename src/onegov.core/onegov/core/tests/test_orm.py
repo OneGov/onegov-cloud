@@ -1,11 +1,16 @@
 import json
+import pytest
+import sqlalchemy
 import transaction
 import uuid
 
+from datetime import datetime
 from morepath import setup
 from onegov.core.orm import SessionManager
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.framework import Framework
+from pytz import timezone
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
@@ -277,5 +282,90 @@ def test_uuid_type(dsn):
     transaction.commit()
 
     assert isinstance(session.query(Test).one().id, uuid.UUID)
+
+    mgr.dispose()
+
+
+def test_utc_datetime_naive(dsn):
+    Base = declarative_base()
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        id = Column(Integer, primary_key=True)
+        date = Column(UTCDateTime)
+
+    mgr = SessionManager(dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    with pytest.raises(sqlalchemy.exc.StatementError):
+        test = Test(date=datetime.now())
+        session.add(test)
+        session.flush()
+
+    mgr.dispose()
+
+
+def test_utc_datetime_aware(dsn):
+    Base = declarative_base()
+
+    class Test(Base):
+        __tablename__ = 'test'
+
+        id = Column(Integer, primary_key=True)
+        date = Column(UTCDateTime)
+
+    mgr = SessionManager(dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    tz = timezone('Europe/Zurich')
+    date = datetime(2015, 3, 5, 12, 0).replace(tzinfo=tz)
+    test = Test(date=date)
+    session.add(test)
+    session.flush()
+    transaction.commit()
+
+    assert session.query(Test).one().date == date
+
+    mgr.dispose()
+
+
+def test_timestamp_mixin(dsn):
+    Base = declarative_base()
+
+    class Test(Base, TimestampMixin):
+        __tablename__ = 'test'
+
+        id = Column(Integer, primary_key=True)
+
+    mgr = SessionManager(dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    test = Test()
+    session.add(test)
+    session.flush()
+    transaction.commit()
+
+    now = datetime.utcnow()
+
+    assert session.query(Test).one().created.year == now.year
+    assert session.query(Test).one().created.month == now.month
+    assert session.query(Test).one().created.day == now.day
+
+    assert session.query(Test).one().modified is None
+
+    test = session.query(Test).one()
+    test.id = 2
+    session.flush()
+
+    assert session.query(Test).one().modified.year == now.year
+    assert session.query(Test).one().modified.month == now.month
+    assert session.query(Test).one().modified.day == now.day
 
     mgr.dispose()

@@ -11,6 +11,7 @@ version = '0.0.1'
 
 dependencies = {
     'cached_property',
+    'delorean',
     'dogpile.cache',
     'morepath',
     'more.itsdangerous',
