@@ -1,5 +1,4 @@
 import threading
-import transaction
 import re
 import zope.sqlalchemy
 
@@ -238,7 +237,6 @@ class SessionManager(object):
 
             self.base.metadata.schema = schema
             self.base.metadata.create_all(conn)
-
-            transaction.commit()
+            conn.execute('COMMIT')
 
             self.created_schemas.add(schema)
