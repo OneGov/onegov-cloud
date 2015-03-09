@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'click',
         'more.chameleon',
         'onegov.core',
         'onegov.page',
@@ -47,6 +48,10 @@ setup(
             'mock'
         ],
     ),
+    entry_points="""
+        [console_scripts]
+        onegov-town=onegov.town.cli:cli
+    """,
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',

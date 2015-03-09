@@ -1,8 +1,4 @@
-""" Contains the view handling code for onegov.town.
-
-This will be moved to a subfolder in the future as more views are amassed.
-
-"""
+""" Contains the view handling code for onegov.town. """
 
 from onegov.core.security import Public
 from onegov.town.app import TownApp

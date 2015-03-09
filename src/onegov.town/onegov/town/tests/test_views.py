@@ -10,6 +10,7 @@ def test_view_permissions(register_view):
     config.scan(onegov.town)
     config.commit()
 
+    # make sure that all registered views have an explicit permission
     for call in register_view.call_args_list:
         view = call[0][2]
         module = view.__venusian_callbacks__[None][0][1]
