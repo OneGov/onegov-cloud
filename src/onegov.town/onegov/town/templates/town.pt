@@ -1,12 +1,5 @@
-<!doctype html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${title}</title>
-</head>
-
-<body>
-    Welcome to ${title}
-</body>
-</html>
+<div metal:use-macro="api.layout">
+    <tal:block metal:fill-slot="title">
+        Municipality of ${api.model.name}
+    </tal:block>
+</div>

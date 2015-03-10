@@ -1,0 +1,26 @@
+<!doctype html>
+<html class="no-js"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    metal:define-macro="layout">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><div metal:define-slot="title"></div></title>
+</head>
+
+<body id="${api.page_id}">
+    <div class="row">
+        <div class="large-12 columns">
+            <h1><div metal:define-slot="title"></div></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="large-12 columns">
+            <div metal:define-slot="content"></div>
+        </div>
+    </div>
+</body>
+
+</html>
