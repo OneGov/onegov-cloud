@@ -188,7 +188,7 @@ class WsgiProcess(multiprocessing.Process):
         self._actual_port.value = server.socket.getsockname()[1]
         self._ready.value = 1
 
-        print("started onegov server on https://{}:{}".format(
+        print("started onegov server on http://{}:{}".format(
             self.host, self.port))
 
         server.serve_forever()
