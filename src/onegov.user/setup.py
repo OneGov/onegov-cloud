@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'click',
         'onegov.core',
         'sqlalchemy'
     ],
@@ -44,6 +45,10 @@ setup(
             'testing.postgresql'
         ],
     ),
+    entry_points="""
+        [console_scripts]
+        onegov-user=onegov.user.cli:cli
+    """,
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',
