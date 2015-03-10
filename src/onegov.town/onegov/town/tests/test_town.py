@@ -41,7 +41,7 @@ def test_template_layout():
         api = TemplateApi(self, request)
         return {'api': api}
 
-    config.scan(more.chameleon)
+    config.scan(more.chameleon, ignore=['more.chameleon.test'])
     config.scan(onegov.town)
 
     config.commit()
