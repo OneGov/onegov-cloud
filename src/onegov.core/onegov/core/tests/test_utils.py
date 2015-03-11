@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import onegov.core
+import os.path
+
 from onegov.core import utils
 
 
@@ -19,3 +22,27 @@ def test_lchop():
 def test_rchop():
     assert utils.rchop('foobar', 'foo') == 'foobar'
     assert utils.rchop('foobar', 'bar') == 'foo'
+
+
+def test_touch(tempdir):
+    path = os.path.join(tempdir, 'test.txt')
+
+    assert not os.path.isfile(path)
+
+    utils.touch(path)
+
+    assert os.path.isfile(path)
+
+    with open(path, 'w') as f:
+        f.write('asdf')
+
+    utils.touch(path)
+
+    with open(path, 'r') as f:
+        assert f.read() == 'asdf'
+
+
+def test_module_path():
+    path = utils.module_path('onegov.core', 'utils.py')
+    assert path == utils.module_path(onegov.core, 'utils.py')
+    assert os.path.isfile(path)

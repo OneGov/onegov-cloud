@@ -11,6 +11,7 @@ version = '0.0.1'
 
 dependencies = {
     'cached_property',
+    'chameleon',
     'delorean',
     'dogpile.cache',
     'morepath',
@@ -19,11 +20,13 @@ dependencies = {
     'more.webassets',
     'onegov.server',
     'passlib',
+    'polib',
     'py-bcrypt',
     'psycopg2',
     'pylibmc',
     'pylru',
     'sqlalchemy>=0.9',
+    'translationstring',
     'unidecode',
     'zope.sqlalchemy'
 }
