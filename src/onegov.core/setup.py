@@ -14,6 +14,7 @@ dependencies = {
     'chameleon',
     'delorean',
     'dogpile.cache',
+    'fs',
     'morepath',
     'more.itsdangerous',
     'more.transaction',

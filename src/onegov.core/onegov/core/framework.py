@@ -20,6 +20,7 @@ import hashlib
 import inspect
 import morepath
 import os.path
+import pydoc
 import pylru
 
 from cached_property import cached_property
@@ -56,6 +57,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         """
         return self.dsn is not None
+
+    @property
+    def has_filestorage(self):
+        """ Returns true if :attr:`fs` is available. """
+        return self._global_file_storage is not None
 
     def configure_application(self, **cfg):
         """ Configures the application, supporting the following parameters:
@@ -99,6 +105,21 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             configured applications to be lower than the actual connection
             limit configured on memcached.
 
+        :file_storage:
+            The file_storage module to use. See
+            `<http://docs.pyfilesystem.org/en/latest/filesystems.html>`_
+
+        :file_storage_options:
+            A dictionary of options passed to the ``__init__`` method of the
+            file_storage class.
+
+            The file storage is expected to work as is. For example, if
+            ``fs.osfs.OSFS`` is used, the root_path is expected exist.
+
+            The file storage can be shared between different onegov.core
+            applications. Each application automatically gets its own
+            namespace inside this space.
+
         """
 
         super(Framework, self).configure_application(**cfg)
@@ -126,6 +147,18 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         self.cache_backend_arguments = {
             'url': self.memcached_url
         }
+
+        if 'filestorage' in cfg:
+            filestorage_class = pydoc.locate(cfg.get('filestorage'))
+            filestorage_options = cfg.get('filestorage_options', {})
+        else:
+            filestorage_class = None
+
+        if filestorage_class:
+            self._global_file_storage = filestorage_class(
+                **filestorage_options)
+        else:
+            self._global_file_storage = None
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
@@ -215,6 +248,37 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         """
         return morepath.security.Identity(
             userid, role=role, application_id=self.application_id_hash)
+
+    @property
+    def filestorage(self):
+        """ Returns a fs object bound to the current application. Based on this
+        nifty module:
+
+        `<http://docs.pyfilesystem.org/en/latest/>`_
+
+        The file storage returned is guaranteed to be independent of other
+        applications (the scope is the application_id, not just the class).
+
+        There is no guarantee as to what file storage backend is actually used.
+        It's quite possible that the file storage will be somewhere online
+        in the future (e.g. S3).
+
+        Therefore, the urls for the file storage should always be acquired
+        through :met:`onegov.core.file_storage.url`.
+
+        The backend is configured through :meth:`configure_application`.
+
+        For a list of methods available on the resulting object, consult this
+        list: `<http://docs.pyfilesystem.org/en/latest/interface.html>`_.
+
+        If no filestorage is available, this returns None.
+        See :attr:`self.has_filestorage`.
+
+        """
+        if self._global_file_storage is None:
+            return None
+
+        return self._global_file_storage.makeopendir(self.schema)
 
 
 @Framework.tween_factory(over=webassets_injector_tween)
