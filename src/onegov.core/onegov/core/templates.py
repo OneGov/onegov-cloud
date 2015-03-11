@@ -58,7 +58,7 @@ class I18nChameleonHelper(object):
         if not self.languages:
             return None
 
-        locale = self.settings.locale_negotiator(self.languages, request)
+        locale = self.settings.i18n.locale_negotiator(self.languages, request)
         locale = locale or self.settings.i18n.default_locale
 
         return self.translators.get(locale)
@@ -67,8 +67,8 @@ class I18nChameleonHelper(object):
     def translators(self):
         """ Returns all available translators. """
         return i18n.get_chameleon_translators(
-            self.settings.domain,
-            self.settings.localedir
+            self.settings.i18n.domain,
+            self.settings.i18n.localedir
         )
 
     @cached_property
@@ -83,35 +83,27 @@ def get_template_loader(template_directories, settings):
     ``.pt``.
 
     """
-    return chameleon.PageTemplateLoader(
+
+    loader = chameleon.PageTemplateLoader(
         template_directories,
         default_extension='.pt',
         prepend_relative_search_path=False,
         auto_reload=False,
     )
 
+    loader.i18n_helper = I18nChameleonHelper(settings)
+
+    return loader
+
 
 @Framework.template_render(extension='.pt')
 def get_chameleon_render(loader, name, original_render):
     """ Returns the Chameleon template renderer for the required template.
 
-    If i18n settings are provided, the renderer will be set up with a
-    translate function as defined in :mod:`onegov.core.i18n`.
-
-    The reason for this happening here is the following Morepath issue:
-
-    `<https://github.com/morepath/morepath/issues/298>`_
     """
     template = loader.load(name, 'xml')
 
     def render(content, request):
-
-        # this is the part that should be done in get_template_loader,
-        # once the morepath issue is fixed
-        if not hasattr(loader, 'i18n_helper'):
-            loader.i18n_helper = I18nChameleonHelper(
-                request.app.registry.settings.i18n)
-        # end
 
         variables = {
             'request': request,
