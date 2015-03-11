@@ -8,10 +8,10 @@ use different templating languages.
 """
 
 from onegov.core import Framework
-from more.chameleon import ChameleonApp
+from onegov.core import utils
 
 
-class TownApp(Framework, ChameleonApp):
+class TownApp(Framework):
     """ The town application. Include this in your onegov.yml to serve it
     with onegov-server.
 
@@ -21,3 +21,18 @@ class TownApp(Framework, ChameleonApp):
 @TownApp.template_directory()
 def get_template_directory():
     return 'templates'
+
+
+@TownApp.setting(section='i18n', name='domain')
+def get_i18n_domain():
+    return 'onegov.town'
+
+
+@TownApp.setting(section='i18n', name='localedir')
+def get_i18n_localedir():
+    return utils.module_path('onegov.town', 'locale')
+
+
+@TownApp.setting(section='i18n', name='default_locale')
+def get_i18n_default_locale():
+    return 'de'

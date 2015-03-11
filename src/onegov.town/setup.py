@@ -35,10 +35,10 @@ setup(
     platforms='any',
     install_requires=[
         'click',
-        'more.chameleon',
         'onegov.core',
         'onegov.page',
         'onegov.user',
+        'translationstring'
     ],
     extras_require=dict(
         test=[

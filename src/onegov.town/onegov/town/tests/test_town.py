@@ -1,5 +1,6 @@
+import onegov.core
 import onegov.town
-import more.chameleon
+import more.webassets
 
 from morepath import setup
 from onegov.town import TownApp
@@ -41,13 +42,13 @@ def test_template_layout():
         api = TemplateApi(self, request)
         return {'api': api}
 
-    config.scan(more.chameleon, ignore=['more.chameleon.test'])
+    config.scan(more.webassets)
+    config.scan(onegov.core)
     config.scan(onegov.town)
-
     config.commit()
 
     client = Client(App())
     response = client.get('/model')
 
-    assert '<!doctype html>' in response.text
+    assert '<!DOCTYPE html>' in response.text
     assert '<body id="model"' in response.text

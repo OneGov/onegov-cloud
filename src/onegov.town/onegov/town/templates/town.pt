@@ -1,5 +1,5 @@
-<div metal:use-macro="api.layout">
+<div metal:use-macro="api.layout" i18n:domain="onegov.town">
     <tal:block metal:fill-slot="title">
-        Municipality of ${api.model.name}
+        ${title}
     </tal:block>
 </div>

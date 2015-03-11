@@ -1,0 +1,4 @@
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/view.py:14
+#, python-format
+msgid "Welcome to ${town}"
+msgstr "Willkommen in ${town}"
