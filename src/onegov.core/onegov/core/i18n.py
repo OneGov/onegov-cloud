@@ -8,6 +8,10 @@ Applications wishing to use i18n need to define two settings:
 :i18n.localedir:
     The absolute path the gettext locale dir.
 
+:i18n.default_locale:
+    The fallback locale that is used if no locale more suitable to the user
+    could be found.
+
 For example::
 
     from onegov.core import Framework
@@ -23,6 +27,10 @@ For example::
     @TownApp.setting(section='i18n', name='localedir')
     def get_i18n_localedir():
         return utils.module_path('onegov.town', 'locale')
+
+    @TownApp.setting(section='i18n', name='default_locale')
+    def get_i18n_default_locale():
+        return 'en'
 
 """
 
