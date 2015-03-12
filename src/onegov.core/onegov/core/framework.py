@@ -300,7 +300,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
             # returns either an url like '/filestorage/4ec56cc005c594880a...'
             # or maybe 'https://amazonaws.com/onegov-cloud/32746/220592/q...'
-            request.url(filename)
+            request.filestorage_link(filename)
 
         """
         if self._global_file_storage is None:
