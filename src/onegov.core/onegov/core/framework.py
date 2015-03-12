@@ -257,8 +257,8 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
     @property
     def filestorage(self):
-        """ Returns a fs object bound to the current application. Based on this
-        nifty module:
+        """ Returns a filestorage object bound to the current application.
+        Based on this nifty module:
 
         `<http://docs.pyfilesystem.org/en/latest/>`_
 
@@ -290,6 +290,17 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         This should not deter you from using this for user uploads, though
         you should be careful. If you want to be sure that your application
         stores files locally, use some other ways of storing those files.
+
+        Example::
+
+            from onegov.core import filestorage
+
+            filename = filestorage.random_filename()
+            app.filestorage.setcontents(filename, 'Lorem Ipsum')
+
+            # returns either an url like '/filestorage/4ec56cc005c594880a...'
+            # or maybe 'https://amazonaws.com/onegov-cloud/32746/220592/q...'
+            request.url(filename)
 
         """
         if self._global_file_storage is None:
