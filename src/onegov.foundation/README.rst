@@ -27,15 +27,15 @@ Onegov Foundation uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/seantis/onegov.foundation.png
-  :target: https://travis-ci.org/seantis/onegov.foundation
+.. image:: https://travis-ci.org/OneGov/onegov.foundation.png
+  :target: https://travis-ci.org/OneGov/onegov.foundation
   :alt: Build Status
 
 Coverage
 --------
 
-.. image:: https://coveralls.io/repos/seantis/onegov.foundation/badge.png?branch=master
-  :target: https://coveralls.io/r/seantis/onegov.foundation?branch=master
+.. image:: https://coveralls.io/repos/OneGov/onegov.foundation/badge.png?branch=master
+  :target: https://coveralls.io/r/OneGov/onegov.foundation?branch=master
   :alt: Project Coverage
 
 Latests PyPI Release
