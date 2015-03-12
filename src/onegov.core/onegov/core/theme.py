@@ -41,12 +41,13 @@ Note that for the theme to work you need to define a filestorage. See
 :meth:`onegov.core.framework.Framework.configure_application`.
 """
 from onegov.core import Framework
+from onegov.core import log
 from onegov.core import utils
 from onegov.core.filestorage import FilestorageFile
 
 
 class Theme(object):
-    """ Describes a onegov.core theme.
+    """ Describres a onegov.core theme.
 
     A onegov theme is any kind of compiled or non-compiled css file. The core
     expects a single css file that stays the same as long as the same options
@@ -111,6 +112,7 @@ def compile(storage, theme, options={}):
     if storage.exists(filename):
         return filename
 
+    log.info("Compiling theme {}, v{}".format(theme.name, theme.version))
     storage.setcontents(filename, theme.compile(options))
 
     return filename

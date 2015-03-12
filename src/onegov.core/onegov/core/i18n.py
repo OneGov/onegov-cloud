@@ -133,10 +133,10 @@ def get_translations(domain, localedir):
     for language, pofile_path in pofiles(localedir):
 
         if not pofile_path.endswith('{}.po'.format(domain)):
-            log.debug("Skipping pofile {}".format(pofile_path))
+            log.info("Skipping pofile {}".format(pofile_path))
             continue
         else:
-            log.debug("Compiling pofile {}".format(pofile_path))
+            log.info("Compiling pofile {}".format(pofile_path))
 
         mofile = BytesIO()
         mofile.write(polib.pofile(pofile_path).to_binary())
