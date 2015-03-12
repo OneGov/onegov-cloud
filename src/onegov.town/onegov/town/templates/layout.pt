@@ -10,6 +10,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><div metal:define-slot="title"></div></title>
+    <link rel="stylesheet" type="text/css" href="${request.theme_link}">
 </head>
 
 <body id="${api.page_id}">

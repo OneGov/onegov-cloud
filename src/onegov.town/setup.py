@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'click',
         'onegov.core',
+        'onegov.foundation',
         'onegov.page',
         'onegov.user',
         'translationstring'

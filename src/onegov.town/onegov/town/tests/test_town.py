@@ -47,7 +47,12 @@ def test_template_layout():
     config.scan(onegov.town)
     config.commit()
 
-    client = Client(App())
+    app = App()
+    app.configure_application(filestorage='fs.memoryfs.MemoryFS')
+    app.namespace = 'tests'
+    app.set_application_id('tests/foo')
+
+    client = Client(app)
     response = client.get('/model')
 
     assert '<!DOCTYPE html>' in response.text
