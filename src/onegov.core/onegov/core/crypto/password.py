@@ -5,7 +5,7 @@ def hash_password(password):
     """ The default password hashing algorithm used by onegov.
 
     Over time the underlying algorithm may change, at which point
-    `:meth:verify_password` must issue a deprecation warning when using
+    :meth:`verify_password` must issue a deprecation warning when using
     the old algorithm.
 
     Note that no salt is being passed, because the algorithm we use now

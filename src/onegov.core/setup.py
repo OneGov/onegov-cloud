@@ -23,6 +23,7 @@ dependencies = {
     'passlib',
     'polib',
     'py-bcrypt',
+    'python-magic',
     'psycopg2',
     'pylibmc',
     'pylru',

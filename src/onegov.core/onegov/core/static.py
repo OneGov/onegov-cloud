@@ -34,8 +34,8 @@ If you need to serve something on another path you can::
 import os.path
 
 from onegov.core import Framework
+from onegov.core.utils import render_file
 from onegov.core.security import Public
-from webob import static
 from more.webassets.tweens import is_subpath
 
 
@@ -71,12 +71,7 @@ def get_static_file(app, absorb):
     return StaticFile.from_application(app, absorb)
 
 
-def render_file_path(file_path, request):
-    """ Takes the given file_path (content) and renders it to the browser. """
-    return request.get_response(static.FileApp(file_path))
-
-
-@Framework.view(model=StaticFile, render=render_file_path, permission=Public)
+@Framework.view(model=StaticFile, render=render_file, permission=Public)
 def view_static_file(self, request):
     """ Renders the given static file in the browser. """
     return self.path

@@ -3,10 +3,11 @@ from more.webassets.core import IncludeRequest
 from onegov.core import utils
 
 
-class VirtualHostRequest(IncludeRequest):
-    """ Extends the default Morepath request with virtual host support.
+class CoreRequest(IncludeRequest):
+    """ Extends the default Morepath request with virtual host support and
+    other useful methods.
 
-    This might be supported by Morepath directly in the future:
+    Virtual hosting might be supported by Morepath directly in the future:
     https://github.com/morepath/morepath/issues/185
 
     """
@@ -73,4 +74,23 @@ class VirtualHostRequest(IncludeRequest):
     def link(self, *args, **kwargs):
         """ Extends the default link generating function of Morepath. """
         return self.transform(
-            super(VirtualHostRequest, self).link(*args, **kwargs))
+            super(CoreRequest, self).link(*args, **kwargs))
+
+    def filestorage_link(self, path):
+        """ Takes the given filestorage path and returns an url if the path
+        exists. The url might point to the local server or it might point to
+        somehwere else on the web.
+
+        """
+
+        app = self.app
+
+        if not app.filestorage.exists(path):
+            return None
+
+        url = app.filestorage.getpathurl(path, allow_none=True)
+
+        if url:
+            return url
+        else:
+            return self.link(app.modules.filestorage.FilestorageFile(path))

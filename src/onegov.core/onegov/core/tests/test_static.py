@@ -11,11 +11,19 @@ from webtest import TestApp as Client
 
 def test_static_file(tempdir):
 
-    class App(object):
-        pass
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+        serve_static_files = True
+        static_files = tempdir
+
+    config.commit()
 
     app = App()
-    app.static_files = tempdir
+    app.configure_application()
+    app.namespace = 'test'
+    app.set_application_id('test/test')
 
     with open(os.path.join(tempdir, 'robots.txt'), 'w') as f:
         f.write('foobar')
@@ -48,6 +56,8 @@ def test_static_file_app(tempdir):
 
     app = App()
     app.configure_application()
+    app.namespace = 'test'
+    app.set_application_id('test/test')
 
     c = Client(app)
     assert c.get('/static/robots.txt').text == 'foobar'
@@ -88,6 +98,8 @@ def test_root_file_app(tempdir):
 
     app = App()
     app.configure_application()
+    app.namespace = 'test'
+    app.set_application_id('test/test')
 
     c = Client(app)
     assert c.get('/robots.txt').text == 'foobar'

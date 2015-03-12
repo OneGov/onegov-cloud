@@ -29,8 +29,9 @@ from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache
+from onegov.core import utils
 from onegov.core.orm import Base, SessionManager
-from onegov.core.request import VirtualHostRequest
+from onegov.core.request import CoreRequest
 from onegov.server import Application as ServerApplication
 from uuid import uuid4 as new_uuid
 
@@ -38,7 +39,7 @@ from uuid import uuid4 as new_uuid
 class Framework(TransactionApp, WebassetsApp, ServerApplication):
     """ Baseclass for Morepath OneGov applications. """
 
-    request_class = VirtualHostRequest
+    request_class = CoreRequest
 
     #: holds the database connection string, *if* there is a database connected
     dsn = None
@@ -46,6 +47,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     #: holdes the current schema associated with the database connection, set
     #: by and derived from :meth:`set_application_id`.
     schema = None
+
+    @cached_property
+    def modules(self):
+        from onegov.core import filestorage
+        return utils.Bunch(filestorage=filestorage)
 
     @property
     def has_database_connection(self):
@@ -264,7 +270,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         in the future (e.g. S3).
 
         Therefore, the urls for the file storage should always be acquired
-        through :met:`onegov.core.file_storage.url`.
+        through :meth:`onegov.core.request.CoreRequest.filestorage_link`.
 
         The backend is configured through :meth:`configure_application`.
 
@@ -273,6 +279,17 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         If no filestorage is available, this returns None.
         See :attr:`self.has_filestorage`.
+
+        WARNING: Files stored in the filestorage are available publicly! All
+        someone has to do is to *guess* the filename. To get an unguessable
+        filename use :meth:`onegov.core.filestorage.random_filename`.
+
+        The reason for this is the fact that filestorage may be something
+        external in the future.
+
+        This should not deter you from using this for user uploads, though
+        you should be careful. If you want to be sure that your application
+        stores files locally, use some other ways of storing those files.
 
         """
         if self._global_file_storage is None:

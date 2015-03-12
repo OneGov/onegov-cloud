@@ -10,7 +10,7 @@ def random_token(nbytes=512):
 
     More information:
 
-    `<http://wyattbaldwin.com\/2014/01/09/generating-random-tokens-in-python>`_
+    `<http://wyattbaldwin.com/2014/01/09/generating-random-tokens-in-python>`_
 
     `<http://www.2uo.de/myths-about-urandom/>`_
 

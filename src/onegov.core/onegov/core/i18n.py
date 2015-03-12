@@ -82,7 +82,7 @@ def default_locale_negotiator(languages, request):
     Will select one of the given languages by:
 
     1. Examining the 'language' cookie which will be preferred if the
-      language in the cookie actually exists
+       language in the cookie actually exists
 
     2. Selecting the best match from the accept_language header
 
