@@ -185,8 +185,13 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         """
         super(Framework, self).set_application_id(application_id)
-        self.schema = application_id.replace('/', '-')
 
+        # replace the dashes in the id with underlines since the schema
+        # should not include double dashes and IDNA leads to those
+        #
+        # then, replace the '/' with a '-' so the only dash left will be
+        # the dash between namespace and id
+        self.schema = application_id.replace('-', '_').replace('/', '-')
         if self.has_database_connection:
             self.session_manager.set_current_schema(self.schema)
 
