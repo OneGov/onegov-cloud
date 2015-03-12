@@ -10,6 +10,10 @@ defined by the applications. The idea is to have a way to share themes
 between applications, not to have powerful skinning features where the user
 can change the theme at any given time.
 
+A theme is basically a CSS file. There is no way to define images/icons
+and so on. The only way to do that is to include the image in the css
+file (which is not *that* crazy of an idea anyway).
+
 To write a theme, create a class providing the properties/methods of
 :class:`Theme`.
 
