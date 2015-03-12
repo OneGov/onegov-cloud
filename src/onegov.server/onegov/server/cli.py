@@ -229,6 +229,9 @@ class WsgiServer(FileSystemEventHandler):
     def on_any_event(self, event):
         """ If anything of significance changed, restart the process. """
 
+        if event.is_directory:
+            return
+
         if event.src_path.endswith('pyc'):
             return
 
@@ -239,6 +242,9 @@ class WsgiServer(FileSystemEventHandler):
             return
 
         if '/onegov.server' in event.src_path:
+            return
+
+        if '/file-storage' in event.src_path:
             return
 
         self.restart()
