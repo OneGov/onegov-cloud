@@ -122,5 +122,25 @@ class BaseTheme(object):
 
 
 class Theme(BaseTheme):
-    name = 'onegov.foundation'
+    """ Zurb Foundation vanilla theme. Use this if you don't want any changes
+    to zurb foundation, except for setting supported variables.
+
+    Do not use this class as a base for your own theme!
+
+    Example::
+
+        from onegov.core import Framework
+        from onegov.foundation import Theme
+
+        class App(Framework):
+            theme_options = {
+                'rowWidth': '1200px'
+            }
+
+        @App.setting(section='core', name='theme')
+        def get_theme():
+            return Theme()
+
+    """
+    name = 'zurb.foundation'
     version = '1.0'
