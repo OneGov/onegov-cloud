@@ -71,14 +71,14 @@ def test_filestorage(tempdir):
     app.filestorage.setcontents('readme', 'readme')
 
     client = Client(app)
-    assert client.get('/?file=test.txt').text == '/filestorage/test.txt'
+    assert client.get('/?file=test.txt').text == '/files/test.txt'
     assert client.get('/?file=asdf.txt').text == ''
 
-    assert client.get('/filestorage/test.txt').text == 'asdf'
-    assert client.get('/filestorage/test.txt').content_type == 'text/plain'
+    assert client.get('/files/test.txt').text == 'asdf'
+    assert client.get('/files/test.txt').content_type == 'text/plain'
 
-    assert client.get('/filestorage/readme').text == 'readme'
-    assert client.get('/filestorage/readme').content_type == 'text/plain'
+    assert client.get('/files/readme').text == 'readme'
+    assert client.get('/files/readme').content_type == 'text/plain'
 
     app.set_application_id('tests/bar')
 

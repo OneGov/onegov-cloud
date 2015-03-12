@@ -94,3 +94,19 @@ class CoreRequest(IncludeRequest):
             return url
         else:
             return self.link(app.modules.filestorage.FilestorageFile(path))
+
+    @cached_property
+    def theme_link(self):
+        """ Returns the link to the current theme. Computed once per request.
+
+        The theme is automatically compiled and stored if it doesn't exist yet,
+        or if it is outdated.
+
+        """
+        theme = self.app.registry.settings.core.theme
+        assert theme is not None, "Do not call if no theme is used"
+
+        filename = self.app.modules.theme.compile(
+            self.app.themestorage, theme, self.app.theme_options)
+
+        return self.link(self.app.modules.theme.ThemeFile(filename))

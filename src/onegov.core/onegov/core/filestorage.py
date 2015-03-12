@@ -34,6 +34,8 @@ class FilestorageFile(object):
     remote path that is served by some different webserver.
 
     """
+    storage = 'filestorage'
+
     def __init__(self, path):
         self.path = path
 
@@ -42,7 +44,7 @@ class FilestorageFile(object):
         return self.path
 
 
-@Framework.path(model=FilestorageFile, path='/filestorage', absorb=True)
+@Framework.path(model=FilestorageFile, path='/files', absorb=True)
 def get_filestorage_file(app, absorb):
     if app.filestorage.exists(absorb):
         return FilestorageFile(absorb)
@@ -51,4 +53,4 @@ def get_filestorage_file(app, absorb):
 @Framework.view(model=FilestorageFile, render=render_file, permission=Public)
 def view_filestorage_file(self, request):
     """ Renders the given filestorage file in the browser. """
-    return request.app.filestorage.getsyspath(self.path)
+    return getattr(request.app, self.storage).getsyspath(self.path)

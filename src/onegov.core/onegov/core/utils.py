@@ -1,7 +1,9 @@
-import os.path
+import hashlib
 import inspect
+import json
 import magic
 import mimetypes
+import os.path
 import pydoc
 import re
 
@@ -113,3 +115,17 @@ def render_file(file_path, request):
 
     return request.get_response(
         static.FileApp(file_path, content_type=get_content_type(file_path)))
+
+
+def hash_dictionary(dictionary):
+    """ Computes a sha256 hash for the given dictionary. The dictionary
+    is expected to only contain values that can be serialized by json.
+
+    That includes int, decimal, string, boolean.
+
+    Note that this function is not meant to be used for hashing secrets. Do
+    not include data in this dictionary that is secret!
+
+    """
+    dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
+    return hashlib.sha1(dict_as_string).hexdigest()

@@ -50,8 +50,17 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
     @cached_property
     def modules(self):
+        """ Provides access to modules used by the Framework class. Those
+        modules cannot be included at the top because they themselves usually
+        include the Framework.
+
+        Admittelty a bit of a code smell.
+
+        """
         from onegov.core import filestorage
-        return utils.Bunch(filestorage=filestorage)
+        from onegov.core import theme
+
+        return utils.Bunch(filestorage=filestorage, theme=theme)
 
     @property
     def has_database_connection(self):
@@ -129,6 +138,9 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         """
 
         super(Framework, self).configure_application(**cfg)
+
+        # certain namespaces are reserved for internal use:
+        assert self.namespace not in {'global'}
 
         self.dsn = cfg.get('dsn')
 
@@ -298,7 +310,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             filename = filestorage.random_filename()
             app.filestorage.setcontents(filename, 'Lorem Ipsum')
 
-            # returns either an url like '/filestorage/4ec56cc005c594880a...'
+            # returns either an url like '/files/4ec56cc005c594880a...'
             # or maybe 'https://amazonaws.com/onegov-cloud/32746/220592/q...'
             request.filestorage_link(filename)
 
@@ -307,6 +319,25 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             return None
 
         return self._global_file_storage.makeopendir(self.schema)
+
+    @property
+    def themestorage(self):
+        """ Returns a storage object meant for themes, shared by all
+        applications.
+
+        Only use this for theming, nothing else!
+
+        """
+
+        if self._global_file_storage is None:
+            return None
+
+        return self._global_file_storage.makeopendir('global-theme')
+
+    @property
+    def theme_options(self):
+        """ Returns the application-bound theme options. """
+        return {}
 
 
 @Framework.tween_factory(over=webassets_injector_tween)
