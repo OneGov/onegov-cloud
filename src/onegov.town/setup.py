@@ -47,7 +47,8 @@ setup(
             'pytest-cov',
             'testing.postgresql',
             'mock',
-            'webtest'
+            'webtest',
+            'pyquery'
         ],
     ),
     entry_points="""

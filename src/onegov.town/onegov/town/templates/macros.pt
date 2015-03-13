@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.town">
+<body>
+
+<metal:navigation define-macro="top_navigation">
+    <nav class="top-bar" data-topbar role="navigation" tal:condition="layout.top_navigation">
+        <ul class="title-area">
+            <!--! this section needs to be included (even though it's empty),
+            or the responsive menu bar icon won't be rendered -->
+            <li class="name" style="width: 0;">
+                <h1><a href="#"></a></h1>
+            </li>
+            <li class="toggle-topbar menu-icon">
+                <a href="#"><span>Menu</span></a>
+            </li>
+        </ul>
+        <section class="top-bar-section">
+            <ul class="left">
+                <tal:block repeat="link layout.top_navigation">
+                    <li tal:attributes="class link.active and 'active'">
+                        <a tal:attributes="href link.url">${link.text}</a>
+                    </li>
+                </tal:block>
+            </ul>
+        </section>
+    </nav>
+</metal:navigation>
+
+<metal:breadcrumbs define-macro="breadcrumbs">
+<ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
+    <tal:block repeat="link layout.breadcrumbs">
+        <li tal:attributes="class link.active and 'current'">
+            <a tal:attributes="href link.url">${link.text}</a>
+        </li>
+    </tal:block>
+</ul>
+</metal:breadcrumbs>
+
+</body>
