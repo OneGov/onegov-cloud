@@ -51,25 +51,26 @@ def test_chameleon_with_translation(tempdir):
 
     @App.template_directory()
     def get_template_directory():
+        # Morepath wants to retrieve the module path (which we don't have),
+        # even if the path is absolute. This is probably a bug:
+        # https://github.com/morepath/morepath/issues/299
+        #
+        # Until that bug is fixed we inject that information into the
+        # calling stack.
         class Mock(object):
             pass
 
-        # Morepath should support absolute template directories, but it
-        # doesn't do it currently, this seems to be a bug:
-        # https://github.com/morepath/morepath/issues/299
-        #
-        # Until that bug is fixed we corce the caller stack into building
-        # the correct path by sheer hackery
         attach_info = Mock()
         attach_info.module = Mock()
-        attach_info.module.__file__ = templates
+        attach_info.module.__file__ = tempdir
 
         import inspect
         stack = inspect.stack()
         self = stack[1][0].f_locals['self']
         self.attach_info = attach_info
+        # remove me in the future
 
-        return 'templates'
+        return templates
 
     @App.setting(section='i18n', name='localedir')
     def get_locale_directory():
