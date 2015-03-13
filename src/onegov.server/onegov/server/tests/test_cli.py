@@ -34,6 +34,7 @@ def test_wsgi_server():
 
     class MockEvent(object):
         src_path = None
+        is_directory = False
 
     event = MockEvent()
     event.src_path = 'test.py'
