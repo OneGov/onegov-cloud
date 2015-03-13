@@ -11,6 +11,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column, ForeignKey, Integer, Text
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, deferred, relationship, validates
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column
@@ -66,7 +67,7 @@ class Page(Base, TimestampMixin):
     )
 
     #: the order of the pages - pages are added at the end by default
-    order = Column(Integer, default=2**16)
+    order = Column(Integer, default=2 ** 16)
 
     # default sort order is order, id
     __mapper_args__ = {
@@ -133,6 +134,17 @@ class Page(Base, TimestampMixin):
                 (self.name, )
             )
         )
+
+    @hybrid_property
+    def absorb(self):
+        """ Alias for :attr:`path`. This is a convenience feature for Morepath
+        if a path is absorbed.
+
+        See `<http://morepath.readthedocs.org/en/latest/\
+        paths_and_linking.html?highlight=absorb#absorbing>`_
+
+        """
+        return self.path
 
     def __repr__(self):
         return "Page(name=%r, id=%r, parent_id=%r)" % (

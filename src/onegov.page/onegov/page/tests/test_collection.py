@@ -12,6 +12,7 @@ def test_add_page(session):
     assert root.root is root
     assert list(root.ancestors) == []
     assert root.path == 'test'
+    assert root.absorb == 'test'
 
     child = pages.add(parent=root, title='Foo Bar')
 
@@ -20,6 +21,7 @@ def test_add_page(session):
     assert child.root is root
     assert list(child.ancestors) == [root]
     assert child.path == 'test/foo-bar'
+    assert child.absorb == 'test/foo-bar'
 
     with pytest.raises(AssertionError):
         # normalized names are enforced
