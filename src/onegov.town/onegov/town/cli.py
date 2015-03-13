@@ -13,6 +13,7 @@ import transaction
 
 from onegov.core.orm import Base, SessionManager
 from onegov.town.model import Town
+from onegov.town.initial_content import add_initial_content
 
 
 @click.group()
@@ -44,9 +45,7 @@ def add(ctx, name):
         )
         sys.exit(1)
 
-    session.add(Town(name=name))
-    session.flush()
-
+    add_initial_content(session, town_name=name)
     transaction.commit()
 
     click.secho(
