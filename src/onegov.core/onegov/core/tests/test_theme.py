@@ -13,6 +13,7 @@ class MockTheme(object):
         self.name = name
         self.version = version
         self.result = result
+        self.default_options = {}
 
     def compile(self, options):
         return self.result.format(**options)
