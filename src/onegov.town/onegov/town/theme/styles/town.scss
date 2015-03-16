@@ -1,15 +1,13 @@
 /*
     top navigation
 */
-.top-bar {
-    ul {
-        margin-bottom: $top-bar-border-size;
+.top-bar,
+.top-bar-section ul li {
+    box-shadow: 0 $top-bar-border-size 0 $primary-color;
+}
 
-        li {
-            box-shadow: 0 $top-bar-border-size 0 $primary-color;
-            margin-bottom: $top-bar-border-size;
-        }
-    }
+.top-bar ul {
+    margin-bottom: $top-bar-border-size;
 }
 
 /*
