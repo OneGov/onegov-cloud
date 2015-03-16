@@ -25,7 +25,7 @@
         color: $bottom-links-color;
         font-size: $bottom-links-size;
 
-        :hover {
+        &:hover {
             text-decoration: underline;
         }
     }
