@@ -1,4 +1,4 @@
-from onegov.foundation import Theme
+from onegov.foundation import BaseTheme, Theme
 
 
 def test_compile():
@@ -16,3 +16,15 @@ def test_options():
 
     assert '#a0d3e8' in theme.compile()
     assert '#a0d3e8' not in theme.compile({'info-color': '#aa33aa'})
+
+    class MyTheme(BaseTheme):
+
+        default_options = {
+            'info-color': '#aa33aa'
+        }
+
+    theme = MyTheme(compress=False)
+    assert '#aa33aa' in theme.compile()
+    assert '#a0d3e8' not in theme.compile()
+    assert '#aa00bb' in theme.compile({'info-color': '#aa00bb'})
+    assert '#aa33aa' not in theme.compile({'info-color': '#aa00bb'})

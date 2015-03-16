@@ -1,5 +1,6 @@
 import os.path
 
+from collections import OrderedDict
 from csscompressor import compress
 from scss.compiler import Compiler
 
@@ -52,6 +53,14 @@ class BaseTheme(object):
         self.compress = compress
 
     @property
+    def default_options(self):
+        """ Default options used when compiling the theme. """
+        # return an ordered dict, in case someone overrides the compile options
+        # with an ordered dict - this would otherwise result in an unordered
+        # dict when both dicts are merged
+        return OrderedDict()
+
+    @property
     def pre_imports(self):
         """ Imports added before the foundation import. The imports must be
         found in one of the paths (see :attr:`extra_search_paths`).
@@ -99,10 +108,14 @@ class BaseTheme(object):
     def compile(self, options={}):
         """ Compiles the theme with the given options. """
 
-        if options:
+        # copy, because the dict may be static if it's a basic property
+        _options = self.default_options.copy()
+        _options.update(options)
+
+        if _options:
             prefix = "@import 'foundation/functions';"
             prefix = prefix + '\n'.join(
-                "${}: {};".format(k, v) for k, v in options.items()
+                "${}: {};".format(k, v) for k, v in _options.items()
             )
         else:
             prefix = ""
