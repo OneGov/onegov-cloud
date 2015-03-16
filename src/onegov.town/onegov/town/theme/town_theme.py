@@ -13,6 +13,9 @@ class TownTheme(BaseTheme):
             # >>>
             'primary-color': '#006fba',
             # <<<
+            'top-bar-border-size': '0.3rem',
+            'bottom-links-color': '#777',
+            'bottom-links-size': '0.8rem',
             'topbar-bg-color': '#f5f5f5',
             'topbar-link-bg-hover': '#dfdfdf',
             'topbar-link-color': '#312f2e',

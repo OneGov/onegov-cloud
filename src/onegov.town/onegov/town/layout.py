@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from onegov.page import Page, PageCollection
+from onegov.town import _
 from onegov.town.elements import Link
 
 
@@ -86,6 +87,14 @@ class Layout(object):
         """
         return None
 
+    @cached_property
+    def bottom_links(self):
+        """ A list of links shown at the absolute bottom. Use this for
+        links like administration, statistics, source-code.
+
+        """
+        return None
+
 
 class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """
@@ -103,3 +112,11 @@ class DefaultLayout(Layout):
         return tuple(
             Link(r.title, self.request.link(r)) for r in self.root_pages
         )
+
+    @cached_property
+    def bottom_links(self):
+        return [
+            Link(_(u'Login'), '/login'),
+            Link(u'OneGov', 'http://www.onegov.ch'),
+            Link(u'Seantis GmbH', 'https://www.seantis.ch')
+        ]

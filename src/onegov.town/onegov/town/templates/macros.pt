@@ -31,13 +31,22 @@
 </metal:navigation>
 
 <metal:breadcrumbs define-macro="breadcrumbs">
-<ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
-    <tal:block repeat="link layout.breadcrumbs">
-        <li tal:attributes="class link.active and 'current'">
-            <a tal:attributes="href link.url">${link.text}</a>
-        </li>
-    </tal:block>
-</ul>
+    <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
+        <tal:block repeat="link layout.breadcrumbs">
+            <li tal:attributes="class link.active and 'current'">
+                <a tal:attributes="href link.url">${link.text}</a>
+            </li>
+        </tal:block>
+    </ul>
 </metal:breadcrumbs>
+
+<metal:bottom_links define-macro="bottom-links">
+    <ul class="bottom-links" tal:condition="layout.bottom_links">
+        <tal:block repeat="link layout.bottom_links">
+            <a tal:attributes="href link.url">${link.text}</a>
+            <tal:block tal:condition="not:repeat.link.end">|</tal:block>
+        </tal:block>
+    </ul>
+</metal:bottom_links>
 
 </body>
