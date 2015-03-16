@@ -24,3 +24,11 @@ def test_random_token():
 
     with pytest.raises(AssertionError):
         random_token(nbytes=511)
+
+
+def test_no_null_bytes():
+    with pytest.raises(AssertionError):
+        assert hash_password("\0")
+
+    with pytest.raises(AssertionError):
+        assert verify_password("\0", "hash")

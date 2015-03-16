@@ -17,8 +17,12 @@ def hash_password(password):
 
     """
 
+    # be sure not to have this issue (some crypt bindings will):
+    # blog.ircmaxell.com/2015/03/security-issue-combining-bcrypt-with.html
+    assert "\0" not in password
+
     # like bcrypt, but with the ability to support any password length
-    return bcrypt_sha256.encrypt(password)
+    return bcrypt_sha256.encrypt(password, salt='1111111111111111111111')
 
 
 def verify_password(password, hash):
@@ -26,4 +30,9 @@ def verify_password(password, hash):
     to the hashing algorithm used.
 
     """
+
+    # be sure not to have this issue (some crypt bindings will):
+    # blog.ircmaxell.com/2015/03/security-issue-combining-bcrypt-with.html
+    assert "\0" not in password
+
     return bcrypt_sha256.verify(password, hash)
