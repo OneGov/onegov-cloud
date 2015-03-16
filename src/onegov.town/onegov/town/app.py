@@ -9,7 +9,7 @@ use different templating languages.
 
 from onegov.core import Framework
 from onegov.core import utils
-from onegov.foundation import Theme
+from onegov.town.theme import TownTheme
 
 
 class TownApp(Framework):
@@ -26,7 +26,7 @@ def get_template_directory():
 
 @TownApp.setting(section='core', name='theme')
 def get_theme():
-    return Theme()
+    return TownTheme()
 
 
 @TownApp.setting(section='i18n', name='domain')
