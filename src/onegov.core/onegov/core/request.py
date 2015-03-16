@@ -107,6 +107,8 @@ class CoreRequest(IncludeRequest):
         assert theme is not None, "Do not call if no theme is used"
 
         filename = self.app.modules.theme.compile(
-            self.app.themestorage, theme, self.app.theme_options)
+            self.app.themestorage, theme, self.app.theme_options,
+            force=self.app.always_compile_theme
+        )
 
         return self.link(self.app.modules.theme.ThemeFile(filename))

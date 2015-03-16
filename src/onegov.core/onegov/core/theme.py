@@ -75,6 +75,13 @@ class Theme(object):
         """
         raise NotImplementedError
 
+    @property
+    def default_options(self):
+        """ The default options of the theme, will be overritten by options
+        passed to :meth:`compile`.
+
+        """
+
     def compile(self, options={}):
         """ Returns a single css that represents the theme. """
         raise NotImplementedError
@@ -82,14 +89,18 @@ class Theme(object):
 
 def get_filename(theme, options={}):
     """ Returns a unique filename for the given theme and options. """
+
+    _options = theme.default_options.copy()
+    _options.update(options)
+
     return '-'.join((
         theme.name,
         theme.version,
-        utils.hash_dictionary(options)
+        utils.hash_dictionary(_options),
     )) + '.css'  # needed to get the correct content_type
 
 
-def compile(storage, theme, options={}):
+def compile(storage, theme, options={}, force=False):
     """ Generates a theme and stores it in the filestorage, returning the
     path to the theme.
 
@@ -105,11 +116,14 @@ def compile(storage, theme, options={}):
     :options:
         The hashable options passed to the theme.
 
+    :force:
+        If true, the compilation is done in any case.
+
     """
 
     filename = get_filename(theme, options)
 
-    if storage.exists(filename):
+    if not force and storage.exists(filename):
         return filename
 
     log.info("Compiling theme {}, v{}".format(theme.name, theme.version))

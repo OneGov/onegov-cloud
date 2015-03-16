@@ -135,6 +135,9 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             applications. Each application automatically gets its own
             namespace inside this space.
 
+        :always_compile_theme:
+            If true, the theme is always compiled - no caching is employed.
+
         """
 
         super(Framework, self).configure_application(**cfg)
@@ -177,6 +180,8 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
                 **filestorage_options)
         else:
             self._global_file_storage = None
+
+        self.always_compile_theme = cfg.get('always_compile_theme', False)
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
