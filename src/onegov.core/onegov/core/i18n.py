@@ -167,8 +167,14 @@ def get_translation_bound_meta(meta_class, translate):
         def get_translations(self, form):
             default = super(TranslationBoundMeta, self).get_translations(form)
 
-            if not default._fallback:
-                default.add_fallback(translate)
+            # WTForms does this weird dance where it wraps translations for
+            # Python 2, but not for Python 3. That's why we have to do this:
+            if hasattr(default, '_fallback'):
+                if not default._fallback:
+                    default.add_fallback(translate)
+            else:
+                if not default.translations._fallback:
+                    default.translations.add_fallback(translate)
 
             return default
 
