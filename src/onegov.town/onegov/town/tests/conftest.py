@@ -7,6 +7,7 @@ import transaction
 from morepath import setup
 from onegov.core.orm import Base, SessionManager
 from onegov.town.initial_content import add_initial_content
+from onegov.user import UserCollection
 from testing.postgresql import Postgresql
 from uuid import uuid4
 
@@ -45,11 +46,16 @@ def town_app(postgres_server_url):
     app.namespace = 'test_' + uuid4().hex
     app.configure_application(
         dsn=postgres_server_url,
-        filestorage='fs.memoryfs.MemoryFS'
+        filestorage='fs.memoryfs.MemoryFS',
+        identity_secure=False
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
     add_initial_content(app.session(), 'Govikon')
+
+    users = UserCollection(app.session())
+    users.add('admin@example.org', 'hunter2', 'admin')
+
     transaction.commit()
 
     yield app

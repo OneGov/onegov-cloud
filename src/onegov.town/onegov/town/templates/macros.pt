@@ -49,4 +49,20 @@
     </ul>
 </metal:bottom_links>
 
+<metal:search define-macro="form">
+    <form tal:attributes="action form.action|'.'" method="POST">
+        <metal:fields use-macro="layout.macros['fields']" tal:define="fields form._fields.values()" />
+        <input type="submit" value="Submit" class="button">
+    </form>
+</metal:search>
+
+<metal:fields define-macro="fields">
+    <tal:block repeat="field fields">
+        <label tal:attributes="class field.errors and 'error'">
+            ${field.label} ${field()}
+        </label>
+        <small class="error" tal:repeat="error field.errors">${error}</small>
+    </tal:block>
+</metal:fields>
+
 </body>
