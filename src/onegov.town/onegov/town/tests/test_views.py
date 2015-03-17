@@ -35,8 +35,8 @@ def test_view_login(town_app):
     # (the default *is* English, but it needs to be added as a locale, or it
     # won't be used)
     assert response.status_code == 200
-    assert "E-Mail Adresse" in response.text
-    assert "Passwort" in response.text
+    assert u"E-Mail Adresse" in response.text
+    assert u"Passwort" in response.text
 
     assert client.cookies == {}
     assert client.get('/logout', expect_errors=True).status_code == 403
@@ -44,9 +44,9 @@ def test_view_login(town_app):
     response.form.set('email', 'admin@example.org')
     response = response.form.submit()
     assert response.status_code == 200
-    assert "E-Mail Adresse" in response.text
-    assert "Passwort" in response.text
-    assert "Dieses Feld wird benötigt." in response.text
+    assert u"E-Mail Adresse" in response.text
+    assert u"Passwort" in response.text
+    assert u"Dieses Feld wird benötigt." in response.text
 
     assert client.cookies == {}
     assert client.get('/logout', expect_errors=True).status_code == 403
