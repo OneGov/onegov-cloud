@@ -1,6 +1,12 @@
+import collections
+
 from cached_property import cached_property
 from more.webassets.core import IncludeRequest
 from onegov.core import utils
+from onegov.core.crypto import random_token
+
+
+Message = collections.namedtuple('Message', ['text', 'type'])
 
 
 class CoreRequest(IncludeRequest):
@@ -113,6 +119,49 @@ class CoreRequest(IncludeRequest):
 
         return self.link(self.app.modules.theme.ThemeFile(filename))
 
+    @cached_property
+    def session_id(self):
+        """ Returns a random session id, making sure it's stored in the
+        cookies. This random session id is used to access data associated
+        with the browser session.
+
+        The random token is very strong and it is signed, making it even harder
+        to guess a token used by another user.
+
+        If someone gains access to this session id, all bets are off though.
+        To prevent that, cookies should only be transmitted over https.
+
+        See :meth:`onegov.core.framework.Framework.configure_application`.
+
+        """
+
+        sessionid = self.app.unsign(self.cookies.get('sessionid', ''))
+
+        if not sessionid:
+            sessionid = random_token()
+            self.cookies['sessionid'] = self.app.sign(sessionid)
+
+            @self.after
+            def store_session(response):
+                response.set_cookie(
+                    'sessionid',
+                    self.cookies['sessionid'],
+                    secure=self.app.identity_secure,
+                    httponly=True
+                )
+
+        return sessionid
+
+    @cached_property
+    def browser_session(self):
+        """ Returns a browser_session bound to the request. Works via cookies,
+        so requests without cookies won't be able to use the browser_session.
+
+        """
+
+        return self.app.modules.browser_session.BrowserSession(
+            self.app.cache, self.session_id)
+
     def get_form(self, form_class):
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
@@ -146,3 +195,60 @@ class CoreRequest(IncludeRequest):
             return self.app.chameleon_translations.get(locale)
         else:
             return self.app.translations.get(locale)
+
+    def message(self, text, type):
+        """ Adds a message with the given type to the messages list. This
+        messages list may then be displayed by an applicaiton building on
+        onegov.core.
+
+        For example:
+
+            http://foundation.zurb.com/docs/components/alert_boxes.html
+
+        Four default types are defined on the request for easier use:
+
+        :meth:`success`
+        :meth:`warning`
+        :meth:`info`
+        :meth:`alert`
+
+        The messages are stored with the session and to display them, the
+        template using the messages should call :meth:`consume_messages`.
+
+        """
+        if not self.browser_session.has('messages'):
+            self.browser_session.messages = [Message(text, type)]
+        else:
+            # this is a bit akward, but I don't see an easy way for this atm.
+            # (otoh, usually there's going to be one message only)
+            self.browser_session.messages = self.browser_session.messages + [
+                Message(text, type)
+            ]
+
+    def consume_messages(self):
+        """ Returns the messages, removing them from the session in the
+        process. Call only if you can be reasonably sure that the user
+        will see the messages.
+
+        """
+        if self.browser_session.has('messages'):
+            for message in self.browser_session.messages:
+                yield message
+
+            del self.browser_session.messages
+
+    def success(self, text):
+        """ Adds a success message. """
+        self.message(text, 'success')
+
+    def warning(self, text):
+        """ Adds a warning message. """
+        self.message(text, 'warning')
+
+    def info(self, text):
+        """ Adds an info message. """
+        self.message(text, 'info')
+
+    def alert(self, text):
+        """ Adds an alert message. """
+        self.message(text, 'alert')

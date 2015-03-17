@@ -24,6 +24,7 @@ import pydoc
 import pylru
 
 from cached_property import cached_property
+from itsdangerous import BadSignature, Signer
 from more.transaction import TransactionApp
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
@@ -57,11 +58,17 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         Admittelty a bit of a code smell.
 
         """
+        from onegov.core import browser_session
         from onegov.core import filestorage
         from onegov.core import i18n
         from onegov.core import theme
 
-        return utils.Bunch(filestorage=filestorage, i18n=i18n, theme=theme)
+        return utils.Bunch(
+            browser_session=browser_session,
+            filestorage=filestorage,
+            i18n=i18n,
+            theme=theme
+        )
 
     @property
     def has_database_connection(self):
@@ -369,6 +376,19 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def languages(self):
         """ Returns all available languages in a set. """
         return set(self.translations.keys())
+
+    def sign(self, text):
+        """ Signs a text with the identity secret. """
+        signer = Signer(self.identity_secret_key)
+        return signer.sign(text.encode('utf-8')).decode('utf-8')
+
+    def unsign(self, text):
+        """ Unsigns a signed text, returning None if unsuccessful. """
+        try:
+            signer = Signer(self.identity_secret_key)
+            return signer.unsign(text).decode('utf-8')
+        except BadSignature:
+            return None
 
 
 @Framework.tween_factory(over=webassets_injector_tween)
