@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import onegov.town
 
 from mock import patch
@@ -29,9 +30,13 @@ def test_view_login(town_app):
     assert client.get('/logout', expect_errors=True).status_code == 403
 
     response = client.get('/login')
+
+    # German is the default translation and there's no English translation yet
+    # (the default *is* English, but it needs to be added as a locale, or it
+    # won't be used)
     assert response.status_code == 200
-    assert "Email Address" in response.text
-    assert "Password" in response.text
+    assert "E-Mail Adresse" in response.text
+    assert "Passwort" in response.text
 
     assert client.cookies == {}
     assert client.get('/logout', expect_errors=True).status_code == 403
@@ -39,9 +44,9 @@ def test_view_login(town_app):
     response.form.set('email', 'admin@example.org')
     response = response.form.submit()
     assert response.status_code == 200
-    assert "Email Address" in response.text
-    assert "Password" in response.text
-    assert "This field is required." in response.text
+    assert "E-Mail Adresse" in response.text
+    assert "Passwort" in response.text
+    assert "Dieses Feld wird benötigt." in response.text
 
     assert client.cookies == {}
     assert client.get('/logout', expect_errors=True).status_code == 403

@@ -15,8 +15,8 @@ from onegov.user import UserCollection
 class LoginForm(Form):
     """ Defines the login form for onegov town. """
 
-    email = StringField(_(u'Email Address'), [validators.InputRequired()])
-    password = PasswordField(_(u'Password'), [validators.InputRequired()])
+    email = StringField(_(u"Email Address"), [validators.InputRequired()])
+    password = PasswordField(_(u"Password"), [validators.InputRequired()])
 
     def get_identity(self, request):
         """ Returns the identity if the username and password match. If they
@@ -55,7 +55,7 @@ def view_post_login(self, request):
 def handle_login(self, request):
     """ Handles the GET and POST login requests. """
 
-    form = LoginForm(request.POST)
+    form = request.get_form(LoginForm)
     form.action = request.link(self, name='login')
 
     if form.submitted(request):

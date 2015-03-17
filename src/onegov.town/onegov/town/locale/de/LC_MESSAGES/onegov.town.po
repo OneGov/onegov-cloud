@@ -1,4 +1,25 @@
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/view.py:14
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:119
+msgid "Login"
+msgstr "Login"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:55
+msgid "Submit"
+msgstr "Absenden"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/homepage.py:15
 #, python-format
 msgid "Welcome to ${town}"
 msgstr "Willkommen in ${town}"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:18
+msgid "Email Address"
+msgstr "E-Mail Adresse"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:19
+msgid "Password"
+msgstr "Passwort"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:71
+#, python-format
+msgid "Login to ${town}"
+msgstr "${town} Login"
