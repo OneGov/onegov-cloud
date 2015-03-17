@@ -112,3 +112,37 @@ class CoreRequest(IncludeRequest):
         )
 
         return self.link(self.app.modules.theme.ThemeFile(filename))
+
+    def get_form(self, form_class):
+        """ Returns an instance of the given form class, set up with the
+        correct translator and with CSRF protection enabled (the latter
+        doesn't work yet).
+
+        """
+        translate = self.get_translate(for_chameleon=False)
+        form_class = self.app.modules.i18n.get_translation_bound_form(
+            form_class, translate)
+
+        return form_class(self.POST, meta={'locales': self.app.languages})
+
+    def get_translate(self, for_chameleon=False):
+        """ Returns the translate method to the given request, or None
+        if no such method is availabe.
+
+        :for_chameleon:
+            True if the translate instance is used for chameleon (which is
+            special).
+
+        """
+        if not self.app.languages:
+            return None
+
+        settings = self.app.registry.settings
+
+        locale = settings.i18n.locale_negotiator(self.app.languages, self)
+        locale = locale or settings.i18n.default_locale
+
+        if for_chameleon:
+            return self.app.chameleon_translations.get(locale)
+        else:
+            return self.app.translations.get(locale)

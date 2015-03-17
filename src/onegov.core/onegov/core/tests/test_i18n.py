@@ -69,3 +69,30 @@ def test_default_locale_negotiator():
     request.accept_language = Accept('de')
     request.cookies['language'] = 'en'
     assert negotiate(['en', 'de'], request) == 'en'
+
+
+def test_get_translation_bound_form():
+
+    class MockTranslation(object):
+
+        _fallback = None
+
+        def add_fallback(self, translation):
+            self._fallback = translation
+
+    default = MockTranslation()
+    translate = MockTranslation()
+
+    class MockMeta(object):
+
+        def get_translations(self, form):
+            return default
+
+    class MockForm(object):
+
+        Meta = MockMeta
+
+    form_class = i18n.get_translation_bound_form(MockForm, translate)
+
+    assert form_class.Meta().get_translations(None) is default
+    assert form_class.Meta().get_translations(None)._fallback is translate

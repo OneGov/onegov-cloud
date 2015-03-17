@@ -147,22 +147,41 @@ def get_translations(domain, localedir):
     return result
 
 
-def get_chameleon_translators(domain, localedir):
-    """ Returns the translate function for the given domain and localedir as
-    a dictionary keyed by language.
+def wrap_translations_for_chameleon(translations):
+    """ Takes the given translations and wraps them for use with Chameleon. """
+
+    return {
+        lang: ChameleonTranslate(Translator(translation))
+        for lang, translation in translations.items()
+    }
+
+
+def get_translation_bound_meta(meta_class, translate):
+    """ Takes a wtforms Meta class and combines our translate class with
+    the one provided by WTForms itself.
 
     """
 
-    config = (domain, localedir)
+    class TranslationBoundMeta(meta_class):
 
-    if not all(config):
-        return None
+        def get_translations(self, form):
+            default = super(TranslationBoundMeta, self).get_translations(form)
 
-    result = {}
+            if not default._fallback:
+                default.add_fallback(translate)
 
-    for language, translation in get_translations(*config).items():
-        result[language] = ChameleonTranslate(
-            Translator(translation)
-        )
+            return default
 
-    return result
+    return TranslationBoundMeta
+
+
+def get_translation_bound_form(form_class, translate):
+    """ Returns a form setup with the given translate function. """
+
+    MetaClass = get_translation_bound_meta(form_class.Meta, translate)
+
+    class TranslationBoundForm(form_class):
+
+        Meta = MetaClass
+
+    return TranslationBoundForm

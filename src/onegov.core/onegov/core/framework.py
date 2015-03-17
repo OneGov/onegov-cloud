@@ -58,9 +58,10 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         """
         from onegov.core import filestorage
+        from onegov.core import i18n
         from onegov.core import theme
 
-        return utils.Bunch(filestorage=filestorage, theme=theme)
+        return utils.Bunch(filestorage=filestorage, i18n=i18n, theme=theme)
 
     @property
     def has_database_connection(self):
@@ -348,6 +349,26 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def theme_options(self):
         """ Returns the application-bound theme options. """
         return {}
+
+    @cached_property
+    def translations(self):
+        """ Returns all available translations keyed by langauge. """
+        return self.modules.i18n.get_translations(
+            self.registry.settings.i18n.domain,
+            self.registry.settings.i18n.localedir
+        )
+
+    @cached_property
+    def chameleon_translations(self):
+        """ Returns all available translations for chameleon. """
+        return self.modules.i18n.wrap_translations_for_chameleon(
+            self.translations
+        )
+
+    @cached_property
+    def languages(self):
+        """ Returns all available languages in a set. """
+        return set(self.translations.keys())
 
 
 @Framework.tween_factory(over=webassets_injector_tween)

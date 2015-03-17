@@ -35,46 +35,7 @@ path.
 
 import chameleon
 
-from cached_property import cached_property
 from onegov.core import Framework
-from onegov.core import i18n
-
-
-class I18nChameleonHelper(object):
-    """ Bound to i18n.settings, this helper offers an easy way to access the
-    translate method required for Chameleon using the request.
-
-    The idea is to initialize this helper once per process and then feed it
-    requests (see :meth:`get_translate`).
-    """
-    def __init__(self, settings):
-        self.settings = settings
-
-    def get_translate(self, request):
-        """ Returns the translate method to the given request, or None
-        if no such method is availabe.
-
-        """
-        if not self.languages:
-            return None
-
-        locale = self.settings.i18n.locale_negotiator(self.languages, request)
-        locale = locale or self.settings.i18n.default_locale
-
-        return self.translators.get(locale)
-
-    @cached_property
-    def translators(self):
-        """ Returns all available translators. """
-        return i18n.get_chameleon_translators(
-            self.settings.i18n.domain,
-            self.settings.i18n.localedir
-        )
-
-    @cached_property
-    def languages(self):
-        """ Returns all available languages in a set. """
-        return set(self.translators.keys())
 
 
 @Framework.template_loader(extension='.pt')
@@ -84,16 +45,12 @@ def get_template_loader(template_directories, settings):
 
     """
 
-    loader = chameleon.PageTemplateLoader(
+    return chameleon.PageTemplateLoader(
         template_directories,
         default_extension='.pt',
         prepend_relative_search_path=False,
         auto_reload=False,
     )
-
-    loader.i18n_helper = I18nChameleonHelper(settings)
-
-    return loader
 
 
 @Framework.template_render(extension='.pt')
@@ -107,7 +64,7 @@ def get_chameleon_render(loader, name, original_render):
 
         variables = {
             'request': request,
-            'translate': loader.i18n_helper.get_translate(request)
+            'translate': request.get_translate(for_chameleon=True)
         }
 
         variables.update(content)
