@@ -19,7 +19,15 @@ msgstr "E-Mail Adresse"
 msgid "Password"
 msgstr "Passwort"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:71
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:73
 #, python-format
 msgid "Login to ${town}"
 msgstr "${town} Login"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:87
+msgid "You have been logged out."
+msgstr "Sie wurden ausgeloggt."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:68
+msgid "You have been logged in."
+msgstr "Sie wurden eingeloggt."

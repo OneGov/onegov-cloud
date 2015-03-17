@@ -36,6 +36,14 @@
         </div>
     </div>
     <div class="row">
+      <div class="large-12 columns">
+        <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
+          ${message.text}
+          <a href="#" class="close">&times;</a>
+        </div>
+      </div>
+    </div>
+    <div class="row">
         <div class="large-12 columns">
             <div metal:define-slot="content"></div>
         </div>

@@ -64,6 +64,8 @@ def handle_login(self, request):
         if identity is not None:
             response = morepath.redirect(request.link(self))
             morepath.remember_identity(response, request, identity)
+
+            request.success(_("You have been logged in."))
             return response
 
     return {
@@ -81,4 +83,6 @@ def view_logout(self, request):
 
     response = morepath.redirect(request.link(self))
     morepath.forget_identity(response, request)
+
+    request.success(_("You have been logged out."))
     return response

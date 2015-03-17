@@ -38,7 +38,9 @@ def test_view_login(town_app):
     assert u"E-Mail Adresse" in response.text
     assert u"Passwort" in response.text
 
-    assert client.cookies == {}
+    assert 'userid' not in client.cookies
+    assert 'role' not in client.cookies
+    assert 'application_id' not in client.cookies
     assert client.get('/logout', expect_errors=True).status_code == 403
 
     response.form.set('email', 'admin@example.org')
@@ -48,7 +50,9 @@ def test_view_login(town_app):
     assert u"Passwort" in response.text
     assert u"Dieses Feld wird benötigt." in response.text
 
-    assert client.cookies == {}
+    assert 'userid' not in client.cookies
+    assert 'role' not in client.cookies
+    assert 'application_id' not in client.cookies
     assert client.get('/logout', expect_errors=True).status_code == 403
 
     response.form.set('email', 'admin@example.org')
@@ -61,6 +65,8 @@ def test_view_login(town_app):
     assert 'application_id' in client.cookies
 
     assert client.get('/logout').status_code == 302
-    assert client.cookies == {}
+    assert 'userid' not in client.cookies
+    assert 'role' not in client.cookies
+    assert 'application_id' not in client.cookies
 
     assert client.get('/logout', expect_errors=True).status_code == 403
