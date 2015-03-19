@@ -1,19 +1,29 @@
 /*
     top navigation
 */
+
+.top-bar {
+  margin-bottom: 1rem;
+
+    ul {
+        margin-bottom: $top-bar-border-size;
+    }
+}
+
 .top-bar,
 .top-bar-section ul li {
     box-shadow: 0 $top-bar-border-size 0 $primary-color;
 }
 
-.top-bar ul {
-    margin-bottom: $top-bar-border-size;
+/*
+    alert boxes
+*/
+.alert-box {
+    margin-bottom: 1rem;   
 }
 
 /*
-
     links at the absoulte bottom
-
 */
 .bottom-links {
     color: $bottom-links-color;
