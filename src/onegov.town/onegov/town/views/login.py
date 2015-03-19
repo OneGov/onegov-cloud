@@ -5,7 +5,7 @@ import morepath
 from onegov.core.security import Public, Private
 from onegov.form import Form
 from wtforms import StringField, PasswordField, validators
-from onegov.town import _
+from onegov.town import _, log
 from onegov.town.app import TownApp
 from onegov.town.layout import DefaultLayout
 from onegov.town.model import Town
@@ -67,6 +67,10 @@ def handle_login(self, request):
 
             request.success(_("You have been logged in."))
             return response
+        else:
+            # XXX turn into a form validation error (whole form)?
+            request.alert(_("Wrong username or password."))
+            log.info("Failed login attempt by {}".format(request.client_addr))
 
     return {
         'layout': DefaultLayout(self, request),
@@ -84,5 +88,5 @@ def view_logout(self, request):
     response = morepath.redirect(request.link(self))
     morepath.forget_identity(response, request)
 
-    request.success(_("You have been logged out."))
+    request.info(_("You have been logged out."))
     return response
