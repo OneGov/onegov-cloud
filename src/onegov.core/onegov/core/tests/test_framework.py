@@ -130,3 +130,18 @@ def test_fix_webassets_url():
     response = client.get('/towns/test')
     assert response.body\
         == b'/towns/test/7da9c72a3b5f9e060b898ef7cd714b8a/jquery.js'
+
+
+def test_sign_unsign():
+    framework = Framework()
+    framework.identity_secret = 'test'
+
+    assert framework.sign('foo').startswith('foo.')
+    assert framework.unsign(framework.sign('foo')) == 'foo'
+
+    signed = framework.sign('foo')
+    framework.identity_secret = 'asdf'
+    assert framework.unsign(signed) is None
+
+    signed = framework.sign('foo')
+    framework.unsign('bar' + signed) is None
