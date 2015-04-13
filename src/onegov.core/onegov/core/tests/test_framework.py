@@ -1,3 +1,5 @@
+import json
+
 from morepath import setup
 from onegov.core import Framework
 from onegov.server import Config, Server
@@ -79,6 +81,119 @@ def test_virtual_host_request():
         'X_VHM_ROOT': '/blog',
         'X_VHM_HOST': 'https://blog.example.org/'})
     assert response.body == b'https://blog.example.org/ - blog'
+
+
+def test_browser_session_request():
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.view(model=Root)
+    def view_root(self, request):
+        return request.session_id
+
+    @App.view(model=Root, name='login')
+    def view_login(self, request):
+        request.browser_session.logged_in = True
+        return 'logged in'
+
+    @App.view(model=Root, name='status')
+    def view_status(self, request):
+        if request.browser_session.logged_in:
+            return 'logged in'
+        else:
+            return 'logged out'
+
+    config.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(identity_secure=False)  # allow http
+
+    app.cache_backend = 'dogpile.cache.memory'
+    app.cache_backend_arguments = {}
+
+    c1 = Client(app)
+    c2 = Client(app)
+
+    c1.get('/').text == c1.get('/').text
+    c1.get('/').text != c2.get('/').text
+    c2.get('/').text == c2.get('/').text
+
+    c1.get('/status').text == 'logged out'
+    c2.get('/status').text == 'logged out'
+
+    c1.get('/login')
+
+    c1.get('/status').text == 'logged in'
+    c2.get('/status').text == 'logged out'
+
+
+def test_request_messages():
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    class Message(object):
+        def __init__(self, text, type):
+            self.text = text
+            self.type = type
+
+    @App.path(model=Message, path='/messages')
+    def get_message(text, type):
+        return Message(text, type)
+
+    @App.view(model=Message, name='add')
+    def view_add_message(self, request):
+        request.message(self.text, self.type)
+
+    @App.view(model=Root)
+    def view_root(self, request):
+        return json.dumps(list(request.consume_messages()))
+
+    config.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(identity_secure=False)  # allow http
+
+    app.cache_backend = 'dogpile.cache.memory'
+    app.cache_backend_arguments = {}
+
+    c1 = Client(app)
+    c2 = Client(app)
+    c1.get('/messages/add?text=one&type=info')
+    c1.get('/messages/add?text=two&type=warning')
+    c2.get('/messages/add?text=three&type=error')
+
+    messages = json.loads(c1.get('/').text)
+    assert len(messages) == 2
+    assert messages[0][0] == 'one'
+    assert messages[1][0] == 'two'
+    assert messages[0][1] == 'info'
+    assert messages[1][1] == 'warning'
+
+    messages = json.loads(c1.get('/').text)
+    assert len(messages) == 0
+
+    messages = json.loads(c2.get('/').text)
+    assert len(messages) == 1
+
+    assert messages[0][0] == 'three'
+    assert messages[0][1] == 'error'
+
+    messages = json.loads(c2.get('/').text)
+    assert len(messages) == 0
 
 
 def test_fix_webassets_url():
