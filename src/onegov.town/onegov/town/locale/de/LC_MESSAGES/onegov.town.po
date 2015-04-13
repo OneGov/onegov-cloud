@@ -1,6 +1,10 @@
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:119
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:141
 msgid "Login"
 msgstr "Login"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:144
+msgid "Logout"
+msgstr "Logout"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:55
 msgid "Submit"
