@@ -21,17 +21,23 @@ def test_browser_session_cache():
     session = BrowserSession('ns', 'token', cache)
 
     assert not session.has('name')
+    assert 'name' not in session
     assert session.name is NO_VALUE
+    assert session['name'] is NO_VALUE
     assert cache.get('ns:token:name') is NO_VALUE
 
     session.name = 'test'
     assert session.has('name')
+    assert 'name' in session
     assert session.name == 'test'
+    assert session['name'] == 'test'
     assert cache.get('ns:token:name') == 'test'
 
     del session.name
     assert not session.has('name')
+    assert 'name' not in session
     assert session.name is NO_VALUE
+    assert session['name'] is NO_VALUE
     assert cache.get('ns:token:name') is NO_VALUE
 
 

@@ -17,6 +17,9 @@ class BrowserSession(object):
         assert client.session.name == 'Foo'
         del client.session.name
 
+    This class can act like an object, through attribute access, or like a
+    dict, through square brackets. Whatever you prefer.
+
     """
 
     def __init__(self, namespace, token, cache):
@@ -50,3 +53,9 @@ class BrowserSession(object):
             super(BrowserSession, self).__delattr__(name)
         else:
             self._cache.delete(self.mangle(name))
+
+    # act like a dict
+    __getitem__ = __getattr__
+    __setitem__ = __setattr__
+    __delattr__ = __delattr__
+    __contains__ = has
