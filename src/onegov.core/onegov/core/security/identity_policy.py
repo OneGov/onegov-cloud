@@ -19,7 +19,7 @@ class IdentityPolicy(BaseIdentityPolicy):
 
     @property
     def secret(self):
-        return self.current_request.app.identity_secret_key
+        return self.current_request.app.identity_secret
 
     def identify(self, request):
         self.current_request = request

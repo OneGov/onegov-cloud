@@ -102,7 +102,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             True if the identity cookie is only transmitted over https. Only
             set this to False during development!
 
-        :identity_secret_key:
+        :identity_secret:
             A random string used to sign the identity. By default a random
             string is generated. The drawback of this is the fact that
             users will be logged out every time the application restarts.
@@ -160,8 +160,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
                 self.dsn, cfg.get('base', Base))
 
         self.identity_secure = cfg.get('identity_secure', True)
-        self.identity_secret_key = cfg.get(
-            'identity_secret_key', new_uuid().hex)
+        self.identity_secret = cfg.get('identity_secret', new_uuid().hex)
 
         self.memcached_url = cfg.get('memcached_url', '127.0.0.1:11211')
         self.memcached_connections = int(cfg.get('memcached_connections', 100))
@@ -379,13 +378,13 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
     def sign(self, text):
         """ Signs a text with the identity secret. """
-        signer = Signer(self.identity_secret_key)
+        signer = Signer(self.identity_secret)
         return signer.sign(text.encode('utf-8')).decode('utf-8')
 
     def unsign(self, text):
         """ Unsigns a signed text, returning None if unsuccessful. """
         try:
-            signer = Signer(self.identity_secret_key)
+            signer = Signer(self.identity_secret)
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None
