@@ -160,7 +160,10 @@ class CoreRequest(IncludeRequest):
         """
 
         return self.app.modules.browser_session.BrowserSession(
-            self.app.cache, self.session_id)
+            namespace=self.app.application_id,
+            token=self.session_id,
+            cache=self.app.cache
+        )
 
     def get_form(self, form_class):
         """ Returns an instance of the given form class, set up with the

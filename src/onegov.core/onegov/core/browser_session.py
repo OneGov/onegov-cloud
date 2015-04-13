@@ -19,14 +19,21 @@ class BrowserSession(object):
 
     """
 
-    def __init__(self, cache, token):
-        self._cache = cache
+    def __init__(self, namespace, token, cache):
+        self._namespace = namespace
         self._token = token
+        self._cache = cache
 
     def mangle(self, name):
-        return ':'.join((self._token, name))
+        """ Takes the given name and returns a key bound to the namespace and
+        token.
+
+        """
+        assert name  # may not be empty or None
+        return ':'.join((self._namespace, self._token, name))
 
     def has(self, name):
+        """ Returns true if the given name exists in the cache. """
         return self._cache.get(self.mangle(name)) is not NO_VALUE
 
     def __getattr__(self, name):
