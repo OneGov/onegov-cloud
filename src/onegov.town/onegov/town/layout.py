@@ -2,6 +2,8 @@ from cached_property import cached_property
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link
+from onegov.town.model import Town
+from morepath.security import NO_IDENTITY
 
 
 class Layout(object):
@@ -27,6 +29,10 @@ class Layout(object):
     def __init__(self, model, request):
         self.model = model
         self.request = request
+
+    @cached_property
+    def town(self):
+        return self.app.session().query(Town).first()
 
     @cached_property
     def app(self):
@@ -95,6 +101,19 @@ class Layout(object):
         """
         return None
 
+    @cached_property
+    def is_logged_in(self):
+        """ Returns True if the current request is logged in at all. """
+        return self.request.identity is not NO_IDENTITY
+
+    @cached_property
+    def current_role(self):
+        """ Returns the user-role of the current request, if logged in.
+        Otherwise, None is returned.
+
+        """
+        return self.is_logged_in and self.request.identity.role or None
+
 
 class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """
@@ -115,8 +134,16 @@ class DefaultLayout(Layout):
 
     @cached_property
     def bottom_links(self):
-        return [
-            Link(_(u'Login'), '/login'),
-            Link(u'OneGov', 'http://www.onegov.ch'),
-            Link(u'Seantis GmbH', 'https://www.seantis.ch')
-        ]
+        links = []
+
+        if not self.is_logged_in:
+            links.append(
+                Link(_(u'Login'), self.request.link(self.town, 'login')))
+        else:
+            links.append(
+                Link(_(u'Logout'), self.request.link(self.town, 'logout')))
+
+        links.append(Link(u'OneGov', 'http://www.onegov.ch'))
+        links.append(Link(u'Seantis GmbH', 'https://www.seantis.ch'))
+
+        return links

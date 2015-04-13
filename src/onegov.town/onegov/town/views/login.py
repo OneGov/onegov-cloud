@@ -68,7 +68,6 @@ def handle_login(self, request):
             request.success(_("You have been logged in."))
             return response
         else:
-            # XXX turn into a form validation error (whole form)?
             request.alert(_("Wrong username or password."))
             log.info("Failed login attempt by {}".format(request.client_addr))
 

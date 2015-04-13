@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import onegov.core
 import onegov.town
 import more.webassets
@@ -79,3 +81,38 @@ def test_startpage(town_app):
 
     links[4].text == 'Politik & Verwaltung'
     links[4].attrib.get('href') == '/gemeinde/politik-verwaltung'
+
+
+def test_login(town_app):
+    client = Client(town_app)
+
+    links = pq(client.get('/').text).find('.bottom-links a')
+    assert links[0].text == 'Login'
+
+    login_page = client.get(links[0].attrib.get('href'))
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = ''
+    login_page = login_page.form.submit()
+
+    assert u"Dieses Feld wird benötigt" in login_page.text
+
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'wrong'
+    login_page = login_page.form.submit()
+
+    assert "Unbekannter Benutzername oder falsches Passwort" in login_page.text
+
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    index_page = login_page.form.submit().follow()
+    assert "Sie wurden eingeloggt" in index_page.text
+
+    links = pq(index_page.text).find('.bottom-links a')
+    assert links[0].text == 'Logout'
+
+    index_page = client.get(links[0].attrib.get('href')).follow()
+    assert "Sie wurden ausgeloggt" in index_page.text
+
+    links = pq(index_page.text).find('.bottom-links a')
+    assert links[0].text == 'Login'
