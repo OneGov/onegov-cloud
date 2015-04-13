@@ -58,10 +58,18 @@
 
 <metal:fields define-macro="fields">
     <tal:block repeat="field fields">
-        <label tal:attributes="class field.errors and 'error'">
-            <tal:block>${field.label.text}</tal:block> ${field()}
-        </label>
-        <small class="error" tal:repeat="error field.errors">${error}</small>
+        <tal:block define="input_type field.widget.input_type|None">
+            <tal:block condition="input_type == 'hidden'">
+                ${field()}
+                <small class="error" tal:repeat="error field.errors">${error}</small>
+            </tal:block>
+            <tal:block condition="input_type != 'hidden'">
+                <label tal:attributes="class field.errors and 'error' or None">
+                    <tal:block>${field.label.text}</tal:block> ${field()}
+                </label>
+                <small class="error" tal:repeat="error field.errors">${error}</small>
+            </tal:block>
+        </tal:block>
     </tal:block>
 </metal:fields>
 
