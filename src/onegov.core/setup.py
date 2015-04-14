@@ -30,6 +30,7 @@ dependencies = {
     'sqlalchemy>=0.9',
     'translationstring',
     'unidecode',
+    'wtforms',
     'zope.sqlalchemy'
 }
 
@@ -67,6 +68,7 @@ setup(
     install_requires=list(dependencies),
     extras_require=dict(
         test=[
+            'freezegun',
             'pytest',
             'pytest-cov',
             'testing.postgresql',

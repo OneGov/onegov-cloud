@@ -1,9 +1,11 @@
 import collections
 
 from cached_property import cached_property
+from datetime import timedelta
 from more.webassets.core import IncludeRequest
 from onegov.core import utils
 from onegov.core.crypto import random_token
+from wtforms.csrf.session import SessionCSRF
 
 
 Message = collections.namedtuple('Message', ['text', 'type'])
@@ -165,17 +167,30 @@ class CoreRequest(IncludeRequest):
             cache=self.app.cache
         )
 
-    def get_form(self, form_class):
+    def get_form(self, form_class, i18n_support=True, csrf_support=True):
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
         doesn't work yet).
 
         """
-        translate = self.get_translate(for_chameleon=False)
-        form_class = self.app.modules.i18n.get_translation_bound_form(
-            form_class, translate)
+        meta = {}
 
-        return form_class(self.POST, meta={'locales': self.app.languages})
+        if i18n_support:
+            translate = self.get_translate(for_chameleon=False)
+            form_class = self.app.modules.i18n.get_translation_bound_form(
+                form_class, translate)
+
+            meta['locales'] = self.app.languages
+
+        if csrf_support:
+            meta['csrf'] = True,
+            meta['csrf_context'] = self.browser_session
+            meta['csrf_class'] = SessionCSRF
+            meta['csrf_secret'] = self.app.csrf_secret.encode('utf-8')
+            meta['csrf_time_limit'] = timedelta(
+                seconds=self.app.csrf_time_limit)
+
+        return form_class(self.POST, meta=meta)
 
     def get_translate(self, for_chameleon=False):
         """ Returns the translate method to the given request, or None

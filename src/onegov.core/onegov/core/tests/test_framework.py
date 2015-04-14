@@ -1,9 +1,13 @@
 import json
+import pytest
 
+from datetime import datetime, timedelta
+from freezegun import freeze_time
 from morepath import setup
 from onegov.core import Framework
 from onegov.server import Config, Server
 from webtest import TestApp as Client
+from wtforms import Form, StringField
 
 
 def test_set_application_id():
@@ -260,3 +264,64 @@ def test_sign_unsign():
 
     signed = framework.sign('foo')
     framework.unsign('bar' + signed) is None
+
+
+def test_csrf_secret_key():
+    app = Framework()
+
+    with pytest.raises(AssertionError):
+        app.configure_application(identity_secret='test', csrf_secret='test')
+
+    with pytest.raises(AssertionError):
+        app.configure_application(identity_secret='very-secret-key')
+
+    with pytest.raises(AssertionError):
+        app.configure_application(csrf_secret='another-very-secret-key')
+
+    app.configure_application(identity_secret='x', csrf_secret='y')
+
+
+def test_csrf():
+
+    class MyForm(Form):
+        name = StringField(u'Name')
+
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.view(model=Root, request_method='GET')
+    def view_get_root(self, request):
+        form = request.get_form(MyForm, i18n_support=False)
+        return form.csrf_token._value()
+
+    @App.view(model=Root, request_method='POST')
+    def view_post_root(self, request):
+        if request.get_form(MyForm, i18n_support=False).validate():
+            return 'success'
+        else:
+            return 'fail'
+
+    config.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(
+        identity_secure=False,
+        disable_memcached=True,
+        csrf_time_limit=60
+    )
+
+    client = Client(app)
+    csrf_token = client.get('/').text
+    assert client.post('/', {'csrf_token': csrf_token}).text == 'success'
+    assert client.post('/', {'csrf_token': csrf_token + 'x'}).text == 'fail'
+    assert client.post('/', {'csrf_token': csrf_token}).text == 'success'
+
+    with freeze_time(datetime.now() + timedelta(minutes=2)):
+        assert client.post('/', {'csrf_token': csrf_token}).text == 'fail'

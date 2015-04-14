@@ -153,6 +153,25 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         :always_compile_theme:
             If true, the theme is always compiled - no caching is employed.
 
+        :csrf_secret:
+            A random string used to sign the csrf token. Make sure this differs
+            from ``identity_secret``! The algorithms behind identity_secret and
+            the csrf protection differ. If the same secret is used we might
+            leak information about said secret.
+
+            By default a random string is generated. The drawback of this is
+            the fact that users won't be able to submit their forms if the
+            app is restarted in the background.
+
+            So provide your own, but be sure to have a really long, really
+            random string that you will never share with anyone!
+
+        :csrf_time_limit:
+            The csrf time limit in seconds. Basically the amount of time a
+            user has to submit a form, from the time it's rendered.
+
+            Defaults to 1'200s (20 minutes).
+
         """
 
         super(Framework, self).configure_application(**cfg)
@@ -186,6 +205,18 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             self.cache_backend_arguments = {
                 'url': self.memcached_url
             }
+
+        self.csrf_secret = cfg.get('csrf_secret', new_uuid().hex)
+        self.csrf_time_limit = int(cfg.get('csrf_time_limit', 1200))
+
+        # you don't want these keys to be the same, see docstring above
+        assert self.identity_secret != self.csrf_secret
+
+        # you don't want to use the keys given in the example file
+        assert self.identity_secret != 'very-secret-key'
+
+        # you don't want to use the keys given in the example file
+        assert self.csrf_secret != 'another-very-secret-key'
 
         if 'filestorage' in cfg:
             filestorage_class = pydoc.locate(cfg.get('filestorage'))
