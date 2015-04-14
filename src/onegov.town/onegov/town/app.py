@@ -21,6 +21,10 @@ class TownApp(Framework):
     """
 
     @cached_property
+    def webassets_path(self):
+        return utils.module_path('onegov.town', 'assets')
+
+    @cached_property
     def webassets_bundles(self):
         return {
             'common': Bundle(

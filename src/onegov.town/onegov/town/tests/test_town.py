@@ -16,7 +16,9 @@ def test_layout():
     # basic tests that can be done by mocking
 
     class Mock(object):
-        pass
+
+        def include(self, *args, **kwargs):
+            pass
 
     layout = Layout(Mock(), Mock())
     layout.request.app = 'test'
