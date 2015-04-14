@@ -101,8 +101,7 @@ def test_login(town_app):
     login_page.form['password'] = 'wrong'
     login_page = login_page.form.submit()
 
-    print(login_page.text)
-    assert "Unbekannter Benutzernam oder falsches Passwort" in login_page.text
+    assert "Unbekannter Benutzername oder falsches Passwort" in login_page.text
 
     login_page.form['email'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'

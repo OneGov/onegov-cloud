@@ -47,7 +47,8 @@ def town_app(postgres_server_url):
     app.configure_application(
         dsn=postgres_server_url,
         filestorage='fs.memoryfs.MemoryFS',
-        identity_secure=False
+        identity_secure=False,
+        disable_memcached=True
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
