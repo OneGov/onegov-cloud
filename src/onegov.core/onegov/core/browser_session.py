@@ -40,7 +40,12 @@ class BrowserSession(object):
         return self._cache.get(self.mangle(name)) is not NO_VALUE
 
     def __getattr__(self, name):
-        return self._cache.get(self.mangle(name))
+        result = self._cache.get(self.mangle(name))
+
+        if result is NO_VALUE:
+            raise AttributeError
+        else:
+            return result
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
@@ -55,7 +60,14 @@ class BrowserSession(object):
             self._cache.delete(self.mangle(name))
 
     # act like a dict
-    __getitem__ = __getattr__
+    def __getitem__(self, name):
+        result = self._cache.get(self.mangle(name))
+
+        if result is NO_VALUE:
+            raise KeyError
+        else:
+            return result
+
     __setitem__ = __setattr__
     __delattr__ = __delattr__
     __contains__ = has

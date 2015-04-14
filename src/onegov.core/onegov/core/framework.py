@@ -112,13 +112,15 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             with anyone!
 
         :memcached_url:
-            The memcached url (default is 127.0.0.1:11211). If no memcached
-            instance is found unning on that url, a dictionary is used
-            for the cache instead.
+            The memcached url (default is 127.0.0.1:11211). If memcached
+            isn't running the cache will not be used, though the memcached
+            server can be started at any time at which point the application
+            will connect to it again.
 
-        :memcached_connections:
-            The maximum number of memcached connections that are available.
-            Defaults to 100.
+        :cache_connections:
+            The maximum number of connections to the cache that are available.
+            Defaults to 100. This is mostly relevant for memcached, though
+            it works for all kinds of caches.
 
             This limit prevents a sophisticated attacker from starting a denial
             of service attack should he figure out a way to spawn lots of
@@ -127,6 +129,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             Normally you want the combined memcached connection limit of all
             configured applications to be lower than the actual connection
             limit configured on memcached.
+
+        :disable_memcached:
+            If True, memcache will not be used. The cache will be entirely in
+            the memory of the current process (so no sharing between multiple
+            processes).
 
         :file_storage:
             The file_storage module to use. See
@@ -163,18 +170,22 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         self.identity_secret = cfg.get('identity_secret', new_uuid().hex)
 
         self.memcached_url = cfg.get('memcached_url', '127.0.0.1:11211')
-        self.memcached_connections = int(cfg.get('memcached_connections', 100))
+        self.cache_connections = int(cfg.get('cache_connections', 100))
 
         def on_cache_ejected(key, value):
             getattr(value, 'disconnect_all', lambda: None)()
 
         self._cache_backends = pylru.lrucache(
-            self.memcached_connections, on_cache_ejected)
+            self.cache_connections, on_cache_ejected)
 
-        self.cache_backend = 'dogpile.cache.pylibmc'
-        self.cache_backend_arguments = {
-            'url': self.memcached_url
-        }
+        if cfg.get('disable_memcached', False):
+            self.cache_backend = 'dogpile.cache.memory'
+            self.cache_backend_arguments = {}
+        else:
+            self.cache_backend = 'dogpile.cache.pylibmc'
+            self.cache_backend_arguments = {
+                'url': self.memcached_url
+            }
 
         if 'filestorage' in cfg:
             filestorage_class = pydoc.locate(cfg.get('filestorage'))
@@ -214,7 +225,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         The cache backend is a dogpile.cache backend. See:
         `<https://dogpilecache.readthedocs.org/>`_
 
-        Once the `memcached_connections` limit defined in
+        Once the `cache_connections` limit defined in
         :meth:`configure_application` is reached, the backends are removed,
         with the least recently used one being discarded first.
 

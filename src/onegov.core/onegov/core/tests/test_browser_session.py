@@ -22,8 +22,13 @@ def test_browser_session_cache():
 
     assert not session.has('name')
     assert 'name' not in session
-    assert session.name is NO_VALUE
-    assert session['name'] is NO_VALUE
+
+    with pytest.raises(AttributeError):
+        session.name
+
+    with pytest.raises(KeyError):
+        session['name']
+
     assert cache.get('ns:token:name') is NO_VALUE
 
     session.name = 'test'
@@ -36,8 +41,13 @@ def test_browser_session_cache():
     del session.name
     assert not session.has('name')
     assert 'name' not in session
-    assert session.name is NO_VALUE
-    assert session['name'] is NO_VALUE
+
+    with pytest.raises(AttributeError):
+        session.name
+
+    with pytest.raises(KeyError):
+        session['name']
+
     assert cache.get('ns:token:name') is NO_VALUE
 
 
@@ -52,7 +62,9 @@ def test_browser_session_cache_namespacing():
     assert session.name == 'test'
 
     session = BrowserSession('ns', 'token2', cache)
-    assert session.name is NO_VALUE
+    with pytest.raises(AttributeError):
+        session.name
 
     session = BrowserSession('ns2', 'token', cache)
-    assert session.name is NO_VALUE
+    with pytest.raises(AttributeError):
+        session.name

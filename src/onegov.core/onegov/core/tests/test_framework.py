@@ -104,7 +104,7 @@ def test_browser_session_request():
 
     @App.view(model=Root, name='status')
     def view_status(self, request):
-        if request.browser_session.logged_in:
+        if request.browser_session.has('logged_in'):
             return 'logged in'
         else:
             return 'logged out'

@@ -7,7 +7,7 @@ from webtest import TestApp as Client
 CALL_COUNT = 0
 
 
-def test_cache():
+def test_cache_connections():
     config = setup()
 
     class App(Framework):
@@ -31,9 +31,7 @@ def test_cache():
 
     app = App()
     app.namespace = 'towns'
-    app.configure_application(memcached_connections=2)
-    app.cache_backend = 'dogpile.cache.memory'
-    app.cache_backend_arguments = {}
+    app.configure_application(cache_connections=2, disable_memcached=True)
 
     client = Client(app)
 
