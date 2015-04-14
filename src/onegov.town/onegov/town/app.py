@@ -10,6 +10,7 @@ use different templating languages.
 from cached_property import cached_property
 from onegov.core import Framework
 from onegov.core import utils
+from onegov.town.model import Town
 from onegov.town.theme import TownTheme
 from webassets import Bundle
 
@@ -19,6 +20,14 @@ class TownApp(Framework):
     with onegov-server.
 
     """
+
+    @property
+    def theme_options(self):
+        # XXX the town is loaded multiple times during one request, even though
+        # it rarely changes, even over multiple reqeusts. It would make
+        # sense to cache this somewhere and invalidate that cache only when
+        # there's a change to the town.
+        return self.session().query(Town).first().theme_options or {}
 
     @cached_property
     def webassets_path(self):

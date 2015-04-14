@@ -2,17 +2,19 @@ from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
 
 
+# the colors which are editable by the user
+user_colors = {
+    'primary-color': '#006fba'
+}
+
+
 class TownTheme(BaseTheme):
     name = 'onegov.town.foundation'
     version = '1.0'
 
     @property
     def default_options(self):
-        return {
-            # this part should be configurable by the user in the future:
-            # >>>
-            'primary-color': '#006fba',
-            # <<<
+        options = {
             'top-bar-border-size': '0.3rem',
             'bottom-links-color': '#777',
             'bottom-links-size': '0.8rem',
@@ -24,6 +26,9 @@ class TownTheme(BaseTheme):
             'topbar-link-color-active-hover': '#312f2e',
             'topbar-link-weight': 'bold',
         }
+        options.update(user_colors)
+
+        return options
 
     @property
     def post_imports(self):

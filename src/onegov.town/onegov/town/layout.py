@@ -139,12 +139,19 @@ class DefaultLayout(Layout):
     def bottom_links(self):
         links = []
 
+        links.append(Link(_(u'Homepage'), self.request.link(self.town)))
+
         if not self.is_logged_in:
-            links.append(
-                Link(_(u'Login'), self.request.link(self.town, 'login')))
+            links.append(Link(
+                _(u'Login'), self.request.link(self.town, 'login')
+            ))
         else:
-            links.append(
-                Link(_(u'Logout'), self.request.link(self.town, 'logout')))
+            links.append(Link(
+                _(u'Logout'), self.request.link(self.town, 'logout')
+            ))
+            links.append(Link(
+                _(u'Settings'), self.request.link(self.town, 'settings')
+            ))
 
         links.append(Link(u'OneGov', 'http://www.onegov.ch'))
         links.append(Link(u'Seantis GmbH', 'https://www.seantis.ch'))

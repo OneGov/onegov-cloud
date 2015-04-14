@@ -38,6 +38,7 @@ def test_template_layout():
 
     class App(TownApp):
         testing_config = config
+        theme_options = {}
 
     @App.path('/model')
     class Model(object):
@@ -90,9 +91,9 @@ def test_login(town_app):
     client = Client(town_app)
 
     links = pq(client.get('/').text).find('.bottom-links a')
-    assert links[0].text == 'Login'
+    assert links[1].text == 'Login'
 
-    login_page = client.get(links[0].attrib.get('href'))
+    login_page = client.get(links[1].attrib.get('href'))
     login_page.form['email'] = 'admin@example.org'
     login_page.form['password'] = ''
     login_page = login_page.form.submit()
@@ -112,10 +113,37 @@ def test_login(town_app):
     assert "Sie wurden eingeloggt" in index_page.text
 
     links = pq(index_page.text).find('.bottom-links a')
-    assert links[0].text == 'Logout'
+    assert links[1].text == 'Logout'
 
-    index_page = client.get(links[0].attrib.get('href')).follow()
+    index_page = client.get(links[1].attrib.get('href')).follow()
     assert "Sie wurden ausgeloggt" in index_page.text
 
     links = pq(index_page.text).find('.bottom-links a')
-    assert links[0].text == 'Login'
+    assert links[1].text == 'Login'
+
+
+def test_settings(town_app):
+    client = Client(town_app)
+
+    assert client.get('/settings', expect_errors=True).status_code == 403
+
+    login_page = client.get('/login')
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    login_page.form.submit()
+
+    settings_page = client.get('/settings')
+    document = pq(settings_page.text)
+    
+    assert document.find('input[name=name]').val() == 'Govikon'
+    assert document.find('input[name=primary_color]').val() == '#006fba'
+
+    settings_page.form['primary_color'] = '#xxx'
+    settings_page = settings_page.form.submit()
+
+    assert "Ungültige Farbe." in settings_page.text
+
+    settings_page.form['primary_color'] = '#ccddee'
+    settings_page = settings_page.form.submit()
+
+    assert not "Ungültige Farbe." in settings_page.text
