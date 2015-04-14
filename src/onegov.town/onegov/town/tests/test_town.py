@@ -134,16 +134,16 @@ def test_settings(town_app):
 
     settings_page = client.get('/settings')
     document = pq(settings_page.text)
-    
+
     assert document.find('input[name=name]').val() == 'Govikon'
     assert document.find('input[name=primary_color]').val() == '#006fba'
 
     settings_page.form['primary_color'] = '#xxx'
     settings_page = settings_page.form.submit()
 
-    assert "Ungültige Farbe." in settings_page.text
+    assert u"Ungültige Farbe." in settings_page.text
 
     settings_page.form['primary_color'] = '#ccddee'
     settings_page = settings_page.form.submit()
 
-    assert not "Ungültige Farbe." in settings_page.text
+    assert u"Ungültige Farbe." not in settings_page.text
