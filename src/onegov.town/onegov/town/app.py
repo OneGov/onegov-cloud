@@ -7,9 +7,11 @@ use different templating languages.
 
 """
 
+from cached_property import cached_property
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.town.theme import TownTheme
+from webassets import Bundle
 
 
 class TownApp(Framework):
@@ -17,6 +19,20 @@ class TownApp(Framework):
     with onegov-server.
 
     """
+
+    @cached_property
+    def webassets_bundles(self):
+        return {
+            'common': Bundle(
+                'js/modernizr.js',
+                'js/jquery.js',
+                'js/fastclick.js',
+                'js/foundation.js',
+                'js/common.js',
+                filters='jsmin',
+                output='bundles/common.bundle.js'
+            )
+        }
 
 
 @TownApp.template_directory()

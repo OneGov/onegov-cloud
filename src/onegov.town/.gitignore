@@ -51,3 +51,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Compiled assets
+onegov/town/assets/.webassets-cache/*
+onegov/town/assets/bundles/*

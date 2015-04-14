@@ -30,6 +30,9 @@ class Layout(object):
         self.model = model
         self.request = request
 
+        # always include the common js files
+        self.request.include('common')
+
     @cached_property
     def town(self):
         return self.app.session().query(Town).first()
