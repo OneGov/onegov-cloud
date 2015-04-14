@@ -41,7 +41,8 @@ setup(
         'onegov.foundation',
         'onegov.page',
         'onegov.user',
-        'translationstring'
+        'translationstring',
+        'WTForms-Components'
     ],
     extras_require=dict(
         test=[
