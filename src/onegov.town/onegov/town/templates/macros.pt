@@ -58,6 +58,7 @@
 
 <metal:fields define-macro="fields">
     <tal:block repeat="field fields">
+        <div class="row"><div class="large-12 columns">
         <tal:block define="input_type field.widget.input_type|None">
             <tal:block condition="input_type == 'hidden'">
                 ${field()}
@@ -70,6 +71,7 @@
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:block>
         </tal:block>
+    </div></div>
     </tal:block>
 </metal:fields>
 

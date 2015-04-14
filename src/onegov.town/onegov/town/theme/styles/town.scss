@@ -23,11 +23,19 @@
 }
 
 /*
+    form errors
+*/
+form small.error {
+    padding: .5rem;
+    padding-left: .5rem;
+}
+
+/*
     links at the absoulte bottom
 */
 .bottom-links {
     color: $bottom-links-color;
-    margin-left: 1rem;
+    margin-left: 0;
     
     a {
         color: $bottom-links-color;

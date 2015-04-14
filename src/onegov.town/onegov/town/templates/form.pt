@@ -3,6 +3,10 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <div metal:use-macro="layout.macros['form']" />
+        <div class="row">
+            <div class="small-6 columns">
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div> 
     </tal:block>
 </div>
