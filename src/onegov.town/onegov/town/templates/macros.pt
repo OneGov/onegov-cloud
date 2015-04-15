@@ -75,4 +75,21 @@
     </tal:block>
 </metal:fields>
 
+<metal:dropzone define-macro="dropzone" i18n:domain="onegov.town">
+    <form action="${layout.image_upload_url}"
+          class="dropzone clearfix"
+          method="POST"
+          enctype="multipart/form-data">
+        <div class="dz-message" i18n:translate="">
+            Drop files to upload
+        </div>
+
+        <!--! Fallback if javascript is not available -->
+        <div class="fallback">
+            <input name="file" type="file" multiple />
+            <input type="submit" value="Submit" class="button" i18n:attributes="value">
+        </div>
+    </form>
+</metal:dropzone>
+
 </body>

@@ -44,6 +44,11 @@ class TownApp(Framework):
                 'js/common.js',
                 filters='jsmin',
                 output='bundles/common.bundle.js'
+            ),
+            'dropzone': Bundle(
+                'js/dropzone.js',
+                filters='jsmin',
+                output='bundles/dropzone.bundle.js'
             )
         }
 

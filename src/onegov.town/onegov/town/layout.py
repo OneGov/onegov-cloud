@@ -1,8 +1,10 @@
+from onegov.core.compat import zip_longest
+
 from cached_property import cached_property
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link
-from onegov.town.model import Town
+from onegov.town.model import ImageCollection, Town
 from morepath.security import NO_IDENTITY
 
 
@@ -117,6 +119,22 @@ class Layout(object):
         """
         return self.is_logged_in and self.request.identity.role or None
 
+    def chunks(self, iterable, n, fillvalue=None):
+        """ Iterates through an iterable, returning chunks with the given size.
+
+        For example::
+
+            chunks('ABCDEFG', 3, 'x') --> ABC DEF Gxx
+
+        """
+
+        args = [iter(iterable)] * n
+        return zip_longest(fillvalue=fillvalue, *args)
+
+    @cached_property
+    def image_upload_url(self):
+        return self.request.link(ImageCollection(self.app), name='upload')
+
 
 class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """
@@ -151,6 +169,9 @@ class DefaultLayout(Layout):
             ))
             links.append(Link(
                 _(u'Settings'), self.request.link(self.town, 'settings')
+            ))
+            links.append(Link(
+                _(u'Images'), self.request.link(ImageCollection(self.app))
             ))
 
         links.append(Link(u'OneGov', 'http://www.onegov.ch'))

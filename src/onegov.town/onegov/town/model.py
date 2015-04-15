@@ -25,3 +25,22 @@ class Town(Base, TimestampMixin):
 
     #: the theme options of the town
     theme_options = Column(JSON, nullable=True, default=user_colors.copy)
+
+
+class ImageCollection(object):
+    """ Defines the collection of images uploaded to the site. Currently
+    this is done without any ORM backing (and therefore without any
+    special features like tagging, metadata and so on).
+
+    Instead it's simply a list of images in a directory.
+
+    This can be made more powerful (and complicated) once we have sufficent
+    time to do it.
+
+    """
+
+    def __init__(self, app):
+        assert app.has_filestorage
+
+        self.path_prefix = 'images/'
+        self.filestorage = app.filestorage.makeopendir('images')

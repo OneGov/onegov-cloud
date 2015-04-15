@@ -57,3 +57,59 @@ input[type=color] {
         }
     }
 }
+
+/*
+    images
+*/
+.thumbnail {
+  padding: .5em;
+}
+
+/* 
+    dropzone styling 
+*/
+.dropzone {
+    background-color: $topbar-bg-color;
+    border: 1px dashed $primary-color;
+    margin-bottom: 1rem;
+    padding: 1rem;
+
+    .dz-preview {
+        float: left;
+        margin-right: 1rem;
+
+        > div:last-child {
+            margin-bottom: 0;
+        }
+    }
+
+    .dz-filename {
+        display: none;
+    }
+
+    .dz-message,
+    .dz-preview > div {
+        margin-bottom: 1rem;
+    }
+
+    .dz-success .dz-error-mark {
+        display: none;
+    }
+
+    .dz-error .dz-success-mark {
+        display: none;
+    }
+
+    .dz-success-mark * {
+        fill: $success-color;
+    }
+
+    .dz-error-mark * {
+        fill: $alert-color;
+    }
+
+    > div:last-child {
+        margin-bottom: 0;
+    }
+}
+

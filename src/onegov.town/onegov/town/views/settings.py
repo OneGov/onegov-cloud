@@ -1,4 +1,4 @@
-""" The login/logout views. """
+""" The settings view, defining things like the logo or color of the town. """
 
 from onegov.core.security import Secret
 from onegov.form import Form

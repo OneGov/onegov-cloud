@@ -1,32 +1,53 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-04-15 08:50+0200\n"
+"POT-Creation-Date: 2015-04-15 15:58+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:142
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:160
 msgid "Homepage"
 msgstr "Startseite"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:146
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:164
 msgid "Login"
 msgstr "Login"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:150
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:168
 msgid "Logout"
 msgstr "Logout"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:153
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:171
 msgid "Settings"
 msgstr "Einstellungen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:174
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
+msgid "Images"
+msgstr "Bilder"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:9
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:6
+msgid "Upload"
+msgstr "Hochladen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:12
+msgid "All Images"
+msgstr "Alle Bilder"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:21
+msgid "No images uploaded yet"
+msgstr "Noch keine Bilder hochgeladen"
+
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:55
 msgid "Submit"
 msgstr "Absenden"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:80
+msgid "Drop files to upload"
+msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/homepage.py:15
 #, python-format
@@ -41,36 +62,36 @@ msgstr "E-Mail Adresse"
 msgid "Password"
 msgstr "Passwort"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:76
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:63
 #, python-format
 msgid "Login to ${town}"
 msgstr "${town} Login"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:90
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:77
 msgid "You have been logged out."
 msgstr "Sie wurden ausgeloggt."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:68
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:55
 msgid "You have been logged in."
 msgstr "Sie wurden eingeloggt."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:71
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:58
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:17
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:16
 msgid "Name"
 msgstr "Name"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:18
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:17
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:53
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:38
 #, python-format
 msgid "Settings for ${town}"
 msgstr "${town} Einstellungen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:46
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:31
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"

@@ -5,6 +5,7 @@ import onegov.town
 from mock import patch
 from morepath import setup
 from webtest import TestApp as Client
+from webtest import Upload
 
 
 @patch('morepath.directive.register_view')
@@ -72,3 +73,27 @@ def test_view_login(town_app):
     assert 'application_id' not in client.cookies
 
     assert client.get('/logout', expect_errors=True).status_code == 403
+
+
+def test_view_images(town_app):
+
+    client = Client(town_app)
+
+    assert client.get('/images', expect_errors=True).status_code == 403
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    images_page = client.get('/images')
+
+    assert "Noch keine Bilder hochgeladen" in images_page
+
+    images_page.form['file'] = Upload('Test.txt', b'x')
+    assert images_page.form.submit(expect_errors=True).status_code == 415
+
+    images_page.form['file'] = Upload('Test.jpg', b'x')
+    images_page = images_page.form.submit().follow()
+
+    assert "Noch keine Bilder hochgeladen" not in images_page
