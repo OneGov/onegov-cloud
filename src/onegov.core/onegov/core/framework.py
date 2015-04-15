@@ -401,10 +401,13 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     @cached_property
     def translations(self):
         """ Returns all available translations keyed by langauge. """
-        return self.modules.i18n.get_translations(
-            self.registry.settings.i18n.domain,
-            self.registry.settings.i18n.localedir
-        )
+        try:
+            return self.modules.i18n.get_translations(
+                self.registry.settings.i18n.domain,
+                self.registry.settings.i18n.localedir
+            )
+        except AttributeError:
+            return {}
 
     @cached_property
     def chameleon_translations(self):
