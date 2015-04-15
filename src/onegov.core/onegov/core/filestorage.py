@@ -29,9 +29,9 @@ class FilestorageFile(object):
 
     Note that this is only used if the file is local. Files stored in the
     filestorage should be linked using
-    :meth:`onegov.core.framework.Framework.filestorage_url`, which might result
-    in a local path, for which this class is used. Or it might result in a
-    remote path that is served by some different webserver.
+    :meth:`onegov.core.request.CoreRequest.filestorage_link`, which might
+    result in a local path, for which this class is used. Or it might result in
+    a remote path that is served by some different webserver.
 
     """
     storage = 'filestorage'
