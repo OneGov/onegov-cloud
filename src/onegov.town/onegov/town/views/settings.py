@@ -1,6 +1,5 @@
 """ The login/logout views. """
 
-from colour import Color
 from onegov.core.security import Secret
 from onegov.form import Form
 from wtforms import StringField, validators
@@ -18,30 +17,18 @@ class SettingsForm(Form):
     primary_color = ColorField(_(u"Primary Color"))
 
 
-@TownApp.html(
-    model=Town, name='settings', template='form.pt',
-    permission=Secret, request_method='GET')
-def view_settings(self, request):
-    return handle_settings(self, request)
-
-
-@TownApp.html(
-    model=Town, name='settings', template='form.pt',
-    permission=Secret, request_method='POST')
-def view_post_settings(self, request):
-    return handle_settings(self, request)
-
-
-def handle_settings(self, request):
+@TownApp.form(
+    model=Town, name='settings', template='form.pt', permission=Secret,
+    form=SettingsForm)
+def handle_settings(self, request, form):
     """ Handles the GET and POST login requests. """
-
-    form = request.get_form(SettingsForm)
-    form.action = request.link(self, name='settings')
 
     if form.submitted(request):
         self.name = form.name.data
         self.theme_options['primary-color'] = form.primary_color.data.get_hex()
         request.app.session().flush()
+
+        request.success(_(u'Your changes were saved'))
     else:
         form.name.data = self.name
         form.primary_color.data = self.theme_options.get('primary-color')

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import onegov.core
 import onegov.town
 
 from mock import patch
@@ -9,6 +10,7 @@ from webtest import TestApp as Client
 @patch('morepath.directive.register_view')
 def test_view_permissions(register_view):
     config = setup()
+    config.scan(onegov.core)
     config.scan(onegov.town)
     config.commit()
 

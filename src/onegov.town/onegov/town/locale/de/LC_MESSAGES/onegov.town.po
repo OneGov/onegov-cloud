@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-04-14 16:30+0200\n"
+"POT-Creation-Date: 2015-04-15 08:50+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -66,7 +66,11 @@ msgstr "Name"
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:51
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:53
 #, python-format
 msgid "Settings for ${town}"
 msgstr "${town} Einstellungen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:46
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"

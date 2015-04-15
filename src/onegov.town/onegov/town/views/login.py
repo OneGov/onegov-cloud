@@ -38,25 +38,12 @@ class LoginForm(Form):
             )
 
 
-@TownApp.html(
+@TownApp.form(
     model=Town, name='login', template='form.pt', permission=Public,
-    request_method='GET')
-def view_login(self, request):
-    return handle_login(self, request)
-
-
-@TownApp.html(
-    model=Town, name='login', template='form.pt', permission=Public,
-    request_method='POST')
-def view_post_login(self, request):
-    return handle_login(self, request)
-
-
-def handle_login(self, request):
+    form=LoginForm
+)
+def handle_login(self, request, form):
     """ Handles the GET and POST login requests. """
-
-    form = request.get_form(LoginForm)
-    form.action = request.link(self, name='login')
 
     if form.submitted(request):
         identity = form.get_identity(request)
