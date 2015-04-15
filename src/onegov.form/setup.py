@@ -34,7 +34,8 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'wtforms'
+        'wtforms',
+        'wtforms-components[color]'
     ],
     extras_require=dict(
         test=[
