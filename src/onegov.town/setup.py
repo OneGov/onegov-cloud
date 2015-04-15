@@ -35,14 +35,13 @@ setup(
     platforms='any',
     install_requires=[
         'click',
-        'colour',
         'jsmin',
         'onegov.core',
+        'onegov.form',
         'onegov.foundation',
         'onegov.page',
         'onegov.user',
         'translationstring',
-        'WTForms-Components'
     ],
     extras_require=dict(
         test=[
