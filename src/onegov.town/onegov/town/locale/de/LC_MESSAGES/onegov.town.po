@@ -1,26 +1,27 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-04-15 15:58+0200\n"
+"POT-Creation-Date: 2015-04-15 17:01+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:160
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:164
 msgid "Homepage"
 msgstr "Startseite"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:164
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:168
 msgid "Login"
 msgstr "Login"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:168
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:172
 msgid "Logout"
 msgstr "Logout"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:171
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:41
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:174
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:178
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
 msgid "Images"
 msgstr "Bilder"
@@ -41,11 +42,16 @@ msgstr "Alle Bilder"
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/layout.pt:30
+msgid "Town Logo"
+msgstr "Logo der Gemeinde"
+
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:55
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:90
 msgid "Submit"
 msgstr "Absenden"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:80
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:83
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
@@ -84,14 +90,13 @@ msgid "Name"
 msgstr "Name"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:17
+msgid "Logo"
+msgstr "Logo"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:18
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:38
-#, python-format
-msgid "Settings for ${town}"
-msgstr "${town} Einstellungen"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:31
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:33
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"

@@ -25,18 +25,20 @@
 
 <body id="${layout.page_id}">
     <div class="row">
-        <div class="large-12 columns">
-            <h1><div metal:define-slot="title"></div></h1>
-        </div>
+      <div class="small-12 columns">
+        <a tal:condition="layout.town.logo_url|nothing" href="${layout.homepage_url}">
+          <img src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
+        </a>
+      </div>
     </div>
     <div class="row">
-        <div class="large-12 columns">
+        <div class="small-12 columns">
             <div metal:use-macro="layout.macros['top_navigation']"></div>
             <div metal:use-macro="layout.macros['breadcrumbs']"></div>
         </div>
     </div>
     <div class="row">
-      <div class="large-12 columns">
+      <div class="small-12 columns">
         <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
           ${message.text}
           <a href="#" class="close">&times;</a>
@@ -44,12 +46,17 @@
       </div>
     </div>
     <div class="row">
-        <div class="large-12 columns">
+        <div class="small-12 columns">
+            <h1><div metal:define-slot="title"></div></h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 columns">
             <div metal:define-slot="content"></div>
         </div>
     </div>
     <div class="row">
-        <div class="large-12 columns">
+        <div class="small-12 columns">
             <div metal:use-macro="layout.macros['bottom-links']"></div>
         </div>
     </div>

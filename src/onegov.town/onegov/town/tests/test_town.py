@@ -47,6 +47,7 @@ def test_template_layout():
     @App.html(model=Model, template='layout.pt')
     def view_model(self, request):
         layout = Layout(self, request)
+        layout.homepage_url = None
         return {'layout': layout}
 
     config.scan(more.webassets)
@@ -91,9 +92,9 @@ def test_login(town_app):
     client = Client(town_app)
 
     links = pq(client.get('/').text).find('.bottom-links a')
-    assert links[1].text == 'Login'
+    assert links[0].text == 'Login'
 
-    login_page = client.get(links[1].attrib.get('href'))
+    login_page = client.get(links[0].attrib.get('href'))
     login_page.form['email'] = 'admin@example.org'
     login_page.form['password'] = ''
     login_page = login_page.form.submit()
@@ -113,13 +114,13 @@ def test_login(town_app):
     assert "Sie wurden eingeloggt" in index_page.text
 
     links = pq(index_page.text).find('.bottom-links a')
-    assert links[1].text == 'Logout'
+    assert links[0].text == 'Logout'
 
-    index_page = client.get(links[1].attrib.get('href')).follow()
+    index_page = client.get(links[0].attrib.get('href')).follow()
     assert "Sie wurden ausgeloggt" in index_page.text
 
     links = pq(index_page.text).find('.bottom-links a')
-    assert links[1].text == 'Login'
+    assert links[0].text == 'Login'
 
 
 def test_settings(town_app):
@@ -147,3 +148,9 @@ def test_settings(town_app):
     settings_page = settings_page.form.submit()
 
     assert u"Ungültige Farbe." not in settings_page.text
+
+    settings_page.form['logo_url'] = 'https://seantis.ch/logo.img'
+    settings_page = settings_page.form.submit()
+
+    print(settings_page.text)
+    assert '<img src="https://seantis.ch/logo.img"' in settings_page.text

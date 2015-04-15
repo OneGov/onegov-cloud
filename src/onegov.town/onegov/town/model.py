@@ -23,6 +23,9 @@ class Town(Base, TimestampMixin):
     #: the name of the town (as registered with the Swiss governement)
     name = Column(Text, nullable=False)
 
+    #: the logo of the town
+    logo_url = Column(Text, nullable=True)
+
     #: the theme options of the town
     theme_options = Column(JSON, nullable=True, default=user_colors.copy)
 

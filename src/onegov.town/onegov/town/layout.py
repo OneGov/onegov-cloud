@@ -135,6 +135,10 @@ class Layout(object):
     def image_upload_url(self):
         return self.request.link(ImageCollection(self.app), name='upload')
 
+    @cached_property
+    def homepage_url(self):
+        return self.request.link(self.town)
+
 
 class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """
@@ -156,8 +160,6 @@ class DefaultLayout(Layout):
     @cached_property
     def bottom_links(self):
         links = []
-
-        links.append(Link(_(u'Homepage'), self.request.link(self.town)))
 
         if not self.is_logged_in:
             links.append(Link(

@@ -14,6 +14,7 @@ class SettingsForm(Form):
     """ Defines the settings form for onegov town. """
 
     name = StringField(_(u"Name"), [validators.InputRequired()])
+    logo_url = StringField(_("Logo"))
     primary_color = ColorField(_(u"Primary Color"))
 
 
@@ -25,16 +26,18 @@ def handle_settings(self, request, form):
 
     if form.submitted(request):
         self.name = form.name.data
+        self.logo_url = form.logo_url.data
         self.theme_options['primary-color'] = form.primary_color.data.get_hex()
         request.app.session().flush()
 
         request.success(_(u'Your changes were saved'))
     else:
         form.name.data = self.name
+        form.logo_url.data = self.logo_url
         form.primary_color.data = self.theme_options.get('primary-color')
 
     return {
         'layout': DefaultLayout(self, request),
-        'title': _(u'Settings for ${town}', mapping={'town': self.name}),
+        'title': _(u'Settings'),
         'form': form
     }
