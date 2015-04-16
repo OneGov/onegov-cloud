@@ -19,7 +19,7 @@
     alert boxes
 */
 .alert-box {
-    margin-bottom: 1rem;   
+    margin-bottom: 1rem;
 }
 
 /*
@@ -30,7 +30,7 @@ form small.error {
     padding-left: .5rem;
 }
 
-/* 
+/*
     the color picker field does not look right with zurb foundation
 */
 input[type=color] {
@@ -47,7 +47,7 @@ input[type=color] {
 .bottom-links {
     color: $bottom-links-color;
     margin-left: 0;
-    
+
     a {
         color: $bottom-links-color;
         font-size: $bottom-links-size;
@@ -65,8 +65,8 @@ input[type=color] {
   padding: .5em;
 }
 
-/* 
-    dropzone styling 
+/*
+    dropzone styling
 */
 .dropzone {
     background-color: $topbar-bg-color;
@@ -77,19 +77,17 @@ input[type=color] {
     .dz-preview {
         float: left;
         margin-right: 1rem;
+    }
 
-        > div:last-child {
-            margin-bottom: 0;
-        }
+    .dz-details,
+    .dz-error-mark,
+    .dz-image,
+    .dz-success-mark {
+        margin-top: 1rem;
     }
 
     .dz-filename {
         display: none;
-    }
-
-    .dz-message,
-    .dz-preview > div {
-        margin-bottom: 1rem;
     }
 
     .dz-success .dz-error-mark {

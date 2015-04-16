@@ -7,8 +7,7 @@ from onegov.page import Page, PageCollection
 
 @TownApp.path(model=Town, path='/')
 def get_town(app):
-    # there's only one town per schema
-    return app.session().query(Town).first()
+    return app.town
 
 
 @TownApp.path(model=Page, path='/gemeinde', absorb=True)

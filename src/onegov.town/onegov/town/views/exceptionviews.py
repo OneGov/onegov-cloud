@@ -1,7 +1,6 @@
 from onegov.core.security import Public
 from onegov.town import _, TownApp
 from onegov.town.layout import DefaultLayout
-from onegov.town.model import Town
 from purl import URL
 from webob.exc import HTTPForbidden
 
@@ -18,8 +17,8 @@ def handle_forbidden(self, request):
     def set_status_code(response):
         response.status_code = self.code  # pass along 403
 
-    town = request.app.session().query(Town).first()
-    url = URL(request.link(town, name='login')).query_param('to', request.url)
+    url = URL(request.link(request.app.town, name='login'))
+    url = url.query_param('to', request.url)
 
     return {
         'layout': DefaultLayout(self, request),

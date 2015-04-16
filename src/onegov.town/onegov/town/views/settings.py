@@ -28,8 +28,8 @@ def handle_settings(self, request, form):
         self.name = form.name.data
         self.logo_url = form.logo_url.data
         self.theme_options['primary-color'] = form.primary_color.data.get_hex()
-        request.app.session().flush()
 
+        request.app.update_town(self)
         request.success(_(u'Your changes were saved'))
     else:
         form.name.data = self.name

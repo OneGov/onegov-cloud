@@ -4,7 +4,7 @@ from cached_property import cached_property
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link
-from onegov.town.model import ImageCollection, Town
+from onegov.town.model import ImageCollection
 from morepath.security import NO_IDENTITY
 
 
@@ -35,9 +35,10 @@ class Layout(object):
         # always include the common js files
         self.request.include('common')
 
-    @cached_property
+    @property
     def town(self):
-        return self.app.session().query(Town).first()
+        """ An alias for self.request.app.town. """
+        return self.request.app.town
 
     @cached_property
     def app(self):
@@ -137,7 +138,7 @@ class Layout(object):
 
     @cached_property
     def homepage_url(self):
-        return self.request.link(self.town)
+        return self.request.link(self.app.town)
 
 
 class DefaultLayout(Layout):
@@ -163,14 +164,14 @@ class DefaultLayout(Layout):
 
         if not self.is_logged_in:
             links.append(Link(
-                _(u'Login'), self.request.link(self.town, 'login')
+                _(u'Login'), self.request.link(self.app.town, 'login')
             ))
         else:
             links.append(Link(
-                _(u'Logout'), self.request.link(self.town, 'logout')
+                _(u'Logout'), self.request.link(self.app.town, 'logout')
             ))
             links.append(Link(
-                _(u'Settings'), self.request.link(self.town, 'settings')
+                _(u'Settings'), self.request.link(self.app.town, 'settings')
             ))
             links.append(Link(
                 _(u'Images'), self.request.link(ImageCollection(self.app))

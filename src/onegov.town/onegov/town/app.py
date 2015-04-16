@@ -22,12 +22,33 @@ class TownApp(Framework):
     """
 
     @property
+    def town(self):
+        """ Returns the cached version of the town. Since the town rarely
+        ever changes, it makes sense to not hit the database for it every
+        time.
+
+        As a consequence, changes to the town object are not propagated,
+        unless you use :meth:`update_town` or use the ORM directly.
+
+        """
+        return self.cache.get_or_create('town', self.load_town)
+
+    def load_town(self):
+        """ Loads the town from the SQL database. """
+        return self.session().query(Town).first()
+
+    def update_town(self, town):
+        """ Takes the given town object (may be from cache) and writes all
+        changes to the SQL database. """
+        session = self.session()
+        session.merge(town)
+        session.flush()
+
+        self.cache.delete('town')
+
+    @property
     def theme_options(self):
-        # XXX the town is loaded multiple times during one request, even though
-        # it rarely changes, even over multiple reqeusts. It would make
-        # sense to cache this somewhere and invalidate that cache only when
-        # there's a change to the town.
-        return self.session().query(Town).first().theme_options or {}
+        return self.town.theme_options or {}
 
     @cached_property
     def webassets_path(self):
