@@ -51,10 +51,10 @@ def test_form_directive():
     )
 
     client = Client(app)
-    assert client.get('/').text == '1 GET /'
-    assert client.post('/').text == '1 POST /'
-    assert client.get('/separate').text == '2 GET /separate'
-    assert client.post('/separate').text == '3 POST /separate'
+    assert client.get('/').text == '1 GET http://localhost/'
+    assert client.post('/').text == '1 POST http://localhost/'
+    assert client.get('/separate').text == '2 GET http://localhost/separate'
+    assert client.post('/separate').text == '3 POST http://localhost/separate'
 
     assert client.get('/1', expect_errors=True).status_code == 403
     assert client.post('/1', expect_errors=True).status_code == 403

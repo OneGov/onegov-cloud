@@ -49,10 +49,10 @@ def test_virtual_host_request():
     c = Client(app)
 
     response = c.get('/')
-    assert response.body == b'/ - root'
+    assert response.body == b'http://localhost/ - root'
 
     response = c.get('/blog')
-    assert response.body == b'/blog - blog'
+    assert response.body == b'http://localhost/blog - blog'
 
     # X_VHM_HOST is a simple prefix..
     response = c.get('/', headers={'X_VHM_HOST': 'http://example.org'})
@@ -67,14 +67,14 @@ def test_virtual_host_request():
 
     # X_VHM_ROOT set to '/' has no influence
     response = c.get('/', headers={'X_VHM_ROOT': '/'})
-    assert response.body == b'/ - root'
+    assert response.body == b'http://localhost/ - root'
 
     # just like X_VHM_HOST it tries to not introduce any '//'s
     response = c.get('/blog', headers={'X_VHM_ROOT': '/blog'})
-    assert response.body == b'/ - blog'
+    assert response.body == b'http://localhost/ - blog'
 
     response = c.get('/blog', headers={'X_VHM_ROOT': '/blog/'})
-    assert response.body == b'/ - blog'
+    assert response.body == b'http://localhost/ - blog'
 
     # X_VHM_HOST and X_VHM_ROOT may be used together
     response = c.get('/blog', headers={
@@ -247,8 +247,8 @@ def test_fix_webassets_url():
     # We really want '/towns/test/xxx' here, which is something the onegov
     # core Framework application fixes through a tween.
     response = client.get('/towns/test')
-    assert response.body\
-        == b'/towns/test/7da9c72a3b5f9e060b898ef7cd714b8a/jquery.js'
+    assert response.body == (b'http://localhost/towns/test/'
+                             b'7da9c72a3b5f9e060b898ef7cd714b8a/jquery.js')
 
 
 def test_sign_unsign():

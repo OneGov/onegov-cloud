@@ -68,6 +68,11 @@ class CoreRequest(IncludeRequest):
         """
         return self.headers.get('X_VHM_ROOT', '').rstrip('/')
 
+    @cached_property
+    def url(self):
+        """ Returns the current url, taking the virtual hosting in account. """
+        return self.transform(self.path)
+
     def transform(self, url):
         """ Applies X_VHM_HOST and X_VHM_ROOT to the given url (which is
         expected to not contain a host yet!). """
@@ -76,6 +81,8 @@ class CoreRequest(IncludeRequest):
 
         if self.x_vhm_host:
             url = self.x_vhm_host + url
+        else:
+            url = self.host_url + url
 
         return url
 

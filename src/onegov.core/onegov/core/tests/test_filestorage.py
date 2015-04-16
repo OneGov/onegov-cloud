@@ -71,7 +71,8 @@ def test_filestorage(tempdir):
     app.filestorage.setcontents('readme', 'readme')
 
     client = Client(app)
-    assert client.get('/?file=test.txt').text == '/files/test.txt'
+    assert client.get('/?file=test.txt').text\
+        == 'http://localhost/files/test.txt'
     assert client.get('/?file=asdf.txt').text == ''
 
     assert client.get('/files/test.txt').text == 'asdf'
