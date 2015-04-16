@@ -66,6 +66,29 @@ input[type=color] {
 }
 
 /*
+    image control elements
+*/
+.image-box {
+    position: relative;
+    
+    .delete {
+        background-color: $input-disabled-bg;
+        border-radius: 15px;
+        color: $button-font-color;
+        height: 27px;
+        left: -4px;
+        position: absolute;
+        text-align: center;
+        top: -13px;
+        width: 27px;    
+    }
+
+    .delete:hover {
+        background-color: $alert-color;
+    }
+}
+
+/*
     dropzone styling
 */
 .dropzone {

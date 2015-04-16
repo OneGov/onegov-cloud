@@ -16,3 +16,17 @@ class Link(object):
 
         #: True if the link is active (sometimes used for the navigation)
         self.active = active
+
+
+class Image(object):
+    """ Represents an img element. """
+
+    def __init__(self, src, alt=None, title=None):
+        #: The src of the image
+        self.src = src
+
+        #: The text for people that can't or won't look at the picture
+        self.alt = alt
+
+        #: The title of the image
+        self.title = title

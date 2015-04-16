@@ -13,7 +13,12 @@
             <div class="small-12 columns">
                 <h2 i18n:translate="">All Images</h2>
                 <ul tal:condition="images" class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-                    <li tal:repeat="image images"><img class="th" tal:condition="image" class="thumbnail" src="${image}" /></li>
+                    <li tal:repeat="image images" id="image-${repeat.image.index}" class="image-box">
+                        <a class="th" href="${image.src}" tal:condition="image">
+                            <img src="${image.src}" />
+                        </a>
+                        <a class="delete" ic-delete-from="${image.src}" ic-on-success="$('#image-${repeat.image.index}').remove();">✗</a>
+                    </li>
                 </ul>
                 <tal:block condition="not:images">
                     <p i18n:translate="">No images uploaded yet</p>

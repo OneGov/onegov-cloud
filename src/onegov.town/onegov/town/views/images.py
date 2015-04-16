@@ -6,6 +6,7 @@ from onegov.core.filestorage import random_filename
 from onegov.core.security import Private
 from onegov.town import _
 from onegov.town.app import TownApp
+from onegov.town.elements import Image
 from onegov.town.layout import DefaultLayout
 from onegov.town.model import ImageCollection
 from webob.exc import HTTPUnsupportedMediaType
@@ -15,10 +16,10 @@ from webob.exc import HTTPUnsupportedMediaType
 def view_get_image_collection(self, request):
     request.include('dropzone')
 
-    images = [
-        request.filestorage_link(self.path_prefix + image)
+    images = (
+        Image(request.filestorage_link(self.path_prefix + image))
         for image in self.filestorage.listdir(files_only=True)
-    ]
+    )
 
     return {
         'layout': DefaultLayout(self, request),

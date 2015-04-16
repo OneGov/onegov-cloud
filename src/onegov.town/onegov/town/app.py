@@ -62,6 +62,7 @@ class TownApp(Framework):
                 'js/jquery.js',
                 'js/fastclick.js',
                 'js/foundation.js',
+                'js/intercooler.js',
                 'js/common.js',
                 filters='jsmin',
                 output='bundles/common.bundle.js'
