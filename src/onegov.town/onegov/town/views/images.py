@@ -16,10 +16,10 @@ from webob.exc import HTTPUnsupportedMediaType
 def view_get_image_collection(self, request):
     request.include('dropzone')
 
-    images = (
+    images = [
         Image(request.filestorage_link(self.path_prefix + image))
         for image in self.filestorage.listdir(files_only=True)
-    )
+    ]
 
     return {
         'layout': DefaultLayout(self, request),
