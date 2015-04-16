@@ -41,6 +41,7 @@ setup(
         'onegov.foundation',
         'onegov.page',
         'onegov.user',
+        'purl',
         'translationstring',
     ],
     extras_require=dict(

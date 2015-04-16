@@ -56,6 +56,7 @@ def town_app(postgres_server_url):
 
     users = UserCollection(app.session())
     users.add('admin@example.org', 'hunter2', 'admin')
+    users.add('editor@example.org', 'hunter2', 'editor')
 
     transaction.commit()
 

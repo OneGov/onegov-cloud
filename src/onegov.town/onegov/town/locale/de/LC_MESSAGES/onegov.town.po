@@ -1,27 +1,23 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-04-15 17:01+0200\n"
+"POT-Creation-Date: 2015-04-16 10:50+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:164
-msgid "Homepage"
-msgstr "Startseite"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:168
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:166
 msgid "Login"
 msgstr "Login"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:172
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:170
 msgid "Logout"
 msgstr "Logout"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:173
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:41
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:178
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:176
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
 msgid "Images"
 msgstr "Bilder"
@@ -30,15 +26,27 @@ msgstr "Bilder"
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:6
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:6
+msgid "You are trying to open a page for which you are not authorized."
+msgstr "Ihnen felt die nötige Berechtigung um diese Seite zu öffnen."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:11
+msgid "Please follow this link to login with a different user."
+msgstr "Bitte folgen Sie diesem Link um sich mit einem anderen Benutzer anzumelden."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:14
+msgid "Please follow this link to login."
+msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:8
 msgid "Upload"
 msgstr "Hochladen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:12
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:14
 msgid "All Images"
 msgstr "Alle Bilder"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:21
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:19
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
 
@@ -55,33 +63,37 @@ msgstr "Absenden"
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/exceptionviews.py:26
+msgid "Access Denied"
+msgstr "Zugriff verweigert"
+
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/homepage.py:15
 #, python-format
 msgid "Welcome to ${town}"
 msgstr "Willkommen in ${town}"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:18
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:19
 msgid "Email Address"
 msgstr "E-Mail Adresse"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:19
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:20
 msgid "Password"
 msgstr "Passwort"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:63
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:73
 #, python-format
 msgid "Login to ${town}"
 msgstr "${town} Login"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:77
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:87
 msgid "You have been logged out."
 msgstr "Sie wurden ausgeloggt."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:55
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:65
 msgid "You have been logged in."
 msgstr "Sie wurden eingeloggt."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:58
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:68
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
 
@@ -100,3 +112,6 @@ msgstr "Primärfarbe"
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:33
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+#~ msgid "Homepage"
+#~ msgstr "Startseite"

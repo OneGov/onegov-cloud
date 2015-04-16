@@ -187,3 +187,29 @@ def test_settings(town_app):
 
     print(settings_page.text)
     assert '<img src="https://seantis.ch/logo.img"' in settings_page.text
+
+
+def test_unauthorized(town_app):
+    client = Client(town_app)
+
+    unauth_page = client.get('/settings', expect_errors=True)
+    assert u"Zugriff verweigert" in unauth_page.text
+    assert u"folgen Sie diesem Link um sich anzumelden" in unauth_page.text
+
+    link = pq(unauth_page.text).find('#alternate-login-link')[0]
+    login_page = client.get(link.attrib.get('href'))
+    login_page.form['email'] = 'editor@example.org'
+    login_page.form['password'] = 'hunter2'
+    unauth_page = login_page.form.submit().follow(expect_errors=True)
+
+    assert u"Zugriff verweigert" in unauth_page.text
+    assert u"mit einem anderen Benutzer anzumelden" in unauth_page.text
+
+    link = pq(unauth_page.text).find('#alternate-login-link')[0]
+    login_page = client.get(link.attrib.get('href'))
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    settings_page = login_page.form.submit().follow()
+
+    assert settings_page.status_code == 200
+    assert u"Zugriff verweigert" not in settings_page

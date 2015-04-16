@@ -4,12 +4,13 @@ import morepath
 
 from onegov.core.security import Public, Private
 from onegov.form import Form
-from wtforms import StringField, PasswordField, validators
 from onegov.town import _, log
 from onegov.town.app import TownApp
 from onegov.town.layout import DefaultLayout
 from onegov.town.model import Town
 from onegov.user import UserCollection
+from purl import URL
+from wtforms import StringField, PasswordField, validators
 
 
 class LoginForm(Form):
@@ -45,11 +46,20 @@ class LoginForm(Form):
 def handle_login(self, request, form):
     """ Handles the GET and POST login requests. """
 
+    if 'to' in request.params:
+        url = URL(form.action).query_param('to', request.params['to'])
+        form.action = url.as_string()
+
     if form.submitted(request):
         identity = form.get_identity(request)
 
         if identity is not None:
-            response = morepath.redirect(request.link(self))
+
+            # redirect to the url the 'to' parameter points to, or to the
+            # homepage of the town
+            to = request.params.get('to', request.link(self))
+            response = morepath.redirect(to)
+
             morepath.remember_identity(response, request, identity)
 
             request.success(_("You have been logged in."))
