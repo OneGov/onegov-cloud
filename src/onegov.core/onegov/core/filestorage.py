@@ -10,7 +10,7 @@ See :attr:`onegov.core.framework.Framework.filestorage` for more information.
 from onegov.core import Framework
 from onegov.core.crypto import random_token
 from onegov.core.utils import render_file
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 
 
 def random_filename():
@@ -54,3 +54,13 @@ def get_filestorage_file(app, absorb):
 def view_filestorage_file(self, request):
     """ Renders the given filestorage file in the browser. """
     return getattr(request.app, self.storage).getsyspath(self.path)
+
+
+@Framework.view(
+    model=FilestorageFile, request_method='DELETE', permission=Private)
+def delete_static_file(self, request):
+    """ Deletes the given filestorage file. By default the permission is
+    ``Private``. An application using the framework can override this though.
+
+    """
+    request.app.filestorage.remove(self.path)

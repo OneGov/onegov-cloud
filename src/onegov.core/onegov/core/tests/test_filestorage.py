@@ -1,6 +1,7 @@
+import more.webassets
+import morepath
 import onegov.core
 import os.path
-import more.webassets
 
 from morepath import setup
 from onegov.core import Framework
@@ -50,9 +51,24 @@ def test_filestorage(tempdir):
     class Model(object):
         pass
 
+    @App.path('/login')
+    class Login(object):
+        pass
+
     @App.view(model=Model)
     def view_file(self, request):
         return request.filestorage_link(request.params.get('file'))
+
+    @App.view(model=Login)
+    def view_login(self, request):
+
+        @request.after
+        def remember_login(response):
+            morepath.remember_identity(response, request, morepath.Identity(
+                userid='test',
+                role='admin',
+                application_id=request.app.application_id
+            ))
 
     config.scan(onegov.core)
     config.scan(more.webassets)
@@ -63,7 +79,8 @@ def test_filestorage(tempdir):
         filestorage='fs.osfs.OSFS',
         filestorage_options={
             'root_path': tempdir
-        }
+        },
+        identity_secure=False
     )
     app.namespace = 'tests'
     app.set_application_id('tests/foo')
@@ -86,3 +103,13 @@ def test_filestorage(tempdir):
     client = Client(app)
     assert client.get('/?file=test.txt').text == ''
     assert client.get('/?file=asdf.txt').text == ''
+
+    app.set_application_id('tests/foo')
+    assert client.get('/files/readme').status_code == 200
+    assert client.delete(
+        '/files/readme', expect_errors=True).status_code == 403
+    client.get('/login')
+    assert client.delete('/files/readme').status_code == 200
+    assert client.get('/files/readme', expect_errors=True).status_code == 404
+    assert client.delete(
+        '/files/readme', expect_errors=True).status_code == 404
