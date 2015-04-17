@@ -160,24 +160,27 @@ class DefaultLayout(Layout):
 
     @cached_property
     def bottom_links(self):
-        links = []
 
-        if not self.is_logged_in:
-            links.append(Link(
-                _(u'Login'), self.request.link(self.app.town, 'login')
-            ))
+        request = self.request
+
+        if self.current_role == 'editor':
+            return [
+                Link(_(u'Logout'), request.link(self.town, 'logout')),
+                Link(_(u'Images'), request.link(ImageCollection(self.app))),
+                Link(u'OneGov', 'http://www.onegov.ch'),
+                Link(u'Seantis GmbH', 'https://www.seantis.ch')
+            ]
+        elif self.current_role == 'admin':
+            return [
+                Link(_(u'Logout'), request.link(self.town, 'logout')),
+                Link(_(u'Images'), request.link(ImageCollection(self.app))),
+                Link(_(u'Settings'), request.link(self.town, 'settings')),
+                Link(u'OneGov', 'http://www.onegov.ch'),
+                Link(u'Seantis GmbH', 'https://www.seantis.ch')
+            ]
         else:
-            links.append(Link(
-                _(u'Logout'), self.request.link(self.app.town, 'logout')
-            ))
-            links.append(Link(
-                _(u'Settings'), self.request.link(self.app.town, 'settings')
-            ))
-            links.append(Link(
-                _(u'Images'), self.request.link(ImageCollection(self.app))
-            ))
-
-        links.append(Link(u'OneGov', 'http://www.onegov.ch'))
-        links.append(Link(u'Seantis GmbH', 'https://www.seantis.ch'))
-
-        return links
+            return [
+                Link(_(u'Login'), request.link(self.town, 'login')),
+                Link(u'OneGov', 'http://www.onegov.ch'),
+                Link(u'Seantis GmbH', 'https://www.seantis.ch')
+            ]
