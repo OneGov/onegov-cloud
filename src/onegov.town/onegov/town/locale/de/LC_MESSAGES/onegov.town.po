@@ -1,26 +1,28 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-04-16 10:50+0200\n"
+"POT-Creation-Date: 2015-04-17 14:01+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:166
-msgid "Login"
-msgstr "Login"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:170
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:168
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
 msgid "Logout"
 msgstr "Logout"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:173
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:169
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:176
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:26
+msgid "Images"
+msgstr "Bilder"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:177
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:41
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:176
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
-msgid "Images"
-msgstr "Bilder"
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:183
+msgid "Login"
+msgstr "Login"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:9
 msgid "Not a valid color."
@@ -32,7 +34,8 @@ msgstr "Ihnen felt die nötige Berechtigung um diese Seite zu öffnen."
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:11
 msgid "Please follow this link to login with a different user."
-msgstr "Bitte folgen Sie diesem Link um sich mit einem anderen Benutzer anzumelden."
+msgstr ""
+"Bitte folgen Sie diesem Link um sich mit einem anderen Benutzer anzumelden."
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:14
 msgid "Please follow this link to login."
@@ -46,7 +49,7 @@ msgstr "Hochladen"
 msgid "All Images"
 msgstr "Alle Bilder"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:19
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:24
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
 
@@ -63,7 +66,44 @@ msgstr "Absenden"
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/exceptionviews.py:26
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:9
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:15
+msgid "This Page"
+msgstr "Dieses Thema"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:17
+msgid "Title"
+msgstr "Titel"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:21
+msgid "URL"
+msgstr "URL"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:25
+msgid "Text"
+msgstr "Text"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:61
+msgid "New Page"
+msgstr "Neues Thema"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:80
+msgid "Edit Page"
+msgstr "Thema Bearbeiten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:55
+msgid "Added a new page."
+msgstr "Die neue Seite wurde hinzugefügt."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:71
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:33
+msgid "Your changes were saved."
+msgstr "Ihre Änderungen wurden gespeichert."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/exceptionviews.py:25
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
 
@@ -97,6 +137,25 @@ msgstr "Sie wurden eingeloggt."
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:16
+msgid "Page"
+msgstr "Thema"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:17
+msgid "Link"
+msgstr "Verknüpfung"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:22
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:26
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:31
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:27
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:32
+msgid "Delete"
+msgstr "Löschen"
+
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:16
 msgid "Name"
 msgstr "Name"
@@ -108,10 +167,6 @@ msgstr "Logo"
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:18
 msgid "Primary Color"
 msgstr "Primärfarbe"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:33
-msgid "Your changes were saved"
-msgstr "Ihre Änderungen wurden gespeichert"
 
 #~ msgid "Homepage"
 #~ msgstr "Startseite"

@@ -1,0 +1,62 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="below-top-navigation">
+        <div class="row" tal:condition="layout.request.is_logged_in">
+            <div class="small-12 columns">
+                <div class="edit-bar clearfix">
+                    <button href="#" data-dropdown="edit-content" class="tiny button dropdown" i18n:translate="">This Page</button>
+                    <ul id="edit-content" data-dropdown-content class="f-dropdown">
+                        <li tal:repeat="link edit_links">
+                            <a href="${link.url}">${link.text}</a>
+                        </li>
+                    </ul>
+                    <button href="#" data-dropdown="add-content" class="tiny button dropdown" i18n:translate="">Add</button>
+                    <ul id="add-content" data-dropdown-content class="f-dropdown">
+                        <li tal:repeat="link add_links">
+                            <a href="${link.url}">${link.text}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </tal:block>
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <tal:block condition="page.meta.type in {'page', 'town-root'}">
+            <div class="row" tal:condition="page.content.text">
+                <div class="small-12 columns">
+                    <tal:block content="structure: layout.markdown(page.content.text)" />
+                </div>
+            </div>
+            <div class="row" tal:condition="children">
+                <div class="small-12 columns">
+                    <ul class="inline-list">
+                        <li tal:repeat="link children">
+                            <a href="${link.url}">${link.text}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </tal:block>
+        <tal:block condition="page.meta.type == 'link'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="panel">
+                        <p i18n:translate>
+                        You've reached this site because you are logged in. Visitors
+                        are automatically redirected to the following link:
+                        </p>
+                        <p>
+                            <a href="${page.content.url}">${page.content.url}</a>
+                        </p>
+                        <p i18n:translate>
+                            You are not automatically redirected so you have a chance
+                            to edit or delete this link.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </tal:block>
+    </tal:block>
+</div>

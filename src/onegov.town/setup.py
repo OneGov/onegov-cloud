@@ -35,7 +35,9 @@ setup(
     platforms='any',
     install_requires=[
         'click',
+        'cssmin',
         'jsmin',
+        'mistune',
         'onegov.core',
         'onegov.form',
         'onegov.foundation',

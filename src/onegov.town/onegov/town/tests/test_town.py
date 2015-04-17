@@ -47,6 +47,7 @@ def test_template_layout():
     def view_model(self, request):
         layout = Layout(self, request)
         layout.homepage_url = None
+        layout.font_awesome_path = ''
         return {'layout': layout}
 
     config.scan(more.webassets)

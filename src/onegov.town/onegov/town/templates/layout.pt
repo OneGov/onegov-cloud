@@ -21,6 +21,7 @@
          Have a look at the source code: https://onegov.readthedocs.org
      -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
+    <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 
 <body id="${layout.page_id}">
@@ -34,9 +35,13 @@
     <div class="row">
         <div class="small-12 columns">
             <div metal:use-macro="layout.macros['top_navigation']"></div>
+            <tal:block metal:define-slot="below-top-navigation">
+      
+            </tal:block>
             <div metal:use-macro="layout.macros['breadcrumbs']"></div>
         </div>
     </div>
+
     <div class="row">
       <div class="small-12 columns">
         <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">

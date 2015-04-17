@@ -8,10 +8,10 @@
         </p>
         <p>
             <a href="${login_url}" id="alternate-login-link">
-                <tal:block i18n:translate="" condition="layout.is_logged_in">
+                <tal:block i18n:translate="" condition="layout.request.is_logged_in">
                     Please follow this link to login with a different user.
                 </tal:block>
-                <tal:block i18n:translate="" condition="not:layout.is_logged_in">
+                <tal:block i18n:translate="" condition="not:layout.request.is_logged_in">
                     Please follow this link to login.
                 </tal:block>
             </a>

@@ -21,6 +21,8 @@ class TownApp(Framework):
 
     """
 
+    serve_static_files = True
+
     @property
     def town(self):
         """ Returns the cached version of the town. Since the town rarely
@@ -71,6 +73,18 @@ class TownApp(Framework):
                 'js/dropzone.js',
                 filters='jsmin',
                 output='bundles/dropzone.bundle.js'
+            ),
+            'markdown-editor': Bundle(
+                'js/editor.js',
+                'js/marked.js',
+                'js/load-editor.js',
+                filters='jsmin',
+                output='bundles/markdown-editor.bundle.js'
+            ),
+            'markdown-editor-theme': Bundle(
+                'css/editor.css',
+                filters='cssmin',
+                output='bundles/markdown-editor-theme.bundle.css'
             )
         }
 

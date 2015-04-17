@@ -1,11 +1,12 @@
-from onegov.core.compat import zip_longest
+import mistune
 
 from cached_property import cached_property
+from onegov.core.compat import zip_longest
+from onegov.core.static import StaticFile
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link
 from onegov.town.model import ImageCollection
-from morepath.security import NO_IDENTITY
 
 
 class Layout(object):
@@ -39,6 +40,13 @@ class Layout(object):
     def town(self):
         """ An alias for self.request.app.town. """
         return self.request.app.town
+
+    @cached_property
+    def font_awesome_path(self):
+        static_file = StaticFile.from_application(
+            self.app, 'font-awesome/css/font-awesome.min.css')
+
+        return self.request.link(static_file)
 
     @cached_property
     def app(self):
@@ -107,19 +115,6 @@ class Layout(object):
         """
         return None
 
-    @cached_property
-    def is_logged_in(self):
-        """ Returns True if the current request is logged in at all. """
-        return self.request.identity is not NO_IDENTITY
-
-    @cached_property
-    def current_role(self):
-        """ Returns the user-role of the current request, if logged in.
-        Otherwise, None is returned.
-
-        """
-        return self.is_logged_in and self.request.identity.role or None
-
     def chunks(self, iterable, n, fillvalue=None):
         """ Iterates through an iterable, returning chunks with the given size.
 
@@ -139,6 +134,9 @@ class Layout(object):
     @cached_property
     def homepage_url(self):
         return self.request.link(self.app.town)
+
+    def markdown(self, text):
+        return mistune.markdown(text)
 
 
 class DefaultLayout(Layout):
@@ -163,14 +161,14 @@ class DefaultLayout(Layout):
 
         request = self.request
 
-        if self.current_role == 'editor':
+        if request.current_role == 'editor':
             return [
                 Link(_(u'Logout'), request.link(self.town, 'logout')),
                 Link(_(u'Images'), request.link(ImageCollection(self.app))),
                 Link(u'OneGov', 'http://www.onegov.ch'),
                 Link(u'Seantis GmbH', 'https://www.seantis.ch')
             ]
-        elif self.current_role == 'admin':
+        elif request.current_role == 'admin':
             return [
                 Link(_(u'Logout'), request.link(self.town, 'logout')),
                 Link(_(u'Images'), request.link(ImageCollection(self.app))),

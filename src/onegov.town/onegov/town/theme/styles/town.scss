@@ -58,6 +58,20 @@ input[type=color] {
     }
 }
 
+/* 
+    pages edit bar
+*/
+.edit-bar {
+    background-color: $primary-color;
+    margin-bottom: 1rem;
+    margin-top: -1rem;
+
+    button {
+        margin-bottom: 0;
+        margin-left: 1px;
+    }
+}
+
 /*
     images
 */
