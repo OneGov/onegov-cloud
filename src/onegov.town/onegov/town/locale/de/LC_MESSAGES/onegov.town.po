@@ -1,26 +1,26 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-04-17 14:01+0200\n"
+"POT-Creation-Date: 2015-04-17 17:42+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:168
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:166
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:173
 msgid "Logout"
 msgstr "Logout"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:169
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:176
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:167
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:174
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:26
 msgid "Images"
 msgstr "Bilder"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:177
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:41
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:183
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:181
 msgid "Login"
 msgstr "Login"
 
@@ -53,7 +53,7 @@ msgstr "Alle Bilder"
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/layout.pt:30
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/layout.pt:31
 msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
@@ -66,13 +66,25 @@ msgstr "Absenden"
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:9
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:6
+msgid "This Page"
+msgstr "Dieses Thema"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:12
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:15
-msgid "This Page"
-msgstr "Dieses Thema"
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:46
+msgid ""
+"You've reached this site because you are logged in. Visitors are "
+"automatically redirected to the following link:"
+msgstr "Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch auf den folgende Verweis weitergeleitet:"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:53
+msgid ""
+"You are not automatically redirected so you have a chance to edit or delete "
+"this link."
+msgstr "Sie wurden nicht automatisch weitergeleitet damit Sie eine Chance haben den Verweis zu bearbeiten oder zu löschen."
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:17
 msgid "Title"
@@ -90,18 +102,30 @@ msgstr "Text"
 msgid "New Page"
 msgstr "Neues Thema"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:80
-msgid "Edit Page"
-msgstr "Thema Bearbeiten"
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:63
+msgid "New Link"
+msgstr "Neue Verknüpfung"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:55
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:71
 msgid "Added a new page."
 msgstr "Die neue Seite wurde hinzugefügt."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:71
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:75
+msgid "Added a new link."
+msgstr "Eine neue Verknüpfung wurde hinzugefügt."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:106
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:33
 msgid "Your changes were saved."
 msgstr "Ihre Änderungen wurden gespeichert."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:113
+msgid "Edit Page"
+msgstr "Thema Bearbeiten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:116
+msgid "Edit Link"
+msgstr "Verknüpfung Bearbeiten"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/exceptionviews.py:25
 msgid "Access Denied"
@@ -137,22 +161,22 @@ msgstr "Sie wurden eingeloggt."
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:16
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:24
 msgid "Page"
 msgstr "Thema"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:17
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:25
 msgid "Link"
 msgstr "Verknüpfung"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:22
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:26
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:31
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:30
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:34
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:39
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:27
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:32
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:35
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:40
 msgid "Delete"
 msgstr "Löschen"
 

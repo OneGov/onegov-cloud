@@ -24,7 +24,7 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
         <tal:block condition="page.meta.type in {'page', 'town-root'}">
-            <div class="row" tal:condition="page.content.text">
+            <div class="row" tal:condition="page.content.text|nothing">
                 <div class="small-12 columns">
                     <tal:block content="structure: layout.markdown(page.content.text)" />
                 </div>
