@@ -10,11 +10,11 @@ def get_town(app):
     return app.town
 
 
-@TownApp.path(model=Page, path='/gemeinde', absorb=True)
+@TownApp.path(model=Page, path='/themen', absorb=True)
 def get_page(app, absorb):
     return PageCollection(app.session()).by_path(absorb)
 
 
-@TownApp.path(model=ImageCollection, path='/images')
+@TownApp.path(model=ImageCollection, path='/bilder')
 def get_images(app):
     return ImageCollection(app)

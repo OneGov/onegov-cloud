@@ -80,14 +80,14 @@ def test_view_images(town_app):
 
     client = Client(town_app)
 
-    assert client.get('/images', expect_errors=True).status_code == 403
+    assert client.get('/bilder', expect_errors=True).status_code == 403
 
     login_page = client.get('/login')
     login_page.form.set('email', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
-    images_page = client.get('/images')
+    images_page = client.get('/bilder')
 
     assert "Noch keine Bilder hochgeladen" in images_page
 
@@ -159,14 +159,14 @@ def test_login(town_app):
 def test_settings(town_app):
     client = Client(town_app)
 
-    assert client.get('/settings', expect_errors=True).status_code == 403
+    assert client.get('/einstellungen', expect_errors=True).status_code == 403
 
     login_page = client.get('/login')
     login_page.form['email'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     login_page.form.submit()
 
-    settings_page = client.get('/settings')
+    settings_page = client.get('/einstellungen')
     document = pq(settings_page.text)
 
     assert document.find('input[name=name]').val() == 'Govikon'
@@ -192,7 +192,7 @@ def test_settings(town_app):
 def test_unauthorized(town_app):
     client = Client(town_app)
 
-    unauth_page = client.get('/settings', expect_errors=True)
+    unauth_page = client.get('/einstellungen', expect_errors=True)
     assert u"Zugriff verweigert" in unauth_page.text
     assert u"folgen Sie diesem Link um sich anzumelden" in unauth_page.text
 

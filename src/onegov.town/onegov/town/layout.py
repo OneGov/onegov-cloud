@@ -174,7 +174,7 @@ class DefaultLayout(Layout):
             return [
                 Link(_(u'Logout'), request.link(self.town, 'logout')),
                 Link(_(u'Images'), request.link(ImageCollection(self.app))),
-                Link(_(u'Settings'), request.link(self.town, 'settings')),
+                Link(_(u'Settings'), request.link(self.town, 'einstellungen')),
                 Link(u'OneGov', 'http://www.onegov.ch'),
                 Link(u'Seantis GmbH', 'https://www.seantis.ch')
             ]

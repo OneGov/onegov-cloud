@@ -19,7 +19,7 @@ class SettingsForm(Form):
 
 
 @TownApp.form(
-    model=Town, name='settings', template='form.pt', permission=Secret,
+    model=Town, name='einstellungen', template='form.pt', permission=Secret,
     form=SettingsForm)
 def handle_settings(self, request, form):
     """ Handles the GET and POST login requests. """
