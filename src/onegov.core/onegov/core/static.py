@@ -45,6 +45,11 @@ class StaticFile(object):
     def __init__(self, path):
         self.path = path
 
+    @property
+    def absorb(self):
+        # alias for morepath
+        return self.path
+
     @staticmethod
     def from_application(app, absorb):
         """ Absorbs all /static/* paths and returns :class:`StaticFile`
@@ -61,7 +66,7 @@ class StaticFile(object):
         path = os.path.join(app.static_files, absorb)
 
         if os.path.isfile(path) and is_subpath(app.static_files, path):
-            return StaticFile(path)
+            return StaticFile(os.path.relpath(path, start=app.static_files))
         else:
             return None
 
@@ -74,4 +79,4 @@ def get_static_file(app, absorb):
 @Framework.view(model=StaticFile, render=render_file, permission=Public)
 def view_static_file(self, request):
     """ Renders the given static file in the browser. """
-    return self.path
+    return os.path.join(request.app.static_files, self.path)

@@ -32,10 +32,7 @@ def test_static_file(tempdir):
     assert StaticFile.from_application(app, 'robots.txt') is None
 
     app.serve_static_files = True
-    assert StaticFile.from_application(app, 'robots.txt').path == os.path.join(
-        app.static_files, 'robots.txt'
-    )
-
+    assert StaticFile.from_application(app, 'robots.txt').path == 'robots.txt'
     assert StaticFile.from_application(app, '../robots.txt') is None
 
 
