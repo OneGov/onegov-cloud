@@ -46,11 +46,11 @@ class Page(Base, TimestampMixin):
     #:
     #: we would use 'metadata' here as a name, but that name is reserved
     #: by SQLAlchemy and can't be used by us
-    meta = Column(JSON, nullable=True)
+    meta = Column(JSON, nullable=False, default=dict)
 
     #: content associated with the page - not loaded by default so this one is
     #: useful for actually storing large bodies of data
-    content = deferred(Column(JSON, nullable=True))
+    content = deferred(Column(JSON, nullable=False, default=dict))
 
     #: the child pages of this page
     children = relationship(

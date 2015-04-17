@@ -20,6 +20,16 @@ class PageCollection(object):
         """ Returns a query using :class:`onegov.page.model.Page`. """
         return self.session.query(Page)
 
+    def by_id(self, page_id):
+        """ Takes the given page id and returns the page. Try to keep this
+        id away from the public. It's not a security problem if it leaks, but
+        it's not something the public can necessarly count on.
+
+        If possible use the path instead.
+
+        """
+        return self.query().filter(Page.id == page_id).first()
+
     def by_path(self, path):
         """ Takes a path and returns the page associated with it.
 
