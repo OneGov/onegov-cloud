@@ -3,6 +3,7 @@ import collections
 from cached_property import cached_property
 from datetime import timedelta
 from more.webassets.core import IncludeRequest
+from morepath.security import NO_IDENTITY
 from onegov.core import utils
 from onegov.core.crypto import random_token
 from wtforms.csrf.session import SessionCSRF
@@ -277,3 +278,16 @@ class CoreRequest(IncludeRequest):
     def alert(self, text):
         """ Adds an alert message. """
         self.message(text, 'alert')
+
+    @cached_property
+    def is_logged_in(self):
+        """ Returns True if the current request is logged in at all. """
+        return self.identity is not NO_IDENTITY
+
+    @cached_property
+    def current_role(self):
+        """ Returns the user-role of the current request, if logged in.
+        Otherwise, None is returned.
+
+        """
+        return self.is_logged_in and self.identity.role or None
