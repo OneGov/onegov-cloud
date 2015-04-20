@@ -11,7 +11,7 @@ from uuid import uuid4
 @pytest.yield_fixture(scope="session")
 def postgres():
     """ Starts a postgres server using `testing.postgresql \
-    <https://pypi.python.org/pypi/testing.postgresql/`_ once per test session.
+    <https://pypi.python.org/pypi/testing.postgresql/>`_ once per test session.
 
     """
 
