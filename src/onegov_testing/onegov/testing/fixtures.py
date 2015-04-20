@@ -31,6 +31,10 @@ def postgres_dsn(postgres):
 
     transaction.abort()
 
+    manager = SessionManager(postgres.url(), None)
+    manager.session().close_all()
+    manager.dispose()
+
     engine = create_engine(postgres.url())
     results = engine.execute(
         "SELECT DISTINCT table_schema FROM information_schema.tables")
