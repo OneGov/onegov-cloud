@@ -1,5 +1,6 @@
 import pytest
 import tempfile
+import transaction
 import shutil
 
 from onegov.core.orm import Base, SessionManager
@@ -27,6 +28,8 @@ def postgres_dsn(postgres):
 
     """
     yield postgres.url()
+
+    transaction.abort()
 
     engine = create_engine(postgres.url())
     results = engine.execute(
@@ -60,7 +63,7 @@ def session_manager(postgres_dsn):
 
 
 @pytest.yield_fixture(scope="function")
-def session(postgres_dsn):
+def session(session_manager):
     """ Provides an SQLAlchemy session, scoped to a random schema.
 
     This is the fixture you usually want to use for ORM tests.
