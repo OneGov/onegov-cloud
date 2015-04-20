@@ -11,7 +11,7 @@ from uuid import uuid4
 
 
 @pytest.yield_fixture(scope="function")
-def town_app(postgres_dsn):
+def town_app(postgres_dsn, temporary_directory):
     config = setup()
     config.scan(more.webassets)
     config.scan(onegov.core)
@@ -22,7 +22,11 @@ def town_app(postgres_dsn):
     app.namespace = 'test_' + uuid4().hex
     app.configure_application(
         dsn=postgres_dsn,
-        filestorage='fs.memoryfs.MemoryFS',
+        filestorage='fs.osfs.OSFS',
+        filestorage_options={
+            'root_path': './file-storage',
+            'create': True
+        },
         identity_secure=False,
         disable_memcached=True
     )
