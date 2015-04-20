@@ -8,7 +8,7 @@ from onegov.core import Framework
 from webtest import TestApp as Client
 
 
-def test_independence(tempdir):
+def test_independence(temporary_directory):
 
     class App(Framework):
         pass
@@ -17,7 +17,7 @@ def test_independence(tempdir):
     app.configure_application(
         filestorage='fs.osfs.OSFS',
         filestorage_options={
-            'root_path': tempdir
+            'root_path': temporary_directory
         }
     )
     app.namespace = 'tests'
@@ -34,13 +34,15 @@ def test_independence(tempdir):
     app.set_application_id('tests/foo')
     assert app.filestorage.getcontents('document.txt') == b'foo'
 
-    assert os.path.isdir(os.path.join(tempdir, 'tests-foo'))
-    assert os.path.isdir(os.path.join(tempdir, 'tests-bar'))
-    assert os.path.isfile(os.path.join(tempdir, 'tests-foo/document.txt'))
-    assert os.path.isfile(os.path.join(tempdir, 'tests-bar/document.txt'))
+    assert os.path.isdir(os.path.join(temporary_directory, 'tests-foo'))
+    assert os.path.isdir(os.path.join(temporary_directory, 'tests-bar'))
+    assert os.path.isfile(
+        os.path.join(temporary_directory, 'tests-foo/document.txt'))
+    assert os.path.isfile(
+        os.path.join(temporary_directory, 'tests-bar/document.txt'))
 
 
-def test_filestorage(tempdir):
+def test_filestorage(temporary_directory):
 
     config = setup()
 
@@ -78,7 +80,7 @@ def test_filestorage(tempdir):
     app.configure_application(
         filestorage='fs.osfs.OSFS',
         filestorage_options={
-            'root_path': tempdir
+            'root_path': temporary_directory
         },
         identity_secure=False
     )

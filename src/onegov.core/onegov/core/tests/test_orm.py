@@ -17,8 +17,8 @@ from webtest import TestApp as Client
 from webob.exc import HTTPUnauthorized
 
 
-def test_is_valid_schema(dsn):
-    mgr = SessionManager(dsn, None)
+def test_is_valid_schema(postgres_dsn):
+    mgr = SessionManager(postgres_dsn, None)
     assert not mgr.is_valid_schema('pg_test')
     assert not mgr.is_valid_schema('-- or 1=1')
     assert not mgr.is_valid_schema('0')
@@ -29,7 +29,7 @@ def test_is_valid_schema(dsn):
     assert mgr.is_valid_schema('my-schema')
 
 
-def test_create_schema(dsn):
+def test_create_schema(postgres_dsn):
     Base = declarative_base()
 
     class Document(Base):
@@ -38,7 +38,7 @@ def test_create_schema(dsn):
         id = Column(Integer, primary_key=True)
         title = Column(Text)
 
-    mgr = SessionManager(dsn, Base)
+    mgr = SessionManager(postgres_dsn, Base)
 
     # we need a schema to use the session manager and it can't be 'public'
     mgr.set_current_schema('testing')
@@ -69,7 +69,7 @@ def test_create_schema(dsn):
     assert 'document' in schema_tables('new')
 
 
-def test_schema_bound_session(dsn):
+def test_schema_bound_session(postgres_dsn):
     Base = declarative_base()
 
     class Document(Base):
@@ -78,7 +78,7 @@ def test_schema_bound_session(dsn):
         id = Column(Integer, primary_key=True)
         title = Column(Text)
 
-    mgr = SessionManager(dsn, Base)
+    mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('foo')
     session = mgr.session()
 
@@ -100,10 +100,10 @@ def test_schema_bound_session(dsn):
     mgr.dispose()
 
 
-def test_session_scope(dsn):
+def test_session_scope(postgres_dsn):
     Base = declarative_base()
 
-    mgr = SessionManager(dsn, Base)
+    mgr = SessionManager(postgres_dsn, Base)
 
     mgr.set_current_schema('foo')
     foo_session = mgr.session()
@@ -125,7 +125,7 @@ def test_session_scope(dsn):
     mgr.dispose()
 
 
-def test_orm_scenario(dsn):
+def test_orm_scenario(postgres_dsn):
     # test a somewhat complete ORM scenario in which create and read data
     # for different applications
     Base = declarative_base()
@@ -189,7 +189,7 @@ def test_orm_scenario(dsn):
     config.commit()
 
     app = App()
-    app.configure_application(dsn=dsn, base=Base)
+    app.configure_application(dsn=postgres_dsn, base=Base)
     app.namespace = 'municipalities'
 
     c = Client(app)
@@ -225,7 +225,7 @@ def test_orm_scenario(dsn):
     app.session_manager.dispose()
 
 
-def test_json_type(dsn):
+def test_json_type(postgres_dsn):
     Base = declarative_base()
 
     class Test(Base):
@@ -234,7 +234,7 @@ def test_json_type(dsn):
         id = Column(Integer, primary_key=True)
         data = Column(JSON, nullable=True)
 
-    mgr = SessionManager(dsn, Base)
+    mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
 
     session = mgr.session()
@@ -264,7 +264,7 @@ def test_json_type(dsn):
     mgr.dispose()
 
 
-def test_uuid_type(dsn):
+def test_uuid_type(postgres_dsn):
     Base = declarative_base()
 
     class Test(Base):
@@ -272,7 +272,7 @@ def test_uuid_type(dsn):
 
         id = Column(UUID, primary_key=True, default=uuid.uuid4)
 
-    mgr = SessionManager(dsn, Base)
+    mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
 
     session = mgr.session()
@@ -286,7 +286,7 @@ def test_uuid_type(dsn):
     mgr.dispose()
 
 
-def test_utc_datetime_naive(dsn):
+def test_utc_datetime_naive(postgres_dsn):
     Base = declarative_base()
 
     class Test(Base):
@@ -295,7 +295,7 @@ def test_utc_datetime_naive(dsn):
         id = Column(Integer, primary_key=True)
         date = Column(UTCDateTime)
 
-    mgr = SessionManager(dsn, Base)
+    mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
 
     session = mgr.session()
@@ -308,7 +308,7 @@ def test_utc_datetime_naive(dsn):
     mgr.dispose()
 
 
-def test_utc_datetime_aware(dsn):
+def test_utc_datetime_aware(postgres_dsn):
     Base = declarative_base()
 
     class Test(Base):
@@ -317,7 +317,7 @@ def test_utc_datetime_aware(dsn):
         id = Column(Integer, primary_key=True)
         date = Column(UTCDateTime)
 
-    mgr = SessionManager(dsn, Base)
+    mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
 
     session = mgr.session()
@@ -334,7 +334,7 @@ def test_utc_datetime_aware(dsn):
     mgr.dispose()
 
 
-def test_timestamp_mixin(dsn):
+def test_timestamp_mixin(postgres_dsn):
     Base = declarative_base()
 
     class Test(Base, TimestampMixin):
@@ -342,7 +342,7 @@ def test_timestamp_mixin(dsn):
 
         id = Column(Integer, primary_key=True)
 
-    mgr = SessionManager(dsn, Base)
+    mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('testing')
 
     session = mgr.session()

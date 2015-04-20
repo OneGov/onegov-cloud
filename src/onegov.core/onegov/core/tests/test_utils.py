@@ -24,8 +24,8 @@ def test_rchop():
     assert utils.rchop('foobar', 'bar') == 'foo'
 
 
-def test_touch(tempdir):
-    path = os.path.join(tempdir, 'test.txt')
+def test_touch(temporary_directory):
+    path = os.path.join(temporary_directory, 'test.txt')
 
     assert not os.path.isfile(path)
 

@@ -31,7 +31,7 @@ def test_get_filename():
     assert get_filename(theme, {'x': 1}) != get_filename(theme, {'x': 2})
 
 
-def test_theme_application(tempdir):
+def test_theme_application(temporary_directory):
     config = setup()
 
     class App(Framework):
@@ -60,7 +60,7 @@ def test_theme_application(tempdir):
     app.configure_application(
         filestorage='fs.osfs.OSFS',
         filestorage_options={
-            'root_path': tempdir
+            'root_path': temporary_directory
         }
     )
     app.namespace = 'tests'

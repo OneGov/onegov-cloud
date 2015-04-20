@@ -8,45 +8,49 @@ from webob import Request
 from webob.acceptparse import Accept
 
 
-def test_pofiles(tempdir):
-    os.makedirs(os.path.join(tempdir, 'de/LC_MESSAGES'))
-    utils.touch(os.path.join(tempdir, 'de/LC_MESSAGES/onegov.test.po'))
+def test_pofiles(temporary_directory):
+    os.makedirs(os.path.join(temporary_directory, 'de/LC_MESSAGES'))
+    utils.touch(
+        os.path.join(temporary_directory, 'de/LC_MESSAGES/onegov.test.po'))
 
-    result = list(i18n.pofiles(tempdir))
+    result = list(i18n.pofiles(temporary_directory))
     assert result[0][0] == 'de'
     assert result[0][1].endswith('onegov.test.po')
 
 
-def test_get_translations(tempdir):
-    os.makedirs(os.path.join(tempdir, 'de/LC_MESSAGES'))
+def test_get_translations(temporary_directory):
+    os.makedirs(os.path.join(temporary_directory, 'de/LC_MESSAGES'))
     po = polib.POFile()
     po.append(polib.POEntry(
         msgid=u'Welcome',
         msgstr=u'Willkommen'
     ))
-    po.save(os.path.join(tempdir, 'de/LC_MESSAGES/onegov.test.po'))
+    po.save(os.path.join(temporary_directory, 'de/LC_MESSAGES/onegov.test.po'))
 
-    os.makedirs(os.path.join(tempdir, 'fr/LC_MESSAGES'))
+    os.makedirs(os.path.join(temporary_directory, 'fr/LC_MESSAGES'))
     po = polib.POFile()
     po.append(polib.POEntry(
         msgid=u'Welcome',
         msgstr=u'Bienvenue'
     ))
-    po.save(os.path.join(tempdir, 'fr/LC_MESSAGES/onegov.test.po'))
+    po.save(os.path.join(temporary_directory, 'fr/LC_MESSAGES/onegov.test.po'))
 
-    os.makedirs(os.path.join(tempdir, 'es/LC_MESSAGES'))
+    os.makedirs(os.path.join(temporary_directory, 'es/LC_MESSAGES'))
     po = polib.POFile()
     po.append(polib.POEntry(
         msgid=u'Welcome',
         msgstr=u'Bienvenido'
     ))
-    po.save(os.path.join(tempdir, 'es/LC_MESSAGES/onegov.somethingelse.po'))
+    po.save(os.path.join(
+        temporary_directory, 'es/LC_MESSAGES/onegov.somethingelse.po'))
 
-    translations = i18n.get_translations('onegov.somethingelse', tempdir)
+    translations = i18n.get_translations(
+        'onegov.somethingelse', temporary_directory)
+
     assert list(translations.keys()) == list(['es'])
     translations['es'].gettext(u'Welcome') == u'Bienvenido'
 
-    translations = i18n.get_translations('onegov.test', tempdir)
+    translations = i18n.get_translations('onegov.test', temporary_directory)
     assert list(sorted(translations.keys())) == list(sorted(['de', 'fr']))
 
     translations['de'].gettext(u'Welcome') == u'Willkommen'

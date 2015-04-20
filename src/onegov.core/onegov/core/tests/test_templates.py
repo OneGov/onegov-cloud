@@ -10,13 +10,13 @@ from translationstring import TranslationStringFactory
 from webtest import TestApp as Client
 
 
-def test_chameleon_with_translation(tempdir):
+def test_chameleon_with_translation(temporary_directory):
     # Test chameleon in a real scenario with templating and translations
 
-    templates = os.path.join(tempdir, 'templates')
+    templates = os.path.join(temporary_directory, 'templates')
     os.mkdir(templates)
 
-    locale = os.path.join(tempdir, 'locale')
+    locale = os.path.join(temporary_directory, 'locale')
     os.makedirs(os.path.join(locale, 'de/LC_MESSAGES'))
 
     po = polib.POFile()

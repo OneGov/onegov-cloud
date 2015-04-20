@@ -9,14 +9,14 @@ from onegov.core.static import StaticFile
 from webtest import TestApp as Client
 
 
-def test_static_file(tempdir):
+def test_static_file(temporary_directory):
 
     config = setup()
 
     class App(Framework):
         testing_config = config
         serve_static_files = True
-        static_files = tempdir
+        static_files = temporary_directory
 
     config.commit()
 
@@ -25,7 +25,7 @@ def test_static_file(tempdir):
     app.namespace = 'test'
     app.set_application_id('test/test')
 
-    with open(os.path.join(tempdir, 'robots.txt'), 'w') as f:
+    with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')
 
     app.serve_static_files = False
@@ -36,19 +36,19 @@ def test_static_file(tempdir):
     assert StaticFile.from_application(app, '../robots.txt') is None
 
 
-def test_static_file_app(tempdir):
+def test_static_file_app(temporary_directory):
     config = setup()
 
     class App(Framework):
         testing_config = config
         serve_static_files = True
-        static_files = tempdir
+        static_files = temporary_directory
 
     config.scan(more.webassets)
     config.scan(onegov.core)
     config.commit()
 
-    with open(os.path.join(tempdir, 'robots.txt'), 'w') as f:
+    with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')
 
     app = App()
@@ -71,13 +71,13 @@ def test_static_file_app(tempdir):
     assert c.get('/static/humans.txt', expect_errors=True).status_code == 404
 
 
-def test_root_file_app(tempdir):
+def test_root_file_app(temporary_directory):
     config = setup()
 
     class App(Framework):
         testing_config = config
         serve_static_files = True
-        static_files = tempdir
+        static_files = temporary_directory
 
     class RobotsTxt(StaticFile):
         pass
@@ -90,7 +90,7 @@ def test_root_file_app(tempdir):
     config.scan(onegov.core)
     config.commit()
 
-    with open(os.path.join(tempdir, 'robots.txt'), 'w') as f:
+    with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')
 
     app = App()
