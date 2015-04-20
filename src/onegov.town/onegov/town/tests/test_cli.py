@@ -2,11 +2,11 @@ from click.testing import CliRunner
 from onegov.town.cli import cli
 
 
-def test_add_town(postgres_server_url):
+def test_add_town(postgres_dsn):
 
     runner = CliRunner()
     result = runner.invoke(cli, [
-        '--dsn', postgres_server_url,
+        '--dsn', postgres_dsn,
         '--schema', 'test-add-town',
         'add', 'Govikon'
     ])
@@ -15,7 +15,7 @@ def test_add_town(postgres_server_url):
     assert 'Govikon was added to the test-add-town schema' in result.output
 
     result = runner.invoke(cli, [
-        '--dsn', postgres_server_url,
+        '--dsn', postgres_dsn,
         '--schema', 'test-add-town',
         'add', 'Govikon'
     ])

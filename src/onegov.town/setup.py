@@ -48,9 +48,7 @@ setup(
     ],
     extras_require=dict(
         test=[
-            'pytest',
-            'pytest-cov',
-            'testing.postgresql',
+            'onegov.testing',
             'mock',
             'webtest',
             'pyquery'
