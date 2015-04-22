@@ -129,14 +129,25 @@ class Layout(object):
 
     @cached_property
     def image_upload_url(self):
+        """ Returns the url to the image upload action. """
         return self.request.link(ImageCollection(self.app), name='upload')
 
     @cached_property
     def homepage_url(self):
+        """ Returns the url to the main page. """
         return self.request.link(self.app.town)
 
     def markdown(self, text):
+        """ Takes the given markdown text and renders it. """
         return mistune.markdown(text)
+
+    @cached_property
+    def csrf_token(self):
+        """ Returns a csrf token for use with DELETE links (forms do their
+        own thing automatically).
+
+        """
+        return self.request.new_csrf_token()
 
 
 class DefaultLayout(Layout):

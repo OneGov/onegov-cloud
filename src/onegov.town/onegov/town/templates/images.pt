@@ -18,7 +18,7 @@
                             <img src="${image.src}" />
                         </a>
                         <a class="delete confirm" 
-                           ic-delete-from="${image.src}" 
+                           ic-delete-from="${image.src}?csrf-token=${layout.csrf_token}" 
                            ic-on-success="$('#image-${repeat.image.index}').remove();"
                            data-confirm="Do you really want to delete the image?"
                            data-confirm-yes="Delete Image"
