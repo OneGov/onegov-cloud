@@ -72,6 +72,10 @@ def test_filestorage(temporary_directory):
                 application_id=request.app.application_id
             ))
 
+    @App.view(model=Model, name='csrf-token')
+    def view_csrf_token(self, request):
+        return request.new_csrf_token()
+
     config.scan(onegov.core)
     config.scan(more.webassets)
     config.commit()
@@ -110,8 +114,20 @@ def test_filestorage(temporary_directory):
     assert client.get('/files/readme').status_code == 200
     assert client.delete(
         '/files/readme', expect_errors=True).status_code == 403
+
+    anonymous_csrf_token = client.get('/csrf-token').text.strip()
     client.get('/login')
-    assert client.delete('/files/readme').status_code == 200
+    logged_in_csrf_token = client.get('/csrf-token').text.strip()
+
+    assert client.delete(
+        '/files/readme', expect_errors=True).status_code == 403
+
+    protected_url = '/files/readme?csrf-token={}'.format(anonymous_csrf_token)
+    assert client.delete(protected_url, expect_errors=True).status_code == 403
+
+    protected_url = '/files/readme?csrf-token={}'.format(logged_in_csrf_token)
+    assert client.delete(protected_url, expect_errors=True).status_code == 200
+
     assert client.get('/files/readme', expect_errors=True).status_code == 404
     assert client.delete(
         '/files/readme', expect_errors=True).status_code == 404

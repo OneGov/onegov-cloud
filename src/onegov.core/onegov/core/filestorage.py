@@ -11,6 +11,7 @@ from onegov.core import Framework
 from onegov.core.crypto import random_token
 from onegov.core.utils import render_file
 from onegov.core.security import Public, Private
+from webob.exc import HTTPForbidden
 
 
 def random_filename():
@@ -62,5 +63,18 @@ def delete_static_file(self, request):
     """ Deletes the given filestorage file. By default the permission is
     ``Private``. An application using the framework can override this though.
 
+    Since a DELETE can only be sent through AJAX it is protected by the
+    same-origin policy. That means that we don't need to use any CSRF
+    protection here.
+
+    That being said, browser bugs and future changes in the HTML standard
+    make it possible for this to happen one day. Therefore, a time-limited
+    token must be passed as query parameter to this function.
+
+    New tokens can be acquired through ``request.new_csrf_token``.
+
     """
+    if not request.is_valid_csrf_token():
+        return HTTPForbidden()
+
     request.app.filestorage.remove(self.path)

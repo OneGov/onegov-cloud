@@ -2,6 +2,11 @@ import collections
 
 from cached_property import cached_property
 from datetime import timedelta
+from itsdangerous import (
+    BadSignature,
+    SignatureExpired,
+    TimestampSigner
+)
 from more.webassets.core import IncludeRequest
 from morepath.security import NO_IDENTITY
 from onegov.core import utils
@@ -291,3 +296,41 @@ class CoreRequest(IncludeRequest):
 
         """
         return self.is_logged_in and self.identity.role or None
+
+    @cached_property
+    def csrf_salt(self):
+        return (self.current_role or 'anonymous') + self.app.application_id
+
+    def new_csrf_token(self):
+        """ Returns a new CSRF token. A CSRF token can be verified
+        using :meth:`is_valid_csrf_token`.
+
+        Note that forms do their own CSRF protection. This is meant
+        for CSRF protection outside of forms.
+
+        """
+        # use app.identity_secret here, because that's being used for
+        # more.itsdangerous, which uses the same algorithm
+        signer = TimestampSigner(self.app.identity_secret, salt=self.csrf_salt)
+        return signer.sign(random_token())
+
+    def is_valid_csrf_token(self, signed_value=None):
+        """ Validates the given CSRF token and returns True if it was
+        created by :meth:`new_csrf_token`.
+
+        If no signed_value is passed, it is taken from
+        request.params.get('csrf-token').
+
+        """
+        signed_value = signed_value or self.params.get('csrf-token')
+
+        if not signed_value:
+            return False
+
+        signer = TimestampSigner(self.app.identity_secret, salt=self.csrf_salt)
+        try:
+            signer.unsign(signed_value, max_age=self.app.csrf_time_limit)
+        except (SignatureExpired, BadSignature):
+            return False
+        else:
+            return True

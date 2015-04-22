@@ -67,7 +67,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             browser_session=browser_session,
             filestorage=filestorage,
             i18n=i18n,
-            theme=theme
+            theme=theme,
         )
 
     @property
