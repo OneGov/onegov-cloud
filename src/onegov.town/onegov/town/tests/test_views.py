@@ -4,7 +4,6 @@ import onegov.town
 
 from mock import patch
 from morepath import setup
-from pyquery import PyQuery as pq
 from webtest import TestApp as Client
 from webtest import Upload
 
@@ -103,7 +102,7 @@ def test_view_images(town_app):
 def test_startpage(town_app):
     client = Client(town_app)
 
-    links = pq(client.get('/').text).find('.top-bar-section a')
+    links = client.get('/').pyquery('.top-bar-section a')
 
     links[0].text == 'Leben & Wohnen'
     links[0].attrib.get('href') == '/gemeinde/leben-wohnen'
@@ -124,7 +123,7 @@ def test_startpage(town_app):
 def test_login(town_app):
     client = Client(town_app)
 
-    links = pq(client.get('/').text).find('.bottom-links a')
+    links = client.get('/').pyquery('.bottom-links a')
     assert links[0].text == 'Login'
 
     login_page = client.get(links[0].attrib.get('href'))
@@ -146,13 +145,13 @@ def test_login(town_app):
     index_page = login_page.form.submit().follow()
     assert "Sie wurden eingeloggt" in index_page.text
 
-    links = pq(index_page.text).find('.bottom-links a')
+    links = index_page.pyquery('.bottom-links a')
     assert links[0].text == 'Logout'
 
     index_page = client.get(links[0].attrib.get('href')).follow()
     assert "Sie wurden ausgeloggt" in index_page.text
 
-    links = pq(index_page.text).find('.bottom-links a')
+    links = index_page.pyquery('.bottom-links a')
     assert links[0].text == 'Login'
 
 
@@ -167,7 +166,7 @@ def test_settings(town_app):
     login_page.form.submit()
 
     settings_page = client.get('/einstellungen')
-    document = pq(settings_page.text)
+    document = settings_page.pyquery
 
     assert document.find('input[name=name]').val() == 'Govikon'
     assert document.find('input[name=primary_color]').val() == '#006fba'
@@ -196,7 +195,7 @@ def test_unauthorized(town_app):
     assert u"Zugriff verweigert" in unauth_page.text
     assert u"folgen Sie diesem Link um sich anzumelden" in unauth_page.text
 
-    link = pq(unauth_page.text).find('#alternate-login-link')[0]
+    link = unauth_page.pyquery('#alternate-login-link')[0]
     login_page = client.get(link.attrib.get('href'))
     login_page.form['email'] = 'editor@example.org'
     login_page.form['password'] = 'hunter2'
@@ -205,7 +204,7 @@ def test_unauthorized(town_app):
     assert u"Zugriff verweigert" in unauth_page.text
     assert u"mit einem anderen Benutzer anzumelden" in unauth_page.text
 
-    link = pq(unauth_page.text).find('#alternate-login-link')[0]
+    link = unauth_page.pyquery('#alternate-login-link')[0]
     login_page = client.get(link.attrib.get('href'))
     login_page.form['email'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
