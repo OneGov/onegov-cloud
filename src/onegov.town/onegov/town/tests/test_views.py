@@ -123,10 +123,10 @@ def test_startpage(town_app):
 def test_login(town_app):
     client = Client(town_app)
 
-    links = client.get('/').pyquery('.bottom-links a')
-    assert links[0].text == 'Login'
+    links = client.get('/').pyquery('.bottom-links a:first-child')
+    assert links.text() == 'Login'
 
-    login_page = client.get(links[0].attrib.get('href'))
+    login_page = client.get(links.attr('href'))
     login_page.form['email'] = 'admin@example.org'
     login_page.form['password'] = ''
     login_page = login_page.form.submit()
@@ -145,14 +145,14 @@ def test_login(town_app):
     index_page = login_page.form.submit().follow()
     assert "Sie wurden eingeloggt" in index_page.text
 
-    links = index_page.pyquery('.bottom-links a')
-    assert links[0].text == 'Logout'
+    links = index_page.pyquery('.bottom-links a:first-child')
+    assert links.text() == 'Logout'
 
-    index_page = client.get(links[0].attrib.get('href')).follow()
+    index_page = client.get(links.attr('href')).follow()
     assert "Sie wurden ausgeloggt" in index_page.text
 
-    links = index_page.pyquery('.bottom-links a')
-    assert links[0].text == 'Login'
+    links = index_page.pyquery('.bottom-links a:first-child')
+    assert links.text() == 'Login'
 
 
 def test_settings(town_app):
@@ -212,3 +212,85 @@ def test_unauthorized(town_app):
 
     assert settings_page.status_code == 200
     assert u"Zugriff verweigert" not in settings_page
+
+
+def test_pages(town_app):
+    client = Client(town_app)
+
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+    assert len(client.get(root_url).pyquery('.edit-bar')) == 0
+
+    login_page = client.get('/login?to={}'.format(root_url))
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    root_page = login_page.form.submit().follow()
+
+    assert len(root_page.pyquery('.edit-bar')) == 1
+    new_page = root_page.click('Thema')
+    assert "Neues Thema" in new_page
+
+    new_page.form['title'] = "Living in Govikon is Swell"
+    new_page.form['text'] = (
+        "## Living in Govikon is Really Great\n"
+        "*Experts say it's the fact that Govikon does not really exist.*"
+    )
+    page = new_page.form.submit().follow()
+
+    assert page.pyquery('h1').text() == "Living in Govikon is Swell"
+    assert page.pyquery('h2').text() == "Living in Govikon is Really Great"
+    assert page.pyquery('em').text().startswith("Experts say it's the fact")
+
+    edit_page = page.click("Bearbeiten")
+
+    assert "Thema Bearbeiten" in edit_page
+    assert "## Living in Govikon" in edit_page
+
+    edit_page.form['title'] = "Living in Govikon is Awful"
+    edit_page.form['text'] = (
+        "## Living in Govikon Really Sucks\n"
+        "*Experts say hiring more experts would help.*"
+    )
+    page = edit_page.form.submit().follow()
+
+    assert page.pyquery('h1').text() == "Living in Govikon is Awful"
+    assert page.pyquery('h2').text() == "Living in Govikon Really Sucks"
+    assert page.pyquery('em').text().startswith("Experts say hiring more")
+
+    page.click("Logout")
+    root_page = client.get(root_url)
+
+    assert len(root_page.pyquery('.edit-bar')) == 0
+
+    assert page.pyquery('h1').text() == "Living in Govikon is Awful"
+    assert page.pyquery('h2').text() == "Living in Govikon Really Sucks"
+    assert page.pyquery('em').text().startswith("Experts say hiring more")
+
+
+def test_links(town_app):
+    client = Client(town_app)
+
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+
+    login_page = client.get('/login?to={}'.format(root_url))
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    root_page = login_page.form.submit().follow()
+
+    new_link = root_page.click(u"Verknüpfung")
+    assert u"Neue Verknüpfung" in new_link
+
+    new_link.form['title'] = 'Google'
+    new_link.form['url'] = 'https://www.google.ch'
+    link = new_link.form.submit().follow()
+
+    assert "Sie wurden nicht automatisch weitergeleitet" in link
+    assert 'https://www.google.ch' in link
+
+    link.click('Logout')
+
+    root_page = client.get(root_url)
+    assert "Google" in root_page
+    google = root_page.click("Google")
+
+    assert google.status_code == 302
+    assert google.location == 'https://www.google.ch'

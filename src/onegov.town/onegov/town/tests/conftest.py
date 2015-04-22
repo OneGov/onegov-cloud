@@ -1,6 +1,7 @@
 import more.webassets
 import onegov.core
 import onegov.town
+import os.path
 import pytest
 import transaction
 
@@ -24,7 +25,7 @@ def town_app(postgres_dsn, temporary_directory):
         dsn=postgres_dsn,
         filestorage='fs.osfs.OSFS',
         filestorage_options={
-            'root_path': './file-storage',
+            'root_path': os.path.join(temporary_directory, 'file-storage'),
             'create': True
         },
         identity_secure=False,

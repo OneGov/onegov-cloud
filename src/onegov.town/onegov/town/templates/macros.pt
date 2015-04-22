@@ -11,9 +11,7 @@
         <ul class="title-area">
             <!--! this section needs to be included (even though it's empty),
             or the responsive menu bar icon won't be rendered -->
-            <li class="name" style="width: 0;">
-                <h1><a href="#"></a></h1>
-            </li>
+            <li class="name" style="width: 0;"></li>
             <li class="toggle-topbar menu-icon">
                 <a href="#"><span>Menu</span></a>
             </li>
