@@ -27,6 +27,7 @@ dependencies = {
     'psycopg2',
     'pylibmc',
     'pylru',
+    'pyreact',
     'sqlalchemy>=0.9',
     'translationstring',
     'unidecode',
