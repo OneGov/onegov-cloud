@@ -58,34 +58,52 @@ class TownApp(Framework):
 
     @cached_property
     def webassets_bundles(self):
+
+        confirm = Bundle(
+            'js/confirm.jsx',
+            filters='jsx',
+            output='bundles/confirm.bundle.js'
+        )
+
+        dropzone = Bundle(
+            'js/dropzone.js',
+            filters='jsmin',
+            output='bundles/dropzone.bundle.js'
+        )
+
+        markdown_editor = Bundle(
+            'js/editor.js',
+            'js/marked.js',
+            'js/load-editor.js',
+            filters='jsmin',
+            output='bundles/markdown-editor.bundle.js'
+        )
+
+        markdown_editor_theme = Bundle(
+            'css/editor.css',
+            filters='cssmin',
+            output='bundles/markdown-editor-theme.bundle.css'
+        )
+
+        common = Bundle(
+            'js/modernizr.js',
+            'js/jquery.js',
+            'js/fastclick.js',
+            'js/foundation.js',
+            'js/intercooler.js',
+            'js/underscore.js',
+            'js/react.js',
+            confirm,
+            'js/common.js',
+            filters='jsmin',
+            output='bundles/common.bundle.js'
+        )
+
         return {
-            'common': Bundle(
-                'js/modernizr.js',
-                'js/jquery.js',
-                'js/fastclick.js',
-                'js/foundation.js',
-                'js/intercooler.js',
-                'js/common.js',
-                filters='jsmin',
-                output='bundles/common.bundle.js'
-            ),
-            'dropzone': Bundle(
-                'js/dropzone.js',
-                filters='jsmin',
-                output='bundles/dropzone.bundle.js'
-            ),
-            'markdown-editor': Bundle(
-                'js/editor.js',
-                'js/marked.js',
-                'js/load-editor.js',
-                filters='jsmin',
-                output='bundles/markdown-editor.bundle.js'
-            ),
-            'markdown-editor-theme': Bundle(
-                'css/editor.css',
-                filters='cssmin',
-                output='bundles/markdown-editor-theme.bundle.css'
-            )
+            'common': common,
+            'dropzone': dropzone,
+            'markdown-editor': markdown_editor,
+            'markdown-editor-theme': markdown_editor_theme
         }
 
 

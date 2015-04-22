@@ -17,7 +17,13 @@
                         <a class="th" href="${image.src}" tal:condition="image">
                             <img src="${image.src}" />
                         </a>
-                        <a class="delete" ic-delete-from="${image.src}" ic-on-success="$('#image-${repeat.image.index}').remove();">✗</a>
+                        <a class="delete confirm" 
+                           ic-delete-from="${image.src}" 
+                           ic-on-success="$('#image-${repeat.image.index}').remove();"
+                           data-confirm="Do you really want to delete the image?"
+                           data-confirm-yes="Delete Image"
+                           data-confirm-no="Cancel"
+                           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">✗</a>
                     </li>
                 </ul>
                 <tal:block condition="not:images">

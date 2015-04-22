@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-04-17 17:42+0200\n"
+"POT-Creation-Date: 2015-04-22 16:05+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -49,7 +49,19 @@ msgstr "Hochladen"
 msgid "All Images"
 msgstr "Alle Bilder"
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:23
+msgid "Do you really want to delete the image?"
+msgstr "Möchten Sie das Bild wirklich löschen?"
+
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:24
+msgid "Delete Image"
+msgstr "Bild Löschen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:25
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:30
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
 
@@ -57,12 +69,12 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:55
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:90
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:53
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:88
 msgid "Submit"
 msgstr "Absenden"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:83
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:81
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
@@ -78,13 +90,17 @@ msgstr "Hinzufügen"
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
-msgstr "Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch auf den folgende Verweis weitergeleitet:"
+msgstr ""
+"Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
+"auf den folgende Verweis weitergeleitet:"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:53
 msgid ""
 "You are not automatically redirected so you have a chance to edit or delete "
 "this link."
-msgstr "Sie wurden nicht automatisch weitergeleitet damit Sie eine Chance haben den Verweis zu bearbeiten oder zu löschen."
+msgstr ""
+"Sie wurden nicht automatisch weitergeleitet damit Sie eine Chance haben den "
+"Verweis zu bearbeiten oder zu löschen."
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:17
 msgid "Title"
