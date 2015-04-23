@@ -25,11 +25,12 @@ def handle_settings(self, request, form):
     """ Handles the GET and POST login requests. """
 
     if form.submitted(request):
-        self.name = form.name.data
-        self.logo_url = form.logo_url.data
-        self.theme_options['primary-color'] = form.primary_color.data.get_hex()
+        with request.app.update_town() as town:
+            town.name = form.name.data
+            town.logo_url = form.logo_url.data
+            town.theme_options['primary-color']\
+                = form.primary_color.data.get_hex()
 
-        request.app.update_town(self)
         request.success(_(u"Your changes were saved."))
     else:
         form.name.data = self.name

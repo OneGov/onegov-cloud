@@ -8,6 +8,7 @@ use different templating languages.
 """
 
 from cached_property import cached_property
+from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.town.model import Town
@@ -39,11 +40,22 @@ class TownApp(Framework):
         """ Loads the town from the SQL database. """
         return self.session().query(Town).first()
 
-    def update_town(self, town):
-        """ Takes the given town object (may be from cache) and writes all
-        changes to the SQL database. """
+    @contextmanager
+    def update_town(self):
+        """ Yields the current town for an update. Use this instead of
+        updating the town directly, because caching is involved. It's rather
+        easy to otherwise update it wrongly.
+
+        Example::
+            with app.update_town() as town:
+                town.name = 'New Name'
+
+        """
+
         session = self.session()
-        session.merge(town)
+
+        town = session.merge(self.town)
+        yield town
         session.flush()
 
         self.cache.delete('town')
