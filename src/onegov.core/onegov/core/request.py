@@ -206,6 +206,14 @@ class CoreRequest(IncludeRequest):
 
         return form_class(self.POST, meta=meta)
 
+    def translate(self, text):
+        """ Transalates the given text, if it's a translatable text. """
+
+        if not hasattr(text, 'domain'):
+            return text
+
+        return self.get_translate().gettext(text)
+
     def get_translate(self, for_chameleon=False):
         """ Returns the translate method to the given request, or None
         if no such method is availabe.
