@@ -59,6 +59,8 @@ input[type=color] {
 
     a:after {
         content: ' |';
+        display: inline-block;
+        margin-left: .4em;
     }
 
     a:last-child:after {
