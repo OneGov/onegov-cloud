@@ -80,6 +80,29 @@ input[type=color] {
         margin-bottom: 0;
         margin-left: 1px;
     }
+
+    a:before {
+        font-family: 'FontAwesome';
+        margin-right: .4em;
+    }
+
+    .new-page:before {
+        content: '\f0f6';
+    }
+
+    .new-link:before {
+        content: '\f0c1';
+    }
+
+    .edit-page:before,
+    .edit-link:before {
+        content: '\f040';
+    }
+
+    .delete-link:before,
+    .delete-page:before {
+        content: '\f014';
+    }
 }
 
 /*

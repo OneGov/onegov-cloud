@@ -65,21 +65,25 @@ def get_links(self, request, action):
 
     if self.meta['type'] in ('town-root', 'page') and action == 'add':
         yield Link(
-            _("Page"), request.link(PageEditor('new', self))
+            _("Page"), request.link(PageEditor('new', self)),
+            classes=('new-page', )
         )
 
         yield Link(
-            _("Link"), request.link(LinkEditor('new', self))
+            _("Link"), request.link(LinkEditor('new', self)),
+            classes=('new-link', )
         )
 
     if self.meta['type'] == 'town-root' and action == 'edit':
         yield Link(
-            _("Edit"), request.link(PageEditor('edit', self))
+            _("Edit"), request.link(PageEditor('edit', self)),
+            classes=('edit-page', )
         )
 
     if self.meta['type'] == 'page' and action == 'edit':
         yield Link(
-            _("Edit"), request.link(PageEditor('edit', self))
+            _("Edit"), request.link(PageEditor('edit', self)),
+            classes=('edit-page', )
         )
 
         if self.children:
@@ -92,23 +96,24 @@ def get_links(self, request, action):
 
         yield Link(
             _("Delete"), request.link(self), request_method='DELETE',
-            classes=['confirm'],
+            classes=('confirm', 'delete-page'),
             attributes={
                 'data-confirm': _("Do you really want to delete this page?"),
                 'data-confirm-yes': _("Delete Page"),
                 'data-confirm-no': _("Cancel"),
                 'data-confirm-extra': extra_warning,
                 'redirect-after': request.link(self.parent)
-            }
+            },
         )
 
     if self.meta['type'] == 'link' and action == 'edit':
         yield Link(
-            _("Edit"), request.link(LinkEditor('edit', self))
+            _("Edit"), request.link(LinkEditor('edit', self)),
+            classes=('edit-link', )
         )
         yield Link(
             _("Delete"), request.link(self), request_method='DELETE',
-            classes=['confirm'],
+            classes=('confirm', 'delete-link'),
             attributes={
                 'data-confirm': _("Do you really want to delete this link?"),
                 'data-confirm-yes': _("Delete Link"),
