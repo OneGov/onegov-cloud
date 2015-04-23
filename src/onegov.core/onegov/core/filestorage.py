@@ -11,7 +11,6 @@ from onegov.core import Framework
 from onegov.core.crypto import random_token
 from onegov.core.utils import render_file
 from onegov.core.security import Public, Private
-from webob.exc import HTTPForbidden
 
 
 def random_filename():
@@ -74,7 +73,5 @@ def delete_static_file(self, request):
     New tokens can be acquired through ``request.new_csrf_token``.
 
     """
-    if not request.is_valid_csrf_token():
-        return HTTPForbidden()
-
+    request.assert_valid_csrf_token()
     request.app.filestorage.remove(self.path)

@@ -11,6 +11,7 @@ from more.webassets.core import IncludeRequest
 from morepath.security import NO_IDENTITY
 from onegov.core import utils
 from onegov.core.crypto import random_token
+from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
 
 
@@ -314,9 +315,10 @@ class CoreRequest(IncludeRequest):
         signer = TimestampSigner(self.app.identity_secret, salt=self.csrf_salt)
         return signer.sign(random_token())
 
-    def is_valid_csrf_token(self, signed_value=None):
-        """ Validates the given CSRF token and returns True if it was
-        created by :meth:`new_csrf_token`.
+    def assert_valid_csrf_token(self, signed_value=None):
+        """ Validates the given CSRF token and returns if it was
+        created by :meth:`new_csrf_token`. If there's a mismatch, a 403 is
+        raised.
 
         If no signed_value is passed, it is taken from
         request.params.get('csrf-token').
@@ -325,12 +327,10 @@ class CoreRequest(IncludeRequest):
         signed_value = signed_value or self.params.get('csrf-token')
 
         if not signed_value:
-            return False
+            raise HTTPForbidden()
 
         signer = TimestampSigner(self.app.identity_secret, salt=self.csrf_salt)
         try:
             signer.unsign(signed_value, max_age=self.app.csrf_time_limit)
         except (SignatureExpired, BadSignature):
-            return False
-        else:
-            return True
+            raise HTTPForbidden()
