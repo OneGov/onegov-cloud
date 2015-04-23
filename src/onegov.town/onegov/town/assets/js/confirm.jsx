@@ -26,6 +26,7 @@ var Confirmation = React.createClass({
         return (
             <div className="reveal-modal medium confirm-modal" data-reveal role="dialog">
                 <h2>{this.props.question}</h2>
+                <p>{this.props.extra}</p>
                 <a tabIndex="1" className="button secondary no">
                     {this.props.no}
                 </a>
@@ -45,14 +46,14 @@ var Confirmation = React.createClass({
     When 'yes' is clicked, the window closes and the handle_yes function
     is invoked.
 */
-var show_confirmation = function(question, yes, no, handle_yes) {
+var show_confirmation = function(question, yes, no, extra, handle_yes) {
     var id = _.random(0, 65536);
     var el = $("<div class='confirm row'>");
 
     $('body').append(el);
 
     var confirm = React.render(
-        <Confirmation question={question} yes={yes} no={no} />,
+        <Confirmation question={question} yes={yes} no={no} extra={extra} />,
         el.get(0)
     );
     var confirm_el = $(confirm.getDOMNode());
@@ -110,8 +111,9 @@ var handle_action = function(e, on_confirm) {
     var question = $(this).data('confirm');
     var yes = $(this).data('confirm-yes');
     var no = $(this).data('confirm-no');
+    var extra = $(this).data('confirm-extra');
 
-    show_confirmation(question, yes, no, on_confirm);
+    show_confirmation(question, yes, no, extra, on_confirm);
 };
 
 // hooks the targeted elements up

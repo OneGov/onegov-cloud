@@ -19,7 +19,7 @@
         <section class="top-bar-section">
             <ul class="left">
                 <tal:block repeat="link layout.top_navigation">
-                    <li tal:attributes="class link.active and 'active'">
+                    <li>
                         <a tal:attributes="href link.url">${link.text}</a>
                     </li>
                 </tal:block>
@@ -31,7 +31,7 @@
 <metal:breadcrumbs define-macro="breadcrumbs">
     <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
         <tal:block repeat="link layout.breadcrumbs">
-            <li tal:attributes="class link.active and 'current'">
+            <li>
                 <a tal:attributes="href link.url">${link.text}</a>
             </li>
         </tal:block>

@@ -266,6 +266,33 @@ def test_pages(town_app):
     assert page.pyquery('em').text().startswith("Experts say hiring more")
 
 
+def test_delete_pages(town_app):
+    client = Client(town_app)
+
+    root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
+
+    login_page = client.get('/login?to={}'.format(root_url))
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+
+    root_page = login_page.form.submit().follow()
+    new_page = root_page.click('Thema')
+
+    new_page.form['title'] = "Living in Govikon is Swell"
+    new_page.form['text'] = (
+        "## Living in Govikon is Really Great\n"
+        "*Experts say it's the fact that Govikon does not really exist.*"
+    )
+    page = new_page.form.submit().follow()
+    delete_link = page.pyquery('a[ic-delete-from]')[0].attrib['ic-delete-from']
+
+    result = client.delete(delete_link.split('?')[0], expect_errors=True)
+    assert result.status_code == 403
+
+    assert client.delete(delete_link).status_code == 200
+    assert client.delete(delete_link, expect_errors=True).status_code == 404
+
+
 def test_links(town_app):
     client = Client(town_app)
 

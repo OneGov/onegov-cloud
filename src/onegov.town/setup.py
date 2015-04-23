@@ -37,6 +37,7 @@ setup(
         'click',
         'cssmin',
         'jsmin',
+        'lxml',
         'mistune',
         'onegov.core',
         'onegov.form',
