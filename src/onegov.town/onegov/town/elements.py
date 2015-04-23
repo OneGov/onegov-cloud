@@ -33,10 +33,7 @@ class Link(object):
     def __call__(self, request):
         """ Renders the element. """
 
-        try:
-            a = builder.A(request.translate(self.text))
-        except Exception as e:
-            import pdb; pdb.set_trace()
+        a = builder.A(request.translate(self.text))
 
         if self.request_method == 'GET':
             a.attrib['href'] = self.url
