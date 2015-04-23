@@ -33,7 +33,10 @@ class Link(object):
     def __call__(self, request):
         """ Renders the element. """
 
-        a = builder.A(request.translate(self.text))
+        try:
+            a = builder.A(request.translate(self.text))
+        except Exception as e:
+            import pdb; pdb.set_trace()
 
         if self.request_method == 'GET':
             a.attrib['href'] = self.url
@@ -50,7 +53,7 @@ class Link(object):
         for key, value in self.attributes.items():
             a.attrib[key] = request.translate(value)
 
-        return tostring(a, encoding='utf-8')
+        return tostring(a)
 
 
 class Image(object):
