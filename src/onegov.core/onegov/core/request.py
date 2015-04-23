@@ -9,6 +9,7 @@ from itsdangerous import (
 )
 from more.webassets.core import IncludeRequest
 from morepath.security import NO_IDENTITY
+from onegov.core import compat
 from onegov.core import utils
 from onegov.core.crypto import random_token
 from webob.exc import HTTPForbidden
@@ -212,7 +213,10 @@ class CoreRequest(IncludeRequest):
         if not hasattr(text, 'domain'):
             return text
 
-        return self.get_translate().gettext(text)
+        if compat.PY3:
+            return self.get_translate().gettext(text)
+        else:
+            return self.get_translate().ugettext(text)  # pragma: nocoverage
 
     def get_translate(self, for_chameleon=False):
         """ Returns the translate method to the given request, or None
