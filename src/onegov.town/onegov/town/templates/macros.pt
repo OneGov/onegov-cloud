@@ -41,8 +41,7 @@
 <metal:bottom_links define-macro="bottom-links">
     <ul class="bottom-links" tal:condition="layout.bottom_links">
         <tal:block repeat="link layout.bottom_links">
-            <a tal:attributes="href link.url">${link.text}</a>
-            <tal:block tal:condition="not:repeat.link.end">|</tal:block>
+            <tal:block replace="structure link(request)"/>
         </tal:block>
     </ul>
 </metal:bottom_links>

@@ -56,9 +56,17 @@ input[type=color] {
             text-decoration: underline;
         }
     }
+
+    a:after {
+        content: ' |';
+    }
+
+    a:last-child:after {
+        content: '';
+    }
 }
 
-/* 
+/*
     pages edit bar
 */
 .edit-bar {
@@ -84,7 +92,7 @@ input[type=color] {
 */
 .image-box {
     position: relative;
-    
+
     .delete {
         background-color: $input-disabled-bg;
         border-radius: 15px;
@@ -94,7 +102,7 @@ input[type=color] {
         position: absolute;
         text-align: center;
         top: -13px;
-        width: 27px;    
+        width: 27px;
     }
 
     .delete:hover {
