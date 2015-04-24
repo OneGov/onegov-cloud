@@ -6,10 +6,10 @@
                     <tal:block condition="edit_links">
                         <button href="#" data-dropdown="edit-content" class="tiny button dropdown">
                             <tal:block condition="page.meta['type'] == 'link'" i18n:translate="">
-                                This Link
+                                Link
                             </tal:block>
                             <tal:block condition="page.meta['type'] != 'link'" i18n:translate="">
-                                This Page
+                                Page
                             </tal:block>
                         </button>
                         <ul id="edit-content" data-dropdown-content class="f-dropdown">

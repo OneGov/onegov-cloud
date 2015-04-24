@@ -223,8 +223,27 @@ input[type=color] {
     }
 
     li:first-child a:after {
-        content: '\f148';
+        content: '\f077';
         font-family: 'FontAwesome';
         margin-left: 1ex;
+    }
+
+    li {
+        a.childpage,
+        a.new-content-placeholder {
+            color: #000;
+            padding-left: 1rem;
+        }
+
+        a.childpage:before,
+        a.new-content-placeholder:before {
+            content: '\f105';
+            font-family: 'FontAwesome';
+            margin-right: 1ex;
+        }
+
+        a.new-content-placeholder {
+            display: none;
+        }
     }
 }

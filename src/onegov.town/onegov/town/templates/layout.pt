@@ -59,7 +59,7 @@
           </li>
         </ul>
       </div>
-      <div class="small-9 columns">
+      <div class="small-9 columns end">
         <div class="row">
             <div class="small-12 columns">
                 <h1><div metal:define-slot="title"></div></h1>

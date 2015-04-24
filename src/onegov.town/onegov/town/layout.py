@@ -212,13 +212,28 @@ class PageLayout(DefaultLayout):
                 self.model.parent.title, self.request.link(self.model.parent))
 
         links = [parent]
-        links.extend(
-            Link(
-                page.title,
-                self.request.link(page),
-                active=(page == self.model),
-            )
-            for page in self.model.siblings.all()
-        )
+
+        for page in self.model.siblings.all():
+            if page != self.model:
+                links.append(
+                    Link(page.title, self.request.link(page))
+                )
+            else:
+                links.append(
+                    Link(page.title, self.request.link(page), active=True)
+                )
+
+                for page in self.model.children:
+                    links.append(
+                        Link(
+                            page.title,
+                            self.request.link(page),
+                            classes=('childpage', )
+                        )
+                    )
+
+                links.append(
+                    Link("...", '#', classes=('new-content-placeholder',))
+                )
 
         return links

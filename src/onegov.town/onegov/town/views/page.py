@@ -98,7 +98,12 @@ def get_links(self, request, action):
             _("Delete"), request.link(self), request_method='DELETE',
             classes=('confirm', 'delete-page'),
             attributes={
-                'data-confirm': _("Do you really want to delete this page?"),
+                'data-confirm': _(
+                    "Do you really want to delete the page \"${title}\"?",
+                    mapping={
+                        'title': self.title
+                    }
+                ),
                 'data-confirm-yes': _("Delete Page"),
                 'data-confirm-no': _("Cancel"),
                 'data-confirm-extra': extra_warning,
@@ -115,7 +120,12 @@ def get_links(self, request, action):
             _("Delete"), request.link(self), request_method='DELETE',
             classes=('confirm', 'delete-link'),
             attributes={
-                'data-confirm': _("Do you really want to delete this link?"),
+                'data-confirm': _(
+                    "Do you really want to delete the link \"${title}\"?",
+                    mapping={
+                        'title': self.title
+                    }
+                ),
                 'data-confirm-yes': _("Delete Link"),
                 'data-confirm-no': _("Cancel"),
                 'redirect-after': request.link(self.parent)
