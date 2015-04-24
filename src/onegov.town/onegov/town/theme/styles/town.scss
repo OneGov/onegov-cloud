@@ -200,12 +200,15 @@ input[type=color] {
 }
 
 /*
-    page lead 
+    page lead
 */
 
 .page-lead {
+    color: $blockquote-font-color;
+    display: block;
     font-size: $h5-font-size;
     font-weight: 300;
+    margin-bottom: .5rem;
 }
 
 /*
@@ -213,7 +216,7 @@ input[type=color] {
 */
 
 .page-links {
-    margin-top: 1rem;
+    margin-top: .5rem;
 }
 
 /*
