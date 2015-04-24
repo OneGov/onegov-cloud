@@ -108,6 +108,11 @@ class Layout(object):
         return None
 
     @cached_property
+    def sidebar_links(self):
+        """ A list of links shown in the sidebar, used for navigation. """
+        return None
+
+    @cached_property
     def bottom_links(self):
         """ A list of links shown at the absolute bottom. Use this for
         links like administration, statistics, source-code.
@@ -193,3 +198,27 @@ class DefaultLayout(Layout):
                 Link(u'OneGov', 'http://www.onegov.ch'),
                 Link(u'Seantis GmbH', 'https://www.seantis.ch')
             ]
+
+
+class PageLayout(DefaultLayout):
+    """ The default layout, extended with the navigation of page objects. """
+
+    @cached_property
+    def sidebar_links(self):
+        if self.model.parent is None:
+            parent = Link(_(u'Homepage'), self.homepage_url)
+        else:
+            parent = Link(
+                self.model.parent.title, self.request.link(self.model.parent))
+
+        links = [parent]
+        links.extend(
+            Link(
+                page.title,
+                self.request.link(page),
+                active=(page == self.model),
+            )
+            for page in self.model.siblings.all()
+        )
+
+        return links

@@ -11,7 +11,7 @@ class Link(object):
     """ Represents a link rendered in a template. """
 
     def __init__(self, text, url, classes=None, request_method='GET',
-                 attributes={}):
+                 attributes={}, **extra):
 
         #: The text of the link
         self.text = text
@@ -26,9 +26,13 @@ class Link(object):
         #: which will lead to the use of XHR
         self.request_method = request_method
 
-        #: Extra attributes (may override other attributes set by this class).
+        #: HTML attributes (may override other attributes set by this class).
         #: Attributes which are translatable, are transalted before rendering.
         self.attributes = attributes
+
+        #: The extra dictionary is applied to the class
+        for key, value in extra.items():
+            setattr(self, key, value)
 
     def __call__(self, request):
         """ Renders the element. """

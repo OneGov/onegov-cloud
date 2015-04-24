@@ -7,7 +7,7 @@ from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
-from onegov.town.layout import DefaultLayout
+from onegov.town.layout import PageLayout
 from onegov.town.model import LinkEditor, PageEditor
 
 
@@ -25,7 +25,7 @@ def view_public_page(self, request):
         return morepath.redirect(self.content['url'])
     else:
         return {
-            'layout': DefaultLayout(self, request),
+            'layout': PageLayout(self, request),
             'title': self.title,
             'page': self,
             'children': [
@@ -37,7 +37,7 @@ def view_public_page(self, request):
 
 def view_private_page(self, request):
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': PageLayout(self, request),
         'title': self.title,
         'page': self,
         'add_links': tuple(get_links(self, request, 'add')),

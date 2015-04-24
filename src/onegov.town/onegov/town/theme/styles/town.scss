@@ -1,4 +1,14 @@
 /*
+    get rid of the jump that is introduced when switching from a site with
+    scrollbar to a site without (or vice versa)
+
+    (100vw includes the scrollbar, 100% does not)
+*/
+html {
+    margin-left: calc(100vw - 100%);
+}
+
+/*
     top navigation
 */
 
@@ -76,9 +86,9 @@ input[type=color] {
     margin-bottom: 1rem;
     margin-top: -1rem;
 
-    button {
+    button.tiny {
         margin-bottom: 0;
-        margin-left: 1px;
+        padding-left: 1rem;
     }
 
     a:before {
@@ -187,4 +197,34 @@ input[type=color] {
 .confirm-modal .button {
     margin-right: 1rem;
     margin-top: 1rem;
+}
+
+
+/*
+    sidebar navigation
+*/
+
+.sidebar {
+    ul {
+        padding-left: 1rem;
+
+        // the left side of the sidebar has to align to the text of the
+        // top navigation and the edit bar *exactly* - for some reason it
+        // doesn't here without removing 1px.. this means I'm doing something
+        // wrong, but I haven't yet found out what
+        li {
+            margin-left: -1px;
+        }
+    }
+
+    li:first-child a {
+        color: #000;
+        margin-bottom: .5rem;
+    }
+
+    li:first-child a:after {
+        content: '\f148';
+        font-family: 'FontAwesome';
+        margin-left: 1ex;
+    }
 }

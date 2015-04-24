@@ -50,15 +50,33 @@
         </div>
       </div>
     </div>
-    <div class="row">
-        <div class="small-12 columns">
-            <h1><div metal:define-slot="title"></div></h1>
+
+    <div class="row" tal:condition="layout.sidebar_links">
+      <div class="small-3 columns sidebar">
+        <ul class="side-nav">
+          <li tal:repeat="link layout.sidebar_links" tal:attributes="class getattr(link, 'active', None) and 'active' or ''">
+            <tal:block replace="structure link(request)" />
+          </li>
+        </ul>
+      </div>
+      <div class="small-9 columns">
+        <div class="row">
+            <div class="small-12 columns">
+                <h1><div metal:define-slot="title"></div></h1>
+                <div metal:define-slot="content"></div>
+            </div>
         </div>
+      </div>
     </div>
-    <div class="row">
-        <div class="small-12 columns">
-            <div metal:define-slot="content"></div>
+    <div class="row" tal:condition="not:layout.sidebar_links">
+      <div class="small-12 columns">
+        <div class="row">
+            <div class="small-12 columns">
+                <h1><div metal:define-slot="title"></div></h1>
+                <div metal:define-slot="content"></div>
+            </div>
         </div>
+      </div>
     </div>
     <div class="row">
         <div class="small-12 columns">
