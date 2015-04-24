@@ -214,9 +214,10 @@ class CoreRequest(IncludeRequest):
             return text
 
         if compat.PY3:
-            return self.get_translate().gettext(text)
+            return text.interpolate(self.get_translate().gettext(text))
         else:
-            return self.get_translate().ugettext(text)  # pragma: nocoverage
+            msg = self.get_translate().ugettext(text)  # pragma: nocoverage
+            return text.interpolate(msg)  # pragma: nocoverage
 
     def get_translate(self, for_chameleon=False):
         """ Returns the translate method to the given request, or None
