@@ -6,6 +6,7 @@ from onegov.core.security import Public, Private
 from onegov.form import Form
 from onegov.town import _, log
 from onegov.town.app import TownApp
+from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
 from onegov.town.model import Town
 from onegov.user import UserCollection
@@ -68,8 +69,14 @@ def handle_login(self, request, form):
             request.alert(_("Wrong username or password."))
             log.info("Failed login attempt by {}".format(request.client_addr))
 
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Login"), request.link(self, name='login'))
+    ]
+
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'title': _(u'Login to ${town}', mapping={'town': self.name}),
         'form': form
     }

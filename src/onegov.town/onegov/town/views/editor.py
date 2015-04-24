@@ -7,7 +7,7 @@ from onegov.form import Form, with_options
 from onegov.page import PageCollection
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.layout import DefaultLayout
+from onegov.town.layout import EditorLayout
 from onegov.town.model import LinkEditor, PageEditor
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
@@ -93,7 +93,7 @@ def handle_new_page(self, request, form, page_type):
         return morepath.redirect(request.link(page))
 
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': EditorLayout(self, request, site_title),
         'title': site_title,
         'form': form
     }
@@ -126,7 +126,7 @@ def handle_edit_page(self, request, form, page_type):
             form.url.data = self.page.content.get('url', '')
 
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': EditorLayout(self, request, site_title),
         'title': site_title,
         'form': form
     }

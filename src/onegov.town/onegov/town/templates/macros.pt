@@ -31,7 +31,7 @@
 <metal:breadcrumbs define-macro="breadcrumbs">
     <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
         <tal:block repeat="link layout.breadcrumbs">
-            <li tal:attributes="class getattr(link, 'current', None) and 'current' or ''"
+            <li tal:attributes="class repeat.link.end and 'current' or ''"
                 tal:content="structure link(request)">
             </li>
         </tal:block>

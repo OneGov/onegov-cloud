@@ -134,7 +134,6 @@ def test_page_layout_breadcrumbs(session):
     assert links[0].url == 'http://nohost'
     assert links[1].text == 'Grandma'
     assert links[1].url == 'grandma'
-    assert links[1].current
 
     layout = PageLayout(page.children[0], MockRequest())
     layout.homepage_url = 'http://nohost'
@@ -147,7 +146,6 @@ def test_page_layout_breadcrumbs(session):
     assert links[1].url == 'grandma'
     assert links[2].text == 'Ma'
     assert links[2].url == 'grandma/ma'
-    assert links[2].current
 
 
 def test_template_layout():

@@ -6,6 +6,7 @@ from wtforms import StringField, validators
 from wtforms_components import ColorField
 from onegov.town import _
 from onegov.town.app import TownApp
+from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
 from onegov.town.model import Town
 
@@ -37,8 +38,14 @@ def handle_settings(self, request, form):
         form.logo_url.data = self.logo_url
         form.primary_color.data = self.theme_options.get('primary-color')
 
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Settings"), request.link(self))
+    ]
+
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'title': _(u'Settings'),
         'form': form
     }

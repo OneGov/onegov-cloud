@@ -6,7 +6,7 @@ from onegov.core.filestorage import random_filename
 from onegov.core.security import Private
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Image
+from onegov.town.elements import Image, Link
 from onegov.town.layout import DefaultLayout
 from onegov.town.model import ImageCollection
 from webob.exc import HTTPUnsupportedMediaType
@@ -21,8 +21,14 @@ def view_get_image_collection(self, request):
         for image in self.filestorage.listdir(files_only=True)
     ]
 
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Images"), request.link(self))
+    ]
+
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'title': _(u'Images'),
         'images': images,
     }

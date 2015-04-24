@@ -213,17 +213,15 @@ class PageLayout(DefaultLayout):
     def breadcrumbs(self):
         """ Returns the breadcrumbs for the current page. """
 
+        return self.get_page_breadcrumbs(self.model)
+
+    def get_page_breadcrumbs(self, page):
         links = [Link(_(u'Homepage'), self.homepage_url)]
 
-        for ancestor in self.model.ancestors:
+        for ancestor in page.ancestors:
             links.append(Link(ancestor.title, self.request.link(ancestor)))
 
-        links.append(
-            Link(
-                self.model.title, self.request.link(self.model),
-                current=True
-            )
-        )
+        links.append(Link(page.title, self.request.link(page)))
 
         return links
 
@@ -256,4 +254,21 @@ class PageLayout(DefaultLayout):
                     Link("...", '#', classes=('new-content-placeholder',))
                 )
 
+        return links
+
+
+class EditorLayout(PageLayout):
+
+    def __init__(self, model, request, site_title):
+        self.site_title = site_title
+        super(PageLayout, self).__init__(model, request)
+
+    @cached_property
+    def sidebar_links(self):
+        pass
+
+    @cached_property
+    def breadcrumbs(self):
+        links = self.get_page_breadcrumbs(self.model.page)
+        links.append(Link(self.site_title, url='#'))
         return links
