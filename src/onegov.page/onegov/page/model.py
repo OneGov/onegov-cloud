@@ -12,7 +12,13 @@ from onegov.core.orm.types import JSON
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref, deferred, relationship, validates
+from sqlalchemy.orm import (
+    backref,
+    deferred,
+    object_session,
+    relationship,
+    validates
+)
 from sqlalchemy.schema import Index
 from sqlalchemy.sql.expression import column
 
@@ -124,6 +130,17 @@ class Page(Base, TimestampMixin):
                 yield ancestor
 
             yield self.parent
+
+    @property
+    def siblings(self):
+        """ Returns a query that includes all siblings, including the page
+        itself.
+
+        """
+        query = object_session(self).query(Page)
+        query = query.filter(Page.parent == self.parent)
+
+        return query
 
     @property
     def path(self):
