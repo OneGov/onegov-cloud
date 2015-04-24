@@ -3,7 +3,7 @@
 import morepath
 
 from onegov.core.security import Private
-from onegov.form import Form
+from onegov.form import Form, with_options
 from onegov.page import PageCollection
 from onegov.town import _
 from onegov.town.app import TownApp
@@ -11,6 +11,7 @@ from onegov.town.layout import DefaultLayout
 from onegov.town.model import LinkEditor, PageEditor
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
+from wtforms.widgets import TextArea
 
 
 class BaseForm(Form):
@@ -22,7 +23,10 @@ class LinkForm(BaseForm):
 
 
 class PageForm(BaseForm):
-    text = TextAreaField(_(u"Text"))
+    lead = TextAreaField(
+        _(u"Lead"), widget=with_options(TextArea, rows=4))
+    text = TextAreaField(
+        _(u"Text"), widget=with_options(TextArea, class_='markdown'))
 
 
 @TownApp.form(
@@ -67,7 +71,10 @@ def handle_new_page(self, request, form, page_type):
 
         if page_type == 'page':
             meta = {'type': 'page'}
-            content = {'text': form.text.data}
+            content = {
+                'lead': form.lead.data,
+                'text': form.text.data
+            }
             message = _(u"Added a new page.")
         else:
             meta = {'type': 'link'}
@@ -99,6 +106,7 @@ def handle_edit_page(self, request, form, page_type):
         self.page.title = form.title.data
 
         if page_type in {'page', 'town-root'}:
+            self.page.content['lead'] = form.lead.data
             self.page.content['text'] = form.text.data
         else:
             self.page.content['url'] = form.url.data
@@ -111,6 +119,7 @@ def handle_edit_page(self, request, form, page_type):
 
         if page_type == 'page':
             site_title = _(u"Edit Page")
+            form.lead.data = self.page.content.get('lead', '')
             form.text.data = self.page.content.get('text', '')
         else:
             site_title = _(u"Edit Link")

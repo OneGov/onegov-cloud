@@ -35,14 +35,20 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
         <tal:block condition="page.meta.type in {'page', 'town-root'}">
-            <div class="row" tal:condition="page.content.text|nothing">
+            <div class="row" tal:condition="page.content.lead|page.content.text|nothing">
                 <div class="small-12 columns">
-                    <tal:block content="structure: layout.markdown(page.content.text)" />
+                    <em class="page-lead" 
+                        tal:condition="page.content.lead|nothing" 
+                        tal:content="page.content.lead">
+                    </em>
+                    <div class="page-content">
+                        <tal:block content="structure: layout.markdown(page.content.text)" />
+                    </div>
                 </div>
             </div>
             <div class="row" tal:condition="children">
                 <div class="small-12 columns">
-                    <ul class="inline-list">
+                    <ul class="inline-list page-links">
                         <li tal:repeat="link children">
                             <a href="${link.url}">${link.text}</a>
                         </li>
