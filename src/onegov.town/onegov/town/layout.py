@@ -6,6 +6,7 @@ from onegov.core.static import StaticFile
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link
+from onegov.town.markdown import RelativeHeaderRenderer
 from onegov.town.model import ImageCollection
 
 
@@ -142,9 +143,14 @@ class Layout(object):
         """ Returns the url to the main page. """
         return self.request.link(self.app.town)
 
+    @cached_property
+    def markdown_renderer(self):
+        """ Returns the markdown renderer used for this layout. """
+        return mistune.Markdown(renderer=RelativeHeaderRenderer())
+
     def markdown(self, text):
         """ Takes the given markdown text and renders it. """
-        return mistune.markdown(text)
+        return self.markdown_renderer.render(text)
 
     @cached_property
     def csrf_token(self):
