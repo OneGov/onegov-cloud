@@ -41,7 +41,7 @@ def test_layout():
     assert layout.page_id == 'foo-bar'
 
 
-def test_page_layout(session):
+def test_page_layout_sidebar(session):
     page = Page(
         name='grandma',
         title='Grandma',
@@ -63,56 +63,91 @@ def test_page_layout(session):
     layout = PageLayout(page, MockRequest())
     layout.homepage_url = 'http://nohost'
 
-    assert len(layout.sidebar_links) == 4
-
-    assert layout.sidebar_links[0].url == 'http://nohost'
-    assert layout.sidebar_links[0].text == 'Homepage'
-
-    assert layout.sidebar_links[1].url == 'grandma'
-    assert layout.sidebar_links[1].text == 'Grandma'
-    assert layout.sidebar_links[1].active
-
-    assert layout.sidebar_links[2].url == 'grandma/ma'
-    assert layout.sidebar_links[2].text == 'Ma'
-    assert layout.sidebar_links[2].classes == ('childpage', )
-
-    assert layout.sidebar_links[3].url == '#'
-    assert layout.sidebar_links[3].text == '...'
-    assert layout.sidebar_links[3].classes == ('new-content-placeholder', )
-
-    layout = PageLayout(page.children[0], MockRequest())
-
-    assert len(layout.sidebar_links) == 4
+    assert len(layout.sidebar_links) == 3
 
     assert layout.sidebar_links[0].url == 'grandma'
     assert layout.sidebar_links[0].text == 'Grandma'
+    assert layout.sidebar_links[0].active
 
     assert layout.sidebar_links[1].url == 'grandma/ma'
     assert layout.sidebar_links[1].text == 'Ma'
-    assert layout.sidebar_links[1].active
+    assert layout.sidebar_links[1].classes == ('childpage', )
 
-    assert layout.sidebar_links[2].url == 'grandma/ma/ada'
-    assert layout.sidebar_links[2].text == 'Ada'
-    assert layout.sidebar_links[2].classes == ('childpage', )
+    assert layout.sidebar_links[2].url == '#'
+    assert layout.sidebar_links[2].text == '...'
+    assert layout.sidebar_links[2].classes == ('new-content-placeholder', )
 
-    assert layout.sidebar_links[3].url == '#'
-    assert layout.sidebar_links[3].text == '...'
-    assert layout.sidebar_links[3].classes == ('new-content-placeholder', )
-
-    layout = PageLayout(page.children[0].children[0], MockRequest())
+    layout = PageLayout(page.children[0], MockRequest())
 
     assert len(layout.sidebar_links) == 3
 
     assert layout.sidebar_links[0].url == 'grandma/ma'
     assert layout.sidebar_links[0].text == 'Ma'
+    assert layout.sidebar_links[0].active
 
     assert layout.sidebar_links[1].url == 'grandma/ma/ada'
     assert layout.sidebar_links[1].text == 'Ada'
-    assert layout.sidebar_links[1].active
+    assert layout.sidebar_links[1].classes == ('childpage', )
 
     assert layout.sidebar_links[2].url == '#'
     assert layout.sidebar_links[2].text == '...'
     assert layout.sidebar_links[2].classes == ('new-content-placeholder', )
+
+    layout = PageLayout(page.children[0].children[0], MockRequest())
+
+    assert len(layout.sidebar_links) == 2
+
+    assert layout.sidebar_links[0].url == 'grandma/ma/ada'
+    assert layout.sidebar_links[0].text == 'Ada'
+    assert layout.sidebar_links[0].active
+
+    assert layout.sidebar_links[1].url == '#'
+    assert layout.sidebar_links[1].text == '...'
+    assert layout.sidebar_links[1].classes == ('new-content-placeholder', )
+
+
+def test_page_layout_breadcrumbs(session):
+    page = Page(
+        name='grandma',
+        title='Grandma',
+        children=[
+            Page(
+                name='ma',
+                title='Ma',
+                children=[
+                    Page(
+                        name='ada',
+                        title='Ada'
+                    )
+                ]
+            )
+        ]
+    )
+    session.add(page)
+
+    layout = PageLayout(page, MockRequest())
+    layout.homepage_url = 'http://nohost'
+
+    links = layout.breadcrumbs
+    assert len(links) == 2
+    assert links[0].text == 'Homepage'
+    assert links[0].url == 'http://nohost'
+    assert links[1].text == 'Grandma'
+    assert links[1].url == 'grandma'
+    assert links[1].current
+
+    layout = PageLayout(page.children[0], MockRequest())
+    layout.homepage_url = 'http://nohost'
+
+    links = layout.breadcrumbs
+    assert len(links) == 3
+    assert links[0].text == 'Homepage'
+    assert links[0].url == 'http://nohost'
+    assert links[1].text == 'Grandma'
+    assert links[1].url == 'grandma'
+    assert links[2].text == 'Ma'
+    assert links[2].url == 'grandma/ma'
+    assert links[2].current
 
 
 def test_template_layout():

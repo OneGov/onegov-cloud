@@ -62,7 +62,7 @@
       <div class="small-12 medium-9 large-9 columns end">
         <div class="row">
             <div class="small-12 columns">
-                <h1><div metal:define-slot="title"></div></h1>
+                <h1 class="main-title"><div metal:define-slot="title"></div></h1>
                 <div metal:define-slot="content"></div>
             </div>
         </div>
@@ -72,7 +72,7 @@
       <div class="small-12 columns">
         <div class="row">
             <div class="small-12 columns">
-                <h1><div metal:define-slot="title"></div></h1>
+                <h1 class="main-title"><div metal:define-slot="title"></div></h1>
                 <div metal:define-slot="content"></div>
             </div>
         </div>

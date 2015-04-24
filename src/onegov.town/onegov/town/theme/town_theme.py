@@ -28,7 +28,9 @@ class TownTheme(BaseTheme):
             'topbar-menu-link-color': '#312f2e',
             'topbar-menu-icon-color': '#312f2e',
             'topbar-dropdown-bg': '#f5f5f5',
-            'side-nav-font-weight-active': 'bold'
+            'side-nav-font-weight-active': 'bold',
+            'crumb-bg': '#fff',
+            'crumb-border-size': '0',
         }
         options.update(user_colors)
 

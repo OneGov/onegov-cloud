@@ -210,14 +210,28 @@ class PageLayout(DefaultLayout):
     """ The default layout, extended with the navigation of page objects. """
 
     @cached_property
-    def sidebar_links(self):
-        if self.model.parent is None:
-            parent = Link(_(u'Homepage'), self.homepage_url)
-        else:
-            parent = Link(
-                self.model.parent.title, self.request.link(self.model.parent))
+    def breadcrumbs(self):
+        """ Returns the breadcrumbs for the current page. """
 
-        links = [parent]
+        links = [Link(_(u'Homepage'), self.homepage_url)]
+
+        for ancestor in self.model.ancestors:
+            links.append(Link(ancestor.title, self.request.link(ancestor)))
+
+        links.append(
+            Link(
+                self.model.title, self.request.link(self.model),
+                current=True
+            )
+        )
+
+        return links
+
+    @cached_property
+    def sidebar_links(self):
+        """ Returns the sidebar links for the current page. """
+
+        links = []
 
         for page in self.model.siblings.all():
             if page != self.model:

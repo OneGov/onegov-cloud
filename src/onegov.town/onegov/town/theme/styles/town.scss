@@ -83,7 +83,7 @@ input[type=color] {
 */
 .edit-bar {
     background-color: $primary-color;
-    margin-bottom: 1rem;
+    margin-bottom: .9rem;
     margin-top: -1rem;
 
     button.tiny {
@@ -200,6 +200,14 @@ input[type=color] {
 }
 
 /*
+    main title
+*/
+
+.main-title {
+    margin-top: -.5rem;
+}
+
+/*
     page lead
 */
 
@@ -207,7 +215,18 @@ input[type=color] {
     display: block;
     font-size: $h5-font-size;
     font-weight: 300;
-    margin-bottom: 1.0rem;
+    margin-bottom: 1rem;
+}
+
+/*
+    breadcrumbs
+*/
+
+.breadcrumbs {
+    border-bottom: 1px solid transparentize($primary-color, .8);
+    margin-bottom: .6rem;
+    padding-bottom: .7rem;
+    padding-left: 1rem;
 }
 
 /*
@@ -227,29 +246,11 @@ input[type=color] {
         }
     }
 
-    li:first-child a {
-        color: #000;
-        margin-bottom: .5rem;
-    }
-
-    li:first-child a:after {
-        content: '\f077';
-        font-family: 'FontAwesome';
-        margin-left: 1ex;
-    }
-
     li {
         a.childpage,
         a.new-content-placeholder {
             color: #000;
             padding-left: 1rem;
-        }
-
-        a.childpage:before,
-        a.new-content-placeholder:before {
-            content: '\f105';
-            font-family: 'FontAwesome';
-            margin-right: 1ex;
         }
 
         a.new-content-placeholder {
