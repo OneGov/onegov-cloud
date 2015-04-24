@@ -231,7 +231,7 @@ def test_pages(town_app):
 
     new_page.form['title'] = "Living in Govikon is Swell"
     new_page.form['text'] = (
-        "## Living in Govikon is Really Great\n"
+        "# Living in Govikon is Really Great\n"
         "*Experts say it's the fact that Govikon does not really exist.*"
     )
     page = new_page.form.submit().follow()
@@ -243,11 +243,11 @@ def test_pages(town_app):
     edit_page = page.click("Bearbeiten")
 
     assert "Thema Bearbeiten" in edit_page
-    assert "## Living in Govikon" in edit_page
+    assert "# Living in Govikon" in edit_page
 
     edit_page.form['title'] = "Living in Govikon is Awful"
     edit_page.form['text'] = (
-        "## Living in Govikon Really Sucks\n"
+        "# Living in Govikon Really Sucks\n"
         "*Experts say hiring more experts would help.*"
     )
     page = edit_page.form.submit().follow()
@@ -317,7 +317,7 @@ def test_links(town_app):
 
     root_page = client.get(root_url)
     assert "Google" in root_page
-    google = root_page.click("Google")
+    google = root_page.click("Google", index=0)
 
     assert google.status_code == 302
     assert google.location == 'https://www.google.ch'
