@@ -96,7 +96,10 @@ class Page(Base, TimestampMixin):
 
     @validates('name')
     def validate_name(self, key, name):
-        assert normalize_for_url(name) == name
+        assert normalize_for_url(name) == name, (
+            "The given name was not normalized"
+        )
+
         return name
 
     def __init__(self, title, parent=None, **kwargs):
