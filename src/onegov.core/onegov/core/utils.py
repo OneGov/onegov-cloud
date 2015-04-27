@@ -11,19 +11,22 @@ from onegov.core import compat
 from unidecode import unidecode
 from webob import static
 
-_spaces = re.compile(r'\s+')
+
+# http://stackoverflow.com/a/13500078
+_unwanted_characters = re.compile(r'[\\/\s<>\[\]{},:;?@&=+$#@%|]+')
 
 
 def normalize_for_url(text):
     """ Takes the given text and makes it fit to be used for an url.
 
-    That means replacing spaces with '-', lowercasing everything and turning
-    unicode characters into their closest ascii equivalent using Unidecode.
+    That means replacing spaces and other unwanted characters with '-',
+    lowercasing everything and turning unicode characters into their closest
+    ascii equivalent using Unidecode.
 
     See https://pypi.python.org/pypi/Unidecode
 
     """
-    return _spaces.sub('-', unidecode(text).strip(' ').lower())
+    return _unwanted_characters.sub('-', unidecode(text).strip(' ').lower())
 
 
 def lchop(text, beginning):
