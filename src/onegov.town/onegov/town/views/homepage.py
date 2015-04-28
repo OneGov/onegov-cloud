@@ -2,7 +2,6 @@
 
 from collections import namedtuple
 from onegov.core.security import Public
-from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.model import Town
@@ -28,6 +27,6 @@ def view_town(self, request):
 
     return {
         'layout': layout,
-        'title': _(u'Welcome to ${town}', mapping={'town': self.name}),
+        'title': self.name,
         'tiles': tiles
     }
