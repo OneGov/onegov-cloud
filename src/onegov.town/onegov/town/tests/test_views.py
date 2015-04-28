@@ -119,6 +119,23 @@ def test_startpage(town_app):
     links[4].text == 'Politik & Verwaltung'
     links[4].attrib.get('href') == '/gemeinde/politik-verwaltung'
 
+    links = client.get('/').pyquery('.homepage-tiles a')
+
+    links[0].text == 'Leben & Wohnen'
+    links[0].attrib.get('href') == '/gemeinde/leben-wohnen'
+
+    links[1].text == 'Kultur & Freizeit'
+    links[1].attrib.get('href') == '/gemeinde/kultur-freizeit'
+
+    links[2].text == 'Bildung & Gesellschaft'
+    links[2].attrib.get('href') == '/gemeinde/bildung-gesellschaft'
+
+    links[3].text == 'Gewerbe & Tourismus'
+    links[3].attrib.get('href') == '/gemeinde/gewerbe-tourismus'
+
+    links[4].text == 'Politik & Verwaltung'
+    links[4].attrib.get('href') == '/gemeinde/politik-verwaltung'
+
 
 def test_login(town_app):
     client = Client(town_app)
@@ -186,6 +203,15 @@ def test_settings(town_app):
 
     print(settings_page.text)
     assert '<img src="https://seantis.ch/logo.img"' in settings_page.text
+
+    settings_page.form['homepage_images'] = """
+        http://images/one
+        http://images/two
+    """
+    settings_page = settings_page.form.submit()
+
+    assert 'http://images/one' in settings_page
+    assert 'http://images/two' in settings_page
 
 
 def test_unauthorized(town_app):

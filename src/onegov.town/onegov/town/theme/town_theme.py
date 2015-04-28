@@ -31,6 +31,12 @@ class TownTheme(BaseTheme):
             'side-nav-font-weight-active': 'bold',
             'crumb-bg': '#fff',
             'crumb-border-size': '0',
+            'tile-image-1': '"../static/homepage-images/tile-1-small.jpg"',
+            'tile-image-2': '"../static/homepage-images/tile-2-small.jpg"',
+            'tile-image-3': '"../static/homepage-images/tile-3-small.jpg"',
+            'tile-image-4': '"../static/homepage-images/tile-4-small.jpg"',
+            'tile-image-5': '"../static/homepage-images/tile-5-small.jpg"',
+            'tile-image-6': 'null'
         }
         options.update(user_colors)
 
