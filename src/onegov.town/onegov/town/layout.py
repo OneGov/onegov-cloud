@@ -165,6 +165,11 @@ class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """
 
     @cached_property
+    def breadcrumbs(self):
+        """ Returns the breadcrumbs for the current page. """
+        return [Link(_("Homepage"), self.homepage_url)]
+
+    @cached_property
     def root_pages(self):
         roots = PageCollection(self.app.session()).query().filter(
             Page.parent_id == None,
@@ -216,7 +221,7 @@ class PageLayout(DefaultLayout):
         return self.get_page_breadcrumbs(self.model)
 
     def get_page_breadcrumbs(self, page):
-        links = [Link(_(u'Homepage'), self.homepage_url)]
+        links = [Link(_("Homepage"), self.homepage_url)]
 
         for ancestor in page.ancestors:
             links.append(Link(ancestor.title, self.request.link(ancestor)))
