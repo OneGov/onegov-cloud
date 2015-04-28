@@ -39,7 +39,7 @@ def view_get_image_collection(self, request):
 def view_upload_file(self, request):
     extension = request.params['file'].filename.split('.')[-1]
 
-    if extension not in {'png', 'jpg', 'jpeg', 'gif'}:
+    if extension not in {'png', 'jpg', 'jpeg', 'gif', 'svg'}:
         raise HTTPUnsupportedMediaType()
 
     filename = '.'.join((random_filename(), extension))
