@@ -27,8 +27,9 @@
 <body id="${layout.page_id}">
     <div class="row">
       <div class="small-12 columns">
-        <a tal:condition="layout.town.logo_url|nothing" href="${layout.homepage_url}">
-          <img src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
+        <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing">
+          <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
+          <h1 tal:condition="not:logo_url">${layout.town.name}</h1>
         </a>
       </div>
     </div>
