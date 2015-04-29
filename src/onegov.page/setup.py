@@ -6,7 +6,7 @@ name = 'onegov.page'
 description = (
     'Pages in a hierarchy for OneGov.'
 )
-version = '0.0.0'
+version = '0.0.1'
 
 
 def get_long_description():
