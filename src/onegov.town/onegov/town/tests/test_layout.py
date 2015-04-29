@@ -151,9 +151,15 @@ def test_page_layout_breadcrumbs(session):
 def test_template_layout():
     config = setup()
 
+    class Mock(object):
+        pass
+
     class App(TownApp):
         testing_config = config
         theme_options = {}
+
+        town = Mock()
+        town.name = 'Govikon'
 
     @App.path('/model')
     class Model(object):

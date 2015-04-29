@@ -262,7 +262,7 @@ def test_pages(town_app):
     )
     page = new_page.form.submit().follow()
 
-    assert page.pyquery('h1').text() == "Living in Govikon is Swell"
+    assert page.pyquery('.main-title').text() == "Living in Govikon is Swell"
     assert page.pyquery('h2').text() == "Living in Govikon is Really Great"
     assert page.pyquery('em').text().startswith("Experts say it's the fact")
 
@@ -278,7 +278,7 @@ def test_pages(town_app):
     )
     page = edit_page.form.submit().follow()
 
-    assert page.pyquery('h1').text() == "Living in Govikon is Awful"
+    assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
     assert page.pyquery('h2').text() == "Living in Govikon Really Sucks"
     assert page.pyquery('em').text().startswith("Experts say hiring more")
 
@@ -287,7 +287,7 @@ def test_pages(town_app):
 
     assert len(root_page.pyquery('.edit-bar')) == 0
 
-    assert page.pyquery('h1').text() == "Living in Govikon is Awful"
+    assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
     assert page.pyquery('h2').text() == "Living in Govikon Really Sucks"
     assert page.pyquery('em').text().startswith("Experts say hiring more")
 
