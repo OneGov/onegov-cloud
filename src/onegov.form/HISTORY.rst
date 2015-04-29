@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.0.1 (unreleased)
-~~~~~~~~~~~~~~~~~~
+Unreleased
+~~~~~~~~~~
 
-Nothing yet.
+- Initial Release [href]
