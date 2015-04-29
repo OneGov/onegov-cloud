@@ -7,7 +7,7 @@ name = 'onegov.core'
 description = (
     'Contains code shared by all OneGov applications.'
 )
-version = '0.0.0'
+version = '0.0.1'
 
 dependencies = {
     'cached_property',
