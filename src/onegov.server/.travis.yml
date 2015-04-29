@@ -20,3 +20,4 @@ deploy:
         secure: Qg6c9ejndUzc712oyqN1kzi6+zpWXY77xis6+V/QUzfkro7oh2TiFXzxVc1IJi4wUqJZJnJn2hjb0cfnB1K0VLMD9FMdHwlZpD68XIabziTRxEL/fuY01/CvX1/ytBK8nLlJPsIjco3f0Nu2b6aQQ0AzQ37q3+X1ABoPVppFI0w=
     on:
         tags: true
+        condition: $TOXENV = py34
