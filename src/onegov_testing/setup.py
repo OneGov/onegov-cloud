@@ -37,7 +37,6 @@ setup(
         'coverage',
         'onegov.core',
         'pytest',
-        'pytest-cov',
         'sqlalchemy',
         'testing.postgresql'
     ],
