@@ -40,9 +40,9 @@ setup(
     ],
     extras_require=dict(
         test=[
+            'coverage',
             'morepath',
             'pytest',
-            'pytest-cov',
             'requests',
             'webtest'
         ],
