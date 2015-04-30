@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.2 (2015-04-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes onegov-server being unable to start when the packages are not stored
   as eggs.
 
