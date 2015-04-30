@@ -91,10 +91,26 @@ class Server(object):
             self.applications.morepath_applications())
 
         if morepath_applications:
-
-            # it's safe to say that we got morepath available here
+            # morepath is only loaded if required by an application
+            import importlib
             import morepath
-            morepath.autosetup()
+
+            from morepath.autosetup import DependencyMap
+
+            # we do our own autosetup to avoid this issue (for now):
+            # https://github.com/morepath/morepath/issues/319
+
+            m = DependencyMap()
+            m.load()
+
+            config = morepath.setup()
+
+            for dist in m.relevant_dists('morepath'):
+                config.scan(
+                    importlib.import_module(dist.project_name),
+                    ignore=['.test', '.tests'])
+
+            config.commit()
 
     def __call__(self, environ, start_response):
         request = Request(environ)
