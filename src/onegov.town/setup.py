@@ -49,6 +49,7 @@ setup(
     ],
     extras_require=dict(
         test=[
+            'coverage',
             'onegov.testing',
             'mock',
             'webtest',
