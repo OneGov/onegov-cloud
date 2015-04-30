@@ -69,6 +69,7 @@ setup(
     install_requires=list(dependencies),
     extras_require=dict(
         test=[
+            'coverage',
             'freezegun',
             'onegov.testing',
             'webtest'
