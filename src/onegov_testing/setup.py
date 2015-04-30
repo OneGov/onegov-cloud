@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'coverage',
         'onegov.core',
         'pytest',
         'pytest-cov',
