@@ -48,6 +48,14 @@ html {
 }
 
 /*
+    required form fields
+*/
+.label-required {
+    color: $primary-color;
+    font-weight: bold;
+}
+
+/*
     form errors
 */
 form small.error {

@@ -63,7 +63,8 @@
             </tal:block>
             <tal:block condition="input_type != 'hidden'">
                 <label tal:attributes="class field.errors and 'error' or None">
-                    <tal:block>${field.label.text}</tal:block> 
+                    <span class="label-text">${field.label.text}</span>
+                    <span class="label-required" tal:condition="field.flags.required|nothing">*</span> 
                     ${field(placeholder=request.translate(field.description))}
                 </label>
                 <small class="error" tal:repeat="error field.errors">${error}</small>

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Show a wildcard next to required form fields.
+  [href]
+
 - Adds hints to form fields, rendered as placemarks.
   [href]
 
