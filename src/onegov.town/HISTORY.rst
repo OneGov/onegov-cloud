@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Upgrade to Zurb Foundation 5.5.2.
+  [href]
+
 - Show a wildcard next to required form fields.
   [href]
 
