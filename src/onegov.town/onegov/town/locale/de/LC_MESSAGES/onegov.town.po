@@ -1,35 +1,36 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-04-28 16:15+0200\n"
+"POT-Creation-Date: 2015-05-01 09:13+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:219
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:170
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:224
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:26
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:74
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:71
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:78
 msgid "Homepage"
 msgstr "Startseite"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:188
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:195
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:193
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:200
 msgid "Logout"
 msgstr "Logout"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:189
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:196
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:194
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:201
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:32
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:27
 msgid "Images"
 msgstr "Bilder"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:197
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:77
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:72
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:202
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:84
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:79
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:203
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:208
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:75
 msgid "Login"
 msgstr "Login"
@@ -82,11 +83,11 @@ msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:52
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:87
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:88
 msgid "Submit"
 msgstr "Absenden"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:80
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:81
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
@@ -128,40 +129,44 @@ msgstr "Titel"
 msgid "URL"
 msgstr "URL"
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:31
+msgid "Text"
+msgstr "Text"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:67
+msgid "New Page"
+msgstr "Neues Thema"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:69
+msgid "New Link"
+msgstr "Neue Verknüpfung"
+
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:27
 msgid "Lead"
 msgstr "Einleitung"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:29
-msgid "Text"
-msgstr "Text"
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:28
+msgid "Describes what this page is about"
+msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:65
-msgid "New Page"
-msgstr "Neues Thema"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:67
-msgid "New Link"
-msgstr "Neue Verknüpfung"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:78
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:80
 msgid "Added a new page."
 msgstr "Die neue Seite wurde hinzugefügt."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:82
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:84
 msgid "Added a new link."
 msgstr "Eine neue Verknüpfung wurde hinzugefügt."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:114
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:63
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:116
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:70
 msgid "Your changes were saved."
 msgstr "Ihre Änderungen wurden gespeichert."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:121
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:123
 msgid "Edit Page"
 msgstr "Thema Bearbeiten"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:125
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:127
 msgid "Edit Link"
 msgstr "Verknüpfung Bearbeiten"
 
@@ -241,14 +246,22 @@ msgstr "Verknüpfung Löschen"
 msgid "Name"
 msgstr "Name"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:19
-msgid "Logo"
-msgstr "Logo"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:20
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:23
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:22
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:20
+msgid "Logo"
+msgstr "Logo"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:21
+msgid "URL pointing to the logo"
+msgstr "Link zum Logo"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:25
 msgid "Homepage Images"
 msgstr "Bilder auf der Startseite"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:26
+msgid "Up to six URLs pointing to images for the tiles on the homepage."
+msgstr "Bis zu sechs Links zu Bildern für die Kacheln auf der Startseite"

@@ -15,16 +15,18 @@ from wtforms.widgets import TextArea
 
 
 class BaseForm(Form):
-    title = StringField(_(u"Title"), [validators.InputRequired()])
+    title = StringField(_("Title"), [validators.InputRequired()])
 
 
 class LinkForm(BaseForm):
-    url = URLField(_(u"URL"), [validators.InputRequired()])
+    url = URLField(_("URL"), [validators.InputRequired()])
 
 
 class PageForm(BaseForm):
     lead = TextAreaField(
-        _(u"Lead"), widget=with_options(TextArea, rows=4))
+        label=_("Lead"),
+        description=_("Describes what this page is about"),
+        widget=with_options(TextArea, rows=4))
     text = TextAreaField(
         _(u"Text"), widget=with_options(TextArea, class_='markdown'))
 

@@ -16,10 +16,17 @@ class SettingsForm(Form):
     """ Defines the settings form for onegov town. """
 
     name = StringField(_("Name"), [validators.InputRequired()])
-    logo_url = StringField(_("Logo"))
+    logo_url = StringField(
+        label=_("Logo"),
+        description=_("URL pointing to the logo")
+    )
     primary_color = ColorField(_("Primary Color"))
     homepage_images = TextAreaField(
-        _("Homepage Images"), widget=with_options(TextArea, rows=6)
+        label=_("Homepage Images"),
+        description=_(
+            "Up to six URLs pointing to images for the tiles on the homepage."
+        ),
+        widget=with_options(TextArea, rows=6)
     )
 
     @property
