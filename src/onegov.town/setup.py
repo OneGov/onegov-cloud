@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'bleach',
         'click',
         'cssmin',
         'jsmin',
