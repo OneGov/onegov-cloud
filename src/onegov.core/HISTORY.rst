@@ -4,7 +4,7 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Caches the translator on the request to be slightly more efficient.
+- Cache the translator on the request to be slightly more efficient.
   [href]
 
 0.0.1 (2015-04-29)
