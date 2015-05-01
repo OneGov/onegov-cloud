@@ -47,3 +47,8 @@ Latests PyPI Release
 License
 -------
 onegov.town is released under GPLv2
+
+Note that Imperavi Redactor (assets/js/redactor.min.js) itself is a proprietary
+commercial software, owned by Imperavi. We (Seantis GmbH) bought an OEM license
+to distribute Redactor alongside onegov.town, so you may use it for free, but
+you are not allowed to use it independently of onegov.town.

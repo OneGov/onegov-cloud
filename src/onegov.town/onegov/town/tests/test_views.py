@@ -201,7 +201,6 @@ def test_settings(town_app):
     settings_page.form['logo_url'] = 'https://seantis.ch/logo.img'
     settings_page = settings_page.form.submit()
 
-    print(settings_page.text)
     assert '<img src="https://seantis.ch/logo.img"' in settings_page.text
 
     settings_page.form['homepage_images'] = """
@@ -257,30 +256,33 @@ def test_pages(town_app):
 
     new_page.form['title'] = "Living in Govikon is Swell"
     new_page.form['text'] = (
-        "# Living in Govikon is Really Great\n"
-        "*Experts say it's the fact that Govikon does not really exist.*"
+        "<h2>Living in Govikon is Really Great</h2>"
+        "<i>Experts say it's the fact that Govikon does not really exist.</i>"
     )
     page = new_page.form.submit().follow()
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Swell"
     assert page.pyquery('h2').text() == "Living in Govikon is Really Great"
-    assert page.pyquery('em').text().startswith("Experts say it's the fact")
+    assert page.pyquery('i').text().startswith("Experts say it's the fact")
 
     edit_page = page.click("Bearbeiten")
 
     assert "Thema Bearbeiten" in edit_page
-    assert "# Living in Govikon" in edit_page
+    assert "&lt;h2&gt;Living in Govikon is Really Great&lt;/h2&gt" in edit_page
 
     edit_page.form['title'] = "Living in Govikon is Awful"
     edit_page.form['text'] = (
-        "# Living in Govikon Really Sucks\n"
-        "*Experts say hiring more experts would help.*"
+        "<h2>Living in Govikon Really Sucks</h2>"
+        "<i>Experts say hiring more experts would help.</i>"
+        "<script>alert('yes')</script>"
     )
     page = edit_page.form.submit().follow()
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
     assert page.pyquery('h2').text() == "Living in Govikon Really Sucks"
-    assert page.pyquery('em').text().startswith("Experts say hiring more")
+    assert page.pyquery('i').text().startswith("Experts say hiring more")
+    assert "<script>alert('yes')</script>" not in page
+    assert "&lt;script&gt;alert('yes')&lt;/script&gt;" in page
 
     page.click("Logout")
     root_page = client.get(root_url)
@@ -289,7 +291,7 @@ def test_pages(town_app):
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
     assert page.pyquery('h2').text() == "Living in Govikon Really Sucks"
-    assert page.pyquery('em').text().startswith("Experts say hiring more")
+    assert page.pyquery('i').text().startswith("Experts say hiring more")
 
 
 def test_delete_pages(town_app):

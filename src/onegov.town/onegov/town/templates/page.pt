@@ -41,7 +41,7 @@
                         tal:content="page.content.lead">
                     </em>
                     <div class="page-content" tal:condition="page.content.text|nothing"
-                        tal:content="structure: layout.markdown(page.content.text)">
+                        tal:content="structure: page.content.text">
                     </div>
                 </div>
             </div>

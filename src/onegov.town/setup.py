@@ -38,7 +38,6 @@ setup(
         'cssmin',
         'jsmin',
         'lxml',
-        'mistune',
         'onegov.core',
         'onegov.form',
         'onegov.foundation',

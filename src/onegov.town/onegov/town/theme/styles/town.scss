@@ -56,6 +56,15 @@ html {
 }
 
 /*
+    richtext editor
+*/
+form .redactor-editor {
+    @include form-element;
+    height: 100%;
+    cursor: text;    
+}
+
+/*
     form errors
 */
 form small.error {
@@ -300,7 +309,25 @@ input[type=color] {
     display: block;
     font-size: $h5-font-size;
     font-weight: 300;
+    margin-bottom: 1.25rem;
+}
+
+/*
+    page content
+*/
+
+.page-content {
     margin-bottom: 1rem;
+}
+
+/*
+    page links
+*/
+
+.page-links {
+    li:first-child {
+        margin-left: 0;
+    }
 }
 
 /*

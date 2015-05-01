@@ -83,18 +83,23 @@ class TownApp(Framework):
             output='bundles/dropzone.bundle.js'
         )
 
-        markdown_editor = Bundle(
-            'js/editor.js',
-            'js/marked.js',
-            'js/load-editor.js',
-            filters='jsmin',
-            output='bundles/markdown-editor.bundle.js'
+        # do NOT minify the redactor, or the copyright notice goes away, which
+        # is something we are not allowed to do per our license
+        # ->
+        redactor = Bundle(
+            'js/redactor.min.js',
+            output='bundles/redactor.bundle.js'
         )
+        redactor_theme = Bundle(
+            'css/redactor.css',
+            output='bundles/redactor.bundle.css'
+        )
+        # <-
 
-        markdown_editor_theme = Bundle(
-            'css/editor.css',
-            filters='cssmin',
-            output='bundles/markdown-editor-theme.bundle.css'
+        editor = Bundle(
+            'js/editor.js',
+            filters='jsmin',
+            output='bundles/editor.bundle.js'
         )
 
         common = Bundle(
@@ -114,8 +119,9 @@ class TownApp(Framework):
         return {
             'common': common,
             'dropzone': dropzone,
-            'markdown-editor': markdown_editor,
-            'markdown-editor-theme': markdown_editor_theme
+            'redactor': redactor,
+            'redactor_theme': redactor_theme,
+            'editor': editor
         }
 
 

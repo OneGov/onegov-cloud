@@ -6,6 +6,7 @@ from onegov.core.security import Private
 from onegov.form import Form, with_options
 from onegov.page import PageCollection
 from onegov.town import _
+from onegov.town.utils import sanitize_html
 from onegov.town.app import TownApp
 from onegov.town.layout import EditorLayout
 from onegov.town.model import LinkEditor, PageEditor
@@ -23,21 +24,22 @@ class LinkForm(BaseForm):
 
 
 class PageForm(BaseForm):
+
     lead = TextAreaField(
         label=_("Lead"),
         description=_("Describes what this page is about"),
         widget=with_options(TextArea, rows=4))
+
     text = TextAreaField(
-        _(u"Text"), widget=with_options(TextArea, class_='markdown'))
+        label=_(u"Text"),
+        widget=with_options(TextArea, class_='editor'),
+        filters=[sanitize_html])
 
 
 @TownApp.form(
     model=PageEditor, form=PageForm, template='form.pt', permission=Private
 )
 def handle_page_form(self, request, form):
-
-    request.include('markdown-editor')
-    request.include('markdown-editor-theme')
 
     if self.action == 'new':
         return handle_new_page(self, request, form, page_type='page')

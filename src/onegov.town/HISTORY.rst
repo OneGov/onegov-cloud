@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Replaces the markdown editor with a WYSIWYG html editor.
+  [href]
+
 - Upgrade to Zurb Foundation 5.5.2.
   [href]
 

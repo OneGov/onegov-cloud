@@ -1,12 +1,9 @@
-import mistune
-
 from cached_property import cached_property
 from onegov.core.compat import zip_longest
 from onegov.core.static import StaticFile
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link
-from onegov.town.markdown import RelativeHeaderRenderer
 from onegov.town.model import ImageCollection
 
 
@@ -144,15 +141,6 @@ class Layout(object):
         return self.request.link(self.app.town)
 
     @cached_property
-    def markdown_renderer(self):
-        """ Returns the markdown renderer used for this layout. """
-        return mistune.Markdown(renderer=RelativeHeaderRenderer())
-
-    def markdown(self, text):
-        """ Takes the given markdown text and renders it. """
-        return self.markdown_renderer.render(text)
-
-    @cached_property
     def csrf_token(self):
         """ Returns a csrf token for use with DELETE links (forms do their
         own thing automatically).
@@ -265,8 +253,12 @@ class PageLayout(DefaultLayout):
 class EditorLayout(PageLayout):
 
     def __init__(self, model, request, site_title):
-        self.site_title = site_title
         super(PageLayout, self).__init__(model, request)
+        self.site_title = site_title
+
+        self.request.include('redactor')
+        self.request.include('redactor_theme')
+        self.request.include('editor')
 
     @cached_property
     def sidebar_links(self):
