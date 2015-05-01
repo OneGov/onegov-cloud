@@ -213,11 +213,17 @@ class CoreRequest(IncludeRequest):
         if not hasattr(text, 'domain'):
             return text
 
+        return self.translator(text)
+
+    @cached_property
+    def translator(self):
+        """ Returns the translate function for basic string translations. """
+        translator = self.get_translate()
+
         if compat.PY3:
-            return text.interpolate(self.get_translate().gettext(text))
+            return lambda text: text.interpolate(translator.gettext(text))
         else:
-            msg = self.get_translate().ugettext(text)  # pragma: nocoverage
-            return text.interpolate(msg)  # pragma: nocoverage
+            return lambda text: text.interpolate(translator.ugettext(text))
 
     def get_translate(self, for_chameleon=False):
         """ Returns the translate method to the given request, or None
