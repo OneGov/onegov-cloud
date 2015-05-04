@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds support for image uploads through the html editor.
+  [href]
+
 - Replaces the markdown editor with a WYSIWYG html editor.
   [href]
 

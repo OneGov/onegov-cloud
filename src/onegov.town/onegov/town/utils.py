@@ -20,6 +20,7 @@ def sanitize_html(html):
         'div',
         'em',
         'i',
+        'img',
         'hr',
         'li',
         'ol',
@@ -35,4 +36,11 @@ def sanitize_html(html):
         'h6'
     ]
 
-    return bleach.clean(html, tags=allowed_tags)
+    allowed_attributes = {
+        'a': ['href', 'title'],
+        'abbr': ['title'],
+        'acronym': ['title'],
+        'img': ['src', 'alt', 'title']
+    }
+
+    return bleach.clean(html, tags=allowed_tags, attributes=allowed_attributes)

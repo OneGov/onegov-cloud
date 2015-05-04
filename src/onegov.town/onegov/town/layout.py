@@ -5,6 +5,7 @@ from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link
 from onegov.town.model import ImageCollection
+from purl import URL
 
 
 class Layout(object):
@@ -130,10 +131,19 @@ class Layout(object):
         args = [iter(iterable)] * n
         return zip_longest(fillvalue=fillvalue, *args)
 
+    def csrf_protected_url(self, url):
+        return URL(url).query_param('csrf-token', self.csrf_token).as_string()
+
     @cached_property
     def image_upload_url(self):
         """ Returns the url to the image upload action. """
-        return self.request.link(ImageCollection(self.app), name='upload')
+        url = self.request.link(ImageCollection(self.app), name='upload')
+        return self.csrf_protected_url(url)
+
+    @cached_property
+    def image_upload_json_url(self):
+        url = self.request.link(ImageCollection(self.app), name='upload.json')
+        return self.csrf_protected_url(url)
 
     @cached_property
     def homepage_url(self):

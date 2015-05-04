@@ -24,7 +24,6 @@ class LinkForm(BaseForm):
 
 
 class PageForm(BaseForm):
-
     lead = TextAreaField(
         label=_("Lead"),
         description=_("Describes what this page is about"),
