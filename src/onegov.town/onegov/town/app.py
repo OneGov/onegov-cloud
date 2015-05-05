@@ -97,6 +97,7 @@ class TownApp(Framework):
         # <-
 
         editor = Bundle(
+            'js/imagemanager.js',
             'js/editor.js',
             filters='jsmin',
             output='bundles/editor.bundle.js'

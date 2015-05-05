@@ -2,14 +2,13 @@
 
 import morepath
 
-from onegov.core.filestorage import random_filename
+from onegov.core.filestorage import delete_static_file, random_filename
 from onegov.core.security import Private
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Image, Link
+from onegov.town.elements import Img, Link
 from onegov.town.layout import DefaultLayout
-from onegov.town.model import ImageCollection
-from webob.exc import HTTPUnsupportedMediaType
+from onegov.town.model import ImageCollection, Image
 
 
 @TownApp.html(model=ImageCollection, template='images.pt', permission=Private)
@@ -17,8 +16,8 @@ def view_get_image_collection(self, request):
     request.include('dropzone')
 
     images = [
-        Image(request.filestorage_link(self.path_prefix + image))
-        for image in self.filestorage.listdir(files_only=True)
+        Img(src=request.link(image.thumbnail), url=request.link(image))
+        for image in self.images
     ]
 
     layout = DefaultLayout(self, request)
@@ -34,21 +33,29 @@ def view_get_image_collection(self, request):
     }
 
 
+# XXX find a way to switch automatically:
+# https://github.com/morepath/morepath/issues/70
+@TownApp.json(model=ImageCollection, permission=Private, name='json')
+def view_get_image_collection_json(self, request):
+    return [
+        {'thumb': request.link(image.thumbnail), 'image': request.link(image)}
+        for image in self.images
+    ]
+
+
 def handle_file_upload(self, request):
     """ Stores the file given with the request and returns the url to the
     resulting file.
 
     """
-    extension = request.params['file'].filename.split('.')[-1]
 
-    if extension not in {'png', 'jpg', 'jpeg', 'gif', 'svg'}:
-        raise HTTPUnsupportedMediaType()
+    filename = '.'.join((
+        random_filename(), request.params['file'].filename.split('.')[-1]
+    ))
 
-    filename = '.'.join((random_filename(), extension))
+    image = self.store_image(request.params['file'].file, filename)
 
-    self.filestorage.setcontents(filename, request.params['file'].file.read())
-
-    return request.filestorage_link(self.path_prefix + filename)
+    return request.link(image)
 
 
 @TownApp.view(model=ImageCollection, name='upload', request_method='POST',
@@ -67,3 +74,15 @@ def view_upload_file_by_json(self, request):
     request.assert_valid_csrf_token()
 
     return {'filelink': handle_file_upload(self, request)}
+
+
+@TownApp.view(
+    model=Image, request_method='DELETE', permission=Private)
+def delete_image(self, request):
+    """ Overrides the :meth:`onegov.core.filestorage.delete_static_file` to
+    ensure that thumbnails are deleted together with the image.
+
+    """
+
+    delete_static_file(self, request)
+    ImageCollection(request.app).delete_image_by_filename(self.filename)

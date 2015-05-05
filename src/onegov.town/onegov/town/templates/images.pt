@@ -14,11 +14,11 @@
                 <h2 i18n:translate="">All Images</h2>
                 <ul tal:condition="images" class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
                     <li tal:repeat="image images" id="image-${repeat.image.index}" class="image-box">
-                        <a class="th" href="${image.src}" tal:condition="image">
+                        <a class="th" href="${image.url}" tal:condition="image">
                             <img src="${image.src}" />
                         </a>
                         <a class="delete confirm" 
-                           ic-delete-from="${image.src}?csrf-token=${layout.csrf_token}" 
+                           ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}" 
                            ic-on-success="$('#image-${repeat.image.index}').remove();"
                            data-confirm="Do you really want to delete the image?"
                            data-confirm-yes="Delete Image"

@@ -2,7 +2,9 @@
 
 from onegov.town.app import TownApp
 from onegov.town.model import (
+    Image,
     ImageCollection,
+    Thumbnail,
     LinkEditor,
     PageEditor,
     Town
@@ -23,6 +25,16 @@ def get_page(app, absorb):
 @TownApp.path(model=ImageCollection, path='/bilder')
 def get_images(app):
     return ImageCollection(app)
+
+
+@TownApp.path(model=Image, path='/bild/{filename}')
+def get_image(app, filename):
+    return ImageCollection(app).get_image_by_filename(filename)
+
+
+@TownApp.path(model=Thumbnail, path='/thumbnails/{filename}')
+def get_thumbnail(app, filename):
+    return ImageCollection(app).get_thumbnail_by_filename(filename)
 
 
 @TownApp.path(model=PageEditor, path='/editor/page/{page_id}/{action}')

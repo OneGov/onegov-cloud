@@ -47,7 +47,7 @@
 </metal:bottom_links>
 
 <metal:search define-macro="form">
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url" method="POST">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url" method="POST">
         <metal:fields use-macro="layout.macros['fields']" tal:define="fields form._fields.values()" />
         <input type="submit" value="Submit" class="button" i18n:attributes="value">
     </form>

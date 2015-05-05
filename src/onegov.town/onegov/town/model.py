@@ -1,11 +1,15 @@
 """ Contains the models directly provided by onegov.town. """
 
+import PIL
+
+from onegov.core.filestorage import FilestorageFile
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.town.theme import user_colors
 from sqlalchemy import Column, Text
 from uuid import uuid4
+from webob.exc import HTTPUnsupportedMediaType
 
 
 class Town(Base, TimestampMixin):
@@ -42,11 +46,132 @@ class ImageCollection(object):
 
     """
 
+    thumbnail_dimension = (256, 256)
+    thumbnail_quality = 80
+    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'svg'}
+    thumbnail_extensions = {'png', 'jpg', 'jpeg', 'gif'}
+
     def __init__(self, app):
         assert app.has_filestorage
 
         self.path_prefix = 'images/'
-        self.filestorage = app.filestorage.makeopendir('images')
+        self.image_storage = app.filestorage.makeopendir('images')
+        self.thumbnail_storage = self.image_storage.makeopendir('thumbnails')
+
+    @property
+    def images(self):
+        """ Returns the :class:`~onegov.town.model.Image` instances in this
+        collection.
+
+        """
+        for filename in self.image_storage.listdir(files_only=True):
+            yield Image(filename)
+
+    @property
+    def thumbnails(self):
+        """ Returns the :class:`~onegov.town.model.Thumbnail` instances in this
+        collection.
+
+        """
+        for filename in self.thumbnail_storage.listdir(files_only=True):
+            yield Thumbnail(filename)
+
+    def store_image(self, image, filename):
+        """ Stores an image (a file with a ``read()`` method) with the given
+        filename. Note that these images are public, so the filename *should*
+        be random.
+
+        See :func:`onegov.core.filestorage.random_filename`.
+
+        """
+        extension = filename.split('.')[-1]
+
+        if extension not in self.allowed_extensions:
+            raise HTTPUnsupportedMediaType()
+
+        self.image_storage.setcontents(filename, image.read())
+
+        return self.get_image_by_filename(filename)
+
+    def get_image_by_filename(self, filename):
+        """ Returns the :class:`~onegov.town.model.Image` instance with the
+        given name, or None if not found.
+
+        """
+        if self.image_storage.exists(filename):
+            return Image(filename)
+
+    def get_thumbnail_by_filename(self, filename):
+        """ Returns the :class:`~onegov.town.model.Thumbnail` instance with the
+        given name, or None if not found.
+
+        This method *generates* the thumbnail if it doesn't exist yet!
+
+        """
+        if not self.image_storage.exists(filename):
+            return None
+
+        if self.thumbnail_storage.exists(filename):
+            return Thumbnail(filename)
+
+        extension = filename.split('.')[-1]
+
+        if extension not in self.thumbnail_extensions:
+            return Image(filename)
+
+        im = PIL.Image.open(self.image_storage.getsyspath(filename))
+        im.thumbnail(self.thumbnail_dimension)
+        im.save(
+            self.thumbnail_storage.open(filename, 'wb'),
+            PIL.Image.EXTENSION['.' + extension],
+            quality=self.thumbnail_quality
+        )
+
+        return Thumbnail(filename)
+
+    def delete_image_by_filename(self, filename):
+        """ Deletes both the image and the thumbnail of the given filename. """
+
+        if self.image_storage.exists(filename):
+            self.image_storage.remove(filename)
+
+        if self.thumbnail_storage.exists(filename):
+            self.thumbnail_storage.remove(filename)
+
+
+class Image(FilestorageFile):
+    """ A filestorage file that points to an image. """
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    @property
+    def thumbnail(self):
+        return Thumbnail(self.filename)
+
+    @property
+    def path(self):
+        return 'images/' + self.filename
+
+
+class Thumbnail(FilestorageFile):
+    """ A filestorage file that points to a thumbnail or the original file
+    storage file, if there can't be a thumbnail (say for *.svg).
+
+    Thumbnails are created on the fly and cached.
+
+    """
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    @property
+    def image(self):
+        return Image(self.filename)
+
+    @property
+    def path(self):
+        return 'images/thumbnails/' + self.filename
 
 
 class Editor(object):

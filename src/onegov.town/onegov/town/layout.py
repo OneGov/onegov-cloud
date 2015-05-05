@@ -132,6 +132,7 @@ class Layout(object):
         return zip_longest(fillvalue=fillvalue, *args)
 
     def csrf_protected_url(self, url):
+        """ Adds a csrf token to the given url. """
         return URL(url).query_param('csrf-token', self.csrf_token).as_string()
 
     @cached_property
@@ -142,8 +143,14 @@ class Layout(object):
 
     @cached_property
     def image_upload_json_url(self):
+        """ Adds the json url for image uploads. """
         url = self.request.link(ImageCollection(self.app), name='upload.json')
         return self.csrf_protected_url(url)
+
+    @cached_property
+    def image_list_url(self):
+        """ Adds the json url for image lists. """
+        return self.request.link(ImageCollection(self.app), name='json')
 
     @cached_property
     def homepage_url(self):

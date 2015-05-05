@@ -57,10 +57,10 @@ class Link(object):
         return tostring(a)
 
 
-class Image(object):
+class Img(object):
     """ Represents an img element. """
 
-    def __init__(self, src, alt=None, title=None):
+    def __init__(self, src, alt=None, title=None, url=None):
         #: The src of the image
         self.src = src
 
@@ -69,3 +69,6 @@ class Image(object):
 
         #: The title of the image
         self.title = title
+
+        #: The target of this image
+        self.url = url

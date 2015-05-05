@@ -44,6 +44,7 @@ setup(
         'onegov.foundation',
         'onegov.page',
         'onegov.user',
+        'pillow',
         'purl',
         'translationstring',
     ],

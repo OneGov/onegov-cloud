@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds image thumbnails and the ability to select previously uploaded images
+  in the html editor.
+  [href]
+
 - Adds support for image uploads through the html editor.
   [href]
 
