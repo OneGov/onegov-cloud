@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.2 (2015-05-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Upgrade to Zurb Foundation 5.5.2.
   [href]
 
