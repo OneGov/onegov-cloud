@@ -5,9 +5,9 @@ $(function() {
 
         textarea.redactor({
             buttons: [
-                'html', 'formatting', 'bold', 'italic', 'deleted',
+                'formatting', 'bold', 'italic', 'deleted',
                 'unorderedlist', 'orderedlist', 'image', 'link',
-                'horizontalrule'
+                'horizontalrule', 'html'
             ],
             formatting: ['p', 'blockquote'],
             imageUpload: form.data('image-upload-url'),
