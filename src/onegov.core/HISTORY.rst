@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The CSRF protection now associates a random secret with the session. The
+  random secret is then used to check if the CSRF token is valid.
+  [href]
+
 - Cache the translator on the request to be slightly more efficient.
   [href]
 
