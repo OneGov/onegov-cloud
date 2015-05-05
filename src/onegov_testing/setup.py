@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'coverage',
         'onegov.core',
+        'Pillow',
         'pytest',
         'sqlalchemy',
         'testing.postgresql'
