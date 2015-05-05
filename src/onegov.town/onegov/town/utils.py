@@ -17,6 +17,7 @@ def sanitize_html(html):
         'br',
         'blockquote',
         'code',
+        'del',
         'div',
         'em',
         'i',

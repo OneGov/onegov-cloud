@@ -4,10 +4,26 @@ $(function() {
         var form = textarea.closest('form');
 
         textarea.redactor({
+            buttons: [
+                'html', 'formatting', 'bold', 'italic', 'deleted',
+                'unorderedlist', 'orderedlist', 'image', 'link',
+                'horizontalrule'
+            ],
+            formatting: ['p', 'blockquote'],
             imageUpload: form.data('image-upload-url'),
             imageManagerJson: form.data('image-list-url'),
-            plugins: ['imagemanager'],
-            lang: 'de'
+            plugins: ['bufferbuttons', 'imagemanager'],
+            lang: 'de',
+            formattingAdd: [
+                {
+                    tag: 'h2',
+                    title: "Titel"
+                },
+                {
+                    tag: 'h3',
+                    title: "Untertitel"
+                }
+            ]
         });
     });
 });
