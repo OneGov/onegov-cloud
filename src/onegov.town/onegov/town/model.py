@@ -64,8 +64,11 @@ class ImageCollection(object):
         collection.
 
         """
-        for filename in self.image_storage.listdir(files_only=True):
-            yield Image(filename)
+        images = self.image_storage.ilistdirinfo(files_only=True)
+        images = sorted(images, key=lambda i: i[1]['created_time'])
+
+        for filename, info in images:
+            yield Image(filename, info)
 
     @property
     def thumbnails(self):
@@ -73,8 +76,11 @@ class ImageCollection(object):
         collection.
 
         """
-        for filename in self.thumbnail_storage.listdir(files_only=True):
-            yield Thumbnail(filename)
+        images = self.thumbnail_storage.ilistdirinfo(files_only=True)
+        images = sorted(images, key=lambda i: i[1]['created_time'])
+
+        for filename, info in images:
+            yield Thumbnail(filename, info)
 
     def store_image(self, image, filename):
         """ Stores an image (a file with a ``read()`` method) with the given
@@ -139,11 +145,21 @@ class ImageCollection(object):
             self.thumbnail_storage.remove(filename)
 
 
-class Image(FilestorageFile):
+class ImageFile(FilestorageFile):
     """ A filestorage file that points to an image. """
 
-    def __init__(self, filename):
+    def __init__(self, filename, info=None):
         self.filename = filename
+        self.info = info or {}
+
+    @property
+    def date(self):
+        if 'date' in self.info:
+            return self.info['created_time'].date()
+
+
+class Image(ImageFile):
+    """ A filestorage file that points to a full image (not a thumbnail). """
 
     @property
     def thumbnail(self):
@@ -154,16 +170,13 @@ class Image(FilestorageFile):
         return 'images/' + self.filename
 
 
-class Thumbnail(FilestorageFile):
+class Thumbnail(ImageFile):
     """ A filestorage file that points to a thumbnail or the original file
     storage file, if there can't be a thumbnail (say for *.svg).
 
     Thumbnails are created on the fly and cached.
 
     """
-
-    def __init__(self, filename):
-        self.filename = filename
 
     @property
     def image(self):

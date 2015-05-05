@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Images are now always shown in order of their creation.
+  [href]
+
 - Adds image thumbnails and the ability to select previously uploaded images
   in the html editor.
   [href]
