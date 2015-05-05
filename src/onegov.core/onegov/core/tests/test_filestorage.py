@@ -67,7 +67,7 @@ def test_filestorage(temporary_directory):
         @request.after
         def remember_login(response):
             morepath.remember_identity(response, request, morepath.Identity(
-                userid='test',
+                userid=request.params.get('userid'),
                 role='admin',
                 application_id=request.app.application_id
             ))
@@ -86,7 +86,8 @@ def test_filestorage(temporary_directory):
         filestorage_options={
             'root_path': temporary_directory
         },
-        identity_secure=False
+        identity_secure=False,
+        disable_memcached=True
     )
     app.namespace = 'tests'
     app.set_application_id('tests/foo')
@@ -116,13 +117,22 @@ def test_filestorage(temporary_directory):
         '/files/readme', expect_errors=True).status_code == 403
 
     anonymous_csrf_token = client.get('/csrf-token').text.strip()
-    client.get('/login')
+    client.get('/login?userid=test')
     logged_in_csrf_token = client.get('/csrf-token').text.strip()
+
+    admin_client = Client(app)
+    admin_client.get('/login?userid=admin')
+    admin_csrf_token = admin_client.get('/csrf-token').text.strip()
 
     assert client.delete(
         '/files/readme', expect_errors=True).status_code == 403
 
     protected_url = '/files/readme?csrf-token={}'.format(anonymous_csrf_token)
+    assert client.delete(protected_url, expect_errors=True).status_code == 403
+
+    print('admin')
+
+    protected_url = '/files/readme?csrf-token={}'.format(admin_csrf_token)
     assert client.delete(protected_url, expect_errors=True).status_code == 403
 
     protected_url = '/files/readme?csrf-token={}'.format(logged_in_csrf_token)

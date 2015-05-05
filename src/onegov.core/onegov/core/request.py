@@ -371,6 +371,9 @@ class CoreRequest(IncludeRequest):
         if not signed_value:
             raise HTTPForbidden()
 
+        if not self.csrf_salt:
+            raise HTTPForbidden()
+
         signer = TimestampSigner(self.app.identity_secret, salt=self.csrf_salt)
         try:
             signer.unsign(signed_value, max_age=self.app.csrf_time_limit)
