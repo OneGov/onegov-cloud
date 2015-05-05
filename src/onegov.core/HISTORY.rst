@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.2 (2015-05-05)
+~~~~~~~~~~~~~~~~~~~
+
 - The CSRF protection now associates a random secret with the session. The
   random secret is then used to check if the CSRF token is valid.
   [href]
