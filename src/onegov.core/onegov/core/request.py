@@ -319,7 +319,10 @@ class CoreRequest(IncludeRequest):
 
     @cached_property
     def csrf_salt(self):
-        return (self.current_role or 'anonymous') + self.app.application_id
+        if not self.browser_session.has('csrf_salt'):
+            self.browser_session['csrf_salt'] = random_token()
+
+        return self.browser_session['csrf_salt']
 
     def new_csrf_token(self):
         """ Returns a new CSRF token. A CSRF token can be verified
@@ -328,9 +331,29 @@ class CoreRequest(IncludeRequest):
         Note that forms do their own CSRF protection. This is meant
         for CSRF protection outside of forms.
 
+        onegov.core uses the Synchronizer Token Pattern for CSRF protection:
+        `<https://www.owasp.org/index.php/\
+        Cross-Site_Request_Forgery_%28CSRF%29_Prevention_Cheat_Sheet>`_
+
+        New CSRF tokens are signed usign a secret attached to the session (but
+        not sent out to the user). Clients have to return the CSRF token they
+        are given. The token has to match the secret, which the client doesn't
+        know. So an attacker would have to get access to both the cookie and
+        the html source to be able to forge a request.
+
+        Since cookies are marked as HTTP only (no javascript access), this
+        even prevents CSRF attack combined with XSS.
+
         """
+        # no csrf tokens for anonymous users (there's not really a point
+        # to doing this)
+        if not self.is_logged_in:
+            return ''
+
         # use app.identity_secret here, because that's being used for
         # more.itsdangerous, which uses the same algorithm
+        assert self.csrf_salt
+
         signer = TimestampSigner(self.app.identity_secret, salt=self.csrf_salt)
         return signer.sign(random_token())
 
