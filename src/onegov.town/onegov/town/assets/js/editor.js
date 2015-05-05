@@ -7,9 +7,7 @@ $(function() {
             imageUpload: form.data('image-upload-url'),
             imageManagerJson: form.data('image-list-url'),
             plugins: ['imagemanager'],
-            lang: 'de',
-            imagePosition: false,
-            imageResizable: false
+            lang: 'de'
         });
     });
 });
