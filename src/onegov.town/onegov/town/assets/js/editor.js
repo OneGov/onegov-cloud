@@ -6,7 +6,10 @@ $(function() {
         textarea.redactor({
             imageUpload: form.data('image-upload-url'),
             imageManagerJson: form.data('image-list-url'),
-            plugins: ['imagemanager']
+            plugins: ['imagemanager'],
+            lang: 'de',
+            imagePosition: false,
+            imageResizable: false
         });
     });
 });

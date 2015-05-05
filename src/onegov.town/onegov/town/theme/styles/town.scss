@@ -60,8 +60,13 @@ html {
 */
 form .redactor-editor {
     @include form-element;
+    cursor: text;
     height: 100%;
-    cursor: text;    
+    min-height: 250px;
+
+    img {
+        display: block;
+    }
 }
 
 /*
@@ -286,6 +291,20 @@ input[type=color] {
 }
 
 /*
+    richtext editor dropzone
+*/
+div#redactor-droparea {
+    background-color: $topbar-bg-color;
+    border: 1px dashed $primary-color;
+    font-size: 1rem;
+
+    input {
+        display: inline;
+        text-align: center;
+    }
+}
+
+/*
     confirm dialog styling
 */
 .confirm-modal .button {
@@ -318,6 +337,10 @@ input[type=color] {
 
 .page-content {
     margin-bottom: 1rem;
+
+    img {
+        display: block;
+    }
 }
 
 /*
