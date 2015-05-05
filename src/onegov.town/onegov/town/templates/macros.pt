@@ -40,9 +40,9 @@
 
 <metal:bottom_links define-macro="bottom-links">
     <ul class="bottom-links" tal:condition="layout.bottom_links">
-        <tal:block repeat="link layout.bottom_links">
+        <li tal:repeat="link layout.bottom_links">
             <tal:block replace="structure link(request)"/>
-        </tal:block>
+        </li>
     </ul>
 </metal:bottom_links>
 

@@ -10,6 +10,7 @@ from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
 from onegov.town.model import Town
+from onegov.town.utils import linkify
 
 
 class SettingsForm(Form):
@@ -27,6 +28,16 @@ class SettingsForm(Form):
             "Up to six URLs pointing to images for the tiles on the homepage."
         ),
         widget=with_options(TextArea, rows=6)
+    )
+    contact = TextAreaField(
+        label=_("Contact"),
+        description=_("The address and phone number of the municipality"),
+        widget=with_options(TextArea, rows=8)
+    )
+    opening_hours = TextAreaField(
+        label=_("Opening Hours"),
+        description=_("The opening hours of the municipality"),
+        widget=with_options(TextArea, rows=8)
     )
 
     @property
@@ -66,12 +77,22 @@ def handle_settings(self, request, form):
             town.name = form.name.data
             town.logo_url = form.logo_url.data
             town.theme_options = form.theme_options
+            town.meta = {
+                'contact': form.contact.data,
+                'contact_html': linkify(
+                    form.contact.data).replace('\n', '<br>'),
+                'opening_hours': form.opening_hours.data,
+                'opening_hours_html': linkify(
+                    form.opening_hours.data).replace('\n', '<br>')
+            }
 
         request.success(_(u"Your changes were saved."))
     else:
         form.name.data = self.name
         form.logo_url.data = self.logo_url
         form.theme_options = self.theme_options
+        form.contact.data = self.meta.get('contact')
+        form.opening_hours.data = self.meta.get('opening_hours')
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds contact and opening hours as a footer.
+  [href]
+
 0.0.2 (2015-05-05)
 ~~~~~~~~~~~~~~~~~~~
 

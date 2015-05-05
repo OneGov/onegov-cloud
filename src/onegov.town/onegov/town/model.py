@@ -33,6 +33,9 @@ class Town(Base, TimestampMixin):
     #: the theme options of the town
     theme_options = Column(JSON, nullable=True, default=user_colors.copy)
 
+    #: additional data associated with the town
+    meta = Column(JSON, nullable=True, default=dict)
+
 
 class ImageCollection(object):
     """ Defines the collection of images uploaded to the site. Currently

@@ -155,7 +155,7 @@ def test_startpage(town_app):
 def test_login(town_app):
     client = Client(town_app)
 
-    links = client.get('/').pyquery('.bottom-links a:first-child')
+    links = client.get('/').pyquery('.bottom-links li:first-child a')
     assert links.text() == 'Login'
 
     login_page = client.get(links.attr('href'))
@@ -177,13 +177,13 @@ def test_login(town_app):
     index_page = login_page.form.submit().follow()
     assert "Sie wurden eingeloggt" in index_page.text
 
-    links = index_page.pyquery('.bottom-links a:first-child')
+    links = index_page.pyquery('.bottom-links li:first-child a')
     assert links.text() == 'Logout'
 
     index_page = client.get(links.attr('href')).follow()
     assert "Sie wurden ausgeloggt" in index_page.text
 
-    links = index_page.pyquery('.bottom-links a:first-child')
+    links = index_page.pyquery('.bottom-links li:first-child a')
     assert links.text() == 'Login'
 
 

@@ -45,3 +45,14 @@ def sanitize_html(html):
     }
 
     return bleach.clean(html, tags=allowed_tags, attributes=allowed_attributes)
+
+
+def linkify(text):
+    """ Takes plain text and injects html links for urls and email addresses.
+
+    """
+
+    if not text:
+        return text
+
+    return bleach.linkify(text, parse_email=True)
