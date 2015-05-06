@@ -9,7 +9,7 @@ from onegov.town import _
 from onegov.town.utils import sanitize_html
 from onegov.town.app import TownApp
 from onegov.town.layout import EditorLayout
-from onegov.town.model import LinkEditor, PageEditor
+from onegov.town.models import LinkEditor, PageEditor
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea

@@ -1,7 +1,7 @@
 """ Contains the paths to the different models served by onegov.town. """
 
 from onegov.town.app import TownApp
-from onegov.town.model import (
+from onegov.town.models import (
     Image,
     ImageCollection,
     Thumbnail,

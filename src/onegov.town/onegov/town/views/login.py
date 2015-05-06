@@ -8,7 +8,7 @@ from onegov.town import _, log
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
-from onegov.town.model import Town
+from onegov.town.models import Town
 from onegov.user import UserCollection
 from purl import URL
 from wtforms import StringField, PasswordField, validators

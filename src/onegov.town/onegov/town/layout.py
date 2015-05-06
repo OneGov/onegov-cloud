@@ -4,7 +4,7 @@ from onegov.core.static import StaticFile
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link
-from onegov.town.model import ImageCollection
+from onegov.town.models import ImageCollection
 from purl import URL
 
 

@@ -11,7 +11,7 @@ from cached_property import cached_property
 from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
-from onegov.town.model import Town
+from onegov.town.models import Town
 from onegov.town.theme import TownTheme
 from webassets import Bundle
 

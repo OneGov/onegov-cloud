@@ -4,7 +4,7 @@ from collections import namedtuple
 from onegov.core.security import Public
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
-from onegov.town.model import Town
+from onegov.town.models import Town
 from onegov.town.layout import DefaultLayout
 
 

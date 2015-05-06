@@ -12,7 +12,7 @@ import sys
 import transaction
 
 from onegov.core.orm import Base, SessionManager
-from onegov.town.model import Town
+from onegov.town.models import Town
 from onegov.town.initial_content import add_initial_content
 
 

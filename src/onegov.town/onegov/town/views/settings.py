@@ -9,7 +9,7 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
-from onegov.town.model import Town
+from onegov.town.models import Town
 from onegov.town.utils import linkify
 
 

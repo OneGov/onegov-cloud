@@ -1,5 +1,5 @@
 from onegov.testing import utils
-from onegov.town.model import ImageCollection
+from onegov.town.models import ImageCollection
 
 
 def test_image_collection(town_app):

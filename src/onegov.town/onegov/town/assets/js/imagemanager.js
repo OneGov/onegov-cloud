@@ -42,6 +42,7 @@ if (!RedactorPlugins) var RedactorPlugins = {};
 
 						}, this));
 
+						this.observe.images();
 
 					}, this)
 				});

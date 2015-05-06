@@ -8,7 +8,7 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Img, Link
 from onegov.town.layout import DefaultLayout
-from onegov.town.model import ImageCollection, Image
+from onegov.town.models import ImageCollection, Image
 
 
 @TownApp.html(model=ImageCollection, template='images.pt', permission=Private)

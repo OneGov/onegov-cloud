@@ -1,5 +1,5 @@
 from onegov.page import PageCollection
-from onegov.town.model import Town
+from onegov.town.models import Town
 
 
 def add_initial_content(session, town_name):

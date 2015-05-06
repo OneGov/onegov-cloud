@@ -8,7 +8,7 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import PageLayout
-from onegov.town.model import LinkEditor, PageEditor
+from onegov.town.models import LinkEditor, PageEditor
 
 
 @TownApp.html(model=Page, template='page.pt', permission=Public)
