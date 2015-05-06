@@ -13,13 +13,12 @@ class PageCollection(object):
 
     """
 
-    def __init__(self, session, page_class=None):
+    def __init__(self, session):
         self.session = session
-        self.page_class = page_class or Page
 
     def query(self):
         """ Returns a query using :class:`onegov.page.model.Page`. """
-        return self.session.query(self.page_class)
+        return self.session.query()
 
     def by_id(self, page_id):
         """ Takes the given page id and returns the page. Try to keep this
