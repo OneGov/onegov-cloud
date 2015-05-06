@@ -1,3 +1,4 @@
+from inspect import isfunction
 from morepath import generic
 from morepath.directive import HtmlDirective, register_view
 from onegov.core.framework import Framework
@@ -10,6 +11,9 @@ class HtmlHandleFormDirective(HtmlDirective):
     Basically wraps the Morepath's ``html`` directive, registering both
     POST and GET (if no specific request method is given) and wrapping the
     view handler with :func:`wrap_with_generic_form_handler`.
+
+    The form is either a class or a function. If it's a function, it is
+    expected to return a form class when given an instance of the model.
 
     Example:
 
@@ -69,7 +73,12 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
     """
 
     def handle_form(self, request):
-        form = request.get_form(form_class)
+
+        if isfunction(form_class):
+            form = request.get_form(form_class(self))
+        else:
+            form = request.get_form(form_class)
+
         form.action = request.link(self, name=view_name)
 
         return obj(self, request, form)

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The form directive now also accepts a factory function.
+  [href]
+
 0.0.2 (2015-05-05)
 ~~~~~~~~~~~~~~~~~~~
 
