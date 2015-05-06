@@ -13,12 +13,13 @@ class PageCollection(object):
 
     """
 
-    def __init__(self, session):
+    def __init__(self, session, page_class=None):
         self.session = session
+        self.page_class = page_class or Page
 
     def query(self):
         """ Returns a query using :class:`onegov.page.model.Page`. """
-        return self.session.query(Page)
+        return self.session.query(self.page_class)
 
     def by_id(self, page_id):
         """ Takes the given page id and returns the page. Try to keep this
@@ -30,7 +31,7 @@ class PageCollection(object):
         """
         return self.query().filter(Page.id == page_id).first()
 
-    def by_path(self, path):
+    def by_path(self, path, ensure_type=None):
         """ Takes a path and returns the page associated with it.
 
         For example, given this hierarchy::
@@ -80,7 +81,8 @@ class PageCollection(object):
                 Page.parent_id == page.id
             ).first()
 
-        return page
+        if ensure_type is None or page.type == ensure_type:
+            return page
 
     def get_unique_child_name(self, name, parent):
         """ Takes the given name or title, normalizes it and makes sure
@@ -102,10 +104,11 @@ class PageCollection(object):
 
         return name
 
-    def add_root(self, title, meta=None, content=None, name=None):
-        return self.add(None, title, meta, content, name)
+    def add_root(self, title, type=None, meta=None, content=None, name=None):
+        return self.add(None, title, type, meta, content, name)
 
-    def add(self, parent, title, meta=None, content=None, name=None):
+    def add(self, parent, title,
+            type=None, meta=None, content=None, name=None):
         """ Adds a page to the given parent. """
 
         name = name or self.get_unique_child_name(title, parent)
@@ -113,9 +116,10 @@ class PageCollection(object):
         page = Page(
             parent=parent,
             title=title,
+            type=type,
             meta=meta,
             content=content,
-            name=name
+            name=name,
         )
 
         self.session.add(page)
@@ -123,10 +127,12 @@ class PageCollection(object):
 
         return page
 
-    def add_or_get_root(self, title, meta=None, content=None, name=None):
-        return self.add_or_get(None, title, meta, content, name)
+    def add_or_get_root(self, title,
+                        type=None, meta=None, content=None, name=None):
+        return self.add_or_get(None, title, type, meta, content, name)
 
-    def add_or_get(self, parent, title, meta=None, content=None, name=None):
+    def add_or_get(self, parent, title,
+                   type=None, meta=None, content=None, name=None):
         """ Adds a page to the given parent. If a page with the same name
         already exists the existing page is returned.
 
@@ -144,7 +150,7 @@ class PageCollection(object):
         if page:
             return page
         else:
-            return self.add(parent, title, meta, content, name)
+            return self.add(parent, title, type, meta, content, name)
 
     def delete(self, page):
         """ Deletes the given page and *all* it's desecendants!. """
@@ -164,4 +170,4 @@ class PageCollection(object):
         :meth:`get_unique_child_name`.
 
         """
-        return self.add(parent, page.title, page.meta, page.content)
+        return self.add(parent, page.title, page.type, page.meta, page.content)

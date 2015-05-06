@@ -13,6 +13,7 @@ def test_add_page(session):
     assert list(root.ancestors) == []
     assert root.path == 'test'
     assert root.absorb == 'test'
+    assert root.type is None
 
     child = pages.add(parent=root, title='Foo Bar')
 

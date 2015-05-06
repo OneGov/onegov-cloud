@@ -44,6 +44,11 @@ class Page(Base, TimestampMixin):
     #: the human readable title of the page
     title = Column(Text, nullable=False)
 
+    #: the type of the page, this can be used to create custom polymorphic
+    #: subclasses of Page. See `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: orm/extensions/declarative/inheritance.html>`_.
+    type = Column(Text, nullable=True)
+
     #: metdata associated with the page - the size of it should be kept small
     #: as metadata is loaded with every query by default
     #:
@@ -77,7 +82,8 @@ class Page(Base, TimestampMixin):
 
     # default sort order is order, id
     __mapper_args__ = {
-        "order_by": [order, id]
+        "order_by": [order, id],
+        "polymorphic_on": 'type'
     }
 
     __table_args__ = (

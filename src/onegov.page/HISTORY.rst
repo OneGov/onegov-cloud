@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a page type column which may be used for polymorphic identites.
+  [href]
+
 0.0.1 (2015-04-29)
 ~~~~~~~~~~~~~~~~~~~
 
