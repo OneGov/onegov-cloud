@@ -18,7 +18,7 @@ class PageCollection(object):
 
     def query(self):
         """ Returns a query using :class:`onegov.page.model.Page`. """
-        return self.session.query()
+        return self.session.query(Page)
 
     def by_id(self, page_id):
         """ Takes the given page id and returns the page. Try to keep this
