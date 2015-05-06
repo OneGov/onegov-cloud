@@ -8,12 +8,12 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import PageLayout
-from onegov.town.models import LinkEditor, PageEditor
+from onegov.town.models import Editor
+from webob import exc
 
 
 @TownApp.html(model=Page, template='page.pt', permission=Public)
 def view_page(self, request):
-
     if not request.is_logged_in:
         return view_public_page(self, request)
     else:
@@ -40,8 +40,8 @@ def view_private_page(self, request):
         'layout': PageLayout(self, request),
         'title': self.title,
         'page': self,
-        'add_links': tuple(get_links(self, request, 'add')),
-        'edit_links': tuple(get_links(self, request, 'edit')),
+        'add_links': tuple(add_links(self, request)),
+        'edit_links': tuple(edit_links(self, request)),
         'children': [
             Link(child.title, request.link(child)) for child in self.children
         ]
@@ -52,40 +52,33 @@ def view_private_page(self, request):
 def delete_page(self, request):
     request.assert_valid_csrf_token()
 
-    if self.meta['type'] == 'page':
-        message = _(u"The page was deleted")
-    else:
-        message = _(u"The link was deleted")
+    if not self.type_info.get('deletable'):
+        raise exc.HTTPMethodNotAllowed()
 
     PageCollection(request.app.session()).delete(self)
-    request.success(message)
+    request.success(self.type_info['delete_message'])
 
 
-def get_links(self, request, action):
+def add_links(self, request):
+    for page_type in (self.type_info.get('allowed_subtypes') or tuple()):
 
-    if self.meta['type'] in ('town-root', 'page') and action == 'add':
-        yield Link(
-            _("Page"), request.link(PageEditor('new', self)),
-            classes=('new-page', )
-        )
+        type_info = self.type_info_map[page_type]
 
         yield Link(
-            _("Link"), request.link(LinkEditor('new', self)),
-            classes=('new-link', )
+            type_info['name'],
+            request.link(Editor('new', self, page_type)),
+            classes=('new-{}'.format(page_type), )
         )
 
-    if self.meta['type'] == 'town-root' and action == 'edit':
-        yield Link(
-            _("Edit"), request.link(PageEditor('edit', self)),
-            classes=('edit-page', )
-        )
 
-    if self.meta['type'] == 'page' and action == 'edit':
-        yield Link(
-            _("Edit"), request.link(PageEditor('edit', self)),
-            classes=('edit-page', )
-        )
+def edit_links(self, request):
+    yield Link(
+        _("Edit"),
+        request.link(Editor('edit', self)),
+        classes=('edit-{}'.format(self.type), )
+    )
 
+    if self.type_info.get('deletable'):
         if self.children:
             extra_warning = _(
                 "Please note that this page has subpages "
@@ -96,38 +89,15 @@ def get_links(self, request, action):
 
         yield Link(
             _("Delete"), request.link(self), request_method='DELETE',
-            classes=('confirm', 'delete-page'),
+            classes=('confirm', 'delete-{}'.format(self.type)),
             attributes={
                 'data-confirm': _(
-                    "Do you really want to delete the page \"${title}\"?",
-                    mapping={
+                    self.type_info['delete_question'], mapping={
                         'title': self.title
-                    }
-                ),
-                'data-confirm-yes': _("Delete Page"),
+                    }),
+                'data-confirm-yes': self.type_info['delete_button'],
                 'data-confirm-no': _("Cancel"),
                 'data-confirm-extra': extra_warning,
-                'redirect-after': request.link(self.parent)
-            },
-        )
-
-    if self.meta['type'] == 'link' and action == 'edit':
-        yield Link(
-            _("Edit"), request.link(LinkEditor('edit', self)),
-            classes=('edit-link', )
-        )
-        yield Link(
-            _("Delete"), request.link(self), request_method='DELETE',
-            classes=('confirm', 'delete-link'),
-            attributes={
-                'data-confirm': _(
-                    "Do you really want to delete the link \"${title}\"?",
-                    mapping={
-                        'title': self.title
-                    }
-                ),
-                'data-confirm-yes': _("Delete Link"),
-                'data-confirm-no': _("Cancel"),
                 'redirect-after': request.link(self.parent)
             }
         )

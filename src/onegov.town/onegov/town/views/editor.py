@@ -9,7 +9,7 @@ from onegov.town import _
 from onegov.town.utils import sanitize_html
 from onegov.town.app import TownApp
 from onegov.town.layout import EditorLayout
-from onegov.town.models import LinkEditor, PageEditor
+from onegov.town.models import Editor
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
@@ -21,6 +21,14 @@ class BaseForm(Form):
 
 class LinkForm(BaseForm):
     url = URLField(_("URL"), [validators.InputRequired()])
+
+    def get_content(self):
+        return {
+            'url': self.url.data
+        }
+
+    def set_content(self, page):
+        self.url.data = page.content.get('url', '')
 
 
 class PageForm(BaseForm):
@@ -34,66 +42,51 @@ class PageForm(BaseForm):
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html])
 
+    def get_content(self):
+        return {
+            'lead': self.lead.data,
+            'text': self.text.data
+        }
+
+    def set_content(self, page):
+        self.lead.data = page.content.get('lead', '')
+        self.text.data = page.content.get('text', '')
+
+
+def get_form_class(editor):
+    type_info = morepath.settings().pages.type_info
+    return type_info[editor.page_type]['form']
+
 
 @TownApp.form(
-    model=PageEditor, form=PageForm, template='form.pt', permission=Private
-)
+    model=Editor, form=get_form_class, template='form.pt', permission=Private)
 def handle_page_form(self, request, form):
-
     if self.action == 'new':
-        return handle_new_page(self, request, form, page_type='page')
+        return handle_new_page(self, request, form, self.page_type)
     elif self.action == 'edit':
-        return handle_edit_page(self, request, form, page_type='page')
-    else:
-        raise NotImplementedError
-
-
-@TownApp.form(
-    model=LinkEditor, form=LinkForm, template='form.pt', permission=Private
-)
-def handle_link_form(self, request, form):
-
-    if self.action == 'new':
-        return handle_new_page(self, request, form, page_type='link')
-    elif self.action == 'edit':
-        return handle_edit_page(self, request, form, page_type='link')
+        return handle_edit_page(self, request, form, self.page_type)
     else:
         raise NotImplementedError
 
 
 def handle_new_page(self, request, form, page_type):
-    assert page_type in {'page', 'link'}
-
-    if page_type == 'page':
-        site_title = _(u"New Page")
-    else:
-        site_title = _(u"New Link")
+    type_info = morepath.settings().pages.type_info
 
     if form.submitted(request):
         pages = PageCollection(request.app.session())
 
-        if page_type == 'page':
-            meta = {'type': 'page'}
-            content = {
-                'lead': form.lead.data,
-                'text': form.text.data
-            }
-            message = _(u"Added a new page.")
-        else:
-            meta = {'type': 'link'}
-            content = {'url': form.url.data}
-            message = _(u"Added a new link.")
-
         page = pages.add(
             parent=self.page,
             title=form.title.data,
-            meta=meta,
-            content=content
+            meta={'type': page_type},
+            content=form.get_content()
         )
 
-        request.success(message)
+        request.success(type_info[page_type]['new_page_message'])
 
         return morepath.redirect(request.link(page))
+
+    site_title = type_info[page_type]['new_page_title']
 
     return {
         'layout': EditorLayout(self, request, site_title),
@@ -103,30 +96,20 @@ def handle_new_page(self, request, form, page_type):
 
 
 def handle_edit_page(self, request, form, page_type):
-    assert page_type in {'page', 'link'}
+    type_info = morepath.settings().pages.type_info
 
     if form.submitted(request):
         self.page.title = form.title.data
-
-        if page_type in {'page', 'town-root'}:
-            self.page.content['lead'] = form.lead.data
-            self.page.content['text'] = form.text.data
-        else:
-            self.page.content['url'] = form.url.data
+        self.page.content = form.get_content()
 
         request.success(_(u"Your changes were saved."))
 
         return morepath.redirect(request.link(self.page))
     else:
         form.title.data = self.page.title
+        form.set_content(self.page)
 
-        if page_type == 'page':
-            site_title = _(u"Edit Page")
-            form.lead.data = self.page.content.get('lead', '')
-            form.text.data = self.page.content.get('text', '')
-        else:
-            site_title = _(u"Edit Link")
-            form.url.data = self.page.content.get('url', '')
+    site_title = type_info[page_type]['edit_page_title']
 
     return {
         'layout': EditorLayout(self, request, site_title),

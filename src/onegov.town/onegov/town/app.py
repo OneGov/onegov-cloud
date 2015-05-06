@@ -11,6 +11,7 @@ from cached_property import cached_property
 from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
+from onegov.town import _
 from onegov.town.models import Town
 from onegov.town.theme import TownTheme
 from webassets import Bundle
@@ -152,3 +153,85 @@ def get_i18n_localedir():
 @TownApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de'
+
+
+@TownApp.setting(section='pages', name='type_info')
+def get_pages_type_info():
+    """ Defines what kind of pages are supported by onegov.town's page
+    view / page editor.
+
+    Supported properties:
+
+        :name:
+            The translatable name of the type.
+
+        :allowed_subtypes:
+            The types that may be added as children, if any.
+
+        :form:
+            The form to be used to edit the page. The form is
+            expected to implement a get_content and a set_content
+            method. ``get_content`` returns the page.content after
+            the form has been submitted. ``set_content`` takes a page
+            and sets the form fields to mirror page.content.
+
+        :new_page_title:
+            The translatable title of the new page.
+
+        :new_page_message:
+            The translatable message shown after a new page has been added.
+
+        :edit_page_title:
+            The translatable title of the edit page.
+
+        :deletable:
+            True if this type may be deleted (defaults to False).
+
+        :delete_message:
+            The translatable message shown after a page has been deleted.
+
+        :delete_button:
+            The text shown on the delete button.
+
+        :delete_question:
+            The question asked before deleting the page.
+
+    """
+
+    from onegov.town.views.editor import LinkForm, PageForm
+
+    return {
+        'town-root': dict(
+            name=_("Topic"),
+            allowed_subtypes=('page', 'link'),
+            edit_page_title=_("Edit Topic"),
+            form=PageForm,
+            deletable=False
+        ),
+        'link': dict(
+            name=_("Link"),
+            allowed_subtypes=None,
+            form=LinkForm,
+            new_page_title=_("New Link"),
+            new_page_message=_("Added a new link"),
+            edit_page_title=_("Edit Link"),
+            deletable=True,
+            delete_message=_("The link was deleted"),
+            delete_button=_("Delete link"),
+            delete_question=_(
+                "Do you really want to delete the link \"${title}\"?"),
+        ),
+        'page': dict(
+            name=_("Topic"),
+            allowed_subtypes=('page', 'link'),
+            form=PageForm,
+            new_page_title=_("New Topic"),
+            new_page_message=_("Added a new topic"),
+            edit_page_title=_("Edit Topic"),
+            deletable=True,
+            delete_message=_("The topic was deleted"),
+            delete_button=_("Delete topic"),
+            delete_question=_(
+                "Do you really want to delete the topic \"${title}\"?"),
+        )
+    }

@@ -5,9 +5,9 @@ from onegov.town.models import (
     Image,
     ImageCollection,
     Thumbnail,
-    LinkEditor,
-    PageEditor,
-    Town
+    Editor,
+    Town,
+    TypedPage
 )
 from onegov.page import Page, PageCollection
 
@@ -19,7 +19,10 @@ def get_town(app):
 
 @TownApp.path(model=Page, path='/themen', absorb=True)
 def get_page(app, absorb):
-    return PageCollection(app.session()).by_path(absorb)
+    return TypedPage.from_page(
+        page=PageCollection(app.session()).by_path(absorb),
+        acceptable_types=('page', 'link', 'town-root')
+    )
 
 
 @TownApp.path(model=ImageCollection, path='/bilder')
@@ -37,21 +40,9 @@ def get_thumbnail(app, filename):
     return ImageCollection(app).get_thumbnail_by_filename(filename)
 
 
-@TownApp.path(model=PageEditor, path='/editor/page/{page_id}/{action}')
-def get_page_editor(app, page_id, action):
-    page = PageCollection(app.session()).by_id(page_id)
+@TownApp.path(model=Editor, path='/editor/{page_type}/{page_id}/{action}')
+def get_editor(app, page_type, page_id, action):
+    page = TypedPage.from_page(PageCollection(app.session()).by_id(page_id))
 
-    if page is None:
-        return
-
-    return PageEditor(action=action, page=page)
-
-
-@TownApp.path(model=LinkEditor, path='/editor/link/{page_id}/{action}')
-def get_link_editor(app, page_id, action):
-    page = PageCollection(app.session()).by_id(page_id)
-
-    if page is None:
-        return
-
-    return LinkEditor(action=action, page=page)
+    if page is not None:
+        return Editor(action=action, page=page, page_type=page_type)

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Refactors pages to be easily be able to define new kind of pages.
+  [href]
+
 - Adds contact and opening hours as a footer.
   [href]
 

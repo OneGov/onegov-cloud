@@ -1,8 +1,69 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-05-05 17:08+0200\n"
+"POT-Creation-Date: 2015-05-06 15:35+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:205
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:225
+msgid "Topic"
+msgstr "Thema"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:207
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:230
+msgid "Edit Topic"
+msgstr "Thema Bearbeiten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:212
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:8
+msgid "Link"
+msgstr "Verknüpfung"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:215
+msgid "New Link"
+msgstr "Neue Verknüpfung"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:216
+msgid "Added a new link"
+msgstr "Eine neue Verknüpfung wurde hinzugefügt"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:217
+msgid "Edit Link"
+msgstr "Verknüpfung Bearbeiten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:219
+msgid "The link was deleted"
+msgstr "Die Verknüpfung wurde gelöscht"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:220
+msgid "Delete link"
+msgstr "Verknüpfung Löschen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:221
+#, python-format
+msgid "Do you really want to delete the link \"${title}\"?"
+msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:228
+msgid "New Topic"
+msgstr "Neues Thema"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:229
+msgid "Added a new topic"
+msgstr "Das neue Thema wurde hinzugefügt"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:232
+msgid "The topic was deleted"
+msgstr "Das Thema wurde gelöscht"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:233
+msgid "Delete topic"
+msgstr "Thema Löschen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:234
+#, python-format
+msgid "Do you really want to delete the topic \"${title}\"?"
+msgstr "Möchten Sie das Thema \"${title}\" wirklich löschen?"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:229
@@ -69,8 +130,7 @@ msgid "Delete Image"
 msgstr "Bild Löschen"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:25
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:108
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:130
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:99
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -101,13 +161,7 @@ msgstr "Absenden"
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:8
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:73
-msgid "Link"
-msgstr "Verknüpfung"
-
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:11
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:68
 msgid "Page"
 msgstr "Thema"
 
@@ -139,46 +193,22 @@ msgstr "Titel"
 msgid "URL"
 msgstr "URL"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:68
-msgid "New Page"
-msgstr "Neues Thema"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:70
-msgid "New Link"
-msgstr "Neue Verknüpfung"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:28
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:36
 msgid "Lead"
 msgstr "Einleitung"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:29
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:37
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:33
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:41
 msgid "Text"
 msgstr "Text"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:81
-msgid "Added a new page."
-msgstr "Die neue Seite wurde hinzugefügt."
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:85
-msgid "Added a new link."
-msgstr "Eine neue Verknüpfung wurde hinzugefügt."
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:117
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:105
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:89
 msgid "Your changes were saved."
 msgstr "Ihre Änderungen wurden gespeichert."
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:124
-msgid "Edit Page"
-msgstr "Thema Bearbeiten"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:128
-msgid "Edit Link"
-msgstr "Verknüpfung Bearbeiten"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/exceptionviews.py:25
 msgid "Access Denied"
@@ -209,48 +239,19 @@ msgstr "Sie wurden eingeloggt."
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:56
-msgid "The page was deleted"
-msgstr "Das Thema wurde gelöscht"
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:76
+msgid "Edit"
+msgstr "Bearbeiten"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:58
-msgid "The link was deleted"
-msgstr "Die Verknüpfung wurde gelöscht"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:90
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:83
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
 "werden!"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:79
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:85
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:116
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:98
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:120
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:91
 msgid "Delete"
 msgstr "Löschen"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:101
-#, python-format
-msgid "Do you really want to delete the page \"${title}\"?"
-msgstr "Möchten Sie das Thema \"${title}\" wirklich löschen?"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:107
-msgid "Delete Page"
-msgstr "Thema Löschen"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:123
-#, python-format
-msgid "Do you really want to delete the link \"${title}\"?"
-msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:129
-msgid "Delete Link"
-msgstr "Verknüpfung Löschen"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:19
 msgid "Name"
