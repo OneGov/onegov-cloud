@@ -7,6 +7,8 @@ from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
 
 
+#: Contains the messages that differ for each trait (the handling of all traits
+#: is the same). New traits need to adapt the same messages as the others.
 trait_messages = {
     'link': dict(
         name=_("Link"),
@@ -23,7 +25,6 @@ trait_messages = {
         new_page_title=_("New Topic"),
         new_page_added=_("Added a new topic"),
         edit_page_title=_("Edit Topic"),
-        deletable=True,
         delete_message=_("The topic was deleted"),
         delete_button=_("Delete topic"),
         delete_question=_(
@@ -33,17 +34,24 @@ trait_messages = {
 
 
 class TraitInfo(object):
+    """" Typically used as a mixin for Pages, this class provides
+    access to the trait related methods.
+
+    """
 
     @property
     def trait(self):
+        """ Gets the trait of the page. """
         return self.meta.get('trait')
 
     @trait.setter
     def trait(self, trait):
+        """ Sets the trait of the page. """
         self.meta['trait'] = trait
 
     @property
     def trait_messages(self):
+        """ Returns all trait_messages. """
         return trait_messages
 
 
@@ -52,6 +60,7 @@ class Topic(Page, TraitInfo):
 
     @property
     def allowed_subtraits(self):
+        """ Returns a list of traits that this page may contain. """
         if self.trait == 'link':
             return tuple()
 
@@ -62,13 +71,21 @@ class Topic(Page, TraitInfo):
 
     @staticmethod
     def is_supported_trait(trait):
+        """ Returns true if the given trait is supported by this type (this
+        doesn't mean that the trait may be added to this page, it serves
+        as a simple sanity check, returning True if the combination of the
+        type and the trait make any sense at all.
+
+        """
         return trait in {'link', 'page'}
 
     @property
     def deletable(self):
+        """ Returns true if this page may be deleted. """
         return self.parent is not None
 
     def get_form_class(self, trait):
+        """ Returns the form class for the given trait. """
         if trait == 'link':
             return LinkForm
 
@@ -79,22 +96,27 @@ class Topic(Page, TraitInfo):
 
 
 class PageForm(Form):
+    """ Defines the base form for all pages. """
     title = StringField(_("Title"), [validators.InputRequired()])
 
 
 class LinkForm(PageForm):
+    """ Defines the form for pages with the 'link' trait. """
     url = URLField(_("URL"), [validators.InputRequired()])
 
     def get_page(self, page):
+        """ Stores the form values on the page. """
         page.title = self.title.data
         page.content = {'url': self.url.data}
 
     def set_page(self, page):
+        """ Stores the page values on the form. """
         self.title.data = page.title
         self.url.data = page.content.get('url')
 
 
 class PageForm(PageForm):
+    """ Defines the form for pages with the 'page' trait. """
     lead = TextAreaField(
         label=_("Lead"),
         description=_("Describes what this page is about"),
@@ -106,6 +128,7 @@ class PageForm(PageForm):
         filters=[sanitize_html])
 
     def get_page(self, page):
+        """ Stores the form values on the page. """
         page.title = self.title.data
         page.content = {
             'lead': self.lead.data,
@@ -113,6 +136,7 @@ class PageForm(PageForm):
         }
 
     def set_page(self, page):
+        """ Stores the page values on the form. """
         self.title.data = page.title
         self.lead.data = page.content.get('lead', '')
         self.text.data = page.content.get('text', '')
