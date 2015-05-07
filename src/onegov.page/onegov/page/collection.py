@@ -81,7 +81,7 @@ class PageCollection(object):
                 Page.parent_id == page.id
             ).first()
 
-        if ensure_type is None or page.type == ensure_type:
+        if ensure_type is None or page is None or page.type == ensure_type:
             return page
 
     def get_unique_child_name(self, name, parent):

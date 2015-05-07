@@ -30,3 +30,4 @@ def test_article(session):
     assert pages.by_path('/root/article')
     assert pages.by_path('/root/article', ensure_type='article')
     assert not pages.by_path('/root/article', ensure_type='missing')
+    assert not pages.by_path('/root/inexistant', ensure_type='article')
