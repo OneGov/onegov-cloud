@@ -19,27 +19,32 @@ def add_initial_content(session, town_name):
     pages.add_root(
         'Leben & Wohnen',
         name='leben-wohnen',
-        meta={'type': 'town-root'}
+        type='topic',
+        meta={'trait': 'page'}
     ),
     pages.add_root(
         'Kultur & Freizeit',
         name='kultur-freizeit',
-        meta={'type': 'town-root'}
+        type='topic',
+        meta={'trait': 'page'}
     ),
     pages.add_root(
         'Bildung & Gesellschaft',
         name='bildung-gesellschaft',
-        meta={'type': 'town-root'}
+        type='topic',
+        meta={'trait': 'page'}
     ),
     pages.add_root(
         'Gewerbe & Tourismus',
         name='gewerbe-tourismus',
-        meta={'type': 'town-root'}
+        type='topic',
+        meta={'trait': 'page'}
     ),
     pages.add_root(
         'Politik & Verwaltung',
         name='politik-verwaltung',
-        meta={'type': 'town-root'}
+        type='topic',
+        meta={'trait': 'page'}
     )
 
     session.flush()

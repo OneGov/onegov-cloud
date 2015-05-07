@@ -6,10 +6,10 @@ from onegov.town.models import (
     ImageCollection,
     Thumbnail,
     Editor,
-    Town,
-    TypedPage
+    Topic,
+    Town
 )
-from onegov.page import Page, PageCollection
+from onegov.page import PageCollection
 
 
 @TownApp.path(model=Town, path='/')
@@ -17,12 +17,9 @@ def get_town(app):
     return app.town
 
 
-@TownApp.path(model=Page, path='/themen', absorb=True)
-def get_page(app, absorb):
-    return TypedPage.from_page(
-        page=PageCollection(app.session()).by_path(absorb),
-        acceptable_types=('page', 'link', 'town-root')
-    )
+@TownApp.path(model=Topic, path='/themen', absorb=True)
+def get_topic(app, absorb):
+    return PageCollection(app.session()).by_path(absorb, ensure_type='topic')
 
 
 @TownApp.path(model=ImageCollection, path='/bilder')
@@ -40,9 +37,16 @@ def get_thumbnail(app, filename):
     return ImageCollection(app).get_thumbnail_by_filename(filename)
 
 
-@TownApp.path(model=Editor, path='/editor/{page_type}/{page_id}/{action}')
-def get_editor(app, page_type, page_id, action):
-    page = TypedPage.from_page(PageCollection(app.session()).by_id(page_id))
+@TownApp.path(
+    model=Editor, path='/editor/{action}/{trait}/{page_id}')
+def get_editor(app, action, trait, page_id):
+    if not Topic.is_supported_trait(trait):
+        return None
+
+    if not Editor.is_supported_action(action):
+        return None
+
+    page = PageCollection(app.session()).by_id(page_id)
 
     if page is not None:
-        return Editor(action=action, page=page, page_type=page_type)
+        return Editor(action=action, page=page, trait=trait)

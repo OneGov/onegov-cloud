@@ -1,5 +1,5 @@
 from onegov.testing import utils
-from onegov.town.models import ImageCollection, TypedPage
+from onegov.town.models import ImageCollection
 
 
 def test_image_collection(town_app):
@@ -24,16 +24,3 @@ def test_image_collection(town_app):
 
     assert len(list(collection.images)) == 0
     assert len(list(collection.thumbnails)) == 0
-
-
-def test_typed_page():
-
-    class MockPage(object):
-
-        def __init__(self, page_type):
-            self.meta = {'type': page_type}
-
-    assert TypedPage.from_page(MockPage('page'), ('link', )) is None
-
-    page = TypedPage.from_page(MockPage('page'))
-    assert page.type == 'page'

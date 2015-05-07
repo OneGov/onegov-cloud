@@ -176,11 +176,12 @@ class DefaultLayout(Layout):
 
     @cached_property
     def root_pages(self):
-        roots = PageCollection(self.app.session()).query().filter(
+        query = PageCollection(self.app.session()).query()
+        query = query.filter(
             Page.parent_id == None,
-            Page.meta != None
+            Page.type == 'topic'
         )
-        return [r for r in roots.all() if r.meta.get('type') == 'town-root']
+        return query.all()
 
     @cached_property
     def top_navigation(self):

@@ -43,7 +43,7 @@ setup(
         'onegov.core>=0.1.0',
         'onegov.form',
         'onegov.foundation',
-        'onegov.page',
+        'onegov.page>=0.1.0',
         'onegov.user',
         'pillow',
         'purl',

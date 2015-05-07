@@ -7,7 +7,7 @@ class Editor(object):
     completely and turned into SQL queries.
 
     """
-    def __init__(self, action, page, page_type=None):
+    def __init__(self, action, page, trait=None):
         """ The editor is defined by an action and a page/context.
 
         :action:
@@ -17,19 +17,29 @@ class Editor(object):
             The 'context' of the action. The actual page in the case of 'edit'
             and 'delete'. The parent in the case of 'new'.
 
-        :page_type:
-            The type of the page. Only necessary in the case of 'new'.
+            New pages inherit the type from the parent.
+
+        :trait:
+            The trait of the page. Currently either 'link' or 'page'.
+            Only necessary if it's a new page. The trait controls the content
+            of the page and leads to different forms.
+
+            See :module:`onegov.town.models.page`.
 
         """
 
+        assert self.is_supported_action(action)
+
         self.action = action
         self.page = page
+        self.trait = action == 'new' and trait or page.trait
 
-        if self.action == 'new':
-            self.page_type = page_type
-        else:
-            self.page_type = page.type
+    @staticmethod
+    def is_supported_action(action):
+        """ Returns True if the given action is supported. """
+        return action in {'new', 'edit', 'delete'}
 
     @property
     def page_id(self):
+        """ Returns the page id so morepath can create a link to this. """
         return self.page.id
