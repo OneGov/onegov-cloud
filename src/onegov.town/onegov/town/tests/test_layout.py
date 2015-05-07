@@ -45,14 +45,17 @@ def test_page_layout_sidebar(session):
     page = Page(
         name='grandma',
         title='Grandma',
+        type='topic',
         children=[
             Page(
                 name='ma',
                 title='Ma',
+                type='topic',
                 children=[
                     Page(
                         name='ada',
-                        title='Ada'
+                        title='Ada',
+                        type='topic'
                     )
                 ]
             )

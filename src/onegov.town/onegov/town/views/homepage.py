@@ -14,13 +14,14 @@ def view_town(self, request):
 
     layout = DefaultLayout(self, request)
     Tile = namedtuple('Tile', ['page', 'links', 'number'])
+
     tiles = [
         Tile(
             page=Link(page.title, request.link(page)),
             number=ix + 1,
             links=[
                 Link(c.title, request.link(c), classes=('tile-sub-link',))
-                for c in page.children[:3]
+                for c in (page.children[:3] if page.type == 'topic' else [])
             ]
         ) for ix, page in enumerate(layout.root_pages)
     ]
@@ -28,5 +29,6 @@ def view_town(self, request):
     return {
         'layout': layout,
         'title': self.name,
-        'tiles': tiles
+        'tiles': tiles,
+        'news': layout.root_pages[-1].news_query.limit(3).all()
     }

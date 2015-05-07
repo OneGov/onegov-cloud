@@ -177,10 +177,8 @@ class DefaultLayout(Layout):
     @cached_property
     def root_pages(self):
         query = PageCollection(self.app.session()).query()
-        query = query.filter(
-            Page.parent_id == None,
-            Page.type == 'topic'
-        )
+        query = query.filter(Page.parent_id == None)
+
         return query.all()
 
     @cached_property
@@ -242,7 +240,7 @@ class PageLayout(DefaultLayout):
 
         links = []
 
-        for page in self.model.siblings.all():
+        for page in self.model.siblings.filter(Page.type == 'topic').all():
             if page != self.model:
                 links.append(
                     Link(page.title, self.request.link(page))
@@ -268,7 +266,12 @@ class PageLayout(DefaultLayout):
         return links
 
 
+class NewsLayout(PageLayout):
+    sidebar_links = None
+
+
 class EditorLayout(PageLayout):
+    sidebar_links = None
 
     def __init__(self, model, request, site_title):
         super(PageLayout, self).__init__(model, request)
@@ -277,10 +280,6 @@ class EditorLayout(PageLayout):
         self.request.include('redactor')
         self.request.include('redactor_theme')
         self.request.include('editor')
-
-    @cached_property
-    def sidebar_links(self):
-        pass
 
     @cached_property
     def breadcrumbs(self):

@@ -1,36 +1,14 @@
+from onegov.core import utils
 from onegov.form import Form, with_options
 from onegov.page import Page
 from onegov.town import _
+from onegov.town.const import NEWS_PREFIX, TRAIT_MESSAGES
 from onegov.town.utils import sanitize_html
+from sqlalchemy import desc
+from sqlalchemy.orm import object_session
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
-
-
-#: Contains the messages that differ for each trait (the handling of all traits
-#: is the same). New traits need to adapt the same messages as the others.
-trait_messages = {
-    'link': dict(
-        name=_("Link"),
-        new_page_title=_("New Link"),
-        new_page_added=_("Added a new link"),
-        edit_page_title=_("Edit Link"),
-        delete_message=_("The link was deleted"),
-        delete_button=_("Delete link"),
-        delete_question=_(
-            "Do you really want to delete the link \"${title}\"?"),
-    ),
-    'page': dict(
-        name=_("Topic"),
-        new_page_title=_("New Topic"),
-        new_page_added=_("Added a new topic"),
-        edit_page_title=_("Edit Topic"),
-        delete_message=_("The topic was deleted"),
-        delete_button=_("Delete topic"),
-        delete_question=_(
-            "Do you really want to delete the topic \"${title}\"?"),
-    )
-}
 
 
 class TraitInfo(object):
@@ -52,15 +30,41 @@ class TraitInfo(object):
     @property
     def trait_messages(self):
         """ Returns all trait_messages. """
-        return trait_messages
+        return TRAIT_MESSAGES
+
+    @property
+    def allowed_subtraits(self):
+        """ Returns a list of traits that this page may contain. """
+        raise NotImplementedError
+
+    def is_supported_trait(trait):
+        """ Returns true if the given trait is supported by this type This
+        doesn't mean that the trait may be added to this page, it serves
+        as a simple sanity check, returning True if the combination of the
+        type and the trait make any sense at all.
+
+        """
+        raise NotImplementedError
+
+    def get_form_class(self, trait):
+        """ Returns the form class for the given trait. """
+        raise NotImplementedError
 
 
 class Topic(Page, TraitInfo):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     @property
+    def deletable(self):
+        """ Returns true if this page may be deleted. """
+        return self.parent is not None
+
+    @property
+    def editable(self):
+        return True
+
+    @property
     def allowed_subtraits(self):
-        """ Returns a list of traits that this page may contain. """
         if self.trait == 'link':
             return tuple()
 
@@ -69,23 +73,10 @@ class Topic(Page, TraitInfo):
 
         raise NotImplementedError
 
-    @staticmethod
-    def is_supported_trait(trait):
-        """ Returns true if the given trait is supported by this type (this
-        doesn't mean that the trait may be added to this page, it serves
-        as a simple sanity check, returning True if the combination of the
-        type and the trait make any sense at all.
-
-        """
+    def is_supported_trait(self, trait):
         return trait in {'link', 'page'}
 
-    @property
-    def deletable(self):
-        """ Returns true if this page may be deleted. """
-        return self.parent is not None
-
     def get_form_class(self, trait):
-        """ Returns the form class for the given trait. """
         if trait == 'link':
             return LinkForm
 
@@ -93,6 +84,47 @@ class Topic(Page, TraitInfo):
             return PageForm
 
         raise NotImplementedError
+
+
+class News(Page, TraitInfo):
+    __mapper_args__ = {'polymorphic_identity': 'news'}
+
+    @property
+    def absorb(self):
+        return utils.lchop(self.path, NEWS_PREFIX).lstrip('/')
+
+    @property
+    def deletable(self):
+        return self.parent is not None
+
+    @property
+    def editable(self):
+        return self.parent is not None
+
+    @property
+    def allowed_subtraits(self):
+        # only allow one level of news
+        if self.parent is None:
+            return ('news', )
+        else:
+            return tuple()
+
+    def is_supported_trait(self, trait):
+        return trait in {'news'}
+
+    def get_form_class(self, trait):
+        if trait == 'news':
+            return PageForm
+
+        raise NotImplementedError
+
+    @property
+    def news_query(self):
+        query = object_session(self).query(News)
+        query = query.filter(Page.parent == self)
+        query = query.order_by(desc(Page.created))
+
+        return query
 
 
 class PageForm(Form):

@@ -209,13 +209,19 @@ input[type=color] {
         content: '\f0c1';
     }
 
+    .new-news:before {
+        content: '\f1ea';
+    }
+
     .edit-town-root:before,
     .edit-page:before,
+    .edit-news:before,
     .edit-link:before {
         content: '\f040';
     }
 
     .delete-link:before,
+    .delete-news:before,
     .delete-page:before {
         content: '\f014';
     }
@@ -441,4 +447,39 @@ div#redactor-droparea {
         padding-bottom: 1rem;
         padding-top: .5rem;
     }
+}
+
+/*
+    news list
+*/
+
+.news-list-item {
+    a h2 {
+        color: $side-nav-link-color;
+        font-size: $h4-font-size;
+        margin-bottom: .5rem;
+    }
+
+    a:hover h2 {
+        color: $side-nav-link-color-hover;
+    }
+
+    .news-date {
+        color: $monsoon;
+        font-size: $bottom-links-size;
+        margin-bottom: .5rem;
+    }
+
+    .news-lead {
+        margin-bottom: .5rem;
+    }
+}
+
+
+/*
+    hide the news in the topbar
+*/
+
+.top-bar-section li:last-child {
+    display: none;
 }

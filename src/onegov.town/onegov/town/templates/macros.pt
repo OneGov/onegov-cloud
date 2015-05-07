@@ -91,4 +91,21 @@
     </form>
 </metal:dropzone>
 
+<metal:dropzone define-macro="newslist" i18n:domain="onegov.town">
+    <div class="newslist" tal:condition="news">
+        <div class="row news-list-item" tal:repeat="item news">
+            <div class="small-12 columns">
+                <a tal:attributes="href request.link(item)">
+                    <h2>${item.title}</h2>
+                </a>
+                <p class="news-date">${item.created.strftime('%d.%m.%Y %H:%M')}</p>
+                <p class="news-lead">${item.content.lead}</p>
+                <p class="news-continue">
+                    <a tal:attributes="href request.link(item)" i18n:translate="">read on...</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</metal:dropzone>
+
 </body>

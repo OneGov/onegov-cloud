@@ -1,4 +1,5 @@
 from onegov.page import PageCollection
+from onegov.town.const import NEWS_PREFIX
 from onegov.town.models import Town
 
 
@@ -45,6 +46,12 @@ def add_initial_content(session, town_name):
         name='politik-verwaltung',
         type='topic',
         meta={'trait': 'page'}
+    )
+    pages.add_root(
+        'Aktuelles',
+        name=NEWS_PREFIX,
+        type='news',
+        meta={'trait': 'news'}
     )
 
     session.flush()

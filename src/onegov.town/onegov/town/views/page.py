@@ -7,13 +7,24 @@ from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
-from onegov.town.layout import PageLayout
+from onegov.town.layout import NewsLayout, PageLayout
 from onegov.town.models import Editor
 from webob import exc
 
 
+@TownApp.view(model=Page, request_method='DELETE', permission=Private)
+def delete_page(self, request):
+    request.assert_valid_csrf_token()
+
+    if not self.deletable:
+        raise exc.HTTPMethodNotAllowed()
+
+    PageCollection(request.app.session()).delete(self)
+    request.success(self.trait_messages[self.trait]['delete_message'])
+
+
 @TownApp.html(model=Page, template='page.pt', permission=Public)
-def view_page(self, request):
+def view_topic(self, request):
     if not request.is_logged_in:
         return view_public_page(self, request)
     else:
@@ -29,6 +40,7 @@ def view_public_page(self, request):
         return {
             'layout': PageLayout(self, request),
             'title': self.title,
+            'name': self.trait_messages[self.trait]['name'],
             'page': self,
             'children': [
                 Link(child.title, request.link(child))
@@ -36,31 +48,44 @@ def view_public_page(self, request):
             ]
         }
 
+    if self.trait == 'news':
+        return {
+            'layout': NewsLayout(self, request),
+            'title': self.title,
+            'name': self.trait_messages[self.trait]['name'],
+            'page': self,
+            'children': self.news_query.all(),
+        }
+
     raise NotImplementedError
 
 
 def view_private_page(self, request):
-    return {
-        'layout': PageLayout(self, request),
-        'title': self.title,
-        'page': self,
-        'add_links': tuple(add_links(self, request)),
-        'edit_links': tuple(edit_links(self, request)),
-        'children': [
-            Link(child.title, request.link(child)) for child in self.children
-        ]
-    }
 
+    if self.type == 'topic':
+        return {
+            'layout': PageLayout(self, request),
+            'title': self.title,
+            'name': self.trait_messages[self.trait]['name'],
+            'page': self,
+            'add_links': tuple(add_links(self, request)),
+            'edit_links': tuple(edit_links(self, request)),
+            'children': [
+                Link(child.title, request.link(child))
+                for child in self.children
+            ]
+        }
 
-@TownApp.view(model=Page, request_method='DELETE', permission=Private)
-def delete_page(self, request):
-    request.assert_valid_csrf_token()
-
-    if not self.deletable:
-        raise exc.HTTPMethodNotAllowed()
-
-    PageCollection(request.app.session()).delete(self)
-    request.success(self.trait_messages[self.trait]['delete_message'])
+    if self.type == 'news':
+        return {
+            'layout': NewsLayout(self, request),
+            'title': self.title,
+            'name': self.trait_messages[self.trait]['name'],
+            'page': self,
+            'add_links': tuple(add_links(self, request)),
+            'edit_links': tuple(edit_links(self, request)),
+            'children': self.news_query.all()
+        }
 
 
 def add_links(self, request):
@@ -76,11 +101,12 @@ def add_links(self, request):
 
 
 def edit_links(self, request):
-    yield Link(
-        _("Edit"),
-        request.link(Editor('edit', self)),
-        classes=('edit-{}'.format(self.trait), )
-    )
+    if self.editable:
+        yield Link(
+            _("Edit"),
+            request.link(Editor('edit', self)),
+            classes=('edit-{}'.format(self.trait), )
+        )
 
     if self.deletable:
         trait_messages = self.trait_messages[self.trait]

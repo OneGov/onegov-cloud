@@ -1,69 +1,95 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-05-06 15:35+0200\n"
+"POT-Creation-Date: 2015-05-07 14:32+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:205
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:225
-msgid "Topic"
-msgstr "Thema"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:207
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:230
-msgid "Edit Topic"
-msgstr "Thema Bearbeiten"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:212
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:8
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:9
 msgid "Link"
 msgstr "Verknüpfung"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:215
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:10
 msgid "New Link"
 msgstr "Neue Verknüpfung"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:216
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:11
 msgid "Added a new link"
 msgstr "Eine neue Verknüpfung wurde hinzugefügt"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:217
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:12
 msgid "Edit Link"
 msgstr "Verknüpfung Bearbeiten"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:219
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:13
 msgid "The link was deleted"
 msgstr "Die Verknüpfung wurde gelöscht"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:220
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:14
 msgid "Delete link"
 msgstr "Verknüpfung Löschen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:221
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:15
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
 msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:228
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:19
+msgid "Topic"
+msgstr "Thema"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:20
 msgid "New Topic"
 msgstr "Neues Thema"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:229
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:21
 msgid "Added a new topic"
 msgstr "Das neue Thema wurde hinzugefügt"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:232
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:22
+msgid "Edit Topic"
+msgstr "Thema Bearbeiten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:23
 msgid "The topic was deleted"
 msgstr "Das Thema wurde gelöscht"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:233
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:24
 msgid "Delete topic"
 msgstr "Thema Löschen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/app.py:234
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:25
 #, python-format
 msgid "Do you really want to delete the topic \"${title}\"?"
 msgstr "Möchten Sie das Thema \"${title}\" wirklich löschen?"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:29
+msgid "News"
+msgstr "Nachricht"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:30
+msgid "Add News"
+msgstr "Nachricht hinzufügen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:31
+msgid "Added news"
+msgstr "Eine neue Nachricht wurde hinzugefügt"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:32
+msgid "Edit News"
+msgstr "Nachricht bearbeiten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:33
+msgid "The news was deleted"
+msgstr "Die Nachricht wurde gelöscht"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:34
+msgid "Delete news"
+msgstr "Nachricht löschen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/const.py:35
+#, python-format
+msgid "Do you really want to delete the news \"${title}\"?"
+msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:229
@@ -100,6 +126,26 @@ msgstr "Login"
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:135
+msgid "Title"
+msgstr "Titel"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:140
+msgid "URL"
+msgstr "URL"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:156
+msgid "Lead"
+msgstr "Einleitung"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:157
+msgid "Describes what this page is about"
+msgstr "Beschreibt kurz um was es bei diesem Thema geht"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:161
+msgid "Text"
+msgstr "Text"
+
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:6
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Ihnen felt die nötige Berechtigung um diese Seite zu öffnen."
@@ -112,6 +158,10 @@ msgstr ""
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:14
 msgid "Please follow this link to login."
 msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/homepage.pt:25
+msgid "Latest news"
+msgstr "Aktuelles"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:8
 msgid "Upload"
@@ -130,7 +180,7 @@ msgid "Delete Image"
 msgstr "Bild Löschen"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:25
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:99
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:131
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -161,15 +211,15 @@ msgstr "Absenden"
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:11
-msgid "Page"
-msgstr "Thema"
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:104
+msgid "read on..."
+msgstr "weiterlesen..."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:22
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:17
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:62
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:76
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -177,7 +227,7 @@ msgstr ""
 "Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
 "auf den folgende Verweis weitergeleitet:"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:69
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:83
 msgid ""
 "You are not automatically redirected so you have a chance to edit or delete "
 "this link."
@@ -185,27 +235,7 @@ msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie eine Chance haben den "
 "Verweis zu bearbeiten oder zu löschen."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:19
-msgid "Title"
-msgstr "Titel"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:23
-msgid "URL"
-msgstr "URL"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:36
-msgid "Lead"
-msgstr "Einleitung"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:37
-msgid "Describes what this page is about"
-msgstr "Beschreibt kurz um was es bei diesem Thema geht"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:41
-msgid "Text"
-msgstr "Text"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:105
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:51
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:89
 msgid "Your changes were saved."
 msgstr "Ihre Änderungen wurden gespeichert."
@@ -239,17 +269,17 @@ msgstr "Sie wurden eingeloggt."
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:76
-msgid "Edit"
-msgstr "Bearbeiten"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:83
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:115
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
 "werden!"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:91
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:106
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:123
 msgid "Delete"
 msgstr "Löschen"
 

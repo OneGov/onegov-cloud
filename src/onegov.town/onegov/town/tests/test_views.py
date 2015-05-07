@@ -309,6 +309,55 @@ def test_pages(town_app):
     assert page.pyquery('i').text().startswith("Experts say hiring more")
 
 
+def test_news(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    page = login_page.form.submit().follow()
+
+    assert len(page.pyquery('.latest-news')) == 0
+
+    page = page.click('Aktuelles', index=1)
+    page = page.click('Nachricht')
+
+    page.form['title'] = "We have a new homepage"
+    page.form['lead'] = "It is very good"
+    page.form['text'] = "It is lots of fun"
+
+    page = page.form.submit().follow()
+
+    assert "We have a new homepage" in page.text
+    assert "It is very good" in page.text
+    assert "It is lots of fun" in page.text
+
+    page = client.get('/aktuelles')
+
+    assert "We have a new homepage" in page.text
+    assert "It is very good" in page.text
+    assert "It is lots of fun" not in page.text
+
+    page = client.get('/')
+
+    assert "We have a new homepage" in page.text
+    assert "It is very good" in page.text
+    assert "It is lots of fun" not in page.text
+
+    page = page.click('weiterlesen...')
+
+    assert "We have a new homepage" in page.text
+    assert "It is very good" in page.text
+    assert "It is lots of fun" in page.text
+
+    client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
+    page = client.get('/aktuelles')
+
+    assert "We have a new homepage" not in page.text
+    assert "It is very good" not in page.text
+    assert "It is lots of fun" not in page.text
+
+
 def test_delete_pages(town_app):
     client = Client(town_app)
 

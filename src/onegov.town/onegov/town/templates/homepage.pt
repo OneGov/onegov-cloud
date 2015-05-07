@@ -19,7 +19,11 @@
                     </div>
                 </div>
             </div>
-            <div class="columns small-12 medium-4 large-4">
+        </div>
+        <div class="row latest-news" tal:condition="news">
+            <div class="columns small-12 medium-7 end">
+                <h2 i18n:translate="">Latest news</h2>
+                <div metal:use-macro="layout.macros.newslist" />
             </div>
         </div>
     </tal:block>

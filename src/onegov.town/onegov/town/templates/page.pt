@@ -5,12 +5,7 @@
                 <div class="edit-bar clearfix">
                     <tal:block condition="edit_links">
                         <button href="#" data-dropdown="edit-content" class="tiny button dropdown">
-                            <tal:block condition="page.trait == 'link'" i18n:translate="">
-                                Link
-                            </tal:block>
-                            <tal:block condition="page.trait == 'page'" i18n:translate="">
-                                Page
-                            </tal:block>
+                            ${name}
                         </button>
                         <ul id="edit-content" data-dropdown-content class="f-dropdown">
                             <li tal:repeat="link edit_links">
@@ -53,6 +48,25 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+        </tal:block>
+        <tal:block condition="page.trait == 'news'">
+            <div class="row" tal:condition="children">
+                <div class="columns small-12 medium-7 end">
+                    <div metal:use-macro="layout.macros.newslist" tal:define="news children" />
+                </div>
+            </div>
+            <div class="row" tal:condition="not:children">
+                <tal:block condition="page.content.get('lead') or page.content.get('text')">
+                    <div class="small-9 columns end">
+                        <em class="page-lead" tal:condition="page.content.lead|nothing" 
+                            tal:content="page.content.lead">
+                        </em>
+                        <div class="page-content" tal:condition="page.content.text|nothing"
+                            tal:content="structure: page.content.text">
+                        </div>
+                    </div>
+                </tal:block>
             </div>
         </tal:block>
         <tal:block condition="page.trait == 'link'">

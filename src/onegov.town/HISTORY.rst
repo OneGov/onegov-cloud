@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a news section.
+  [href]
+
 - Refactors pages to be easily be able to define new kind of pages.
   [href]
 
