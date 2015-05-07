@@ -10,9 +10,14 @@ def test_article(session):
     pages = PageCollection(session)
     root = pages.add_root("Root")
 
-    pages.add(parent=root, title='Article', type='article')
-    pages.add(parent=root, title='Page')
-    pages.add(parent=root, title='Test', type='generic')
+    page = pages.add(parent=root, title='Article', type='article')
+    assert isinstance(page, Article)
+
+    page = pages.add(parent=root, title='Page')
+    assert not isinstance(page, Article)
+
+    page = pages.add(parent=root, title='Test', type='generic')
+    assert not isinstance(page, Article)
 
     assert isinstance(pages.by_path('/root/article'), Article)
     assert not isinstance(pages.by_path('/root/page'), Article)

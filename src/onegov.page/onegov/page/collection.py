@@ -1,6 +1,7 @@
 from onegov.core.utils import normalize_for_url
 from onegov.page.model import Page
 from onegov.page import utils
+from sqlalchemy import inspect
 
 
 class PageCollection(object):
@@ -112,13 +113,17 @@ class PageCollection(object):
 
         name = name or self.get_unique_child_name(title, parent)
 
-        page = Page(
+        # look up the right class depending on the type
+        page_mapper = inspect(Page).polymorphic_map.get(type)
+        page_class = page_mapper and page_mapper.class_ or Page
+
+        page = page_class(
             parent=parent,
             title=title,
             type=type,
             meta=meta,
             content=content,
-            name=name,
+            name=name
         )
 
         self.session.add(page)
