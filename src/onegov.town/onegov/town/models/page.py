@@ -5,7 +5,7 @@ from onegov.town import _
 from onegov.town.const import NEWS_PREFIX, TRAIT_MESSAGES
 from onegov.town.utils import sanitize_html
 from sqlalchemy import desc
-from sqlalchemy.orm import object_session
+from sqlalchemy.orm import undefer, object_session
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
@@ -123,6 +123,8 @@ class News(Page, TraitInfo):
         query = object_session(self).query(News)
         query = query.filter(Page.parent == self)
         query = query.order_by(desc(Page.created))
+        query = query.options(undefer('created'))
+        query = query.options(undefer('content'))
 
         return query
 
