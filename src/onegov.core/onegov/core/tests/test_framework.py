@@ -261,7 +261,7 @@ def test_sign_unsign():
 
     signed_by_one = framework.sign('foo')
     framework.application_id = 'two'
-    assert framework.unsign(signed_by_one) == None
+    assert framework.unsign(signed_by_one) is None
     framework.application_id = 'one'
     assert framework.unsign(signed_by_one) == 'foo'
 
