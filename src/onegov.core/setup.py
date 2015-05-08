@@ -29,6 +29,7 @@ dependencies = {
     'pylru',
     'pyreact',
     'sqlalchemy>=0.9',
+    'sqlparse',
     'translationstring',
     'unidecode',
     'wtforms',

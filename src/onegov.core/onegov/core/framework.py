@@ -31,7 +31,7 @@ from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache
 from onegov.core import utils
-from onegov.core.orm import Base, SessionManager
+from onegov.core.orm import Base, SessionManager, debug
 from onegov.core.request import CoreRequest
 from onegov.server import Application as ServerApplication
 from uuid import uuid4 as new_uuid
@@ -48,6 +48,15 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     #: holdes the current schema associated with the database connection, set
     #: by and derived from :meth:`set_application_id`.
     schema = None
+
+    def __call__(self, environ, start_response):
+        """ Intercept all wsgi calls so we can attach debug tools. """
+
+        if getattr(self, 'sql_query_report', False) is False:
+            return super(Framework, self).__call__(environ, start_response)
+
+        with debug.analyze_sql_queries(self.sql_query_report):
+            return super(Framework, self).__call__(environ, start_response)
 
     @cached_property
     def modules(self):
@@ -172,6 +181,16 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
             Defaults to 1'200s (20 minutes).
 
+        :sql_query_report:
+            Prints out a report sql queries for each request, unless False.
+            Valid values are:
+
+            * 'summary' (only show the number of queries)
+            * 'redundant' (show summary and the actual redundant queries)
+            * 'all' (show summary and all executed queries)
+
+            Do not use in production!
+
         """
 
         super(Framework, self).configure_application(**cfg)
@@ -231,6 +250,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             self._global_file_storage = None
 
         self.always_compile_theme = cfg.get('always_compile_theme', False)
+        self.sql_query_report = cfg.get('sql_query_report', False)
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the

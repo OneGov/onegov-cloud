@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to count and print the sql queries that go into a single
+  request.
+  [href]
+
 - Store all login information server-side. The client only gets a random
   session id scoped to the application.
   [href]

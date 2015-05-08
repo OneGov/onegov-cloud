@@ -9,7 +9,7 @@ class UUID(BaseUUID):
     Another approach could be the following:
 
     `<https://github.com/seantis/libres/blob/master/\
-    libres/db/models/types/uuid_type.py`_
+    libres/db/models/types/uuid_type.py>`_
 
     We can switch to this any time.
 
