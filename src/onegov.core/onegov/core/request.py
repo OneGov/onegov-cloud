@@ -136,6 +136,10 @@ class CoreRequest(IncludeRequest):
 
         return self.link(self.app.modules.theme.ThemeFile(filename))
 
+    @property
+    def has_valid_session_id(self):
+        return bool(self.app.unsign(self.cookies.get('sessionid', '')))
+
     @cached_property
     def session_id(self):
         """ Returns a random session id, making sure it's stored in the
@@ -173,6 +177,9 @@ class CoreRequest(IncludeRequest):
     def browser_session(self):
         """ Returns a browser_session bound to the request. Works via cookies,
         so requests without cookies won't be able to use the browser_session.
+
+        The browser session is bound to the application (by id), so no session
+        data is shared between the applications.
 
         """
 
@@ -282,11 +289,12 @@ class CoreRequest(IncludeRequest):
         will see the messages.
 
         """
-        if self.browser_session.has('messages'):
-            for message in self.browser_session.messages:
-                yield message
+        if self.has_valid_session_id:
+            if self.browser_session.has('messages'):
+                for message in self.browser_session.messages:
+                    yield message
 
-            del self.browser_session.messages
+                del self.browser_session.messages
 
     def success(self, text):
         """ Adds a success message. """

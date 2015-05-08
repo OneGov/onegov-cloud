@@ -1,38 +1,38 @@
-from cached_property import cached_property
-from more.itsdangerous import IdentityPolicy as BaseIdentityPolicy
+from morepath.security import Identity
 from onegov.core import Framework
 
 
-class IdentityPolicy(BaseIdentityPolicy):
+class IdentityPolicy(object):
+    """ Stores the tokens associated with the identity on the browser session
 
-    @cached_property
-    def required_keys(self):
-        return ('userid', 'role', 'application_id')
+    """
 
-    @property
-    def cookie_settings(self):
-        return {
-            'max_age': self.max_age,
-            'secure': self.current_request.app.identity_secure,
-            'httponly': True
-        }
-
-    @property
-    def secret(self):
-        return self.current_request.app.identity_secret
+    required_keys = {'userid', 'role', 'application_id'}
 
     def identify(self, request):
-        self.current_request = request
-        return super(IdentityPolicy, self).identify(request)
+
+        # request.browser_session creates a session if none exists, which is
+        # a side effect we want to avoid here
+        if not request.has_valid_session_id:
+            return None
+
+        try:
+            identifiers = {
+                key: request.browser_session[key] for key in self.required_keys
+            }
+        except KeyError:
+            return None
+        else:
+            return Identity(**identifiers)
 
     def remember(self, response, request, identity):
-        self.current_request = request
-        return super(IdentityPolicy, self).remember(
-            response, request, identity)
+        for key in self.required_keys:
+            request.browser_session[key] = getattr(identity, key)
 
     def forget(self, response, request):
-        self.current_request = request
-        return super(IdentityPolicy, self).forget(response, request)
+        for key in self.required_keys:
+            if request.browser_session.has(key):
+                del request.browser_session[key]
 
 
 @Framework.identity_policy()

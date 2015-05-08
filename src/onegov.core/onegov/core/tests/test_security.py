@@ -57,7 +57,7 @@ def spawn_basic_permissions_app():
 
     app = App()
     app.namespace = 'test'
-    app.configure_application(identity_secure=False)
+    app.configure_application(identity_secure=False, disable_memcached=True)
     app.set_application_id('test/app')
 
     return app
@@ -116,4 +116,5 @@ def test_secure_cookie():
         extra_environ={'wsgi.url_scheme': 'http'}
     )
 
-    assert client.cookiejar._cookies['localhost.local']['/']['userid'].secure
+    cookie = client.cookiejar._cookies['localhost.local']['/']['sessionid']
+    assert cookie.secure

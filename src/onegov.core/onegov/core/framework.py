@@ -422,14 +422,19 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         return set(self.translations.keys())
 
     def sign(self, text):
-        """ Signs a text with the identity secret. """
-        signer = Signer(self.identity_secret)
+        """ Signs a text with the identity secret.
+
+        The text is signed together with the application id, so if one
+        application signs a text another won't be able to unsign it.
+
+        """
+        signer = Signer(self.identity_secret, salt=self.application_id)
         return signer.sign(text.encode('utf-8')).decode('utf-8')
 
     def unsign(self, text):
         """ Unsigns a signed text, returning None if unsuccessful. """
         try:
-            signer = Signer(self.identity_secret)
+            signer = Signer(self.identity_secret, salt=self.application_id)
             return signer.unsign(text).decode('utf-8')
         except BadSignature:
             return None

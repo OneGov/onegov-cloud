@@ -69,5 +69,6 @@ class BrowserSession(object):
             return result
 
     __setitem__ = __setattr__
+    __delitem__ = __delattr__
     __delattr__ = __delattr__
     __contains__ = has

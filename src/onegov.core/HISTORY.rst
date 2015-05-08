@@ -4,6 +4,13 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Store all login information server-side. The client only gets a random
+  session id scoped to the application.
+  [href]
+
+- Make sure that signatures are only valid for the origin application.
+  [href]
+
 0.1.0 (2015-05-06)
 ~~~~~~~~~~~~~~~~~~~
 

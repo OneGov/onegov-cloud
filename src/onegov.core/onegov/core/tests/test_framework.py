@@ -254,9 +254,16 @@ def test_fix_webassets_url():
 def test_sign_unsign():
     framework = Framework()
     framework.identity_secret = 'test'
+    framework.application_id = 'one'
 
     assert framework.sign('foo').startswith('foo.')
     assert framework.unsign(framework.sign('foo')) == 'foo'
+
+    signed_by_one = framework.sign('foo')
+    framework.application_id = 'two'
+    assert framework.unsign(signed_by_one) == None
+    framework.application_id = 'one'
+    assert framework.unsign(signed_by_one) == 'foo'
 
     signed = framework.sign('foo')
     framework.identity_secret = 'asdf'
