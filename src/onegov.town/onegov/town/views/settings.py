@@ -40,6 +40,9 @@ class SettingsForm(Form):
         description=_("The opening hours of the municipality"),
         widget=with_options(TextArea, rows=8)
     )
+
+    # the footer height is determined by javascript, see town.scss and
+    # common.js for more information (search for footer)
     footer_height = HiddenField()
 
     @property
