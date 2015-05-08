@@ -2,7 +2,7 @@
 
 from onegov.core.security import Secret
 from onegov.form import Form, with_options
-from wtforms import StringField, TextAreaField, validators
+from wtforms import HiddenField, StringField, TextAreaField, validators
 from wtforms.widgets import TextArea
 from wtforms_components import ColorField
 from onegov.town import _
@@ -10,6 +10,7 @@ from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
 from onegov.town.models import Town
+from onegov.town.theme import user_options
 from onegov.town.utils import linkify
 
 
@@ -39,12 +40,19 @@ class SettingsForm(Form):
         description=_("The opening hours of the municipality"),
         widget=with_options(TextArea, rows=8)
     )
+    footer_height = HiddenField()
 
     @property
     def theme_options(self):
         options = {
             'primary-color': self.primary_color.data.get_hex(),
+            'footer-height': self.footer_height.data
         }
+
+        # override the options using the default vaules if no value was given
+        for key in options:
+            if not options[key]:
+                options[key] = user_options[key]
 
         urls = (url.strip() for url in self.homepage_images.data.split('\n'))
         urls = (url for url in urls if url)
@@ -58,6 +66,7 @@ class SettingsForm(Form):
     @theme_options.setter
     def theme_options(self, theme_options):
         self.primary_color.data = theme_options.get('primary-color')
+        self.footer_height.data = theme_options.get('footer-height')
 
         tile_image_keys = ('tile-image-{}'.format(ix) for ix in range(1, 7))
         urls = (theme_options.get(key) for key in tile_image_keys)

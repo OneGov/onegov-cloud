@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix sticky footer jumping in Chrome by fixating it using CSS.
+  [href]
+
 0.1.0 (2015-05-07)
 ~~~~~~~~~~~~~~~~~~~
 

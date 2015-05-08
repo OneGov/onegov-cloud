@@ -25,59 +25,62 @@
 </head>
 
 <body id="${layout.page_id}">
-    <div class="row">
-      <div class="small-12 columns">
-        <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing">
-          <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
-          <h1 tal:condition="not:logo_url">${layout.town.name}</h1>
-        </a>
-      </div>
-    </div>
-    <div class="row">
+    <div id="inner-body">
+      <div class="row">
         <div class="small-12 columns">
-            <div metal:use-macro="layout.macros['top_navigation']"></div>
-            <tal:block metal:define-slot="below-top-navigation">
-      
-            </tal:block>
-            <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+          <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing">
+            <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
+            <h1 tal:condition="not:logo_url">${layout.town.name}</h1>
+          </a>
         </div>
-    </div>
+      </div>
+      <div class="row">
+          <div class="small-12 columns">
+              <div metal:use-macro="layout.macros['top_navigation']"></div>
+              <tal:block metal:define-slot="below-top-navigation">
+        
+              </tal:block>
+              <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+          </div>
+      </div>
 
-    <div class="row">
-      <div class="small-12 columns">
-        <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
-          ${message.text}
-          <a href="#" class="close">&times;</a>
+      <div class="row">
+        <div class="small-12 columns">
+          <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
+            ${message.text}
+            <a href="#" class="close">&times;</a>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="row" tal:condition="layout.sidebar_links">
-      <div class="small-12 medium-3 large-3 columns sidebar">
-        <ul class="side-nav">
-          <li tal:repeat="link layout.sidebar_links" tal:attributes="class getattr(link, 'active', None) and 'active' or ''">
-            <tal:block replace="structure link(request)" />
-          </li>
-        </ul>
-      </div>
-      <div class="small-12 medium-9 large-9 columns end">
-        <div class="row">
-            <div class="small-12 columns">
-                <h1 class="main-title"><div metal:define-slot="title"></div></h1>
-                <div metal:define-slot="content"></div>
-            </div>
+      <div class="row content with-sidebar-links" tal:condition="layout.sidebar_links">
+        <div class="small-12 medium-3 large-3 columns sidebar">
+          <ul class="side-nav">
+            <li tal:repeat="link layout.sidebar_links" tal:attributes="class getattr(link, 'active', None) and 'active' or ''">
+              <tal:block replace="structure link(request)" />
+            </li>
+          </ul>
+        </div>
+        <div class="small-12 medium-9 large-9 columns end">
+          <div class="row">
+              <div class="small-12 columns">
+                  <h1 class="main-title"><div metal:define-slot="title"></div></h1>
+                  <div metal:define-slot="content"></div>
+              </div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row" tal:condition="not:layout.sidebar_links">
-      <div class="small-12 columns">
-        <div class="row">
-            <div class="small-12 columns">
-                <h1 class="main-title"><div metal:define-slot="title"></div></h1>
-                <div metal:define-slot="content"></div>
-            </div>
+      <div class="row content without-sidebar-links" tal:condition="not:layout.sidebar_links">
+        <div class="small-12 columns">
+          <div class="row">
+              <div class="small-12 columns">
+                  <h1 class="main-title"><div metal:define-slot="title"></div></h1>
+                  <div metal:define-slot="content"></div>
+              </div>
+          </div>
         </div>
       </div>
+      <div class="push"></div>
     </div>
     <footer class="row footer" tal:define="contact layout.town.meta.contact_html|nothing; opening_hours layout.town.meta.opening_hours_html|nothing">
       <div class="small-12 columns">

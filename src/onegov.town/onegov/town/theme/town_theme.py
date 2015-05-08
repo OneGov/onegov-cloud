@@ -2,9 +2,10 @@ from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
 
 
-# the colors which are editable by the user
-user_colors = {
-    'primary-color': '#006fba'
+# options editable by the user
+user_options = {
+    'primary-color': '#006fba',
+    'footer-height': '200px'
 }
 
 
@@ -41,7 +42,7 @@ class TownTheme(BaseTheme):
             'tile-image-5': '"../static/homepage-images/tile-5-small.jpg"',
             'tile-image-6': '"../static/homepage-images/tile-6-small.jpg"',
         }
-        options.update(user_colors)
+        options.update(user_options)
 
         return options
 

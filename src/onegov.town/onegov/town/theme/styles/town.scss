@@ -28,6 +28,36 @@ html {
     margin-left: calc(100vw - 100%);
 }
 
+/* 
+    our footer is sticky, which is no easy feat, since variable length
+    sticky footers don't work with anything but the latest browsers (flex)
+
+    however, sticky footers work just fine if you know the height of the footer
+    
+    since we have semi-variable content in the footer (it can change, but not
+    often), we read the height of the footer if the settings page is open
+    and write the footer height into the custom theme variables
+
+    see common.js for the oneliner that does that (look for footer_height)
+*/
+
+html,
+body {
+    height: 100%;
+}
+
+#inner-body {
+    margin: 0 auto -$footer-height;
+    min-height: 100%;
+}
+
+footer,
+.push {
+    animation-duration: 3s;
+    height: $footer-height; /* .push must be the same height as .footer */
+}
+
+
 /*
     top navigation
 */

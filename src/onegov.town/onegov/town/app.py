@@ -113,7 +113,6 @@ class TownApp(Framework):
             'js/intercooler.js',
             'js/underscore.js',
             'js/react.js',
-            'js/stickyfooter.js',
             confirm,
             'js/common.js',
             filters='jsmin',

@@ -18,3 +18,6 @@ $('#add-content').find('a')
 
 // initialize all foundation functions
 $(document).foundation();
+
+// get the footer height and write it to the footer_height setting if possible
+$(document).find('#footer_height').val($('footer > div').height() + 'px');
