@@ -70,8 +70,9 @@ def analyze_sql_queries(report='summary'):
     total_queries = sum(queries.values())
     redundant_queries = sum(1 for v in queries.values() if v > 1)
 
-    print("executed {} queries, {} of which were redundant".format(
-        total_queries, redundant_queries))
+    if total_queries > 0:
+        print("executed {} queries, {} of which were redundant".format(
+            total_queries, redundant_queries))
 
     if redundant_queries and report == 'redundant':
         print("The following queries were redundant:")
