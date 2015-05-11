@@ -99,7 +99,10 @@ def test_browser_session_request():
 
     @App.view(model=Root)
     def view_root(self, request):
-        return request.session_id
+        # the session id is only available if there's a change in the
+        # browser session
+        request.browser_session['foo'] = 'bar'
+        return request.cookies['session_id']
 
     @App.view(model=Root, name='login')
     def view_login(self, request):
@@ -136,6 +139,52 @@ def test_browser_session_request():
 
     c1.get('/status').text == 'logged in'
     c2.get('/status').text == 'logged out'
+
+
+def test_browser_session_dirty():
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.view(model=Root, name='undirty')
+    def view_undirty(self, request):
+        request.browser_session.get('foo')
+        return ''
+
+    @App.view(model=Root, name='dirty')
+    def view_dirty(self, request):
+        request.browser_session['foo'] = 'bar'
+        return ''
+
+    config.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(identity_secure=False)  # allow http
+
+    app.cache_backend = 'dogpile.cache.memory'
+    app.cache_backend_arguments = {}
+
+    client = Client(app)
+
+    client.get('/undirty')
+    assert 'session_id' not in client.cookies
+
+    client.get('/dirty')
+    assert 'session_id' in client.cookies
+
+    old_session_id = client.cookies['session_id']
+
+    client.get('/undirty')
+    assert client.cookies['session_id'] == old_session_id
+
+    client.get('/undirty')
+    assert client.cookies['session_id'] == old_session_id
 
 
 def test_request_messages():

@@ -116,5 +116,5 @@ def test_secure_cookie():
         extra_environ={'wsgi.url_scheme': 'http'}
     )
 
-    cookie = client.cookiejar._cookies['localhost.local']['/']['sessionid']
+    cookie = client.cookiejar._cookies['localhost.local']['/']['session_id']
     assert cookie.secure

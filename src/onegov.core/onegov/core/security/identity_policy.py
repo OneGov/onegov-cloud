@@ -10,12 +10,6 @@ class IdentityPolicy(object):
     required_keys = {'userid', 'role', 'application_id'}
 
     def identify(self, request):
-
-        # request.browser_session creates a session if none exists, which is
-        # a side effect we want to avoid here
-        if not request.has_valid_session_id:
-            return None
-
         try:
             identifiers = {
                 key: request.browser_session[key] for key in self.required_keys

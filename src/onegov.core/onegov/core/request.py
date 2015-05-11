@@ -28,6 +28,8 @@ class CoreRequest(IncludeRequest):
 
     """
 
+    browser_session_changed = False
+
     def link_prefix(self):
         """ Override the `link_prefix` with the application base path provided
         by onegov.server, because the default link_prefix contains the
@@ -136,43 +138,6 @@ class CoreRequest(IncludeRequest):
 
         return self.link(self.app.modules.theme.ThemeFile(filename))
 
-    @property
-    def has_valid_session_id(self):
-        return bool(self.app.unsign(self.cookies.get('sessionid', '')))
-
-    @cached_property
-    def session_id(self):
-        """ Returns a random session id, making sure it's stored in the
-        cookies. This random session id is used to access data associated
-        with the browser session.
-
-        The random token is very strong and it is signed, making it even harder
-        to guess a token used by another user.
-
-        If someone gains access to this session id, all bets are off though.
-        To prevent that, cookies should only be transmitted over https.
-
-        See :meth:`onegov.core.framework.Framework.configure_application`.
-
-        """
-
-        sessionid = self.app.unsign(self.cookies.get('sessionid', ''))
-
-        if not sessionid:
-            sessionid = random_token()
-            self.cookies['sessionid'] = self.app.sign(sessionid)
-
-            @self.after
-            def store_session(response):
-                response.set_cookie(
-                    'sessionid',
-                    self.cookies['sessionid'],
-                    secure=self.app.identity_secure,
-                    httponly=True
-                )
-
-        return sessionid
-
     @cached_property
     def browser_session(self):
         """ Returns a browser_session bound to the request. Works via cookies,
@@ -181,12 +146,33 @@ class CoreRequest(IncludeRequest):
         The browser session is bound to the application (by id), so no session
         data is shared between the applications.
 
+        If no data is written to the browser_session, no session_id cookie
+        is created.
+
         """
+
+        session_id = self.app.unsign(self.cookies.get('session_id', ''))
+
+        if not session_id:
+            session_id = random_token()
+
+        def on_dirty(namespace, token):
+            self.cookies['session_id'] = self.app.sign(token)
+
+            @self.after
+            def store_session(response):
+                response.set_cookie(
+                    'session_id',
+                    self.cookies['session_id'],
+                    secure=self.app.identity_secure,
+                    httponly=True
+                )
 
         return self.app.modules.browser_session.BrowserSession(
             namespace=self.app.application_id,
-            token=self.session_id,
-            cache=self.app.cache
+            token=session_id,
+            cache=self.app.cache,
+            on_dirty=on_dirty
         )
 
     def get_form(self, form_class, i18n_support=True, csrf_support=True):
@@ -289,12 +275,11 @@ class CoreRequest(IncludeRequest):
         will see the messages.
 
         """
-        if self.has_valid_session_id:
-            if self.browser_session.has('messages'):
-                for message in self.browser_session.messages:
-                    yield message
+        if self.browser_session.has('messages'):
+            for message in self.browser_session.messages:
+                yield message
 
-                del self.browser_session.messages
+            del self.browser_session.messages
 
     def success(self, text):
         """ Adds a success message. """

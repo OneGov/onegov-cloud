@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The browser session now only adds a session_id to the cookies if there's
+  a change in the browser session.
+  [href]
+
 - Adds the ability to count and print the sql queries that go into a single
   request.
   [href]
