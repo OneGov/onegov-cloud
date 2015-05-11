@@ -3,7 +3,7 @@ from onegov.form import Form, with_options
 from onegov.page import Page
 from onegov.town import _
 from onegov.town.const import NEWS_PREFIX, TRAIT_MESSAGES
-from onegov.town.utils import sanitize_html
+from onegov.town.utils import sanitize_html, mark_images
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer, object_session
 from wtforms import StringField, TextAreaField, validators
@@ -159,7 +159,7 @@ class PageForm(PageForm):
     text = TextAreaField(
         label=_(u"Text"),
         widget=with_options(TextArea, class_='editor'),
-        filters=[sanitize_html])
+        filters=[sanitize_html, mark_images])
 
     def get_page(self, page):
         """ Stores the form values on the page. """

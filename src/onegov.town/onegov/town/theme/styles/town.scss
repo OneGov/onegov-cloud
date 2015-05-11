@@ -28,12 +28,12 @@ html {
     margin-left: calc(100vw - 100%);
 }
 
-/* 
+/*
     our footer is sticky, which is no easy feat, since variable length
     sticky footers don't work with anything but the latest browsers (flex)
 
     however, sticky footers work just fine if you know the height of the footer
-    
+
     since we have semi-variable content in the footer (it can change, but not
     often), we read the height of the footer if the settings page is open
     and write the footer height into the custom theme variables
@@ -366,12 +366,14 @@ div#redactor-droparea {
 /*
     page lead
 */
+$max-page-width: 600px;
 
 .page-lead {
     display: block;
     font-size: $h5-font-size;
     font-weight: 300;
     margin-bottom: 1.25rem;
+    max-width: $max-page-width;
 }
 
 /*
@@ -392,6 +394,14 @@ div#redactor-droparea {
 
     img {
         display: block;
+    }
+
+    p {
+        max-width: $max-page-width;
+    }
+
+    .has-img {
+        max-width: none;
     }
 }
 

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Paragraphs are now limited in width, images are 100% width.
+  [href]
+
 - Fix sticky footer jumping in Chrome by fixating it using CSS.
   [href]
 
