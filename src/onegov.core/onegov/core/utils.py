@@ -13,7 +13,7 @@ from webob import static
 
 
 # http://stackoverflow.com/a/13500078
-_unwanted_characters = re.compile(r'[\\/\s<>\[\]{},:;?@&=+$#@%|]+')
+_unwanted_characters = re.compile(r'[\\/\s<>\[\]{},:;?!@&=+$#@%|]+')
 
 
 def normalize_for_url(text):
