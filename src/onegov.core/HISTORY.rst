@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Urls generated from titles no longer contain double dashes ('--').
+  [href]
+
 - The browser session now only adds a session_id to the cookies if there's
   a change in the browser session.
   [href]

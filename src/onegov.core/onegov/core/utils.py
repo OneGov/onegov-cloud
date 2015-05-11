@@ -14,6 +14,7 @@ from webob import static
 
 # http://stackoverflow.com/a/13500078
 _unwanted_characters = re.compile(r'[\\/\s<>\[\]{},:;?!@&=+$#@%|]+')
+_double_dash = re.compile(r'[-]+')
 
 
 def normalize_for_url(text):
@@ -26,7 +27,10 @@ def normalize_for_url(text):
     See https://pypi.python.org/pypi/Unidecode
 
     """
-    return _unwanted_characters.sub('-', unidecode(text).strip(' ').lower())
+    clean = _unwanted_characters.sub('-', unidecode(text).strip(' ').lower())
+    clean = _double_dash.sub('-', clean)
+
+    return clean
 
 
 def lchop(text, beginning):
