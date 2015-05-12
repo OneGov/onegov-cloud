@@ -57,12 +57,12 @@ def field_declaration():
     # a field name can contain any kind of character, except for a '=' and
     # a '*', which we'll need later for the field definition
     characters = text_without('*=') | White(max=1) + text_without('*=')
-    field_name = Combine(OneOrMore(characters))
+    label = Combine(OneOrMore(characters))
 
     # a field declaration begins with spaces (so we can differentiate between
     # text and catual fields), then includes the name and the '*' which marks
     # required fields
-    field_declaration = field_name.setResultsName('field_name')
+    field_declaration = label.setResultsName('label')
     field_declaration += Optional(required).setResultsName('required')
     field_declaration += Suppress('=')
 
