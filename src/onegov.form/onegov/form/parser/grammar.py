@@ -87,6 +87,20 @@ def textfield():
     return textfield
 
 
+def password():
+    """ Returns a password field parser.
+
+    Example:
+        ***
+
+    """
+
+    password = Literal('***')
+    password = password.setParseAction(tag(type='password'))
+
+    return password
+
+
 def radio_buttons():
     """ Returns a radio buttons parser.
 
@@ -183,7 +197,13 @@ def fieldset_title():
 
 
 # put together the actual grammar
-fields = Group(textfield() | radio_buttons() | checkboxes() | select())
+fields = Group(
+    textfield() |
+    radio_buttons() |
+    checkboxes() |
+    select() |
+    password()
+)
 
 field = field_declaration() + fields.setResultsName('field')
 field = field.setParseAction(tag(type='field'))

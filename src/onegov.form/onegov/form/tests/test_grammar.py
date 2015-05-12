@@ -37,6 +37,14 @@ def test_textfield():
     assert f.field.length == 25
 
 
+def test_password():
+
+    f = field.parseString("Passwort* = ***")
+    assert f.label == "Passwort"
+    assert f.required
+    assert f.field.type == 'password'
+
+
 def test_radiobutton():
 
     f = field.parseString("Gender* = () Male (x) Female")
