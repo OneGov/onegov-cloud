@@ -161,6 +161,28 @@ def select():
     return select
 
 
-# combine all possible fields
+def fieldset_title():
+    """ A fieldset title parser. Fieldset titles are just like headings in
+    markdown:
+
+        # My header
+
+    It's possible to have an empty fieldset title (to disable a fieldset):
+
+        #
+
+    """
+
+    label = Combine(ZeroOrMore(text | White())).setResultsName('label')
+
+    fieldset_title = Suppress('#') + label
+    fieldset_title = fieldset_title.setParseAction(tag(type='fieldset'))
+
+    return fieldset_title
+
+
+# put together the actual grammar
 fields = Group(textfield() | radio_buttons() | checkboxes() | select())
 field = field_declaration() + fields.setResultsName('field')
+
+line = (fieldset_title() | field)

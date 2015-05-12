@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from onegov.form.parser.grammar import field_declaration, field
+from onegov.form.parser.grammar import field_declaration, field, line
 
 
 def test_field_declaration():
@@ -94,3 +94,14 @@ def test_select():
     assert f.field[2].key == 'DXB'
     assert f.field[2].label == 'Dubai'
     assert f.field[2].selected
+
+
+def test_fieldset_title():
+
+    f = line.parseString("# My Title")
+    assert f.type == 'fieldset'
+    assert f.label == 'My Title'
+
+    f = line.parseString("#")
+    assert f.type == 'fieldset'
+    assert f.label == ''
