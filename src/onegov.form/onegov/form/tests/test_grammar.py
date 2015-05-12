@@ -105,3 +105,7 @@ def test_fieldset_title():
     f = line.parseString("#")
     assert f.type == 'fieldset'
     assert f.label == ''
+
+    f = line.parseString("x# = ___")
+    assert f.type == 'field'
+    assert f.label == 'x#'

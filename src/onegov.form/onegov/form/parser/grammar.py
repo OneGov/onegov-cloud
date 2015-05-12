@@ -183,6 +183,8 @@ def fieldset_title():
 
 # put together the actual grammar
 fields = Group(textfield() | radio_buttons() | checkboxes() | select())
+
 field = field_declaration() + fields.setResultsName('field')
+field = field.setParseAction(tag(type='field'))
 
 line = (fieldset_title() | field)
