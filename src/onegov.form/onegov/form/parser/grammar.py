@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from onegov.form.compat import unicode_characters
 from pyparsing import (
     nums,
