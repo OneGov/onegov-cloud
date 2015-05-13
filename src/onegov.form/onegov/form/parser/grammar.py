@@ -190,6 +190,24 @@ def select():
     return select
 
 
+def custom():
+    """ Returns a custom field parser.
+
+    Examples:
+        /E-Mail
+        /Stripe
+
+    """
+
+    custom_id = OneOrMore(text)('custom_id')
+    custom_id.setParseAction(lambda t: t[0].lower())
+
+    custom = Suppress('/') + custom_id + StringEnd()
+    custom.setParseAction(tag(type='custom'))
+
+    return custom
+
+
 def fieldset_title():
     """ A fieldset title parser. Fieldset titles are just like headings in
     markdown:
@@ -217,7 +235,8 @@ fields = Group(
     checkboxes() |
     select() |
     password() |
-    textarea()
+    textarea() |
+    custom()
 )
 
 field = field_declaration() + fields.setResultsName('field')

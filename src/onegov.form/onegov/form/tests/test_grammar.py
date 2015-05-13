@@ -135,3 +135,14 @@ def test_fieldset_title():
     f = line.parseString("x# = ___")
     assert f.type == 'field'
     assert f.label == 'x#'
+
+
+def test_custom():
+
+    f = line.parseString("E-Mail* = /E-Mail")
+    assert f.field.type == 'custom'
+    assert f.field.custom_id == 'e-mail'
+
+    f = line.parseString("CC* = /Stripe")
+    assert f.field.type == 'custom'
+    assert f.field.custom_id == 'stripe'
