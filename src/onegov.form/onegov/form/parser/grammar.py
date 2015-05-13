@@ -123,14 +123,17 @@ def radio_buttons():
     """ Returns a radio buttons parser.
 
     Example:
-        () Male (x) Female
+        () Male (x) Female ( ) Space Alien
     """
     radio_button = Group(
         Literal('(x)').setParseAction(literal(True)) |
-        Literal('()').setParseAction(literal(False))
+        Literal('()').setParseAction(literal(False)) |
+        Literal('( )').setParseAction(literal(False))
     ).setResultsName('checked').setParseAction(unwrap)
 
-    radio_button_text = Group(text + (~Literal('()') | ~Literal('(x)')))
+    characters = text_without('()') | White(max=1) + text_without('()')
+
+    radio_button_text = Group(Combine(OneOrMore(characters)))
     radio_button_text = radio_button_text.setResultsName('label')
     radio_button_text = radio_button_text.setParseAction(unwrap)
 
@@ -144,15 +147,18 @@ def checkboxes():
     """ Returns a check boxes parser.
 
     Example:
-        [] Android [x] iPhone [x] Blackberry
+        [] Android [x] iPhone [x] Dumb Phone
 
     """
     checkbox = Group(
         Literal('[x]').setParseAction(literal(True)) |
-        Literal('[]').setParseAction(literal(False))
+        Literal('[]').setParseAction(literal(False)) |
+        Literal('[ ]').setParseAction(literal(False))
     ).setResultsName('checked').setParseAction(unwrap)
 
-    checkbox_text = Group(text + (~Literal('[]') | ~Literal('[x]')))
+    characters = text_without('[]') | White(max=1) + text_without('[]')
+
+    checkbox_text = Group(Combine(OneOrMore(characters)))
     checkbox_text = checkbox_text.setResultsName('label')
     checkbox_text = checkbox_text.setParseAction(unwrap)
 

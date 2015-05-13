@@ -65,7 +65,7 @@ def test_password():
 
 def test_radiobutton():
 
-    f = field.parseString("Gender* = () Male (x) Female")
+    f = field.parseString("Gender* = () Male (x) Female ( ) Space Alien")
     assert f.label == "Gender"
     assert f.required
     assert f.field.type == 'radio'
@@ -73,11 +73,13 @@ def test_radiobutton():
     assert not f.field[0].checked
     assert f.field[1].label == 'Female'
     assert f.field[1].checked
+    assert f.field[2].label == 'Space Alien'
+    assert not f.field[2].checked
 
 
 def test_checkboxes():
 
-    f = field.parseString("Languages = [x] German [x] English [] French")
+    f = field.parseString("Languages = [x] German [x] English [] Swiss German")
     assert f.label == "Languages"
     assert not f.required
     assert f.field.type == 'checkbox'
@@ -85,7 +87,7 @@ def test_checkboxes():
     assert f.field[0].checked
     assert f.field[1].label == 'English'
     assert f.field[1].checked
-    assert f.field[2].label == 'French'
+    assert f.field[2].label == 'Swiss German'
     assert not f.field[2].checked
 
 
