@@ -146,3 +146,16 @@ def test_custom():
     f = line.parseString("CC* = /Stripe")
     assert f.field.type == 'custom'
     assert f.field.custom_id == 'stripe'
+
+
+def test_button():
+
+    f = line.parseString("[Click Me!](https://www.google.ch)")
+    assert f.type == 'button'
+    assert f.label == 'Click Me!'
+    assert f.url == 'https://www.google.ch'
+
+    f = line.parseString("[Send]")
+    assert f.type == 'button'
+    assert f.label == 'Send'
+    assert f.url == ''

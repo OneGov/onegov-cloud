@@ -208,6 +208,31 @@ def custom():
     return custom
 
 
+def button():
+    """ Returns a buttons parser.
+
+    Examples:
+        [Send]
+        [Send](http://my-post-address.com)
+
+    By default, buttons post to the form.
+
+    """
+
+    characters = text_without('[]') | White(max=1) + text_without('[]')
+
+    label = Combine(OneOrMore(characters))('label')
+    label.setParseAction(lambda t: t[0])
+
+    url = OneOrMore(text_without('()'))('url').setParseAction(lambda t: t[0])
+
+    button = Suppress('[') + label + Suppress(']')
+    button += Optional(Suppress('(') + url + Suppress(')'))
+    button.setParseAction((tag(type='button')))
+
+    return button
+
+
 def fieldset_title():
     """ A fieldset title parser. Fieldset titles are just like headings in
     markdown:
@@ -242,4 +267,4 @@ fields = Group(
 field = field_declaration() + fields.setResultsName('field')
 field = field.setParseAction(tag(type='field'))
 
-line = (fieldset_title() | field) + StringEnd()
+line = (fieldset_title() | field | button()) + StringEnd()
