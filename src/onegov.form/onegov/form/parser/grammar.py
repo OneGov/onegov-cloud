@@ -77,7 +77,7 @@ def textfield():
         ____[50]
 
     """
-    textfield_length = (Suppress('[') + numeric + Suppress(']'))
+    textfield_length = Suppress('[') + numeric + Suppress(']')
     textfield_length = textfield_length.setParseAction(as_int)
     textfield_length = textfield_length.setResultsName('length')
 
@@ -95,10 +95,7 @@ def password():
 
     """
 
-    password = Literal('***')
-    password = password.setParseAction(tag(type='password'))
-
-    return password
+    return Literal('***').setParseAction(tag(type='password'))
 
 
 def radio_buttons():
@@ -154,21 +151,17 @@ def select():
     The parentheses identify the selected element.
 
     """
-
-    delimiter = Suppress(',')
-    definition_delimiter = Suppress('>')
-
     key = text_without('(){},>').setResultsName('key')
     label = text_without('(){},>').setResultsName('label')
 
-    item = Optional(key + definition_delimiter) + label
+    item = Optional(key + Suppress('>')) + label
     selected_item = Suppress('(') + item.copy() + Suppress(')')
 
     item.setParseAction(tag(selected=False))
     selected_item.setParseAction(tag(selected=True))
 
     item = Group(selected_item | item)
-    items = item + ZeroOrMore(delimiter + item)
+    items = item + ZeroOrMore(Suppress(',') + item)
 
     select = Suppress('{') + items + Suppress('}')
     select.setParseAction(tag(type='select'))
