@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
-from onegov.form.parser.grammar import field_declaration, field, line
+from onegov.form.parser.grammar import (
+    button,
+    custom,
+    field_identifier,
+    checkboxes,
+    password,
+    select,
+    textarea,
+    textfield,
+    radios,
+)
 
 
-def test_field_declaration():
-    parse = field_declaration().parseString
+def test_field_identifier():
+    parse = field_identifier().parseString
+
+    assert parse("Yes?=").asDict() == {'required': False, 'label': 'Yes?'}
+    assert parse("Yes?*=").asDict() == {'required': True, 'label': 'Yes?'}
 
     assert parse("OMG. U ok?! =").label == "OMG. U ok?!"
     assert parse("a b =").label == "a b"
@@ -24,140 +37,123 @@ def test_field_declaration():
 
 def test_textfield():
 
-    f = field.parseString("Vorname = ___")
-    assert f.label == "Vorname"
-    assert not f.required
-    assert f.field.type == 'text'
-    assert f.field.length == ''
+    field = textfield()
 
-    f = field.parseString("Vorname* = ___[25]")
-    assert f.label == "Vorname"
-    assert f.required
-    assert f.field.type == 'text'
-    assert f.field.length == 25
+    f = field.parseString('___')
+    assert f.type == 'text'
+    assert not f.length
+    f.asDict() == {'length': None, 'type': 'text'}
+
+    f = field.parseString('___[25]')
+    assert f.type == 'text'
+    assert f.length == 25
+    f.asDict() == {'length': 25, 'type': 'text'}
 
 
 def test_textarea():
 
-    f = field.parseString("Comment* = ...")
-    assert f.label == "Comment"
-    assert f.required
-    assert f.field.type == 'textarea'
-    assert f.field.cols == ''
-    assert f.field.rows == ''
+    field = textarea()
 
-    f = field.parseString("Comment* = ...[25]")
-    assert f.field.cols == 25
-    assert f.field.rows == ''
+    f = field.parseString("...")
+    assert f.type == 'textarea'
+    assert not f.rows
+    f.asDict() == {'type': 'textarea'}
 
-    f = field.parseString("Comment* = ...[1*2]")
-    assert f.field.cols == 1
-    assert f.field.rows == 2
+    f = field.parseString("...[15]")
+    assert f.type == 'textarea'
+    assert f.rows == 15
+    f.asDict() == {'rows': 15, 'type': 'textarea'}
 
 
 def test_password():
 
-    f = field.parseString("Passwort* = ***")
-    assert f.label == "Passwort"
-    assert f.required
-    assert f.field.type == 'password'
+    field = password()
+
+    f = field.parseString("***")
+    assert f.type == 'password'
+    assert f.asDict() == {'type': 'password'}
 
 
-def test_radiobutton():
+def test_radios():
 
-    f = field.parseString("Gender* = () Male (x) Female ( ) Space Alien")
-    assert f.label == "Gender"
-    assert f.required
-    assert f.field.type == 'radio'
-    assert f.field[0].label == 'Male'
-    assert not f.field[0].checked
-    assert f.field[1].label == 'Female'
-    assert f.field[1].checked
-    assert f.field[2].label == 'Space Alien'
-    assert not f.field[2].checked
+    field = radios()
+
+    f = field.parseString("() Male (x) Female ( ) Space Alien")
+    assert f.type == 'radio'
+
+    assert [r.asDict() for r in f] == [
+        {'checked': False, 'label': 'Male'},
+        {'checked': True, 'label': 'Female'},
+        {'checked': False, 'label': 'Space Alien'}
+    ]
+
+    f = field.parseString("() Hans ")
+
+    assert [r.asDict() for r in f] == [
+        {'checked': False, 'label': 'Hans'},
+    ]
 
 
 def test_checkboxes():
 
-    f = field.parseString("Languages = [x] German [x] English [] Swiss German")
-    assert f.label == "Languages"
-    assert not f.required
-    assert f.field.type == 'checkbox'
-    assert f.field[0].label == 'German'
-    assert f.field[0].checked
-    assert f.field[1].label == 'English'
-    assert f.field[1].checked
-    assert f.field[2].label == 'Swiss German'
-    assert not f.field[2].checked
+    field = checkboxes()
+
+    f = field.parseString("[x] German [ ] English [] Swiss German ")
+    assert f.type == 'checkbox'
+
+    assert [r.asDict() for r in f] == [
+        {'checked': True, 'label': 'German'},
+        {'checked': False, 'label': 'English'},
+        {'checked': False, 'label': 'Swiss German'}
+    ]
 
 
 def test_select():
 
-    f = field.parseString("Airports = {KUL, ZRH, (DXB)}")
-    assert f.label == "Airports"
-    assert not f.required
+    field = select()
 
-    assert f.field.type == 'select'
-    assert f.field[0].key == ''
-    assert f.field[0].label == 'KUL'
-    assert not f.field[0].selected
-    assert f.field[1].key == ''
-    assert f.field[1].label == 'ZRH'
-    assert not f.field[1].selected
-    assert f.field[2].key == ''
-    assert f.field[2].label == 'DXB'
-    assert f.field[2].selected
+    f = field.parseString("{KUL, ZRH, (DXB)}")
+    assert f.type == 'select'
 
-    f = field.parseString("Airports = {KUL, ZRH > Zürich, (DXB > Dubai)}")
-    assert f.label == "Airports"
-    assert not f.required
+    assert [s.asDict() for s in f] == [
+        {'selected': False, 'label': 'KUL'},
+        {'selected': False, 'label': 'ZRH'},
+        {'selected': True, 'label': 'DXB'}
+    ]
 
-    assert f.field.type == 'select'
-    assert f.field[0].key == ''
-    assert f.field[0].label == 'KUL'
-    assert not f.field[0].selected
-    assert f.field[1].key == 'ZRH'
-    assert f.field[1].label == 'Zürich'
-    assert not f.field[1].selected
-    assert f.field[2].key == 'DXB'
-    assert f.field[2].label == 'Dubai'
-    assert f.field[2].selected
+    f = field.parseString("{KUL, ZRH > Zürich, (DXB > Dubai)}")
 
-
-def test_fieldset_title():
-
-    f = line.parseString("# My Title")
-    assert f.type == 'fieldset'
-    assert f.label == 'My Title'
-
-    f = line.parseString("#")
-    assert f.type == 'fieldset'
-    assert f.label == ''
-
-    f = line.parseString("x# = ___")
-    assert f.type == 'field'
-    assert f.label == 'x#'
+    assert [s.asDict() for s in f] == [
+        {'selected': False, 'label': 'KUL'},
+        {'selected': False, 'label': 'Zürich', 'key': 'ZRH'},
+        {'selected': True, 'label': 'Dubai', 'key': 'DXB'}
+    ]
 
 
 def test_custom():
 
-    f = line.parseString("E-Mail* = /E-Mail")
-    assert f.field.type == 'custom'
-    assert f.field.custom_id == 'e-mail'
+    field = custom()
 
-    f = line.parseString("CC* = /Stripe")
-    assert f.field.type == 'custom'
-    assert f.field.custom_id == 'stripe'
+    f = field.parseString("/E-Mail")
+    assert f.asDict() == {'type': 'custom', 'custom_id': 'e-mail'}
+
+    f = field.parseString("/Stripe")
+    assert f.asDict() == {'type': 'custom', 'custom_id': 'stripe'}
 
 
 def test_button():
 
-    f = line.parseString("[Click Me!](https://www.google.ch)")
-    assert f.type == 'button'
-    assert f.label == 'Click Me!'
-    assert f.url == 'https://www.google.ch'
+    btn = button()
 
-    f = line.parseString("[Send]")
-    assert f.type == 'button'
-    assert f.label == 'Send'
-    assert f.url == ''
+    f = btn.parseString("[Click Me!](https://www.google.ch)")
+    assert f.asDict() == {
+        'type': 'button',
+        'label': 'Click Me!',
+        'url': 'https://www.google.ch'
+    }
+
+    f = btn.parseString("[Send]")
+    assert f.asDict() == {
+        'type': 'button',
+        'label': 'Send'
+    }

@@ -7,6 +7,7 @@ from pyparsing import (
     Literal,
     OneOrMore,
     Optional,
+    MatchFirst,
     StringEnd,
     Suppress,
     Word,
@@ -46,29 +47,27 @@ def tag(**tags):
     return apply_tags
 
 
-def field_declaration():
-    """ Returns a field declaration parser:
+def with_whitespace_inside(expr):
+    return expr | White(max=1) + expr
 
-    Example:
-        My field * =
 
-    """
+def enclosed_in(expr, characters):
+    left, right = characters
+    return Suppress(left) + expr + Suppress(right)
 
-    required = Literal('*').setParseAction(matches('*'))
 
-    # a field name can contain any kind of character, except for a '=' and
-    # a '*', which we'll need later for the field definition
-    characters = text_without('*=') | White(max=1) + text_without('*=')
-    label = Combine(OneOrMore(characters))
+def number_enclosed_in(characters):
+    left, right = characters
+    return enclosed_in(numeric, characters).setParseAction(as_int)
 
-    # a field declaration begins with spaces (so we can differentiate between
-    # text and catual fields), then includes the name and the '*' which marks
-    # required fields
-    field_declaration = label.setResultsName('label')
-    field_declaration += Optional(required).setResultsName('required')
-    field_declaration += Suppress('=')
 
-    return field_declaration
+def mark_enclosed_in(characters):
+    left, right = characters
+    return MatchFirst((
+        Literal(left + 'x' + right).setParseAction(literal(True)),
+        Literal(left + ' ' + right).setParseAction(literal(False)),
+        Literal(left + right).setParseAction(literal(False))
+    ))
 
 
 def textfield():
@@ -77,12 +76,12 @@ def textfield():
     Example:
         ____[50]
 
-    """
-    textfield_length = Suppress('[') + numeric + Suppress(']')
-    textfield_length = textfield_length.setParseAction(as_int)
-    textfield_length = textfield_length.setResultsName('length')
+    The number defines the maximum length.
 
-    textfield = Literal('___') + Optional(textfield_length)
+    """
+    length = number_enclosed_in('[]')('length')
+
+    textfield = Suppress('___') + Optional(length)
     textfield = textfield.setParseAction(tag(type='text'))
 
     return textfield
@@ -93,16 +92,15 @@ def textarea():
 
     Example:
 
-        ...[100*4]
+        ...[5]
+
+    The number defines the number of rows.
 
     """
 
-    rows = Optional(Suppress('*') + numeric)('rows').setParseAction(as_int)
-    cols = numeric('cols').setParseAction(as_int)
+    rows = number_enclosed_in('[]')('rows')
 
-    dimension = Suppress('[') + cols + rows + Suppress(']')
-
-    textarea = Literal('...') + Optional(dimension)
+    textarea = Suppress('...') + Optional(rows)
     textarea = textarea.setParseAction(tag(type='textarea'))
 
     return textarea
@@ -116,31 +114,21 @@ def password():
 
     """
 
-    return Literal('***').setParseAction(tag(type='password'))
+    return Suppress('***').setParseAction(tag(type='password'))
 
 
-def radio_buttons():
+def radios():
     """ Returns a radio buttons parser.
 
     Example:
         () Male (x) Female ( ) Space Alien
     """
-    radio_button = Group(
-        Literal('(x)').setParseAction(literal(True)) |
-        Literal('()').setParseAction(literal(False)) |
-        Literal('( )').setParseAction(literal(False))
-    ).setResultsName('checked').setParseAction(unwrap)
 
-    characters = text_without('()') | White(max=1) + text_without('()')
+    check = mark_enclosed_in('()')('checked')
+    characters = with_whitespace_inside(text_without('()'))
+    label = Combine(OneOrMore(characters))('label')
 
-    radio_button_text = Group(Combine(OneOrMore(characters)))
-    radio_button_text = radio_button_text.setResultsName('label')
-    radio_button_text = radio_button_text.setParseAction(unwrap)
-
-    radio_buttons = OneOrMore(Group(radio_button + radio_button_text))
-    radio_buttons = radio_buttons.setParseAction(tag(type='radio'))
-
-    return radio_buttons
+    return OneOrMore(Group(check + label)).setParseAction(tag(type='radio'))
 
 
 def checkboxes():
@@ -150,22 +138,11 @@ def checkboxes():
         [] Android [x] iPhone [x] Dumb Phone
 
     """
-    checkbox = Group(
-        Literal('[x]').setParseAction(literal(True)) |
-        Literal('[]').setParseAction(literal(False)) |
-        Literal('[ ]').setParseAction(literal(False))
-    ).setResultsName('checked').setParseAction(unwrap)
+    check = mark_enclosed_in('[]')('checked')
+    characters = with_whitespace_inside(text_without('[]'))
+    label = Combine(OneOrMore(characters))('label')
 
-    characters = text_without('[]') | White(max=1) + text_without('[]')
-
-    checkbox_text = Group(Combine(OneOrMore(characters)))
-    checkbox_text = checkbox_text.setResultsName('label')
-    checkbox_text = checkbox_text.setParseAction(unwrap)
-
-    checkboxes = OneOrMore(Group(checkbox + checkbox_text))
-    checkboxes = checkboxes.setParseAction(tag(type='checkbox'))
-
-    return checkboxes
+    return OneOrMore(Group(check + label)).setParseAction(tag(type='checkbox'))
 
 
 def select():
@@ -178,22 +155,21 @@ def select():
     The parentheses identify the selected element.
 
     """
-    key = text_without('(){},>').setResultsName('key')
-    label = text_without('(){},>').setResultsName('label')
+    chars = OneOrMore(with_whitespace_inside(text_without('(){},>')))
 
-    item = Optional(key + Suppress('>')) + label
-    selected_item = Suppress('(') + item.copy() + Suppress(')')
+    key = Optional(chars + Suppress('>'))('key').setParseAction(
+        lambda t: t and t[0] or None)
 
-    item.setParseAction(tag(selected=False))
-    selected_item.setParseAction(tag(selected=True))
+    unselected = key + chars('label').setParseAction(lambda t: t[0])
+    selected = enclosed_in(unselected, '()').setParseAction(tag(selected=True))
 
-    item = Group(selected_item | item)
+    unselected.setParseAction(tag(selected=False))
+    selected.setParseAction(tag(selected=True))
+
+    item = Group(selected | unselected)
     items = item + ZeroOrMore(Suppress(',') + item)
 
-    select = Suppress('{') + items + Suppress('}')
-    select.setParseAction(tag(type='select'))
-
-    return select
+    return enclosed_in(items, '{}').setParseAction(tag(type='select'))
 
 
 def custom():
@@ -225,7 +201,7 @@ def button():
 
     """
 
-    characters = text_without('[]') | White(max=1) + text_without('[]')
+    characters = with_whitespace_inside(text_without('[]'))
 
     label = Combine(OneOrMore(characters))('label')
     label.setParseAction(lambda t: t[0])
@@ -259,18 +235,52 @@ def fieldset_title():
     return fieldset_title
 
 
-# put together the actual grammar
-fields = Group(
-    textfield() |
-    radio_buttons() |
-    checkboxes() |
-    select() |
-    password() |
-    textarea() |
-    custom()
-)
+def field_identifier():
+    """ Returns a field identifier parser:
 
-field = field_declaration() + fields.setResultsName('field')
-field = field.setParseAction(tag(type='field'))
+    Example:
+        My field *
 
-line = (fieldset_title() | field | button()) + StringEnd()
+    """
+
+    required = Literal('*').setParseAction(matches('*'))
+    required = Optional(required, default=False)('required')
+
+    # a field name can contain any kind of character, except for a '=' and
+    # a '*', which we'll need later for the field definition
+    characters = with_whitespace_inside(text_without('*='))
+    label = Combine(OneOrMore(characters))('label')
+
+    # a field declaration begins with spaces (so we can differentiate between
+    # text and catual fields), then includes the name and the '*' which marks
+    # required fields
+    field_identifier = label + required + Suppress('=')
+
+    return field_identifier
+
+
+def field_description():
+    """ Returns the right hand side of the field definition. """
+    return MatchFirst([
+        textfield(),
+        radios(),
+        checkboxes(),
+        select(),
+        password(),
+        textarea(),
+        custom()
+    ])('field')
+
+
+def field_definition():
+    return field_identifier() + Suppress('=') + field_description()
+
+
+# defines a field on a single linge
+# field_definition = field_identifier() + Suppress('=') + field_description()
+# field_definition.setParseAction(tag(type='field'))
+# field_definition = field_identifier() + field_description()
+
+# block = Forward()
+# block_content = field_definition | field_identifier() + block
+# block << block_content | Optional(indentedBlock(block_content, [1]))
