@@ -37,6 +37,24 @@ def test_textfield():
     assert f.field.length == 25
 
 
+def test_textarea():
+
+    f = field.parseString("Comment* = ...")
+    assert f.label == "Comment"
+    assert f.required
+    assert f.field.type == 'textarea'
+    assert f.field.cols == ''
+    assert f.field.rows == ''
+
+    f = field.parseString("Comment* = ...[25]")
+    assert f.field.cols == 25
+    assert f.field.rows == ''
+
+    f = field.parseString("Comment* = ...[1*2]")
+    assert f.field.cols == 1
+    assert f.field.rows == 2
+
+
 def test_password():
 
     f = field.parseString("Passwort* = ***")

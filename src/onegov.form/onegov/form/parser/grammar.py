@@ -88,6 +88,26 @@ def textfield():
     return textfield
 
 
+def textarea():
+    """ Returns a textarea parser.
+
+    Example:
+
+        ...[100*4]
+
+    """
+
+    rows = Optional(Suppress('*') + numeric)('rows').setParseAction(as_int)
+    cols = numeric('cols').setParseAction(as_int)
+
+    dimension = Suppress('[') + cols + rows + Suppress(']')
+
+    textarea = Literal('...') + Optional(dimension)
+    textarea = textarea.setParseAction(tag(type='textarea'))
+
+    return textarea
+
+
 def password():
     """ Returns a password field parser.
 
@@ -196,7 +216,8 @@ fields = Group(
     radio_buttons() |
     checkboxes() |
     select() |
-    password()
+    password() |
+    textarea()
 )
 
 field = field_declaration() + fields.setResultsName('field')
