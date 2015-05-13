@@ -7,6 +7,7 @@ from pyparsing import (
     Literal,
     OneOrMore,
     Optional,
+    StringEnd,
     Suppress,
     Word,
     White,
@@ -201,4 +202,4 @@ fields = Group(
 field = field_declaration() + fields.setResultsName('field')
 field = field.setParseAction(tag(type='field'))
 
-line = (fieldset_title() | field)
+line = (fieldset_title() | field) + StringEnd()
