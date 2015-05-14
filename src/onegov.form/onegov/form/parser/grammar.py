@@ -3,7 +3,6 @@ from onegov.form.compat import unicode_characters
 from pyparsing import (
     nums,
     Combine,
-    Empty,
     Forward,
     Group,
     indentedBlock,
@@ -16,7 +15,6 @@ from pyparsing import (
     Suppress,
     Word,
     White,
-    Token,
 )
 
 
