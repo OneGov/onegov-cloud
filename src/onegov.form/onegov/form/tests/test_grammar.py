@@ -185,6 +185,8 @@ def test_document():
     result = document().searchString(form)
     assert len(result) == 7
 
+    assert result[0].asDict() == {'label': 'Name', 'type': 'fieldset'}
+
     assert result[1].asDict() == {
         'label': 'First name',
         'type': 'text',
@@ -196,6 +198,9 @@ def test_document():
         'required': True,
         'length': 50
     }
+
+    assert result[3].asDict() == {'label': 'Delivery', 'type': 'fieldset'}
+
     assert result[4]['label'] == 'Delivery Method'
     assert result[4]['type'] == 'radio'
     assert result[4]['required'] == False
@@ -220,4 +225,35 @@ def test_document():
 
     assert result[6]['parts'][1].asDict() == {
         'checked': True, 'label': 'Credit Card'
+    }
+
+def test_document_checkboxes():
+    form = textwrap.dedent("""
+        # Extras
+
+        Extras = [ ] Priority Boarding
+                 [ ] Extra Luggage
+                 [x] Travel Insurance
+
+    """)
+
+    result = document().searchString(form)
+    assert len(result) == 2
+
+    assert result[0].asDict() == {'label': 'Extras', 'type': 'fieldset'}
+
+    assert result[1]['label'] == 'Extras'
+    assert result[1]['type'] == 'checkbox'
+    assert result[1]['required'] == False
+
+    assert result[1]['parts'][0].asDict() == {
+        'checked': False, 'label': 'Priority Boarding'
+    }
+
+    assert result[1]['parts'][1].asDict() == {
+        'checked': False, 'label': 'Extra Luggage'
+    }
+
+    assert result[1]['parts'][2].asDict() == {
+        'checked': True, 'label': 'Travel Insurance'
     }

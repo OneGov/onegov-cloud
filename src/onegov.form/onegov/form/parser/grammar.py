@@ -296,7 +296,8 @@ def block_content():
     return MatchFirst([
         fieldset_title(),
         field_identifier() + textfield(),
-        field_identifier() + OneOrMore(Optional(LE) + radios())('parts')
+        field_identifier() + OneOrMore(Optional(LE) + radios())('parts'),
+        field_identifier() + OneOrMore(Optional(LE) + checkboxes())('parts')
     ])
 
 
