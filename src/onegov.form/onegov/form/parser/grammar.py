@@ -5,7 +5,6 @@ from pyparsing import (
     CharsNotIn,
     Combine,
     Group,
-    indentedBlock,
     LineEnd,
     Literal,
     OneOrMore,
@@ -14,8 +13,7 @@ from pyparsing import (
     MatchFirst,
     Suppress,
     Word,
-    White,
-    ZeroOrMore
+    White
 )
 
 
@@ -27,30 +25,37 @@ numeric = Word(nums)
 
 
 def text_without(characters):
+    """ Returns all printable text without the given characters. """
     return Word(unicode_characters, excludeChars=characters)
 
 
 def matches(character):
+    """ Returns true if the given character matches the token. """
     return lambda tokens: tokens and tokens[0] == character
 
 
 def literal(text):
+    """" Returns the given value, ignoring the tokens alltogether. """
     return lambda tokens: text
 
 
 def as_int(tokens):
+    """ Converts the token to int if possible. """
     return int(tokens[0]) if tokens else None
 
 
 def rstrip(tokens):
+    """ Strips whitetext on the right of the token. """
     return tokens[0].rstrip()
 
 
 def unwrap(tokens):
+    """ Unwraps grouped tokens. """
     return tokens[0][0]
 
 
 def tag(**tags):
+    """ Takes the given tags and applies them to the token. """
     def apply_tags(tokens):
         for key, value in tags.items():
             tokens[key] = value
@@ -58,20 +63,36 @@ def tag(**tags):
 
 
 def with_whitespace_inside(expr):
+    """ Returns an expression that allows for whitespace inside, but not
+    outside the expression.
+
+    """
     return expr | White(' ', max=1) + expr
 
 
 def enclosed_in(expr, characters):
+    """ Wraps the given expression in the given characters. """
     left, right = characters
     return Suppress(left) + expr + Suppress(right)
 
 
 def number_enclosed_in(characters):
+    """ Wraps numers in the given characters, making sure the result is an int.
+
+    """
     left, right = characters
     return enclosed_in(numeric, characters).setParseAction(as_int)
 
 
 def mark_enclosed_in(characters):
+    """ Returns a mark (x) inclosed in the given characters. For example,
+    ``mark_enclosed_in('[]')`` creates an expression that accepts any of these
+    and sets the result of the 'x' value to True, the others to False::
+
+        [x]
+        [ ]
+        []
+    """
     left, right = characters
     return MatchFirst((
         Literal(left + 'x' + right).setParseAction(literal(True)),
@@ -92,7 +113,7 @@ def textfield():
     length = number_enclosed_in('[]')('length')
 
     textfield = Suppress('___') + Optional(length)
-    textfield = textfield.setParseAction(tag(type='text'))
+    textfield.setParseAction(tag(type='text'))
 
     return textfield
 
@@ -111,7 +132,7 @@ def textarea():
     rows = number_enclosed_in('[]')('rows')
 
     textarea = Suppress('...') + Optional(rows)
-    textarea = textarea.setParseAction(tag(type='textarea'))
+    textarea.setParseAction(tag(type='textarea'))
 
     return textarea
 
@@ -127,6 +148,23 @@ def password():
     return Suppress('***').setParseAction(tag(type='password'))
 
 
+def marker_box(characters):
+    """ Returns a marker box:
+
+    Example:
+        (x) Male
+        [x] Female
+        {x} What?
+    """
+
+    check = mark_enclosed_in(characters)('checked')
+
+    label = Combine(OneOrMore(CharsNotIn(characters + '\n')))('label')
+    label.setParseAction(rstrip)
+
+    return Group(check + label)
+
+
 def radios():
     """ Returns a radio buttons parser.
 
@@ -134,14 +172,7 @@ def radios():
         () Male (x) Female ( ) Space Alien
     """
 
-    check = mark_enclosed_in('()')('checked')
-    label = Combine(OneOrMore(CharsNotIn('()\n')))('label')
-    label.setParseAction(rstrip)
-
-    radios = OneOrMore(Group(check + label))
-    radios.setParseAction(tag(type='radio'))
-
-    return radios
+    return OneOrMore(marker_box('()')).setParseAction(tag(type='radio'))
 
 
 def checkboxes():
@@ -151,38 +182,7 @@ def checkboxes():
         [] Android [x] iPhone [x] Dumb Phone
 
     """
-    check = mark_enclosed_in('[]')('checked')
-    characters = with_whitespace_inside(text_without('[]'))
-    label = Combine(OneOrMore(characters))('label')
-
-    return OneOrMore(Group(check + label)).setParseAction(tag(type='checkbox'))
-
-
-def select():
-    """ Returns a select parser.
-
-    Examples:
-        {ZRH, KUL, (DXB)}
-        {ZRH > Zürich, KUL > Kuala Lumpur, (DXB > Dubai)}
-
-    The parentheses identify the selected element.
-
-    """
-    chars = OneOrMore(with_whitespace_inside(text_without('(){},>')))
-
-    key = Optional(chars + Suppress('>'))('key').setParseAction(
-        lambda t: t and t[0] or None)
-
-    unselected = key + chars('label').setParseAction(lambda t: t[0])
-    selected = enclosed_in(unselected, '()').setParseAction(tag(selected=True))
-
-    unselected.setParseAction(tag(selected=False))
-    selected.setParseAction(tag(selected=True))
-
-    item = Group(selected | unselected)
-    items = item + ZeroOrMore(Suppress(',') + item)
-
-    return enclosed_in(items, '{}').setParseAction(tag(type='select'))
+    return OneOrMore(marker_box('[]')).setParseAction(tag(type='checkbox'))
 
 
 def custom():
@@ -270,24 +270,11 @@ def field_identifier():
     return label + required + Suppress('=')
 
 
-def field_description():
-    """ Returns the right hand side of the field definition. """
-    return MatchFirst([
-        textfield(),
-        radios(),
-        checkboxes(),
-        select(),
-        password(),
-        textarea(),
-        custom()
-    ])
-
-
-def indented(content):
-    return indentedBlock(content, [1]).setParseAction(unwrap)
-
-
 def block_content():
+    """ Returns the content of one logical parser block, this is the last
+    step towards the document, which is a collection of these blocks.
+
+    """
     LE = Suppress(LineEnd())
     identifier = field_identifier()
 
@@ -296,10 +283,10 @@ def block_content():
         fieldset_title(),
         identifier + (textfield() | textarea() | password() | custom()),
         identifier + OneOrMore(Optional(LE) + radios())('parts'),
-        identifier + OneOrMore(Optional(LE) + checkboxes())('parts'),
-        identifier + OneOrMore(Optional(LE) + select())('parts')
+        identifier + OneOrMore(Optional(LE) + checkboxes())('parts')
     ])
 
 
 def document():
+    """ Returns a form document. """
     return OneOrMore(block_content())
