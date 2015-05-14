@@ -184,7 +184,7 @@ def test_document():
 
     assert result[4]['label'] == 'Delivery Method'
     assert result[4]['type'] == 'radio'
-    assert result[4]['required'] == False
+    assert not result[4]['required']
 
     assert result[4]['parts'][0].asDict() == {
         'checked': False, 'label': 'Pickup'
@@ -198,7 +198,7 @@ def test_document():
 
     assert result[6]['label'] == 'Payment'
     assert result[6]['type'] == 'radio'
-    assert result[6]['required'] == True
+    assert result[6]['required']
 
     assert result[6]['parts'][0].asDict() == {
         'checked': False, 'label': 'Bill'
@@ -244,7 +244,7 @@ def test_multiline_checkboxes():
 
     assert result[1]['label'] == 'Extras'
     assert result[1]['type'] == 'checkbox'
-    assert result[1]['required'] == False
+    assert not result[1]['required']
 
     assert result[1]['parts'][0].asDict() == {
         'checked': False, 'label': 'Priority Boarding'
