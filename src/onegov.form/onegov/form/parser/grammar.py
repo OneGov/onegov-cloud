@@ -2,7 +2,6 @@
 from onegov.form.compat import unicode_characters
 from pyparsing import (
     nums,
-    CharsNotIn,
     Combine,
     Group,
     LineEnd,
@@ -67,7 +66,7 @@ def with_whitespace_inside(expr):
     outside the expression.
 
     """
-    return expr | White(' ', max=1) + expr
+    return Combine(OneOrMore(expr | White(' ', max=1) + expr))
 
 
 def enclosed_in(expr, characters):
@@ -158,9 +157,7 @@ def marker_box(characters):
     """
 
     check = mark_enclosed_in(characters)('checked')
-
-    label = Combine(OneOrMore(CharsNotIn(characters + '\n')))('label')
-    label.setParseAction(rstrip)
+    label = with_whitespace_inside(text_without(characters))('label')
 
     return Group(check + label)
 
@@ -240,7 +237,7 @@ def fieldset_title():
 
     """
 
-    label = Combine(OneOrMore(CharsNotIn('\n'))).setResultsName('label')
+    label = with_whitespace_inside(text).setResultsName('label')
 
     fieldset_title = Suppress('#') + (Suppress('...') | label)
     fieldset_title = fieldset_title.setParseAction(tag(type='fieldset'))

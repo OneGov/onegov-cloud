@@ -11,7 +11,23 @@ from onegov.form.parser.grammar import (
     textarea,
     textfield,
     radios,
+    text_without,
+    with_whitespace_inside
 )
+
+
+def test_text_without():
+    assert text_without('?!').parseString('what')[0] == 'what'
+    assert text_without('?!').parseString('what what?')[0] == 'what'
+    assert text_without('?!').parseString('what!')[0] == 'what'
+    assert text_without('?').parseString('what!')[0] == 'what!'
+
+
+def test_with_whitespace_inside():
+    text = text_without('')
+    assert with_whitespace_inside(text).parseString("a b")[0] == "a b"
+    assert with_whitespace_inside(text).parseString("a b ")[0] == "a b"
+    assert with_whitespace_inside(text).parseString("a  b ")[0] == "a"
 
 
 def test_field_identifier():
