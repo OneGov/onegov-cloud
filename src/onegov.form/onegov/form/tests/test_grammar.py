@@ -2,14 +2,12 @@
 import textwrap
 
 from onegov.form.parser.grammar import (
-    block_content,
     button,
     custom,
     document,
     field_identifier,
     checkboxes,
     password,
-    select,
     textarea,
     textfield,
     radios,
@@ -227,6 +225,7 @@ def test_document():
         'type': 'button',
         'url': 'https://www.google.ch'
     }
+
 
 def test_multiline_checkboxes():
     form = textwrap.dedent("""
