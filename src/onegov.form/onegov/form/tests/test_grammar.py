@@ -112,28 +112,6 @@ def test_checkboxes():
     ]
 
 
-def test_select():
-
-    field = select()
-
-    f = field.parseString("{KUL, ZRH, (DXB)}")
-    assert f.type == 'select'
-
-    assert [s.asDict() for s in f] == [
-        {'selected': False, 'label': 'KUL'},
-        {'selected': False, 'label': 'ZRH'},
-        {'selected': True, 'label': 'DXB'}
-    ]
-
-    f = field.parseString("{KUL, ZRH > Zürich, (DXB > Dubai)}")
-
-    assert [s.asDict() for s in f] == [
-        {'selected': False, 'label': 'KUL'},
-        {'selected': False, 'label': 'Zürich', 'key': 'ZRH'},
-        {'selected': True, 'label': 'Dubai', 'key': 'DXB'}
-    ]
-
-
 def test_custom():
 
     field = custom()
@@ -180,10 +158,15 @@ def test_document():
         # ...
 
         Payment* = () Bill (x) Credit Card
+        Password = ***
+        Comment = ...
+        E-Mail = /E-Mail
+
+        [Submit](https://www.google.ch)
     """)
 
     result = document().searchString(form)
-    assert len(result) == 7
+    assert len(result) == 11
 
     assert result[0].asDict() == {'label': 'Name', 'type': 'fieldset'}
 
@@ -227,7 +210,25 @@ def test_document():
         'checked': True, 'label': 'Credit Card'
     }
 
-def test_document_checkboxes():
+    assert result[7].asDict() == {
+        'required': False, 'label': 'Password', 'type': 'password'
+    }
+    assert result[8].asDict() == {
+        'required': False, 'label': 'Comment', 'type': 'textarea'
+    }
+    assert result[9].asDict() == {
+        'required': False,
+        'label': 'E-Mail',
+        'type': 'custom',
+        'custom_id': 'e-mail'
+    }
+    assert result[10].asDict() == {
+        'label': 'Submit',
+        'type': 'button',
+        'url': 'https://www.google.ch'
+    }
+
+def test_multiline_checkboxes():
     form = textwrap.dedent("""
         # Extras
 

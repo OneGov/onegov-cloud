@@ -200,7 +200,7 @@ def custom():
     custom_id = OneOrMore(text)('custom_id')
     custom_id.setParseAction(lambda t: t[0].lower())
 
-    custom = Suppress('/') + custom_id + StringEnd()
+    custom = Suppress('/') + custom_id
     custom.setParseAction(tag(type='custom'))
 
     return custom
@@ -292,12 +292,15 @@ def indented(content):
 
 def block_content():
     LE = Suppress(LineEnd())
+    identifier = field_identifier()
 
     return MatchFirst([
+        button(),
         fieldset_title(),
-        field_identifier() + textfield(),
-        field_identifier() + OneOrMore(Optional(LE) + radios())('parts'),
-        field_identifier() + OneOrMore(Optional(LE) + checkboxes())('parts')
+        identifier + (textfield() | textarea() | password() | custom()),
+        identifier + OneOrMore(Optional(LE) + radios())('parts'),
+        identifier + OneOrMore(Optional(LE) + checkboxes())('parts'),
+        identifier + OneOrMore(Optional(LE) + select())('parts')
     ])
 
 
