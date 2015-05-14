@@ -306,12 +306,3 @@ def block_content():
 
 def document():
     return OneOrMore(block_content())
-
-# defines a field on a single linge
-# field_definition = field_identifier() + Suppress('=') + field_description()
-# field_definition.setParseAction(tag(type='field'))
-# field_definition = field_identifier() + field_description()
-
-# block = Forward()
-# block_content = field_definition | field_identifier() + block
-# block << block_content | Optional(indentedBlock(block_content, [1]))
