@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+import textwrap
+
 from onegov.form.parser.grammar import (
+    block_content,
     button,
     custom,
+    document,
     field_identifier,
     checkboxes,
     password,
@@ -156,4 +160,41 @@ def test_button():
     assert f.asDict() == {
         'type': 'button',
         'label': 'Send'
+    }
+
+
+def test_document():
+    # a form that includes all the features available
+    form = textwrap.dedent("""
+        # Name
+        First name* = ___
+        Last name* = ___[50]
+
+        # Delivery
+        Delivery Method =
+            ( ) Pickup
+            (x) Postal Service
+    """)
+
+    result = document().searchString(form)
+    assert result[0].asDict() == {
+        'label': 'First name',
+        'type': 'text',
+        'required': True
+    }
+    assert result[1].asDict() == {
+        'label': 'Last name',
+        'type': 'text',
+        'required': True,
+        'length': 50
+    }
+    result[2]['label'] == 'Delivery Method'
+    result[2]['type'] == 'radio'
+    result[2]['required'] == 'False'
+
+    result[2]['parts'][0].asDict() == {
+        'checked': False, 'label': 'Pickup'
+    }
+    result[2]['parts'][0].asDict() == {
+        'checked': True, 'label': 'Postal Service'
     }

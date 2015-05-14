@@ -3,10 +3,15 @@ from onegov.form.compat import unicode_characters
 from pyparsing import (
     nums,
     Combine,
+    FollowedBy,
     Group,
+    indentedBlock,
+    LineEnd,
+    LineStart,
     Literal,
     OneOrMore,
     Optional,
+    ParserElement,
     MatchFirst,
     StringEnd,
     Suppress,
@@ -15,6 +20,9 @@ from pyparsing import (
     ZeroOrMore
 )
 
+
+# we want newlines to be significant
+ParserElement.setDefaultWhitespaceChars(' \t')
 
 text = Word(unicode_characters)
 numeric = Word(nums)
@@ -48,7 +56,7 @@ def tag(**tags):
 
 
 def with_whitespace_inside(expr):
-    return expr | White(max=1) + expr
+    return expr | White(' ', max=1) + expr
 
 
 def enclosed_in(expr, characters):
@@ -128,7 +136,10 @@ def radios():
     characters = with_whitespace_inside(text_without('()'))
     label = Combine(OneOrMore(characters))('label')
 
-    return OneOrMore(Group(check + label)).setParseAction(tag(type='radio'))
+    radios = OneOrMore(Group(check + label))('parts')
+    radios.setParseAction(tag(type='radio'))
+
+    return radios
 
 
 def checkboxes():
@@ -254,9 +265,7 @@ def field_identifier():
     # a field declaration begins with spaces (so we can differentiate between
     # text and catual fields), then includes the name and the '*' which marks
     # required fields
-    field_identifier = label + required + Suppress('=')
-
-    return field_identifier
+    return label + required + Suppress('=')
 
 
 def field_description():
@@ -269,12 +278,26 @@ def field_description():
         password(),
         textarea(),
         custom()
-    ])('field')
+    ])
 
 
-def field_definition():
-    return field_identifier() + Suppress('=') + field_description()
+def indented(content):
+    return indentedBlock(content, [1])
 
+
+def block_content():
+    LE = Suppress(LineEnd())
+
+    return MatchFirst([
+        field_identifier() + field_description(),
+        field_identifier() + LE + indented(radios()).setParseAction(unwrap),
+        field_identifier() + LE + indented(checkboxes()).setParseAction(unwrap),
+        field_identifier() + LE + indented(select()).setParseAction(unwrap),
+    ])
+
+
+def document():
+    return OneOrMore(block_content())
 
 # defines a field on a single linge
 # field_definition = field_identifier() + Suppress('=') + field_description()
