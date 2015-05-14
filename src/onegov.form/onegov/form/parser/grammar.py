@@ -2,6 +2,7 @@
 from onegov.form.compat import unicode_characters
 from pyparsing import (
     nums,
+    CharsNotIn,
     Combine,
     FollowedBy,
     Group,
@@ -42,6 +43,10 @@ def literal(text):
 
 def as_int(tokens):
     return int(tokens[0]) if tokens else None
+
+
+def rstrip(tokens):
+    return tokens[0].rstrip()
 
 
 def unwrap(tokens):
@@ -133,10 +138,10 @@ def radios():
     """
 
     check = mark_enclosed_in('()')('checked')
-    characters = with_whitespace_inside(text_without('()'))
-    label = Combine(OneOrMore(characters))('label')
+    label = Combine(OneOrMore(CharsNotIn('()\n')))('label')
+    label.setParseAction(rstrip)
 
-    radios = OneOrMore(Group(check + label))('parts')
+    radios = OneOrMore(Group(check + label))
     radios.setParseAction(tag(type='radio'))
 
     return radios
@@ -234,13 +239,13 @@ def fieldset_title():
 
     It's possible to have an empty fieldset title (to disable a fieldset):
 
-        #
+        # ...
 
     """
 
-    label = Combine(ZeroOrMore(text | White())).setResultsName('label')
+    label = Combine(OneOrMore(CharsNotIn('\n'))).setResultsName('label')
 
-    fieldset_title = Suppress('#') + label
+    fieldset_title = Suppress('#') + (Suppress('...') | label)
     fieldset_title = fieldset_title.setParseAction(tag(type='fieldset'))
 
     return fieldset_title
@@ -282,17 +287,16 @@ def field_description():
 
 
 def indented(content):
-    return indentedBlock(content, [1])
+    return indentedBlock(content, [1]).setParseAction(unwrap)
 
 
 def block_content():
     LE = Suppress(LineEnd())
 
     return MatchFirst([
-        field_identifier() + field_description(),
-        field_identifier() + LE + indented(radios()).setParseAction(unwrap),
-        field_identifier() + LE + indented(checkboxes()).setParseAction(unwrap),
-        field_identifier() + LE + indented(select()).setParseAction(unwrap),
+        fieldset_title(),
+        field_identifier() + textfield(),
+        field_identifier() + OneOrMore(Optional(LE) + radios())('parts')
     ])
 
 

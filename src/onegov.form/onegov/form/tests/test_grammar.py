@@ -167,34 +167,57 @@ def test_document():
     # a form that includes all the features available
     form = textwrap.dedent("""
         # Name
+
         First name* = ___
         Last name* = ___[50]
 
         # Delivery
+
         Delivery Method =
             ( ) Pickup
             (x) Postal Service
+
+        # ...
+
+        Payment* = () Bill (x) Credit Card
     """)
 
     result = document().searchString(form)
-    assert result[0].asDict() == {
+    assert len(result) == 7
+
+    assert result[1].asDict() == {
         'label': 'First name',
         'type': 'text',
         'required': True
     }
-    assert result[1].asDict() == {
+    assert result[2].asDict() == {
         'label': 'Last name',
         'type': 'text',
         'required': True,
         'length': 50
     }
-    result[2]['label'] == 'Delivery Method'
-    result[2]['type'] == 'radio'
-    result[2]['required'] == 'False'
+    assert result[4]['label'] == 'Delivery Method'
+    assert result[4]['type'] == 'radio'
+    assert result[4]['required'] == False
 
-    result[2]['parts'][0].asDict() == {
+    assert result[4]['parts'][0].asDict() == {
         'checked': False, 'label': 'Pickup'
     }
-    result[2]['parts'][0].asDict() == {
+
+    assert result[4]['parts'][1].asDict() == {
         'checked': True, 'label': 'Postal Service'
+    }
+
+    assert result[5].asDict() == {'type': 'fieldset'}
+
+    assert result[6]['label'] == 'Payment'
+    assert result[6]['type'] == 'radio'
+    assert result[6]['required'] == True
+
+    assert result[6]['parts'][0].asDict() == {
+        'checked': False, 'label': 'Bill'
+    }
+
+    assert result[6]['parts'][1].asDict() == {
+        'checked': True, 'label': 'Credit Card'
     }
