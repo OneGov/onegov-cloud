@@ -273,3 +273,56 @@ def test_multiline_checkboxes():
     assert result[1]['parts'][2].asDict() == {
         'checked': True, 'label': 'Travel Insurance'
     }
+
+
+def test_nested_blocks():
+    form = textwrap.dedent("""
+        Payment = (x) Bill
+                  ( ) Credit Card
+                      Address = ___
+
+    """)
+    result = document().searchString(form)
+
+    assert len(result) == 1
+    assert result[0].parts[1].dependencies[0].asDict() == {
+        'required': False, 'label': 'Address', 'type': 'text'
+    }
+
+
+def test_doubly_nested():
+    form = textwrap.dedent("""
+        Payment = (x) Bill
+                      Address = ___
+                      Comment = ...
+
+                  ( ) Credit Card
+                      Type = (x) Visa
+                             ( ) Mastercard
+                      Store = [ ] Address
+                              [x] Card
+
+    """)
+    result = document().searchString(form)
+
+    assert len(result) == 1
+    assert result[0].parts[0].dependencies[0].asDict() == {
+        'label': 'Address', 'required': False, 'type': 'text'
+    }
+    assert result[0].parts[0].dependencies[1].asDict() == {
+        'label': 'Comment', 'required': False, 'type': 'textarea'
+    }
+    assert result[0].parts[1].dependencies[0].label == 'Type'
+    assert result[0].parts[1].dependencies[0].type == 'radio'
+    assert result[0].parts[1].dependencies[0].parts[0].asDict() == {
+        'checked': True, 'label': 'Visa'
+    }
+    assert result[0].parts[1].dependencies[0].parts[1].asDict() == {
+        'checked': False, 'label': 'Mastercard'
+    }
+    assert result[0].parts[1].dependencies[1].parts[0].asDict() == {
+        'checked': False, 'label': 'Address'
+    }
+    assert result[0].parts[1].dependencies[1].parts[1].asDict() == {
+        'checked': True, 'label': 'Card'
+    }

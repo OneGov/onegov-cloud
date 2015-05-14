@@ -3,7 +3,10 @@ from onegov.form.compat import unicode_characters
 from pyparsing import (
     nums,
     Combine,
+    Empty,
+    Forward,
     Group,
+    indentedBlock,
     LineEnd,
     Literal,
     OneOrMore,
@@ -12,7 +15,8 @@ from pyparsing import (
     MatchFirst,
     Suppress,
     Word,
-    White
+    White,
+    Token,
 )
 
 
@@ -21,6 +25,12 @@ ParserElement.setDefaultWhitespaceChars(' \t')
 
 text = Word(unicode_characters)
 numeric = Word(nums)
+
+# shortcut
+indented = indentedBlock
+
+
+block = Forward()
 
 
 def text_without(characters):
@@ -147,7 +157,14 @@ def password():
     return Suppress('***').setParseAction(tag(type='password'))
 
 
-def marker_box(characters):
+class Stack(list):
+
+    def init(self, initial_value):
+        if not len(self):
+            self[:] = [initial_value]
+
+
+def marker_box(characters, indent_stack=None):
     """ Returns a marker box:
 
     Example:
@@ -159,7 +176,13 @@ def marker_box(characters):
     check = mark_enclosed_in(characters)('checked')
     label = with_whitespace_inside(text_without(characters))('label')
 
-    return Group(check + label)
+    stack = Stack()
+    label.setParseAction(lambda s, l, t: stack.init(l - 1))
+
+    dependencies = Group(indented(block, stack))('dependencies')
+    dependencies.setParseAction(unwrap)
+
+    return Group(check + label + Optional(dependencies))
 
 
 def radios():
@@ -179,7 +202,10 @@ def checkboxes():
         [] Android [x] iPhone [x] Dumb Phone
 
     """
-    return OneOrMore(marker_box('[]')).setParseAction(tag(type='checkbox'))
+    boxes = OneOrMore(marker_box('[]'))
+    boxes.setParseAction(tag(type='checkbox'))
+
+    return boxes
 
 
 def custom():
@@ -287,3 +313,6 @@ def block_content():
 def document():
     """ Returns a form document. """
     return OneOrMore(block_content())
+
+
+block << block_content()
