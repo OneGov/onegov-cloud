@@ -36,7 +36,9 @@ import os.path
 from onegov.core import Framework
 from onegov.core.utils import render_file
 from onegov.core.security import Public
-from more.webassets.tweens import is_subpath
+from more.webassets.tweens import (
+    is_subpath, has_insecure_path_element, unquote
+)
 
 
 class StaticFile(object):
@@ -63,12 +65,20 @@ class StaticFile(object):
         if not app.serve_static_files:
             return None
 
+        absorb = unquote(absorb)
+
+        if has_insecure_path_element(absorb):
+            return None
+
         path = os.path.join(app.static_files, absorb)
 
-        if os.path.isfile(path) and is_subpath(app.static_files, path):
-            return StaticFile(os.path.relpath(path, start=app.static_files))
-        else:
+        if not is_subpath(app.static_files, path):
             return None
+
+        if not os.path.isfile(path):
+            return None
+
+        return StaticFile(os.path.relpath(path, start=app.static_files))
 
 
 @Framework.path(model=StaticFile, path='/static', absorb=True)

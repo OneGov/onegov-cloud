@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Tighten security around static file serving.
+  [href]
+
 - Urls generated from titles no longer contain double dashes ('--').
   [href]
 
