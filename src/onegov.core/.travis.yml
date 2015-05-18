@@ -1,6 +1,3 @@
-# Opt into fully virtualized infrastructure
-sudo: required
-
 language: python
 
 env:
