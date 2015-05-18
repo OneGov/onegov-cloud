@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.0 (2015-05-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Tighten security around static file serving.
   [href]
 
