@@ -340,9 +340,10 @@ def password():
 
 
 class Stack(list):
+    length_of_marker_box = 3
 
     def init(self, string, line, tokens):
-        self[:] = [col(line, string) + 3]
+        self[:] = [col(line, string) + self.length_of_marker_box]
 
 
 def marker_box(characters):
@@ -358,6 +359,8 @@ def marker_box(characters):
     check = mark_enclosed_in(characters)('checked')
     label = with_whitespace_inside(text_without(characters))('label')
 
+    # Initialize the stack to the position of the label (which comes after
+    # the checkbox), to get the correct indentation checks by pyparsing.
     stack = Stack()
     check.setParseAction(stack.init)
 
