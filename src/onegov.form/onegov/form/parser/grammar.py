@@ -345,7 +345,7 @@ class Stack(list):
         self[:] = [col(line, string) + 3]
 
 
-def marker_box(characters, indent_stack=None):
+def marker_box(characters):
     """ Returns a marker box:
 
     Example::
