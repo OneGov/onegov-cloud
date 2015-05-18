@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from onegov.form.compat import unicode_characters
 from pyparsing import (
+    col,
     nums,
     Combine,
     Forward,
@@ -98,13 +99,11 @@ def mark_enclosed_in(characters):
 
         [x]
         [ ]
-        []
     """
     left, right = characters
     return MatchFirst((
         Literal(left + 'x' + right).setParseAction(literal(True)),
-        Literal(left + ' ' + right).setParseAction(literal(False)),
-        Literal(left + right).setParseAction(literal(False))
+        Literal(left + ' ' + right).setParseAction(literal(False))
     ))
 
 
@@ -157,9 +156,8 @@ def password():
 
 class Stack(list):
 
-    def init(self, initial_value):
-        if not len(self):
-            self[:] = [initial_value]
+    def init(self, string, line, tokens):
+        self[:] = [col(line, string) + 3]
 
 
 def marker_box(characters, indent_stack=None):
@@ -175,7 +173,7 @@ def marker_box(characters, indent_stack=None):
     label = with_whitespace_inside(text_without(characters))('label')
 
     stack = Stack()
-    label.setParseAction(lambda s, l, t: stack.init(l - 1))
+    check.setParseAction(stack.init)
 
     dependencies = Group(indented(block, stack))('dependencies')
     dependencies.setParseAction(unwrap)
@@ -187,7 +185,7 @@ def radios():
     """ Returns a radio buttons parser.
 
     Example:
-        () Male (x) Female ( ) Space Alien
+        ( ) Male (x) Female ( ) Space Alien
     """
 
     return OneOrMore(marker_box('()')).setParseAction(tag(type='radio'))

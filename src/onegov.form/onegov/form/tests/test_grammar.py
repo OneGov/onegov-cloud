@@ -96,7 +96,7 @@ def test_radios():
 
     field = radios()
 
-    f = field.parseString("() Male (x) Female ( ) Space Alien")
+    f = field.parseString("( ) Male (x) Female ( ) Space Alien")
     assert f.type == 'radio'
 
     assert [r.asDict() for r in f] == [
@@ -105,7 +105,7 @@ def test_radios():
         {'checked': False, 'label': 'Space Alien'}
     ]
 
-    f = field.parseString("() Hans ")
+    f = field.parseString("( ) Hans ")
 
     assert [r.asDict() for r in f] == [
         {'checked': False, 'label': 'Hans'},
@@ -116,7 +116,7 @@ def test_checkboxes():
 
     field = checkboxes()
 
-    f = field.parseString("[x] German [ ] English [] Swiss German ")
+    f = field.parseString("[x] German [ ] English [ ] Swiss German ")
     assert f.type == 'checkbox'
 
     assert [r.asDict() for r in f] == [
@@ -171,7 +171,7 @@ def test_document():
 
         # ...
 
-        Payment* = () Bill (x) Credit Card
+        Payment* = ( ) Bill (x) Credit Card
         Password = ***
         Comment = ...
         E-Mail = /E-Mail
@@ -290,7 +290,7 @@ def test_nested_blocks():
     }
 
 
-def test_doubly_nested():
+def test_nested_nested():
     form = textwrap.dedent("""
         Payment = (x) Bill
                       Address = ___
@@ -326,3 +326,29 @@ def test_doubly_nested():
     assert result[0].parts[1].dependencies[1].parts[1].asDict() == {
         'checked': True, 'label': 'Card'
     }
+
+
+def test_nested_nested_nested():
+    form = textwrap.dedent("""
+        Delivery = (x) Pickup
+                   ( ) Fedex
+                       Address = (x) Postbox
+                                     Postbox Number = ___
+                                 ( ) Home Address
+                                     Street = ___
+    """)
+    result = document().searchString(form)
+
+    assert result[0].parts[0].asDict() == {'checked': True, 'label': 'Pickup'}
+    assert result[0].parts[1].label == 'Fedex'
+
+    address = result[0].parts[1].dependencies[0]
+
+    assert address.label == 'Address'
+    assert address.parts[0].label == 'Postbox'
+    assert address.parts[0].checked
+    assert address.parts[1].label == 'Home Address'
+    assert not address.parts[1].checked
+
+    assert address.parts[0].dependencies[0].label == 'Postbox Number'
+    assert address.parts[1].dependencies[0].label == 'Street'
