@@ -1,3 +1,4 @@
+import inspect
 import weakref
 
 from collections import OrderedDict
@@ -94,9 +95,9 @@ class Fieldset(object):
         return self.label is not None
 
 
-def with_options(widget_class, **render_options):
-    """ Takes a widget class and returns a child-instance of the widget class,
-    with the given options set on the render call.
+def with_options(widget, **render_options):
+    """ Takes a widget class or instance and returns a child-instance of the
+    widget class, with the given options set on the render call.
 
     This makes it easy to use existing WTForms widgets with custom render
     options:
@@ -105,10 +106,22 @@ def with_options(widget_class, **render_options):
 
     """
 
-    class Widget(widget_class):
+    if inspect.isclass(widget):
+        class Widget(widget):
 
-        def __call__(self, *args, **kwargs):
-            render_options.update(kwargs)
-            return super(Widget, self).__call__(*args, **render_options)
+            def __call__(self, *args, **kwargs):
+                render_options.update(kwargs)
+                return super(Widget, self).__call__(*args, **render_options)
 
-    return Widget()
+        return Widget()
+    else:
+        class Widget(widget.__class__):
+
+            def __init__(self):
+                self.__dict__.update(widget.__dict__)
+
+            def __call__(self, *args, **kwargs):
+                render_options.update(kwargs)
+                return widget.__call__(*args, **render_options)
+
+        return Widget()

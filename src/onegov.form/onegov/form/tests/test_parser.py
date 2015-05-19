@@ -163,3 +163,8 @@ def test_dependent_validation():
 
     form.validate()
     assert not form.errors
+
+    assert 'data-depends-on="payment/Bill"' in (
+        form.address.widget(form.address))
+    assert 'data-depends-on="payment/Credit Card"' in (
+        form.credit_card_number.widget(form.credit_card_number))

@@ -124,6 +124,10 @@ class FieldDependency(object):
     def fulfilled(self, form, field):
         return getattr(form, self.field_id).data == self.choice
 
+    @property
+    def html_data(self):
+        return {'data-depends-on': '/'.join((self.field_id, self.choice))}
+
 
 class WTFormsClassBuilder(object):
     """ Helps dynamically build a wtforms class from parsed blocks.
@@ -165,5 +169,13 @@ class WTFormsClassBuilder(object):
             fieldset=self.current_fieldset,
             **kwargs
         ))
+
+        if dependency:
+            field = getattr(self.form_class, field_id)
+            widget = field.kwargs.get('widget', field.field_class.widget)
+
+            field.kwargs['widget'] = with_options(
+                widget, **dependency.html_data
+            )
 
         return field_id
