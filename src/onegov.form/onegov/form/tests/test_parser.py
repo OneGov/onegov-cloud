@@ -2,6 +2,7 @@ import pytest
 
 from onegov.form.parser import parse_form
 from textwrap import dedent
+from webob.multidict import MultiDict
 from wtforms.fields.html5 import EmailField
 
 
@@ -119,3 +120,46 @@ def test_parse_checkbox():
         ('Early Boarding', 'Early Boarding'),
     ]
     assert form.extras.default == ['Priority Seating', 'Early Boarding']
+
+
+def test_dependent_validation():
+
+    text = dedent("""
+        Payment * = ( ) Bill
+                        Address * = ___
+                    ( ) Credit Card
+                        Credit Card Number * = ___
+    """)
+
+    form_class = parse_form(text)
+    assert len(form_class()._fields) == 3
+
+    form = form_class(MultiDict([
+        ('payment', 'Bill'),
+        ('address', 'Destiny Lane')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+    form = form_class(MultiDict([
+        ('payment', 'Bill'),
+    ]))
+
+    form.validate()
+    assert form.errors == {'address': ['This field is required.']}
+
+    form = form_class(MultiDict([
+        ('payment', 'Credit Card'),
+    ]))
+
+    form.validate()
+    assert form.errors == {'credit_card_number': ['This field is required.']}
+
+    form = form_class(MultiDict([
+        ('payment', 'Credit Card'),
+        ('credit_card_number', '123')
+    ]))
+
+    form.validate()
+    assert not form.errors
