@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'onegov.core',
         'pyparsing',
         'wtforms',
         'wtforms-components[color]',
