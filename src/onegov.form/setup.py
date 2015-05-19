@@ -36,7 +36,8 @@ setup(
     install_requires=[
         'pyparsing',
         'wtforms',
-        'wtforms-components[color]'
+        'wtforms-components[color]',
+        'unidecode'
     ],
     extras_require=dict(
         test=[

@@ -2,6 +2,7 @@ from onegov.form.core import (
     Form,
     with_options
 )
+from onegov.form.utils import label_to_field_id
 from onegov.form.parser.grammar import document
 from wtforms import PasswordField, StringField, TextAreaField
 from wtforms.widgets import TextArea
@@ -12,7 +13,7 @@ from wtforms.validators import InputRequired, Length
 doc = document()
 
 
-def parse_form(text):
+def parse_form(text, custom_fields={}):
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
@@ -51,6 +52,15 @@ def parse_form(text):
                 label=block.label,
                 required=block.required
             )
+        elif block.type == 'custom':
+            if block.custom_id in custom_fields:
+                builder.add_field(
+                    field_class=custom_fields[block.custom_id],
+                    label=block.label,
+                    required=block.required
+                )
+            else:
+                raise NotImplementedError
         else:
             raise NotImplementedError
 
@@ -85,7 +95,7 @@ class WTFormsClassBuilder(object):
         if required:
             validators.insert(0, InputRequired())
 
-        field_id = label.lower().replace(' ', '_')
+        field_id = label_to_field_id(label)
 
         setattr(self.form_class, field_id, field_class(
             label=label,
