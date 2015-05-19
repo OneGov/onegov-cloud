@@ -25,9 +25,6 @@ def parse_form(text):
         if block.type == 'fieldset':
             builder.set_current_fieldset(block.label or None)
 
-        elif block.type == 'button':
-            raise NotImplementedError
-
         elif block.type == 'text':
             if block.length:
                 validators = [Length(max=block.length)]

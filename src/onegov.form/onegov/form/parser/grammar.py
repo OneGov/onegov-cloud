@@ -55,20 +55,6 @@ putting fields in a fieldset, define an empty fieldeset::
     # ...
     I don't belong to a Fieldset = ___
 
-Buttons
--------
-
-Buttons come in two versions. One without address, and one with. If there's no
-address, the button POSTs to the current url. If there is an url, the button
-POSTs the form the the given url.
-
-For example::
-
-        [Submit to current URL]
-        [Submit to another URL](http://my-post-address.com)
-
-You'll notice that this looks just like a Markdown link.
-
 Available Fields
 ----------------
 
@@ -414,32 +400,6 @@ def custom():
     return custom
 
 
-def button():
-    """ Returns a buttons parser.
-
-    Examples::
-
-        [Send]
-        [Send](http://my-post-address.com)
-
-    By default, buttons post to the form.
-
-    """
-
-    characters = with_whitespace_inside(text_without('[]'))
-
-    label = Combine(OneOrMore(characters))('label')
-    label.setParseAction(lambda t: t[0])
-
-    url = OneOrMore(text_without('()'))('url').setParseAction(lambda t: t[0])
-
-    button = Suppress('[') + label + Suppress(']')
-    button += Optional(Suppress('(') + url + Suppress(')'))
-    button.setParseAction((tag(type='button')))
-
-    return button
-
-
 def fieldset_title():
     """ A fieldset title parser. Fieldset titles are just like headings in
     markdown::
@@ -492,7 +452,6 @@ def block_content():
     identifier = field_identifier()
 
     return MatchFirst([
-        button(),
         fieldset_title(),
         identifier + (textfield() | textarea() | password() | custom()),
         identifier + OneOrMore(Optional(LE) + radios())('parts'),

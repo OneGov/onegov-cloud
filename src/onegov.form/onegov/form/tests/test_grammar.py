@@ -2,7 +2,6 @@
 import textwrap
 
 from onegov.form.parser.grammar import (
-    button,
     custom,
     document,
     field_identifier,
@@ -137,24 +136,6 @@ def test_custom():
     assert f.asDict() == {'type': 'custom', 'custom_id': 'stripe'}
 
 
-def test_button():
-
-    btn = button()
-
-    f = btn.parseString("[Click Me!](https://www.google.ch)")
-    assert f.asDict() == {
-        'type': 'button',
-        'label': 'Click Me!',
-        'url': 'https://www.google.ch'
-    }
-
-    f = btn.parseString("[Send]")
-    assert f.asDict() == {
-        'type': 'button',
-        'label': 'Send'
-    }
-
-
 def test_document():
     # a form that includes all the features available
     form = textwrap.dedent("""
@@ -175,12 +156,10 @@ def test_document():
         Password = ***
         Comment = ...
         E-Mail = /E-Mail
-
-        [Submit](https://www.google.ch)
     """)
 
     result = document().searchString(form)
-    assert len(result) == 11
+    assert len(result) == 10
 
     assert result[0].asDict() == {'label': 'Name', 'type': 'fieldset'}
 
@@ -235,11 +214,6 @@ def test_document():
         'label': 'E-Mail',
         'type': 'custom',
         'custom_id': 'e-mail'
-    }
-    assert result[10].asDict() == {
-        'label': 'Submit',
-        'type': 'button',
-        'url': 'https://www.google.ch'
     }
 
 
