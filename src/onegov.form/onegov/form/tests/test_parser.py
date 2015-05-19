@@ -28,3 +28,42 @@ def test_parse_text():
     assert form.comment.label.text == 'Comment'
     assert form.comment.widget(form.comment) == (
         '<textarea id="comment" name="comment" rows="8"></textarea>')
+
+
+def test_parse_fieldsets():
+    text = dedent("""
+        # Name
+        First name = ___
+        Last name = ___
+
+        # Address
+        Street = ___
+
+        # ...
+        Comment = ___
+    """)
+
+    form_class = parse_form(text)
+    form = form_class()
+
+    fields = form._fields.values()
+    assert len(fields) == 4
+
+    fieldsets = form.fieldsets
+    assert len(fieldsets) == 3
+
+    assert len(fieldsets[0]) == 2
+    assert fieldsets[0].label == 'Name'
+    assert fieldsets[0].is_visible
+    assert fieldsets[0]['first_name'].label.text == 'First name'
+    assert fieldsets[0]['last_name'].label.text == 'Last name'
+
+    assert len(fieldsets[1]) == 1
+    assert fieldsets[1].label == 'Address'
+    assert fieldsets[1].is_visible
+    assert fieldsets[1]['street'].label.text == 'Street'
+
+    assert len(fieldsets[2]) == 1
+    assert fieldsets[2].label is None
+    assert not fieldsets[2].is_visible
+    assert fieldsets[2]['comment'].label.text == 'Comment'

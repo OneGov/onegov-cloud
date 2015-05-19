@@ -1,3 +1,8 @@
+import weakref
+
+from collections import OrderedDict
+from itertools import groupby
+from operator import itemgetter
 from wtforms import Form as BaseForm
 
 
@@ -5,11 +10,88 @@ class Form(BaseForm):
     """ Extends wtforms.Form with useful methods and integrations needed in
     OneGov applications.
 
+    This form supports fieldsets (which WTForms doesn't recognize). To put
+    fields into a fieldset, add a fieldset attribute to the field during
+    class definition::
+
+        class MyForm(Form):
+            first_name = StringField('First Name', fieldset='Name')
+            last_name = StringField('Last Name', fieldset='Name')
+            comment = StringField('Comment')
+
+    A form created like this will have two fieldsets, one visible fieldset
+    with the legend set to 'Name' and one invisible fieldset containing
+    'comment'.
+
+    Fieldsets with the same name are *not* automatically grouped together.
+    Instead, fields are taken in the order they are defined and put into the
+    same fieldset, if the previous fieldset has the same name.
+
+    That is to say, in this example, we get three fieldsets::
+
+        class MyForm(Form):
+            a = StringField('A', fieldset='1')
+            b = StringField('B', fieldset='2')
+            c = StringField('C', fieldset='1')
+
+    The first fieldset has the label '1' and it contains 'a'. The second
+    fieldset has the label '2' and it contains 'b'. The third fieldset has
+    the label '3' and it contains 'c'.
+
+    This ensures that all fields are in either a visible or an invisible
+    fieldset (see :meth:`Fieldset.is_visible`).
+
     """
+
+    def __init__(self, *args, **kwargs):
+
+        # consume the fieldset attribute of all unbound fields, as WTForms
+        # doesn't know it
+        fields_by_fieldset = [
+            (field.kwargs.pop('fieldset', None), field_id)
+            for field_id, field in self._unbound_fields
+        ]
+
+        super(Form, self).__init__(*args, **kwargs)
+
+        # use the consumed fieldset attribute to build fieldsets
+        self.fieldsets = []
+
+        for label, fields in groupby(fields_by_fieldset, key=itemgetter(0)):
+            self.fieldsets.append(Fieldset(
+                label=label,
+                fields=(self._fields[f[1]] for f in fields)
+            ))
 
     def submitted(self, request):
         """ Returns true if the given request is a successful post request. """
         return request.POST and self.validate()
+
+
+class Fieldset(object):
+    """ Defines a fieldset with a list of fields. """
+
+    def __init__(self, label, fields):
+        """ Initializes the Fieldset.
+
+        :label: Label of the fieldset (None if it's an invisible fieldset)
+        :fields: Iterator of bound fields. Fieldset creates a list of weak
+        references to these fields, as they are defined elsewhere and should
+        not be kept in memory just because a Fieldset references them.
+
+        """
+        self.label = label
+        self.fields = OrderedDict((f.id, weakref.proxy(f)) for f in fields)
+
+    def __len__(self):
+        return len(self.fields)
+
+    def __getitem__(self, key):
+        return self.fields[key]
+
+    @property
+    def is_visible(self):
+        return self.label is not None
 
 
 def with_options(widget_class, **render_options):

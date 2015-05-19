@@ -23,7 +23,7 @@ def parse_form(text):
     for block in (i[0] for i in doc.scanString(text)):
 
         if block.type == 'fieldset':
-            raise NotImplementedError
+            builder.set_current_fieldset(block.label or None)
 
         elif block.type == 'button':
             raise NotImplementedError
@@ -77,6 +77,10 @@ class WTFormsClassBuilder(object):
             pass
 
         self.form_class = DynamicForm
+        self.current_fieldset = None
+
+    def set_current_fieldset(self, label):
+        self.current_fieldset = label
 
     def add_field(self, field_class, label, required, **kwargs):
         validators = kwargs.pop('validators', [])
@@ -89,5 +93,6 @@ class WTFormsClassBuilder(object):
         setattr(self.form_class, field_id, field_class(
             label=label,
             validators=validators,
+            fieldset=self.current_fieldset,
             **kwargs
         ))
