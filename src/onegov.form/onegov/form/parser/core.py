@@ -2,9 +2,15 @@ from onegov.form.core import (
     Form,
     with_options
 )
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.utils import label_to_field_id
 from onegov.form.parser.grammar import document
-from wtforms import PasswordField, StringField, TextAreaField
+from wtforms import (
+    PasswordField,
+    RadioField,
+    StringField,
+    TextAreaField
+)
 from wtforms.widgets import TextArea
 from wtforms.validators import InputRequired, Length
 
@@ -30,7 +36,6 @@ def parse_form(text, custom_fields={}):
 def handle_block(builder, block, custom_fields):
     if block.type == 'fieldset':
         builder.set_current_fieldset(block.label or None)
-
     elif block.type == 'text':
         if block.length:
             validators = [Length(max=block.length)]
@@ -43,7 +48,6 @@ def handle_block(builder, block, custom_fields):
             required=block.required,
             validators=validators
         )
-
     elif block.type == 'textarea':
         builder.add_field(
             field_class=TextAreaField,
@@ -56,6 +60,31 @@ def handle_block(builder, block, custom_fields):
             field_class=PasswordField,
             label=block.label,
             required=block.required
+        )
+    elif block.type == 'radio':
+        choices = [
+            (c.label, c.label) for c in block.parts
+        ]
+        default = [c.label for c in block.parts if c.checked][0]
+
+        builder.add_field(
+            field_class=RadioField,
+            label=block.label,
+            required=block.required,
+            choices=choices,
+            default=default
+        )
+    elif block.type == 'checkbox':
+        choices = [
+            (c.label, c.label) for c in block.parts
+        ]
+        default = [c.label for c in block.parts if c.checked]
+        builder.add_field(
+            field_class=MultiCheckboxField,
+            label=block.label,
+            required=block.required,
+            choices=choices,
+            default=default
         )
     elif block.type == 'custom':
         if block.custom_id in custom_fields:

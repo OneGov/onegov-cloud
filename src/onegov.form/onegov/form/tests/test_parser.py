@@ -83,3 +83,39 @@ def test_parse_custom_fields():
 
     assert form.e_mail.label.text == 'E-Mail'
     assert isinstance(form.e_mail, EmailField)
+
+
+def test_parse_radio():
+
+    text = dedent("""
+        Gender = ( ) Male
+                 (x) Female
+    """)
+
+    form = parse_form(text)()
+
+    assert len(form._fields) == 1
+    assert form.gender.choices == [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+    ]
+    assert form.gender.default == 'Female'
+
+
+def test_parse_checkbox():
+
+    text = dedent("""
+        Extras = [ ] Extra Luggage
+                 [x] Priority Seating
+                 [x] Early Boarding
+    """)
+
+    form = parse_form(text)()
+
+    assert len(form._fields) == 1
+    assert form.extras.choices == [
+        ('Extra Luggage', 'Extra Luggage'),
+        ('Priority Seating', 'Priority Seating'),
+        ('Early Boarding', 'Early Boarding'),
+    ]
+    assert form.extras.default == ['Priority Seating', 'Early Boarding']
