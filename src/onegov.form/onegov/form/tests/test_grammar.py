@@ -4,6 +4,7 @@ import textwrap
 from onegov.form.parser.grammar import (
     custom,
     document,
+    email,
     field_identifier,
     checkboxes,
     password,
@@ -89,6 +90,15 @@ def test_password():
     f = field.parseString("***")
     assert f.type == 'password'
     assert f.asDict() == {'type': 'password'}
+
+
+def test_email():
+
+    field = email()
+
+    f = field.parseString("@@@")
+    assert f.type == 'email'
+    assert f.asDict() == {'type': 'email'}
 
 
 def test_radios():

@@ -35,19 +35,11 @@ class FormDefinition(Base, TimestampMixin):
     #: link between forms and submissions
     submissions = relationship('FormSubmission', backref='form')
 
-    def parse_form(self, custom_fields={}):
-        """ Parses the form definition and returns a form class.
+    @property
+    def form_class(self):
+        """ Parses the form definition and returns a form class. """
 
-        Note that it's up to the caller to ensure that custom_fields cover
-        the custom fields used in the definition.
-
-        Changes to the custom_fields might result in parser errors, so it's
-        best to never change them, at best, add new fields. Don't remove once
-        used custom_fields, unless you know for sure they are not used anymore.
-
-        """
-
-        return parse_form(self.definition, custom_fields)
+        return parse_form(self.definition)
 
 
 class FormSubmission(Base, TimestampMixin):

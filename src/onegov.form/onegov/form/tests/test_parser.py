@@ -1,5 +1,3 @@
-import pytest
-
 from onegov.form.parser import parse_form
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -73,14 +71,8 @@ def test_parse_fieldsets():
     assert fieldsets[2]['comment'].label.text == 'Comment'
 
 
-def test_parse_custom_fields():
-
-    with pytest.raises(NotImplementedError):
-        form = parse_form("E-Mail = /E-Mail")
-
-    form = parse_form("E-Mail = /E-Mail", custom_fields={
-        'e-mail': EmailField
-    })()
+def test_parse_email():
+    form = parse_form("E-Mail = @@@")()
 
     assert form.e_mail.label.text == 'E-Mail'
     assert isinstance(form.e_mail, EmailField)

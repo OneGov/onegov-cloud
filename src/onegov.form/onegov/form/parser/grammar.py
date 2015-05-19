@@ -90,6 +90,13 @@ A password field consists of exactly three stars::
 
     I'm a password = ***
 
+Email
+~~~~~
+
+An e-mail field consists of exactly three ``@``::
+
+    I'm an e-mail field = @@@
+
 Radio Buttons
 ~~~~~~~~~~~~~
 
@@ -149,23 +156,6 @@ Just like radiobuttons, checkboxes may be nested to created dependencies::
                           [ ] Olives
                           [ ] Other
                               Description = ___
-
-Custom Fields
-~~~~~~~~~~~~~
-
-Custom fields are fields for which there's no special syntax, but which have
-a specialized function.
-
-For example::
-
-    E-Mail = /E-Mail
-    Stripe = /Stripe
-    Social Security Number = /Social-Security-Number
-
-The availability of these fields depends on how onegov.form is used. The idea
-is for external packages to define their own custom fields.
-
-As of this writing there are no custom fields.
 
 """
 from onegov.form.compat import unicode_characters
@@ -325,6 +315,17 @@ def password():
     return Suppress('***').setParseAction(tag(type='password'))
 
 
+def email():
+    """ Returns an email field parser.
+
+    Example::
+
+        @@@
+
+    """
+    return Suppress('@@@').setParseAction(tag(type='email'))
+
+
 class Stack(list):
     length_of_marker_box = 3
 
@@ -453,7 +454,9 @@ def block_content():
 
     return MatchFirst([
         fieldset_title(),
-        identifier + (textfield() | textarea() | password() | custom()),
+        identifier + (
+            textfield() | textarea() | password() | custom() | email()
+        ),
         identifier + OneOrMore(Optional(LE) + radios())('parts'),
         identifier + OneOrMore(Optional(LE) + checkboxes())('parts')
     ])

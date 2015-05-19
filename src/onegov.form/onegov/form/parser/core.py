@@ -11,6 +11,7 @@ from wtforms import (
     StringField,
     TextAreaField
 )
+from wtforms.fields.html5 import EmailField
 from wtforms_components import If
 from wtforms.widgets import TextArea
 from wtforms.validators import InputRequired, Length
@@ -20,7 +21,7 @@ from wtforms.validators import InputRequired, Length
 doc = document()
 
 
-def parse_form(text, custom_fields={}):
+def parse_form(text):
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
@@ -29,12 +30,12 @@ def parse_form(text, custom_fields={}):
     builder = WTFormsClassBuilder(Form)
 
     for block in (i[0] for i in doc.scanString(text)):
-        handle_block(builder, block, custom_fields)
+        handle_block(builder, block)
 
     return builder.form_class
 
 
-def handle_block(builder, block, custom_fields, dependency=None):
+def handle_block(builder, block, dependency=None):
     if block.type == 'fieldset':
         builder.set_current_fieldset(block.label or None)
     elif block.type == 'text':
@@ -61,6 +62,13 @@ def handle_block(builder, block, custom_fields, dependency=None):
     elif block.type == 'password':
         field_id = builder.add_field(
             field_class=PasswordField,
+            label=block.label,
+            dependency=dependency,
+            required=block.required
+        )
+    elif block.type == 'email':
+        field_id = builder.add_field(
+            field_class=EmailField,
             label=block.label,
             dependency=dependency,
             required=block.required
@@ -93,16 +101,6 @@ def handle_block(builder, block, custom_fields, dependency=None):
             choices=choices,
             default=default
         )
-    elif block.type == 'custom':
-        if block.custom_id in custom_fields:
-            field_id = builder.add_field(
-                field_class=custom_fields[block.custom_id],
-                label=block.label,
-                dependency=dependency,
-                required=block.required
-            )
-        else:
-            raise NotImplementedError
     else:
         raise NotImplementedError
 
@@ -112,7 +110,7 @@ def handle_block(builder, block, custom_fields, dependency=None):
             dependency = FieldDependency(field_id, part.label)
 
             for child in part.dependencies:
-                handle_block(builder, child, custom_fields, dependency)
+                handle_block(builder, child, dependency)
 
 
 class FieldDependency(object):
