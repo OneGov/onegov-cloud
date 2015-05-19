@@ -22,49 +22,52 @@ def parse_form(text, custom_fields={}):
     builder = WTFormsClassBuilder(Form)
 
     for block in (i[0] for i in doc.scanString(text)):
+        handle_block(builder, block, custom_fields)
 
-        if block.type == 'fieldset':
-            builder.set_current_fieldset(block.label or None)
+    return builder.form_class
 
-        elif block.type == 'text':
-            if block.length:
-                validators = [Length(max=block.length)]
-            else:
-                validators = []
 
+def handle_block(builder, block, custom_fields):
+    if block.type == 'fieldset':
+        builder.set_current_fieldset(block.label or None)
+
+    elif block.type == 'text':
+        if block.length:
+            validators = [Length(max=block.length)]
+        else:
+            validators = []
+
+        builder.add_field(
+            field_class=StringField,
+            label=block.label,
+            required=block.required,
+            validators=validators
+        )
+
+    elif block.type == 'textarea':
+        builder.add_field(
+            field_class=TextAreaField,
+            label=block.label,
+            required=block.required,
+            widget=with_options(TextArea, rows=block.rows or None)
+        )
+    elif block.type == 'password':
+        builder.add_field(
+            field_class=PasswordField,
+            label=block.label,
+            required=block.required
+        )
+    elif block.type == 'custom':
+        if block.custom_id in custom_fields:
             builder.add_field(
-                field_class=StringField,
-                label=block.label,
-                required=block.required,
-                validators=validators
-            )
-
-        elif block.type == 'textarea':
-            builder.add_field(
-                field_class=TextAreaField,
-                label=block.label,
-                required=block.required,
-                widget=with_options(TextArea, rows=block.rows or None)
-            )
-        elif block.type == 'password':
-            builder.add_field(
-                field_class=PasswordField,
+                field_class=custom_fields[block.custom_id],
                 label=block.label,
                 required=block.required
             )
-        elif block.type == 'custom':
-            if block.custom_id in custom_fields:
-                builder.add_field(
-                    field_class=custom_fields[block.custom_id],
-                    label=block.label,
-                    required=block.required
-                )
-            else:
-                raise NotImplementedError
         else:
             raise NotImplementedError
-
-    return builder.form_class
+    else:
+        raise NotImplementedError
 
 
 class WTFormsClassBuilder(object):
