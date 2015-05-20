@@ -37,6 +37,10 @@ def parse_form(text):
 
 
 def handle_block(builder, block, dependency=None):
+    """ Takes a parsed block and instructs the builder to add a field based
+    on it.
+
+    """
     if block.type == 'fieldset':
         builder.set_current_fieldset(block.label or None)
     elif block.type == 'text':
@@ -145,6 +149,10 @@ def handle_block(builder, block, dependency=None):
 
 
 class FieldDependency(object):
+    """ Defines a dependency to a field. The given field must have the given
+    choice for this dependency to be fulfilled.
+
+    """
 
     def __init__(self, field_id, choice):
         self.field_id = field_id
