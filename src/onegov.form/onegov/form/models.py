@@ -2,7 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.form.parser import parse_form
-from sqlalchemy import Boolean, Column, ForeignKeyConstraint, Integer, Text
+from sqlalchemy import Column, ForeignKeyConstraint, Integer, Text
 from sqlalchemy.orm import deferred, relationship
 
 
@@ -17,13 +17,7 @@ class FormDefinition(Base, TimestampMixin):
     #: the revision of the form, basically a hash of the definition
     revision = Column(Text, nullable=False, primary_key=True)
 
-    #: true if the form is a builtin form
-    is_builtin = Column(Boolean, nullable=False)
-
-    #: true if the form is available to the public
-    is_available = Column(Boolean, nullable=False)
-
-    #: metadata associated with the form, only for storing small amounts
+    #: metadata associated with the form, for storing small amounts of data
     meta = Column(JSON, nullable=False, default=dict)
 
     #: content associated with the form, for storing things like long texts
@@ -32,8 +26,17 @@ class FormDefinition(Base, TimestampMixin):
     #: the form as parsable string
     definition = Column(Text, nullable=False)
 
+    #: the type of the form, this can be used to create custom polymorphic
+    #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/\
+    #: orm/extensions/declarative/inheritance.html>`_.
+    type = Column(Text, nullable=True)
+
     #: link between forms and submissions
     submissions = relationship('FormSubmission', backref='form')
+
+    __mapper_args__ = {
+        "polymorphic_on": 'type'
+    }
 
     @property
     def form_class(self):
