@@ -11,6 +11,7 @@ from onegov.form.parser.grammar import (
     textarea,
     textfield,
     radios,
+    stdnum,
     text_without,
     with_whitespace_inside
 )
@@ -99,6 +100,25 @@ def test_email():
     f = field.parseString("@@@")
     assert f.type == 'email'
     assert f.asDict() == {'type': 'email'}
+
+
+def test_stdnum():
+    field = stdnum()
+
+    f = field.parseString("#test")
+    assert f.type == 'stdnum'
+    assert f.format == 'test'
+    assert f.asDict() == {'type': 'stdnum', 'format': 'test'}
+
+    f = field.parseString("# test")
+    assert f.type == 'stdnum'
+    assert f.format == 'test'
+    assert f.asDict() == {'type': 'stdnum', 'format': 'test'}
+
+    f = field.parseString("# asdf.asdf")
+    assert f.type == 'stdnum'
+    assert f.format == 'asdf.asdf'
+    assert f.asDict() == {'type': 'stdnum', 'format': 'asdf.asdf'}
 
 
 def test_radios():

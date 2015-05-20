@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'onegov.core',
         'pyparsing',
+        'python-stdnum',
         'wtforms',
         'wtforms-components[color]',
         'unidecode'

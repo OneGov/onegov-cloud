@@ -2,6 +2,7 @@ from onegov.form.core import (
     Form,
     with_options
 )
+from onegov.form.validators import Stdnum
 from onegov.form.fields import MultiCheckboxField
 from onegov.form.utils import label_to_field_id
 from onegov.form.parser.grammar import document
@@ -12,7 +13,7 @@ from wtforms import (
     TextAreaField
 )
 from wtforms.fields.html5 import EmailField
-from wtforms_components import If
+from wtforms_components import Email, If
 from wtforms.widgets import TextArea
 from wtforms.validators import InputRequired, Length
 
@@ -71,7 +72,16 @@ def handle_block(builder, block, dependency=None):
             field_class=EmailField,
             label=block.label,
             dependency=dependency,
-            required=block.required
+            required=block.required,
+            validators=[Email()]
+        )
+    elif block.type == 'stdnum':
+        field_id = builder.add_field(
+            field_class=StringField,
+            label=block.label,
+            dependency=dependency,
+            required=block.required,
+            validators=[Stdnum(block.format)]
         )
     elif block.type == 'radio':
         choices = [

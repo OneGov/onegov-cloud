@@ -1,3 +1,5 @@
+import pytest
+
 from onegov.form.parser import parse_form
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -160,3 +162,46 @@ def test_dependent_validation():
         form.address.widget(form.address))
     assert 'data-depends-on="payment/Credit Card"' in (
         form.credit_card_number.widget(form.credit_card_number))
+
+
+def test_stdnum_field():
+
+    form_class = parse_form("Bank Account = # iban")
+    form = form_class(MultiDict([
+        ('bank_account', '')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+    form = form_class(MultiDict([
+        ('bank_account', 'CH93 0076 2011 6238 5295 7')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+    form = form_class(MultiDict([
+        ('bank_account', 'CH93 0000 2011 6238 5295 7')
+    ]))
+
+    form.validate()
+    assert form.errors
+
+    with pytest.raises(ImportError):
+        form_class = parse_form("Invalid = # asdf")
+
+    form_class = parse_form("ahv = # ch.ssn")
+    form = form_class(MultiDict([
+        ('ahv', '756.9217.0769.85')
+    ]))
+
+    form.validate()
+    assert not form.errors
+
+    form = form_class(MultiDict([
+        ('ahv', '756.9217.0769.12')
+    ]))
+
+    form.validate()
+    assert form.errors

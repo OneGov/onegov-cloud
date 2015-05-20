@@ -90,12 +90,39 @@ A password field consists of exactly three stars::
 
     I'm a password = ***
 
-Email
-~~~~~
+E-Mail
+~~~~~~
 
 An e-mail field consists of exactly three ``@``::
 
     I'm an e-mail field = @@@
+
+Standard Numbers
+~~~~~~~~~~~~~~~~
+
+onegov.form uses `python-stdnum \
+<https://github.com/arthurdejong/python-stdnum>`_ to offer a wide range of
+standard formats that are guaranteed to be validated.
+
+To use, simply use a `#`, followed by the stdnum format to use::
+
+    I'm a valid IBAN (or empty) = # iban
+    I'm a valid IBAN (required) * = # iban
+
+The format string after the `#` must be importable from stdnum. In other words,
+this must work, if you are using ``ch.ssn`` (to use an example)::
+
+    $ python
+    >>> from stdnum.ch import ssn
+
+This is a bit of an advanced feature and since it delegates most work to an
+external library there's no guarantee that a format once used may be reused
+in the future.
+
+Still, the library should be somewhat stable and the benefit is huge.
+
+To see the available format, have a look at the docs:
+`<http://arthurdejong.org/python-stdnum/doc/1.1/index.html#available-formats>`_
 
 Radio Buttons
 ~~~~~~~~~~~~~
@@ -161,20 +188,21 @@ Just like radiobuttons, checkboxes may be nested to created dependencies::
 from onegov.form.compat import unicode_characters
 from pyparsing import (
     col,
-    nums,
     Combine,
     Forward,
     Group,
     indentedBlock,
     LineEnd,
     Literal,
+    MatchFirst,
+    nums,
     OneOrMore,
     Optional,
     ParserElement,
-    MatchFirst,
+    Regex,
     Suppress,
-    Word,
     White,
+    Word,
 )
 
 
@@ -326,6 +354,21 @@ def email():
     return Suppress('@@@').setParseAction(tag(type='email'))
 
 
+def stdnum():
+    """ Returns an stdnum parser.
+
+    Example::
+
+        # iban
+
+    """
+    prefix = Suppress('#') + Optional(White(" "))
+    parser = prefix + Regex(r'[a-z\.]+')('format')
+    parser.setParseAction(tag(type='stdnum'))
+
+    return parser
+
+
 class Stack(list):
     length_of_marker_box = 3
 
@@ -454,9 +497,14 @@ def block_content():
 
     return MatchFirst([
         fieldset_title(),
-        identifier + (
-            textfield() | textarea() | password() | custom() | email()
-        ),
+        identifier + MatchFirst([
+            textfield(),
+            textarea(),
+            password(),
+            custom(),
+            email(),
+            stdnum()
+        ]),
         identifier + OneOrMore(Optional(LE) + radios())('parts'),
         identifier + OneOrMore(Optional(LE) + checkboxes())('parts')
     ])
