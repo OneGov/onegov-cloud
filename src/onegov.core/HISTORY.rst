@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Introduces a custom json encoder/decoder that handles additional types.
+  [href]
+
 0.2.0 (2015-05-18)
 ~~~~~~~~~~~~~~~~~~~
 

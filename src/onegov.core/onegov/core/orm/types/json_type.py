@@ -1,6 +1,13 @@
+# We use our own custom json implementation. In the libres library we made this
+# configurable. Since onegov.core is a framework we don't do that though, we
+# want all onegov.core applications with the same framework version to be able
+# to read each others json.
+#
+# Therefore we use a common denominator kind of json encoder/decoder.
+from onegov.core import custom_json as json
+
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.types import TypeDecorator, TEXT
-import json
 
 
 class JSON(TypeDecorator):

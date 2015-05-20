@@ -16,6 +16,7 @@ dependencies = {
     'dogpile.cache',
     'fs',
     'itsdangerous',
+    'isodate',
     'morepath',
     'more.transaction',
     'more.webassets',
