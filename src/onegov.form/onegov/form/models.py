@@ -2,8 +2,11 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from onegov.form.parser import parse_form
-from sqlalchemy import Column, ForeignKeyConstraint, Integer, Text
-from sqlalchemy.orm import deferred, relationship
+from sqlalchemy import Column, ForeignKey, Integer, Text
+from sqlalchemy.orm import (
+    deferred,
+    relationship,
+)
 
 
 class FormDefinition(Base, TimestampMixin):
@@ -11,11 +14,11 @@ class FormDefinition(Base, TimestampMixin):
 
     __tablename__ = 'forms'
 
-    #: the name of the form, generated form the title if not provided
+    #: the name of the form (key, part of the url)
     name = Column(Text, nullable=False, primary_key=True)
 
-    #: the revision of the form, basically a hash of the definition
-    revision = Column(Text, nullable=False, primary_key=True)
+    #: the title of the form
+    title = Column(Text, nullable=False)
 
     #: metadata associated with the form, for storing small amounts of data
     meta = Column(JSON, nullable=False, default=dict)
@@ -54,17 +57,18 @@ class FormSubmission(Base, TimestampMixin):
     id = Column(Integer, primary_key=True)
 
     #: name of the form this submission belongs to
-    name = Column(Text, nullable=False)
+    name = Column(Text, ForeignKey(FormDefinition.name), nullable=False)
 
-    #: the revision of the form this submission belongs to
-    revision = Column(Text, nullable=False)
+    #: the source code of the form at the moment of submission. This is stored
+    #: alongside the submission as the original form may change later. We
+    #: want to keep the old form around just in case.
+    definition = Column(Text, nullable=False)
 
     #: the submission data
     data = Column(JSON, nullable=False)
 
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['name', 'revision'],
-            [FormDefinition.name, FormDefinition.revision]
-        ),
-    )
+    @property
+    def form_class(self):
+        """ Parses the form definition and returns a form class. """
+
+        return parse_form(self.definition)

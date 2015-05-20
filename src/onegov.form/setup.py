@@ -34,7 +34,8 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core',
+        'jsonpickle',
+        'onegov.core>=0.3.0',
         'pyparsing',
         'python-stdnum',
         'wtforms',
@@ -44,6 +45,7 @@ setup(
     extras_require=dict(
         test=[
             'coverage',
+            'onegov.testing',
             'pytest',
             'webob'
         ],

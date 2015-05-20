@@ -33,7 +33,10 @@ def parse_form(text):
     for block in (i[0] for i in doc.scanString(text)):
         handle_block(builder, block)
 
-    return builder.form_class
+    form_class = builder.form_class
+    form_class._source = text
+
+    return form_class
 
 
 def handle_block(builder, block, dependency=None):
