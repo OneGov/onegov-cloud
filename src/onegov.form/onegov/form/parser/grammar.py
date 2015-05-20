@@ -97,6 +97,33 @@ An e-mail field consists of exactly three ``@``::
 
     I'm an e-mail field = @@@
 
+Date
+~~~~
+
+A date (without time) is defined by this exact string: ``YYYY.MM.DD``::
+
+    I'm a date field = YYYY.MM.DD
+
+Note that this doesn't mean that the date format can be influenced.
+
+Datetime
+~~~~~~~~
+
+A date (with time) is defined by this exact string: ``YYYY.MM.DD HH:MM``::
+
+    I'm a datetime field = YYYY.MM.DD HH:MM
+
+Again, this doesn't mean that the datetime format can be influenced.
+
+Time
+~~~~
+
+A Time is defined by this exact string: ``HH:MM``::
+
+    I'm a time field = HH:MM
+
+One more time, this doesn't mean that the datetime format can be influenced.
+
 Standard Numbers
 ~~~~~~~~~~~~~~~~
 
@@ -354,6 +381,42 @@ def email():
     return Suppress('@@@').setParseAction(tag(type='email'))
 
 
+def date():
+    """ Returns a date parser.
+
+    Example::
+
+        YYYY.MM.DD
+
+    """
+
+    return Suppress('YYYY.MM.DD').setParseAction(tag(type='date'))
+
+
+def datetime():
+    """ Returns a datetime parser.
+
+    Example::
+
+        YYYY.MM.DD HH:MM
+
+    """
+
+    return Suppress('YYYY.MM.DD HH:MM').setParseAction(tag(type='datetime'))
+
+
+def time():
+    """ Returns a time parser.
+
+    Example::
+
+        HH:MM
+
+    """
+
+    return Suppress('HH:MM').setParseAction(tag(type='time'))
+
+
 def stdnum():
     """ Returns an stdnum parser.
 
@@ -425,25 +488,6 @@ def checkboxes():
     return boxes
 
 
-def custom():
-    """ Returns a custom field parser.
-
-    Examples::
-
-        /E-Mail
-        /Stripe
-
-    """
-
-    custom_id = OneOrMore(text)('custom_id')
-    custom_id.setParseAction(lambda t: t[0].lower())
-
-    custom = Suppress('/') + custom_id
-    custom.setParseAction(tag(type='custom'))
-
-    return custom
-
-
 def fieldset_title():
     """ A fieldset title parser. Fieldset titles are just like headings in
     markdown::
@@ -501,9 +545,11 @@ def block_content():
             textfield(),
             textarea(),
             password(),
-            custom(),
             email(),
-            stdnum()
+            stdnum(),
+            datetime(),
+            date(),
+            time()
         ]),
         identifier + OneOrMore(Optional(LE) + radios())('parts'),
         identifier + OneOrMore(Optional(LE) + checkboxes())('parts')

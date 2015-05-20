@@ -2,7 +2,6 @@
 import textwrap
 
 from onegov.form.parser.grammar import (
-    custom,
     document,
     email,
     field_identifier,
@@ -102,6 +101,24 @@ def test_email():
     assert f.asDict() == {'type': 'email'}
 
 
+def test_dates():
+
+    text = textwrap.dedent("""
+        Date = YYYY.MM.DD
+        Datetime = YYYY.MM.DD HH:MM
+        Time = HH:MM
+    """)
+
+    blocks = document().searchString(text)
+    blocks[0].asDict() == {'type': 'date', 'label': 'Date'}
+
+    blocks = document().searchString(text)
+    blocks[1].asDict() == {'type': 'datetime', 'label': 'Datetime'}
+
+    blocks = document().searchString(text)
+    blocks[1].asDict() == {'type': 'time', 'label': 'Time'}
+
+
 def test_stdnum():
     field = stdnum()
 
@@ -155,17 +172,6 @@ def test_checkboxes():
     ]
 
 
-def test_custom():
-
-    field = custom()
-
-    f = field.parseString("/E-Mail")
-    assert f.asDict() == {'type': 'custom', 'custom_id': 'e-mail'}
-
-    f = field.parseString("/Stripe")
-    assert f.asDict() == {'type': 'custom', 'custom_id': 'stripe'}
-
-
 def test_document():
     # a form that includes all the features available
     form = textwrap.dedent("""
@@ -185,11 +191,10 @@ def test_document():
         Payment* = ( ) Bill (x) Credit Card
         Password = ***
         Comment = ...
-        E-Mail = /E-Mail
     """)
 
     result = document().searchString(form)
-    assert len(result) == 10
+    assert len(result) == 9
 
     assert result[0].asDict() == {'label': 'Name', 'type': 'fieldset'}
 
@@ -238,12 +243,6 @@ def test_document():
     }
     assert result[8].asDict() == {
         'required': False, 'label': 'Comment', 'type': 'textarea'
-    }
-    assert result[9].asDict() == {
-        'required': False,
-        'label': 'E-Mail',
-        'type': 'custom',
-        'custom_id': 'e-mail'
     }
 
 

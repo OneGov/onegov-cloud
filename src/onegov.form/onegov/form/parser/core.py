@@ -2,20 +2,20 @@ from onegov.form.core import (
     Form,
     with_options
 )
-from onegov.form.validators import Stdnum
-from onegov.form.fields import MultiCheckboxField
-from onegov.form.utils import label_to_field_id
+from onegov.form.fields import TimeField, MultiCheckboxField
 from onegov.form.parser.grammar import document
+from onegov.form.utils import label_to_field_id
+from onegov.form.validators import Stdnum
 from wtforms import (
     PasswordField,
     RadioField,
     StringField,
     TextAreaField
 )
-from wtforms.fields.html5 import EmailField
-from wtforms_components import Email, If
-from wtforms.widgets import TextArea
+from wtforms.fields.html5 import DateField, DateTimeLocalField, EmailField
 from wtforms.validators import InputRequired, Length
+from wtforms.widgets import TextArea
+from wtforms_components import Email, If
 
 
 # cache the parser
@@ -82,6 +82,27 @@ def handle_block(builder, block, dependency=None):
             dependency=dependency,
             required=block.required,
             validators=[Stdnum(block.format)]
+        )
+    elif block.type == 'date':
+        field_id = builder.add_field(
+            field_class=DateField,
+            label=block.label,
+            dependency=dependency,
+            required=block.required,
+        )
+    elif block.type == 'datetime':
+        field_id = builder.add_field(
+            field_class=DateTimeLocalField,
+            label=block.label,
+            dependency=dependency,
+            required=block.required,
+        )
+    elif block.type == 'time':
+        field_id = builder.add_field(
+            field_class=TimeField,
+            label=block.label,
+            dependency=dependency,
+            required=block.required
         )
     elif block.type == 'radio':
         choices = [

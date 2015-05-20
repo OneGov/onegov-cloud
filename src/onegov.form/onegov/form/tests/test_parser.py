@@ -1,9 +1,14 @@
 import pytest
 
+from onegov.form.fields import TimeField
 from onegov.form.parser import parse_form
 from textwrap import dedent
 from webob.multidict import MultiDict
-from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import (
+    DateField,
+    DateTimeLocalField,
+    EmailField
+)
 
 
 def test_parse_text():
@@ -78,6 +83,27 @@ def test_parse_email():
 
     assert form.e_mail.label.text == 'E-Mail'
     assert isinstance(form.e_mail, EmailField)
+
+
+def test_parse_date():
+    form = parse_form("Date = YYYY.MM.DD")()
+
+    assert form.date.label.text == 'Date'
+    assert isinstance(form.date, DateField)
+
+
+def test_parse_datetime():
+    form = parse_form("Datetime = YYYY.MM.DD HH:MM")()
+
+    assert form.datetime.label.text == 'Datetime'
+    assert isinstance(form.datetime, DateTimeLocalField)
+
+
+def test_parse_time():
+    form = parse_form("Time = HH:MM")()
+
+    assert form.time.label.text == 'Time'
+    assert isinstance(form.time, TimeField)
 
 
 def test_parse_radio():
