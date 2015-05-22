@@ -11,6 +11,7 @@ from onegov.town.models import (
     Topic,
     Town
 )
+from onegov.form import FormDefinition, FormCollection
 from onegov.page import PageCollection
 
 
@@ -45,8 +46,17 @@ def get_thumbnail(app, filename):
     return ImageCollection(app).get_thumbnail_by_filename(filename)
 
 
-@TownApp.path(
-    model=Editor, path='/editor/{action}/{trait}/{page_id}')
+@TownApp.path(model=FormCollection, path='/formulare')
+def get_forms(app):
+    return FormCollection(app.session())
+
+
+@TownApp.path(model=FormDefinition, path='/formulare/{name}')
+def get_form(app, name):
+    return FormCollection(app.session()).definitions.by_name(name)
+
+
+@TownApp.path(model=Editor, path='/editor/{action}/{trait}/{page_id}')
 def get_editor(app, action, trait, page_id):
     if not Editor.is_supported_action(action):
         return None

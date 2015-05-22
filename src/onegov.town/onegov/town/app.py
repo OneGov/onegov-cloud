@@ -11,6 +11,8 @@ from cached_property import cached_property
 from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
+from onegov.town import log
+from onegov.town.initial_content import add_builtin_forms
 from onegov.town.models import Town
 from onegov.town.theme import TownTheme
 from webassets import Bundle
@@ -59,6 +61,24 @@ class TownApp(Framework):
         session.flush()
 
         self.cache.delete('town')
+
+    def configure_application(self, **cfg):
+        super(TownApp, self).configure_application(**cfg)
+
+        schema_prefix = self.namespace + '-'
+        town_schemas = [
+            s for s in self.session_manager.list_schemas()
+            if s.startswith(schema_prefix)
+        ]
+
+        for schema in town_schemas:
+            self.session_manager.set_current_schema(schema)
+
+            session = self.session()
+            add_builtin_forms(session)
+            session.flush()
+
+        log.info('Updated all builtin forms')
 
     @property
     def theme_options(self):

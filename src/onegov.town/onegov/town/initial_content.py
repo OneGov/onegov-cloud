@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+
+import os
+
+from onegov.core.utils import module_path
+from onegov.form import FormCollection
 from onegov.page import PageCollection
 from onegov.town.const import NEWS_PREFIX
 from onegov.town.models import Town
@@ -15,43 +21,78 @@ def add_initial_content(session, town_name):
 
     session.add(Town(name=town_name))
 
+    add_root_pages(session)
+    add_builtin_forms(session)
+
+    session.flush()
+
+
+def add_root_pages(session):
     pages = PageCollection(session)
 
     pages.add_root(
-        'Leben & Wohnen',
+        "Leben & Wohnen",
         name='leben-wohnen',
         type='topic',
         meta={'trait': 'page'}
     ),
     pages.add_root(
-        'Kultur & Freizeit',
+        "Kultur & Freizeit",
         name='kultur-freizeit',
         type='topic',
         meta={'trait': 'page'}
     ),
     pages.add_root(
-        'Bildung & Gesellschaft',
+        "Bildung & Gesellschaft",
         name='bildung-gesellschaft',
         type='topic',
         meta={'trait': 'page'}
     ),
     pages.add_root(
-        'Gewerbe & Tourismus',
+        "Gewerbe & Tourismus",
         name='gewerbe-tourismus',
         type='topic',
         meta={'trait': 'page'}
     ),
     pages.add_root(
-        'Politik & Verwaltung',
+        "Politik & Verwaltung",
         name='politik-verwaltung',
         type='topic',
         meta={'trait': 'page'}
     )
     pages.add_root(
-        'Aktuelles',
+        "Aktuelles",
         name=NEWS_PREFIX,
         type='news',
         meta={'trait': 'news'}
     )
 
-    session.flush()
+
+def add_builtin_forms(session):
+    forms = FormCollection(session).definitions
+    builtin_forms = module_path('onegov.town', 'forms')
+
+    def load_definition(filename):
+        with open(os.path.join(builtin_forms, filename), 'r') as formfile:
+            formlines = formfile.readlines()
+
+            title = formlines[0].strip()
+            definition = ''.join(formlines[3:])
+
+            return title, definition
+
+    def ensure_form(name, title, definition):
+        form = forms.by_name(name)
+
+        if form:
+            form.title = title
+            form.definition = definition
+        else:
+            forms.add(name=name, title=title, definition=definition)
+
+    for filename in os.listdir(builtin_forms):
+        if filename.endswith(".form"):
+            name = filename.replace('.form', '')
+            title, definition = load_definition(filename)
+
+            ensure_form(name, title, definition)
