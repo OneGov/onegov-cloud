@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import textwrap
 
+from onegov.form.parser.core import stress_indentations
 from onegov.form.parser.grammar import (
-    document,
+    block_content,
     email,
     field_identifier,
     checkboxes,
@@ -109,13 +110,13 @@ def test_dates():
         Time = HH:MM
     """)
 
-    blocks = document().searchString(text)
+    blocks = block_content().searchString(text)
     blocks[0].asDict() == {'type': 'date', 'label': 'Date'}
 
-    blocks = document().searchString(text)
+    blocks = block_content().searchString(text)
     blocks[1].asDict() == {'type': 'datetime', 'label': 'Datetime'}
 
-    blocks = document().searchString(text)
+    blocks = block_content().searchString(text)
     blocks[1].asDict() == {'type': 'time', 'label': 'Time'}
 
 
@@ -172,7 +173,7 @@ def test_checkboxes():
     ]
 
 
-def test_document():
+def test_block_content():
     # a form that includes all the features available
     form = textwrap.dedent("""
         # Name
@@ -193,7 +194,7 @@ def test_document():
         Comment = ...
     """)
 
-    result = document().searchString(form)
+    result = block_content().searchString(form)
     assert len(result) == 9
 
     assert result[0].asDict() == {'label': 'Name', 'type': 'fieldset'}
@@ -256,7 +257,7 @@ def test_multiline_checkboxes():
 
     """)
 
-    result = document().searchString(form)
+    result = block_content().searchString(form)
     assert len(result) == 2
 
     assert result[0].asDict() == {'label': 'Extras', 'type': 'fieldset'}
@@ -285,7 +286,7 @@ def test_nested_blocks():
                       Address = ___
 
     """)
-    result = document().searchString(form)
+    result = block_content().searchString(form)
 
     assert len(result) == 1
     assert result[0].parts[1].dependencies[0].asDict() == {
@@ -306,7 +307,7 @@ def test_nested_nested():
                               [x] Card
 
     """)
-    result = document().searchString(form)
+    result = block_content().searchString(form)
 
     assert len(result) == 1
     assert result[0].parts[0].dependencies[0].asDict() == {
@@ -340,7 +341,7 @@ def test_nested_nested_nested():
                                  ( ) Home Address
                                      Street = ___
     """)
-    result = document().searchString(form)
+    result = block_content().searchString(form)
 
     assert result[0].parts[0].asDict() == {'checked': True, 'label': 'Pickup'}
     assert result[0].parts[1].label == 'Fedex'
@@ -355,3 +356,32 @@ def test_nested_nested_nested():
 
     assert address.parts[0].dependencies[0].label == 'Postbox Number'
     assert address.parts[1].dependencies[0].label == 'Street'
+
+
+def test_nested_regression():
+    form = textwrap.dedent("""
+        Delivery * =
+            (x) I want it delivered
+                Alternate Address =
+                    (x) No
+                    ( ) Yes
+                        Street = ___
+                        Town = ___
+            ( ) I want to pick it up
+        Kommentar = ...
+    """)
+    blocks = block_content().searchString(form)
+
+    assert len(blocks) == 2
+    assert blocks[0].type == 'radio'
+    assert blocks[1].type == 'textarea'
+
+    assert len(blocks[0].parts) == 1
+
+    blocks = block_content().searchString(stress_indentations(form))
+
+    assert len(blocks) == 2
+    assert blocks[0].type == 'radio'
+    assert blocks[1].type == 'textarea'
+
+    assert len(blocks[0].parts) == 2

@@ -436,7 +436,10 @@ class Stack(list):
     length_of_marker_box = 3
 
     def init(self, string, line, tokens):
-        self[:] = [col(line, string) + self.length_of_marker_box]
+        column = col(line, string) + self.length_of_marker_box
+
+        if len(self) == 0 or self[0] < column:
+            self[:] = [column]
 
 
 def marker_box(characters):
@@ -532,8 +535,8 @@ def field_identifier():
 
 
 def block_content():
-    """ Returns the content of one logical parser block, this is the last
-    step towards the document, which is a collection of these blocks.
+    """ Returns the content of one logical block. The parser searches the
+    form string for occurences of these blocks.
 
     """
     LE = Suppress(LineEnd())
@@ -554,11 +557,6 @@ def block_content():
         identifier + OneOrMore(Optional(LE) + radios())('parts'),
         identifier + OneOrMore(Optional(LE) + checkboxes())('parts')
     ])
-
-
-def document():
-    """ Returns a form document. """
-    return OneOrMore(block_content())
 
 
 block << block_content()

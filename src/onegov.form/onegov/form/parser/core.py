@@ -3,7 +3,7 @@ from onegov.form.core import (
     with_options
 )
 from onegov.form.fields import TimeField, MultiCheckboxField
-from onegov.form.parser.grammar import document
+from onegov.form.parser.grammar import block_content
 from onegov.form.utils import label_to_field_id
 from onegov.form.validators import Stdnum
 from wtforms import (
@@ -19,7 +19,7 @@ from wtforms_components import Email, If
 
 
 # cache the parser
-doc = document()
+block_parser = block_content()
 
 
 def parse_form(text):
@@ -30,7 +30,10 @@ def parse_form(text):
 
     builder = WTFormsClassBuilder(Form)
 
-    for block in (i[0] for i in doc.scanString(text)):
+    # XXX this is a bit of a hack, see method docs
+    text = stress_indentations(text)
+
+    for block in (i[0] for i in block_parser.scanString(text)):
         handle_block(builder, block)
 
     form_class = builder.form_class
@@ -39,11 +42,55 @@ def parse_form(text):
     return form_class
 
 
+def stress_indentations(text):
+    """ The parser's indent matching fails to detect indentations correctly,
+    if there's no newline between an indeted part and and a dedented part.
+
+    For example, this will fail:
+
+        parent
+            child
+                grandchild
+            sibling
+
+    But this won't:
+
+        parent
+            child
+                grandchild
+
+            sibling
+
+    Having tried a few things without success I want to move on for now, so
+    to work around this issue, this function is called before the string
+    is parsed, which fixes this issue.
+
+    It does so by adding newlines after each dedent.
+
+    """
+    def lines_with_empty_lines_inserted(lines):
+        previous_indentation = 0
+
+        for line in lines:
+            indentation = len(line) - len(line.lstrip())
+
+            if previous_indentation > indentation:
+                yield ''
+                yield line
+            else:
+                yield line
+
+            previous_indentation = indentation
+
+    return '\n'.join(lines_with_empty_lines_inserted(text.split('\n')))
+
+
 def handle_block(builder, block, dependency=None):
     """ Takes a parsed block and instructs the builder to add a field based
     on it.
 
     """
+
     if block.type == 'fieldset':
         builder.set_current_fieldset(block.label or None)
     elif block.type == 'text':

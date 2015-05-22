@@ -26,11 +26,12 @@ class FormDefinitionCollection(object):
     def query(self):
         return self.session.query(FormDefinition)
 
-    def add(self, title, definition, type=None, meta=None, content=None):
+    def add(self, title, definition,
+            type=None, meta=None, content=None, name=None):
         """ Add the given form to the database. """
         form = FormDefinition()
 
-        form.name = normalize_for_url(title)
+        form.name = name or normalize_for_url(title)
         form.title = title
         form.definition = definition
         form.type = type
