@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a method to list all schemas found in the database.
+  [href]
+
 0.3.0 (2015-05-20)
 ~~~~~~~~~~~~~~~~~~~
 

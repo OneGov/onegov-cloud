@@ -208,6 +208,16 @@ class SessionManager(object):
 
         return result.first()[0]
 
+    def list_schemas(self):
+        """ Returns a list containing *all* schemas defined in the current
+        database.
+
+        """
+        conn = self.engine.execution_options(schema=None)
+        query = text("SELECT schema_name FROM information_schema.schemata")
+
+        return [r[0] for r in conn.execute(query).fetchall()]
+
     def ensure_schema_exists(self, schema):
         """ Makes sure the schema exists on the database. If it doesn't, it
         is created.
