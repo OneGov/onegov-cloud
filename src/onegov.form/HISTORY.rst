@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.0 (2015-05-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to store forms and related submissions in the database.
   [href]
 
