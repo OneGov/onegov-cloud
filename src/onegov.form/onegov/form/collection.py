@@ -3,7 +3,7 @@ from onegov.form.models import FormDefinition, FormSubmission
 
 
 class FormCollection(object):
-    """ Manages a collection of forms defined in the database. """
+    """ Manages a collection of forms and form-submissions. """
 
     def __init__(self, session):
         self.session = session
@@ -18,6 +18,7 @@ class FormCollection(object):
 
 
 class FormDefinitionCollection(object):
+    """ Manages a collection of forms. """
 
     def __init__(self, session):
         self.session = session
@@ -26,6 +27,7 @@ class FormDefinitionCollection(object):
         return self.session.query(FormDefinition)
 
     def add(self, title, definition, type=None, meta=None, content=None):
+        """ Add the given form to the database. """
         form = FormDefinition()
 
         form.name = normalize_for_url(title)
@@ -43,11 +45,26 @@ class FormDefinitionCollection(object):
 
         return form
 
+    def delete(self, name, with_submissions=False):
+        """ Delete the given form. Only possible if there are no submissions
+        associated with it, or if ``with_submissions`` is True.
+
+        """
+        if with_submissions:
+            submissions = self.session.query(FormSubmission)
+            submissions = submissions.filter(FormSubmission.name == name)
+            submissions.delete()
+
+        self.query().filter(FormDefinition.name == name).delete('fetch')
+        self.session.flush()
+
     def by_name(self, name):
+        """ Returns the given form by name or None. """
         return self.query().filter(FormDefinition.name == name).first()
 
 
 class FormSubmissionCollection(object):
+    """ Manages a collection of submissions. """
 
     def __init__(self, session):
         self.session = session
@@ -79,4 +96,5 @@ class FormSubmissionCollection(object):
         return submission
 
     def by_form_name(self, name):
+        """ Return all submissions for the given form-name. """
         return self.query().filter(FormSubmission.name == name).all()
