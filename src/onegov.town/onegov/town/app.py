@@ -65,20 +65,21 @@ class TownApp(Framework):
     def configure_application(self, **cfg):
         super(TownApp, self).configure_application(**cfg)
 
-        schema_prefix = self.namespace + '-'
-        town_schemas = [
-            s for s in self.session_manager.list_schemas()
-            if s.startswith(schema_prefix)
-        ]
+        if self.has_database_connection:
+            schema_prefix = self.namespace + '-'
+            town_schemas = [
+                s for s in self.session_manager.list_schemas()
+                if s.startswith(schema_prefix)
+            ]
 
-        for schema in town_schemas:
-            self.session_manager.set_current_schema(schema)
+            for schema in town_schemas:
+                self.session_manager.set_current_schema(schema)
 
-            session = self.session()
-            add_builtin_forms(session)
-            session.flush()
+                session = self.session()
+                add_builtin_forms(session)
+                session.flush()
 
-        log.info('Updated all builtin forms')
+            log.info('Updated all builtin forms')
 
     @property
     def theme_options(self):

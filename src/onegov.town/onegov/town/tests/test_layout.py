@@ -181,8 +181,8 @@ def test_template_layout():
     config.commit()
 
     app = App()
-    app.configure_application(filestorage='fs.memoryfs.MemoryFS')
     app.namespace = 'tests'
+    app.configure_application(dsn=None, filestorage='fs.memoryfs.MemoryFS')
     app.set_application_id('tests/foo')
 
     client = Client(app)
