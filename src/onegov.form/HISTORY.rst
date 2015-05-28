@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.0 (2015-05-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Rewrites most of the parsing logic. Pyparsing is no longer used for
   indentation, instead the form source is transalted into YAML first, then
   parsed further.
