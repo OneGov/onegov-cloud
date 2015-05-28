@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.1 (2015-05-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Makes sure multiple fields with the same labels are handled more
   intelligently.
   [href]
