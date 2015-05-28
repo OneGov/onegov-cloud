@@ -37,6 +37,13 @@ def handle_defined_form(self, request, form):
         Link(_("Forms"), request.link(collection)),
         Link(self.title, request.link(self))
     ]
+    layout.sidebar_links = [
+        Link(
+            text=f.title,
+            url=request.link(f),
+            active=(f.name == self.name)
+        ) for f in collection.definitions.query().all()
+    ]
 
     return {
         'layout': layout,
