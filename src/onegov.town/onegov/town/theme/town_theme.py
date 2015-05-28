@@ -40,7 +40,7 @@ class TownTheme(BaseTheme):
             'tile-image-3': '"../static/homepage-images/tile-3-small.jpg"',
             'tile-image-4': '"../static/homepage-images/tile-4-small.jpg"',
             'tile-image-5': '"../static/homepage-images/tile-5-small.jpg"',
-            'tile-image-6': '"../static/homepage-images/tile-6-small.jpg"',
+            'tile-image-6': '"../static/homepage-images/tile-6-small.jpg"'
         }
         options.update(user_options)
 
