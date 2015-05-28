@@ -1,5 +1,6 @@
 import pytest
 
+from onegov.form import errors
 from onegov.form.fields import TimeField
 from onegov.form.parser import parse_form
 from textwrap import dedent
@@ -64,18 +65,60 @@ def test_parse_fieldsets():
     assert len(fieldsets[0]) == 2
     assert fieldsets[0].label == 'Name'
     assert fieldsets[0].is_visible
-    assert fieldsets[0]['first_name'].label.text == 'First name'
-    assert fieldsets[0]['last_name'].label.text == 'Last name'
+    assert fieldsets[0]['name_first_name'].label.text == 'First name'
+    assert fieldsets[0]['name_last_name'].label.text == 'Last name'
 
     assert len(fieldsets[1]) == 1
     assert fieldsets[1].label == 'Address'
     assert fieldsets[1].is_visible
-    assert fieldsets[1]['street'].label.text == 'Street'
+    assert fieldsets[1]['address_street'].label.text == 'Street'
 
     assert len(fieldsets[2]) == 1
     assert fieldsets[2].label is None
     assert not fieldsets[2].is_visible
     assert fieldsets[2]['comment'].label.text == 'Comment'
+
+
+def test_fieldset_field_ids():
+    text = dedent("""
+        First Name = ___
+
+        # Spouse
+        First Name = ___
+    """)
+
+    form = parse_form(text)()
+    hasattr(form, 'first_name')
+    hasattr(form, 'spouse_first_name')
+
+
+def test_duplicate_field():
+    text = dedent("""
+        First Name = ___
+        First Name = ___
+    """)
+
+    with pytest.raises(errors.DuplicateLabelError):
+        parse_form(text)
+
+
+def test_dependent_field():
+    text = dedent("""
+        Comment =
+            [ ] I have one
+                Comment = ...
+
+        # Extra
+        Comment =
+            [ ] I have one
+                Comment = ...
+    """)
+
+    form = parse_form(text)
+    assert hasattr(form, 'comment')
+    assert hasattr(form, 'comment_comment')
+    assert hasattr(form, 'extra_comment')
+    assert hasattr(form, 'extra_comment_comment')
 
 
 def test_parse_email():
@@ -159,7 +202,7 @@ def test_dependent_validation():
 
     form = form_class(MultiDict([
         ('payment', 'Bill'),
-        ('address', 'Destiny Lane')
+        ('payment_address', 'Destiny Lane')
     ]))
 
     form.validate()
@@ -170,27 +213,29 @@ def test_dependent_validation():
     ]))
 
     form.validate()
-    assert form.errors == {'address': ['This field is required.']}
+    assert form.errors == {'payment_address': ['This field is required.']}
 
     form = form_class(MultiDict([
         ('payment', 'Credit Card'),
     ]))
 
     form.validate()
-    assert form.errors == {'credit_card_number': ['This field is required.']}
+    assert form.errors == {
+        'payment_credit_card_number': ['This field is required.']}
 
     form = form_class(MultiDict([
         ('payment', 'Credit Card'),
-        ('credit_card_number', '123')
+        ('payment_credit_card_number', '123')
     ]))
 
     form.validate()
     assert not form.errors
 
     assert 'data-depends-on="payment/Bill"' in (
-        form.address.widget(form.address))
+        form.payment_address.widget(form.payment_address))
     assert 'data-depends-on="payment/Credit Card"' in (
-        form.credit_card_number.widget(form.credit_card_number))
+        form.payment_credit_card_number.widget(
+            form.payment_credit_card_number))
 
 
 def test_nested_regression():
@@ -213,7 +258,10 @@ def test_nested_regression():
 
     assert len(form._fields) == 5
     assert len(form.delivery.choices) == 2
-    assert len(form.alternate_address.choices) == 2
+    assert len(form.delivery_alternate_address.choices) == 2
+
+    assert hasattr(form, 'delivery_alternate_address_street')
+    assert hasattr(form, 'delivery_alternate_address_town')
 
 
 def test_stdnum_field():

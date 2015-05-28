@@ -234,6 +234,7 @@ from onegov.form.core import (
     Form,
     with_options
 )
+from onegov.form import errors
 from onegov.form.fields import TimeField, MultiCheckboxField
 from onegov.form.parser.grammar import (
     checkbox,
@@ -661,7 +662,18 @@ class WTFormsClassBuilder(object):
             else:
                 validators.insert(0, If(dependency.fulfilled, InputRequired()))
 
-        field_id = label_to_field_id(label)
+        # try to find a smart field_id that contains the dependency or the
+        # current fieldset name - if all fails, an error will be thrown,
+        # as field_ids *need* to be unique
+        if dependency:
+            field_id = dependency.field_id + '_' + label_to_field_id(label)
+        elif self.current_fieldset:
+            field_id = label_to_field_id(self.current_fieldset + ' ' + label)
+        else:
+            field_id = label_to_field_id(label)
+
+        if hasattr(self.form_class, field_id):
+            raise errors.DuplicateLabelError(label=label)
 
         setattr(self.form_class, field_id, field_class(
             label=label,

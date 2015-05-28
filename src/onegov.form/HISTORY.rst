@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Makes sure multiple fields with the same labels are handled more
+  intelligently.
+  [href]
+
 0.2.0 (2015-05-28)
 ~~~~~~~~~~~~~~~~~~~
 
