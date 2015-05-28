@@ -4,6 +4,14 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Rewrites most of the parsing logic. Pyparsing is no longer used for
+  indentation, instead the form source is transalted into YAML first, then
+  parsed further.
+
+  This fixes all known indentation problems.
+
+  [href]
+
 0.1.0 (2015-05-22)
 ~~~~~~~~~~~~~~~~~~~
 

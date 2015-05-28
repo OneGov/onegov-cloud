@@ -1,9 +1,254 @@
+""" onegov.form includes it's own markdownish form syntax, inspired by
+https://github.com/maleldil/wmd
+
+The goal of this syntax is to enable the creation of forms through the web,
+without having to use javascript, html or python code.
+
+Also, just like Markdown, we want this syntax to be readable by humans.
+
+How it works
+============
+
+Internally, the form syntax is converted into a YAML file, which is in turn
+parsed and turned into a WTForms class. We decided to go for the intermediate
+YAML file because it's easy to define a Syntax which correctly supports
+indentation. Our pyparsing approach was flimsy at best.
+
+Parser Errors
+=============
+
+There's currently no sophisticated error check. It's possible that the parser
+misunderstand something you defined without warning. So be careful to check
+that what you wanted was actually what you got.
+
+Syntax
+======
+
+Fields
+------
+
+Every field is identified by a label, an optional 'required' indicator and a
+field definition. The Label can be any kind of text, not including ``*`` and
+``=``.
+The ``*`` indicates that a field is required. The ``=`` separates the
+identifier from the definition.
+
+A required field starts like this::
+
+    My required field * =
+
+An optional field starts like this::
+
+    My optional field =
+
+Following the identifier is the field definition. For example, this defines
+a textfield::
+
+    My textfield = ___
+
+All possible fields are documented further below.
+
+Fieldsets
+---------
+
+Fields are grouped into fieldsets. The fieldset of a field is the fieldset
+that was last defined::
+
+    # Fieldset 1
+    I belong to Fieldset 1 = ___
+
+    # Fieldset 2
+    I belong to Fieldset 2 = ___
+
+If no fieldset is defined, the fields don't belong to a fieldset. To stop
+putting fields in a fieldset, define an empty fieldeset::
+
+    # Fieldset 1
+    I belong to Fieldset 1 = ___
+
+    # ...
+    I don't belong to a Fieldset = ___
+
+Available Fields
+----------------
+
+Textfield
+~~~~~~~~~
+
+A textfield consists of exactly three underscores::
+
+    I'm a textfield = ___
+
+If the textfield is limited in length, the length can be given::
+
+    I'm a limited textfield = ___[50]
+
+The length of such textfields is validated.
+
+Textarea
+~~~~~~~~
+
+A textarea has no limit and consists of exactly three dots::
+
+    I'm a textarea = ...
+
+Optionally, the number of rows can be passed to the field. This changes the
+way the textarea looks, not the way it acts::
+
+    I'm a textarea with 10 rows = ...[10]
+
+Password
+~~~~~~~~
+
+A password field consists of exactly three stars::
+
+    I'm a password = ***
+
+E-Mail
+~~~~~~
+
+An e-mail field consists of exactly three ``@``::
+
+    I'm an e-mail field = @@@
+
+Date
+~~~~
+
+A date (without time) is defined by this exact string: ``YYYY.MM.DD``::
+
+    I'm a date field = YYYY.MM.DD
+
+Note that this doesn't mean that the date format can be influenced.
+
+Datetime
+~~~~~~~~
+
+A date (with time) is defined by this exact string: ``YYYY.MM.DD HH:MM``::
+
+    I'm a datetime field = YYYY.MM.DD HH:MM
+
+Again, this doesn't mean that the datetime format can be influenced.
+
+Time
+~~~~
+
+A Time is defined by this exact string: ``HH:MM``::
+
+    I'm a time field = HH:MM
+
+One more time, this doesn't mean that the datetime format can be influenced.
+
+Standard Numbers
+~~~~~~~~~~~~~~~~
+
+onegov.form uses `python-stdnum \
+<https://github.com/arthurdejong/python-stdnum>`_ to offer a wide range of
+standard formats that are guaranteed to be validated.
+
+To use, simply use a `#`, followed by the stdnum format to use::
+
+    I'm a valid IBAN (or empty) = # iban
+    I'm a valid IBAN (required) * = # iban
+
+The format string after the `#` must be importable from stdnum. In other words,
+this must work, if you are using ``ch.ssn`` (to use an example)::
+
+    $ python
+    >>> from stdnum.ch import ssn
+
+This is a bit of an advanced feature and since it delegates most work to an
+external library there's no guarantee that a format once used may be reused
+in the future.
+
+Still, the library should be somewhat stable and the benefit is huge.
+
+To see the available format, have a look at the docs:
+`<http://arthurdejong.org/python-stdnum/doc/1.1/index.html#available-formats>`_
+
+Radio Buttons
+~~~~~~~~~~~~~
+
+Radio button fields consist of x radio buttons, out of which one may be
+preselected. Radio buttons need to be indented on the lines after the
+definition::
+
+    Gender =
+        ( ) Female
+        ( ) Male
+        (x) I don't want to say
+
+Radio buttons also have the ability to define optional form parts. Those
+parts are only shown if a question was answered a certain way.
+
+Form parts are properly nested if they lign up with the label above them.
+
+For example::
+
+    Delivery Method =
+        ( ) Pickup
+            Pickup Time * = ___
+        (x) Address
+            Street * = ___
+            Town * = ___
+
+Here, the street and the town only need to be provided, if the delivery method
+is 'Address'. If the user selects a different option, the fields are not
+shown and they will not be required.
+
+On the other hand, if 'Pickup' is selected, the 'Pickup Time' needs to be
+filled out and the address options are hidden.
+
+This kind of nesting may continue ad infinitum. Meaning you can nest radio
+buttons as deeply as you like. Note however, that this is discouraged and that
+your users will not be too happy if you present them with a deeply nested
+form.
+
+More than one level of nesting is a clear indicator that your form is too
+complex.
+
+Checkboxes
+~~~~~~~~~~
+
+Checkboxes work exactly like radio buttons, just that you can select
+multiple fields::
+
+    Extras =
+        [x] Phone insurance
+        [ ] Phone case
+        [x] Extra battery
+
+Just like radiobuttons, checkboxes may be nested to created dependencies::
+
+    Additional toppings =
+        [ ] Salami
+        [ ] Olives
+        [ ] Other
+            Description = ___
+"""
+
+import pyparsing as pp
+import yaml
+
+from onegov.core.utils import Bunch
 from onegov.form.core import (
     Form,
     with_options
 )
 from onegov.form.fields import TimeField, MultiCheckboxField
-from onegov.form.parser.grammar import block_content
+from onegov.form.parser.grammar import (
+    checkbox,
+    date,
+    datetime,
+    email,
+    field_identifier,
+    fieldset_title,
+    password,
+    radio,
+    stdnum,
+    textarea,
+    textfield,
+    time,
+)
 from onegov.form.utils import label_to_field_id
 from onegov.form.validators import Stdnum
 from wtforms import (
@@ -18,8 +263,91 @@ from wtforms.widgets import TextArea
 from wtforms_components import Email, If
 
 
-# cache the parser
-block_parser = block_content()
+# cache the parser elements
+elements = Bunch()
+elements.identifier = field_identifier()
+elements.fieldset_title = fieldset_title()
+elements.textfield = textfield()
+elements.textarea = textarea()
+elements.password = password()
+elements.email = email()
+elements.stdnum = stdnum()
+elements.datetime = datetime()
+elements.date = date()
+elements.time = time()
+elements.radio = radio()
+elements.checkbox = checkbox()
+elements.boxes = elements.checkbox | elements.radio
+elements.single_line_fields = elements.identifier + pp.MatchFirst([
+    elements.textfield,
+    elements.textarea,
+    elements.password,
+    elements.email,
+    elements.stdnum,
+    elements.datetime,
+    elements.date,
+    elements.time
+])
+
+
+class CustomLoader(yaml.SafeLoader):
+    """ Extends the default yaml loader with customized constructors. """
+
+
+class constructor(object):
+    """ Adds decorated functions to as constructors to the CustomLoader. """
+
+    def __init__(self, tag):
+        self.tag = tag
+
+    def __call__(self, fn):
+        CustomLoader.add_constructor(self.tag, fn)
+        return fn
+
+
+@constructor('!text')
+def construct_textfield(loader, node):
+    return elements.textfield.parseString(node.value)
+
+
+@constructor('!textarea')
+def construct_textarea(loader, node):
+    return elements.textarea.parseString(node.value)
+
+
+@constructor('!email')
+def construct_email(loader, node):
+    return elements.email.parseString(node.value)
+
+
+@constructor('!stdnum')
+def construct_stdnum(loader, node):
+    return elements.stdnum.parseString(node.value)
+
+
+@constructor('!date')
+def construct_date(loader, node):
+    return elements.date.parseString(node.value)
+
+
+@constructor('!datetime')
+def construct_datetime(loader, node):
+    return elements.datetime.parseString(node.value)
+
+
+@constructor('!time')
+def construct_time(loader, node):
+    return elements.time.parseString(node.value)
+
+
+@constructor('!radio')
+def construct_radio(loader, node):
+    return elements.radio.parseString(node.value)
+
+
+@constructor('!checkbox')
+def construct_checkbox(loader, node):
+    return elements.checkbox.parseString(node.value)
 
 
 def parse_form(text):
@@ -29,12 +357,20 @@ def parse_form(text):
     """
 
     builder = WTFormsClassBuilder(Form)
+    parsed = yaml.load('\n'.join(translate_to_yaml(text)), CustomLoader)
 
-    # XXX this is a bit of a hack, see method docs
-    text = stress_indentations(text)
+    for fieldset in parsed:
 
-    for block in (i[0] for i in block_parser.scanString(text)):
-        handle_block(builder, block)
+        # fieldsets occur only at the top level
+        fieldset_name = next(k for k in fieldset.keys())
+
+        if fieldset_name != '...':
+            builder.set_current_fieldset(fieldset_name)
+        else:
+            builder.set_current_fieldset(None)
+
+        for block in fieldset[fieldset_name]:
+            handle_block(builder, block)
 
     form_class = builder.form_class
     form_class._source = text
@@ -42,160 +378,237 @@ def parse_form(text):
     return form_class
 
 
-def stress_indentations(text):
-    """ The parser's indent matching fails to detect indentations correctly,
-    if there's no newline between an indeted part and and a dedented part.
-
-    For example, this will fail:
-
-        parent
-            child
-                grandchild
-            sibling
-
-    But this won't:
-
-        parent
-            child
-                grandchild
-
-            sibling
-
-    Having tried a few things without success I want to move on for now, so
-    to work around this issue, this function is called before the string
-    is parsed, which fixes this issue.
-
-    It does so by adding newlines after each dedent.
-
-    """
-    def lines_with_empty_lines_inserted(lines):
-        previous_indentation = 0
-
-        for line in lines:
-            indentation = len(line) - len(line.lstrip())
-
-            if previous_indentation > indentation:
-                yield ''
-                yield line
-            else:
-                yield line
-
-            previous_indentation = indentation
-
-    return '\n'.join(lines_with_empty_lines_inserted(text.split('\n')))
-
-
 def handle_block(builder, block, dependency=None):
-    """ Takes a parsed block and instructs the builder to add a field based
-    on it.
+    """ Takes the given parsed yaml block and adds it to the from builder. """
 
-    """
+    key, field = next(i for i in block.items())
 
-    if block.type == 'fieldset':
-        builder.set_current_fieldset(block.label or None)
-    elif block.type == 'text':
-        if block.length:
-            validators = [Length(max=block.length)]
+    identifier_src = key.rstrip('= ') + '='
+    identifier = elements.identifier.parseString(identifier_src)
+
+    # add the nested options/dependencies in case of radio/checkbox buttons
+    if isinstance(field, list):
+        choices = [next(i for i in f.items()) for f in field]
+
+        for choice, dependencies in choices:
+            choice.dependencies = dependencies
+
+        choices = [c[0] for c in choices]
+
+        field = Bunch(choices=choices, type=choices[0].type)
+
+        # make sure only one type is found (either radio or checkbox)
+        types = set(f.type for f in field.choices)
+        assert types <= {'radio', 'checkbox'}
+        assert len(types) == 1
+
+    if field.type == 'text':
+        if field.length:
+            validators = [Length(max=field.length)]
         else:
             validators = []
 
         field_id = builder.add_field(
             field_class=StringField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required,
+            required=identifier.required,
             validators=validators,
         )
-    elif block.type == 'textarea':
+    elif field.type == 'textarea':
         field_id = builder.add_field(
             field_class=TextAreaField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required,
-            widget=with_options(TextArea, rows=block.rows or None)
+            required=identifier.required,
+            widget=with_options(TextArea, rows=field.rows or None)
         )
-    elif block.type == 'password':
+    elif field.type == 'password':
         field_id = builder.add_field(
             field_class=PasswordField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required
+            required=identifier.required
         )
-    elif block.type == 'email':
+    elif field.type == 'email':
         field_id = builder.add_field(
             field_class=EmailField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required,
+            required=identifier.required,
             validators=[Email()]
         )
-    elif block.type == 'stdnum':
+    elif field.type == 'stdnum':
         field_id = builder.add_field(
             field_class=StringField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required,
-            validators=[Stdnum(block.format)]
+            required=identifier.required,
+            validators=[Stdnum(field.format)]
         )
-    elif block.type == 'date':
+    elif field.type == 'date':
         field_id = builder.add_field(
             field_class=DateField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required,
+            required=identifier.required,
         )
-    elif block.type == 'datetime':
+    elif field.type == 'datetime':
         field_id = builder.add_field(
             field_class=DateTimeLocalField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required,
+            required=identifier.required,
         )
-    elif block.type == 'time':
+    elif field.type == 'time':
         field_id = builder.add_field(
             field_class=TimeField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required
+            required=identifier.required
         )
-    elif block.type == 'radio':
-        choices = [
-            (c.label, c.label) for c in block.parts
-        ]
-        checked = [c.label for c in block.parts if c.checked]
+    elif field.type == 'radio':
+        choices = [(c.label, c.label) for c in field.choices]
+        checked = [c.label for c in field.choices if c.checked]
         default = checked and checked[0] or None
 
         field_id = builder.add_field(
             field_class=RadioField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required,
+            required=identifier.required,
             choices=choices,
             default=default
         )
-    elif block.type == 'checkbox':
-        choices = [
-            (c.label, c.label) for c in block.parts
-        ]
-        default = [c.label for c in block.parts if c.checked]
+    elif field.type == 'checkbox':
+        choices = [(c.label, c.label) for c in field.choices]
+        default = [c.label for c in field.choices if c.checked]
+
         field_id = builder.add_field(
             field_class=MultiCheckboxField,
-            label=block.label,
+            label=identifier.label,
             dependency=dependency,
-            required=block.required,
+            required=identifier.required,
             choices=choices,
             default=default
         )
     else:
         raise NotImplementedError
 
-    # go through nested blocks
-    if block.type in {'radio', 'checkbox'}:
-        for part in block.parts:
-            dependency = FieldDependency(field_id, part.label)
+    # go through nested blocks and recursively add them
+    if field.type in {'radio', 'checkbox'}:
+        for choice in field.choices:
+            if not choice.dependencies:
+                continue
 
-            for child in part.dependencies:
+            dependency = FieldDependency(field_id, choice.label)
+
+            for child in choice.dependencies:
                 handle_block(builder, child, dependency)
+
+    return field_id
+
+
+def match(expr, text):
+    """ Returns true if the given parser expression matches the given text. """
+    try:
+        expr.parseString(text)
+    except pp.ParseException:
+        return False
+    else:
+        return True
+
+
+def try_parse(expr, text):
+    """ Returns the result of the given parser expression and text, or None.
+
+    """
+    try:
+        return expr.parseString(text)
+    except pp.ParseException:
+        return None
+
+
+def prepare(text):
+    """ Takes the raw form source and prepares it for the translation into
+    yaml.
+
+    """
+
+    lines = (l.rstrip() for l in text.split('\n'))
+    lines = (l for l in lines if l)
+    lines = (l for l in ensure_a_fieldset(lines))
+
+    for line in lines:
+        yield line
+
+
+def ensure_a_fieldset(lines):
+    """ Makes sure that the given lines all belong to a fieldset. That means
+    adding an empty fieldset before all lines, if none is found first.
+
+    """
+    found_fieldset = False
+
+    for line in lines:
+        if found_fieldset:
+            yield line
+            continue
+
+        if match(elements.fieldset_title, line):
+            found_fieldset = True
+            yield line
+        else:
+            found_fieldset = True
+            yield '# ...'
+            yield line
+
+
+def translate_to_yaml(text):
+    """ Takes the given form text and constructs an easier to parse yaml
+    string.
+
+    """
+
+    lines = (l for l in prepare(text))
+
+    for line in lines:
+
+        # the top level are the fieldsets
+        if match(elements.fieldset_title, line):
+            yield '- "{}":'.format(line.lstrip('# ').rstrip())
+            continue
+
+        # fields are nested lists of dictionaries
+        parse_result = try_parse(elements.single_line_fields, line)
+        if parse_result is not None:
+            yield '{indent}- "{identifier}": !{type} "{definition}"'.format(
+                indent=' ' * (4 + (len(line) - len(line.lstrip()))),
+                type=parse_result.type,
+                identifier=line.split('=')[0].strip(),
+                definition=line.split('=')[1].strip()
+            )
+            continue
+
+        # checkboxes/radios come without identifier
+        parse_result = try_parse(elements.boxes, line)
+        if parse_result is not None:
+            yield '{indent}- !{type} "{definition}":'.format(
+                indent=' ' * (4 + (len(line) - len(line.lstrip()))),
+                type=parse_result.type,
+                definition=line.strip()
+            )
+            continue
+
+        # identifiers which are alone contain nested checkboxes/radios
+        if match(elements.identifier, line):
+            yield '{indent}- "{identifier}":'.format(
+                indent=' ' * (4 + (len(line) - len(line.lstrip()))),
+                identifier=line.strip()
+            )
+            continue
+
+        assert False, "The given text could not be parsed"
 
 
 class FieldDependency(object):

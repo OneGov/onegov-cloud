@@ -109,8 +109,9 @@ def test_parse_time():
 def test_parse_radio():
 
     text = dedent("""
-        Gender = ( ) Male
-                 (x) Female
+        Gender =
+            ( ) Male
+            (x) Female
     """)
 
     form = parse_form(text)()
@@ -126,9 +127,10 @@ def test_parse_radio():
 def test_parse_checkbox():
 
     text = dedent("""
-        Extras = [ ] Extra Luggage
-                 [x] Priority Seating
-                 [x] Early Boarding
+        Extras =
+            [ ] Extra Luggage
+            [x] Priority Seating
+            [x] Early Boarding
     """)
 
     form = parse_form(text)()
@@ -145,10 +147,11 @@ def test_parse_checkbox():
 def test_dependent_validation():
 
     text = dedent("""
-        Payment * = ( ) Bill
-                        Address * = ___
-                    ( ) Credit Card
-                        Credit Card Number * = ___
+        Payment * =
+            ( ) Bill
+                Address * = ___
+            ( ) Credit Card
+                Credit Card Number * = ___
     """)
 
     form_class = parse_form(text)
@@ -188,6 +191,29 @@ def test_dependent_validation():
         form.address.widget(form.address))
     assert 'data-depends-on="payment/Credit Card"' in (
         form.credit_card_number.widget(form.credit_card_number))
+
+
+def test_nested_regression():
+
+    text = dedent("""
+        Delivery * =
+            (x) I want it delivered
+                Alternate Address =
+                    (x) No
+                    ( ) Yes
+                        Street = ___
+                        Town = ___
+            ( ) I want to pick it up
+        Kommentar = ...
+    """)
+
+    form_class = parse_form(text)
+
+    form = form_class()
+
+    assert len(form._fields) == 5
+    assert len(form.delivery.choices) == 2
+    assert len(form.alternate_address.choices) == 2
 
 
 def test_stdnum_field():

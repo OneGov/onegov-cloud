@@ -1,225 +1,8 @@
 # -*- coding: utf-8 -*-
-""" onegov.form includes it's own markdownish form syntax, inspired by
-https://github.com/maleldil/wmd
-
-The goal of this syntax is to enable the creation of forms through the web,
-without having to use javascript, html or python code.
-
-Also, just like Markdown, we want this syntax to be readable by humans.
-
-Syntax
-======
-
-Fields
-------
-
-Every field is identified by a label, an optional 'required' indicator and a
-field definition. The Label can be any kind of text, not including ``*`` and
-``=``.
-The ``*`` indicates that a field is required. The ``=`` separates the
-identifier from the definition.
-
-A required field starts like this::
-
-    My required field * =
-
-An optional field starts like this::
-
-    My optional field =
-
-Following the identifier is the field definition. For example, this defines
-a textfield::
-
-    My textfield = ___
-
-All possible fields are documented further below.
-
-Fieldsets
----------
-
-Fields are grouped into fieldsets. The fieldset of a field is the fieldset
-that was last defined::
-
-    # Fieldset 1
-    I belong to Fieldset 1 = ___
-
-    # Fieldset 2
-    I belong to Fieldset 2 = ___
-
-If no fieldset is defined, the fields don't belong to a fieldset. To stop
-putting fields in a fieldset, define an empty fieldeset::
-
-    # Fieldset 1
-    I belong to Fieldset 1 = ___
-
-    # ...
-    I don't belong to a Fieldset = ___
-
-Available Fields
-----------------
-
-Textfield
-~~~~~~~~~
-
-A textfield consists of exactly three underscores::
-
-    I'm a textfield = ___
-
-If the textfield is limited in length, the length can be given::
-
-    I'm a limited textfield = ___[50]
-
-The length of such textfields is validated.
-
-Textarea
-~~~~~~~~
-
-A textarea has no limit and consists of exactly three dots::
-
-    I'm a textarea = ...
-
-Optionally, the number of rows can be passed to the field. This changes the
-way the textarea looks, not the way it acts::
-
-    I'm a textarea with 10 rows = ...[10]
-
-Password
-~~~~~~~~
-
-A password field consists of exactly three stars::
-
-    I'm a password = ***
-
-E-Mail
-~~~~~~
-
-An e-mail field consists of exactly three ``@``::
-
-    I'm an e-mail field = @@@
-
-Date
-~~~~
-
-A date (without time) is defined by this exact string: ``YYYY.MM.DD``::
-
-    I'm a date field = YYYY.MM.DD
-
-Note that this doesn't mean that the date format can be influenced.
-
-Datetime
-~~~~~~~~
-
-A date (with time) is defined by this exact string: ``YYYY.MM.DD HH:MM``::
-
-    I'm a datetime field = YYYY.MM.DD HH:MM
-
-Again, this doesn't mean that the datetime format can be influenced.
-
-Time
-~~~~
-
-A Time is defined by this exact string: ``HH:MM``::
-
-    I'm a time field = HH:MM
-
-One more time, this doesn't mean that the datetime format can be influenced.
-
-Standard Numbers
-~~~~~~~~~~~~~~~~
-
-onegov.form uses `python-stdnum \
-<https://github.com/arthurdejong/python-stdnum>`_ to offer a wide range of
-standard formats that are guaranteed to be validated.
-
-To use, simply use a `#`, followed by the stdnum format to use::
-
-    I'm a valid IBAN (or empty) = # iban
-    I'm a valid IBAN (required) * = # iban
-
-The format string after the `#` must be importable from stdnum. In other words,
-this must work, if you are using ``ch.ssn`` (to use an example)::
-
-    $ python
-    >>> from stdnum.ch import ssn
-
-This is a bit of an advanced feature and since it delegates most work to an
-external library there's no guarantee that a format once used may be reused
-in the future.
-
-Still, the library should be somewhat stable and the benefit is huge.
-
-To see the available format, have a look at the docs:
-`<http://arthurdejong.org/python-stdnum/doc/1.1/index.html#available-formats>`_
-
-Radio Buttons
-~~~~~~~~~~~~~
-
-Radio button fields consist of x radio buttons, out of which one may be
-preselected::
-
-    Gender = ( ) Female ( ) Male (x) I don't want to say
-
-To improve readability, radio buttons may be listed on multiple lines, as
-long as they are properly indented::
-
-    Gender = ( ) Female
-             ( ) Male
-             (x) I don't want to say
-
-Radio buttons also have the ability to define optional form parts. Those
-parts are only shown if a question was answered a certain way.
-
-Form parts are properly nested if they lign up with the label above them.
-
-For example::
-
-    Delivery Method = ( ) Pickup
-                          Pickup Time = ___
-                      (x) Address
-                          Street * = ___
-                          Town * = ___
-
-Here, the street and the town only need to be provided, if the delivery method
-is 'Address'. If the user selects a different option, the fields are not
-shown and they will not be required.
-
-On the other hand, if 'Pickup' is selected, the 'Pickup Time' needs to be
-filled out and the address options are hidden.
-
-This kind of nesting may continue ad infinitum. Meaning you can nest radio
-buttons as deeply as you like. Note however, that this is discouraged and that
-your users will not be too happy if you present them with a deeply nested
-form.
-
-More than one level of nesting is a clear indicator that your form is too
-complex.
-
-Checkboxes
-~~~~~~~~~~
-
-Checkboxes work exactly like radio buttons, just that you can select
-multiple fields::
-
-    Extras = [x] Phone insurance
-             [ ] Phone case
-             [x] Extra battery
-
-Just like radiobuttons, checkboxes may be nested to created dependencies::
-
-    Additional toppings = [ ] Salami
-                          [ ] Olives
-                          [ ] Other
-                              Description = ___
-
-"""
 from onegov.form.compat import unicode_characters
 from pyparsing import (
     col,
     Combine,
-    Forward,
-    Group,
-    indentedBlock,
-    LineEnd,
     Literal,
     MatchFirst,
     nums,
@@ -238,12 +21,6 @@ ParserElement.setDefaultWhitespaceChars(' \t')
 
 text = Word(unicode_characters)
 numeric = Word(nums)
-
-# shortcut
-indented = indentedBlock
-
-
-block = Forward()
 
 
 def text_without(characters):
@@ -455,40 +232,27 @@ def marker_box(characters):
     check = mark_enclosed_in(characters)('checked')
     label = with_whitespace_inside(text_without(characters))('label')
 
-    # Initialize the stack to the position of the label (which comes after
-    # the checkbox), to get the correct indentation checks by pyparsing.
-    stack = Stack()
-    check.setParseAction(stack.init)
-
-    dependencies = Group(indented(block, stack))('dependencies')
-    dependencies.setParseAction(unwrap)
-
-    return Group(check + label + Optional(dependencies))
+    return check + label
 
 
-def radios():
-    """ Returns a radio buttons parser.
+def radio():
+    """ Returns a radio parser:
 
     Example::
-
-        ( ) Male (x) Female ( ) Space Alien
+        (x) Male
+        ( ) Female
     """
+    return marker_box('()').setParseAction(tag(type='radio'))
 
-    return OneOrMore(marker_box('()')).setParseAction(tag(type='radio'))
 
-
-def checkboxes():
-    """ Returns a check boxes parser.
+def checkbox():
+    """ Returns a checkbox parser:
 
     Example::
-
-        [] Android [x] iPhone [x] Dumb Phone
-
+        [x] Male
+        [] ] Female
     """
-    boxes = OneOrMore(marker_box('[]'))
-    boxes.setParseAction(tag(type='checkbox'))
-
-    return boxes
+    return marker_box('[]').setParseAction(tag(type='checkbox'))
 
 
 def fieldset_title():
@@ -532,31 +296,3 @@ def field_identifier():
     # text and catual fields), then includes the name and the '*' which marks
     # required fields
     return label + required + Suppress('=')
-
-
-def block_content():
-    """ Returns the content of one logical block. The parser searches the
-    form string for occurences of these blocks.
-
-    """
-    LE = Suppress(LineEnd())
-    identifier = field_identifier()
-
-    return MatchFirst([
-        fieldset_title(),
-        identifier + MatchFirst([
-            textfield(),
-            textarea(),
-            password(),
-            email(),
-            stdnum(),
-            datetime(),
-            date(),
-            time()
-        ]),
-        identifier + OneOrMore(Optional(LE) + radios())('parts'),
-        identifier + OneOrMore(Optional(LE) + checkboxes())('parts')
-    ])
-
-
-block << block_content()
