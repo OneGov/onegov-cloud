@@ -115,5 +115,6 @@ def handle_settings(self, request, form):
     return {
         'layout': layout,
         'title': _(u'Settings'),
-        'form': form
+        'form': form,
+        'form_width': 'large'
     }

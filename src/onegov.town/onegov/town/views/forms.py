@@ -21,7 +21,7 @@ def view_get_form_collection(self, request):
     return {
         'layout': layout,
         'title': _("Forms"),
-        'forms': forms
+        'forms': forms,
     }
 
 
@@ -48,5 +48,6 @@ def handle_defined_form(self, request, form):
     return {
         'layout': layout,
         'title': self.title,
-        'form': form
+        'form': form,
+        'form_width': 'large'
     }

@@ -78,7 +78,8 @@ def handle_login(self, request, form):
     return {
         'layout': layout,
         'title': _(u'Login to ${town}', mapping={'town': self.name}),
-        'form': form
+        'form': form,
+        'form_width': 'small'
     }
 
 

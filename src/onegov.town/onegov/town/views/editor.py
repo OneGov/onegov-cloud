@@ -41,7 +41,8 @@ def handle_new_page(self, request, form):
     return {
         'layout': EditorLayout(self, request, site_title),
         'title': site_title,
-        'form': form
+        'form': form,
+        'form_width': 'large'
     }
 
 
@@ -59,5 +60,6 @@ def handle_edit_page(self, request, form):
     return {
         'layout': EditorLayout(self, request, site_title),
         'title': site_title,
-        'form': form
+        'form': form,
+        'form_width': 'large'
     }
