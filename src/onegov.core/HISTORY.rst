@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix pofile loading not working in certain environments.
+  [href]
+
 0.3.1 (2015-05-28)
 ~~~~~~~~~~~~~~~~~~~
 

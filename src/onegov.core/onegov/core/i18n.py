@@ -113,7 +113,7 @@ def pofiles(localedir):
             continue
 
         for pofile in glob.glob(os.path.join(subpath, '*.po')):
-            yield path, os.path.join(subpath, pofile)
+            yield path, pofile
 
 
 def get_translations(domain, localedir):
