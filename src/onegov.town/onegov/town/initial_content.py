@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import codecs
 import os
 
 from onegov.core.utils import module_path
@@ -73,11 +74,12 @@ def add_builtin_forms(session):
     builtin_forms = module_path('onegov.town', 'forms')
 
     def load_definition(filename):
-        with open(os.path.join(builtin_forms, filename), 'r') as formfile:
+        path = os.path.join(builtin_forms, filename)
+        with codecs.open(path, 'r', encoding='utf-8') as formfile:
             formlines = formfile.readlines()
 
             title = formlines[0].strip()
-            definition = ''.join(formlines[3:])
+            definition = u''.join(formlines[3:])
 
             return title, definition
 
@@ -91,7 +93,7 @@ def add_builtin_forms(session):
             forms.add(name=name, title=title, definition=definition)
 
     for filename in os.listdir(builtin_forms):
-        if filename.endswith(".form"):
+        if filename.endswith('.form'):
             name = filename.replace('.form', '')
             title, definition = load_definition(filename)
 
