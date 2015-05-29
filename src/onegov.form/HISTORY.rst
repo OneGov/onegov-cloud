@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Make sure special fields like the csrf token are included in the fieldsets.
+  [href]
+
 0.2.1 (2015-05-28)
 ~~~~~~~~~~~~~~~~~~~
 

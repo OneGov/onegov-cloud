@@ -58,6 +58,15 @@ class Form(BaseForm):
         # use the consumed fieldset attribute to build fieldsets
         self.fieldsets = []
 
+        # wtforms' constructor might add more fields not available as
+        # unbound fields (like the csrf token)
+        if len(self._fields) != len(self._unbound_fields):
+            processed = set(f[1] for f in fields_by_fieldset)
+            extra = (
+                f[1] for f in self._fields.items() if f[0] not in processed
+            )
+            self.fieldsets.append(Fieldset(None, fields=extra))
+
         for label, fields in groupby(fields_by_fieldset, key=itemgetter(0)):
             self.fieldsets.append(Fieldset(
                 label=label,
