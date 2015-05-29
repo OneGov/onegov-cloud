@@ -1,3 +1,4 @@
+import base64
 import inspect
 import magic
 import weakref
@@ -7,6 +8,7 @@ from itertools import groupby
 from onegov.form.errors import InvalidMimeType
 from operator import itemgetter
 from mimetypes import types_map
+from wtforms import FileField
 from wtforms import Form as BaseForm
 
 
@@ -90,22 +92,35 @@ class Form(BaseForm):
                 fields=(self._fields[f[1]] for f in fields)
             ))
 
-    def submitted(self, request):
+    def submitted(self, request, whitelist=default_whitelist):
         """ Returns true if the given request is a successful post request. """
-        return request.POST and self.validate()
+        valid = request.POST and self.validate()
 
-    def load_file(self, request, field_id, whitelist=default_whitelist):
+        if not valid:
+            return False
+
+        # load the files, making sure their mime type is on a whitelist and
+        # that their mimetype matches the extension they have
+        #
+        # access the files through self._files after that
+        for field in self._fields.values():
+            if isinstance(field, FileField):
+                field.data = self.load_file(request, field)
+
+        return True
+
+    def load_file(self, request, field, whitelist=default_whitelist):
         """ Loads the given input field from the request, making sure it's
         mimetype matches the extension and is found in the mimetype whitelist.
 
         """
 
-        field = getattr(self, field_id)
-        file_ext = '.' + field.data.split('.')[-1]
-        file_data = request.FILES[field.name].read()
+        file_ext = '.' + field.data.filename.split('.')[-1]
+        file_data = request.POST[field.id].file.read()
 
         mimetype_by_extension = types_map.get(file_ext, '0xdeadbeef')
-        mimetype_by_introspection = magic.from_buffer(file_data)
+        mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
+        mimetype_by_introspection = mimetype_by_introspection.decode('utf-8')
 
         if mimetype_by_extension != mimetype_by_introspection:
             raise InvalidMimeType()
@@ -113,7 +128,11 @@ class Form(BaseForm):
         if mimetype_by_introspection not in whitelist:
             raise InvalidMimeType()
 
-        return file_data
+        return {
+            'filename': field.data.filename,
+            'base64': base64.b64encode(file_data).decode('ascii'),
+            'mimetype': mimetype_by_introspection
+        }
 
 
 class Fieldset(object):

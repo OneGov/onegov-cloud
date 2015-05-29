@@ -40,11 +40,8 @@ class ExpectedExtensions(object):
     """
 
     def __init__(self, extensions):
-        self.extensions = ['.' + ext.lstrip('.') for ext in extensions]
+        self.extensions = tuple('.' + ext.lstrip('.') for ext in extensions)
 
     def __call__(self, form, field):
-        if not field.data:
-            return
-
-        if not field.data.endswith(self.extension):
+        if not field.data.filename.endswith(self.extensions):
             raise ValidationError(field.gettext(u'Invalid input.'))

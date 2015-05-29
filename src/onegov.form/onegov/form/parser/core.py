@@ -138,6 +138,24 @@ A Time is defined by this exact string: ``HH:MM``::
 
 One more time, this doesn't mean that the datetime format can be influenced.
 
+Files
+~~~~~
+
+A file upload is defined like this::
+
+    I'm a file upload field = *.*
+
+This particular example would allow any file. To allow only certain files
+do something like this::
+
+    I'm a image filed = *.png|*.jpg|*.gif
+    I'm a document = *.doc
+    I'm any document = *.doc|*.pdf
+
+The files are checked against their file extension. Onegov.form also checks
+that uploaded files have the mimetype they claim to have and it won't accept
+obviously dangerous uploads like binaries (unless you really want to).
+
 Standard Numbers
 ~~~~~~~~~~~~~~~~
 

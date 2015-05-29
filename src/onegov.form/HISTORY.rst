@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a file upload syntax.
+  [href]
+
 - Show the 'required' flag, even if the requirement is conditional.
   [href]
 
