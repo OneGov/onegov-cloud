@@ -31,6 +31,9 @@ def handle_defined_form(self, request, form):
 
     collection = FormCollection(request.app.session())
 
+    if form.submitted(request):
+        pass
+
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
@@ -42,5 +45,5 @@ def handle_defined_form(self, request, form):
         'layout': layout,
         'title': self.title,
         'form': form,
-        'form_width': 'normal'
+        'form_width': 'small'
     }
