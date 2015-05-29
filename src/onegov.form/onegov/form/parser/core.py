@@ -660,7 +660,12 @@ class WTFormsClassBuilder(object):
             if dependency is None:
                 validators.insert(0, InputRequired())
             else:
-                validators.insert(0, If(dependency.fulfilled, InputRequired()))
+                # set the requried flag, even if it's not always required
+                # as it's better to show it too often, than not often enough
+                validator = If(dependency.fulfilled, InputRequired())
+                validator.field_flags = ('required', )
+
+                validators.insert(0, validator)
 
         # try to find a smart field_id that contains the dependency or the
         # current fieldset name - if all fails, an error will be thrown,

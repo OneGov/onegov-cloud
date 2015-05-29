@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Show the 'required' flag, even if the requirement is conditional.
+  [href]
+
 0.2.3 (2015-05-29)
 ~~~~~~~~~~~~~~~~~~~
 
