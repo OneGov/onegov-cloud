@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from onegov.form.compat import unicode_characters
 from pyparsing import (
-    col,
+    alphanums,
     Combine,
+    Group,
     Literal,
     MatchFirst,
     nums,
@@ -209,14 +210,29 @@ def stdnum():
     return parser
 
 
-class Stack(list):
-    length_of_marker_box = 3
+def fileinput():
+    """ Returns a fileinput parser.
 
-    def init(self, string, line, tokens):
-        column = col(line, string) + self.length_of_marker_box
+    For all kindes of files::
+        *.*
 
-        if len(self) == 0 or self[0] < column:
-            self[:] = [column]
+    For specific files:
+        *.pdf|*.doc
+    """
+    any_extension = Suppress('*.*')
+    some_extension = Suppress('*.') + Word(alphanums) + Optional(Suppress('|'))
+
+    def extract_file_types(tokens):
+        tokens['type'] = 'fileinput'
+        if len(tokens[0]) == 0:
+            tokens['extensions'] = ['*']
+        else:
+            tokens['extensions'] = [ext.lower() for ext in tokens[0].asList()]
+
+    parser = Group(any_extension | OneOrMore(some_extension))
+    parser.setParseAction(extract_file_types)
+
+    return parser
 
 
 def marker_box(characters):

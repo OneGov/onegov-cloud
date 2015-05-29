@@ -6,6 +6,7 @@ from onegov.form.fields import TimeField
 from onegov.form.parser import parse_form
 from textwrap import dedent
 from webob.multidict import MultiDict
+from wtforms import FileField
 from wtforms.fields.html5 import (
     DateField,
     DateTimeLocalField,
@@ -167,6 +168,13 @@ def test_parse_time():
 
     assert form.time.label.text == 'Time'
     assert isinstance(form.time, TimeField)
+
+
+def test_parse_fileinput():
+    form = parse_form("File = *.pdf|*.doc")()
+
+    assert form.file.label.text == 'File'
+    assert isinstance(form.file, FileField)
 
 
 def test_parse_radio():

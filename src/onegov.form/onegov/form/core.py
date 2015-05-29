@@ -1,10 +1,27 @@
 import inspect
+import magic
 import weakref
 
 from collections import OrderedDict
 from itertools import groupby
+from onegov.form.errors import InvalidMimeType
 from operator import itemgetter
+from mimetypes import types_map
 from wtforms import Form as BaseForm
+
+
+default_whitelist = {
+    'application/excel',
+    'application/vnd.ms-excel',
+    'application/msword',
+    'application/pdf',
+    'application/zip',
+    'image/gif',
+    'image/jpeg',
+    'image/png',
+    'image/x-ms-bmp',
+    'text/plain',
+}
 
 
 class Form(BaseForm):
@@ -76,6 +93,27 @@ class Form(BaseForm):
     def submitted(self, request):
         """ Returns true if the given request is a successful post request. """
         return request.POST and self.validate()
+
+    def load_file(self, request, field_id, whitelist=default_whitelist):
+        """ Loads the given input field from the request, making sure it's
+        mimetype matches the extension and is found in the mimetype whitelist.
+
+        """
+
+        field = getattr(self, field_id)
+        file_ext = '.' + field.data.split('.')[-1]
+        file_data = request.FILES[field.name].read()
+
+        mimetype_by_extension = types_map.get(file_ext, '0xdeadbeef')
+        mimetype_by_introspection = magic.from_buffer(file_data)
+
+        if mimetype_by_extension != mimetype_by_introspection:
+            raise InvalidMimeType()
+
+        if mimetype_by_introspection not in whitelist:
+            raise InvalidMimeType()
+
+        return file_data
 
 
 class Fieldset(object):

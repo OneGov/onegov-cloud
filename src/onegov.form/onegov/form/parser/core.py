@@ -243,6 +243,7 @@ from onegov.form.parser.grammar import (
     email,
     field_identifier,
     fieldset_title,
+    fileinput,
     password,
     radio,
     stdnum,
@@ -251,8 +252,9 @@ from onegov.form.parser.grammar import (
     time,
 )
 from onegov.form.utils import label_to_field_id
-from onegov.form.validators import Stdnum
+from onegov.form.validators import Stdnum, ExpectedExtensions
 from wtforms import (
+    FileField,
     PasswordField,
     RadioField,
     StringField,
@@ -276,6 +278,7 @@ elements.stdnum = stdnum()
 elements.datetime = datetime()
 elements.date = date()
 elements.time = time()
+elements.fileinput = fileinput()
 elements.radio = radio()
 elements.checkbox = checkbox()
 elements.boxes = elements.checkbox | elements.radio
@@ -287,7 +290,8 @@ elements.single_line_fields = elements.identifier + pp.MatchFirst([
     elements.stdnum,
     elements.datetime,
     elements.date,
-    elements.time
+    elements.time,
+    elements.fileinput
 ])
 
 
@@ -349,6 +353,11 @@ def construct_radio(loader, node):
 @constructor('!checkbox')
 def construct_checkbox(loader, node):
     return elements.checkbox.parseString(node.value)
+
+
+@constructor('!fileinput')
+def construct_fileinput(loader, node):
+    return elements.fileinput.parseString(node.value)
 
 
 def parse_form(text):
@@ -467,6 +476,14 @@ def handle_block(builder, block, dependency=None):
             label=identifier.label,
             dependency=dependency,
             required=identifier.required
+        )
+    elif field.type == 'fileinput':
+        field_id = builder.add_field(
+            field_class=FileField,
+            label=identifier.label,
+            dependency=dependency,
+            required=identifier.required,
+            validators=[ExpectedExtensions(field.extensions)]
         )
     elif field.type == 'radio':
         choices = [(c.label, c.label) for c in field.choices]

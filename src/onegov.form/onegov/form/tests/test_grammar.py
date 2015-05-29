@@ -5,6 +5,7 @@ from onegov.form.parser.grammar import (
     datetime,
     email,
     field_identifier,
+    fileinput,
     password,
     radio,
     stdnum,
@@ -160,3 +161,24 @@ def test_checkbox():
     assert f.type == 'checkbox'
     assert f.label == 'Swiss German'
     assert not f.checked
+
+
+def test_fileinput():
+
+    field = fileinput()
+
+    f = field.parseString("*.*")
+    assert f.type == 'fileinput'
+    assert f.extensions == ['*']
+
+    f = field.parseString("*.pdf")
+    assert f.type == 'fileinput'
+    assert f.extensions == ['pdf']
+
+    f = field.parseString("*.bat")
+    assert f.type == 'fileinput'
+    assert f.extensions == ['bat']
+
+    f = field.parseString("*.png|*.jpg|*.gif")
+    assert f.type == 'fileinput'
+    assert f.extensions == ['png', 'jpg', 'gif']

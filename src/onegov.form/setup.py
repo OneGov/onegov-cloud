@@ -38,6 +38,7 @@ setup(
         'onegov.core>=0.3.0',
         'pyparsing',
         'pyyaml',
+        'python-magic',
         'python-stdnum',
         'wtforms',
         'wtforms-components[color]',
