@@ -577,24 +577,24 @@ def translate_to_yaml(text):
 
         # the top level are the fieldsets
         if match(elements.fieldset_title, line):
-            yield '- "{}":'.format(line.lstrip('# ').rstrip())
+            yield u'- "{}":'.format(line.lstrip(u'# ').rstrip())
             continue
 
         # fields are nested lists of dictionaries
         parse_result = try_parse(elements.single_line_fields, line)
         if parse_result is not None:
-            yield '{indent}- "{identifier}": !{type} "{definition}"'.format(
+            yield u'{indent}- "{identifier}": !{type} "{definition}"'.format(
                 indent=' ' * (4 + (len(line) - len(line.lstrip()))),
                 type=parse_result.type,
-                identifier=line.split('=')[0].strip(),
-                definition=line.split('=')[1].strip()
+                identifier=line.split(u'=')[0].strip(),
+                definition=line.split(u'=')[1].strip()
             )
             continue
 
         # checkboxes/radios come without identifier
         parse_result = try_parse(elements.boxes, line)
         if parse_result is not None:
-            yield '{indent}- !{type} "{definition}":'.format(
+            yield u'{indent}- !{type} "{definition}":'.format(
                 indent=' ' * (4 + (len(line) - len(line.lstrip()))),
                 type=parse_result.type,
                 definition=line.strip()
@@ -603,7 +603,7 @@ def translate_to_yaml(text):
 
         # identifiers which are alone contain nested checkboxes/radios
         if match(elements.identifier, line):
-            yield '{indent}- "{identifier}":'.format(
+            yield u'{indent}- "{identifier}":'.format(
                 indent=' ' * (4 + (len(line) - len(line.lstrip()))),
                 identifier=line.strip()
             )

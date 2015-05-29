@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytest
 
 from onegov.form import errors
@@ -38,6 +39,25 @@ def test_parse_text():
     assert form.comment.label.text == 'Comment'
     assert form.comment.widget(form.comment) == (
         '<textarea id="comment" name="comment" rows="8"></textarea>')
+
+
+def test_unicode():
+    text = dedent(u"""
+        # Persönliche Informationen
+        Bürgerort = ___
+        Geschlecht =
+            ( ) Männlich
+            ( ) Weiblich
+    """)
+
+    form = parse_form(text)()
+
+    assert form.personliche_informationen_burgerort.label.text == u'Bürgerort'
+    assert u'Persönliche Informationen' == form.fieldsets[0].label
+    assert form.personliche_informationen_geschlecht.choices == [
+        (u'Männlich', u'Männlich'),
+        (u'Weiblich', u'Weiblich')
+    ]
 
 
 def test_parse_fieldsets():
