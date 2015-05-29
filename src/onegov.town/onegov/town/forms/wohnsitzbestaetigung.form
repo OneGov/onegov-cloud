@@ -10,7 +10,7 @@ Geburtsdatum * = YYYY.MM.DD
 Strasse (inkl. Hausnummer) * = ___
 PLZ / Ort * = ___
 Telefon * = ___
-E-Mail * = ___
+E-Mail * = @@@
 
 # Weitere Personen
 
@@ -20,9 +20,9 @@ Ebenfalls eine Bestätigung erstellen für =
 
 # Ausstellung
 
-Versand * = 
+Versand * =
     (x) Ich möchte das Dokument mittels Post erhalten
-        Abweichende Versandadresse = 
+        Abweichende Versandadresse =
             (x) Nein
             ( ) Ja
                 Strasse (inkl. Hausnummer) * = ___
