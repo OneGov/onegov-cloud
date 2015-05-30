@@ -7,6 +7,8 @@ use different templating languages.
 
 """
 
+import transaction
+
 from cached_property import cached_property
 from contextlib import contextmanager
 from onegov.core import Framework
@@ -78,6 +80,7 @@ class TownApp(Framework):
                 session = self.session()
                 add_builtin_forms(session)
                 session.flush()
+                transaction.commit()
 
             log.info('Updated all builtin forms')
 
