@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The 'more...' news link is only showed if there actually is more to read.
+  [href]
+
 - Paragraphs are now limited in width, images are 100% width.
   [href]
 

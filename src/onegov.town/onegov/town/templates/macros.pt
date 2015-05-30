@@ -108,7 +108,7 @@
                 </a>
                 <p class="news-date">${item.created.strftime('%d.%m.%Y %H:%M')}</p>
                 <p class="news-lead">${item.content.lead}</p>
-                <p class="news-continue">
+                <p class="news-continue" tal:condition="item.content.text">
                     <a tal:attributes="href request.link(item)" i18n:translate="">read on...</a>
                 </p>
             </div>
