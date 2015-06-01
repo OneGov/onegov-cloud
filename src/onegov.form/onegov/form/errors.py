@@ -13,3 +13,7 @@ class DuplicateLabelError(FormError):
 
 class InvalidMimeType(FormError):
     pass
+
+
+class UnableToComplete(FormError):
+    pass

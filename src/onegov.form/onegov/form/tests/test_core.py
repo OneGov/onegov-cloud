@@ -29,7 +29,7 @@ class DummyField(object):
 def test_submitted():
 
     class TestForm(Form):
-        test = StringField("Test", [validators.InputRequired()])
+        test = StringField("Test", [validators.DataRequired()])
 
     request = DummyRequest({})
     assert not TestForm(request.POST).submitted(request)

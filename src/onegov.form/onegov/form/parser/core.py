@@ -280,7 +280,7 @@ from wtforms import (
     TextAreaField
 )
 from wtforms.fields.html5 import DateField, DateTimeLocalField, EmailField
-from wtforms.validators import InputRequired, Length
+from wtforms.validators import DataRequired, Length
 from wtforms.widgets import TextArea
 from wtforms_components import Email, If
 
@@ -709,12 +709,19 @@ class WTFormsClassBuilder(object):
         validators = kwargs.pop('validators', [])
 
         if required:
+
+            # we use the DataRequired check instead of InputRequired, since
+            # InputRequired only works if the data comes over the wire. We
+            # also want to load forms with data from the database, where
+            # InputRequired will fail, but DataRequired will not.
+            #
+            # As a consequence, falsey values can't be submitted for now.
             if dependency is None:
-                validators.insert(0, InputRequired())
+                validators.insert(0, DataRequired())
             else:
                 # set the requried flag, even if it's not always required
                 # as it's better to show it too often, than not often enough
-                validator = If(dependency.fulfilled, InputRequired())
+                validator = If(dependency.fulfilled, DataRequired())
                 validator.field_flags = ('required', )
 
                 validators.insert(0, validator)

@@ -4,6 +4,13 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Divides the submissions into 'pending' and 'complete'.
+
+  Pending submissions are temporary and possibly invalid. Complete submissions
+  are final and always valid.
+
+  [href]
+
 - Compresses uploaded files before storing them on the database.
   [href]
 

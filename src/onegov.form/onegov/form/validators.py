@@ -17,7 +17,7 @@ class Stdnum(object):
 
     def __call__(self, form, field):
         # only do a check for filled out values, to check for the existance
-        # of any value use InputRequired!
+        # of any value use DataRequired!
         if not field.data:
             return
 
