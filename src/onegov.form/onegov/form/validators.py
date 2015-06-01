@@ -1,6 +1,6 @@
 import importlib
-import os
 
+from mimetypes import types_map
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms import ValidationError
 
@@ -27,12 +27,58 @@ class Stdnum(object):
             raise ValidationError(field.gettext(u'Invalid input.'))
 
 
-class ExpectedExtensions(object):
-    """ Makes sure an uploaded file has one of the expected extensions.
+class FileSizeLimit(object):
+    """ Makes sure an uploaded file is not bigger than the given number of
+    bytes.
 
-    That doesn't necessarily mean the file is really what it claims to be.
-    But that's not the concern of this validator. That is the job of
-    :meth:`onegov.form.core.Form.load_file`.
+    Expects an :class:`onegov.form.fields.UploadField` instance.
+
+    """
+
+    def __init__(self, max_bytes):
+        self.max_bytes = max_bytes
+
+    def __call__(self, form, field):
+        if field.data:
+            if field.data.get('size', 0) > self.max_bytes:
+                raise ValidationError(field.gettext(u'Invalid input.'))
+
+
+class WhitelistedMimeType(object):
+    """ Makes sure an uploaded file is in a whitelist of allowed mimetypes.
+
+    Expects an :class:`onegov.form.fields.UploadField` instance.
+    """
+
+    whitelist = {
+        'application/excel',
+        'application/vnd.ms-excel',
+        'application/msword',
+        'application/pdf',
+        'application/zip',
+        'image/gif',
+        'image/jpeg',
+        'image/png',
+        'image/x-ms-bmp',
+        'text/plain',
+    }
+
+    def __init__(self, whitelist=None):
+        if whitelist is not None:
+            self.whitelist = whitelist
+
+    def __call__(self, form, field):
+        if field.data:
+            if field.data['mimetype'] not in self.whitelist:
+                raise ValidationError(field.gettext(u'Invalid input.'))
+
+
+class ExpectedExtensions(WhitelistedMimeType):
+    """ Makes sure an uploaded file has one of the expected extensions. Since
+    extensions are not something we can count on we look up the mimetype of
+    the extension and use that to check.
+
+    Expects an :class:`onegov.form.fields.UploadField` instance.
 
     Usage::
 
@@ -41,22 +87,5 @@ class ExpectedExtensions(object):
     """
 
     def __init__(self, extensions):
-        self.extensions = tuple('.' + ext.lstrip('.') for ext in extensions)
-
-    def __call__(self, form, field):
-        if not field.data.filename.endswith(self.extensions):
-            raise ValidationError(field.gettext(u'Invalid input.'))
-
-
-class FileSizeLimit(object):
-    """ Makes sure an uploaded file is not bigger than the given number of
-    bytes.
-
-    """
-
-    def __init__(self, max_bytes):
-        self.max_bytes = max_bytes
-
-    def __call__(self, form, field):
-        if os.fstat(field.data.file.fileno()).st_size > self.max_bytes:
-            raise ValidationError(field.gettext(u'Invalid input.'))
+        mimetypes = set(types_map.get(ext, None) for ext in extensions)
+        super(ExpectedExtensions, self).__init__(whitelist=mimetypes)

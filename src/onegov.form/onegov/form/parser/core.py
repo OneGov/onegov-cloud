@@ -270,7 +270,9 @@ from onegov.form.parser.grammar import (
     time,
 )
 from onegov.form.utils import label_to_field_id
-from onegov.form.validators import Stdnum, ExpectedExtensions, FileSizeLimit
+from onegov.form.validators import (
+    Stdnum, ExpectedExtensions, FileSizeLimit, WhitelistedMimeType
+)
 from wtforms import (
     PasswordField,
     RadioField,
@@ -513,6 +515,7 @@ def handle_block(builder, block, dependency=None):
             dependency=dependency,
             required=identifier.required,
             validators=[
+                WhitelistedMimeType(),
                 ExpectedExtensions(field.extensions),
                 FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
             ]
