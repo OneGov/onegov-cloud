@@ -2,6 +2,7 @@ import base64
 import inspect
 import magic
 import weakref
+import zlib
 
 from collections import OrderedDict
 from itertools import groupby
@@ -128,11 +129,15 @@ class Form(BaseForm):
         if mimetype_by_introspection not in whitelist:
             raise InvalidMimeType()
 
-        return {
+        compressed_data = zlib.compress(file_data)
+
+        result = {
+            'data': base64.b64encode(compressed_data).decode('ascii'),
             'filename': field.data.filename,
-            'base64': base64.b64encode(file_data).decode('ascii'),
             'mimetype': mimetype_by_introspection
         }
+
+        return result
 
 
 class Fieldset(object):

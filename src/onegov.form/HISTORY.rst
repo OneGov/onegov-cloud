@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Compresses uploaded files before storing them on the database.
+  [href]
+
 - Limits the size of uploaded files.
   [href]
 
