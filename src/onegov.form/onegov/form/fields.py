@@ -28,6 +28,9 @@ class UploadField(FileField):
             self.data = {}
 
     def process_fieldstorage(self, fs):
+        if not fs or not hasattr(fs, 'file'):
+            return {}
+
         file_data = fs.file.read()
 
         mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
