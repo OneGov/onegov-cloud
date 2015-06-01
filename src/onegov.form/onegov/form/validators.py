@@ -1,4 +1,5 @@
 import importlib
+import os
 
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms import ValidationError
@@ -44,4 +45,18 @@ class ExpectedExtensions(object):
 
     def __call__(self, form, field):
         if not field.data.filename.endswith(self.extensions):
+            raise ValidationError(field.gettext(u'Invalid input.'))
+
+
+class FileSizeLimit(object):
+    """ Makes sure an uploaded file is not bigger than the given number of
+    bytes.
+
+    """
+
+    def __init__(self, max_bytes):
+        self.max_bytes = max_bytes
+
+    def __call__(self, form, field):
+        if os.fstat(field.data.file.fileno()).st_size > self.max_bytes:
             raise ValidationError(field.gettext(u'Invalid input.'))

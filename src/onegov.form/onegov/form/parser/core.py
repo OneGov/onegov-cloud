@@ -270,7 +270,7 @@ from onegov.form.parser.grammar import (
     time,
 )
 from onegov.form.utils import label_to_field_id
-from onegov.form.validators import Stdnum, ExpectedExtensions
+from onegov.form.validators import Stdnum, ExpectedExtensions, FileSizeLimit
 from wtforms import (
     FileField,
     PasswordField,
@@ -311,6 +311,18 @@ elements.single_line_fields = elements.identifier + pp.MatchFirst([
     elements.time,
     elements.fileinput
 ])
+
+
+# increasing the default filesize is *strongly discouarged*, as we are not
+# storing those files efficently yet -> they need to fit in memory
+#
+# if this value should be higher, we need to either:
+# * store the files outside the database
+# * store the files in a separate table where they are not read into memory
+#   as frequently as they are now
+#
+MEGABYTE = 1024 ** 2
+DEFAULT_UPLOAD_LIMIT = 5 * MEGABYTE
 
 
 class CustomLoader(yaml.SafeLoader):
@@ -501,7 +513,10 @@ def handle_block(builder, block, dependency=None):
             label=identifier.label,
             dependency=dependency,
             required=identifier.required,
-            validators=[ExpectedExtensions(field.extensions)]
+            validators=[
+                ExpectedExtensions(field.extensions),
+                FileSizeLimit(DEFAULT_UPLOAD_LIMIT)
+            ]
         )
     elif field.type == 'radio':
         choices = [(c.label, c.label) for c in field.choices]

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Limits the size of uploaded files.
+  [href]
+
 - No longer stores the csrf_token with the form submission.
   [href]
 
