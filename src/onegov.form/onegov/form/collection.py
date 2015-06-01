@@ -91,6 +91,10 @@ class FormSubmissionCollection(object):
         submission.definition = form._source
         submission.data = form.data
 
+        # never include the csrf token
+        if form.meta.csrf and form.meta.csrf_field_name in submission.data:
+            del submission.data[form.meta.csrf_field_name]
+
         self.session.add(submission)
         self.session.flush()
 

@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from textwrap import dedent
 from webob.multidict import MultiDict
+from wtforms.csrf.core import CSRF
 
 
 def test_add_form(session):
@@ -54,6 +55,28 @@ def test_submit_form(session):
     stored_form = submission.form_class(data=submission.data)
 
     assert submitted_form.data == stored_form.data
+
+
+def test_no_store_csrf_token(session):
+    collection = FormCollection(session)
+
+    class MockCSRF(CSRF):
+
+        def generate_csrf_token(self, csrf_token_field):
+            return '0xdeadbeef'
+
+    signup = collection.definitions.add('Signup', definition="E-Mail = @@@")
+
+    data = MultiDict([
+        ('e_mail', 'info@example.org'),
+        ('csrf_token', '0xdeadbeef')
+    ])
+
+    form = signup.form_class(data, meta=dict(csrf=True, csrf_class=MockCSRF))
+    submission = collection.submissions.add('signup', form)
+
+    assert 'e_mail' in submission.data
+    assert 'csrf_token' not in submission.data
 
 
 def test_delete_without_submissions(session):

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- No longer stores the csrf_token with the form submission.
+  [href]
+
 - Adds a file upload syntax.
   [href]
 
