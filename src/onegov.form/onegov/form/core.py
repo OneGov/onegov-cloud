@@ -131,13 +131,12 @@ class Form(BaseForm):
 
         compressed_data = zlib.compress(file_data)
 
-        result = {
+        return {
             'data': base64.b64encode(compressed_data).decode('ascii'),
             'filename': field.data.filename,
-            'mimetype': mimetype_by_introspection
+            'mimetype': mimetype_by_introspection,
+            'size': len(file_data)
         }
-
-        return result
 
 
 class Fieldset(object):
