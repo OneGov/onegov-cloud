@@ -1,30 +1,10 @@
-import base64
 import inspect
-import magic
 import weakref
-import zlib
 
 from collections import OrderedDict
 from itertools import groupby
-from onegov.form.errors import InvalidMimeType
 from operator import itemgetter
-from mimetypes import types_map
-from wtforms import FileField
 from wtforms import Form as BaseForm
-
-
-default_whitelist = {
-    'application/excel',
-    'application/vnd.ms-excel',
-    'application/msword',
-    'application/pdf',
-    'application/zip',
-    'image/gif',
-    'image/jpeg',
-    'image/png',
-    'image/x-ms-bmp',
-    'text/plain',
-}
 
 
 class Form(BaseForm):
@@ -93,50 +73,9 @@ class Form(BaseForm):
                 fields=(self._fields[f[1]] for f in fields)
             ))
 
-    def submitted(self, request, whitelist=default_whitelist):
+    def submitted(self, request):
         """ Returns true if the given request is a successful post request. """
-        valid = request.POST and self.validate()
-
-        if not valid:
-            return False
-
-        # load the files, making sure their mime type is on a whitelist and
-        # that their mimetype matches the extension they have
-        #
-        # access the files through self._files after that
-        for field in self._fields.values():
-            if isinstance(field, FileField):
-                field.data = self.load_file(request, field)
-
-        return True
-
-    def load_file(self, request, field, whitelist=default_whitelist):
-        """ Loads the given input field from the request, making sure it's
-        mimetype matches the extension and is found in the mimetype whitelist.
-
-        """
-
-        file_ext = '.' + field.data.filename.split('.')[-1]
-        file_data = request.POST[field.id].file.read()
-
-        mimetype_by_extension = types_map.get(file_ext, '0xdeadbeef')
-        mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
-        mimetype_by_introspection = mimetype_by_introspection.decode('utf-8')
-
-        if mimetype_by_extension != mimetype_by_introspection:
-            raise InvalidMimeType()
-
-        if mimetype_by_introspection not in whitelist:
-            raise InvalidMimeType()
-
-        compressed_data = zlib.compress(file_data)
-
-        return {
-            'data': base64.b64encode(compressed_data).decode('ascii'),
-            'filename': field.data.filename,
-            'mimetype': mimetype_by_introspection,
-            'size': len(file_data)
-        }
+        return request.POST and self.validate()
 
 
 class Fieldset(object):

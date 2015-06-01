@@ -253,7 +253,7 @@ from onegov.form.core import (
     with_options
 )
 from onegov.form import errors
-from onegov.form.fields import TimeField, MultiCheckboxField
+from onegov.form.fields import TimeField, MultiCheckboxField, UploadField
 from onegov.form.parser.grammar import (
     checkbox,
     date,
@@ -272,7 +272,6 @@ from onegov.form.parser.grammar import (
 from onegov.form.utils import label_to_field_id
 from onegov.form.validators import Stdnum, ExpectedExtensions, FileSizeLimit
 from wtforms import (
-    FileField,
     PasswordField,
     RadioField,
     StringField,
@@ -509,7 +508,7 @@ def handle_block(builder, block, dependency=None):
         )
     elif field.type == 'fileinput':
         field_id = builder.add_field(
-            field_class=FileField,
+            field_class=UploadField,
             label=identifier.label,
             dependency=dependency,
             required=identifier.required,
