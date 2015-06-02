@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import humanize
 
 from cgi import escape
 
@@ -29,7 +30,7 @@ class UploadWidget(FileInput):
         else:
             return HTMLString("""
                 <div class="upload-widget with-data">
-                    <p>{existing_file_label}: {filename} ✓</p>
+                    <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
                     <ul>
                         <li>
                             <input type="radio" id="{name}-0" name="{name}"
@@ -60,6 +61,7 @@ class UploadWidget(FileInput):
                 # be careful, we do our own html generation here without any
                 # safety harness - we need to carefully escape values the user
                 # might supply
+                filesize=humanize.naturalsize(field.data['size']),
                 filename=escape(field.data['filename'], quote=True),
                 name=field.id,
                 input_html=input_html,
