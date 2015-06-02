@@ -175,7 +175,8 @@ class CoreRequest(IncludeRequest):
             on_dirty=on_dirty
         )
 
-    def get_form(self, form_class, i18n_support=True, csrf_support=True):
+    def get_form(self, form_class,
+                 i18n_support=True, csrf_support=True, data=None):
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
         doesn't work yet).
@@ -198,7 +199,7 @@ class CoreRequest(IncludeRequest):
             meta['csrf_time_limit'] = timedelta(
                 seconds=self.app.csrf_time_limit)
 
-        return form_class(self.POST, meta=meta)
+        return form_class(self.POST, meta=meta, data=data)
 
     def translate(self, text):
         """ Transalates the given text, if it's a translatable text. """
