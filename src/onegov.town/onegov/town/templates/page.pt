@@ -1,30 +1,4 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.town">
-    <tal:block metal:fill-slot="below-top-navigation">
-        <div class="row" tal:condition="layout.request.is_logged_in">
-            <div class="small-12 columns">
-                <div class="edit-bar clearfix">
-                    <tal:block condition="edit_links">
-                        <button href="#" data-dropdown="edit-content" class="tiny button dropdown">
-                            ${name}
-                        </button>
-                        <ul id="edit-content" data-dropdown-content class="f-dropdown">
-                            <li tal:repeat="link edit_links">
-                                <tal:block replace="structure link(layout.request)">
-                            </li>
-                        </ul>
-                    </tal:block>
-                    <tal:block condition="add_links">
-                        <button href="#" data-dropdown="add-content" class="tiny button dropdown" i18n:translate="">Add</button>
-                        <ul id="add-content" data-dropdown-content class="f-dropdown">
-                            <li tal:repeat="link add_links">
-                                <tal:block replace="structure link(layout.request)">
-                            </li>
-                        </ul>
-                    </tal:block>
-                </div>
-            </div>
-        </div>
-    </tal:block>
     <tal:block metal:fill-slot="title">
         ${title}
     </tal:block>

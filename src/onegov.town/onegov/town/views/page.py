@@ -6,7 +6,7 @@ from onegov.core.security import Public, Private
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Link
+from onegov.town.elements import Link, LinkGroup
 from onegov.town.layout import NewsLayout, PageLayout
 from onegov.town.models import Editor
 from webob import exc
@@ -62,14 +62,26 @@ def view_public_page(self, request):
 
 def view_private_page(self, request):
 
+    editbar_links = [
+        LinkGroup(
+            title=self.trait_messages[self.trait]['name'],
+            links=tuple(edit_links(self, request))
+        ),
+        LinkGroup(
+            title=_(u'Add'),
+            links=tuple(add_links(self, request))
+        ),
+    ]
+
     if self.type == 'topic':
+        layout = PageLayout(self, request)
+        layout.editbar_links = editbar_links
+
         return {
-            'layout': PageLayout(self, request),
+            'layout': layout,
             'title': self.title,
             'name': self.trait_messages[self.trait]['name'],
             'page': self,
-            'add_links': tuple(add_links(self, request)),
-            'edit_links': tuple(edit_links(self, request)),
             'children': [
                 Link(child.title, request.link(child))
                 for child in self.children
@@ -77,13 +89,14 @@ def view_private_page(self, request):
         }
 
     if self.type == 'news':
+        layout = NewsLayout(self, request)
+        layout.editbar_links = editbar_links
+
         return {
-            'layout': NewsLayout(self, request),
+            'layout': layout,
             'title': self.title,
             'name': self.trait_messages[self.trait]['name'],
             'page': self,
-            'add_links': tuple(add_links(self, request)),
-            'edit_links': tuple(edit_links(self, request)),
             'children': self.news_query.all()
         }
 

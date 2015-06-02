@@ -72,3 +72,11 @@ class Img(object):
 
         #: The target of this image
         self.url = url
+
+
+class LinkGroup(object):
+    """ Represents a list of links. """
+
+    def __init__(self, title, links):
+        self.title = title
+        self.links = links

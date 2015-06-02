@@ -17,7 +17,7 @@
         | | | | '_ \ / _ \ |  _ / _ \ \ / / | |   | |/ _ \| | | |/ _` |
         | |_| | | | |  __/ |_| | (_) \ V /  | |___| | (_) | |_| | (_| |
          \___/|_| |_|\___|\____|\___/ \_/    \____|_|\___/ \__,_|\__,_|
-        
+
          Have a look at the source code: https://onegov.readthedocs.org
      -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
@@ -37,9 +37,7 @@
       <div class="row">
           <div class="small-12 columns">
               <div metal:use-macro="layout.macros['top_navigation']"></div>
-              <tal:block metal:define-slot="below-top-navigation">
-        
-              </tal:block>
+              <div metal:use-macro="layout.macros['editbar']"></div>
               <div metal:use-macro="layout.macros['breadcrumbs']"></div>
           </div>
       </div>

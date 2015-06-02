@@ -119,6 +119,14 @@ class Layout(object):
         """
         return None
 
+    @cached_property
+    def editbar_links(self):
+        """ A of :class:`onegov.town.elements.LinkGroup` classes. Each of them
+        will be shown in the top editbar, with the group title being the
+        dropdown title.
+        """
+        return None
+
     def chunks(self, iterable, n, fillvalue=None):
         """ Iterates through an iterable, returning chunks with the given size.
 
@@ -220,8 +228,6 @@ class PageLayout(DefaultLayout):
 
     @cached_property
     def breadcrumbs(self):
-        """ Returns the breadcrumbs for the current page. """
-
         return self.get_page_breadcrumbs(self.model)
 
     def get_page_breadcrumbs(self, page):
@@ -236,8 +242,6 @@ class PageLayout(DefaultLayout):
 
     @cached_property
     def sidebar_links(self):
-        """ Returns the sidebar links for the current page. """
-
         links = []
 
         for page in self.model.siblings.filter(Page.type == 'topic').all():

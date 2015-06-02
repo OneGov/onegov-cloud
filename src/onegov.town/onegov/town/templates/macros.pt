@@ -28,6 +28,27 @@
     </nav>
 </metal:navigation>
 
+<metal:editbar define-macro="editbar">
+    <div class="row" tal:condition="layout.editbar_links">
+        <div class="small-12 columns">
+            <div class="edit-bar clearfix">
+                <tal:block repeat="group layout.editbar_links">
+                    <tal:block condition="group.links" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
+                        <button href="#" data-dropdown="${dropdown_id}" class="tiny button dropdown">
+                            ${group.title}
+                        </button>
+                        <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown">
+                            <li tal:repeat="link group.links">
+                                <tal:block replace="structure link(request)" />
+                            </li>
+                        </ul>
+                    </tal:block>
+                </tal:block>
+            </div>
+        </div>
+    </div>
+</metal:editbar>
+
 <metal:breadcrumbs define-macro="breadcrumbs">
     <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
         <tal:block repeat="link layout.breadcrumbs">
