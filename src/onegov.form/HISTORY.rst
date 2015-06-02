@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.1 (2015-06-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes unicode error in Python 2.7.
   [href]
 

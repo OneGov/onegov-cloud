@@ -6,7 +6,7 @@ name = 'onegov.form'
 description = (
     'Common OneGov form library based on WTForms.'
 )
-version = '0.3.0'
+version = '0.3.1'
 
 
 def get_long_description():
@@ -36,7 +36,7 @@ setup(
     install_requires=[
         'humanize',
         'jsonpickle',
-        'onegov.core>=0.3.0',
+        'onegov.core>=0.3.1',
         'pyparsing',
         'pyyaml',
         'python-magic',
