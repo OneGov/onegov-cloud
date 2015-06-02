@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.3 (2015-06-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Accepts wtform's data attribute in request.get_form.
   [href]
 
