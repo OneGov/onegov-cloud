@@ -113,6 +113,12 @@ class Fieldset(object):
     def is_visible(self):
         return self.label is not None
 
+    @property
+    def non_empty_fields(self):
+        """ Returns only the fields which are not empty. """
+        return OrderedDict(
+            (id, field) for id, field in self.fields.items() if field.data)
+
 
 def with_options(widget, **render_options):
     """ Takes a widget class or instance and returns a child-instance of the

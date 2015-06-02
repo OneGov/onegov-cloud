@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to render fields for html output (without input elements).
+  [href]
+
 - Adds the ability to upload files without losing them if the form has an
   unrelated validation error.
   [href]
