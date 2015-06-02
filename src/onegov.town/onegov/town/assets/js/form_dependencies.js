@@ -18,8 +18,10 @@
 
         <input name="address" data-depends-on="delivery/Fedex" type="text">
 
-    Currently only works with radio buttons and checkboxes. It also expects
-    the labels to surround the input.
+    Currently only works with radio buttons and checkboxes. By default, the
+    closest label found is hidden as well (going upwards in the DOM).
+
+    If this is not desired, use ``data-hide-label="false"``.
 */
 
 /*
@@ -52,7 +54,13 @@ var get_dependency = function(input) {
     var name = data.split('/')[0];
     var value = data.substring(name.length + 1);
 
-    return {'name': name, 'value': value};
+    var hide_label = true;
+
+    if (! _.isUndefined(input.data('hide-label'))) {
+        hide_label = input.data('hide-label');
+    }
+
+    return {'name': name, 'value': value, 'hide_label': hide_label};
 };
 
 /*
@@ -88,7 +96,9 @@ var evaluate_dependency = function(form, input, dependency) {
         input.closest('label').show().siblings('.error').show();
     } else {
         input.hide();
-        input.closest('label').hide().siblings('.error').hide();
+        if (dependency.hide_label) {
+            input.closest('label').hide().siblings('.error').hide();
+        }
     }
 };
 
