@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'humanize',
         'jsonpickle',
         'onegov.core>=0.3.0',
         'pyparsing',

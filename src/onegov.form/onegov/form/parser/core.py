@@ -322,7 +322,7 @@ elements.single_line_fields = elements.identifier + pp.MatchFirst([
 # * store the files in a separate table where they are not read into memory
 #   as frequently as they are now
 #
-MEGABYTE = 1024 ** 2
+MEGABYTE = 1000 ** 2
 DEFAULT_UPLOAD_LIMIT = 5 * MEGABYTE
 
 

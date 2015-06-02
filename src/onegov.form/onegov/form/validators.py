@@ -1,4 +1,5 @@
 import importlib
+import humanize
 
 from mimetypes import types_map
 from stdnum.exceptions import ValidationError as StdnumValidationError
@@ -35,13 +36,18 @@ class FileSizeLimit(object):
 
     """
 
+    message = "The file is too large, please provide a file smaller than {}."
+
     def __init__(self, max_bytes):
         self.max_bytes = max_bytes
 
     def __call__(self, form, field):
         if field.data:
             if field.data.get('size', 0) > self.max_bytes:
-                raise ValidationError(field.gettext(u'Invalid input.'))
+                message = field.gettext(self.message).format(
+                    humanize.naturalsize(self.max_bytes)
+                )
+                raise ValidationError(message)
 
 
 class WhitelistedMimeType(object):
@@ -63,6 +69,8 @@ class WhitelistedMimeType(object):
         'text/plain',
     }
 
+    message = "Files of this type are not supported."
+
     def __init__(self, whitelist=None):
         if whitelist is not None:
             self.whitelist = whitelist
@@ -70,7 +78,7 @@ class WhitelistedMimeType(object):
     def __call__(self, form, field):
         if field.data:
             if field.data['mimetype'] not in self.whitelist:
-                raise ValidationError(field.gettext(u'Invalid input.'))
+                raise ValidationError(field.gettext(self.message))
 
 
 class ExpectedExtensions(WhitelistedMimeType):
