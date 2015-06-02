@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.0 (2015-06-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to render fields for html output (without input elements).
   [href]
 
