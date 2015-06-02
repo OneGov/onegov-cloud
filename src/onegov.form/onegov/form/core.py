@@ -77,6 +77,16 @@ class Form(BaseForm):
         """ Returns true if the given request is a successful post request. """
         return request.POST and self.validate()
 
+    def ignore_csrf_error(self):
+        """ Removes the csrf error from the form if found, after validation.
+
+        Use this only if you know what you are doing (really, never).
+
+        """
+        if self.meta.csrf_field_name in self.errors:
+            del self.errors[self.meta.csrf_field_name]
+            self.csrf_token.errors = []
+
 
 class Fieldset(object):
     """ Defines a fieldset with a list of fields. """

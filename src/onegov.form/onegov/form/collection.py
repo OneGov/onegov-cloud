@@ -89,6 +89,8 @@ class FormSubmissionCollection(object):
         # this should happen way earlier, we just double check here
         if state == 'complete':
             assert form.validate()
+        else:
+            form.validate()
 
         # look up the right class depending on the type
         _mapper = inspect(FormSubmission).polymorphic_map.get(state)
@@ -100,10 +102,7 @@ class FormSubmissionCollection(object):
 
         # pending submissions are not necessarily valid, however we don't need
         # to store invalid state as it is wiped out anyway
-        if state == 'pending':
-            form.validate()
-            for field_id in form.errors:
-                del submission.data[field_id]
+        submission.prune(form)
 
         # never include the csrf token
         if form.meta.csrf and form.meta.csrf_field_name in submission.data:

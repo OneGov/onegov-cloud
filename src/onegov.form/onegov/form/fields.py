@@ -2,6 +2,7 @@ import base64
 import magic
 import zlib
 
+from onegov.form.widgets import UploadWidget
 from wtforms import FileField, StringField, SelectMultipleField, widgets
 from wtforms.widgets import html5 as html5_widgets
 
@@ -21,16 +22,34 @@ class UploadField(FileField):
 
     """
 
+    widget = UploadWidget()
+
     def process_formdata(self, valuelist):
+        # the upload widget optionally includes an action with the request,
+        # indicating if the existing file should be replaced, kept or deleted
         if valuelist:
-            self.data = self.process_fieldstorage(valuelist[0])
+            if len(valuelist) == 2:
+                action, fieldstorage = valuelist
+            else:
+                action = 'replace'
+                fieldstorage = valuelist[0]
+
+            if action == 'replace':
+                self.data = self.process_fieldstorage(fieldstorage)
+            elif action == 'delete':
+                self.data = {}
+            elif action == 'keep':
+                pass
+            else:
+                raise NotImplementedError()
         else:
             self.data = {}
 
     def process_fieldstorage(self, fs):
-        if not fs or not hasattr(fs, 'file'):
+        if not hasattr(fs, 'file'):
             return {}
 
+        fs.file.seek(0)
         file_data = fs.file.read()
 
         mimetype_by_introspection = magic.from_buffer(file_data, mime=True)

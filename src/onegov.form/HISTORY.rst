@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to upload files without losing them if the form has an
+  unrelated validation error.
+  [href]
+
 - Divides the submissions into 'pending' and 'complete'.
 
   Pending submissions are temporary and possibly invalid. Complete submissions
