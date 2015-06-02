@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 import onegov.core
 import onegov.town
+import textwrap
 
 from mock import patch
 from morepath import setup
+from onegov.form import FormCollection
 from onegov.testing import utils
 from webtest import TestApp as Client
 from webtest import Upload
@@ -398,3 +400,63 @@ def test_links(town_app):
 
     assert google.status_code == 302
     assert google.location == 'https://www.google.ch'
+
+
+def test_pending_submissions(town_app):
+    collection = FormCollection(town_app.session())
+    collection.definitions.add('Profile', definition=textwrap.dedent("""
+        # Your Details
+        First name * = ___
+        Last name * = ___
+    """))
+
+    client = Client(town_app)
+
+    form_page = client.get('/formulare').click('Profile')
+    assert 'Your Details' in form_page
+    assert 'First name' in form_page
+    assert 'Last name' in form_page
+
+    assert 'formulare' in form_page.request.url
+    form_page = form_page.form.submit().follow()
+
+    assert 'formulare' not in form_page.request.url
+    assert 'formular-eingabe' in form_page.request.url
+    assert len(form_page.pyquery('small.error')) == 2
+
+    form_page.form['your_details_first_name'] = 'Kung'
+    form_page = form_page.form.submit()
+
+    assert len(form_page.pyquery('small.error')) == 1
+
+    form_page.form['your_details_last_name'] = 'Fury'
+    form_page = form_page.form.submit()
+
+    assert len(form_page.pyquery('small.error')) == 0
+
+
+def test_pending_submission_file_upload(town_app):
+    collection = FormCollection(town_app.session())
+    collection.definitions.add('Statistics', definition=textwrap.dedent("""
+        Name * = ___
+        Datei * = *.txt|*.csv
+    """))
+
+    client = Client(town_app)
+    form_page = client.get('/formulare').click('Statistics')
+    form_page.form['datei'] = Upload('test.jpg', utils.create_image().read())
+
+    form_page = form_page.form.submit().follow()
+    assert 'formular-eingabe' in form_page.request.url
+    assert len(form_page.pyquery('small.error')) == 2
+
+    form_page.form['datei'] = Upload('README.txt', b'1;2;3')
+    form_page = form_page.form.submit()
+
+    assert "README.txt" in form_page.text
+    assert u"Datei ersetzen" in form_page.text
+    assert u"Datei löschen" in form_page.text
+    assert u"Datei behalten" in form_page.text
+
+    # unfortunately we can't test more here, as webtest doesn't support
+    # multiple differing fields of the same name...

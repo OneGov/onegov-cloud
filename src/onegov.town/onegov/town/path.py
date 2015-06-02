@@ -11,7 +11,7 @@ from onegov.town.models import (
     Topic,
     Town
 )
-from onegov.form import FormDefinition, FormCollection
+from onegov.form import FormDefinition, FormCollection, PendingFormSubmission
 from onegov.page import PageCollection
 
 
@@ -54,6 +54,11 @@ def get_forms(app):
 @TownApp.path(model=FormDefinition, path='/formulare/{name}')
 def get_form(app, name):
     return FormCollection(app.session()).definitions.by_name(name)
+
+
+@TownApp.path(model=PendingFormSubmission, path='/formular-eingabe/{id}')
+def get_pending_form_submission(app, id):
+    return FormCollection(app.session()).submissions.by_id(id, state='pending')
 
 
 @TownApp.path(model=Editor, path='/editor/{action}/{trait}/{page_id}')

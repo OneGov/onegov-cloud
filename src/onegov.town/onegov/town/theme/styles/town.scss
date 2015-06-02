@@ -128,6 +128,16 @@ form {
             margin-bottom: 1rem;
         }
     }
+
+    .upload-widget p {
+        color: $success-color;
+        font-size: $form-label-font-size;
+        margin-bottom: 0;
+    }
+
+    .upload-widget.with-data input[type=file] {
+        margin-left: 2em;
+    }
 }
 
 /*

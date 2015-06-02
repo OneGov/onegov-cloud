@@ -7,3 +7,11 @@ from onegov.town import _
 
 # messages defined in wtforms-components
 _(u"Not a valid color.")
+
+# messages defined in onegov.form
+_(u"Uploaded file")
+_(u"Keep file")
+_(u"Replace file")
+_(u"Delete file")
+_(u"The file is too large, please provide a file smaller than {}.")
+_(u"Files of this type are not supported.")

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-05-28 16:03+0200\n"
+"POT-Creation-Date: 2015-06-02 10:47+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -93,8 +93,9 @@ msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:228
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:17
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:36
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:19
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:49
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:88
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:74
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:111
@@ -127,6 +128,31 @@ msgstr "Login"
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:9
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:12
+msgid "Uploaded file"
+msgstr "Hochgeladene Datei"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:13
+msgid "Keep file"
+msgstr "Datei behalten"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:14
+msgid "Replace file"
+msgstr "Datei ersetzen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:15
+msgid "Delete file"
+msgstr "Datei löschen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:16
+#, python-format
+msgid "The file is too large, please provide a file smaller than {}."
+msgstr "Die Datei ist zu gross, bitte senden Sie eine Datei kleiner als {}."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:17
+msgid "Files of this type are not supported."
+msgstr "Dateien dieses Typs werde nicht unterstützt."
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:134
 msgid "Title"
@@ -208,16 +234,16 @@ msgstr "Kontakt"
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:52
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:89
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:60
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:97
 msgid "Submit"
 msgstr "Absenden"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:82
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:90
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:104
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:112
 msgid "read on..."
 msgstr "weiterlesen..."
 
@@ -241,7 +267,7 @@ msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie eine Chance haben den "
 "Verweis zu bearbeiten oder zu löschen."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:51
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:52
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:101
 msgid "Your changes were saved."
 msgstr "Ihre Änderungen wurden gespeichert."
@@ -250,9 +276,10 @@ msgstr "Ihre Änderungen wurden gespeichert."
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:23
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:18
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:37
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:25
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:20
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:50
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:89
 msgid "Forms"
 msgstr "Formulare"
 
@@ -269,7 +296,7 @@ msgstr "Passwort"
 msgid "Login to ${town}"
 msgstr "${town} Login"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:94
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:95
 msgid "You have been logged out."
 msgstr "Sie wurden ausgeloggt."
 
