@@ -111,7 +111,12 @@ def handle_pending_submission(self, request):
 def handle_complete_submission(self, request):
     form = request.get_form(self.form_class, data=self.data)
 
-    if not form.validate():
+    # we're not really using a csrf protected form here (the complete form
+    # button is basically just there so we can use a POST instead of a GET)
+    form.validate()
+    form.ignore_csrf_error()
+
+    if form.errors:
         return morepath.redirect(request.link(self))
     else:
         self.state = 'complete'
