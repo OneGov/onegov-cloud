@@ -17,3 +17,9 @@ if PY3:
     zip_longest = itertools.zip_longest
 else:
     zip_longest = itertools.izip_longest  # pragma: nocoverage # noqa
+
+if PY3:
+    from io import StringIO, BytesIO
+else:
+    from cStringIO import StringIO  # pragma: nocoverage # noqa
+    BytesIO = StringIO  # pragma: nocoverage # noqa
