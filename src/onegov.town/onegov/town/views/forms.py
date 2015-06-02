@@ -2,8 +2,13 @@
 
 import morepath
 
-from onegov.form import FormCollection, FormDefinition, PendingFormSubmission
 from onegov.core.security import Public
+from onegov.form import (
+    FormCollection,
+    FormDefinition,
+    PendingFormSubmission,
+    render_field
+)
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
@@ -81,7 +86,7 @@ def handle_pending_submission(self, request):
         self.data = form.data
         self.prune(form)
 
-    completable = not form.errors and request.params.get('edit', False)
+    completable = not form.errors and 'edit' not in request.GET
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
@@ -94,5 +99,25 @@ def handle_pending_submission(self, request):
         'layout': layout,
         'title': self.form.title,
         'form': form,
-        'completable': completable
+        'completable': completable,
+        'render_field': render_field,
+        'edit_link': request.link(self) + '?edit',
+        'complete_link': request.link(self, 'complete')
     }
+
+
+@TownApp.view(model=PendingFormSubmission, name='complete', permission=Public,
+              request_method='POST')
+def handle_complete_submission(self, request):
+    form = request.get_form(self.form_class, data=self.data)
+
+    if not form.validate():
+        return morepath.redirect(request.link(self))
+    else:
+        self.state = 'complete'
+
+        # TODO Show a new page with the transaction id and a thank you
+        request.success(_(u"Thank you for your submission"))
+
+        collection = FormCollection(request.app.session())
+        return morepath.redirect(request.link(collection))

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-06-02 10:47+0200\n"
+"POT-Creation-Date: 2015-06-02 14:30+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -93,9 +93,9 @@ msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:228
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:19
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:49
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:88
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:24
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:54
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:93
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:74
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:111
@@ -267,6 +267,26 @@ msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie eine Chance haben den "
 "Verweis zu bearbeiten oder zu löschen."
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submission.pt:14
+msgid ""
+"Your form submission is ready to be sent to the town. Please review your "
+"data and press \"Complete\" to finalize the process. If there's anything "
+"you'd like to change, click on \"Edit\" to return to the filled-out form."
+msgstr ""
+"Ihre Anfrage kann jetzt an die Gemeinde übermittelt werden. Bitte überprüfen "
+"Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um die Anfrage zu "
+"übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken Sie auf "
+"\"Bearbeiten\" um zum Formular zurückzukehren. "
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submission.pt:39
+msgid "Complete"
+msgstr "Abschliessen"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submission.pt:41
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:106
+msgid "Edit"
+msgstr "Bearbeiten"
+
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:52
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:101
 msgid "Your changes were saved."
@@ -276,12 +296,16 @@ msgstr "Ihre Änderungen wurden gespeichert."
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
 
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:30
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:25
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:20
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:50
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:89
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:55
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:94
 msgid "Forms"
 msgstr "Formulare"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/forms.py:120
+msgid "Thank you for your submission"
+msgstr "Danke für Ihre Eingabe"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:20
 msgid "Email Address"
@@ -313,10 +337,6 @@ msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
 "werden!"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:106
-msgid "Edit"
-msgstr "Bearbeiten"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:123
 msgid "Delete"

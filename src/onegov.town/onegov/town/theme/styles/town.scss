@@ -141,6 +141,26 @@ form {
 }
 
 /*
+    form display rendering
+*/
+.row.fieldset-display {
+    margin-bottom: 1em;
+
+    .field-display {
+        margin-bottom: .5em;
+    }
+
+    .field-display-label {
+        font-weight: bold;
+    }
+}
+
+.row.fieldset-display-submit form {
+    display: inline-block;
+    margin-right: .5em;
+}
+
+/*
     the color picker field does not look right with zurb foundation
 */
 input[type=color] {

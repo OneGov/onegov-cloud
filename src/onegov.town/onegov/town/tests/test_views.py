@@ -434,6 +434,10 @@ def test_pending_submissions(town_app):
 
     assert len(form_page.pyquery('small.error')) == 0
 
+    assert collection.submissions.query().first().state == 'pending'
+    form_page.form.submit()
+    assert collection.submissions.query().first().state == 'complete'
+
 
 def test_pending_submission_file_upload(town_app):
     collection = FormCollection(town_app.session())
