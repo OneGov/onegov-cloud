@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.1 (2015-06-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Stores a checksum with each form definition and submission.
   [href]
 
