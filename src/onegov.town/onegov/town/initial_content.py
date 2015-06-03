@@ -89,8 +89,14 @@ def add_builtin_forms(session):
         if form:
             form.title = title
             form.definition = definition
+            form.type = 'builtin'
         else:
-            forms.add(name=name, title=title, definition=definition)
+            forms.add(
+                name=name,
+                title=title,
+                definition=definition,
+                type='builtin'
+            )
 
     for filename in os.listdir(builtin_forms):
         if filename.endswith('.form'):
