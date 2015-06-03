@@ -83,8 +83,7 @@ def handle_pending_submission(self, request):
     if not request.POST:
         form.ignore_csrf_error()
     else:
-        self.data = form.data
-        self.prune(form)
+        collection.submissions.update(self, form)
 
     completable = not form.errors and 'edit' not in request.GET
 
