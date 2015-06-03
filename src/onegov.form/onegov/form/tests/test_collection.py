@@ -1,6 +1,7 @@
 import pytest
 
 from datetime import datetime, timedelta
+from delorean import Delorean
 from onegov.core.compat import BytesIO
 from onegov.form import FormCollection, PendingFormSubmission
 from onegov.form.models import FormSubmissionFile
@@ -239,3 +240,19 @@ def test_file_submissions_cascade(session):
     assert session.query(FormSubmissionFile).count() == 1
     session.delete(submission)
     assert session.query(FormSubmissionFile).count() == 0
+
+
+def test_get_current(session):
+    collection = FormCollection(session)
+
+    form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
+    data = MultiDict([('e_mail', 'billg@microsoft.com')])
+
+    submission = collection.submissions.add(
+        'newsletter', form.form_class(data), state='complete')
+
+    submission.created = submission.modified = Delorean(
+        datetime.utcnow() - timedelta(days=1), timezone='UTC').datetime
+
+    assert not collection.submissions.by_id(submission.id, current_only=True)
+    assert collection.submissions.by_id(submission.id, current_only=False)

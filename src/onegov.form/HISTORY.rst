@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to filter out submissions older than one hour.
+  [href]
+
 0.4.0 (2015-06-03)
 ~~~~~~~~~~~~~~~~~~~
 

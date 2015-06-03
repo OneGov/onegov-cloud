@@ -197,25 +197,32 @@ class FormSubmissionCollection(object):
 
         # delete the ones that were never modified
         query = query.filter(FormSubmission.state == 'pending')
-        query = query.filter(FormSubmission.modified == None)
-        query = query.filter(FormSubmission.created < older_than)
-        query.delete()
-
-        # delete the ones that were modified
-        query = query.filter(FormSubmission.state == 'pending')
-        query = query.filter(FormSubmission.modified != None)
-        query = query.filter(FormSubmission.modified < older_than)
-        query.delete()
+        query = query.filter(FormSubmission.last_change < older_than)
+        query.delete('fetch')
 
     def by_form_name(self, name):
         """ Return all submissions for the given form-name. """
         return self.query().filter(FormSubmission.name == name).all()
 
-    def by_id(self, id, state=None):
-        """ Return the submission by id. """
+    def by_id(self, id, state=None, current_only=False):
+        """ Return the submission by id.
+
+            :state:
+                Only if the submission matches the given state.
+
+            :current_only:
+                Only if the submission is not older than one hour.
+        """
         query = self.query().filter(FormSubmission.id == id)
 
         if state is not None:
             query = query.filter(FormSubmission.state == state)
+
+        if current_only:
+            an_hour_ago = Delorean(
+                datetime.utcnow() - timedelta(hours=1), timezone='UTC'
+            ).datetime
+
+            query = query.filter(FormSubmission.last_change >= an_hour_ago)
 
         return query.first()

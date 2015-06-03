@@ -36,7 +36,7 @@ setup(
     install_requires=[
         'humanize',
         'jsonpickle',
-        'onegov.core>=0.3.1',
+        'onegov.core>=0.3.5',
         'pyparsing',
         'pyyaml',
         'python-magic',
