@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.0 (2015-06-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Moves the uploaded files to their own table.
   [href]
 
