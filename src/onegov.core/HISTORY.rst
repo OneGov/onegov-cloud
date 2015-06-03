@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a convenience property to timestamps that returns either the modified-
+  or the created-timestamp.
+  [href]
+
 0.3.4 (2015-06-03)
 ~~~~~~~~~~~~~~~~~~~
 

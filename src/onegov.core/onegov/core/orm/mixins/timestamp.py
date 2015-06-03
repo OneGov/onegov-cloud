@@ -1,8 +1,10 @@
 from delorean import Delorean
 from onegov.core.orm.types import UTCDateTime
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy import func
 from sqlalchemy.orm import deferred
 from sqlalchemy.schema import Column
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 class TimestampMixin(object):
@@ -24,3 +26,8 @@ class TimestampMixin(object):
     @declared_attr
     def modified(cls):
         return deferred(Column(UTCDateTime, onupdate=cls.timestamp))
+
+    @hybrid_property
+    def last_change(self):
+        """ Returns the self.modified if not NULL, else self.created. """
+        return func.coalesce(self.modified, self.created)
