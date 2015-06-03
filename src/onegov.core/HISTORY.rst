@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes SQL statement debugger failing if a statement is executed with a list
+  of parameters.
+  [href]
+
 0.3.3 (2015-06-02)
 ~~~~~~~~~~~~~~~~~~~
 

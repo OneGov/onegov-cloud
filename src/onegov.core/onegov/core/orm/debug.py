@@ -51,17 +51,24 @@ def analyze_sql_queries(report='summary'):
     @event.listens_for(Engine, 'after_cursor_execute')
     def after_exec(conn, cursor, statement, parameters, context, executemany):
         runtime = timer.stop()
-        query = cursor.mogrify(statement, parameters)
+
+        def handle_query(query):
+            if report == 'all':
+                print_query(query)
+
+            if query not in queries:
+                queries[query] = 1
+            else:
+                queries[query] += 1
+
+        if isinstance(parameters, dict):
+            handle_query(cursor.mogrify(statement, parameters))
+        else:
+            for parameter in parameters:
+                handle_query(cursor.mogrify(statement, parameter))
 
         if report == 'all':
-            print_query(query)
             print('< took {}'.format(runtime))
-
-        if query not in queries:
-            queries[query] = 1
-        else:
-            queries[query] += 1
-
     yield
 
     event.remove(Engine, 'before_cursor_execute', before_exec)
