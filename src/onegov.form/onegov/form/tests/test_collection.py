@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from delorean import Delorean
 from onegov.core.compat import BytesIO
 from onegov.form import FormCollection, PendingFormSubmission
-from onegov.form.models import FormSubmissionFile
+from onegov.form.models import FormSubmissionFile, hash_definition
 from onegov.form.errors import UnableToComplete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
@@ -12,6 +12,10 @@ from textwrap import dedent
 from webob.multidict import MultiDict
 from werkzeug.datastructures import FileMultiDict
 from wtforms.csrf.core import CSRF
+
+
+def test_form_checksum():
+    assert hash_definition('abc') == '900150983cd24fb0d6963f7d28e17f72'
 
 
 def test_add_form(session):
@@ -36,6 +40,8 @@ def test_add_form(session):
             Last Name * = ___
         """))
 
+    assert form.checksum and form.checksum == hash_definition(form.definition)
+
 
 def test_submit_form(session):
     collection = FormCollection(session)
@@ -57,6 +63,9 @@ def test_submit_form(session):
 
     form = collection.definitions.by_name('tps-report')
     submission = form.submissions[0]
+
+    assert submission.checksum and submission.checksum == hash_definition(
+        form.definition) == hash_definition(submission.definition)
 
     stored_form = submission.form_class(data=submission.data)
 

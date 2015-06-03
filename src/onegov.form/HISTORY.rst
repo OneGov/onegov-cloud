@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Stores a checksum with each form definition and submission.
+  [href]
+
 - Adds the ability to filter out submissions older than one hour.
   [href]
 

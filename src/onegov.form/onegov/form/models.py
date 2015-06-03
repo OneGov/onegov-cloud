@@ -1,3 +1,4 @@
+from hashlib import md5
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
@@ -8,7 +9,12 @@ from sqlalchemy.orm import (
     deferred,
     relationship,
 )
+from sqlalchemy_utils import observes
 from uuid import uuid4
+
+
+def hash_definition(definition):
+    return md5(definition.encode('utf-8')).hexdigest()
 
 
 class FormDefinition(Base, TimestampMixin):
@@ -31,6 +37,10 @@ class FormDefinition(Base, TimestampMixin):
     #: the form as parsable string
     definition = Column(Text, nullable=False)
 
+    #: the checksum of the definition, forms and submissions with matching
+    #: checksums are guaranteed to have the exact same definition
+    checksum = Column(Text, nullable=False)
+
     #: the type of the form, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
@@ -49,6 +59,10 @@ class FormDefinition(Base, TimestampMixin):
 
         return parse_form(self.definition)
 
+    @observes('definition')
+    def definition_observer(self, definition):
+        self.checksum = hash_definition(definition)
+
 
 class FormSubmission(Base, TimestampMixin):
     """ Defines a submitted form in the database. """
@@ -65,6 +79,10 @@ class FormSubmission(Base, TimestampMixin):
     #: alongside the submission as the original form may change later. We
     #: want to keep the old form around just in case.
     definition = Column(Text, nullable=False)
+
+    #: the checksum of the definition, forms and submissions with matching
+    #: checksums are guaranteed to have the exact same definition
+    checksum = Column(Text, nullable=False)
 
     #: the submission data
     data = Column(JSON, nullable=False)
@@ -91,6 +109,10 @@ class FormSubmission(Base, TimestampMixin):
         """ Parses the form definition and returns a form class. """
 
         return parse_form(self.definition)
+
+    @observes('definition')
+    def definition_observer(self, definition):
+        self.checksum = hash_definition(definition)
 
     def complete(self):
         """ Changes the state to 'complete', if the data is valid. """
