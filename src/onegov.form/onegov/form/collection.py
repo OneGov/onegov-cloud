@@ -38,7 +38,10 @@ class FormDefinitionCollection(object):
     def add(self, title, definition,
             type=None, meta=None, content=None, name=None):
         """ Add the given form to the database. """
-        form = FormDefinition()
+
+        # look up the right class depending on the type
+        _mapper = inspect(FormDefinition).polymorphic_map.get(type)
+        form = (_mapper and _mapper.class_ or FormDefinition)()
 
         form.name = name or normalize_for_url(title)
         form.title = title

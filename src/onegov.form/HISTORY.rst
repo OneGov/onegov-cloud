@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Uses the right class for form-definitions depending on the type.
+  [href]
+
 0.4.1 (2015-06-03)
 ~~~~~~~~~~~~~~~~~~~
 
