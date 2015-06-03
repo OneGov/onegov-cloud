@@ -58,7 +58,8 @@ def get_form(app, name):
 
 @TownApp.path(model=PendingFormSubmission, path='/formular-eingabe/{id}')
 def get_pending_form_submission(app, id):
-    return FormCollection(app.session()).submissions.by_id(id, state='pending')
+    return FormCollection(app.session()).submissions.by_id(
+        id, state='pending', current_only=True)
 
 
 @TownApp.path(model=Editor, path='/editor/{action}/{trait}/{page_id}')
