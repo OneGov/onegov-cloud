@@ -75,6 +75,13 @@ class FormSubmission(Base, TimestampMixin):
         nullable=False
     )
 
+    #: the files belonging to this submission
+    files = relationship(
+        "FormSubmissionFile",
+        backref='submission',
+        cascade="all, delete-orphan"
+    )
+
     __mapper_args__ = {
         "polymorphic_on": 'state'
     }
@@ -118,3 +125,37 @@ class PendingFormSubmission(FormSubmission):
 
 class CompleteFormSubmission(FormSubmission):
     __mapper_args__ = {'polymorphic_identity': 'complete'}
+
+
+class FormSubmissionFile(Base, TimestampMixin):
+    """ Holds files uploaded in form submissions.
+
+    This ensures that forms can be loaded without having to load the files
+    into memory. But it's still not super efficient. The thinking is that
+    most forms won't have file uploads and if they do it won't be large.
+
+    Don't store big files here, or files which need to be served often.
+    For that you *have* to use some kind of filesystem storage.
+
+    The basic use case for this table is the odd table which contains some
+    kind of file which is then viewed by backend personell only.
+
+    In this case there won't many file downloads and it's important
+    that the file stays with the form and is not accidentally lost.
+
+    So it fits for that case.
+    """
+
+    __tablename__ = 'submission_files'
+
+    #: id of the file
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: the id of the submission
+    submission_id = Column(UUID, ForeignKey(FormSubmission.id), nullable=False)
+
+    #: the id of the field in the submission
+    field_id = Column(Text, nullable=False)
+
+    #: the actual file data
+    filedata = deferred(Column(Text, nullable=False))

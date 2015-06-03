@@ -46,11 +46,16 @@ class UploadField(FileField):
             self.data = {}
 
     def process_fieldstorage(self, fs):
-        if not hasattr(fs, 'file'):
-            return {}
 
-        fs.file.seek(0)
-        file_data = fs.file.read()
+        # support webob and werkzeug multidicts
+        fp = getattr(fs, 'file', getattr(fs, 'stream', None))
+
+        if fp is None:
+            return {}
+        else:
+            fp.seek(0)
+
+        file_data = fp.read()
 
         mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
         mimetype_by_introspection = mimetype_by_introspection.decode('utf-8')

@@ -315,12 +315,10 @@ elements.single_line_fields = elements.identifier + pp.MatchFirst([
 
 
 # increasing the default filesize is *strongly discouarged*, as we are not
-# storing those files efficently yet -> they need to fit in memory
+# storing those files in the database, so they need to fit in memory
 #
-# if this value should be higher, we need to either:
-# * store the files outside the database
-# * store the files in a separate table where they are not read into memory
-#   as frequently as they are now
+# if this value must be higher, we need to store the files outside the
+# database
 #
 MEGABYTE = 1000 ** 2
 DEFAULT_UPLOAD_LIMIT = 5 * MEGABYTE

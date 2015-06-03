@@ -50,7 +50,8 @@ setup(
             'coverage',
             'onegov.testing',
             'pytest',
-            'webob'
+            'webob',
+            'werkzeug'
         ],
     ),
     classifiers=[

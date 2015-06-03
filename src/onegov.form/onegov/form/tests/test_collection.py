@@ -1,12 +1,15 @@
 import pytest
 
 from datetime import datetime, timedelta
+from onegov.core.compat import BytesIO
 from onegov.form import FormCollection, PendingFormSubmission
+from onegov.form.models import FormSubmissionFile
 from onegov.form.errors import UnableToComplete
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from textwrap import dedent
 from webob.multidict import MultiDict
+from werkzeug.datastructures import FileMultiDict
 from wtforms.csrf.core import CSRF
 
 
@@ -166,3 +169,73 @@ def test_delete_with_submissions(session):
 
     assert collection.submissions.query().count() == 0
     assert collection.definitions.query().count() == 0
+
+
+def test_file_submissions(session):
+    collection = FormCollection(session)
+
+    # upload a new file
+    definition = collection.definitions.add('File', definition="File = *.txt")
+
+    data = FileMultiDict()
+    data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
+
+    submission = collection.submissions.add(
+        'file', definition.form_class(data), state='pending')
+
+    assert len(submission.files) == 1
+    assert len(submission.files[0].filedata) > 0
+
+    # replace the existing file
+    previous_content = submission.files[0].filedata
+    session.refresh(submission)
+
+    data = FileMultiDict()
+    data.add('file', 'replace')
+    data.add_file('file', BytesIO(b'barfoo'), filename='foobar.txt')
+
+    collection.submissions.update(submission, definition.form_class(data))
+
+    assert len(submission.files) == 1
+    assert previous_content != submission.files[0].filedata
+
+    # keep the file
+    previous_content = submission.files[0].filedata
+    session.refresh(submission)
+
+    data = FileMultiDict()
+    data.add('file', 'keep')
+    data.add_file('file', BytesIO(b''), filename='foobar.txt')
+
+    collection.submissions.update(submission, definition.form_class(data))
+
+    assert len(submission.files) == 1
+    assert previous_content == submission.files[0].filedata
+
+    # delete the file
+    session.refresh(submission)
+
+    data = FileMultiDict()
+    data.add('file', 'delete')
+    data.add_file('file', BytesIO(b'asdf'), filename='foobar.txt')
+
+    collection.submissions.update(submission, definition.form_class(data))
+    assert len(submission.files) == 0
+
+
+def test_file_submissions_cascade(session):
+
+    collection = FormCollection(session)
+
+    # upload a new file
+    definition = collection.definitions.add('File', definition="File = *.txt")
+
+    data = FileMultiDict()
+    data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
+
+    submission = collection.submissions.add(
+        'file', definition.form_class(data), state='pending')
+
+    assert session.query(FormSubmissionFile).count() == 1
+    session.delete(submission)
+    assert session.query(FormSubmissionFile).count() == 0
