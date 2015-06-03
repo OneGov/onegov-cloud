@@ -89,7 +89,6 @@ def add_builtin_forms(session):
         if form:
             form.title = title
             form.definition = definition
-            form.type = 'builtin'
         else:
             forms.add(
                 name=name,
