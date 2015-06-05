@@ -129,6 +129,15 @@ class TownApp(Framework):
             output='bundles/editor.bundle.js'
         )
 
+        code_editor = Bundle(
+            'js/ace.js',
+            'js/ace-mode-clojure.js',
+            'js/ace-theme-clouds.js',
+            'js/code_editor.js',
+            filters='jsmin',
+            output='bundles/code_editor.bundle.js'
+        )
+
         common = Bundle(
             'js/modernizr.js',
             'js/jquery.js',
@@ -149,7 +158,8 @@ class TownApp(Framework):
             'dropzone': dropzone,
             'redactor': redactor,
             'redactor_theme': redactor_theme,
-            'editor': editor
+            'editor': editor,
+            'code_editor': code_editor
         }
 
 

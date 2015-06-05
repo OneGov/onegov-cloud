@@ -105,6 +105,25 @@ form {
         min-height: 250px;
     }
 
+    .code-editor-wrapper {
+        margin-bottom: 1em;
+    }
+
+    .read-only .ace_scroller {
+        background-color: $input-disabled-bg;
+        color: $steel;
+        cursor: $input-disabled-cursor;
+    }
+
+    .ace_scroller {
+        @include form-element;
+        color: inherit;
+        font: inherit;
+        font-size: inherit;
+        height: 100%;
+        min-height: 250px;
+    }
+
     small.error {
         padding: .5rem;
         padding-left: .5rem;
