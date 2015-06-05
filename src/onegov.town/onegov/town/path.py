@@ -51,7 +51,7 @@ def get_forms(app):
     return FormCollection(app.session())
 
 
-@TownApp.path(model=FormDefinition, path='/formulare/{name}')
+@TownApp.path(model=FormDefinition, path='/formular/{name}')
 def get_form(app, name):
     return FormCollection(app.session()).definitions.by_name(name)
 
