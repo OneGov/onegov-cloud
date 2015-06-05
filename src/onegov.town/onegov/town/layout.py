@@ -1,9 +1,10 @@
 from cached_property import cached_property
 from onegov.core.compat import zip_longest
 from onegov.core.static import StaticFile
+from onegov.form import FormCollection
 from onegov.page import Page, PageCollection
 from onegov.town import _
-from onegov.town.elements import Link
+from onegov.town.elements import Link, LinkGroup
 from onegov.town.models import ImageCollection
 from purl import URL
 
@@ -278,7 +279,7 @@ class EditorLayout(PageLayout):
     sidebar_links = None
 
     def __init__(self, model, request, site_title):
-        super(PageLayout, self).__init__(model, request)
+        super(EditorLayout, self).__init__(model, request)
         self.site_title = site_title
 
         self.request.include('redactor')
@@ -290,3 +291,81 @@ class EditorLayout(PageLayout):
         links = self.get_page_breadcrumbs(self.model.page)
         links.append(Link(self.site_title, url='#'))
         return links
+
+
+class FormEditorLayout(DefaultLayout):
+    def __init__(self, model, request):
+        super(FormEditorLayout, self).__init__(model, request)
+
+        self.request.include('redactor')
+        self.request.include('redactor_theme')
+        self.request.include('editor')
+        self.request.include('code_editor')
+
+
+class FormSubmissionLayout(DefaultLayout):
+
+    @cached_property
+    def form(self):
+        if hasattr(self.model, 'form'):
+            return self.model.form
+        else:
+            return self.model
+
+    @cached_property
+    def breadcrumbs(self):
+        collection = FormCollection(self.request.app.session())
+
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Forms"), self.request.link(collection)),
+            Link(self.form.title, '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                LinkGroup(
+                    title=_("Form"),
+                    links=[
+                        Link(
+                            text=_("Edit"),
+                            url=self.request.link(
+                                self.form,
+                                name='bearbeiten'
+                            ),
+                            classes=('edit-form', )
+                        )
+                    ]
+                ),
+            ]
+
+
+class FormCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Forms"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Form"),
+                            url=self.request.link(
+                                self.model,
+                                name='neu'
+                            ),
+                            classes=('new-form', )
+                        )
+                    ]
+                ),
+            ]

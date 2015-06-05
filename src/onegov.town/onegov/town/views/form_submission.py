@@ -1,4 +1,4 @@
-""" Builtin and custom forms defined in the database. """
+""" Renders and handles defined forms, turning them into submissions. """
 
 import morepath
 
@@ -11,25 +11,7 @@ from onegov.form import (
 )
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Link
-from onegov.town.layout import DefaultLayout
-
-
-@TownApp.html(model=FormCollection, template='forms.pt', permission=Public)
-def view_get_form_collection(self, request):
-    forms = self.definitions.query().order_by(FormDefinition.name).all()
-
-    layout = DefaultLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(self))
-    ]
-
-    return {
-        'layout': layout,
-        'title': _("Forms"),
-        'forms': forms,
-    }
+from onegov.town.layout import FormSubmissionLayout
 
 
 @TownApp.form(model=FormDefinition, form=lambda e: e.form_class,
@@ -49,18 +31,13 @@ def handle_defined_form(self, request, form):
 
         return morepath.redirect(request.link(submission))
 
-    layout = DefaultLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(collection)),
-        Link(self.title, request.link(self))
-    ]
-
     return {
-        'layout': layout,
+        'layout': FormSubmissionLayout(self, request),
         'title': self.title,
         'form': form,
-        'form_width': 'small'
+        'form_width': 'small',
+        'lead': self.meta.get('lead'),
+        'text': self.content.get('text')
     }
 
 
@@ -87,15 +64,8 @@ def handle_pending_submission(self, request):
 
     completable = not form.errors and 'edit' not in request.GET
 
-    layout = DefaultLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(collection)),
-        Link(self.form.title, request.link(self.form))
-    ]
-
     return {
-        'layout': layout,
+        'layout': FormSubmissionLayout(self, request),
         'title': self.form.title,
         'form': form,
         'completable': completable,

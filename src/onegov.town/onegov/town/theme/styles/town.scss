@@ -301,7 +301,7 @@ input[type=color] {
 #homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
 
 /*
-    pages edit bar
+    edit bar
 */
 .edit-bar {
     background-color: $primary-color;
@@ -330,16 +330,22 @@ input[type=color] {
         content: '\f1ea';
     }
 
+    .new-form:before {
+        content: '\f044';
+    }
+
     .edit-town-root:before,
     .edit-page:before,
     .edit-news:before,
-    .edit-link:before {
+    .edit-link:before,
+    .edit-form:before {
         content: '\f040';
     }
 
     .delete-link:before,
     .delete-news:before,
-    .delete-page:before {
+    .delete-page:before,
+    .delete-form:before {
         content: '\f014';
     }
 }

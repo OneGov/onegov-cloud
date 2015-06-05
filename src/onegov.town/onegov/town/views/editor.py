@@ -49,7 +49,7 @@ def handle_new_page(self, request, form):
 def handle_edit_page(self, request, form):
     if form.submitted(request):
         form.get_page(self.page)
-        request.success(_(u"Your changes were saved."))
+        request.success(_(u"Your changes were saved"))
 
         return morepath.redirect(request.link(self.page))
     else:

@@ -98,7 +98,7 @@ def handle_settings(self, request, form):
                     form.opening_hours.data).replace('\n', '<br>')
             }
 
-        request.success(_(u"Your changes were saved."))
+        request.success(_(u"Your changes were saved"))
     else:
         form.name.data = self.name
         form.logo_url.data = self.logo_url

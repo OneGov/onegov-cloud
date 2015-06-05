@@ -417,10 +417,10 @@ def test_pending_submissions(town_app):
     assert 'First name' in form_page
     assert 'Last name' in form_page
 
-    assert 'formulare' in form_page.request.url
+    assert 'formular/' in form_page.request.url
     form_page = form_page.form.submit().follow()
 
-    assert 'formulare' not in form_page.request.url
+    assert 'formular/' not in form_page.request.url
     assert 'formular-eingabe' in form_page.request.url
     assert len(form_page.pyquery('small.error')) == 2
 
