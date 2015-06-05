@@ -7,15 +7,21 @@ $(function () {
 
         var height = textarea.height();
         var width = textarea.width();
+        textarea.css('display', 'none');
 
-        var wrapper = $('<div class="code-editor-wrapper">');
-        wrapper.position('absolute');
-        wrapper.height(textarea.height());
-        wrapper.insertBefore(textarea);
+        var outside = $('<div class="code-editor-wrapper">');
 
-        var editor = ace.edit(wrapper[0]);
+        var inside = $('<div class="code-editor">');
+        inside.position('absolute');
+
+        outside.append(inside);
+        outside.insertBefore(textarea);
+
+        var editor = ace.edit(inside[0]);
         editor.setHighlightActiveLine(false);
         editor.setDisplayIndentGuides(true);
+        editor.setFontSize('12px');
+        editor.renderer.setPadding(0);
         editor.renderer.setShowGutter(false);
         editor.getSession().setValue(textarea.val());
         editor.getSession().setMode("ace/mode/" + mode);
@@ -32,7 +38,5 @@ $(function () {
         editor.getSession().on('change', function(){
             textarea.val(editor.getSession().getValue());
         });
-
-        textarea.css('display', 'none');
     });
 });

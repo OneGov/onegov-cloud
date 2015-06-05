@@ -105,25 +105,6 @@ form {
         min-height: 250px;
     }
 
-    .code-editor-wrapper {
-        margin-bottom: 1em;
-    }
-
-    .read-only .ace_scroller {
-        background-color: $input-disabled-bg;
-        color: $steel;
-        cursor: $input-disabled-cursor;
-    }
-
-    .ace_scroller {
-        @include form-element;
-        color: inherit;
-        font: inherit;
-        font-size: inherit;
-        height: 100%;
-        min-height: 250px;
-    }
-
     small.error {
         padding: .5rem;
         padding-left: .5rem;
@@ -157,6 +138,41 @@ form {
     .upload-widget.with-data input[type=file] {
         margin-left: 2em;
     }
+
+    /*
+        Ace code editor, which you don't want to touch. Huge pita to get to
+        work right with custom styling (it'll look like it's working, but
+        all the cursor measurements are off and the editing is werid).
+    */
+    $code-editor-height: 600px;
+
+    .code-editor-wrapper {
+        @include form-element;
+        height: $code-editor-height;
+        margin-bottom: 1em;
+    }
+
+    .read-only {
+        background-color: $input-disabled-bg;
+        color: $steel;
+        cursor: $input-disabled-cursor;
+    }
+
+    .code-editor,
+    .ace_scroller, 
+    .ace_content {
+        height: $code-editor-height - 15px;
+    }
+
+    .ace_content {
+        color: inherit;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+        font-size: 12px;
+        line-height: 12px;
+    }
+    /*
+    <--
+    */
 }
 
 /*
