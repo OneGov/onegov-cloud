@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-06-05 16:21+0200\n"
+"POT-Creation-Date: 2015-06-05 17:07+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -93,8 +93,8 @@ msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:184
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:235
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:313
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:343
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:320
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:350
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:103
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:141
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
@@ -103,8 +103,8 @@ msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 msgid "Homepage"
 msgstr "Startseite"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:314
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:344
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:321
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:351
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:16
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:104
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:142
@@ -134,17 +134,17 @@ msgstr "Einstellungen"
 msgid "Login"
 msgstr "Login"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:323
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:355
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:330
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:362
 msgid "Form"
 msgstr "Formular"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:352
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:359
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:71
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:326
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:333
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submission.pt:41
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:144
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:119
@@ -179,6 +179,10 @@ msgstr "Die Datei ist zu gross, bitte senden Sie eine Datei kleiner als {}."
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:17
 msgid "Files of this type are not supported."
 msgstr "Dateien dieses Typs werde nicht unterstützt."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/translations.py:18
+msgid "The form could not be parsed."
+msgstr "Das Formular ist nicht gültig."
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:134
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:17

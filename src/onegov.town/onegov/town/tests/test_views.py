@@ -464,3 +464,52 @@ def test_pending_submission_file_upload(town_app):
 
     # unfortunately we can't test more here, as webtest doesn't support
     # multiple differing fields of the same name...
+
+
+def test_edit_builtin_form(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    # the definition is read only and must be discarded in any case
+    form_page = client.get('/formular/wohnsitzbestaetigung/bearbeiten')
+    existing_definition = form_page.form['definition']
+    form_page.form['definition'] = 'x = ___'
+    form_page.form.submit()
+
+    form_page = client.get('/formular/wohnsitzbestaetigung/bearbeiten')
+    form_page.form['definition'] == existing_definition
+
+
+def test_add_custom_form(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    form_page = client.get('/formulare/neu')
+    form_page.form['title'] = "My Form"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = "There are many like it, but this one's mine"
+    form_page.form['definition'] = "xxx = !!!"
+    form_page = form_page.form.submit()
+
+    assert u"Das Formular ist nicht gültig." in form_page
+
+    form_page.form['definition'] = "Name * = ___"
+    form_page = form_page.form.submit().follow()
+
+    form_page.form['name'] = 'My name'
+    form_page = form_page.form.submit().follow()
+
+    form_page = form_page.click("Bearbeiten", index=0)
+    form_page.form['definition'] = "Nom * = ___"
+    form_page = form_page.form.submit().follow()
+
+    form_page.form['nom'] = 'My name'
+    form_page.form.submit().follow()
