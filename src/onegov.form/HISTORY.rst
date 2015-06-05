@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.5.0 (2015-06-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a *very* simple form syntax parser.
   [href]
 
