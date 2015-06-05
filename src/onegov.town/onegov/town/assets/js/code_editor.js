@@ -28,7 +28,8 @@ $(function () {
         editor.setTheme("ace/theme/clouds");
 
         if (readonly === true) {
-            wrapper.addClass('read-only');
+            outside.addClass('read-only');
+            inside.addClass('read-only');
             editor.setReadOnly(true);
             editor.setDisplayIndentGuides(false);
             editor.renderer.$cursorLayer.element.style.opacity=0;
