@@ -43,11 +43,6 @@ class FormDefinitionBaseForm(Form):
         self.text.data = content.get('text', '')
 
 
-# even though the definition has nothing to do with clojure, it looks
-# okay in it -> if we want to improve here, we need our own syntax mode
-syntax = 'clojure'
-
-
 class BuiltinDefinitionForm(FormDefinitionBaseForm):
     """ Form to edit builtin forms. """
 
@@ -56,7 +51,7 @@ class BuiltinDefinitionForm(FormDefinitionBaseForm):
         validators=[validators.InputRequired(), ValidFormDefinition()],
         widget=with_options(
             TextArea, rows=24, readonly='readonly',
-            **{'data-editor': syntax}
+            **{'data-editor': 'form'}
         ),
     )
 
@@ -70,7 +65,7 @@ class CustomDefinitionForm(FormDefinitionBaseForm):
     definition = TextAreaField(
         label=_(u"Definition"),
         validators=[validators.InputRequired(), ValidFormDefinition()],
-        widget=with_options(TextArea, rows=32, **{'data-editor': syntax}),
+        widget=with_options(TextArea, rows=32, **{'data-editor': 'form'}),
     )
 
 
