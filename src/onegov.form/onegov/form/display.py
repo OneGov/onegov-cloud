@@ -72,7 +72,7 @@ class StringFieldRenderer(BaseRenderer):
 @registry.register_for('PasswordField')
 class PasswordFieldRenderer(BaseRenderer):
     def __call__(self, field):
-        return '***'
+        return '*' * len(field.data)
 
 
 @registry.register_for('DateField')

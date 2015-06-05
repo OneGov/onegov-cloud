@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes password field not working.
+  [href]
+
 - Uses the right class for form-definitions depending on the type.
   [href]
 

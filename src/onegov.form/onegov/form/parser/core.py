@@ -389,6 +389,11 @@ def construct_fileinput(loader, node):
     return elements.fileinput.parseString(node.value)
 
 
+@constructor('!password')
+def construct_password(loader, node):
+    return elements.password.parseString(node.value)
+
+
 def parse_form(text):
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).

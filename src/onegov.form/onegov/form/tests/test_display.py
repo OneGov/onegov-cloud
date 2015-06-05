@@ -16,7 +16,9 @@ def test_render_textfields():
 
 
 def test_render_password():
-    assert render_field(MockField('PasswordField', 'secret')) == '***'
+    assert render_field(MockField('PasswordField', '123')) == '***'
+    assert render_field(MockField('PasswordField', '1234')) == '****'
+    assert render_field(MockField('PasswordField', '12345')) == '*****'
 
 
 def test_render_date_field():
