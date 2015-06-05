@@ -10,6 +10,10 @@
                 'large': 'small-12 medium-9 large-7 columns'
             }[econtext.get('form_width', 'normal')]
         ?>
+
+        <tal:block metal:use-macro="layout.macros.page_content"
+            tal:define="lead lead|nothing;text text|nothing" />
+
         <div class="row">
             <div tal:attributes="class size">
                 <div metal:use-macro="layout.macros['form']" />

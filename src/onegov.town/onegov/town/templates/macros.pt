@@ -137,4 +137,13 @@
     </div>
 </metal:dropzone>
 
+<metal:page_content define-macro="page_content" i18n:domain="onegov.town">
+    <div class="row" tal:condition="lead | text">
+        <div class="small-12 columns end">
+            <em class="page-lead" tal:condition="lead" tal:content="lead" />
+            <div class="page-text" tal:condition="text" tal:content="structure text" />
+        </div>
+    </div>
+</metal:page_content>
+
 </body>
