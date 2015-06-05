@@ -98,3 +98,20 @@ class ExpectedExtensions(WhitelistedMimeType):
         mimetypes = set(
             types_map.get('.' + ext.lstrip('.'), None) for ext in extensions)
         super(ExpectedExtensions, self).__init__(whitelist=mimetypes)
+
+
+class ValidFormDefinition(object):
+    """ Makes sure the given text is a valid onegov.form definition. """
+
+    message = "The form could not be parsed."
+
+    def __call__(self, form, field):
+        if field.data:
+            # XXX circular import
+            from onegov.form.parser.core import parse_form
+
+            try:
+                parse_form(field.data)
+            except AttributeError:
+                # TODO inform the user what the error was
+                raise ValidationError(field.gettext(self.message))

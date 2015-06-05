@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a *very* simple form syntax parser.
+  [href]
+
 - Fixes password field not working.
   [href]
 
