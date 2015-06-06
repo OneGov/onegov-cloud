@@ -132,7 +132,7 @@ class TownApp(Framework):
         code_editor = Bundle(
             'js/ace.js',
             'js/ace-mode-form.js',
-            'js/ace-theme-clouds.js',
+            'js/ace-theme-tomorrow.js',
             'js/code_editor.js',
             filters='jsmin',
             output='bundles/code_editor.bundle.js'

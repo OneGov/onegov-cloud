@@ -11,10 +11,10 @@ var FormHighlightRules = function() {
         start: [
             {
                 token: 'comment',
-                regex: '#.*'
+                regex: '^#.*'
             },
             {
-                token: 'keyword',
+                token: 'support.function',
                 regex: /(___|\*\*\*|\.\.\.|@@@|YYYY.MM.DD|YYYY.MM.DD HH:MM|HH:MM)/
             },
             {
@@ -23,7 +23,19 @@ var FormHighlightRules = function() {
             },
             {
                 token: 'keyword.operator',
-                regex: /(\*|=)/
+                regex: /(\*\s?=|=)/
+            },
+            {
+                token: 'support.type',
+                regex: /# .*$/
+            },
+            {
+                token: 'string',
+                regex: /(\*\.\*|\*\.[a-zA-Z\.0-9]+)/
+            },
+            {
+                token: 'support.constant',
+                regex: /\[[0-9]+\]/
             }
         ]
     };

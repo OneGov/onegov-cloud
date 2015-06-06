@@ -25,7 +25,7 @@ $(function () {
         editor.renderer.setShowGutter(false);
         editor.getSession().setValue(textarea.val());
         editor.getSession().setMode("ace/mode/" + mode);
-        editor.setTheme("ace/theme/clouds");
+        editor.setTheme("ace/theme/tomorrow");
 
         if (readonly === true) {
             outside.addClass('read-only');
