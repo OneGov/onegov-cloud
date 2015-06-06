@@ -6,13 +6,21 @@ import pytest
 import transaction
 
 from morepath import setup
+from onegov.core.crypto import hash_password
 from onegov.town.initial_content import add_initial_content
-from onegov.user import UserCollection
+from onegov.user import User
 from uuid import uuid4
 
 
+@pytest.fixture(scope='session')
+def town_password():
+    # only hash the password for the test users once per test session
+    return hash_password('hunter2')
+
+
 @pytest.yield_fixture(scope="function")
-def town_app(postgres_dsn, temporary_directory):
+def town_app(postgres_dsn, temporary_directory, town_password):
+
     config = setup()
     config.scan(more.webassets)
     config.scan(onegov.core)
@@ -33,11 +41,23 @@ def town_app(postgres_dsn, temporary_directory):
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
-    add_initial_content(app.session(), 'Govikon')
+    session = app.session()
+    add_initial_content(session, 'Govikon')
 
-    users = UserCollection(app.session())
-    users.add('admin@example.org', 'hunter2', 'admin')
-    users.add('editor@example.org', 'hunter2', 'editor')
+    # usually we don't want to create the users directly, anywhere else you
+    # *need* to go through the UserCollection. Here however, we can improve
+    # the test speed by not hashing the password for every test.
+
+    session.add(User(
+        username='admin@example.org',
+        password_hash=town_password,
+        role='admin'
+    ))
+    session.add(User(
+        username='editor@example.org',
+        password_hash=town_password,
+        role='editor'
+    ))
 
     transaction.commit()
 
