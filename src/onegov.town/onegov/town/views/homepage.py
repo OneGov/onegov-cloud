@@ -1,11 +1,15 @@
+# -*- coding: utf-8 -*-
+
 """ The onegov town homepage. """
 
 from collections import namedtuple
 from onegov.core.security import Public
+from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Link
+from onegov.town.elements import Link, LinkGroup
 from onegov.town.models import Town
 from onegov.town.layout import DefaultLayout
+from onegov.form import FormCollection
 
 
 @TownApp.html(model=Town, template='homepage.pt', permission=Public)
@@ -26,9 +30,63 @@ def view_town(self, request):
         ) for ix, page in enumerate(layout.root_pages)
     ]
 
+    # the panels on the homepage are currently mostly place-holders, real
+    # links as well as translatable text is added every time we implement
+    # a new feature that we need to link up on the homepage
+    online_counter = LinkGroup(
+        title=_("Services"),
+        links=[
+            Link(
+                text=_("Online Counter"),
+                url=request.link(FormCollection(request.app.session())),
+                subtitle=_("Forms and applications")
+            ),
+            Link(
+                text=u"Raumreservationen",
+                url="#",
+                subtitle=u"Turnhalle und Gesellschaftsräume"
+            ),
+            Link(
+                text=u"GA-Tageskarte",
+                url="#",
+                subtitle=u"Günstige Tageskarten von der Gemeinde"
+            )
+        ]
+    )
+
+    latest_events = LinkGroup(
+        title=u"Veranstaltungen",
+        links=[
+            Link(
+                text=u"Gemeindeversammlung",
+                url="#",
+                subtitle=u"Montag, 16. März 2015, 19:30"
+            ),
+            Link(
+                text=u"Grümpelturnier",
+                url="#",
+                subtitle=u"Sonntag, 22. März 2015, 10:00"
+            ),
+            Link(
+                text=u"MuKi Turnen",
+                url="#",
+                subtitle=u"Freitag, 26. März 2015, 18:30"
+            ),
+            Link(
+                text=u"150 Jahre Govikon",
+                url="#",
+                subtitle=u"Sonntag, 31. März 2015, 11:00"
+            ),
+        ]
+    )
+
     return {
         'layout': layout,
         'title': self.name,
         'tiles': tiles,
-        'news': layout.root_pages[-1].news_query.limit(3).all()
+        'news': layout.root_pages[-1].news_query.limit(3).all(),
+        'panels': [
+            online_counter,
+            latest_events
+        ]
     }

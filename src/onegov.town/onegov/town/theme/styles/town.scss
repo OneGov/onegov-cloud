@@ -301,6 +301,43 @@ input[type=color] {
 #homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
 
 /*
+    homepage panels
+*/
+
+.homepage-links-panel {
+    background-color: $topbar-bg-color;
+    margin-bottom: 1.5em;
+    padding: 1em;
+
+    h2 {
+        font-size: 1em;
+        font-weight: bold;
+        margin-top: 0;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+
+        a {
+            display: block;
+            font-weight: bold;
+            margin-bottom: -.25rem;
+        }
+
+        a:before {
+            content: '\f054\00a0';
+            font-family: 'FontAwesome';
+        }
+
+        small {
+            font-size: .8em;
+            margin-left: 1rem;
+        }
+    }
+}
+
+/*
     edit bar
 */
 .edit-bar {
