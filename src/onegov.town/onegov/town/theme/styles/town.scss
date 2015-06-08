@@ -198,21 +198,23 @@ form {
 /*
     form collection rendering
 */
-.submissions-count {
-    display: block;
-    font-size: .8em;
-    margin-bottom: 1em;
-
-    span:first-child:before {
-        color: $body-font-color;
-        content: '\f046\00a0';
-        font-family: 'FontAwesome';
+.form-definitions {
+    li + li {
+        margin-top: 1em;
     }
 
-    &.no-submissions span:first-child:before {
-        color: $body-font-color;
-        content: '\f096\00a0';
-        font-family: 'FontAwesome';
+    .form-definition-title {
+        font-weight: bold;
+    }
+
+    .form-definition-lead {
+        margin-bottom: .2em;
+        max-width: 500px;
+    }
+
+    .submissions-count {
+        display: block;
+        font-size: .8em;
     }
 }
 

@@ -430,10 +430,3 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:40
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
-
-#, fuzzy
-#~ msgid "0 Submissions"
-#~ msgstr "0 Eingaben"
-
-#~ msgid "No Submissions"
-#~ msgstr "Keine Eingaben"
