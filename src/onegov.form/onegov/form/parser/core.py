@@ -253,7 +253,7 @@ from onegov.form.core import (
     with_options
 )
 from onegov.form import errors
-from onegov.form.fields import TimeField, MultiCheckboxField, UploadField
+from onegov.form.fields import MultiCheckboxField, UploadField
 from onegov.form.parser.grammar import (
     checkbox,
     date,
@@ -282,7 +282,7 @@ from wtforms import (
 from wtforms.fields.html5 import DateField, DateTimeLocalField, EmailField
 from wtforms.validators import DataRequired, Length
 from wtforms.widgets import TextArea
-from wtforms_components import Email, If
+from wtforms_components import Email, If, TimeField
 
 
 # cache the parser elements

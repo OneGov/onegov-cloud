@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes time field triggering an error.
+  [href]
+
 0.5.0 (2015-06-05)
 ~~~~~~~~~~~~~~~~~~~
 
