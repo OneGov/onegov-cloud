@@ -8,6 +8,20 @@
         <ul tal:condition="forms">
             <li tal:repeat="form forms">
                 <a tal:attributes="href request.link(form)">${form.title}</a>
+                <tal:block condition="request.is_logged_in">
+                    <a href="#" class="submissions-count" tal:condition="form.submissions_count == 1">
+                        <span>${form.submissions_count}</span>
+                        <span i18n:translate="">Submission</span>
+                    </a>
+                    <a href="#" class="submissions-count" tal:condition="form.submissions_count > 1">
+                        <span>${form.submissions_count}</span>
+                        <span i18n:translate="">Submissions</span>
+                    </a>
+                    <span class="submissions-count no-submissions" tal:condition="not:form.submissions_count">
+                        <span>${form.submissions_count}</span>
+                        <span i18n:translate="">Submissions</span>
+                    </span>
+                </tal:block>
             </li>
         </ul>
     </tal:block>

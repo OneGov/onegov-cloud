@@ -159,7 +159,7 @@ form {
     }
 
     .code-editor,
-    .ace_scroller, 
+    .ace_scroller,
     .ace_content {
         height: $code-editor-height - 15px;
     }
@@ -193,6 +193,27 @@ form {
 .row.fieldset-display-submit form {
     display: inline-block;
     margin-right: .5em;
+}
+
+/*
+    form collection rendering
+*/
+.submissions-count {
+    display: block;
+    font-size: .8em;
+    margin-bottom: 1em;
+
+    span:first-child:before {
+        color: $body-font-color;
+        content: '\f046\00a0';
+        font-family: 'FontAwesome';
+    }
+
+    &.no-submissions span:first-child:before {
+        color: $body-font-color;
+        content: '\f096\00a0';
+        font-family: 'FontAwesome';
+    }
 }
 
 /*
