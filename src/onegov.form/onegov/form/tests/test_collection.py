@@ -97,9 +97,8 @@ def test_submit_pending(session):
         'tweet', submitted_form, state='pending')
     assert isinstance(submission, PendingFormSubmission)
 
-    # but invalid data is purged from the submission
     assert 'handle' in submission.data
-    assert 'tweet' not in submission.data
+    assert 'tweet' in submission.data
 
     with pytest.raises(UnableToComplete):
         submission.complete()

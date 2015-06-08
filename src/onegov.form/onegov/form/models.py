@@ -122,24 +122,6 @@ class FormSubmission(Base, TimestampMixin):
 
         self.state = 'complete'
 
-    def prune(self, form=None):
-        """ Pending submissions are not necessarily valid. This function
-        removes the invalid bits from the data if called.
-
-        On 'completed' submissions it has no effect.
-
-        """
-        if self.state == 'pending':
-
-            if not form:
-                form = self.form_class(data=self.data)
-                form.validate()
-
-            for field_id in form.errors:
-                if field_id in self.data:
-                    del self.data[field_id]
-                    form._fields[field_id].data = ''
-
 
 class PendingFormSubmission(FormSubmission):
     __mapper_args__ = {'polymorphic_identity': 'pending'}

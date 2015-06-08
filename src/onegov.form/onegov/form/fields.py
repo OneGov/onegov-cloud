@@ -3,17 +3,12 @@ import magic
 import zlib
 
 from onegov.form.widgets import UploadWidget
-from wtforms import FileField, StringField, SelectMultipleField, widgets
-from wtforms.widgets import html5 as html5_widgets
+from wtforms import FileField, SelectMultipleField, widgets
 
 
 class MultiCheckboxField(SelectMultipleField):
     widget = widgets.ListWidget(prefix_label=False)
     option_widget = widgets.CheckboxInput()
-
-
-class TimeField(StringField):
-    widget = html5_widgets.TimeInput
 
 
 class UploadField(FileField):

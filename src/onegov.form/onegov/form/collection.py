@@ -133,10 +133,6 @@ class FormSubmissionCollection(object):
         submission.definition = form._source
         submission.data = form.data
 
-        # pending submissions are not necessarily valid, however we don't need
-        # to store invalid state as it is wiped out anyway
-        submission.prune(form)
-
         # never include the csrf token
         if form.meta.csrf and form.meta.csrf_field_name in submission.data:
             del submission.data[form.meta.csrf_field_name]

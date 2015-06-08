@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Store all information, even invalid one, to avoid accidentally throwing
+  away error information.
+  [href]
+
 - Fixes time field triggering an error.
   [href]
 

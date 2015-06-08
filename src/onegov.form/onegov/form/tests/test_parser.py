@@ -2,7 +2,6 @@
 import pytest
 
 from onegov.form import errors
-from onegov.form.fields import TimeField
 from onegov.form.parser import parse_form
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -12,6 +11,7 @@ from wtforms.fields.html5 import (
     DateTimeLocalField,
     EmailField
 )
+from wtforms_components import TimeField
 
 
 def test_parse_text():
