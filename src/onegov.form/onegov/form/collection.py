@@ -235,3 +235,8 @@ class FormSubmissionCollection(object):
             query = query.filter(FormSubmission.last_change >= an_hour_ago)
 
         return query.first()
+
+    def delete(self, submission):
+        """ Deletes the given submission and all the files belonging to it. """
+        self.session.delete(submission)
+        self.session.flush()
