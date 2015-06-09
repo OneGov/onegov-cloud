@@ -260,6 +260,33 @@ form {
         content: '\f003\00a0';
         font-family: 'FontAwesome';
     }
+
+    .submission-action-show {
+        color: $success-color;
+    }
+
+    .submission-action-edit {
+        color: $warning-color;
+    }
+
+    .submission-action-delete {
+        color: $alert-color;
+    }
+
+    .submission-action-show:before {
+        content: '\f06e\00a0';
+        font-family: 'FontAwesome';
+    }
+
+    .submission-action-edit:before {
+        content: '\f040\00a0';
+        font-family: 'FontAwesome';
+    }
+
+    .submission-action-delete:before {
+        content: '\f014 \00a0';
+        font-family: 'FontAwesome';
+    }
 }
 
 /*

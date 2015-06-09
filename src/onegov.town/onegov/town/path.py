@@ -15,6 +15,7 @@ from onegov.form import (
     FormDefinition,
     FormCollection,
     FormSubmissionCollection,
+    CompleteFormSubmission,
     PendingFormSubmission
 )
 from onegov.page import PageCollection
@@ -70,6 +71,12 @@ def get_form_submissions(app, name):
 def get_pending_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='pending', current_only=True)
+
+
+@TownApp.path(model=CompleteFormSubmission, path='/formular-eingang/{id}')
+def get_complete_form_submission(app, id):
+    return FormCollection(app.session()).submissions.by_id(
+        id, state='complete', current_only=False)
 
 
 @TownApp.path(model=Editor, path='/editor/{action}/{trait}/{page_id}')

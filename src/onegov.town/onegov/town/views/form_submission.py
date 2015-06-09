@@ -2,11 +2,12 @@
 
 import morepath
 
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.form import (
     FormCollection,
     FormDefinition,
     PendingFormSubmission,
+    CompleteFormSubmission,
     render_field
 )
 from onegov.town import _
@@ -95,3 +96,10 @@ def handle_complete_submission(self, request):
 
         collection = FormCollection(request.app.session())
         return morepath.redirect(request.link(collection))
+
+
+@TownApp.view(
+    model=CompleteFormSubmission, request_method='DELETE', permission=Private)
+def delete_form_submission(self, request):
+    request.assert_valid_csrf_token()
+    FormCollection(request.app.session()).submissions.delete(self)
