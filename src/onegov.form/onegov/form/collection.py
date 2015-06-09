@@ -25,6 +25,10 @@ class FormCollection(object):
     def submissions(self):
         return FormSubmissionCollection(self.session)
 
+    def scoped_submissions(self, name, ensure_existance=True):
+        if not ensure_existance or self.definitions.by_name(name):
+            return FormSubmissionCollection(self.session, name)
+
 
 class FormDefinitionCollection(object):
     """ Manages a collection of forms. """
@@ -79,13 +83,19 @@ class FormDefinitionCollection(object):
 class FormSubmissionCollection(object):
     """ Manages a collection of submissions. """
 
-    def __init__(self, session):
+    def __init__(self, session, name=None):
         self.session = session
+        self.name = name
 
     def query(self):
-        return self.session.query(FormSubmission)
+        query = self.session.query(FormSubmission)
 
-    def add(self, form_name, form, state):
+        if self.name is not None:
+            query = query.filter(FormSubmission.name == self.name)
+
+        return query
+
+    def add(self, name, form, state):
         """ Takes a form filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -106,7 +116,7 @@ class FormSubmissionCollection(object):
 
         submission = (_mapper and _mapper.class_ or FormSubmission)()
         submission.id = uuid4()
-        submission.name = form_name
+        submission.name = name
         submission.state = state
 
         self.update(submission, form)
@@ -199,7 +209,7 @@ class FormSubmissionCollection(object):
         query = query.filter(FormSubmission.last_change < older_than)
         query.delete('fetch')
 
-    def by_form_name(self, name):
+    def by_name(self, name):
         """ Return all submissions for the given form-name. """
         return self.query().filter(FormSubmission.name == name).all()
 

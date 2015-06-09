@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to scope a submission collection to a specific form.
+  [href]
+
 0.5.1 (2015-06-08)
 ~~~~~~~~~~~~~~~~~~~
 
