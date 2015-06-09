@@ -211,10 +211,26 @@ form {
         margin-bottom: .2em;
         max-width: 500px;
     }
+}
 
-    .submissions-count {
-        display: block;
-        font-size: .8em;
+.form-definition-info {
+    @include label(
+        $bg: $secondary-color,
+        $padding: 2px 4px,
+        $radius: 2px,
+        $text-size: rem-calc(12)
+    );
+
+    &.has-submissions {
+        background-color: $success-color;
+
+        * {
+            color: #fff;
+        }
+    }
+
+    &.builtin-form {
+        background-color: $info-color;
     }
 }
 

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-06-08 17:02+0200\n"
+"POT-Creation-Date: 2015-06-09 09:50+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -224,12 +224,20 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:14
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:15
+msgid "Builtin Form"
+msgstr "Vordefiniert"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:18
+msgid "Custom Form"
+msgstr "Gemeindespezifisch"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:23
 msgid "Submission"
 msgstr "Eingabe"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:18
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:22
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:26
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:29
 msgid "Submissions"
 msgstr "Eingaben"
 
