@@ -178,7 +178,7 @@ form {
 /*
     form display rendering
 */
-.row.fieldset-display {
+.fieldset-display {
     margin-bottom: 1em;
 
     .field-display {
@@ -231,6 +231,34 @@ form {
 
     &.builtin-form {
         background-color: $info-color;
+    }
+}
+
+/*
+    form submissions rendering
+*/
+
+.submissions {
+    list-style: none;
+    margin-left: 0;
+
+    li + li {
+        margin-top: 1em;
+    }
+
+    .submission-date:before {
+        content: '\f133';
+        font-family: 'FontAwesome';
+    }
+
+    .submission-title:before {
+        content: '\f093';
+        font-family: 'FontAwesome';
+    }
+
+    .submission-email:before {
+        content: '\f003\00a0';
+        font-family: 'FontAwesome';
     }
 }
 

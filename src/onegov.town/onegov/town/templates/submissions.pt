@@ -1,0 +1,22 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <ul class="submissions">
+            <li tal:repeat="submission submissions">
+                <div class="submission-date">
+                    ${layout.format_date(submission.received, 'datetime')}
+                </div>
+
+                <div class="submission-title">
+                    ${submission.title}
+                </div>
+
+                <div class="submission-email" tal:condition="submission.email">
+                    <a href="mailto:${submission.email}">${submission.email}</a>
+                </div>
+            </li>
+        </ul>
+    </tal:block>
+</div>

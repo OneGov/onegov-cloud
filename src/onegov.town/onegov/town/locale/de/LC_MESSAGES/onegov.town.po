@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-06-09 09:50+0200\n"
+"POT-Creation-Date: 2015-06-09 11:43+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -95,6 +95,7 @@ msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:235
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:320
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:350
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:110
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:98
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:136
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
@@ -105,7 +106,8 @@ msgstr "Startseite"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:321
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:351
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:45
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:56
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:111
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:99
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:137
 msgid "Forms"
@@ -232,12 +234,13 @@ msgstr "Vordefiniert"
 msgid "Custom Form"
 msgstr "Gemeindespezifisch"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:23
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:24
 msgid "Submission"
 msgstr "Eingabe"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:26
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:29
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:28
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:31
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:113
 msgid "Submissions"
 msgstr "Eingaben"
 
@@ -337,6 +340,16 @@ msgstr "Ihre Änderungen wurden gespeichert"
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/exceptionviews.py:25
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:74
+#, python-format
+msgid "Form definition from ${date}"
+msgstr "Formular Definition vom ${date}"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:118
+#, python-format
+msgid "Submissions for \"${form}\""
+msgstr "Eingaben zu \"${form}\""
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:105
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:100

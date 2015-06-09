@@ -19,10 +19,12 @@
                         </tal:block>
                     </div>
                     <div class="form-definition-info ${form.submissions_count and 'has-submissions' or 'no-submissions'}">
-                        <a href="#" tal:condition="form.submissions_count == 1">
+                        <a href="${request.link(get_submissions_collection(form.name))}" 
+                           tal:condition="form.submissions_count == 1">
                             <span>${form.submissions_count}</span> <span i18n:translate="">Submission</span>
                         </a>
-                        <a href="#" tal:condition="form.submissions_count > 1">
+                        <a href="${request.link(get_submissions_collection(form.name))}"
+                           tal:condition="form.submissions_count > 1">
                             <span>${form.submissions_count}</span> <span i18n:translate="">Submissions</span>
                         </a>
                         <span tal:condition="not:form.submissions_count">

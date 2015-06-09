@@ -6,6 +6,7 @@ from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
 from onegov.town.models import ImageCollection
+from pytz import timezone
 from purl import URL
 
 
@@ -28,6 +29,12 @@ class Layout(object):
     inheriting from this one should be added.
 
     """
+
+    # XXX those could be configured/detected from the request
+    timezone = timezone('Europe/Zurich')
+    time_format = '%H:%M'
+    date_format = '%d.%m.%Y'
+    datetime_format = ' '.join((date_format, time_format))
 
     def __init__(self, model, request):
         self.model = model
@@ -173,6 +180,16 @@ class Layout(object):
 
         """
         return self.request.new_csrf_token()
+
+    def format_date(self, date, format):
+        """ Takes a datetime and formats it according to local timezone and
+        the given format.
+
+        """
+        assert format in {'date', 'time', 'datetime'}
+
+        date = self.timezone.normalize(date.astimezone(self.timezone))
+        return date.strftime(getattr(self, format + '_format'))
 
 
 class DefaultLayout(Layout):

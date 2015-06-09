@@ -1,12 +1,19 @@
 """ Lists the builtin and custom forms. """
 
-from onegov.core.security import Public
-from onegov.form import FormCollection, FormDefinition, FormSubmission
+from functools import partial
+
+from onegov.core.security import Public, Private
+from onegov.form import (
+    FormCollection,
+    FormSubmissionCollection,
+    FormDefinition,
+    FormSubmission
+)
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.layout import FormCollectionLayout
-
-from sqlalchemy import func
+from onegov.town.elements import Link
+from onegov.town.layout import DefaultLayout, FormCollectionLayout
+from sqlalchemy import desc, func
 
 
 def get_definitions_with_submission_count(session):
@@ -33,7 +40,7 @@ def get_definitions_with_submission_count(session):
 
 
 @TownApp.html(model=FormCollection, template='forms.pt', permission=Public)
-def view_get_form_collection(self, request):
+def view_form_collection(self, request):
 
     if request.is_logged_in:
         forms = get_definitions_with_submission_count(request.app.session())
@@ -44,4 +51,32 @@ def view_get_form_collection(self, request):
         'layout': FormCollectionLayout(self, request),
         'title': _("Forms"),
         'forms': forms,
+        'get_submissions_collection': partial(
+            self.scoped_submissions, ensure_existance=False)
+    }
+
+
+@TownApp.html(model=FormSubmissionCollection, template='submissions.pt',
+              permission=Private)
+def view_form_submission_collection(self, request):
+
+    form_collection = FormCollection(request.app.session())
+    form = form_collection.definitions.by_name(self.name)
+
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Forms"), request.link(form_collection)),
+        Link(form.title, request.link(form)),
+        Link(_("Submissions"), '#')
+    ]
+
+    submissions = self.query().order_by(desc(FormSubmission.received))
+
+    return {
+        'layout': layout,
+        'title': _("Submissions for \"${form}\"", mapping={
+            'form': form.title
+        }),
+        'submissions': submissions
     }

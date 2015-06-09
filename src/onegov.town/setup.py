@@ -47,6 +47,7 @@ setup(
         'onegov.user',
         'pillow',
         'purl',
+        'pytz',
         'translationstring',
     ],
     extras_require=dict(
