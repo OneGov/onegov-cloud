@@ -1,7 +1,7 @@
 from cached_property import cached_property
 from onegov.core.compat import zip_longest
 from onegov.core.static import StaticFile
-from onegov.form import FormCollection
+from onegov.form import FormCollection, render_field
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
@@ -190,6 +190,10 @@ class Layout(object):
 
         date = self.timezone.normalize(date.astimezone(self.timezone))
         return date.strftime(getattr(self, format + '_format'))
+
+    def render_field(self, field):
+        """ Alias for ``onegov.form.render_field``. """
+        return render_field(field)
 
 
 class DefaultLayout(Layout):

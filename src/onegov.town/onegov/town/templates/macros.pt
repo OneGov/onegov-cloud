@@ -146,4 +146,20 @@
     </div>
 </metal:page_content>
 
+<metal:display_form define-macro="display_form" i18n:domain="onegov.town">
+    <div tal:repeat="fieldset form.fieldsets">
+        <tal:block define="fields fieldset.non_empty_fields" condition="fields">
+            <h2 tal:condition="fieldset.is_visible">${fieldset.label}</h2>
+            <div class="field-display" tal:repeat="field fields.values()">
+                <tal:block define="rendered layout.render_field(field)" condition="rendered">
+                    <div class="field-display-label">${field.label.text}</div>
+                    <div class="field-display-data">
+                        <tal:block replace="structure layout.render_field(field)" />
+                    </div>
+                </tal:block>
+            </div>
+        </tal:block>
+    </div>
+</metal:display_form>
+
 </body>

@@ -7,12 +7,12 @@ from onegov.form import (
     FormCollection,
     FormDefinition,
     PendingFormSubmission,
-    CompleteFormSubmission,
-    render_field
+    CompleteFormSubmission
 )
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.layout import FormSubmissionLayout
+from onegov.town.elements import Link
+from onegov.town.layout import DefaultLayout, FormSubmissionLayout
 
 
 @TownApp.form(model=FormDefinition, form=lambda e: e.form_class,
@@ -42,9 +42,9 @@ def handle_defined_form(self, request, form):
     }
 
 
-@TownApp.html(model=PendingFormSubmission, template='submission.pt',
+@TownApp.html(model=PendingFormSubmission, template='pending_submission.pt',
               permission=Public, request_method='GET')
-@TownApp.html(model=PendingFormSubmission, template='submission.pt',
+@TownApp.html(model=PendingFormSubmission, template='pending_submission.pt',
               permission=Public, request_method='POST')
 def handle_pending_submission(self, request):
     """ Renders a pending submission, takes it's input and allows the
@@ -70,7 +70,6 @@ def handle_pending_submission(self, request):
         'title': self.form.title,
         'form': form,
         'completable': completable,
-        'render_field': render_field,
         'edit_link': request.link(self) + '?edit',
         'complete_link': request.link(self, 'complete')
     }
@@ -98,8 +97,31 @@ def handle_complete_submission(self, request):
         return morepath.redirect(request.link(collection))
 
 
-@TownApp.view(
-    model=CompleteFormSubmission, request_method='DELETE', permission=Private)
+@TownApp.html(model=CompleteFormSubmission, request_method='GET',
+              permission=Private, template='complete_submission.pt')
+def view_form_submission(self, request):
+    collection = FormCollection(request.app.session())
+
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Forms"), request.link(collection)),
+        Link(self.form.title, request.link(self.form)),
+        Link(_("Submissions"), request.link(
+            collection.scoped_submissions(
+                name=self.name, ensure_existance=False))),
+        Link(self.title, '#')
+    ]
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'form': request.get_form(self.form_class, data=self.data),
+    }
+
+
+@TownApp.view(model=CompleteFormSubmission, request_method='DELETE',
+              permission=Private)
 def delete_form_submission(self, request):
     request.assert_valid_csrf_token()
     FormCollection(request.app.session()).submissions.delete(self)

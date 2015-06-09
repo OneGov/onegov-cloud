@@ -18,7 +18,7 @@
                 </div>
 
                 <div class="submission-actions">
-                    <a class="submission-action-show" href="#" i18n:translate="">Show</a>
+                    <a class="submission-action-show" href="${request.link(submission)}" i18n:translate="">Show</a>
                     <a class="submission-action-edit" href="#" i18n:translate="">Edit</a>
 
                     <a class="submission-action-delete delete confirm"
