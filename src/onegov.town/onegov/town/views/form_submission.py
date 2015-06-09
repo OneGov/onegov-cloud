@@ -11,8 +11,7 @@ from onegov.form import (
 )
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Link
-from onegov.town.layout import DefaultLayout, FormSubmissionLayout
+from onegov.town.layout import FormSubmissionLayout
 
 
 @TownApp.form(model=FormDefinition, form=lambda e: e.form_class,
@@ -42,10 +41,14 @@ def handle_defined_form(self, request, form):
     }
 
 
-@TownApp.html(model=PendingFormSubmission, template='pending_submission.pt',
+@TownApp.html(model=PendingFormSubmission, template='submission.pt',
               permission=Public, request_method='GET')
-@TownApp.html(model=PendingFormSubmission, template='pending_submission.pt',
+@TownApp.html(model=PendingFormSubmission, template='submission.pt',
               permission=Public, request_method='POST')
+@TownApp.html(model=CompleteFormSubmission, template='submission.pt',
+              permission=Private, request_method='GET')
+@TownApp.html(model=CompleteFormSubmission, template='submission.pt',
+              permission=Private, request_method='POST')
 def handle_pending_submission(self, request):
     """ Renders a pending submission, takes it's input and allows the
     user to turn the submission into a complete submission, once all data
@@ -71,12 +74,16 @@ def handle_pending_submission(self, request):
         'form': form,
         'completable': completable,
         'edit_link': request.link(self) + '?edit',
-        'complete_link': request.link(self, 'complete')
+        'complete_link': request.link(self, 'complete'),
+        'is_pending': self.state == 'pending',
+        'readonly': 'readonly' in request.GET
     }
 
 
-@TownApp.view(model=PendingFormSubmission, name='complete', permission=Public,
-              request_method='POST')
+@TownApp.view(model=PendingFormSubmission, name='complete',
+              permission=Public, request_method='POST')
+@TownApp.view(model=CompleteFormSubmission, name='complete',
+              permission=Private, request_method='POST')
 def handle_complete_submission(self, request):
     form = request.get_form(self.form_class, data=self.data)
 
@@ -88,36 +95,24 @@ def handle_complete_submission(self, request):
     if form.errors:
         return morepath.redirect(request.link(self))
     else:
-        self.state = 'complete'
 
-        # TODO Show a new page with the transaction id and a thank you
-        request.success(_(u"Thank you for your submission"))
+        if self.state == 'complete':
+            self.state = 'complete'  # trigger updates
 
-        collection = FormCollection(request.app.session())
-        return morepath.redirect(request.link(collection))
+            request.success(_(u"Your changes were saved"))
 
+            return morepath.redirect(request.link(
+                FormCollection(request.app.session()).scoped_submissions(
+                    self.name, ensure_existance=False)
+            ))
+        else:
+            self.state = 'complete'
 
-@TownApp.html(model=CompleteFormSubmission, request_method='GET',
-              permission=Private, template='complete_submission.pt')
-def view_form_submission(self, request):
-    collection = FormCollection(request.app.session())
+            # TODO Show a new page with the transaction id and a thank you
+            request.success(_(u"Thank you for your submission"))
 
-    layout = DefaultLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(collection)),
-        Link(self.form.title, request.link(self.form)),
-        Link(_("Submissions"), request.link(
-            collection.scoped_submissions(
-                name=self.name, ensure_existance=False))),
-        Link(self.title, '#')
-    ]
-
-    return {
-        'layout': layout,
-        'title': self.title,
-        'form': request.get_form(self.form_class, data=self.data),
-    }
+            collection = FormCollection(request.app.session())
+            return morepath.redirect(request.link(collection))
 
 
 @TownApp.view(model=CompleteFormSubmission, request_method='DELETE',

@@ -18,8 +18,8 @@
                 </div>
 
                 <div class="submission-actions">
-                    <a class="submission-action-show" href="${request.link(submission)}" i18n:translate="">Show</a>
-                    <a class="submission-action-edit" href="#" i18n:translate="">Edit</a>
+                    <a class="submission-action-show" href="${request.link(submission)}?readonly" i18n:translate="">Show</a>
+                    <a class="submission-action-edit" href="${request.link(submission)}?edit" i18n:translate="">Edit</a>
 
                     <a class="submission-action-delete delete confirm"
                            ic-delete-from="${request.link(submission)}?csrf-token=${layout.csrf_token}"
