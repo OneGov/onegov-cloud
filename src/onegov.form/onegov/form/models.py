@@ -1,4 +1,6 @@
+from delorean import Delorean
 from hashlib import md5
+from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
@@ -91,6 +93,9 @@ class FormSubmission(Base, TimestampMixin):
     #: want to keep the old form around just in case.
     definition = Column(Text, nullable=False)
 
+    #: the exact time this submissions was changed from 'pending' to 'complete'
+    received = Column(UTCDateTime, nullable=True)
+
     #: the checksum of the definition, forms and submissions with matching
     #: checksums are guaranteed to have the exact same definition
     checksum = Column(Text, nullable=False)
@@ -155,6 +160,8 @@ class FormSubmission(Base, TimestampMixin):
 
             if email_fields:
                 self.email = form._fields[email_fields[0]].data
+
+            self.received = Delorean().datetime
 
     def complete(self):
         """ Changes the state to 'complete', if the data is valid. """

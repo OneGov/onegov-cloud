@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a 'received' field to the submissions which contains the time at which
+  the submission was received.
+
 - Adds an email and a title field to the submission.
   [href]
 
