@@ -5,6 +5,7 @@ from collections import OrderedDict
 from itertools import groupby
 from operator import itemgetter
 from wtforms import Form as BaseForm
+from wtforms.validators import InputRequired, DataRequired
 
 
 class Form(BaseForm):
@@ -86,6 +87,62 @@ class Form(BaseForm):
         if self.meta.csrf_field_name in self.errors:
             del self.errors[self.meta.csrf_field_name]
             self.csrf_token.errors = []
+
+    def match_fields(self, include_classes=None, exclude_classes=None,
+                     required=None, limit=None):
+        """ Returns field ids matching the given search criteria.
+
+        :include_classes:
+            A list of field classes which should be included.
+
+        :excluded_classes:
+            A list of field classes which should be excluded.
+
+        :required:
+            True if required fields only, False if no required fields.
+
+        :limit:
+            If > 0, limits the number of returned elements.
+
+        All parameters may be set to None disable matching it to anything.
+
+        """
+
+        matches = []
+
+        for field_id, field in self._fields.items():
+            if include_classes:
+                for cls in include_classes:
+                    if isinstance(field, cls):
+                        break
+                else:
+                    continue
+
+            if exclude_classes:
+                for cls in exclude_classes:
+                    if not isinstance(field, cls):
+                        break
+                else:
+                    continue
+
+            if required is True and not self.is_required(field_id):
+                continue
+
+            if required is False and self.is_required(field_id):
+                continue
+
+            matches.append(field_id)
+
+            if limit and len(matches) == limit:
+                break
+
+        return matches
+
+    def is_required(self, field_id):
+        for validator in self._fields[field_id].validators:
+            if isinstance(validator, (InputRequired, DataRequired)):
+                return True
+        return False
 
 
 class Fieldset(object):

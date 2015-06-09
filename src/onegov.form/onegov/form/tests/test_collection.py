@@ -72,6 +72,31 @@ def test_submit_form(session):
     assert submitted_form.data == stored_form.data
 
 
+def test_submission_extra_data(session):
+    collection = FormCollection(session)
+
+    form = collection.definitions.add('TPS Report', definition=dedent("""
+        First Name * = ___
+        Last Name * = ___
+        E-Mail = @@@
+        Date = YYYY.MM.DD
+    """))
+
+    data = MultiDict([
+        ('first_name', 'Bill'),
+        ('last_name', 'Lumbergh'),
+        ('e_mail', 'bill.lumbergh@initech.com'),
+        ('date', '2011-01-01')
+    ])
+
+    submitted_form = form.form_class(data)
+    submission = collection.submissions.add(
+        'tps-report', submitted_form, state='complete')
+
+    assert submission.title == 'Bill, Lumbergh'
+    assert submission.email == 'bill.lumbergh@initech.com'
+
+
 def test_submit_pending(session):
     collection = FormCollection(session)
 

@@ -2,6 +2,7 @@ from hashlib import md5
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
+from onegov.form.display import render_field
 from onegov.form.errors import UnableToComplete
 from onegov.form.parser import parse_form
 from sqlalchemy import Column, Enum, ForeignKey, Text
@@ -11,6 +12,8 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy_utils import observes
 from uuid import uuid4
+from wtforms import StringField, TextAreaField
+from wtforms.fields.html5 import EmailField
 
 
 def hash_definition(definition):
@@ -75,6 +78,14 @@ class FormSubmission(Base, TimestampMixin):
     #: name of the form this submission belongs to
     name = Column(Text, ForeignKey(FormDefinition.name), nullable=False)
 
+    #: the title of the submission, generated from the submitted fields
+    #: NULL for submissions which are not complete
+    title = Column(Text, nullable=True)
+
+    #: the e-mail address associated with the submitee, generated from the
+    # submitted fields (may be NULL, even for complete submissions)
+    email = Column(Text, nullable=True)
+
     #: the source code of the form at the moment of submission. This is stored
     #: alongside the submission as the original form may change later. We
     #: want to keep the old form around just in case.
@@ -113,6 +124,37 @@ class FormSubmission(Base, TimestampMixin):
     @observes('definition')
     def definition_observer(self, definition):
         self.checksum = hash_definition(definition)
+
+    @observes('state')
+    def state_observer(self, state):
+        if self.state == 'complete':
+            form = self.form_class(data=self.data)
+
+            title_fields = form.match_fields(
+                include_classes=(StringField, ),
+                exclude_classes=(TextAreaField, ),
+                required=True,
+                limit=3
+            )
+
+            if title_fields:
+                self.title = u', '.join(
+                    render_field(form._fields[id]) for id in title_fields
+                )
+
+            email_fields = form.match_fields(
+                include_classes=(EmailField, ),
+                required=True,
+                limit=1
+            )
+            email_fields += form.match_fields(
+                include_classes=(EmailField, ),
+                required=False,
+                limit=1
+            )
+
+            if email_fields:
+                self.email = form._fields[email_fields[0]].data
 
     def complete(self):
         """ Changes the state to 'complete', if the data is valid. """

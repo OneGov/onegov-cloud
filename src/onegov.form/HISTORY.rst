@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an email and a title field to the submission.
+  [href]
+
 - Adds the ability to scope a submission collection to a specific form.
   [href]
 

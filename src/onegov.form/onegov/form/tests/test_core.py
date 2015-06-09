@@ -1,5 +1,6 @@
 from onegov.form import Form, with_options
-from wtforms import StringField, validators
+from wtforms import StringField, TextAreaField, validators
+from wtforms.fields.html5 import EmailField
 from wtforms.widgets import TextArea
 
 
@@ -44,3 +45,22 @@ def test_with_options():
 
     widget = with_options(TextArea, class_="x")
     assert 'class="x"' in widget(DummyField('one', 'one', '1'))
+
+
+def test_match_fields():
+
+    class TestForm(Form):
+        name = StringField("Name", [validators.DataRequired()])
+        email = EmailField("E-Mail")
+        comment = TextAreaField("Comment")
+
+    form = TestForm()
+    assert form.match_fields(required=True) == ['name']
+    assert form.match_fields(required=False) == ['email', 'comment']
+    assert form.match_fields(required=None) == ['name', 'email', 'comment']
+    assert form.match_fields(required=None, limit=1) == ['name']
+    assert form.match_fields(include_classes=(StringField, ))\
+        == ['name', 'email', 'comment']
+    assert form.match_fields(include_classes=(EmailField, )) == ['email']
+    assert form.match_fields(exclude_classes=(TextAreaField, ))\
+        == ['name', 'email']
