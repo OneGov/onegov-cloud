@@ -30,4 +30,8 @@ class TimestampMixin(object):
     @hybrid_property
     def last_change(self):
         """ Returns the self.modified if not NULL, else self.created. """
-        return func.coalesce(self.modified, self.created)
+        return self.modified or self.created
+
+    @last_change.expression
+    def last_change(cls):
+        return func.coalesce(cls.modified, cls.created)

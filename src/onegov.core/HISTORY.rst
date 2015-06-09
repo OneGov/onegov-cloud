@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Make sure the last_change timestamp property works for single objects.
+  [href]
+
 0.3.5 (2015-06-03)
 ~~~~~~~~~~~~~~~~~~~
 
