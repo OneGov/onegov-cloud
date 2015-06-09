@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.5.2 (2015-06-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a 'received' field to the submissions which contains the time at which
   the submission was received.
 
