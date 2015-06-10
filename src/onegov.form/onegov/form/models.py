@@ -10,6 +10,7 @@ from onegov.form.parser import parse_form
 from sqlalchemy import Column, Enum, ForeignKey, Text
 from sqlalchemy.orm import (
     deferred,
+    object_session,
     relationship,
 )
 from sqlalchemy_utils import observes
@@ -67,6 +68,15 @@ class FormDefinition(Base, TimestampMixin):
     @observes('definition')
     def definition_observer(self, definition):
         self.checksum = hash_definition(definition)
+
+    def has_submissions(self, with_state=None):
+        query = object_session(self).query(FormSubmission.id)
+        query = query.filter(FormSubmission.name == self.name)
+
+        if with_state is not None:
+            query = query.filter(FormSubmission.state == with_state)
+
+        return query.first() and True or False
 
 
 class FormSubmission(Base, TimestampMixin):

@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a helpful ``has_submissions`` function on the form definition model.
+  [href]
+
+- Automatically delete pending submissions when removing a definition.
+  [href]
+
 0.5.3 (2015-06-10)
 ~~~~~~~~~~~~~~~~~~~
 
