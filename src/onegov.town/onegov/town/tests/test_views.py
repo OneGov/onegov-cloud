@@ -523,3 +523,36 @@ def test_add_custom_form(town_app):
 
     form_page.form['nom'] = 'My name'
     form_page.form.submit().follow()
+
+
+def test_delete_builtin_form(town_app):
+    client = Client(town_app)
+    builtin_form = '/formular/wohnsitzbestaetigung'
+
+    response = client.delete(builtin_form, expect_errors=True)
+    assert response.status_code == 403
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    response = client.delete(builtin_form, expect_errors=True)
+    assert response.status_code == 403
+
+
+def test_delete_custom_form(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    form_page = client.get('/formulare/neu')
+    form_page.form['title'] = "My Form"
+    form_page.form['definition'] = "name = ___"
+    form_page = form_page.form.submit().follow()
+
+    client.delete(
+        form_page.pyquery('a.delete-form')[0].attrib['ic-delete-from'])
