@@ -4,11 +4,16 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a function to retrieve form definitions together with the number of
+  complete submissions.
+  [href]
+
 0.5.2 (2015-06-09)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds a 'received' field to the submissions which contains the time at which
   the submission was received.
+  [href]
 
 - Adds an email and a title field to the submission.
   [href]

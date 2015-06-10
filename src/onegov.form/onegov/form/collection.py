@@ -7,7 +7,7 @@ from onegov.form.models import (
     FormSubmission,
     FormSubmissionFile
 )
-from sqlalchemy import inspect, not_
+from sqlalchemy import inspect, func, not_
 from uuid import uuid4
 
 
@@ -28,6 +28,33 @@ class FormCollection(object):
     def scoped_submissions(self, name, ensure_existance=True):
         if not ensure_existance or self.definitions.by_name(name):
             return FormSubmissionCollection(self.session, name)
+
+    def get_definitions_with_submission_count(self):
+        """ Returns all form definitions and the number of submissions
+        belonging to those definitions, in a single query.
+
+        The number of submissions is stored on the form definition under the
+        ``submissions_count`` attribute.
+
+        Only submissions which are 'complete' are considered.
+
+        """
+        submissions = self.session.query(
+            FormSubmission.name,
+            func.count(FormSubmission.id).label('count')
+        )
+        submissions = submissions.filter(FormSubmission.state == 'complete')
+        submissions = submissions.group_by(FormSubmission.name).subquery()
+
+        definitions = self.session.query(FormDefinition, submissions.c.count)
+        definitions = definitions.outerjoin(
+            submissions, submissions.c.name == FormDefinition.name
+        )
+        definitions = definitions.order_by(FormDefinition.name)
+
+        for form, submissions_count in definitions.all():
+            form.submissions_count = submissions_count or 0
+            yield form
 
 
 class FormDefinitionCollection(object):

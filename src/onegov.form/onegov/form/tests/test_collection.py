@@ -97,6 +97,38 @@ def test_submission_extra_data(session):
     assert submission.email == 'bill.lumbergh@initech.com'
 
 
+def test_definitions_with_submissions_count(session):
+    collection = FormCollection(session)
+
+    form = collection.definitions.add('Newsletter', definition="E-Mail = @@@")
+
+    data = MultiDict([
+        ('e_mail', 'test@example.org'),
+    ])
+
+    s1 = collection.submissions.add(
+        'newsletter', form.form_class(data), state='complete')
+
+    form = next(collection.get_definitions_with_submission_count())
+    assert form.submissions_count == 1
+
+    s2 = collection.submissions.add(
+        'newsletter', form.form_class(data), state='complete')
+
+    form = next(collection.get_definitions_with_submission_count())
+    assert form.submissions_count == 2
+
+    collection.submissions.delete(s1)
+
+    form = next(collection.get_definitions_with_submission_count())
+    assert form.submissions_count == 1
+
+    collection.submissions.delete(s2)
+
+    form = next(collection.get_definitions_with_submission_count())
+    assert form.submissions_count == 0
+
+
 def test_submit_pending(session):
     collection = FormCollection(session)
 
