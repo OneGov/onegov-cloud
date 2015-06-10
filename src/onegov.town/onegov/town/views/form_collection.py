@@ -1,5 +1,7 @@
 """ Lists the builtin and custom forms. """
 
+from functools import partial
+
 from onegov.core.security import Public, Private
 from onegov.form import (
     FormCollection,
@@ -25,7 +27,9 @@ def view_form_collection(self, request):
     return {
         'layout': FormCollectionLayout(self, request),
         'title': _("Forms"),
-        'forms': forms
+        'forms': forms,
+        'get_submissions_collection': partial(
+            self.scoped_submissions, ensure_existance=False)
     }
 
 
