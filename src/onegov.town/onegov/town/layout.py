@@ -1,7 +1,7 @@
 from cached_property import cached_property
 from onegov.core.compat import zip_longest
 from onegov.core.static import StaticFile
-from onegov.form import FormCollection, render_field
+from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
@@ -194,6 +194,14 @@ class Layout(object):
     def render_field(self, field):
         """ Alias for ``onegov.form.render_field``. """
         return render_field(field)
+
+    def field_download_link(self, field):
+        if not field.type == 'UploadField':
+            return None
+
+        if field.data.get('data', '').startswith('@'):
+            return self.request.link(
+                FormSubmissionFile(id=field.data['data'].lstrip('@')))
 
 
 class DefaultLayout(Layout):

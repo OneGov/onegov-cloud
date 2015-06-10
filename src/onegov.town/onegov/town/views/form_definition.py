@@ -9,6 +9,7 @@ from onegov.town.layout import FormEditorLayout
 from onegov.town.utils import sanitize_html, mark_images
 from wtforms import StringField, TextAreaField, validators
 from wtforms.widgets import TextArea
+from webob import exc
 
 
 class FormDefinitionBaseForm(Form):
@@ -150,9 +151,14 @@ def handle_edit_definition(self, request, form):
 @TownApp.view(model=FormDefinition, request_method='DELETE',
               permission=Private)
 def delete_form_definition(self, request):
-    assert self.type == 'custom'
-    assert not self.has_submissions(with_state='complete')
+
     request.assert_valid_csrf_token()
+
+    if self.type != 'custom':
+        raise exc.HTTPMethodNotAllowed()
+
+    if self.has_submissions(with_state='complete'):
+        raise exc.HTTPMethodNotAllowed()
 
     FormCollection(request.app.session()).definitions.delete(
         self.name, with_submissions=False)

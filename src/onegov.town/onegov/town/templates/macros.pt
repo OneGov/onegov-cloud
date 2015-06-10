@@ -153,8 +153,15 @@
             <div class="field-display" tal:repeat="field fields.values()">
                 <tal:block define="rendered layout.render_field(field)" condition="rendered">
                     <div class="field-display-label">${field.label.text}</div>
-                    <div class="field-display-data">
-                        <tal:block replace="structure layout.render_field(field)" />
+                    <div class="field-display-data" tal:define="downloadable request.is_logged_in and field.type == 'UploadField'">
+                        <tal:block condition="downloadable">
+                            <a href="${layout.field_download_link(field)}">
+                                <tal:block replace="structure layout.render_field(field)" />
+                            </a>
+                        </tal:block>
+                        <tal:block condition="not:downloadable">
+                            <tal:block replace="structure layout.render_field(field)" />
+                        </tal:block>
                     </div>
                 </tal:block>
             </div>

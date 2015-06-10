@@ -1,11 +1,13 @@
 """ Renders and handles defined forms, turning them into submissions. """
 
+import base64
 import morepath
 
 from onegov.core.security import Public, Private
 from onegov.form import (
     FormCollection,
     FormDefinition,
+    FormSubmissionFile,
     PendingFormSubmission,
     CompleteFormSubmission
 )
@@ -113,6 +115,15 @@ def handle_complete_submission(self, request):
 
             collection = FormCollection(request.app.session())
             return morepath.redirect(request.link(collection))
+
+
+@TownApp.view(model=FormSubmissionFile, permission=Private)
+def view_form_submission_file(self, request):
+    response = morepath.Response(base64.b64decode(self.filedata))
+    response.content_type = self.submission_data['mimetype']
+    response.content_encoding = 'deflate'
+
+    return response
 
 
 @TownApp.view(model=CompleteFormSubmission, request_method='DELETE',

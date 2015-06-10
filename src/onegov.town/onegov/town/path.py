@@ -14,6 +14,7 @@ from onegov.town.models import (
 from onegov.form import (
     FormDefinition,
     FormCollection,
+    FormSubmissionFile,
     FormSubmissionCollection,
     CompleteFormSubmission,
     PendingFormSubmission
@@ -77,6 +78,11 @@ def get_pending_form_submission(app, id):
 def get_complete_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='complete', current_only=False)
+
+
+@TownApp.path(model=FormSubmissionFile, path='/formular-datei/{id}')
+def get_form_submission_file(app, id):
+    return FormCollection(app.session()).submissions.file_by_id(id)
 
 
 @TownApp.path(model=Editor, path='/editor/{action}/{trait}/{page_id}')
