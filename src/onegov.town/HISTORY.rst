@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to use builtin forms, define custom forms and manage
+  submissions.
+
 - The 'more...' news link is only showed if there actually is more to read.
   [href]
 
