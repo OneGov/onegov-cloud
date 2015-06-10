@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Compress files using gzip instead of zlib, as the former is better supported.
+  [href]
+
 - Change the submission complete method, ensuring the right polymorphic
   instance is returned afterwards.
   [href]

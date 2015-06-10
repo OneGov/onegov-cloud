@@ -1,7 +1,8 @@
 import base64
+import gzip
 import magic
-import zlib
 
+from onegov.core.compat import BytesIO
 from onegov.form.widgets import UploadWidget
 from wtforms import FileField, SelectMultipleField, widgets
 
@@ -55,10 +56,13 @@ class UploadField(FileField):
         mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
         mimetype_by_introspection = mimetype_by_introspection.decode('utf-8')
 
-        compressed_data = zlib.compress(file_data)
+        compressed_data = BytesIO()
+        with gzip.GzipFile(fileobj=compressed_data, mode="wb") as f:
+            f.write(file_data)
 
         return {
-            'data': base64.b64encode(compressed_data).decode('ascii'),
+            'data': base64.b64encode(
+                compressed_data.getvalue()).decode('ascii'),
             'filename': fs.filename,
             'mimetype': mimetype_by_introspection,
             'size': len(file_data)

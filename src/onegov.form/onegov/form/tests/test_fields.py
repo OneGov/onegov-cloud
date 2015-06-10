@@ -1,8 +1,9 @@
 import base64
 import tempfile
-import zlib
 
 from cgi import FieldStorage
+from gzip import GzipFile
+from onegov.core.compat import BytesIO
 from onegov.form import Form
 from onegov.form.fields import UploadField
 
@@ -28,4 +29,9 @@ def test_upload_file():
     assert data['mimetype'] == 'text/plain'
     assert data['size']
     assert data['data']
-    assert zlib.decompress(base64.b64decode(data['data'])) == b'foobar'
+
+    def decompress(data):
+        with GzipFile(filename='', mode='r', fileobj=BytesIO(data)) as f:
+            return f.read()
+
+    assert decompress(base64.b64decode(data['data'])) == b'foobar'
