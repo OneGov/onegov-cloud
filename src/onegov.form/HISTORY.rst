@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.5.3 (2015-06-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a function to retrieve form definitions together with the number of
   complete submissions.
   [href]
