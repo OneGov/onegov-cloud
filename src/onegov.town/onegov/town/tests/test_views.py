@@ -556,3 +556,28 @@ def test_delete_custom_form(town_app):
 
     client.delete(
         form_page.pyquery('a.delete-form')[0].attrib['ic-delete-from'])
+
+
+def test_show_uploaded_file(town_app):
+    collection = FormCollection(town_app.session())
+    collection.definitions.add('Text', definition="File * = *.txt")
+
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    form_page = client.get('/formular/text')
+    form_page.form['file'] = Upload('test.txt', b'foobar')
+    form_page = form_page.form.submit().follow()  # preview
+    form_page = form_page.form.submit().follow()  # finalize
+
+    submission = client.get('/formular/text/eingaben').click('Anzeigen')
+
+    assert 'test.txt' in submission.text
+    file_response = submission.click('test.txt')
+
+    assert file_response.content_type == 'text/plain'
+    assert file_response.text == 'foobar'

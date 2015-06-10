@@ -97,10 +97,8 @@ def handle_complete_submission(self, request):
     if form.errors:
         return morepath.redirect(request.link(self))
     else:
-
         if self.state == 'complete':
-            self.state = 'complete'  # trigger updates
-
+            self.data.changed()  # trigger updates
             request.success(_(u"Your changes were saved"))
 
             return morepath.redirect(request.link(
@@ -108,12 +106,12 @@ def handle_complete_submission(self, request):
                     self.name, ensure_existance=False)
             ))
         else:
-            self.state = 'complete'
+            collection = FormCollection(request.app.session())
+            collection.submissions.complete_submission(self)
 
             # TODO Show a new page with the transaction id and a thank you
             request.success(_(u"Thank you for your submission"))
 
-            collection = FormCollection(request.app.session())
             return morepath.redirect(request.link(collection))
 
 
@@ -121,7 +119,7 @@ def handle_complete_submission(self, request):
 def view_form_submission_file(self, request):
     response = morepath.Response(base64.b64decode(self.filedata))
     response.content_type = self.submission_data['mimetype']
-    response.content_encoding = 'deflate'
+    response.content_encoding = 'gzip'
 
     return response
 

@@ -48,7 +48,9 @@ def view_form_submission_collection(self, request):
         Link(_("Submissions"), '#')
     ]
 
-    submissions = self.query().order_by(desc(FormSubmission.received))
+    submissions = self.by_state('complete')
+    submissions = submissions.order_by(desc(FormSubmission.received))
+    submissions = submissions.all()
 
     return {
         'layout': layout,
