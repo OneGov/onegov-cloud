@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.5.4 (2015-06-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a helpful ``has_submissions`` function on the form definition model.
   [href]
 
