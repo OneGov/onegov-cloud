@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.0 (2015-06-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Compress files using gzip instead of zlib, as the former is better supported.
   [href]
 
