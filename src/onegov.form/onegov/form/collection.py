@@ -270,6 +270,13 @@ class FormSubmissionCollection(object):
 
         return query.first()
 
+    def file_by_id(self, id):
+        """ Returns the submission file with the given id or None. """
+        query = self.session.query(FormSubmissionFile)
+        query = query.filter(FormSubmissionFile.id == id)
+
+        return query.first()
+
     def delete(self, submission):
         """ Deletes the given submission and all the files belonging to it. """
         self.session.delete(submission)

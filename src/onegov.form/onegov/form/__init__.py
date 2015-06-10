@@ -12,6 +12,7 @@ from onegov.form.display import render_field
 from onegov.form.models import (
     FormDefinition,
     FormSubmission,
+    FormSubmissionFile,
     PendingFormSubmission,
     CompleteFormSubmission
 )
@@ -23,6 +24,7 @@ __all__ = [
     'FormSubmissionCollection',
     'FormDefinition',
     'FormSubmission',
+    'FormSubmissionFile',
     'PendingFormSubmission',
     'CompleteFormSubmission',
     'render_field',

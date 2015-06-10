@@ -224,3 +224,11 @@ class FormSubmissionFile(Base, TimestampMixin):
 
     #: the actual file data
     filedata = deferred(Column(Text, nullable=False))
+
+    @property
+    def submission_data(self):
+        """ Returns the data stored on the submission, associated with this
+        submisison file.
+
+        """
+        return self.submission.data.get(self.field_id)
