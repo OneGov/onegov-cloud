@@ -345,22 +345,75 @@ class FormSubmissionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
-            return [
-                LinkGroup(
-                    title=_("Form"),
-                    links=[
-                        Link(
-                            text=_("Edit"),
-                            url=self.request.link(
-                                self.form,
-                                name='bearbeiten'
-                            ),
-                            classes=('edit-form', )
-                        )
-                    ]
-                ),
-            ]
+
+        if not self.request.is_logged_in:
+            return
+
+        collection = FormCollection(self.request.app.session())
+
+        edit_link = Link(
+            text=_("Edit"),
+            url=self.request.link(self.form, name='bearbeiten'),
+            classes=('edit-form', )
+        )
+
+        if self.form.type == 'builtin':
+            delete_link = Link(
+                text=_("Delete"),
+                url=self.request.link(self.form),
+                request_method='DELETE',
+                classes=('confirm', 'delete-form'),
+                attributes={
+                    'data-confirm': _("This form can't be deleted."),
+                    'data-confirm-extra': _(
+                        "This is a builtin-form. "
+                        "Builtin-forms can't be deleted."
+                    ),
+                    'data-confirm-no': _("Cancel"),
+                    'redirect-after': self.request.link(collection)
+                }
+            )
+
+        elif self.form.has_submissions(with_state='complete'):
+            delete_link = Link(
+                text=_("Delete"),
+                url=self.request.link(self.form),
+                request_method='DELETE',
+                classes=('confirm', 'delete-form'),
+                attributes={
+                    'data-confirm': _("This form can't be deleted."),
+                    'data-confirm-extra': _(
+                        "The are submissions associated with the form. "
+                        "Those need to be removed first."
+                    ),
+                    'data-confirm-no': _("Cancel"),
+                    'redirect-after': self.request.link(collection)
+                }
+            )
+        else:
+            delete_link = Link(
+                text=_("Delete"),
+                url=self.request.link(self.form),
+                request_method='DELETE',
+                classes=('confirm', 'delete-form'),
+                attributes={
+                    'data-confirm': _(
+                        "Do you really want to delete this form?"),
+                    'data-confirm-yes': _("Delete form"),
+                    'data-confirm-no': _("Cancel"),
+                    'redirect-after': self.request.link(collection)
+                }
+            )
+
+        return [
+            LinkGroup(
+                title=_("Form"),
+                links=[
+                    edit_link,
+                    delete_link
+                ]
+            ),
+        ]
 
 
 class FormCollectionLayout(DefaultLayout):

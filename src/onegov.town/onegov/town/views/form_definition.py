@@ -145,3 +145,14 @@ def handle_edit_definition(self, request, form):
         'form': form,
         'form_width': 'large',
     }
+
+
+@TownApp.view(model=FormDefinition, request_method='DELETE',
+              permission=Private)
+def delete_form_definition(self, request):
+    assert self.type == 'custom'
+    assert not self.has_submissions(with_state='complete')
+    request.assert_valid_csrf_token()
+
+    FormCollection(request.app.session()).definitions.delete(
+        self.name, with_submissions=False)

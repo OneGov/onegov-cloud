@@ -17,7 +17,7 @@
        i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">Link</a>
 */
 
-/* 
+/*
     Renders the zurb foundation reveal model. Takes question, yes and no
     as options (those are the texts for the respective elements).
 */
@@ -38,9 +38,28 @@ var Confirmation = React.createClass({
     }
 });
 
+
+/*
+    The confirmation, if no 'yes' button is supplied (to inform the user
+    why some action can't be taken).
+*/
+var DenyConfirmation = React.createClass({
+    render: function() {
+        return (
+            <div className="reveal-modal medium confirm-modal" data-reveal role="dialog">
+                <h2>{this.props.question}</h2>
+                <p>{this.props.extra}</p>
+                <a tabIndex="1" className="button secondary no">
+                    {this.props.no}
+                </a>
+            </div>
+        );
+    }
+});
+
 /*
     Actually shows the confirmation and handles the clicks on it.
-    
+
     When 'no' is clicked, the window closes.
 
     When 'yes' is clicked, the window closes and the handle_yes function
@@ -52,10 +71,20 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
 
     $('body').append(el);
 
-    var confirm = React.render(
-        <Confirmation question={question} yes={yes} no={no} extra={extra} />,
-        el.get(0)
-    );
+    var confirm = null;
+
+    if (_.isUndefined(yes)) {
+        confirm = React.render(
+            <DenyConfirmation question={question} no={no} extra={extra} />,
+            el.get(0)
+        );
+    } else {
+        confirm = React.render(
+            <Confirmation
+                question={question} yes={yes} no={no} extra={extra} />,
+            el.get(0)
+        );
+    }
     var confirm_el = $(confirm.getDOMNode());
 
     confirm_el.find('a.no').click(function() {
