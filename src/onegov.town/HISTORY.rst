@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.0 (2015-06-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to use builtin forms, define custom forms and manage
   submissions.
 
