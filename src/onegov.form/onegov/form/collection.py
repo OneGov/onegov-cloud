@@ -1,14 +1,16 @@
 from delorean import Delorean
 from datetime import datetime, timedelta
 from onegov.core.utils import normalize_for_url
+from onegov.form.errors import UnableToComplete
 from onegov.form.fields import UploadField
 from onegov.form.models import (
     FormDefinition,
     FormSubmission,
     FormSubmissionFile
 )
-from sqlalchemy import inspect, func, not_
+from sqlalchemy import inspect, func, not_, exc
 from uuid import uuid4
+import warnings
 
 
 class FormCollection(object):
@@ -167,6 +169,30 @@ class FormSubmissionCollection(object):
 
         return submission
 
+    def complete_submission(self, submission):
+        """ Changes the state to 'complete', if the data is valid. """
+
+        assert submission.state == 'pending'
+
+        if not submission.form_class(data=submission.data).validate():
+            raise UnableToComplete()
+
+        submission.state = 'complete'
+
+        # by completing a submission we are changing it's polymorphic identity,
+        # which is something SQLAlchemy rightly warns us about. Since we know
+        # about it however (and deal with it using self.session.expunge below),
+        # we should ignore this (and only this) warning.
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                action="ignore",
+                message=r'Flushing object',
+                category=exc.SAWarning
+            )
+            self.session.flush()
+
+        self.session.expunge(submission)
+
     def update(self, submission, form):
         """ Takes a submission and a form and updates the submission data
         as well as the files stored in a spearate table.
@@ -242,6 +268,9 @@ class FormSubmissionCollection(object):
         query = query.filter(FormSubmission.state == 'pending')
         query = query.filter(FormSubmission.last_change < older_than)
         query.delete('fetch')
+
+    def by_state(self, state):
+        return self.query().filter(FormSubmission.state == state)
 
     def by_name(self, name):
         """ Return all submissions for the given form-name. """

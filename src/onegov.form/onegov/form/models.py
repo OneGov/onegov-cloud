@@ -5,7 +5,6 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.form.display import render_field
-from onegov.form.errors import UnableToComplete
 from onegov.form.parser import parse_form
 from sqlalchemy import Column, Enum, ForeignKey, Text
 from sqlalchemy.orm import (
@@ -174,14 +173,6 @@ class FormSubmission(Base, TimestampMixin):
             # only set the date the first time around
             if not self.received:
                 self.received = Delorean().datetime
-
-    def complete(self):
-        """ Changes the state to 'complete', if the data is valid. """
-
-        if not self.form_class(data=self.data).validate():
-            raise UnableToComplete()
-
-        self.state = 'complete'
 
 
 class PendingFormSubmission(FormSubmission):

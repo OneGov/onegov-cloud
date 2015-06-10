@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Change the submission complete method, ensuring the right polymorphic
+  instance is returned afterwards.
+  [href]
+
 - Make sure the received date is only set once.
   [href]
 

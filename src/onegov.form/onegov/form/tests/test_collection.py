@@ -3,7 +3,11 @@ import pytest
 from datetime import datetime, timedelta
 from delorean import Delorean
 from onegov.core.compat import BytesIO
-from onegov.form import FormCollection, PendingFormSubmission
+from onegov.form import (
+    FormCollection,
+    PendingFormSubmission,
+    CompleteFormSubmission
+)
 from onegov.form.models import FormSubmissionFile, hash_definition
 from onegov.form.errors import UnableToComplete
 from sqlalchemy.exc import IntegrityError
@@ -158,10 +162,14 @@ def test_submit_pending(session):
     assert 'tweet' in submission.data
 
     with pytest.raises(UnableToComplete):
-        submission.complete()
+        collection.submissions.complete_submission(submission)
 
     submission.data['tweet'] = "Nevermind, it didn't work #mybad"
-    submission.complete()
+    collection.submissions.complete_submission(submission)
+
+    submission = collection.submissions.by_state('complete').first()
+    submission.state == 'complete'
+    submission.__class__ == CompleteFormSubmission
 
 
 def test_remove_old_pending_submissions(session):
