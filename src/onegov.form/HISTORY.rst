@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Make sure the received date is only set once.
+  [href]
+
 0.5.4 (2015-06-10)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -171,7 +171,9 @@ class FormSubmission(Base, TimestampMixin):
             if email_fields:
                 self.email = form._fields[email_fields[0]].data
 
-            self.received = Delorean().datetime
+            # only set the date the first time around
+            if not self.received:
+                self.received = Delorean().datetime
 
     def complete(self):
         """ Changes the state to 'complete', if the data is valid. """
