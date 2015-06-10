@@ -237,6 +237,33 @@ def test_delete_with_submissions(session):
     assert collection.definitions.query().count() == 0
 
 
+def test_delete_with_pending_submissions(session):
+    collection = FormCollection(session)
+
+    form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
+    data = MultiDict([('e_mail', 'billg@microsoft.com')])
+
+    collection.submissions.add(
+        'newsletter', form.form_class(data), state='pending')
+    collection.definitions.delete('newsletter', with_submissions=False)
+
+    assert collection.submissions.query().count() == 0
+    assert collection.definitions.query().count() == 0
+
+
+def test_delete_fail_with_submissions(session):
+    collection = FormCollection(session)
+
+    form = collection.definitions.add('Newsletter', definition="E-Mail *= @@@")
+    data = MultiDict([('e_mail', 'billg@microsoft.com')])
+
+    collection.submissions.add(
+        'newsletter', form.form_class(data), state='complete')
+
+    with pytest.raises(IntegrityError):
+        collection.definitions.delete('newsletter', with_submissions=False)
+
+
 def test_file_submissions(session):
     collection = FormCollection(session)
 

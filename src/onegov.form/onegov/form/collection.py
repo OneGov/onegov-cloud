@@ -93,12 +93,19 @@ class FormDefinitionCollection(object):
         """ Delete the given form. Only possible if there are no submissions
         associated with it, or if ``with_submissions`` is True.
 
-        """
-        if with_submissions:
-            submissions = self.session.query(FormSubmission)
-            submissions = submissions.filter(FormSubmission.name == name)
-            submissions.delete()
+        Note that pending submissions are removed automatically, only complete
+        submissions have a bearing on ``with_submissions``.
 
+        """
+        submissions = self.session.query(FormSubmission)
+        submissions = submissions.filter(FormSubmission.name == name)
+
+        if not with_submissions:
+            submissions = submissions.filter(FormSubmission.state == 'pending')
+
+        submissions.delete()
+
+        # this will fail if there are any submissions left
         self.query().filter(FormDefinition.name == name).delete('fetch')
         self.session.flush()
 
