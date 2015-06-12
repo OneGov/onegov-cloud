@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix encoding error when generating the theme on certain platforms.
+  [href]
+
 - Make sure the last_change timestamp property works for single objects.
   [href]
 
