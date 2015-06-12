@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.6 (2015-06-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Fix encoding error when generating the theme on certain platforms.
   [href]
 
