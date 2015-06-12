@@ -199,8 +199,13 @@ form {
     form collection rendering
 */
 .form-definitions {
-    li + li {
-        margin-top: 1em;
+    margin-left: 0;
+
+    li {
+        list-style-type: none;
+        padding: 0.5rem 0;
+        clear: both;
+        min-height: 90px;
     }
 
     .form-definition-title {
@@ -213,25 +218,30 @@ form {
     }
 }
 
+.form-definition-counter {
+    display: block;
+    float: left;
+    margin-right: 1rem;
+    background: #f5f5f5;
+    padding: 0.5rem;
+    width: 80px;
+
+    .count {
+        font-size: 200%;
+        display: block;
+        text-align: center;
+    }
+    .count-label {
+        color: $bottom-links-color;
+        display: block;
+        text-align: center;
+        font-size: .8rem;
+    }
+}
+
 .form-definition-info {
-    @include label(
-        $bg: $secondary-color,
-        $padding: 2px 4px,
-        $radius: 2px,
-        $text-size: rem-calc(12)
-    );
-
-    &.has-submissions {
-        background-color: $success-color;
-
-        * {
-            color: #fff;
-        }
-    }
-
-    &.builtin-form {
-        background-color: $info-color;
-    }
+    color: $bottom-links-color;
+    font-size: .8rem;
 }
 
 /*

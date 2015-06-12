@@ -7,6 +7,23 @@
 
         <ul tal:condition="forms" class="form-definitions">
             <li tal:repeat="form forms">
+                <tal:block condition="request.is_logged_in">
+                    <div class="form-definition-counter ${form.submissions_count and 'has-submissions' or 'no-submissions'}">
+                        <div tal:condition="form.submissions_count == 1">
+                            <a href="${request.link(get_submissions_collection(form.name))}">
+                                <span class="count">${form.submissions_count}</span> <span i18n:translate="" class="count-label">Submission</span>
+                            </a>
+                        </div>
+                        <div tal:condition="form.submissions_count > 1">
+                            <a href="${request.link(get_submissions_collection(form.name))}">
+                                <span class="count">${form.submissions_count}</span> <span i18n:translate="" class="count-label">Submissions</span>
+                            </a>
+                        </div>
+                        <div tal:condition="not:form.submissions_count">
+                            <span class="count">${form.submissions_count}</span> <span i18n:translate="" class="count-label">Submissions</span>
+                        </div>
+                    </div>
+                </tal:block>
                 <a class="form-definition-title" tal:attributes="href request.link(form)">${form.title}</a>
                 <div class="form-definition-lead">${form.meta.get('lead')}</div>
                 <tal:block condition="request.is_logged_in">
@@ -17,19 +34,6 @@
                         <tal:block condition="form.type == 'custom'">
                             <span i18n:translate="">Custom Form</span>
                         </tal:block>
-                    </div>
-                    <div class="form-definition-info ${form.submissions_count and 'has-submissions' or 'no-submissions'}">
-                        <a href="${request.link(get_submissions_collection(form.name))}" 
-                           tal:condition="form.submissions_count == 1">
-                            <span>${form.submissions_count}</span> <span i18n:translate="">Submission</span>
-                        </a>
-                        <a href="${request.link(get_submissions_collection(form.name))}"
-                           tal:condition="form.submissions_count > 1">
-                            <span>${form.submissions_count}</span> <span i18n:translate="">Submissions</span>
-                        </a>
-                        <span tal:condition="not:form.submissions_count">
-                            <span>${form.submissions_count}</span> <span i18n:translate="">Submissions</span>
-                        </span>
                     </div>
                 </tal:block>
             </li>
