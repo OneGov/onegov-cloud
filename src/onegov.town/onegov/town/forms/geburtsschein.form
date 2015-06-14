@@ -1,4 +1,4 @@
-Wohnsitzbestätigung
+Geburtsschein
 -------------------
 
 # Personalien
@@ -12,11 +12,11 @@ PLZ / Ort * = ___
 Telefon * = ___
 E-Mail * = @@@
 
-# Weitere Personen
+# Art
 
-Ebenfalls eine Bestätigung erstellen für =
-    [ ] Ehepartner/in
-    [ ] Kinder
+Art * =
+    (x) Geburtsschein national
+    ( ) Geburtsschein international
 
 # Versand
 
