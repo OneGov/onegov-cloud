@@ -26,8 +26,8 @@ Wohnverhältnis =
 
 # Vermietung / Hausverwaltung
 Name Hausverwaltung = ___
-Strasse (inkl. Hausnummer) * = ___
-PLZ / Ort * = ___
+Strasse (inkl. Hausnummer) = ___
+PLZ / Ort = ___
 
 # Aufenthalt
 Datum Zuzug * = YYYY.MM.DD

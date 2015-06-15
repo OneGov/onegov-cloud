@@ -7,10 +7,9 @@ Vorname * = ___
 Name * = ___
 Geburtsdatum * = YYYY.MM.DD
 
+# Adresse bisher
 Strasse (inkl. Hausnummer) bisher * = ___
 PLZ / Ort bisher * = ___
-Telefon * = ___
-E-Mail * = @@@
 
 # Ehepartner(in) / Kinder
 Mit Ehepartner(in) / Kinder =
@@ -19,7 +18,7 @@ Mit Ehepartner(in) / Kinder =
     [ ] Kinder
         Kinder = ...
 
-# Neue Adresse
+# Adresse neu
 Datum Wegzug * = YYYY.MM.DD
 Dauer Auslandaufenthalt * =
     (x) Definitiv
@@ -36,6 +35,7 @@ c/o = ___
 Strasse (inkl. Hausnummer) = ___
 PLZ / Ort = ___
 
-# Bemerkungen
-
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
 Bemerkung = ...

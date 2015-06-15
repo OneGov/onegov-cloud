@@ -7,10 +7,9 @@ Vorname * = ___
 Name * = ___
 Geburtsdatum * = YYYY.MM.DD
 
+# Adresse
 Strasse (inkl. Hausnummer) * = ___
 PLZ / Ort * = ___
-Telefon * = ___
-E-Mail * = @@@
 
 # Weitere Personen
 
@@ -29,4 +28,7 @@ Versand * =
                 PLZ / Ort * = ___
     ( ) Ich möchte das Dokument am Schalter abholen
 
-Kommentar = ...
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

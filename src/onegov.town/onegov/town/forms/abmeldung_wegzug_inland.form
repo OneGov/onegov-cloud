@@ -24,6 +24,8 @@ Datum Wegzug * = YYYY.MM.DD
 Strasse (inkl. Hausnummer) neu * = ___
 PLZ / Ort neu * = ___
 
-# Bemerkungen
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
 
 Bemerkung = ...
