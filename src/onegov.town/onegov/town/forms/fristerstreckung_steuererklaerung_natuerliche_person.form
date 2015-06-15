@@ -4,7 +4,7 @@ Fristerstreckung Steuererklärung Natürliche Person
 # Personalien
 Vorname * = ___
 Name * = ___
-AHV-Nummer = ___
+AHV-Nummer = # ch.ssn
 
 # Adresse
 Strasse (inkl. Hausnummer) * = ___

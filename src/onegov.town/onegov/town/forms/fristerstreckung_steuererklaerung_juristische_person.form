@@ -12,7 +12,7 @@ PLZ / Ort * = ___
 # Vertretung
 Vorname * = ___
 Name * = ___
-AHV-Nummer = ___
+AHV-Nummer = # ch.ssn
 
 # Firsterstreckung
 Steuerperiode * = ___

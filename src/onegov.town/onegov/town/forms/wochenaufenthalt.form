@@ -5,7 +5,7 @@ Wochenaufenthalt
 Vorname * = ___
 Name * = ___
 Ledigname (Mädchenname) = ___
-AHV-Nummer = ___
+AHV-Nummer = # ch.ssn
 Geburtsdatum * = YYYY.MM.DD
 Konfession = ___
 
