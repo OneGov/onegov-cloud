@@ -117,15 +117,15 @@ form {
 
     fieldset {
         border: 0;
-        border-top: 1px solid #f5f5f5;
+        border-top: 1px solid $topbar-bg-color;
         margin-bottom: 1rem;
         padding: 0;
 
         legend {
-            padding: 0 0.75rem;
             color: $input-font-color;
             font-size: $input-font-size;
             margin-bottom: 1rem;
+            padding: 0 .75rem;
             text-align: center;
         }
     }
