@@ -11,7 +11,7 @@ Strasse (inkl. Hausnummer) * = ___
 PLZ / Ort * = ___
 
 # Firsterstreckung
-Steuerperiode * = ___
+Steuerjahr * = ___
 Fristerstreckung bis * = YYYY.MM.DD
 Begründung * = ...
 

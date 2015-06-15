@@ -15,7 +15,7 @@ Name * = ___
 AHV-Nummer = # ch.ssn
 
 # Firsterstreckung
-Steuerperiode * = ___
+Steuerjahr * = ___
 Fristerstreckung bis * = YYYY.MM.DD
 Begründung * = ...
 
