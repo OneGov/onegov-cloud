@@ -4,7 +4,7 @@ Anmeldung Zuzug
 # Personalien
 Vorname * = ___
 Name * = ___
-Ledigname (Mädchenname) = ___
+Ledigname = ___
 AHV-Nummer = ___
 Geburtsdatum * = YYYY.MM.DD
 Konfession = ___
