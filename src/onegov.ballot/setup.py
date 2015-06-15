@@ -35,17 +35,12 @@ setup(
     platforms='any',
     install_requires=[
         'onegov.core',
-        'onegov.form',
-        'onegov.foundation',
-        'onegov.user'
     ],
     extras_require=dict(
         test=[
             'coverage',
             'onegov.testing',
-            'webtest',
-            'pytest',
-            'pyquery'
+            'pytest'
         ],
     ),
     classifiers=[
