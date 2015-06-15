@@ -11,16 +11,16 @@
                     <div class="form-definition-counter ${form.submissions_count and 'has-submissions' or 'no-submissions'}">
                         <div tal:condition="form.submissions_count == 1">
                             <a href="${request.link(get_submissions_collection(form.name))}">
-                                <span class="count">${form.submissions_count}</span> <span i18n:translate="" class="count-label">Submission</span>
+                                <div class="count">${form.submissions_count}</div> <div i18n:translate="" class="count-label">Submission</div>
                             </a>
                         </div>
                         <div tal:condition="form.submissions_count > 1">
                             <a href="${request.link(get_submissions_collection(form.name))}">
-                                <span class="count">${form.submissions_count}</span> <span i18n:translate="" class="count-label">Submissions</span>
+                                <div class="count">${form.submissions_count}</div> <div i18n:translate="" class="count-label">Submissions</div>
                             </a>
                         </div>
                         <div tal:condition="not:form.submissions_count">
-                            <span class="count">${form.submissions_count}</span> <span i18n:translate="" class="count-label">Submissions</span>
+                            <div class="count">${form.submissions_count}</div> <div i18n:translate="" class="count-label">Submissions</div>
                         </div>
                     </div>
                 </tal:block>

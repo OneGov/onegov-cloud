@@ -202,10 +202,9 @@ form {
     margin-left: 0;
 
     li {
-        list-style-type: none;
-        padding: 0.5rem 0;
         clear: both;
-        min-height: 90px;
+        list-style-type: none;
+        padding: .5rem 0;
     }
 
     .form-definition-title {
@@ -219,23 +218,25 @@ form {
 }
 
 .form-definition-counter {
-    display: block;
+    background-color: $topbar-bg-color;
     float: left;
     margin-right: 1rem;
-    background: #f5f5f5;
-    padding: 0.5rem;
-    width: 80px;
+    min-width: 90px;
+    padding: .5rem;
 
     .count {
-        font-size: 200%;
-        display: block;
+        font-size: 2em;
         text-align: center;
     }
+
     .count-label {
         color: $bottom-links-color;
-        display: block;
-        text-align: center;
         font-size: .8rem;
+        text-align: center;
+    }
+
+    &.has-submissions:hover {
+        background-color: transparentize($primary-color, .8);
     }
 }
 
