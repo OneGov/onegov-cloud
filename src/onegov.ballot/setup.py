@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 name = 'onegov.ballot'
 description = (
-    'OneGov ballot results for cantons in Switzerland.'
+    'Models ballot results for OneGov.'
 )
 version = '0.0.0'
 

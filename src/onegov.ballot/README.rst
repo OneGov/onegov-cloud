@@ -1,7 +1,7 @@
 Onegov Ballot
 =============
 
-OneGov ballot results for cantons in Switzerland.
+Models ballot results for OneGov.
 
 Run the Tests
 -------------
