@@ -10,7 +10,7 @@ Geburtsdatum * = YYYY.MM.DD
 Strasse (inkl. Hausnummer) bisher * = ___
 PLZ / Ort bisher * = ___
 
-# Ehepartner(in) / Kinder
+# Weitere Personen
 Mit Ehepartner(in) / Kinder =
     [ ] Ehepartner(in)
         Ehepartner(in) = ...
