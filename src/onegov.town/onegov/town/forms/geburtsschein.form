@@ -2,7 +2,6 @@ Geburtsschein
 -------------------
 
 # Personalien
-
 Vorname * = ___
 Name * = ___
 Geburtsdatum * = YYYY.MM.DD
@@ -11,13 +10,12 @@ Geburtsdatum * = YYYY.MM.DD
 Strasse (inkl. Hausnummer) * = ___
 PLZ / Ort * = ___
 
-# Art
+# National / International
 Art * =
     (x) Geburtsschein national
     ( ) Geburtsschein international
 
 # Versand
-
 Versand * =
     (x) Ich möchte das Dokument mittels Post erhalten
         Abweichende Versandadresse =
