@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds many new builtin forms.
+  [freinhard]
+
+- Adds minor style adjustments.
+  [freinhard]
+
 0.2.0 (2015-06-10)
 ~~~~~~~~~~~~~~~~~~~
 
