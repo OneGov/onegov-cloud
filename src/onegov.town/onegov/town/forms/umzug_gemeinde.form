@@ -5,6 +5,13 @@ Umzug innerhalb der Gemeinde
 Vorname * = ___
 Name * = ___
 
+# Weitere Personen
+Mit Ehepartner(in) / Kinder =
+    [ ] Ehepartner(in)
+        Ehepartner(in) = ...
+    [ ] Kinder
+        Kinder = ...
+
 # Adresse bisher
 Strasse (inkl. Hausnummer) bisher * = ___
 PLZ / Ort bisher * = ___
