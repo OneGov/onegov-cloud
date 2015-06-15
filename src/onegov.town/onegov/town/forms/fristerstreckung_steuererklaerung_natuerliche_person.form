@@ -1,0 +1,21 @@
+Fristerstreckung Steuererklärung Natürliche Person
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+AHV-Nummer = ___
+
+# Adresse
+Strasse (inkl. Hausnummer) * = ___
+PLZ / Ort * = ___
+
+# Firsterstreckung
+Steuerperiode * = ___
+Fristerstreckung bis * = YYYY.MM.DD
+Begründung * = ...
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...
