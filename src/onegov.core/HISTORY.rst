@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Stop throwing an error if no translation is registered.
+  [href]
+
 0.3.6 (2015-06-12)
 ~~~~~~~~~~~~~~~~~~~
 
