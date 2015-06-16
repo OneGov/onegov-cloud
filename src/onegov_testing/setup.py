@@ -35,6 +35,7 @@ setup(
     platforms='any',
     install_requires=[
         'coverage',
+        'mock',
         'onegov.core',
         'Pillow',
         'pytest',
