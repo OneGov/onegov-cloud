@@ -422,13 +422,13 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def translations(self):
         """ Returns all available translations keyed by langauge. """
 
-        if not self.registry.settings.i18n.domain:
-            return {}
-
-        if not self.registry.settings.i18n.localedir:
-            return {}
-
         try:
+            if not self.registry.settings.i18n.domain:
+                return {}
+
+            if not self.registry.settings.i18n.localedir:
+                return {}
+
             return self.modules.i18n.get_translations(
                 self.registry.settings.i18n.domain,
                 self.registry.settings.i18n.localedir
