@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """ OneGov Ballot models the aggregated results of Swiss ballots.
 It takes hints from the CH-0155 Standard.
 
@@ -16,6 +18,9 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
+from sqlalchemy import select, func, case
+from sqlalchemy.event import listens_for
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, relationship
 from sqlalchemy_utils import observes
 from uuid import uuid4
@@ -124,6 +129,88 @@ class Ballot(Base, TimestampMixin):
         backref=backref("ballot")
     )
 
+    @hybrid_property
+    def accepted(self):
+        """ True if the ballot has been accepted (yays outweigh the nays).
+
+        Only available if all results have been counted.
+        """
+        if self.counted:
+            return self.yays > self.nays
+        else:
+            return None
+
+    @accepted.expression
+    def accepted(cls):
+        return case({True: cls.yays > cls.nays}, cls.counted)
+
+    @hybrid_property
+    def counted(self):
+        """ True if all results have been counted. """
+        return sum(1 for r in self.results if r.counted) == len(self.results)
+
+    @counted.expression
+    def counted(cls):
+        expr = select([func.bool_and(BallotResult.counted)])
+        expr = expr.where(BallotResult.ballot_id == cls.id)
+        expr = expr.label('counted')
+
+        return expr
+
+    @hybrid_property
+    def yays_percentage(self):
+        """ The percentage of yays (discounts empty/invalid ballots). """
+        return self.yays / (self.yays + self.nays) * 100
+
+    @hybrid_property
+    def nays_percentage(self):
+        """ The percentage of nays (discounts empty/invalid ballots). """
+        return 100 - self.yays_percentage
+
+    def aggregate_results(self, attribute):
+        """ Gets the sum of the given attribute from the results. """
+        return sum(
+            getattr(result, attribute) for result in self.results)
+
+    def aggregate_results_expression(cls, attribute):
+        """ Gets the sum of the given attribute from the results,
+        as SQL expression.
+
+        """
+        expr = select([func.sum(getattr(BallotResult, attribute))])
+        expr = expr.where(BallotResult.ballot_id == cls.id)
+        expr = expr.label(attribute)
+
+        return expr
+
+
+@listens_for(Ballot, 'mapper_configured')
+def add_aggregated_attributes(mapper, cls):
+    """ Takes the following attributes and adds them as hybrid_properties
+    to the ballot. This results in a Ballot class that has all the following
+    properties which will return the sum of the underlying results if called.
+
+    E.g. this will return all the yays of the joined ballot results::
+
+        ballot.yays
+
+    """
+    attributes = ['yays', 'nays', 'empty', 'invalid', 'cast_ballots']
+
+    def new_hybrid_property(attribute):
+        @hybrid_property
+        def sum_result(self):
+            return self.aggregate_results(attribute)
+
+        @sum_result.expression
+        def sum_result(cls):
+            return cls.aggregate_results_expression(cls, attribute)
+
+        return sum_result
+
+    for attribute in attributes:
+        setattr(cls, attribute, new_hybrid_property(attribute))
+
 
 class BallotResult(Base, TimestampMixin):
     """ The result of a specific ballot. Each ballot may have multiple
@@ -145,24 +232,44 @@ class BallotResult(Base, TimestampMixin):
 
     #: True if the result has been counted and no changes will be made anymore.
     #: If the result is definite, all the values below must be specified.
-    is_established = Column(Boolean, nullable=False)
+    counted = Column(Boolean, nullable=False)
 
     #: number of yays, in case of variants, the number of yays for the first
     #: option of the tie breaker
-    yays = Column(Integer, nullable=True)
+    yays = Column(Integer, nullable=False, default=lambda: 0)
 
     #: number of nays, in case of variants, the number of nays for the first
     #: option of the tie breaker (so a yay for the second option)
-    nays = Column(Integer, nullable=True)
+    nays = Column(Integer, nullable=False, default=lambda: 0)
 
     #: number of empty votes
-    empty = Column(Integer, nullable=True)
+    empty = Column(Integer, nullable=False, default=lambda: 0)
 
     #: number of invalid votes
-    invalid = Column(Integer, nullable=True)
+    invalid = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: the answer value that actually won
-    result = Column(Text, nullable=False)
+    #: true if the ballot was accepted, false if not -> automatically set
+    accepted = Column(Boolean, nullable=False, default=lambda: 0)
 
     #: the ballot this result belongs to
     ballot_id = Column(UUID, ForeignKey(Ballot.id), nullable=False)
+
+    @observes('yays')
+    @observes('nays')
+    def accepted(self, value):
+        if not self.counted:
+            self.accepted = None
+        else:
+            self.accepted = self.yays > self.nays
+
+    @hybrid_property
+    def cast_ballots(self):
+        return self.yays + self.nays + self.empty + self.invalid
+
+    @hybrid_property
+    def yays_percentage(self):
+        return self.yays / (self.yays + self.nays) * 100
+
+    @hybrid_property
+    def nays_percentage(self):
+        return 100 - self.yays_percentage
