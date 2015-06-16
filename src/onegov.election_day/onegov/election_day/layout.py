@@ -20,3 +20,7 @@ class Layout(object):
 
         """
         return self.template_loader['layout.pt']
+
+
+class DefaultLayout(Layout):
+    pass
