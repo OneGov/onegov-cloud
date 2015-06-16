@@ -99,6 +99,8 @@ class Server(object):
 
             # we do our own autosetup to avoid this issue (for now):
             # https://github.com/morepath/morepath/issues/319
+            # the next release or morepath will be smarter in this regard
+            # and we'll be able to change this code
 
             m = DependencyMap()
             m.load()
@@ -106,8 +108,21 @@ class Server(object):
             config = morepath.setup()
 
             for dist in m.relevant_dists('morepath'):
+
+                if hasattr(dist, 'get_entry_map'):
+                    entry_points = dist.get_entry_map('morepath')
+                else:
+                    entry_points = None
+
+                if entry_points and 'scan' in entry_points:
+                    module_name = entry_points['scan'].module_name
+                else:
+                    module_name = dist.project_name
+
+                # likewise, the config scan will exclude '.test', '.tests'
+                # by default
                 config.scan(
-                    importlib.import_module(dist.project_name),
+                    importlib.import_module(module_name),
                     ignore=['.test', '.tests'])
 
             config.commit()

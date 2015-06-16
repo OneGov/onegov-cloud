@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Include Morepath's upcoming changes to module imports until Morepath 0.11
+  is released.
+  [href]
+
 0.0.2 (2015-04-30)
 ~~~~~~~~~~~~~~~~~~~
 
