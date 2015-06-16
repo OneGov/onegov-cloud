@@ -35,6 +35,8 @@ setup(
     platforms='any',
     install_requires=[
         'onegov.core',
+        'sqlalchemy',
+        'sqlalchemy_utils'
     ],
     extras_require=dict(
         test=[
