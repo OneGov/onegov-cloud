@@ -48,6 +48,11 @@ setup(
             'pyquery'
         ],
     ),
+    entry_points={
+        'morepath': [
+            'scan = onegov.election_day'
+        ]
+    },
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',
