@@ -174,6 +174,7 @@ class Ballot(Base, TimestampMixin):
         return sum(
             getattr(result, attribute) for result in self.results)
 
+    @staticmethod
     def aggregate_results_expression(cls, attribute):
         """ Gets the sum of the given attribute from the results,
         as SQL expression.
