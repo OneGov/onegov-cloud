@@ -30,3 +30,11 @@ class VoteCollection(object):
         query = query.order_by(Vote.domain, Vote.id)
 
         return query.all()
+
+    def by_id(self, id):
+        """ Returns the vote by id. """
+
+        query = self.query()
+        query = query.filter(Vote.id == id)
+
+        return query.first()
