@@ -1,3 +1,36 @@
-#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:32
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:4
+msgid "There are no votes defined yet."
+msgstr "Es wurden noch keine Abstimmungen eingetragen."
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:10
+msgid "Federal Votes on ${date}"
+msgstr "Eidgenössische Abstimmungen vom ${date}"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:15
+msgid "Cantonal Votes on ${date}"
+msgstr "Kantonale Abstimmungen vom ${date}"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:23
+msgid "Vote"
+msgstr "Abstimmung"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:24
+msgid "Result"
+msgstr "Resultat"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:25
+msgid "Yes %"
+msgstr "Ja %"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:26
+msgid "No %"
+msgstr "Nein %"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:27
+msgid "Reported"
+msgstr "Gemeldet"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:13
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:28
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"

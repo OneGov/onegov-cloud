@@ -24,8 +24,13 @@
 </head>
 <body>
   <div class="row header">
-    <div class="small-8 columns">
+    <div class="small-12 columns">
       <h1 i18n:translate="">Elections &amp; Votes</h1>
+    </div>
+  </div>
+  <div class="row body">
+    <div class="small-12 columns">
+      <div metal:define-slot="content"></div>
     </div>
   </div>
 </body>
