@@ -13,7 +13,6 @@ def test_create_all_models(session):
     session.flush()
 
     ballot = Ballot(
-        question="Do you want pass the universal healthcare act?",
         type='proposal',
         vote_id=vote.id
     )
@@ -59,7 +58,6 @@ def test_ballot_results_aggregation(session):
     session.flush()
 
     ballot = Ballot(
-        question="Do you want pass the universal healthcare act?",
         type='proposal',
         vote_id=vote.id
     )

@@ -47,10 +47,11 @@ class Vote(Base, TimestampMixin):
 
     #: defines the scope of the vote - eCH-0115 calls this the domain of
     #: influence. Unlike eCH-0115 we refrain from putting this in a separate
-    #: model. We also don't include domains smaller than municipality.
+    #: model. We also only include domains we currently support.
     domain = Column(
         Enum(
-            'federation', 'canton', 'district', 'municipality',
+            'federation',
+            'canton',
             name='domain_of_influence'
         ),
         nullable=False
@@ -60,8 +61,27 @@ class Vote(Base, TimestampMixin):
     ballots = relationship(
         "Ballot",
         cascade="all, delete-orphan",
-        backref=backref("vote"),
-        lazy='joined'
+        backref=backref("vote")
+    )
+
+    #: a vote contains either one ballot (a proposal), or three ballots (a
+    #: proposal, a counter proposal and a tie breaker)
+    proposal = relationship(
+        "Ballot", lazy='joined', viewonly=True, uselist=False, primaryjoin=(
+            "and_(Vote.id == Ballot.vote_id,Ballot.type == 'proposal')"
+        )
+    )
+
+    counter_proposal = relationship(
+        "Ballot", lazy='joined', viewonly=True, uselist=False, primaryjoin=(
+            "and_(Vote.id == Ballot.vote_id,Ballot.type == 'counter-proposal')"
+        )
+    )
+
+    tie_breaker = relationship(
+        "Ballot", lazy='joined', viewonly=True, uselist=False, primaryjoin=(
+            "and_(Vote.id == Ballot.vote_id,Ballot.type == 'tie-breaker')"
+        )
     )
 
     @observes('title')
@@ -70,29 +90,27 @@ class Vote(Base, TimestampMixin):
 
     @property
     def answer(self):
-        if len(self.ballots) == 1:
-            return 'accepted' if self.ballots[0].accepted else 'rejected'
+        # standard ballot, no counter proposal
+        if not self.counter_proposal:
+            return 'accepted' if self.proposal.accepted else 'rejected'
 
-        if len(self.ballots) == 3:
-            r = {b.type: b for b in self.ballots}
+        # variant ballot, with proposal, coutner proposal and tie breaker
+        elif all((self.proposal, self.counter_proposal, self.tie_breaker)):
 
-            accepted = set(b.type for b in self.ballots if b.accepted)
-            rejected = set(b.type for b in self.ballots if not b.accepted)
+            if self.proposal.accepted and self.counter_proposal.accepted:
+                return 'accepted' if self.tie_breaker.accepted else 'rejected'
 
-            if {'proposal', 'counter-proposal'} <= accepted:
-                if r['tie-breaker'].accepted:
-                    return 'proposal'
-                else:
-                    return 'counter-proposal'
-
-            elif {'proposal', 'counter-proposal'} <= rejected:
-                return 'rejected'
-
-            elif 'proposal' in accepted:
+            elif self.proposal.accepted:
                 return 'proposal'
 
-            else:
+            elif self.counter_proposal.accepted:
                 return 'counter-proposal'
+
+            else:
+                return 'rejected'
+
+        # not implemeneted here, not implemented in Swiss law either (at least
+        # on a federal level)
         else:
             raise NotImplementedError
 
@@ -142,9 +160,6 @@ class Ballot(Base, TimestampMixin):
 
     #: identifies the ballot, maybe used in the url
     id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: the question of the ballot
-    question = Column(Text, nullable=False)
 
     #: the type of the ballot, 'standard' for normal votes, 'counter-proposal'
     #: if there's an alternative to the standard ballot. And 'tie-breaker',
