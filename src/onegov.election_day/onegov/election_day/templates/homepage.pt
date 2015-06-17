@@ -30,9 +30,22 @@
                         <tbody>
                             <tr tal:repeat="vote votes">
                                 <td>${vote.title}</td>
-                                <td></td>
-                                <td></td>
-                                <td></td>
+                                <td>
+                                    <tal:block condition="vote.answer == 'accepted'" i18n:translate="">
+                                        Accepted
+                                    </tal:block>
+                                    <tal:block condition="vote.answer == 'rejected'" i18n:translate="">
+                                        Rejected
+                                    </tal:block>
+                                    <tal:block condition="vote.answer == 'proposal'" i18n:translate="">
+                                        Proposal
+                                    </tal:block>
+                                    <tal:block condition="vote.answer == 'counter-proposal'" i18n:translate="">
+                                        Counter Proposal
+                                    </tal:block>
+                                </td>
+                                <td>${'{0:.2f}'.format(vote.yays_percentage)}</td>
+                                <td>${'{0:.2f}'.format(vote.nays_percentage)}</td>
                                 <td></td>
                             </tr>
                         </tbody>
