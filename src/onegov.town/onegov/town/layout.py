@@ -1,16 +1,14 @@
 from cached_property import cached_property
-from onegov.core.compat import zip_longest
+from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
 from onegov.town.models import ImageCollection
-from pytz import timezone
-from purl import URL
 
 
-class Layout(object):
+class Layout(ChameleonLayout):
     """ Contains methods to render a page inheriting from layout.pt.
 
     All pages inheriting from layout.pt rely on this class being present
@@ -30,15 +28,8 @@ class Layout(object):
 
     """
 
-    # XXX those could be configured/detected from the request
-    timezone = timezone('Europe/Zurich')
-    time_format = '%H:%M'
-    date_format = '%d.%m.%Y'
-    datetime_format = ' '.join((date_format, time_format))
-
     def __init__(self, model, request):
-        self.model = model
-        self.request = request
+        super(Layout, self).__init__(model, request)
 
         # always include the common js files
         self.request.include('common')
@@ -56,11 +47,6 @@ class Layout(object):
         return self.request.link(static_file)
 
     @cached_property
-    def app(self):
-        """ Returns the application behind the request. """
-        return self.request.app
-
-    @cached_property
     def page_id(self):
         """ Returns the unique page id of the rendered page. Used to have
         a useful id in the body element for CSS/JS.
@@ -72,27 +58,6 @@ class Layout(object):
         page_id = page_id.rstrip('-')
 
         return page_id or 'root'
-
-    @cached_property
-    def template_loader(self):
-        """ Returns the chameleon template loader. """
-        return self.app.registry._template_loaders['.pt']
-
-    @cached_property
-    def base(self):
-        """ Returns the layout, which defines the base layout of all town
-        pages. See ``templates/layout.pt``.
-
-        """
-        return self.template_loader['layout.pt']
-
-    @cached_property
-    def macros(self):
-        """ Returns the macros, which offer often used html constructs.
-        See ``templates/macros.pt``.
-
-        """
-        return self.template_loader['macros.pt']
 
     @cached_property
     def top_navigation(self):
@@ -135,22 +100,6 @@ class Layout(object):
         """
         return None
 
-    def chunks(self, iterable, n, fillvalue=None):
-        """ Iterates through an iterable, returning chunks with the given size.
-
-        For example::
-
-            chunks('ABCDEFG', 3, 'x') --> ABC DEF Gxx
-
-        """
-
-        args = [iter(iterable)] * n
-        return zip_longest(fillvalue=fillvalue, *args)
-
-    def csrf_protected_url(self, url):
-        """ Adds a csrf token to the given url. """
-        return URL(url).query_param('csrf-token', self.csrf_token).as_string()
-
     @cached_property
     def image_upload_url(self):
         """ Returns the url to the image upload action. """
@@ -172,24 +121,6 @@ class Layout(object):
     def homepage_url(self):
         """ Returns the url to the main page. """
         return self.request.link(self.app.town)
-
-    @cached_property
-    def csrf_token(self):
-        """ Returns a csrf token for use with DELETE links (forms do their
-        own thing automatically).
-
-        """
-        return self.request.new_csrf_token()
-
-    def format_date(self, date, format):
-        """ Takes a datetime and formats it according to local timezone and
-        the given format.
-
-        """
-        assert format in {'date', 'time', 'datetime'}
-
-        date = self.timezone.normalize(date.astimezone(self.timezone))
-        return date.strftime(getattr(self, format + '_format'))
 
     def render_field(self, field):
         """ Alias for ``onegov.form.render_field``. """

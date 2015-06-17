@@ -7,4 +7,4 @@ _ = TranslationStringFactory('onegov.town')  # noqa
 
 from onegov.town.app import TownApp
 
-__all__ = ['_', 'TownApp']
+__all__ = ['_', 'log', 'TownApp']
