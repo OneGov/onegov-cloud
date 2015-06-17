@@ -1,0 +1,20 @@
+/*
+    Tables
+*/
+table {
+    border: 0;
+    width: 100%;
+
+    thead {
+        background: none;
+    }
+
+    th {
+        border-bottom: 1px solid $body-font-color;
+    }
+
+    th,
+    td {
+        padding: .5rem 0;
+    }
+}
