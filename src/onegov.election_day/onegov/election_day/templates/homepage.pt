@@ -31,22 +31,26 @@
                             <tr tal:repeat="vote votes">
                                 <td>${vote.title}</td>
                                 <td>
-                                    <tal:block condition="vote.answer == 'accepted'" i18n:translate="">
+                                    <span tal:condition="vote.answer == 'accepted'" class="accepted" i18n:translate="">
                                         Accepted
-                                    </tal:block>
-                                    <tal:block condition="vote.answer == 'rejected'" i18n:translate="">
+                                    </span>
+                                    <span tal:condition="vote.answer == 'rejected'" class="rejected" i18n:translate="">
                                         Rejected
-                                    </tal:block>
-                                    <tal:block condition="vote.answer == 'proposal'" i18n:translate="">
+                                    </span>
+                                    <span tal:condition="vote.answer == 'proposal'" class="accepted" i18n:translate="">
                                         Proposal
-                                    </tal:block>
-                                    <tal:block condition="vote.answer == 'counter-proposal'" i18n:translate="">
+                                    </span>
+                                    <span tal:condition="vote.answer == 'counter-proposal'" class="rejected" i18n:translate="">
                                         Counter Proposal
-                                    </tal:block>
+                                    </span>
                                 </td>
                                 <td>${'{0:.2f}'.format(vote.yays_percentage)}</td>
                                 <td>${'{0:.2f}'.format(vote.nays_percentage)}</td>
-                                <td></td>
+                                <td tal:define="(counted, total) vote.progress" i18n:translate="">
+                                    <span tal:replace="counted" i18n:name='counted' />
+                                    of
+                                    <span tal:replace="counted" i18n:name='total' />
+                                </td>
                             </tr>
                         </tbody>
                     </table>

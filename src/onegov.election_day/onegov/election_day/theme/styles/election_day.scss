@@ -1,4 +1,18 @@
 /*
+    Voting states
+*/
+
+.accepted {
+    color: $success-color;
+    font-weight: bold;
+}
+
+.rejected {
+    color: $alert-color;
+    font-weight: bold;
+}
+
+/*
     Tables
 */
 table {
