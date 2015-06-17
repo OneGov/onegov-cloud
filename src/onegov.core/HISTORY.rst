@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Include a layout base class useful for applications that render html.
+  [href]
+
 - Stop throwing an error if no translation is registered.
   [href]
 

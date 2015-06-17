@@ -29,6 +29,8 @@ dependencies = {
     'pylibmc',
     'pylru',
     'pyreact',
+    'pytz',
+    'purl',
     'sqlalchemy>=0.9',
     'sqlparse',
     'translationstring',
