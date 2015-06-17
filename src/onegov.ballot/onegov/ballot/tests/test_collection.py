@@ -6,26 +6,22 @@ def test_by_date(session):
     session.add(Vote(
         title="first",
         domain='federation',
-        date=date(2015, 6, 14),
-        elegible_voters=1234,
+        date=date(2015, 6, 14)
     ))
     session.add(Vote(
         title="last",
         domain='canton',
-        date=date(2015, 6, 14),
-        elegible_voters=1234,
+        date=date(2015, 6, 14)
     ))
     session.add(Vote(
         title="second",
         domain='federation',
-        date=date(2015, 6, 14),
-        elegible_voters=1234,
+        date=date(2015, 6, 14)
     ))
     session.add(Vote(
         title="ignore",
         domain='canton',
-        date=date(2015, 6, 12),
-        elegible_voters=1234,
+        date=date(2015, 6, 12)
     ))
 
     session.flush()
@@ -44,14 +40,12 @@ def test_get_latest(session):
     session.add(Vote(
         title="latest",
         domain='federation',
-        date=date(2015, 6, 14),
-        elegible_voters=1234,
+        date=date(2015, 6, 14)
     ))
     session.add(Vote(
         title="older",
         domain='canton',
-        date=date(2015, 6, 12),
-        elegible_voters=1234,
+        date=date(2015, 6, 12)
     ))
 
     session.flush()

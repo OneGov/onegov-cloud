@@ -56,19 +56,71 @@ class Vote(Base, TimestampMixin):
         nullable=False
     )
 
-    #: number of elegible voters
-    elegible_voters = Column(Integer, nullable=False)
-
     #: a vote contains n ballots
     ballots = relationship(
         "Ballot",
         cascade="all, delete-orphan",
-        backref=backref("vote")
+        backref=backref("vote"),
+        lazy='joined'
     )
 
     @observes('title')
     def title_observer(self, title):
         self.id = normalize_for_url(title)
+
+    @property
+    def answer(self):
+        if len(self.ballots) == 1:
+            return 'accepted' if self.ballots[0].accepted else 'rejected'
+
+        if len(self.ballots) == 3:
+            r = {b.type: b for b in self.ballots}
+
+            accepted = set(b.type for b in self.ballots if b.accepted)
+            rejected = set(b.type for b in self.ballots if not b.accepted)
+
+            if {'proposal', 'counter-proposal'} <= accepted:
+                if r['tie-breaker'].accepted:
+                    return 'proposal'
+                else:
+                    return 'counter-proposal'
+
+            elif {'proposal', 'counter-proposal'} <= rejected:
+                return 'rejected'
+
+            elif 'proposal' in accepted:
+                return 'proposal'
+
+            else:
+                return 'counter-proposal'
+        else:
+            raise NotImplementedError
+
+    @hybrid_property
+    def yays_percentage(self):
+        """ The percentage of yays (discounts empty/invalid ballots). """
+        return self.yays / (self.yays + self.nays) * 100
+
+    @hybrid_property
+    def nays_percentage(self):
+        """ The percentage of nays (discounts empty/invalid ballots). """
+        return 100 - self.yays_percentage
+
+    def aggregate_results(self, attribute):
+        """ Gets the sum of the given attribute from the results. """
+        return sum(getattr(ballot, attribute) for ballot in self.ballots)
+
+    @staticmethod
+    def aggregate_results_expression(cls, attribute):
+        """ Gets the sum of the given attribute from the results,
+        as SQL expression.
+
+        """
+        expr = select([func.sum(getattr(Ballot, attribute))])
+        expr = expr.where(Ballot.vote_id == cls.id)
+        expr = expr.label(attribute)
+
+        return expr
 
 
 class Ballot(Base, TimestampMixin):
@@ -94,12 +146,18 @@ class Ballot(Base, TimestampMixin):
     #: the question of the ballot
     question = Column(Text, nullable=False)
 
-    #: the type of the ballot, 'standard' for normal votes, 'variant'
-    #: for tie breaker ballots (ballots defining which option is preferred if
-    #: ballots are about two mutually exclusive options and both options have
-    #: the yays)
+    #: the type of the ballot, 'standard' for normal votes, 'counter-proposal'
+    #: if there's an alternative to the standard ballot. And 'tie-breaker',
+    #: which must exist if there's a counter proposal. The tie breaker is
+    #: only relevant if both standard and counter proposal are accepted.
+    #: If that's the case, the accepted tie breaker selects the standard,
+    #: the rejected tie breaker selects the counter proposal.
     type = Column(
-        Enum('standard', 'variant', name='ballot_result_type'), nullable=False
+        Enum(
+            'proposal', 'counter-proposal', 'tie-breaker',
+            name='ballot_result_type'
+        ),
+        nullable=False
     )
 
     #: identifies the vote this ballot result belongs to
@@ -109,7 +167,8 @@ class Ballot(Base, TimestampMixin):
     results = relationship(
         "BallotResult",
         cascade="all, delete-orphan",
-        backref=backref("ballot")
+        backref=backref("ballot"),
+        lazy='joined'
     )
 
     @hybrid_property
@@ -168,6 +227,7 @@ class Ballot(Base, TimestampMixin):
         return expr
 
 
+@listens_for(Vote, 'mapper_configured')
 @listens_for(Ballot, 'mapper_configured')
 def add_aggregated_attributes(mapper, cls):
     """ Takes the following attributes and adds them as hybrid_properties
@@ -232,19 +292,19 @@ class BallotResult(Base, TimestampMixin):
     #: number of invalid votes
     invalid = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: true if the ballot was accepted, false if not -> automatically set
-    accepted = Column(Boolean, nullable=False, default=lambda: 0)
+    #: number of elegible voters
+    elegible_voters = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the ballot this result belongs to
     ballot_id = Column(UUID, ForeignKey(Ballot.id), nullable=False)
 
-    @observes('yays')
-    @observes('nays')
-    def accepted(self, value):
-        if not self.counted:
-            self.accepted = None
-        else:
-            self.accepted = self.yays > self.nays
+    @hybrid_property
+    def accepted(self):
+        return self.yays > self.nays if self.counted else None
+
+    @accepted.expression
+    def accepted(cls):
+        return case({True: cls.yays > cls.nays}, cls.counted)
 
     @hybrid_property
     def cast_ballots(self):

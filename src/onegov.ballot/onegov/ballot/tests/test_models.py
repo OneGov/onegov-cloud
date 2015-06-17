@@ -7,7 +7,6 @@ def test_create_all_models(session):
         title="Universal Healthcare",
         domain='federation',
         date=date(2015, 6, 14),
-        elegible_voters=10000,
     )
 
     session.add(vote)
@@ -15,7 +14,7 @@ def test_create_all_models(session):
 
     ballot = Ballot(
         question="Do you want pass the universal healthcare act?",
-        type='standard',
+        type='proposal',
         vote_id=vote.id
     )
 
@@ -41,7 +40,6 @@ def test_vote_id_generation(session):
         title="Universal Healthcare",
         domain='federation',
         date=date(2015, 6, 14),
-        elegible_voters=10000,
     )
 
     session.add(vote)
@@ -55,7 +53,6 @@ def test_ballot_results_aggregation(session):
         title="Universal Healthcare",
         domain='federation',
         date=date(2015, 6, 14),
-        elegible_voters=1234,
     )
 
     session.add(vote)
@@ -63,7 +60,7 @@ def test_ballot_results_aggregation(session):
 
     ballot = Ballot(
         question="Do you want pass the universal healthcare act?",
-        type='standard',
+        type='proposal',
         vote_id=vote.id
     )
 
