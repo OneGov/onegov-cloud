@@ -23,7 +23,7 @@ from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
 from sqlalchemy import select, func, case
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy.orm import backref, relationship, object_session
 from sqlalchemy_utils import observes
 from uuid import uuid4
 
@@ -74,28 +74,24 @@ class Vote(Base, TimestampMixin, DerivedPercentage):
     ballots = relationship(
         "Ballot",
         cascade="all, delete-orphan",
-        backref=backref("vote")
+        order_by="Ballot.type",
+        backref=backref("vote"),
+        lazy='joined'
     )
 
     #: a vote contains either one ballot (a proposal), or three ballots (a
     #: proposal, a counter proposal and a tie breaker)
-    proposal = relationship(
-        "Ballot", lazy='joined', viewonly=True, uselist=False, primaryjoin=(
-            "and_(Vote.id == Ballot.vote_id,Ballot.type == 'proposal')"
-        )
-    )
+    @property
+    def proposal(self):
+        return self.ballots and self.ballots[0]
 
-    counter_proposal = relationship(
-        "Ballot", lazy='joined', viewonly=True, uselist=False, primaryjoin=(
-            "and_(Vote.id == Ballot.vote_id,Ballot.type == 'counter-proposal')"
-        )
-    )
+    @property
+    def counter_proposal(self):
+        return len(self.ballots) == 3 and self.ballots[1]
 
-    tie_breaker = relationship(
-        "Ballot", lazy='joined', viewonly=True, uselist=False, primaryjoin=(
-            "and_(Vote.id == Ballot.vote_id,Ballot.type == 'tie-breaker')"
-        )
-    )
+    @property
+    def tie_breaker(self):
+        return len(self.ballots) == 3 and self.ballots[2]
 
     @observes('title')
     def title_observer(self, title):
@@ -126,6 +122,28 @@ class Vote(Base, TimestampMixin, DerivedPercentage):
         # on a federal level)
         else:
             raise NotImplementedError
+
+    @property
+    def progress(self):
+        """ Returns a tuple with the first value being the number of counted
+        ballot result groups and the second value being the number of total
+        result groups related to this vote.
+
+        """
+
+        ballots = (self.proposal, self.counter_proposal, self.tie_breaker)
+        ballot_ids = set(b.id for b in ballots if b)
+
+        if not ballot_ids:
+            return 0, 0
+
+        query = object_session(self).query(BallotResult)
+        query = query.with_entities(BallotResult.counted)
+        query = query.filter(BallotResult.ballot_id.in_(ballot_ids))
+
+        results = query.all()
+
+        return sum(1 for r in results if r[0]), len(results)
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """

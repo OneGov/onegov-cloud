@@ -27,6 +27,6 @@ class VoteCollection(object):
 
         query = self.query()
         query = query.filter(Vote.date == date)
-        query = query.order_by(Vote.domain, Vote.title)
+        query = query.order_by(Vote.domain, Vote.id)
 
         return query.all()
