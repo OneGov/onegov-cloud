@@ -74,7 +74,9 @@ class Layout(object):
         """
         assert format in {'date', 'time', 'datetime'}
 
-        date = self.timezone.normalize(date.astimezone(self.timezone))
+        if hasattr(date, 'astimezone'):
+            date = self.timezone.normalize(date.astimezone(self.timezone))
+
         return date.strftime(getattr(self, format + '_format'))
 
 

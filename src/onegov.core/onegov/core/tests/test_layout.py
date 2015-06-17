@@ -21,4 +21,6 @@ def test_format_date():
 
     assert layout.format_date(dt, 'datetime') == '17.06.2015 12:00'
     assert layout.format_date(dt, 'date') == '17.06.2015'
+    assert layout.format_date(dt.date(), 'date') == '17.06.2015'
     assert layout.format_date(dt, 'time') == '12:00'
+    assert layout.format_date(dt.time(), 'time') == '12:00'
