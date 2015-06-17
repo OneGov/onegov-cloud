@@ -1,0 +1,3 @@
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:32
+msgid "Elections &amp; Votes"
+msgstr "Wahlen &amp; Abstimmungen"
