@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.7 (2015-06-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a groupby function that returns lists instead of generators.
   [href]
 
