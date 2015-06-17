@@ -29,7 +29,7 @@
                         </thead>
                         <tbody>
                             <tr tal:repeat="vote votes">
-                                <td>${vote.title}</td>
+                                <td><a href="${request.link(vote)}">${vote.title}</a></td>
                                 <td>
                                     <span tal:condition="vote.answer == 'accepted'" class="accepted" i18n:translate="">
                                         Accepted
