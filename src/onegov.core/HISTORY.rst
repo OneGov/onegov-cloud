@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a groupby function that returns lists instead of generators.
+  [href]
+
 - Include a layout base class useful for applications that render html.
   [href]
 

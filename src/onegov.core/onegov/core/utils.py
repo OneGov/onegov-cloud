@@ -7,6 +7,7 @@ import os.path
 import pydoc
 import re
 
+from itertools import groupby
 from onegov.core import compat
 from unidecode import unidecode
 from webob import static
@@ -136,3 +137,11 @@ def hash_dictionary(dictionary):
     """
     dict_as_string = json.dumps(dictionary, sort_keys=True).encode('utf-8')
     return hashlib.sha1(dict_as_string).hexdigest()
+
+
+def groupbylist(*args, **kwargs):
+    """ Works just like Python's ``itertools.groupby``function, but instead
+    of returning generators, it returns lists.
+
+    """
+    return [(k, list(g)) for k, g in groupby(*args, **kwargs)]
