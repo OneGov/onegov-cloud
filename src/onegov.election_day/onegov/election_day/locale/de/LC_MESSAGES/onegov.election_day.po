@@ -1,3 +1,9 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2015-06-10 10:22+0200\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:4
 msgid "There are no votes defined yet."
 msgstr "Es wurden noch keine Abstimmungen eingetragen."
