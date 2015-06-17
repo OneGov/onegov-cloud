@@ -23,6 +23,8 @@ class VoteCollection(object):
             return self.by_date(latest_date)
 
     def by_date(self, date):
+        """ Returns the votes on the given date. """
+
         query = self.query()
         query = query.filter(Vote.date == date)
         query = query.order_by(Vote.domain, Vote.title)
