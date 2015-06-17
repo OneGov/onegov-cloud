@@ -1,17 +1,12 @@
 from datetime import date
-from onegov.ballot import Ballot, BallotResult, Contest, Vote
+from onegov.ballot import Ballot, BallotResult, Vote
 
 
 def test_create_all_models(session):
-    contest = Contest(date=date(2015, 6, 14))
-
-    session.add(contest)
-    session.flush()
-
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
-        contest_date=contest.date,
+        date=date(2015, 6, 14),
         elegible_voters=10000,
     )
 
@@ -42,16 +37,13 @@ def test_create_all_models(session):
 
 
 def test_vote_id_generation(session):
-    contest = Contest(date=date(2015, 6, 14))
-
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
-        contest_date=contest.date,
+        date=date(2015, 6, 14),
         elegible_voters=10000,
     )
 
-    session.add(contest)
     session.add(vote)
     session.flush()
 
@@ -59,23 +51,20 @@ def test_vote_id_generation(session):
 
 
 def test_ballot_results_aggregation(session):
-    contest = Contest(date=date(2015, 6, 14))
-    contest.votes.append(
-        Vote(
-            title="Universal Healthcare",
-            domain='federation',
-            contest_date=contest.date,
-            elegible_voters=1234,
-        )
+    vote = Vote(
+        title="Universal Healthcare",
+        domain='federation',
+        date=date(2015, 6, 14),
+        elegible_voters=1234,
     )
 
-    session.add(contest)
+    session.add(vote)
     session.flush()
 
     ballot = Ballot(
         question="Do you want pass the universal healthcare act?",
         type='standard',
-        vote_id=contest.votes[0].id
+        vote_id=vote.id
     )
 
     ballot.results.extend([

@@ -28,25 +28,6 @@ from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
-class Contest(Base, TimestampMixin):
-    """ A contest contains all votes and elections decided upon on a given
-    date.
-
-    """
-
-    __tablename__ = 'contests'
-
-    #: there's only one contest for each date
-    date = Column(Date, nullable=False, primary_key=True)
-
-    #: a contest contains n votes
-    votes = relationship(
-        "Vote",
-        cascade="all, delete-orphan",
-        backref=backref("contest")
-    )
-
-
 class Vote(Base, TimestampMixin):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
@@ -61,6 +42,9 @@ class Vote(Base, TimestampMixin):
     #: title of the vote
     title = Column(Text, nullable=False)
 
+    #: identifies the date of the vote
+    date = Column(Date, nullable=False)
+
     #: defines the scope of the vote - eCH-0115 calls this the domain of
     #: influence. Unlike eCH-0115 we refrain from putting this in a separate
     #: model. We also don't include domains smaller than municipality.
@@ -71,9 +55,6 @@ class Vote(Base, TimestampMixin):
         ),
         nullable=False
     )
-
-    #: identifies the contest this vote belongs to
-    contest_date = Column(Date, ForeignKey(Contest.date), nullable=False)
 
     #: number of elegible voters
     elegible_voters = Column(Integer, nullable=False)
