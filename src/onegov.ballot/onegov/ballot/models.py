@@ -28,7 +28,20 @@ from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
-class Vote(Base, TimestampMixin):
+class DerivedPercentage(object):
+
+    @hybrid_property
+    def yays_percentage(self):
+        """ The percentage of yays (discounts empty/invalid ballots). """
+        return self.yays / (self.yays + self.nays) * 100
+
+    @hybrid_property
+    def nays_percentage(self):
+        """ The percentage of nays (discounts empty/invalid ballots). """
+        return 100 - self.yays_percentage
+
+
+class Vote(Base, TimestampMixin, DerivedPercentage):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
@@ -114,16 +127,6 @@ class Vote(Base, TimestampMixin):
         else:
             raise NotImplementedError
 
-    @hybrid_property
-    def yays_percentage(self):
-        """ The percentage of yays (discounts empty/invalid ballots). """
-        return self.yays / (self.yays + self.nays) * 100
-
-    @hybrid_property
-    def nays_percentage(self):
-        """ The percentage of nays (discounts empty/invalid ballots). """
-        return 100 - self.yays_percentage
-
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
         return sum(getattr(ballot, attribute) for ballot in self.ballots)
@@ -141,7 +144,7 @@ class Vote(Base, TimestampMixin):
         return expr
 
 
-class Ballot(Base, TimestampMixin):
+class Ballot(Base, TimestampMixin, DerivedPercentage):
     """ A ballot contains a single question asked for a vote.
 
     Usually each vote has exactly one ballot, but it's possible for votes to
@@ -214,16 +217,6 @@ class Ballot(Base, TimestampMixin):
 
         return expr
 
-    @hybrid_property
-    def yays_percentage(self):
-        """ The percentage of yays (discounts empty/invalid ballots). """
-        return self.yays / (self.yays + self.nays) * 100
-
-    @hybrid_property
-    def nays_percentage(self):
-        """ The percentage of nays (discounts empty/invalid ballots). """
-        return 100 - self.yays_percentage
-
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
         return sum(
@@ -271,7 +264,7 @@ def add_aggregated_attributes(mapper, cls):
         setattr(cls, attribute, new_hybrid_property(attribute))
 
 
-class BallotResult(Base, TimestampMixin):
+class BallotResult(Base, TimestampMixin, DerivedPercentage):
     """ The result of a specific ballot. Each ballot may have multiple
     results. Those results may be aggregated or not.
 
@@ -324,11 +317,3 @@ class BallotResult(Base, TimestampMixin):
     @hybrid_property
     def cast_ballots(self):
         return self.yays + self.nays + self.empty + self.invalid
-
-    @hybrid_property
-    def yays_percentage(self):
-        return self.yays / (self.yays + self.nays) * 100
-
-    @hybrid_property
-    def nays_percentage(self):
-        return 100 - self.yays_percentage
