@@ -1,6 +1,6 @@
 import more.webassets
 import onegov.core
-import onegov.town
+import onegov.election_day
 import os.path
 import pytest
 import textwrap

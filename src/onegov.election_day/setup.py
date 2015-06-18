@@ -34,11 +34,12 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core >= 0.3.7',
+        'onegov.core>=0.3.7',
+        'onegov.ballot',
         'onegov.form',
         'onegov.foundation',
         'onegov.user',
-        'yaml'
+        'pyyaml'
     ],
     extras_require=dict(
         test=[
