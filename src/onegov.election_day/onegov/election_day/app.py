@@ -1,6 +1,8 @@
+from cached_property import cached_property
 from onegov.core import Framework, utils
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.election_day.model import Principal
+from webassets import Bundle
 
 
 class ElectionDayApp(Framework):
@@ -16,6 +18,29 @@ class ElectionDayApp(Framework):
 
         """
         return Principal()
+
+    @cached_property
+    def webassets_path(self):
+        return utils.module_path('onegov.election_day', 'assets')
+
+    @cached_property
+    def webassets_bundles(self):
+
+        common = Bundle(
+            'js/modernizr.js',
+            'js/jquery.js',
+            'js/fastclick.js',
+            'js/foundation.js',
+            'js/underscore.js',
+            'js/stackable.js',
+            'js/common.js',
+            filters='jsmin',
+            output='bundles/common.bundle.js'
+        )
+
+        return {
+            'common': common
+        }
 
 
 @ElectionDayApp.template_directory()

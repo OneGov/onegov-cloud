@@ -51,3 +51,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Generated Bundles
+onegov/election_day/assets/bundles
+onegov/election_day/assets/.webassets-cache

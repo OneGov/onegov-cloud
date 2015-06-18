@@ -49,3 +49,15 @@ table {
         }
     }
 }
+
+/*
+    Responsive Tables
+*/
+.stacktable.large-only { display: table; }
+.stacktable.small-only { display: none; }
+
+@media #{$small-only} {
+    .stacktable.large-only { display: none; }
+    .stacktable.small-only { display: table; }
+    .stacktable th.st-head-row-main { display: none; }
+}
