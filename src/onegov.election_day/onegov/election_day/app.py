@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from onegov.core import Framework, utils
+from onegov.core.filestorage import FilestorageFile
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.election_day.model import Principal
 from webassets import Bundle
@@ -32,11 +33,21 @@ class ElectionDayApp(Framework):
         """
         assert self.has_filestorage
 
-        if not self.filestorage.isfile('principal.yml'):
-            return None
-        else:
+        if self.filestorage.isfile('principal.yml'):
             yaml_source = self.filestorage.open('principal.yml').read()
             return Principal.from_yaml(yaml_source)
+
+    @property
+    def logo(self):
+        """ Returns the logo as
+        :class:`onegov.core.filestorage.FilestorageFile`.
+
+        """
+        return self.cache.get_or_create('logo', self.load_logo)
+
+    def load_logo(self):
+        if self.filestorage.isfile(self.principal.logo):
+            return FilestorageFile(self.principal.logo)
 
     @cached_property
     def webassets_path(self):

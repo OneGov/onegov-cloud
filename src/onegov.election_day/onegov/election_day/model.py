@@ -6,8 +6,9 @@ class Principal(object):
 
     """
 
-    def __init__(self, name):
+    def __init__(self, name, logo):
         self.name = name
+        self.logo = logo
 
     @staticmethod
     def from_yaml(yaml_source):
