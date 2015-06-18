@@ -26,11 +26,14 @@
 </head>
 <body>
   <div class="row header">
-    <div class="small-1 columns">
-      <img alt="Logo" i18n:attributes="alt" src="${request.link(request.app.logo)}" />
-    </div>
-    <div class="small-11 columns">
-      <h1 i18n:translate="">Elections &amp; Votes</h1>
+    <div class="small-12 columns">
+      <a href="${layout.homepage_link}" title="Back to the latest elections &amp; votes" i18n:attributes="title">
+        <h1 class="show-for-sr">
+          <tal:block content="layout.app.principal.name" />:
+          <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
+        </h1>
+        <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" />
+      </a>
     </div>
   </div>
   <div class="row body">

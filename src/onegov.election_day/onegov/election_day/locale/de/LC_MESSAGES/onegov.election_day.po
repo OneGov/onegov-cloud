@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-06-18 15:35+0200\n"
+"POT-Creation-Date: 2015-06-18 15:47+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -41,12 +41,13 @@ msgstr "Gemeldet"
 
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:14
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:33
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:35
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
 
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:30
-msgid "Logo"
-msgstr "Logo"
+msgid "Back to the latest elections &amp; votes"
+msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
 
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/macros.pt:9
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:57
