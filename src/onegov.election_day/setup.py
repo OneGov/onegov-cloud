@@ -37,7 +37,8 @@ setup(
         'onegov.core >= 0.3.7',
         'onegov.form',
         'onegov.foundation',
-        'onegov.user'
+        'onegov.user',
+        'yaml'
     ],
     extras_require=dict(
         test=[

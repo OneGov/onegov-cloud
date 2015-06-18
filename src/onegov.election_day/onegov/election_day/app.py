@@ -17,7 +17,26 @@ class ElectionDayApp(Framework):
         :class:`onegov.election_day.model.Principal`.
 
         """
-        return Principal()
+        return self.cache.get_or_create('principal', self.load_principal)
+
+    def load_principal(self):
+        """ The principal is defined in the ``principal.yml`` file stored
+        on the applications filestorage root.
+
+        If the file does not exist, the site root does not exist and therefore
+        a 404 is returned.
+
+        The structure of the yaml file is defined in
+        class:`onegov.election_app.model.Principal`.
+
+        """
+        assert self.has_filestorage
+
+        if not self.filestorage.isfile('principal.yml'):
+            return None
+        else:
+            yaml_source = self.filestorage.open('principal.yml').read()
+            return Principal.from_yaml(yaml_source)
 
     @cached_property
     def webassets_path(self):
