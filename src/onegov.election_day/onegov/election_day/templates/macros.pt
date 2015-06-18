@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+<body>
+
+<metal:navigation define-macro="answer" i18n:domain="onegov.election_day">
+    <span tal:condition="answer == 'accepted'" class="accepted" i18n:translate="">
+        Accepted
+    </span>
+    <span tal:condition="answer == 'rejected'" class="rejected" i18n:translate="">
+        Rejected
+    </span>
+    <span tal:condition="answer == 'proposal'" class="accepted" i18n:translate="">
+        Proposal
+    </span>
+    <span tal:condition="answer == 'counter-proposal'" class="rejected" i18n:translate="">
+        Counter Proposal
+    </span>
+</metal:navigation>
+
+<metal:navigation define-macro="progress" i18n:domain="onegov.election_day">
+    <tal:block i18n:translate="">
+        <span tal:replace="progress[0]" i18n:name='counted' />
+            of
+        <span tal:replace="progress[1]" i18n:name='total' />
+    </tal:block>
+</metal:navigation>
+
+</body>

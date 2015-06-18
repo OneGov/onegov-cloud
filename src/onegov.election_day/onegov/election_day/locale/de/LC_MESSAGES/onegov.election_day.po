@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-06-18 08:46+0200\n"
+"POT-Creation-Date: 2015-06-18 12:39+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -36,27 +36,67 @@ msgstr "Nein %"
 msgid "Reported"
 msgstr "Gemeldet"
 
-#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:34
-msgid "Accepted"
-msgstr "Angenommen"
-
-#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:37
-msgid "Rejected"
-msgstr "Abgelehnt"
-
-#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:40
-msgid "Proposal"
-msgstr "Initiative"
-
-#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:43
-msgid "Counter Proposal"
-msgstr "Gegenentwurf"
-
-#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:49
-msgid "${counted} of ${total}"
-msgstr "${counted} von ${total}"
-
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:13
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:28
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/macros.pt:9
+msgid "Accepted"
+msgstr "Angenommen"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/macros.pt:12
+msgid "Rejected"
+msgstr "Abgelehnt"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/macros.pt:15
+msgid "Proposal"
+msgstr "Initiative"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/macros.pt:18
+msgid "Counter Proposal"
+msgstr "Gegenentwurf"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/macros.pt:24
+msgid "${counted} of ${total}"
+msgstr "${counted} von ${total}"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:7
+msgid "Result:"
+msgstr "Resultat:"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:12
+msgid "Yays"
+msgstr "Ja-Stimmen"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:14
+msgid "Nays"
+msgstr "Nein-Stimmen"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:20
+msgid "Counted municipalities"
+msgstr "Ausgezählte Gemeinden"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:22
+msgid "Elegible Voters"
+msgstr "Stimmberechtigte"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:24
+msgid "Cast Ballots"
+msgstr "Eingegangene Stimmzettel"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:26
+msgid "Turnout"
+msgstr "Wahlbeteiligung"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:28
+msgid "Empty Ballots"
+msgstr "Leere Stimmzettel"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:30
+msgid "Invalid Ballots"
+msgstr "Ungültige Stimmzettel"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:32
+msgid "Valid Ballots"
+msgstr "Gültige Stimmzettel"

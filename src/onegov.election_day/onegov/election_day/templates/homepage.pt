@@ -31,25 +31,12 @@
                             <tr tal:repeat="vote votes">
                                 <td><a href="${request.link(vote)}">${vote.title}</a></td>
                                 <td>
-                                    <span tal:condition="vote.answer == 'accepted'" class="accepted" i18n:translate="">
-                                        Accepted
-                                    </span>
-                                    <span tal:condition="vote.answer == 'rejected'" class="rejected" i18n:translate="">
-                                        Rejected
-                                    </span>
-                                    <span tal:condition="vote.answer == 'proposal'" class="accepted" i18n:translate="">
-                                        Proposal
-                                    </span>
-                                    <span tal:condition="vote.answer == 'counter-proposal'" class="rejected" i18n:translate="">
-                                        Counter Proposal
-                                    </span>
+                                    <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
                                 </td>
                                 <td>${'{0:.2f}'.format(vote.yays_percentage)}</td>
                                 <td>${'{0:.2f}'.format(vote.nays_percentage)}</td>
-                                <td tal:define="(counted, total) vote.progress" i18n:translate="">
-                                    <span tal:replace="counted" i18n:name='counted' />
-                                    of
-                                    <span tal:replace="counted" i18n:name='total' />
+                                <td>
+                                    <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                 </td>
                             </tr>
                         </tbody>
