@@ -131,8 +131,7 @@ class Vote(Base, TimestampMixin, DerivedPercentage):
 
         """
 
-        ballots = (self.proposal, self.counter_proposal, self.tie_breaker)
-        ballot_ids = set(b.id for b in ballots if b)
+        ballot_ids = set(b.id for b in self.ballots)
 
         if not ballot_ids:
             return 0, 0
