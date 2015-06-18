@@ -227,6 +227,28 @@ def test_progress(session):
     assert vote.proposal.progress == (2, 3)
 
 
+def test_turnout(session):
+    vote = Vote(
+        title="Abstimmung",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    vote.ballots.append(Ballot(type='proposal'))
+
+    session.add(vote)
+    session.flush()
+
+    vote.proposal.results.append(
+        BallotResult(group='1', counted=True, elegible_voters=100, yays=10)
+    )
+
+    session.flush()
+
+    assert vote.turnout == 10
+    assert vote.proposal.turnout == 10
+
+
 def test_ballot_results_aggregation(session):
     vote = Vote(
         title="Universal Healthcare",

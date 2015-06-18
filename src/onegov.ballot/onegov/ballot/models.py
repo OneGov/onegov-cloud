@@ -58,8 +58,12 @@ class DerivedBallotsCount(object):
     def cast_ballots(self):
         return self.yays + self.nays + self.empty + self.invalid
 
+    @hybrid_property
+    def turnout(self):
+        return self.cast_ballots / self.elegible_voters * 100
 
-class Vote(Base, TimestampMixin, DerivedPercentage):
+
+class Vote(Base, TimestampMixin, DerivedPercentage, DerivedBallotsCount):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
@@ -68,7 +72,7 @@ class Vote(Base, TimestampMixin, DerivedPercentage):
     __tablename__ = 'votes'
 
     summarized_properties = [
-        'yays', 'nays', 'empty', 'invalid', 'elegible_voters', 'cast_ballots'
+        'yays', 'nays', 'empty', 'invalid', 'elegible_voters',
     ]
 
     #: identifies the vote, may be used in the url, generated from the title
@@ -216,7 +220,7 @@ class Ballot(Base, TimestampMixin,
     __tablename__ = 'ballots'
 
     summarized_properties = [
-        'yays', 'nays', 'empty', 'invalid', 'elegible_voters', 'cast_ballots'
+        'yays', 'nays', 'empty', 'invalid', 'elegible_voters'
     ]
 
     #: identifies the ballot, maybe used in the url
