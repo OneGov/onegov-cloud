@@ -47,6 +47,160 @@ def test_vote_id_generation(session):
     assert vote.id == 'universal-healthcare'
 
 
+def test_ballot_answer_simple(session):
+    vote = Vote(
+        title="Abstimmung",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    session.add(vote)
+    session.flush()
+
+    ballot = Ballot(
+        type='proposal',
+        vote_id=vote.id
+    )
+
+    ballot.results.extend([
+        BallotResult(
+            group='Ort A',
+            counted=True,
+            yays=100,
+            nays=50
+        ),
+        BallotResult(
+            group='Ort B',
+            counted=False,
+            yays=100,
+            nays=50
+        )
+    ])
+
+    session.add(ballot)
+    session.flush()
+
+    # not all results are counted yet
+    assert vote.answer is None
+
+    for result in ballot.results:
+        result.counted = True
+
+    assert vote.answer == 'accepted'
+
+    # if there are as many nays as yays, we default to 'rejected' - in reality
+    # this is very unlikely to happen
+    for result in ballot.results:
+        result.nays = 100
+
+    assert vote.answer == 'rejected'
+
+
+def test_ballot_answer_proposal_wins(session):
+    vote = Vote(
+        title="Abstimmung mit Gegenentwurf",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.ballots.append(Ballot(type='counter-proposal'))
+    vote.ballots.append(Ballot(type='tie-breaker'))
+
+    session.add(vote)
+    session.flush()
+
+    # if only the proposal is accepted, the proposal wins
+    vote.proposal.results.append(
+        BallotResult(group='x', yays=100, nays=0, counted=True))
+    vote.counter_proposal.results.append(
+        BallotResult(group='x', yays=0, nays=100, counted=True))
+    vote.tie_breaker.results.append(
+        BallotResult(group='x', yays=0, nays=0, counted=True))
+
+    assert vote.answer == 'proposal'
+
+
+def test_ballot_answer_counter_proposal_wins(session):
+    vote = Vote(
+        title="Abstimmung mit Gegenentwurf",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.ballots.append(Ballot(type='counter-proposal'))
+    vote.ballots.append(Ballot(type='tie-breaker'))
+
+    session.add(vote)
+    session.flush()
+
+    # if only the proposal is accepted, the proposal wins
+    vote.proposal.results.append(
+        BallotResult(group='x', yays=0, nays=100, counted=True))
+    vote.counter_proposal.results.append(
+        BallotResult(group='x', yays=100, nays=0, counted=True))
+    vote.tie_breaker.results.append(
+        BallotResult(group='x', yays=0, nays=0, counted=True))
+
+    assert vote.answer == 'counter-proposal'
+
+
+def test_ballot_answer_counter_tie_breaker_decides(session):
+    vote = Vote(
+        title="Abstimmung mit Gegenentwurf",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.ballots.append(Ballot(type='counter-proposal'))
+    vote.ballots.append(Ballot(type='tie-breaker'))
+
+    session.add(vote)
+    session.flush()
+
+    # if only the proposal is accepted, the proposal wins
+    vote.proposal.results.append(
+        BallotResult(group='x', yays=100, nays=0, counted=True))
+    vote.counter_proposal.results.append(
+        BallotResult(group='x', yays=100, nays=0, counted=True))
+    vote.tie_breaker.results.append(
+        BallotResult(group='x', yays=100, nays=0, counted=True))
+
+    assert vote.answer == 'proposal'
+
+    vote.tie_breaker.results[0].yays = 0
+    vote.tie_breaker.results[0].nays = 100
+
+    assert vote.answer == 'counter-proposal'
+
+
+def test_ballot_answer_nobody_wins(session):
+    vote = Vote(
+        title="Abstimmung mit Gegenentwurf",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.ballots.append(Ballot(type='counter-proposal'))
+    vote.ballots.append(Ballot(type='tie-breaker'))
+
+    session.add(vote)
+    session.flush()
+
+    # if only the proposal is accepted, the proposal wins
+    vote.proposal.results.append(
+        BallotResult(group='x', yays=0, nays=100, counted=True))
+    vote.counter_proposal.results.append(
+        BallotResult(group='x', yays=0, nays=100, counted=True))
+    vote.tie_breaker.results.append(
+        BallotResult(group='x', yays=100, nays=0, counted=True))
+
+    assert vote.answer == 'rejected'
+
+
 def test_ballot_results_aggregation(session):
     vote = Vote(
         title="Universal Healthcare",

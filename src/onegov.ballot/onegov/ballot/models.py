@@ -98,7 +98,18 @@ class Vote(Base, TimestampMixin, DerivedPercentage):
         self.id = normalize_for_url(title)
 
     @property
+    def counted(self):
+        for ballot in self.ballots:
+            if not ballot.counted:
+                return False
+
+        return True
+
+    @property
     def answer(self):
+        if not self.counted:
+            return None
+
         # standard ballot, no counter proposal
         if not self.counter_proposal:
             return 'accepted' if self.proposal.accepted else 'rejected'
@@ -107,7 +118,10 @@ class Vote(Base, TimestampMixin, DerivedPercentage):
         elif all((self.proposal, self.counter_proposal, self.tie_breaker)):
 
             if self.proposal.accepted and self.counter_proposal.accepted:
-                return 'accepted' if self.tie_breaker.accepted else 'rejected'
+                if self.tie_breaker.accepted:
+                    return 'proposal'
+                else:
+                    return 'counter-proposal'
 
             elif self.proposal.accepted:
                 return 'proposal'
