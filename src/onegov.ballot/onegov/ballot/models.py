@@ -260,10 +260,25 @@ class Ballot(Base, TimestampMixin,
 
         return expr
 
+    @property
+    def progress(self):
+        """ Returns a tuple with the first value being the number of counted
+        ballot result groups and the second value being the number of total
+        result groups related to this vote.
+
+        """
+
+        query = object_session(self).query(BallotResult)
+        query = query.with_entities(BallotResult.counted)
+        query = query.filter(BallotResult.ballot_id == self.id)
+
+        results = query.all()
+
+        return sum(1 for r in results if r[0]), len(results)
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
-        return sum(
-            getattr(result, attribute) for result in self.results)
+        return sum(getattr(result, attribute) for result in self.results)
 
     @staticmethod
     def aggregate_results_expression(cls, attribute):

@@ -224,6 +224,7 @@ def test_progress(session):
     )
 
     assert vote.progress == (2, 3)
+    assert vote.proposal.progress == (2, 3)
 
 
 def test_ballot_results_aggregation(session):
