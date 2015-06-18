@@ -41,6 +41,24 @@ class DerivedPercentage(object):
         return 100 - self.yays_percentage
 
 
+class DerivedAcceptance(object):
+
+    @hybrid_property
+    def accepted(self):
+        return self.yays > self.nays if self.counted else None
+
+    @accepted.expression
+    def accepted(cls):
+        return case({True: cls.yays > cls.nays}, cls.counted)
+
+
+class DerivedBallotsCount(object):
+
+    @hybrid_property
+    def cast_ballots(self):
+        return self.yays + self.nays + self.empty + self.invalid
+
+
 class Vote(Base, TimestampMixin, DerivedPercentage):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
@@ -48,6 +66,10 @@ class Vote(Base, TimestampMixin, DerivedPercentage):
     """
 
     __tablename__ = 'votes'
+
+    summarized_properties = [
+        'yays', 'nays', 'empty', 'invalid', 'elegible_voters', 'cast_ballots'
+    ]
 
     #: identifies the vote, may be used in the url, generated from the title
     id = Column(Text, primary_key=True)
@@ -175,7 +197,8 @@ class Vote(Base, TimestampMixin, DerivedPercentage):
         return expr
 
 
-class Ballot(Base, TimestampMixin, DerivedPercentage):
+class Ballot(Base, TimestampMixin,
+             DerivedPercentage, DerivedAcceptance, DerivedBallotsCount):
     """ A ballot contains a single question asked for a vote.
 
     Usually each vote has exactly one ballot, but it's possible for votes to
@@ -191,6 +214,10 @@ class Ballot(Base, TimestampMixin, DerivedPercentage):
     """
 
     __tablename__ = 'ballots'
+
+    summarized_properties = [
+        'yays', 'nays', 'empty', 'invalid', 'elegible_voters', 'cast_ballots'
+    ]
 
     #: identifies the ballot, maybe used in the url
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -219,21 +246,6 @@ class Ballot(Base, TimestampMixin, DerivedPercentage):
         backref=backref("ballot"),
         lazy='joined'
     )
-
-    @hybrid_property
-    def accepted(self):
-        """ True if the ballot has been accepted (yays outweigh the nays).
-
-        Only available if all results have been counted.
-        """
-        if self.counted:
-            return self.yays > self.nays
-        else:
-            return None
-
-    @accepted.expression
-    def accepted(cls):
-        return case({True: cls.yays > cls.nays}, cls.counted)
 
     @hybrid_property
     def counted(self):
@@ -266,36 +278,8 @@ class Ballot(Base, TimestampMixin, DerivedPercentage):
         return expr
 
 
-@listens_for(Vote, 'mapper_configured')
-@listens_for(Ballot, 'mapper_configured')
-def add_aggregated_attributes(mapper, cls):
-    """ Takes the following attributes and adds them as hybrid_properties
-    to the ballot. This results in a Ballot class that has all the following
-    properties which will return the sum of the underlying results if called.
-
-    E.g. this will return all the yays of the joined ballot results::
-
-        ballot.yays
-
-    """
-    attributes = ['yays', 'nays', 'empty', 'invalid', 'cast_ballots']
-
-    def new_hybrid_property(attribute):
-        @hybrid_property
-        def sum_result(self):
-            return self.aggregate_results(attribute)
-
-        @sum_result.expression
-        def sum_result(cls):
-            return cls.aggregate_results_expression(cls, attribute)
-
-        return sum_result
-
-    for attribute in attributes:
-        setattr(cls, attribute, new_hybrid_property(attribute))
-
-
-class BallotResult(Base, TimestampMixin, DerivedPercentage):
+class BallotResult(Base, TimestampMixin,
+                   DerivedPercentage, DerivedAcceptance, DerivedBallotsCount):
     """ The result of a specific ballot. Each ballot may have multiple
     results. Those results may be aggregated or not.
 
@@ -337,14 +321,32 @@ class BallotResult(Base, TimestampMixin, DerivedPercentage):
     #: the ballot this result belongs to
     ballot_id = Column(UUID, ForeignKey(Ballot.id), nullable=False)
 
-    @hybrid_property
-    def accepted(self):
-        return self.yays > self.nays if self.counted else None
 
-    @accepted.expression
-    def accepted(cls):
-        return case({True: cls.yays > cls.nays}, cls.counted)
+@listens_for(Vote, 'mapper_configured')
+@listens_for(Ballot, 'mapper_configured')
+def add_summarized_properties(mapper, cls):
+    """ Takes the following attributes and adds them as hybrid_properties
+    to the ballot. This results in a Ballot class that has all the following
+    properties which will return the sum of the underlying results if called.
 
-    @hybrid_property
-    def cast_ballots(self):
-        return self.yays + self.nays + self.empty + self.invalid
+    E.g. this will return all the yays of the joined ballot results::
+
+        ballot.yays
+
+    """
+
+    attributes = cls.summarized_properties
+
+    def new_hybrid_property(attribute):
+        @hybrid_property
+        def sum_result(self):
+            return self.aggregate_results(attribute)
+
+        @sum_result.expression
+        def sum_result(cls):
+            return cls.aggregate_results_expression(cls, attribute)
+
+        return sum_result
+
+    for attribute in attributes:
+        setattr(cls, attribute, new_hybrid_property(attribute))
