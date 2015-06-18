@@ -34,6 +34,7 @@ def election_day_app(postgres_dsn, temporary_directory):
 
     app.filestorage.setcontents('principal.yml', textwrap.dedent("""
         name: Kanton Govikon
+        logo: logo.jpg
     """))
 
     yield app
