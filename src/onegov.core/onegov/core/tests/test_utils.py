@@ -14,7 +14,8 @@ def test_normalize_for_url():
     assert utils.normalize_for_url(u'währung') == 'wahrung'
     assert utils.normalize_for_url(u'one/two') == 'one-two'
     assert utils.normalize_for_url('far / away') == 'far-away'
-    assert utils.normalize_for_url('far <away>') == 'far-away-'
+    assert utils.normalize_for_url('far <away>') == 'far-away'
+    assert utils.normalize_for_url('far (away)') == 'far-away'
 
 
 def test_lchop():

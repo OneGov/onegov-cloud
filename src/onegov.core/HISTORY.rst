@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Remove parentheses from url when normalizing it.
+  [href]
+
 0.3.7 (2015-06-17)
 ~~~~~~~~~~~~~~~~~~~
 
