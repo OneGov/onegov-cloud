@@ -17,7 +17,7 @@
                         </h2>
                     </tal:block>
 
-                    <table>
+                    <table class="overview">
                         <thead>
                             <tr>
                                 <th i18n:translate="">Vote</th>

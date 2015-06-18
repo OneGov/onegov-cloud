@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-06-17 16:21+0200\n"
+"POT-Creation-Date: 2015-06-18 08:46+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -51,6 +51,10 @@ msgstr "Initiative"
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:43
 msgid "Counter Proposal"
 msgstr "Gegenentwurf"
+
+#: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:49
+msgid "${counted} of ${total}"
+msgstr "${counted} von ${total}"
 
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:13
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/layout.pt:28
