@@ -201,6 +201,31 @@ def test_ballot_answer_nobody_wins(session):
     assert vote.answer == 'rejected'
 
 
+def test_progress(session):
+    vote = Vote(
+        title="Abstimmung",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    vote.ballots.append(Ballot(type='proposal'))
+
+    session.add(vote)
+    session.flush()
+
+    vote.proposal.results.append(
+        BallotResult(group='1', counted=True)
+    )
+    vote.proposal.results.append(
+        BallotResult(group='2', counted=True)
+    )
+    vote.proposal.results.append(
+        BallotResult(group='3', counted=False)
+    )
+
+    assert vote.progress == (2, 3)
+
+
 def test_ballot_results_aggregation(session):
     vote = Vote(
         title="Universal Healthcare",
