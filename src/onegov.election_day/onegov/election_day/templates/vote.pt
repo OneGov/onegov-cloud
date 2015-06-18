@@ -32,5 +32,40 @@
             <dt i18n:translate="">Valid Ballots</dt>
             <dd>${vote.yays + vote.nays}</dd>
         </dl>
+
+        <div class="ballot" tal:repeat="ballot vote.ballots">
+            <h3><div metal:use-macro="layout.macros['ballot_type']" tal:define="ballot_type ballot.type" /></h3>
+
+            <table class="ballot-results stackable">
+                <thead>
+                    <th i18n:translate="">Electoral District</th>
+                    <th i18n:translate="">Result</th>
+                    <th i18n:translate="">Yays</th>
+                    <th i18n:translate="">Nays</th>
+                    <th i18n:translate="">Empty</th>
+                    <th i18n:translate="">Invalid</th>
+                    <th i18n:translate="">Yes %</th>
+                    <th i18n:translate="">No %</th>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="result ballot.results">
+                        <tal:block condition="not: result.counted">
+                            <td colspan="8">${result.group}</td>
+                        </tal:block>
+                        <tal:block condition="result.counted">
+                            <td>${result.group}</td>
+                            <td class="accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
+                            <td class="rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
+                            <td>${result.yays}</td>
+                            <td>${result.nays}</td>
+                            <td>${result.empty}</td>
+                            <td>${result.invalid}</td>
+                            <td>${'{0:.2f}'.format(result.yays_percentage)}</td>
+                            <td>${'{0:.2f}'.format(result.nays_percentage)}</td>
+                        </tal:block>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </tal:block>
 </div>
