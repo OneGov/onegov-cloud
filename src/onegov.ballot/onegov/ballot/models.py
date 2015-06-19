@@ -248,7 +248,8 @@ class Ballot(Base, TimestampMixin,
         "BallotResult",
         cascade="all, delete-orphan",
         backref=backref("ballot"),
-        lazy='joined'
+        lazy='joined',
+        order_by="BallotResult.group",
     )
 
     @hybrid_property
