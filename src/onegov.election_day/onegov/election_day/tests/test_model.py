@@ -7,6 +7,7 @@ def test_load_principal():
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Foobar
         logo:
+        canton: zg
     """))
 
     assert principal.name == 'Foobar'
