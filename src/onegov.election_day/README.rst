@@ -27,15 +27,15 @@ Onegov Election Day uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/seantis/onegov.election_day.png
-  :target: https://travis-ci.org/seantis/onegov.election_day
+.. image:: https://travis-ci.org/OneGov/onegov.election_day.png
+  :target: https://travis-ci.org/OneGov/onegov.election_day
   :alt: Build Status
 
 Coverage
 --------
 
-.. image:: https://coveralls.io/repos/seantis/onegov.election_day/badge.png?branch=master
-  :target: https://coveralls.io/r/seantis/onegov.election_day?branch=master
+.. image:: https://coveralls.io/repos/OneGov/onegov.election_day/badge.png?branch=master
+  :target: https://coveralls.io/r/OneGov/onegov.election_day?branch=master
   :alt: Project Coverage
 
 Latests PyPI Release
