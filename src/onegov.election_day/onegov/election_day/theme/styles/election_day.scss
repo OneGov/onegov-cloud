@@ -107,3 +107,16 @@ table {
     padding: 12px;
 }
 
+/*
+    Voting factoids
+*/
+.factoids {
+    background-color: $white-smoke;
+    font-size: .8rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+
+    strong {
+        display: block;
+    }
+}

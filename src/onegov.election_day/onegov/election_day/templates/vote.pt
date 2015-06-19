@@ -8,30 +8,52 @@
                 <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
             </h3>
 
-            <dl>
-                <dt class="accepted" i18n:translate="">Yays</dt>
-                <dd class="accepted" >${vote.yays} / ${'{0:.2f}'.format(vote.yays_percentage)} %</dd>
-                <dt class="rejected" i18n:translate="">Nays</dt>
-                <dd class="rejected" >${vote.nays} / ${'{0:.2f}'.format(vote.nays_percentage)} %</dd>
-            </dl>
+            <div class="row">
+                <div class="columns small-12 medium-2">
+                    <dl>
+                        <dt i18n:translate="">Yays</dt>
+                        <dd class="accepted" >${vote.yays} / ${'{0:.2f}'.format(vote.yays_percentage)} %</dd>
+                    </dl>
+                </div>
+                <div class="columns small-12 medium-2 end">
+                    <dl>
+                        <dt i18n:translate="">Nays</dt>
+                        <dd class="rejected" >${vote.nays} / ${'{0:.2f}'.format(vote.nays_percentage)} %</dd>
+                    </dl>
+                </div>
+            </div>
         </tal:block>
 
-        <dl>
-            <dt i18n:translate="">Counted municipalities</dt>
-            <dd><div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" /></dd>
-            <dt i18n:translate="">Elegible Voters</dt>
-            <dd>${vote.elegible_voters}</dd>
-            <dt i18n:translate="">Cast Ballots</dt>
-            <dd>${vote.cast_ballots}</dd>
-            <dt i18n:translate="">Turnout</dt>
-            <dd>${'{0:.2f}'.format(vote.turnout)} %</dd>
-            <dt i18n:translate="">Empty Ballots</dt>
-            <dd>${vote.empty}</dd>
-            <dt i18n:translate="">Invalid Ballots</dt>
-            <dd>${vote.invalid}</dd>
-            <dt i18n:translate="">Valid Ballots</dt>
-            <dd>${vote.yays + vote.nays}</dd>
-        </dl>
+        <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+            <li>
+                <strong i18n:translate="">Counted municipalities</strong>
+                <span metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
+            </li>
+            <li>
+                <strong i18n:translate="">Elegible Voters</strong>
+                <span>${vote.elegible_voters}</span>
+            </li>
+            <li>
+                <strong i18n:translate="">Cast Ballots</strong>
+                <span>${vote.cast_ballots}</span>
+            </li>
+            <li>
+                <strong i18n:translate="">Turnout</strong>
+                <span>${'{0:.2f}'.format(vote.turnout)} %</span>
+            </li>
+            <li>
+                <strong i18n:translate="">Empty Ballots</strong>
+                <span>${vote.empty}</span>
+            </li>
+            <li>
+                <strong i18n:translate="">Invalid Ballots</strong>
+                <span>${vote.invalid}</span>
+            </li>
+            <li>
+                <strong i18n:translate="">Valid Ballots</strong>
+                <span>${vote.yays + vote.nays}</span>
+            </li>
+        </ul>
 
         <div class="ballot" tal:repeat="ballot vote.ballots">
             <h3><div metal:use-macro="layout.macros['ballot_type']" tal:define="ballot_type ballot.type" /></h3>
