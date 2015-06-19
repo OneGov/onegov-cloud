@@ -27,15 +27,15 @@ Onegov Ballot uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/seantis/onegov.ballot.png
-  :target: https://travis-ci.org/seantis/onegov.ballot
+.. image:: https://travis-ci.org/OneGov/onegov.ballot.png
+  :target: https://travis-ci.org/OneGov/onegov.ballot
   :alt: Build Status
 
 Coverage
 --------
 
-.. image:: https://coveralls.io/repos/seantis/onegov.ballot/badge.png?branch=master
-  :target: https://coveralls.io/r/seantis/onegov.ballot?branch=master
+.. image:: https://coveralls.io/repos/OneGov/onegov.ballot/badge.png?branch=master
+  :target: https://coveralls.io/r/OneGov/onegov.ballot?branch=master
   :alt: Project Coverage
 
 Latests PyPI Release
