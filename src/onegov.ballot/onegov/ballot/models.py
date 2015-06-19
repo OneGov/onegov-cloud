@@ -296,6 +296,35 @@ class Ballot(Base, TimestampMixin,
 
         return expr
 
+    def percentage_by_municipality(self):
+        """ Returns the yays/nays percentage grouped and keyed by
+        municipality_id.
+
+        Uncounted municipalities are not included.
+
+        """
+
+        query = object_session(self).query(BallotResult)
+
+        query = query.with_entities(
+            BallotResult.municipality_id,
+            func.sum(BallotResult.yays),
+            func.sum(BallotResult.nays)
+        )
+
+        query = query.group_by(BallotResult.municipality_id)
+        query = query.filter(BallotResult.counted == True)
+        query = query.filter(BallotResult.ballot_id == self.id)
+
+        result = {}
+
+        for id, yays, nays in query.all():
+            result[id] = {}
+            result[id]['yays_percentage'] = yays / (yays + nays) * 100
+            result[id]['nays_percentage'] = 100 - result[id]['yays_percentage']
+
+        return result
+
 
 class BallotResult(Base, TimestampMixin,
                    DerivedPercentage, DerivedAcceptance, DerivedBallotsCount):
@@ -315,6 +344,9 @@ class BallotResult(Base, TimestampMixin,
     #: levels. We could use the example, to group by '/ZH' or by
     #: '/ZH/Bezirk Zürich/Stadt Zürich'
     group = Column(Text, nullable=False)
+
+    #: The municipality id (BFS Nummer).
+    municipality_id = Column(Integer, nullable=False)
 
     #: True if the result has been counted and no changes will be made anymore.
     #: If the result is definite, all the values below must be specified.

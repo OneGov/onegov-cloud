@@ -1,4 +1,4 @@
-from onegov.ballot.models import Vote
+from onegov.ballot.models import Ballot, Vote
 from sqlalchemy import desc
 
 
@@ -38,3 +38,15 @@ class VoteCollection(object):
         query = query.filter(Vote.id == id)
 
         return query.first()
+
+
+class BallotCollection(object):
+
+    def __init__(self, session):
+        self.session = session
+
+    def query(self):
+        return self.session.query(Ballot)
+
+    def by_id(self, id):
+        return self.query().filter(Ballot.id == id).first()
