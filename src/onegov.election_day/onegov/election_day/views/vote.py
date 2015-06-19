@@ -1,5 +1,5 @@
 from onegov.core.security import Public
-from onegov.ballot import Vote
+from onegov.ballot import Ballot, Vote
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
 
@@ -7,7 +7,15 @@ from onegov.election_day.layout import DefaultLayout
 @ElectionDayApp.html(model=Vote, template='vote.pt', permission=Public)
 def view_vote(self, request):
 
+    layout = DefaultLayout(self, request)
+    request.include('ballot_map')
+
     return {
         'vote': self,
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
     }
+
+
+@ElectionDayApp.json(model=Ballot, permission=Public, name='by-municipality')
+def view_ballot_by_municipality(self, request):
+    return self.percentage_by_municipality()

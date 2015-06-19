@@ -12,6 +12,8 @@ class ElectionDayApp(Framework):
 
     """
 
+    serve_static_files = True
+
     @property
     def principal(self):
         """ Returns the principal of the election day app. See
@@ -68,8 +70,18 @@ class ElectionDayApp(Framework):
             output='bundles/common.bundle.js'
         )
 
+        ballot_map = Bundle(
+            'js/d3.js',
+            'js/d3tip.js',
+            'js/topojson.js',
+            'js/ballot-map.js',
+            filters='jsmin',
+            output='bundles/d3.bundle.js'
+        )
+
         return {
-            'common': common
+            'common': common,
+            'ballot_map': ballot_map
         }
 
 

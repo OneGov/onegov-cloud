@@ -74,3 +74,36 @@ table {
     .stacktable.small-only { display: table; }
     .stacktable th.st-head-row-main { display: none; }
 }
+
+/*
+    Ballot Map
+*/
+
+.border {
+    fill: none;
+}
+
+.municipality .selected {
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-opacity: .8;
+    stroke-width: 1px;
+}
+
+.lake {
+    fill: $white;
+    stroke: #b0becb;
+    stroke-width: 1px;
+}
+
+/*
+    D3 Tooltip
+*/
+
+.d3-tip {
+    background: rgba(0, 0, 0, .1);
+    border-radius: 2px;
+    font-size: .8rem;
+    padding: 12px;
+}
+

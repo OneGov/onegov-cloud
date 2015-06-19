@@ -36,6 +36,13 @@
         <div class="ballot" tal:repeat="ballot vote.ballots">
             <h3><div metal:use-macro="layout.macros['ballot_type']" tal:define="ballot_type ballot.type" /></h3>
 
+            <div class="ballot-map"
+                data-type="${ballot.type}"
+                data-canton="${layout.app.principal.canton}"
+                data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, vote.date.year)}"
+                data-dataurl="${request.link(ballot, name='by-municipality')}">
+            </div>
+
             <table class="ballot-results stackable">
                 <thead>
                     <th i18n:translate="">Electoral District</th>
