@@ -50,10 +50,12 @@ from __future__ import print_function
 
 import click
 import multiprocessing
+import objgraph
 import os
 import signal
 import sys
 import time
+import resource
 import traceback
 
 from datetime import datetime
@@ -188,6 +190,19 @@ class WsgiProcess(multiprocessing.Process):
     def port(self):
         return self._actual_port.value
 
+    def print_memory_stats(self):
+
+        total_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss\
+            / 1024 / 1024
+
+        print("Total memory used: {0:.2f} mb".format(total_memory))
+        print()
+        print("Most common types:")
+        objgraph.show_most_common_types(limit=10)
+        print()
+        print("Growth since last invocation:")
+        objgraph.show_growth(limit=10)
+
     def run(self):
         # use the parent's process stdin to be able to provide pdb correctly
         if hasattr(self, 'stdin_fileno'):
@@ -195,6 +210,9 @@ class WsgiProcess(multiprocessing.Process):
 
         # when pressing ctrl+c exit immediately
         signal.signal(signal.SIGINT, lambda *args: sys.exit(0))
+
+        # when pressing ctrl+t show the memory usage of the process
+        signal.signal(signal.SIGINFO, lambda *args: self.print_memory_stats())
 
         # reset the tty every time, fixing problems that might occur if
         # the process is restarted during a pdb session

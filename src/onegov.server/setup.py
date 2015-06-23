@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'cached_property',
         'click',
+        'objgraph',
         'PyYAML',
         'watchdog',
         'webob',

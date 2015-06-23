@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Pressing Ctrl+T in the onegov-server cli will now show a memory summary. This
+  is helpful for determening if there are memory leaks or not.
+  [href]
+
 - Improves the debug server output, highlighting slow requests and dimming out
   redirects.
   [href]
