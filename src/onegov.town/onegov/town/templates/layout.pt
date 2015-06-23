@@ -82,11 +82,6 @@
     </div>
     <footer class="row footer" tal:define="contact layout.town.meta.contact_html|nothing; opening_hours layout.town.meta.opening_hours_html|nothing">
       <div class="small-12 columns">
-        <div class="row footer-links">
-          <div class="small-12 columns">
-            <div metal:use-macro="layout.macros['bottom-links']"></div>
-          </div>
-        </div>
         <div class="row footer-columns" tal:condition="contact|opening_hours">
           <div class="small-12 medium-3 columns">
             <h2 i18n:translate="" tal:condition="contact">Contact</h2>
@@ -97,6 +92,11 @@
             <div tal:content="structure layout.town.meta.opening_hours_html" />
           </div>
           <div class="small-12 medium-3 columns"></div>
+        </div>
+        <div class="row footer-links">
+          <div class="small-12 columns">
+            <div metal:use-macro="layout.macros['bottom-links']"></div>
+          </div>
         </div>
       </div>
     </footer>
