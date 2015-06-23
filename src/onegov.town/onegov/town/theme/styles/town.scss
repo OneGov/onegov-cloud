@@ -20,6 +20,10 @@
     border-bottom: 1px solid transparentize($primary-color, .8);
 }
 
+@mixin smooth-edges() {
+    border-radius: 2px;
+}
+
 /*
     get rid of the jump that is introduced when switching from a site with
     scrollbar to a site without (or vice versa)
@@ -382,6 +386,8 @@ input[type=color] {
     }
 
     .tile-image {
+        @include smooth-edges;
+
         background-size: cover;
         display: block;
         height: 5rem;
