@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes greyscale scss mixin not working in Firefox.
+  [href]
+
 - Adds many new builtin forms.
   [freinhard]
 
