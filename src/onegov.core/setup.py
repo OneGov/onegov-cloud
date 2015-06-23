@@ -7,7 +7,7 @@ name = 'onegov.core'
 description = (
     'Contains code shared by all OneGov applications.'
 )
-version = '0.3.8'
+version = '0.3.9'
 
 dependencies = {
     'bleach',

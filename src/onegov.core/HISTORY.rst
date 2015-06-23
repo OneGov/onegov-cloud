@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.9 (2015-06-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Moves sanitize_html and linkify functions from onegov.town to core.
   [href]
 
