@@ -50,3 +50,16 @@ def test_module_path():
     path = utils.module_path('onegov.core', 'utils.py')
     assert path == utils.module_path(onegov.core, 'utils.py')
     assert os.path.isfile(path)
+
+
+def test_linkify():
+    # this is really bleach's job, but we want to run the codepath anyway
+    assert utils.linkify('info@example.org')\
+        == '<a href="mailto:info@example.org">info@example.org</a>'
+    assert utils.linkify('https://google.ch')\
+        == '<a href="https://google.ch" rel="nofollow">https://google.ch</a>'
+
+
+def test_sanitize_html():
+    # this is really bleach's job, but we want to run the codepath anyway
+    assert utils.sanitize_html('<script>') == '&lt;script&gt;'

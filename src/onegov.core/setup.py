@@ -10,6 +10,7 @@ description = (
 version = '0.3.8'
 
 dependencies = {
+    'bleach',
     'cached_property',
     'chameleon',
     'delorean',
