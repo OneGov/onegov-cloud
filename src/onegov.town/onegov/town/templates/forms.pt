@@ -36,6 +36,7 @@
                         </tal:block>
                     </div>
                 </tal:block>
+                <div class="clearfix"></div>
             </li>
         </ul>
     </tal:block>
