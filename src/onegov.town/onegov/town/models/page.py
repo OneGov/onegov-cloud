@@ -1,9 +1,10 @@
 from onegov.core import utils
+from onegov.core.utils import sanitize_html
 from onegov.form import Form, with_options
 from onegov.page import Page
 from onegov.town import _
 from onegov.town.const import NEWS_PREFIX, TRAIT_MESSAGES
-from onegov.town.utils import sanitize_html, mark_images
+from onegov.town.utils import mark_images
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer, object_session
 from wtforms import StringField, TextAreaField, validators

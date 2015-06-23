@@ -1,12 +1,13 @@
 import morepath
 
 from onegov.core.security import Private
+from onegov.core.utils import sanitize_html
 from onegov.form import Form, FormCollection, FormDefinition, with_options
 from onegov.form.validators import ValidFormDefinition
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import FormEditorLayout
-from onegov.town.utils import sanitize_html, mark_images
+from onegov.town.utils import mark_images
 from wtforms import StringField, TextAreaField, validators
 from wtforms.widgets import TextArea
 from webob import exc

@@ -1,6 +1,7 @@
 """ The settings view, defining things like the logo or color of the town. """
 
 from onegov.core.security import Secret
+from onegov.core.utils import linkify
 from onegov.form import Form, with_options
 from wtforms import HiddenField, StringField, TextAreaField, validators
 from wtforms.widgets import TextArea
@@ -11,7 +12,6 @@ from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
 from onegov.town.models import Town
 from onegov.town.theme import user_options
-from onegov.town.utils import linkify
 
 
 class SettingsForm(Form):
