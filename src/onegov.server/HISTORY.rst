@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Improves the debug server output, highlighting slow requests and dimming out
+  redirects.
+  [href]
+
 - Include Morepath's upcoming changes to module imports until Morepath 0.11
   is released.
   [href]

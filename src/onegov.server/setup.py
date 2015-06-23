@@ -37,6 +37,7 @@ setup(
         'PyYAML',
         'watchdog',
         'webob',
+        'xtermcolor'
     ],
     extras_require=dict(
         test=[

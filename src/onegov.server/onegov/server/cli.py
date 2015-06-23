@@ -62,6 +62,7 @@ from onegov.server import Config
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 from wsgiref.simple_server import make_server, WSGIRequestHandler
+from xtermcolor import colorize
 
 
 @click.command()
@@ -124,11 +125,40 @@ class CustomWSGIRequestHandler(WSGIRequestHandler):
         return WSGIRequestHandler.parse_request(self)
 
     def log_request(self, status, bytes):
+        status = int(status)
+
         duration = datetime.utcnow() - self._started
         duration = int(round(duration.total_seconds() * 1000, 0))
 
-        print("{} - {} {} - {} ms - {} bytes".format(
-            status, self.command, self.path, duration, bytes))
+        method = self.command
+        path = self.path
+
+        template = "{status} - {duration} - {method} {path}"
+
+        if status in {302, 304}:
+            path = colorize(path, rgb=0x666666)  # grey
+        else:
+            pass  # white
+
+        if duration > 500:
+            duration = click.style(
+                str(duration) + ' ms', fg='red')
+        elif duration > 250:
+            duration = click.style(
+                str(duration) + ' ms', fg='yellow')
+        else:
+            duration = click.style(
+                str(duration) + ' ms', fg='green')
+
+        if method == 'POST':
+            method = click.style(method, underline=True)
+
+        print(template.format(
+            status=status,
+            method=method,
+            path=path,
+            duration=duration
+        ))
 
 
 class WsgiProcess(multiprocessing.Process):
