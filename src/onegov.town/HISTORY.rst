@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes form dependency javascript not working with multiple choices.
+  [href]
+
 - Fixes greyscale scss mixin not working in Firefox.
   [href]
 

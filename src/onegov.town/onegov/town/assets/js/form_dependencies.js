@@ -28,11 +28,11 @@
     Returns the choice value of the given field (string) in the given
     form (jquery object).
 */
-var get_choice = function(form, field_name) {
-    var input = form.find('input[name="' + field_name + '"]:checked');
-    if (input.length === 0) return null;
+var get_choices = function(form, field_name) {
+    var fields = form.find('input[name="' + field_name + '"]:checked');
+    if (fields.length === 0) return null;
 
-    return input.val();
+    return _.map($(fields), function(f) { return $(f).val(); });
 };
 
 
@@ -91,7 +91,7 @@ var setup_depends_on = function(form) {
     Evaluates the dependency and acts on the result.
 */
 var evaluate_dependency = function(form, input, dependency) {
-    if (get_choice(form, dependency.name) == dependency.value) {
+    if (_.contains(get_choices(form, dependency.name), dependency.value)) {
         input.show();
         input.closest('label').show().siblings('.error').show();
     } else {
