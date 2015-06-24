@@ -44,7 +44,7 @@ def view_public_page(self, request):
             'page': self,
             'children': [
                 Link(child.title, request.link(child))
-                for child in self.children
+                for child in sorted(self.children, key=lambda c: c.name)
             ]
         }
 

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Pages are now always sorted from A to Z.
+  [href]
+
 - Fixes form dependency javascript not working with multiple choices.
   [href]
 

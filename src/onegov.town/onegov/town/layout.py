@@ -205,7 +205,11 @@ class PageLayout(DefaultLayout):
     def sidebar_links(self):
         links = []
 
-        for page in self.model.siblings.filter(Page.type == 'topic').all():
+        # always sort a-z
+        query = self.model.siblings.filter(Page.type == 'topic')
+        query = query.order_by(Page.name)
+
+        for page in query.all():
             if page != self.model:
                 links.append(
                     Link(page.title, self.request.link(page))
@@ -215,7 +219,7 @@ class PageLayout(DefaultLayout):
                     Link(page.title, self.request.link(page), active=True)
                 )
 
-                for page in self.model.children:
+                for page in sorted(self.model.children, key=lambda c: c.name):
                     links.append(
                         Link(
                             page.title,
