@@ -36,6 +36,7 @@ def election_day_app(postgres_dsn, temporary_directory):
         name: Kanton Govikon
         logo: logo.jpg
         canton: zg
+        color: '#000'
     """))
 
     yield app

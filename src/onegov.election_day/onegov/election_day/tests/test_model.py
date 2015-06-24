@@ -8,6 +8,7 @@ def test_load_principal():
         name: Foobar
         logo:
         canton: zg
+        color: '#000'
     """))
 
     assert principal.name == 'Foobar'

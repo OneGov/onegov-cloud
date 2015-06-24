@@ -13,12 +13,13 @@ class Principal(object):
 
     """
 
-    def __init__(self, name, logo, canton):
+    def __init__(self, name, logo, canton, color):
         assert canton in cantons
 
         self.name = name
         self.logo = logo
         self.canton = canton
+        self.color = color
 
     @staticmethod
     def from_yaml(yaml_source):

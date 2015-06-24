@@ -51,6 +51,20 @@ class ElectionDayApp(Framework):
         if self.filestorage.isfile(self.principal.logo):
             return FilestorageFile(self.principal.logo)
 
+    @property
+    def theme_options(self):
+        assert self.principal.color is not None, """ No color defined, be
+        sure to define one in your principal.yml like this:
+
+            color: '#123456'
+
+        Note how you need to add apostrophes around the definition!
+        """
+
+        return {
+            'primary-color': self.principal.color
+        }
+
     @cached_property
     def webassets_path(self):
         return utils.module_path('onegov.election_day', 'assets')
