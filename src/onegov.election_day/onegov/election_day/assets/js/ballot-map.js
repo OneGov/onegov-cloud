@@ -88,7 +88,7 @@ var init_ballot_map = function(el) {
                 .style('stroke-width', '1px')
                 .attr('d', path);
 
-            var legend_values = [20, 30, 40, 49.999, 50.001, 60, 70, 80];
+            var legend_values = [80, 70, 60, 50.001, 49.999, 40, 30, 20];
 
             var color_scale = _.map(legend_values, function(value) {
                 return scale(value);
