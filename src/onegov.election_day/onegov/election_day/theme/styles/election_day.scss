@@ -1,4 +1,14 @@
 /*
+    get rid of the jump that is introduced when switching from a site with
+    scrollbar to a site without (or vice versa)
+
+    (100vw includes the scrollbar, 100% does not)
+*/
+html {
+    margin-left: calc(100vw - 100%);
+}
+
+/*
     Header
 */
 .header {
