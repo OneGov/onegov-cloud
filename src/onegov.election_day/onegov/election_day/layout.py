@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from datetime import datetime
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 
@@ -23,6 +24,10 @@ class Layout(ChameleonLayout):
     def get_topojson_link(self, canton, year):
         return self.request.link(
             StaticFile('mapdata/{}/{}.json'.format(year, canton)))
+
+    @cached_property
+    def copyright_year(self):
+        return datetime.utcnow().year
 
 
 class DefaultLayout(Layout):

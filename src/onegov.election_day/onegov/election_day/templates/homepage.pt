@@ -1,4 +1,13 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="before-content">
+        <h1>
+            <small>${layout.app.principal.name}</small>
+            <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
+        </h1>
+
+        <hr />
+    </tal:block>
+
     <tal:block metal:fill-slot="content">
         <tal:block condition="not:votes_by_domain">
             <h2 i18n:translate="">There are no votes defined yet.</h2>
@@ -7,14 +16,14 @@
             <tal:block repeat="(domain, votes) votes_by_domain">
                 <tal:block define="date votes[0].date">
                     <tal:block condition="domain == 'federation'">
-                        <h2 i18n:translate="">
+                        <h4 i18n:translate="">
                             Federal Votes on <span tal:replace="layout.format_date(date, 'date')" i18n:name='date' />
-                        </h2>
+                        </h4>
                     </tal:block>
                     <tal:block condition="domain == 'canton'">
-                        <h2 i18n:translate="">
+                        <h4 i18n:translate="">
                             Cantonal Votes on <span tal:replace="layout.format_date(date, 'date')" i18n:name='date' />
-                        </h2>
+                        </h4>
                     </tal:block>
 
                     <table class="overview stackable">
@@ -22,9 +31,9 @@
                             <tr>
                                 <th i18n:translate="">Vote</th>
                                 <th i18n:translate="">Result</th>
-                                <th i18n:translate="">Yes %</th>
-                                <th i18n:translate="">No %</th>
-                                <th i18n:translate="">Reported</th>
+                                <th i18n:translate="" class="right-aligned">Yes %</th>
+                                <th i18n:translate="" class="right-aligned">No %</th>
+                                <th i18n:translate="" class="right-aligned">Reported</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -33,9 +42,9 @@
                                 <td>
                                     <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
                                 </td>
-                                <td>${'{0:.2f}'.format(vote.yays_percentage)}</td>
-                                <td>${'{0:.2f}'.format(vote.nays_percentage)}</td>
-                                <td>
+                                <td class="right-aligned">${'{0:.2f}'.format(vote.yays_percentage)}</td>
+                                <td class="right-aligned">${'{0:.2f}'.format(vote.nays_percentage)}</td>
+                                <td class="right-aligned">
                                     <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                 </td>
                             </tr>

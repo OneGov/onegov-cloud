@@ -9,13 +9,12 @@ var init_ballot_map = function(el) {
     var canton = map.data('canton');
 
     var scale = d3.scale.linear()
-                .domain([10, 40, 50, 60, 90])
+                .domain([30, 49.9999999, 50.000001, 70])
                 .range([
-                    "#d7191c",
-                    "#fdae61",
-                    "#ffffbf",
-                    "#abd9e9",
-                    "#2c7bb6"
+                    "#ca0020",
+                    "#f4a582",
+                    "#92c5de",
+                    "#0571b0"
                 ]);
 
     var tooltip = d3.tip()
@@ -82,7 +81,7 @@ var init_ballot_map = function(el) {
             svg.append('path')
                 .datum(topojson.mesh(
                     mapdata, mapdata.objects.municipalities, function(a, b) {
-                        return a !== b; 
+                        return a !== b;
                     }
                 ))
                 .attr('class', 'border')

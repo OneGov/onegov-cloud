@@ -1,20 +1,56 @@
 /*
-    Header & Body
+    Header
 */
-
 .header {
-    margin-bottom: 1rem;
-    margin-top: 1rem;
+    text-align: right;
 }
 
-.overview {
+/*
+    Before Content
+*/
+.before-content {
+    background-color: $white-smoke;
     margin-bottom: 2rem;
+    padding-top: 2.5rem;
+
+    h1 small {
+        display: block;
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin-bottom: 1.3rem;
+    }
+
+    dl dt {
+        opacity: .5;
+    }
+
+    dl dd {
+        font-size: 240%;
+        font-weight: bold;
+        margin-bottom: -6px;
+    }
+
+    hr {
+        border: 4px solid $primary-color;
+        margin-bottom: 0;
+        margin-top: 2rem;
+        padding: 0;
+    }
+
+    .percentage {
+        background: $success-color;
+        height: .5rem;
+
+        .nays {
+            background: $alert-color;
+            height: .5rem;
+        }
+    }
 }
 
 /*
     Voting states
 */
-
 .accepted {
     color: $success-color;
     font-weight: bold;
@@ -26,7 +62,7 @@
 }
 
 /*
-    Tables
+    All tables
 */
 table {
     border: 0;
@@ -37,17 +73,23 @@ table {
     }
 
     th {
-        border-bottom: 1px solid $body-font-color;
+        border-bottom: 1px solid $white-smoke;
     }
 
     th,
     td {
-        padding: .5rem 0;
+        padding: .5rem;
+
+        &.right-aligned {
+            text-align: right;
+        }
     }
 
     // overview table on the homepage -> specified widths because we have
     // multiple tables which should align vertically
     &.overview {
+        margin-bottom: 2rem;
+
         td:nth-child(2) {
             width: 12.5%;
         }
@@ -64,8 +106,9 @@ table {
 }
 
 /*
-    Responsive Tables
+    Responsive tables
 */
+
 .stacktable.large-only { display: table; }
 .stacktable.small-only { display: none; }
 
@@ -76,7 +119,7 @@ table {
 }
 
 /*
-    Ballot Map
+    Ballot map
 */
 
 .border {
@@ -84,7 +127,7 @@ table {
 }
 
 .municipality .selected {
-    stroke: #fff;
+    stroke: $white;
     stroke-linecap: round;
     stroke-opacity: .8;
     stroke-width: 1px;
@@ -92,31 +135,52 @@ table {
 
 .lake {
     fill: $white;
-    stroke: #b0becb;
+    stroke: $aluminum;
     stroke-width: 1px;
 }
 
 /*
     D3 Tooltip
 */
-
 .d3-tip {
     background: $white-smoke;
     border-radius: 2px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, .4);
     font-size: .8rem;
     padding: 12px;
+
+    .fa-thumbs-up {
+        color: $success-color;
+    }
+
+    .fa-thumbs-down {
+        color: $alert-color;
+    }
 }
 
 /*
-    Voting factoids
+    Voting Factoids
 */
 .factoids {
-    background-color: $white-smoke;
     font-size: .8rem;
-    margin-bottom: 1rem;
-    padding-top: 1rem;
+    margin-bottom: .5rem;
 
     strong {
         display: block;
     }
+
+    span {
+        font-weight: bold;
+        opacity: .5;
+    }
+}
+
+/*
+    Footer
+*/
+footer {
+    border-top: 1px solid $white-smoke;
+    font-size: 85%;
+    margin-top: 2rem;
+    padding: 1rem 0;
 }

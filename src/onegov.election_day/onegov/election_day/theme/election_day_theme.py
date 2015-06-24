@@ -16,5 +16,12 @@ class ElectionDayTheme(BaseTheme):
         ]
 
     @property
+    def default_options(self):
+        return {
+            'header-line-height': '1.3',
+            'subheader-line-height': '1.3'
+        }
+
+    @property
     def extra_search_paths(self):
         return [module_path('onegov.election_day.theme', 'styles')]

@@ -1,100 +1,126 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
-    <tal:block metal:fill-slot="content">
-        <h2>${vote.title}</h2>
+    <tal:block metal:fill-slot="before-content">
+        <tal:block condition="not:vote.answer">
+            <h1>
+                ${vote.title}
+            </h1>
 
+            <hr />
+        </tal:block>
         <tal:block condition="vote.answer">
-            <h3>
-                <span i18n:translate="">Result:</span>
-                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
-            </h3>
+            <h1>
+                <small>
+                    <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
+                </small>
+                ${vote.title}
+            </h1>
 
             <div class="row">
-                <div class="columns small-12 medium-2">
+                <div class="columns small-12 medium-6">
                     <dl>
+                        <dd class="accepted" >${'{0:.2f}'.format(vote.yays_percentage)}%</dd>
                         <dt i18n:translate="">Yays</dt>
-                        <dd class="accepted" >${vote.yays} / ${'{0:.2f}'.format(vote.yays_percentage)} %</dd>
                     </dl>
                 </div>
-                <div class="columns small-12 medium-2 end">
-                    <dl>
+                <div class="columns small-12 medium-6 end">
+                    <dl style="text-align: right;">
+                        <dd class="rejected" >${'{0:.2f}'.format(vote.nays_percentage)}%</dd>
                         <dt i18n:translate="">Nays</dt>
-                        <dd class="rejected" >${vote.nays} / ${'{0:.2f}'.format(vote.nays_percentage)} %</dd>
                     </dl>
                 </div>
             </div>
-        </tal:block>
 
+            <div class="percentage">
+                <div class="yays"></div>
+                <div class="nays right" style="width:${'{0:.2f}'.format(vote.nays_percentage)}%"></div>
+            </div>
+        </tal:block>
+    </tal:block>
+    <tal:block metal:fill-slot="content">
         <ul class="small-block-grid-1 medium-block-grid-4 factoids">
             <li>
-                <strong i18n:translate="">Counted municipalities</strong>
-                <span metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
+                <span i18n:translate="">Last Update</span>
+                <strong>12.06.2015 15:33</strong>
             </li>
             <li>
-                <strong i18n:translate="">Elegible Voters</strong>
-                <span>${vote.elegible_voters}</span>
+                <span i18n:translate="">Counted municipalities</span>
+                <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" /></strong>
             </li>
             <li>
-                <strong i18n:translate="">Cast Ballots</strong>
-                <span>${vote.cast_ballots}</span>
+                <span i18n:translate="">Elegible Voters</span>
+                <strong>${vote.elegible_voters}</strong>
             </li>
             <li>
-                <strong i18n:translate="">Turnout</strong>
-                <span>${'{0:.2f}'.format(vote.turnout)} %</span>
+                <span i18n:translate="">Cast Ballots</span>
+                <strong>${vote.cast_ballots}</strong>
             </li>
             <li>
-                <strong i18n:translate="">Empty Ballots</strong>
-                <span>${vote.empty}</span>
+                <span i18n:translate="">Turnout</span>
+                <strong>${'{0:.2f}'.format(vote.turnout)} %</strong>
             </li>
             <li>
-                <strong i18n:translate="">Invalid Ballots</strong>
-                <span>${vote.invalid}</span>
+                <span i18n:translate="">Empty Ballots</span>
+                <strong>${vote.empty}</strong>
             </li>
             <li>
-                <strong i18n:translate="">Valid Ballots</strong>
-                <span>${vote.yays + vote.nays}</span>
+                <span i18n:translate="">Invalid Ballots</span>
+            <strong>${vote.invalid}</strong>
+            </li>
+            <li>
+                <span i18n:translate="">Valid Ballots</span>
+                <strong>${vote.yays + vote.nays}</strong>
             </li>
         </ul>
 
-        <div class="ballot" tal:repeat="ballot vote.ballots">
-            <h3><div metal:use-macro="layout.macros['ballot_type']" tal:define="ballot_type ballot.type" /></h3>
+        <hr />
 
-            <div class="ballot-map"
-                data-type="${ballot.type}"
-                data-canton="${layout.app.principal.canton}"
-                data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, vote.date.year)}"
-                data-dataurl="${request.link(ballot, name='by-municipality')}">
+        <tal:block tal:repeat="ballot vote.ballots">
+            <div class="row">
+                <div class="small-12 small-centered medium-8 large-6 columns">
+                    <div class="ballot-map"
+                        data-type="${ballot.type}"
+                        data-canton="${layout.app.principal.canton}"
+                        data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, vote.date.year)}"
+                        data-dataurl="${request.link(ballot, name='by-municipality')}">
+                    </div>
+                </div>
             </div>
-
-            <table class="ballot-results stackable">
-                <thead>
-                    <th i18n:translate="">Electoral District</th>
-                    <th i18n:translate="">Result</th>
-                    <th i18n:translate="">Yays</th>
-                    <th i18n:translate="">Nays</th>
-                    <th i18n:translate="">Empty</th>
-                    <th i18n:translate="">Invalid</th>
-                    <th i18n:translate="">Yes %</th>
-                    <th i18n:translate="">No %</th>
-                </thead>
-                <tbody>
-                    <tr tal:repeat="result ballot.results">
-                        <tal:block condition="not: result.counted">
-                            <td colspan="8">${result.group}</td>
-                        </tal:block>
-                        <tal:block condition="result.counted">
-                            <td>${result.group}</td>
-                            <td class="accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                            <td class="rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
-                            <td>${result.yays}</td>
-                            <td>${result.nays}</td>
-                            <td>${result.empty}</td>
-                            <td>${result.invalid}</td>
-                            <td>${'{0:.2f}'.format(result.yays_percentage)}</td>
-                            <td>${'{0:.2f}'.format(result.nays_percentage)}</td>
-                        </tal:block>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="row">
+                <div class="small-12 columns">
+                    <div>
+                        <table class="ballot-results stackable">
+                            <thead>
+                                <th i18n:translate="">Electoral District</th>
+                                <th i18n:translate="">Result</th>
+                                <th i18n:translate="" class="number">Yays</th>
+                                <th i18n:translate="" class="number">Nays</th>
+                                <th i18n:translate="" class="number">Empty</th>
+                                <th i18n:translate="" class="number">Invalid</th>
+                                <th i18n:translate="" class="number">Yes %</th>
+                                <th i18n:translate="" class="number">No %</th>
+                            </thead>
+                            <tbody>
+                                <tr tal:repeat="result ballot.results">
+                                    <tal:block condition="not: result.counted">
+                                        <td colspan="8">${result.group}</td>
+                                    </tal:block>
+                                    <tal:block condition="result.counted">
+                                        <td>${result.group}</td>
+                                        <td class="accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
+                                        <td class="rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
+                                        <td class="number">${result.yays}</td>
+                                        <td class="number">${result.nays}</td>
+                                        <td class="number">${result.empty}</td>
+                                        <td class="number">${result.invalid}</td>
+                                        <td class="number">${'{0:.2f}'.format(result.yays_percentage)}</td>
+                                        <td class="number">${'{0:.2f}'.format(result.nays_percentage)}</td>
+                                    </tal:block>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </tal:block>
     </tal:block>
 </div>
