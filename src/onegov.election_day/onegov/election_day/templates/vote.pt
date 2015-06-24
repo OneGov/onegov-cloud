@@ -64,6 +64,8 @@
                         data-canton="${layout.app.principal.canton}"
                         data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, vote.date.year)}"
                         data-dataurl="${request.link(ballot, name='by-municipality')}">
+
+                        <div class="legend" data-right-hand="Yay" data-left-hand="Nay" i18n:attributes="data-left-hand; data-right-hand"></div>
                     </div>
                 </div>
             </div>

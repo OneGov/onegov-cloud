@@ -129,7 +129,7 @@ table {
 }
 
 /*
-    Ballot map
+    Ballot Map
 */
 
 .border {
@@ -147,6 +147,36 @@ table {
     fill: $white;
     stroke: $aluminum;
     stroke-width: 1px;
+}
+
+/*
+    Ballot Map Legend
+*/
+
+.legend {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    margin-left: 25%;
+    margin-right: 25%;
+    ul {
+        list-style: none;
+        margin: 0;
+
+        li {
+            float: left;
+            width: 12.5%;
+        }
+    }
+
+    .legend-left {
+        float: left;
+        font-size: .8em;
+    }
+
+    .legend-right {
+        float: right;
+        font-size: .8em;
+    }
 }
 
 /*

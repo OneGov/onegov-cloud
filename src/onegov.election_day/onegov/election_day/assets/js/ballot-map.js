@@ -88,6 +88,24 @@ var init_ballot_map = function(el) {
                 .style('stroke-width', '1px')
                 .attr('d', path);
 
+            var legend_values = [20, 30, 40, 49.999, 50.001, 60, 70, 80];
+
+            var color_scale = _.map(legend_values, function(value) {
+                return scale(value);
+            });
+
+            var legend_items = _.map(color_scale, function(color) {
+                return $('<li />').css('border-top', '10px solid ' + color);
+            });
+
+            var legend = map.find('.legend');
+            legend.append($('<ul />').append(legend_items));
+            legend.append($('<div class="clearfix"></div>'));
+            legend.append($('<div class="legend-left">' + legend.data('left-hand') + '</div>'));
+            legend.append($('<div class="legend-right">' + legend.data('right-hand') + '</div>'));
+
+            map.append(legend);
+
             // set the svg element size to the bounding box, to avoid extra
             // whitespace around the map
             var bbox = svg[0][0].getBBox();
@@ -99,7 +117,7 @@ var init_ballot_map = function(el) {
 
             // move each element up when it's selected (there's no z-index in
             // svg) and make sure the others are deselected
-            $('.municipality path').each(function(ix, path) {
+            map.find('.municipality path').each(function(ix, path) {
                 $(path).on('mouseenter', function() {
                     $('.municipality path.selected').each(
                         function() {
