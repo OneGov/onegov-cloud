@@ -92,12 +92,12 @@
                             <thead>
                                 <th i18n:translate="">Electoral District</th>
                                 <th i18n:translate="">Result</th>
-                                <th i18n:translate="" class="number">Yays</th>
-                                <th i18n:translate="" class="number">Nays</th>
-                                <th i18n:translate="" class="number">Empty</th>
-                                <th i18n:translate="" class="number">Invalid</th>
-                                <th i18n:translate="" class="number">Yes %</th>
-                                <th i18n:translate="" class="number">No %</th>
+                                <th i18n:translate="" class="right-aligned">Yays</th>
+                                <th i18n:translate="" class="right-aligned">Nays</th>
+                                <th i18n:translate="" class="right-aligned">Empty</th>
+                                <th i18n:translate="" class="right-aligned">Invalid</th>
+                                <th i18n:translate="" class="right-aligned">Yes %</th>
+                                <th i18n:translate="" class="right-aligned">No %</th>
                             </thead>
                             <tbody>
                                 <tr tal:repeat="result ballot.results">
@@ -108,12 +108,12 @@
                                         <td>${result.group}</td>
                                         <td class="accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
                                         <td class="rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
-                                        <td class="number">${result.yays}</td>
-                                        <td class="number">${result.nays}</td>
-                                        <td class="number">${result.empty}</td>
-                                        <td class="number">${result.invalid}</td>
-                                        <td class="number">${'{0:.2f}'.format(result.yays_percentage)}</td>
-                                        <td class="number">${'{0:.2f}'.format(result.nays_percentage)}</td>
+                                        <td class="right-aligned">${result.yays}</td>
+                                        <td class="right-aligned">${result.nays}</td>
+                                        <td class="right-aligned">${result.empty}</td>
+                                        <td class="right-aligned">${result.invalid}</td>
+                                        <td class="right-aligned">${'{0:.2f}'.format(result.yays_percentage)}</td>
+                                        <td class="right-aligned">${'{0:.2f}'.format(result.nays_percentage)}</td>
                                     </tal:block>
                                 </tr>
                             </tbody>
