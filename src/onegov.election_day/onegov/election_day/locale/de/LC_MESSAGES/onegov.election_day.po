@@ -38,7 +38,7 @@ msgstr "JA %"
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:35
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:100
 msgid "No %"
-msgstr "Nein %"
+msgstr "NEIN %"
 
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/homepage.pt:36
 msgid "Reported"
