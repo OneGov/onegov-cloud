@@ -190,7 +190,7 @@ class WsgiProcess(multiprocessing.Process):
     def port(self):
         return self._actual_port.value
 
-    def print_memory_stats(self):
+    def print_memory_stats(self, signum, frame):
 
         total_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss\
             / 1024 / 1024
@@ -212,7 +212,8 @@ class WsgiProcess(multiprocessing.Process):
         signal.signal(signal.SIGINT, lambda *args: sys.exit(0))
 
         # when pressing ctrl+t show the memory usage of the process
-        signal.signal(signal.SIGINFO, lambda *args: self.print_memory_stats())
+        if hasattr(signal, 'SIGINFO'):
+            signal.signal(signal.SIGINFO, self.print_memory_stats)
 
         # reset the tty every time, fixing problems that might occur if
         # the process is restarted during a pdb session
