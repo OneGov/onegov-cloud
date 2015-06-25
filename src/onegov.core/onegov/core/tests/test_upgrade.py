@@ -19,14 +19,10 @@ def test_upgrade_task_registration():
 
     assert len(tasks) == 2
 
-    assert tasks[0].task_id \
-        == 'onegov.core.tests:Add another field'
     assert tasks[0].task_name == 'Add another field'
     assert tasks[0].always_run is True
     assert tasks[0].requires is None
 
-    assert tasks[1].task_id \
-        == 'onegov.core.tests:Add new field'
     assert tasks[1].always_run is False
     assert tasks[1].requires is None
 

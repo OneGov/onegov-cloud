@@ -1,7 +1,7 @@
 import importlib
 import pkg_resources
 
-from inspect import getmembers, isfunction
+from inspect import getmembers, isfunction, ismethod
 
 
 def get_distributions_with_entry_map(key):
@@ -97,7 +97,8 @@ class upgrade_task(object):
 
 def is_task(function):
     """ Returns True if the given function is an uprade task. """
-    return isfunction(function) and hasattr(function, 'task_name')
+    return isfunction(function) or ismethod(function)\
+        and hasattr(function, 'task_name')
 
 
 def get_module_tasks(module):
@@ -114,21 +115,16 @@ def get_tasks(upgrade_modules=None):
 
     upgrade_modules = upgrade_modules or get_upgrade_modules()
 
-    task_ids = set()
-    tasks = []
+    tasks = {}
 
     for distribution, upgrade_module in upgrade_modules:
 
         for function in get_module_tasks(upgrade_module):
             task_id = ':'.join((distribution, function.task_name))
+            assert task_id not in tasks, "Duplicate task"
+            tasks[task_id] = function
 
-            assert task_id not in task_ids, "Duplicate task"
-            task_ids.add(task_id)
-
-            function.task_id = task_id
-            tasks.append(function)
-
-    return list(sorted(tasks, key=lambda f: f.task_name))
+    return list(sorted(tasks.values(), key=lambda f: f.task_name))
 
 
 class UpgradeRunner(object):
