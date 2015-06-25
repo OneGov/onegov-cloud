@@ -7,7 +7,7 @@ import click
 
 from morepath import setup
 from onegov.core.orm import Base, SessionManager
-from onegov.core.upgrade import UpgradeRunner
+from onegov.core.upgrade import UpgradeRunner, get_tasks
 from onegov.server.config import Config
 from onegov.server.core import Server
 from uuid import uuid4
@@ -38,7 +38,7 @@ def upgrade(ctx):
     ctx = ctx.obj
 
     update_path = '/' + uuid4().hex
-    upgrade_runner = UpgradeRunner()
+    upgrade_runner = UpgradeRunner(get_tasks())
 
     for appcfg in ctx['config'].applications:
 

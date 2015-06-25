@@ -1,6 +1,6 @@
 import pytest
 
-from onegov.core.upgrade import UpgradeRunner, upgrade_task
+from onegov.core.upgrade import get_tasks, upgrade_task
 
 
 def test_upgrade_task_registration():
@@ -15,21 +15,20 @@ def test_upgrade_task_registration():
         def add_another_field(request):
             pass
 
-    runner = UpgradeRunner(
-        upgrade_modules=[('onegov.core.tests', MyUpgradeModule)])
+    tasks = get_tasks([('onegov.core.tests', MyUpgradeModule)])
 
-    assert len(runner.upgrade_tasks) == 2
+    assert len(tasks) == 2
 
-    assert runner.upgrade_tasks[0].task_id \
+    assert tasks[0].task_id \
         == 'onegov.core.tests:Add another field'
-    assert runner.upgrade_tasks[0].task_name == 'Add another field'
-    assert runner.upgrade_tasks[0].always_run is True
-    assert runner.upgrade_tasks[0].requires is None
+    assert tasks[0].task_name == 'Add another field'
+    assert tasks[0].always_run is True
+    assert tasks[0].requires is None
 
-    assert runner.upgrade_tasks[1].task_id \
+    assert tasks[1].task_id \
         == 'onegov.core.tests:Add new field'
-    assert runner.upgrade_tasks[1].always_run is False
-    assert runner.upgrade_tasks[1].requires is None
+    assert tasks[1].always_run is False
+    assert tasks[1].requires is None
 
 
 def test_upgrade_duplicate_tasks():
@@ -45,4 +44,4 @@ def test_upgrade_duplicate_tasks():
             pass
 
     with pytest.raises(AssertionError):
-        UpgradeRunner(upgrade_modules=[('onegov.core.tests', MyUpgradeModule)])
+        get_tasks([('onegov.core.tests', MyUpgradeModule)])
