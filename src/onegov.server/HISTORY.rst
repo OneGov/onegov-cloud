@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to disable morepath autoconfig.
+  [href]
+
 - Pressing Ctrl+T in the onegov-server cli will now show a memory summary. This
   is helpful for determening if there are memory leaks or not.
   [href]

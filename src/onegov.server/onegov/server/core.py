@@ -63,15 +63,19 @@ class Server(object):
     server automatically configures morepath for the applications that depend
     on it.
 
+    If morepath autoconfig is not desired, set ``configure_morepath`` to False.
+
     """
 
-    def __init__(self, config):
+    def __init__(self, config, configure_morepath=True):
         self.applications = ApplicationCollection(config.applications)
         self.wildcard_applications = set(
             a.root for a in config.applications if not a.is_static)
 
         self.configure_logging(config.logging)
-        self.configure_morepath()
+
+        if configure_morepath:
+            self.configure_morepath()
 
     def configure_logging(self, config):
         """ Configures the python logging.
