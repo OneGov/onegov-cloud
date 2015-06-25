@@ -6,11 +6,12 @@ updates.
 import click
 
 from morepath import setup
-from onegov.server.core import Server
-from onegov.server.config import Config
 from onegov.core.orm import Base, SessionManager
-from webtest import TestApp as Client
+from onegov.core.upgrade import UpgradeRunner
+from onegov.server.config import Config
+from onegov.server.core import Server
 from uuid import uuid4
+from webtest import TestApp as Client
 
 
 @click.group()
@@ -37,6 +38,7 @@ def upgrade(ctx):
     ctx = ctx.obj
 
     update_path = '/' + uuid4().hex
+    upgrade_runner = UpgradeRunner()
 
     for appcfg in ctx['config'].applications:
 
@@ -51,13 +53,14 @@ def upgrade(ctx):
         class UpdateApplication(appcfg.application_class):
             testing_config = config
 
-        @UpdateApplication.path(path=update_path)
-        class Update(object):
-            pass
+        @UpdateApplication.path(model=UpgradeRunner, path=update_path)
+        def get_upgrade_runner():
+            return upgrade_runner
 
-        @UpdateApplication.view(model=Update)
-        def run_update(self, request):
+        @UpdateApplication.view(model=UpgradeRunner)
+        def run_upgrade(self, request):
             print("Running upgrade for {}".format(request.app.application_id))
+            self.run_upgrade(request)
 
         config.commit()
 
