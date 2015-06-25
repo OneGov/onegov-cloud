@@ -15,16 +15,19 @@ def test_upgrade_task_registration():
         def add_another_field(request):
             pass
 
-    tasks = get_tasks([('onegov.core.tests', MyUpgradeModule)])
+    tasks = get_tasks([('onegov.core', MyUpgradeModule)])
 
     assert len(tasks) == 2
 
-    assert tasks[0].task_name == 'Add another field'
-    assert tasks[0].always_run is True
-    assert tasks[0].requires is None
+    assert tasks[0][0] == 'onegov.core:Add another field'
+    assert tasks[0][1].task_name == 'Add another field'
+    assert tasks[0][1].always_run is True
+    assert tasks[0][1].requires is None
 
-    assert tasks[1].always_run is False
-    assert tasks[1].requires is None
+    assert tasks[1][0] == 'onegov.core:Add new field'
+    assert tasks[1][1].task_name == 'Add new field'
+    assert tasks[1][1].always_run is False
+    assert tasks[1][1].requires is None
 
 
 def test_upgrade_task_requirements():
@@ -48,9 +51,14 @@ def test_upgrade_task_requirements():
     tasks = get_tasks([('one', One), ('two', Two)])
 
     assert len(tasks) == 3
-    assert tasks[0].task_name == 'Init Database'
-    assert tasks[1].task_name == 'New Field'
-    assert tasks[2].task_name == 'Destroy Database'
+
+    assert tasks[0][0] == 'one:Init Database'
+    assert tasks[1][0] == 'two:New Field'
+    assert tasks[2][0] == 'two:Destroy Database'
+
+    assert tasks[0][1].task_name == 'Init Database'
+    assert tasks[1][1].task_name == 'New Field'
+    assert tasks[2][1].task_name == 'Destroy Database'
 
 
 def test_upgrade_duplicate_tasks():

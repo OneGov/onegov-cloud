@@ -147,11 +147,11 @@ def get_tasks(upgrade_modules=None):
             graph.add_edge(task.requires, task_id)
 
     for task_id in sorted(roots):
-        ordered_tasks.append(tasks[task_id])
+        ordered_tasks.append((task_id, tasks[task_id]))
 
         try:
             for _, task_id in nx.dfs_edges(graph, task_id):
-                ordered_tasks.append(tasks[task_id])
+                ordered_tasks.append((task_id, tasks[task_id]))
         except KeyError:
             pass
 
@@ -165,5 +165,5 @@ class UpgradeRunner(object):
         self.tasks = tasks
 
     def run_upgrade(self, request):
-        for task in self.tasks:
+        for task_id, task in self.tasks:
             task(request)
