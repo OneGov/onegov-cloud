@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix json encoder/decode not working with lists and generators.
+  [href]
+
 0.3.9 (2015-06-23)
 ~~~~~~~~~~~~~~~~~~~
 

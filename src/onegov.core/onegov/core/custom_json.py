@@ -12,6 +12,7 @@ don't support decoding...
 import datetime
 import isodate
 import json
+import types
 
 from onegov.core import compat
 from onegov.core import utils
@@ -25,6 +26,8 @@ class CustomJSONEncoder(json.JSONEncoder):
             return '__date__@' + isodate.date_isoformat(o)
         elif isinstance(o, datetime.time):
             return '__time__@' + isodate.time_isoformat(o)
+        elif isinstance(o, types.GeneratorType):
+            return list(o)
         else:
             if isinstance(o, compat.string_types):
                 # make sure the reserved words can't be added as a string by
@@ -58,7 +61,7 @@ def json_loads_object_hook(dictionary):
             dictionary[key] = custom_json_decoder(value)
 
         elif isinstance(value, (list, tuple)):
-            dictionary[key] = map(custom_json_decoder, value)
+            dictionary[key] = list(map(custom_json_decoder, value))
 
     return dictionary
 
