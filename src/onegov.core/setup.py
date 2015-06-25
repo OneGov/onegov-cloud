@@ -13,6 +13,7 @@ dependencies = {
     'bleach',
     'cached_property',
     'chameleon',
+    'click',
     'delorean',
     'dogpile.cache',
     'fs',

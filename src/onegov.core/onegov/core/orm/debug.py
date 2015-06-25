@@ -1,3 +1,5 @@
+import click
+
 from contextlib import contextmanager
 from datetime import datetime
 from sqlalchemy import event
@@ -77,7 +79,17 @@ def analyze_sql_queries(report='summary'):
     total_queries = sum(queries.values())
     redundant_queries = sum(1 for v in queries.values() if v > 1)
 
-    if total_queries > 0:
+    if total_queries > 10:
+        total_queries = click.style(str(total_queries), 'red')
+    elif total_queries > 5:
+        total_queries = click.style(str(total_queries), 'yellow')
+    else:
+        total_queries = click.style(str(total_queries), 'green')
+
+    if redundant_queries:
+        redundant_queries = click.style(str(redundant_queries), 'red')
+
+    if total_queries != '0':
         print("executed {} queries, {} of which were redundant".format(
             total_queries, redundant_queries))
 

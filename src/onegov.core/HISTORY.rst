@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds colors to the sql debug output.
+  [href]
+
 - Fix json encoder/decode not working with lists and generators.
   [href]
 
