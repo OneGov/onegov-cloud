@@ -37,6 +37,7 @@ dependencies = {
     'sqlparse',
     'translationstring',
     'unidecode',
+    'webtest',
     'wtforms',
     'zope.sqlalchemy'
 }
@@ -77,10 +78,13 @@ setup(
         test=[
             'coverage',
             'freezegun',
-            'onegov.testing',
-            'webtest'
+            'onegov.testing'
         ],
     ),
+    entry_points="""
+        [console_scripts]
+        onegov-core=onegov.core.cli:cli
+    """,
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',
