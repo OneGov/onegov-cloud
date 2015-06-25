@@ -1,4 +1,5 @@
 import importlib
+import networkx as nx
 import pkg_resources
 
 from inspect import getmembers, isfunction, ismethod
@@ -107,13 +108,11 @@ def get_module_tasks(module):
         yield function
 
 
-def get_tasks(upgrade_modules=None):
-    """ Takes a list of upgrade_modules or upgrade_classes and returns the
-    tasks that should be run.
+def get_tasks_by_id(upgrade_modules=None):
+    """ Takes a list of upgrade modules or classes and returns the tasks
+    keyed by id.
 
     """
-
-    upgrade_modules = upgrade_modules or get_upgrade_modules()
 
     tasks = {}
 
@@ -121,10 +120,42 @@ def get_tasks(upgrade_modules=None):
 
         for function in get_module_tasks(upgrade_module):
             task_id = ':'.join((distribution, function.task_name))
+
             assert task_id not in tasks, "Duplicate task"
             tasks[task_id] = function
 
-    return list(sorted(tasks.values(), key=lambda f: f.task_name))
+    return tasks
+
+
+def get_tasks(upgrade_modules=None):
+    """ Takes a list of upgrade modules or classes and returns the
+    tasks that should be run in the order they should be run.
+
+    The order takes dependencies into account.
+
+    """
+
+    tasks = get_tasks_by_id(upgrade_modules or get_upgrade_modules())
+    ordered_tasks = []
+    roots = set()
+    graph = nx.DiGraph()
+
+    for task_id, task in tasks.items():
+        if task.requires is None:
+            roots.add(task_id)
+        else:
+            graph.add_edge(task.requires, task_id)
+
+    for task_id in sorted(roots):
+        ordered_tasks.append(tasks[task_id])
+
+        try:
+            for _, task_id in nx.dfs_edges(graph, task_id):
+                ordered_tasks.append(tasks[task_id])
+        except KeyError:
+            pass
+
+    return ordered_tasks
 
 
 class UpgradeRunner(object):

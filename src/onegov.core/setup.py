@@ -22,6 +22,7 @@ dependencies = {
     'morepath',
     'more.transaction',
     'more.webassets',
+    'networkx',
     'onegov.server',
     'passlib',
     'polib',
