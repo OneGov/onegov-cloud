@@ -208,7 +208,7 @@ class SessionManager(object):
 
         return result.first()[0]
 
-    def list_schemas(self):
+    def list_schemas(self, limit_to_namespace=None):
         """ Returns a list containing *all* schemas defined in the current
         database.
 
@@ -216,7 +216,13 @@ class SessionManager(object):
         conn = self.engine.execution_options(schema=None)
         query = text("SELECT schema_name FROM information_schema.schemata")
 
-        return [r[0] for r in conn.execute(query).fetchall()]
+        if limit_to_namespace is not None:
+            return [
+                r[0] for r in conn.execute(query).fetchall()
+                if r[0].split('-')[0] == limit_to_namespace
+            ]
+        else:
+            return [r[0] for r in conn.execute(query).fetchall()]
 
     def ensure_schema_exists(self, schema):
         """ Makes sure the schema exists on the database. If it doesn't, it
