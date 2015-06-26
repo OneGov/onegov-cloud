@@ -39,7 +39,7 @@ setup(
         'jsmin',
         'lazy-object-proxy',
         'lxml',
-        'onegov.core>=0.3.9',
+        'onegov.core>=0.4.0',
         'onegov.form>=0.6.0',
         'onegov.foundation',
         'onegov.page>=0.1.0',
@@ -61,6 +61,9 @@ setup(
     entry_points="""
         [console_scripts]
         onegov-town=onegov.town.cli:cli
+
+        [onegov]
+        upgrade=onegov.town.upgrade
     """,
     classifiers=[
         'Intended Audience :: Developers',
