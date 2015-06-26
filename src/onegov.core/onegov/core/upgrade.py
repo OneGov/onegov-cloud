@@ -252,18 +252,45 @@ class UpgradeRunner(object):
         self.commit = commit
         self.states = {}
 
+    def register_modules(self, request, modules):
+        """ Sets up the state tracking for all modules. Initially, all tasks
+        are marekd as executed, because we assume tasks to upgrade older
+        deployments to a new deployment.
+
+        If this is a new deployment we do not need to execute these tasks.
+
+        Tasks where this is not desired should be marked as 'always_run'.
+        They will then manage their own state (i.e. check if they need to
+        run or not).
+
+        This function is idempotent.
+
+        """
+
+        session = request.app.session()
+
+        for module in modules:
+            query = session.query(UpgradeState)
+            query = query.filter(UpgradeState.module == module)
+
+            if query.first():
+                continue
+
+            session.add(
+                UpgradeState(module=module, state={
+                    'executed_tasks': [
+                        task.task_name for task_id, task in self.tasks
+                    ]
+                })
+            )
+
     def get_state(self, context, module):
         if module not in self.states:
             query = context.session.query(UpgradeState)
             query = query.filter(UpgradeState.module == module)
 
-            state = query.first()
-
-            if state:
-                self.states[module] = state
-            else:
-                self.states[module] = UpgradeState(module=module)
-                context.session.add(self.states[module])
+            # assume that all modules have been ran through register_module
+            self.states[module] = query.one()
 
         return self.states[module]
 
@@ -271,7 +298,18 @@ class UpgradeRunner(object):
 
         executed_tasks = 0
 
+        modules = set(
+            task_id.replace(task.task_name, '').rstrip(':')
+            for task_id, task in self.tasks
+        )
+
+        self.register_modules(request, modules)
+
+        if self.commit:
+            transaction.commit()
+
         for task_id, task in self.tasks:
+
             context = UpgradeContext(request)
 
             module = task_id.replace(task.task_name, '').rstrip(':')
