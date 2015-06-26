@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds support for onegov.core.upgrade.
+  [href]
+
 0.0.2 (2015-06-19)
 ~~~~~~~~~~~~~~~~~~~
 

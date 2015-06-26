@@ -34,7 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core',
+        'onegov.core>=0.4.0',
         'sqlalchemy',
         'sqlalchemy_utils'
     ],
@@ -45,6 +45,11 @@ setup(
             'pytest'
         ],
     ),
+    entry_points={
+        'onegov': [
+            'upgrade = onegov.ballot.upgrade'
+        ]
+    },
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',
