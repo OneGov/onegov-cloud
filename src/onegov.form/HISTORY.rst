@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Remove accidentally left in upgrade test code.
+  [href]
+
 0.6.1 (2015-06-26)
 ~~~~~~~~~~~~~~~~~~~
 
