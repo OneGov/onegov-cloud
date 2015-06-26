@@ -86,6 +86,9 @@ setup(
     entry_points="""
         [console_scripts]
         onegov-core=onegov.core.cli:cli
+
+        [onegov]
+        upgrade=onegov.core.upgrade
     """,
     classifiers=[
         'Intended Audience :: Developers',

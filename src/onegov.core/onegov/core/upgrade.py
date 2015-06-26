@@ -75,7 +75,7 @@ def get_upgrade_modules():
     for distribution, entry_map in get_distributions_with_entry_map('onegov'):
         if 'upgrade' in entry_map:
             yield (
-                distribution.project_name,
+                '.'.join(entry_map['upgrade'].module_name.split('.')[:2]),
                 importlib.import_module(entry_map['upgrade'].module_name)
             )
 
@@ -141,8 +141,10 @@ class upgrade_task(object):
 
 def is_task(function):
     """ Returns True if the given function is an uprade task. """
-    return isfunction(function) or ismethod(function)\
-        and hasattr(function, 'task_name')
+    if not isfunction(function) or ismethod(function):
+        return False
+
+    return hasattr(function, 'task_name')
 
 
 def get_module_tasks(module):
@@ -201,6 +203,44 @@ def get_tasks(upgrade_modules=None):
     return ordered_tasks
 
 
+def register_modules(request, modules, tasks):
+    """ Sets up the state tracking for all modules. Initially, all tasks
+    are marekd as executed, because we assume tasks to upgrade older
+    deployments to a new deployment.
+
+    If this is a new deployment we do not need to execute these tasks.
+
+    Tasks where this is not desired should be marked as 'always_run'.
+    They will then manage their own state (i.e. check if they need to
+    run or not).
+
+    This function is idempotent.
+
+    """
+
+    # add all modules and all their tasks
+
+    session = request.app.session()
+
+    for module, upgrade_module in modules:
+        query = session.query(UpgradeState)
+        query = query.filter(UpgradeState.module == module)
+
+        if query.first():
+            continue
+
+        session.add(
+            UpgradeState(module=module, state={
+                'executed_tasks': [
+                    task.task_name for task_id, task in tasks
+                    if task_id.startswith(module)
+                ]
+            })
+        )
+
+    session.flush()
+
+
 class UpgradeTransaction(object):
     """ Holds the session and the alembic operations connection together and
     commits/aborts both at the same time.
@@ -234,8 +274,8 @@ class UpgradeContext(object):
 
     def __init__(self, request):
         self.request = request
-        self.app = request.app
         self.session = request.app.session()
+        self.app = request.app
         self.operations_connection = self.session.bind.connect()
         self.operations = Operations(
             MigrationContext.configure(self.operations_connection))
@@ -247,42 +287,11 @@ class UpgradeContext(object):
 class UpgradeRunner(object):
     """ Runs all tasks of a :class:`UpgradeTasksRegistry`. """
 
-    def __init__(self, tasks, commit=True):
+    def __init__(self, modules, tasks, commit=True):
+        self.modules = modules
         self.tasks = tasks
         self.commit = commit
         self.states = {}
-
-    def register_modules(self, request, modules):
-        """ Sets up the state tracking for all modules. Initially, all tasks
-        are marekd as executed, because we assume tasks to upgrade older
-        deployments to a new deployment.
-
-        If this is a new deployment we do not need to execute these tasks.
-
-        Tasks where this is not desired should be marked as 'always_run'.
-        They will then manage their own state (i.e. check if they need to
-        run or not).
-
-        This function is idempotent.
-
-        """
-
-        session = request.app.session()
-
-        for module in modules:
-            query = session.query(UpgradeState)
-            query = query.filter(UpgradeState.module == module)
-
-            if query.first():
-                continue
-
-            session.add(
-                UpgradeState(module=module, state={
-                    'executed_tasks': [
-                        task.task_name for task_id, task in self.tasks
-                    ]
-                })
-            )
 
     def get_state(self, context, module):
         if module not in self.states:
@@ -298,12 +307,7 @@ class UpgradeRunner(object):
 
         executed_tasks = 0
 
-        modules = set(
-            task_id.replace(task.task_name, '').rstrip(':')
-            for task_id, task in self.tasks
-        )
-
-        self.register_modules(request, modules)
+        register_modules(request, self.modules, self.tasks)
 
         if self.commit:
             transaction.commit()

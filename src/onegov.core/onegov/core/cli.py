@@ -7,7 +7,7 @@ import click
 
 from morepath import setup
 from onegov.core.orm import Base, SessionManager
-from onegov.core.upgrade import UpgradeRunner, get_tasks
+from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
 from onegov.server.config import Config
 from onegov.server.core import Server
 from uuid import uuid4
@@ -40,6 +40,8 @@ def upgrade(ctx, dry_run):
     ctx = ctx.obj
 
     update_path = '/' + uuid4().hex
+
+    modules = list(get_upgrade_modules())
     tasks = get_tasks()
 
     for appcfg in ctx['config'].applications:
@@ -94,7 +96,7 @@ def upgrade(ctx, dry_run):
 
         for schema in schemas:
             # we *need* a new upgrade runner for each schema
-            upgrade_runner = UpgradeRunner(tasks, commit=not dry_run)
+            upgrade_runner = UpgradeRunner(modules, tasks, commit=not dry_run)
 
             if appcfg.is_static:
                 root = appcfg.path
