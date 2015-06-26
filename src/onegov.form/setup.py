@@ -37,7 +37,7 @@ setup(
         'delorean',
         'humanize',
         'jsonpickle',
-        'onegov.core>=0.3.5',
+        'onegov.core>=0.4.0',
         'pyparsing',
         'pyyaml',
         'python-magic',
@@ -56,6 +56,11 @@ setup(
             'werkzeug'
         ],
     ),
+    entry_points={
+        'onegov': [
+            'upgrade = onegov.form.upgrade'
+        ]
+    },
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',
