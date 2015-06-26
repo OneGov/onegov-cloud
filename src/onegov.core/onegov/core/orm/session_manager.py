@@ -219,7 +219,7 @@ class SessionManager(object):
         if limit_to_namespace is not None:
             return [
                 r[0] for r in conn.execute(query).fetchall()
-                if r[0].split('-')[0] == limit_to_namespace
+                if r[0].startswith(limit_to_namespace + '-')
             ]
         else:
             return [r[0] for r in conn.execute(query).fetchall()]

@@ -1,5 +1,10 @@
+import os.path
 import pytest
+import textwrap
 
+from click.testing import CliRunner
+from mock import patch
+from onegov.core.cli import cli
 from onegov.core.upgrade import get_tasks, upgrade_task
 
 
@@ -75,3 +80,115 @@ def test_upgrade_duplicate_tasks():
 
     with pytest.raises(AssertionError):
         get_tasks([('onegov.core.tests', MyUpgradeModule)])
+
+
+def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
+
+    config = os.path.join(temporary_directory, 'test.yml')
+    with open(config, 'w') as cfg:
+        cfg.write(textwrap.dedent("""\
+            applications:
+                - path: /foo/*
+                  application: onegov.core.framework.Framework
+                  namespace: foo
+                  configuration:
+                    dsn: {}
+                    identity_secure: False
+                    identity_secret: asdf
+                    csrf_secret: asdfasdf
+                    filestorage: fs.osfs.OSFS
+                    filestorage_options:
+                      root_path: '{}/file-storage'
+                      create: true
+        """.format(postgres_dsn, temporary_directory)))
+
+    session_manager.ensure_schema_exists("foo-bar")
+    session_manager.ensure_schema_exists("foo-fah")
+
+    with patch('onegov.core.upgrade.get_upgrade_modules') as get_modules_1:
+        with patch('onegov.core.cli.get_upgrade_modules') as get_modules_2:
+
+            class Upgrades:
+                @staticmethod
+                @upgrade_task(name='Foobar')
+                def run_upgrade(context):
+                    pass
+
+            get_modules_1.return_value = get_modules_2.return_value = [
+                ('onegov.test', Upgrades)
+            ]
+
+            # first run, no tasks are executed because the db is empty
+            runner = CliRunner()
+            result = runner.invoke(cli, [
+                '--config', config,
+                '--namespace', 'foo',
+                'upgrade'
+            ], catch_exceptions=False)
+
+            output = result.output.split('\n')
+            assert 'Running upgrade for foo/bar' in output[0]
+            assert 'no pending upgrade tasks found' in output[1]
+            assert 'Running upgrade for foo/fah' in output[2]
+            assert 'no pending upgrade tasks found' in output[3]
+            assert result.exit_code == 0
+
+            class NewUpgrades:
+                @staticmethod
+                @upgrade_task(name='Barfoo')
+                def run_upgrade(context):
+                    pass
+
+            get_modules_1.return_value = get_modules_2.return_value = [
+                ('onegov.test', NewUpgrades)
+            ]
+
+            # second run with a new task which will be executed
+            runner = CliRunner()
+            result = runner.invoke(cli, [
+                '--config', config,
+                '--namespace', 'foo',
+                'upgrade',
+                '--dry-run'
+            ], catch_exceptions=False)
+
+            output = result.output.split('\n')
+            assert 'Running upgrade for foo/bar' in output[0]
+            assert 'Barfoo' in output[1]
+            assert 'executed 1 upgrade tasks' in output[2]
+            assert 'Running upgrade for foo/fah' in output[3]
+            assert 'Barfoo' in output[4]
+            assert 'executed 1 upgrade tasks' in output[5]
+            assert result.exit_code == 0
+
+            # we used dry-run above, so running it again yields the same result
+            runner = CliRunner()
+            result = runner.invoke(cli, [
+                '--config', config,
+                '--namespace', 'foo',
+                'upgrade',
+            ], catch_exceptions=False)
+
+            output = result.output.split('\n')
+            assert 'Running upgrade for foo/bar' in output[0]
+            assert 'Barfoo' in output[1]
+            assert 'executed 1 upgrade tasks' in output[2]
+            assert 'Running upgrade for foo/fah' in output[3]
+            assert 'Barfoo' in output[4]
+            assert 'executed 1 upgrade tasks' in output[5]
+            assert result.exit_code == 0
+
+            # the task has now been completed and it won't be executed again
+            runner = CliRunner()
+            result = runner.invoke(cli, [
+                '--config', config,
+                '--namespace', 'foo',
+                'upgrade',
+            ], catch_exceptions=False)
+
+            output = result.output.split('\n')
+            assert 'Running upgrade for foo/bar' in output[0]
+            assert 'no pending upgrade tasks found' in output[1]
+            assert 'Running upgrade for foo/fah' in output[2]
+            assert 'no pending upgrade tasks found' in output[3]
+            assert result.exit_code == 0

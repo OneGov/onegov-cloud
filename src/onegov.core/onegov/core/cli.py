@@ -7,6 +7,7 @@ updates.
 import click
 
 from morepath import setup
+from onegov.core.compat import text_type
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
 from onegov.server.config import Config
@@ -96,10 +97,10 @@ def upgrade(ctx, dry_run):
         c = Client(server)
 
         def on_success(task):
-            print(click.style(u"✓ " + task.task_name, fg='green'))
+            print(click.style("* " + text_type(task.task_name), fg='green'))
 
         def on_fail(task):
-            print(click.style(u"✗ " + task.task_name, fg='red'))
+            print(click.style("* " + text_type(task.task_name), fg='red'))
 
         for schema in schemas:
             # we *need* a new upgrade runner for each schema

@@ -24,7 +24,7 @@ dependencies = {
     'more.transaction',
     'more.webassets',
     'networkx',
-    'onegov.server',
+    'onegov.server>=0.0.3',
     'passlib',
     'polib',
     'py-bcrypt',
@@ -80,6 +80,7 @@ setup(
         test=[
             'coverage',
             'freezegun',
+            'mock',
             'onegov.testing'
         ],
     ),
