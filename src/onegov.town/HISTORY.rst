@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Remove support for Python 3.3.
+  [href]
+
 - Pages are now always sorted from A to Z.
   [href]
 
