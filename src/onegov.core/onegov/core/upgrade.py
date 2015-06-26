@@ -140,7 +140,7 @@ class upgrade_task(object):
 
 def is_task(function):
     """ Returns True if the given function is an uprade task. """
-    if not isfunction(function) or ismethod(function):
+    if not (isfunction(function) or ismethod(function)):
         return False
 
     return hasattr(function, 'task_name')
