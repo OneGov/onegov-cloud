@@ -40,7 +40,7 @@ def upgrade(ctx, dry_run):
     ctx = ctx.obj
 
     update_path = '/' + uuid4().hex
-    upgrade_runner = UpgradeRunner(get_tasks(), commit=not dry_run)
+    tasks = get_tasks()
 
     for appcfg in ctx['config'].applications:
 
@@ -63,7 +63,13 @@ def upgrade(ctx, dry_run):
         def run_upgrade(self, request):
             title = "Running upgrade for {}".format(request.app.application_id)
             print(click.style(title, underline=True))
-            self.run_upgrade(request)
+
+            executed_tasks = self.run_upgrade(request)
+
+            if executed_tasks:
+                print("executed {} upgrade tasks".format(executed_tasks))
+            else:
+                print("no pending upgrade tasks found")
 
         config.commit()
 
@@ -87,6 +93,9 @@ def upgrade(ctx, dry_run):
         c = Client(server)
 
         for schema in schemas:
+            # we *need* a new upgrade runner for each schema
+            upgrade_runner = UpgradeRunner(tasks, commit=not dry_run)
+
             if appcfg.is_static:
                 root = appcfg.path
             else:

@@ -8,8 +8,44 @@ import transaction
 
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
-from onegov.core.utils import Bunch
 from inspect import getmembers, isfunction, ismethod
+from onegov.core.orm import Base
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import JSON
+from sqlalchemy import Column, Text
+
+
+class UpgradeState(Base, TimestampMixin):
+    """ Keeps the state of all upgrade steps over all modules. """
+
+    __tablename__ = 'upgrades'
+
+    # the name of the module (e.g. onegov.core)
+    module = Column(Text, primary_key=True)
+
+    # a json holding the state of the upgrades
+    state = Column(JSON, nullable=False, default=dict)
+
+    @property
+    def executed_tasks(self):
+        if not self.state:
+            return set()
+        else:
+            return set(self.state.get('executed_tasks', []))
+
+    def was_already_executed(self, task):
+        return task.task_name in self.executed_tasks
+
+    def mark_as_executed(self, task):
+        if not self.state:
+            self.state = {}
+
+        if 'executed_tasks' in self.state:
+            self.state['executed_tasks'].append(task.task_name)
+        else:
+            self.state['executed_tasks'] = [task.task_name]
+
+        self.state.changed()
 
 
 def get_distributions_with_entry_map(key):
@@ -176,7 +212,6 @@ class UpgradeTransaction(object):
 
     def __init__(self, context):
         self.operations_transaction = context.operations_connection.begin()
-        self.session_savepoint = transaction.savepoint()
         self.session = context.session
 
     def flush(self):
@@ -215,15 +250,45 @@ class UpgradeRunner(object):
     def __init__(self, tasks, commit=True):
         self.tasks = tasks
         self.commit = commit
+        self.states = {}
+
+    def get_state(self, context, module):
+        if module not in self.states:
+            query = context.session.query(UpgradeState)
+            query = query.filter(UpgradeState.module == module)
+
+            state = query.first()
+
+            if state:
+                self.states[module] = state
+            else:
+                self.states[module] = UpgradeState(module=module)
+                context.session.add(self.states[module])
+
+        return self.states[module]
 
     def run_upgrade(self, request):
 
+        executed_tasks = 0
+
         for task_id, task in self.tasks:
             context = UpgradeContext(request)
+
+            module = task_id.replace(task.task_name, '').rstrip(':')
+            state = self.get_state(context, module)
+
+            if not task.always_run and state.was_already_executed(task):
+                continue
+
             upgrade = context.begin()
 
             try:
                 task(context)
+
+                # mark all tasks as executed, even 'always run' ones
+                state.mark_as_executed(task)
+                executed_tasks += 1
+
                 upgrade.flush()
 
                 print(click.style('✓', fg='green'), task.task_name)
@@ -239,3 +304,5 @@ class UpgradeRunner(object):
                     upgrade.commit()
                 else:
                     upgrade.abort()
+
+        return executed_tasks
