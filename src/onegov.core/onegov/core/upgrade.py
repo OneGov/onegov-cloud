@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import click
 import importlib
 import networkx as nx
 import pkg_resources
@@ -287,11 +286,23 @@ class UpgradeContext(object):
 class UpgradeRunner(object):
     """ Runs all tasks of a :class:`UpgradeTasksRegistry`. """
 
-    def __init__(self, modules, tasks, commit=True):
+    def __init__(self, modules, tasks, commit=True,
+                 on_task_success=None, on_task_fail=None):
         self.modules = modules
         self.tasks = tasks
         self.commit = commit
         self.states = {}
+
+        self._on_task_success = on_task_success
+        self._on_task_fail = on_task_fail
+
+    def on_task_success(self, task):
+        if self._on_task_success is not None:
+            self._on_task_success(task)
+
+    def on_task_fail(self, task):
+        if self._on_task_fail is not None:
+            self._on_task_fail(task)
 
     def get_state(self, context, module):
         if module not in self.states:
@@ -303,20 +314,23 @@ class UpgradeRunner(object):
 
         return self.states[module]
 
-    def run_upgrade(self, request):
-
-        executed_tasks = 0
-
+    def register_modules(self, request):
         register_modules(request, self.modules, self.tasks)
 
         if self.commit:
             transaction.commit()
 
-        for task_id, task in self.tasks:
+    def get_module_from_task_id(self, task_id):
+        return task_id.split(':')[0]
 
+    def run_upgrade(self, request):
+        self.register_modules(request)
+
+        tasks = ((self.get_module_from_task_id(i), t) for i, t in self.tasks)
+        executed = 0
+
+        for module, task in tasks:
             context = UpgradeContext(request)
-
-            module = task_id.replace(task.task_name, '').rstrip(':')
             state = self.get_state(context, module)
 
             if not task.always_run and state.was_already_executed(task):
@@ -329,16 +343,14 @@ class UpgradeRunner(object):
 
                 # mark all tasks as executed, even 'always run' ones
                 state.mark_as_executed(task)
-                executed_tasks += 1
-
                 upgrade.flush()
 
-                print(click.style('✓', fg='green'), task.task_name)
+                executed += 1
+                self.on_task_success(task)
 
             except:
                 upgrade.abort()
-
-                print(click.style('✗', fg='red'), task.task_name)
+                self.on_task_fail(task)
 
                 raise
             else:
@@ -347,4 +359,4 @@ class UpgradeRunner(object):
                 else:
                     upgrade.abort()
 
-        return executed_tasks
+        return executed

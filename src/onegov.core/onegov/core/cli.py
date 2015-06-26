@@ -94,9 +94,21 @@ def upgrade(ctx, dry_run):
         # build the path to the update view and call it
         c = Client(server)
 
+        def on_success(task):
+            print(click.style('✗', fg='red'), task.task_name)
+
+        def on_fail(task):
+            print(click.style('✗', fg='red'), task.task_name)
+
         for schema in schemas:
             # we *need* a new upgrade runner for each schema
-            upgrade_runner = UpgradeRunner(modules, tasks, commit=not dry_run)
+            upgrade_runner = UpgradeRunner(
+                modules=modules,
+                tasks=tasks,
+                commit=not dry_run,
+                on_task_success=on_success,
+                on_task_fail=on_fail
+            )
 
             if appcfg.is_static:
                 root = appcfg.path
