@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ Provides commands related to the onegov.core Framework. Currently only
 updates.
 
@@ -95,10 +96,10 @@ def upgrade(ctx, dry_run):
         c = Client(server)
 
         def on_success(task):
-            print(click.style('✗', fg='red'), task.task_name)
+            print(click.style(u"✓ " + task.task_name, fg='green'))
 
         def on_fail(task):
-            print(click.style('✗', fg='red'), task.task_name)
+            print(click.style(u"✗ " + task.task_name, fg='red'))
 
         for schema in schemas:
             # we *need* a new upgrade runner for each schema
