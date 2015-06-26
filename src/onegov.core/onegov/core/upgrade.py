@@ -165,6 +165,50 @@ def get_tasks(upgrade_modules=None):
     return ordered_tasks
 
 
+class UpgradeTransaction(object):
+    """ Holds the session and the alembic operations connection together and
+    commits/aborts both at the same time.
+
+    Not really a two-phase commit solution. That could be accomplished but
+    for now this suffices.
+
+    """
+
+    def __init__(self, context):
+        self.operations_transaction = context.operations_connection.begin()
+        self.session_savepoint = transaction.savepoint()
+        self.session = context.session
+
+    def flush(self):
+        self.session.flush()
+
+    def commit(self):
+        self.operations_transaction.commit()
+        transaction.commit()
+
+    def abort(self):
+        self.operations_transaction.rollback()
+        transaction.abort()
+
+
+class UpgradeContext(object):
+    """ Holdes the context of the upgrade. An instance of this is passed
+    to each upgrade task.
+
+    """
+
+    def __init__(self, request):
+        self.request = request
+        self.app = request.app
+        self.session = request.app.session()
+        self.operations_connection = self.session.bind.connect()
+        self.operations = Operations(
+            MigrationContext.configure(self.operations_connection))
+
+    def begin(self):
+        return UpgradeTransaction(self)
+
+
 class UpgradeRunner(object):
     """ Runs all tasks of a :class:`UpgradeTasksRegistry`. """
 
@@ -175,37 +219,23 @@ class UpgradeRunner(object):
     def run_upgrade(self, request):
 
         for task_id, task in self.tasks:
-
-            session = request.app.session()
-            connection = session.bind.connect()
-
-            context = Bunch(
-                request=request,
-                app=request.app,
-                session=session,
-                operations=Operations(MigrationContext.configure(connection))
-            )
-
-            operations_transaction = connection.begin()
-            session_savepoint = transaction.savepoint()
+            context = UpgradeContext(request)
+            upgrade = context.begin()
 
             try:
                 task(context)
-                session.flush()
+                upgrade.flush()
 
                 print(click.style('✓', fg='green'), task.task_name)
 
             except:
-                operations_transaction.rollback()
-                session_savepoint.rollback()
+                upgrade.abort()
 
                 print(click.style('✗', fg='red'), task.task_name)
 
                 raise
             else:
                 if self.commit:
-                    operations_transaction.commit()
-                    transaction.commit()
+                    upgrade.commit()
                 else:
-                    operations_transaction.rollback()
-                    transaction.abort()
+                    upgrade.abort()
