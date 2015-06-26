@@ -251,8 +251,13 @@ class SessionManager(object):
 
             conn = self.engine.execution_options(schema=schema)
 
-            self.base.metadata.schema = schema
-            self.base.metadata.create_all(conn)
-            conn.execute('COMMIT')
+            try:
+                self.base.metadata.schema = schema
+                self.base.metadata.create_all(conn)
+                conn.execute('COMMIT')
+            finally:
+                # reset the schema on the global base variable - this state
+                # sticks around otherwise and haunts us in the tests
+                self.base.metadata.schema = None
 
             self.created_schemas.add(schema)
