@@ -34,7 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core>=0.3.7',
+        'onegov.core>=0.4.0',
         'onegov.ballot',
         'onegov.form',
         'onegov.foundation',
@@ -53,6 +53,9 @@ setup(
     entry_points={
         'morepath': [
             'scan = onegov.election_day'
+        ],
+        'onegov': [
+            'upgrade = onegov.election_day.upgrade'
         ]
     },
     classifiers=[
