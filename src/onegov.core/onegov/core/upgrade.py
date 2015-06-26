@@ -1,7 +1,14 @@
+# -*- coding: utf-8 -*-
+
+import click
 import importlib
 import networkx as nx
 import pkg_resources
+import transaction
 
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
+from onegov.core.utils import Bunch
 from inspect import getmembers, isfunction, ismethod
 
 
@@ -32,8 +39,8 @@ def get_upgrade_modules():
     for distribution, entry_map in get_distributions_with_entry_map('onegov'):
         if 'upgrade' in entry_map:
             yield (
-                distribution.name,
-                importlib.import_module(entry_map['upgrade'])
+                distribution.project_name,
+                importlib.import_module(entry_map['upgrade'].module_name)
             )
 
 
@@ -161,9 +168,44 @@ def get_tasks(upgrade_modules=None):
 class UpgradeRunner(object):
     """ Runs all tasks of a :class:`UpgradeTasksRegistry`. """
 
-    def __init__(self, tasks):
+    def __init__(self, tasks, commit=True):
         self.tasks = tasks
+        self.commit = commit
 
     def run_upgrade(self, request):
+
         for task_id, task in self.tasks:
-            task(request)
+
+            session = request.app.session()
+            connection = session.bind.connect()
+
+            context = Bunch(
+                request=request,
+                app=request.app,
+                session=session,
+                operations=Operations(MigrationContext.configure(connection))
+            )
+
+            operations_transaction = connection.begin()
+            session_savepoint = transaction.savepoint()
+
+            try:
+                task(context)
+                session.flush()
+
+                print(click.style('✓', fg='green'), task.task_name)
+
+            except:
+                operations_transaction.rollback()
+                session_savepoint.rollback()
+
+                print(click.style('✗', fg='red'), task.task_name)
+
+                raise
+            else:
+                if self.commit:
+                    operations_transaction.commit()
+                    transaction.commit()
+                else:
+                    operations_transaction.rollback()
+                    transaction.abort()

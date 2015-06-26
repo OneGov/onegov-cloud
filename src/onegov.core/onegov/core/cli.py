@@ -31,14 +31,16 @@ def cli(ctx, config, namespace):
 
 
 @cli.command()
+@click.option('--dry-run', default=False, is_flag=True,
+              help="Do not write any changes into the database.")
 @click.pass_context
-def upgrade(ctx):
+def upgrade(ctx, dry_run):
     """ Upgrades all application instances of the given namespace(s). """
 
     ctx = ctx.obj
 
     update_path = '/' + uuid4().hex
-    upgrade_runner = UpgradeRunner(get_tasks())
+    upgrade_runner = UpgradeRunner(get_tasks(), commit=not dry_run)
 
     for appcfg in ctx['config'].applications:
 
@@ -59,7 +61,8 @@ def upgrade(ctx):
 
         @UpdateApplication.view(model=UpgradeRunner)
         def run_upgrade(self, request):
-            print("Running upgrade for {}".format(request.app.application_id))
+            title = "Running upgrade for {}".format(request.app.application_id)
+            print(click.style(title, underline=True))
             self.run_upgrade(request)
 
         config.commit()
@@ -74,7 +77,8 @@ def upgrade(ctx):
                 {
                     'path': appcfg.path,
                     'application': UpdateApplication,
-                    'namespace': appcfg.namespace
+                    'namespace': appcfg.namespace,
+                    'configuration': appcfg.configuration
                 }
             ]
         }), configure_morepath=False)
