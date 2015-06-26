@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Removes support for Python 3.3. Use 2.7 or 3.3.
+  [href]
+
 - Adds colors to the sql debug output.
   [href]
 
