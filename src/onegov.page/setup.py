@@ -34,7 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core'
+        'onegov.core>=0.4.0'
     ],
     extras_require=dict(
         test=[
@@ -42,6 +42,11 @@ setup(
             'onegov.testing'
         ],
     ),
+    entry_points={
+        'onegov': [
+            'upgrade = onegov.page.upgrade'
+        ]
+    },
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',
