@@ -6,7 +6,7 @@ name = 'onegov.town'
 description = (
     'OneGov web application for small towns.'
 )
-version = '0.2.0'
+version = '0.2.1'
 
 
 def get_long_description():
@@ -39,7 +39,7 @@ setup(
         'jsmin',
         'lazy-object-proxy',
         'lxml',
-        'onegov.core>=0.4.0',
+        'onegov.core>=0.4.1',
         'onegov.form>=0.6.0',
         'onegov.foundation',
         'onegov.page>=0.1.0',
