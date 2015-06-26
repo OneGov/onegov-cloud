@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Remove support for Python 3.3.
+  [href]
+
 0.1.0 (2015-05-07)
 ~~~~~~~~~~~~~~~~~~~
 
