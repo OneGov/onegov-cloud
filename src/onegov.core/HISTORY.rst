@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.1 (2015-06-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Ensure that the bind schema doesn't stick around to cause test failures.
   [href]
 
