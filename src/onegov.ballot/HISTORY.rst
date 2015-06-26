@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Remove support for Python 3.3.
+  [href]
+
 - Adds support for onegov.core.upgrade.
   [href]
 
