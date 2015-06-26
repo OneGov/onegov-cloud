@@ -35,7 +35,7 @@ setup(
     platforms='any',
     install_requires=[
         'click',
-        'onegov.core',
+        'onegov.core>=0.4.0',
         'sqlalchemy'
     ],
     extras_require=dict(
@@ -47,6 +47,9 @@ setup(
     entry_points="""
         [console_scripts]
         onegov-user=onegov.user.cli:cli
+
+        [onegov]
+        upgrade=onegov.user.upgrade
     """,
     classifiers=[
         'Intended Audience :: Developers',
