@@ -34,9 +34,15 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'onegov.core>=0.4.0',
         'csscompressor',
         'pyscss',
     ],
+    entry_points={
+        'onegov': [
+            'upgrade = onegov.foundation.upgrade'
+        ]
+    },
     extras_require=dict(
         test=[
             'coverage',
