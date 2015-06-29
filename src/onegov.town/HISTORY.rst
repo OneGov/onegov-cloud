@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix sticky footer being partly rendered out of the viewport.
+  [href]
+
 - Updates Redactor to 10.2.
   [href]
 

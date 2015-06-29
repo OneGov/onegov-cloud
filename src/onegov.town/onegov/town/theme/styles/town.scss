@@ -697,11 +697,20 @@ $max-page-width: 600px;
 }
 
 /*
+    content block
+*/
+.content {
+    margin-bottom: 1rem;
+}
+
+/*
     sticky footer
 */
 
 .footer {
-    margin-top: 1rem;
+    // please do not add a margin here, it will mess up the sticky footer!
+    // instead add a margin-bottom to whatever is rendered before the footer.
+
     padding: 0 1rem;
 
     h2,
