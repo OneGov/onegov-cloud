@@ -17,6 +17,10 @@ def spawn_basic_permissions_app():
     class Root(object):
         pass
 
+    @App.path(path='/hidden')
+    class HiddenFromPublic(object):
+        is_hidden_from_public = True
+
     @App.view(model=Root, name='public', permission=Public)
     def public_view(self, request):
         return 'public'
@@ -28,6 +32,10 @@ def spawn_basic_permissions_app():
     @App.view(model=Root, name='secret', permission=Secret)
     def secret_view(self, request):
         return 'secret'
+
+    @App.view(model=HiddenFromPublic, permission=Public)
+    def hidden_from_public_view(self, request):
+        return 'hidden'
 
     @App.view(
         model=Root,
@@ -70,6 +78,7 @@ def test_anonymous_access():
     assert client.get('/private', expect_errors=True).status_code == 403
     assert client.get('/secret', expect_errors=True).status_code == 403
     assert client.get('/logout', expect_errors=True).status_code == 403
+    assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
 def test_private_access():
@@ -79,6 +88,7 @@ def test_private_access():
 
     assert client.get('/public').text == 'public'
     assert client.get('/private').text == 'private'
+    assert client.get('/hidden').text == 'hidden'
     assert client.get('/secret', expect_errors=True).status_code == 403
 
     client.get('/logout')
@@ -87,6 +97,7 @@ def test_private_access():
     assert client.get('/private', expect_errors=True).status_code == 403
     assert client.get('/secret', expect_errors=True).status_code == 403
     assert client.get('/logout', expect_errors=True).status_code == 403
+    assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
 def test_secret_access():
@@ -97,6 +108,7 @@ def test_secret_access():
     assert client.get('/public').text == 'public'
     assert client.get('/private').text == 'private'
     assert client.get('/secret').text == 'secret'
+    assert client.get('/hidden').text == 'hidden'
 
     client.get('/logout')
 
@@ -104,6 +116,7 @@ def test_secret_access():
     assert client.get('/private', expect_errors=True).status_code == 403
     assert client.get('/secret', expect_errors=True).status_code == 403
     assert client.get('/logout', expect_errors=True).status_code == 403
+    assert client.get('/hidden', expect_errors=True).status_code == 403
 
 
 def test_secure_cookie():

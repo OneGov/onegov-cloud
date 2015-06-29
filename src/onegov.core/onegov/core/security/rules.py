@@ -7,7 +7,15 @@ def has_permission_not_logged_in(identity, model, permission):
     """ This catch-all rule returns the default permission rule. It says
     that the permission must be part of the anonymous rule.
 
+    Models with a 'is_hidden_from_public' property are not viewable by
+    anonymous users, if said property is set to True. If it is set to False,
+    the usual permission check kicks in.
+
     """
+
+    if getattr(model, 'is_hidden_from_public', False):
+        return False
+
     return permission in settings().roles.anonymous
 
 
