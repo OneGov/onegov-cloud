@@ -6,6 +6,7 @@ from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
 from onegov.town.models import ImageCollection
+from sqlalchemy import desc
 
 
 class Layout(ChameleonLayout):
@@ -146,6 +147,7 @@ class DefaultLayout(Layout):
     @cached_property
     def root_pages(self):
         query = PageCollection(self.app.session()).query()
+        query = query.order_by(desc(Page.type), Page.name)
         query = query.filter(Page.parent_id == None)
 
         return self.request.exclude_invisible(query.all())
