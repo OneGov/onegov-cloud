@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-06-10 10:22+0200\n"
+"POT-Creation-Date: 2015-06-29 11:01+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -91,107 +91,109 @@ msgstr "Nachricht löschen"
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:205
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:256
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:341
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:424
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:144
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:195
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:284
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:367
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:45
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:98
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:136
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:100
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:138
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:25
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:74
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:111
 msgid "Homepage"
 msgstr "Startseite"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:342
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:425
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:285
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:368
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:29
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:46
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:99
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:137
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:101
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:139
 msgid "Forms"
 msgstr "Formulare"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:355
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:298
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submission.pt:29
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submissions.pt:22
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:139
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:141
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:119
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:227
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:234
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:166
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:173
 msgid "Logout"
 msgstr "Logout"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:228
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:235
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:167
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:174
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:31
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/images.py:26
 msgid "Images"
 msgstr "Bilder"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:362
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:379
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:395
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:305
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:322
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:338
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submissions.pt:31
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:136
 msgid "Delete"
 msgstr "Löschen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:410
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:436
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:353
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:379
 msgid "Form"
 msgstr "Formular"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:236
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:175
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:117
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:112
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:242
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:181
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/login.py:75
 msgid "Login"
 msgstr "Login"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:367
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:384
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:310
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:327
 msgid "This form can't be deleted."
 msgstr "Das Formular kann nicht gelöscht werden."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:368
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:311
 msgid "This is a builtin-form. Builtin-forms can't be deleted."
-msgstr "Dies ist ein vordefiniertes Formular. Vordefinierte Formulare können nicht gelöscht werden."
+msgstr ""
+"Dies ist ein vordefiniertes Formular. Vordefinierte Formulare können nicht "
+"gelöscht werden."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:372
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:389
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:403
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:315
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:332
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:346
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/images.pt:25
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submissions.pt:29
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:144
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:433
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:376
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/page.py:71
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:385
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:328
 msgid ""
 "The are submissions associated with the form. Those need to be removed first."
 msgstr ""
 "Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen Sie "
 "diese Eingaben bevor Sie das Formular löschen."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:400
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:343
 msgid "Do you really want to delete this form?"
 msgstr "Möchten Sie das Formular wirklich löschen?"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:402
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/layout.py:345
 msgid "Delete form"
 msgstr "Formular löschen"
 
@@ -228,26 +230,30 @@ msgstr "Dateien dieses Typs werde nicht unterstützt."
 msgid "The form could not be parsed."
 msgstr "Das Formular ist nicht gültig."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:134
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:17
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:136
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:19
 msgid "Title"
 msgstr "Titel"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:139
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:141
 msgid "URL"
 msgstr "URL"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:155
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:20
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:166
+msgid "Hide from the public"
+msgstr "Vor der Öffentlichkeit verstecken"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:157
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:22
 msgid "Lead"
 msgstr "Einleitung"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:156
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:158
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:160
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:25
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/models/page.py:162
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:27
 msgid "Text"
 msgstr "Text"
 
@@ -268,23 +274,23 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:15
-msgid "Builtin Form"
-msgstr "Vordefiniert"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:18
-msgid "Custom Form"
-msgstr "Gemeindespezifisch"
-
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:24
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:14
 msgid "Submission"
 msgstr "Eingabe"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:28
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:31
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:19
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:23
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:48
 msgid "Submissions"
 msgstr "Eingaben"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:32
+msgid "Builtin Form"
+msgstr "Vordefiniert"
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/forms.pt:35
+msgid "Custom Form"
+msgstr "Gemeindespezifisch"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/homepage.pt:27
 msgid "Latest news"
@@ -314,12 +320,12 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/layout.pt:92
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/layout.pt:87
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:34
 msgid "Contact"
 msgstr "Kontakt"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/layout.pt:96
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/layout.pt:91
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:39
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
@@ -337,7 +343,18 @@ msgstr "Dateien hierhin ziehen um sie hochzuladen"
 msgid "read on..."
 msgstr "weiterlesen..."
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:36
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:142
+msgid "This site is hidden from the general public"
+msgstr "Diese Seite ist nicht öffentlich."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/macros.pt:151
+msgid ""
+"This site is hidden from the general public. To show it to everyone, edit "
+"this page and disable \"Hide from public\"."
+msgstr "Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und "
+"entfernen Sie das Häckchen im Feld \"Vor der Öffentlichkeit verstecken\"."
+
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:39
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -345,7 +362,7 @@ msgstr ""
 "Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
 "auf den folgende Verweis weitergeleitet:"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:43
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:46
 msgid ""
 "You are not automatically redirected so you have a chance to edit or delete "
 "this link."
@@ -381,7 +398,7 @@ msgid "Delete Submission"
 msgstr "Eingabe Löschen"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/editor.py:52
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:124
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:126
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_submission.py:102
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/settings.py:101
 msgid "Your changes were saved"
@@ -391,30 +408,30 @@ msgstr "Ihre Änderungen wurden gespeichert"
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:55
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_collection.py:57
 #, python-format
 msgid "Submissions for \"${form}\""
 msgstr "Eingaben zu \"${form}\""
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:105
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:100
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:107
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:102
 msgid "New Form"
 msgstr "Neues Formular"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:21
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:23
 msgid "Describes what this form is about"
 msgstr "Beschreibt kurz um was es bei diesem Formular geht"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:50
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:66
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:52
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:68
 msgid "Definition"
 msgstr "Definition"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:93
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_definition.py:95
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
-#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_submission.py:112
+#: /Users/denis/Code/onegov/src/onegov.town/onegov/town/views/form_submission.py:113
 msgid "Thank you for your submission"
 msgstr "Danke für Ihre Eingabe"
 

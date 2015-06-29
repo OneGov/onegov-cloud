@@ -8,7 +8,7 @@ from onegov.town import _, TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import FormEditorLayout
 from onegov.town.utils import mark_images
-from wtforms import StringField, TextAreaField, validators
+from wtforms import BooleanField, StringField, TextAreaField, validators
 from wtforms.widgets import TextArea
 from webob import exc
 
@@ -28,13 +28,18 @@ class FormDefinitionBaseForm(Form):
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html, mark_images])
 
+    is_hidden_from_public = BooleanField(_("Hide from the public"))
+
     def get_meta(self):
         return {
             'lead': self.lead.data,
+            'is_hidden_from_public': self.is_hidden_from_public.data
         }
 
     def set_meta(self, meta):
         self.lead.data = meta.get('lead', '')
+        self.is_hidden_from_public.data = meta.get(
+            'is_hidden_from_public', False)
 
     def get_content(self):
         return {

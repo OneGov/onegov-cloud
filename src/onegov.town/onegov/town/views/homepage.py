@@ -84,7 +84,9 @@ def view_town(self, request):
         'layout': layout,
         'title': self.name,
         'tiles': tiles,
-        'news': layout.root_pages[-1].news_query.limit(3).all(),
+        'news': request.exclude_invisible(
+            layout.root_pages[-1].news_query.limit(3).all(),
+        ),
         'panels': [
             online_counter,
             latest_events

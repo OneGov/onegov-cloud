@@ -43,8 +43,11 @@ def view_public_page(self, request):
             'name': self.trait_messages[self.trait]['name'],
             'page': self,
             'children': [
-                Link(child.title, request.link(child))
-                for child in sorted(self.children, key=lambda c: c.name)
+                Link(child.title, request.link(child), model=child)
+                for child in sorted(
+                    request.exclude_invisible(self.children),
+                    key=lambda c: c.name
+                )
             ]
         }
 
@@ -54,7 +57,7 @@ def view_public_page(self, request):
             'title': self.title,
             'name': self.trait_messages[self.trait]['name'],
             'page': self,
-            'children': self.news_query.all(),
+            'children': request.exclude_invisible(self.news_query.all()),
         }
 
     raise NotImplementedError
@@ -83,7 +86,7 @@ def view_private_page(self, request):
             'name': self.trait_messages[self.trait]['name'],
             'page': self,
             'children': [
-                Link(child.title, request.link(child))
+                Link(child.title, request.link(child), model=child)
                 for child in self.children
             ]
         }

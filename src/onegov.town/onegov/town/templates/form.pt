@@ -11,6 +11,8 @@
             }[econtext.get('form_width', 'normal')]
         ?>
 
+        <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" tal:define="item definition|nothing" tal:condition="item" />
+
         <tal:block metal:use-macro="layout.macros.page_content"
             tal:define="lead lead|nothing;text text|nothing" />
 

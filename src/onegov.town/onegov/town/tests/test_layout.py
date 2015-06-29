@@ -24,6 +24,9 @@ class MockRequest(object):
         if isinstance(model, Page):
             return model.path
 
+    def exclude_invisible(self, objects):
+        return objects
+
 
 def test_layout():
     # basic tests that can be done by mocking

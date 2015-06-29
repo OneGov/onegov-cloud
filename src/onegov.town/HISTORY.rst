@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to hide news, pages or forms from anonymous users.
+  [href]
+
 - Fix sticky footer being partly rendered out of the viewport.
   [href]
 

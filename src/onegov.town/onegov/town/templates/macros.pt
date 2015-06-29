@@ -120,12 +120,12 @@
     </form>
 </metal:dropzone>
 
-<metal:dropzone define-macro="newslist" i18n:domain="onegov.town">
+<metal:newslist define-macro="newslist" i18n:domain="onegov.town">
     <div class="newslist" tal:condition="news">
         <div class="row news-list-item" tal:repeat="item news">
             <div class="small-12 columns">
                 <a tal:attributes="href request.link(item)">
-                    <h2>${item.title}</h2>
+                    <h2>${item.title} <metal:hint use-macro="layout.macros['hidden_from_public_hint']" /></h2>
                 </a>
                 <p class="news-date">${item.created.strftime('%d.%m.%Y %H:%M')}</p>
                 <p class="news-lead">${item.content.lead}</p>
@@ -135,7 +135,29 @@
             </div>
         </div>
     </div>
-</metal:dropzone>
+</metal:newslist>
+
+<metal:hidden_page_hint define-macro="hidden_from_public_hint" i18n:domain="onegov.town">
+    <tal:block condition="item.is_hidden_from_public|nothing">
+        <!--! Note, this snippet is duplicated in the Link class in elements.py -->
+        <i title="This site is hidden from the general public" i18n:attributes="title" class="hidden-from-public-hint"></i>
+    </tal:block>
+</metal:hidden_page_hint>
+
+<metal:hidden_page_hint define-macro="hidden_from_public_hint_long" i18n:domain="onegov.town">
+    <tal:block condition="item.is_hidden_from_public|nothing">
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="panel">
+                    <p i18n:translate>
+                    This site is hidden from the general public. To show it to
+                    everyone, edit this page and disable "Hide from public".
+                    </p>
+                </div>
+            </div>
+        </div>
+    </tal:block>
+</metal:hidden_page_hint>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town">
     <div class="row" tal:condition="lead or text">

@@ -37,6 +37,7 @@ def handle_defined_form(self, request, form):
         'layout': FormSubmissionLayout(self, request),
         'title': self.title,
         'form': form,
+        'definition': self,
         'form_width': 'small',
         'lead': self.meta.get('lead'),
         'text': self.content.get('text')

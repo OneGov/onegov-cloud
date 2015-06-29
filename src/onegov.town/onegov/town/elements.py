@@ -4,6 +4,7 @@ macros.
 """
 
 from lxml.html import builder, tostring
+from onegov.town import _
 from purl import URL
 
 
@@ -34,6 +35,17 @@ class Link(object):
         for key, value in extra.items():
             setattr(self, key, value)
 
+    @property
+    def is_hidden_from_public(self):
+        """ Returns True if Link is hidden from the public. Pass extra keyword
+        ``model`` to ``__init__`` to have this work automatically.
+
+        """
+        if hasattr(self, 'model') and self.model.is_hidden_from_public:
+            return True
+        else:
+            return False
+
     def __call__(self, request):
         """ Renders the element. """
 
@@ -50,6 +62,19 @@ class Link(object):
 
         if self.classes:
             a.attrib['class'] = ' '.join(self.classes)
+
+        # add the hidden from public hint if needed
+        if self.is_hidden_from_public:
+
+            # This snippet is duplicated in the hidden-from-public-hint macro!
+            hint = builder.I()
+            hint.attrib['class'] = 'hidden-from-public-hint'
+            hint.attrib['title'] = request.translate(
+                _("This site is hidden from the general public")
+            )
+
+            a.append(builder.I(' '))
+            a.append(hint)
 
         for key, value in self.attributes.items():
             a.attrib[key] = request.translate(value)

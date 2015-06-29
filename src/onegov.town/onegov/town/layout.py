@@ -148,7 +148,7 @@ class DefaultLayout(Layout):
         query = PageCollection(self.app.session()).query()
         query = query.filter(Page.parent_id == None)
 
-        return query.all()
+        return self.request.exclude_invisible(query.all())
 
     @cached_property
     def top_navigation(self):
@@ -209,22 +209,31 @@ class PageLayout(DefaultLayout):
         query = self.model.siblings.filter(Page.type == 'topic')
         query = query.order_by(Page.name)
 
-        for page in query.all():
+        for page in self.request.exclude_invisible(query.all()):
             if page != self.model:
                 links.append(
-                    Link(page.title, self.request.link(page))
+                    Link(page.title, self.request.link(page), model=page)
                 )
             else:
                 links.append(
-                    Link(page.title, self.request.link(page), active=True)
+                    Link(
+                        page.title, self.request.link(page),
+                        active=True, model=page
+                    )
                 )
 
-                for page in sorted(self.model.children, key=lambda c: c.name):
+                children = sorted(
+                    self.request.exclude_invisible(self.model.children),
+                    key=lambda c: c.name
+                )
+
+                for page in children:
                     links.append(
                         Link(
                             page.title,
                             self.request.link(page),
-                            classes=('childpage', )
+                            classes=('childpage', ),
+                            model=page
                         )
                     )
 

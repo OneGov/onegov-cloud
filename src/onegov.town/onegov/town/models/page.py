@@ -4,10 +4,11 @@ from onegov.form import Form, with_options
 from onegov.page import Page
 from onegov.town import _
 from onegov.town.const import NEWS_PREFIX, TRAIT_MESSAGES
+from onegov.town.models.mixins import HiddenMetaMixin
 from onegov.town.utils import mark_images
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer, object_session
-from wtforms import StringField, TextAreaField, validators
+from wtforms import BooleanField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
 
@@ -52,7 +53,7 @@ class TraitInfo(object):
         raise NotImplementedError
 
 
-class Topic(Page, TraitInfo):
+class Topic(Page, TraitInfo, HiddenMetaMixin):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     @property
@@ -87,7 +88,7 @@ class Topic(Page, TraitInfo):
         raise NotImplementedError
 
 
-class News(Page, TraitInfo):
+class News(Page, TraitInfo, HiddenMetaMixin):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     @property
@@ -162,9 +163,12 @@ class PageForm(PageForm):
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html, mark_images])
 
+    is_hidden_from_public = BooleanField(_("Hide from the public"))
+
     def get_page(self, page):
         """ Stores the form values on the page. """
         page.title = self.title.data
+        page.is_hidden_from_public = self.is_hidden_from_public.data
         page.content = {
             'lead': self.lead.data,
             'text': self.text.data
@@ -173,5 +177,6 @@ class PageForm(PageForm):
     def set_page(self, page):
         """ Stores the page values on the form. """
         self.title.data = page.title
+        self.is_hidden_from_public.data = page.is_hidden_from_public
         self.lead.data = page.content.get('lead', '')
         self.text.data = page.content.get('text', '')

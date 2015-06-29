@@ -565,3 +565,80 @@ def test_show_uploaded_file(town_app):
 
     assert file_response.content_type == 'text/plain'
     assert file_response.text == 'foobar'
+
+
+def test_hide_page(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    new_page = client.get('/themen/leben-wohnen').click('Thema')
+
+    new_page.form['title'] = "Test"
+    new_page.form['is_hidden_from_public'] = True
+    page = new_page.form.submit().follow()
+
+    anonymous = Client(town_app)
+    response = anonymous.get(page.request.url, expect_errors=True)
+    assert response.status_code == 403
+
+    edit_page = page.click("Bearbeiten")
+    edit_page.form['is_hidden_from_public'] = False
+    page = edit_page.form.submit().follow()
+
+    response = anonymous.get(page.request.url)
+    assert response.status_code == 200
+
+
+def test_hide_news(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    new_page = client.get('/aktuelles').click('Nachricht')
+
+    new_page.form['title'] = "Test"
+    new_page.form['is_hidden_from_public'] = True
+    page = new_page.form.submit().follow()
+
+    anonymous = Client(town_app)
+    response = anonymous.get(page.request.url, expect_errors=True)
+    assert response.status_code == 403
+
+    edit_page = page.click("Bearbeiten")
+    edit_page.form['is_hidden_from_public'] = False
+    page = edit_page.form.submit().follow()
+
+    response = anonymous.get(page.request.url)
+    assert response.status_code == 200
+
+
+def test_hide_form(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    form_page = client.get('/formular/wohnsitzbestaetigung/bearbeiten')
+    form_page.form['is_hidden_from_public'] = True
+    page = form_page.form.submit().follow()
+
+    anonymous = Client(town_app)
+    response = anonymous.get(
+        '/formular/wohnsitzbestaetigung', expect_errors=True)
+    assert response.status_code == 403
+
+    edit_page = page.click("Bearbeiten")
+    edit_page.form['is_hidden_from_public'] = False
+    page = edit_page.form.submit().follow()
+
+    response = anonymous.get(page.request.url)
+    assert response.status_code == 200
