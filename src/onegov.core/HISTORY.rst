@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.2 (2015-06-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Added a new 'hidden_from_public' property which may be set on any model
   handled by onegov.core Applications. If said property is found and it is
   True, anonymous users are forbidden from viewing it.
