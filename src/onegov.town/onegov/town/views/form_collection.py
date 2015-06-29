@@ -27,7 +27,7 @@ def view_form_collection(self, request):
     return {
         'layout': FormCollectionLayout(self, request),
         'title': _("Forms"),
-        'forms': forms,
+        'forms': request.exclude_invisible(forms),
         'get_submissions_collection': partial(
             self.scoped_submissions, ensure_existance=False)
     }
