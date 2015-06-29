@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Updates Redactor to 10.2.
+  [href]
+
 0.2.1 (2015-06-26)
 ~~~~~~~~~~~~~~~~~~~
 
