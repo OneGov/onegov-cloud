@@ -303,6 +303,51 @@ class CoreRequest(IncludeRequest):
         """ Returns True if the current request is logged in at all. """
         return self.identity is not NO_IDENTITY
 
+    def has_permission(self, model, permission):
+        """ Returns True if the current user has the given permission on the
+        given model.
+
+        """
+        if self.is_logged_in:
+            permitted = self.app.modules.rules.has_permission_logged_in
+        else:
+            permitted = self.app.modules.rules.has_permission_not_logged_in
+
+        return permitted(self.identity, model, permission)
+
+    def exclude_invisible(self, models):
+        """ Excludes models invisble to the current user from the list. """
+        return [m for m in models if self.is_visible(m)]
+
+    def is_visible(self, model):
+        """ Returns True if the given model is visible to the current user.
+        This is basically an alias for :meth:`CoreRequest.is_public`. It exists
+        because it is easier to understand than ``is_public``.
+
+        """
+        return self.has_permission(model, self.app.modules.security.Public)
+
+    def is_public(self, model):
+        """ Returns True if the current user has the Public permission for
+        the given model.
+
+        """
+        return self.has_permission(model, self.app.modules.security.Public)
+
+    def is_private(self, model):
+        """ Returns True if the current user has the Private permission for
+        the given model.
+
+        """
+        return self.has_permission(model, self.app.modules.security.Private)
+
+    def is_secret(self, model):
+        """ Returns True if the current user has the Secret permission for
+        the given model.
+
+        """
+        return self.has_permission(model, self.app.modules.security.Secret)
+
     @cached_property
     def current_role(self):
         """ Returns the user-role of the current request, if logged in.

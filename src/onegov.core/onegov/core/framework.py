@@ -70,13 +70,17 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         from onegov.core import browser_session
         from onegov.core import filestorage
         from onegov.core import i18n
+        from onegov.core import security
         from onegov.core import theme
+        from onegov.core.security import rules
 
         return utils.Bunch(
             browser_session=browser_session,
             filestorage=filestorage,
             i18n=i18n,
-            theme=theme,
+            security=security,
+            rules=rules,
+            theme=theme
         )
 
     @property
