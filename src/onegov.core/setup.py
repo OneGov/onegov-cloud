@@ -19,7 +19,7 @@ dependencies = {
     'fs',
     'itsdangerous',
     'isodate',
-    'morepath',
+    'morepath>=0.11.1',
     'more.transaction',
     'more.webassets',
     'networkx',
