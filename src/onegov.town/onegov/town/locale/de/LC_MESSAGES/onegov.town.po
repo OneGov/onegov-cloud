@@ -360,7 +360,7 @@ msgid ""
 "automatically redirected to the following link:"
 msgstr ""
 "Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
-"auf den folgende Verweis weitergeleitet:"
+"auf den folgenden Verweis weitergeleitet:"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:46
 msgid ""
