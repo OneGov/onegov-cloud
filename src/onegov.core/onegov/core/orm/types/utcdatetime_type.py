@@ -1,4 +1,4 @@
-from delorean import Delorean
+from sedate import standardize_date, to_timezone
 from sqlalchemy import types
 
 
@@ -18,8 +18,8 @@ class UTCDateTime(types.TypeDecorator):
 
     def process_bind_param(self, value, engine):
         if value is not None:
-            return Delorean(value).naive()
+            return to_timezone(value, 'UTC').replace(tzinfo=None)
 
     def process_result_value(self, value, engine):
         if value is not None:
-            return Delorean(value, timezone='UTC').datetime
+            return standardize_date(value, timezone='UTC')

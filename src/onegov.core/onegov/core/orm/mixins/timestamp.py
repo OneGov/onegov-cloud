@@ -1,5 +1,5 @@
-from delorean import Delorean
 from onegov.core.orm.types import UTCDateTime
+from sedate import utcnow
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy import func
 from sqlalchemy.orm import deferred
@@ -17,7 +17,7 @@ class TimestampMixin(object):
 
     @staticmethod
     def timestamp():
-        return Delorean().datetime
+        return utcnow()
 
     @declared_attr
     def created(cls):
