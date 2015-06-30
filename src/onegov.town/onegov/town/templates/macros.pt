@@ -148,7 +148,7 @@
     <tal:block condition="item.is_hidden_from_public|nothing">
         <div class="row">
             <div class="small-12 columns">
-                <div class="panel">
+                <div class="panel callout">
                     <p i18n:translate>
                     This site is hidden from the general public. To show it to
                     everyone, edit this page and disable "Hide from public".

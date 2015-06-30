@@ -63,6 +63,13 @@ footer,
     height: $footer-height; /* .push must be the same height as .footer */
 }
 
+/*
+    Zurb lacks a separate color for callout panels.
+*/
+.panel.callout {
+    border-color: $callout-panel-border-color;
+}
+
 
 /*
     top navigation

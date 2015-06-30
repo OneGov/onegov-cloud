@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Use more pronounced colors for various elements.
+  [href]
+
 - Adds the ability to hide news, pages or forms from anonymous users.
   [href]
 
