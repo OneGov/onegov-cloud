@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.3 (2015-06-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to format numbers through the layout class.
   [href]
 
