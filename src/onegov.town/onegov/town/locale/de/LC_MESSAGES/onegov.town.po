@@ -360,14 +360,14 @@ msgid ""
 "automatically redirected to the following link:"
 msgstr ""
 "Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
-"auf den folgenden Verweis weitergeleitet:"
+"zum folgenden Verweis weitergeleitet:"
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/page.pt:46
 msgid ""
 "You are not automatically redirected so you have a chance to edit or delete "
 "this link."
 msgstr ""
-"Sie wurden nicht automatisch weitergeleitet damit Sie eine Chance haben den "
+"Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben den "
 "Verweis zu bearbeiten oder zu löschen."
 
 #: /Users/denis/Code/onegov/src/onegov.town/onegov/town/templates/submission.pt:14
