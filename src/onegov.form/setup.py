@@ -34,7 +34,6 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'delorean',
         'humanize',
         'jsonpickle',
         'onegov.core>=0.4.0',
@@ -42,6 +41,7 @@ setup(
         'pyyaml',
         'python-magic',
         'python-stdnum',
+        'sedate',
         'sqlalchemy_utils',
         'wtforms',
         'wtforms-components[color]',

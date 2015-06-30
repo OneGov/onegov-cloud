@@ -1,4 +1,3 @@
-from delorean import Delorean
 from hashlib import md5
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm import Base
@@ -6,6 +5,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
+from sedate import utcnow
 from sqlalchemy import Column, Enum, ForeignKey, Text
 from sqlalchemy.orm import (
     deferred,
@@ -172,7 +172,7 @@ class FormSubmission(Base, TimestampMixin):
 
             # only set the date the first time around
             if not self.received:
-                self.received = Delorean().datetime
+                self.received = utcnow()
 
 
 class PendingFormSubmission(FormSubmission):

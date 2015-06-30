@@ -1,7 +1,6 @@
 import pytest
 
 from datetime import datetime, timedelta
-from delorean import Delorean
 from onegov.core.compat import BytesIO
 from onegov.form import (
     FormCollection,
@@ -10,6 +9,7 @@ from onegov.form import (
 )
 from onegov.form.models import FormSubmissionFile, hash_definition
 from onegov.form.errors import UnableToComplete
+from sedate import utcnow
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm.exc import FlushError
 from textwrap import dedent
@@ -351,8 +351,7 @@ def test_get_current(session):
     submission = collection.submissions.add(
         'newsletter', form.form_class(data), state='complete')
 
-    submission.created = submission.modified = Delorean(
-        datetime.utcnow() - timedelta(days=1), timezone='UTC').datetime
+    submission.created = submission.modified = utcnow() - timedelta(days=1)
 
     assert not collection.submissions.by_id(submission.id, current_only=True)
     assert collection.submissions.by_id(submission.id, current_only=False)

@@ -1,4 +1,5 @@
-from delorean import Delorean
+import warnings
+
 from datetime import datetime, timedelta
 from onegov.core.utils import normalize_for_url
 from onegov.form.errors import UnableToComplete
@@ -8,9 +9,9 @@ from onegov.form.models import (
     FormSubmission,
     FormSubmissionFile
 )
+from sedate import replace_timezone, utcnow
 from sqlalchemy import inspect, func, not_, exc
 from uuid import uuid4
-import warnings
 
 
 class FormCollection(object):
@@ -259,8 +260,9 @@ class FormSubmissionCollection(object):
         date is expected to be in UTC!
 
         """
+
         if older_than.tzinfo is None:
-            older_than = Delorean(older_than, timezone='UTC').datetime
+            older_than = replace_timezone(older_than, 'UTC')
 
         query = self.query()
 
@@ -291,10 +293,7 @@ class FormSubmissionCollection(object):
             query = query.filter(FormSubmission.state == state)
 
         if current_only:
-            an_hour_ago = Delorean(
-                datetime.utcnow() - timedelta(hours=1), timezone='UTC'
-            ).datetime
-
+            an_hour_ago = utcnow() - timedelta(hours=1)
             query = query.filter(FormSubmission.last_change >= an_hour_ago)
 
         return query.first()
