@@ -24,7 +24,7 @@ setup(
     version=version,
     description=description,
     long_description=get_long_description(),
-    url='http://github.com/seantis/onegov.town',
+    url='http://github.com/onegov/onegov.town',
     author='Seantis GmbH',
     author_email='info@seantis.ch',
     license='GPLv2',
