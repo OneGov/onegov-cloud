@@ -1,3 +1,5 @@
+import numbers
+
 from cached_property import cached_property
 from onegov.core.compat import zip_longest
 from pytz import timezone
@@ -29,6 +31,7 @@ class Layout(object):
     time_format = '%H:%M'
     date_format = '%d.%m.%Y'
     datetime_format = ' '.join((date_format, time_format))
+    thousands_separator = "'"
 
     def __init__(self, model, request):
         self.model = model
@@ -78,6 +81,24 @@ class Layout(object):
             date = self.timezone.normalize(date.astimezone(self.timezone))
 
         return date.strftime(getattr(self, format + '_format'))
+
+    def format_number(self, number, decimal_places=None):
+        """ Takes the given numer and formats it according to locale (in the
+        future, for now the format is fixed).
+
+        If the number is an integer, the default decimal places are 0,
+        otherwise 2.
+
+        """
+        if decimal_places is None:
+            if isinstance(number, numbers.Integral):
+                decimal_places = 0
+            else:
+                decimal_places = 2
+
+        format = '{{:,.{}f}}'.format(decimal_places)
+
+        return format.format(number).replace(',', self.thousands_separator)
 
 
 class ChameleonLayout(Layout):
