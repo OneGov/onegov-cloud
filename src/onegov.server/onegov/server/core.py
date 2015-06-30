@@ -94,42 +94,10 @@ class Server(object):
         morepath_applications = set(
             self.applications.morepath_applications())
 
+        # morepath is only loaded if required by an application
         if morepath_applications:
-            # morepath is only loaded if required by an application
-            import importlib
             import morepath
-
-            from morepath.autosetup import DependencyMap
-
-            # we do our own autosetup to avoid this issue (for now):
-            # https://github.com/morepath/morepath/issues/319
-            # the next release or morepath will be smarter in this regard
-            # and we'll be able to change this code
-
-            m = DependencyMap()
-            m.load()
-
-            config = morepath.setup()
-
-            for dist in m.relevant_dists('morepath'):
-
-                if hasattr(dist, 'get_entry_map'):
-                    entry_points = dist.get_entry_map('morepath')
-                else:
-                    entry_points = None
-
-                if entry_points and 'scan' in entry_points:
-                    module_name = entry_points['scan'].module_name
-                else:
-                    module_name = dist.project_name
-
-                # likewise, the config scan will exclude '.test', '.tests'
-                # by default
-                config.scan(
-                    importlib.import_module(module_name),
-                    ignore=['.test', '.tests'])
-
-            config.commit()
+            morepath.autosetup()
 
     def __call__(self, environ, start_response):
         request = Request(environ)
