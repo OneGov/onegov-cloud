@@ -42,8 +42,8 @@
                                 <td>
                                     <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
                                 </td>
-                                <td class="right-aligned">${'{0:.2f}'.format(vote.yays_percentage)}</td>
-                                <td class="right-aligned">${'{0:.2f}'.format(vote.nays_percentage)}</td>
+                                <td class="right-aligned">${layout.format_number(vote.yays_percentage)}</td>
+                                <td class="right-aligned">${layout.format_number(vote.nays_percentage)}</td>
                                 <td class="right-aligned">
                                     <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                 </td>
