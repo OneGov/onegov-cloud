@@ -75,6 +75,6 @@ $.Redactor.opts.langs['de'] = {
 	filename: 'Name (optional)',
 	edit: 'Bearbeiten',
 	center: 'Center',
-	upload_label: 'Drop file here or '
+	upload_label: 'Datei hier ablegen oder '
 };
 })( jQuery );

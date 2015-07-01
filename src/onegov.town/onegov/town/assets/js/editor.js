@@ -6,13 +6,15 @@ $(function() {
         textarea.redactor({
             buttons: [
                 'formatting', 'bold', 'italic', 'deleted',
-                'unorderedlist', 'orderedlist', 'image', 'link',
+                'unorderedlist', 'orderedlist', 'image', 'file', 'link',
                 'horizontalrule', 'html'
             ],
             formatting: ['p', 'blockquote'],
+            fileUpload: form.data('file-upload-url'),
+            fileManagerJson: form.data('file-list-url'),
             imageUpload: form.data('image-upload-url'),
             imageManagerJson: form.data('image-list-url'),
-            plugins: ['bufferbuttons', 'imagemanager'],
+            plugins: ['bufferbuttons', 'filemanager', 'imagemanager'],
             lang: 'de',
             formattingAdd: [
                 {

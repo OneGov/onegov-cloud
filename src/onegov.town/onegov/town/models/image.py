@@ -2,11 +2,12 @@
 
 import PIL
 
-from onegov.core.filestorage import FilestorageFile
+from onegov.town.models import File
+from onegov.town.models import FileCollection
 from webob.exc import HTTPUnsupportedMediaType
 
 
-class ImageCollection(object):
+class ImageCollection(FileCollection):
     """ Defines the collection of images uploaded to the site. Currently
     this is done without any ORM backing (and therefore without any
     special features like tagging, metadata and so on).
@@ -27,16 +28,17 @@ class ImageCollection(object):
         assert app.has_filestorage
 
         self.path_prefix = 'images/'
-        self.image_storage = app.filestorage.makeopendir('images')
-        self.thumbnail_storage = self.image_storage.makeopendir('thumbnails')
+        self.file_storage = app.filestorage.makeopendir('images')
+        self.thumbnail_storage = self.file_storage.makeopendir('thumbnails')
 
     @property
-    def images(self):
+    def files(self):
         """ Returns the :class:`~onegov.town.model.Image` instances in this
         collection.
 
         """
-        images = self.image_storage.ilistdirinfo(files_only=True)
+
+        images = self.file_storage.ilistdirinfo(files_only=True)
         images = sorted(images, key=lambda i: i[1]['created_time'])
 
         for filename, info in images:
@@ -54,29 +56,12 @@ class ImageCollection(object):
         for filename, info in images:
             yield Thumbnail(filename, info)
 
-    def store_image(self, image, filename):
-        """ Stores an image (a file with a ``read()`` method) with the given
-        filename. Note that these images are public, so the filename *should*
-        be random.
-
-        See :func:`onegov.core.filestorage.random_filename`.
-
-        """
-        extension = filename.split('.')[-1]
-
-        if extension not in self.allowed_extensions:
-            raise HTTPUnsupportedMediaType()
-
-        self.image_storage.setcontents(filename, image.read())
-
-        return self.get_image_by_filename(filename)
-
-    def get_image_by_filename(self, filename):
+    def get_file_by_filename(self, filename):
         """ Returns the :class:`~onegov.town.model.Image` instance with the
         given name, or None if not found.
 
         """
-        if self.image_storage.exists(filename):
+        if self.file_storage.exists(filename):
             return Image(filename)
 
     def get_thumbnail_by_filename(self, filename):
@@ -86,7 +71,7 @@ class ImageCollection(object):
         This method *generates* the thumbnail if it doesn't exist yet!
 
         """
-        if not self.image_storage.exists(filename):
+        if not self.file_storage.exists(filename):
             return None
 
         if self.thumbnail_storage.exists(filename):
@@ -97,7 +82,7 @@ class ImageCollection(object):
         if extension not in self.thumbnail_extensions:
             return Image(filename)
 
-        im = PIL.Image.open(self.image_storage.getsyspath(filename))
+        im = PIL.Image.open(self.file_storage.getsyspath(filename))
         im.thumbnail(self.thumbnail_dimension)
         im.save(
             self.thumbnail_storage.open(filename, 'wb'),
@@ -107,30 +92,17 @@ class ImageCollection(object):
 
         return Thumbnail(filename)
 
-    def delete_image_by_filename(self, filename):
+    def delete_file_by_filename(self, filename):
         """ Deletes both the image and the thumbnail of the given filename. """
 
-        if self.image_storage.exists(filename):
-            self.image_storage.remove(filename)
+        if self.file_storage.exists(filename):
+            self.file_storage.remove(filename)
 
         if self.thumbnail_storage.exists(filename):
             self.thumbnail_storage.remove(filename)
 
 
-class ImageFile(FilestorageFile):
-    """ A filestorage file that points to an image. """
-
-    def __init__(self, filename, info=None):
-        self.filename = filename
-        self.info = info or {}
-
-    @property
-    def date(self):
-        if 'date' in self.info:
-            return self.info['created_time'].date()
-
-
-class Image(ImageFile):
+class Image(File):
     """ A filestorage file that points to a full image (not a thumbnail). """
 
     @property
@@ -142,7 +114,7 @@ class Image(ImageFile):
         return 'images/' + self.filename
 
 
-class Thumbnail(ImageFile):
+class Thumbnail(File):
     """ A filestorage file that points to a thumbnail or the original file
     storage file, if there can't be a thumbnail (say for ``*.svg``).
 

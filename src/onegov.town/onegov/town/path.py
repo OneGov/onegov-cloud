@@ -4,6 +4,8 @@ from onegov.town.app import TownApp
 from onegov.town.const import NEWS_PREFIX
 from onegov.town.models import (
     Editor,
+    File,
+    FileCollection,
     Image,
     ImageCollection,
     News,
@@ -38,6 +40,16 @@ def get_news(app, absorb):
     return PageCollection(app.session()).by_path(absorb, ensure_type='news')
 
 
+@TownApp.path(model=FileCollection, path='/dateien')
+def get_files(app):
+    return FileCollection(app)
+
+
+@TownApp.path(model=File, path='/datei/{filename}')
+def get_file(app, filename):
+    return FileCollection(app).get_file_by_filename(filename)
+
+
 @TownApp.path(model=ImageCollection, path='/bilder')
 def get_images(app):
     return ImageCollection(app)
@@ -45,7 +57,7 @@ def get_images(app):
 
 @TownApp.path(model=Image, path='/bild/{filename}')
 def get_image(app, filename):
-    return ImageCollection(app).get_image_by_filename(filename)
+    return ImageCollection(app).get_file_by_filename(filename)
 
 
 @TownApp.path(model=Thumbnail, path='/thumbnails/{filename}')

@@ -122,6 +122,7 @@ class TownApp(Framework):
 
         editor = Bundle(
             'js/bufferbuttons.js',
+            'js/filemanager.js',
             'js/imagemanager.js',
             'js/redactor.de.js',
             'js/editor.js',

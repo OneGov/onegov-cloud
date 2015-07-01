@@ -1,8 +1,6 @@
 """ The onegov town collection of images uploaded to the site. """
 
-import morepath
-
-from onegov.core.filestorage import delete_static_file, random_filename
+from onegov.core.filestorage import delete_static_file
 from onegov.core.security import Private
 from onegov.town import _
 from onegov.town.app import TownApp
@@ -17,7 +15,7 @@ def view_get_image_collection(self, request):
 
     images = [
         Img(src=request.link(image.thumbnail), url=request.link(image))
-        for image in self.images
+        for image in self.files
     ]
 
     layout = DefaultLayout(self, request)
@@ -39,41 +37,8 @@ def view_get_image_collection(self, request):
 def view_get_image_collection_json(self, request):
     return [
         {'thumb': request.link(image.thumbnail), 'image': request.link(image)}
-        for image in self.images
+        for image in self.files
     ]
-
-
-def handle_file_upload(self, request):
-    """ Stores the file given with the request and returns the url to the
-    resulting file.
-
-    """
-
-    filename = '.'.join((
-        random_filename(), request.params['file'].filename.split('.')[-1]
-    ))
-
-    image = self.store_image(request.params['file'].file, filename)
-
-    return request.link(image)
-
-
-@TownApp.view(model=ImageCollection, name='upload', request_method='POST',
-              permission=Private)
-def view_upload_file(self, request):
-    request.assert_valid_csrf_token()
-
-    handle_file_upload(self, request)
-
-    return morepath.redirect(request.link(self))
-
-
-@TownApp.json(model=ImageCollection, name='upload.json', request_method='POST',
-              permission=Private)
-def view_upload_file_by_json(self, request):
-    request.assert_valid_csrf_token()
-
-    return {'filelink': handle_file_upload(self, request)}
 
 
 @TownApp.view(
@@ -85,4 +50,4 @@ def delete_image(self, request):
     """
 
     delete_static_file(self, request)
-    ImageCollection(request.app).delete_image_by_filename(self.filename)
+    ImageCollection(request.app).delete_file_by_filename(self.filename)

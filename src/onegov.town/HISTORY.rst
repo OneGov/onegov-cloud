@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds files upload and listing.
+  [treinhard]
+
 - Use more pronounced colors for various elements.
   [href]
 

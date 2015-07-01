@@ -5,6 +5,7 @@ from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
+from onegov.town.models import FileCollection
 from onegov.town.models import ImageCollection
 from sqlalchemy import desc
 
@@ -102,6 +103,23 @@ class Layout(ChameleonLayout):
         return None
 
     @cached_property
+    def file_upload_url(self):
+        """ Returns the url to the file upload action. """
+        url = self.request.link(FileCollection(self.app), name='upload')
+        return self.csrf_protected_url(url)
+
+    @cached_property
+    def file_upload_json_url(self):
+        """ Adds the json url for file uploads. """
+        url = self.request.link(FileCollection(self.app), name='upload.json')
+        return self.csrf_protected_url(url)
+
+    @cached_property
+    def file_list_url(self):
+        """ Adds the json url for file lists. """
+        return self.request.link(FileCollection(self.app), name='json')
+
+    @cached_property
     def image_upload_url(self):
         """ Returns the url to the image upload action. """
         url = self.request.link(ImageCollection(self.app), name='upload')
@@ -166,6 +184,7 @@ class DefaultLayout(Layout):
         if request.current_role == 'editor':
             return [
                 Link(_(u'Logout'), request.link(self.town, 'logout')),
+                Link(_(u'Files'), request.link(FileCollection(self.app))),
                 Link(_(u'Images'), request.link(ImageCollection(self.app))),
                 Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
                 Link(u'Seantis GmbH', 'https://www.seantis.ch')
@@ -173,6 +192,7 @@ class DefaultLayout(Layout):
         elif request.current_role == 'admin':
             return [
                 Link(_(u'Logout'), request.link(self.town, 'logout')),
+                Link(_(u'Files'), request.link(FileCollection(self.app))),
                 Link(_(u'Images'), request.link(ImageCollection(self.app))),
                 Link(_(u'Settings'), request.link(self.town, 'einstellungen')),
                 Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
