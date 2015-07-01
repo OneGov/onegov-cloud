@@ -17,6 +17,7 @@ from webob import static
 # http://stackoverflow.com/a/13500078
 _unwanted_characters = re.compile(r'[\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|]+')
 _double_dash = re.compile(r'[-]+')
+_number_suffix = re.compile(r'-([0-9]+)$')
 
 
 def normalize_for_url(text):
@@ -34,6 +35,25 @@ def normalize_for_url(text):
     clean = clean.rstrip('-')
 
     return clean
+
+
+def increment_name(name):
+    """ Takes the given name and adds a numbered suffix beginning at 1.
+
+    For example::
+
+        foo => foo-1
+        foo-1 => foo-2
+
+    """
+
+    match = _number_suffix.search(name)
+    number = (match and int(match.group(1)) or 0) + 1
+
+    if match:
+        return _number_suffix.sub('-{}'.format(number), name)
+    else:
+        return name + '-{}'.format(number)
 
 
 def lchop(text, beginning):

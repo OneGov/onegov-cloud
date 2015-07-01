@@ -63,3 +63,10 @@ def test_linkify():
 def test_sanitize_html():
     # this is really bleach's job, but we want to run the codepath anyway
     assert utils.sanitize_html('<script>') == '&lt;script&gt;'
+
+
+def test_increment_name():
+    assert utils.increment_name('test') == 'test-1'
+    assert utils.increment_name('test-2') == 'test-3'
+    assert utils.increment_name('test2') == 'test2-1'
+    assert utils.increment_name('test-1-1') == 'test-1-2'

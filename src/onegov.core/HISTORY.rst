@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an abstract AdjacencyList implementation (refactored from onegov.page).
+  [href]
+
 0.4.3 (2015-06-30)
 ~~~~~~~~~~~~~~~~~~~
 
