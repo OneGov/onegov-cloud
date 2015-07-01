@@ -84,7 +84,7 @@ def test_view_images(town_app):
 
     assert "Noch keine Bilder hochgeladen" in images_page
 
-    images_page.form['file'] = Upload('Test.txt', utils.create_image().read())
+    images_page.form['file'] = Upload('Test.txt', b'File content')
     assert images_page.form.submit(expect_errors=True).status_code == 415
 
     images_page.form['file'] = Upload('Test.jpg', utils.create_image().read())

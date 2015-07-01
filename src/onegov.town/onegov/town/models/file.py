@@ -1,5 +1,6 @@
 """ Contains the models describing the files. """
 
+import magic
 import PIL
 
 from onegov.core.compat import unquote_plus
@@ -19,7 +20,7 @@ class FileCollection(object):
 
     """
 
-    allowed_extensions = {'txt', 'pdf'}
+    allowed_mime = {'text/plain', 'application/pdf'}
 
     def __init__(self, app):
         assert app.has_filestorage
@@ -49,10 +50,14 @@ class FileCollection(object):
         """
         extension = filename.split('.')[-1]
 
-        if extension not in self.allowed_extensions:
+        file_data = file_.read()
+        mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
+        mimetype_by_introspection = mimetype_by_introspection.decode('utf-8')
+
+        if mimetype_by_introspection not in self.allowed_mime:
             raise HTTPUnsupportedMediaType()
 
-        self.file_storage.setcontents(filename, file_.read())
+        self.file_storage.setcontents(filename, file_data)
 
         return self.get_file_by_filename(filename)
 

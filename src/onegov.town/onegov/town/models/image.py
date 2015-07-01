@@ -21,7 +21,7 @@ class ImageCollection(FileCollection):
 
     thumbnail_dimension = (256, 256)
     thumbnail_quality = 80
-    allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'svg'}
+    allowed_mime = {'image/png', 'image/jpeg', 'image/gif', 'image/svg+xml'}
     thumbnail_extensions = {'png', 'jpg', 'jpeg', 'gif'}
 
     def __init__(self, app):
