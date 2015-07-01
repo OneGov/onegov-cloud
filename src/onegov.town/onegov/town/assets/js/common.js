@@ -8,7 +8,7 @@ $('a').on('success.ic', function(evt, elt, data, textStatus, xhr) {
 });
 
 // show the new content placeholder when hovering over the add content dropdown
-$('#add-content').find('a')
+$('.show-new-content-placeholder')
     .on('mouseenter', function() {
         $('.new-content-placeholder').text($(this).text()).show();
     })

@@ -112,7 +112,7 @@ def add_links(self, request):
         yield Link(
             name,
             request.link(Editor('new', self, trait)),
-            classes=('new-{}'.format(trait), )
+            classes=('new-{}'.format(trait), 'show-new-content-placeholder')
         )
 
 
