@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix lists not showing a dot in the redactor editor.
+  [href]
+
 - Adds files upload and listing.
   [treinhard]
 
