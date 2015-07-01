@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.4 (2015-07-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a content mixin for meta/content JSON fields.
   [href]
 
