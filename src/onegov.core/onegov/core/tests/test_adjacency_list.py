@@ -7,6 +7,12 @@ class FamilyMember(AdjacencyList):
     __tablename__ = 'familymembers'
 
 
+class UnusedList(AdjacencyList):
+    # this class leads to errors if we didn't abstract the adjacency list
+    # properly (duplicate indexes and so on)
+    __tablename__ = 'unusedlist'
+
+
 class DeadFamilyMember(FamilyMember):
     __mapper_args__ = {'polymorphic_identity': 'dead'}
 

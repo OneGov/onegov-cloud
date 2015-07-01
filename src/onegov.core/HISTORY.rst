@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes SQLAlchemy error occurring if more than one model used the new 
+  AdjacencyList base class.
+  [href]
+
 0.4.4 (2015-07-01)
 ~~~~~~~~~~~~~~~~~~~
 

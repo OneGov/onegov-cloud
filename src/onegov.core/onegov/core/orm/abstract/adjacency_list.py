@@ -69,20 +69,23 @@ class AdjacencyList(Base):
             "polymorphic_on": cls.type
         }
 
-    __table_args__ = (
-        # make sure that no children of a single parent share a name
-        Index(
-            'children_name', 'name', 'parent_id', unique=True,
-            postgresql_where=column('parent_id') != None),
+    @declared_attr
+    def __table_args__(cls):
 
-        # make sure that no root item shares the name with another
-        #
-        # this can't be combined with the index above because NULL value's in
-        # Postgres (and other SQL dbs) can't be unique in an index
-        Index(
-            'root_name', 'name', unique=True,
-            postgresql_where=column('parent_id') == None)
-    )
+        return (
+            # make sure that no children of a single parent share a name
+            Index(
+                cls.__name__.lower() + '_children_name', 'name', 'parent_id',
+                unique=True, postgresql_where=column('parent_id') != None),
+
+            # make sure that no root item shares the name with another
+            #
+            # this can't be combined with the index above because NULL values
+            # in Postgres (and other SQL dbs) can't be unique in an index
+            Index(
+                cls.__name__.lower() + '_root_name', 'name', unique=True,
+                postgresql_where=column('parent_id') == None)
+        )
 
     @validates('name')
     def validate_name(self, key, name):
