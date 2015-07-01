@@ -1,5 +1,5 @@
 from onegov.core.orm.abstract import AdjacencyListCollection
-from onegov.orgs.models import Organization, Person, Membership
+from onegov.org.models import Organization, Person, Membership
 
 
 class OrganizationCollection(AdjacencyListCollection):
@@ -38,7 +38,7 @@ class MembershipCollection(object):
     def query(self):
         return self.session.query(Membership)
 
-    def add(self, organization, person, function):
+    def add(self, organization, person, function=None):
         membership = Membership(
             organization=organization,
             person=person,

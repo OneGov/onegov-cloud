@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from oengov.core.orm.abstract import AdjacencyList
-from onegov.core.orm import Base, backref, relationship
+from onegov.core.orm.abstract import AdjacencyList
+from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import (
@@ -12,6 +12,7 @@ from sqlalchemy import (
     ForeignKey,
     UniqueConstraint
 )
+from sqlalchemy.orm import backref, relationship
 from uuid import uuid4
 
 
