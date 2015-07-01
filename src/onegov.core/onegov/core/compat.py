@@ -1,5 +1,6 @@
 import itertools
 import sys
+import urllib
 
 PY3 = sys.version_info[0] == 3
 
@@ -23,3 +24,10 @@ if PY3:
 else:
     from cStringIO import StringIO  # pragma: nocoverage # noqa
     BytesIO = StringIO  # pragma: nocoverage # noqa
+
+if PY3:
+    quote_plus = urllib.parse.quote_plus
+    unquote_plus = urllib.parse.unquote_plus
+else:
+    quote_plus = urllib.quote_plus  # pragma: nocoverage # noqa
+    unquote_plus = urllib.unquote_plus  # pragma: nocoverage # noqa
