@@ -1,7 +1,7 @@
 from hashlib import md5
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
@@ -22,7 +22,7 @@ def hash_definition(definition):
     return md5(definition.encode('utf-8')).hexdigest()
 
 
-class FormDefinition(Base, TimestampMixin):
+class FormDefinition(Base, ContentMixin, TimestampMixin):
     """ Defines a form stored in the database. """
 
     __tablename__ = 'forms'
@@ -32,12 +32,6 @@ class FormDefinition(Base, TimestampMixin):
 
     #: the title of the form
     title = Column(Text, nullable=False)
-
-    #: metadata associated with the form, for storing small amounts of data
-    meta = Column(JSON, nullable=False, default=dict)
-
-    #: content associated with the form, for storing things like long texts
-    content = deferred(Column(JSON, nullable=False, default=dict))
 
     #: the form as parsable string
     definition = Column(Text, nullable=False)

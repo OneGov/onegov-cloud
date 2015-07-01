@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Use content/meta defined in onegov.core.
+  [href]
+
 0.6.2 (2015-06-26)
 ~~~~~~~~~~~~~~~~~~~
 
