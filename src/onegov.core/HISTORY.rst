@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a content mixin for meta/content JSON fields.
+  [href]
+
 - Adds an abstract AdjacencyList implementation (refactored from onegov.page).
   [href]
 

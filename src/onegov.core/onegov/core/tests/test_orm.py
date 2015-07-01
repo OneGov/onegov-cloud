@@ -7,7 +7,7 @@ import uuid
 from datetime import datetime
 from morepath import setup
 from onegov.core.orm import SessionManager
-from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.framework import Framework
 from pytz import timezone
@@ -367,5 +367,29 @@ def test_timestamp_mixin(postgres_dsn):
     assert session.query(Test).one().modified.year == now.year
     assert session.query(Test).one().modified.month == now.month
     assert session.query(Test).one().modified.day == now.day
+
+    mgr.dispose()
+
+
+def test_content_mixin(postgres_dsn):
+    Base = declarative_base()
+
+    class Test(Base, ContentMixin):
+        __tablename__ = 'test'
+
+        id = Column(Integer, primary_key=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    session = mgr.session()
+
+    test = Test(meta={'filename': 'rtfm'}, content={'text': 'RTFM'})
+    session.add(test)
+    session.flush()
+    transaction.commit()
+
+    session.query(Test).one().meta == {'filename': 'rtfm'}
+    session.query(Test).one().content == {'text': 'RTFM'}
 
     mgr.dispose()
