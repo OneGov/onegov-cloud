@@ -4,7 +4,6 @@ import PIL
 
 from onegov.town.models import File
 from onegov.town.models import FileCollection
-from webob.exc import HTTPUnsupportedMediaType
 
 
 class ImageCollection(FileCollection):

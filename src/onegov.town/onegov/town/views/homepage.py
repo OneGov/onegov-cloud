@@ -88,7 +88,7 @@ def view_town(self, request):
             Link(
                 text=_("People"),
                 url=request.link(PersonCollection(session)),
-                subtitle=_("Important people in this town")
+                subtitle=_("Active people in this town")
             )
         ]
     )

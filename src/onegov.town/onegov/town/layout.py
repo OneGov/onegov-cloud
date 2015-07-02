@@ -7,7 +7,7 @@ from onegov.org import PersonCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
 from onegov.town.models import FileCollection
-from onegov.town.models import ImageCollection
+from onegov.town.models import ImageCollection, Thumbnail
 from sqlalchemy import desc
 
 
@@ -141,6 +141,18 @@ class Layout(ChameleonLayout):
     def homepage_url(self):
         """ Returns the url to the main page. """
         return self.request.link(self.app.town)
+
+    def thumbnail_url(self, url):
+        """ Takes the given url and returns the thumbnail url for it, if it
+        exists. Otherwise returns the url as is.
+
+        """
+        thumbnail = Thumbnail.from_url(url)
+
+        if self.request.app.filestorage.exists(thumbnail.path):
+            return self.request.link(thumbnail)
+        else:
+            return url
 
     def render_field(self, field):
         """ Alias for ``onegov.form.render_field``. """

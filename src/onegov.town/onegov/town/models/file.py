@@ -2,7 +2,6 @@
 
 import base64
 import magic
-import PIL
 
 from onegov.core.filestorage import FilestorageFile
 from webob.exc import HTTPUnsupportedMediaType
@@ -48,9 +47,9 @@ class FileCollection(object):
         See :func:`onegov.core.filestorage.random_filename`.
 
         """
-        extension = filename.split('.')[-1]
 
         file_data = file_.read()
+
         mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
         mimetype_by_introspection = mimetype_by_introspection.decode('utf-8')
 
@@ -77,7 +76,7 @@ class FileCollection(object):
 
 
 class File(FilestorageFile):
-    """ A filestorage file that points to an image. """
+    """ A filestorage file that points to an uploaded image or file. """
 
     def __init__(self, filename, info=None):
         self.filename = filename
@@ -97,3 +96,7 @@ class File(FilestorageFile):
         if '-' in self.filename:
             name = str(self.filename.split('-')[0])
             return base64.urlsafe_b64decode(name).strip()
+
+    @classmethod
+    def from_url(cls, url):
+        return cls(url.split('/')[-1])

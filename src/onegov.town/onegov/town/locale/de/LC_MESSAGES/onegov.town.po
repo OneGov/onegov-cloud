@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-07-02 13:33+0200\n"
+"POT-Creation-Date: 2015-07-02 13:51+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -340,8 +340,8 @@ msgstr "Online-Schalter"
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
 
-msgid "Important people in this town"
-msgstr "Wichtige Personen in der Gemeinde"
+msgid "Active people in this town"
+msgstr "In der Gemeinde aktive Personen"
 
 msgid "Email Address"
 msgstr "E-Mail Adresse"

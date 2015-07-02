@@ -193,7 +193,7 @@
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town">
     <div class="person-card person-list-card" tal:define="link request.link(person)">
-        <a href="${link}" aria-hidden="true" tal:define="url person.picture_url or person.gravatar_url">
+        <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url)) or person.gravatar_url">
             <img class="person-card-portrait" src="${url}" tal:condition="url">
             <i class="person-card-portrait fa fa-user" tal:condition="not:url"></i>
         </a>
