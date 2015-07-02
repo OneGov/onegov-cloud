@@ -51,6 +51,14 @@ class Person(Base, TimestampMixin):
 
     __tablename__ = 'people'
 
+    @property
+    def title(self):
+        if self.academic_title:
+            return u" ".join(
+                (self.academic_title, self.first_name, self.last_name))
+        else:
+            return u" ".join((self.first_name, self.last_name))
+
     #: the unique id, part of the url
     id = Column(UUID, primary_key=True, default=uuid4)
 
