@@ -57,6 +57,10 @@ body {
     min-height: 100%;
 }
 
+.top-bar.expanded {
+    box-shadow: none;
+}
+
 footer,
 .push {
     animation-duration: 3s;
