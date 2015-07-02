@@ -77,4 +77,7 @@ def view_upload_file_by_json(self, request):
 
     file_ = handle_file_upload(self, request)
 
-    return {'filelink': request.link(file_), 'filename': file_.original_name}
+    return {
+        'filelink': request.link(file_),
+        'filename': file_.original_name.decode('utf-8'),
+    }
