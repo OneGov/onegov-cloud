@@ -3,9 +3,13 @@ from onegov.org.collection import (
     OrganizationCollection,
     PersonCollection
 )
+from onegov.org.models import Person, Organization, Membership
 
 __all__ = [
+    'Membership',
     'MembershipCollection',
+    'Organization',
     'OrganizationCollection',
+    'Person',
     'PersonCollection'
 ]
