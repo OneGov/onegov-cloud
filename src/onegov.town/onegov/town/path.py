@@ -21,6 +21,7 @@ from onegov.form import (
     CompleteFormSubmission,
     PendingFormSubmission
 )
+from onegov.org import Person, PersonCollection
 from onegov.page import PageCollection
 
 
@@ -109,3 +110,13 @@ def get_editor(app, action, trait, page_id):
 
     if page is not None:
         return Editor(action=action, page=page, trait=trait)
+
+
+@TownApp.path(model=PersonCollection, path='/personen')
+def get_people(app):
+    return PersonCollection(app.session())
+
+
+@TownApp.path(model=Person, path='/person/{id}')
+def get_person(app, id):
+    return PersonCollection(app.session()).by_id(id)

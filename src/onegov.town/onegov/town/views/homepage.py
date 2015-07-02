@@ -4,18 +4,20 @@
 
 from collections import namedtuple
 from onegov.core.security import Public
+from onegov.form import FormCollection
+from onegov.org import PersonCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link, LinkGroup
-from onegov.town.models import Town
 from onegov.town.layout import DefaultLayout
-from onegov.form import FormCollection
+from onegov.town.models import Town
 
 
 @TownApp.html(model=Town, template='homepage.pt', permission=Public)
 def view_town(self, request):
     """ Renders the town's homepage. """
 
+    session = request.app.session()
     layout = DefaultLayout(self, request)
     Tile = namedtuple('Tile', ['page', 'links', 'number'])
 
@@ -38,7 +40,7 @@ def view_town(self, request):
         links=[
             Link(
                 text=_("Online Counter"),
-                url=request.link(FormCollection(request.app.session())),
+                url=request.link(FormCollection(session)),
                 subtitle=_("Forms and applications")
             ),
             Link(
@@ -80,6 +82,17 @@ def view_town(self, request):
         ]
     )
 
+    directories = LinkGroup(
+        title=_("Directories"),
+        links=[
+            Link(
+                text=_("People"),
+                url=request.link(PersonCollection(session)),
+                subtitle=_("Important people in this town")
+            )
+        ]
+    )
+
     return {
         'layout': layout,
         'title': self.name,
@@ -89,6 +102,7 @@ def view_town(self, request):
         ),
         'panels': [
             online_counter,
-            latest_events
+            latest_events,
+            directories
         ]
     }

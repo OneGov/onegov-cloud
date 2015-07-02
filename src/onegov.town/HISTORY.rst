@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to keep a directory of people related to the town.
+  [href]
+
 - Fix lists not showing a dot in the redactor editor.
   [href]
 

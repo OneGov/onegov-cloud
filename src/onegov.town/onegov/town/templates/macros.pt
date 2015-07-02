@@ -191,4 +191,52 @@
     </div>
 </metal:display_form>
 
+<metal:person_card define-macro="person_list_card" i18n:domain="onegov.town">
+    <div class="person-card person-list-card" tal:define="link request.link(person)">
+        <a href="${link}" aria-hidden="true" tal:define="url person.picture_url or person.gravatar_url">
+            <img class="person-card-portrait" src="${url}" tal:condition="url">
+            <i class="person-card-portrait fa fa-user" tal:condition="not:url"></i>
+        </a>
+        <ul>
+            <li class="person-card-title">
+                <a href="${link}">
+                    <span>${person.last_name} ${person.first_name}</span
+                </a>
+            </li>
+            <li tal:condition="person.email" class="person-card-email">
+                <a href="mailto:${person.email}">${person.email}</a>
+            </li>
+            <li tal:condition="person.phone" class="person-card-phone">
+                <a href="tel:${person.email}">${person.phone}</a>
+            </li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+</metal:person_card>
+
+<metal:person_card define-macro="person_card" i18n:domain="onegov.town">
+    <div class="person-card">
+        <div aria-hidden="true" tal:define="url person.picture_url or person.gravatar_url">
+            <img class="person-card-portrait" src="${url}" tal:condition="url">
+            <i class="person-card-portrait fa fa-user" tal:condition="not:url"></i>
+        </div>
+        <ul>
+            <li tal:condition="person.address" class="person-card-address">
+                <span>${person.address}</span>
+            </li>
+            <li tal:condition="person.email" class="person-card-email">
+                <a href="mailto:${person.email}">${person.email}</a>
+            </li>
+            <li tal:condition="person.phone" class="person-card-phone">
+                <a href="tel:${person.email}">${person.phone}</a>
+            </li>
+            <li tal:condition="person.website" class="person-card-website">
+                <a href="${person.website}">${person.website}</a>
+            </li>
+        </ul>
+
+        <div class="clearfix"></div>
+    </div>
+</metal:person_card>
+
 </body>

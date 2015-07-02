@@ -492,10 +492,15 @@ input[type=color] {
         content: '\f044';
     }
 
+    .new-person:before {
+        content: '\f007';
+    }
+
     .edit-town-root:before,
     .edit-page:before,
     .edit-news:before,
     .edit-link:before,
+    .edit-person:before,
     .edit-form:before {
         content: '\f040';
     }
@@ -503,6 +508,7 @@ input[type=color] {
     .delete-link:before,
     .delete-news:before,
     .delete-page:before,
+    .delete-person:before,
     .delete-form:before {
         content: '\f014';
     }
@@ -795,4 +801,68 @@ $max-page-width: 600px;
     content: '\f070';
     font-family: 'FontAwesome';
     font-style: normal;
+}
+
+
+/*
+    Person card
+*/
+.person-card {
+    padding: 0 1em 1em 0;
+
+    .person-card-portrait {
+        float: left;
+        font-size: 200px;
+        height: 200px;
+        margin-right: 1rem;
+        text-align: center;
+        width: 200px;
+    }
+
+    ul {
+        list-style: none;
+        margin-bottom: 0;
+        margin-left: 0;
+
+        li:before {
+            font-family: 'FontAwesome';
+            margin-right: .5ex;
+        }
+    }
+
+    .person-card-address {
+        margin-bottom: 1em;
+
+        span {
+            white-space: pre-line;
+        }
+    }
+
+    .person-card-website:before {
+        content: '\f0c1';
+    }
+
+    .person-card-phone:before {
+        content: '\f095';
+    }
+
+    .person-card-email:before {
+        content: '\f003';
+    }
+}
+
+/*
+    Person card in lists
+*/
+
+.person-list-card {
+    .person-card-portrait {
+        font-size: 5rem;
+        height: 5rem; // enough to show three lines of text
+        width: 5rem;
+    }
+
+    .person-card-title {
+        font-weight: bold;
+    }
 }

@@ -3,6 +3,7 @@ from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.page import Page, PageCollection
+from onegov.org import PersonCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
 from onegov.town.models import FileCollection
@@ -416,4 +417,80 @@ class FormCollectionLayout(DefaultLayout):
                         )
                     ]
                 ),
+            ]
+
+
+class PersonCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("People"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Person"),
+                            url=self.request.link(
+                                self.model,
+                                name='neu'
+                            ),
+                            classes=('new-person', )
+                        )
+                    ]
+                ),
+            ]
+
+
+class PersonLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self):
+        return PersonCollection(self.request.app.session())
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("People"), self.request.link(self.collection)),
+            Link(_(self.model.title), self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                LinkGroup(
+                    title=_("Person"),
+                    links=[
+                        Link(
+                            text=_("Edit"),
+                            url=self.request.link(self.model, 'bearbeiten'),
+                            classes=('edit-person', )
+                        ),
+                        Link(
+                            text=_("Delete"),
+                            url=self.request.link(self.model),
+                            request_method='DELETE',
+                            classes=('confirm', 'delete-person'),
+                            attributes={
+                                'data-confirm': _(
+                                    "Do you really want to delete this person?"
+                                ),
+                                'data-confirm-yes': _("Delete person"),
+                                'data-confirm-no': _("Cancel"),
+                                'redirect-after': self.request.link(
+                                    self.collection
+                                )
+                            }
+                        ),
+                    ]
+                )
             ]

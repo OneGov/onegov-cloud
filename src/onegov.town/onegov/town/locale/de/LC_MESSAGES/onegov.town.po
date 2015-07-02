@@ -1,374 +1,262 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-07-01 10:52+0200\n"
+"POT-Creation-Date: 2015-07-02 13:33+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:9
 msgid "Link"
 msgstr "Verknüpfung"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:10
 msgid "New Link"
 msgstr "Neue Verknüpfung"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:11
 msgid "Added a new link"
 msgstr "Eine neue Verknüpfung wurde hinzugefügt"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:12
 msgid "Edit Link"
 msgstr "Verknüpfung Bearbeiten"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:13
 msgid "The link was deleted"
 msgstr "Die Verknüpfung wurde gelöscht"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:14
 msgid "Delete link"
 msgstr "Verknüpfung Löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:15
 #, python-format
 msgid "Do you really want to delete the link \"${title}\"?"
 msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:19
 msgid "Topic"
 msgstr "Thema"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:20
 msgid "New Topic"
 msgstr "Neues Thema"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:21
 msgid "Added a new topic"
 msgstr "Das neue Thema wurde hinzugefügt"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:22
 msgid "Edit Topic"
 msgstr "Thema Bearbeiten"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:23
 msgid "The topic was deleted"
 msgstr "Das Thema wurde gelöscht"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:24
 msgid "Delete topic"
 msgstr "Thema Löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:25
 #, python-format
 msgid "Do you really want to delete the topic \"${title}\"?"
 msgstr "Möchten Sie das Thema \"${title}\" wirklich löschen?"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:29
 msgid "News"
 msgstr "Nachricht"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:30
 msgid "Add News"
 msgstr "Nachricht hinzufügen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:31
 msgid "Added news"
 msgstr "Eine neue Nachricht wurde hinzugefügt"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:32
 msgid "Edit News"
 msgstr "Nachricht bearbeiten"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:33
 msgid "The news was deleted"
 msgstr "Die Nachricht wurde gelöscht"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:34
 msgid "Delete news"
 msgstr "Nachricht löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/const.py:35
 #, python-format
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/elements.py:73
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/macros.pt:143
 msgid "This site is hidden from the general public"
 msgstr "Diese Seite ist nicht öffentlich."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:163
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:215
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:313
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:396
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/files.py:26
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_collection.py:45
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:105
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:143
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/images.py:23
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/login.py:74
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:111
 msgid "Homepage"
 msgstr "Startseite"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:314
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:397
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_collection.py:29
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_collection.py:46
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:106
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:144
 msgid "Forms"
 msgstr "Formulare"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:327
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submission.pt:29
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submissions.pt:22
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:146
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/page.py:122
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:186
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:193
+msgid "People"
+msgstr "Personen"
+
 msgid "Logout"
 msgstr "Logout"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:187
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:194
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/images.py:29
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/images.py:24
+msgid "Files"
+msgstr "Dateien"
+
 msgid "Images"
 msgstr "Bilder"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:334
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:351
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:367
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submissions.pt:31
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/page.py:139
 msgid "Delete"
 msgstr "Löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:382
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:408
 msgid "Form"
 msgstr "Formular"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:195
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:117
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:112
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:201
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/login.py:75
 msgid "Login"
 msgstr "Login"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:339
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:356
 msgid "This form can't be deleted."
 msgstr "Das Formular kann nicht gelöscht werden."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:340
 msgid "This is a builtin-form. Builtin-forms can't be deleted."
 msgstr ""
 "Dies ist ein vordefiniertes Formular. Vordefinierte Formulare können nicht "
 "gelöscht werden."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:344
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:361
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:375
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/files.pt:25
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/images.pt:25
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submissions.pt:29
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/page.py:147
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:405
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/page.py:74
 msgid "Add"
 msgstr "Hinzufügen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:357
+msgid "Person"
+msgstr "Person"
+
 msgid ""
 "The are submissions associated with the form. Those need to be removed first."
 msgstr ""
 "Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen Sie "
 "diese Eingaben bevor Sie das Formular löschen."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:372
 msgid "Do you really want to delete this form?"
 msgstr "Möchten Sie das Formular wirklich löschen?"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/layout.py:374
 msgid "Delete form"
 msgstr "Formular löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/translations.py:9
+msgid "Do you really want to delete this person?"
+msgstr "Möchten Sie die Person wirklich löschen?"
+
+msgid "Delete person"
+msgstr "Person löschen"
+
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/translations.py:12
 msgid "Uploaded file"
 msgstr "Hochgeladene Datei"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/translations.py:13
 msgid "Keep file"
 msgstr "Datei behalten"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/translations.py:14
 msgid "Replace file"
 msgstr "Datei ersetzen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/translations.py:15
 msgid "Delete file"
 msgstr "Datei löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/translations.py:16
 #, python-format
 msgid "The file is too large, please provide a file smaller than {}."
 msgstr "Die Datei ist zu gross, bitte senden Sie eine Datei kleiner als {}."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/translations.py:17
 msgid "Files of this type are not supported."
 msgstr "Dateien dieses Typs werde nicht unterstützt."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/translations.py:18
 msgid "The form could not be parsed."
 msgstr "Das Formular ist nicht gültig."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/models/page.py:136
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:19
 msgid "Title"
 msgstr "Titel"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/models/page.py:141
 msgid "URL"
 msgstr "URL"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/models/page.py:166
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:31
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/models/page.py:157
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:22
 msgid "Lead"
 msgstr "Einleitung"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/models/page.py:158
 msgid "Describes what this page is about"
 msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/models/page.py:162
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:27
 msgid "Text"
 msgstr "Text"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/files.pt:8
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/images.pt:8
 msgid "Upload"
 msgstr "Hochladen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/files.pt:14
 msgid "All Files"
 msgstr "Alle Dateien"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/files.pt:23
 msgid "Do you really want to delete the file?"
 msgstr "Möchten Sie die Datei wirklich löschen?"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/files.pt:24
 msgid "Delete File"
 msgstr "Datei löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/files.pt:30
 msgid "No files uploaded yet"
 msgstr "Noch keine Dateien hochgeladen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:6
 msgid "You are trying to open a page for which you are not authorized."
 msgstr "Ihnen felt die nötige Berechtigung um diese Seite zu öffnen."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:11
 msgid "Please follow this link to login with a different user."
 msgstr ""
 "Bitte folgen Sie diesem Link um sich mit einem anderen Benutzer anzumelden."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forbidden.pt:14
 msgid "Please follow this link to login."
 msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forms.pt:6
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forms.pt:14
 msgid "Submission"
 msgstr "Eingabe"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forms.pt:19
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forms.pt:23
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_collection.py:48
 msgid "Submissions"
 msgstr "Eingaben"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forms.pt:32
 msgid "Builtin Form"
 msgstr "Vordefiniert"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/forms.pt:35
 msgid "Custom Form"
 msgstr "Gemeindespezifisch"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/homepage.pt:27
 msgid "Latest news"
 msgstr "Aktuelles"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/images.pt:14
 msgid "All Images"
 msgstr "Alle Bilder"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/images.pt:23
 msgid "Do you really want to delete the image?"
 msgstr "Möchten Sie das Bild wirklich löschen?"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/images.pt:24
 msgid "Delete Image"
 msgstr "Bild Löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/images.pt:30
 msgid "No images uploaded yet"
 msgstr "Noch keine Bilder hochgeladen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/layout.pt:32
 msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/layout.pt:87
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:34
 msgid "Contact"
 msgstr "Kontakt"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/layout.pt:91
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:39
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/macros.pt:81
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/macros.pt:118
 msgid "Submit"
 msgstr "Absenden"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/macros.pt:111
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/macros.pt:133
 msgid "read on..."
 msgstr "weiterlesen..."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/macros.pt:152
 msgid ""
 "This site is hidden from the general public. To show it to everyone, edit "
 "this page and disable \"Hide from public\"."
@@ -376,7 +264,6 @@ msgstr ""
 "Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und entfernen "
 "Sie das Häckchen im Feld \"Vor der Öffentlichkeit verstecken\"."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/page.pt:39
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -384,7 +271,6 @@ msgstr ""
 "Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
 "zum folgenden Verweis weitergeleitet:"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/page.pt:46
 msgid ""
 "You are not automatically redirected so you have a chance to edit or delete "
 "this link."
@@ -392,7 +278,9 @@ msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
 "den Verweis zu bearbeiten oder zu löschen."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submission.pt:14
+msgid "No people added yet."
+msgstr "Es wurden noch keine Personen hinzugefügt."
+
 msgid ""
 "Your form submission is ready to be sent to the town. Please review your "
 "data and press \"Complete\" to finalize the process. If there's anything "
@@ -403,136 +291,138 @@ msgstr ""
 "übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken Sie auf "
 "\"Bearbeiten\" um zum Formular zurückzukehren. "
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submission.pt:27
 msgid "Complete"
 msgstr "Abschliessen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submissions.pt:21
 msgid "Show"
 msgstr "Anzeigen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submissions.pt:27
 msgid "Do you really want to delete the submission?"
 msgstr "Möchten Sie die Eingabe wirklich löschen?"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/templates/submissions.pt:28
 msgid "Delete Submission"
 msgstr "Eingabe Löschen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/editor.py:52
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:131
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_submission.py:103
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:101
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/exceptionviews.py:25
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/files.py:32
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/files.py:27
-msgid "Files"
-msgstr "Dateien"
-
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_collection.py:57
 #, python-format
 msgid "Submissions for \"${form}\""
 msgstr "Eingaben zu \"${form}\""
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:112
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:107
 msgid "New Form"
 msgstr "Neues Formular"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:23
 msgid "Describes what this form is about"
 msgstr "Beschreibt kurz um was es bei diesem Formular geht"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:57
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:73
 msgid "Definition"
 msgstr "Definition"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_definition.py:100
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/form_submission.py:114
 msgid "Thank you for your submission"
 msgstr "Danke für Ihre Eingabe"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/homepage.py:37
 msgid "Services"
 msgstr "Dienstleistungen"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/homepage.py:40
+msgid "Directories"
+msgstr "Verzeichnisse"
+
 msgid "Online Counter"
 msgstr "Online-Schalter"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/homepage.py:42
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/login.py:20
+msgid "Important people in this town"
+msgstr "Wichtige Personen in der Gemeinde"
+
 msgid "Email Address"
 msgstr "E-Mail Adresse"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/login.py:21
 msgid "Password"
 msgstr "Passwort"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/login.py:80
 #, python-format
 msgid "Login to ${town}"
 msgstr "${town} Login"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/login.py:95
 msgid "You have been logged out."
 msgstr "Sie wurden ausgeloggt."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/login.py:66
 msgid "You have been logged in."
 msgstr "Sie wurden eingeloggt."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/login.py:69
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/page.py:131
 msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
 "werden!"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:20
+msgid "Academic Title"
+msgstr "Akademischer Titel"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "New person"
+msgstr "Neue Person"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "URL pointing to the picture"
+msgstr "Link zum Bild"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Added a new person"
+msgstr "Eine neue Person wurde hinzugefügt"
+
+msgid "New"
+msgstr "Neu"
+
 msgid "Name"
 msgstr "Name"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:25
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:22
 msgid "Logo"
 msgstr "Logo"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:23
 msgid "URL pointing to the logo"
 msgstr "Link zum Logo"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:27
 msgid "Homepage Images"
 msgstr "Bilder auf der Startseite"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:28
 msgid "Up to six URLs pointing to images for the tiles on the homepage."
 msgstr "Bis zu sechs Links zu Bildern für die Kacheln auf der Startseite"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:35
 msgid "The address and phone number of the municipality"
 msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
-#: /Users/tobias/projects/onegov/src/onegov.town/onegov/town/views/settings.py:40
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
