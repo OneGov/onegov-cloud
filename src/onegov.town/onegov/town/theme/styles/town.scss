@@ -57,10 +57,6 @@ body {
     min-height: 100%;
 }
 
-.top-bar.expanded {
-    box-shadow: none;
-}
-
 footer,
 .push {
     animation-duration: 3s;
@@ -80,7 +76,11 @@ footer,
 */
 
 .top-bar {
-  margin-bottom: 1rem;
+    margin-bottom: 1rem;
+
+    &.expanded {
+        box-shadow: none;
+    }
 
     ul {
         margin-bottom: $top-bar-border-size;
@@ -366,8 +366,8 @@ input[type=color] {
 */
 
 .homepage-tile {
-    margin-bottom: 1.375em;
     line-height: 1rem;
+    margin-bottom: 1.375em;
 
     h2 {
         font-size: 1rem;
@@ -383,11 +383,11 @@ input[type=color] {
     }
 
     .tile-sub-link:after {
+        color: transparentize($primary-color, .8);
         content: ' | ';
         display: inline-block;
         margin-left: .6ex;
         margin-right: .6ex;
-        color: transparentize($primary-color, .8);
     }
 
     .tile-sub-link:last-child:after {
