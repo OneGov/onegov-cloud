@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-07-02 13:51+0200\n"
+"POT-Creation-Date: 2015-07-02 15:57+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -339,6 +339,26 @@ msgstr "Online-Schalter"
 
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
+
+msgid "Administration"
+msgstr "Verwaltung"
+
+msgid "Employees of the municipality"
+msgstr "Mitarbeitende der Verwaltung"
+
+msgid "Politics"
+msgstr "Politik"
+
+#, python-format
+msgid "Politicians in ${town}"
+msgstr "Politiker in ${town}"
+
+msgid "Clubs"
+msgstr "Vereine"
+
+#, python-format
+msgid "Clubs in ${town}"
+msgstr "Vereine in ${town}"
 
 msgid "Active people in this town"
 msgstr "In der Gemeinde aktive Personen"

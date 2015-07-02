@@ -82,9 +82,31 @@ def view_town(self, request):
         ]
     )
 
+    # XXX it sucks to use hardcoded links here, but it's saner than loading
+    # all those objects from the database...
+
     directories = LinkGroup(
         title=_("Directories"),
         links=[
+            Link(
+                text=_("Administration"),
+                url=request.transform('/organisationen/verwaltung'),
+                subtitle=_("Employees of the municipality")
+            ),
+            Link(
+                text=_("Politics"),
+                url=request.transform('/organisationen/politik'),
+                subtitle=_("Politicians in ${town}", mapping={
+                    'town': request.app.town.name
+                })
+            ),
+            Link(
+                text=_("Clubs"),
+                url=request.transform('/organisationen/vereine'),
+                subtitle=_("Clubs in ${town}", mapping={
+                    'town': request.app.town.name
+                })
+            ),
             Link(
                 text=_("People"),
                 url=request.link(PersonCollection(session)),

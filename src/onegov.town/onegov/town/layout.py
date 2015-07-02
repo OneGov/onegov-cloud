@@ -506,3 +506,7 @@ class PersonLayout(DefaultLayout):
                     ]
                 )
             ]
+
+
+class OrganizationLayout(PageLayout):
+    sidebar_links = None

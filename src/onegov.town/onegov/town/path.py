@@ -21,7 +21,12 @@ from onegov.form import (
     CompleteFormSubmission,
     PendingFormSubmission
 )
-from onegov.org import Person, PersonCollection
+from onegov.org import (
+    Person,
+    PersonCollection,
+    Organization,
+    OrganizationCollection
+)
 from onegov.page import PageCollection
 
 
@@ -120,3 +125,8 @@ def get_people(app):
 @TownApp.path(model=Person, path='/person/{id}')
 def get_person(app, id):
     return PersonCollection(app.session()).by_id(id)
+
+
+@TownApp.path(model=Organization, path='/organisationen', absorb=True)
+def get_organization(app, absorb):
+    return OrganizationCollection(app.session()).by_path(absorb)

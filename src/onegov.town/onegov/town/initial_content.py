@@ -5,6 +5,7 @@ import os
 
 from onegov.core.utils import module_path
 from onegov.form import FormCollection
+from onegov.org import OrganizationCollection
 from onegov.page import PageCollection
 from onegov.town.const import NEWS_PREFIX
 from onegov.town.models import Town
@@ -23,6 +24,7 @@ def add_initial_content(session, town_name):
     session.add(Town(name=town_name))
 
     add_root_pages(session)
+    add_root_organizations(session)
     add_builtin_forms(session)
 
     session.flush()
@@ -66,6 +68,25 @@ def add_root_pages(session):
         name=NEWS_PREFIX,
         type='news',
         meta={'trait': 'news'}
+    )
+
+
+def add_root_organizations(session):
+    orgs = OrganizationCollection(session)
+
+    orgs.add_root(
+        "Verwaltung",
+        name='verwaltung',
+    )
+
+    orgs.add_root(
+        "Politik",
+        name='politik'
+    )
+
+    orgs.add_root(
+        "Vereine",
+        name='vereine'
     )
 
 
