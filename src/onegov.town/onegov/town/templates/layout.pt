@@ -66,6 +66,15 @@
                   <div metal:define-slot="content"></div>
               </div>
           </div>
+          <div class="row">
+              <div class="small-12 medium-12 visible-for-medium-down columns">
+                  <ul class="side-nav">
+                    <li tal:repeat="link layout.sidebar_links" tal:attributes="class getattr(link, 'active', None) and 'active' or ''">
+                      <tal:block replace="structure link(request)" />
+                    </li>
+                  </ul>
+              </div>
+          </div>
         </div>
       </div>
       <div class="row content without-sidebar-links" tal:condition="not:layout.sidebar_links">
