@@ -52,7 +52,7 @@
       </div>
 
       <div class="row content with-sidebar-links" tal:condition="layout.sidebar_links">
-        <div class="small-12 medium-3 large-3 columns sidebar">
+        <div class="small-12 medium-3 large-3 visible-for-large-up columns sidebar">
           <ul class="side-nav">
             <li tal:repeat="link layout.sidebar_links" tal:attributes="class getattr(link, 'active', None) and 'active' or ''">
               <tal:block replace="structure link(request)" />
