@@ -39,6 +39,18 @@ def test_submitted():
     assert TestForm(request.POST).submitted(request)
 
 
+def test_useful_data():
+
+    class TestForm(Form):
+        a = StringField("a")
+        b = StringField("b")
+        c = StringField("c")
+
+    request = DummyRequest({'a': 'A', 'b': 'B', 'c': 'C'})
+    assert TestForm(request.POST).get_useful_data(exclude={'a', 'b'}) \
+        == {'c': 'C'}
+
+
 def test_with_options():
     widget = with_options(TextArea, class_="markdown")
     assert 'class="markdown"' in widget(DummyField('one', 'one', '1'))

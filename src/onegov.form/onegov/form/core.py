@@ -139,10 +139,20 @@ class Form(BaseForm):
         return matches
 
     def is_required(self, field_id):
+        """ Returns true if the given field_id is required. """
+
         for validator in self._fields[field_id].validators:
             if isinstance(validator, (InputRequired, DataRequired)):
                 return True
         return False
+
+    def get_useful_data(self, exclude={'csrf_token'}):
+        """ Returns the form data in a dictionary, by default excluding data
+        that should not be stored in the db backend.
+
+        """
+
+        return {k: v for k, v in self.data.items() if k not in exclude}
 
 
 class Fieldset(object):

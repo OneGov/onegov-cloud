@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a method to get all useful data from a form.
+  [href]
+
 - Use content/meta defined in onegov.core.
   [href]
 
