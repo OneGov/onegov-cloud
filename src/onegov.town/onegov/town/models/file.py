@@ -4,7 +4,6 @@ import base64
 import magic
 import PIL
 
-from onegov.core.compat import unquote_plus
 from onegov.core.filestorage import FilestorageFile
 from webob.exc import HTTPUnsupportedMediaType
 
