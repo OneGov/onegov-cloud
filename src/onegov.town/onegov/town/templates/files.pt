@@ -12,13 +12,13 @@
         <div class="row">
             <div class="small-12 columns">
                 <h2 i18n:translate="">All Files</h2>
-                <ul tal:condition="files" class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                <ul tal:condition="files">
                     <li tal:repeat="file files" id="file-${repeat.file.index}" class="file-box">
                         <a href="${file.url}" tal:condition="file">
                             ${file.text}
                         </a>
-                        <a class="delete confirm" 
-                           ic-delete-from="${file.url}?csrf-token=${layout.csrf_token}" 
+                        <a class="delete confirm"
+                           ic-delete-from="${file.url}?csrf-token=${layout.csrf_token}"
                            ic-on-success="$('#file-${repeat.file.index}').remove();"
                            data-confirm="Do you really want to delete the file?"
                            data-confirm-yes="Delete File"
