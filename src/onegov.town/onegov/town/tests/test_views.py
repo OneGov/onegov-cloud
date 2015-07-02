@@ -664,3 +664,38 @@ def test_hide_form(town_app):
 
     response = anonymous.get(page.request.url)
     assert response.status_code == 200
+
+
+def test_people_view(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    people = client.get('/personen')
+    assert 'noch keine Personen' in people
+
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'Flash'
+    new_person.form['last_name'] = 'Gordon'
+    person = new_person.form.submit().follow()
+
+    assert 'Flash Gordon' in person
+
+    people = client.get('/personen')
+
+    assert 'Gordon Flash' in people
+
+    edit_person = person.click('Bearbeiten')
+    edit_person.form['first_name'] = 'Merciless'
+    edit_person.form['last_name'] = 'Ming'
+    person = edit_person.form.submit().follow()
+
+    assert 'Merciless Ming' in person
+
+    client.delete(person.request.url)
+
+    people = client.get('/personen')
+    assert 'noch keine Personen' in people
