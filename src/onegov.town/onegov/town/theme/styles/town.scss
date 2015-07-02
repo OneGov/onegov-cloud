@@ -388,8 +388,8 @@ input[type=color] {
     .tile-sub-link:after {
         content: ' | ';
         display: inline-block;
-        margin-left: .5ex;
-        margin-right: .5ex;
+        margin-left: .6ex;
+        margin-right: .6ex;
         color: transparentize($primary-color, .8);
     }
 
