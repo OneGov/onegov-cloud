@@ -95,5 +95,5 @@ class File(FilestorageFile):
     @property
     def original_name(self):
         if '-' in self.filename:
-            name = self.filename.split('-')[0]
+            name = str(self.filename.split('-')[0])
             return base64.urlsafe_b64decode(name).strip()
