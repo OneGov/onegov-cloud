@@ -390,6 +390,7 @@ input[type=color] {
         display: inline-block;
         margin-left: .5ex;
         margin-right: .5ex;
+        color: transparentize($primary-color, .8);
     }
 
     .tile-sub-link:last-child:after {
