@@ -35,9 +35,12 @@ def view_get_file_collection(self, request):
 
 
 @TownApp.json(model=FileCollection, permission=Private, name='json')
-def view_get_image_collection_json(self, request):
+def view_get_file_collection_json(self, request):
     return [
-        {'link': request.link(file_), 'title': file_.original_name}
+        {
+            'link': request.link(file_),
+            'title': file_.original_name.decode('utf-8')
+        }
         for file_ in self.files
     ]
 
