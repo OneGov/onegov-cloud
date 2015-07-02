@@ -1,8 +1,8 @@
 """ The onegov town collection of files uploaded to the site. """
 
+import base64
 import morepath
 
-from onegov.core.compat import quote_plus
 from onegov.core.filestorage import random_filename
 from onegov.core.security import Private
 from onegov.town import _
@@ -49,7 +49,11 @@ def handle_file_upload(self, request):
     """
 
     extension = request.params['file'].filename.split('.')[-1]
-    name = quote_plus(request.params['file'].filename)
+    name = request.params['file'].filename.encode('utf-8')
+    # Pad with whitespace to avoid '=' padding in base64 encoded value.
+    if len(name) % 3 != 0:
+        name = name.ljust(len(name) + (3 - len(name) % 3))
+    name = base64.urlsafe_b64encode(name).decode('utf-8')
 
     filename = '{}-{}.{}'.format(name, random_filename(), extension)
 

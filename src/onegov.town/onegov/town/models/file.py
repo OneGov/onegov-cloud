@@ -1,5 +1,6 @@
 """ Contains the models describing the files. """
 
+import base64
 import magic
 import PIL
 
@@ -95,5 +96,5 @@ class File(FilestorageFile):
     @property
     def original_name(self):
         if '-' in self.filename:
-            index = self.filename.rindex('-')
-            return unquote_plus(self.filename[0:index])
+            name = self.filename.split('-')[0]
+            return base64.urlsafe_b64decode(name).strip()
