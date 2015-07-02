@@ -239,4 +239,10 @@
     </div>
 </metal:person_card>
 
-</body>
+<metal:sidebar define-macro="sidebar" i18n:domain="onegov.town">
+    <ul class="side-nav">
+        <li tal:repeat="link layout.sidebar_links" tal:attributes="class getattr(link, 'active', None) and 'active' or ''">
+            <tal:block replace="structure link(request)" />
+        </li>
+    </ul>
+</metal:sidebar>

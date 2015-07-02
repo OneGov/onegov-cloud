@@ -52,12 +52,8 @@
       </div>
 
       <div class="row content with-sidebar-links" tal:condition="layout.sidebar_links">
-        <div class="small-12 medium-3 large-3 columns sidebar">
-          <ul class="side-nav">
-            <li tal:repeat="link layout.sidebar_links" tal:attributes="class getattr(link, 'active', None) and 'active' or ''">
-              <tal:block replace="structure link(request)" />
-            </li>
-          </ul>
+        <div class="small-12 medium-3 large-3 columns sidebar visible-for-large-up">
+          <div metal:use-macro="layout.macros['sidebar']" />
         </div>
         <div class="small-12 medium-9 large-9 columns end">
           <div class="row">
@@ -65,6 +61,11 @@
                   <h1 class="main-title"><div metal:define-slot="title"></div></h1>
                   <div metal:define-slot="content"></div>
               </div>
+          </div>
+          <div class="row">
+            <div class="small-12 medium-12 visible-for-medium-down columns sidebar sidebar-bottom">
+              <div metal:use-macro="layout.macros['sidebar']" />
+            </div>
           </div>
         </div>
       </div>

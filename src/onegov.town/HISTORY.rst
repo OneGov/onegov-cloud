@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Show sidebar below the content on smaller screens.
+  [href]
+
 - Adds the ability to keep a directory of people related to the town.
   [href]
 
