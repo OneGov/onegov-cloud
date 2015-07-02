@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.3 (2015-07-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a method to get all useful data from a form.
   [href]
 
