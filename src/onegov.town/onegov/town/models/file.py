@@ -19,7 +19,16 @@ class FileCollection(object):
 
     """
 
-    allowed_mime = {'text/plain', 'application/pdf'}
+    allowed_mime = {
+        'application/msword',
+        'application/pdf',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-'
+        'officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/zip',
+        'text/plain',
+    }
 
     def __init__(self, app):
         assert app.has_filestorage
