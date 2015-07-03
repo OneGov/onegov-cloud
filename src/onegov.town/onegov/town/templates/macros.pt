@@ -198,7 +198,9 @@
     <div class="person-card person-list-card" tal:define="link request.link(person)">
         <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url)) or person.gravatar_url">
             <img class="person-card-portrait" src="${url}?s=100" tal:condition="url">
-            <i class="person-card-portrait fa fa-user" tal:condition="not:url"></i>
+            <div class="person-card-portrait" tal:condition="not:url">
+                <i class="fa fa-user"></i>
+            </div>
         </a>
         <ul>
             <li class="person-card-title">
@@ -221,7 +223,9 @@
     <div class="person-card">
         <div aria-hidden="true" tal:define="url person.picture_url or person.gravatar_url">
             <img class="person-card-portrait" src="${url}?s=200" tal:condition="url">
-            <i class="person-card-portrait fa fa-user" tal:condition="not:url"></i>
+            <div class="person-card-portrait" tal:condition="not:url">
+                <i class="fa fa-user"></i>
+            </div>
         </div>
         <ul>
             <li tal:condition="person.address" class="person-card-address">
