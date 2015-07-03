@@ -4,11 +4,7 @@ from hashlib import md5
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import (
-    Column,
-    Text
-)
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy import Column, Text
 from uuid import uuid4
 
 
@@ -27,7 +23,7 @@ class Person(Base, TimestampMixin):
     @property
     def gravatar_url(self):
         if self.email:
-            return 'https://www.gravatar.com/avatar/{}?s=200'.format(
+            return 'https://www.gravatar.com/avatar/{}'.format(
                 md5(self.email.encode('utf-8')).hexdigest()
             )
 
@@ -49,9 +45,3 @@ class Person(Base, TimestampMixin):
     website = Column(Text, nullable=True)
 
     address = Column(Text, nullable=True)
-
-    memberships = relationship(
-        "Membership",
-        cascade="all, delete-orphan",
-        backref=backref("person")
-    )
