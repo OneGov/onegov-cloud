@@ -802,15 +802,21 @@ $max-page-width: 600px;
     Person card
 */
 .person-card {
-    padding: 0 1em 1em 0;
+    margin: 0 1em 1em 0;
 
     .person-card-portrait {
         float: left;
-        font-size: 200px;
         height: 200px;
         margin-right: 1rem;
         text-align: center;
         width: 200px;
+        background: $topbar-bg-color;
+        padding-top: 0;
+
+        .fa-user {
+            color: $white;
+            font-size: 200px;
+        }
     }
 
     ul {
@@ -851,9 +857,12 @@ $max-page-width: 600px;
 
 .person-list-card {
     .person-card-portrait {
-        font-size: 5rem;
         height: 5rem; // enough to show three lines of text
         width: 5rem;
+
+        .fa-user {
+            font-size: 80px;
+        }
     }
 
     .person-card-title {
