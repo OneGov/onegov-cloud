@@ -5,7 +5,7 @@
 from collections import namedtuple
 from onegov.core.security import Public
 from onegov.form import FormCollection
-from onegov.org import PersonCollection
+from onegov.people import PersonCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link, LinkGroup
@@ -82,31 +82,9 @@ def view_town(self, request):
         ]
     )
 
-    # XXX it sucks to use hardcoded links here, but it's saner than loading
-    # all those objects from the database...
-
     directories = LinkGroup(
         title=_("Directories"),
         links=[
-            Link(
-                text=_("Administration"),
-                url=request.transform('/organisationen/verwaltung'),
-                subtitle=_("Contact persons, departments")
-            ),
-            Link(
-                text=_("Politics"),
-                url=request.transform('/organisationen/politik'),
-                subtitle=_("Members of authorities, commissions, parties", mapping={
-                    'town': request.app.town.name
-                })
-            ),
-            Link(
-                text=_("Clubs"),
-                url=request.transform('/organisationen/vereine'),
-                subtitle=_("Leisure, sports, culture", mapping={
-                    'town': request.app.town.name
-                })
-            ),
             Link(
                 text=_("People"),
                 url=request.link(PersonCollection(session)),

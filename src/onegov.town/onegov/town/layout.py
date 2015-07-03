@@ -2,8 +2,8 @@ from cached_property import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.form import FormCollection, FormSubmissionFile, render_field
-from onegov.org import PersonCollection
 from onegov.page import Page, PageCollection
+from onegov.people import PersonCollection
 from onegov.town import _
 from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import FileCollection
@@ -481,7 +481,3 @@ class PersonLayout(DefaultLayout):
                     ]
                 )
             ]
-
-
-class OrganizationLayout(PageLayout):
-    sidebar_links = None

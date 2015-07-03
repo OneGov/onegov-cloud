@@ -126,7 +126,7 @@ class TraitInfo(object):
 
             if self.children:
                 extra_warning = _(
-                    "Please note that this item has subitems "
+                    "Please note that this page has subpages "
                     "which will also be deleted!"
                 )
             else:

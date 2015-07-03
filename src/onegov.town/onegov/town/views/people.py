@@ -2,7 +2,7 @@ import morepath
 
 from onegov.core.security import Public, Private
 from onegov.form import Form, with_options
-from onegov.org import Person, PersonCollection
+from onegov.people import Person, PersonCollection
 from onegov.town import _
 from onegov.town import TownApp
 from onegov.town.elements import Link

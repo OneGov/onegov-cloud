@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-03 11:04+0200\n"
+"POT-Creation-Date: 2015-07-03 13:55+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -191,8 +191,10 @@ msgstr "Nachricht löschen"
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
-msgid "Please note that this item has subitems which will also be deleted!"
+msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
+"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+"werden!"
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -350,24 +352,6 @@ msgstr "Online-Schalter"
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
 
-msgid "Administration"
-msgstr "Verwaltung"
-
-msgid "Contact persons, departments"
-msgstr "Ansprechpartner, Dienststellen"
-
-msgid "Politics"
-msgstr "Politik"
-
-msgid "Members of authorities, commissions, parties"
-msgstr "Behördenmitglieder, Kommissionen, Parteien"
-
-msgid "Clubs"
-msgstr "Vereine"
-
-msgid "Leisure, sports, culture"
-msgstr "Freizeit, Sport, Kultur"
-
 msgid "All contacts"
 msgstr "Alle Kontakte"
 
@@ -449,23 +433,3 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
-
-#~ msgid "Contact persons"
-#~ msgstr "Ansprechpersonen"
-
-#~ msgid "Please note that this page has subpages which will also be deleted!"
-#~ msgstr ""
-#~ "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
-#~ "werden!"
-
-#~ msgid "Employees of the municipality"
-#~ msgstr "Mitarbeitende der Verwaltung"
-
-#~ msgid "Politicians in ${town}"
-#~ msgstr "Politiker in ${town}"
-
-#~ msgid "Clubs in ${town}"
-#~ msgstr "Vereine in ${town}"
-
-#~ msgid "Active people in this town"
-#~ msgstr "In der Gemeinde aktive Personen"

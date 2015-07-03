@@ -42,7 +42,7 @@ setup(
         'onegov.core>=0.4.5',
         'onegov.form>=0.6.3',
         'onegov.foundation',
-        'onegov.org>=0.0.1',
+        'onegov.people>=0.0.1',
         'onegov.page>=0.1.0',
         'onegov.user',
         'pillow',
