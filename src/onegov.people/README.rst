@@ -1,7 +1,7 @@
-Onegov Org
-==========
+Onegov People
+=============
 
-Organisations and People for OneGov.
+People for OneGov.
 
 Run the Tests
 -------------
@@ -18,32 +18,32 @@ Limit the tests to a specific python version::
 Conventions
 -----------
 
-Onegov Org follows PEP8 as close as possible. To test for it run::
+Onegov People follows PEP8 as close as possible. To test for it run::
 
     tox -e pep8
 
-Onegov Org uses `Semantic Versioning <http://semver.org/>`_
+Onegov People uses `Semantic Versioning <http://semver.org/>`_
 
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/OneGov/onegov.org.png
-  :target: https://travis-ci.org/OneGov/onegov.org
+.. image:: https://travis-ci.org/OneGov/onegov.people.png
+  :target: https://travis-ci.org/OneGov/onegov.people
   :alt: Build Status
 
 Coverage
 --------
 
-.. image:: https://coveralls.io/repos/OneGov/onegov.org/badge.png?branch=master
-  :target: https://coveralls.io/r/OneGov/onegov.org?branch=master
+.. image:: https://coveralls.io/repos/OneGov/onegov.people/badge.png?branch=master
+  :target: https://coveralls.io/r/OneGov/onegov.people?branch=master
   :alt: Project Coverage
 
 Latests PyPI Release
 --------------------
-.. image:: https://pypip.in/v/onegov.org/badge.png
-  :target: https://crate.io/packages/onegov.org
+.. image:: https://pypip.in/v/onegov.people/badge.png
+  :target: https://crate.io/packages/onegov.people
   :alt: Latest PyPI Release
 
 License
 -------
-onegov.org is released under GPLv2
+onegov.people is released under GPLv2

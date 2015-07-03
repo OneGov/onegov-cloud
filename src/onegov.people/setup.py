@@ -2,11 +2,11 @@
 
 from setuptools import setup, find_packages
 
-name = 'onegov.org'
+name = 'onegov.people'
 description = (
-    'Organisations and People for OneGov.'
+    'People for OneGov.'
 )
-version = '0.0.1'
+version = '0.0.0'
 
 
 def get_long_description():
@@ -24,7 +24,7 @@ setup(
     version=version,
     description=description,
     long_description=get_long_description(),
-    url='http://github.com/OneGov/onegov.org',
+    url='http://github.com/OneGov/onegov.people',
     author='Seantis GmbH',
     author_email='info@seantis.ch',
     license='GPLv2',
@@ -45,7 +45,7 @@ setup(
     ),
     entry_points={
         'onegov': [
-            'upgrade = onegov.org.upgrade'
+            'upgrade = onegov.people.upgrade'
         ]
     },
     classifiers=[
