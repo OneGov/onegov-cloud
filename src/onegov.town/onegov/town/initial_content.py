@@ -7,7 +7,6 @@ from onegov.core.utils import module_path
 from onegov.form import FormCollection
 from onegov.org import OrganizationCollection
 from onegov.page import PageCollection
-from onegov.town.const import NEWS_PREFIX
 from onegov.town.models import Town
 
 
@@ -65,7 +64,7 @@ def add_root_pages(session):
     )
     pages.add_root(
         "Aktuelles",
-        name=NEWS_PREFIX,
+        name='aktuelles',
         type='news',
         meta={'trait': 'news'}
     )

@@ -561,7 +561,7 @@ def test_delete_custom_form(town_app):
     form_page = form_page.form.submit().follow()
 
     client.delete(
-        form_page.pyquery('a.delete-form')[0].attrib['ic-delete-from'])
+        form_page.pyquery('a.delete-link')[0].attrib['ic-delete-from'])
 
 
 def test_show_uploaded_file(town_app):

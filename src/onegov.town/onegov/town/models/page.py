@@ -3,7 +3,7 @@ from onegov.core.utils import sanitize_html
 from onegov.form import Form, with_options
 from onegov.page import Page
 from onegov.town import _
-from onegov.town.const import NEWS_PREFIX, TRAIT_MESSAGES
+from onegov.town.models.traitinfo import TraitInfo
 from onegov.town.models.mixins import HiddenMetaMixin
 from onegov.town.utils import mark_images
 from sqlalchemy import desc
@@ -11,46 +11,6 @@ from sqlalchemy.orm import undefer, object_session
 from wtforms import BooleanField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
-
-
-class TraitInfo(object):
-    """" Typically used as a mixin for Pages, this class provides
-    access to the trait related methods.
-
-    """
-
-    @property
-    def trait(self):
-        """ Gets the trait of the page. """
-        return self.meta.get('trait')
-
-    @trait.setter
-    def trait(self, trait):
-        """ Sets the trait of the page. """
-        self.meta['trait'] = trait
-
-    @property
-    def trait_messages(self):
-        """ Returns all trait_messages. """
-        return TRAIT_MESSAGES
-
-    @property
-    def allowed_subtraits(self):
-        """ Returns a list of traits that this page may contain. """
-        raise NotImplementedError
-
-    def is_supported_trait(trait):
-        """ Returns true if the given trait is supported by this type This
-        doesn't mean that the trait may be added to this page, it serves
-        as a simple sanity check, returning True if the combination of the
-        type and the trait make any sense at all.
-
-        """
-        raise NotImplementedError
-
-    def get_form_class(self, trait):
-        """ Returns the form class for the given trait. """
-        raise NotImplementedError
 
 
 class Topic(Page, TraitInfo, HiddenMetaMixin):
@@ -93,7 +53,7 @@ class News(Page, TraitInfo, HiddenMetaMixin):
 
     @property
     def absorb(self):
-        return utils.lchop(self.path, NEWS_PREFIX).lstrip('/')
+        return utils.lchop(self.path, 'aktuelles').lstrip('/')
 
     @property
     def deletable(self):

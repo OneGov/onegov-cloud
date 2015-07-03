@@ -476,7 +476,7 @@ class PersonLayout(DefaultLayout):
                             confirm=_(
                                 "Do you really want to delete this person?"),
                             yes_button_text=_("Delete person"),
-                            redireact_after=self.request.link(self.collection)
+                            redirect_after=self.request.link(self.collection)
                         )
                     ]
                 )

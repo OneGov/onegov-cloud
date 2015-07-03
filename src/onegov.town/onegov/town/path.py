@@ -1,7 +1,6 @@
 """ Contains the paths to the different models served by onegov.town. """
 
 from onegov.town.app import TownApp
-from onegov.town.const import NEWS_PREFIX
 from onegov.town.models import (
     Editor,
     File,
@@ -42,7 +41,7 @@ def get_topic(app, absorb):
 
 @TownApp.path(model=News, path='/aktuelles', absorb=True)
 def get_news(app, absorb):
-    absorb = '/{}/{}'.format(NEWS_PREFIX, absorb)
+    absorb = '/{}/{}'.format('aktuelles', absorb)
     return PageCollection(app.session()).by_path(absorb, ensure_type='news')
 
 
