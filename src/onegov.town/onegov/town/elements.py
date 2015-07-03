@@ -82,6 +82,41 @@ class Link(object):
         return tostring(a)
 
 
+class DeleteLink(Link):
+
+    def __init__(self, text, url, confirm,
+                 yes_button_text=None,
+                 no_button_text=None,
+                 extra_information=None,
+                 redirect_after=None):
+
+        attr = {
+            'data-confirm': confirm
+        }
+
+        if extra_information:
+            attr['data-confirm-extra'] = extra_information
+
+        if yes_button_text:
+            attr['data-confirm-yes'] = yes_button_text
+
+        if no_button_text:
+            attr['data-confirm-no'] = no_button_text
+        else:
+            attr['data-confirm-no'] = _("Cancel")
+
+        if redirect_after:
+            attr['redirect-after'] = redirect_after
+
+        super(DeleteLink, self).__init__(
+            text=text,
+            url=url,
+            classes=('confirm', 'delete-link'),
+            request_method='DELETE',
+            attributes=attr
+        )
+
+
 class Img(object):
     """ Represents an img element. """
 

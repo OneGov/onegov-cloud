@@ -6,7 +6,7 @@ from onegov.core.security import Public, Private
 from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Link, LinkGroup
+from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.layout import NewsLayout, PageLayout
 from onegov.town.models import Editor
 from webob import exc
@@ -135,17 +135,12 @@ def edit_links(self, request):
         else:
             extra_warning = ""
 
-        yield Link(
-            _("Delete"), request.link(self), request_method='DELETE',
-            classes=('confirm', 'delete-{}'.format(self.trait)),
-            attributes={
-                'data-confirm': _(
-                    trait_messages['delete_question'], mapping={
-                        'title': self.title
-                    }),
-                'data-confirm-yes': trait_messages['delete_button'],
-                'data-confirm-no': _("Cancel"),
-                'data-confirm-extra': extra_warning,
-                'redirect-after': request.link(self.parent)
-            }
+        yield DeleteLink(
+            _("Delete"), request.link(self),
+            confirm=_(trait_messages['delete_question'], mapping={
+                'title': self.title
+            }),
+            yes_button_text=trait_messages['delete_button'],
+            extra_information=extra_warning,
+            redirect_after=request.link(self.parent)
         )

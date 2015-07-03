@@ -5,7 +5,7 @@ from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.org import PersonCollection
 from onegov.page import Page, PageCollection
 from onegov.town import _
-from onegov.town.elements import Link, LinkGroup
+from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import FileCollection
 from onegov.town.models import ImageCollection, Thumbnail
 from sqlalchemy import desc
@@ -282,8 +282,7 @@ class NewsLayout(AdjacencyListLayout):
         return list(self.get_breadcrumbs(self.model))
 
 
-class EditorLayout(PageLayout):
-    sidebar_links = None
+class EditorLayout(AdjacencyListLayout):
 
     def __init__(self, model, request, site_title):
         super(EditorLayout, self).__init__(model, request)
@@ -297,10 +296,12 @@ class EditorLayout(PageLayout):
     def breadcrumbs(self):
         links = list(self.get_breadcrumbs(self.model.page))
         links.append(Link(self.site_title, url='#'))
+
         return links
 
 
 class FormEditorLayout(DefaultLayout):
+
     def __init__(self, model, request):
         super(FormEditorLayout, self).__init__(model, request)
 
@@ -344,51 +345,34 @@ class FormSubmissionLayout(DefaultLayout):
         )
 
         if self.form.type == 'builtin':
-            delete_link = Link(
+            delete_link = DeleteLink(
                 text=_("Delete"),
                 url=self.request.link(self.form),
-                request_method='DELETE',
-                classes=('confirm', 'delete-form'),
-                attributes={
-                    'data-confirm': _("This form can't be deleted."),
-                    'data-confirm-extra': _(
-                        "This is a builtin-form. "
-                        "Builtin-forms can't be deleted."
-                    ),
-                    'data-confirm-no': _("Cancel"),
-                    'redirect-after': self.request.link(collection)
-                }
+                confirm=_("This form can't be deleted."),
+                extra_information=_(
+                    "This is a builtin-form. "
+                    "Builtin-forms can't be deleted."
+                )
             )
 
         elif self.form.has_submissions(with_state='complete'):
-            delete_link = Link(
+            delete_link = DeleteLink(
                 text=_("Delete"),
                 url=self.request.link(self.form),
-                request_method='DELETE',
-                classes=('confirm', 'delete-form'),
-                attributes={
-                    'data-confirm': _("This form can't be deleted."),
-                    'data-confirm-extra': _(
-                        "The are submissions associated with the form. "
-                        "Those need to be removed first."
-                    ),
-                    'data-confirm-no': _("Cancel"),
-                    'redirect-after': self.request.link(collection)
-                }
+                confirm=_("This form can't be deleted."),
+                extra_information=_(
+                    "The are submissions associated with the form. "
+                    "Those need to be removed first."
+                )
             )
+
         else:
-            delete_link = Link(
+            delete_link = DeleteLink(
                 text=_("Delete"),
                 url=self.request.link(self.form),
-                request_method='DELETE',
-                classes=('confirm', 'delete-form'),
-                attributes={
-                    'data-confirm': _(
-                        "Do you really want to delete this form?"),
-                    'data-confirm-yes': _("Delete form"),
-                    'data-confirm-no': _("Cancel"),
-                    'redirect-after': self.request.link(collection)
-                }
+                confirm=_("Do you really want to delete this form?"),
+                yes_button_text=_("Delete form"),
+                redirect_after=self.request.link(collection)
             )
 
         return [
@@ -486,22 +470,14 @@ class PersonLayout(DefaultLayout):
                             url=self.request.link(self.model, 'bearbeiten'),
                             classes=('edit-person', )
                         ),
-                        Link(
+                        DeleteLink(
                             text=_("Delete"),
                             url=self.request.link(self.model),
-                            request_method='DELETE',
-                            classes=('confirm', 'delete-person'),
-                            attributes={
-                                'data-confirm': _(
-                                    "Do you really want to delete this person?"
-                                ),
-                                'data-confirm-yes': _("Delete person"),
-                                'data-confirm-no': _("Cancel"),
-                                'redirect-after': self.request.link(
-                                    self.collection
-                                )
-                            }
-                        ),
+                            confirm=_(
+                                "Do you really want to delete this person?"),
+                            yes_button_text=_("Delete person"),
+                            redireact_after=self.request.link(self.collection)
+                        )
                     ]
                 )
             ]
