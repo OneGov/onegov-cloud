@@ -75,21 +75,17 @@ footer,
     top navigation
 */
 
-.top-bar {
+.main-navigation {
     margin-bottom: 1rem;
+    background-color: $topbar-bg-color;
+    border-bottom: $top-bar-border-size solid $primary-color;
+}
+
+.top-bar {
 
     &.expanded {
         box-shadow: none;
     }
-
-    ul {
-        margin-bottom: $top-bar-border-size;
-    }
-}
-
-.top-bar,
-.top-bar-section ul li {
-    box-shadow: 0 $top-bar-border-size 0 $primary-color;
 }
 
 /*

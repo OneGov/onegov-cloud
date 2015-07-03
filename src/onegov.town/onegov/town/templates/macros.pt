@@ -7,25 +7,28 @@
 <body>
 
 <metal:navigation define-macro="top_navigation">
-    <nav class="top-bar" data-topbar role="navigation" tal:condition="layout.top_navigation">
-        <ul class="title-area">
-            <!--! this section needs to be included (even though it's empty),
-            or the responsive menu bar icon won't be rendered -->
-            <li class="name" style="width: 0;"></li>
-            <li class="toggle-topbar menu-icon">
-                <a href="#"><span>Menu</span></a>
-            </li>
-        </ul>
-        <section class="top-bar-section">
-            <ul class="left">
-                <tal:block repeat="link layout.top_navigation">
-                    <li>
-                        <a tal:attributes="href link.url">${link.text}</a>
-                    </li>
-                </tal:block>
+    <div class="main-navigation">
+        <nav class="top-bar" data-topbar role="navigation" tal:condition="layout.top_navigation">
+            <ul class="title-area">
+                <!--! this section needs to be included (even though it's empty),
+                or the responsive menu bar icon won't be rendered -->
+                <li class="name" style="width: 0;"></li>
+                <li class="toggle-topbar menu-icon">
+                    <a href="#"><span>Menu</span></a>
+                </li>
             </ul>
-        </section>
-    </nav>
+            <section class="top-bar-section">
+                <ul class="left">
+                    <tal:block repeat="link layout.top_navigation">
+                        <li>
+                            <a tal:attributes="href link.url">${link.text}</a>
+                        </li>
+                    </tal:block>
+                </ul>
+            </section>
+        </nav>
+        <div class="clearfix"></div>
+    </div>
 </metal:navigation>
 
 <metal:editbar define-macro="editbar">
