@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes onegov.core.utils.rchop not working correctly.
+  [href]
+
 0.4.5 (2015-07-02)
 ~~~~~~~~~~~~~~~~~~~
 

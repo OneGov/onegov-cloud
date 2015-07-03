@@ -26,6 +26,8 @@ def test_lchop():
 def test_rchop():
     assert utils.rchop('foobar', 'foo') == 'foobar'
     assert utils.rchop('foobar', 'bar') == 'foo'
+    assert utils.rchop('https://www.example.org/ex/amp/le', '/ex/amp/le') \
+        == 'https://www.example.org'
 
 
 def test_touch(temporary_directory):

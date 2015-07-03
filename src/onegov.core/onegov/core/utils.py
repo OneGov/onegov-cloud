@@ -69,7 +69,7 @@ def rchop(text, end):
     """ Removes the end from the text if the text ends with it. """
 
     if text.endswith(end):
-        return text[:len(end)]
+        return text[:-len(end)]
 
     return text
 
