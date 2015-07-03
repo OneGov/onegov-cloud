@@ -91,26 +91,26 @@ def view_town(self, request):
             Link(
                 text=_("Administration"),
                 url=request.transform('/organisationen/verwaltung'),
-                subtitle=_("Employees of the municipality")
+                subtitle=_("Contact persons")
             ),
             Link(
                 text=_("Politics"),
                 url=request.transform('/organisationen/politik'),
-                subtitle=_("Politicians in ${town}", mapping={
+                subtitle=_("Members of authorities, commissions, parties", mapping={
                     'town': request.app.town.name
                 })
             ),
             Link(
                 text=_("Clubs"),
                 url=request.transform('/organisationen/vereine'),
-                subtitle=_("Clubs in ${town}", mapping={
+                subtitle=_("Leisure, sports, culture", mapping={
                     'town': request.app.town.name
                 })
             ),
             Link(
                 text=_("People"),
                 url=request.link(PersonCollection(session)),
-                subtitle=_("Active people in this town")
+                subtitle=_("All contacts")
             )
         ]
     )

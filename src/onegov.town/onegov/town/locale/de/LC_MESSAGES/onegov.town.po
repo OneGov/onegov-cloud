@@ -1,8 +1,15 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-07-02 15:57+0200\n"
+"POT-Creation-Date: 2015-07-03 10:57+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Project-Id-Version: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Language: de\n"
+"X-Generator: Poedit 1.7.6\n"
 
 msgid "Link"
 msgstr "Verknüpfung"
@@ -70,6 +77,9 @@ msgstr "Nachricht löschen"
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
+msgid "Cancel"
+msgstr "Abbrechen"
+
 msgid "This site is hidden from the general public"
 msgstr "Diese Seite ist nicht öffentlich."
 
@@ -97,15 +107,6 @@ msgstr "Bilder"
 msgid "Delete"
 msgstr "Löschen"
 
-msgid "Form"
-msgstr "Formular"
-
-msgid "Settings"
-msgstr "Einstellungen"
-
-msgid "Login"
-msgstr "Login"
-
 msgid "This form can't be deleted."
 msgstr "Das Formular kann nicht gelöscht werden."
 
@@ -114,14 +115,14 @@ msgstr ""
 "Dies ist ein vordefiniertes Formular. Vordefinierte Formulare können nicht "
 "gelöscht werden."
 
-msgid "Cancel"
-msgstr "Abbrechen"
+msgid "Form"
+msgstr "Formular"
 
-msgid "Add"
-msgstr "Hinzufügen"
+msgid "Settings"
+msgstr "Einstellungen"
 
-msgid "Person"
-msgstr "Person"
+msgid "Login"
+msgstr "Login"
 
 msgid ""
 "The are submissions associated with the form. Those need to be removed first."
@@ -134,6 +135,12 @@ msgstr "Möchten Sie das Formular wirklich löschen?"
 
 msgid "Delete form"
 msgstr "Formular löschen"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Person"
+msgstr "Person"
 
 msgid "Do you really want to delete this person?"
 msgstr "Möchten Sie die Person wirklich löschen?"
@@ -343,25 +350,23 @@ msgstr "Formulare und Gesuche"
 msgid "Administration"
 msgstr "Verwaltung"
 
-msgid "Employees of the municipality"
-msgstr "Mitarbeitende der Verwaltung"
+msgid "Contact persons"
+msgstr "Ansprechpersonen"
 
 msgid "Politics"
 msgstr "Politik"
 
-#, python-format
-msgid "Politicians in ${town}"
-msgstr "Politiker in ${town}"
+msgid "Members of authorities, commissions, parties"
+msgstr "Behördenmitglieder, Kommissionen, Parteien"
 
 msgid "Clubs"
 msgstr "Vereine"
 
-#, python-format
-msgid "Clubs in ${town}"
-msgstr "Vereine in ${town}"
+msgid "Leisure, sports, culture"
+msgstr "Freizeit, Sport, Kultur"
 
-msgid "Active people in this town"
-msgstr "In der Gemeinde aktive Personen"
+msgid "All contacts"
+msgstr "Alle Kontakte"
 
 msgid "Email Address"
 msgstr "E-Mail Adresse"
@@ -446,3 +451,15 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
+
+#~ msgid "Employees of the municipality"
+#~ msgstr "Mitarbeitende der Verwaltung"
+
+#~ msgid "Politicians in ${town}"
+#~ msgstr "Politiker in ${town}"
+
+#~ msgid "Clubs in ${town}"
+#~ msgstr "Vereine in ${town}"
+
+#~ msgid "Active people in this town"
+#~ msgstr "In der Gemeinde aktive Personen"
