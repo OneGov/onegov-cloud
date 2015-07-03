@@ -801,13 +801,13 @@ $max-page-width: 600px;
     margin: 0 1em 1em 0;
 
     .person-card-portrait {
+        background: $topbar-bg-color;
         float: left;
         height: 200px;
         margin-right: 1rem;
+        padding-top: 0;
         text-align: center;
         width: 200px;
-        background: $topbar-bg-color;
-        padding-top: 0;
 
         .fa-user {
             color: $white;
