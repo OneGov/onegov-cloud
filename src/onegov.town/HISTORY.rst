@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.2 (2015-07-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Show sidebar below the content on smaller screens.
   [href]
 
