@@ -52,7 +52,7 @@
       </div>
 
       <div class="row content with-sidebar-links" tal:condition="layout.sidebar_links">
-        <div class="small-12 medium-3 large-3 columns sidebar visible-for-large-up">
+        <div class="small-12 medium-3 large-3 columns sidebar show-for-medium-up">
           <div metal:use-macro="layout.macros['sidebar']" />
         </div>
         <div class="small-12 medium-9 large-9 columns">
@@ -63,7 +63,7 @@
               </div>
           </div>
           <div class="row">
-            <div class="small-12 medium-12 visible-for-medium-down columns sidebar sidebar-bottom">
+            <div class="small-12 medium-12 hide-for-medium-up columns sidebar sidebar-bottom">
               <div metal:use-macro="layout.macros['sidebar']" />
             </div>
           </div>
