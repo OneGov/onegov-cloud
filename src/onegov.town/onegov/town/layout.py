@@ -2,8 +2,8 @@ from cached_property import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.form import FormCollection, FormSubmissionFile, render_field
-from onegov.page import Page, PageCollection
 from onegov.org import PersonCollection
+from onegov.page import Page, PageCollection
 from onegov.town import _
 from onegov.town.elements import Link, LinkGroup
 from onegov.town.models import FileCollection
@@ -219,68 +219,67 @@ class DefaultLayout(Layout):
             ]
 
 
-class PageLayout(DefaultLayout):
-    """ The default layout, extended with the navigation of page objects. """
+class AdjacencyListLayout(DefaultLayout):
+    """ Provides layouts for for models inheriting from
+    :class:`onegov.core.orm.abstract.AdjacencyList`
 
-    @cached_property
-    def breadcrumbs(self):
-        return self.get_page_breadcrumbs(self.model)
+    """
 
-    def get_page_breadcrumbs(self, page):
-        links = [Link(_("Homepage"), self.homepage_url)]
+    def get_breadcrumbs(self, item):
+        """ Yields the breadcrumbs for the given adjacency list item. """
 
-        for ancestor in page.ancestors:
-            links.append(Link(ancestor.title, self.request.link(ancestor)))
+        yield Link(_("Homepage"), self.homepage_url)
 
-        links.append(Link(page.title, self.request.link(page)))
+        for ancestor in item.ancestors:
+            yield Link(ancestor.title, self.request.link(ancestor))
 
-        return links
+        yield Link(item.title, self.request.link(item))
 
-    @cached_property
-    def sidebar_links(self):
-        links = []
+    def get_sidebar(self, type=None):
+        """ Yields the sidebar for the given adjacency list item. """
+        query = self.model.siblings.filter(self.model.__class__.type == type)
+        query = query.order_by(self.model.__class__.name)
 
-        # always sort a-z
-        query = self.model.siblings.filter(Page.type == 'topic')
-        query = query.order_by(Page.name)
+        for item in self.request.exclude_invisible(query.all()):
+            url = self.request.link(item)
 
-        for page in self.request.exclude_invisible(query.all()):
-            if page != self.model:
-                links.append(
-                    Link(page.title, self.request.link(page), model=page)
-                )
+            if item != self.model:
+                yield Link(item.title, url, model=item)
             else:
-                links.append(
-                    Link(
-                        page.title, self.request.link(page),
-                        active=True, model=page
-                    )
-                )
+                yield Link(item.title, url, model=item, active=True)
 
                 children = sorted(
                     self.request.exclude_invisible(self.model.children),
                     key=lambda c: c.name
                 )
 
-                for page in children:
-                    links.append(
-                        Link(
-                            page.title,
-                            self.request.link(page),
-                            classes=('childpage', ),
-                            model=page
-                        )
+                for item in children:
+                    yield Link(
+                        text=item.title,
+                        url=self.request.link(item),
+                        classes=('childpage', ),
+                        model=item
                     )
 
-                links.append(
-                    Link("...", '#', classes=('new-content-placeholder',))
-                )
-
-        return links
+                yield Link("...", "#", classes=('new-content-placeholder', ))
 
 
-class NewsLayout(PageLayout):
-    sidebar_links = None
+class PageLayout(AdjacencyListLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return list(self.get_breadcrumbs(self.model))
+
+    @cached_property
+    def sidebar_links(self):
+        return list(self.get_sidebar(type='topic'))
+
+
+class NewsLayout(AdjacencyListLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return list(self.get_breadcrumbs(self.model))
 
 
 class EditorLayout(PageLayout):
@@ -296,7 +295,7 @@ class EditorLayout(PageLayout):
 
     @cached_property
     def breadcrumbs(self):
-        links = self.get_page_breadcrumbs(self.model.page)
+        links = list(self.get_breadcrumbs(self.model.page))
         links.append(Link(self.site_title, url='#'))
         return links
 
