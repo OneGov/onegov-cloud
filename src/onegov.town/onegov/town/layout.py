@@ -341,7 +341,7 @@ class FormSubmissionLayout(DefaultLayout):
         edit_link = Link(
             text=_("Edit"),
             url=self.request.link(self.form, name='bearbeiten'),
-            classes=('edit-form', )
+            classes=('edit-link', )
         )
 
         if self.form.type == 'builtin':
@@ -468,7 +468,7 @@ class PersonLayout(DefaultLayout):
                         Link(
                             text=_("Edit"),
                             url=self.request.link(self.model, 'bearbeiten'),
-                            classes=('edit-person', )
+                            classes=('edit-link', )
                         ),
                         DeleteLink(
                             text=_("Delete"),

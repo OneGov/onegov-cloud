@@ -493,12 +493,7 @@ input[type=color] {
         content: '\f007';
     }
 
-    .edit-town-root:before,
-    .edit-page:before,
-    .edit-news:before,
-    .edit-link:before,
-    .edit-person:before,
-    .edit-form:before {
+    .edit-link:before {
         content: '\f040';
     }
 

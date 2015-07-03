@@ -121,7 +121,7 @@ def edit_links(self, request):
         yield Link(
             _("Edit"),
             request.link(Editor('edit', self)),
-            classes=('edit-{}'.format(self.trait), )
+            classes=('edit-link', )
         )
 
     if self.deletable:
