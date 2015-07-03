@@ -91,7 +91,7 @@ def view_town(self, request):
             Link(
                 text=_("Administration"),
                 url=request.transform('/organisationen/verwaltung'),
-                subtitle=_("Contact persons")
+                subtitle=_("Contact persons, departments")
             ),
             Link(
                 text=_("Politics"),

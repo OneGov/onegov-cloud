@@ -1,81 +1,15 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-07-03 10:57+0200\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
 "Project-Id-Version: \n"
+"POT-Creation-Date: 2015-07-03 11:04+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
-"MIME-Version: 1.0\n"
 "Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.7.6\n"
-
-msgid "Link"
-msgstr "Verknüpfung"
-
-msgid "New Link"
-msgstr "Neue Verknüpfung"
-
-msgid "Added a new link"
-msgstr "Eine neue Verknüpfung wurde hinzugefügt"
-
-msgid "Edit Link"
-msgstr "Verknüpfung Bearbeiten"
-
-msgid "The link was deleted"
-msgstr "Die Verknüpfung wurde gelöscht"
-
-msgid "Delete link"
-msgstr "Verknüpfung Löschen"
-
-#, python-format
-msgid "Do you really want to delete the link \"${title}\"?"
-msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
-
-msgid "Topic"
-msgstr "Thema"
-
-msgid "New Topic"
-msgstr "Neues Thema"
-
-msgid "Added a new topic"
-msgstr "Das neue Thema wurde hinzugefügt"
-
-msgid "Edit Topic"
-msgstr "Thema Bearbeiten"
-
-msgid "The topic was deleted"
-msgstr "Das Thema wurde gelöscht"
-
-msgid "Delete topic"
-msgstr "Thema Löschen"
-
-#, python-format
-msgid "Do you really want to delete the topic \"${title}\"?"
-msgstr "Möchten Sie das Thema \"${title}\" wirklich löschen?"
-
-msgid "News"
-msgstr "Nachricht"
-
-msgid "Add News"
-msgstr "Nachricht hinzufügen"
-
-msgid "Added news"
-msgstr "Eine neue Nachricht wurde hinzugefügt"
-
-msgid "Edit News"
-msgstr "Nachricht bearbeiten"
-
-msgid "The news was deleted"
-msgstr "Die Nachricht wurde gelöscht"
-
-msgid "Delete news"
-msgstr "Nachricht löschen"
-
-#, python-format
-msgid "Do you really want to delete the news \"${title}\"?"
-msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -190,6 +124,75 @@ msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
 msgid "Text"
 msgstr "Text"
+
+msgid "Link"
+msgstr "Verknüpfung"
+
+msgid "New Link"
+msgstr "Neue Verknüpfung"
+
+msgid "Added a new link"
+msgstr "Eine neue Verknüpfung wurde hinzugefügt"
+
+msgid "Edit Link"
+msgstr "Verknüpfung Bearbeiten"
+
+msgid "The link was deleted"
+msgstr "Die Verknüpfung wurde gelöscht"
+
+msgid "Delete link"
+msgstr "Verknüpfung Löschen"
+
+#, python-format
+msgid "Do you really want to delete the link \"${title}\"?"
+msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
+
+msgid "Topic"
+msgstr "Thema"
+
+msgid "New Topic"
+msgstr "Neues Thema"
+
+msgid "Added a new topic"
+msgstr "Das neue Thema wurde hinzugefügt"
+
+msgid "Edit Topic"
+msgstr "Thema Bearbeiten"
+
+msgid "The topic was deleted"
+msgstr "Das Thema wurde gelöscht"
+
+msgid "Delete topic"
+msgstr "Thema Löschen"
+
+#, python-format
+msgid "Do you really want to delete the topic \"${title}\"?"
+msgstr "Möchten Sie das Thema \"${title}\" wirklich löschen?"
+
+msgid "News"
+msgstr "Nachricht"
+
+msgid "Add News"
+msgstr "Nachricht hinzufügen"
+
+msgid "Added news"
+msgstr "Eine neue Nachricht wurde hinzugefügt"
+
+msgid "Edit News"
+msgstr "Nachricht bearbeiten"
+
+msgid "The news was deleted"
+msgstr "Die Nachricht wurde gelöscht"
+
+msgid "Delete news"
+msgstr "Nachricht löschen"
+
+#, python-format
+msgid "Do you really want to delete the news \"${title}\"?"
+msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
+
+msgid "Please note that this item has subitems which will also be deleted!"
+msgstr ""
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -350,8 +353,8 @@ msgstr "Formulare und Gesuche"
 msgid "Administration"
 msgstr "Verwaltung"
 
-msgid "Contact persons"
-msgstr "Ansprechpersonen"
+msgid "Contact persons, departments"
+msgstr "Ansprechpartner, Dienststellen"
 
 msgid "Politics"
 msgstr "Politik"
@@ -386,11 +389,6 @@ msgstr "Sie wurden eingeloggt."
 
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
-
-msgid "Please note that this page has subpages which will also be deleted!"
-msgstr ""
-"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
-"werden!"
 
 msgid "Academic Title"
 msgstr "Akademischer Titel"
@@ -451,6 +449,14 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
+
+#~ msgid "Contact persons"
+#~ msgstr "Ansprechpersonen"
+
+#~ msgid "Please note that this page has subpages which will also be deleted!"
+#~ msgstr ""
+#~ "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+#~ "werden!"
 
 #~ msgid "Employees of the municipality"
 #~ msgstr "Mitarbeitende der Verwaltung"
