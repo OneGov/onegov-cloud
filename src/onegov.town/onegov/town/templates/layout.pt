@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 
-<body id="${layout.page_id}">
+<body id="${layout.page_id}" data-leaflet-images-folder="${layout.leaflet_theme_path}/images">
     <div id="inner-body">
       <div class="row">
         <div class="small-12 columns">

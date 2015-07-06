@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
+from onegov.core import utils
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
@@ -36,6 +37,7 @@ class Layout(ChameleonLayout):
 
         # always include the common js files
         self.request.include('common')
+        self.request.include('common_theme')
 
     @property
     def town(self):
@@ -48,6 +50,13 @@ class Layout(ChameleonLayout):
             self.app, 'font-awesome/css/font-awesome.min.css')
 
         return self.request.link(static_file)
+
+    @cached_property
+    def leaflet_theme_path(self):
+        static_file = StaticFile.from_application(
+            self.app, 'leaflet/leaflet-theme')
+
+        return utils.rchop(self.request.link(static_file), '/leaflet-theme')
 
     @cached_property
     def page_id(self):
