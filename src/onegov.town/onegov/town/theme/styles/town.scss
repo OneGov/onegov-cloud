@@ -691,7 +691,7 @@ $max-page-width: 600px;
     li {
         a.childpage,
         a.new-content-placeholder {
-            color: #000;
+            color: $oil;
             overflow: hidden;
             padding-left: 1rem;
             text-overflow: ellipsis;
