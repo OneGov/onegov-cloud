@@ -1,0 +1,11 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="header-extras">
+        <script src="https://maps.google.com/maps/api/js?v=3&sensor=false"></script>
+    </tal:block>
+    <tal:block metal:fill-slot="title" i18n:translate>
+        Map
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <div class="map" data-size="fullscreen" data-lat="${map.lat}" data-lon="${map.lon}" data-zoom="${map.zoom}" />
+    </tal:block>
+</div>

@@ -7,6 +7,7 @@ from onegov.town.models import (
     FileCollection,
     Image,
     ImageCollection,
+    Map,
     News,
     Thumbnail,
     Topic,
@@ -27,6 +28,11 @@ from onegov.people import Person, PersonCollection
 @TownApp.path(model=Town, path='/')
 def get_town(app):
     return app.town
+
+
+@TownApp.path(model=Map, path='/karte/{lat}/{lon}/{zoom}')
+def get_map(app, lat, lon, zoom):
+    return Map(lat, lon, zoom)
 
 
 @TownApp.path(model=Topic, path='/themen', absorb=True)

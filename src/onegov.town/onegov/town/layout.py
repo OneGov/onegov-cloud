@@ -1,7 +1,7 @@
 from cached_property import cached_property
+from onegov.core import utils
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
-from onegov.core import utils
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
@@ -226,6 +226,18 @@ class DefaultLayout(Layout):
                 Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
                 Link(u'Seantis GmbH', 'https://www.seantis.ch')
             ]
+
+
+class MapLayout(Layout):
+    """ Defines the layout of the map view. This layout is very different than
+    the rest of the site - we only show a map, no white labeling whatsoever.
+
+    We do this because we include maps using iframes, so this view is really
+    never used separately, though it can be.
+
+    This view should be as light as possible.
+
+    """
 
 
 class AdjacencyListLayout(DefaultLayout):

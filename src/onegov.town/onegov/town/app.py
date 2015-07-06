@@ -115,6 +115,7 @@ class TownApp(Framework):
 
         map = Bundle(
             'js/leaflet.js',
+            'js/leaflet-google.js',
             'js/map.js',
             filters='jsmin',
             output='bundles/map.bundle.js'
@@ -180,6 +181,8 @@ class TownApp(Framework):
             'common_theme': common_theme,
             'dropzone': dropzone,
             'editor': editor,
+            'map': map,
+            'map_theme': map_theme,
             'redactor': redactor,
             'redactor_theme': redactor_theme
         }
