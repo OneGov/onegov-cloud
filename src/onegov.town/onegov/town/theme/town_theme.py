@@ -70,6 +70,7 @@ class TownTheme(BaseTheme):
             ('side-nav-font-weight-active', 'bold'),
             ('crumb-bg', '#fff'),
             ('crumb-border-size', '0'),
+            ('header-line-height', '1.25'),
 
             # custom
             ('tile-image-1', '"../static/homepage-images/tile-1-small.jpg"'),
