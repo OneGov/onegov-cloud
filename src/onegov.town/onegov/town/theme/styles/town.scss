@@ -76,9 +76,9 @@ footer,
 */
 
 .main-navigation {
-    margin-bottom: 1rem;
     background-color: $topbar-bg-color;
     border-bottom: $top-bar-border-size solid $primary-color;
+    margin-bottom: 1rem;
 }
 
 .top-bar {
@@ -692,8 +692,8 @@ $max-page-width: 600px;
         a.childpage,
         a.new-content-placeholder {
             color: #000;
-            padding-left: 1rem;
             overflow: hidden;
+            padding-left: 1rem;
             text-overflow: ellipsis;
         }
 
