@@ -117,7 +117,7 @@ class TownApp(Framework):
             'js/leaflet.js',
             'js/leaflet-google.js',
             'js/map.js',
-            filters='jsmin',
+            #filters='jsmin',
             output='bundles/map.bundle.js'
         )
 
@@ -138,6 +138,7 @@ class TownApp(Framework):
             'js/bufferbuttons.js',
             'js/filemanager.js',
             'js/imagemanager.js',
+            'js/geomanager.js',
             'js/redactor.de.js',
             'js/editor.js',
             filters='jsmin',

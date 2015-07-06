@@ -1,5 +1,5 @@
 from onegov.core import utils
-from onegov.core.utils import sanitize_html
+from onegov.town.utils import sanitize_html
 from onegov.form import Form, with_options
 from onegov.page import Page
 from onegov.town import _

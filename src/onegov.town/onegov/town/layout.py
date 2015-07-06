@@ -9,6 +9,7 @@ from onegov.town import _
 from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import FileCollection
 from onegov.town.models import ImageCollection, Thumbnail
+from ordered_set import OrderedSet
 from sqlalchemy import desc
 
 
@@ -238,6 +239,13 @@ class MapLayout(Layout):
     This view should be as light as possible.
 
     """
+
+    def __init__(self, model, request):
+        super(MapLayout, self).__init__(model, request)
+
+        self.request.included_assets = OrderedSet()
+        self.request.include('map')
+        self.request.include('map_theme')
 
 
 class AdjacencyListLayout(DefaultLayout):
