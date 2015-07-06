@@ -116,7 +116,8 @@ def handle_new_definition(self, request, form):
 
 
 @TownApp.form(model=FormDefinition, template='form.pt', permission=Private,
-              form=lambda m: form_classes[m.type], name='bearbeiten')
+              form=lambda self, request: form_classes[self.type],
+              name='bearbeiten')
 def handle_edit_definition(self, request, form):
 
     if form.submitted(request):

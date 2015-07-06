@@ -699,3 +699,40 @@ def test_people_view(town_app):
 
     people = client.get('/personen')
     assert 'noch keine Personen' in people
+
+
+def test_with_people(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    people = client.get('/personen')
+
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'Flash'
+    new_person.form['last_name'] = 'Gordon'
+    new_person.form.submit()
+
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'Merciless'
+    new_person.form['last_name'] = 'Ming'
+    new_person.form.submit()
+
+    new_page = client.get('/themen/leben-wohnen').click('Thema')
+
+    assert 'Flash Gordon' in new_page
+    assert 'Merciless Ming' in new_page
+
+    new_page.form['title'] = 'About Flash'
+    new_page.form['people_flash_gordon'] = True
+    new_page.form['people_flash_gordon_function'] = 'Astronaut'
+    edit_page = new_page.form.submit().follow().click('Bearbeiten')
+
+    assert edit_page.form['people_flash_gordon'].value == 'y'
+    assert edit_page.form['people_flash_gordon_function'].value == 'Astronaut'
+
+    assert edit_page.form['people_merciless_ming'].value is None
+    assert edit_page.form['people_merciless_ming_function'].value == ''

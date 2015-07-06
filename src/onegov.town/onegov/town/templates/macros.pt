@@ -95,9 +95,17 @@
             </tal:block>
             <tal:block condition="input_type != 'hidden'">
                 <label tal:attributes="class field.errors and 'error' or None">
-                    <span class="label-text">${field.label.text}</span>
-                    <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                    ${field(placeholder=request.translate(field.description))}
+                    <!-- render the label after the field if it's a boolean field -->
+                    <tal:block condition="field.type == 'BooleanField'">
+                        ${field(placeholder=request.translate(field.description))}
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                    </tal:block>
+                    <tal:block condition="field.type != 'BooleanField'">
+                        <span class="label-text">${field.label.text}</span>
+                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+                        ${field(placeholder=request.translate(field.description))}
+                    </tal:block>
                 </label>
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:block>

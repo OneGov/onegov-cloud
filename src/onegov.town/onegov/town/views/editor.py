@@ -10,8 +10,12 @@ from onegov.town.layout import EditorLayout
 from onegov.town.models import Editor
 
 
-@TownApp.form(model=Editor, form=lambda e: e.page.get_form_class(e.trait),
-              template='form.pt', permission=Private)
+def get_form_class(editor, request):
+    return editor.page.get_form_class(editor.trait, request)
+
+
+@TownApp.form(model=Editor, template='form.pt', permission=Private,
+              form=get_form_class)
 def handle_page_form(self, request, form):
     if self.action == 'new':
         return handle_new_page(self, request, form)

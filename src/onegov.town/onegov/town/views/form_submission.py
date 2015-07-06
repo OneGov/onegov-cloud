@@ -16,7 +16,7 @@ from onegov.town.app import TownApp
 from onegov.town.layout import FormSubmissionLayout
 
 
-@TownApp.form(model=FormDefinition, form=lambda e: e.form_class,
+@TownApp.form(model=FormDefinition, form=lambda self, request: self.form_class,
               template='form.pt', permission=Public)
 def handle_defined_form(self, request, form):
     """ Renders the empty form and takes input, even if it's not valid, stores

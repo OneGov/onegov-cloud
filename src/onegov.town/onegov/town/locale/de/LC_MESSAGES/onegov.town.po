@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-03 13:55+0200\n"
+"POT-Creation-Date: 2015-07-06 15:49+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -113,9 +113,6 @@ msgstr "Titel"
 msgid "URL"
 msgstr "URL"
 
-msgid "Hide from the public"
-msgstr "Vor der Öffentlichkeit verstecken"
-
 msgid "Lead"
 msgstr "Einleitung"
 
@@ -124,6 +121,12 @@ msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
 msgid "Text"
 msgstr "Text"
+
+msgid "Hide from the public"
+msgstr "Vor der Öffentlichkeit verstecken"
+
+msgid "Function"
+msgstr "Funktion"
 
 msgid "Link"
 msgstr "Verknüpfung"
