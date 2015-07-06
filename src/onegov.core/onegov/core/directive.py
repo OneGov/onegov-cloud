@@ -75,7 +75,7 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
     def handle_form(self, request):
 
         if isfunction(form_class):
-            form = request.get_form(form_class(self))
+            form = request.get_form(form_class(self, request))
         else:
             form = request.get_form(form_class)
 

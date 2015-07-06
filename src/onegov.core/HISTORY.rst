@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Pass the request in addition to the model when dynamically building the
+  form class in the form directive.
+  [href]
+
 - Fixes onegov.core.utils.rchop not working correctly.
   [href]
 
