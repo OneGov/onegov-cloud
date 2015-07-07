@@ -9,14 +9,44 @@ from wtforms import BooleanField, StringField, TextAreaField
 from wtforms.widgets import TextArea
 
 
-def extend_form(form_class, request, extensions):
-    for extension in extensions:
-        form_class = extension(form_class, request)
+class ContentExtension(object):
+    """ Extends classes based on :class:`onegov.core.orm.mixins.ContentMixin`
+    with custom data that is stored in either 'meta' or 'content'.
 
-    return form_class
+    """
+
+    @property
+    def content_extensions(self):
+        """ Returns all base classes of the current class which themselves have
+        ``ContentExtension`` as baseclass.
+
+        """
+        for cls in self.__class__.__bases__:
+            if ContentExtension in cls.__bases__:
+                yield cls
+
+    def with_content_extensions(self, form_class, request):
+        """ Takes the given form and request and extends the form with
+        all content extensions in the order in which they occur in the base
+        class list.
+
+        In other words, extends the forms with all used extension-fields.
+
+        """
+        for extension in self.content_extensions:
+            form_class = extension.extend_form(self, form_class, request)
+
+        return form_class
+
+    def extend_form(self, form_class, request):
+        """ Must be implemented by each ContentExtension. Takes the form
+        class without extension and adds the required fields to it.
+
+        """
+        raise NotImplementedError
 
 
-class HiddenMetaMixin(object):
+class HiddenFromPublicExtension(ContentExtension):
     """ Extends any class that has a meta dictionary field with the ability to
     hide it from the public.
 
@@ -32,7 +62,7 @@ class HiddenMetaMixin(object):
     def is_hidden_from_public(self, is_hidden):
         self.meta['is_hidden_from_public'] = is_hidden
 
-    def extend_form_with_hidden_switch(self, form_class, request):
+    def extend_form(self, form_class, request):
 
         assert hasattr(form_class, 'get_page')
         assert hasattr(form_class, 'set_page')
@@ -55,7 +85,7 @@ class HiddenMetaMixin(object):
         return HiddenPageForm
 
 
-class PeopleContentMixin(object):
+class PersonLinkExtension(ContentExtension):
     """ Extends any class that has a content dictionary field with the ability
     to reference people from :class:`onegov.people.PersonCollection`.
 
@@ -84,7 +114,7 @@ class PeopleContentMixin(object):
 
         return query.all()
 
-    def extend_form_with_people(self, form_class, request):
+    def extend_form(self, form_class, request):
 
         assert hasattr(form_class, 'get_page')
         assert hasattr(form_class, 'set_page')
@@ -145,7 +175,7 @@ class PeopleContentMixin(object):
         return builder.form_class
 
 
-class ContactContentMixin(object):
+class ContactExtension(ContentExtension):
     """ Extends any class that has a content dictionary field with a simple
     contacts field.
 
@@ -159,7 +189,7 @@ class ContactContentMixin(object):
     def contact_html(self):
         return self.content.get('contact_html')
 
-    def extend_form_with_contact(self, form_class, request):
+    def extend_form(self, form_class, request):
 
         assert hasattr(form_class, 'get_page')
         assert hasattr(form_class, 'set_page')

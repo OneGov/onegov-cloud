@@ -4,11 +4,10 @@ from onegov.form import Form, with_options
 from onegov.page import Page
 from onegov.town import _
 from onegov.town.models.traitinfo import TraitInfo
-from onegov.town.models.mixins import (
-    extend_form,
-    ContactContentMixin,
-    HiddenMetaMixin,
-    PeopleContentMixin,
+from onegov.town.models.extensions import (
+    ContactExtension,
+    HiddenFromPublicExtension,
+    PersonLinkExtension,
 )
 from onegov.town.utils import mark_images
 from sqlalchemy import desc
@@ -19,7 +18,7 @@ from wtforms.widgets import TextArea
 
 
 class Topic(Page, TraitInfo,
-            HiddenMetaMixin, PeopleContentMixin, ContactContentMixin):
+            HiddenFromPublicExtension, PersonLinkExtension, ContactExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     @property
@@ -49,17 +48,13 @@ class Topic(Page, TraitInfo,
             return LinkForm
 
         if trait == 'page':
-            return extend_form(PageForm, request, (
-                self.extend_form_with_hidden_switch,
-                self.extend_form_with_contact,
-                self.extend_form_with_people,
-            ))
+            return self.with_content_extensions(PageForm, request)
 
         raise NotImplementedError
 
 
 class News(Page, TraitInfo,
-           HiddenMetaMixin, PeopleContentMixin, ContactContentMixin):
+           HiddenFromPublicExtension, PersonLinkExtension, ContactExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     @property
@@ -87,11 +82,7 @@ class News(Page, TraitInfo,
 
     def get_form_class(self, trait, request):
         if trait == 'news':
-            return extend_form(PageForm, request, (
-                self.extend_form_with_hidden_switch,
-                self.extend_form_with_contact,
-                self.extend_form_with_people,
-            ))
+            return self.with_content_extensions(PageForm, request)
 
         raise NotImplementedError
 

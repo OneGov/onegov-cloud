@@ -1,12 +1,49 @@
 from onegov.core.utils import Bunch
 from onegov.form import Form
-from onegov.town.models.mixins import PeopleContentMixin, ContactContentMixin
+from onegov.town.models.extensions import (
+    PersonLinkExtension, ContactExtension, HiddenFromPublicExtension
+)
 from uuid import UUID
 
 
-def test_people_content_mixin():
+def test_hidden_from_public_extension():
 
-    class Topic(PeopleContentMixin):
+    class Topic(HiddenFromPublicExtension):
+        meta = {}
+
+    class TopicForm(Form):
+
+        def get_page(self, page):
+            pass
+
+        def set_page(self, page):
+            pass
+
+    topic = Topic()
+    assert not topic.is_hidden_from_public
+
+    form_class = topic.with_content_extensions(TopicForm, request=object())
+    form = form_class()
+
+    assert 'is_hidden_from_public' in form._fields
+    assert not form.is_hidden_from_public.data
+
+    form.is_hidden_from_public.data = True
+    form.get_page(topic)
+
+    assert topic.is_hidden_from_public
+
+    form_class = topic.with_content_extensions(TopicForm, request=object())
+    form = form_class()
+
+    form.set_page(topic)
+
+    assert form.is_hidden_from_public.data
+
+
+def test_person_link_extension():
+
+    class Topic(PersonLinkExtension):
         content = {}
 
         def get_selectable_people(self, request):
@@ -32,7 +69,7 @@ def test_people_content_mixin():
     topic = Topic()
     assert topic.people is None
 
-    form_class = topic.extend_form_with_people(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
     assert 'people_troy_barnes' in form._fields
@@ -54,7 +91,7 @@ def test_people_content_mixin():
         ('6d120102d90344868eb32614cf3acb1a', 'The Truest Repairman')
     ]
 
-    form_class = topic.extend_form_with_people(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
     form.set_page(topic)
 
@@ -64,9 +101,9 @@ def test_people_content_mixin():
     assert not form.people_abed_nadir_function.data
 
 
-def test_contact_content_mixin():
+def test_contact_extension():
 
-    class Topic(ContactContentMixin):
+    class Topic(ContactExtension):
         content = {}
 
     class TopicForm(Form):
@@ -81,7 +118,7 @@ def test_contact_content_mixin():
     assert topic.contact is None
     assert topic.contact_html is None
 
-    form_class = topic.extend_form_with_contact(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
     assert 'contact_address' in form._fields
@@ -107,7 +144,7 @@ def test_contact_content_mixin():
         'https://www.apple.com</a>'
     )
 
-    form_class = topic.extend_form_with_contact(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
     form.set_page(topic)

@@ -8,7 +8,6 @@ from onegov.town import _, TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import FormEditorLayout
 from onegov.town.models import CustomFormDefinition
-from onegov.town.models.mixins import extend_form
 from onegov.town.utils import mark_images
 from webob import exc
 from wtforms import StringField, TextAreaField, validators
@@ -82,11 +81,7 @@ def get_form_class(model, request):
         'custom': CustomDefinitionForm
     }
 
-    return extend_form(form_classes[model.type], request, (
-        model.extend_form_with_hidden_switch,
-        model.extend_form_with_contact,
-        model.extend_form_with_people,
-    ))
+    return model.with_content_extensions(form_classes[model.type], request)
 
 
 @TownApp.form(model=FormCollection, name='neu', template='form.pt',
