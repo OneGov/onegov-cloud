@@ -46,7 +46,7 @@ class Link(object):
         else:
             return False
 
-    def __call__(self, request):
+    def __call__(self, request, extra_classes=None):
         """ Renders the element. """
 
         a = builder.A(request.translate(self.text))
@@ -60,8 +60,9 @@ class Link(object):
 
             a.attrib['ic-delete-from'] = url.as_string()
 
-        if self.classes:
-            a.attrib['class'] = ' '.join(self.classes)
+        if self.classes or extra_classes:
+            classes = self.classes + (extra_classes or tuple())
+            a.attrib['class'] = ' '.join(classes)
 
         # add the hidden from public hint if needed
         if self.is_hidden_from_public:

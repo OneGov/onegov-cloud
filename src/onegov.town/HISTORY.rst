@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Show the edit/delete links outside the dropdown.
+  [href]
+
 - Adds the ability to add an address block to topics, news and forms.
   [href]
 

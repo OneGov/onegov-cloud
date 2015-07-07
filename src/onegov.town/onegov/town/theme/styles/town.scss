@@ -459,7 +459,7 @@ input[type=color] {
         p {
             margin-bottom: 0;
         }
-        
+
         p:first-line {
             font-weight: bold;
         }
@@ -475,8 +475,17 @@ input[type=color] {
     margin-top: -1.2rem;
 
     button.tiny {
+        float: right;
+        font-size: .8rem;
         margin-bottom: 0;
-        padding-left: 1rem;
+    }
+
+    > a {
+        margin-bottom: 0;
+    }
+
+    a.tiny {
+        font-size: .8rem;
     }
 
     a:before {

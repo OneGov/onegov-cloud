@@ -36,7 +36,7 @@
         <div class="small-12 columns">
             <div class="edit-bar clearfix">
                 <tal:block repeat="group layout.editbar_links">
-                    <tal:block condition="group.links" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
+                    <tal:block condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
                         <button href="#" data-dropdown="${dropdown_id}" class="tiny button dropdown">
                             ${group.title}
                         </button>
@@ -45,6 +45,9 @@
                                 <tal:block replace="structure link(request)" />
                             </li>
                         </ul>
+                    </tal:block>
+                    <tal:block condition="group.url|nothing" define="link group">
+                        <tal:block replace="structure link(request, ('tiny', 'button'))" />
                     </tal:block>
                 </tal:block>
             </div>

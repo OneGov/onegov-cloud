@@ -84,16 +84,15 @@ class TraitInfo(object):
 
     def get_editbar_links(self, request):
         """ Returns the editbar links on the private view of this trait. """
-        return [
-            LinkGroup(
-                title=self.trait_messages[self.trait]['name'],
-                links=tuple(self.get_edit_links(request))
-            ),
+        links = list(self.get_edit_links(request))
+        links.append(
             LinkGroup(
                 title=_(u'Add'),
                 links=tuple(self.get_add_links(request))
-            ),
-        ]
+            )
+        )
+
+        return links
 
     def get_add_links(self, request):
         """ Yields the add links shown on the private view of this trait. """

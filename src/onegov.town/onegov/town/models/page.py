@@ -18,7 +18,7 @@ from wtforms.widgets import TextArea
 
 
 class Topic(Page, TraitInfo,
-            HiddenFromPublicExtension, PersonLinkExtension, ContactExtension):
+            HiddenFromPublicExtension, ContactExtension, PersonLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     @property
@@ -54,7 +54,7 @@ class Topic(Page, TraitInfo,
 
 
 class News(Page, TraitInfo,
-           HiddenFromPublicExtension, PersonLinkExtension, ContactExtension):
+           HiddenFromPublicExtension, ContactExtension, PersonLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     @property

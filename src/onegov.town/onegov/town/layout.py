@@ -376,13 +376,7 @@ class FormSubmissionLayout(DefaultLayout):
             )
 
         return [
-            LinkGroup(
-                title=_("Form"),
-                links=[
-                    edit_link,
-                    delete_link
-                ]
-            ),
+            edit_link, delete_link
         ]
 
 
@@ -462,22 +456,17 @@ class PersonLayout(DefaultLayout):
     def editbar_links(self):
         if self.request.is_logged_in:
             return [
-                LinkGroup(
-                    title=_("Person"),
-                    links=[
-                        Link(
-                            text=_("Edit"),
-                            url=self.request.link(self.model, 'bearbeiten'),
-                            classes=('edit-link', )
-                        ),
-                        DeleteLink(
-                            text=_("Delete"),
-                            url=self.request.link(self.model),
-                            confirm=_(
-                                "Do you really want to delete this person?"),
-                            yes_button_text=_("Delete person"),
-                            redirect_after=self.request.link(self.collection)
-                        )
-                    ]
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'bearbeiten'),
+                    classes=('edit-link', )
+                ),
+                DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model),
+                    confirm=_(
+                        "Do you really want to delete this person?"),
+                    yes_button_text=_("Delete person"),
+                    redirect_after=self.request.link(self.collection)
                 )
             ]
