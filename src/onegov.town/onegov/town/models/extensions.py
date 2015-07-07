@@ -33,6 +33,13 @@ class ContentExtension(object):
         In other words, extends the forms with all used extension-fields.
 
         """
+
+        # the content is injected/updated using the following methods - this
+        # is currently a best practice in the code, but not really something
+        # we enforce using base classes or something like it.
+        assert hasattr(form_class, 'update_model')
+        assert hasattr(form_class, 'apply_model')
+
         for extension in self.content_extensions:
             form_class = extension.extend_form(self, form_class, request)
 
@@ -64,25 +71,60 @@ class HiddenFromPublicExtension(ContentExtension):
 
     def extend_form(self, form_class, request):
 
-        assert hasattr(form_class, 'get_page')
-        assert hasattr(form_class, 'set_page')
-
         class HiddenPageForm(form_class):
             is_hidden_from_public = BooleanField(_("Hide from the public"))
 
-            def get_page(self, page):
-                super(HiddenPageForm, self).get_page(page)
+            def update_model(self, model):
+                super(HiddenPageForm, self).update_model(model)
+                model.is_hidden_from_public = self.is_hidden_from_public.data
 
-                page.meta['is_hidden_from_public'] \
-                    = self.is_hidden_from_public.data
-
-            def set_page(self, page):
-                super(HiddenPageForm, self).set_page(page)
-
-                self.is_hidden_from_public.data\
-                    = page.meta.get('is_hidden_from_public', False)
+            def apply_model(self, model):
+                super(HiddenPageForm, self).apply_model(model)
+                self.is_hidden_from_public.data = model.is_hidden_from_public
 
         return HiddenPageForm
+
+
+class ContactExtension(ContentExtension):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field.
+
+    """
+
+    @property
+    def contact(self):
+        return self.content.get('contact')
+
+    @contact.setter
+    def contact(self, value):
+        self.content['contact'] = value
+        self.content['contact_html'] = linkify(value)
+
+    @property
+    def contact_html(self):
+        return self.content.get('contact_html')
+
+    def extend_form(self, form_class, request):
+
+        assert hasattr(form_class, 'update_model')
+        assert hasattr(form_class, 'apply_model')
+
+        class ContactPageForm(form_class):
+            contact_address = TextAreaField(
+                label=_(u"Address"),
+                fieldset=_("Contact"),
+                widget=with_options(TextArea, rows=5)
+            )
+
+            def update_model(self, model):
+                super(ContactPageForm, self).update_model(model)
+                model.contact = self.contact_address.data
+
+            def apply_model(self, model):
+                super(ContactPageForm, self).apply_model(model)
+                self.contact_address.data = model.content.get('contact', '')
+
+        return ContactPageForm
 
 
 class PersonLinkExtension(ContentExtension):
@@ -116,9 +158,6 @@ class PersonLinkExtension(ContentExtension):
 
     def extend_form(self, form_class, request):
 
-        assert hasattr(form_class, 'get_page')
-        assert hasattr(form_class, 'set_page')
-
         class PeoplePageForm(form_class):
 
             def get_people_fields(self, with_function):
@@ -139,15 +178,15 @@ class PersonLinkExtension(ContentExtension):
 
                         yield person_id, function
 
-            def get_page(self, page):
-                super(PeoplePageForm, self).get_page(page)
-                page.content['people'] = list(self.get_people_and_function())
+            def update_model(self, model):
+                super(PeoplePageForm, self).update_model(model)
+                model.content['people'] = list(self.get_people_and_function())
 
-            def set_page(self, page):
-                super(PeoplePageForm, self).set_page(page)
+            def apply_model(self, model):
+                super(PeoplePageForm, self).apply_model(model)
 
                 fields = self.get_people_fields(with_function=False)
-                people = dict(page.content.get('people', []))
+                people = dict(model.content.get('people', []))
 
                 for field_id, field in fields:
                     if field.id.hex in people:
@@ -173,42 +212,3 @@ class PersonLinkExtension(ContentExtension):
             )
 
         return builder.form_class
-
-
-class ContactExtension(ContentExtension):
-    """ Extends any class that has a content dictionary field with a simple
-    contacts field.
-
-    """
-
-    @property
-    def contact(self):
-        return self.content.get('contact')
-
-    @property
-    def contact_html(self):
-        return self.content.get('contact_html')
-
-    def extend_form(self, form_class, request):
-
-        assert hasattr(form_class, 'get_page')
-        assert hasattr(form_class, 'set_page')
-
-        class ContactPageForm(form_class):
-            contact_address = TextAreaField(
-                label=_(u"Address"),
-                fieldset=_("Contact"),
-                widget=with_options(TextArea, rows=5)
-            )
-
-            def get_page(self, page):
-                super(ContactPageForm, self).get_page(page)
-                page.content['contact'] = self.contact_address.data
-                page.content['contact_html'] = linkify(
-                    self.contact_address.data)
-
-            def set_page(self, page):
-                super(ContactPageForm, self).set_page(page)
-                self.contact_address.data = page.content.get('contact', '')
-
-        return ContactPageForm

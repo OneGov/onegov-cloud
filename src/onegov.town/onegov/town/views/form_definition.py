@@ -29,20 +29,20 @@ class FormDefinitionBaseForm(Form):
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html, mark_images])
 
-    def get_page(self, page):
-        page.title = self.title.data
+    def update_model(self, model):
+        model.title = self.title.data
 
-        if page.type == 'custom':
-            page.definition = self.definition.data
+        if model.type == 'custom':
+            model.definition = self.definition.data
 
-        page.meta['lead'] = self.lead.data
-        page.content['text'] = self.text.data
+        model.meta['lead'] = self.lead.data
+        model.content['text'] = self.text.data
 
-    def set_page(self, page):
-        self.title.data = page.title
-        self.definition.data = page.definition
-        self.lead.data = page.meta.get('lead', '')
-        self.text.data = page.content.get('text', '')
+    def apply_model(self, model):
+        self.title.data = model.title
+        self.definition.data = model.definition
+        self.lead.data = model.meta.get('lead', '')
+        self.text.data = model.content.get('text', '')
 
 
 class BuiltinDefinitionForm(FormDefinitionBaseForm):
@@ -90,17 +90,18 @@ def handle_new_definition(self, request, form):
 
     if form.submitted(request):
 
-        page = Bunch(
-            title=None, definition=None, type='custom', meta={}, content={})
-        form.get_page(page)
+        model = Bunch(
+            title=None, definition=None, type='custom', meta={}, content={}
+        )
+        form.update_model(model)
 
         # forms added online are always custom forms
         new_form = self.definitions.add(
-            title=page.title,
-            definition=page.definition,
+            title=model.title,
+            definition=model.definition,
             type='custom',
-            meta=page.meta,
-            content=page.content
+            meta=model.meta,
+            content=model.content
         )
 
         request.success(_("Added a new form"))
@@ -131,14 +132,14 @@ def handle_edit_definition(self, request, form):
         if self.type == 'custom':
             self.definition = form.definition.data
 
-        form.get_page(self)
+        form.update_model(self)
 
         request.success(_("Your changes were saved"))
         return morepath.redirect(request.link(self))
     else:
         form.title.data = self.title
         form.definition.data = self.definition
-        form.set_page(self)
+        form.apply_model(self)
 
     collection = FormCollection(request.app.session())
 

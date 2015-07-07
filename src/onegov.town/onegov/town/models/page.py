@@ -106,15 +106,15 @@ class LinkForm(PageBaseForm):
     """ Defines the form for pages with the 'link' trait. """
     url = URLField(_("URL"), [validators.InputRequired()])
 
-    def get_page(self, page):
+    def update_model(self, model):
         """ Stores the form values on the page. """
-        page.title = self.title.data
-        page.content = {'url': self.url.data}
+        model.title = self.title.data
+        model.content = {'url': self.url.data}
 
-    def set_page(self, page):
+    def apply_model(self, model):
         """ Stores the page values on the form. """
-        self.title.data = page.title
-        self.url.data = page.content.get('url')
+        self.title.data = model.title
+        self.url.data = model.content.get('url')
 
 
 class PageForm(PageBaseForm):
@@ -129,16 +129,16 @@ class PageForm(PageBaseForm):
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html, mark_images])
 
-    def get_page(self, page):
+    def update_model(self, model):
         """ Stores the form values on the page. """
-        page.title = self.title.data
-        page.content = {
+        model.title = self.title.data
+        model.content = {
             'lead': self.lead.data,
             'text': self.text.data
         }
 
-    def set_page(self, page):
+    def apply_model(self, model):
         """ Stores the page values on the form. """
-        self.title.data = page.title
-        self.lead.data = page.content.get('lead', '')
-        self.text.data = page.content.get('text', '')
+        self.title.data = model.title
+        self.lead.data = model.content.get('lead', '')
+        self.text.data = model.content.get('text', '')

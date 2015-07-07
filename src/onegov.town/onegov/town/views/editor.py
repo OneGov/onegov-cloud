@@ -35,7 +35,7 @@ def handle_new_page(self, request, form):
             type=self.page.type,
             meta={'trait': self.trait}
         )
-        form.get_page(page)
+        form.update_model(page)
 
         request.success(page.trait_messages[page.trait]['new_page_added'])
         return morepath.redirect(request.link(page))
@@ -52,12 +52,12 @@ def handle_new_page(self, request, form):
 
 def handle_edit_page(self, request, form):
     if form.submitted(request):
-        form.get_page(self.page)
+        form.update_model(self.page)
         request.success(_(u"Your changes were saved"))
 
         return morepath.redirect(request.link(self.page))
     else:
-        form.set_page(self.page)
+        form.apply_model(self.page)
 
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
 

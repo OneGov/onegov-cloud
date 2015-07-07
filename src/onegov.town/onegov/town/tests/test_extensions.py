@@ -13,10 +13,10 @@ def test_hidden_from_public_extension():
 
     class TopicForm(Form):
 
-        def get_page(self, page):
+        def update_model(self, model):
             pass
 
-        def set_page(self, page):
+        def apply_model(self, model):
             pass
 
     topic = Topic()
@@ -29,14 +29,14 @@ def test_hidden_from_public_extension():
     assert not form.is_hidden_from_public.data
 
     form.is_hidden_from_public.data = True
-    form.get_page(topic)
+    form.update_model(topic)
 
     assert topic.is_hidden_from_public
 
     form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
-    form.set_page(topic)
+    form.apply_model(topic)
 
     assert form.is_hidden_from_public.data
 
@@ -60,10 +60,10 @@ def test_person_link_extension():
 
     class TopicForm(Form):
 
-        def get_page(self, page):
+        def update_model(self, model):
             pass
 
-        def set_page(self, page):
+        def apply_model(self, model):
             pass
 
     topic = Topic()
@@ -78,14 +78,14 @@ def test_person_link_extension():
     assert 'people_abed_nadir_function' in form._fields
 
     form.people_troy_barnes.data = True
-    form.get_page(topic)
+    form.update_model(topic)
 
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', None)
     ]
 
     form.people_troy_barnes_function.data = 'The Truest Repairman'
-    form.get_page(topic)
+    form.update_model(topic)
 
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', 'The Truest Repairman')
@@ -93,7 +93,7 @@ def test_person_link_extension():
 
     form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
-    form.set_page(topic)
+    form.apply_model(topic)
 
     assert form.people_troy_barnes.data is True
     assert form.people_troy_barnes_function.data == 'The Truest Repairman'
@@ -108,10 +108,10 @@ def test_contact_extension():
 
     class TopicForm(Form):
 
-        def get_page(self, page):
+        def update_model(self, model):
             pass
 
-        def set_page(self, page):
+        def apply_model(self, model):
             pass
 
     topic = Topic()
@@ -129,7 +129,7 @@ def test_contact_extension():
         "https://www.apple.com"
     )
 
-    form.get_page(topic)
+    form.update_model(topic)
 
     assert topic.contact == (
         "Steve Jobs\n"
@@ -147,7 +147,7 @@ def test_contact_extension():
     form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
-    form.set_page(topic)
+    form.apply_model(topic)
 
     assert form.contact_address.data == (
         "Steve Jobs\n"
