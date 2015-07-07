@@ -172,28 +172,32 @@
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town">
     <div class="row" tal:condition="lead or text or people or contact">
-        <div class="small-12 columns" tal:condition="not: people or contact">
-            <em class="page-lead" tal:condition="lead" tal:content="lead" />
-            <div class="page-text" tal:condition="text" tal:content="structure text" />
-        </div>
-        <div class="small-12 medium-8 columns" tal:condition="people">
-            <em class="page-lead" tal:condition="lead" tal:content="lead" />
-            <div class="page-text" tal:condition="text" tal:content="structure text" />
-        </div>
-        <div class="small-12 medium-4 columns" tal:condition="people or contact">
-            <div class="page-content-panel contact-panel" tal:condition="contact">
-                <p tal:content="structure contact.rstrip('\n').replace('\n', '<br>')"></p>
+        <tal:block condition="not: people or contact">
+            <div class="small-12 columns">
+                <em class="page-lead" tal:condition="lead" tal:content="lead" />
+                <div class="page-text" tal:condition="text" tal:content="structure text" />
             </div>
-            <div class="page-content-panel people-panel" tal:condition="people">
-                <h2 i18n:translate>People</h2>
-                <ul tal:repeat="person people">
-                    <li>
-                        <a href="${request.link(person)}">${person.title}</a>
-                        <small>${person.context_specific_function}</small>
-                    </li>
-                </ul>
+        </tal:block>
+        <tal:block condition="people or contact">
+            <div class="small-12 medium-8 columns">
+                <em class="page-lead" tal:condition="lead" tal:content="lead" />
+                <div class="page-text" tal:condition="text" tal:content="structure text" />
             </div>
-        </div>
+            <div class="small-12 medium-4 columns" tal:condition="people or contact">
+                <div class="page-content-panel contact-panel" tal:condition="contact">
+                    <p tal:content="structure contact.rstrip('\n').replace('\n', '<br>')"></p>
+                </div>
+                <div class="page-content-panel people-panel" tal:condition="people">
+                    <h2 i18n:translate>People</h2>
+                    <ul tal:repeat="person people">
+                        <li>
+                            <a href="${request.link(person)}">${person.title}</a>
+                            <small>${person.context_specific_function}</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </tal:block>
     </div>
 </metal:page_content>
 

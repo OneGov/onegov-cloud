@@ -4,10 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Adds the ability to add an address block to top and news pages.
+- Adds the ability to add an address block to topics, news and forms.
   [href]
 
-- Adds the ability to add people to topics and news pages.
+- Adds the ability to add people to topics, news and forms.
   [href]
 
 0.2.2 (2015-07-03)

@@ -9,6 +9,13 @@ from wtforms import BooleanField, StringField, TextAreaField
 from wtforms.widgets import TextArea
 
 
+def extend_form(form_class, request, extensions):
+    for extension in extensions:
+        form_class = extension(form_class, request)
+
+    return form_class
+
+
 class HiddenMetaMixin(object):
     """ Extends any class that has a meta dictionary field with the ability to
     hide it from the public.

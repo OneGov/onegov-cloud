@@ -16,8 +16,8 @@ from onegov.town.app import TownApp
 from onegov.town.layout import FormSubmissionLayout
 
 
-@TownApp.form(model=FormDefinition, form=lambda self, request: self.form_class,
-              template='form.pt', permission=Public)
+@TownApp.form(model=FormDefinition, template='form.pt', permission=Public,
+              form=lambda self, request: self.form_class)
 def handle_defined_form(self, request, form):
     """ Renders the empty form and takes input, even if it's not valid, stores
     it as a pending submission and redirects the user to the view that handles
@@ -40,7 +40,9 @@ def handle_defined_form(self, request, form):
         'definition': self,
         'form_width': 'small',
         'lead': self.meta.get('lead'),
-        'text': self.content.get('text')
+        'text': self.content.get('text'),
+        'people': self.people,
+        'contact': self.contact_html
     }
 
 

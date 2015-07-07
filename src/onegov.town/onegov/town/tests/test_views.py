@@ -414,7 +414,7 @@ def test_pending_submissions(town_app):
         # Your Details
         First name * = ___
         Last name * = ___
-    """))
+    """), type='custom')
 
     client = Client(town_app)
 
@@ -450,7 +450,7 @@ def test_pending_submission_error_file_upload(town_app):
     collection.definitions.add('Statistics', definition=textwrap.dedent("""
         Name * = ___
         Datei * = *.txt|*.csv
-    """))
+    """), type='custom')
 
     client = Client(town_app)
     form_page = client.get('/formulare').click('Statistics')
@@ -466,7 +466,7 @@ def test_pending_submission_successful_file_upload(town_app):
     collection.definitions.add('Statistics', definition=textwrap.dedent("""
         Name * = ___
         Datei * = *.txt|*.csv
-    """))
+    """), type='custom')
 
     client = Client(town_app)
     form_page = client.get('/formulare').click('Statistics')
@@ -566,7 +566,8 @@ def test_delete_custom_form(town_app):
 
 def test_show_uploaded_file(town_app):
     collection = FormCollection(town_app.session())
-    collection.definitions.add('Text', definition="File * = *.txt")
+    collection.definitions.add(
+        'Text', definition="File * = *.txt", type='custom')
 
     client = Client(town_app)
 

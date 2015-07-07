@@ -5,6 +5,7 @@ from onegov.page import Page
 from onegov.town import _
 from onegov.town.models.traitinfo import TraitInfo
 from onegov.town.models.mixins import (
+    extend_form,
     ContactContentMixin,
     HiddenMetaMixin,
     PeopleContentMixin,
@@ -15,13 +16,6 @@ from sqlalchemy.orm import undefer, object_session
 from wtforms import BooleanField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
-
-
-def extend_form(form_class, request, extensions):
-    for extension in extensions:
-        form_class = extension(form_class, request)
-
-    return form_class
 
 
 class Topic(Page, TraitInfo,

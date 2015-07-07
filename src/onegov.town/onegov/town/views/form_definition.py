@@ -1,16 +1,18 @@
 import morepath
 
 from onegov.core.security import Private
-from onegov.core.utils import sanitize_html
+from onegov.core.utils import Bunch, sanitize_html
 from onegov.form import Form, FormCollection, FormDefinition, with_options
 from onegov.form.validators import ValidFormDefinition
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import FormEditorLayout
+from onegov.town.models import CustomFormDefinition
+from onegov.town.models.mixins import extend_form
 from onegov.town.utils import mark_images
+from webob import exc
 from wtforms import BooleanField, StringField, TextAreaField, validators
 from wtforms.widgets import TextArea
-from webob import exc
 
 
 class FormDefinitionBaseForm(Form):
@@ -30,24 +32,23 @@ class FormDefinitionBaseForm(Form):
 
     is_hidden_from_public = BooleanField(_("Hide from the public"))
 
-    def get_meta(self):
-        return {
-            'lead': self.lead.data,
-            'is_hidden_from_public': self.is_hidden_from_public.data
-        }
+    def get_page(self, page):
+        page.title = self.title.data
 
-    def set_meta(self, meta):
-        self.lead.data = meta.get('lead', '')
-        self.is_hidden_from_public.data = meta.get(
+        if page.type == 'custom':
+            page.definition = self.definition.data
+
+        page.meta['lead'] = self.lead.data
+        page.meta['is_hidden_from_public'] = self.is_hidden_from_public.data
+        page.content['text'] = self.text.data
+
+    def set_page(self, page):
+        self.title.data = page.title
+        self.definition.data = page.definition
+        self.lead.data = page.meta.get('lead', '')
+        self.is_hidden_from_public.data = page.meta.get(
             'is_hidden_from_public', False)
-
-    def get_content(self):
-        return {
-            'text': self.text.data
-        }
-
-    def set_content(self, content):
-        self.text.data = content.get('text', '')
+        self.text.data = page.content.get('text', '')
 
 
 class BuiltinDefinitionForm(FormDefinitionBaseForm):
@@ -76,25 +77,39 @@ class CustomDefinitionForm(FormDefinitionBaseForm):
     )
 
 
-form_classes = {
-    'builtin': BuiltinDefinitionForm,
-    'custom': CustomDefinitionForm
-}
+def get_form_class(model, request):
+
+    if isinstance(model, FormCollection):
+        model = CustomFormDefinition()
+
+    form_classes = {
+        'builtin': BuiltinDefinitionForm,
+        'custom': CustomDefinitionForm
+    }
+
+    return extend_form(form_classes[model.type], request, (
+        model.extend_form_with_contact,
+        model.extend_form_with_people,
+    ))
 
 
 @TownApp.form(model=FormCollection, name='neu', template='form.pt',
-              permission=Private, form=CustomDefinitionForm)
+              permission=Private, form=get_form_class)
 def handle_new_definition(self, request, form):
 
     if form.submitted(request):
 
+        page = Bunch(
+            title=None, definition=None, type='custom', meta={}, content={})
+        form.get_page(page)
+
         # forms added online are always custom forms
         new_form = self.definitions.add(
-            title=form.title.data,
-            definition=form.definition.data,
+            title=page.title,
+            definition=page.definition,
             type='custom',
-            meta=form.get_meta(),
-            content=form.get_content()
+            meta=page.meta,
+            content=page.content
         )
 
         request.success(_("Added a new form"))
@@ -116,8 +131,7 @@ def handle_new_definition(self, request, form):
 
 
 @TownApp.form(model=FormDefinition, template='form.pt', permission=Private,
-              form=lambda self, request: form_classes[self.type],
-              name='bearbeiten')
+              form=get_form_class, name='bearbeiten')
 def handle_edit_definition(self, request, form):
 
     if form.submitted(request):
@@ -126,16 +140,14 @@ def handle_edit_definition(self, request, form):
         if self.type == 'custom':
             self.definition = form.definition.data
 
-        self.meta = form.get_meta()
-        self.content = form.get_content()
+        form.get_page(self)
 
         request.success(_("Your changes were saved"))
         return morepath.redirect(request.link(self))
     else:
         form.title.data = self.title
         form.definition.data = self.definition
-        form.set_meta(self.meta)
-        form.set_content(self.content)
+        form.set_page(self)
 
     collection = FormCollection(request.app.session())
 
