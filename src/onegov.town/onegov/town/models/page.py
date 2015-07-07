@@ -13,7 +13,7 @@ from onegov.town.models.mixins import (
 from onegov.town.utils import mark_images
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer, object_session
-from wtforms import BooleanField, StringField, TextAreaField, validators
+from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
 
@@ -50,6 +50,7 @@ class Topic(Page, TraitInfo,
 
         if trait == 'page':
             return extend_form(PageForm, request, (
+                self.extend_form_with_hidden_switch,
                 self.extend_form_with_contact,
                 self.extend_form_with_people,
             ))
@@ -87,6 +88,7 @@ class News(Page, TraitInfo,
     def get_form_class(self, trait, request):
         if trait == 'news':
             return extend_form(PageForm, request, (
+                self.extend_form_with_hidden_switch,
                 self.extend_form_with_contact,
                 self.extend_form_with_people,
             ))
@@ -136,14 +138,9 @@ class PageForm(PageBaseForm):
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html, mark_images])
 
-    is_hidden_from_public = BooleanField(
-        label=_("Hide from the public")
-    )
-
     def get_page(self, page):
         """ Stores the form values on the page. """
         page.title = self.title.data
-        page.is_hidden_from_public = self.is_hidden_from_public.data
         page.content = {
             'lead': self.lead.data,
             'text': self.text.data
@@ -152,6 +149,5 @@ class PageForm(PageBaseForm):
     def set_page(self, page):
         """ Stores the page values on the form. """
         self.title.data = page.title
-        self.is_hidden_from_public.data = page.is_hidden_from_public
         self.lead.data = page.content.get('lead', '')
         self.text.data = page.content.get('text', '')

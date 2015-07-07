@@ -32,6 +32,28 @@ class HiddenMetaMixin(object):
     def is_hidden_from_public(self, is_hidden):
         self.meta['is_hidden_from_public'] = is_hidden
 
+    def extend_form_with_hidden_switch(self, form_class, request):
+
+        assert hasattr(form_class, 'get_page')
+        assert hasattr(form_class, 'set_page')
+
+        class HiddenPageForm(form_class):
+            is_hidden_from_public = BooleanField(_("Hide from the public"))
+
+            def get_page(self, page):
+                super(HiddenPageForm, self).get_page(page)
+
+                page.meta['is_hidden_from_public'] \
+                    = self.is_hidden_from_public.data
+
+            def set_page(self, page):
+                super(HiddenPageForm, self).set_page(page)
+
+                self.is_hidden_from_public.data\
+                    = page.meta.get('is_hidden_from_public', False)
+
+        return HiddenPageForm
+
 
 class PeopleContentMixin(object):
     """ Extends any class that has a content dictionary field with the ability

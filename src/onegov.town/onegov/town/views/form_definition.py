@@ -11,7 +11,7 @@ from onegov.town.models import CustomFormDefinition
 from onegov.town.models.mixins import extend_form
 from onegov.town.utils import mark_images
 from webob import exc
-from wtforms import BooleanField, StringField, TextAreaField, validators
+from wtforms import StringField, TextAreaField, validators
 from wtforms.widgets import TextArea
 
 
@@ -30,8 +30,6 @@ class FormDefinitionBaseForm(Form):
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html, mark_images])
 
-    is_hidden_from_public = BooleanField(_("Hide from the public"))
-
     def get_page(self, page):
         page.title = self.title.data
 
@@ -39,15 +37,12 @@ class FormDefinitionBaseForm(Form):
             page.definition = self.definition.data
 
         page.meta['lead'] = self.lead.data
-        page.meta['is_hidden_from_public'] = self.is_hidden_from_public.data
         page.content['text'] = self.text.data
 
     def set_page(self, page):
         self.title.data = page.title
         self.definition.data = page.definition
         self.lead.data = page.meta.get('lead', '')
-        self.is_hidden_from_public.data = page.meta.get(
-            'is_hidden_from_public', False)
         self.text.data = page.content.get('text', '')
 
 
@@ -88,6 +83,7 @@ def get_form_class(model, request):
     }
 
     return extend_form(form_classes[model.type], request, (
+        model.extend_form_with_hidden_switch,
         model.extend_form_with_contact,
         model.extend_form_with_people,
     ))
