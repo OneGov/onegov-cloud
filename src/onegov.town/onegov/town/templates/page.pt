@@ -9,7 +9,7 @@
         <tal:block condition="page.trait == 'page'">
 
             <tal:block metal:use-macro="layout.macros.page_content"
-             tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people" />
+             tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html" />
 
             <div class="row" tal:condition="children">
                 <div class="small-12 columns">
@@ -29,7 +29,7 @@
             </div>
 
             <tal:block metal:use-macro="layout.macros.page_content"
-             tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people" />
+             tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html" />
 
         </tal:block>
         <tal:block condition="page.trait == 'link'">

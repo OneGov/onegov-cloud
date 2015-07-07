@@ -14,7 +14,7 @@
         <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" tal:define="item definition|nothing" tal:condition="item" />
 
         <tal:block metal:use-macro="layout.macros.page_content"
-            tal:define="lead lead|nothing;text text|nothing; people nothing" />
+            tal:define="lead lead|nothing;text text|nothing; people nothing; contact nothing" />
 
         <div class="row">
             <div tal:attributes="class size">

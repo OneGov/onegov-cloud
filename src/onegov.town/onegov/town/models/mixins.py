@@ -1,13 +1,16 @@
 from collections import OrderedDict
+from onegov.core.utils import linkify
+from onegov.form import with_options
 from onegov.form.parser.core import WTFormsClassBuilder, FieldDependency
 from onegov.people import Person, PersonCollection
 from onegov.town import _
 from sqlalchemy.orm import object_session
-from wtforms import BooleanField, StringField
+from wtforms import BooleanField, StringField, TextAreaField
+from wtforms.widgets import TextArea
 
 
 class HiddenMetaMixin(object):
-    """ Extends any class with a meta dictionary field with the ability to
+    """ Extends any class that has a meta dictionary field with the ability to
     hide it from the public.
 
     see :func:`onegov.core.security.rules.has_permission_not_logged_in`
@@ -24,8 +27,8 @@ class HiddenMetaMixin(object):
 
 
 class PeopleContentMixin(object):
-    """ Extends any class with a content dictionary field containing people
-    and a function local to the object.
+    """ Extends any class that has a content dictionary field with the ability
+    to reference people from :class:`onegov.people.PersonCollection`.
 
     """
 
@@ -111,3 +114,42 @@ class PeopleContentMixin(object):
             )
 
         return builder.form_class
+
+
+class ContactContentMixin(object):
+    """ Extends any class that has a content dictionary field with a simple
+    contacts field.
+
+    """
+
+    @property
+    def contact(self):
+        return self.content.get('contact')
+
+    @property
+    def contact_html(self):
+        return self.content.get('contact_html')
+
+    def extend_form_with_contact(self, form_class, request):
+
+        assert hasattr(form_class, 'get_page')
+        assert hasattr(form_class, 'set_page')
+
+        class ContactPageForm(form_class):
+            contact_address = TextAreaField(
+                label=_(u"Address"),
+                fieldset=_("Contact"),
+                widget=with_options(TextArea, rows=5)
+            )
+
+            def get_page(self, page):
+                super(ContactPageForm, self).get_page(page)
+                page.content['contact'] = self.contact_address.data
+                page.content['contact_html'] = linkify(
+                    self.contact_address.data)
+
+            def set_page(self, page):
+                super(ContactPageForm, self).set_page(page)
+                self.contact_address.data = page.content.get('contact', '')
+
+        return ContactPageForm

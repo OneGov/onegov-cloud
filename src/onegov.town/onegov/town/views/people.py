@@ -51,7 +51,7 @@ class PersonForm(Form):
 
     address = TextAreaField(
         label=_("Address"),
-        widget=with_options(TextArea, rows=4)
+        widget=with_options(TextArea, rows=5)
     )
 
 

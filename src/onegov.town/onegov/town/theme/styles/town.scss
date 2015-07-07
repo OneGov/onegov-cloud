@@ -422,11 +422,11 @@ input[type=color] {
 #homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
 
 /*
-    homepage panels
+    panels
 */
 
 .homepage-links-panel,
-.page-contacts-panel {
+.page-content-panel {
     background-color: $topbar-bg-color;
     margin-bottom: 1.5em;
     padding: 1em;
@@ -452,6 +452,16 @@ input[type=color] {
 
         small {
             font-size: .8em;
+        }
+    }
+
+    &.contact-panel {
+        p {
+            margin-bottom: 0;
+        }
+        
+        p:first-line {
+            font-weight: bold;
         }
     }
 }

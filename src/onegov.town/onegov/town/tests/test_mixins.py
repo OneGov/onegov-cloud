@@ -1,6 +1,6 @@
 from onegov.core.utils import Bunch
 from onegov.form import Form
-from onegov.town.models.mixins import PeopleContentMixin
+from onegov.town.models.mixins import PeopleContentMixin, ContactContentMixin
 from uuid import UUID
 
 
@@ -62,3 +62,58 @@ def test_people_content_mixin():
     assert form.people_troy_barnes_function.data == 'The Truest Repairman'
     assert not form.people_abed_nadir.data
     assert not form.people_abed_nadir_function.data
+
+
+def test_contact_content_mixin():
+
+    class Topic(ContactContentMixin):
+        content = {}
+
+    class TopicForm(Form):
+
+        def get_page(self, page):
+            pass
+
+        def set_page(self, page):
+            pass
+
+    topic = Topic()
+    assert topic.contact is None
+    assert topic.contact_html is None
+
+    form_class = topic.extend_form_with_contact(TopicForm, request=object())
+    form = form_class()
+
+    assert 'contact_address' in form._fields
+
+    form.contact_address.data = (
+        "Steve Jobs\n"
+        "steve@apple.com\n"
+        "https://www.apple.com"
+    )
+
+    form.get_page(topic)
+
+    assert topic.contact == (
+        "Steve Jobs\n"
+        "steve@apple.com\n"
+        "https://www.apple.com"
+    )
+
+    assert topic.contact_html == (
+        "Steve Jobs\n"
+        '<a href="mailto:steve@apple.com">steve@apple.com</a>\n'
+        '<a href="https://www.apple.com" rel="nofollow">'
+        'https://www.apple.com</a>'
+    )
+
+    form_class = topic.extend_form_with_contact(TopicForm, request=object())
+    form = form_class()
+
+    form.set_page(topic)
+
+    assert form.contact_address.data == (
+        "Steve Jobs\n"
+        "steve@apple.com\n"
+        "https://www.apple.com"
+    )

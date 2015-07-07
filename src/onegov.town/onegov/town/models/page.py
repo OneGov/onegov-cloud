@@ -4,7 +4,11 @@ from onegov.form import Form, with_options
 from onegov.page import Page
 from onegov.town import _
 from onegov.town.models.traitinfo import TraitInfo
-from onegov.town.models.mixins import HiddenMetaMixin, PeopleContentMixin
+from onegov.town.models.mixins import (
+    ContactContentMixin,
+    HiddenMetaMixin,
+    PeopleContentMixin,
+)
 from onegov.town.utils import mark_images
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer, object_session
@@ -13,7 +17,15 @@ from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
 
 
-class Topic(Page, TraitInfo, HiddenMetaMixin, PeopleContentMixin):
+def extend_form(form_class, request, extensions):
+    for extension in extensions:
+        form_class = extension(form_class, request)
+
+    return form_class
+
+
+class Topic(Page, TraitInfo,
+            HiddenMetaMixin, PeopleContentMixin, ContactContentMixin):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     @property
@@ -43,12 +55,16 @@ class Topic(Page, TraitInfo, HiddenMetaMixin, PeopleContentMixin):
             return LinkForm
 
         if trait == 'page':
-            return self.extend_form_with_people(PageForm, request)
+            return extend_form(PageForm, request, (
+                self.extend_form_with_contact,
+                self.extend_form_with_people,
+            ))
 
         raise NotImplementedError
 
 
-class News(Page, TraitInfo, HiddenMetaMixin, PeopleContentMixin):
+class News(Page, TraitInfo,
+           HiddenMetaMixin, PeopleContentMixin, ContactContentMixin):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     @property
@@ -76,7 +92,10 @@ class News(Page, TraitInfo, HiddenMetaMixin, PeopleContentMixin):
 
     def get_form_class(self, trait, request):
         if trait == 'news':
-            return self.extend_form_with_people(PageForm, request)
+            return extend_form(PageForm, request, (
+                self.extend_form_with_contact,
+                self.extend_form_with_people,
+            ))
 
         raise NotImplementedError
 
