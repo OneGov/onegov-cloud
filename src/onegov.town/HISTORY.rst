@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to add people to topics and news pages.
+  [href]
+
 0.2.2 (2015-07-03)
 ~~~~~~~~~~~~~~~~~~~
 

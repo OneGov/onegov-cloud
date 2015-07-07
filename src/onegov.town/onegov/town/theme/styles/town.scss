@@ -425,7 +425,8 @@ input[type=color] {
     homepage panels
 */
 
-.homepage-links-panel {
+.homepage-links-panel,
+.page-contacts-panel {
     background-color: $topbar-bg-color;
     margin-bottom: 1.5em;
     padding: 1em;

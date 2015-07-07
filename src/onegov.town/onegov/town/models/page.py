@@ -1,12 +1,10 @@
 from onegov.core import utils
 from onegov.town.utils import sanitize_html
 from onegov.form import Form, with_options
-from onegov.form.parser.core import WTFormsClassBuilder, FieldDependency
-from onegov.people import Person, PersonCollection
 from onegov.page import Page
 from onegov.town import _
 from onegov.town.models.traitinfo import TraitInfo
-from onegov.town.models.mixins import HiddenMetaMixin
+from onegov.town.models.mixins import HiddenMetaMixin, PeopleContentMixin
 from onegov.town.utils import mark_images
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer, object_session
@@ -15,7 +13,7 @@ from wtforms.fields.html5 import URLField
 from wtforms.widgets import TextArea
 
 
-class Topic(Page, TraitInfo, HiddenMetaMixin):
+class Topic(Page, TraitInfo, HiddenMetaMixin, PeopleContentMixin):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     @property
@@ -40,76 +38,17 @@ class Topic(Page, TraitInfo, HiddenMetaMixin):
     def is_supported_trait(self, trait):
         return trait in {'link', 'page'}
 
-    def with_people(self, form_class, request):
-
-        assert hasattr(form_class, 'get_page')
-        assert hasattr(form_class, 'set_page')
-
-        class PeoplePageForm(form_class):
-
-            def get_people_fields(self):
-                return {
-                    f: self._fields[f] for f in self._fields
-                    if f.startswith('people_') and not f.endswith('_function')
-                }
-
-            def get_page(self, page):
-                super(PeoplePageForm, self).get_page(page)
-
-                fields = self.get_people_fields()
-
-                ids = {f: v for f, v in fields.items() if v.data is True}
-
-                page.content['people'] = [
-                    [v.id.hex, self._fields[f + '_function'].data]
-                    for f, v in ids.items()
-                ]
-
-            def set_page(self, page):
-                super(PeoplePageForm, self).set_page(page)
-
-                fields = self.get_people_fields()
-                people = dict(page.content.get('people', []))
-
-                for field_id, field in fields.items():
-                    if field.id.hex in people:
-                        self._fields[field_id].data = True
-                        self._fields[field_id + '_function'].data\
-                            = people[field.id.hex]
-
-        builder = WTFormsClassBuilder(PeoplePageForm)
-        builder.set_current_fieldset(_("People"))
-
-        query = PersonCollection(request.app.session()).query()
-        query = query.order_by(Person.first_name, Person.last_name)
-
-        for person in query.all():
-            field_id = builder.add_field(
-                field_class=BooleanField,
-                label=person.title,
-                required=False,
-                id=person.id
-            )
-            builder.add_field(
-                field_class=StringField,
-                label=_("Function"),
-                required=False,
-                dependency=FieldDependency(field_id, 'y')
-            )
-
-        return builder.form_class
-
     def get_form_class(self, trait, request):
         if trait == 'link':
             return LinkForm
 
         if trait == 'page':
-            return self.with_people(PageForm, request)
+            return self.extend_form_with_people(PageForm, request)
 
         raise NotImplementedError
 
 
-class News(Page, TraitInfo, HiddenMetaMixin):
+class News(Page, TraitInfo, HiddenMetaMixin, PeopleContentMixin):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     @property
@@ -137,7 +76,7 @@ class News(Page, TraitInfo, HiddenMetaMixin):
 
     def get_form_class(self, trait, request):
         if trait == 'news':
-            return PageForm
+            return self.extend_form_with_people(PageForm, request)
 
         raise NotImplementedError
 

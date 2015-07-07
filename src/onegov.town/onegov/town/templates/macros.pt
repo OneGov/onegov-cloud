@@ -171,10 +171,25 @@
 </metal:hidden_page_hint>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town">
-    <div class="row" tal:condition="lead or text">
-        <div class="small-12 columns end">
+    <div class="row" tal:condition="lead or text or people">
+        <div class="small-12 columns" tal:condition="not: people">
             <em class="page-lead" tal:condition="lead" tal:content="lead" />
             <div class="page-text" tal:condition="text" tal:content="structure text" />
+        </div>
+        <div class="small-12 medium-8 columns" tal:condition="people">
+            <em class="page-lead" tal:condition="lead" tal:content="lead" />
+            <div class="page-text" tal:condition="text" tal:content="structure text" />
+        </div>
+        <div class="small-12 medium-4 columns" tal:condition="people">
+            <div class="page-contacts-panel">
+                <h2 i18n:translate>People</h2>
+                <ul tal:repeat="person people">
+                    <li>
+                        <a href="${request.link(person)}">${person.title}</a>
+                        <small>${person.context_specific_function}</small>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </metal:page_content>
