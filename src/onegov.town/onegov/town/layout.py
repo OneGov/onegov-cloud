@@ -1,5 +1,4 @@
 from cached_property import cached_property
-from onegov.core import utils
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.form import FormCollection, FormSubmissionFile, render_field
@@ -9,7 +8,6 @@ from onegov.town import _
 from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import FileCollection
 from onegov.town.models import ImageCollection, Thumbnail
-from ordered_set import OrderedSet
 from sqlalchemy import desc
 
 
@@ -38,7 +36,6 @@ class Layout(ChameleonLayout):
 
         # always include the common js files
         self.request.include('common')
-        self.request.include('common_theme')
 
     @property
     def town(self):
@@ -51,13 +48,6 @@ class Layout(ChameleonLayout):
             self.app, 'font-awesome/css/font-awesome.min.css')
 
         return self.request.link(static_file)
-
-    @cached_property
-    def leaflet_theme_path(self):
-        static_file = StaticFile.from_application(
-            self.app, 'leaflet/leaflet-theme')
-
-        return utils.rchop(self.request.link(static_file), '/leaflet-theme')
 
     @cached_property
     def page_id(self):
@@ -227,25 +217,6 @@ class DefaultLayout(Layout):
                 Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
                 Link(u'Seantis GmbH', 'https://www.seantis.ch')
             ]
-
-
-class MapLayout(Layout):
-    """ Defines the layout of the map view. This layout is very different than
-    the rest of the site - we only show a map, no white labeling whatsoever.
-
-    We do this because we include maps using iframes, so this view is really
-    never used separately, though it can be.
-
-    This view should be as light as possible.
-
-    """
-
-    def __init__(self, model, request):
-        super(MapLayout, self).__init__(model, request)
-
-        self.request.included_assets = OrderedSet()
-        self.request.include('map')
-        self.request.include('map_theme')
 
 
 class AdjacencyListLayout(DefaultLayout):

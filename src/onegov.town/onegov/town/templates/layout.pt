@@ -22,12 +22,9 @@
      -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
-
-    <tal:header-extras metal:define-slot="header-extras" />
 </head>
 
-<body id="${layout.page_id}" data-leaflet-images-folder="${layout.leaflet_theme_path}/images">
-  <tal:body metal:define-slot="body">
+<body id="${layout.page_id}">
     <div id="inner-body">
       <div class="row">
         <div class="small-12 columns">
@@ -104,7 +101,6 @@
         </div>
       </div>
     </footer>
-  </tal:body>
 </body>
 
 </html>

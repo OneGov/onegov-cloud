@@ -1,7 +1,7 @@
 import morepath
 
 from onegov.core.security import Private
-from onegov.town.utils import sanitize_html
+from onegov.core.utils import sanitize_html
 from onegov.form import Form, FormCollection, FormDefinition, with_options
 from onegov.form.validators import ValidFormDefinition
 from onegov.town import _, TownApp

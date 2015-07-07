@@ -107,20 +107,6 @@ class TownApp(Framework):
             output='bundles/dropzone.bundle.js'
         )
 
-        map_theme = Bundle(
-            'css/leaflet.css',
-            filters='cssmin',
-            output='bundles/map_theme.bundle.css'
-        )
-
-        map = Bundle(
-            'js/leaflet.js',
-            'js/leaflet-google.js',
-            'js/map.js',
-            #filters='jsmin',
-            output='bundles/map.bundle.js'
-        )
-
         # do NOT minify the redactor, or the copyright notice goes away, which
         # is something we are not allowed to do per our license
         # ->
@@ -138,7 +124,6 @@ class TownApp(Framework):
             'js/bufferbuttons.js',
             'js/filemanager.js',
             'js/imagemanager.js',
-            'js/geomanager.js',
             'js/redactor.de.js',
             'js/editor.js',
             filters='jsmin',
@@ -164,28 +149,18 @@ class TownApp(Framework):
             'js/react.js',
             'js/form_dependencies.js',
             confirm,
-            map,
             'js/common.js',
             filters='jsmin',
             output='bundles/common.bundle.js'
         )
 
-        common_theme = Bundle(
-            map_theme,
-            filters='cssmin',
-            output='bundles/common.bundle.css'
-        )
-
         return {
-            'code_editor': code_editor,
             'common': common,
-            'common_theme': common_theme,
             'dropzone': dropzone,
-            'editor': editor,
-            'map': map,
-            'map_theme': map_theme,
             'redactor': redactor,
-            'redactor_theme': redactor_theme
+            'redactor_theme': redactor_theme,
+            'editor': editor,
+            'code_editor': code_editor
         }
 
 
