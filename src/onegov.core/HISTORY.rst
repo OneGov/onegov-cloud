@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to send emails.
+  [href]
+
 0.4.6 (2015-07-06)
 ~~~~~~~~~~~~~~~~~~~
 
