@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Show an alert for every form that contains errors.
+  [href]
+
 - Adds a reply-to address for automated e-mails.
   [href]
 

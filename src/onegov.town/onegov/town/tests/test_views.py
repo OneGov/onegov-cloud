@@ -13,6 +13,14 @@ def test_view_permissions():
     utils.assert_explicit_permissions(onegov.town)
 
 
+def test_view_form_alert(town_app):
+
+    login = Client(town_app).get('/login')
+    login = login.form.submit()
+
+    assert u'Das Formular enthält Fehler' in login
+
+
 def test_view_login(town_app):
 
     client = Client(town_app)

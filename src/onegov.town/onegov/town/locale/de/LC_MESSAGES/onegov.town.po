@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-06 15:49+0200\n"
+"POT-Creation-Date: 2015-07-08 16:04+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -49,9 +49,6 @@ msgstr ""
 "Dies ist ein vordefiniertes Formular. Vordefinierte Formulare können nicht "
 "gelöscht werden."
 
-msgid "Form"
-msgstr "Formular"
-
 msgid "Settings"
 msgstr "Einstellungen"
 
@@ -73,14 +70,17 @@ msgstr "Formular löschen"
 msgid "Add"
 msgstr "Hinzufügen"
 
-msgid "Person"
-msgstr "Person"
-
 msgid "Do you really want to delete this person?"
 msgstr "Möchten Sie die Person wirklich löschen?"
 
 msgid "Delete person"
 msgstr "Person löschen"
+
+msgid "Form"
+msgstr "Formular"
+
+msgid "Person"
+msgstr "Person"
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
@@ -107,6 +107,18 @@ msgstr "Dateien dieses Typs werde nicht unterstützt."
 msgid "The form could not be parsed."
 msgstr "Das Formular ist nicht gültig."
 
+msgid "Hide from the public"
+msgstr "Vor der Öffentlichkeit verstecken"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "Function"
+msgstr "Funktion"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -121,12 +133,6 @@ msgstr "Beschreibt kurz um was es bei diesem Thema geht"
 
 msgid "Text"
 msgstr "Text"
-
-msgid "Hide from the public"
-msgstr "Vor der Öffentlichkeit verstecken"
-
-msgid "Function"
-msgstr "Funktion"
 
 msgid "Link"
 msgstr "Verknüpfung"
@@ -257,8 +263,8 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
-msgid "Contact"
-msgstr "Kontakt"
+msgid "The form contains errors"
+msgstr "Das Formular enthält Fehler"
 
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
@@ -404,9 +410,6 @@ msgstr "Bild"
 msgid "URL pointing to the picture"
 msgstr "Link zum Bild"
 
-msgid "Address"
-msgstr "Adresse"
-
 msgid "Added a new person"
 msgstr "Eine neue Person wurde hinzugefügt"
 
@@ -416,6 +419,9 @@ msgstr "Neu"
 msgid "Name"
 msgstr "Name"
 
+msgid "E-Mail Reply Address"
+msgstr "E-Mail Antwort Adresse"
+
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
@@ -424,6 +430,9 @@ msgstr "Logo"
 
 msgid "URL pointing to the logo"
 msgstr "Link zum Logo"
+
+msgid "Replies to automated e-mails go to this address."
+msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
 
 msgid "Homepage Images"
 msgstr "Bilder auf der Startseite"

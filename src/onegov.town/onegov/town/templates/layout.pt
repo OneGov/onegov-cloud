@@ -44,6 +44,11 @@
 
       <div class="row">
         <div class="small-12 columns">
+          <!--! If there's a form object with errors, show an alert box - works for all views that use a form -->
+          <div tal:condition="form.errors|nothing" data-alert class="alert-box alert">
+            <tal:block i18n:translate>The form contains errors</tal:block>
+            <a href="#" class="close">&times;</a>
+          </div>
           <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
             ${message.text}
             <a href="#" class="close">&times;</a>
