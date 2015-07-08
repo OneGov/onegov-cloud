@@ -91,9 +91,33 @@ footer,
 /*
     alert boxes
 */
+
 .alert-box {
-    margin-bottom: 1rem;
+    border-color: scale-color($primary-color, $lightness: $alert-function-factor);
+    border-left: 3.2rem solid;
+    vertical-align: middle;
+
+    &::before {
+        font-family: 'FontAwesome';
+        font-size: 2em;
+        line-height: .8;
+        margin-left: -3.2rem;
+        padding-right: 2rem;
+    }
+
+    &.success::before {
+        content: '\f058';
+    }
+
+    &.alert::before {
+        content: '\f06a';
+    }
+
+    &.info::before {
+        content: '\f05a';
+    }
 }
+
 
 /*
     form style customizations
@@ -890,38 +914,4 @@ $max-page-width: 600px;
     .person-card-title {
         font-weight: bold;
     }
-}
-
-.alert-box.success::before,
-.alert-box.alert::before,
-.alert-box.info::before {
-    font-family: 'FontAwesome';
-    font-size: 2em;
-    line-height: .8;
-    margin-left: -3.2rem;
-    padding-right: 2rem;
-}
-
-.alert-box.success {
-    border-left: 3.2rem solid #268939;
-}
-
-.alert-box.alert {
-    border-left: 3.2rem solid #c61f2d;
-}
-
-.alert-box.info {
-    border-left: 3.2rem solid #1262da;
-}
-
-.alert-box.success::before {
-    content: "\f058";
-}
-
-.alert-box.alert::before {
-    content: "\f06a";
-}
-
-.alert-box.info::before {
-    content: "\f05a";
 }
