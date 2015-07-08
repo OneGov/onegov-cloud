@@ -94,15 +94,19 @@ footer,
 
 .alert-box {
     border-color: scale-color($primary-color, $lightness: $alert-function-factor);
-    border-left: 3.2rem solid;
+    border-left: 3rem solid;
+    padding: .5rem 1.5rem .875rem .875rem;
     vertical-align: middle;
 
     &::before {
         font-family: 'FontAwesome';
-        font-size: 2em;
+        font-size: 1.5rem;
         line-height: .8;
-        margin-left: -3.2rem;
-        padding-right: 2rem;
+        margin-left: -3.1rem;
+        margin-top: 1rem;
+        padding-right: 1.5rem;
+        position: relative;
+        top: .25rem;
     }
 
     &.success::before {
@@ -115,6 +119,10 @@ footer,
 
     &.info::before {
         content: '\f05a';
+    }
+
+    &.warning::before {
+        content: '\f071';
     }
 }
 
