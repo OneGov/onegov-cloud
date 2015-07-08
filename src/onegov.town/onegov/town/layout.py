@@ -142,6 +142,14 @@ class Layout(ChameleonLayout):
         """ Returns the url to the main page. """
         return self.request.link(self.app.town)
 
+    @cached_property
+    def login_url(self):
+        """ Returns the login url for the current page. """
+        return '{}?to={}'.format(
+            self.request.link(self.town, 'login'),
+            self.request.transform(self.request.path)
+        )
+
     def thumbnail_url(self, url):
         """ Takes the given url and returns the thumbnail url for it, if it
         exists. Otherwise returns the url as is.
@@ -213,7 +221,7 @@ class DefaultLayout(Layout):
             ]
         else:
             return [
-                Link(_(u'Login'), request.link(self.town, 'login')),
+                Link(_(u'Login'), self.login_url),
                 Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
                 Link(u'Seantis GmbH', 'https://www.seantis.ch')
             ]
