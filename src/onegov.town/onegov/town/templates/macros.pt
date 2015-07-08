@@ -238,7 +238,7 @@
         <ul>
             <li class="person-card-title">
                 <a href="${link}">
-                    <span>${person.last_name} ${person.first_name}</span
+                    <span>${person.title}</span
                 </a>
             </li>
             <li tal:condition="person.email" class="person-card-email">

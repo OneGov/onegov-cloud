@@ -687,7 +687,7 @@ def test_people_view(town_app):
 
     people = client.get('/personen')
 
-    assert 'Gordon Flash' in people
+    assert 'Flash Gordon' in people
 
     edit_person = person.click('Bearbeiten')
     edit_person.form['first_name'] = 'Merciless'

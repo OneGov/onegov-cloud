@@ -152,7 +152,7 @@ class PersonLinkExtension(ContentExtension):
 
     def get_selectable_people(self, request):
         query = PersonCollection(request.app.session()).query()
-        query = query.order_by(Person.first_name, Person.last_name)
+        query = query.order_by(Person.last_name, Person.first_name)
 
         return query.all()
 
