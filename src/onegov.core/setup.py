@@ -19,6 +19,7 @@ dependencies = {
     'fs',
     'itsdangerous',
     'isodate',
+    'mailthon',
     'morepath>=0.11.1',
     'more.transaction',
     'more.webassets',
@@ -81,7 +82,8 @@ setup(
             'coverage',
             'freezegun',
             'mock',
-            'onegov.testing'
+            'onegov.testing',
+            'pytest-localserver'
         ],
     ),
     entry_points="""

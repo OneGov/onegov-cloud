@@ -24,7 +24,11 @@ import pydoc
 import pylru
 
 from cached_property import cached_property
+from email.utils import parseaddr
 from itsdangerous import BadSignature, Signer
+from mailthon import email
+from mailthon.middleware import TLS, Auth
+from mailthon.postman import Postman
 from more.transaction import TransactionApp
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
@@ -185,6 +189,25 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
             Defaults to 1'200s (20 minutes).
 
+        :mail_host:
+            The mail server to send e-mails from.
+
+        :mail_port:
+            The port used for the mail server.
+
+        :mail_force_tls:
+            True if TLS should be forced when connecting to the mail server.
+            Defaults to ``True``.
+
+        :mail_username:
+            The username used for mail server authentication.
+
+        :mail_password:
+            The password used for mail server authentication.
+
+        :mail_sender:
+            The sender e-mail address.
+
         :sql_query_report:
             Prints out a report sql queries for each request, unless False.
             Valid values are:
@@ -256,6 +279,13 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         self.always_compile_theme = cfg.get('always_compile_theme', False)
         self.sql_query_report = cfg.get('sql_query_report', False)
 
+        self.mail_host = cfg.get('mail_host', None)
+        self.mail_port = cfg.get('mail_port', None)
+        self.mail_force_tls = cfg.get('mail_force_tls', True)
+        self.mail_username = cfg.get('mail_username', None)
+        self.mail_password = cfg.get('mail_password', None)
+        self.mail_sender = cfg.get('mail_sender', None)
+
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
         application id and makes sure it exists, *if* a database connection
@@ -318,6 +348,87 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def session(self):
         """ Alias for self.session_manager.session. """
         return self.session_manager.session
+
+    @cached_property
+    def postman(self):
+        """ Returns a Mailthon postman configured with the mail settings in
+        the settings view. See `<http://mailthon.readthedocs.org/>`_ for
+        more information.
+
+        """
+
+        assert self.mail_host
+        assert self.mail_port
+
+        middlewares = []
+
+        if self.mail_force_tls:
+            middlewares.append(TLS(force=True))
+
+        if self.mail_username:
+            middlewares.append(
+                Auth(
+                    username=self.mail_username,
+                    password=self.mail_password
+                )
+            )
+
+        # pending issue: https://github.com/eugene-eeo/mailthon/issues/18
+        class FixedPostman(Postman):
+            def deliver(self, conn, envelope):
+                rejected = conn.sendmail(
+                    envelope.mail_from,
+                    envelope.receivers,
+                    envelope.string(),
+                )
+
+                return self.response_cls(conn.noop(), rejected)
+
+        return FixedPostman(
+            host=self.mail_host,
+            port=self.mail_port,
+            middlewares=middlewares
+        )
+
+    def send_email(self, reply_to, receivers=(), cc=(), bcc=(),
+                   subject=None, content=None, encoding='utf-8',
+                   attachments=()):
+        """ Sends a plain-text e-mail using :attr:`postman` to the given
+        recipients. A reply to address is used to enable people to answer
+        to the e-mail which is usually sent by a noreply kind of e-mail
+        address.
+
+        For more complex use cases have a look at
+        `<http://mailthon.readthedocs.org/>`_.
+
+        """
+        assert self.mail_sender
+
+        # if the reply to address has a name part (Name <address@host>), use
+        # the name part for the sender address as well to somewhat hide the
+        # fact that we're using a noreply email
+        name, address = parseaddr(reply_to)
+
+        if name and not parseaddr(self.mail_sender)[0]:
+            mail_sender = u'{} <{}>'.format(name, self.mail_sender)
+        else:
+            mail_sender = self.mail_sender
+
+        envelope = email(
+            sender=mail_sender,
+            receivers=receivers,
+            cc=cc,
+            bcc=bcc,
+            subject=subject,
+            content=content,
+            encoding=encoding,
+            attachments=attachments
+        )
+
+        envelope.headers['From'] = mail_sender
+        envelope.headers['Reply-To'] = reply_to
+
+        return self.postman.send(envelope)
 
     @cached_property
     def static_files(self):

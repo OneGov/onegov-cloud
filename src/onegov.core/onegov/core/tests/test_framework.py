@@ -381,3 +381,69 @@ def test_csrf():
 
     with freeze_time(datetime.now() + timedelta(minutes=2)):
         assert client.post('/', {'csrf_token': csrf_token}).text == 'fail'
+
+
+def test_send_email(smtpserver):
+
+    app = Framework()
+    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_sender = 'noreply@example.org'
+    app.mail_force_tls = False
+    app.mail_username = None
+    app.mail_password = None
+
+    result = app.send_email(
+        reply_to='info@example.org',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test"
+    )
+
+    assert result.ok
+
+    assert len(smtpserver.outbox) == 1
+    message = smtpserver.outbox[0]
+
+    assert message['Sender'] == 'noreply@example.org'
+    assert message['From'] == 'noreply@example.org'
+    assert message['Reply-To'] == 'info@example.org'
+    assert message['Subject'] == 'Test E-Mail'
+    assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/html; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
+    )
+
+
+def test_send_email_with_name(smtpserver):
+
+    app = Framework()
+    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_sender = 'noreply@example.org'
+    app.mail_force_tls = False
+    app.mail_username = None
+    app.mail_password = None
+
+    result = app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test"
+    )
+
+    assert result.ok
+
+    assert len(smtpserver.outbox) == 1
+    message = smtpserver.outbox[0]
+
+    assert message['Sender'] == 'Govikon <noreply@example.org>'
+    assert message['From'] == 'Govikon <noreply@example.org>'
+    assert message['Reply-To'] == 'Govikon <info@example.org>'
+    assert message['Subject'] == 'Test E-Mail'
+    assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/html; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
+    )
