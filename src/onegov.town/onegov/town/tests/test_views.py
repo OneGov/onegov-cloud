@@ -197,16 +197,19 @@ def test_settings(town_app):
     assert document.find('input[name=primary_color]').val() == '#006fba'
 
     settings_page.form['primary_color'] = '#xxx'
+    settings_page.form['reply_to'] = 'info@govikon.ch'
     settings_page = settings_page.form.submit()
 
     assert u"Ungültige Farbe." in settings_page.text
 
     settings_page.form['primary_color'] = '#ccddee'
+    settings_page.form['reply_to'] = 'info@govikon.ch'
     settings_page = settings_page.form.submit()
 
     assert u"Ungültige Farbe." not in settings_page.text
 
     settings_page.form['logo_url'] = 'https://seantis.ch/logo.img'
+    settings_page.form['reply_to'] = 'info@govikon.ch'
     settings_page = settings_page.form.submit()
 
     assert '<img src="https://seantis.ch/logo.img"' in settings_page.text

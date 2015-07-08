@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a reply-to address for automated e-mails.
+  [href]
+
 - Show the edit/delete links outside the dropdown.
   [href]
 

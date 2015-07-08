@@ -4,6 +4,7 @@ from onegov.core.security import Secret
 from onegov.core.utils import linkify
 from onegov.form import Form, with_options
 from wtforms import HiddenField, StringField, TextAreaField, validators
+from wtforms.fields.html5 import EmailField
 from wtforms.widgets import TextArea
 from wtforms_components import ColorField
 from onegov.town import _
@@ -21,6 +22,10 @@ class SettingsForm(Form):
     logo_url = StringField(
         label=_("Logo"),
         description=_("URL pointing to the logo")
+    )
+    reply_to = EmailField(
+        _("E-Mail Reply Address"), [validators.InputRequired()],
+        description=_("Replies to automated e-mails go to this address."),
     )
     primary_color = ColorField(_("Primary Color"))
     homepage_images = TextAreaField(
@@ -95,7 +100,8 @@ def handle_settings(self, request, form):
                     form.contact.data).replace('\n', '<br>'),
                 'opening_hours': form.opening_hours.data,
                 'opening_hours_html': linkify(
-                    form.opening_hours.data).replace('\n', '<br>')
+                    form.opening_hours.data).replace('\n', '<br>'),
+                'reply_to': form.reply_to.data
             }
 
         request.success(_(u"Your changes were saved"))
@@ -105,6 +111,7 @@ def handle_settings(self, request, form):
         form.theme_options = self.theme_options
         form.contact.data = self.meta.get('contact')
         form.opening_hours.data = self.meta.get('opening_hours')
+        form.reply_to.data = self.meta.get('reply_to')
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [

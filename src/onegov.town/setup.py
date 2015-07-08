@@ -39,7 +39,7 @@ setup(
         'jsmin',
         'lazy-object-proxy',
         'lxml',
-        'onegov.core>=0.4.6',
+        'onegov.core>=0.4.7',
         'onegov.form>=0.6.3',
         'onegov.foundation',
         'onegov.people>=0.0.1',
@@ -57,7 +57,8 @@ setup(
             'onegov.testing',
             'mock',
             'webtest',
-            'pyquery'
+            'pyquery',
+            'pytest-localserver'
         ],
     ),
     entry_points="""

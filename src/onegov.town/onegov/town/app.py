@@ -64,6 +64,21 @@ class TownApp(Framework):
 
         self.cache.delete('town')
 
+    def send_email(self, **kwargs):
+        """ Wraps :meth:`onegov.core.framework.Framework.send_email`, setting
+        the reply_to address by using the reply address from the town
+        settings.
+
+        """
+
+        assert 'reply_to' in self.town.meta
+
+        reply_to = u"{} <{}>".format(
+            self.town.name, self.town.meta['reply_to']
+        )
+
+        return super(TownApp, self).send_email(reply_to=reply_to, **kwargs)
+
     def configure_application(self, **cfg):
         super(TownApp, self).configure_application(**cfg)
 
