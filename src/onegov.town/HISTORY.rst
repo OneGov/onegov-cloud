@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.3 (2015-07-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Each form must now contain at least one required e-mail address field.
   [href]
 
