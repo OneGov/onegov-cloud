@@ -4,6 +4,7 @@ import humanize
 from mimetypes import types_map
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms import ValidationError
+from wtforms.fields.html5 import EmailField
 
 
 class Stdnum(object):
@@ -104,6 +105,10 @@ class ValidFormDefinition(object):
     """ Makes sure the given text is a valid onegov.form definition. """
 
     message = "The form could not be parsed."
+    email = "Define at least one required e-mail field ('E-Mail * = @@@')"
+
+    def __init__(self, require_email_field=True):
+        self.require_email_field = require_email_field
 
     def __call__(self, form, field):
         if field.data:
@@ -111,7 +116,17 @@ class ValidFormDefinition(object):
             from onegov.form.parser.core import parse_form
 
             try:
-                parse_form(field.data)
+                form = parse_form(field.data)()
             except AttributeError:
                 # TODO inform the user what the error was
                 raise ValidationError(field.gettext(self.message))
+            else:
+                if self.require_email_field:
+                    matches = form.match_fields(
+                        include_classes=(EmailField, ),
+                        required=True,
+                        limit=1
+                    )
+
+                    if not matches:
+                        raise ValidationError(field.gettext(self.email))
