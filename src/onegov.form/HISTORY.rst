@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.4 (2015-07-09)
+~~~~~~~~~~~~~~~~~~~
+
 - The default form definition validator now checks that there's at least one
   required E-Mail field.
 
