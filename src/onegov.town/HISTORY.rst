@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The login link always redirects to the original site now.
+  [href]
+
 - Show an alert for every form that contains errors.
   [href]
 
