@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Each form must now contain at least one required e-mail address field.
+  [href]
+
 - The login link always redirects to the original site now.
   [href]
 

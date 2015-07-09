@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-08 16:30+0200\n"
+"POT-Creation-Date: 2015-07-09 09:37+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -106,6 +106,9 @@ msgstr "Dateien dieses Typs werde nicht unterstützt."
 
 msgid "The form could not be parsed."
 msgstr "Das Formular ist nicht gültig."
+
+msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
+msgstr "Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
 
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
@@ -446,6 +449,3 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
-
-#~ msgid "The form contains errors"
-#~ msgstr "Das Formular enthält Fehler"

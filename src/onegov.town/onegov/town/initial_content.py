@@ -7,6 +7,7 @@ from onegov.core.utils import module_path
 from onegov.form import FormCollection
 from onegov.page import PageCollection
 from onegov.town.models import Town
+from wtforms.fields.html5 import EmailField
 
 
 def add_initial_content(session, town_name):
@@ -89,12 +90,18 @@ def add_builtin_forms(session):
             form.title = title
             form.definition = definition
         else:
-            forms.add(
+            form = forms.add(
                 name=name,
                 title=title,
                 definition=definition,
                 type='builtin'
             )
+
+        assert form.form_class().match_fields(
+            include_classes=(EmailField, ),
+            required=True,
+            limit=1
+        ), "Each form must have at least one required email field"
 
     for filename in os.listdir(builtin_forms):
         if filename.endswith('.form'):

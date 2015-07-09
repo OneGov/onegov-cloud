@@ -528,17 +528,19 @@ def test_add_custom_form(town_app):
 
     assert u"Das Formular ist nicht gültig." in form_page
 
-    form_page.form['definition'] = "Name * = ___"
+    form_page.form['definition'] = "Name * = ___\nE-Mail * = @@@"
     form_page = form_page.form.submit().follow()
 
     form_page.form['name'] = 'My name'
+    form_page.form['e_mail'] = 'my@name.com'
     form_page = form_page.form.submit().follow()
 
     form_page = form_page.click("Bearbeiten", index=0)
-    form_page.form['definition'] = "Nom * = ___"
+    form_page.form['definition'] = "Nom * = ___\nMail * = @@@"
     form_page = form_page.form.submit().follow()
 
     form_page.form['nom'] = 'My name'
+    form_page.form['mail'] = 'my@name.com'
     form_page.form.submit().follow()
 
 
@@ -568,7 +570,7 @@ def test_delete_custom_form(town_app):
 
     form_page = client.get('/formulare/neu')
     form_page.form['title'] = "My Form"
-    form_page.form['definition'] = "name = ___"
+    form_page.form['definition'] = "e-mail * = @@@"
     form_page = form_page.form.submit().follow()
 
     client.delete(
