@@ -1,9 +1,10 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
+from onegov.ticket import handlers
 from onegov.user.model import User
 from sqlalchemy import Column, Enum, ForeignKey, Text
-from sqlalchemy import deferred
+from sqlalchemy.orm import deferred, relationship
 from uuid import uuid4
 
 
@@ -32,7 +33,7 @@ class Ticket(Base, TimestampMixin):
     #: create custom polymorphic subclasses of this class. See
     #: `<http://docs.sqlalchemy.org/en/improve_toc/\
     #: orm/extensions/declarative/inheritance.html>`_.
-    handler = Column(Text, nullable=False)
+    handler_code = Column(Text, nullable=False, index=True)
 
     #: the data associated with the handler, not menat to be loaded in a list,
     #: therefore deferred.
@@ -52,7 +53,15 @@ class Ticket(Base, TimestampMixin):
 
     #: the user that owns this ticket with this ticket (optional)
     user_id = Column(UUID, ForeignKey(User.id), nullable=True)
+    user = relationship(User, backref="tickets")
 
     __mapper_args__ = {
-        'polymorphic_on': handler
+        'polymorphic_on': handler_code
     }
+
+    @property
+    def handler(self):
+        """ Returns an instance of the handler associated with this ticket. """
+
+        return handlers.get(self.handler_code).handler_class(
+            self, self.handler_data)

@@ -1,3 +1,6 @@
+from onegov.ticket.errors import DuplicateHandlerError
+
+
 class Handler(object):
     """ Defines a generic handler, responsible for a subset of the tickets.
 
@@ -33,26 +36,6 @@ class Handler(object):
         self.ticket.handler_data = self.data
 
     @property
-    def id(self):
-        """ Returns the id of the handler. Not supposed to ever change! """
-        raise NotImplementedError
-
-    @property
-    def shortcode(self):
-        """ Returns the three characters long shortcode of the handler added
-        in front of the ticket number. Not supposed to ever change!
-
-        Examples for good shortcodes:
-
-            FRM
-            ONS
-            RES
-            EVT
-
-        """
-        raise NotImplementedError
-
-    @property
     def title(self):
         """ Returns the title of the ticket. If this title may change over
         time, the handler must call :meth:`self.refresh` when there's a change.
@@ -84,3 +67,43 @@ class Handler(object):
         """
 
         raise NotImplementedError
+
+
+class HandlerRegistry(object):
+
+    def __init__(self):
+        self.registry = {}
+
+    def get(self, handler_code):
+        """ Returns the handler registration for the given id. If the id
+        does not exist, a KeyError is raised.
+
+        """
+        return self.registry[handler_code]
+
+    def register(self, handler_code, handler_class):
+        """ Registers a handler.
+
+        :handler_code:
+            Three characters long shortcode of the handler added in front of
+            the ticket number. Must be globally unique and must not change!
+
+            Examples for good handler_codes::
+
+                FRM
+                ONS
+                RES
+                EVT
+
+        :handler_class:
+            A handler class inheriting from :class:`Handler`.
+
+        """
+
+        assert len(handler_code) == 3
+        assert handler_code == handler_code.upper()
+
+        if handler_code in self.registry:
+            raise DuplicateHandlerError
+
+        self.registry[handler_code] = handler_class
