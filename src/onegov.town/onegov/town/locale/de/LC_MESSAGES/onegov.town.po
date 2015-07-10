@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-09 09:37+0200\n"
+"POT-Creation-Date: 2015-07-10 13:54+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -108,7 +108,8 @@ msgid "The form could not be parsed."
 msgstr "Das Formular ist nicht gültig."
 
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
-msgstr "Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
+msgstr ""
+"Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
 
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
@@ -328,6 +329,39 @@ msgstr "Möchten Sie die Eingabe wirklich löschen?"
 msgid "Delete Submission"
 msgstr "Eingabe Löschen"
 
+msgid ""
+"Your request will be processed shortly. To see the state of your process "
+"your may return to this page at any time. All information on this page has "
+"been sent to your e-mail address."
+msgstr ""
+"Ihr Anliegen wird in Kürze bearbeitet. Sie können jederzeit zu dieser Seite "
+"zurückkehren um den Status Ihres Anliegens abzufragen. Alle Informationen "
+"auf dieser Seite wurde an Ihre E-Mail Adresse gesendet. "
+
+msgid ""
+"Your request has been completed. If you asked for documents to be sent to "
+"your address, they should arrive shortly. If you asked to pick up documents "
+"at the municipality, the are now ready to be picked up."
+msgstr ""
+"Ihr Anliegen wurde erfolgreich abgeschlossen. Falls Sie Dokumente über den "
+"Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
+"Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
+
+msgid "Ticket Number"
+msgstr "Referenz"
+
+msgid "State"
+msgstr "Status"
+
+msgid "Open"
+msgstr "Offen"
+
+msgid "Pending"
+msgstr "In Bearbeitung"
+
+msgid "Closed"
+msgstr "Abgeschlossen"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -350,8 +384,8 @@ msgstr "Definition"
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
-msgid "Thank you for your submission"
-msgstr "Danke für Ihre Eingabe"
+msgid "Thank you for your submission!"
+msgstr "Vielen Dank für Ihre Eingabe!"
 
 msgid "Services"
 msgstr "Dienstleistungen"
@@ -449,3 +483,15 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
+
+msgid "Your request has been submitted"
+msgstr "Ihr Anliegen wurde eingereicht"
+
+msgid "Your request is currently pending"
+msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
+
+msgid "Your request has been processed"
+msgstr "Ihr Anliegen wurde abgeschlossen"
+
+#~ msgid "Your request is currently being worked on."
+#~ msgstr "Ihr Anliegen wird zur Zeit bearbeitet."

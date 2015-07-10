@@ -4,6 +4,7 @@ import base64
 import morepath
 
 from onegov.core.security import Public, Private
+from onegov.ticket import TicketCollection
 from onegov.form import (
     FormCollection,
     FormDefinition,
@@ -112,10 +113,17 @@ def handle_complete_submission(self, request):
             collection = FormCollection(request.app.session())
             collection.submissions.complete_submission(self)
 
-            # TODO Show a new page with the transaction id and a thank you
-            request.success(_(u"Thank you for your submission"))
+            # make sure accessing the submission doesn't flash it, because
+            # it uses sqlalchemy utils observe, which doesn't like premature
+            # flushing at all
+            with collection.session.no_autoflush:
+                ticket = TicketCollection(request.app.session()).open_ticket(
+                    handler_code='FRM', submission_id=self.id.hex
+                )
 
-            return morepath.redirect(request.link(collection))
+            request.success(_("Thank you for your submission!"))
+
+            return morepath.redirect(request.link(ticket, 'status'))
 
 
 @TownApp.view(model=FormSubmissionFile, permission=Private)

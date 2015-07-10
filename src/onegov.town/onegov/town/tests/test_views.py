@@ -5,6 +5,7 @@ import textwrap
 
 from onegov.form import FormCollection
 from onegov.testing import utils
+from onegov.ticket import TicketCollection
 from webtest import TestApp as Client
 from webtest import Upload
 
@@ -419,12 +420,13 @@ def test_links(town_app):
     assert google.location == 'https://www.google.ch'
 
 
-def test_pending_submissions(town_app):
+def test_submit_form(town_app):
     collection = FormCollection(town_app.session())
     collection.definitions.add('Profile', definition=textwrap.dedent("""
         # Your Details
         First name * = ___
         Last name * = ___
+        E-Mail * = @@@
     """), type='custom')
 
     client = Client(town_app)
@@ -433,27 +435,36 @@ def test_pending_submissions(town_app):
     assert 'Your Details' in form_page
     assert 'First name' in form_page
     assert 'Last name' in form_page
+    assert 'E-Mail' in form_page
 
     assert 'formular/' in form_page.request.url
     form_page = form_page.form.submit().follow()
 
     assert 'formular/' not in form_page.request.url
     assert 'formular-eingabe' in form_page.request.url
-    assert len(form_page.pyquery('small.error')) == 2
+    assert len(form_page.pyquery('small.error')) == 3
 
     form_page.form['your_details_first_name'] = 'Kung'
     form_page = form_page.form.submit()
 
-    assert len(form_page.pyquery('small.error')) == 1
+    assert len(form_page.pyquery('small.error')) == 2
 
     form_page.form['your_details_last_name'] = 'Fury'
+    form_page.form['your_details_e_mail'] = 'kung.fury@example.org'
     form_page = form_page.form.submit()
 
     assert len(form_page.pyquery('small.error')) == 0
+    ticket_page = form_page.form.submit().follow()
 
-    assert collection.submissions.query().first().state == 'pending'
-    form_page.form.submit()
-    assert collection.submissions.query().first().state == 'complete'
+    # make sure a ticket has been created
+    assert 'FRM-' in ticket_page
+    assert 'ticket-state-open' in ticket_page
+
+    tickets = TicketCollection(town_app.session()).by_handler_code('FRM')
+    assert len(tickets) == 1
+
+    assert tickets[0].title == 'Kung, Fury, kung.fury@example.org'
+    assert tickets[0].group == 'Profile'
 
 
 def test_pending_submission_error_file_upload(town_app):

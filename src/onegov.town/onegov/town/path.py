@@ -22,6 +22,7 @@ from onegov.form import (
 )
 from onegov.page import PageCollection
 from onegov.people import Person, PersonCollection
+from onegov.ticket import Ticket, TicketCollection
 
 
 @TownApp.path(model=Town, path='/')
@@ -119,3 +120,9 @@ def get_people(app):
 @TownApp.path(model=Person, path='/person/{id}')
 def get_person(app, id):
     return PersonCollection(app.session()).by_id(id)
+
+
+@TownApp.path(model=Ticket, path='/ticket/{handler_code}/{id}')
+def get_ticket(app, handler_code, id):
+    return TicketCollection(app.session()).by_id(
+        id, ensure_handler_code=handler_code)

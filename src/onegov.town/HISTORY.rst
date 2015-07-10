@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Form submissions automatically generate a onegov.ticket in the backend.
+  [href]
+
 0.2.3 (2015-07-09)
 ~~~~~~~~~~~~~~~~~~~
 

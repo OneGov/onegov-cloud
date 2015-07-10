@@ -212,7 +212,7 @@ form {
 
     .ace_content {
         color: inherit;
-        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+        font-family: $font-family-monospace;
         font-size: 12px;
         line-height: 12px;
     }
@@ -226,14 +226,14 @@ form {
 */
 .fieldset-display {
     margin-bottom: 1em;
+}
 
-    .field-display {
-        margin-bottom: .5em;
-    }
+.field-display {
+    margin-bottom: .5em;
+}
 
-    .field-display-label {
-        font-weight: bold;
-    }
+.field-display-label {
+    font-weight: bold;
 }
 
 .row.fieldset-display-submit form {
@@ -921,5 +921,56 @@ $max-page-width: 600px;
 
     .person-card-title {
         font-weight: bold;
+    }
+}
+
+
+/*
+    Ticket
+*/
+
+.ticket-number {
+    @include label(
+        $padding: .25rem .5rem .1rem,
+        $text-size: 1rem,
+        $bg: $yellow-light,
+        $radius:4px
+    );
+    font-family: $font-family-monospace;
+}
+
+.ticket-state-open {
+    @include label(
+        $padding: .25rem .5rem,
+        $text-size: 1rem,
+        $bg: $gray-light,
+        $radius:4px
+    );
+}
+
+.ticket-state-pending {
+    @include label(
+        $padding: .25rem .5rem,
+        $text-size: 1rem,
+        $bg: $blue-light,
+        $radius:4px
+    );
+}
+
+.ticket-state-closed {
+    @include label(
+        $padding: .25rem .5rem,
+        $text-size: 1rem,
+        $bg: $green-light,
+        $radius:4px
+    );
+}
+
+/*
+    Ticket status page
+*/
+.ticket-status-page {
+    .ticket-number {
+        margin-bottom: 1rem;
     }
 }
