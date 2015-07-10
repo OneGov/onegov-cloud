@@ -88,3 +88,5 @@ def test_open_ticket(session, handlers):
     assert ticket.title == "Test"
 
     assert len(collection.by_handler_code("ECO")) == 1
+    assert collection.by_id(ticket.id)
+    assert collection.by_id(ticket.id, ensure_handler_code='FOO') is None

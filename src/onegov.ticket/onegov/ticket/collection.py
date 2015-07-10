@@ -76,5 +76,12 @@ class TicketCollection(object):
         return ticket
 
     def by_handler_code(self, handler_code):
-        return self.session.query(Ticket)\
-            .filter(Ticket.handler_code == handler_code).all()
+        return self.query().filter(Ticket.handler_code == handler_code).all()
+
+    def by_id(self, id, ensure_handler_code=None):
+        query = self.query().filter(Ticket.id == id)
+
+        if ensure_handler_code:
+            query = query.filter(Ticket.handler_code == ensure_handler_code)
+
+        return query.first()
