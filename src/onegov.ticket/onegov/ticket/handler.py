@@ -112,3 +112,16 @@ class HandlerRegistry(object):
             raise DuplicateHandlerError
 
         self.registry[handler_code] = handler_class
+
+    def registered_handler(self, handler_code):
+        """ A decorator to register handles as follows::
+
+        @handlers.registered_handler('FOO')
+        class FooHandler(Handler):
+            pass
+
+        """
+        def wrapper(handler_class):
+            self.register(handler_code, handler_class)
+            return handler_class
+        return wrapper

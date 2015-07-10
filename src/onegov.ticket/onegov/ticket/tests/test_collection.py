@@ -41,6 +41,7 @@ def test_issue_unique_ticket_number(session):
 
 def test_open_ticket(session, handlers):
 
+    @handlers.registered_handler('ECO')
     class EchoHandler(Handler):
 
         @property
@@ -57,7 +58,6 @@ def test_open_ticket(session, handlers):
         def get_links(self, request):
             return self.data.get('links')
 
-    handlers.register('ECO', EchoHandler)
     collection = TicketCollection(session)
 
     ticket = collection.open_ticket(
