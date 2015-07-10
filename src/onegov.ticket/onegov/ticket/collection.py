@@ -66,11 +66,15 @@ class TicketCollection(object):
 
         ticket = Ticket()
         ticket.number = self.issue_unique_ticket_number(handler_code)
+
+        # add it to the session before invoking the handler, who expects
+        # each ticket to belong to a session already
+        self.session.add(ticket)
+
         ticket.handler_code = handler_code
         ticket.handler_data = handler_data
         ticket.handler.refresh()
 
-        self.session.add(ticket)
         self.session.flush()
 
         return ticket

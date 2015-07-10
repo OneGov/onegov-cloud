@@ -1,4 +1,5 @@
 from onegov.ticket.errors import DuplicateHandlerError
+from sqlalchemy.orm import object_session
 
 
 class Handler(object):
@@ -26,6 +27,10 @@ class Handler(object):
     def __init__(self, ticket, handler_data):
         self.ticket = ticket
         self.data = handler_data
+
+    @property
+    def session(self):
+        return object_session(self.ticket)
 
     def refresh(self):
         """ Updates the current ticket with the latest data from the handler.
