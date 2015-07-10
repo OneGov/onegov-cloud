@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an isodate format function to the layout base.
+  [href]
+
 0.4.7 (2015-07-08)
 ~~~~~~~~~~~~~~~~~~~
 

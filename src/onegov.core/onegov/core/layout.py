@@ -1,6 +1,7 @@
 import numbers
 
 from cached_property import cached_property
+from datetime import datetime
 from onegov.core.compat import zip_longest
 from pytz import timezone
 from purl import URL
@@ -81,6 +82,10 @@ class Layout(object):
             date = self.timezone.normalize(date.astimezone(self.timezone))
 
         return date.strftime(getattr(self, format + '_format'))
+
+    def isodate(self, date):
+        """ Returns the given date in the ISO 8601 format. """
+        return datetime.isoformat(date)
 
     def format_number(self, number, decimal_places=None):
         """ Takes the given numer and formats it according to locale (in the
