@@ -1,5 +1,5 @@
 from mock import Mock
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Handler, Ticket, TicketCollection
 
 
 def test_random_number():
@@ -37,3 +37,52 @@ def test_issue_unique_ticket_number(session):
     assert collection.issue_unique_ticket_number('ABC') == 'ABC-1000-0001'
     assert collection.issue_unique_ticket_number('ABC') == 'ABC-1000-0002'
     assert len(collection.random_number.mock_calls) == 3
+
+
+def test_open_ticket(session, handlers):
+
+    class EchoHandler(Handler):
+
+        @property
+        def title(self):
+            return self.data.get('title')
+
+        @property
+        def group(self):
+            return self.data.get('group')
+
+        def get_summary(self, request):
+            return self.data.get('summary')
+
+        def get_links(self, request):
+            return self.data.get('links')
+
+    handlers.register('ECO', EchoHandler)
+    collection = TicketCollection(session)
+
+    ticket = collection.open_ticket(
+        handler_code='ECO',
+        title="Title",
+        group="Group",
+        summary="Summary",
+        links=[("Link", '#')]
+    )
+
+    assert ticket.number.startswith('ECO-')
+    assert ticket.title == "Title"
+    assert ticket.group == "Group"
+    assert ticket.handler_code == 'ECO'
+    assert ticket.handler_data == {
+        'title': "Title",
+        'group': "Group",
+        'summary': "Summary",
+        'links': [("Link", '#')]
+    }
+
+    assert ticket.handler.get_summary(request=object()) == "Summary"
+    assert ticket.handler.get_links(request=object()) == [("Link", '#')]
+
+    ticket.handler_data['title'] = "Test"
+    assert ticket.title == "Title"
+    ticket.handler.refresh()
+    assert ticket.title == "Test"

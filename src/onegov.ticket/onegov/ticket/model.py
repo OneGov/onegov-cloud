@@ -63,5 +63,4 @@ class Ticket(Base, TimestampMixin):
     def handler(self):
         """ Returns an instance of the handler associated with this ticket. """
 
-        return handlers.get(self.handler_code).handler_class(
-            self, self.handler_data)
+        return handlers.get(self.handler_code)(self, self.handler_data)

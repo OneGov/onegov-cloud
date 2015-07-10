@@ -1,6 +1,5 @@
 import random
 
-from onegov.ticket import handlers
 from onegov.ticket.model import Ticket
 
 
@@ -62,13 +61,11 @@ class TicketCollection(object):
             if not self.is_existing_ticket_number(candidate):
                 return candidate
 
-    def open(self, handler_code, **handler_data):
+    def open_ticket(self, handler_code, **handler_data):
         """ Opens a new ticket using the given handler. """
 
-        registration = handlers.get(handler_code)
-
         ticket = Ticket()
-        ticket.number = self.issue_unique_ticket_number(registration.shortcode)
+        ticket.number = self.issue_unique_ticket_number(handler_code)
         ticket.handler_code = handler_code
         ticket.handler_data = handler_data
         ticket.handler.refresh()
