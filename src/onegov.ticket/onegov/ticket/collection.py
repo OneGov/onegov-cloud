@@ -76,4 +76,5 @@ class TicketCollection(object):
         return ticket
 
     def by_handler_code(self, handler_code):
-        return self.session.query(Ticket).filter_by(handler_code).all()
+        return self.session.query(Ticket)\
+            .filter(Ticket.handler_code == handler_code).all()

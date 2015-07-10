@@ -86,3 +86,5 @@ def test_open_ticket(session, handlers):
     assert ticket.title == "Title"
     ticket.handler.refresh()
     assert ticket.title == "Test"
+
+    assert len(collection.by_handler_code("ECO")) == 1
