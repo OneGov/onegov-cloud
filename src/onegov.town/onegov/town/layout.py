@@ -478,3 +478,13 @@ class PersonLayout(DefaultLayout):
                     redirect_after=self.request.link(self.collection)
                 )
             ]
+
+
+class TicketsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Tickets"), '#')
+        ]

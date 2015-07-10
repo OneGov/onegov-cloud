@@ -5,6 +5,8 @@ $('a').on('success.ic', function(evt, elt, data, textStatus, xhr) {
     if (! _.isUndefined(redirect_after)) {
         window.location = redirect_after;
     }
+
+    return true;
 });
 
 // show the new content placeholder when hovering over the add content dropdown

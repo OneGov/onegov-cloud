@@ -1,0 +1,56 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <dl class="sub-nav" tal:define="base_link request.link(layout.model)">
+            <dt>Filter:</dt>
+            <tal:block repeat="link filters">
+                <dd class="${link.active and 'active' or ''}">
+                    <tal:block replace="structure link(request)"></tal:block>
+                </dd>
+            </tal:block>
+        </dl>
+        <div class="tickets table-list-header">
+            <label class="table-list-header-select-all">
+                <input type="checkbox" class="js-check-all">
+            </label>
+            <div class="table-list-header-cell state-open">
+                <i class="fa fa-exclamation-circle"></i>
+                ${len(tickets)} ${tickets_title}
+            </div>
+        </div>
+        <ul class="table-list">
+            <li tal:repeat="ticket tickets">
+                <tal:block>
+                    <label class="table-list-cell table-list-cell-checkbox">
+                        <input type="checkbox">
+                    </label>
+                    <div class="table-list-cell ticket-number-plain">
+                        <a href="#">
+                            ${ticket.number}
+                        </a>
+                    </div>
+                    <div class="table-list-cell ticket-title">
+                        <a href="#">
+                            ${ticket.title}
+                        </a>
+                        <div class="ticket-meta">
+                          <span class="ticket-meta-section opened-by" tal:define="formatted layout.format_date(ticket.created, 'datetime')">
+                              <span i18n:translate>opened</span> <time datetime="${layout.isodate(ticket.created)}" is="relative-time" title="${formatted}">${formatted}</time>
+                          </span>
+                        </div>
+                    </div>
+                    <div class="table-list-cell ticket-group">
+                        ${ticket.group}
+                    </div>
+                    <div class="table-list-cell table-list-cell-avatar">
+                        <span tal:condition="ticket.user_id">
+                            ${ticket.user.username}
+                        </span>
+                    </div>
+                </tal:block>
+            </li>
+        </ul>
+    </tal:block>
+</div>

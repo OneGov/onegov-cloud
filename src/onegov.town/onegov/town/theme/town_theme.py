@@ -71,6 +71,7 @@ class TownTheme(BaseTheme):
             ('crumb-bg', '#fff'),
             ('crumb-border-size', '0'),
             ('header-line-height', '1.25'),
+            ('sub-nav-padding', '.25rem'),
 
             # custom
             ('tile-image-1', '"../static/homepage-images/tile-1-small.jpg"'),

@@ -286,3 +286,15 @@
         </li>
     </ul>
 </metal:sidebar>
+
+<metal:ticket_status define-macro="ticket_status" i18n:domain="onegov.town">
+    <div i18n:translate tal:condition="ticket.state == 'open'" class="ticket-state-open">
+        Open
+    </div>
+    <div i18n:translate tal:condition="ticket.state == 'pending'" class="ticket-state-pending">
+        Pending
+    </div>
+    <div i18n:translate tal:condition="ticket.state == 'closed'" class="ticket-state-closed">
+        Closed
+    </div>
+</metal:ticket_status>

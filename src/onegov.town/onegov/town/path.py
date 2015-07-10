@@ -126,3 +126,8 @@ def get_person(app, id):
 def get_ticket(app, handler_code, id):
     return TicketCollection(app.session()).by_id(
         id, ensure_handler_code=handler_code)
+
+
+@TownApp.path(model=TicketCollection, path='/tickets')
+def get_tickets(app):
+    return TicketCollection(app.session())

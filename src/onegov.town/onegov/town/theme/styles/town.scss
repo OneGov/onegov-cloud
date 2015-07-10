@@ -930,6 +930,10 @@ $max-page-width: 600px;
     Ticket
 */
 
+.ticket-number-plain {
+    font-family: $font-family-monospace;
+}
+
 .ticket-number {
     @include label(
         $padding: .25rem .5rem .1rem,
@@ -974,4 +978,66 @@ $max-page-width: 600px;
     .ticket-number {
         margin-bottom: 1rem;
     }
+}
+
+
+/*
+    Table-Like Lists
+*/
+
+.table-list-header {
+    background-color: $table-head-bg;
+    border-top: 1px solid $table-border-color;
+    margin-top: 20px;
+    padding: 6px 0 0 12px;
+    position: relative;
+
+    label {
+        display: table-cell;
+    }
+
+    .table-list-header-cell {
+        display: table-cell;
+        padding-left: 15px;
+        position: relative;
+        vertical-align: top;
+
+        &.state-open {
+            font-weight: bold;
+        }
+    }
+}
+
+.table-list {
+    color: $sub-nav-font-color;
+    display: table;
+    list-style-type: none;
+    margin: 0 0 20px;
+    padding: 0;
+    table-layout: fixed;
+    width: 100%;
+
+    li {
+        border-bottom: 1px solid $table-border-color;
+    }
+
+    .table-list-cell {
+        display: table-cell;
+        padding: 8px 10px;
+        position: relative;
+        vertical-align: top;
+    }
+
+    .table-list-cell-avatar {
+        text-align: right;
+    }
+}
+
+/*
+    Sub navigation
+*/
+.sub-nav {
+    // we slightly increase the padding in the town theme, if the line height
+    // is not slightly increased at the same time, we see some weird overlap
+    line-height: 1.7rem;
 }
