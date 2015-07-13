@@ -19,14 +19,14 @@
         </div>
         <ul class="table-list">
             <li tal:repeat="ticket tickets">
-                <tal:block>
+                <tal:block tal:define="ticket_url request.link(ticket)">
                     <div class="table-list-cell ticket-number-plain">
-                        <a href="#">
+                        <a href="${ticket_url}">
                             ${ticket.number}
                         </a>
                     </div>
                     <div class="table-list-cell ticket-title">
-                        <a href="#">
+                        <a href="${ticket_url}">
                             ${ticket.title}
                         </a>
                         <div class="ticket-meta">

@@ -1,8 +1,18 @@
 from onegov.core.security import Public, Private
-from onegov.ticket import Ticket, TicketCollectionSubset
+from onegov.ticket import Ticket, TicketCollection
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
-from onegov.town.layout import DefaultLayout, TicketsLayout
+from onegov.town.layout import DefaultLayout, TicketLayout, TicketsLayout
+
+
+@TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
+def view_ticket(self, request):
+
+    return {
+        'title': self.number,
+        'layout': TicketLayout(self, request),
+        'ticket': self
+    }
 
 
 @TownApp.html(model=Ticket, name='status', template='ticket_status.pt',
@@ -25,7 +35,7 @@ def view_ticket_status(self, request):
     }
 
 
-@TownApp.html(model=TicketCollectionSubset, template='tickets.pt',
+@TownApp.html(model=TicketCollection, template='tickets.pt',
               permission=Private)
 def view_tickets(self, request):
 
