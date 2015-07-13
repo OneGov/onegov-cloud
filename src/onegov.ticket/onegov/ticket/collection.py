@@ -17,7 +17,7 @@ class TicketCollectionPagination(Pagination):
         return self.state == other.state and self.page == other.page
 
     def subset(self):
-        query = super(self.__class__, self).query()
+        query = self.query()
         query = query.order_by(desc(Ticket.created))
         query = query.options(joinedload(Ticket.user))
         query = query.options(undefer(Ticket.created))
