@@ -1,10 +1,8 @@
 from onegov.core.security import Public, Private
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket, TicketCollectionSubset
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout, TicketsLayout
-from sqlalchemy import desc
-from sqlalchemy.orm import joinedload, undefer
 
 
 @TownApp.html(model=Ticket, name='status', template='ticket_status.pt',
@@ -27,40 +25,37 @@ def view_ticket_status(self, request):
     }
 
 
-@TownApp.html(model=TicketCollection, template='tickets.pt',
+@TownApp.html(model=TicketCollectionSubset, template='tickets.pt',
               permission=Private)
 def view_tickets(self, request):
 
-    # TODO add pagination
-    query = TicketCollection(request.app.session()).query()
-    query = query.order_by(desc(Ticket.created))
-    query = query.options(joinedload(Ticket.user))
-    query = query.options(undefer(Ticket.created))
+    def get_filters():
+        states = (
+            ('open', _("Open")),
+            ('pending', _("Pending")),
+            ('closed', _("Closed"))
+        )
 
-    # TODO add to the collection model?
-    state = request.params.get('state', 'open')
-    state = state in {'open', 'pending', 'closed'} and state or 'open'
+        for id, text in states:
+            yield Link(
+                text=text,
+                url=request.link(self.for_state(id)),
+                active=self.state == id
+            )
 
-    query = query.filter(Ticket.state == state)
-
-    base = request.link(self)
-    filters = [
-        Link(_("Open"), base + '?state=open', active=state == 'open'),
-        Link(_("Pending"), base + '?state=pending', active=state == 'pending'),
-        Link(_("Closed"), base + '?state=closed', active=state == 'closed'),
-    ]
-
-    if state == 'open':
+    if self.state == 'open':
         tickets_title = _("Open Tickets")
-    elif state == 'pending':
+    elif self.state == 'pending':
         tickets_title = _("Pending Tickets")
-    elif state == 'closed':
+    elif self.state == 'closed':
         tickets_title = _("Closed Tickets")
+    else:
+        raise NotImplementedError
 
     return {
         'title': _("Tickets"),
         'layout': TicketsLayout(self, request),
-        'tickets': query.all(),
-        'filters': filters,
-        'tickets_title': tickets_title
+        'tickets': self.batch,
+        'filters': tuple(get_filters()),
+        'tickets_title': tickets_title,
     }

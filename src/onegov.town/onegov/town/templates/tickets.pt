@@ -12,20 +12,14 @@
             </tal:block>
         </dl>
         <div class="tickets table-list-header">
-            <label class="table-list-header-select-all">
-                <input type="checkbox" class="js-check-all">
-            </label>
             <div class="table-list-header-cell state-open">
                 <i class="fa fa-exclamation-circle"></i>
-                ${len(tickets)} ${tickets_title}
+                ${layout.model.subset_count} ${tickets_title}
             </div>
         </div>
         <ul class="table-list">
             <li tal:repeat="ticket tickets">
                 <tal:block>
-                    <label class="table-list-cell table-list-cell-checkbox">
-                        <input type="checkbox">
-                    </label>
                     <div class="table-list-cell ticket-number-plain">
                         <a href="#">
                             ${ticket.number}
@@ -52,5 +46,9 @@
                 </tal:block>
             </li>
         </ul>
+        <div class="pagination-centered">
+            <div metal:use-macro="layout.macros['pagination']" tal:define="
+            collection layout.model; current_page layout.model;" />
+        </div>
     </tal:block>
 </div>

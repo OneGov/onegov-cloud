@@ -988,7 +988,7 @@ $max-page-width: 600px;
     background-color: $table-head-bg;
     border-top: 1px solid $table-border-color;
     margin-top: 20px;
-    padding: 6px 0 0 12px;
+    padding: rem-calc(6 0);
     position: relative;
 
     label {

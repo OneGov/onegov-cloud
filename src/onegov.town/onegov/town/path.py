@@ -22,7 +22,7 @@ from onegov.form import (
 )
 from onegov.page import PageCollection
 from onegov.people import Person, PersonCollection
-from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import Ticket, TicketCollection, TicketCollectionSubset
 
 
 @TownApp.path(model=Town, path='/')
@@ -129,5 +129,5 @@ def get_ticket(app, handler_code, id):
 
 
 @TownApp.path(model=TicketCollection, path='/tickets')
-def get_tickets(app):
-    return TicketCollection(app.session())
+def get_tickets(app, page=0, state='open'):
+    return TicketCollectionSubset(app.session(), page, state)
