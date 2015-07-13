@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a pagination base class for use with collections.
+  [href]
+
 - Adds an isodate format function to the layout base.
   [href]
 
