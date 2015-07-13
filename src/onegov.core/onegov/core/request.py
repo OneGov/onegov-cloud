@@ -219,6 +219,14 @@ class CoreRequest(IncludeRequest):
         else:
             return lambda text: text.interpolate(translator.ugettext(text))
 
+    @cached_property
+    def locale(self):
+        """ Returns the current locale of this request. """
+        settings = self.app.registry.settings
+
+        locale = settings.i18n.locale_negotiator(self.app.languages, self)
+        return locale or settings.i18n.default_locale
+
     def get_translate(self, for_chameleon=False):
         """ Returns the translate method to the given request, or None
         if no such method is availabe.
@@ -231,15 +239,10 @@ class CoreRequest(IncludeRequest):
         if not self.app.languages:
             return None
 
-        settings = self.app.registry.settings
-
-        locale = settings.i18n.locale_negotiator(self.app.languages, self)
-        locale = locale or settings.i18n.default_locale
-
         if for_chameleon:
-            return self.app.chameleon_translations.get(locale)
+            return self.app.chameleon_translations.get(self.locale)
         else:
-            return self.app.translations.get(locale)
+            return self.app.translations.get(self.locale)
 
     def message(self, text, type):
         """ Adds a message with the given type to the messages list. This

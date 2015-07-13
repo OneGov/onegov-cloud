@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a relative date function to the layout.
+  [href]
+
 0.4.8 (2015-07-13)
 ~~~~~~~~~~~~~~~~~~~
 

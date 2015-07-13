@@ -1,3 +1,4 @@
+import arrow
 import numbers
 
 from cached_property import cached_property
@@ -76,10 +77,13 @@ class Layout(object):
         the given format.
 
         """
-        assert format in {'date', 'time', 'datetime'}
+        assert format in {'date', 'time', 'datetime', 'relative'}
 
         if hasattr(date, 'astimezone'):
             date = self.timezone.normalize(date.astimezone(self.timezone))
+
+        if format == 'relative':
+            return arrow.get(date).humanize(locale=self.request.locale)
 
         return date.strftime(getattr(self, format + '_format'))
 

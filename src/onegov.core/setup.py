@@ -11,6 +11,7 @@ version = '0.4.8'
 
 dependencies = {
     'alembic',
+    'arrow',
     'bleach',
     'cached_property',
     'chameleon',
