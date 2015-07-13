@@ -31,7 +31,7 @@
                         </a>
                         <div class="ticket-meta">
                           <span class="ticket-meta-section opened-by" tal:define="formatted layout.format_date(ticket.created, 'datetime')">
-                              <span i18n:translate>opened</span> <time datetime="${layout.isodate(ticket.created)}" is="relative-time" title="${formatted}">${formatted}</time>
+                              <span>${layout.format_date(ticket.created, 'relative')}</span>
                           </span>
                         </div>
                     </div>

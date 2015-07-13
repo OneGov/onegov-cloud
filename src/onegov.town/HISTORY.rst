@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Form submissions, tickets and news are now shown with a relative date
+  (e.g. 5 hours ago).
+  [href]
+
 - Form submissions automatically generate a onegov.ticket in the backend.
   [href]
 

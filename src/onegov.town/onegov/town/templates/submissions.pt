@@ -6,7 +6,7 @@
         <ul class="submissions">
             <li tal:repeat="submission submissions" id="${submission.id}">
                 <div class="submission-date">
-                    ${layout.format_date(submission.received, 'datetime')}
+                    ${layout.format_date(submission.received, 'relative')}
                 </div>
 
                 <div class="submission-title">

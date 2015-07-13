@@ -141,7 +141,7 @@
                 <a tal:attributes="href request.link(item)">
                     <h2>${item.title} <metal:hint use-macro="layout.macros['hidden_from_public_hint']" /></h2>
                 </a>
-                <p class="news-date">${item.created.strftime('%d.%m.%Y %H:%M')}</p>
+                <p class="news-date">${layout.format_date(item.created, 'relative')}</p>
                 <p class="news-lead">${item.content.lead}</p>
                 <p class="news-continue" tal:condition="item.content.text">
                     <a tal:attributes="href request.link(item)" i18n:translate="">read on...</a>
