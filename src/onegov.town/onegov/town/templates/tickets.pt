@@ -3,7 +3,7 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <dl class="sub-nav ticket-filters" tal:define="base_link request.link(layout.model)">
+        <dl class="sub-nav tickets-filter">
             <dt i18n:translate class="show-for-sr">State:</dt>
             <tal:block repeat="link filters">
                 <dd class="${link.active and 'active' or ''}">
@@ -11,40 +11,41 @@
                 </dd>
             </tal:block>
         </dl>
-        <div class="tickets table-list-header">
-            <div class="table-list-header-cell state-open">
-                ${layout.model.subset_count} ${tickets_title}
-            </div>
-        </div>
-        <ul class="table-list">
-            <li tal:repeat="ticket tickets">
-                <tal:block tal:define="ticket_url request.link(ticket)">
-                    <div class="table-list-cell ticket-number-plain">
-                        <a href="${ticket_url}">
-                            ${ticket.number}
-                        </a>
-                    </div>
-                    <div class="table-list-cell ticket-title">
-                        <a href="${ticket_url}">
-                            ${ticket.title}
-                        </a>
-                        <div class="ticket-meta">
-                          <span class="ticket-meta-section opened-by" tal:define="formatted layout.format_date(ticket.created, 'datetime')">
-                              <span>${layout.format_date(ticket.created, 'relative')}</span>
-                          </span>
-                        </div>
-                    </div>
-                    <div class="table-list-cell ticket-group">
-                        ${ticket.group}
-                    </div>
-                    <div class="table-list-cell table-list-cell-avatar">
-                        <span tal:condition="ticket.user_id">
-                            ${ticket.user.username}
-                        </span>
-                    </div>
+        <table class="tickets-table">
+            <thead>
+                <tr>
+                    <th colspan="5">${layout.model.subset_count} ${tickets_title}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:block repeat="ticket tickets">
+                    <tr tal:define="ticket_url request.link(ticket)" class="ticket-handler-${ticket.handler_code}">
+                        <td class="ticket-number-plain">
+                            <a href="${ticket_url}">
+                                ${ticket.number}
+                            </a>
+                        </td>
+                        <td class="ticket-group">
+                            ${ticket.group}
+                        </td>
+                        <td class="ticket-title">
+                            <a href="${ticket_url}">
+                                ${ticket.title}
+                            </a>
+                        </td>
+                        <td class="ticket-date" tal:define="formatted layout.format_date(ticket.created, 'datetime')">
+                            ${layout.format_date(ticket.created, 'relative')}
+                        </td>
+                        <td class="ticket-user">
+                            <tal:block condition="ticket.user_id">
+                                ${ticket.user.username}
+                            </tal:block>
+                        </td>
+                    </tr>
                 </tal:block>
-            </li>
-        </ul>
+            </tbody>
+        </table>
+
         <div class="pagination-centered">
             <div metal:use-macro="layout.macros['pagination']" tal:define="
             collection layout.model; current_page layout.model;" />

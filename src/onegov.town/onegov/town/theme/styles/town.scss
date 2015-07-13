@@ -979,57 +979,16 @@ $max-page-width: 600px;
     }
 }
 
-
 /*
-    Table-Like Lists
+    Tickets list
 */
-
-.table-list-header {
-    background-color: $table-head-bg;
-    border-top: 1px solid $table-border-color;
-    margin-top: 20px;
-    padding: rem-calc(6 0);
-    position: relative;
-
-    label {
-        display: table-cell;
-    }
-
-    .table-list-header-cell {
-        display: table-cell;
-        padding-left: 15px;
-        position: relative;
-        vertical-align: top;
-
-        &.state-open {
-            font-weight: bold;
-        }
-    }
+.tickets-table {
+    width: 100%;
 }
 
-.table-list {
-    color: $sub-nav-font-color;
-    display: table;
-    list-style-type: none;
-    margin: 0 0 20px;
-    padding: 0;
-    table-layout: fixed;
-    width: 100%;
-
-    li {
-        border-bottom: 1px solid $table-border-color;
-    }
-
-    .table-list-cell {
-        display: table-cell;
-        padding: 8px 10px;
-        position: relative;
-        vertical-align: top;
-    }
-
-    .table-list-cell-avatar {
-        text-align: right;
-    }
+.ticket-handler-FRM td:first-child::before {
+    content: '\f044';
+    font-family: 'FontAwesome';
 }
 
 /*
