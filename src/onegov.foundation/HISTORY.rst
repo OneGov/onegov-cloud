@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.4 (2015-07-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Monkey-patches pyscss, to fix its Zurb Foundation compilation.
   See https://github.com/Kronuz/pyScss/pull/342.
   [href]

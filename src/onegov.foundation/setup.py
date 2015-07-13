@@ -6,7 +6,7 @@ name = 'onegov.foundation'
 description = (
     'Provides a base for Zurb Foundation themes used in OneGov.'
 )
-version = '0.0.3'
+version = '0.0.4'
 
 
 def get_long_description():
