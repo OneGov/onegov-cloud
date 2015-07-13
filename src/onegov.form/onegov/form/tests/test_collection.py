@@ -334,11 +334,14 @@ def test_file_submissions_cascade(session):
     data = FileMultiDict()
     data.add_file('file', BytesIO(b'foobar'), filename='foobar.txt')
 
-    submission = collection.submissions.add(
+    collection.submissions.add(
         'file', definition.form_class(data), state='pending')
 
     assert session.query(FormSubmissionFile).count() == 1
-    session.delete(submission)
+
+    collection.submissions.remove_old_pending_submissions(older_than=(
+        datetime.utcnow() + timedelta(seconds=60)))
+
     assert session.query(FormSubmissionFile).count() == 0
 
 

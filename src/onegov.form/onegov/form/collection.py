@@ -264,12 +264,20 @@ class FormSubmissionCollection(object):
         if older_than.tzinfo is None:
             older_than = replace_timezone(older_than, 'UTC')
 
-        query = self.query()
+        submissions = self.query()
 
         # delete the ones that were never modified
-        query = query.filter(FormSubmission.state == 'pending')
-        query = query.filter(FormSubmission.last_change < older_than)
-        query.delete('fetch')
+        submissions = submissions.filter(FormSubmission.state == 'pending')
+        submissions = submissions.filter(
+            FormSubmission.last_change < older_than)
+
+        files = self.session.query(FormSubmissionFile)
+        files = files.filter(FormSubmissionFile.submission_id.in_(
+            submissions.with_entities(FormSubmission.id).subquery())
+        )
+
+        files.delete('fetch')
+        submissions.delete('fetch')
 
     def by_state(self, state):
         return self.query().filter(FormSubmission.state == state)

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix expired submission removal not working if files had been uploaded.
+  [href]
+
 0.6.4 (2015-07-09)
 ~~~~~~~~~~~~~~~~~~~
 
