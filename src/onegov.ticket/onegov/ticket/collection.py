@@ -6,10 +6,37 @@ from sqlalchemy import desc
 from sqlalchemy.orm import joinedload, undefer
 
 
-class TicketCollection(object):
+class TicketCollectionPagination(Pagination):
 
-    def __init__(self, session):
+    def __init__(self, session, page=0, state='open'):
         self.session = session
+        self.page = page
+        self.state = state
+
+    def __eq__(self, other):
+        return self.state == other.state and self.page == other.page
+
+    def subset(self):
+        query = super(self.__class__, self).query()
+        query = query.order_by(desc(Ticket.created))
+        query = query.options(joinedload(Ticket.user))
+        query = query.options(undefer(Ticket.created))
+        query = query.filter(Ticket.state == self.state)
+
+        return query
+
+    @property
+    def page_index(self):
+        return self.page
+
+    def page_by_index(self, index):
+        return self.__class__(self.session, index, self.state)
+
+    def for_state(self, state):
+        return self.__class__(self.session, 0, state)
+
+
+class TicketCollection(TicketCollectionPagination):
 
     def query(self):
         return self.session.query(Ticket)
@@ -92,33 +119,3 @@ class TicketCollection(object):
             query = query.filter(Ticket.handler_code == ensure_handler_code)
 
         return query.first()
-
-
-class TicketCollectionSubset(TicketCollection, Pagination):
-
-    def __init__(self, session, page=0, state='open'):
-        self.session = session
-        self.page = page
-        self.state = state
-
-    def __eq__(self, other):
-        return self.state == other.state and self.page == other.page
-
-    def subset(self):
-        query = super(TicketCollectionSubset, self).query()
-        query = query.order_by(desc(Ticket.created))
-        query = query.options(joinedload(Ticket.user))
-        query = query.options(undefer(Ticket.created))
-        query = query.filter(Ticket.state == self.state)
-
-        return query
-
-    @property
-    def page_index(self):
-        return self.page
-
-    def page_by_index(self, index):
-        return TicketCollectionSubset(self.session, index, self.state)
-
-    def for_state(self, state):
-        return TicketCollectionSubset(self.session, 0, state)
