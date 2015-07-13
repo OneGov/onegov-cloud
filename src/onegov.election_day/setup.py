@@ -37,7 +37,7 @@ setup(
         'onegov.core>=0.4.3',
         'onegov.ballot',
         'onegov.form',
-        'onegov.foundation',
+        'onegov.foundation>=0.0.4',
         'onegov.user',
         'pyyaml'
     ],
