@@ -67,11 +67,6 @@
                   <div metal:define-slot="content"></div>
               </div>
           </div>
-          <div class="row">
-            <div class="small-12 medium-12 hide-for-medium-up columns sidebar sidebar-bottom">
-              <div metal:use-macro="layout.macros['sidebar']" />
-            </div>
-          </div>
         </div>
       </div>
       <div class="row content without-sidebar-links" tal:condition="not:layout.sidebar_links">
