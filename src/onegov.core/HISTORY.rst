@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.8 (2015-07-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a pagination base class for use with collections.
   [href]
 
