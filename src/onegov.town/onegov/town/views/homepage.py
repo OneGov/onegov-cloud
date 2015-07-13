@@ -89,7 +89,12 @@ def view_town(self, request):
                 text=_("People"),
                 url=request.link(PersonCollection(session)),
                 subtitle=_("All contacts")
-            )
+            ),
+            Link(
+                text=_("Topics"),
+                url='#',
+                subtitle=_("Catalog A-Z")
+            ),
         ]
     )
 

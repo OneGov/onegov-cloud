@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-10 13:54+0200\n"
+"POT-Creation-Date: 2015-07-13 13:39+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -28,6 +28,9 @@ msgstr "Bearbeiten"
 
 msgid "People"
 msgstr "Personen"
+
+msgid "Tickets"
+msgstr ""
 
 msgid "Logout"
 msgstr "Logout"
@@ -290,6 +293,15 @@ msgstr ""
 "Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und entfernen "
 "Sie das Häckchen im Feld \"Vor der Öffentlichkeit verstecken\"."
 
+msgid "Open"
+msgstr "Offen"
+
+msgid "Pending"
+msgstr "In Bearbeitung"
+
+msgid "Closed"
+msgstr "Abgeschlossen"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -353,14 +365,8 @@ msgstr "Referenz"
 msgid "State"
 msgstr "Status"
 
-msgid "Open"
-msgstr "Offen"
-
-msgid "Pending"
-msgstr "In Bearbeitung"
-
-msgid "Closed"
-msgstr "Abgeschlossen"
+msgid "opened"
+msgstr ""
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
@@ -401,6 +407,12 @@ msgstr "Formulare und Gesuche"
 
 msgid "All contacts"
 msgstr "Alle Kontakte"
+
+msgid "Topics"
+msgstr "Themen"
+
+msgid "Catalog A-Z"
+msgstr "Katalog A-Z"
 
 msgid "Email Address"
 msgstr "E-Mail Adresse"
@@ -487,11 +499,20 @@ msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
 msgid "Your request has been submitted"
 msgstr "Ihr Anliegen wurde eingereicht"
 
+msgid "Open Tickets"
+msgstr ""
+
 msgid "Your request is currently pending"
 msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
 
+msgid "Pending Tickets"
+msgstr ""
+
 msgid "Your request has been processed"
 msgstr "Ihr Anliegen wurde abgeschlossen"
+
+msgid "Closed Tickets"
+msgstr ""
 
 #~ msgid "Your request is currently being worked on."
 #~ msgstr "Ihr Anliegen wird zur Zeit bearbeitet."
