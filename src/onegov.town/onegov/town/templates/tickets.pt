@@ -3,8 +3,8 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <dl class="sub-nav" tal:define="base_link request.link(layout.model)">
-            <dt>Filter:</dt>
+        <dl class="sub-nav ticket-filters" tal:define="base_link request.link(layout.model)">
+            <dt i18n:translate class="show-for-sr">State:</dt>
             <tal:block repeat="link filters">
                 <dd class="${link.active and 'active' or ''}">
                     <tal:block replace="structure link(request)"></tal:block>
@@ -13,7 +13,6 @@
         </dl>
         <div class="tickets table-list-header">
             <div class="table-list-header-cell state-open">
-                <i class="fa fa-exclamation-circle"></i>
                 ${layout.model.subset_count} ${tickets_title}
             </div>
         </div>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-13 13:39+0200\n"
+"POT-Creation-Date: 2015-07-13 16:56+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -30,7 +30,7 @@ msgid "People"
 msgstr "Personen"
 
 msgid "Tickets"
-msgstr ""
+msgstr "Tickets"
 
 msgid "Logout"
 msgstr "Logout"
@@ -302,6 +302,12 @@ msgstr "In Bearbeitung"
 msgid "Closed"
 msgstr "Abgeschlossen"
 
+msgid "Previous Page"
+msgstr "Vorherige Seite"
+
+msgid "Next Page"
+msgstr "Nächste Seite"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -341,6 +347,12 @@ msgstr "Möchten Sie die Eingabe wirklich löschen?"
 msgid "Delete Submission"
 msgstr "Eingabe Löschen"
 
+msgid "Ticket Number"
+msgstr "Referenz"
+
+msgid "State"
+msgstr "Status"
+
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
@@ -359,14 +371,8 @@ msgstr ""
 "Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
 "Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
 
-msgid "Ticket Number"
-msgstr "Referenz"
-
-msgid "State"
-msgstr "Status"
-
-msgid "opened"
-msgstr ""
+msgid "State:"
+msgstr "Status:"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
@@ -500,19 +506,19 @@ msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
 msgid "Open Tickets"
-msgstr ""
+msgstr "Offene Tickets"
 
 msgid "Your request is currently pending"
 msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
 
 msgid "Pending Tickets"
-msgstr ""
+msgstr "Tickets in Bearbeitung"
 
 msgid "Your request has been processed"
 msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "Closed Tickets"
-msgstr ""
+msgstr "Abgeschlossene Tickets"
 
 #~ msgid "Your request is currently being worked on."
 #~ msgstr "Ihr Anliegen wird zur Zeit bearbeitet."
