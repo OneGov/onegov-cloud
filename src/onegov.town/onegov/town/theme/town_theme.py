@@ -68,6 +68,8 @@ class TownTheme(BaseTheme):
             ('topbar-menu-icon-color', '#312f2e'),
             ('topbar-dropdown-bg', '$gray-pastel'),
             ('side-nav-font-weight-active', 'bold'),
+            ('side-nav-padding', '0'),
+            ('side-nav-link-padding', 'rem-calc(0 14)'),
             ('crumb-bg', '#fff'),
             ('crumb-border-size', '0'),
             ('header-line-height', '1.25'),

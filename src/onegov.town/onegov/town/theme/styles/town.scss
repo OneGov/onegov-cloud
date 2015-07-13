@@ -78,7 +78,7 @@ footer,
 .main-navigation {
     background-color: $topbar-bg-color;
     border-bottom: $top-bar-border-size solid $primary-color;
-    margin-bottom: 1rem;
+    margin-bottom: .1rem;
 }
 
 .top-bar {
@@ -503,8 +503,8 @@ input[type=color] {
 */
 .edit-bar {
     background-color: $primary-color;
-    margin-bottom: .8rem;
-    margin-top: -1.2rem;
+    margin-bottom: 2px;
+    margin-top: -6px;
 
     button.tiny {
         float: right;
@@ -740,24 +740,12 @@ $max-page-width: 600px;
 */
 
 .sidebar {
-    ul {
-        padding-left: 1rem;
-
-        // the left side of the sidebar has to align to the text of the
-        // top navigation and the edit bar *exactly* - for some reason it
-        // doesn't here without removing 1px.. this means I'm doing something
-        // wrong, but I haven't yet found out what
-        li {
-            margin-left: -1px;
-        }
-    }
-
     li {
         a.childpage,
         a.new-content-placeholder {
             color: $oil;
             overflow: hidden;
-            padding-left: 1rem;
+            padding-left: 1.5rem;
             text-overflow: ellipsis;
         }
 
