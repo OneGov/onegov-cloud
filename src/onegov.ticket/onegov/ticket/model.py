@@ -64,3 +64,14 @@ class Ticket(Base, TimestampMixin):
         """ Returns an instance of the handler associated with this ticket. """
 
         return handlers.get(self.handler_code)(self, self.handler_data)
+
+    def accept_ticket(self, user):
+        assert self.state == 'open'
+
+        self.user = user
+        self.state = 'pending'
+
+    def close_ticket(self):
+        assert self.state == 'pending'
+
+        self.state = 'closed'

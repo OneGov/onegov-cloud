@@ -36,9 +36,14 @@ class Handler(object):
         """ Updates the current ticket with the latest data from the handler.
         """
 
-        self.ticket.title = self.title
-        self.ticket.group = self.group
-        self.ticket.handler_data = self.data
+        if self.ticket.title != self.title:
+            self.ticket.title = self.title
+
+        if self.ticket.group != self.group:
+            self.ticket.group = self.group
+
+        if self.ticket.handler_data != self.data:
+            self.ticket.handler_data = self.data
 
     @property
     def title(self):
@@ -69,6 +74,9 @@ class Handler(object):
                 ('Link Title', 'http://link'),
                 ('Link Title 2', 'http://link2'),
             ]
+
+        If the links are not tuples, but callables, they will be called with
+        the request which should return the rendered link.
         """
 
         raise NotImplementedError
