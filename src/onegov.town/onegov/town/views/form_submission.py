@@ -15,6 +15,7 @@ from onegov.form import (
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.layout import FormSubmissionLayout
+from purl import URL
 
 
 @TownApp.form(model=FormDefinition, template='form.pt', permission=Public,
@@ -72,7 +73,17 @@ def handle_pending_submission(self, request):
     else:
         collection.submissions.update(self, form)
 
+    if 'return-to' in request.GET:
+        action = URL(form.action)
+        action = action.query_param('return-to', request.GET['return-to'])
+
+        form.action = action.as_string()
+
     completable = not form.errors and 'edit' not in request.GET
+
+    if completable and 'return-to' in request.GET:
+        request.success(_(u"Your changes were saved"))
+        return morepath.redirect(request.GET['return-to'])
 
     return {
         'layout': FormSubmissionLayout(self, request),

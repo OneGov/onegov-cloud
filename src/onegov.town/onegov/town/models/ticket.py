@@ -4,7 +4,9 @@ from onegov.core.templates import render_macro
 from onegov.form import FormSubmissionCollection
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.town import _
+from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
+from purl import URL
 
 
 class FormSubmissionTicket(Ticket):
@@ -42,6 +44,15 @@ class FormSubmissionHandler(Handler):
         })
 
     def get_links(self, request):
+
+        edit_link = URL(request.link(self.submission))
+        edit_link = edit_link.query_param('edit', '')
+        edit_link = edit_link.query_param('return-to', request.url)
+
         return [
-            (_("Edit Submission"), request.link(self.submission) + '?edit'),
+            Link(
+                text=_('Edit submission'),
+                url=edit_link.as_string(),
+                classes=('edit-link', )
+            )
         ]

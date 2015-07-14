@@ -511,3 +511,8 @@ class TicketLayout(DefaultLayout):
             Link(_("Tickets"), self.request.link(self.collection)),
             Link(self.model.number, '#')
         ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return self.model.handler.get_links(self.request)

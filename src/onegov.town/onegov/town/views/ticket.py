@@ -8,6 +8,12 @@ from onegov.town.layout import DefaultLayout, TicketLayout, TicketsLayout
 @TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
 def view_ticket(self, request):
 
+    # XXX this is very to do here, much harder when the ticket is updated
+    # because there's no good link to the ticket at that point - so when
+    # viewing the ticket we commit the sin of possibly changing data in a
+    # GET request.
+    self.handler.refresh()
+
     return {
         'title': self.number,
         'layout': TicketLayout(self, request),
