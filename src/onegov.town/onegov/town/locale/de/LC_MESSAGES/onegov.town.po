@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-14 14:11+0200\n"
+"POT-Creation-Date: 2015-07-14 16:06+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -249,18 +249,6 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
 
-msgid "Submission"
-msgstr "Eingabe"
-
-msgid "Submissions"
-msgstr "Eingaben"
-
-msgid "Builtin Form"
-msgstr "Vordefiniert"
-
-msgid "Custom Form"
-msgstr "Gemeindespezifisch"
-
 msgid "Latest news"
 msgstr "Aktuelles"
 
@@ -362,6 +350,15 @@ msgstr "Referenz"
 msgid "State"
 msgstr "Status"
 
+msgid "Group"
+msgstr "Gruppe"
+
+msgid "Owner"
+msgstr "Zuständig"
+
+msgid "Created"
+msgstr "Eingang"
+
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
@@ -391,10 +388,6 @@ msgstr "Ihre Änderungen wurden gespeichert"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
-
-#, python-format
-msgid "Submissions for \"${form}\""
-msgstr "Eingaben zu \"${form}\""
 
 msgid "New Form"
 msgstr "Neues Formular"
@@ -530,6 +523,9 @@ msgstr "Offene Tickets"
 
 msgid "Your request is currently pending"
 msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
+
+msgid "Ticket Status"
+msgstr "Ticket Status"
 
 msgid "Pending Tickets"
 msgstr "Tickets in Bearbeitung"

@@ -31,7 +31,7 @@
                         <td class="ticket-title">
                             ${ticket.title}
                         </td>
-                        <td class="ticket-date" tal:define="formatted layout.format_date(ticket.created, 'datetime')">
+                        <td class="ticket-date">
                             ${layout.format_date(ticket.created, 'relative')}
                         </td>
                         <td class="ticket-user">
