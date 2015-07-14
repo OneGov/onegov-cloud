@@ -345,6 +345,13 @@ class FormSubmissionLayout(DefaultLayout):
         if not self.request.is_logged_in:
             return
 
+        # only show the edit bar links if the site is the base of the form
+        # -> if the user already entered some form data remove the edit bar
+        # because it makes it seem like it's there to edit the submission,
+        # not the actual form
+        if hasattr(self.model, 'form'):
+            return
+
         collection = FormCollection(self.request.app.session())
 
         edit_link = Link(

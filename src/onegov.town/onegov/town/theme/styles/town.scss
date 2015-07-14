@@ -230,6 +230,10 @@ form {
 
 .field-display {
     margin-bottom: .5em;
+
+    .field-display-data {
+        margin-bottom: 1rem;
+    }
 }
 
 .field-display-label {
@@ -968,15 +972,6 @@ $max-page-width: 600px;
         $bg: $green-light,
         $radius:4px
     );
-}
-
-/*
-    Ticket status page
-*/
-.ticket-status-page {
-    .ticket-number {
-        margin-bottom: 1rem;
-    }
 }
 
 /*

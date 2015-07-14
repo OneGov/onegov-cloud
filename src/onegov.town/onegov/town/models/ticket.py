@@ -1,7 +1,10 @@
 from cached_property import cached_property
 
-from onegov.ticket import Ticket, Handler, handlers
+from onegov.core.templates import render_macro
 from onegov.form import FormSubmissionCollection
+from onegov.ticket import Ticket, Handler, handlers
+from onegov.town import _
+from onegov.town.layout import DefaultLayout
 
 
 class FormSubmissionTicket(Ticket):
@@ -19,6 +22,10 @@ class FormSubmissionHandler(Handler):
     def submission(self):
         return self.collection.by_id(self.data['submission_id'])
 
+    @cached_property
+    def form(self):
+        return self.submission.form_class(data=self.submission.data)
+
     @property
     def title(self):
         return self.submission.title
@@ -26,3 +33,15 @@ class FormSubmissionHandler(Handler):
     @property
     def group(self):
         return self.submission.form.title
+
+    def get_summary(self, request):
+        layout = DefaultLayout(self.submission, request)
+        return render_macro(layout.macros['display_form'], request, {
+            'form': self.form,
+            'layout': layout
+        })
+
+    def get_links(self, request):
+        return [
+            (_("Edit Submission"), request.link(self.submission) + '?edit'),
+        ]
