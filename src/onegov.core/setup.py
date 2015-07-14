@@ -7,7 +7,7 @@ name = 'onegov.core'
 description = (
     'Contains code shared by all OneGov applications.'
 )
-version = '0.4.9'
+version = '0.4.10'
 
 dependencies = {
     'alembic',
