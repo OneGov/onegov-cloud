@@ -6,6 +6,7 @@ import polib
 
 from morepath import setup
 from onegov.core import Framework
+from onegov.core.templates import render_macro
 from translationstring import TranslationStringFactory
 from webtest import TestApp as Client
 
@@ -28,6 +29,10 @@ def test_chameleon_with_translation(temporary_directory):
         msgid=u"We're sinking, we're sinking!",
         msgstr=u'Wir denken, wir denken!'
     ))
+    po.append(polib.POEntry(
+        msgid=u"Macro",
+        msgstr=u"Makro"
+    ))
     po.save(os.path.join(locale, 'de/LC_MESSAGES/onegov.test.po'))
 
     with open(os.path.join(templates, 'index.pt'), 'w') as f:
@@ -39,6 +44,10 @@ def test_chameleon_with_translation(temporary_directory):
                   i18n:domain="onegov.test">
                 <b><tal:block i18n:translate="">Welcome</tal:block></b>
                 <b>${foo}</b>
+                <metal:macro
+                    define-macro="testmacro" i18n:domain="onegov.test">
+                    <i i18n:translate>Macro</i>
+                </metal:macro>
             </html>
         """)
 
@@ -75,6 +84,13 @@ def test_chameleon_with_translation(temporary_directory):
             'foo': _("We're sinking, we're sinking!")
         }
 
+    @App.view(model=Root, name='macro')
+    def view_root_macro(self, request):
+        template = request.app.registry._template_loaders['.pt']['index.pt']
+        template.macros['testmacro']
+
+        return render_macro(template.macros['testmacro'], request, {})
+
     config.scan(onegov.core)
     config.scan(more.webassets)
     config.commit()
@@ -82,3 +98,9 @@ def test_chameleon_with_translation(temporary_directory):
     client = Client(App())
     assert '<b>Willkommen</b>' in client.get('/').text
     assert '<b>Wir denken, wir denken!</b>' in client.get('/').text
+    assert '<i>Makro</i>' in client.get('/').text
+
+    assert '<b>Willkommen</b>' not in client.get('/macro').text
+    assert '<b>Wir denken, wir denken!</b>' not in client.get('/macro').text
+
+    assert '<i>Makro</i>' in client.get('/macro').text

@@ -9,7 +9,7 @@ class Pagination(object):
     """ Provides collections with pagination, if they implement a few
     documented properties and methods.
 
-    See :class:`onegov.ticket.TicketCollectionSubset` for an example.
+    See :class:`onegov.ticket.TicketCollection` for an example.
 
     """
 

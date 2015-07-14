@@ -33,9 +33,17 @@ path.
 
 """
 
-import chameleon
-
+from chameleon import PageTemplateLoader
+from chameleon.tal import RepeatDict
+from chameleon.utils import Scope, decode_string
 from onegov.core import Framework
+
+
+def get_default_vars(request):
+    return {
+        'request': request,
+        'translate': request.get_translate(for_chameleon=True)
+    }
 
 
 @Framework.template_loader(extension='.pt')
@@ -45,7 +53,7 @@ def get_template_loader(template_directories, settings):
 
     """
 
-    return chameleon.PageTemplateLoader(
+    return PageTemplateLoader(
         template_directories,
         default_extension='.pt',
         prepend_relative_search_path=False,
@@ -62,12 +70,38 @@ def get_chameleon_render(loader, name, original_render):
 
     def render(content, request):
 
-        variables = {
-            'request': request,
-            'translate': request.get_translate(for_chameleon=True)
-        }
-
+        variables = get_default_vars(request)
         variables.update(content)
+
         return original_render(template.render(**variables), request)
 
     return render
+
+
+def render_macro(macro, request, content):
+    """ Renders a :class:`chameleon.zpt.template.Macro` like this::
+
+        layout.render_macro(layout.macros['my_macro'], **vars)
+
+    This code is basically a stripped down version of this:
+    `<https://github.com/malthe/chameleon/blob\
+    /257c9192fea4b158215ecc4f84e1249d4b088753/src/chameleon\
+    /zpt/template.py#L206>`_.
+
+    As such it doesn't treat chameleon like a black box and it will probably
+    fail one day in the future, if Chameleon is refactored. Our tests will
+    detect that though.
+
+    """
+
+    variables = get_default_vars(request)
+    variables.setdefault('__translate', variables['translate'])
+    variables.setdefault('__convert', variables['translate'])
+    variables.setdefault('__decode', decode_string)
+    variables['repeat'] = RepeatDict({})
+    variables.update(content)
+
+    stream = list()
+    macro.include(stream, Scope(variables), {})
+
+    return u''.join(stream)

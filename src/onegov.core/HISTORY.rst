@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to render a single chameleon macro.
+  [href]
+
 0.4.9 (2015-07-13)
 ~~~~~~~~~~~~~~~~~~~
 
