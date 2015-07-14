@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a handler_id to easily query for a handler record.
+  [href]
+
 - Adds accept/close ticket functions.
   [href]
 

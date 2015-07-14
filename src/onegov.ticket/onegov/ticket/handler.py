@@ -24,8 +24,9 @@ class Handler(object):
 
     """
 
-    def __init__(self, ticket, handler_data):
+    def __init__(self, ticket, handler_id, handler_data):
         self.ticket = ticket
+        self.id = handler_id
         self.data = handler_data
 
     @property
@@ -41,6 +42,9 @@ class Handler(object):
 
         if self.ticket.group != self.group:
             self.ticket.group = self.group
+
+        if self.ticket.handler_id != self.id:
+            self.ticket.handler_id = self.id
 
         if self.ticket.handler_data != self.data:
             self.ticket.handler_data = self.data

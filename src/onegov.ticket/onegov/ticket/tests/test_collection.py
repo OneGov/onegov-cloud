@@ -31,6 +31,7 @@ def test_issue_unique_ticket_number(session):
         title='Test',
         group='Test',
         handler_code='ABC',
+        handler_id='1'
     ))
 
     collection.random_number = Mock(side_effect=[10000000, 10000001, 10000002])
@@ -61,6 +62,7 @@ def test_open_ticket(session, handlers):
     collection = TicketCollection(session)
 
     ticket = collection.open_ticket(
+        handler_id='1',
         handler_code='ECO',
         title="Title",
         group="Group",
@@ -71,6 +73,7 @@ def test_open_ticket(session, handlers):
     assert ticket.number.startswith('ECO-')
     assert ticket.title == "Title"
     assert ticket.group == "Group"
+    assert ticket.handler_id == '1'
     assert ticket.handler_code == 'ECO'
     assert ticket.handler_data == {
         'title': "Title",
@@ -90,3 +93,4 @@ def test_open_ticket(session, handlers):
     assert len(collection.by_handler_code("ECO")) == 1
     assert collection.by_id(ticket.id)
     assert collection.by_id(ticket.id, ensure_handler_code='FOO') is None
+    assert collection.by_handler_id('1') is not None

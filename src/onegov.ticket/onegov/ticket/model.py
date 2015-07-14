@@ -35,6 +35,9 @@ class Ticket(Base, TimestampMixin):
     #: orm/extensions/declarative/inheritance.html>`_.
     handler_code = Column(Text, nullable=False, index=True)
 
+    #: a unique id for the handler record
+    handler_id = Column(Text, nullable=False, index=True, unique=True)
+
     #: the data associated with the handler, not menat to be loaded in a list,
     #: therefore deferred.
     handler_data = deferred(Column(JSON, nullable=False, default=dict))
@@ -63,7 +66,8 @@ class Ticket(Base, TimestampMixin):
     def handler(self):
         """ Returns an instance of the handler associated with this ticket. """
 
-        return handlers.get(self.handler_code)(self, self.handler_data)
+        return handlers.get(self.handler_code)(
+            self, self.handler_id, self.handler_data)
 
     def accept_ticket(self, user):
         assert self.state == 'open'

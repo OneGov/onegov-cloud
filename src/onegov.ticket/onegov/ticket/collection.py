@@ -91,7 +91,7 @@ class TicketCollection(TicketCollectionPagination):
             if not self.is_existing_ticket_number(candidate):
                 return candidate
 
-    def open_ticket(self, handler_code, **handler_data):
+    def open_ticket(self, handler_code, handler_id, **handler_data):
         """ Opens a new ticket using the given handler. """
 
         ticket = Ticket()
@@ -101,6 +101,7 @@ class TicketCollection(TicketCollectionPagination):
         # each ticket to belong to a session already
         self.session.add(ticket)
 
+        ticket.handler_id = handler_id
         ticket.handler_code = handler_code
         ticket.handler_data = handler_data
         ticket.handler.refresh()
@@ -119,3 +120,6 @@ class TicketCollection(TicketCollectionPagination):
             query = query.filter(Ticket.handler_code == ensure_handler_code)
 
         return query.first()
+
+    def by_handler_id(self, handler_id):
+        return self.query().filter(Ticket.handler_id == handler_id).first()
