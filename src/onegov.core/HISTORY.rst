@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.11 (2015-07-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Make sure upgrade steps are only added once per record.
   [href]
 
