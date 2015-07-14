@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Make sure upgrade steps are only added once per record.
+  [href]
+
+- Add ``has_column`` function to upgrade context.
+  [href]
+
 0.4.10 (2015-07-14)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -12,6 +12,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON
 from sqlalchemy import Column, Text
+from sqlalchemy.engine.reflection import Inspector
 
 
 class UpgradeState(Base, TimestampMixin):
@@ -41,6 +42,8 @@ class UpgradeState(Base, TimestampMixin):
 
         if 'executed_tasks' in self.state:
             self.state['executed_tasks'].append(task.task_name)
+            self.state['executed_tasks'] = list(
+                set(self.state['executed_tasks']))
         else:
             self.state['executed_tasks'] = [task.task_name]
 
@@ -281,6 +284,10 @@ class UpgradeContext(object):
 
     def begin(self):
         return UpgradeTransaction(self)
+
+    def has_column(self, table, column):
+        inspector = Inspector.from_engine(self.session.bind)
+        return column in {c['name'] for c in inspector.get_columns('tickets')}
 
 
 class UpgradeRunner(object):
