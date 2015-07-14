@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.4 (2015-07-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Integrates tickets through onegov.ticket.
   [href]
 
