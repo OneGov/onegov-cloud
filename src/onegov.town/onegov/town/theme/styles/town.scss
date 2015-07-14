@@ -951,7 +951,7 @@ $max-page-width: 600px;
     @include label(
         $padding: .25rem .5rem,
         $text-size: 1rem,
-        $bg: $gray-light,
+        $bg: $primary-color,
         $radius:4px
     );
 }
