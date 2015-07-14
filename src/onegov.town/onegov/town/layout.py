@@ -515,4 +515,20 @@ class TicketLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
-            return self.model.handler.get_links(self.request)
+            links = self.model.handler.get_links(self.request)
+
+            if self.model.state == 'open':
+                links.append(Link(
+                    text=_("Accept ticket"),
+                    url=self.request.link(self.model, 'accept'),
+                    classes=('ticket-action', 'ticket-accept'),
+                ))
+
+            elif self.model.state == 'pending':
+                links.append(Link(
+                    text=_("Close ticket"),
+                    url=self.request.link(self.model, 'close'),
+                    classes=('ticket-action', 'ticket-close'),
+                ))
+
+            return links

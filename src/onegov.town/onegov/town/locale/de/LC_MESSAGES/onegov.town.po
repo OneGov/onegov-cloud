@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-14 11:23+0200\n"
+"POT-Creation-Date: 2015-07-14 14:11+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -78,6 +78,12 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 
 msgid "Delete person"
 msgstr "Person löschen"
+
+msgid "Accept ticket"
+msgstr "Ticket annehmen"
+
+msgid "Close ticket"
+msgstr "Ticket abschliessen"
 
 msgid "Form"
 msgstr "Formular"
@@ -377,6 +383,9 @@ msgstr ""
 msgid "State:"
 msgstr "Status:"
 
+msgid "Accept"
+msgstr "Annehmen"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -505,6 +514,14 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
 
+#, python-format
+msgid "You have accepted ticket ${number}"
+msgstr "Sie haben das Ticket ${number} angenommen"
+
+#, python-format
+msgid "You have closed ticket ${number}"
+msgstr "Sie haben das Ticket ${number} abgeschlossen"
+
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
@@ -522,4 +539,3 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
-

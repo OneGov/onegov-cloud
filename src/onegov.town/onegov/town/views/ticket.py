@@ -1,8 +1,11 @@
+import morepath
+
 from onegov.core.security import Public, Private
 from onegov.ticket import Ticket, TicketCollection
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout, TicketLayout, TicketsLayout
+from onegov.user import UserCollection
 
 
 @TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -19,6 +22,31 @@ def view_ticket(self, request):
         'layout': TicketLayout(self, request),
         'ticket': self
     }
+
+
+@TownApp.view(model=Ticket, name='accept', permission=Private)
+def accept_ticket(self, request):
+    user = UserCollection(request.app.session()).by_username(
+        request.identity.userid)
+
+    self.accept_ticket(user)
+    request.success(_(u"You have accepted ticket ${number}", mapping={
+        'number': self.number
+    }))
+
+    return morepath.redirect(request.link(self))
+
+
+@TownApp.view(model=Ticket, name='close', permission=Private)
+def close_ticket(self, request):
+    self.close_ticket()
+
+    request.success(_(u"You have closed ticket ${number}", mapping={
+        'number': self.number
+    }))
+
+    return morepath.redirect(
+        request.link(TicketCollection(request.app.session())))
 
 
 @TownApp.html(model=Ticket, name='status', template='ticket_status.pt',

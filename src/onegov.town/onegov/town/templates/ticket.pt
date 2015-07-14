@@ -12,7 +12,6 @@
             <div class="columns small-12 medium-4">
 
                 <div class="field-display ticket-status-page">
-
                     <div class="field-display-label" i18n:translate>Ticket Number</div>
                     <div class="field-display-data ticket-number">
                         ${ticket.number}

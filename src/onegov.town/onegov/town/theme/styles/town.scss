@@ -977,13 +977,64 @@ $max-page-width: 600px;
 /*
     Tickets list
 */
+$accept-ticket-icon: '\f1db';
+$accept-ticket-icon-hover: '\f192';
+$close-ticket-icon: '\f1db';
+$close-ticket-icon-hover: '\f05d';
+$frm-handler-icon: '\f044';
+
 .tickets-table {
     width: 100%;
 }
 
 .ticket-handler-FRM td:first-child::before {
-    content: '\f044';
+    content: $frm-handler-icon;
     font-family: 'FontAwesome';
+}
+
+tr.ticket:hover {
+    background-color: $yellow-pastel;
+}
+
+.ticket-action {
+    @include button(
+        $padding: $button-tny,
+        $bg: $success-color
+    );
+    font-size: 1em;
+    margin: 0;
+}
+
+.ticket-accept {
+    float: right;
+
+    &::before {
+        content: $accept-ticket-icon;
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
+    }
+
+    &:hover::before {
+        content: $accept-ticket-icon-hover;   
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
+    }
+}
+
+.ticket-close {
+    float: right;
+
+    &::before {
+        content: $close-ticket-icon;
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
+    }
+
+    &:hover::before {
+        content: $close-ticket-icon-hover;   
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
+    }
 }
 
 /*
