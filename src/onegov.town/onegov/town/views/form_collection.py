@@ -1,61 +1,19 @@
 """ Lists the builtin and custom forms. """
 
-from functools import partial
-
-from onegov.core.security import Public, Private
-from onegov.form import (
-    FormCollection,
-    FormSubmissionCollection,
-    FormDefinition,
-    FormSubmission
-)
+from onegov.core.security import Public
+from onegov.form import FormCollection, FormDefinition
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Link
-from onegov.town.layout import DefaultLayout, FormCollectionLayout
-from sqlalchemy import desc
+from onegov.town.layout import FormCollectionLayout
 
 
 @TownApp.html(model=FormCollection, template='forms.pt', permission=Public)
 def view_form_collection(self, request):
 
-    if request.is_logged_in:
-        forms = self.get_definitions_with_submission_count()
-    else:
-        forms = self.definitions.query().order_by(FormDefinition.name).all()
+    forms = self.definitions.query().order_by(FormDefinition.name).all()
 
     return {
         'layout': FormCollectionLayout(self, request),
         'title': _("Forms"),
-        'forms': request.exclude_invisible(forms),
-        'get_submissions_collection': partial(
-            self.scoped_submissions, ensure_existance=False)
-    }
-
-
-@TownApp.html(model=FormSubmissionCollection, template='submissions.pt',
-              permission=Private)
-def view_form_submission_collection(self, request):
-
-    form_collection = FormCollection(request.app.session())
-    form = form_collection.definitions.by_name(self.name)
-
-    layout = DefaultLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Forms"), request.link(form_collection)),
-        Link(form.title, request.link(form)),
-        Link(_("Submissions"), '#')
-    ]
-
-    submissions = self.by_state('complete')
-    submissions = submissions.order_by(desc(FormSubmission.received))
-    submissions = submissions.all()
-
-    return {
-        'layout': layout,
-        'title': _("Submissions for \"${form}\"", mapping={
-            'form': form.title
-        }),
-        'submissions': submissions
+        'forms': request.exclude_invisible(forms)
     }

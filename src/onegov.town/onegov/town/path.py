@@ -16,7 +16,6 @@ from onegov.form import (
     FormDefinition,
     FormCollection,
     FormSubmissionFile,
-    FormSubmissionCollection,
     CompleteFormSubmission,
     PendingFormSubmission
 )
@@ -74,11 +73,6 @@ def get_forms(app):
 @TownApp.path(model=FormDefinition, path='/formular/{name}')
 def get_form(app, name):
     return FormCollection(app.session()).definitions.by_name(name)
-
-
-@TownApp.path(model=FormSubmissionCollection, path='/formular/{name}/eingaben')
-def get_form_submissions(app, name):
-    return FormCollection(app.session()).scoped_submissions(name)
 
 
 @TownApp.path(model=PendingFormSubmission, path='/formular-eingabe/{id}')

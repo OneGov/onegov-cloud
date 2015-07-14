@@ -62,9 +62,15 @@ def view_ticket_status(self, request):
     else:
         raise NotImplementedError
 
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Ticket Status"), '#')
+    ]
+
     return {
         'title': title,
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'ticket': self
     }
 

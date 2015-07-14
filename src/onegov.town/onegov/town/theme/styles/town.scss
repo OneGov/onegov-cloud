@@ -132,7 +132,8 @@ footer,
 table {
     border-collapse: separate;
 
-    td, th {
+    td,
+    th {
         border-bottom: 1px solid $table-border-color;
     }
 }
@@ -260,14 +261,6 @@ form {
     form collection rendering
 */
 .form-definitions {
-    margin-left: 0;
-
-    li {
-        clear: both;
-        list-style-type: none;
-        padding: .5rem 0;
-    }
-
     .form-definition-title {
         font-weight: bold;
     }
@@ -275,89 +268,6 @@ form {
     .form-definition-lead {
         margin-bottom: .2em;
         max-width: 500px;
-    }
-}
-
-.form-definition-counter {
-    background-color: $topbar-bg-color;
-    float: left;
-    margin-right: 1rem;
-    min-width: 90px;
-    padding: .5rem;
-
-    .count {
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .count-label {
-        color: $bottom-links-color;
-        font-size: .8rem;
-        text-align: center;
-    }
-
-    &.has-submissions:hover {
-        background-color: transparentize($primary-color, .8);
-    }
-}
-
-.form-definition-info {
-    color: $bottom-links-color;
-    font-size: .8rem;
-}
-
-/*
-    form submissions rendering
-*/
-
-.submissions {
-    list-style: none;
-    margin-left: 0;
-
-    li + li {
-        margin-top: 1em;
-    }
-
-    .submission-date:before {
-        content: '\f133';
-        font-family: 'FontAwesome';
-    }
-
-    .submission-title:before {
-        content: '\f093';
-        font-family: 'FontAwesome';
-    }
-
-    .submission-email:before {
-        content: '\f003\00a0';
-        font-family: 'FontAwesome';
-    }
-
-    .submission-action-show {
-        color: $success-color;
-    }
-
-    .submission-action-edit {
-        color: $warning-color;
-    }
-
-    .submission-action-delete {
-        color: $alert-color;
-    }
-
-    .submission-action-show:before {
-        content: '\f06e\00a0';
-        font-family: 'FontAwesome';
-    }
-
-    .submission-action-edit:before {
-        content: '\f040\00a0';
-        font-family: 'FontAwesome';
-    }
-
-    .submission-action-delete:before {
-        content: '\f014 \00a0';
-        font-family: 'FontAwesome';
     }
 }
 
@@ -945,8 +855,8 @@ $max-page-width: 600px;
 */
 
 .ticket-number-plain {
-    font-family: $font-family-monospace;
     color: $monsoon;
+    font-family: $font-family-monospace;
     font-weight: bold;
 }
 

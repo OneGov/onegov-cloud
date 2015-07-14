@@ -7,36 +7,8 @@
 
         <ul tal:condition="forms" class="form-definitions">
             <li tal:repeat="form forms">
-                <tal:block condition="request.is_logged_in">
-                    <div class="form-definition-counter ${form.submissions_count and 'has-submissions' or 'no-submissions'}">
-                        <div tal:condition="form.submissions_count == 1">
-                            <a href="${request.link(get_submissions_collection(form.name))}">
-                                <div class="count">${form.submissions_count}</div> <div i18n:translate="" class="count-label">Submission</div>
-                            </a>
-                        </div>
-                        <div tal:condition="form.submissions_count > 1">
-                            <a href="${request.link(get_submissions_collection(form.name))}">
-                                <div class="count">${form.submissions_count}</div> <div i18n:translate="" class="count-label">Submissions</div>
-                            </a>
-                        </div>
-                        <div tal:condition="not:form.submissions_count">
-                            <div class="count">${form.submissions_count}</div> <div i18n:translate="" class="count-label">Submissions</div>
-                        </div>
-                    </div>
-                </tal:block>
                 <a class="form-definition-title" tal:attributes="href request.link(form)">${form.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item form" />
                 <div class="form-definition-lead">${form.meta.get('lead')}</div>
-                <tal:block condition="request.is_logged_in">
-                    <div class="form-definition-info ${form.type == 'builtin' and 'builtin-form' or 'custom-form'}">
-                        <tal:block condition="form.type == 'builtin'">
-                            <span i18n:translate="">Builtin Form</span>
-                        </tal:block>
-                        <tal:block condition="form.type == 'custom'">
-                            <span i18n:translate="">Custom Form</span>
-                        </tal:block>
-                    </div>
-                </tal:block>
-                <div class="clearfix"></div>
             </li>
         </ul>
     </tal:block>

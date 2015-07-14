@@ -605,10 +605,11 @@ def test_show_uploaded_file(town_app):
     form_page = form_page.form.submit().follow()  # preview
     form_page = form_page.form.submit().follow()  # finalize
 
-    submission = client.get('/formular/text/eingaben').click('Anzeigen')
+    ticket_page = client.get(
+        form_page.pyquery('.ticket-number a').attr('href'))
 
-    assert 'test.txt' in submission.text
-    file_response = submission.click('test.txt')
+    assert 'test.txt' in ticket_page.text
+    file_response = ticket_page.click('test.txt')
 
     assert file_response.content_type == 'text/plain'
     assert file_response.text == 'foobar'

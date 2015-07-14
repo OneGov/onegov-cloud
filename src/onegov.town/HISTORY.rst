@@ -4,11 +4,18 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Form submissions, tickets and news are now shown with a relative date
-  (e.g. 5 hours ago).
+- Integrates tickets through onegov.ticket.
   [href]
 
 - Form submissions automatically generate a onegov.ticket in the backend.
+  [href]
+
+- The old form submissions colleciton view is no more. This is now done
+  through the ticketing system.
+  [href]
+
+- Form submissions, tickets and news are now shown with a relative date
+  (e.g. 5 hours ago).
   [href]
 
 0.2.3 (2015-07-09)

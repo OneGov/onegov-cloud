@@ -16,7 +16,6 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.layout import FormSubmissionLayout
 from purl import URL
-from webob.exc import HTTPMethodNotAllowed
 
 
 @TownApp.form(model=FormDefinition, template='form.pt', permission=Public,
@@ -145,14 +144,3 @@ def view_form_submission_file(self, request):
     response.content_encoding = 'gzip'
 
     return response
-
-
-@TownApp.view(model=CompleteFormSubmission, request_method='DELETE',
-              permission=Private)
-def delete_form_submission(self, request):
-    request.assert_valid_csrf_token()
-
-    if TicketCollection(request.app.session()).by_handler_id(self.id.hex):
-        raise HTTPMethodNotAllowed()
-
-    FormCollection(request.app.session()).submissions.delete(self)
