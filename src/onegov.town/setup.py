@@ -44,7 +44,7 @@ setup(
         'onegov.foundation>=0.0.4',
         'onegov.people>=0.0.1',
         'onegov.page>=0.1.0',
-        'onegov.ticket',
+        'onegov.ticket>=0.0.2',
         'onegov.user',
         'pillow',
         'purl',

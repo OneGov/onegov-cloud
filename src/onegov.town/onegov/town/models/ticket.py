@@ -22,7 +22,7 @@ class FormSubmissionHandler(Handler):
 
     @cached_property
     def submission(self):
-        return self.collection.by_id(self.data['submission_id'])
+        return self.collection.by_id(self.id)
 
     @cached_property
     def form(self):

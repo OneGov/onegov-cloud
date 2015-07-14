@@ -16,6 +16,7 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.layout import FormSubmissionLayout
 from purl import URL
+from webob.exc import HTTPMethodNotAllowed
 
 
 @TownApp.form(model=FormDefinition, template='form.pt', permission=Public,
@@ -129,7 +130,7 @@ def handle_complete_submission(self, request):
             # flushing at all
             with collection.session.no_autoflush:
                 ticket = TicketCollection(request.app.session()).open_ticket(
-                    handler_code='FRM', submission_id=self.id.hex
+                    handler_code='FRM', handler_id=self.id.hex
                 )
 
             request.success(_("Thank you for your submission!"))
@@ -150,4 +151,8 @@ def view_form_submission_file(self, request):
               permission=Private)
 def delete_form_submission(self, request):
     request.assert_valid_csrf_token()
+
+    if TicketCollection(request.app.session()).by_handler_id(self.id.hex):
+        raise HTTPMethodNotAllowed()
+
     FormCollection(request.app.session()).submissions.delete(self)
