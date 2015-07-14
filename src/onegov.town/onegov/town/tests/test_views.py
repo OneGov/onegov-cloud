@@ -762,3 +762,54 @@ def test_with_people(town_app):
 
     assert edit_page.form['people_merciless_ming'].value is None
     assert edit_page.form['people_merciless_ming_function'].value == ''
+
+
+def test_tickets(town_app):
+    client = Client(town_app)
+
+    assert client.get('/tickets', expect_errors=True).status_code == 403
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    form_page = client.get('/formulare/neu')
+    form_page.form['title'] = "Newsletter"
+    form_page.form['definition'] = "E-Mail *= @@@"
+    form_page = form_page.form.submit()
+
+    client.get('/logout')
+
+    form_page = client.get('/formular/newsletter')
+    form_page.form['e_mail'] = 'info@seantis.ch'
+
+    status_page = form_page.form.submit().follow().form.submit().follow()
+
+    assert 'FRM-' in status_page
+    assert 'Offen' in status_page
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    tickets_page = client.get('/tickets')
+
+    assert '1 Offene Tickets' in tickets_page
+
+    ticket_page = tickets_page.click('Annehmen').follow()
+
+    assert '1 Tickets in Bearbeitung' in client.get('/tickets?state=pending')
+
+    assert 'editor@example.org' in ticket_page
+    assert 'Newsletter' in ticket_page
+    assert 'info@seantis.ch' in ticket_page
+    assert 'In Bearbeitung' in ticket_page
+    assert 'FRM-' in ticket_page
+
+    ticket_page = ticket_page.click('Ticket abschliessen').follow()
+
+    assert 'Abgeschlossen' in ticket_page
+
+    assert '1 Abgeschlossene Tickets' in client.get('/tickets?state=closed')
