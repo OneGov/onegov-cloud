@@ -946,6 +946,8 @@ $max-page-width: 600px;
 
 .ticket-number-plain {
     font-family: $font-family-monospace;
+    color: $monsoon;
+    font-weight: bold;
 }
 
 .ticket-number {
@@ -956,6 +958,10 @@ $max-page-width: 600px;
         $radius:4px
     );
     font-family: $font-family-monospace;
+}
+
+.ticket-date {
+    color: $monsoon;
 }
 
 .ticket-state-open {
@@ -1001,6 +1007,7 @@ $frm-handler-icon: '\f044';
 .ticket-handler-FRM td:first-child::before {
     content: $frm-handler-icon;
     font-family: 'FontAwesome';
+    font-weight: normal;
 }
 
 tr.ticket:hover {
