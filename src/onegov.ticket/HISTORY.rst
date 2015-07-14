@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.2 (2015-07-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a handler_id to easily query for a handler record.
   [href]
 
