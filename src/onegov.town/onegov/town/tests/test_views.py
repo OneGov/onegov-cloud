@@ -546,7 +546,7 @@ def test_add_custom_form(town_app):
     form_page.form['e_mail'] = 'my@name.com'
     form_page = form_page.form.submit().follow()
 
-    form_page = form_page.click("Bearbeiten", index=0)
+    form_page = client.get('/formular/my-form/bearbeiten')
     form_page.form['definition'] = "Nom * = ___\nMail * = @@@"
     form_page = form_page.form.submit().follow()
 

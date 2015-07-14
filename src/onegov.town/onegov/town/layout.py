@@ -217,6 +217,9 @@ class DefaultLayout(Layout):
                 Link(_(u'Files'), request.link(FileCollection(self.app))),
                 Link(_(u'Images'), request.link(ImageCollection(self.app))),
                 Link(_(u'Settings'), request.link(self.town, 'einstellungen')),
+                Link(_(u'Tickets'), request.link(TicketCollection(
+                    self.app.session()
+                ))),
                 Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
                 Link(u'Seantis GmbH', 'https://www.seantis.ch')
             ]
