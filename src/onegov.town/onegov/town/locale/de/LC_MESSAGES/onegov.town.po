@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-14 16:06+0200\n"
+"POT-Creation-Date: 2015-07-15 12:01+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -305,6 +305,37 @@ msgstr "Vorherige Seite"
 msgid "Next Page"
 msgstr "Nächste Seite"
 
+msgid "Dear Sir or Madam,"
+msgstr "Guten Tag"
+
+msgid "Your ticket has been closed"
+msgstr "Ihr Ticket wurde geschlossen"
+
+msgid "The ticket number is"
+msgstr "Ihre Ticket Referenz"
+
+msgid ""
+"If you asked for documents to be sent to your address, they should arrive "
+"shortly. If you asked to pick up documents at the municipality, the are now "
+"ready to be picked up."
+msgstr ""
+"Falls Sie Dokumente über den Postweg verlangt haben, sollten Sie in den "
+"kommenden Tagen Post erhalten. Falls Sie Dokumente am Schalter abholen "
+"wollten, so können Sie das jetzt tun."
+
+msgid "A new ticket has been opened"
+msgstr "Ein neues Ticket wurde für Sie eröffnet"
+
+msgid ""
+"We will send another e-mail once your ticket has been completed. In the "
+"meantime you can check the status of your ticket at any time:"
+msgstr ""
+"Sie erhalten ein weiteres E-Mail, sobald ihr Ticket abgeschlossen wurde. In "
+"der Zwischenzeit sehen Sie den Status Ihres Tickets jederzeit hier:"
+
+msgid "Check ticket status"
+msgstr "Ticket Status abfragen"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -403,6 +434,9 @@ msgstr "Ein neues Formular wurd hinzugefügt"
 
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
+
+msgid "A ticket has been opened"
+msgstr "Ein neues Ticket wurde für Sie eröffnet"
 
 msgid "Services"
 msgstr "Dienstleistungen"

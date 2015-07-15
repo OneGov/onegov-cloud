@@ -29,6 +29,10 @@ class FormSubmissionHandler(Handler):
         return self.submission.form_class(data=self.submission.data)
 
     @property
+    def email(self):
+        return self.submission.email
+
+    @property
     def title(self):
         return self.submission.title
 

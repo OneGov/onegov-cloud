@@ -32,12 +32,6 @@ class Layout(ChameleonLayout):
 
     """
 
-    def __init__(self, model, request):
-        super(Layout, self).__init__(model, request)
-
-        # always include the common js files
-        self.request.include('common')
-
     @property
     def town(self):
         """ An alias for self.request.app.town. """
@@ -176,8 +170,26 @@ class Layout(ChameleonLayout):
                 FormSubmissionFile(id=field.data['data'].lstrip('@')))
 
 
+class DefaultMailLayout(Layout):
+    """ A special layout for creating HTML E-Mails. """
+
+    @cached_property
+    def base(self):
+        return self.template_loader['mail_layout.pt']
+
+    @cached_property
+    def macros(self):
+        return self.template_loader['mail_macros.pt']
+
+
 class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """
+
+    def __init__(self, model, request):
+        super(Layout, self).__init__(model, request)
+
+        # always include the common js files
+        self.request.include('common')
 
     @cached_property
     def breadcrumbs(self):

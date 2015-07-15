@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds e-mail notifications for open/close ticket.
+  [href]
+
 0.2.4 (2015-07-14)
 ~~~~~~~~~~~~~~~~~~~
 

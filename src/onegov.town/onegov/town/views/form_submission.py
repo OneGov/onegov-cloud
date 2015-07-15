@@ -15,6 +15,7 @@ from onegov.form import (
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.layout import FormSubmissionLayout
+from onegov.town.mail import send_html_mail
 from purl import URL
 
 
@@ -124,13 +125,23 @@ def handle_complete_submission(self, request):
             collection = FormCollection(request.app.session())
             collection.submissions.complete_submission(self)
 
-            # make sure accessing the submission doesn't flash it, because
+            # make sure accessing the submission doesn't flush it, because
             # it uses sqlalchemy utils observe, which doesn't like premature
             # flushing at all
             with collection.session.no_autoflush:
                 ticket = TicketCollection(request.app.session()).open_ticket(
                     handler_code='FRM', handler_id=self.id.hex
                 )
+
+            send_html_mail(
+                request=request,
+                template='mail_ticket_opened.pt',
+                subject=_("A ticket has been opened"),
+                receivers=(self.email, ),
+                content={
+                    'model': ticket
+                }
+            )
 
             request.success(_("Thank you for your submission!"))
 

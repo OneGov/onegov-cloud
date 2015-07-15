@@ -8,6 +8,7 @@ import transaction
 from morepath import setup
 from onegov.core.crypto import hash_password
 from onegov.town.initial_content import add_initial_content
+from onegov.town.models import Town
 from onegov.user import User
 from uuid import uuid4
 
@@ -19,7 +20,7 @@ def town_password():
 
 
 @pytest.yield_fixture(scope="function")
-def town_app(postgres_dsn, temporary_directory, town_password):
+def town_app(postgres_dsn, temporary_directory, town_password, smtpserver):
 
     config = setup()
     config.scan(more.webassets)
@@ -43,6 +44,16 @@ def town_app(postgres_dsn, temporary_directory, town_password):
 
     session = app.session()
     add_initial_content(session, 'Govikon')
+
+    town = session.query(Town).one()
+    town.meta['reply_to'] = 'mails@govikon.ch'
+
+    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_sender = 'mails@govikon.ch'
+    app.mail_force_tls = False
+    app.mail_username = None
+    app.mail_password = None
+    app.smtpserver = smtpserver
 
     # usually we don't want to create the users directly, anywhere else you
     # *need* to go through the UserCollection. Here however, we can improve

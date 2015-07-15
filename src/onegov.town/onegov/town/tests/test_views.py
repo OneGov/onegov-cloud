@@ -591,7 +591,7 @@ def test_delete_custom_form(town_app):
 def test_show_uploaded_file(town_app):
     collection = FormCollection(town_app.session())
     collection.definitions.add(
-        'Text', definition="File * = *.txt", type='custom')
+        'Text', definition="File * = *.txt\nE-Mail * = @@@", type='custom')
 
     client = Client(town_app)
 
@@ -601,6 +601,7 @@ def test_show_uploaded_file(town_app):
     login_page.form.submit()
 
     form_page = client.get('/formular/text')
+    form_page.form['e_mail'] = 'info@example.org'
     form_page.form['file'] = Upload('test.txt', b'foobar')
     form_page = form_page.form.submit().follow()  # preview
     form_page = form_page.form.submit().follow()  # finalize
@@ -784,7 +785,17 @@ def test_tickets(town_app):
     form_page = client.get('/formular/newsletter')
     form_page.form['e_mail'] = 'info@seantis.ch'
 
+    assert len(town_app.smtpserver.outbox) == 0
+
     status_page = form_page.form.submit().follow().form.submit().follow()
+
+    assert len(town_app.smtpserver.outbox) == 1
+
+    message = town_app.smtpserver.outbox[0]
+    message = message.get_payload(0).get_payload(decode=True).decode('utf-8')
+
+    assert 'FRM-' in message
+    assert '/status' in message
 
     assert 'FRM-' in status_page
     assert 'Offen' in status_page
@@ -809,6 +820,17 @@ def test_tickets(town_app):
     assert 'FRM-' in ticket_page
 
     ticket_page = ticket_page.click('Ticket abschliessen').follow()
+
+    assert len(town_app.smtpserver.outbox) == 2
+
+    message = town_app.smtpserver.outbox[1]
+    message = message.get_payload(0).get_payload(decode=True).decode('utf-8')
+
+    assert 'FRM-' in message
+    assert '/status' not in message
+
+    assert 'FRM-' in status_page
+    assert 'Offen' in status_page
 
     assert 'Abgeschlossen' in ticket_page
 

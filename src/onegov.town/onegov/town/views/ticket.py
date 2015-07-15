@@ -4,6 +4,7 @@ from onegov.core.security import Public, Private
 from onegov.ticket import Ticket, TicketCollection
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
+from onegov.town.mail import send_html_mail
 from onegov.town.layout import DefaultLayout, TicketLayout, TicketsLayout
 from onegov.user import UserCollection
 
@@ -44,6 +45,16 @@ def close_ticket(self, request):
     request.success(_(u"You have closed ticket ${number}", mapping={
         'number': self.number
     }))
+
+    send_html_mail(
+        request=request,
+        template='mail_ticket_closed.pt',
+        subject=_("Your ticket has been closed"),
+        receivers=(self.handler.email, ),
+        content={
+            'model': self
+        }
+    )
 
     return morepath.redirect(
         request.link(TicketCollection(request.app.session())))
