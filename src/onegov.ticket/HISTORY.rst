@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds reopen ticket function.
+  [msom]
+
 0.0.2 (2015-07-14)
 ~~~~~~~~~~~~~~~~~~~
 

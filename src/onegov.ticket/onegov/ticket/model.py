@@ -79,3 +79,9 @@ class Ticket(Base, TimestampMixin):
         assert self.state == 'pending'
 
         self.state = 'closed'
+
+    def reopen_ticket(self, user):
+        assert self.state == 'closed'
+
+        self.user = user
+        self.state = 'open'
