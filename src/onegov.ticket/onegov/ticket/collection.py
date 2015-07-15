@@ -133,4 +133,9 @@ class TicketCollection(TicketCollectionPagination):
         query = query.with_entities(Ticket.state, func.count(Ticket.state))
         query = query.group_by(Ticket.state)
 
-        return TicketCount(**{r[0]: r[1] for r in query.all()})
+        count = {r[0]: r[1] for r in query.all()}
+        count.setdefault('open', 0)
+        count.setdefault('pending', 0)
+        count.setdefault('closed', 0)
+
+        return TicketCount(**count)
