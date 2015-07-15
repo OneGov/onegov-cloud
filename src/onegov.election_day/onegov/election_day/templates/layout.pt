@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="no-js"
+<html class="no-js" lang="${request.locale}"
 xmlns="http://www.w3.org/1999/xhtml"
 xmlns:i18n="http://xml.zope.org/namespaces/i18n"
 xmlns:metal="http://xml.zope.org/namespaces/metal"
