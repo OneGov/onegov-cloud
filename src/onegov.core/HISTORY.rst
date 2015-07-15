@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to render a template directly.
+  [href]
+
 0.4.11 (2015-07-14)
 ~~~~~~~~~~~~~~~~~~~
 

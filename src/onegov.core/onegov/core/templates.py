@@ -78,6 +78,20 @@ def get_chameleon_render(loader, name, original_render):
     return render
 
 
+def render_template(template, request, content):
+    """ Renders the given template. Use this if you need to get the rendered
+    value directly. If oyu render a view, this is not needed!
+
+    """
+
+    template = request.app.registry._template_loaders['.pt'][template]
+
+    variables = get_default_vars(request)
+    variables.update(content)
+
+    return template.render(**variables)
+
+
 def render_macro(macro, request, content):
     """ Renders a :class:`chameleon.zpt.template.Macro` like this::
 
