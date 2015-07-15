@@ -857,6 +857,10 @@ $max-page-width: 600px;
 /*
     Ticket
 */
+$open-ticket-bg: $primary-color;
+$pending-ticket-bg: $blue-light;
+$closed-ticket-bg: $green-light;
+$ticket-number-bg: $yellow-light;
 
 .ticket-number-plain {
     color: $monsoon;
@@ -868,7 +872,7 @@ $max-page-width: 600px;
     @include label(
         $padding: .25rem .5rem .1rem,
         $text-size: 1rem,
-        $bg: $yellow-light,
+        $bg: $ticket-number-bg,
         $radius:4px
     );
     font-family: $font-family-monospace;
@@ -882,7 +886,7 @@ $max-page-width: 600px;
     @include label(
         $padding: .25rem .5rem,
         $text-size: 1rem,
-        $bg: $primary-color,
+        $bg: $open-ticket-bg,
         $radius:4px
     );
 }
@@ -891,7 +895,7 @@ $max-page-width: 600px;
     @include label(
         $padding: .25rem .5rem,
         $text-size: 1rem,
-        $bg: $blue-light,
+        $bg: $pending-ticket-bg,
         $radius:4px
     );
 }
@@ -900,7 +904,7 @@ $max-page-width: 600px;
     @include label(
         $padding: .25rem .5rem,
         $text-size: 1rem,
-        $bg: $green-light,
+        $bg: $closed-ticket-bg,
         $radius:4px
     );
 }
@@ -994,4 +998,28 @@ tr.ticket:hover {
     // we slightly increase the padding in the town theme, if the line height
     // is not slightly increased at the same time, we see some weird overlap
     line-height: 1.7rem;
+}
+
+
+/*
+    Ticket counter in header
+*/
+
+.ticket-count {
+    background-color: $topbar-bg-color;
+    float: right;
+    font-size: .8rem;
+    padding: .25rem .5em;
+
+    > div {
+        display: inline-block;
+
+        + div::before {
+            content: '|';
+        }
+    }
+
+    .number {
+        font-weight: bold;
+    }
 }

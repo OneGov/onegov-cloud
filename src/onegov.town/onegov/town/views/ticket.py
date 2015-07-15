@@ -31,9 +31,12 @@ def accept_ticket(self, request):
         request.identity.userid)
 
     self.accept_ticket(user)
+
     request.success(_(u"You have accepted ticket ${number}", mapping={
         'number': self.number
     }))
+
+    request.app.update_ticket_count()
 
     return morepath.redirect(request.link(self))
 
@@ -55,6 +58,8 @@ def close_ticket(self, request):
             'model': self
         }
     )
+
+    request.app.update_ticket_count()
 
     return morepath.redirect(
         request.link(TicketCollection(request.app.session())))

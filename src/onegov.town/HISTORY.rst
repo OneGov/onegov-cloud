@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Shows a ticket count at the top of every page for logged in users.
+  [href]
+
 - Adds e-mail notifications for open/close ticket.
   [href]
 

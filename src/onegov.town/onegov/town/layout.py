@@ -138,6 +138,21 @@ class Layout(ChameleonLayout):
         return self.request.link(self.app.town)
 
     @cached_property
+    def open_tickets_url(self):
+        return self.request.link(
+            TicketCollection(self.request.app.session(), state='open'))
+
+    @cached_property
+    def pending_tickets_url(self):
+        return self.request.link(
+            TicketCollection(self.request.app.session(), state='pending'))
+
+    @cached_property
+    def closed_tickets_url(self):
+        return self.request.link(
+            TicketCollection(self.request.app.session(), state='closed'))
+
+    @cached_property
     def login_url(self):
         """ Returns the login url for the current page. """
         return '{}?to={}'.format(

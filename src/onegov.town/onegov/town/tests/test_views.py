@@ -770,10 +770,15 @@ def test_tickets(town_app):
 
     assert client.get('/tickets', expect_errors=True).status_code == 403
 
+    assert len(client.get('/').pyquery('.ticket-count')) == 0
+
     login_page = client.get('/login')
     login_page.form.set('email', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
+
+    assert client.get('/').pyquery('.ticket-count div').text()\
+        == '0 Offen 0 In Bearbeitung 0 Abgeschlossen'
 
     form_page = client.get('/formulare/neu')
     form_page.form['title'] = "Newsletter"
@@ -805,6 +810,9 @@ def test_tickets(town_app):
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
+    assert client.get('/').pyquery('.ticket-count div').text()\
+        == '1 Offen 0 In Bearbeitung 0 Abgeschlossen'
+
     tickets_page = client.get('/tickets')
 
     assert '1 Offene Tickets' in tickets_page
@@ -812,6 +820,9 @@ def test_tickets(town_app):
     ticket_page = tickets_page.click('Annehmen').follow()
 
     assert '1 Tickets in Bearbeitung' in client.get('/tickets?state=pending')
+
+    assert client.get('/').pyquery('.ticket-count div').text()\
+        == '0 Offen 1 In Bearbeitung 0 Abgeschlossen'
 
     assert 'editor@example.org' in ticket_page
     assert 'Newsletter' in ticket_page
@@ -821,6 +832,9 @@ def test_tickets(town_app):
 
     ticket_url = ticket_page.request.path
     ticket_page = ticket_page.click('Ticket abschliessen').follow()
+
+    assert client.get('/').pyquery('.ticket-count div').text()\
+        == '0 Offen 0 In Bearbeitung 1 Abgeschlossen'
 
     assert len(town_app.smtpserver.outbox) == 2
 

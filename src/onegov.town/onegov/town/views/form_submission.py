@@ -144,6 +144,7 @@ def handle_complete_submission(self, request):
             )
 
             request.success(_("Thank you for your submission!"))
+            request.app.update_ticket_count()
 
             return morepath.redirect(request.link(ticket, 'status'))
 

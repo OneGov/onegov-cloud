@@ -13,6 +13,7 @@ from cached_property import cached_property
 from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
+from onegov.ticket import TicketCollection
 from onegov.town import log
 from onegov.town.initial_content import add_builtin_forms
 from onegov.town.models import Town
@@ -63,6 +64,16 @@ class TownApp(Framework):
         session.flush()
 
         self.cache.delete('town')
+
+    @property
+    def ticket_count(self):
+        return self.cache.get_or_create('ticket_count', self.load_ticket_count)
+
+    def load_ticket_count(self):
+        return TicketCollection(self.session()).get_count()
+
+    def update_ticket_count(self):
+        return self.cache.delete('ticket_count')
 
     def send_email(self, **kwargs):
         """ Wraps :meth:`onegov.core.framework.Framework.send_email`, setting

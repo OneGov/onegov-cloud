@@ -27,11 +27,38 @@
 <body id="${layout.page_id}">
     <div id="inner-body">
       <div class="row">
-        <div class="small-12 columns">
+        <div class="small-12 medium-7 columns">
           <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing">
             <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
             <h1 tal:condition="not:logo_url">${layout.town.name}</h1>
           </a>
+        </div>
+        <div class="small-12 medium-5 columns">
+          <tal:block condition="request.is_logged_in">
+            <tal:block define="ticket_count layout.request.app.ticket_count">
+              <div class="ticket-count">
+                  <span i18n:translate>Tickets:</span>
+                  <div class="ticket-count-open">
+                    <a href="${layout.open_tickets_url}">
+                      <span class="number">${ticket_count.open}</span>
+                      <span class="text" i18n:translate>Open</span>
+                    </a>
+                  </div>
+                  <div class="ticket-count-pending">
+                    <a href="${layout.pending_tickets_url}">
+                      <span class="number">${ticket_count.pending}</span>
+                      <span class="text" i18n:translate>Pending</span>
+                    </a>
+                  </div>
+                  <div class="ticket-count-closed">
+                    <a href="${layout.closed_tickets_url}">
+                      <span class="number">${ticket_count.closed}</span>
+                      <span class="text" i18n:translate>Closed</span>
+                    </a>
+                  </div>
+              </div>
+            </tal:block>
+          </tal:block>
         </div>
       </div>
       <div class="row">
