@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.4 (2015-07-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a ticket counting function.
   [href]
 
