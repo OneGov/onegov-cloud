@@ -546,4 +546,11 @@ class TicketLayout(DefaultLayout):
                     classes=('ticket-action', 'ticket-close'),
                 ))
 
+            elif self.model.state == 'closed':
+                links.append(Link(
+                    text=_("Reopen ticket"),
+                    url=self.request.link(self.model, 'reopen'),
+                    classes=('ticket-action', 'ticket-reopen'),
+                ))
+
             return links

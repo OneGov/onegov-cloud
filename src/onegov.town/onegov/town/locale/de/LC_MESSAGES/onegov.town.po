@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-15 12:01+0200\n"
+"POT-Creation-Date: 2015-07-15 12:59+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -90,6 +90,9 @@ msgstr "Formular"
 
 msgid "Person"
 msgstr "Person"
+
+msgid "Reopen ticket"
+msgstr "Ticket wieder öffnen"
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
@@ -336,6 +339,9 @@ msgstr ""
 msgid "Check ticket status"
 msgstr "Ticket Status abfragen"
 
+msgid "Your ticket has been reopened"
+msgstr "Ihr Ticket wurde wieder geöffnet"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -548,6 +554,10 @@ msgstr "Sie haben das Ticket ${number} angenommen"
 #, python-format
 msgid "You have closed ticket ${number}"
 msgstr "Sie haben das Ticket ${number} abgeschlossen"
+
+#, python-format
+msgid "You have reopened ticket ${number}"
+msgstr "Sie haben das Ticket ${number} wieder geöffnet"
 
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"

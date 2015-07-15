@@ -908,6 +908,8 @@ $accept-ticket-icon: '\f1db';
 $accept-ticket-icon-hover: '\f192';
 $close-ticket-icon: '\f1db';
 $close-ticket-icon-hover: '\f05d';
+$reopen-ticket-icon: '\f1db';
+$reopen-ticket-icon-hover: '\f192';
 $frm-handler-icon: '\f044';
 
 .tickets-table {
@@ -960,6 +962,22 @@ tr.ticket:hover {
 
     &:hover::before {
         content: $close-ticket-icon-hover;
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
+    }
+}
+
+.ticket-reopen {
+    float: right;
+
+    &::before {
+        content: $reopen-ticket-icon;
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
+    }
+
+    &:hover::before {
+        content: $reopen-ticket-icon-hover;
         font-family: 'FontAwesome';
         margin-right: 1ex;
     }

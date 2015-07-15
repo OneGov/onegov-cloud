@@ -1,0 +1,16 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Your ticket has been reopened</p>
+
+        <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${model.number}</span></p>
+
+        <p i18n:translate>We will send another e-mail once your ticket has
+        been completed. In the meantime you can check the status of your
+        ticket at any time:</p>
+        <a href="${request.link(model, 'status')}" i18n:translate>Check ticket status</a>
+    </tal:block>
+</div>

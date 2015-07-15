@@ -60,6 +60,31 @@ def close_ticket(self, request):
         request.link(TicketCollection(request.app.session())))
 
 
+@TownApp.view(model=Ticket, name='reopen', permission=Private)
+def reopen_ticket(self, request):
+    user = UserCollection(request.app.session()).by_username(
+        request.identity.userid)
+
+    self.reopen_ticket(user)
+
+    request.success(_(u"You have reopened ticket ${number}", mapping={
+        'number': self.number
+    }))
+
+    send_html_mail(
+        request=request,
+        template='mail_ticket_reopened.pt',
+        subject=_("Your ticket has been reopened"),
+        receivers=(self.handler.email, ),
+        content={
+            'model': self
+        }
+    )
+
+    return morepath.redirect(
+        request.link(TicketCollection(request.app.session())))
+
+
 @TownApp.html(model=Ticket, name='status', template='ticket_status.pt',
               permission=Public)
 def view_ticket_status(self, request):
