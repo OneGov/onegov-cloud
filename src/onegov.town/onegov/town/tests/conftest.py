@@ -53,6 +53,7 @@ def town_app(postgres_dsn, temporary_directory, town_password, smtpserver):
     app.mail_force_tls = False
     app.mail_username = None
     app.mail_password = None
+    app.mail_use_directory = False
     app.smtpserver = smtpserver
 
     # usually we don't want to create the users directly, anywhere else you
