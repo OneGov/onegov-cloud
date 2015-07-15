@@ -1,4 +1,5 @@
 import json
+import os
 import pytest
 
 from datetime import datetime, timedelta
@@ -391,6 +392,7 @@ def test_send_email(smtpserver):
     app.mail_force_tls = False
     app.mail_username = None
     app.mail_password = None
+    app.mail_use_directory = False
 
     result = app.send_email(
         reply_to='info@example.org',
@@ -424,6 +426,7 @@ def test_send_email_with_name(smtpserver):
     app.mail_force_tls = False
     app.mail_username = None
     app.mail_password = None
+    app.mail_use_directory = False
 
     result = app.send_email(
         reply_to='Govikon <info@example.org>',
@@ -447,3 +450,34 @@ def test_send_email_with_name(smtpserver):
         'Content-Transfer-Encoding: base64\n\n'
         'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
     )
+
+
+def test_send_email_to_maildir(temporary_directory):
+
+    app = Framework()
+    app.mail_sender = 'noreply@example.org'
+    app.mail_use_directory = True
+    app.mail_directory = temporary_directory
+
+    result = app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test"
+    )
+
+    assert result.ok
+    assert os.listdir(temporary_directory) == ['cur', 'new', 'tmp']
+
+    new_emails = os.path.join(temporary_directory, 'new')
+    assert len(os.listdir(new_emails)) == 1
+
+    new_email = os.path.join(new_emails, os.listdir(new_emails)[0])
+    with open(new_email, 'r') as f:
+        email = f.read()
+
+    assert 'Subject: Test E-Mail' in email
+    assert 'Reply-To: Govikon <info@example.org>' in email
+    assert 'From: Govikon <noreply@example.org>' in email
+    assert 'Sender: Govikon <noreply@example.org>' in email
+    assert 'To: recipient@example.org' in email

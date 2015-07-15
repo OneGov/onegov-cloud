@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to send e-mails to a maildir, instead of directly to an
+  SMTP server.
+  [href]
+
 0.4.12 (2015-07-15)
 ~~~~~~~~~~~~~~~~~~~
 

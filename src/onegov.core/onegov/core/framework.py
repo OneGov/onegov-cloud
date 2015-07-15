@@ -28,13 +28,13 @@ from email.utils import parseaddr
 from itsdangerous import BadSignature, Signer
 from mailthon import email
 from mailthon.middleware import TLS, Auth
-from mailthon.postman import Postman
 from more.transaction import TransactionApp
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache
 from onegov.core import utils
+from onegov.core.mail import Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
 from onegov.core.request import CoreRequest
 from onegov.server import Application as ServerApplication
@@ -208,6 +208,15 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         :mail_sender:
             The sender e-mail address.
 
+        :mail_use_directory:
+            If true, mails are stored in the maildir defined through
+            ``mail_directory``. There, some other process is supposed to
+            pick up the e-mails and send them.
+
+        :mail_directory:
+            The directory (maildir) where mails are stored if if
+            ``mail_use_directory`` is set to True.
+
         :sql_query_report:
             Prints out a report sql queries for each request, unless False.
             Valid values are:
@@ -285,6 +294,8 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         self.mail_username = cfg.get('mail_username', None)
         self.mail_password = cfg.get('mail_password', None)
         self.mail_sender = cfg.get('mail_sender', None)
+        self.mail_use_directory = cfg.get('mail_use_directory', False)
+        self.mail_directory = cfg.get('mail_directory', None)
 
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
@@ -357,38 +368,36 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         """
 
-        assert self.mail_host
-        assert self.mail_port
+        if self.mail_use_directory:
+            assert self.mail_directory
 
-        middlewares = []
-
-        if self.mail_force_tls:
-            middlewares.append(TLS(force=True))
-
-        if self.mail_username:
-            middlewares.append(
-                Auth(
-                    username=self.mail_username,
-                    password=self.mail_password
-                )
+            return MaildirPostman(
+                host=None,
+                port=None,
+                options=dict(maildir=self.mail_directory)
             )
+        else:
+            assert self.mail_host
+            assert self.mail_port
 
-        # pending issue: https://github.com/eugene-eeo/mailthon/issues/18
-        class FixedPostman(Postman):
-            def deliver(self, conn, envelope):
-                rejected = conn.sendmail(
-                    envelope.mail_from,
-                    envelope.receivers,
-                    envelope.string(),
+            middlewares = []
+
+            if self.mail_force_tls:
+                middlewares.append(TLS(force=True))
+
+            if self.mail_username:
+                middlewares.append(
+                    Auth(
+                        username=self.mail_username,
+                        password=self.mail_password
+                    )
                 )
 
-                return self.response_cls(conn.noop(), rejected)
-
-        return FixedPostman(
-            host=self.mail_host,
-            port=self.mail_port,
-            middlewares=middlewares
-        )
+            return Postman(
+                host=self.mail_host,
+                port=self.mail_port,
+                middlewares=middlewares
+            )
 
     def send_email(self, reply_to, receivers=(), cc=(), bcc=(),
                    subject=None, content=None, encoding='utf-8',
