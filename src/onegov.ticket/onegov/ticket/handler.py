@@ -50,6 +50,11 @@ class Handler(object):
             self.ticket.handler_data = self.data
 
     @property
+    def email(self):
+        """ Returns the email address behind the ticket request. """
+        raise NotImplementedError
+
+    @property
     def title(self):
         """ Returns the title of the ticket. If this title may change over
         time, the handler must call :meth:`self.refresh` when there's a change.

@@ -46,6 +46,10 @@ def test_open_ticket(session, handlers):
     class EchoHandler(Handler):
 
         @property
+        def email(self):
+            return self.data.get('email')
+
+        @property
         def title(self):
             return self.data.get('title')
 
@@ -67,7 +71,8 @@ def test_open_ticket(session, handlers):
         title="Title",
         group="Group",
         summary="Summary",
-        links=[("Link", '#')]
+        links=[("Link", '#')],
+        email="citizen@example.org"
     )
 
     assert ticket.number.startswith('ECO-')
@@ -79,7 +84,8 @@ def test_open_ticket(session, handlers):
         'title': "Title",
         'group': "Group",
         'summary': "Summary",
-        'links': [("Link", '#')]
+        'links': [("Link", '#')],
+        'email': "citizen@example.org"
     }
 
     assert ticket.handler.get_summary(request=object()) == "Summary"

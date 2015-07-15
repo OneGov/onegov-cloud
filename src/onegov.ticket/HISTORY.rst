@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an email property to the handler.
+  [href]
+
 - Adds reopen ticket function.
   [msom]
 
