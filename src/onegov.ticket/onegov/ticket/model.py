@@ -38,7 +38,7 @@ class Ticket(Base, TimestampMixin):
     #: a unique id for the handler record
     handler_id = Column(Text, nullable=False, index=True, unique=True)
 
-    #: the data associated with the handler, not menat to be loaded in a list,
+    #: the data associated with the handler, not meant to be loaded in a list,
     #: therefore deferred.
     handler_data = deferred(Column(JSON, nullable=False, default=dict))
 
