@@ -922,6 +922,18 @@ $frm-handler-icon: '\f044';
 
 .tickets-table {
     width: 100%;
+
+    td {
+        vertical-align: top;
+    }
+
+    // forces the ticket-title to break on newlines
+    td.ticket-number-plain,
+    td.ticket-date,
+    td.ticket-group,
+    td.ticket-action {
+        white-space: nowrap;
+    }
 }
 
 .ticket-handler-FRM td:first-child::before {
