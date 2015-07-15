@@ -224,7 +224,7 @@ form {
 
     .ace_content {
         color: inherit;
-        font-family: $font-family-monospace;
+        font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
         font-size: 12px;
         line-height: 12px;
     }
