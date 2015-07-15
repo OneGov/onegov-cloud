@@ -40,6 +40,44 @@ def test_issue_unique_ticket_number(session):
     assert len(collection.random_number.mock_calls) == 3
 
 
+def test_ticket_count(session):
+
+    for i in range(0, 3):
+        i = i + 1
+        session.add(Ticket(
+            number='ABC-1000-{:04d}'.format(i),
+            title='test', group='test',
+            handler_code='ABC',
+            handler_id=str(i),
+            state='open'
+        ))
+
+    for i in range(0, 2):
+        i = (i + 1) * 10
+        session.add(Ticket(
+            number='ABC-1000-{:04d}'.format(i),
+            title='test', group='test',
+            handler_code='ABC',
+            handler_id=str(i),
+            state='pending'
+        ))
+
+    for i in range(0, 1):
+        i = (i + 1) * 100
+        session.add(Ticket(
+            number='ABC-1000-{:04d}'.format(i),
+            title='test', group='test',
+            handler_code='ABC',
+            handler_id=str(i),
+            state='closed'
+        ))
+
+    count = TicketCollection(session).get_count()
+    assert count.open == 3
+    assert count.pending == 2
+    assert count.closed == 1
+
+
 def test_open_ticket(session, handlers):
 
     @handlers.registered_handler('ECO')

@@ -1,8 +1,9 @@
 import random
 
+from collections import namedtuple
 from onegov.core.collection import Pagination
 from onegov.ticket.model import Ticket
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload, undefer
 
 
@@ -34,6 +35,9 @@ class TicketCollectionPagination(Pagination):
 
     def for_state(self, state):
         return self.__class__(self.session, 0, state)
+
+
+TicketCount = namedtuple('TicketCount', ['open', 'pending', 'closed'])
 
 
 class TicketCollection(TicketCollectionPagination):
@@ -123,3 +127,10 @@ class TicketCollection(TicketCollectionPagination):
 
     def by_handler_id(self, handler_id):
         return self.query().filter(Ticket.handler_id == handler_id).first()
+
+    def get_count(self):
+        query = self.query()
+        query = query.with_entities(Ticket.state, func.count(Ticket.state))
+        query = query.group_by(Ticket.state)
+
+        return TicketCount(**{r[0]: r[1] for r in query.all()})
