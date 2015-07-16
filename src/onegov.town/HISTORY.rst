@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.6 (2015-07-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes encoding issue in Apple Mail.
   [href]
 
