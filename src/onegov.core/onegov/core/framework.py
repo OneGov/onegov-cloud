@@ -400,7 +400,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             )
 
     def send_email(self, reply_to, receivers=(), cc=(), bcc=(),
-                   subject=None, content=None, encoding='utf-8',
+                   subject=None, content=None, encoding='iso-8859-1',
                    attachments=()):
         """ Sends a plain-text e-mail using :attr:`postman` to the given
         recipients. A reply to address is used to enable people to answer
@@ -409,6 +409,10 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         For more complex use cases have a look at
         `<http://mailthon.readthedocs.org/>`_.
+
+        Note: If you implement your own email sending using the Mailthon API,
+        be sure to use 'iso-8859-1' encoding. If you use the default 'utf-8',
+        the repoze.sendmail qp command will not work correctly!
 
         """
         assert self.mail_sender

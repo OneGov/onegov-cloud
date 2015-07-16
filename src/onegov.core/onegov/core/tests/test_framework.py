@@ -411,10 +411,10 @@ def test_send_email(smtpserver):
     assert message['Reply-To'] == 'info@example.org'
     assert message['Subject'] == 'Test E-Mail'
     assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/html; charset="utf-8"\n'
+        'Content-Type: text/html; charset="iso-8859-1"\n'
         'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
+        'Content-Transfer-Encoding: quoted-printable\n\n'
+        'This e-mail is just a test'
     )
 
 
@@ -445,10 +445,10 @@ def test_send_email_with_name(smtpserver):
     assert message['Reply-To'] == 'Govikon <info@example.org>'
     assert message['Subject'] == 'Test E-Mail'
     assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/html; charset="utf-8"\n'
+        'Content-Type: text/html; charset="iso-8859-1"\n'
         'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: base64\n\n'
-        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
+        'Content-Transfer-Encoding: quoted-printable\n\n'
+        'This e-mail is just a test'
     )
 
 

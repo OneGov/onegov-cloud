@@ -1,7 +1,6 @@
 import os.path
 
 from mailbox import Maildir, MaildirMessage
-from mailthon.helpers import format_addresses
 from mailthon.postman import Postman as BasePostman
 
 
@@ -33,11 +32,13 @@ class MaildirTransport(object):
 
     def sendmail(self, from_addr, to_addrs, message):
         msg = MaildirMessage(message)
+
         # the x-* headers are for repoze.sendmail compatibility
         # (i.e. we can use the qp script if we use these headers)
-        msg['X-Actually-From'] = msg['from'] = from_addr
-        msg['X-Actually-To'] = msg['to'] = format_addresses(to_addrs)
-        self.maildir.add(MaildirMessage(msg))
+        msg['X-Actually-From'] = msg['from']
+        msg['X-Actually-To'] = msg['to']
+
+        self.maildir.add(msg)
 
         return {}
 
