@@ -45,6 +45,11 @@ class SettingsForm(Form):
         description=_("The opening hours of the municipality"),
         widget=with_options(TextArea, rows=8)
     )
+    analytics_code = TextAreaField(
+        label=_("Analytics Code"),
+        description=_("JavaScript for web statistics support"),
+        widget=with_options(TextArea, rows=10)
+    )
 
     # the footer height is determined by javascript, see town.scss and
     # common.js for more information (search for footer)
@@ -101,7 +106,8 @@ def handle_settings(self, request, form):
                 'opening_hours': form.opening_hours.data,
                 'opening_hours_html': linkify(
                     form.opening_hours.data).replace('\n', '<br>'),
-                'reply_to': form.reply_to.data
+                'reply_to': form.reply_to.data,
+                'analytics_code': form.analytics_code.data
             }
 
         request.success(_(u"Your changes were saved"))
@@ -112,6 +118,7 @@ def handle_settings(self, request, form):
         form.contact.data = self.meta.get('contact')
         form.opening_hours.data = self.meta.get('opening_hours')
         form.reply_to.data = self.meta.get('reply_to')
+        form.analytics_code.data = self.meta.get('analytics_code')
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [

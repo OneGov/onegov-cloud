@@ -128,6 +128,7 @@
         </div>
       </div>
     </footer>
+    <tal:block tal:content="structure layout.town.meta.analytics_code|nothing" />
 </body>
 
 </html>

@@ -232,6 +232,10 @@ def test_settings(town_app):
     assert 'http://images/one' in settings_page
     assert 'http://images/two' in settings_page
 
+    settings_page.form['analytics_code'] = '<script>alert("Hi!");</script>'
+    settings_page = settings_page.form.submit()
+    assert '<script>alert("Hi!");</script>' in settings_page.text
+
 
 def test_unauthorized(town_app):
     client = Client(town_app)

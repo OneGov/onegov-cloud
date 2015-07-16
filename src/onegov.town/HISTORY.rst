@@ -13,6 +13,9 @@ Unreleased
 - Adds reopen ticket functionality.
   [msom]
 
+- Adds analytics code snippet.
+  [msom]
+
 0.2.4 (2015-07-14)
 ~~~~~~~~~~~~~~~~~~~
 

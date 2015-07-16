@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-15 12:59+0200\n"
+"POT-Creation-Date: 2015-07-16 10:06+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -546,6 +546,12 @@ msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
+
+msgid "Analytics Code"
+msgstr "Analytics Code"
+
+msgid "JavaScript for web statistics support"
+msgstr "JavaScript für Web-Statistik"
 
 #, python-format
 msgid "You have accepted ticket ${number}"
