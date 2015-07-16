@@ -467,7 +467,7 @@ def test_send_email_to_maildir(temporary_directory):
     )
 
     assert result.ok
-    assert os.listdir(temporary_directory) == ['cur', 'new', 'tmp']
+    assert set(os.listdir(temporary_directory)) == {'cur', 'new', 'tmp'}
 
     new_emails = os.path.join(temporary_directory, 'new')
     assert len(os.listdir(new_emails)) == 1
