@@ -50,12 +50,6 @@
                       <span class="text" i18n:translate>Pending</span>
                     </a>
                   </div>
-                  <div class="ticket-count-closed">
-                    <a href="${layout.closed_tickets_url}">
-                      <span class="number">${ticket_count.closed}</span>
-                      <span class="text" i18n:translate>Closed</span>
-                    </a>
-                  </div>
               </div>
             </tal:block>
           </tal:block>
