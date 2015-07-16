@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.5 (2015-07-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows a ticket count at the top of every page for logged in users.
   [href]
 
