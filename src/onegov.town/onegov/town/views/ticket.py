@@ -86,8 +86,9 @@ def reopen_ticket(self, request):
         }
     )
 
-    return morepath.redirect(
-        request.link(TicketCollection(request.app.session())))
+    request.app.update_ticket_count()
+
+    return morepath.redirect(request.link(self))
 
 
 @TownApp.html(model=Ticket, name='status', template='ticket_status.pt',

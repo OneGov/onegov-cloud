@@ -801,7 +801,8 @@ def test_tickets(town_app):
     assert len(town_app.smtpserver.outbox) == 1
 
     message = town_app.smtpserver.outbox[0]
-    message = message.get_payload(0).get_payload(decode=True).decode('utf-8')
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
 
     assert 'FRM-' in message
     assert '/status' in message
@@ -843,7 +844,8 @@ def test_tickets(town_app):
     assert len(town_app.smtpserver.outbox) == 2
 
     message = town_app.smtpserver.outbox[1]
-    message = message.get_payload(0).get_payload(decode=True).decode('utf-8')
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
 
     assert 'FRM-' in message
     assert '/status' not in message
@@ -859,4 +861,14 @@ def test_tickets(town_app):
     ticket_page = client.get(ticket_url)
     ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
 
-    assert '1 Offene Tickets' in client.get('/tickets')
+    assert '1 Tickets in Bearbeitung' in client.get('/tickets?state=pending')
+
+    assert client.get('/').pyquery('.ticket-count div').text()\
+        == '0 Offen 1 In Bearbeitung 0 Abgeschlossen'
+
+    message = town_app.smtpserver.outbox[2]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
+
+    assert 'FRM-' in message
+    assert '/status' in message
