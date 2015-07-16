@@ -37,6 +37,14 @@ class Config(object):
         with open(yaml_file, 'r') as f:
             return Config(yaml.load(f.read()))
 
+    @staticmethod
+    def from_yaml_string(yaml_string):
+        """ Load the given yaml string and return a new Configuration instance
+        with the configuration values found in the yaml string.
+
+        """
+        return Config(yaml.load(yaml_string))
+
 
 class ApplicationConfig(object):
     """ Represents an application config entry loaded from a dictionary like

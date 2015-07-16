@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to load yaml configs from string.
+  [href]
+
 - Remove support for Python 3.3.
   [href]
 
