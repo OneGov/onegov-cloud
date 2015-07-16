@@ -5,6 +5,9 @@ updates.
 """
 
 import click
+import os
+import platform
+import subprocess
 
 from morepath import setup
 from onegov.core.compat import text_type
@@ -30,6 +33,165 @@ def cli(ctx, config, namespace):
         'config': Config.from_yaml_file(config),
         'namespace': namespace
     }
+
+
+@cli.command()
+@click.argument('server')
+@click.argument('remote-config')
+@click.option('--confirm/--no-confirm', default=True,
+              help="Ask for confirmation (disabling this is dangerous!)")
+@click.option('--no-filestorage', default=False, is_flag=True,
+              help="Do not transfer the files")
+@click.option('--no-database', default=False, is_flag=True,
+              help="Do not transfer the database")
+@click.pass_context
+def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
+    """ Transfers the database and all files from a server running a
+    onegov-cloud application and installs them locally, overwriting the
+    local data!
+
+    This command expects to have access to the remote server via ssh
+    (no password) and to be run sudo without password. If this is too scary
+    for you, feel free to write something saner.
+
+    Only namespaces which are present locally and remotely are considered.
+
+    So if you have a 'cities' namespace locally and a 'towns' namespace on
+    the remote, nothing will happen.
+
+    WARNING: This may delete local content!
+
+    """
+
+    ctx = ctx.obj
+
+    if confirm:
+        click.confirm(
+            "Do you really want override all your local data?",
+            default=False, abort=True
+        )
+
+    print("Parsing the remote application configuration")
+
+    remote_dir = os.path.dirname(remote_config)
+    remote_config = Config.from_yaml_string(
+        subprocess.check_output([
+            "ssh", server, "-C", "sudo cat '{}'".format(remote_config)
+        ])
+    )
+
+    remote_applications = {a.namespace: a for a in remote_config.applications}
+
+    # storages may be shared between applications, so we need to keep track
+    fetched = set()
+
+    # filter out namespaces on demand
+    for appcfg in ctx['config'].applications:
+
+        if ctx['namespace'] != '*' and appcfg.namespace != ctx['namespace']:
+            continue
+
+        if appcfg.configuration.get('disable_transfer'):
+            print("Skipping {}, transfer disabled".format(appcfg.namespace))
+            continue
+
+        if appcfg.namespace not in remote_applications:
+            print("Skipping {}, not found on remote".format(appcfg.namespace))
+            continue
+
+        remotecfg = remote_applications[appcfg.namespace]
+
+        if not no_filestorage:
+            if remotecfg.configuration.get('filestorage') == 'fs.osfs.OSFS':
+                assert appcfg.configuration.get('filestorage')\
+                    == 'fs.osfs.OSFS'
+
+                print("Fetching remote filestorage")
+
+                local_fs = appcfg.configuration['filestorage_options']
+                remote_fs = remotecfg.configuration['filestorage_options']
+
+                remote_storage = os.path.join(
+                    remote_dir, remote_fs['root_path'])
+                local_storage = os.path.join('.', local_fs['root_path'])
+
+                if ':'.join((remote_storage, local_storage)) in fetched:
+                    continue
+
+                tar_filename = '/tmp/{}.tar.gz'.format(uuid4().hex)
+
+                subprocess.check_output([
+                    'ssh', server, '-C', "sudo tar czvf '{}' -C '{}' .".format(
+                        tar_filename, remote_storage
+                    )
+                ])
+
+                subprocess.check_output([
+                    'scp',
+                    '{}:{}'.format(server, tar_filename),
+                    '{}/transfer.tar.gz'.format(local_storage)
+                ])
+
+                subprocess.check_output([
+                    'tar', 'xzvf', '{}/transfer.tar.gz'.format(local_storage),
+                    '-C', local_storage
+                ])
+
+                subprocess.check_output([
+                    'ssh', server, '-C', "sudo rm '{}'".format(tar_filename)
+                ])
+
+                subprocess.check_output([
+                    'rm', '{}/transfer.tar.gz'.format(local_storage)
+                ])
+
+                fetched.add(':'.join((remote_storage, local_storage)))
+
+        if 'dsn' in remotecfg.configuration:
+            assert 'dsn' in appcfg.configuration
+
+            print("Fetching remote database")
+
+            local_db = appcfg.configuration['dsn'].split('/')[-1]
+            remote_db = remotecfg.configuration['dsn'].split('/')[-1]
+            database_dump = subprocess.check_output([
+                'ssh', server, '-C',
+                (
+                    "sudo -u postgres pg_dump "
+                    "--format=c --no-owner --no-privileges --clean {}".format(
+                        remote_db
+                    )
+                ),
+            ])
+
+            with open('dump.sql', 'wb') as f:
+                f.write(database_dump)
+
+            try:
+                if platform.system() == 'Darwin':
+                    subprocess.check_output([
+                        "cat dump.sql | pg_restore -d {}".format(local_db)
+                    ], stderr=subprocess.STDOUT, shell=True)
+                elif platform.system() == 'Linux':
+                    subprocess.check_output([
+                        (
+                            "cat dump.sql "
+                            "| sudo -u postgres pg_restore -d {}".format(
+                                local_db
+                            )
+                        )
+                    ], stderr=subprocess.STDOUT, shell=True)
+                else:
+                    raise NotImplementedError
+            except subprocess.CalledProcessError as e:
+                lines = e.output.decode('utf-8').rstrip('\n').split('\n')
+
+                if lines[-1].startswith('WARNING: errors ignored on restore:'):
+                    pass
+                else:
+                    raise
+            finally:
+                subprocess.check_output(['rm', 'dump.sql'])
 
 
 @cli.command()

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a data transfer command to download data from a onegov cloud server and
+  install them locally. Requires ssh permissions to function.
+
 - Adds the ability to send e-mails to a maildir, instead of directly to an
   SMTP server.
   [href]
