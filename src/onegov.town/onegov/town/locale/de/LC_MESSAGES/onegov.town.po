@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-15 12:01+0200\n"
+"POT-Creation-Date: 2015-07-15 12:59+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -338,6 +338,9 @@ msgstr ""
 
 msgid "Check ticket status"
 msgstr "Ticket Status abfragen"
+
+msgid "Your ticket has been reopened"
+msgstr "Ihr Ticket wurde wieder geöffnet"
 
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
