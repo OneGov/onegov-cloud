@@ -10,7 +10,7 @@
         </div>
         <div class="row fieldset-display" tal:condition="completable">
             <div class="small-12 medium-12 large-12 columns">
-                <div class="panel" tal:condition="is_pending">
+                <div class="panel callout" tal:condition="is_pending">
                     <p i18n:translate="">
                         Your form submission is ready to be sent to the town.
                         Please review your data and press "Complete" to finalize the process.
