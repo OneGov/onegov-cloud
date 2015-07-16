@@ -296,4 +296,7 @@ class WsgiServer(FileSystemEventHandler):
         if '/file-storage' in event.src_path:
             return
 
+        if '/mails' in event.src_path:
+            return
+
         self.restart()
