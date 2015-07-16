@@ -1019,11 +1019,11 @@ tr.ticket:hover {
 
 .ticket-count {
     background-color: $primary-color;
+    border-radius: 0 0 3px 3px;
+    color: $white;
     float: right;
     font-size: .8rem;
     padding: .25rem .5em;
-    color: $white;
-    border-radius: 0 0 3px 3px;
 
     > div {
         display: inline-block;
@@ -1037,5 +1037,7 @@ tr.ticket:hover {
         font-weight: bold;
     }
 
-    a {color: $white}
+    a {
+        color: $white;
+    }
 }
