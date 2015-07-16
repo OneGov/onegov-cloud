@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.13 (2015-07-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a data transfer command to download data from a onegov cloud server and
   install them locally. Requires ssh permissions to function.
 
