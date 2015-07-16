@@ -19,7 +19,7 @@
     metal:define-macro="layout">
 <head>
     <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <title><div metal:define-slot="title"></div></title>
     <style tal:define="primary_color layout.town.theme_options.get('primary-color', '#006fba')">
     /*csslint 
