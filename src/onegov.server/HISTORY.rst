@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.4 (2015-07-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to load yaml configs from string.
   [href]
 
