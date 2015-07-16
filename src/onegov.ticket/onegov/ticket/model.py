@@ -84,4 +84,4 @@ class Ticket(Base, TimestampMixin):
         assert self.state == 'closed'
 
         self.user = user
-        self.state = 'open'
+        self.state = 'pending'

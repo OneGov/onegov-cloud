@@ -36,6 +36,6 @@ def test_transitions(session):
         ticket.close_ticket()
 
     ticket.reopen_ticket(User())
-    assert ticket.state == 'open'
+    assert ticket.state == 'pending'
     assert ticket.user != user
     assert ticket.user is not None

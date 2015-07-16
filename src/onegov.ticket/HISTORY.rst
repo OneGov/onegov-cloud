@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Reopening a ticket changes its state to pending.
+  [href]
+
 0.0.4 (2015-07-15)
 ~~~~~~~~~~~~~~~~~~~
 
