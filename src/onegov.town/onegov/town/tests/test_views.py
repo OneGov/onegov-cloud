@@ -782,7 +782,7 @@ def test_tickets(town_app):
     login_page.form.submit()
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offen 0 In Bearbeitung 0 Abgeschlossen'
+        == '0 Offen 0 In Bearbeitung'
 
     form_page = client.get('/formulare/neu')
     form_page.form['title'] = "Newsletter"
@@ -816,7 +816,7 @@ def test_tickets(town_app):
     login_page.form.submit()
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '1 Offen 0 In Bearbeitung 0 Abgeschlossen'
+        == '1 Offen 0 In Bearbeitung'
 
     tickets_page = client.get('/tickets')
 
@@ -827,7 +827,7 @@ def test_tickets(town_app):
     assert '1 Tickets in Bearbeitung' in client.get('/tickets?state=pending')
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offen 1 In Bearbeitung 0 Abgeschlossen'
+        == '0 Offen 1 In Bearbeitung'
 
     assert 'editor@example.org' in ticket_page
     assert 'Newsletter' in ticket_page
@@ -839,7 +839,7 @@ def test_tickets(town_app):
     ticket_page = ticket_page.click('Ticket abschliessen').follow()
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offen 0 In Bearbeitung 1 Abgeschlossen'
+        == '0 Offen 0 In Bearbeitung'
 
     assert len(town_app.smtpserver.outbox) == 2
 
@@ -864,7 +864,7 @@ def test_tickets(town_app):
     assert '1 Tickets in Bearbeitung' in client.get('/tickets?state=pending')
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offen 1 In Bearbeitung 0 Abgeschlossen'
+        == '0 Offen 1 In Bearbeitung'
 
     message = town_app.smtpserver.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
