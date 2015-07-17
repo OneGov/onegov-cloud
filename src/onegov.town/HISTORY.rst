@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the datetimepicker plugin.
+  [msom]
+
 0.2.6 (2015-07-16)
 ~~~~~~~~~~~~~~~~~~~
 

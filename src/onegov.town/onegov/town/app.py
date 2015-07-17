@@ -175,13 +175,21 @@ class TownApp(Framework):
             'js/react.js',
             'js/form_dependencies.js',
             confirm,
+            'js/jquery.datetimepicker.js',
             'js/common.js',
-            filters='jsmin',
+            # filters='jsmin',
             output='bundles/common.bundle.js'
+        )
+
+        common_css = Bundle(
+            'css/jquery.datetimepicker.css',
+            filters='cssmin',
+            output='bundles/common.bundle.css',
         )
 
         return {
             'common': common,
+            'common_css': common_css,
             'dropzone': dropzone,
             'redactor': redactor,
             'redactor_theme': redactor_theme,

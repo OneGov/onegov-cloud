@@ -205,6 +205,7 @@ class DefaultLayout(Layout):
 
         # always include the common js files
         self.request.include('common')
+        self.request.include('common_css')
 
     @cached_property
     def breadcrumbs(self):
