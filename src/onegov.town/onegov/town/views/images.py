@@ -1,5 +1,4 @@
 """ The onegov town collection of images uploaded to the site. """
-
 from onegov.core.filestorage import delete_static_file
 from onegov.core.security import Private
 from onegov.town import _
@@ -13,9 +12,10 @@ from onegov.town.models import ImageCollection, Image
 def view_get_image_collection(self, request):
     request.include('dropzone')
 
-    images = [
-        Img(src=request.link(image.thumbnail), url=request.link(image))
-        for image in self.files
+    image_groups = [
+        [group, [Img(src=request.link(image.thumbnail),
+                     url=request.link(image)) for image in images]]
+        for group, images in self.grouped_files()
     ]
 
     layout = DefaultLayout(self, request)
@@ -27,7 +27,7 @@ def view_get_image_collection(self, request):
     return {
         'layout': layout,
         'title': _(u'Images'),
-        'images': images,
+        'image_groups': image_groups,
     }
 
 

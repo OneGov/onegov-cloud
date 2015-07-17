@@ -93,7 +93,7 @@ class File(FilestorageFile):
 
     @property
     def date(self):
-        if 'date' in self.info:
+        if 'created_time' in self.info:
             return self.info['created_time'].date()
 
     @property

@@ -12,21 +12,24 @@
         <div class="row">
             <div class="small-12 columns">
                 <h2 i18n:translate="">All Images</h2>
-                <ul tal:condition="images" class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-                    <li tal:repeat="image images" id="image-${repeat.image.index}" class="image-box">
-                        <a class="th" href="${image.url}" tal:condition="image">
-                            <img src="${image.src}" />
-                        </a>
-                        <a class="delete confirm" 
-                           ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}" 
-                           ic-on-success="$('#image-${repeat.image.index}').remove();"
-                           data-confirm="Do you really want to delete the image?"
-                           data-confirm-yes="Delete Image"
-                           data-confirm-no="Cancel"
-                           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">✗</a>
-                    </li>
-                </ul>
-                <tal:block condition="not:images">
+                <tal:block tal:condition="image_groups" tal:repeat="group image_groups">
+                    <h3>${group[0]}</h3>
+                    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                        <li tal:repeat="image group[1]" id="image-${repeat.image.index}" class="image-box">
+                            <a class="th" href="${image.url}" tal:condition="image">
+                                <img src="${image.src}" />
+                            </a>
+                            <a class="delete confirm"
+                               ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}"
+                               ic-on-success="$('#image-${repeat.image.index}').remove();"
+                               data-confirm="Do you really want to delete the image?"
+                               data-confirm-yes="Delete Image"
+                               data-confirm-no="Cancel"
+                               i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">✗</a>
+                        </li>
+                    </ul>
+                </tal:block>
+                <tal:block condition="not:image_groups">
                     <p i18n:translate="">No images uploaded yet</p>
                 </tal:block>
             </div>

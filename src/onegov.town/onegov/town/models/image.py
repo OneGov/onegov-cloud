@@ -2,6 +2,11 @@
 
 import PIL
 
+from collections import OrderedDict
+from datetime import datetime, timedelta
+from datetime import date
+from itertools import groupby
+from onegov.town import _
 from onegov.town.models import File
 from onegov.town.models import FileCollection
 
@@ -42,6 +47,49 @@ class ImageCollection(FileCollection):
 
         for filename, info in images:
             yield Image(filename, info)
+
+    def grouped_files(self):
+        """ Returns the :class:`~onegov.town.model.Image` instances in this
+        collection grouped by natural language dates.
+        """
+        prev_month = lambda x: datetime((x.month - 2) // 12 + x.year,
+                                        (x.month - 2) % 12 + 1, 1)
+
+        today = date.today()
+        this_month = datetime(today.year, today.month, 1)
+        last_month = prev_month(this_month)
+
+        ranges = OrderedDict()
+        # todo: recent ?
+        # todo: last week ?
+        ranges[_('This month')] = (this_month, datetime.now())
+        ranges[_('Last month')] = (last_month,
+                                this_month-timedelta(microseconds=1))
+        # todo: older months by names?
+        # todo: older years?
+
+        # group by date
+        def keyfunc(x):
+            # todo: this will probably suck for many files/ranges, could be
+            #       one reason to implement ORM backup
+            for key in ranges:
+                # todo: the 'created_time' seems to be wrong (OSX?)
+                if ranges[key][0] < x.info['modified_time'] < ranges[key][1]:
+                    return key
+            return _('Older')
+        groups = [
+            [group, [image for image in images]]
+            for group, images in groupby(self.files, keyfunc)
+        ]
+
+        # sort by ranges
+        keys = list(ranges.keys()) + [_('Older')]
+
+        def sortfunc(x):
+            return keys.index(x[0])
+        groups = sorted(groups, key=sortfunc)
+
+        return groups
 
     @property
     def thumbnails(self):
