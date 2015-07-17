@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a sendmail command that replaces repoze.sendmail's qp.
+  [href]
+
 0.4.13 (2015-07-16)
 ~~~~~~~~~~~~~~~~~~~
 

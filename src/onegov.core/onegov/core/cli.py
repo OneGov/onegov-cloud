@@ -5,18 +5,37 @@ updates.
 """
 
 import click
+import email
+import mailbox
 import os
 import platform
 import subprocess
 
+from mailthon.middleware import TLS, Auth
 from morepath import setup
 from onegov.core.compat import text_type
+from onegov.core.mail import Postman
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
 from onegov.server.config import Config
 from onegov.server.core import Server
 from uuid import uuid4
 from webtest import TestApp as Client
+
+
+class Context(object):
+
+    def __init__(self, config, namespace):
+        self.config = config
+        self.namespace = namespace
+
+    @property
+    def appconfigs(self):
+        for appcfg in self.config.applications:
+            if self.namespace != '*' and self.namespace != appcfg.namespace:
+                continue
+
+            yield appcfg
 
 
 @click.group()
@@ -29,10 +48,56 @@ from webtest import TestApp as Client
               ))
 @click.pass_context
 def cli(ctx, config, namespace):
-    ctx.obj = {
-        'config': Config.from_yaml_file(config),
-        'namespace': namespace
-    }
+    ctx.obj = Context(Config.from_yaml_file(config), namespace)
+
+
+@cli.command()
+@click.option('--hostname', help="The smtp host")
+@click.option('--port', help="The smtp port")
+@click.option('--force-tls', default=False, is_flag=True,
+              help="Force a TLS connection")
+@click.option('--username', help="The username to authenticate", default=None)
+@click.option('--password', help="The password to authenticate", default=None)
+@click.pass_context
+def sendmail(ctx, hostname, port, force_tls, username, password):
+    """ Iterates over all applications and processes the maildir for each
+    application that uses maildir e-mail delivery.
+
+    """
+    context = ctx.obj
+
+    for appcfg in context.appconfigs:
+
+        if not appcfg.configuration.get('mail_use_directory'):
+            continue
+
+        maildir = mailbox.Maildir(
+            appcfg.configuration.get('mail_directory'), create=False)
+
+        if not len(maildir):
+            return
+
+        middlewares = []
+
+        if force_tls:
+            middlewares.append(TLS(force=True))
+
+        if username:
+            middlewares.append(Auth(username, password))
+
+        postman = Postman(hostname, port, middlewares)
+
+        with postman.connection() as connection:
+
+            for filename in maildir.keys():
+                msg_str = maildir.get_file(filename).read().decode('utf-8')
+                msg = email.message_from_string(msg_str)
+
+                connection.sendmail(msg['From'], msg['To'], msg_str)
+                status, message = connection.noop()
+
+                if status == 250:
+                    maildir.remove(filename)
 
 
 @cli.command()
@@ -63,7 +128,7 @@ def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
 
     """
 
-    ctx = ctx.obj
+    context = ctx.obj
 
     if confirm:
         click.confirm(
@@ -86,10 +151,7 @@ def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
     fetched = set()
 
     # filter out namespaces on demand
-    for appcfg in ctx['config'].applications:
-
-        if ctx['namespace'] != '*' and appcfg.namespace != ctx['namespace']:
-            continue
+    for appcfg in context.appconfigs:
 
         if appcfg.configuration.get('disable_transfer'):
             print("Skipping {}, transfer disabled".format(appcfg.namespace))
@@ -201,18 +263,14 @@ def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
 def upgrade(ctx, dry_run):
     """ Upgrades all application instances of the given namespace(s). """
 
-    ctx = ctx.obj
+    context = ctx.obj
 
     update_path = '/' + uuid4().hex
 
     modules = list(get_upgrade_modules())
     tasks = get_tasks()
 
-    for appcfg in ctx['config'].applications:
-
-        # filter out namespaces on demand
-        if ctx['namespace'] != '*' and appcfg.namespace != ctx['namespace']:
-            continue
+    for appcfg in context.appconfigs:
 
         # have a custom update application so we can get a proper execution
         # context with a request and a session
