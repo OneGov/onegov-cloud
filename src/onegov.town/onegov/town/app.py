@@ -177,7 +177,7 @@ class TownApp(Framework):
             confirm,
             'js/jquery.datetimepicker.js',
             'js/common.js',
-            # filters='jsmin',
+            filters='jsmin',
             output='bundles/common.bundle.js'
         )
 
