@@ -5,7 +5,8 @@ from datetime import timedelta
 from itsdangerous import (
     BadSignature,
     SignatureExpired,
-    TimestampSigner
+    TimestampSigner,
+    URLSafeTimedSerializer
 )
 from more.webassets.core import IncludeRequest
 from morepath.security import NO_IDENTITY
@@ -421,3 +422,23 @@ class CoreRequest(IncludeRequest):
             signer.unsign(signed_value, max_age=self.app.csrf_time_limit)
         except (SignatureExpired, BadSignature):
             raise HTTPForbidden()
+
+    def new_url_safe_token(self, data, salt=None):
+        """ Returns a new URL safe token. A token can be deserialized
+        using :meth:`load_url_safe_token`.
+
+        """
+        serializer = URLSafeTimedSerializer(self.app.identity_secret)
+        return serializer.dumps(data, salt=salt)
+
+    def load_url_safe_token(self, data, salt=None, max_age=3600):
+        """ Deserialize a token created by :meth:`new_url_safe_token`.
+
+        If the token is invalid, None is returned.
+
+        """
+        serializer = URLSafeTimedSerializer(self.app.identity_secret)
+        try:
+            return serializer.loads(data, salt=salt, max_age=max_age)
+        except (SignatureExpired, BadSignature):
+            return None
