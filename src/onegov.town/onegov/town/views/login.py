@@ -17,7 +17,10 @@ from wtforms import StringField, PasswordField, validators
 class LoginForm(Form):
     """ Defines the login form for onegov town. """
 
-    email = StringField(_(u"Email Address"), [validators.InputRequired()])
+    email = StringField(
+        _(u"Email Address"),
+        [validators.InputRequired(), validators.Email()]
+    )
     password = PasswordField(_(u"Password"), [validators.InputRequired()])
 
     def get_identity(self, request):
@@ -75,8 +78,15 @@ def handle_login(self, request, form):
         Link(_("Login"), request.link(self, name='login'))
     ]
 
+    # todo: Nicer text? Use Link class?
+    retrieve_password = _(
+        u'Forgot your password? <a href="${url}">Reset your password</a>.',
+        mapping={'url': request.link(self, name='request-password')}
+    )
+
     return {
         'layout': layout,
+        'text': retrieve_password,
         'title': _(u'Login to ${town}', mapping={'town': self.name}),
         'form': form,
         'form_width': 'small'
