@@ -29,8 +29,6 @@ class CoreRequest(IncludeRequest):
 
     """
 
-    browser_session_changed = False
-
     def link_prefix(self):
         """ Override the `link_prefix` with the application base path provided
         by onegov.server, because the default link_prefix contains the
