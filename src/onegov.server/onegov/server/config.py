@@ -28,22 +28,22 @@ class Config(object):
             raise errors.ApplicationConflictError(
                 "Not all namespaces are unique")
 
-    @staticmethod
-    def from_yaml_file(yaml_file):
+    @classmethod
+    def from_yaml_file(cls, yaml_file):
         """ Load the given yaml file and return a new Configuration instance
         with the configuration values found in the yaml file.
 
         """
         with open(yaml_file, 'r') as f:
-            return Config(yaml.load(f.read()))
+            return cls(yaml.load(f.read()))
 
-    @staticmethod
-    def from_yaml_string(yaml_string):
+    @classmethod
+    def from_yaml_string(cls, yaml_string):
         """ Load the given yaml string and return a new Configuration instance
         with the configuration values found in the yaml string.
 
         """
-        return Config(yaml.load(yaml_string))
+        return cls(yaml.load(yaml_string))
 
 
 class ApplicationConfig(object):
