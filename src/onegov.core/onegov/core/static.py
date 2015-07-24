@@ -52,8 +52,8 @@ class StaticFile(object):
         # alias for morepath
         return self.path
 
-    @staticmethod
-    def from_application(app, absorb):
+    @classmethod
+    def from_application(cls, app, absorb):
         """ Absorbs all /static/* paths and returns :class:`StaticFile`
         instances with the path set to a subpath of
         :meth:`onegov.core.Framework.static_files`.
@@ -78,7 +78,7 @@ class StaticFile(object):
         if not os.path.isfile(path):
             return None
 
-        return StaticFile(os.path.relpath(path, start=app.static_files))
+        return cls(os.path.relpath(path, start=app.static_files))
 
 
 @Framework.path(model=StaticFile, path='/static', absorb=True)
