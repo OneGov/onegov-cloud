@@ -21,6 +21,6 @@ class Principal(object):
         self.canton = canton
         self.color = color
 
-    @staticmethod
-    def from_yaml(yaml_source):
-        return Principal(**yaml.load(yaml_source))
+    @classmethod
+    def from_yaml(cls, yaml_source):
+        return cls(**yaml.load(yaml_source))
