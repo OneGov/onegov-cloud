@@ -352,6 +352,7 @@ input[type=color] {
     .tile-image {
         @include smooth-edges;
 
+        background-position: center center;
         background-size: cover;
         display: block;
         height: 5rem;
