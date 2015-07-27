@@ -104,7 +104,12 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         return self._global_file_storage is not None
 
     def configure_application(self, **cfg):
-        """ Configures the application, supporting the following parameters:
+        """ Configures the application. This function calls all methods on
+        the current class which start with 'configure_', passing the
+        configuration as keyword arguments.
+
+        The core itself supports the following parameters. Additional
+        parameters are made available by extra 'configure_' methods.
 
         :dsn:
             The database connection to use. May be None.
@@ -231,6 +236,16 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         super(Framework, self).configure_application(**cfg)
 
+        members = sorted(
+            inspect.getmembers(self.__class__, callable),
+            key=lambda item: item[0]
+        )
+
+        for n, method in members:
+            if n.startswith('configure_') and n != 'configure_application':
+                method(self, **cfg)
+
+    def configure_dsn(self, **cfg):
         # certain namespaces are reserved for internal use:
         assert self.namespace not in {'global'}
 
@@ -240,8 +255,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             self.session_manager = SessionManager(
                 self.dsn, cfg.get('base', Base))
 
-        self.identity_secure = cfg.get('identity_secure', True)
-        self.identity_secret = cfg.get('identity_secret', new_uuid().hex)
+    def configure_memcached(self, **cfg):
 
         self.memcached_url = cfg.get('memcached_url', '127.0.0.1:11211')
         self.cache_connections = int(cfg.get('cache_connections', 100))
@@ -261,6 +275,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
                 'url': self.memcached_url
             }
 
+    def configure_secrets(self, **cfg):
+
+        self.identity_secure = cfg.get('identity_secure', True)
+        self.identity_secret = cfg.get('identity_secret', new_uuid().hex)
+
         self.csrf_secret = cfg.get('csrf_secret', new_uuid().hex)
         self.csrf_time_limit = int(cfg.get('csrf_time_limit', 1200))
 
@@ -272,6 +291,8 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         # you don't want to use the keys given in the example file
         assert self.csrf_secret != 'another-very-secret-key'
+
+    def configure_filestorage(self, **cfg):
 
         if 'filestorage' in cfg:
             filestorage_class = pydoc.locate(cfg.get('filestorage'))
@@ -285,9 +306,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         else:
             self._global_file_storage = None
 
+    def configure_debug(self, **cfg):
         self.always_compile_theme = cfg.get('always_compile_theme', False)
         self.sql_query_report = cfg.get('sql_query_report', False)
 
+    def configure_mail(self, **cfg):
         self.mail_host = cfg.get('mail_host', None)
         self.mail_port = cfg.get('mail_port', None)
         self.mail_force_tls = cfg.get('mail_force_tls', True)

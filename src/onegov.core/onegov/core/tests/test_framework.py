@@ -20,6 +20,26 @@ def test_set_application_id():
     assert app.schema == 'namespace-id'
 
 
+def test_configure():
+    class App(Framework):
+        configured = []
+
+        def configure_a(self, **cfg):
+            self.configured.append('a')
+
+        def configure_b(self, **cfg):
+            self.configured.append('b')
+
+        @property
+        def configure_c(self, **cfg):
+            self.configured.append('c')
+
+    app = App()
+    app.configure_application()
+
+    assert app.configured == ['a', 'b']
+
+
 def test_virtual_host_request():
     config = setup()
 
