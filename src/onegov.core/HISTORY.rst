@@ -8,6 +8,9 @@ Unreleased
   for onegov.core.Framework extensions to provide their own configuration).
   [href]
 
+- Adds functions to create and deserialize URL safe tokens.
+  [msom]
+
 0.4.14 (2015-07-17)
 ~~~~~~~~~~~~~~~~~~~
 
