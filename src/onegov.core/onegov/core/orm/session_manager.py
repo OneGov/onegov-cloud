@@ -44,7 +44,8 @@ class SessionManager(object):
     # defines the currently used schema (global variable)
     __current_schema = None
 
-    def __init__(self, dsn, base, engine_config={}, session_config={}):
+    def __init__(self, dsn, base,
+                 engine_config={}, session_config={}, on_set_search_path=None):
         """ Configures the data source name/dsn/database url and sets up the
         connection to the database.
 
@@ -70,6 +71,10 @@ class SessionManager(object):
             See: `<http://docs.sqlalchemy.org/en/latest/orm/session_api.html\
             #sqlalchemy.orm.session.sessionmaker>`
 
+        :on_set_search_path:
+            An optional function that receives the schema right after
+            'SET search_path TO' query is executed. Only used for testing.
+
         Example::
 
             from sqlalchemy.ext.declarative import declarative_base
@@ -87,29 +92,47 @@ class SessionManager(object):
         self.dsn = dsn
         self.base = base
         self.created_schemas = set()
+        self.on_set_search_path = on_set_search_path
 
         self.engine = create_engine(
             self.dsn,
             poolclass=SingletonThreadPool,
             **engine_config
         )
+        self.register_engine(self.engine)
+
         self.session_factory = scoped_session(
             sessionmaker(bind=self.engine, **session_config),
             scopefunc=self._scopefunc
         )
-
         zope.sqlalchemy.register(self.session_factory)
 
-        def activate_schema(conn, cursor, stmt, params, context, executemany):
-            if 'schema' in conn._execution_options:
-                schema = conn._execution_options['schema']
-            else:
-                schema = self.__current_schema
+    def _activate_schema(self,
+                         conn, cursor, stmt, params, context, executemany):
+        """ Processes before_cursor_execute events and forces the current
+        *global* schema to be used.
 
-            if schema is not None:
-                cursor.execute("SET search_path TO %s", (schema, ))
+        """
+        if 'schema' in conn._execution_options:
+            schema = conn._execution_options['schema']
+        else:
+            schema = self.__current_schema
 
-        event.listen(self.engine, "before_cursor_execute", activate_schema)
+        if schema is not None:
+            cursor.execute("SET search_path TO %s", (schema, ))
+
+            if self.on_set_search_path:
+                self.on_set_search_path(schema)
+
+    def register_engine(self, engine):
+        """ Takes the given engine and registers it with the *global* schema
+        switching mechanism. Again, this is *global*, so there can only be
+        one session manager and whatever it has set as the current schema, will
+        be enforced on *all* engines registered with it.
+
+        """
+
+        event.listen(engine, "before_cursor_execute", self._activate_schema)
 
     def _scopefunc(self):
         """ Returns the scope of the scoped_session used to create new

@@ -125,6 +125,63 @@ def test_session_scope(postgres_dsn):
     mgr.dispose()
 
 
+def test_register_engine(postgres_dsn, capsys):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text)
+
+    class CaptureSetPath(object):
+        schemas = []
+
+        def clear(self):
+            self.schemas = []
+
+        def on_set_search_path(self, schema):
+            self.schemas.append(schema)
+
+    set_path = CaptureSetPath()
+
+    mgr = SessionManager(
+        postgres_dsn, Base, engine_config={'echo': True},
+        on_set_search_path=set_path.on_set_search_path
+    )
+
+    # setting a new schema creates it
+    mgr.set_current_schema('foo')
+    stdout, stderr = capsys.readouterr()
+    created = sum(1 for l in stdout.split('\n') if 'CREATE SCHEMA "foo"' in l)
+    assert created == 1
+
+    # querying it results in the search path being set
+    set_path.clear()
+    mgr.session().query(Document).first()
+
+    assert set_path.schemas == ['foo']
+
+    # switching to a new schema creates a new schema
+    mgr.set_current_schema('bar')
+    stdout, stderr = capsys.readouterr()
+
+    created = sum(1 for l in stdout.split('\n') if 'CREATE SCHEMA "bar"' in l)
+    assert created == 1
+
+    # querying the new schema results in the search path being set
+    set_path.clear()
+    mgr.session().query(Document).first()
+
+    assert set_path.schemas == ['bar']
+
+    # setting an existing schema does not create a new schema
+    mgr.set_current_schema('foo')
+
+    created = sum(1 for l in stdout.split('\n') if 'CREATE SCHEMA "foo"' in l)
+    assert created == 0
+
+
 def test_orm_scenario(postgres_dsn):
     # test a somewhat complete ORM scenario in which create and read data
     # for different applications
