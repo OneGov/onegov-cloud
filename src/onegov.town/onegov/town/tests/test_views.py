@@ -3,6 +3,7 @@ import onegov.core
 import onegov.town
 import textwrap
 
+from lxml.html import document_fromstring
 from onegov.form import FormCollection
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
@@ -187,6 +188,58 @@ def test_login(town_app):
 
     links = index_page.pyquery('.bottom-links li:first-child a')
     assert links.text() == 'Login'
+
+
+def test_reset_password(town_app):
+    client = Client(town_app)
+
+    links = client.get('/').pyquery('.bottom-links li:first-child a')
+    assert links.text() == 'Login'
+    login_page = client.get(links.attr('href'))
+
+    request_page = login_page.click('Passwort zurücksetzen')
+    assert 'Passwort zurücksetzen' in request_page.text
+
+    request_page.form['email'] = 'someone@example.org'
+    assert 'someone@example.org' in request_page.form.submit().follow()
+    assert len(town_app.smtpserver.outbox) == 0
+
+    request_page.form['email'] = 'admin@example.org'
+    assert 'admin@example.org' in request_page.form.submit().follow()
+    assert len(town_app.smtpserver.outbox) == 1
+
+    message = town_app.smtpserver.outbox[0]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
+    link = list(document_fromstring(message).iterlinks())[0][2]
+    token = link.split('token=')[1]
+
+    reset_page = client.get(link)
+    assert token in reset_page.text
+
+    reset_page.form['email'] = 'someone_else@example.org'
+    reset_page.form['password'] = 'new_password'
+    reset_page = reset_page.form.submit()
+    assert "Ungültiger Addresse oder abgelaufener Link" in reset_page.text
+    assert token in reset_page.text
+
+    reset_page.form['email'] = 'admin@example.org'
+    reset_page.form['password'] = 'new_password'
+    assert "Passwort geändert" in reset_page.form.submit().follow().text
+
+    reset_page.form['email'] = 'admin@example.org'
+    reset_page.form['password'] = 'new_password'
+    reset_page = reset_page.form.submit()
+    assert "Ungültiger Addresse oder abgelaufener Link" in reset_page.text
+
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    login_page = login_page.form.submit()
+    assert "Unbekannter Benutzername oder falsches Passwort" in login_page.text
+
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'new_password'
+    assert "Sie wurden eingeloggt" in login_page.form.submit().follow().text
 
 
 def test_settings(town_app):

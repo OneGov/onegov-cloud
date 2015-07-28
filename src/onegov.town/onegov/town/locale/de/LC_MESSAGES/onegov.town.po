@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-16 10:06+0200\n"
+"POT-Creation-Date: 2015-07-28 15:15+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -270,6 +270,15 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
+msgid "Tickets:"
+msgstr ""
+
+msgid "Open"
+msgstr "Offen"
+
+msgid "Pending"
+msgstr "In Bearbeitung"
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
@@ -293,12 +302,6 @@ msgstr ""
 "Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und entfernen "
 "Sie das Häckchen im Feld \"Vor der Öffentlichkeit verstecken\"."
 
-msgid "Open"
-msgstr "Offen"
-
-msgid "Pending"
-msgstr "In Bearbeitung"
-
 msgid "Closed"
 msgstr "Abgeschlossen"
 
@@ -310,6 +313,17 @@ msgstr "Nächste Seite"
 
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
+
+msgid "Click the following link to set a new password:"
+msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
+
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
+msgid "If you don't want to change your password, you can ignore this email."
+msgstr ""
+"Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
+"möchten."
 
 msgid "Your ticket has been closed"
 msgstr "Ihr Ticket wurde geschlossen"
@@ -465,6 +479,10 @@ msgstr "Themen"
 msgid "Catalog A-Z"
 msgstr "Katalog A-Z"
 
+#, python-format
+msgid "Forgot your password? <a href=\"${url}\">Reset your password</a>."
+msgstr "Passwort vergessen?  <a href=\"${url}\">Passwort zurücksetzen</a>"
+
 msgid "Email Address"
 msgstr "E-Mail Adresse"
 
@@ -516,6 +534,25 @@ msgstr "Eine neue Person wurde hinzugefügt"
 
 msgid "New"
 msgstr "Neu"
+
+msgid "New Password"
+msgstr "Neues Passwort"
+
+#, python-format
+msgid ""
+"A password reset link has been sent to ${email}, provided an account exists "
+"for this email address."
+msgstr ""
+"Eine E-Mail wurde an ${email} gesendet (sofern die Adresse gültig ist)."
+
+msgid "Password changed."
+msgstr "Passwort geändert."
+
+msgid "Wrong username or password reset link not valid any more."
+msgstr "Ungültiger Addresse oder abgelaufener Link."
+
+msgid "Password reset"
+msgstr "Passwort zurücksetzen"
 
 msgid "Name"
 msgstr "Name"

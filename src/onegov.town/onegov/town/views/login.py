@@ -78,15 +78,14 @@ def handle_login(self, request, form):
         Link(_("Login"), request.link(self, name='login'))
     ]
 
-    # todo: Nicer text? Use Link class?
-    retrieve_password = _(
+    text = _(
         u'Forgot your password? <a href="${url}">Reset your password</a>.',
         mapping={'url': request.link(self, name='request-password')}
     )
 
     return {
         'layout': layout,
-        'text': retrieve_password,
+        'text': text,
         'title': _(u'Login to ${town}', mapping={'town': self.name}),
         'form': form,
         'form_width': 'small'

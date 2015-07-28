@@ -32,9 +32,10 @@ class RequestPasswordResetForm(Form):
         token = None
 
         if user is not None:
+            modified = user.modified.isoformat() if user.modified else ''
             token = request.new_url_safe_token({
                 'username': user.username,
-                'modified': user.modified.isoformat()
+                'modified': modified
             })
         return user, token
 
@@ -106,13 +107,15 @@ class PasswordResetForm(Form):
         if data and data['username'] == self.email.data:
             users = UserCollection(request.app.session())
             user = users.by_username(self.email.data)
-            if user and user.modified.isoformat() == data['modified']:
-                user.password = self.password.data
-                return morepath.Identity(
-                    userid=user.username,
-                    role=user.role,
-                    application_id=request.app.application_id
-                )
+            if user:
+                modified = user.modified.isoformat() if user.modified else ''
+                if modified == data['modified']:
+                    user.password = self.password.data
+                    return morepath.Identity(
+                        userid=user.username,
+                        role=user.role,
+                        application_id=request.app.application_id
+                    )
 
         return None
 
