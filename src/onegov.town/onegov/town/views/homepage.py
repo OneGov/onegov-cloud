@@ -103,7 +103,7 @@ def view_town(self, request):
         'title': self.name,
         'tiles': tiles,
         'news': request.exclude_invisible(
-            layout.root_pages[-1].news_query.limit(3).all(),
+            layout.root_pages[-1].news_query.limit(2).all(),
         ),
         'panels': [
             online_counter,
