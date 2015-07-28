@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Limits the news list on the homepage to two entries.
+  [href]
+
 - Adds the datetimepicker plugin.
   [msom]
 
