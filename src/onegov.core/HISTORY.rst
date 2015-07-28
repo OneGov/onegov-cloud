@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Gets rid of global state used by the session manager.
+  [href]
+
 - Adds the ability to define configurations in independent methods (allowing
   for onegov.core.Framework extensions to provide their own configuration).
   [href]
