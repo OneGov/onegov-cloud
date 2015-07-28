@@ -235,6 +235,17 @@ class SessionManager(object):
         else:
             return [r[0] for r in conn.execute(query).fetchall()]
 
+    def is_schema_found_on_database(self, schema):
+        """ Returns True if the given schema exists on the database. """
+
+        conn = self.engine.execution_options(schema=None)
+        result = conn.execute(text(
+            "SELECT EXISTS(SELECT 1 FROM information_schema.schemata "
+            "WHERE schema_name = :schema)"
+        ), schema=schema)
+
+        return result.first()[0]
+
     def ensure_schema_exists(self, schema):
         """ Makes sure the schema exists on the database. If it doesn't, it
         is created.
@@ -255,9 +266,10 @@ class SessionManager(object):
             #
             # this is the *only* place where this happens - if anyone
             # knows how to do this using sqlalchemy/psycopg2, come forward!
-            conn = self.engine.execution_options(schema=None)
-            conn.execute('CREATE SCHEMA IF NOT EXISTS "{}"'.format(schema))
-            conn.execute('COMMIT')
+            if not self.is_schema_found_on_database(schema):
+                conn = self.engine.execution_options(schema=None)
+                conn.execute('CREATE SCHEMA "{}"'.format(schema))
+                conn.execute('COMMIT')
 
             conn = self.engine.execution_options(schema=schema)
 
