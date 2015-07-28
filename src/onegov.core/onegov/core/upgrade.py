@@ -221,7 +221,6 @@ def register_modules(request, modules, tasks):
     """
 
     # add all modules and all their tasks
-
     session = request.app.session()
 
     for module, upgrade_module in modules:

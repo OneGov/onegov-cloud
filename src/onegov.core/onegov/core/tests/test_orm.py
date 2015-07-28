@@ -29,6 +29,63 @@ def test_is_valid_schema(postgres_dsn):
     assert mgr.is_valid_schema('my-schema')
 
 
+def test_independent_sessions(postgres_dsn):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'document'
+        id = Column(Integer, primary_key=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+
+    mgr.set_current_schema('foo')
+    s1 = mgr.session()
+
+    s1.add(Document())
+    s1.flush()
+
+    mgr.set_current_schema('bar')
+    s2 = mgr.session()
+
+    assert s1 is not s2
+
+    assert s1.query(Document).count() == 1
+    assert s2.query(Document).count() == 0
+
+    mgr.dispose()
+
+
+def test_independent_managers(postgres_dsn):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'document'
+        id = Column(Integer, primary_key=True)
+
+    one = SessionManager(postgres_dsn, Base)
+    two = SessionManager(postgres_dsn, Base)
+
+    one.set_current_schema('foo')
+    two.set_current_schema('foo')
+
+    assert one.session() is not two.session()
+    assert one.session() is one.session()
+    assert two.session() is two.session()
+
+    one.session().add(Document())
+    one.session().flush()
+
+    assert one.session().query(Document).count() == 1
+    assert two.session().query(Document).count() == 0
+
+    one.set_current_schema('bar')
+    one.session().info == {'schema': 'bar'}
+    two.session().info == {'schema': 'foo'}
+
+    one.dispose()
+    two.dispose()
+
+
 def test_create_schema(postgres_dsn):
     Base = declarative_base()
 
@@ -67,6 +124,8 @@ def test_create_schema(postgres_dsn):
 
     assert 'new' in existing_schemas()
     assert 'document' in schema_tables('new')
+
+    mgr.dispose()
 
 
 def test_schema_bound_session(postgres_dsn):
@@ -123,63 +182,6 @@ def test_session_scope(postgres_dsn):
     assert bar_session is bar_session_2
 
     mgr.dispose()
-
-
-def test_register_engine(postgres_dsn, capsys):
-    Base = declarative_base()
-
-    class Document(Base):
-        __tablename__ = 'documents'
-
-        id = Column(Integer, primary_key=True)
-        title = Column(Text)
-
-    class CaptureSetPath(object):
-        schemas = []
-
-        def clear(self):
-            self.schemas = []
-
-        def on_set_search_path(self, schema):
-            self.schemas.append(schema)
-
-    set_path = CaptureSetPath()
-
-    mgr = SessionManager(
-        postgres_dsn, Base, engine_config={'echo': True},
-        on_set_search_path=set_path.on_set_search_path
-    )
-
-    # setting a new schema creates it
-    mgr.set_current_schema('foo')
-    stdout, stderr = capsys.readouterr()
-    created = sum(1 for l in stdout.split('\n') if 'CREATE SCHEMA "foo"' in l)
-    assert created == 1
-
-    # querying it results in the search path being set
-    set_path.clear()
-    mgr.session().query(Document).first()
-
-    assert set_path.schemas == ['foo']
-
-    # switching to a new schema creates a new schema
-    mgr.set_current_schema('bar')
-    stdout, stderr = capsys.readouterr()
-
-    created = sum(1 for l in stdout.split('\n') if 'CREATE SCHEMA "bar"' in l)
-    assert created == 1
-
-    # querying the new schema results in the search path being set
-    set_path.clear()
-    mgr.session().query(Document).first()
-
-    assert set_path.schemas == ['bar']
-
-    # setting an existing schema does not create a new schema
-    mgr.set_current_schema('foo')
-
-    created = sum(1 for l in stdout.split('\n') if 'CREATE SCHEMA "foo"' in l)
-    assert created == 0
 
 
 def test_orm_scenario(postgres_dsn):
