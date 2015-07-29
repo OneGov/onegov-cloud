@@ -77,6 +77,7 @@ class SessionManager(object):
 
         self.engine = create_engine(
             self.dsn, poolclass=QueuePool, pool_size=5, max_overflow=5,
+            isolation_level='SERIALIZABLE',
             **engine_config)
         self.register_engine(self.engine)
 

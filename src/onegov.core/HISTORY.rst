@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Switch postgres isolation level to SERIALIZABLE for all sessions.
+  [href]
+
 0.4.15 (2015-07-29)
 ~~~~~~~~~~~~~~~~~~~
 
