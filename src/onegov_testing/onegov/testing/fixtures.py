@@ -48,6 +48,9 @@ def postgres_dsn(postgres):
         if schema in ('information_schema', 'public'):
             continue
 
+        # having a bad day because your test doesn't work if run with others?
+        # did you use a session manager? if yes, make sure to use mgr.dispose()
+        # before finishing your test, or use the sesion_manager fixture!
         engine.execute('DROP SCHEMA "{}" CASCADE'.format(schema))
 
     engine.raw_connection().invalidate()
