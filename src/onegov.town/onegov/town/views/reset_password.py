@@ -95,7 +95,10 @@ class PasswordResetForm(Form):
         _(u"Email Address"),
         [validators.InputRequired(), validators.Email()]
     )
-    password = PasswordField(_(u"New Password"), [validators.InputRequired()])
+    password = PasswordField(
+        _(u"New Password"),
+        [validators.InputRequired(), validators.Length(min=8)]
+    )
     token = HiddenField()
 
     def get_identity(self, request):

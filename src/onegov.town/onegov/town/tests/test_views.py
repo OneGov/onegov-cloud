@@ -224,6 +224,12 @@ def test_reset_password(town_app):
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
+    reset_page.form['password'] = '1234'
+    reset_page = reset_page.form.submit()
+    assert "Feld muss mindestens 8 Zeichen beinhalten" in reset_page.text
+    assert token in reset_page.text
+
+    reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
     assert u"Passwort geändert" in reset_page.form.submit().follow().text
 
