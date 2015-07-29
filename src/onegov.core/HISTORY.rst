@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.15 (2015-07-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Gets rid of global state used by the session manager.
   [href]
