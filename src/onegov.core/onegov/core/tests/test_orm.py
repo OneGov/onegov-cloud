@@ -55,42 +55,6 @@ def test_independent_sessions(postgres_dsn):
     mgr.dispose()
 
 
-def test_readonly_transactions(postgres_dsn):
-    Base = declarative_base()
-
-    class Document(Base):
-        __tablename__ = 'document'
-        id = Column(Integer, primary_key=True)
-
-    mgr = SessionManager(postgres_dsn, Base)
-    mgr.set_current_schema('foo')
-
-    with pytest.raises(sqlalchemy.exc.InternalError):
-        with mgr.readonly_transactions():
-            current_isolation = mgr.session().execute(
-                "select current_setting('transaction_isolation'); ")
-
-            assert current_isolation.first() == ('serializable',)
-            mgr.session().add(Document())
-
-            session = mgr.session()
-            assert session is mgr.session()
-
-            transaction.commit()
-
-    transaction.abort()
-
-    assert not mgr._use_readonly_transactions
-
-    # readonly transactions are inside their own scope
-    assert session is not mgr.session()
-
-    mgr.session().add(Document())
-    transaction.commit()
-
-    mgr.dispose()
-
-
 def test_independent_managers(postgres_dsn):
     Base = declarative_base()
 

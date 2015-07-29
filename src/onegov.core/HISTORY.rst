@@ -4,9 +4,6 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Adds the ability to run transactions in read only mode.
-  [href]
-
 - Switch postgres isolation level to SERIALIZABLE for all sessions.
   [href]
 
