@@ -187,6 +187,13 @@ class TownApp(Framework):
             output='bundles/common.bundle.css',
         )
 
+        check_password = Bundle(
+            'js/zxcvbn.js',
+            'js/check_password.js',
+            filters='jsmin',
+            output='bundles/check_password.bundle.js'
+        )
+
         return {
             'common': common,
             'common_css': common_css,
@@ -194,7 +201,8 @@ class TownApp(Framework):
             'redactor': redactor,
             'redactor_theme': redactor_theme,
             'editor': editor,
-            'code_editor': code_editor
+            'code_editor': code_editor,
+            'check_password': check_password
         }
 
 

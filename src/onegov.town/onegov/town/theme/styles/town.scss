@@ -197,6 +197,11 @@ form {
         margin-left: 2em;
     }
 
+    input[type=password] + meter {
+        margin: -0.5rem 0 1rem 0;
+        width: 100%;
+    }
+
     /*
         Ace code editor, which you don't want to touch. Huge pita to get to
         work right with custom styling (it'll look like it's working, but

@@ -128,6 +128,9 @@ class PasswordResetForm(Form):
     form=PasswordResetForm
 )
 def handle_password_reset(self, request, form):
+    request.include('common')
+    request.include('check_password')
+
     if form.submitted(request):
         identity = form.get_identity(request)
         if identity is not None:
