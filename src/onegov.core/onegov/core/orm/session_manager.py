@@ -1,7 +1,9 @@
 import threading
 import re
+import weakref
 import zope.sqlalchemy
 
+from contextlib import contextmanager
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
@@ -75,6 +77,8 @@ class SessionManager(object):
         self.created_schemas = set()
         self.current_schema = None
 
+        self._use_readonly_transactions = False
+
         self.engine = create_engine(
             self.dsn, poolclass=QueuePool, pool_size=5, max_overflow=5,
             isolation_level='SERIALIZABLE',
@@ -85,7 +89,7 @@ class SessionManager(object):
             sessionmaker(bind=self.engine, **session_config),
             scopefunc=self._scopefunc
         )
-        zope.sqlalchemy.register(self.session_factory)
+        self.register_session_factory(self.session_factory)
 
     def register_engine(self, engine):
         """ Takes the given engine and registers it with the schema
@@ -98,7 +102,7 @@ class SessionManager(object):
         """
 
         @event.listens_for(engine, "before_cursor_execute")
-        def _activate_schema(
+        def activate_schema(
             conn, cursor, statement, parameters, context, executemany
         ):
             """ Share the 'info' dictionary of Session with Connection
@@ -118,6 +122,51 @@ class SessionManager(object):
             if schema is not None:
                 cursor.execute("SET search_path TO %s", (schema, ))
 
+    def register_session_factory(self, session_factory):
+        """ Takes the given session factory and sets it up with the read only
+        transaction mechanism and registers it with zope.sqlalchemy.
+
+        """
+        zope.sqlalchemy.register(self.session_factory)
+
+        @event.listens_for(session_factory, "after_begin")
+        def set_transaction_characteristics(session, transaction, connection):
+            if self._use_readonly_transactions:
+                connection.execute('SET TRANSACTION READ ONLY DEFERRABLE')
+            else:
+                connection.execute('SET TRANSACTION READ WRITE')
+
+    @contextmanager
+    def readonly_transactions(self, use=True):
+        """ Activates readonly transaction mode for the current sessions.
+        Note that this only works if this is done before any query is executed.
+
+        Use as follows::
+
+            with session_manager.readonly_transactions():
+                session = session_manager.session()  # this session is readonly
+
+        Note that when exiting the context, the sessions created inside the
+        context do not change::
+
+            with session_manager.readonly_transactions():
+                session = session_manager.session()  # this session is readonly
+
+            session # this is till readonly
+            session_manager.session() # this is a new session (not readonly)
+
+        Because of this, readonly sessions and writable sessions do not share
+        state. But you should not be mixing them anyway. If you do, be sure
+        to commit or abort your transactions first.
+
+        """
+        previous_value = self._use_readonly_transactions
+        self._use_readonly_transactions = use
+        try:
+            yield
+        finally:
+            self._use_readonly_transactions = previous_value
+
     def _scopefunc(self):
         """ Returns the scope of the scoped_session used to create new
         sessions. Relies on self.current_schema being set before the
@@ -128,7 +177,11 @@ class SessionManager(object):
         schema.
 
         """
-        return (threading.current_thread(), self.current_schema)
+        return (
+            threading.current_thread(),
+            self.current_schema,
+            self._use_readonly_transactions
+        )
 
     def dispose(self):
         """ Closes the connection to the server and cleans up. This only needed
@@ -190,7 +243,7 @@ class SessionManager(object):
     def bind_session(self, session):
         """ Bind the session to the current schema. """
         session.info['schema'] = self.current_schema
-        session.connection().info['session'] = session
+        session.connection().info['session'] = weakref.proxy(session)
 
         return session
 
