@@ -197,8 +197,8 @@ def test_reset_password(town_app):
     assert links.text() == 'Login'
     login_page = client.get(links.attr('href'))
 
-    request_page = login_page.click('Passwort zurücksetzen')
-    assert 'Passwort zurücksetzen' in request_page.text
+    request_page = login_page.click(u'Passwort zurücksetzen')
+    assert u'Passwort zurücksetzen' in request_page.text
 
     request_page.form['email'] = 'someone@example.org'
     assert 'someone@example.org' in request_page.form.submit().follow()
@@ -220,17 +220,17 @@ def test_reset_password(town_app):
     reset_page.form['email'] = 'someone_else@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert "Ungültiger Addresse oder abgelaufener Link" in reset_page.text
+    assert u"Ungültiger Addresse oder abgelaufener Link" in reset_page.text
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
-    assert "Passwort geändert" in reset_page.form.submit().follow().text
+    assert u"Passwort geändert" in reset_page.form.submit().follow().text
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert "Ungültiger Addresse oder abgelaufener Link" in reset_page.text
+    assert u"Ungültiger Addresse oder abgelaufener Link" in reset_page.text
 
     login_page.form['email'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
