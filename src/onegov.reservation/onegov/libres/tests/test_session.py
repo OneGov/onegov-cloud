@@ -6,6 +6,7 @@ from onegov.libres import LibresIntegration
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
+from uuid import uuid4
 
 
 def test_setup_database(postgres_dsn):
@@ -58,6 +59,7 @@ def test_setup_database(postgres_dsn):
 
     assert tables == {
         'documents',
+        'resources',
         'allocations',
         'reserved_slots',
         'reservations'
@@ -87,12 +89,16 @@ def test_libres_context(postgres_dsn):
 
     assert tables == {
         'allocations',
+        'resources',
         'reserved_slots',
         'reservations'
     }
 
-    scheduler = new_scheduler(app.libres_context, 'test', 'Europe/Zurich')
+    scheduler = new_scheduler(app.libres_context, uuid4(), 'Europe/Zurich')
     assert scheduler.managed_allocations().count() == 0
 
     scheduler.allocate((datetime(2015, 7, 30, 11), datetime(2015, 7, 30, 12)))
     assert scheduler.managed_allocations().count() == 1
+
+    assert app.session_manager is app.libres_context.get_service(
+        'session_provider')

@@ -1,5 +1,6 @@
 from libres.context.registry import create_default_registry
 from libres.db.models import ORMBase
+from uuid import UUID
 
 
 class LibresIntegration(object):
@@ -40,9 +41,23 @@ class LibresIntegration(object):
         self.session_manager.bases.append(ORMBase)
 
         self.libres_registry = create_default_registry()
+        self.libres_context = self.libres_context_from_session_manager(
+            self.libres_registry,
+            self.session_manager
+        )
 
-        self.libres_context = self.libres_registry.register_context(
-            'onegov.libres')
+    @staticmethod
+    def libres_context_from_session_manager(registry, session_manager):
+        context = registry.register_context('onegov.libres')
+        context.set_service('session_provider', lambda ctx: session_manager)
 
-        self.libres_context.set_service(
-            'session_provider', lambda ctx: self.session_manager)
+        # onegov.libres uses uuids for the resources, so we don't need to
+        # generate anything, we can just reuse the id (which is passed as the
+        # name)
+        def uuid_generator(name):
+            assert isinstance(name, UUID)
+            return name
+
+        context.set_service('uuid_generator', lambda ctx: uuid_generator)
+
+        return context
