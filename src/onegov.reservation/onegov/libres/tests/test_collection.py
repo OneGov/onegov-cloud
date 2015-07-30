@@ -1,7 +1,7 @@
 from onegov.libres import ResourceCollection
 
 
-def test_resource_add(libres_context):
+def test_resource_collection(libres_context):
 
     collection = ResourceCollection(libres_context)
     assert collection.query().count() == 0
@@ -14,3 +14,7 @@ def test_resource_add(libres_context):
     assert collection.query().count() == 1
     assert hasattr(collection.by_id(resource.id), 'scheduler')
     assert hasattr(collection.by_name('executive-lounge'), 'scheduler')
+
+    collection.delete(collection.by_id(resource.id))
+
+    assert collection.query().count() == 0

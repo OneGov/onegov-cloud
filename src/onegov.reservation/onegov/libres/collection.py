@@ -55,3 +55,7 @@ class ResourceCollection(object):
     def by_name(self, name):
         return self.bind_scheduler(
             self.query().filter(Resource.name == name).first())
+
+    def delete(self, resource):
+        self.session.delete(resource)
+        self.session.flush()
