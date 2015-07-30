@@ -56,6 +56,8 @@ def test_scheduler_boundaries(libres_context):
 def test_delete_cascade(session_manager, libres_context):
     resource = Resource(id=uuid4())
     resource.timezone = 'Europe/Zurich'
+    resource.name = 'test'
+    resource.title = 'Test'
 
     session = session_manager.session()
     session.add(resource)

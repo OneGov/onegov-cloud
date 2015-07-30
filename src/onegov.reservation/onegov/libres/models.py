@@ -26,8 +26,14 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
 
     __tablename__ = 'resources'
 
-    #: the unique id, part of the url
+    #: the unique id
     id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: a nice id for the url, readable by humans
+    name = Column(Text, primary_key=False, unique=True)
+
+    #: the title of the resource
+    title = Column(Text, primary_key=False, nullable=False)
 
     #: the timezone this resource resides in
     timezone = Column(Text, nullable=False)
