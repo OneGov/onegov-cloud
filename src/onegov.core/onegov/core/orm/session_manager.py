@@ -1,5 +1,6 @@
 import threading
 import re
+import weakref
 import zope.sqlalchemy
 
 from sqlalchemy import create_engine, event, text
@@ -189,7 +190,7 @@ class SessionManager(object):
     def bind_session(self, session):
         """ Bind the session to the current schema. """
         session.info['schema'] = self.current_schema
-        session.connection().info['session'] = session
+        session.connection().info['session'] = weakref.proxy(session)
 
         return session
 

@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Make sure we don't get a circulare dependency between the connection and
+  the session.
+  [href]
+
 - Adds the ability to define multiple bases on the session manager.
   [href]
 
