@@ -44,6 +44,13 @@ class SessionManager(object):
         :base:
             Declarative base used to define the SQLAlchemy database models.
 
+            Extra bases may be added to the session manager after __init__::
+
+                mgr.bases.append(MyBase)
+
+            The tables in these additional schemas are created on the schema
+            alongside the primary base.
+
         :engine_config:
             Additional configuration passed to SQLAlchemy's `create_engine`.
 
@@ -55,14 +62,6 @@ class SessionManager(object):
 
             See: `<http://docs.sqlalchemy.org/en/latest/orm/session_api.html\
             #sqlalchemy.orm.session.sessionmaker>`
-
-        Example::
-
-            from sqlalchemy.ext.declarative import declarative_base
-
-            Base = declarative_base()
-            manager.setup(
-                'postgres://user:password@localhost:5432/dbname', Base)
 
         Note, to connect to another database you need to create a new
         SessionManager instance.
