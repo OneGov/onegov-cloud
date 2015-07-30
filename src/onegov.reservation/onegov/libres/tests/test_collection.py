@@ -9,11 +9,11 @@ def test_resource_collection(libres_context):
     resource = collection.add('Executive Lounge', 'Europe/Zurich')
     assert resource.name == 'executive-lounge'
     assert resource.timezone == 'Europe/Zurich'
-    assert resource.scheduler.resource == resource.id
+    assert resource.get_scheduler(libres_context).resource == resource.id
 
     assert collection.query().count() == 1
-    assert hasattr(collection.by_id(resource.id), 'scheduler')
-    assert hasattr(collection.by_name('executive-lounge'), 'scheduler')
+    assert collection.by_id(resource.id)
+    assert collection.by_name('executive-lounge')
 
     collection.delete(collection.by_id(resource.id))
 

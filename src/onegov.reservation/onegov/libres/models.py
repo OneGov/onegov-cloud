@@ -44,6 +44,15 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
     #: the last hour shown on the calendar
     last_hour = Column(Integer, nullable=False, default=18)
 
+    #: the type of the resource, this can be used to create custom polymorphic
+    #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
+    #: orm/extensions/declarative/inheritance.html>`_.
+    type = Column(Text, nullable=True)
+
+    __mapper_args__ = {
+        "polymorphic_on": 'type'
+    }
+
     allocations = relationship(
         Allocation,
         cascade="all, delete-orphan",
