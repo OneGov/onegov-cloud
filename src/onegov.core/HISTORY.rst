@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.16 (2015-07-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Make sure we don't get a circulare dependency between the connection and
   the session.
