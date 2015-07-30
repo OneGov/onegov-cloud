@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-28 15:15+0200\n"
+"POT-Creation-Date: 2015-07-30 16:12+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -286,6 +286,12 @@ msgstr ""
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
+msgid "Forgot your password?"
+msgstr "Haben Sie Ihr Passwort vergessen?"
+
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
 msgid "Submit"
 msgstr "Absenden"
 
@@ -316,9 +322,6 @@ msgstr "Guten Tag"
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
-
-msgid "Reset password"
-msgstr "Passwort zurücksetzen"
 
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
@@ -479,10 +482,6 @@ msgstr "Themen"
 msgid "Catalog A-Z"
 msgstr "Katalog A-Z"
 
-#, python-format
-msgid "Forgot your password? <a href=\"${url}\">Reset your password</a>."
-msgstr "Passwort vergessen?  <a href=\"${url}\">Passwort zurücksetzen</a>"
-
 msgid "Email Address"
 msgstr "E-Mail Adresse"
 
@@ -622,3 +621,6 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
+
+#~ msgid "Forgot your password? <a href=\"${url}\">Reset your password</a>."
+#~ msgstr "Passwort vergessen?  <a href=\"${url}\">Passwort zurücksetzen</a>"

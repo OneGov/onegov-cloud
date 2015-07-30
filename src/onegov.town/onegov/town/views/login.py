@@ -44,7 +44,7 @@ class LoginForm(Form):
 
 
 @TownApp.form(
-    model=Town, name='login', template='form.pt', permission=Public,
+    model=Town, name='login', template='login.pt', permission=Public,
     form=LoginForm
 )
 def handle_login(self, request, form):
@@ -78,17 +78,11 @@ def handle_login(self, request, form):
         Link(_("Login"), request.link(self, name='login'))
     ]
 
-    text = _(
-        u'Forgot your password? <a href="${url}">Reset your password</a>.',
-        mapping={'url': request.link(self, name='request-password')}
-    )
-
     return {
         'layout': layout,
-        'text': text,
+        'password_reset_link': request.link(self, name='request-password'),
         'title': _(u'Login to ${town}', mapping={'town': self.name}),
-        'form': form,
-        'form_width': 'small'
+        'form': form
     }
 
 
