@@ -215,7 +215,7 @@ class DefaultLayout(Layout):
     @cached_property
     def root_pages(self):
         query = PageCollection(self.app.session()).query()
-        query = query.order_by(desc(Page.type), Page.name)
+        query = query.order_by(desc(Page.type), Page.title)
         query = query.filter(Page.parent_id == None)
 
         return self.request.exclude_invisible(query.all())
@@ -278,7 +278,7 @@ class AdjacencyListLayout(DefaultLayout):
     def get_sidebar(self, type=None):
         """ Yields the sidebar for the given adjacency list item. """
         query = self.model.siblings.filter(self.model.__class__.type == type)
-        query = query.order_by(self.model.__class__.name)
+        query = query.order_by(self.model.__class__.title)
 
         for item in self.request.exclude_invisible(query.all()):
             url = self.request.link(item)
@@ -290,7 +290,7 @@ class AdjacencyListLayout(DefaultLayout):
 
                 children = sorted(
                     self.request.exclude_invisible(self.model.children),
-                    key=lambda c: c.name
+                    key=lambda c: c.title
                 )
 
                 for item in children:
