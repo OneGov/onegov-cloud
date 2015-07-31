@@ -4,9 +4,6 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Correctly sort the the pages even if the title has changed.
-  [href]
-
 - Limits the news list on the homepage to two entries.
   [href]
 

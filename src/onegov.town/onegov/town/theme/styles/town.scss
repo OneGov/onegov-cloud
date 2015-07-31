@@ -197,6 +197,11 @@ form {
         margin-left: 2em;
     }
 
+    input[type=password] + meter {
+        margin: -0.5rem 0 1rem 0;
+        width: 100%;
+    }
+
     /*
         Password quality meter
     */

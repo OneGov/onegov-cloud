@@ -78,9 +78,14 @@ def handle_login(self, request, form):
         Link(_("Login"), request.link(self, name='login'))
     ]
 
+    text = _(
+        u'Forgot your password? <a href="${url}">Reset your password</a>.',
+        mapping={'url': request.link(self, name='request-password')}
+    )
+
     return {
         'layout': layout,
-        'password_reset_link': request.link(self, name='request-password'),
+        'text': text,
         'title': _(u'Login to ${town}', mapping={'town': self.name}),
         'form': form
     }

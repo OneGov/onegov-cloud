@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-30 16:12+0200\n"
+"POT-Creation-Date: 2015-07-28 15:15+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -323,6 +323,9 @@ msgstr "Guten Tag"
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
 
+msgid "Reset password"
+msgstr "Passwort zurücksetzen"
+
 msgid "If you don't want to change your password, you can ignore this email."
 msgstr ""
 "Sie können dieses E-Mail ignorieren, falls Sie Ihr Passwort nicht ändern "
@@ -481,6 +484,10 @@ msgstr "Themen"
 
 msgid "Catalog A-Z"
 msgstr "Katalog A-Z"
+
+#, python-format
+msgid "Forgot your password? <a href=\"${url}\">Reset your password</a>."
+msgstr "Passwort vergessen?  <a href=\"${url}\">Passwort zurücksetzen</a>"
 
 msgid "Email Address"
 msgstr "E-Mail Adresse"
