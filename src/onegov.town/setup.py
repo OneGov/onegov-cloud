@@ -48,6 +48,7 @@ setup(
         'onegov.user',
         'pillow',
         'purl',
+        'python-dateutil',
         'python-magic',
         'pytz',
         'translationstring',

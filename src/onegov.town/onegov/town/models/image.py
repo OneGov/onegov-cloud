@@ -3,6 +3,7 @@
 import PIL
 
 from collections import OrderedDict
+from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
 from datetime import date
 from itertools import groupby
@@ -48,47 +49,49 @@ class ImageCollection(FileCollection):
         for filename, info in images:
             yield Image(filename, info)
 
-    def grouped_files(self):
+    def grouped_files(self, today=None):
         """ Returns the :class:`~onegov.town.model.Image` instances in this
         collection grouped by natural language dates.
         """
-        prev_month = lambda x: datetime((x.month - 2) // 12 + x.year,
-                                        (x.month - 2) % 12 + 1, 1)
-
-        today = date.today()
+        if today is None:
+            today = date.today()
         this_month = datetime(today.year, today.month, 1)
-        last_month = prev_month(this_month)
-
-        ranges = OrderedDict()
-        # todo: recent ?
-        # todo: last week ?
-        ranges[_('This month')] = (this_month, datetime.now())
-        ranges[_('Last month')] = (last_month,
-                                this_month-timedelta(microseconds=1))
-        # todo: older months by names?
-        # todo: older years?
-
-        # group by date
-        def keyfunc(x):
-            # todo: this will probably suck for many files/ranges, could be
-            #       one reason to implement ORM backup
-            for key in ranges:
-                # todo: the 'created_time' seems to be wrong (OSX?)
-                if ranges[key][0] < x.info['modified_time'] < ranges[key][1]:
-                    return key
-            return _('Older')
-        groups = [
-            [group, [image for image in images]]
-            for group, images in groupby(self.files, keyfunc)
+        ranges = [
+            [_('This month'), this_month],
+            [_('Last month'), this_month - relativedelta(months=1)],
+            [_('This year'), datetime(today.year, 1, 1)],
+            [_('Last year'), datetime(today.year - 1, 1, 1)],
+            [_('Older'), datetime(today.year - 2, 1, 1)],
         ]
+        ranges = sorted(ranges, reverse=True, key=lambda x: x[1])
+        images = sorted(
+            self.files, reverse=True, key=lambda x: x.info['modified_time']
+        )
 
-        # sort by ranges
-        keys = list(ranges.keys()) + [_('Older')]
+        # iterate over all images and append the indexes to the ranges
+        last_index = 0
+        range_index = 0
+        for index, image in enumerate(images):
+            timestamp = image.info['modified_time']
+            if timestamp < ranges[range_index][1]:
+                ranges[range_index].append(last_index)
+                ranges[range_index].append(index)
+                last_index = index
 
-        def sortfunc(x):
-            return keys.index(x[0])
-        groups = sorted(groups, key=sortfunc)
+                # skip to next possible range
+                range_index = len(ranges)
+                for next_range in ranges:
+                    if timestamp < next_range[1]:
+                        range_index = ranges.index(next_range) + 1
+                if range_index >= len(ranges):
+                    break
+        ranges[-1].append(last_index)
+        ranges[-1].append(len(images))
 
+        groups = []
+        for range in ranges:
+            if len(range) == 4 and range[2] != range[3]:
+                groups.append([range[0], images[range[2]:range[3]]])
         return groups
 
     @property

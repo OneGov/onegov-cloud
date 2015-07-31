@@ -13,6 +13,9 @@ Unreleased
 - Add retrieve password functionality.
   [msom]
 
+- Group images by dates.
+  [msom]
+
 0.2.6 (2015-07-16)
 ~~~~~~~~~~~~~~~~~~~
 
