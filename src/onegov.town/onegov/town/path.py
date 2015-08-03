@@ -1,5 +1,14 @@
 """ Contains the paths to the different models served by onegov.town. """
 
+from onegov.form import (
+    FormDefinition,
+    FormCollection,
+    FormSubmissionFile,
+    CompleteFormSubmission,
+    PendingFormSubmission
+)
+from onegov.libres import ResourceCollection
+from onegov.libres.models import Resource
 from onegov.town.app import TownApp
 from onegov.town.models import (
     Editor,
@@ -11,13 +20,6 @@ from onegov.town.models import (
     Thumbnail,
     Topic,
     Town
-)
-from onegov.form import (
-    FormDefinition,
-    FormCollection,
-    FormSubmissionFile,
-    CompleteFormSubmission,
-    PendingFormSubmission
 )
 from onegov.page import PageCollection
 from onegov.people import Person, PersonCollection
@@ -125,3 +127,8 @@ def get_ticket(app, handler_code, id):
 @TownApp.path(model=TicketCollection, path='/tickets')
 def get_tickets(app, page=0, state='open'):
     return TicketCollection(app.session(), page, state)
+
+
+@TownApp.path(model=Resource, path='/reservationen/{name}')
+def get_resource(app, name):
+    return ResourceCollection(app.libres_context).by_name(name)

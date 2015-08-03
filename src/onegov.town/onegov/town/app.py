@@ -188,6 +188,22 @@ class TownApp(Framework, LibresIntegration):
             output='bundles/common.bundle.css',
         )
 
+        fullcalendar = Bundle(
+            'js/moment.js',
+            'js/moment.de.js',
+            'js/fullcalendar.js',
+            'js/fullcalendar.de.js',
+            'js/fullcalendar_custom.js',
+            filters='jsmin',
+            output='bundles/fullcalendar.bundle.js'
+        )
+
+        fullcalendar_css = Bundle(
+            'css/fullcalendar.css',
+            filters='cssmin',
+            output='bundles/fullcalendar.bundle.css'
+        )
+
         check_password = Bundle(
             'js/zxcvbn.js',
             'js/check_password.js',
@@ -203,7 +219,9 @@ class TownApp(Framework, LibresIntegration):
             'redactor_theme': redactor_theme,
             'editor': editor,
             'code_editor': code_editor,
-            'check_password': check_password
+            'check_password': check_password,
+            'fullcalendar': fullcalendar,
+            'fullcalendar_css': fullcalendar_css
         }
 
 

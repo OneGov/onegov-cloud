@@ -201,7 +201,7 @@ form {
         Password quality meter
     */
     meter {
-        -webkit-appearance: none; 
+        -webkit-appearance: none;
         background: $input-border-color !important;
         border: 0;
         height: 10px;
@@ -1084,5 +1084,44 @@ tr.ticket:hover {
 
     a {
         color: $white;
+    }
+}
+
+
+/*
+    Fullcalendar Integration
+*/
+
+.calendar {
+
+    table {
+        margin-bottom: 0;
+
+        .fc-today {
+            background: $yellow-pastel;
+        }
+
+        .fc-day-header,
+        .fc-day-number {
+            font-size: .9em;
+        }
+
+    }
+
+    .fc button,
+    .fc-button {
+        @include button(
+            $padding: $button-tny,
+            $bg: $primary-color
+        );
+        background-image: none;
+        box-shadow: none;
+        font-size: .9rem;
+        height: 2.25rem;
+        text-shadow: none;
+
+        .fc-state-disabled {
+            background: $secondary-color;
+        }
     }
 }

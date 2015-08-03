@@ -34,5 +34,5 @@ def test_initial_content(town_app):
     resources = {r.name: r.type for r in resources}
 
     assert resources == {
-        'ga-tageskarten': 'daypass'
+        'ga-tageskarte': 'daypass'
     }

@@ -570,3 +570,19 @@ class TicketLayout(DefaultLayout):
                 ))
 
             return links
+
+
+class ResourceLayout(DefaultLayout):
+
+    def __init__(self, model, request):
+        super(ResourceLayout, self).__init__(model, request)
+
+        self.request.include('fullcalendar')
+        self.request.include('fullcalendar_css')
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_(self.model.title), self.request.link(self.model))
+        ]

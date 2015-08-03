@@ -121,8 +121,8 @@ def add_builtin_forms(session):
 def add_resources(libres_context):
     resource = ResourceCollection(libres_context)
     resource.add(
-        "GA Tageskarten",
+        "GA Tageskarte",
         'Europe/Zurich',
         type='daypass',
-        name='ga-tageskarten'
+        name='ga-tageskarte'
     )
