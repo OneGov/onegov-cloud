@@ -84,9 +84,10 @@ class ImageCollection(FileCollection):
                     if timestamp < next_range[1]:
                         range_index = ranges.index(next_range) + 1
                 if range_index >= len(ranges):
+                    range_index = len(ranges) - 1
                     break
-        ranges[-1].append(last_index)
-        ranges[-1].append(len(images))
+        ranges[range_index].append(last_index)
+        ranges[range_index].append(len(images))
 
         groups = []
         for range in ranges:

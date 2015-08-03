@@ -110,8 +110,44 @@ def test_image_grouping(town_app):
         groups = ImageCollection(town_app).grouped_files(today=today)
         assert groups[0][0] == 'This month'
         assert groups[0][1] == images[0:1]
-        assert groups[1][0] == 'Older'
+        assert groups[1][0] == 'This year'
         assert groups[1][1] == images[1:]
+
+    with patch('onegov.town.models.ImageCollection.files') as files:
+        today = date(2008, 8, 8)
+
+        images = [
+            MockImage(datetime(2008, 8, 1, 0, 00)),  # this month
+        ]
+        files.__get__ = Mock(return_value=images)
+
+        groups = ImageCollection(town_app).grouped_files(today=today)
+        assert groups[0][0] == 'This month'
+        assert groups[0][1] == images[0:1]
+
+    with patch('onegov.town.models.ImageCollection.files') as files:
+        today = date(2008, 8, 8)
+
+        images = [
+            MockImage(datetime(2008, 7, 1, 0, 00)),  # last month
+        ]
+        files.__get__ = Mock(return_value=images)
+
+        groups = ImageCollection(town_app).grouped_files(today=today)
+        assert groups[0][0] == 'Last month'
+        assert groups[0][1] == images[0:1]
+
+    with patch('onegov.town.models.ImageCollection.files') as files:
+        today = date(2008, 8, 8)
+
+        images = [
+            MockImage(datetime(2002, 7, 1, 0, 00)),  # older
+        ]
+        files.__get__ = Mock(return_value=images)
+
+        groups = ImageCollection(town_app).grouped_files(today=today)
+        assert groups[0][0] == 'Older'
+        assert groups[0][1] == images[0:1]
 
     with patch('onegov.town.models.ImageCollection.files') as files:
         today = date(2008, 1, 8)
