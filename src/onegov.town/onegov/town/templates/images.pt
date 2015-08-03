@@ -13,7 +13,7 @@
             <div class="small-12 columns">
                 <h2 i18n:translate="">All Images</h2>
                 <tal:block tal:condition="image_groups" tal:repeat="group image_groups">
-                    <h3>${group[0]}</h3>
+                    <h3 i18n:translate="">${group[0]}</h3>
                     <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
                         <li tal:repeat="image group[1]" id="image-${repeat.image.index}" class="image-box">
                             <a class="th" href="${image.url}" tal:condition="image">

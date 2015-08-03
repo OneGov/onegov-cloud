@@ -36,8 +36,11 @@ def view_get_image_collection(self, request):
 @TownApp.json(model=ImageCollection, permission=Private, name='json')
 def view_get_image_collection_json(self, request):
     return [
-        {'thumb': request.link(image.thumbnail), 'image': request.link(image)}
-        for image in self.files
+        {
+            'group': request.translate(group),
+            'images': [{'thumb': request.link(image.thumbnail),
+                        'image': request.link(image)} for image in images]
+        } for group, images in self.grouped_files()
     ]
 
 

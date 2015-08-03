@@ -30,15 +30,22 @@ if (!RedactorPlugins) var RedactorPlugins = {};
 				  url: this.opts.imageManagerJson,
 				  success: $.proxy(function(data)
 					{
-						$.each(data, $.proxy(function(key, val)
+						$.each(data, $.proxy(function(key, groups)
 						{
-							// title
-							var thumbtitle = '';
-							if (typeof val.title !== 'undefined') thumbtitle = val.title;
+							var group = $('<p style="margin: 1rem 0 0 0;">' + groups.group + '</p>');
+							$('#redactor-image-manager-box').append(group);
 
-							var img = $('<img src="' + val.thumb + '" rel="' + val.image + '" title="' + thumbtitle + '" style="width: 100px; height: 75px; cursor: pointer;" />');
-							$('#redactor-image-manager-box').append(img);
-							$(img).click($.proxy(this.imagemanager.insert, this));
+							$.each(groups.images, $.proxy(function(key, val)
+							{
+								// title
+								var thumbtitle = '';
+								if (typeof val.title !== 'undefined') thumbtitle = val.title;
+
+								var img = $('<img src="' + val.thumb + '" rel="' + val.image + '" title="' + thumbtitle + '" style="max-width: 100px; max-height: 75px; cursor: pointer;" />');
+								$('#redactor-image-manager-box').append(img);
+								$(img).click($.proxy(this.imagemanager.insert, this));
+
+							}, this));
 
 						}, this));
 
