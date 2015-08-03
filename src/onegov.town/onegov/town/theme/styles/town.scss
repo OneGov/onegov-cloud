@@ -197,9 +197,26 @@ form {
         margin-left: 2em;
     }
 
-    input[type=password] + meter {
-        margin: -0.5rem 0 1rem 0;
+    /*
+        Password quality meter
+    */
+    meter {
+        -webkit-appearance: none; 
+        background: $input-border-color !important;
+        border: 0;
+        height: 10px;
+        position: relative;
+        top: -1.55rem;
         width: 100%;
+    }
+
+    meter::-webkit-meter-bar {
+        background: $input-border-color !important;
+        border: 0;
+    }
+
+    meter::-webkit-meter-optimum-value {
+        background: $success-color;
     }
 
     /*
