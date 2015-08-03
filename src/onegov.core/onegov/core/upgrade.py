@@ -277,7 +277,18 @@ class UpgradeContext(object):
         self.request = request
         self.session = request.app.session()
         self.app = request.app
-        self.operations_connection = self.session.bind.connect()
+        self.schema = request.app.session_manager.current_schema
+        self.engine = self.session.bind
+
+        # Make sure the connection is the same for the session, the engine
+        # and the alembic migrations context. Otherwise the upgrade locks up.
+        # If that happens again, test with this:
+        #
+        #       http://docs.sqlalchemy.org/en/latest/core/pooling.html
+        #       #sqlalchemy.pool.AssertionPool
+        #
+        self.operations_connection = self.session._connection_for_bind(
+            self.session.bind)
         self.operations = Operations(
             MigrationContext.configure(self.operations_connection))
 
@@ -285,7 +296,7 @@ class UpgradeContext(object):
         return UpgradeTransaction(self)
 
     def has_column(self, table, column):
-        inspector = Inspector.from_engine(self.session.bind)
+        inspector = Inspector(self.operations_connection)
         return column in {c['name'] for c in inspector.get_columns('tickets')}
 
 

@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Fix onegov-core upgrade hanging forever.
+  [href]
+
 0.4.16 (2015-07-30)
 ~~~~~~~~~~~~~~~~~~~
 
