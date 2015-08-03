@@ -1,11 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-<<<<<<< HEAD
 "POT-Creation-Date: 2015-07-31 11:34+0200\n"
-=======
-"POT-Creation-Date: 2015-07-30 16:12+0200\n"
->>>>>>> master
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
