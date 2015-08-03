@@ -12,6 +12,10 @@ class ResourceCollection(object):
 
     """
     def __init__(self, libres_context):
+        assert hasattr(libres_context, 'get_service'), """
+            The ResourceCollection expected the libres_contex, not the session.
+        """
+
         self.libres_context = libres_context
         self.session = libres_context.get_service('session_provider').session()
 
