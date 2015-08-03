@@ -22,7 +22,7 @@ class ResourceCollection(object):
     def query(self):
         return self.session.query(Resource)
 
-    def add(self, title, timezone, type=None,
+    def add(self, title, timezone, type=None, name=None,
             meta={}, content={}, first_hour=7, last_hour=18):
 
         # look up the right class depending on the type
@@ -30,7 +30,7 @@ class ResourceCollection(object):
         resource = (_mapper and _mapper.class_ or Resource)()
 
         resource.id == uuid4()
-        resource.name = normalize_for_url(title)
+        resource.name = name or normalize_for_url(title)
         resource.title = title
         resource.timezone = timezone
         resource.meta = meta
