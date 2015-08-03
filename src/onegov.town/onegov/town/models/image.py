@@ -44,7 +44,7 @@ class ImageCollection(FileCollection):
         """
 
         images = self.file_storage.ilistdirinfo(files_only=True)
-        images = sorted(images, key=lambda i: i[1]['created_time'])
+        images = sorted(images, key=lambda i: i[1]['modified_time'])
 
         for filename, info in images:
             yield Image(filename, info)
@@ -102,7 +102,7 @@ class ImageCollection(FileCollection):
 
         """
         images = self.thumbnail_storage.ilistdirinfo(files_only=True)
-        images = sorted(images, key=lambda i: i[1]['created_time'])
+        images = sorted(images, key=lambda i: i[1]['modified_time'])
 
         for filename, info in images:
             yield Thumbnail(filename, info)

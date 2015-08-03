@@ -43,7 +43,7 @@ class FileCollection(object):
 
         """
         files = self.file_storage.ilistdirinfo(files_only=True)
-        files = sorted(files, key=lambda i: i[1]['created_time'])
+        files = sorted(files, key=lambda i: i[1]['modified_time'])
 
         for filename, info in files:
             yield File(filename, info)
@@ -93,8 +93,8 @@ class File(FilestorageFile):
 
     @property
     def date(self):
-        if 'created_time' in self.info:
-            return self.info['created_time'].date()
+        if 'modified_time' in self.info:
+            return self.info['modified_time'].date()
 
     @property
     def path(self):
