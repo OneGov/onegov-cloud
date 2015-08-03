@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.0 (2015-08-03)
+~~~~~~~~~~~~~~~~~~~
+
+- Correctly sort the the pages even if the title has changed.
+  [href]
+
 - Limits the news list on the homepage to two entries.
   [href]
 
