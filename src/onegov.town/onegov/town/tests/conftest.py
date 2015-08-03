@@ -41,9 +41,9 @@ def town_app(postgres_dsn, temporary_directory, town_password, smtpserver):
         disable_memcached=True
     )
     app.set_application_id(app.namespace + '/' + 'test')
+    add_initial_content(app.libres_registry, app.session_manager, 'Govikon')
 
     session = app.session()
-    add_initial_content(session, 'Govikon')
 
     town = session.query(Town).one()
     town.meta['reply_to'] = 'mails@govikon.ch'

@@ -13,6 +13,7 @@ from cached_property import cached_property
 from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
+from onegov.libres import LibresIntegration
 from onegov.ticket import TicketCollection
 from onegov.town import log
 from onegov.town.initial_content import add_builtin_forms
@@ -21,7 +22,7 @@ from onegov.town.theme import TownTheme
 from webassets import Bundle
 
 
-class TownApp(Framework):
+class TownApp(Framework, LibresIntegration):
     """ The town application. Include this in your onegov.yml to serve it
     with onegov-server.
 

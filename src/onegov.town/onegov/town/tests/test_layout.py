@@ -167,6 +167,10 @@ def test_template_layout():
         town = Mock()
         town.name = 'Govikon'
 
+        # disable LibresIntegration for this test
+        def configure_libres(self, **cfg):
+            pass
+
     @App.path('/model')
     class Model(object):
         pass

@@ -3,6 +3,7 @@ import os
 
 from onegov.core.utils import module_path, rchop
 from onegov.form import FormCollection
+from onegov.libres import ResourceCollection
 from onegov.page import PageCollection
 
 
@@ -28,3 +29,10 @@ def test_initial_content(town_app):
     builtin_forms = set(rchop(p, '.form') for p in paths)
 
     assert builtin_forms == forms
+
+    resources = ResourceCollection(town_app.libres_context).query().all()
+    resources = {r.name: r.type for r in resources}
+
+    assert resources == {
+        'ga-tageskarten': 'daypass'
+    }

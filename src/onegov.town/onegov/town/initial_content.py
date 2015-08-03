@@ -4,18 +4,24 @@ import codecs
 import os
 
 from onegov.core.utils import module_path
+from onegov.libres import LibresIntegration, ResourceCollection
 from onegov.form import FormCollection
 from onegov.page import PageCollection
 from onegov.town.models import Town
 from wtforms.fields.html5 import EmailField
 
 
-def add_initial_content(session, town_name):
+def add_initial_content(libres_registry, session_manager, town_name):
     """ Adds the initial content for the given town on the given session.
 
     All content that comes with a new town is added here.
 
     """
+
+    session = session_manager.session()
+
+    libres_context = LibresIntegration.libres_context_from_session_manager(
+        libres_registry, session_manager)
 
     # can only be called if no town is defined yet
     assert not session.query(Town).first()
@@ -24,6 +30,7 @@ def add_initial_content(session, town_name):
 
     add_root_pages(session)
     add_builtin_forms(session)
+    add_resources(libres_context)
 
     session.flush()
 
@@ -109,3 +116,13 @@ def add_builtin_forms(session):
             title, definition = load_definition(filename)
 
             ensure_form(name, title, definition)
+
+
+def add_resources(libres_context):
+    resource = ResourceCollection(libres_context)
+    resource.add(
+        "GA Tageskarten",
+        'Europe/Zurich',
+        type='daypass',
+        name='ga-tageskarten'
+    )
