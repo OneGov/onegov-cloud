@@ -1,0 +1,30 @@
+
+import os
+
+from onegov.core.utils import module_path, rchop
+from onegov.form import FormCollection
+from onegov.page import PageCollection
+
+
+def test_initial_content(town_app):
+    pages = PageCollection(town_app.session()).query().all()
+    pages = {p.name: p.title for p in pages}
+
+    assert pages == {
+        'leben-wohnen': 'Leben & Wohnen',
+        'kultur-freizeit': 'Kultur & Freizeit',
+        'bildung-gesellschaft': 'Bildung & Gesellschaft',
+        'gewerbe-tourismus': 'Gewerbe & Tourismus',
+        'politik-verwaltung': 'Politik & Verwaltung',
+        'aktuelles': 'Aktuelles'
+    }
+
+    forms = FormCollection(town_app.session()).definitions.query().all()
+    forms = set(form.name for form in forms)
+
+    paths = (p for p in os.listdir(module_path('onegov.town', 'forms')))
+    paths = (p for p in paths if p.endswith('.form'))
+    paths = (os.path.basename(p) for p in paths)
+    builtin_forms = set(rchop(p, '.form') for p in paths)
+
+    assert builtin_forms == forms
