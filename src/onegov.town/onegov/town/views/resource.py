@@ -5,7 +5,7 @@ from onegov.town.layout import ResourceLayout
 
 
 @TownApp.html(model=Resource, template='resource.pt', permission=Public)
-def view_person(self, request):
+def view_resource(self, request):
     return {
         'title': self.title,
         'resource': self,
