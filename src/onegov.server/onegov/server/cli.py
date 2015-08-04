@@ -308,6 +308,9 @@ class WsgiServer(FileSystemEventHandler):
         if 'assets/js' in event.src_path:
             return
 
+        if 'onegov.sublime' in event.src_path:
+            return
+
         print("changed: {}".format(event.src_path))
 
         self.restart()
