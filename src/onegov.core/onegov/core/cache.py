@@ -34,41 +34,20 @@ eventually be discarded by memcache if the cache is full).
 
 """
 
-import pylibmc
-
 from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE
 from dogpile.cache.proxy import ProxyBackend
-from onegov.core import compat
 from onegov.core import log
-
-
-DEFAULT_BACKEND_ARGUMENTS = {
-    'dogpile.cache.pylibmc': {
-        'binary': True,
-        'behaviors': {
-            'tcp_nodelay': True,
-            'ketama': True
-        }
-    }
-}
 
 
 def create_backend(namespace, backend, arguments={}, expiration_time=None):
 
     prefix = '{}:'.format(namespace)
 
-    _arguments = DEFAULT_BACKEND_ARGUMENTS.get(backend, {})
-    _arguments.update(arguments)
-
-    if backend == 'dogpile.cache.pylibmc':
-        if isinstance(arguments['url'], compat.string_types):
-            arguments['url'] = [arguments['url']]
-
     return make_region(key_mangler=lambda key: prefix + key).configure(
         backend,
         expiration_time=None,
-        arguments=_arguments,
+        arguments=arguments,
         wrap=[IgnoreUnreachableBackend]
     )
 
@@ -84,37 +63,37 @@ class IgnoreUnreachableBackend(ProxyBackend):
     def get(self, key):
         try:
             return self.proxied.get(key)
-        except pylibmc.Error:
+        except TypeError:
             log.exception("Error reading from memcached")
             return NO_VALUE
 
     def set(self, key, value):
         try:
             self.proxied.set(key, value)
-        except pylibmc.Error:
+        except TypeError:
             log.exception("Error writing to memcached")
 
     def delete(self, key):
         try:
             self.proxied.delete(key)
-        except pylibmc.Error:
+        except TypeError:
             log.exception("Error deleting from memcached")
 
     def get_multi(self, keys):
         try:
             return self.proxied.get_multi(keys)
-        except pylibmc.Error:
+        except TypeError:
             log.exception("Error reading from memcached")
             return [NO_VALUE] * len(keys)
 
     def set_multi(self, mapping):
         try:
             self.proxied.set_multi(mapping)
-        except pylibmc.Error:
+        except TypeError:
             log.exception("Error writing to memcached")
 
     def delete_multi(self, keys):
         try:
             self.proxied.delete_multi(keys)
-        except pylibmc.Error:
+        except TypeError:
             log.exception("Error deleting from memcached")

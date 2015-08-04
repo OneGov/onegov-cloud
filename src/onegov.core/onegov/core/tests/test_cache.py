@@ -68,7 +68,7 @@ def test_cache_connections():
 
 def test_unreachable_backend_proxy():
 
-    region = cache.create_backend('ns', 'dogpile.cache.pylibmc', arguments={
+    region = cache.create_backend('ns', 'dogpile.cache.memcached', arguments={
         'url': '127.0.0.1:12345'
     })
 

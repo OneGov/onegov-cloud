@@ -270,7 +270,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             self.cache_backend = 'dogpile.cache.memory'
             self.cache_backend_arguments = {}
         else:
-            self.cache_backend = 'dogpile.cache.pylibmc'
+            self.cache_backend = 'dogpile.cache.memcached'
             self.cache_backend_arguments = {
                 'url': self.memcached_url
             }

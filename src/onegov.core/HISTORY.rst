@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Replaces pylibmc with python-memcached, with the latter now having Python 3
+  support.
+  [href]
+
 - Fix onegov-core upgrade hanging forever.
   [href]
 

@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
-
 from setuptools import setup, find_packages
 
 name = 'onegov.core'
@@ -8,43 +6,6 @@ description = (
     'Contains code shared by all OneGov applications.'
 )
 version = '0.4.16'
-
-dependencies = {
-    'alembic',
-    'arrow',
-    'bleach',
-    'cached_property',
-    'chameleon',
-    'click',
-    'dogpile.cache',
-    'fs',
-    'itsdangerous',
-    'isodate',
-    'mailthon',
-    'morepath>=0.11.1',
-    'more.transaction',
-    'more.webassets',
-    'networkx',
-    'onegov.server>=0.0.3',
-    'passlib',
-    'polib',
-    'py-bcrypt',
-    'python-magic',
-    'psycopg2',
-    'pylibmc',
-    'pylru',
-    'pyreact',
-    'pytz',
-    'purl',
-    'sedate',
-    'sqlalchemy>=0.9',
-    'sqlparse',
-    'translationstring',
-    'unidecode',
-    'webtest',
-    'wtforms',
-    'zope.sqlalchemy'
-}
 
 
 def get_long_description():
@@ -55,13 +16,6 @@ def get_long_description():
     readme = readme[readme.index(description) + len(description):]
 
     return '\n'.join((readme, history))
-
-if os.environ.get('READTHEDOCS', None) == 'True':
-    # on readthedocs.org we can't install c modules which is why we have
-    # to mock them and exclude them from the setup
-    # see also: http://docs.readthedocs.org/en/latest/faq.html
-
-    dependencies -= {'pylibmc'}
 
 setup(
     name=name,
@@ -77,7 +31,44 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    install_requires=list(dependencies),
+    install_requires=[
+        'alembic',
+        'arrow',
+        'bleach',
+        'cached_property',
+        'chameleon',
+        'click',
+        'dogpile.cache',
+        'fs',
+        'itsdangerous',
+        'isodate',
+        'mailthon',
+        'morepath>=0.11.1',
+        'more.transaction',
+        'more.webassets',
+        'networkx',
+        'onegov.server>=0.0.3',
+        'passlib',
+        'polib',
+        'py-bcrypt',
+        'python-magic',
+        'python-memcached>=1.57',
+        'pylibmc',
+        'psycopg2',
+        'pylibmc',
+        'pylru',
+        'pyreact',
+        'pytz',
+        'purl',
+        'sedate',
+        'sqlalchemy>=0.9',
+        'sqlparse',
+        'translationstring',
+        'unidecode',
+        'webtest',
+        'wtforms',
+        'zope.sqlalchemy'
+    ],
     extras_require=dict(
         test=[
             'coverage',
