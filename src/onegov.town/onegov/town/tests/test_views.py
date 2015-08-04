@@ -3,8 +3,10 @@ import onegov.core
 import onegov.town
 import textwrap
 
+from datetime import datetime
 from lxml.html import document_fromstring
 from onegov.form import FormCollection
+from onegov.libres import ResourceCollection
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
 from webtest import TestApp as Client
@@ -931,3 +933,36 @@ def test_tickets(town_app):
 
     assert 'FRM-' in message
     assert '/status' in message
+
+
+def test_resource_slots(town_app):
+
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.add("Foo", 'Europe/Zurich')
+
+    scheduler = resource.get_scheduler(town_app.libres_context)
+    scheduler.allocate(
+        dates=[
+            (datetime(2015, 8, 4), datetime(2015, 8, 4)),
+            (datetime(2015, 8, 5), datetime(2015, 8, 5))
+        ],
+        whole_day=True
+    )
+
+    client = Client(town_app)
+
+    url = '/reservationen/foo/slots'
+    assert client.get(url).json == []
+
+    url = '/reservationen/foo/slots?start=2015-08-04&end=2015-08-05'
+
+    assert client.get(url).json == [
+        {
+            'start': '2015-08-04T00:00:00+02:00',
+            'end': '2015-08-05T00:00:00+02:00'
+        },
+        {
+            'start': '2015-08-05T00:00:00+02:00',
+            'end': '2015-08-06T00:00:00+02:00'
+        }
+    ]

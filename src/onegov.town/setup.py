@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'click',
         'cssmin',
+        'isodate',
         'jsmin',
         'lazy-object-proxy',
         'lxml',
