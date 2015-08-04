@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.17 (2015-08-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Replaces pylibmc with python-memcached, with the latter now having Python 3
   support.
