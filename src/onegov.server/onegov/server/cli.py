@@ -299,4 +299,15 @@ class WsgiServer(FileSystemEventHandler):
         if '/mails' in event.src_path:
             return
 
+        if '.webassets-cache' in event.src_path:
+            return
+
+        if 'assets/bundles' in event.src_path:
+            return
+
+        if 'assets/js' in event.src_path:
+            return
+
+        print("changed: {}".format(event.src_path))
+
         self.restart()
