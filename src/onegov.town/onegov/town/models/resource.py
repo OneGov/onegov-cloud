@@ -36,26 +36,65 @@ class RoomResource(Resource, HiddenFromPublicExtension,
 
 
 class AllocationForm(Form):
+    """ Baseform for all allocation forms. Allocation forms are expected
+    to implement the methods above (which contain a NotImplementedException).
+
+    Have a look at :meth:`libres.db.scheduler.Scheduler.allocate` to find out
+    more about those values.
+
+    """
 
     @property
     def dates(self):
+        """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
     @property
     def whole_day(self):
+        """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
     @property
     def quota(self):
+        """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
     @property
     def quota_limit(self):
+        """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
 
     @property
     def data(self):
+        """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
+
+    def generate_dates(self, start, end, start_time=None, end_time=None):
+        """ Takes the given dates and generates the date tuples using rrule.
+        The `except_for` field will be considered if present.
+
+        """
+
+        if start == end:
+            dates = (start, )
+        else:
+            if hasattr(self, 'except_for'):
+                exceptions = {
+                    int(x) for x in (self.except_for.data or tuple())
+                }
+                weekdays = [d[0] for d in WEEKDAYS if d[0] not in exceptions]
+
+            dates = rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
+
+        if start_time is None or end_time is None:
+            return [(d, d) for d in dates]
+        else:
+            return [
+                (
+                    datetime.combine(d, start_time),
+                    datetime.combine(d, end_time)
+                ) for d in dates
+            ]
 
 
 class DaypassAllocationForm(AllocationForm):
@@ -73,20 +112,7 @@ class DaypassAllocationForm(AllocationForm):
 
     @property
     def dates(self):
-        if self.start.data == self.end.data:
-            return [(self.start.data, self.end.data)]
-        else:
-            exceptions = {int(x) for x in (self.except_for.data or tuple())}
-            weekdays = [d[0] for d in WEEKDAYS if d[0] not in exceptions]
-
-            dates = rrule(
-                DAILY,
-                dtstart=self.start.data,
-                until=self.end.data,
-                byweekday=weekdays
-            )
-
-            return [(d, d) for d in dates]
+        return self.generate_dates(self.start.data, self.end.data)
 
     @property
     def quota(self):
@@ -136,27 +162,9 @@ class RoomAllocationForm(AllocationForm):
 
     @property
     def dates(self):
-        if self.start_date.data == self.end_date.data:
-            return [(self.start, self.end)]
-        else:
-            exceptions = {int(x) for x in (self.except_for.data or tuple())}
-            weekdays = [d[0] for d in WEEKDAYS if d[0] not in exceptions]
-
-            dates = rrule(
-                DAILY,
-                dtstart=self.start,
-                until=self.end,
-                byweekday=weekdays
-            )
-
-            start_time, end_time = (
-                self.as_time(self.start_time.data),
-                self.as_time(self.end_time.data)
-            )
-
-            return [
-                (
-                    datetime.combine(d, start_time),
-                    datetime.combine(d, end_time)
-                ) for d in dates
-            ]
+        return self.generate_dates(
+            self.start_date.data,
+            self.end_date.data,
+            self.as_time(self.start_time.data),
+            self.as_time(self.end_time.data)
+        )
