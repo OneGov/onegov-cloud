@@ -59,6 +59,16 @@ class ResourceCollection(object):
 
         return query.first()
 
-    def delete(self, resource):
+    def delete(self, resource, including_reservations=False):
+        scheduler = resource.get_scheduler(self.libres_context)
+
+        if not including_reservations:
+            assert not scheduler.managed_reserved_slots().first()
+            assert not scheduler.managed_reservations().first()
+
+            scheduler.managed_allocations().delete('fetch')
+        else:
+            scheduler.extinguish_managed_records()
+
         self.session.delete(resource)
         self.session.flush()

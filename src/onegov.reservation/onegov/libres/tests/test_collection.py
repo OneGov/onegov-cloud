@@ -1,3 +1,6 @@
+import pytest
+
+from datetime import datetime
 from onegov.libres import ResourceCollection
 
 
@@ -18,3 +21,27 @@ def test_resource_collection(libres_context):
     collection.delete(collection.by_id(resource.id))
 
     assert collection.query().count() == 0
+
+
+def test_resource_save_delete(libres_context):
+    collection = ResourceCollection(libres_context)
+
+    resource = collection.add('Executive Lounge', 'Europe/Zurich')
+    assert resource.name == 'executive-lounge'
+    assert resource.timezone == 'Europe/Zurich'
+    scheduler = resource.get_scheduler(libres_context)
+
+    dates = (datetime(2015, 8, 5, 12), datetime(2015, 8, 5, 18))
+
+    scheduler.allocate(dates)
+    scheduler.reserve('info@example.org', dates)
+
+    with pytest.raises(AssertionError):
+        collection.delete(resource)
+
+    collection.delete(resource, including_reservations=True)
+
+    assert collection.query().count() == 0
+    assert scheduler.managed_reservations().count() == 0
+    assert scheduler.managed_reserved_slots().count() == 0
+    assert scheduler.managed_allocations().count() == 0
