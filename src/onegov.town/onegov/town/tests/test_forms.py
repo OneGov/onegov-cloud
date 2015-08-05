@@ -2,10 +2,7 @@ import pytest
 
 from datetime import date, datetime
 from dateutil.rrule import MO, WE
-from onegov.town.forms.allocation import (
-    DaypassAllocationForm,
-    RoomAllocationForm
-)
+from onegov.town.forms import DaypassAllocationForm, RoomAllocationForm
 
 
 @pytest.mark.parametrize('form_class', [

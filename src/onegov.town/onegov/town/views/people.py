@@ -1,15 +1,11 @@
 import morepath
 
 from onegov.core.security import Public, Private
-from onegov.form import Form, with_options
 from onegov.people import Person, PersonCollection
-from onegov.town import _
-from onegov.town import TownApp
+from onegov.town import _, TownApp
+from onegov.town.forms import PersonForm
 from onegov.town.elements import Link
 from onegov.town.layout import PersonLayout, PersonCollectionLayout
-from wtforms import StringField, TextAreaField, validators
-from wtforms.fields.html5 import EmailField
-from wtforms.widgets import TextArea
 
 
 @TownApp.html(model=PersonCollection, template='people.pt', permission=Public)
@@ -30,29 +26,6 @@ def view_person(self, request):
         'person': self,
         'layout': PersonLayout(self, request)
     }
-
-
-class PersonForm(Form):
-    """ Form to edit people. """
-
-    academic_title = StringField(_("Academic Title"))
-
-    first_name = StringField(_("First name"), [validators.InputRequired()])
-    last_name = StringField(_("Last name"), [validators.InputRequired()])
-
-    picture_url = StringField(
-        label=_("Picture"),
-        description=_("URL pointing to the picture")
-    )
-
-    email = EmailField(_("E-Mail"))
-    phone = StringField(_("Phone"))
-    website = StringField(_("Website"))
-
-    address = TextAreaField(
-        label=_("Address"),
-        widget=with_options(TextArea, rows=5)
-    )
 
 
 @TownApp.form(model=PersonCollection, name='neu', template='form.pt',

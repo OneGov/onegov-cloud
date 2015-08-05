@@ -8,10 +8,7 @@ from onegov.town import TownApp, _
 from onegov.town import utils
 from onegov.town.elements import Link
 from onegov.town.layout import ResourcesLayout, ResourceLayout
-from onegov.town.forms.allocation import (
-    DaypassAllocationForm,
-    RoomAllocationForm
-)
+from onegov.town.forms import DaypassAllocationForm, RoomAllocationForm
 
 
 @TownApp.html(model=ResourceCollection, template='resources.pt',
