@@ -20,8 +20,8 @@
                 data-header-left="month,agendaWeek,agendaDay" 
                 data-header-center="title"
                 data-header-right="today prev,next"
-                data-min-time="${resource.first_hour}:00:00"
-                data-max-time="${resource.last_hour}:00:00"
+                data-min-time="07:00:00"
+                data-max-time="22:00:00"
             />
         </tal:block>
     </tal:block>
