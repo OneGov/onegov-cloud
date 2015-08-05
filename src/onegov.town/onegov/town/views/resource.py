@@ -200,13 +200,19 @@ def handle_new_allocation(self, request, form):
         if whole_day:
             form.start.data = start
             form.end.data = end
-            form.as_whole_day.data = 'yes'
+
+            if hasattr(form, 'as_whole_day'):
+                form.as_whole_day.data = 'yes'
         else:
             form.start.data = start
             form.end.data = end
-            form.as_whole_day.data = 'no'
-            form.start_time.data = start.strftime('%H:%M')
-            form.end_time.data = end.strftime('%H:%M')
+
+            if hasattr(form, 'as_whole_day'):
+                form.as_whole_day.data = 'no'
+
+            if hasattr(form, 'start_time'):
+                form.start_time.data = start.strftime('%H:%M')
+                form.end_time.data = end.strftime('%H:%M')
 
     return {
         'layout': layout,

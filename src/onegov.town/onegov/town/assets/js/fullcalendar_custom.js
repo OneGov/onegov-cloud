@@ -3,12 +3,10 @@ var new_select_handler = function(url) {
         var params = '';
 
         if (view.name == "month") {
-            // start + start because fullcalendar passes the next day as end
-            params = '?start=' + start.toISOString() + '&end=' + start.toISOString() + '&whole_day=yes';
+            params = '?start=' + start.toISOString() + '&end=' + end.subtract(1, 'days').toISOString() + '&whole_day=yes';
         } else {
             params = '?start=' + start.toISOString() + '&end=' + end.toISOString() + '&whole_day=no';
         }
-
         location.href = url + params;
     };
 };
