@@ -193,6 +193,21 @@ def handle_new_allocation(self, request, form):
     layout = ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
 
+    start, end = utils.parse_fullcalendar_request(request, self.timezone)
+    whole_day = request.params.get('whole_day') == 'yes'
+
+    if start and end:
+        if whole_day:
+            form.start.data = start
+            form.end.data = end
+            form.as_whole_day.data = 'yes'
+        else:
+            form.start.data = start
+            form.end.data = end
+            form.as_whole_day.data = 'no'
+            form.start_time.data = start.strftime('%H:%M')
+            form.end_time.data = end.strftime('%H:%M')
+
     return {
         'layout': layout,
         'title': _("New allocation"),

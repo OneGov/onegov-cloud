@@ -1,7 +1,7 @@
 import sedate
 
 from datetime import datetime, time
-from isodate import parse_date
+from isodate import parse_date, parse_datetime
 from lxml import etree
 from lxml.html import fragments_fromstring
 
@@ -49,12 +49,16 @@ def parse_fullcalendar_request(request, timezone):
     end = request.params.get('end')
 
     if start and end:
-        start = datetime.combine(parse_date(start), time(0, 0))
-        end = datetime.combine(parse_date(end), time(0, 0))
+        if 'T' in start:
+            start = parse_datetime(start)
+            end = parse_datetime(end)
+        else:
+            start = datetime.combine(parse_date(start), time(0, 0))
+            end = datetime.combine(parse_date(end), time(23, 59, 59, 999999))
 
         start = sedate.replace_timezone(start, timezone)
         end = sedate.replace_timezone(end, timezone)
 
-        return sedate.align_range_to_day(start, end, timezone)
+        return start, end
     else:
         return None, None

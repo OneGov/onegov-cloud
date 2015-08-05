@@ -72,10 +72,11 @@ def test_daypass_except_for():
 
 def test_room_single_date():
     form = RoomAllocationForm(data={
-        'start_date': date(2015, 8, 4),
-        'end_date': date(2015, 8, 4),
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 4),
         'start_time': '12:00',
-        'end_time': '16:00'
+        'end_time': '16:00',
+        'as_whole_day': 'no'
     })
 
     assert form.dates == [(datetime(2015, 8, 4, 12), datetime(2015, 8, 4, 16))]
@@ -85,10 +86,24 @@ def test_room_single_date():
     assert not form.data
 
 
+def test_room_whole_day():
+    form = RoomAllocationForm(data={
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 4),
+        'as_whole_day': 'yes'
+    })
+
+    assert form.dates == [(datetime(2015, 8, 4), datetime(2015, 8, 4))]
+    assert form.whole_day == True
+    assert form.quota == 1
+    assert form.quota_limit == 1
+    assert not form.data
+
+
 def test_room_multiple_dates():
     form = RoomAllocationForm(data={
-        'start_date': date(2015, 8, 4),
-        'end_date': date(2015, 8, 8),
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 8),
         'start_time': '12:00',
         'end_time': '16:00'
     })
@@ -104,8 +119,8 @@ def test_room_multiple_dates():
 
 def test_room_except_for():
     form = RoomAllocationForm(data={
-        'start_date': date(2015, 8, 3),
-        'end_date': date(2015, 8, 6),
+        'start': date(2015, 8, 3),
+        'end': date(2015, 8, 6),
         'start_time': '12:00',
         'end_time': '16:00',
         'except_for': [MO.weekday, WE.weekday]

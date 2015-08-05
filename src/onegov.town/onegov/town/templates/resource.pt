@@ -12,6 +12,9 @@
                 data-feed="${feed}" 
                 data-header-left="title"
                 data-header-right="today prev,next"
+                data-selectable="${request.is_logged_in and 'true' or 'false'}"
+                data-select-url="${request.link(resource, name='neue-einteilung')}"
+                data-default-view="month"
             />
         </tal:block>
         <tal:block condition="resource.type == 'room'">
@@ -22,6 +25,9 @@
                 data-header-right="today prev,next"
                 data-min-time="07:00:00"
                 data-max-time="22:00:00"
+                data-selectable="${request.is_logged_in and 'true' or 'false'}"
+                data-select-url="${request.link(resource, name='neue-einteilung')}"
+                data-default-view="agendaWeek"
             />
         </tal:block>
     </tal:block>

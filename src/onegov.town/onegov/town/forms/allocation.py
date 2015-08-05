@@ -2,12 +2,15 @@ import sedate
 
 from datetime import datetime, time
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
-from onegov.form import Form
+from onegov.form import Form, with_options
+from onegov.form.parser.core import FieldDependency
 from onegov.form.fields import MultiCheckboxField
 from onegov.town import _
-from wtforms.validators import InputRequired
-from wtforms.fields import TextField
+from wtforms.validators import DataRequired, InputRequired
+from wtforms.fields import RadioField, TextField
 from wtforms.fields.html5 import DateField, IntegerField
+from wtforms.widgets import TextInput
+from wtforms_components import If
 
 
 WEEKDAYS = (
@@ -126,11 +129,23 @@ class DaypassAllocationForm(AllocationForm):
 
 class RoomAllocationForm(AllocationForm):
 
-    start_date = DateField(_("Start"), [InputRequired()])
-    end_date = DateField(_("End"), [InputRequired()])
+    start = DateField(_("Start"), [InputRequired()])
+    end = DateField(_("End"), [InputRequired()])
 
-    start_time = TextField("Each starting at", [InputRequired()])
-    end_time = TextField("Each starting at", [InputRequired()])
+    as_whole_day = RadioField(_("Whole day"), choices=[
+        ('yes', _("Yes")),
+        ('no', _("No"))
+    ], default='yes')
+
+    as_whole_day_dependency = FieldDependency('as_whole_day', 'no')
+
+    start_time = TextField("Each starting at", [
+        If(as_whole_day_dependency.fulfilled, DataRequired())
+    ], widget=with_options(TextInput, **as_whole_day_dependency.html_data))
+
+    end_time = TextField("Each ending at", [
+        If(as_whole_day_dependency.fulfilled, DataRequired())
+    ], widget=with_options(TextInput, **as_whole_day_dependency.html_data))
 
     except_for = MultiCheckboxField(
         _("Except for"),
@@ -138,7 +153,6 @@ class RoomAllocationForm(AllocationForm):
         filters=[choices_as_integer]
     )
 
-    whole_day = False
     data = None
     quota = 1
     quota_limit = 1
@@ -146,30 +160,29 @@ class RoomAllocationForm(AllocationForm):
     def as_time(self, text):
         return time(*(int(s) for s in text.split(':'))) if text else None
 
-    def combine_datetime(self, prefix):
+    def combine_datetime(self, field):
         d, t = (
-            getattr(self, prefix + '_date').data,
-            getattr(self, prefix + '_time').data
+            getattr(self, field).data,
+            getattr(self, field + '_time').data
         )
 
-        if not (d and t):
+        if d and not t:
+            return sedate.as_datetime(d)
+
+        if not t:
             return None
 
         return datetime.combine(d, self.as_time(t))
 
     @property
-    def start(self):
-        return self.combine_datetime('start')
-
-    @property
-    def end(self):
-        return self.combine_datetime('end')
+    def whole_day(self):
+        return self.as_whole_day.data == 'yes'
 
     @property
     def dates(self):
         return self.generate_dates(
-            self.start_date.data,
-            self.end_date.data,
+            self.combine_datetime('start'),
+            self.combine_datetime('end'),
             self.as_time(self.start_time.data),
             self.as_time(self.end_time.data)
         )
