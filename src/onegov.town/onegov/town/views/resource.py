@@ -1,9 +1,16 @@
+import morepath
+
 from libres.db.models import Allocation
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.libres.models import Resource
-from onegov.town import TownApp
+from onegov.town import TownApp, _
 from onegov.town import utils
+from onegov.town.elements import Link
 from onegov.town.layout import ResourceLayout
+from onegov.town.views.allocation import (
+    DaypassAllocationForm,
+    RoomAllocationForm
+)
 
 
 @TownApp.html(model=Resource, template='resource.pt', permission=Public)
@@ -11,7 +18,8 @@ def view_resource(self, request):
     return {
         'title': self.title,
         'resource': self,
-        'layout': ResourceLayout(self, request)
+        'layout': ResourceLayout(self, request),
+        'feed': request.link(self, name='slots')
     }
 
 
@@ -39,3 +47,44 @@ def view_allocations_json(self, request):
         return allocations
     else:
         return []
+
+
+def get_allocation_form_class(resource, request):
+    if resource.type == 'daypass':
+        return DaypassAllocationForm
+
+    if resource.type == 'room':
+        return RoomAllocationForm
+
+    raise NotImplementedError
+
+
+@TownApp.form(model=Resource, template='form.pt', name='neue-einteilung',
+              permission=Private, form=get_allocation_form_class)
+def handle_new_allocation(self, request, form):
+
+    if form.submitted(request):
+        scheduler = self.get_scheduler(request.app.libres_context)
+
+        allocations = scheduler.allocate(
+            dates=form.dates,
+            whole_day=form.whole_day,
+            quota=form.quota,
+            quota_limit=form.quota_limit,
+            data=form.data
+        )
+
+        request.success(_("Successfully added ${n} allocations", mapping={
+            'n': len(allocations)
+        }))
+
+        return morepath.redirect(request.link(self))
+
+    layout = ResourceLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+
+    return {
+        'layout': layout,
+        'title': _("New allocation"),
+        'form': form
+    }

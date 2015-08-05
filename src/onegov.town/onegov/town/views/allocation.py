@@ -1,3 +1,5 @@
+import sedate
+
 from datetime import datetime, time
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from onegov.form import Form
@@ -17,6 +19,13 @@ WEEKDAYS = (
     (SA.weekday, _("Saturday")),
     (SU.weekday, _("Sunday")),
 )
+
+
+def choices_as_integer(choices):
+    if choices is None:
+        return None
+
+    return [int(c) for c in choices]
 
 
 class AllocationForm(Form):
@@ -59,6 +68,10 @@ class AllocationForm(Form):
 
         """
 
+        if start and end:
+            start = sedate.as_datetime(start)
+            end = sedate.as_datetime(end)
+
         if start == end:
             dates = (start, )
         else:
@@ -83,13 +96,17 @@ class AllocationForm(Form):
 
 class DaypassAllocationForm(AllocationForm):
 
-    start = DateField(_("Start"), [InputRequired])
-    end = DateField(_("End"), [InputRequired])
+    start = DateField(_("Start"), [InputRequired()])
+    end = DateField(_("End"), [InputRequired()])
 
-    daypasses = IntegerField(_("Daypasses"), [InputRequired])
-    daypasses_limit = IntegerField(_("Daypasses Limit"), [InputRequired])
+    daypasses = IntegerField(_("Daypasses"), [InputRequired()])
+    daypasses_limit = IntegerField(_("Daypasses Limit"), [InputRequired()])
 
-    except_for = MultiCheckboxField(_("Except for"), choices=WEEKDAYS)
+    except_for = MultiCheckboxField(
+        _("Except for"),
+        choices=WEEKDAYS,
+        filters=[choices_as_integer]
+    )
 
     whole_day = True
     data = None
@@ -109,13 +126,17 @@ class DaypassAllocationForm(AllocationForm):
 
 class RoomAllocationForm(AllocationForm):
 
-    start_date = DateField(_("Start"), [InputRequired])
-    end_date = DateField(_("End"), [InputRequired])
+    start_date = DateField(_("Start"), [InputRequired()])
+    end_date = DateField(_("End"), [InputRequired()])
 
-    start_time = TextField("Each starting at", [InputRequired])
-    end_time = TextField("Each starting at", [InputRequired])
+    start_time = TextField("Each starting at", [InputRequired()])
+    end_time = TextField("Each starting at", [InputRequired()])
 
-    except_for = MultiCheckboxField(_("Except for"), choices=WEEKDAYS)
+    except_for = MultiCheckboxField(
+        _("Except for"),
+        choices=WEEKDAYS,
+        filters=[choices_as_integer]
+    )
 
     whole_day = False
     data = None

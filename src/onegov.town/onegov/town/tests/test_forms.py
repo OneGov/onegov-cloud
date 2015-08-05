@@ -32,8 +32,8 @@ def test_allocation_form_dates(form_class):
 
 def test_daypass_single_date():
     form = DaypassAllocationForm(data={
-        'start': datetime(2015, 8, 4),
-        'end': datetime(2015, 8, 4),
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 4),
         'daypasses': 4,
         'daypasses_limit': 1
     })
@@ -47,8 +47,8 @@ def test_daypass_single_date():
 
 def test_daypass_multiple_dates():
     form = DaypassAllocationForm(data={
-        'start': datetime(2015, 8, 4),
-        'end': datetime(2015, 8, 8),
+        'start': date(2015, 8, 4),
+        'end': date(2015, 8, 8),
     })
 
     assert form.dates == [

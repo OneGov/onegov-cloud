@@ -1,5 +1,7 @@
 var setup_calendar = function(calendar) {
-    calendar.fullCalendar({});
+    calendar.fullCalendar({
+        events: calendar.data('feed')
+    });
 };
 
 $(document).ready(function() {

@@ -53,6 +53,7 @@ setup(
         'python-dateutil',
         'python-magic',
         'pytz',
+        'sedate',
         'translationstring',
     ],
     extras_require=dict(
