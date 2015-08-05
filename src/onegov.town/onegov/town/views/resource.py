@@ -150,8 +150,7 @@ def view_allocations_json(self, request):
             allocations.append(
                 {
                     'start': allocation.display_start().isoformat(),
-                    'end': allocation.display_end().isoformat(),
-                    'allDay': allocation.whole_day
+                    'end': allocation.display_end().isoformat()
                 }
             )
 
