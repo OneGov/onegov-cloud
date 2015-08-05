@@ -134,6 +134,6 @@ def get_resources(app):
     return ResourceCollection(app.libres_context)
 
 
-@TownApp.path(model=Resource, path='/reservationen/{name}')
+@TownApp.path(model=Resource, path='/reservation/{name}')
 def get_resource(app, name):
     return ResourceCollection(app.libres_context).by_name(name)

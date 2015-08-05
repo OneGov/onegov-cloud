@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-07-31 11:34+0200\n"
+"POT-Creation-Date: 2015-08-05 11:31+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -31,6 +31,9 @@ msgstr "Personen"
 
 msgid "Tickets"
 msgstr "Tickets"
+
+msgid "Reservations"
+msgstr "Reservationen"
 
 msgid "Logout"
 msgstr "Logout"
@@ -94,6 +97,12 @@ msgstr "Person"
 msgid "Reopen ticket"
 msgstr "Ticket wieder öffnen"
 
+msgid "Room"
+msgstr "Raum"
+
+msgid "Daypass"
+msgstr "Tagskarte"
+
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
 
@@ -123,14 +132,146 @@ msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
 msgstr ""
 "Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
 
-msgid "Hide from the public"
-msgstr "Vor der Öffentlichkeit verstecken"
+msgid "Monday"
+msgstr "Montag"
+
+msgid "Tuesday"
+msgstr "Dienstag"
+
+msgid "Wednesday"
+msgstr "Mittwoch"
+
+msgid "Thursday"
+msgstr "Donnerstag"
+
+msgid "Friday"
+msgstr "Freitag"
+
+msgid "Saturday"
+msgstr "Samstag"
+
+msgid "Sunday"
+msgstr "Sonntag"
+
+msgid "Start"
+msgstr "Von"
+
+msgid "End"
+msgstr "Bis"
+
+msgid "Daypasses"
+msgstr "Tageskarten"
+
+msgid "Daypasses Limit"
+msgstr "Tageskarten pro Person und Tag"
+
+msgid "Except for"
+msgstr "Ausser an"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Lead"
+msgstr "Einleitung"
+
+msgid "Describes what this form is about"
+msgstr "Beschreibt kurz um was es bei diesem Formular geht"
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Definition"
+msgstr "Definition"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Describes what this page is about"
+msgstr "Beschreibt kurz um was es bei diesem Thema geht"
+
+msgid "Academic Title"
+msgstr "Akademischer Titel"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "URL pointing to the picture"
+msgstr "Link zum Bild"
 
 msgid "Address"
 msgstr "Adresse"
 
+msgid "Email Address"
+msgstr "E-Mail Adresse"
+
+msgid "New Password"
+msgstr "Neues Passwort"
+
+msgid "Describes what this reservation resource is about"
+msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
+
+msgid "First hour shown in calendar"
+msgstr "Die erste Stunde die im Kalender angezeigt wird"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "E-Mail Reply Address"
+msgstr "E-Mail Antwort Adresse"
+
+msgid "Primary Color"
+msgstr "Primärfarbe"
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "URL pointing to the logo"
+msgstr "Link zum Logo"
+
+msgid "Replies to automated e-mails go to this address."
+msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
+
+msgid "Homepage Images"
+msgstr "Bilder auf der Startseite"
+
+msgid "Up to six URLs pointing to images for the tiles on the homepage."
+msgstr "Bis zu sechs Links zu Bildern für die Kacheln auf der Startseite"
+
 msgid "Contact"
 msgstr "Kontakt"
+
+msgid "The address and phone number of the municipality"
+msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
+
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+msgid "The opening hours of the municipality"
+msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
+
+msgid "Analytics Code"
+msgstr "Analytics Code"
+
+msgid "JavaScript for web statistics support"
+msgstr "JavaScript für Web-Statistik"
+
+msgid "Hide from the public"
+msgstr "Vor der Öffentlichkeit verstecken"
 
 msgid "Function"
 msgstr "Funktion"
@@ -149,21 +290,6 @@ msgstr "Letztes Jahr"
 
 msgid "Older"
 msgstr "Älter"
-
-msgid "Title"
-msgstr "Titel"
-
-msgid "URL"
-msgstr "URL"
-
-msgid "Lead"
-msgstr "Einleitung"
-
-msgid "Describes what this page is about"
-msgstr "Beschreibt kurz um was es bei diesem Thema geht"
-
-msgid "Text"
-msgstr "Text"
 
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
@@ -286,7 +412,7 @@ msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
 msgid "Tickets:"
-msgstr ""
+msgstr "Tickets:"
 
 msgid "Open"
 msgstr "Offen"
@@ -297,9 +423,6 @@ msgstr "In Bearbeitung"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
-
-msgid "Opening Hours"
-msgstr "Öffnungszeiten"
 
 msgid "Forgot your password?"
 msgstr "Haben Sie Ihr Passwort vergessen?"
@@ -391,6 +514,9 @@ msgstr ""
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
+msgid "No reservation resources defined yet."
+msgstr "Es wurden noch keine Ressourcen hinzugefügt."
+
 msgid ""
 "Your form submission is ready to be sent to the town. Please review your "
 "data and press \"Complete\" to finalize the process. If there's anything "
@@ -461,12 +587,6 @@ msgstr "Zugriff verweigert"
 msgid "New Form"
 msgstr "Neues Formular"
 
-msgid "Describes what this form is about"
-msgstr "Beschreibt kurz um was es bei diesem Formular geht"
-
-msgid "Definition"
-msgstr "Definition"
-
 msgid "Added a new form"
 msgstr "Ein neues Formular wurd hinzugefügt"
 
@@ -497,9 +617,6 @@ msgstr "Themen"
 msgid "Catalog A-Z"
 msgstr "Katalog A-Z"
 
-msgid "Email Address"
-msgstr "E-Mail Adresse"
-
 msgid "Password"
 msgstr "Passwort"
 
@@ -516,41 +633,14 @@ msgstr "Sie wurden eingeloggt."
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
 
-msgid "Academic Title"
-msgstr "Akademischer Titel"
-
-msgid "First name"
-msgstr "Vorname"
-
-msgid "Last name"
-msgstr "Nachname"
-
-msgid "E-Mail"
-msgstr "E-Mail"
-
-msgid "Phone"
-msgstr "Telefon"
-
-msgid "Website"
-msgstr "Webseite"
-
 msgid "New person"
 msgstr "Neue Person"
-
-msgid "Picture"
-msgstr "Bild"
-
-msgid "URL pointing to the picture"
-msgstr "Link zum Bild"
 
 msgid "Added a new person"
 msgstr "Eine neue Person wurde hinzugefügt"
 
 msgid "New"
 msgstr "Neu"
-
-msgid "New Password"
-msgstr "Neues Passwort"
 
 #, python-format
 msgid ""
@@ -568,41 +658,24 @@ msgstr "Ungültiger Addresse oder abgelaufener Link."
 msgid "Password reset"
 msgstr "Passwort zurücksetzen"
 
-msgid "Name"
-msgstr "Name"
+msgid "Added a new daypass"
+msgstr "Eine neue Tageskarte wurde hinzugefügt"
 
-msgid "E-Mail Reply Address"
-msgstr "E-Mail Antwort Adresse"
+msgid "New daypass"
+msgstr "Neue Tageskarte"
 
-msgid "Primary Color"
-msgstr "Primärfarbe"
+msgid "Added a new room"
+msgstr "Ein neuer Raum wurde hinzugefügt"
 
-msgid "Logo"
-msgstr "Logo"
+msgid "New room"
+msgstr "Neuer Raum"
 
-msgid "URL pointing to the logo"
-msgstr "Link zum Logo"
+msgid "New allocation"
+msgstr "Neue Einteilung"
 
-msgid "Replies to automated e-mails go to this address."
-msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
-
-msgid "Homepage Images"
-msgstr "Bilder auf der Startseite"
-
-msgid "Up to six URLs pointing to images for the tiles on the homepage."
-msgstr "Bis zu sechs Links zu Bildern für die Kacheln auf der Startseite"
-
-msgid "The address and phone number of the municipality"
-msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
-
-msgid "The opening hours of the municipality"
-msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
-
-msgid "Analytics Code"
-msgstr "Analytics Code"
-
-msgid "JavaScript for web statistics support"
-msgstr "JavaScript für Web-Statistik"
+#, python-format
+msgid "Successfully added ${n} allocations"
+msgstr "${n} Einteilungen wurden hinzugefügt"
 
 #, python-format
 msgid "You have accepted ticket ${number}"

@@ -515,6 +515,14 @@ input[type=color] {
         content: '\f007';
     }
 
+    .new-room:before {
+        content: '\f015';
+    }
+
+    .new-daypass:before {
+        content: '\f145';
+    }
+
     .edit-link:before {
         content: '\f040';
     }

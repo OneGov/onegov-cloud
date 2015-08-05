@@ -951,10 +951,10 @@ def test_resource_slots(town_app):
 
     client = Client(town_app)
 
-    url = '/reservationen/foo/slots'
+    url = '/reservation/foo/slots'
     assert client.get(url).json == []
 
-    url = '/reservationen/foo/slots?start=2015-08-04&end=2015-08-05'
+    url = '/reservation/foo/slots?start=2015-08-04&end=2015-08-05'
 
     assert client.get(url).json == [
         {
@@ -968,13 +968,29 @@ def test_resource_slots(town_app):
     ]
 
 
-def test_resources_view(town_app):
-
-    # just a smoke test really
+def test_resources(town_app):
     client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
 
     resources = client.get('/reservationen')
     assert 'GA Tageskarte' in resources
 
     resource = resources.click('GA Tageskarte')
     assert 'calendar' in resource
+
+    new = resources.click('Raum')
+    new.form['title'] = 'Meeting Room'
+    resource = new.form.submit().follow()
+
+    assert 'calendar' in resource
+    assert 'Meeting Room' in resource
+
+    edit = resource.click('Bearbeiten')
+    edit.form['title'] = 'Besprechungsraum'
+    edit.form.submit()
+
+    assert 'Besprechungsraum' in client.get('/reservationen')

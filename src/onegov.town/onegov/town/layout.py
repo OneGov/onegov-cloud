@@ -161,6 +161,11 @@ class Layout(ChameleonLayout):
             self.request.transform(self.request.path)
         )
 
+    def include_editor(self):
+        self.request.include('redactor')
+        self.request.include('redactor_theme')
+        self.request.include('editor')
+
     def thumbnail_url(self, url):
         """ Takes the given url and returns the thumbnail url for it, if it
         exists. Otherwise returns the url as is.
@@ -328,10 +333,7 @@ class EditorLayout(AdjacencyListLayout):
     def __init__(self, model, request, site_title):
         super(EditorLayout, self).__init__(model, request)
         self.site_title = site_title
-
-        self.request.include('redactor')
-        self.request.include('redactor_theme')
-        self.request.include('editor')
+        self.include_editor()
 
     @cached_property
     def breadcrumbs(self):
@@ -345,11 +347,7 @@ class FormEditorLayout(DefaultLayout):
 
     def __init__(self, model, request):
         super(FormEditorLayout, self).__init__(model, request)
-
-        self.request.include('redactor')
-        self.request.include('redactor_theme')
-        self.request.include('editor')
-        self.request.include('code_editor')
+        self.include_editor()
 
 
 class FormSubmissionLayout(DefaultLayout):
@@ -582,6 +580,33 @@ class ResourcesLayout(DefaultLayout):
             Link(_("Reservations"), self.request.link(self.model))
         ]
 
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Room"),
+                            url=self.request.link(
+                                self.model,
+                                name='neuer-raum'
+                            ),
+                            classes=('new-room', )
+                        ),
+                        Link(
+                            text=_("Daypass"),
+                            url=self.request.link(
+                                self.model,
+                                name='neue-tageskarte'
+                            ),
+                            classes=('new-daypass', )
+                        )
+                    ]
+                ),
+            ]
+
 
 class ResourceLayout(DefaultLayout):
 
@@ -602,3 +627,14 @@ class ResourceLayout(DefaultLayout):
             Link(_("Reservations"), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model))
         ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'bearbeiten'),
+                    classes=('edit-link', )
+                )
+            ]
