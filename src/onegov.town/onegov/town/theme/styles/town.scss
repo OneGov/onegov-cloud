@@ -1114,6 +1114,16 @@ tr.ticket:hover {
             font-size: .9em;
         }
 
+        .fc-event {
+            border-radius: 0;
+            margin: 0;
+        }
+
+        // fix borders missing with zurb foundation
+        tbody div.fc-content-skeleton td {
+            border-color: #ddd;
+        }
+
     }
 
     .fc button,
