@@ -280,17 +280,15 @@ form {
 }
 
 /*
-    form collection rendering
+    simple listed content
 */
-.form-definitions {
-    .form-definition-title {
-        font-weight: bold;
-    }
+.list-title {
+    font-weight: bold;
+}
 
-    .form-definition-lead {
-        margin-bottom: .2em;
-        max-width: 500px;
-    }
+.list-lead {
+    margin-bottom: .2em;
+    max-width: 500px;
 }
 
 /*
