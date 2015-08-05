@@ -64,12 +64,18 @@ footer,
 }
 
 /*
+    Rounded corners for panels.
+*/
+.panel {
+    @include smooth-edges;
+}
+
+/*
     Zurb lacks a separate color for callout panels.
 */
 .panel.callout {
     border-color: $callout-panel-border-color;
 }
-
 
 /*
     top navigation
