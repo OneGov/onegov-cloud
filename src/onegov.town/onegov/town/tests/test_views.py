@@ -966,3 +966,15 @@ def test_resource_slots(town_app):
             'end': '2015-08-06T00:00:00+02:00'
         }
     ]
+
+
+def test_resources_view(town_app):
+
+    # just a smoke test really
+    client = Client(town_app)
+
+    resources = client.get('/reservationen')
+    assert 'GA Tageskarte' in resources
+
+    resource = resources.click('GA Tageskarte')
+    assert 'calendar' in resource

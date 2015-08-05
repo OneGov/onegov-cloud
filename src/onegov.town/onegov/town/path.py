@@ -129,6 +129,11 @@ def get_tickets(app, page=0, state='open'):
     return TicketCollection(app.session(), page, state)
 
 
+@TownApp.path(model=ResourceCollection, path='/reservationen')
+def get_resources(app):
+    return ResourceCollection(app.libres_context)
+
+
 @TownApp.path(model=Resource, path='/reservationen/{name}')
 def get_resource(app, name):
     return ResourceCollection(app.libres_context).by_name(name)

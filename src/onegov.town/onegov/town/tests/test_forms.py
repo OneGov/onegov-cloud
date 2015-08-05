@@ -2,7 +2,7 @@ import pytest
 
 from datetime import date, datetime
 from dateutil.rrule import MO, WE
-from onegov.town.views.allocation import (
+from onegov.town.forms.allocation import (
     DaypassAllocationForm,
     RoomAllocationForm
 )

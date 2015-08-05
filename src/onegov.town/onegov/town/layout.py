@@ -2,6 +2,7 @@ from cached_property import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.form import FormCollection, FormSubmissionFile, render_field
+from onegov.libres import ResourceCollection
 from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
@@ -572,6 +573,16 @@ class TicketLayout(DefaultLayout):
             return links
 
 
+class ResourcesLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Reservations"), self.request.link(self.model))
+        ]
+
+
 class ResourceLayout(DefaultLayout):
 
     def __init__(self, model, request):
@@ -581,8 +592,13 @@ class ResourceLayout(DefaultLayout):
         self.request.include('fullcalendar_css')
 
     @cached_property
+    def collection(self):
+        return ResourceCollection(self.request.app.libres_context)
+
+    @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
+            Link(_("Reservations"), self.request.link(self.collection)),
             Link(_(self.model.title), self.request.link(self.model))
         ]

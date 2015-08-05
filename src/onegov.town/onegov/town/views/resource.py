@@ -2,15 +2,26 @@ import morepath
 
 from libres.db.models import Allocation
 from onegov.core.security import Public, Private
+from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
 from onegov.town import TownApp, _
 from onegov.town import utils
 from onegov.town.elements import Link
-from onegov.town.layout import ResourceLayout
-from onegov.town.views.allocation import (
+from onegov.town.layout import ResourcesLayout, ResourceLayout
+from onegov.town.forms.allocation import (
     DaypassAllocationForm,
     RoomAllocationForm
 )
+
+
+@TownApp.html(model=ResourceCollection, template='resources.pt',
+              permission=Public)
+def view_resources(self, request):
+    return {
+        'title': _("Reservations"),
+        'resources': self.query().order_by(Resource.title).all(),
+        'layout': ResourcesLayout(self, request)
+    }
 
 
 @TownApp.html(model=Resource, template='resource.pt', permission=Public)
