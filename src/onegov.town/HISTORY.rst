@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Add the ability to define room/daypass resources and allocations (no way
+  to do reservations just yet).
+  [href]
+
 - Group images by dates.
   [msom]
 
