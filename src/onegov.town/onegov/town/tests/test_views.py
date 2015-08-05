@@ -994,3 +994,5 @@ def test_resources(town_app):
     edit.form.submit()
 
     assert 'Besprechungsraum' in client.get('/reservationen')
+
+    assert client.delete('/reservation/meeting-room').status_code == 200

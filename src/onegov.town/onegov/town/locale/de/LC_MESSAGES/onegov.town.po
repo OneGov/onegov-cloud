@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-05 11:31+0200\n"
+"POT-Creation-Date: 2015-08-05 12:43+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -81,6 +81,18 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 
 msgid "Delete person"
 msgstr "Person löschen"
+
+msgid "Do you really want to delete this resource?"
+msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
+
+msgid "Delete resource"
+msgstr "Reservations-Ressource löschen"
+
+msgid "This resource can't be deleted."
+msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
+
+msgid "There are existing reservations associated with this resource"
+msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"

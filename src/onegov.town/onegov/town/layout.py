@@ -631,10 +631,30 @@ class ResourceLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
+            if self.model.deletable(self.request.app.libres_context):
+                delete_link = DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model),
+                    confirm=_("Do you really want to delete this resource?"),
+                    yes_button_text=_("Delete resource"),
+                    redirect_after=self.request.link(self.collection)
+                )
+
+            else:
+                delete_link = DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model),
+                    confirm=_("This resource can't be deleted."),
+                    extra_information=_(
+                        "There are existing reservations associated "
+                        "with this resource"
+                    )
+                )
             return [
                 Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'bearbeiten'),
                     classes=('edit-link', )
-                )
+                ),
+                delete_link
             ]

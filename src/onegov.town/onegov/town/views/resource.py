@@ -10,6 +10,7 @@ from onegov.town.forms import ResourceForm
 from onegov.town.models.resource import DaypassResource, RoomResource
 from onegov.town.layout import ResourcesLayout, ResourceLayout
 from onegov.town.forms import DaypassAllocationForm, RoomAllocationForm
+from webob import exc
 
 
 RESOURCE_TYPES = {
@@ -120,6 +121,16 @@ def view_resource(self, request):
         'layout': ResourceLayout(self, request),
         'feed': request.link(self, name='slots')
     }
+
+
+@TownApp.view(model=Resource, request_method='DELETE', permission=Private)
+def handle_delete_resource(self, request):
+
+    if not self.deletable(request.app.libres_context):
+        raise exc.HTTPMethodNotAllowed()
+
+    collection = ResourceCollection(request.app.libres_context)
+    collection.delete(self, including_reservations=False)
 
 
 @TownApp.json(model=Resource, name='slots', permission=Public)

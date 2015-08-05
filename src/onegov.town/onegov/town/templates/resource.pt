@@ -5,7 +5,7 @@
     <tal:block metal:fill-slot="content">
 
         <tal:block metal:use-macro="layout.macros.page_content"
-             tal:define="lead resource.content.get('lead');text resource.content.get('text'); people resource.people; contact resource.contact_html" />
+             tal:define="lead resource.meta.get('lead');text resource.content.get('text'); people resource.people; contact resource.contact_html" />
 
         <div class="calendar" data-feed="${feed}"></div>
     </tal:block>
