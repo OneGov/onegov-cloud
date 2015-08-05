@@ -7,6 +7,22 @@
         <tal:block metal:use-macro="layout.macros.page_content"
              tal:define="lead resource.meta.get('lead');text resource.content.get('text'); people resource.people; contact resource.contact_html" />
 
-        <div class="calendar" data-feed="${feed}"></div>
+        <tal:block condition="resource.type == 'daypass'">
+            <div class="calendar"
+                data-feed="${feed}" 
+                data-header-left="title"
+                data-header-right="today prev,next"
+            />
+        </tal:block>
+        <tal:block condition="resource.type == 'room'">
+            <div class="calendar" 
+                data-feed="${feed}" 
+                data-header-left="month,agendaWeek,agendaDay" 
+                data-header-center="title"
+                data-header-right="today prev,next"
+                data-min-time="${resource.first_hour}:00:00"
+                data-max-time="${resource.last_hour}:00:00"
+            />
+        </tal:block>
     </tal:block>
 </div>

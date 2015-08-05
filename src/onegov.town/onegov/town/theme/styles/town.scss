@@ -1102,8 +1102,25 @@ tr.ticket:hover {
 
 .calendar {
 
+    button:focus {
+        // XXX fullcalendar focuses the buttons when they are clicked,
+        // resulting in the chrome accessibility outline.. now this is
+        // helpful in allmost all the cases (and shoult not be disabled)
+        // however, the calendar is not accessible as it is, so we might
+        // as well remove this otherwise very jaring looking outline
+        // -> the fullcalendar needs an accessible alternative, it can't
+        // really be made accessible because it's a huge blob of html
+        // tables designed to show a calendar...
+        outline: none;
+    }
+
     table {
+        background-color: transparent;
         margin-bottom: 0;
+
+        tr {
+            background-color: transparent;
+        }
 
         .fc-today {
             background: $yellow-pastel;
@@ -1123,7 +1140,6 @@ tr.ticket:hover {
         tbody div.fc-content-skeleton td {
             border-color: #ddd;
         }
-
     }
 
     .fc button,
@@ -1138,8 +1154,11 @@ tr.ticket:hover {
         height: 2.25rem;
         text-shadow: none;
 
-        .fc-state-disabled {
+        &.fc-state-active,
+        &.fc-state-disabled {
             background: $secondary-color;
+            color: $jet;
+            opacity: 1;
         }
     }
 }
