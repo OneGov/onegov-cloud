@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.3 (2015-08-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Removes first/last hour setting.
   [href]
 
