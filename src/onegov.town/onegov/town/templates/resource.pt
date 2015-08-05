@@ -7,9 +7,11 @@
         <tal:block metal:use-macro="layout.macros.page_content"
              tal:define="lead resource.meta.get('lead');text resource.content.get('text'); people resource.people; contact resource.contact_html" />
 
+        <div class="panel" i18n:translate="">Click on a block in the calendar below to make a reservation.</div>
+
         <tal:block condition="resource.type == 'daypass'">
             <div class="calendar"
-                data-feed="${feed}" 
+                data-feed="${feed}"
                 data-header-left="title"
                 data-header-right="today prev,next"
                 data-selectable="${request.is_logged_in and 'true' or 'false'}"
@@ -18,9 +20,9 @@
             />
         </tal:block>
         <tal:block condition="resource.type == 'room'">
-            <div class="calendar" 
-                data-feed="${feed}" 
-                data-header-left="month,agendaWeek,agendaDay" 
+            <div class="calendar"
+                data-feed="${feed}"
+                data-header-left="month,agendaWeek,agendaDay"
                 data-header-center="title"
                 data-header-right="today prev,next"
                 data-min-time="07:00:00"
