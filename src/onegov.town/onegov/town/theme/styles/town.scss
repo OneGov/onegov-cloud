@@ -220,28 +220,6 @@ form {
     }
 
     /*
-        Password quality meter
-    */
-    meter {
-        -webkit-appearance: none; 
-        background: $input-border-color !important;
-        border: 0;
-        height: 10px;
-        position: relative;
-        top: -1.55rem;
-        width: 100%;
-    }
-
-    meter::-webkit-meter-bar {
-        background: $input-border-color !important;
-        border: 0;
-    }
-
-    meter::-webkit-meter-optimum-value {
-        background: $success-color;
-    }
-
-    /*
         Ace code editor, which you don't want to touch. Huge pita to get to
         work right with custom styling (it'll look like it's working, but
         all the cursor measurements are off and the editing is werid).
