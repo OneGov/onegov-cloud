@@ -3,7 +3,7 @@ from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -37,12 +37,6 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
 
     #: the timezone this resource resides in
     timezone = Column(Text, nullable=False)
-
-    #: the first hour shown on the calendar
-    first_hour = Column(Integer, nullable=False, default=7)
-
-    #: the last hour shown on the calendar
-    last_hour = Column(Integer, nullable=False, default=18)
 
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
