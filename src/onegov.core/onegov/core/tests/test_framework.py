@@ -501,3 +501,35 @@ def test_send_email_to_maildir(temporary_directory):
     assert 'From: Govikon <noreply@example.org>' in email
     assert 'Sender: Govikon <noreply@example.org>' in email
     assert 'To: recipient@example.org' in email
+
+
+def test_object_by_path():
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.path(path='/pages', absorb=True)
+    class Page(object):
+        def __init__(self, absorb):
+            self.absorb = absorb
+
+    config.commit()
+
+    app = App()
+    assert isinstance(app.object_by_path('/'), Root)
+    assert isinstance(app.object_by_path('https://www.example.org/'), Root)
+
+    page = app.object_by_path('/pages/foo/bar')
+    assert page.absorb == 'foo/bar'
+    assert isinstance(page, Page)
+
+    assert app.object_by_path('/pages').absorb == ''
+
+    # works, because 'foobar' is a view of the root
+    assert isinstance(app.object_by_path('/foobar'), Root)
+    assert app.object_by_path('/asdf/asdf') is None

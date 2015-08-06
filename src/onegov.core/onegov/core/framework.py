@@ -38,6 +38,7 @@ from onegov.core.mail import Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
 from onegov.core.request import CoreRequest
 from onegov.server import Application as ServerApplication
+from purl import URL
 from uuid import uuid4 as new_uuid
 
 
@@ -368,6 +369,40 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         # the cleartext value I honestly couldn't tell you what it could be
         # used for...
         return hashlib.sha1(self.application_id.encode('utf-8')).hexdigest()
+
+    def object_by_path(self, path):
+        """ Takes a path and returns the object associated with it. If a
+        scheme or a host is passed it is ignored.
+
+        Be careful if you use this function with user provided urls, we load
+        objects here, not views. Therefore no security restrictions apply.
+
+        The first use case of this function is to provide a generic copy/paste
+        functionality. There, we only allow urls to be copied which have been
+        previously signed by the server.
+
+        *Safeguards like this are necessary if the user has the ability to
+        somehow influence the path*!
+
+        """
+
+        # strip host and scheme
+        path = URL(path).path()
+
+        request = morepath.request.Request(environ={
+            'PATH_INFO': URL(path).path(),
+            'SERVER_NAME': '',
+            'SERVER_PORT': '',
+            'SERVER_PROTOCOL': 'https'
+        }, app=self)
+
+        obj = morepath.publish.resolve_model(request)
+
+        # if there is more than one token unconsumed, this can't be a view
+        if len(request.unconsumed) > 1:
+            return None
+
+        return obj
 
     @cached_property
     def webassets_url(self):

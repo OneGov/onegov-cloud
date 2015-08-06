@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a function that returns the object associated with a path.
+  [href]
+
 - Fix options not being translated on i18n-enabled forms.
   [href]
 
