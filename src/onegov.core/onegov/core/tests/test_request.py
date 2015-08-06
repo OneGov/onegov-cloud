@@ -18,5 +18,5 @@ def test_url_safe_token():
     assert request.load_url_safe_token(token) == {'foo': 'bar'}
     assert request.load_url_safe_token(token, salt='x') is None
 
-    with freeze_time(datetime.now() + timedelta(seconds=1)):
+    with freeze_time(datetime.now() + timedelta(seconds=2)):
         assert request.load_url_safe_token(token, max_age=1) is None
