@@ -139,13 +139,19 @@ class RoomAllocationForm(AllocationForm):
 
     as_whole_day_dependency = FieldDependency('as_whole_day', 'no')
 
-    start_time = TextField("Each starting at", [
-        If(as_whole_day_dependency.fulfilled, DataRequired())
-    ], widget=with_options(TextInput, **as_whole_day_dependency.html_data))
+    start_time = TextField(
+        label=_("Each starting at"),
+        description=_("HH:MM"),
+        validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
+        widget=with_options(TextInput, **as_whole_day_dependency.html_data)
+    )
 
-    end_time = TextField("Each ending at", [
-        If(as_whole_day_dependency.fulfilled, DataRequired())
-    ], widget=with_options(TextInput, **as_whole_day_dependency.html_data))
+    end_time = TextField(
+        label=_("Each ending at"),
+        description=_("HH:MM"),
+        validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
+        widget=with_options(TextInput, **as_whole_day_dependency.html_data)
+    )
 
     except_for = MultiCheckboxField(
         _("Except for"),

@@ -7,7 +7,12 @@
         <tal:block metal:use-macro="layout.macros.page_content"
              tal:define="lead resource.meta.get('lead');text resource.content.get('text'); people resource.people; contact resource.contact_html" />
 
-        <div class="panel" i18n:translate="">Click on a block in the calendar below to make a reservation.</div>
+        <div class="panel" i18n:translate tal:condition="not: request.is_logged_in">
+            Click on any of the blocks in the calendar below to make a reservation.
+        </div>
+        <div class="panel" i18n:translate tal:condition="request.is_logged_in">
+            Select a free time span in the calendar below to create an allocation.
+        </div>
 
         <tal:block condition="resource.type == 'daypass'">
             <div class="calendar"

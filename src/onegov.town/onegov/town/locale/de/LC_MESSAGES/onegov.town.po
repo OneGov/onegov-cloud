@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-05 12:43+0200\n"
+"POT-Creation-Date: 2015-08-06 09:09+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -180,6 +180,24 @@ msgstr "Tageskarten pro Person und Tag"
 msgid "Except for"
 msgstr "Ausser an"
 
+msgid "Whole day"
+msgstr "Ganztägig"
+
+msgid "Each starting at"
+msgstr "Jeweils von"
+
+msgid "HH:MM"
+msgstr "HH:MM"
+
+msgid "Each ending at"
+msgstr "Jeweils bis"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -236,9 +254,6 @@ msgstr "Neues Passwort"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
-
-msgid "First hour shown in calendar"
-msgstr "Die erste Stunde die im Kalender angezeigt wird"
 
 msgid "Name"
 msgstr "Name"
@@ -526,6 +541,14 @@ msgstr ""
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
+msgid "Click on any of the blocks in the calendar below to make a reservation."
+msgstr ""
+"Klicken Sie auf einen der Blöcke im Kalender um eine Reservation zu "
+"erstellen."
+
+msgid "Select a free time span in the calendar below to create an allocation."
+msgstr "Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu machen."
+
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 
@@ -721,6 +744,3 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
-
-#~ msgid "Forgot your password? <a href=\"${url}\">Reset your password</a>."
-#~ msgstr "Passwort vergessen?  <a href=\"${url}\">Passwort zurücksetzen</a>"
