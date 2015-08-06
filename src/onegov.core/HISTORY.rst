@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.18 (2015-08-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a function that returns the object associated with a path.
   [href]
