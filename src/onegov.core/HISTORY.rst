@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Use bcrypt instead of py-bcrypt as the latter has been deprecated by passlib.
+  [href]
+
 0.4.18 (2015-08-06)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'alembic',
         'arrow',
+        'bcrypt',
         'bleach',
         'cached_property',
         'chameleon',
@@ -50,7 +51,6 @@ setup(
         'onegov.server>=0.0.3',
         'passlib',
         'polib',
-        'py-bcrypt',
         'python-magic',
         'python-memcached>=1.57',
         'pylibmc',
