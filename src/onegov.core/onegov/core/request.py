@@ -150,9 +150,9 @@ class CoreRequest(IncludeRequest):
 
         """
 
-        session_id = self.app.unsign(self.cookies.get('session_id', ''))
-
-        if not session_id:
+        if 'session_id' in self.cookies:
+            session_id = self.app.unsign(self.cookies['session_id'])
+        else:
             session_id = random_token()
 
         def on_dirty(namespace, token):
