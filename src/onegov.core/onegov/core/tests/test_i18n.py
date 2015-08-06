@@ -6,6 +6,7 @@ from onegov.core import i18n
 from onegov.core import utils
 from webob import Request
 from webob.acceptparse import Accept
+from wtforms import Label
 
 
 def test_pofiles(temporary_directory):
@@ -84,10 +85,18 @@ def test_get_translation_bound_form():
         def add_fallback(self, translation):
             self._fallback = translation
 
+        def gettext(self, text):
+            return text[::-1]  # inverse the string
+
     default = MockTranslation()
     translate = MockTranslation()
 
-    class MockMeta(object):
+    class MetaMeta(object):
+
+        def render_field(self, field, render_kw):
+            return field.label.text
+
+    class MockMeta(MetaMeta):
 
         def get_translations(self, form):
             return default
@@ -96,7 +105,16 @@ def test_get_translation_bound_form():
 
         Meta = MockMeta
 
+    class MockField(object):
+
+        def __init__(self, label):
+            self.label = Label('x', label)
+
     form_class = i18n.get_translation_bound_form(MockForm, translate)
 
     assert form_class.Meta().get_translations(None) is default
     assert form_class.Meta().get_translations(None)._fallback is translate
+
+    meta = form_class.Meta()
+    meta.get_translations(None)
+    assert meta.render_field(MockField('Yes'), {}) == 'seY'

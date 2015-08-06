@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Fix options not being translated on i18n-enabled forms.
+  [href]
+
 0.4.17 (2015-08-04)
 ~~~~~~~~~~~~~~~~~~~
 

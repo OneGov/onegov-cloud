@@ -176,7 +176,36 @@ def get_translation_bound_meta(meta_class, translate):
                 if not default.translations._fallback:
                     default.translations.add_fallback(translate)
 
+            # Cache for reuse in render_field. I'm not sure this is perfectly
+            # sane, as WTForms does use it's own caching mechanism with
+            # translations bound to the current locales. For now it seems
+            # fine, but we don't do different locales yet.
+            self._translations = default
+
             return default
+
+        def render_field(self, field, render_kw):
+            """ Wtforms does not actually translate labels, it simply leaves
+            the translations string be. If those translation strings hit our
+            templates directly, they will then be picked up by our template
+            renderer.
+
+            However, that's not always the case. For example, when rendering
+            a list of options, WTForms renders each option as a field with a
+            label. By doing that it coerces the translation string into a
+            plain string.
+
+            By always translating the labels before they hit the template we
+            can make sure that this is not a problem. We do this by
+            intercepting each render call, which thankfully is something
+            wtforms does support.
+
+            """
+            if hasattr(field, 'label'):
+                field.label.text = self._translations.gettext(field.label.text)
+
+            return super(TranslationBoundMeta, self).render_field(
+                field, render_kw)
 
     return TranslationBoundMeta
 
