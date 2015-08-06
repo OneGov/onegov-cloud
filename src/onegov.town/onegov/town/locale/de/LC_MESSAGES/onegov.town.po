@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-06 09:09+0200\n"
+"POT-Creation-Date: 2015-08-06 14:12+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -213,6 +213,12 @@ msgstr "Text"
 msgid "Definition"
 msgstr "Definition"
 
+msgid "Email Address"
+msgstr "E-Mail Adresse"
+
+msgid "Password"
+msgstr "Passwort"
+
 msgid "URL"
 msgstr "URL"
 
@@ -245,9 +251,6 @@ msgstr "Link zum Bild"
 
 msgid "Address"
 msgstr "Adresse"
-
-msgid "Email Address"
-msgstr "E-Mail Adresse"
 
 msgid "New Password"
 msgstr "Neues Passwort"
@@ -391,6 +394,12 @@ msgid "Please note that this page has subpages which will also be deleted!"
 msgstr ""
 "Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
 "werden!"
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid "Paste"
+msgstr "Einfügen"
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -547,7 +556,9 @@ msgstr ""
 "erstellen."
 
 msgid "Select a free time span in the calendar below to create an allocation."
-msgstr "Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu machen."
+msgstr ""
+"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu "
+"machen."
 
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
@@ -613,6 +624,9 @@ msgstr "Status:"
 msgid "Accept"
 msgstr "Annehmen"
 
+msgid "A link was added to the clipboard"
+msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
@@ -651,9 +665,6 @@ msgstr "Themen"
 
 msgid "Catalog A-Z"
 msgstr "Katalog A-Z"
-
-msgid "Password"
-msgstr "Passwort"
 
 #, python-format
 msgid "Login to ${town}"
@@ -744,3 +755,6 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
+
+#~ msgid "A link to the page was added to the clipboard"
+#~ msgstr "Ein Verweis auf die Seite wurde in die Zwischenablage gespeichert"

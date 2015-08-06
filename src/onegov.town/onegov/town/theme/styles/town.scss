@@ -68,13 +68,11 @@ footer,
 */
 .panel {
     @include smooth-edges;
-}
 
-/*
-    Zurb lacks a separate color for callout panels.
-*/
-.panel.callout {
-    border-color: $callout-panel-border-color;
+    // Zurb lacks a separate color for callout panels.
+    &.callout {
+        border-color: $callout-panel-border-color;
+    }
 }
 
 /*
@@ -503,6 +501,14 @@ input[type=color] {
 
     .new-daypass:before {
         content: '\f145';
+    }
+
+    .copy-link:before {
+        content: '\f0c5';
+    }
+
+    .paste-link:before {
+        content: '\f0ea';
     }
 
     .edit-link:before {

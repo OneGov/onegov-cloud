@@ -7,10 +7,17 @@ from onegov.page import PageCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.layout import EditorLayout
-from onegov.town.models import Editor
+from onegov.town.models import Clipboard, Editor
 
 
 def get_form_class(editor, request):
+
+    src = Clipboard.from_session(request).get_object()
+
+    if src and editor.action == 'paste':
+        if src and src.trait in editor.page.allowed_subtraits:
+            return editor.page.get_form_class(src.trait, request)
+
     return editor.page.get_form_class(editor.trait, request)
 
 
@@ -21,11 +28,17 @@ def handle_page_form(self, request, form):
         return handle_new_page(self, request, form)
     elif self.action == 'edit':
         return handle_edit_page(self, request, form)
+    elif self.action == 'paste':
+        clipboard = Clipboard.from_session(request)
+        src = clipboard.get_object()
+        clipboard.clear()
+
+        return handle_new_page(self, request, form, src)
     else:
         raise NotImplementedError
 
 
-def handle_new_page(self, request, form):
+def handle_new_page(self, request, form, src=None):
 
     if form.submitted(request):
         pages = PageCollection(request.app.session())
@@ -39,6 +52,9 @@ def handle_new_page(self, request, form):
 
         request.success(page.trait_messages[page.trait]['new_page_added'])
         return morepath.redirect(request.link(page))
+
+    if src:
+        form.apply_model(src)
 
     site_title = self.page.trait_messages[self.trait]['new_page_title']
 

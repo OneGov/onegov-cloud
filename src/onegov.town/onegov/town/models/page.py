@@ -25,6 +25,16 @@ class Topic(Page, TraitInfo,
         return True
 
     @property
+    def paste_target(self):
+        if self.trait == 'link':
+            return self.parent
+
+        if self.trait == 'page':
+            return self
+
+        raise NotImplementedError
+
+    @property
     def allowed_subtraits(self):
         if self.trait == 'link':
             return tuple()
@@ -62,6 +72,13 @@ class News(Page, TraitInfo,
     @property
     def editable(self):
         return self.parent is not None
+
+    @property
+    def paste_target(self):
+        if self.parent:
+            return self.parent
+        else:
+            return self
 
     @property
     def allowed_subtraits(self):

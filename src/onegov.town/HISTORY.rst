@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a copy&paste mechanism for pages, links and news.
+  [href]
+
 - Add the ability to define room/daypass resources and allocations (no way
   to do reservations just yet).
   [href]

@@ -996,3 +996,73 @@ def test_resources(town_app):
     assert 'Besprechungsraum' in client.get('/reservationen')
 
     assert client.delete('/reservation/meeting-room').status_code == 200
+
+
+def test_clipboard(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    page = client.get('/themen/bildung-gesellschaft')
+    assert 'paste-link' not in page
+
+    page = page.click(
+        'Kopieren',
+        extra_environ={'HTTP_REFERER': page.request.url}
+    ).follow()
+
+    assert 'paste-link' in page
+
+    page = page.click('Einf').form.submit().follow()
+    assert '/bildung-gesellschaft/bildung-gesellschaft' in page.request.url
+
+
+def test_clipboard_separation(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    page = client.get('/themen/bildung-gesellschaft')
+    page = page.click('Kopieren')
+
+    assert 'paste-link' in client.get('/themen/bildung-gesellschaft')
+
+    # new client (browser) -> new clipboard
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    assert 'paste-link' not in client.get('/themen/bildung-gesellschaft')
+
+
+def test_copy_pages_to_news(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    page = client.get('/themen/bildung-gesellschaft')
+    edit = page.click('Bearbeiten')
+
+    edit.form['lead'] = '0xdeadbeef'
+    page = edit.form.submit().follow()
+
+    page.click('Kopieren')
+
+    edit = client.get('/aktuelles').click('Einf')
+
+    assert '0xdeadbeef' in edit
+    page = edit.form.submit().follow()
+
+    assert '/aktuelles/bildung-gesellschaft' in page.request.url

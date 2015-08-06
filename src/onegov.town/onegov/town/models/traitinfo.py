@@ -1,6 +1,6 @@
 from onegov.town import _
 from onegov.town.elements import DeleteLink, Link, LinkGroup
-from onegov.town.models import Editor
+from onegov.town.models import Clipboard, Editor
 
 #: Contains the messages that differ for each trait (the handling of all traits
 #: is the same). New traits need to adapt the same messages as the others.
@@ -69,6 +69,17 @@ class TraitInfo(object):
         """ Returns a list of traits that this page may contain. """
         raise NotImplementedError
 
+    @property
+    def paste_target(self):
+        """ Returns the page that should be used as parent for the content
+        pasting if paste is called on the current page (self).
+
+        This is usually just self. If the paste action should put the content
+        alongside the current page, it would be the parent.
+
+        """
+        raise NotImplementedError
+
     def is_supported_trait(trait):
         """ Returns true if the given trait is supported by this type This
         doesn't mean that the trait may be added to this page, it serves
@@ -118,6 +129,19 @@ class TraitInfo(object):
                 _("Edit"),
                 request.link(Editor('edit', self)),
                 classes=('edit-link', )
+            )
+            yield Link(
+                _("Copy"),
+                request.link(Clipboard.from_url(request, request.path_info)),
+                classes=('copy-link', )
+            )
+
+        if request.browser_session.has('clipboard_url'):
+
+            yield Link(
+                _("Paste"),
+                request.link(Editor('paste', self.paste_target)),
+                classes=('paste-link', 'show-new-content-placeholder'),
             )
 
         if self.deletable:

@@ -11,6 +11,7 @@ from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
 from onegov.town.app import TownApp
 from onegov.town.models import (
+    Clipboard,
     Editor,
     File,
     FileCollection,
@@ -137,3 +138,12 @@ def get_resources(app):
 @TownApp.path(model=Resource, path='/reservation/{name}')
 def get_resource(app, name):
     return ResourceCollection(app.libres_context).by_name(name)
+
+
+@TownApp.path(model=Clipboard, path='/clipboard/copy/{token}')
+def get_clipboard(request, token):
+    clipboard = Clipboard(request, token)
+
+    # the url is None if the token is invalid
+    if clipboard.url:
+        return clipboard

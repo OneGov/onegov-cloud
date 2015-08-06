@@ -15,7 +15,7 @@ class Editor(object):
 
         :page:
             The 'context' of the action. The actual page in the case of 'edit'
-            and 'delete'. The parent in the case of 'new'.
+            and 'delete'. The parent in the case of 'new' or 'paste'.
 
             New pages inherit the type from the parent.
 
@@ -37,7 +37,7 @@ class Editor(object):
     @staticmethod
     def is_supported_action(action):
         """ Returns True if the given action is supported. """
-        return action in {'new', 'edit', 'delete'}
+        return action in {'new', 'paste', 'edit', 'delete'}
 
     @property
     def page_id(self):

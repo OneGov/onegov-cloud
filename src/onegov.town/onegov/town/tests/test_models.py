@@ -1,8 +1,8 @@
 from datetime import datetime, date
-from dateutil import relativedelta
 from mock import Mock, patch
+from onegov.core.request import CoreRequest
 from onegov.testing import utils
-from onegov.town.models import ImageCollection
+from onegov.town.models import Clipboard, ImageCollection
 
 
 def test_image_collection(town_app):
@@ -27,6 +27,28 @@ def test_image_collection(town_app):
 
     assert len(list(collection.files)) == 0
     assert len(list(collection.thumbnails)) == 0
+
+
+def test_clipboard(town_app):
+
+    request = CoreRequest(environ={
+        'PATH_INFO': '/',
+        'SERVER_NAME': '',
+        'SERVER_PORT': '',
+        'SERVER_PROTOCOL': 'https'
+    }, app=town_app)
+
+    clipboard = Clipboard.from_url(request, 'https://google.ch')
+    assert clipboard.url == 'https://google.ch'
+
+    clipboard.store_in_session()
+    assert clipboard.from_session(clipboard.request).url == 'https://google.ch'
+
+    clipboard.clear()
+    assert clipboard.from_session(clipboard.request).url is None
+
+    clipboard = Clipboard(request, clipboard.token + 'x')
+    assert clipboard.url is None
 
 
 def test_image_grouping(town_app):
