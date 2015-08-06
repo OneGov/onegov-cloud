@@ -145,22 +145,38 @@ class TraitInfo(object):
             )
 
         if self.deletable:
-            trait_messages = self.trait_messages[self.trait]
 
-            if self.children:
-                extra_warning = _(
-                    "Please note that this page has subpages "
-                    "which will also be deleted!"
+            trait_messages = self.trait_messages[self.trait]
+            safe_delete = False if self.children else True
+
+            if safe_delete or request.current_role == 'admin':
+
+                if not safe_delete:
+                    extra_warning = _(
+                        "Please note that this page has subpages "
+                        "which will also be deleted!"
+                    )
+                else:
+                    extra_warning = ""
+
+                yield DeleteLink(
+                    _("Delete"), request.link(self),
+                    confirm=_(trait_messages['delete_question'], mapping={
+                        'title': self.title
+                    }),
+                    yes_button_text=trait_messages['delete_button'],
+                    extra_information=extra_warning,
+                    redirect_after=request.link(self.parent)
                 )
             else:
-                extra_warning = ""
-
-            yield DeleteLink(
-                _("Delete"), request.link(self),
-                confirm=_(trait_messages['delete_question'], mapping={
-                    'title': self.title
-                }),
-                yes_button_text=trait_messages['delete_button'],
-                extra_information=extra_warning,
-                redirect_after=request.link(self.parent)
-            )
+                yield DeleteLink(
+                    text=_("Delete"),
+                    url=request.link(self),
+                    confirm=_("This page can't be deleted."),
+                    extra_information=_(
+                        "This page has subpages. Only administrators can "
+                        "delete pages with subpages. To delete this page, "
+                        "delete all subpages first or ask an administrator "
+                        "to do it for you."
+                    )
+                )

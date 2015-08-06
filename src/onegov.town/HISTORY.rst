@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Limit the deletion of pages including subpages to users with the admin role.
+  [href]
+
 - Adds a copy&paste mechanism for pages, links and news.
   [href]
 
