@@ -6,6 +6,7 @@ from onegov.town.forms.form_definition import (
     BuiltinDefinitionForm,
     CustomDefinitionForm
 )
+from onegov.town.forms.login import LoginForm
 from onegov.town.forms.page import LinkForm, PageForm
 from onegov.town.forms.person import PersonForm
 from onegov.town.forms.reset_password import (
@@ -20,6 +21,7 @@ __all__ = [
     'CustomDefinitionForm',
     'DaypassAllocationForm',
     'LinkForm',
+    'LoginForm',
     'PageForm',
     'PasswordResetForm',
     'PersonForm',
