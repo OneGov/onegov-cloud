@@ -71,7 +71,7 @@ class Event(Base, ContentMixin, TimestampMixin):
 
     def _update_occurrences(self):
         # clear old occurrences
-        self.occurrences.clear()
+        self.occurrences = []
 
         # do not create occurrences unless the event is published
         if not self.state == 'published':
