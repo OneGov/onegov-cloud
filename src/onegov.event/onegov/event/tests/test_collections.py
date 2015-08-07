@@ -72,3 +72,103 @@ def test_collections(session):
     events.delete(event_2)
     assert events.query().count() == 0
     assert occurrences.query().count() == 0
+
+
+def test_paginations(session):
+    timezone = 'US/Eastern'
+
+    events = EventCollection(session)
+    occurrences = OccurrenceCollection(session)
+
+    assert events.page_index == 0
+    assert events.pages_count == 0
+    assert events.batch == []
+    assert occurrences.page_index == 0
+    assert occurrences.pages_count == 0
+    assert occurrences.batch == []
+
+    for year in range(2008, 2011):
+        for month in range(1, 13):
+            event = events.add(
+                title='Event {0}-{1}'.format(year, month),
+                start=datetime(year, month, 18, 14, 00),
+                end=datetime(year, month, 18, 16, 00),
+                timezone=timezone,
+                tags='year-{0}, month-{1}'.format(year, month),
+                recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4'
+            )
+            event.submit()
+            if year > 2008:
+                event.publish()
+            if year > 2009:
+                event.withdraw()
+    assert events.query().count() == 3*12
+    assert occurrences.query().count() == 4*12
+
+    events = EventCollection(session, state='initiated')
+    assert events.subset_count == 0
+
+    events = EventCollection(session, state='submitted')
+    assert events.subset_count == 12
+    assert all([e.start.year == 2008 for e in events.batch])
+    assert all([e.start.month < 11 for e in events.batch])
+    assert len(events.next.batch) == 12 - events.batch_size
+    assert all([e.start.year == 2008 for e in events.next.batch])
+    assert all([e.start.month > 10 for e in events.next.batch])
+
+    events = EventCollection(session, state='published')
+    assert events.subset_count == 12
+    assert all([e.start.year == 2009 for e in events.batch])
+    assert all([e.start.month < 11 for e in events.batch])
+    assert len(events.next.batch) == 12 - events.batch_size
+    assert all([e.start.year == 2009 for e in events.next.batch])
+    assert all([e.start.month > 10 for e in events.next.batch])
+
+    events = EventCollection(session, state='withdrawn')
+    assert events.subset_count == 12
+    assert all([e.start.year == 2010 for e in events.batch])
+    assert all([e.start.month < 11 for e in events.batch])
+    assert len(events.next.batch) == 12 - events.batch_size
+    assert all([e.start.year == 2010 for e in events.next.batch])
+    assert all([e.start.month > 10 for e in events.next.batch])
+
+    occurrences = OccurrenceCollection(session)
+    assert occurrences.subset_count == 48
+    assert all([o.start.year == 2009 for o in occurrences.batch])
+
+    occurrences = OccurrenceCollection(
+        session, start=tzdatetime(2009, 12, 1, 0, 0, timezone)
+    )
+    assert occurrences.subset_count == 4
+    assert all([o.start.year == 2009 and o.start.month == 12
+                for o in occurrences.batch])
+
+    occurrences = OccurrenceCollection(
+        session, end=tzdatetime(2009, 1, 31, 0, 0, timezone)
+    )
+    assert occurrences.subset_count == 4
+    assert all([o.start.year == 2009 and o.start.month == 1
+                for o in occurrences.batch])
+
+    occurrences = OccurrenceCollection(
+        session, start=tzdatetime(2009, 5, 1, 0, 0, timezone),
+        end=tzdatetime(2009, 6, 30, 0, 0, timezone)
+    )
+    assert occurrences.subset_count == 8
+    assert all([o.start.year == 2009 and o.start.month in [5, 6]
+                for o in occurrences.batch])
+
+    occurrences = OccurrenceCollection(
+        session, tags=['month-7', 'month-8']
+    )
+    assert occurrences.subset_count == 8
+    assert all([o.start.year == 2009 and o.start.month in [7, 8]
+                for o in occurrences.batch])
+
+    occurrences = OccurrenceCollection(
+        session, start=tzdatetime(2009, 5, 1, 0, 0, timezone),
+        end=tzdatetime(2009, 6, 30, 0, 0, timezone), tags=['month-6']
+    )
+    assert occurrences.subset_count == 4
+    assert all([o.start.year == 2009 and o.start.month == 6
+                for o in occurrences.batch])
