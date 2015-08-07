@@ -55,9 +55,9 @@ def view_town(self, request):
     if daypasses:
         online_counter_links.append(
             Link(
-                text=u"GA-Tageskarte",
+                text=u"SBB-Tageskarte",
                 url=request.link(daypasses),
-                subtitle=u"Günstige Tageskarten von der Gemeinde"
+                subtitle=u"Generalabonnement Gemeinde"
             )
         )
 
