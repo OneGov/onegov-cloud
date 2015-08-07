@@ -54,14 +54,24 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     #: by and derived from :meth:`set_application_id`.
     schema = None
 
-    def __call__(self, environ, start_response):
+    @morepath.reify
+    def __call__(self):
         """ Intercept all wsgi calls so we can attach debug tools. """
 
-        if getattr(self, 'sql_query_report', False) is False:
-            return super(Framework, self).__call__(environ, start_response)
+        fn = super(Framework, self).__call__
 
-        with debug.analyze_sql_queries(self.sql_query_report):
-            return super(Framework, self).__call__(environ, start_response)
+        if getattr(self, 'sql_query_report', False):
+            fn = self.with_query_report(fn)
+
+        return fn
+
+    def with_query_report(self, fn):
+
+        def with_query_report_wrapper(*args, **kwargs):
+            with debug.analyze_sql_queries(self.sql_query_report):
+                return fn(*args, **kwargs)
+
+        return with_query_report_wrapper
 
     @cached_property
     def modules(self):
