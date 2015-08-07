@@ -14,7 +14,8 @@ $(function() {
             fileManagerJson: form.data('file-list-url'),
             imageUpload: form.data('image-upload-url'),
             imageManagerJson: form.data('image-list-url'),
-            plugins: ['bufferbuttons', 'filemanager', 'imagemanager'],
+            definedLinks: form.data('sitecollection-url'),
+            plugins: ['bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks'],
             lang: 'de',
             formattingAdd: [
                 {

@@ -8,8 +8,12 @@ from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
 from onegov.town import _
 from onegov.town.elements import DeleteLink, Link, LinkGroup
-from onegov.town.models import FileCollection
-from onegov.town.models import ImageCollection, Thumbnail
+from onegov.town.models import (
+    FileCollection,
+    ImageCollection,
+    SiteCollection,
+    Thumbnail
+)
 from sqlalchemy import desc
 
 
@@ -132,6 +136,11 @@ class Layout(ChameleonLayout):
     def image_list_url(self):
         """ Adds the json url for image lists. """
         return self.request.link(ImageCollection(self.app), name='json')
+
+    @cached_property
+    def sitecollection_url(self):
+        """ Adds the json url for internal links lists. """
+        return self.request.link(SiteCollection(self.app.session()))
 
     @cached_property
     def homepage_url(self):

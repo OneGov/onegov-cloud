@@ -1066,3 +1066,22 @@ def test_copy_pages_to_news(town_app):
     page = edit.form.submit().follow()
 
     assert '/aktuelles/bildung-gesellschaft' in page.request.url
+
+
+def test_sitecollection(town_app):
+    client = Client(town_app)
+
+    assert client.get('/sitecollection', expect_errors=True).status_code == 403
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    collection = client.get('/sitecollection').json
+
+    assert collection[0] == {
+        'name': 'Bildung & Gesellschaft',
+        'url': 'http://localhost/themen/bildung-gesellschaft',
+        'group': 'Themen'
+    }

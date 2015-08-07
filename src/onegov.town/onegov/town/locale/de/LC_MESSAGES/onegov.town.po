@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-06 14:12+0200\n"
+"POT-Creation-Date: 2015-08-07 09:48+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -390,16 +390,25 @@ msgstr "Nachricht löschen"
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
-msgid "Please note that this page has subpages which will also be deleted!"
-msgstr ""
-"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
-"werden!"
-
 msgid "Copy"
 msgstr "Kopieren"
 
 msgid "Paste"
 msgstr "Einfügen"
+
+msgid "Please note that this page has subpages which will also be deleted!"
+msgstr ""
+"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+"werden!"
+
+msgid "This page can't be deleted."
+msgstr "Diese Seite kann nicht gelöscht werden."
+
+msgid ""
+"This page has subpages. Only administrators can delete pages with subpages. "
+"To delete this page, delete all subpages first or ask an administrator to do "
+"it for you."
+msgstr ""
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -722,6 +731,9 @@ msgstr "Neue Einteilung"
 #, python-format
 msgid "Successfully added ${n} allocations"
 msgstr "${n} Einteilungen wurden hinzugefügt"
+
+msgid "Resources"
+msgstr "Reservationen"
 
 #, python-format
 msgid "You have accepted ticket ${number}"

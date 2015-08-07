@@ -1,8 +1,11 @@
+import os
+
 from datetime import datetime, date
 from mock import Mock, patch
 from onegov.core.request import CoreRequest
+from onegov.core.utils import module_path, rchop
 from onegov.testing import utils
-from onegov.town.models import Clipboard, ImageCollection
+from onegov.town.models import Clipboard, ImageCollection, SiteCollection
 
 
 def test_image_collection(town_app):
@@ -49,6 +52,33 @@ def test_clipboard(town_app):
 
     clipboard = Clipboard(request, clipboard.token + 'x')
     assert clipboard.url is None
+
+
+def test_sitecollection(town_app):
+
+    sitecollection = SiteCollection(town_app.session())
+    objects = sitecollection.get()
+
+    assert {o.name for o in objects['topics']} == {
+        'leben-wohnen',
+        'kultur-freizeit',
+        'bildung-gesellschaft',
+        'gewerbe-tourismus',
+        'politik-verwaltung'
+    }
+
+    assert {o.name for o in objects['news']} == {
+        'aktuelles'
+    }
+
+    paths = (p for p in os.listdir(module_path('onegov.town', 'forms')))
+    paths = (p for p in paths if p.endswith('.form'))
+    paths = (os.path.basename(p) for p in paths)
+    builtin_forms = set(rchop(p, '.form') for p in paths)
+
+    assert {o.name for o in objects['forms']} == set(builtin_forms)
+
+    assert {o.name for o in objects['resources']} == {'ga-tageskarte'}
 
 
 def test_image_grouping(town_app):

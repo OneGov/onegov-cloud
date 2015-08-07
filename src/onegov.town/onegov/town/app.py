@@ -149,11 +149,12 @@ class TownApp(Framework, LibresIntegration):
 
         editor = Bundle(
             'js/bufferbuttons.js',
+            'js/definedlinks.js',
             'js/filemanager.js',
             'js/imagemanager.js',
             'js/redactor.de.js',
             'js/editor.js',
-            filters='jsmin',
+            #filters='jsmin',
             output='bundles/editor.bundle.js'
         )
 

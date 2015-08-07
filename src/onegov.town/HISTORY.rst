@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to insert site links in the redactor through a dropdown.
+  [href]
+
 - Limit the deletion of pages including subpages to users with the admin role.
   [href]
 

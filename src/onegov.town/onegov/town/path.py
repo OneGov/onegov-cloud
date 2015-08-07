@@ -18,6 +18,7 @@ from onegov.town.models import (
     Image,
     ImageCollection,
     News,
+    SiteCollection,
     Thumbnail,
     Topic,
     Town
@@ -147,3 +148,8 @@ def get_clipboard(request, token):
     # the url is None if the token is invalid
     if clipboard.url:
         return clipboard
+
+
+@TownApp.path(model=SiteCollection, path='/sitecollection')
+def get_sitecollection(app):
+    return SiteCollection(app.session())

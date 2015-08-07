@@ -74,7 +74,7 @@
 </metal:bottom_links>
 
 <metal:search define-macro="form">
-    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url" method="POST" enctype="multipart/form-data">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" method="POST" enctype="multipart/form-data">
         <tal:block repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible">
                 <legend>${fieldset.label}</legend>
