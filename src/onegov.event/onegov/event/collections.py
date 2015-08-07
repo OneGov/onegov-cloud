@@ -1,4 +1,5 @@
 from onegov.event.models import Event, Occurrence
+from sedate import replace_timezone
 from sqlalchemy import or_
 
 
@@ -10,9 +11,14 @@ class EventCollection(object):
     def query(self):
         return self.session.query(Event)
 
-    def add(self, start, end, title, **optional):
+    def add(self, title, start, end, timezone, **optional):
         event = Event(
-            state='initiated', start=start, end=end, title=title, **optional
+            state='initiated',
+            title=title,
+            start=replace_timezone(start, timezone),
+            end=replace_timezone(end, timezone),
+            timezone=timezone,
+            **optional
         )
 
         self.session.add(event)

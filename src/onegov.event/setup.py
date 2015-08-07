@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'onegov.core>=0.4.0',
         'python-dateutil',
+        'sedate'
     ],
     extras_require=dict(
         test=[
