@@ -9,7 +9,37 @@ from sqlalchemy.orm import backref, relationship
 from uuid import uuid4
 
 
-class Event(Base, ContentMixin, TimestampMixin):
+class OccurrenceMixin(object):
+    """ Contains all attributes events and ocurrences share. """
+
+    #: title of the event
+    title = Column(Text, nullable=False)
+
+    #: description of the location of the event
+    location = Column(Text, nullable=True)
+
+    #: tags (categories) of the event
+    tags = Column(Text, nullable=True)
+
+    #: start date/time of the event (of the first event if recurring); no
+    #  timezone here, it's UTC
+    start = Column(UTCDateTime, nullable=False)
+
+    #: end date/time of the event (of the first event if recurring); no
+    #  timezone here, it's UTC
+    end = Column(UTCDateTime, nullable=False)
+
+    #: timezone the event was submitted
+    timezone = Column(String, nullable=False)
+
+    def display_start(self, timezone=None):
+        return to_timezone(self.start, timezone or self.timezone)
+
+    def display_end(self, timezone=None):
+        return to_timezone(self.end, timezone or self.timezone)
+
+
+class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
     """ Defines an event.
 
     Occurrences are stored in a seperate table containing only a minimal set
@@ -32,26 +62,6 @@ class Event(Base, ContentMixin, TimestampMixin):
         nullable=False,
         default='initiated'
     )
-
-    #: title of the event
-    title = Column(Text, nullable=False)
-
-    #: description of the location of the event
-    location = Column(Text, nullable=True)
-
-    #: tags (categories) of the event
-    tags = Column(Text, nullable=True)
-
-    #: start date/time of the event (of the first event if recurring); no
-    #  timezone here, it's UTC
-    start = Column(UTCDateTime, nullable=False)
-
-    #: end date/time of the event (of the first event if recurring); no
-    #  timezone here, it's UTC
-    end = Column(UTCDateTime, nullable=False)
-
-    #: timezone the event was submitted
-    timezone = Column(String, nullable=False)
 
     #: recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
@@ -122,14 +132,8 @@ class Event(Base, ContentMixin, TimestampMixin):
         assert self.state == 'published'
         self.state = 'withdrawn'
 
-    def display_start(self, timezone=None):
-        return to_timezone(self.start, timezone or self.timezone)
 
-    def display_end(self, timezone=None):
-        return to_timezone(self.end, timezone or self.timezone)
-
-
-class Occurrence(Base, TimestampMixin):
+class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     """ Defines an occurrence of an event. """
 
     __tablename__ = 'event_occurrences'
@@ -139,27 +143,3 @@ class Occurrence(Base, TimestampMixin):
 
     #: the event this occurrence belongs to
     event_id = Column(UUID, ForeignKey(Event.id), nullable=False)
-
-    #: title of the event
-    title = Column(Text, nullable=False)
-
-    #: description of the location of the event
-    location = Column(Text, nullable=True)
-
-    #: tags (categories) of the event
-    tags = Column(Text, nullable=True)
-
-    #: timezone the event was submitted
-    timezone = Column(String, nullable=False)
-
-    #: start date/time of the event
-    start = Column(UTCDateTime, nullable=False)
-
-    #: end date/time of the event
-    end = Column(UTCDateTime, nullable=False)
-
-    def display_start(self, timezone=None):
-        return to_timezone(self.start, timezone or self.timezone)
-
-    def display_end(self, timezone=None):
-        return to_timezone(self.end, timezone or self.timezone)
