@@ -7,6 +7,9 @@ Unreleased
 - Use bcrypt instead of py-bcrypt as the latter has been deprecated by passlib.
   [href]
 
+- Support hstore types.
+  [msom]
+
 0.4.18 (2015-08-06)
 ~~~~~~~~~~~~~~~~~~~
 
