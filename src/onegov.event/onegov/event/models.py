@@ -66,7 +66,8 @@ class Event(Base, ContentMixin, TimestampMixin):
 
     def __setattr__(self, name, value):
         super(Event, self).__setattr__(name, value)
-        if name in ('state', 'start', 'end', 'timezone', 'recurrence', 'tags'):
+        if name in ('state', 'title', 'location', 'tags',
+                    'start', 'end', 'timezone', 'recurrence'):
             self._update_occurrences()
 
     def _update_occurrences(self):
@@ -87,14 +88,26 @@ class Event(Base, ContentMixin, TimestampMixin):
                     break
                 end = start + (self.end - self.start)
                 self.occurrences.append(
-                    Occurrence(start=start, end=end, tags=self.tags,
-                               timezone=self.timezone)
+                    Occurrence(
+                        title=self.title,
+                        location=self.location,
+                        tags=self.tags,
+                        start=start,
+                        end=end,
+                        timezone=self.timezone
+                    )
                 )
         else:
             # create one occurence
             self.occurrences.append(
-                Occurrence(start=self.start, end=self.end, tags=self.tags,
-                           timezone=self.timezone)
+                Occurrence(
+                    title=self.title,
+                    location=self.location,
+                    tags=self.tags,
+                    start=self.start,
+                    end=self.end,
+                    timezone=self.timezone
+                )
             )
 
     def submit(self):
@@ -127,6 +140,15 @@ class Occurrence(Base, TimestampMixin):
     #: the event this occurrence belongs to
     event_id = Column(UUID, ForeignKey(Event.id), nullable=False)
 
+    #: title of the event
+    title = Column(Text, nullable=False)
+
+    #: description of the location of the event
+    location = Column(Text, nullable=True)
+
+    #: tags (categories) of the event
+    tags = Column(Text, nullable=True)
+
     #: timezone the event was submitted
     timezone = Column(String, nullable=False)
 
@@ -135,9 +157,6 @@ class Occurrence(Base, TimestampMixin):
 
     #: end date/time of the event
     end = Column(UTCDateTime, nullable=False)
-
-    #: tags (categories) of the event
-    tags = Column(Text, nullable=True)
 
     def display_start(self, timezone=None):
         return to_timezone(self.start, timezone or self.timezone)

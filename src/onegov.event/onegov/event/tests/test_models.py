@@ -66,8 +66,10 @@ def test_create_event(session):
     assert occurence.start == event.start
     assert occurence.end == event.end
     assert occurence.event.title == event.title
+    assert occurence.title == event.title
     assert occurence.event.content == event.content
     assert occurence.event.location == event.location
+    assert occurence.location == event.location
     assert occurence.event.tags == event.tags
     assert occurence.tags == event.tags
 
@@ -96,8 +98,10 @@ def test_create_event_recurring(session):
     assert occurrences[0].start == event.start
     assert occurrences[0].end == event.end
     assert occurrences[0].event.title == event.title
+    assert occurrences[0].title == event.title
     assert occurrences[0].event.content == event.content
     assert occurrences[0].event.location == event.location
+    assert occurrences[0].location == event.location
     assert occurrences[0].event.tags == event.tags
     assert occurrences[1].start == tzdatetime(2008, 2, 9, 10, 15, timezone)
     assert occurrences[1].end == tzdatetime(2008, 2, 9, 16, 00, timezone)
@@ -182,8 +186,10 @@ def test_update_event(session):
     assert occurence.start == event.start
     assert occurence.end == event.end
     assert occurence.event.title == event.title
+    assert occurence.title == event.title
     assert occurence.event.content == event.content
     assert occurence.event.location == event.location
+    assert occurence.location == event.location
     assert occurence.event.tags == event.tags
     assert occurence.tags == event.tags
 
@@ -200,8 +206,10 @@ def test_update_event(session):
     assert occurence.start == event.start
     assert occurence.end == event.end
     assert occurence.event.title == event.title
+    assert occurence.title == event.title
     assert occurence.event.content == event.content
     assert occurence.event.location == event.location
+    assert occurence.location == event.location
     assert occurence.event.tags == event.tags
     assert occurence.tags == event.tags
 
