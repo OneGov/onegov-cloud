@@ -170,7 +170,7 @@ class CoreRequest(IncludeRequest):
         return self.app.modules.browser_session.BrowserSession(
             namespace=self.app.application_id,
             token=session_id,
-            cache=self.app.cache,
+            cache=self.app.session_cache,
             on_dirty=on_dirty
         )
 

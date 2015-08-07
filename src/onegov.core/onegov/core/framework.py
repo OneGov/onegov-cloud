@@ -274,8 +274,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         def on_cache_ejected(key, value):
             getattr(value, 'disconnect_all', lambda: None)()
 
-        self._cache_backends = pylru.lrucache(
-            self.cache_connections, on_cache_ejected)
+        self._caches = pylru.lrucache(self.cache_connections, on_cache_ejected)
 
         if cfg.get('disable_memcached', False):
             self.cache_backend = 'dogpile.cache.memory'
@@ -348,26 +347,36 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         if self.has_database_connection:
             self.session_manager.set_current_schema(self.schema)
 
-    @property
-    def cache(self):
-        """ Returns the cache backend for this application.
-
-        The cache backend is a dogpile.cache backend. See:
-        `<https://dogpilecache.readthedocs.org/>`_
+    def get_cache(self, namespace, expiration_time=None):
+        """ Creates a new cache backend for this application or reuses an
+        existing one. Each backend is bound to a namespace and has its own
+        expiration time (ttl).
 
         Once the `cache_connections` limit defined in
         :meth:`configure_application` is reached, the backends are removed,
         with the least recently used one being discarded first.
 
         """
-        if self.application_id not in self._cache_backends:
-            self._cache_backends[self.application_id] = cache.create_backend(
-                namespace=self.application_id,
+
+        if namespace not in self._caches:
+            self._caches[namespace] = cache.create_backend(
+                namespace=namespace,
+                expiration_time=expiration_time,
                 backend=self.cache_backend,
                 arguments=self.cache_backend_arguments,
-                expiration_time=None)
+            )
 
-        return self._cache_backends[self.application_id]
+        return self._caches[namespace]
+
+    @property
+    def session_cache(self):
+        """ A cache that is kept for as long as possible. """
+        return self.get_cache(self.application_id + ':s')
+
+    @property
+    def cache(self):
+        """ A cache that might be invalidated frequently. """
+        return self.get_cache(self.application_id + ':x', expiration_time=3600)
 
     @property
     def application_id_hash(self):
