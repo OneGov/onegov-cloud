@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.1 (2015-08-07)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to insert site links in the redactor through a dropdown.
   [href]
 
