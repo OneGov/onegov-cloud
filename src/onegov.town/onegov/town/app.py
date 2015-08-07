@@ -154,7 +154,7 @@ class TownApp(Framework, LibresIntegration):
             'js/imagemanager.js',
             'js/redactor.de.js',
             'js/editor.js',
-            #filters='jsmin',
+            filters='jsmin',
             output='bundles/editor.bundle.js'
         )
 
