@@ -305,9 +305,6 @@ class WsgiServer(FileSystemEventHandler):
         if 'assets/bundles' in event.src_path:
             return
 
-        if 'assets/js' in event.src_path:
-            return
-
         if 'onegov.sublime' in event.src_path:
             return
 
