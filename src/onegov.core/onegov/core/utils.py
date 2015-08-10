@@ -8,8 +8,10 @@ import os.path
 import pydoc
 import re
 
+from contextlib import contextmanager
 from itertools import groupby
 from onegov.core import compat
+from cProfile import Profile
 from unidecode import unidecode
 from webob import static
 
@@ -72,6 +74,22 @@ def rchop(text, end):
         return text[:-len(end)]
 
     return text
+
+
+@contextmanager
+def profile(filename):
+    """ Profiles the wrapped code and stores the result in the profiles folder
+    with the given filename.
+
+    """
+    profiler = Profile()
+    profiler.enable()
+
+    yield
+
+    profiler.disable()
+    profiler.create_stats()
+    profiler.dump_stats('profiles/{}'.format(filename))
 
 
 def module_path(module, subpath):

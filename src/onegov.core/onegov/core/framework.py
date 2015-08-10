@@ -24,6 +24,7 @@ import pydoc
 import pylru
 
 from cached_property import cached_property
+from datetime import datetime
 from email.utils import parseaddr
 from itsdangerous import BadSignature, Signer
 from mailthon import email
@@ -63,6 +64,9 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         if getattr(self, 'sql_query_report', False):
             fn = self.with_query_report(fn)
 
+        if getattr(self, 'profile', False):
+            fn = self.with_profiler(fn)
+
         return fn
 
     def with_query_report(self, fn):
@@ -72,6 +76,16 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
                 return fn(*args, **kwargs)
 
         return with_query_report_wrapper
+
+    def with_profiler(self, fn):
+
+        def with_profiler_wrapper(*args, **kwargs):
+            filename = '{:%Y-%m-%d %H:%M:%S}.profile'.format(datetime.now())
+
+            with utils.profile(filename):
+                return fn(*args, **kwargs)
+
+        return with_profiler_wrapper
 
     @cached_property
     def modules(self):
@@ -243,6 +257,12 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
             Do not use in production!
 
+        :profile:
+            If true, profiles the request and stores the result in the profiles
+            folder with the following format: ``YYYY-MM-DD hh:mm:ss.profile``
+
+            Do not use in production!
+
         """
 
         super(Framework, self).configure_application(**cfg)
@@ -319,6 +339,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def configure_debug(self, **cfg):
         self.always_compile_theme = cfg.get('always_compile_theme', False)
         self.sql_query_report = cfg.get('sql_query_report', False)
+        self.profile = cfg.get('profile', False)
 
     def configure_mail(self, **cfg):
         self.mail_host = cfg.get('mail_host', None)

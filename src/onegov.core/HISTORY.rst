@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds the ability to profile requests and selected pieces of code.
+  [href]
+
 0.4.19 (2015-08-10)
 ~~~~~~~~~~~~~~~~~~~
 
