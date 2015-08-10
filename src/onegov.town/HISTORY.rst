@@ -4,10 +4,14 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Improves upon the requirements.txt generation. No other changes.
+  [href]
+
 0.3.2 (2015-08-10)
 ~~~~~~~~~~~~~~~~~~~
 
 - No changes worth mentioning. Experimental requirements.txt generation on release.
+  [href]
 
 0.3.1 (2015-08-07)
 ~~~~~~~~~~~~~~~~~~~
