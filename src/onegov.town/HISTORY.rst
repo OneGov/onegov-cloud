@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.3 (2015-08-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves upon the requirements.txt generation. No other changes.
   [href]
 
