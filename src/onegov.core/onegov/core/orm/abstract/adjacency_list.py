@@ -65,7 +65,6 @@ class AdjacencyList(Base):
     @declared_attr
     def __mapper_args__(cls):
         return {
-            "order_by": [cls.order, cls.id],
             "polymorphic_on": cls.type
         }
 

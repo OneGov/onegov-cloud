@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Removes the default order_by clause on adjacency lists.
+  [href]
+
 - Adds the ability to profile requests and selected pieces of code.
   [href]
 
