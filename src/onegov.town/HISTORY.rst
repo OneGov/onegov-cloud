@@ -4,6 +4,8 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- No changes worth mentioning. Experimental requirements.txt generation on release.
+
 0.3.1 (2015-08-07)
 ~~~~~~~~~~~~~~~~~~~
 
