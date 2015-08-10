@@ -8,7 +8,7 @@ env:
 install:
 - pip install tox==1.9.2
 - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
-- if [ "$TOXENV" = 'py34' ]; then .tox/py34/bin/pip freeze > requirements.txt; fi
+- if [ "$TOXENV" = 'py34' ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze > $TRAVIS_BUILD_DIR/requirements.txt; fi
 
 script:
 - tox -e $TOXENV
@@ -22,6 +22,7 @@ deploy:
     api_key:
       secure: LfZUmiNfEnydbF6XYGH45GUrj26IzkT6qNvYNN0zglrd7dEMzUcgA2PjOk/89Nia2TV63SedwLrG2fhHT1Owi0mU8NrNrEoBWbboWoQ7Tclw35snDdGUjib4zK4BkA99Exd2wQBfygtPSmlb9pTzppKhs0v4UtnWWL3e8TNQAsc=
     file: requirements.txt
+    skip_cleanup: true
     on:
       tags: true
       condition: $TOXENV = py34
