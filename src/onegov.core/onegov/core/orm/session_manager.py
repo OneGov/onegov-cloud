@@ -265,7 +265,9 @@ class SessionManager(object):
                 conn = self.engine.execution_options(schema=None)
                 conn.execute('CREATE SCHEMA "{}"'.format(schema))
                 conn.execute(
-                    'CREATE EXTENSION hstore SCHEMA "{}"'.format(schema)
+                    'CREATE EXTENSION IF NOT EXIST hstore SCHEMA "{}"'.format(
+                        schema
+                    )
                 )
                 conn.execute('COMMIT')
 
