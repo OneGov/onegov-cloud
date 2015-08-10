@@ -78,7 +78,7 @@ def test_sitecollection(town_app):
 
     assert {o.name for o in objects['forms']} == set(builtin_forms)
 
-    assert {o.name for o in objects['resources']} == {'ga-tageskarte'}
+    assert {o.name for o in objects['resources']} == {'sbb-tageskarte'}
 
 
 def test_image_grouping(town_app):

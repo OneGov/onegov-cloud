@@ -977,9 +977,9 @@ def test_resources(town_app):
     login_page.form.submit()
 
     resources = client.get('/reservationen')
-    assert 'GA Tageskarte' in resources
+    assert 'SBB-Tageskarte' in resources
 
-    resource = resources.click('GA Tageskarte')
+    resource = resources.click('SBB-Tageskarte')
     assert 'calendar' in resource
 
     new = resources.click('Raum')
