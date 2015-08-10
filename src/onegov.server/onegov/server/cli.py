@@ -299,6 +299,9 @@ class WsgiServer(FileSystemEventHandler):
         if '/mails' in event.src_path:
             return
 
+        if '/profiles' in event.src_path:
+            return
+
         if '.webassets-cache' in event.src_path:
             return
 
