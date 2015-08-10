@@ -9,6 +9,7 @@ import pydoc
 import re
 
 from contextlib import contextmanager
+from datetime import datetime
 from itertools import groupby
 from onegov.core import compat
 from cProfile import Profile
@@ -90,6 +91,26 @@ def profile(filename):
     profiler.disable()
     profiler.create_stats()
     profiler.dump_stats('profiles/{}'.format(filename))
+
+
+@contextmanager
+def timing(name=None):
+    """ Runs the wrapped code and prints the time in ms it took to run it.
+    The name is printed in front of the time, if given.
+
+    """
+
+    start = datetime.utcnow()
+
+    yield
+
+    duration = datetime.utcnow() - start
+    duration = int(round(duration.total_seconds() * 1000, 0))
+
+    if name:
+        print('{}: {} ms'.format(name, duration))
+    else:
+        print('{} ms'.format(duration))
 
 
 def module_path(module, subpath):
