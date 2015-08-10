@@ -265,7 +265,7 @@ class SessionManager(object):
                 conn = self.engine.execution_options(schema=None)
                 conn.execute('CREATE SCHEMA "{}"'.format(schema))
                 conn.execute(
-                    'CREATE EXTENSION IF NOT EXIST hstore SCHEMA "{}"'.format(
+                    'CREATE EXTENSION IF NOT EXISTS hstore SCHEMA "{}"'.format(
                         schema
                     )
                 )
