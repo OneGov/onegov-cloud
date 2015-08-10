@@ -829,6 +829,8 @@ $max-page-width: 600px;
     margin: 0 1em 1em 0;
 
     .person-card-portrait {
+        @include smooth-edges;
+
         background: $topbar-bg-color;
         float: left;
         height: 200px;
