@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The onegov.town.element classes now use less memory.
+  [href]
+
 0.3.3 (2015-08-10)
 ~~~~~~~~~~~~~~~~~~~
 

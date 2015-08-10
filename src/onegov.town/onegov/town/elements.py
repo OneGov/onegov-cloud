@@ -11,8 +11,19 @@ from purl import URL
 class Link(object):
     """ Represents a link rendered in a template. """
 
+    __slots__ = [
+        'active',
+        'attributes',
+        'classes',
+        'model',
+        'request_method',
+        'subtitle',
+        'text',
+        'url',
+    ]
+
     def __init__(self, text, url, classes=None, request_method='GET',
-                 attributes={}, **extra):
+                 attributes={}, active=False, model=None, subtitle=None):
 
         #: The text of the link
         self.text = text
@@ -31,9 +42,14 @@ class Link(object):
         #: Attributes which are translatable, are transalted before rendering.
         self.attributes = attributes
 
-        #: The extra dictionary is applied to the class
-        for key, value in extra.items():
-            setattr(self, key, value)
+        #: Indicate if this link is active or not (not used for rendering)
+        self.active = active
+
+        #: The model that underlies this link (to check if the link is visible)
+        self.model = model
+
+        #: Shown as a subtitle below certain links (not automatically rendered)
+        self.subtitle = subtitle
 
     @property
     def is_hidden_from_public(self):
@@ -41,7 +57,7 @@ class Link(object):
         ``model`` to ``__init__`` to have this work automatically.
 
         """
-        if hasattr(self, 'model') and self.model.is_hidden_from_public:
+        if self.model and self.model.is_hidden_from_public:
             return True
         else:
             return False
@@ -121,6 +137,8 @@ class DeleteLink(Link):
 class Img(object):
     """ Represents an img element. """
 
+    __slots__ = ['src', 'alt', 'title', 'url']
+
     def __init__(self, src, alt=None, title=None, url=None):
         #: The src of the image
         self.src = src
@@ -137,6 +155,8 @@ class Img(object):
 
 class LinkGroup(object):
     """ Represents a list of links. """
+
+    __slots__ = ['title', 'links']
 
     def __init__(self, title, links):
         self.title = title
