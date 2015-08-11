@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.4 (2015-08-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Depends on latest onegov.form release to fix installation issue.
   [href]
 
