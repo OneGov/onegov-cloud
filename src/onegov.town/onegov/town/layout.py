@@ -175,6 +175,9 @@ class Layout(ChameleonLayout):
         self.request.include('redactor_theme')
         self.request.include('editor')
 
+    def include_code_editor(self):
+        self.request.include('code_editor')
+
     def thumbnail_url(self, url):
         """ Takes the given url and returns the thumbnail url for it, if it
         exists. Otherwise returns the url as is.
@@ -357,6 +360,7 @@ class FormEditorLayout(DefaultLayout):
     def __init__(self, model, request):
         super(FormEditorLayout, self).__init__(model, request)
         self.include_editor()
+        self.include_code_editor()
 
 
 class FormSubmissionLayout(DefaultLayout):
