@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.5 (2015-08-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Fix code editor not working in form definition editor.
   [href]
 
