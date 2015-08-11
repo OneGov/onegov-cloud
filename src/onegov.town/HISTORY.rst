@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Depends on latest onegov.form release to fix installation issue.
+  [href]
+
 - The onegov.town.element classes now use less memory.
   [href]
 

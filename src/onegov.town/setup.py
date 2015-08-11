@@ -41,7 +41,7 @@ setup(
         'lazy-object-proxy',
         'lxml',
         'onegov.core>=0.4.18',
-        'onegov.form>=0.6.4',
+        'onegov.form>=0.6.6',
         'onegov.foundation>=0.0.4',
         'onegov.libres',
         'onegov.people>=0.0.1',
