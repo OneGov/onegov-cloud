@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'colour>=0.0.4',
         'humanize',
         'jsonpickle',
         'onegov.core>=0.4.4',
@@ -44,7 +45,12 @@ setup(
         'sedate',
         'sqlalchemy_utils',
         'wtforms',
-        'wtforms-components[color]',
+
+        # be careful to add extras for wtforms-components by including the
+        # needed packages, not by using square brackets, pip doesn't do well
+        # with square brackets (the install on the server won't work)
+        'wtforms-components',
+
         'unidecode'
     ],
     extras_require=dict(

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes installation issue with pip.
+  [href]
+
 0.6.5 (2015-07-13)
 ~~~~~~~~~~~~~~~~~~~
 
