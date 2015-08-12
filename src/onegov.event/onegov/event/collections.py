@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta
 from onegov.core.collection import Pagination
 from onegov.event.models import Event, Occurrence
-from sedate import replace_timezone
+from sedate import replace_timezone, standardize_date
 from sqlalchemy import or_
 
 
@@ -47,10 +48,26 @@ class EventCollection(EventCollectionPagination):
         self.session.add(event)
         self.session.flush()
 
+        self.remove_old_events()
+
         return event
 
     def delete(self, event):
         self.session.delete(event)
+        self.session.flush()
+
+    def remove_old_events(self, max_age=None):
+        if max_age is None:
+            max_age = datetime.utcnow() - timedelta(days=30)
+            max_age = standardize_date(max_age, 'UTC')
+
+        events = self.session.query(Event).filter(Event.start < max_age)
+        events = list(filter(
+            lambda x: max(x.occurrence_dates()) < max_age, events
+        ))
+        for event in events:
+            self.session.delete(event)
+
         self.session.flush()
 
 

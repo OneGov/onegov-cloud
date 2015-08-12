@@ -80,6 +80,19 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
                     'start', 'end', 'timezone', 'recurrence'):
             self._update_occurrences()
 
+    def occurrence_dates(self, max_year=None):
+        occurrences = [self.start]
+        if self.recurrence:
+            occurrences = rrule.rrulestr(self.recurrence, dtstart=self.start)
+            occurrences = list(
+                map(lambda x: standardize_date(x, self.timezone), occurrences)
+            )
+            if max_year is not None:
+                occurrences = list(
+                    filter(lambda x: x.year <= max_year, occurrences)
+                )
+        return occurrences
+
     def _update_occurrences(self):
         # clear old occurrences
         self.occurrences = []
@@ -88,34 +101,21 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
         if not self.state == 'published':
             return
 
-        if self.recurrence:
-            # create all occurrences for this and next year
-            max_year = datetime.today().year + 1
-            for start in rrule.rrulestr(self.recurrence,
-                                        dtstart=self.start):
-                start = standardize_date(start, self.timezone)
-                if start.year > max_year:
-                    break
-                end = start + (self.end - self.start)
-                self.occurrences.append(
-                    Occurrence(
-                        title=self.title,
-                        location=self.location,
-                        tags=self.tags,
-                        start=start,
-                        end=end,
-                        timezone=self.timezone
-                    )
-                )
-        else:
-            # create one occurence
+        # do not create occurrences unless start and end is set
+        if not self.start or not self.end:
+            return
+
+        # create all occurrences for this and next year
+        max_year = datetime.today().year + 1
+        for start in self.occurrence_dates(max_year=max_year):
+            end = start + (self.end - self.start)
             self.occurrences.append(
                 Occurrence(
                     title=self.title,
                     location=self.location,
                     tags=self.tags,
-                    start=self.start,
-                    end=self.end,
+                    start=start,
+                    end=end,
                     timezone=self.timezone
                 )
             )
