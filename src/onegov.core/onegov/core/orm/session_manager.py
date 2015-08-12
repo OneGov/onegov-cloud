@@ -264,6 +264,9 @@ class SessionManager(object):
             if not self.is_schema_found_on_database(schema):
                 conn = self.engine.execution_options(schema=None)
                 conn.execute('CREATE SCHEMA "{}"'.format(schema))
+
+                # This is not a good spot the create the extension, see
+                #   https://github.com/OneGov/onegov.core/issues/5
                 conn.execute(
                     'CREATE EXTENSION IF NOT EXISTS hstore SCHEMA "{}"'.format(
                         schema
