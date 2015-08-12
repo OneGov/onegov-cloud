@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.7 (2015-08-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes some email sending issues.
   [href]
 
