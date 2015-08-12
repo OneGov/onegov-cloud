@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.20 (2015-08-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Linkify now escapes all html by default (except for the 'a' tag).
   [href]
