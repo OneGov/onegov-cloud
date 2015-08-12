@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.6 (2015-08-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Makes sure that all person links are valid.
   [href]
 
