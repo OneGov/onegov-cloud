@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds a helper function that puts a scheme in front of urls without one.
+  [href]
+
 0.4.20 (2015-08-12)
 ~~~~~~~~~~~~~~~~~~~
 

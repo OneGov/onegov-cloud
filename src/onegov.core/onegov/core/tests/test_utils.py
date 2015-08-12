@@ -80,3 +80,14 @@ def test_increment_name():
     assert utils.increment_name('test-2') == 'test-3'
     assert utils.increment_name('test2') == 'test2-1'
     assert utils.increment_name('test-1-1') == 'test-1-2'
+
+
+def test_ensure_scheme():
+    assert utils.ensure_scheme(None) is None
+    assert utils.ensure_scheme('seantis.ch') == 'http://seantis.ch'
+    assert utils.ensure_scheme('seantis.ch', 'https') == 'https://seantis.ch'
+
+    assert utils.ensure_scheme('google.ch?q=onegov.cloud')\
+        == 'http://google.ch?q=onegov.cloud'
+
+    assert utils.ensure_scheme('https://abc.xyz') == 'https://abc.xyz'

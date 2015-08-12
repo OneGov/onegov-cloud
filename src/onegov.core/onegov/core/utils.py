@@ -13,6 +13,7 @@ from datetime import datetime
 from itertools import groupby
 from onegov.core import compat
 from cProfile import Profile
+from purl import URL
 from unidecode import unidecode
 from webob import static
 
@@ -279,3 +280,20 @@ def linkify(text, escape=True):
 
     return bleach.clean(
         linkified, tags=['a'], attributes={'a': ['href', 'rel']})
+
+
+def ensure_scheme(url, default='http'):
+    """ Makes sure that the given url has a scheme in front, if none
+    was provided.
+
+    """
+
+    if not url:
+        return url
+
+    _url = URL(url)
+
+    if _url.scheme():
+        return url
+
+    return _url.scheme(default).as_string()
