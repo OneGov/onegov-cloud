@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- When inserting a defined link, the dropdown now starts with an empty selection.
+  [href]
+
 0.3.5 (2015-08-11)
 ~~~~~~~~~~~~~~~~~~~
 

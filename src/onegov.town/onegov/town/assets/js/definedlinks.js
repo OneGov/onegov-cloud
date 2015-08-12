@@ -38,6 +38,9 @@
                         }, this));
                     }, this));
 
+                    // makes sure there's nothing preselected
+                    $select.prop('selectedIndex', -1);
+
                     $select.on('change', $.proxy(this.definedlinks.select, this));
 
                 }, this));
