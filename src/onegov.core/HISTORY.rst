@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds proper support for unicode email addresses (only the domain and the
+  text - the local part won't be supported for now as it is rare and doesn't
+  even pass Chrome's or Firefox's email validation).
+  [href]
+
 - Removes the default order_by clause on adjacency lists.
   [href]
 

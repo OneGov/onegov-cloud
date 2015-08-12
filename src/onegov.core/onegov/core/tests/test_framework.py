@@ -3,6 +3,7 @@ import os
 import pytest
 
 from datetime import datetime, timedelta
+from email.header import decode_header
 from freezegun import freeze_time
 from morepath import setup
 from onegov.core import Framework
@@ -501,6 +502,42 @@ def test_send_email_to_maildir(temporary_directory):
     assert 'From: Govikon <noreply@example.org>' in email
     assert 'Sender: Govikon <noreply@example.org>' in email
     assert 'To: recipient@example.org' in email
+
+
+def test_send_email_unicode(smtpserver):
+    app = Framework()
+    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_sender = u'noreply@exämple.org'
+    app.mail_force_tls = False
+    app.mail_username = None
+    app.mail_password = None
+    app.mail_use_directory = False
+
+    result = app.send_email(
+        reply_to=u'Gövikon <info@exämple.org>',
+        receivers=[u'recipient@exämple.org'],
+        subject=u"Nüws",
+        content=u"This e-mäil is just a test"
+    )
+
+    assert result.ok
+
+    assert len(smtpserver.outbox) == 1
+    message = smtpserver.outbox[0]
+
+    def decode(header):
+        return decode_header(header)[0][0].decode('utf-8')
+
+    assert decode(message['Sender']) == u"Gövikon <noreply@exämple.org>"
+    assert decode(message['From']) == u"Gövikon <noreply@exämple.org>"
+    assert decode(message['Reply-To']) == u"Gövikon <info@exämple.org>"
+    assert decode(message['Subject']) == u"Nüws"
+    assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/html; charset="iso-8859-1"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: quoted-printable\n\n'
+        'This e-m=E4il is just a test'
+    )
 
 
 def test_object_by_path():
