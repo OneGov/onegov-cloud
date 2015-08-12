@@ -43,7 +43,7 @@ setup(
         'fs',
         'itsdangerous',
         'isodate',
-        'mailthon',
+        'mailthon>=0.1.1',
         'morepath>=0.11.1',
         'more.transaction',
         'more.webassets',

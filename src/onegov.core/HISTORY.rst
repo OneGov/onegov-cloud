@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Fixes more unicode email sending issues.
+  [href]
+
 0.4.21 (2015-08-12)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -25,7 +25,7 @@ import pylru
 
 from cached_property import cached_property
 from datetime import datetime
-from email.utils import parseaddr
+from email.utils import parseaddr, formataddr
 from itsdangerous import BadSignature, Signer
 from mailthon import email
 from mailthon.middleware import TLS, Auth
@@ -521,7 +521,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         name, address = parseaddr(reply_to)
 
         if name and not parseaddr(self.mail_sender)[0]:
-            mail_sender = u'{} <{}>'.format(name, self.mail_sender)
+            mail_sender = formataddr((name, self.mail_sender))
         else:
             mail_sender = self.mail_sender
 
@@ -536,8 +536,8 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             attachments=attachments
         )
 
-        envelope.headers['From'] = mail_sender
-        envelope.headers['Reply-To'] = reply_to
+        envelope.headers['Sender'] = mail_sender
+        envelope.headers['Reply-To'] = formataddr((name, address))
 
         return self.postman.send(envelope)
 

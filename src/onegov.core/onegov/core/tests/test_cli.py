@@ -4,6 +4,7 @@ import yaml
 
 from click.testing import CliRunner
 from email.header import decode_header
+from email.utils import parseaddr
 from onegov.core import Framework
 from onegov.core.cli import cli
 
@@ -119,13 +120,13 @@ def test_sendmail_unicode(smtpserver, temporary_directory):
         f.write(yaml.dump(cfg))
 
     app = Framework()
-    app.mail_sender = u'noreply@exämple.org'
+    app.mail_sender = u'noreply@example.org'
     app.mail_use_directory = True
     app.mail_directory = os.path.join(temporary_directory, 'mails')
 
     app.send_email(
-        reply_to=u'Gövikon <info@exämple.org>',
-        receivers=[u'recipient@exämple.org'],
+        reply_to=u'Gövikon <info@example.org>',
+        receivers=[u'recipient@example.org'],
         subject=u"Test E-Mäil",
         content=u"This e-mäil is just a test"
     )
@@ -140,12 +141,21 @@ def test_sendmail_unicode(smtpserver, temporary_directory):
     message = smtpserver.outbox[0]
 
     def decode(header):
-        return decode_header(header)[0][0].decode('utf-8')
+        name, addr = parseaddr(header)
 
-    assert decode(message['Sender']) == u"Gövikon <noreply@exämple.org>"
-    assert decode(message['From']) == u"Gövikon <noreply@exämple.org>"
-    assert decode(message['Reply-To']) == u"Gövikon <info@exämple.org>"
-    assert decode(message['Subject']) == u"Test E-Mäil"
+        try:
+            name = decode_header(name)[0][0].decode('utf-8')
+        except AttributeError:
+            pass
+
+        return name, addr
+
+    assert decode(message['Sender']) == (u"Gövikon", 'noreply@example.org')
+    assert decode(message['From']) == (u"Gövikon", 'noreply@example.org')
+    assert decode(message['Reply-To']) == (u"Gövikon", 'info@example.org')
+    assert decode_header(message['Subject'])[0][0].decode('utf-8')\
+        == u"Test E-Mäil"
+
     assert message.get_payload()[0].as_string() == (
         'Content-Type: text/html; charset="iso-8859-1"\n'
         'MIME-Version: 1.0\n'

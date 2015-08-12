@@ -1,26 +1,7 @@
 import os.path
 
 from mailbox import Maildir, MaildirMessage
-from mailthon.helpers import encode_address
-from mailthon.postman import Postman as BasePostman
-
-
-# pending issue: https://github.com/eugene-eeo/mailthon/issues/18
-# wait for https://github.com/eugene-eeo/mailthon/issues/24
-def stringify_address(addr, encoding='utf-8'):
-    return encode_address(addr, encoding).decode('utf-8')
-
-
-class Postman(BasePostman):
-    def deliver(self, conn, envelope):
-
-        rejected = conn.sendmail(
-            stringify_address(envelope.mail_from),
-            [stringify_address(addr) for addr in envelope.receivers],
-            envelope.string(),
-        )
-
-        return self.response_cls(conn.noop(), rejected)
+from mailthon.postman import Postman
 
 
 class MaildirTransport(object):
@@ -38,14 +19,7 @@ class MaildirTransport(object):
                 os.makedirs(d)
 
     def sendmail(self, from_addr, to_addrs, message):
-        msg = MaildirMessage(message)
-
-        # the x-* headers are for repoze.sendmail compatibility
-        # (i.e. we can use the qp script if we use these headers)
-        msg['X-Actually-From'] = msg['from']
-        msg['X-Actually-To'] = msg['to']
-
-        self.maildir.add(msg)
+        self.maildir.add(MaildirMessage(message))
 
         return {}
 

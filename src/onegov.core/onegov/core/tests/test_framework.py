@@ -5,6 +5,7 @@ import pytest
 
 from datetime import datetime, timedelta
 from email.header import decode_header
+from email.utils import parseaddr
 from freezegun import freeze_time
 from morepath import setup
 from onegov.core import Framework
@@ -508,15 +509,15 @@ def test_send_email_to_maildir(temporary_directory):
 def test_send_email_unicode(smtpserver):
     app = Framework()
     app.mail_host, app.mail_port = smtpserver.addr
-    app.mail_sender = u'noreply@exämple.org'
+    app.mail_sender = u'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
     app.mail_password = None
     app.mail_use_directory = False
 
     result = app.send_email(
-        reply_to=u'Gövikon <info@exämple.org>',
-        receivers=[u'recipient@exämple.org'],
+        reply_to=u'Gövikon <info@example.org>',
+        receivers=[u'recipient@example.org'],
         subject=u"Nüws",
         content=u"This e-mäil is just a test"
     )
@@ -527,12 +528,19 @@ def test_send_email_unicode(smtpserver):
     message = smtpserver.outbox[0]
 
     def decode(header):
-        return decode_header(header)[0][0].decode('utf-8')
+        name, addr = parseaddr(header)
 
-    assert decode(message['Sender']) == u"Gövikon <noreply@exämple.org>"
-    assert decode(message['From']) == u"Gövikon <noreply@exämple.org>"
-    assert decode(message['Reply-To']) == u"Gövikon <info@exämple.org>"
-    assert decode(message['Subject']) == u"Nüws"
+        try:
+            name = decode_header(name)[0][0].decode('utf-8')
+        except AttributeError:
+            pass
+
+        return name, addr
+
+    assert decode(message['Sender']) == (u"Gövikon", 'noreply@example.org')
+    assert decode(message['From']) == (u"Gövikon", 'noreply@example.org')
+    assert decode(message['Reply-To']) == (u"Gövikon", 'info@example.org')
+    assert message['Subject'] == '=?utf-8?b?TsO8d3M=?='
     assert message.get_payload()[0].as_string() == (
         'Content-Type: text/html; charset="iso-8859-1"\n'
         'MIME-Version: 1.0\n'
