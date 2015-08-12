@@ -540,7 +540,10 @@ def test_send_email_unicode(smtpserver):
     assert decode(message['Sender']) == (u"Gövikon", 'noreply@example.org')
     assert decode(message['From']) == (u"Gövikon", 'noreply@example.org')
     assert decode(message['Reply-To']) == (u"Gövikon", 'info@example.org')
-    assert message['Subject'] == '=?utf-8?b?TsO8d3M=?='
+
+    assert decode_header(message['Subject'])[0][0].decode('utf-8') \
+        == u"Nüws"
+
     assert message.get_payload()[0].as_string() == (
         'Content-Type: text/html; charset="iso-8859-1"\n'
         'MIME-Version: 1.0\n'
