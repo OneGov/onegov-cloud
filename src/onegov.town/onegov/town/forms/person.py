@@ -1,3 +1,4 @@
+from onegov.core.utils import ensure_scheme
 from onegov.form import Form, with_options
 from onegov.town import _
 from wtforms import StringField, TextAreaField, validators
@@ -20,7 +21,7 @@ class PersonForm(Form):
 
     email = EmailField(_("E-Mail"))
     phone = StringField(_("Phone"))
-    website = StringField(_("Website"))
+    website = StringField(_("Website"), filters=[ensure_scheme])
 
     address = TextAreaField(
         label=_("Address"),

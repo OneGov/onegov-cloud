@@ -40,7 +40,7 @@ setup(
         'jsmin',
         'lazy-object-proxy',
         'lxml',
-        'onegov.core>=0.4.18',
+        'onegov.core>=0.4.21',
         'onegov.form>=0.6.6',
         'onegov.foundation>=0.0.4',
         'onegov.libres',

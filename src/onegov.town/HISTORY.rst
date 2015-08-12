@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Makes sure that all person links are valid.
+  [href]
+
 - When inserting a defined link, the dropdown now starts with an empty selection.
   [href]
 
