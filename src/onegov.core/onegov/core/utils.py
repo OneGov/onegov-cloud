@@ -254,12 +254,28 @@ def sanitize_html(html):
     return bleach.clean(html, tags=allowed_tags, attributes=allowed_attributes)
 
 
-def linkify(text):
+def linkify(text, escape=True):
     """ Takes plain text and injects html links for urls and email addresses.
+
+    By default the text is html escaped before it is linkified. This accounts
+    for the fact that we usually use this for text blocks that we mean to
+    extend with email addresses and urls.
+
+    If html is already possible, why linkify it?
+
+    Note: We need to clean the html after we've created it (linkify
+    parses escaped html and turns it into real html). As a consequence it
+    is possible to have html urls in the text that won't be escaped.
 
     """
 
     if not text:
         return text
 
-    return bleach.linkify(text, parse_email=True)
+    linkified = bleach.linkify(text, parse_email=True)
+
+    if not escape:
+        return linkified
+
+    return bleach.clean(
+        linkified, tags=['a'], attributes={'a': ['href', 'rel']})

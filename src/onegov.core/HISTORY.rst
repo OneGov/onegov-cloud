@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Linkify now escapes all html by default (except for the 'a' tag).
+  [href]
+
 - Adds proper support for unicode email addresses (only the domain and the
   text - the local part won't be supported for now as it is rare and doesn't
   even pass Chrome's or Firefox's email validation).

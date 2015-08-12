@@ -61,6 +61,14 @@ def test_linkify():
     assert utils.linkify('https://google.ch')\
         == '<a href="https://google.ch" rel="nofollow">https://google.ch</a>'
 
+    # by default, linkify sanitizes the text before linkifying it
+    assert utils.linkify('info@example.org<br>')\
+        == '<a href="mailto:info@example.org">info@example.org</a>&lt;br&gt;'
+
+    # we can disable that however
+    assert utils.linkify('info@example.org<br>', escape=False)\
+        == '<a href="mailto:info@example.org">info@example.org</a><br>'
+
 
 def test_sanitize_html():
     # this is really bleach's job, but we want to run the codepath anyway
