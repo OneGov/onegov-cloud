@@ -81,3 +81,11 @@ def test_unreachable_backend_proxy():
         'foo': 1, 'bar': 2
     })
     assert region.get_multi(['foo', 'bar']) == [cache.NO_VALUE, cache.NO_VALUE]
+
+
+def test_cache_key():
+    region = cache.create_backend('ns', 'dogpile.cache.memcached', arguments={
+        'url': '127.0.0.1:12345'
+    })
+
+    region.set('x' * 500, 'y')

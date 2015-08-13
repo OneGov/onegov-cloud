@@ -37,14 +37,25 @@ eventually be discarded by memcache if the cache is full).
 from dogpile.cache import make_region
 from dogpile.cache.api import NO_VALUE
 from dogpile.cache.proxy import ProxyBackend
+from hashlib import sha1
 from onegov.core import log
+
+
+def prefix_key_mangler(prefix):
+
+    prefix = prefix.encode('utf-8')
+
+    def key_mangler(key):
+        return sha1(prefix + key.encode('utf-8')).hexdigest()
+
+    return key_mangler
 
 
 def create_backend(namespace, backend, arguments={}, expiration_time=None):
 
     prefix = '{}:'.format(namespace)
 
-    return make_region(key_mangler=lambda key: prefix + key).configure(
+    return make_region(key_mangler=prefix_key_mangler(prefix)).configure(
         backend,
         expiration_time=None,
         arguments=arguments,

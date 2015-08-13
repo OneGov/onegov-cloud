@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The memcached key is now limited in its size.
+  [href]
+
 - Properly support postgres extensions.
   [href]
 
