@@ -1,0 +1,88 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+
+            <div class="large-8 medium-8 columns">
+                <div class="row">
+                    <div class="large-12 columns">
+                        <tal:block repeat="event events">
+                            <div class="row">
+                                <div class="large-2 large-push-10 columns">
+                                    <div class="events-day-date">
+                                        <div>
+                                            <!-- todo: use localized dates (display_start etc) -->
+                                            <span>${event.start.day}.</span>
+                                            <!-- todo: use layout.format_date -->
+                                            <span>${event.start.strftime('%b')}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="large-10 large-pull-2 medium-12 small-12 columns">
+                                    <div><a href="${request.link(event)}">${event.title}</a></div>
+                                    <div>${event.event.location}</div>
+                                    <div>${layout.format_date(event.start, 'datetime')}-${layout.format_date(event.end, 'time')}</div>
+                                    <div><span tal:repeat="tag event.display_tags" class="event-tag">${tag}</span></div>
+                                    <hr>
+                                </div>
+                            </div>
+                        </tal:block>
+                    </div>
+                </div>
+
+                <div class="pagination-centered">
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
+                </div>
+
+            </div>
+
+            <div class="large-4 medium-4 columns">
+
+                <!-- todo: add map -->
+
+                <div class="events-filter-result">
+                    <span>${number_events}</span>
+                    <span i18n:translate="">Events</span>
+                </div>
+
+                <div class="events-filter-tags">
+                    <span tal:repeat="tag used_tags" class="event-tag">
+                        <!-- todo: add active state, add filtering-->
+                        <a href="#">${tag}</a>
+                    </span>
+                </div>
+
+                <div class="row events-filter-date">
+                    <!--  todo: add filtering -->
+                    <div class="large-6 columns">
+                        <div class="row collapse">
+                            <label i18n:translate="">From</label>
+                            <input type="date" >
+                        </div>
+                    </div>
+                    <div class="large-6 columns">
+                        <div class="row collapse">
+                            <label i18n:translate="">To</label>
+                            <input type="date">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="events-add-box">
+                    <dl>
+                        <dt>
+                            <!-- todo: set url -->
+                            <a href="#">
+                                <i class="fa fa-chevron-right"></i> <span i18n:translate="">Submit your event</span>
+                            </a>
+                        </dt>
+                        <dd i18n:translate="">Submit your own event</dd>
+                    </dl>
+                </div>
+          </div>
+
+        </div>
+    </tal:block>
+</div>

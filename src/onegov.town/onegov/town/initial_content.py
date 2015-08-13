@@ -3,7 +3,9 @@
 import codecs
 import os
 
+from datetime import datetime, timedelta
 from onegov.core.utils import module_path
+from onegov.event import EventCollection
 from onegov.libres import LibresIntegration, ResourceCollection
 from onegov.form import FormCollection
 from onegov.page import PageCollection
@@ -31,6 +33,7 @@ def add_initial_content(libres_registry, session_manager, town_name):
     add_root_pages(session)
     add_builtin_forms(session)
     add_resources(libres_context)
+    add_events(session)
 
     session.flush()
 
@@ -126,3 +129,56 @@ def add_resources(libres_context):
         type='daypass',
         name='sbb-tageskarte'
     )
+
+
+def add_events(session):
+    today = datetime.today().date()
+    today = datetime(today.year, today.month, today.day)
+
+    events = EventCollection(session)
+    event = events.add(
+        title=u"Gemeindeversammlung",
+        start=today + timedelta(days=16, hours=19, minutes=30),
+        end=today + timedelta(days=16, hours=21, minutes=0),
+        recurrence="RRULE:FREQ=MONTHLY;INTERVAL=1;COUNT=3",
+        timezone="Europe/Zurich",
+        tags=u"Politik",
+        location=u"Gemeindesaal",
+        content={"description": u"Lorem ipsum."},
+    )
+    event.submit()
+    event.publish()
+    event = events.add(
+        title=u"Grümpelturnier",
+        start=today + timedelta(days=22, hours=10, minutes=0),
+        end=today + timedelta(days=22, hours=18, minutes=0),
+        timezone="Europe/Zurich",
+        tags=u"Freizeit, Sport",
+        location=u"Sportanlage",
+        content={"description": u"Lorem ipsum."},
+    )
+    event.submit()
+    event.publish()
+    event = events.add(
+        title=u"MuKi Turnen",
+        start=today + timedelta(days=26, hours=10, minutes=30),
+        end=today + timedelta(days=26, hours=18, minutes=0),
+        recurrence="RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=10",
+        timezone="Europe/Zurich",
+        tags=u"Freizeit, Sport",
+        location=u"Turnhalle",
+        content={"description": u"Lorem ipsum."},
+    )
+    event.submit()
+    event.publish()
+    event = events.add(
+        title=u"150 Jahre Govikon",
+        start=today + timedelta(days=31, hours=11, minutes=0),
+        end=today + timedelta(days=31, hours=22, minutes=0),
+        timezone="Europe/Zurich",
+        tags=u"Freizeit, Fest",
+        location=u"Sportanlage",
+        content={"description": u"Lorem ipsum."},
+    )
+    event.submit()
+    event.publish()

@@ -1,5 +1,6 @@
 """ Contains the paths to the different models served by onegov.town. """
 
+from onegov.event import Occurrence, OccurrenceCollection
 from onegov.form import (
     FormDefinition,
     FormCollection,
@@ -153,3 +154,14 @@ def get_clipboard(request, token):
 @TownApp.path(model=SiteCollection, path='/sitecollection')
 def get_sitecollection(app):
     return SiteCollection(app.session())
+
+
+@TownApp.path(model=OccurrenceCollection, path='/veranstaltungen')
+def get_occurrences(app, page=0, start=None, end=None, tags=None):
+    return OccurrenceCollection(app.session(), page, start, end, tags)
+
+
+@TownApp.path(model=Occurrence, path='/veranstaltung/{id}')
+def get_occurrence(app, id):
+    # todo: Occurrence(app).by_name(name)
+    return OccurrenceCollection(app.session()).by_id(id)

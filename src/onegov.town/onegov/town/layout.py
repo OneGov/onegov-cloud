@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
+from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.libres import ResourceCollection
 from onegov.page import Page, PageCollection
@@ -671,3 +672,29 @@ class ResourceLayout(DefaultLayout):
                 ),
                 delete_link
             ]
+
+
+class EventsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Events"), self.request.link(self.model))
+        ]
+
+
+class EventLayout(DefaultLayout):
+
+    @cached_property
+    def collection(self):
+        return OccurrenceCollection(self.request.app.session())
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Events"), self.request.link(self.collection)),
+            # todo:
+            # Link(self.model.id, '#')
+        ]

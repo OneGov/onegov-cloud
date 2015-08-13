@@ -1152,3 +1152,66 @@ tr.ticket:hover {
         }
     }
 }
+
+/*
+    Events
+*/
+.event-tag {
+    @include label(
+        $bg: $secondary-color,
+        $radius: 4px
+    );
+
+    a {
+        color: inherit;
+    }
+}
+
+.events-day-date {
+    background-color: $white-smoke;
+    min-height: 118px;
+    width: 100%;
+
+    div {
+        float: right;
+        padding: .1em 1.4em;
+        text-align: center;
+    }
+
+    span:first-child {
+        display: block;
+        font-size: 1.4em;
+        font-weight: bold;
+    }
+}
+
+.events-filter-result {
+    margin-bottom: 1em;
+
+    span:first-child {
+        font-size: 1.6em;
+        font-weight: bold;
+    }
+}
+
+.events-filter-tags,
+.events-filter-date {
+    margin-bottom: 1em;
+}
+
+.events-add-box {
+    @include panel;
+    @include smooth-edges;
+
+    margin-top: 2em;
+}
+
+.event-lead {
+    font-size: $h5-font-size;
+    font-weight: 300;
+}
+
+.event-tags,
+.event-description {
+    margin-bottom: 2em;
+}

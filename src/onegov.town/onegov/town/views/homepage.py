@@ -3,6 +3,7 @@
 """ The onegov town homepage. """
 
 from collections import namedtuple
+from onegov.event import OccurrenceCollection
 from onegov.core.security import Public
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
@@ -66,29 +67,26 @@ def view_town(self, request):
         links=online_counter_links
     )
 
+    occurrences = OccurrenceCollection(session)
     latest_events = LinkGroup(
         title=u"Veranstaltungen",
         links=[
             Link(
-                text=u"Gemeindeversammlung",
+                text=occurrence.title,
                 url="#",
-                subtitle=u"Montag, 16. März 2015, 19:30"
-            ),
-            Link(
-                text=u"Grümpelturnier",
-                url="#",
-                subtitle=u"Sonntag, 22. März 2015, 10:00"
-            ),
-            Link(
-                text=u"MuKi Turnen",
-                url="#",
-                subtitle=u"Freitag, 26. März 2015, 18:30"
-            ),
-            Link(
-                text=u"150 Jahre Govikon",
-                url="#",
-                subtitle=u"Sonntag, 31. März 2015, 11:00"
-            ),
+                # todo: this sucks
+                subtitle='{0}, {1}. {2} {3}'.format(
+                    request.translate(
+                        occurrence.display_start().strftime('%A')
+                    ),
+                    occurrence.display_start().strftime('%d'),
+                    request.translate(
+                        occurrence.display_start().strftime('%B')
+                    ),
+                    occurrence.display_start().strftime('%Y, %H:%M')
+                )
+            )
+            for occurrence in occurrences.query().limit(4)
         ]
     )
 

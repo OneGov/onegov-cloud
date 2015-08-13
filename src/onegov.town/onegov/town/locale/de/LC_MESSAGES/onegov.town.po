@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-07 09:48+0200\n"
+"POT-Creation-Date: 2015-08-13 11:58+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -34,6 +34,9 @@ msgstr "Tickets"
 
 msgid "Reservations"
 msgstr "Reservationen"
+
+msgid "Events"
+msgstr "Veranstaltungen"
 
 msgid "Logout"
 msgstr "Logout"
@@ -409,6 +412,21 @@ msgid ""
 "To delete this page, delete all subpages first or ask an administrator to do "
 "it for you."
 msgstr ""
+
+msgid "All occurrences of this event"
+msgstr "Alle Daten dieser Veranstaltung"
+
+msgid "From"
+msgstr "Von"
+
+msgid "To"
+msgstr "Bis"
+
+msgid "Submit your event"
+msgstr "Veranstaltung melden"
+
+msgid "Submit your own event"
+msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 
 msgid "Upload"
 msgstr "Hochladen"
