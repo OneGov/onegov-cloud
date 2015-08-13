@@ -29,7 +29,7 @@ class SessionManager(object):
     #   reasons. Someone could figure out a way to set the search_path to
     #   default and to add an application that has the right to change the
     #   public schema.
-    _reserved_schemas = {'information_schema', 'public'}
+    _reserved_schemas = {'information_schema', 'public', 'extensions'}
 
     def __init__(self, dsn, base, engine_config={}, session_config={}):
         """ Configures the data source name/dsn/database url and sets up the
@@ -67,6 +67,20 @@ class SessionManager(object):
         Note, to connect to another database you need to create a new
         SessionManager instance.
 
+        **Postgres Extensions**
+
+        The session manager supports the setup of postgres extensions.
+        Currently those extensions are hard-coded and they are all added to the
+        extensions schema. The extensions schema is then added to the search
+        path of each query.
+
+        Since extensions can only be created by superusers, this is something
+        you might want to do in a separate step in deployment. We don't advise
+        you to use a superuser connection for your onegov cloud deployment.
+
+        You may therefore use the list of the required extensions below and
+        create a schema 'extensions' with those extensions inside.
+
         """
         assert 'postgres' in dsn, "Onegov only supports Postgres!"
 
@@ -74,6 +88,14 @@ class SessionManager(object):
         self.bases = [base]
         self.created_schemas = set()
         self.current_schema = None
+
+        # onegov.core creates extensions that it requires in a separate schema
+
+        # in the future, this might become something we can configure through
+        # the setuptools entry_points -> modules could advertise what they need
+        # and the core would install the extensions the modules require
+        self.required_extensions = {'hstore'}
+        self.created_extensions = set()
 
         self.engine = create_engine(
             self.dsn, poolclass=QueuePool, pool_size=5, max_overflow=5,
@@ -116,7 +138,7 @@ class SessionManager(object):
                     schema = None
 
             if schema is not None:
-                cursor.execute("SET search_path TO %s", (schema, ))
+                cursor.execute("SET search_path TO %s, extensions", (schema, ))
 
     def _scopefunc(self):
         """ Returns the scope of the scoped_session used to create new
@@ -241,6 +263,27 @@ class SessionManager(object):
 
         return result.first()[0]
 
+    def create_required_extensions(self):
+        """ Creates the required extensions once per lifetime of the manager.
+
+        """
+        if self.required_extensions != self.created_extensions:
+
+            # extensions are a all added to a shared schema
+            if not self.is_schema_found_on_database('extensions'):
+                conn = self.engine.execution_options(schema=None)
+                conn.execute('CREATE SCHEMA "extensions"')
+                conn.execute('COMMIT')
+
+            conn = self.engine.execution_options(schema='extensions')
+            for ext in self.required_extensions - self.created_extensions:
+                conn.execute(
+                    'CREATE EXTENSION IF NOT EXISTS "{}" '
+                    'SCHEMA "extensions"'.format(ext)
+                )
+                conn.execute('COMMIT')
+                self.created_extensions.add(ext)
+
     def ensure_schema_exists(self, schema):
         """ Makes sure the schema exists on the database. If it doesn't, it
         is created.
@@ -254,6 +297,9 @@ class SessionManager(object):
             # dangerous way!
             assert self.is_valid_schema(schema)
 
+            # setup the extensions right before we activate our first schema
+            self.create_required_extensions()
+
             # psycopg2 doesn't know how to correctly build a CREATE
             # SCHEMA statement, so we need to do it manually.
             # self.is_valid_schema should've checked that no sql
@@ -264,14 +310,6 @@ class SessionManager(object):
             if not self.is_schema_found_on_database(schema):
                 conn = self.engine.execution_options(schema=None)
                 conn.execute('CREATE SCHEMA "{}"'.format(schema))
-
-                # This is not a good spot the create the extension, see
-                #   https://github.com/OneGov/onegov.core/issues/5
-                conn.execute(
-                    'CREATE EXTENSION IF NOT EXISTS hstore SCHEMA "{}"'.format(
-                        schema
-                    )
-                )
                 conn.execute('COMMIT')
 
             conn = self.engine.execution_options(schema=schema)

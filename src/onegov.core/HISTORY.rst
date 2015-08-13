@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Properly support postgres extensions.
+  [href]
+
 0.4.22 (2015-08-12)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -12,7 +12,9 @@ from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.framework import Framework
 from pytz import timezone
 from sqlalchemy import Column, Integer, Text
+from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.mutable import MutableDict
 from webtest import TestApp as Client
 from webob.exc import HTTPUnauthorized
 
@@ -452,3 +454,37 @@ def test_content_mixin(postgres_dsn):
     session.query(Test).one().content == {'text': 'RTFM'}
 
     mgr.dispose()
+
+
+def test_extensions_schema(postgres_dsn):
+    Base = declarative_base()
+
+    class Data(Base):
+        __tablename__ = 'data'
+
+        id = Column(Integer, primary_key=True)
+        data = Column(MutableDict.as_mutable(HSTORE))
+
+    mgr = SessionManager(postgres_dsn, Base)
+
+    for ix, schema in enumerate(('foo', 'bar')):
+        mgr.set_current_schema(schema)
+
+        obj = Data()
+        obj.data = {}
+        obj.data['index'] = str(ix)
+        obj.data['schema'] = schema
+
+        mgr.session().add(obj)
+        mgr.session().flush()
+
+        transaction.commit()
+
+    for ix, schema in enumerate(('foo', 'bar')):
+        mgr.set_current_schema(schema)
+
+        obj = mgr.session().query(Data).one()
+        assert obj.data['index'] == str(ix)
+        assert obj.data['schema'] == schema
+
+    assert mgr.created_extensions == {'hstore'}
