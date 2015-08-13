@@ -48,6 +48,12 @@ def test_collections(session):
         assert events.query().count() == 2
         assert occurrences.query().count() == 6
 
+        assert occurrences.query().all() == sorted(
+            occurrences.query().all(), key=lambda x: x.start
+        )
+
+        assert sorted(occurrences.used_tags) == ['animals', 'fun', 'history']
+
         assert occurrences.query(tags=['fun']).count() == 5
         assert occurrences.query(tags=['fun', 'history']).count() == 6
         assert occurrences.query(tags=['animals', 'history']).count() == 6

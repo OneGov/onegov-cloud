@@ -68,6 +68,7 @@ def test_create_event(session):
     assert occurence.event.title == event.title
     assert occurence.title == event.title
     assert occurence.event.content == event.content
+    assert occurence.event.description == event.content['description']
     assert occurence.event.location == event.location
     assert occurence.location == event.location
     assert occurence.event.tags == event.tags
@@ -188,6 +189,7 @@ def test_update_event(session):
     assert occurence.event.title == event.title
     assert occurence.title == event.title
     assert occurence.event.content == event.content
+    assert occurence.event.description == event.content['description']
     assert occurence.event.location == event.location
     assert occurence.location == event.location
     assert occurence.event.tags == event.tags
@@ -208,6 +210,7 @@ def test_update_event(session):
     assert occurence.event.title == event.title
     assert occurence.title == event.title
     assert occurence.event.content == event.content
+    assert occurence.event.description == event.content['description']
     assert occurence.event.location == event.location
     assert occurence.location == event.location
     assert occurence.event.tags == event.tags

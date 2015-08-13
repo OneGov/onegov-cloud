@@ -63,7 +63,7 @@ class EventCollection(EventCollectionPagination):
 
         events = self.session.query(Event).filter(Event.start < max_age)
         events = list(filter(
-            lambda x: max(x.occurrence_dates()) < max_age, events
+            lambda x: max(x.occurrence_dates(limit=False)) < max_age, events
         ))
         for event in events:
             self.session.delete(event)
@@ -113,4 +113,18 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
                 Occurrence.tags.like('%{0}%'.format(tag)) for tag in tags
             )))
 
+        query = query.order_by(Occurrence.start)
+
         return query
+
+    def by_id(self, id):
+        return self.query().filter(Occurrence.id == id).first()
+
+    @property
+    def used_tags(self):
+        # todo: optimize with hstore
+        tags = []
+        for occurrence in self.session.query(Occurrence):
+            tags.extend([tag.strip() for tag in occurrence.tags.split(',')])
+
+        return sorted(set(tags))

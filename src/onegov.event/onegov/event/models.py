@@ -38,6 +38,11 @@ class OccurrenceMixin(object):
     def display_end(self, timezone=None):
         return to_timezone(self.end, timezone or self.timezone)
 
+    # todo: remove me with hstore!
+    @property
+    def display_tags(self):
+        return self.tags.split(',')
+
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
     """ Defines an event.
@@ -80,14 +85,19 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
                     'start', 'end', 'timezone', 'recurrence'):
             self._update_occurrences()
 
-    def occurrence_dates(self, max_year=None):
+    def occurrence_dates(self, limit=True):
+        """ Returns the start dates of all occurrences.
+
+        Limits the occurrences per default to this and the next year.
+        """
         occurrences = [self.start]
         if self.recurrence:
             occurrences = rrule.rrulestr(self.recurrence, dtstart=self.start)
             occurrences = list(
                 map(lambda x: standardize_date(x, self.timezone), occurrences)
             )
-            if max_year is not None:
+            if limit:
+                max_year = datetime.today().year + 1
                 occurrences = list(
                     filter(lambda x: x.year <= max_year, occurrences)
                 )
@@ -106,8 +116,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
             return
 
         # create all occurrences for this and next year
-        max_year = datetime.today().year + 1
-        for start in self.occurrence_dates(max_year=max_year):
+        for start in self.occurrence_dates():
             end = start + (self.end - self.start)
             self.occurrences.append(
                 Occurrence(
@@ -131,6 +140,10 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
     def withdraw(self):
         assert self.state == 'published'
         self.state = 'withdrawn'
+
+    @property
+    def description(self):
+        return self.content.get('description', '')
 
 
 class Occurrence(Base, OccurrenceMixin, TimestampMixin):
