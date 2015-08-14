@@ -1,3 +1,5 @@
+import arrow
+
 from cached_property import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
@@ -674,7 +676,31 @@ class ResourceLayout(DefaultLayout):
             ]
 
 
-class EventsLayout(DefaultLayout):
+class EventBaseLayout(DefaultLayout):
+
+    month_abbr_format = '%b'
+    event_format = '%A, %d. %B %Y, %H:%M'
+
+    def format_date(self, date, format):
+        """ Takes a datetime and formats it.
+
+        This overrides :meth:`onegov.core.Layout.format_date` since we want to
+        display the date in the timezone given by the event, not a fixed one.
+
+        """
+        assert format in {
+            'date', 'time', 'datetime', 'relative', 'month_abbr', 'event'
+        }
+
+        if format == 'relative':
+            return arrow.get(date).humanize(locale=self.request.locale)
+
+        # todo: event and month_abbr need translation
+
+        return date.strftime(getattr(self, format + '_format'))
+
+
+class EventsLayout(EventBaseLayout):
 
     @cached_property
     def breadcrumbs(self):
@@ -684,7 +710,7 @@ class EventsLayout(DefaultLayout):
         ]
 
 
-class EventLayout(DefaultLayout):
+class EventLayout(EventBaseLayout):
 
     @cached_property
     def collection(self):

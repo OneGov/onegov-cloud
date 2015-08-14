@@ -1167,6 +1167,17 @@ tr.ticket:hover {
     }
 }
 
+.event-tag.active {
+    @include label(
+        // $bg: $secondary-color,
+        $radius: 4px
+    );
+
+    a {
+        color: inherit;
+    }
+}
+
 .events-day-date {
     background-color: $white-smoke;
     min-height: 118px;

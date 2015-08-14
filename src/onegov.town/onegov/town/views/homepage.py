@@ -11,7 +11,7 @@ from onegov.people import PersonCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link, LinkGroup
-from onegov.town.layout import DefaultLayout
+from onegov.town.layout import DefaultLayout, EventBaseLayout
 from onegov.town.models import Town
 
 
@@ -67,24 +67,16 @@ def view_town(self, request):
         links=online_counter_links
     )
 
+    event_layout = EventBaseLayout(self, request)
     occurrences = OccurrenceCollection(session)
     latest_events = LinkGroup(
         title=u"Veranstaltungen",
         links=[
             Link(
                 text=occurrence.title,
-                url="#",
-                # todo: this sucks
-                subtitle='{0}, {1}. {2} {3}'.format(
-                    request.translate(
-                        occurrence.display_start().strftime('%A')
-                    ),
-                    occurrence.display_start().strftime('%d'),
-                    request.translate(
-                        occurrence.display_start().strftime('%B')
-                    ),
-                    occurrence.display_start().strftime('%Y, %H:%M')
-                )
+                url=request.link(occurrence),
+                subtitle=event_layout.format_date(occurrence.localized_start,
+                                                  'event')
             )
             for occurrence in occurrences.query().limit(4)
         ]

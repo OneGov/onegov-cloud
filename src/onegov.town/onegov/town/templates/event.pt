@@ -4,9 +4,8 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
         <div class="large-8 medium-8 columns">
-            <!-- todo: use localized dates (display_start etc) -->
             <div class="event-lead">
-                ${event.event.location}, ${layout.format_date(event.start, 'datetime')}-${layout.format_date(event.end, 'time')}
+                ${event.event.location}, ${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}
             </div>
 
             <div class="event-tags">
@@ -22,7 +21,7 @@
         <div class="large-4 medium-4 columns">
             <div class="event-occurrences">
                 <span i18n:translate="">All occurrences of this event</span>
-                <ul tal:define="occurrences event.event.occurrence_dates()">
+                <ul>
                     <li tal:repeat="occurrence occurrences">
                         ${layout.format_date(occurrence, 'date')}
                     </li>

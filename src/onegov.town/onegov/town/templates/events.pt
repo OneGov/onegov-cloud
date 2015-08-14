@@ -13,17 +13,15 @@
                                 <div class="large-2 large-push-10 columns">
                                     <div class="events-day-date">
                                         <div>
-                                            <!-- todo: use localized dates (display_start etc) -->
-                                            <span>${event.start.day}.</span>
-                                            <!-- todo: use layout.format_date -->
-                                            <span>${event.start.strftime('%b')}</span>
+                                            <span>${event.localized_start.day}.</span>
+                                            <span>${layout.format_date(event.localized_start, 'month_abbr')}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="large-10 large-pull-2 medium-12 small-12 columns">
                                     <div><a href="${request.link(event)}">${event.title}</a></div>
                                     <div>${event.event.location}</div>
-                                    <div>${layout.format_date(event.start, 'datetime')}-${layout.format_date(event.end, 'time')}</div>
+                                    <div>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}</div>
                                     <div><span tal:repeat="tag event.display_tags" class="event-tag">${tag}</span></div>
                                     <hr>
                                 </div>
@@ -43,29 +41,30 @@
                 <!-- todo: add map -->
 
                 <div class="events-filter-result">
-                    <span>${number_events}</span>
+                    <span>${number_of_events}</span>
                     <span i18n:translate="">Events</span>
                 </div>
 
                 <div class="events-filter-tags">
-                    <span tal:repeat="tag used_tags" class="event-tag">
-                        <!-- todo: add active state, add filtering-->
-                        <a href="#">${tag}</a>
-                    </span>
+                    <tal:block tal:repeat="tag tags">
+                        <span class="event-tag ${tag.active and 'active' or ''}">
+                            <tal:block replace="structure tag(request)"></tal:block>
+                        </span>
+                    </tal:block>
                 </div>
 
                 <div class="row events-filter-date">
-                    <!--  todo: add filtering -->
+                    <!--  todo: add javascript for filtering, add fallback if no javascript available -->
                     <div class="large-6 columns">
                         <div class="row collapse">
                             <label i18n:translate="">From</label>
-                            <input type="date" >
+                            <input name="start" type="date" value="${start}">
                         </div>
                     </div>
                     <div class="large-6 columns">
                         <div class="row collapse">
                             <label i18n:translate="">To</label>
-                            <input type="date">
+                            <input name="end" type="date" value="${end}">
                         </div>
                     </div>
                 </div>
@@ -73,7 +72,7 @@
                 <div class="events-add-box">
                     <dl>
                         <dt>
-                            <!-- todo: set url -->
+                            <!-- todo: set url (and use link?) -->
                             <a href="#">
                                 <i class="fa fa-chevron-right"></i> <span i18n:translate="">Submit your event</span>
                             </a>
