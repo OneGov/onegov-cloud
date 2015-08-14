@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.23 (2015-08-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Binds all e-mails to the transaction. Only if the transaction commits are
   the e-mails sent.
