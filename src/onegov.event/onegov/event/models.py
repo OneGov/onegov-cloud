@@ -10,7 +10,14 @@ from uuid import uuid4
 
 
 class OccurrenceMixin(object):
-    """ Contains all attributes events and ocurrences share. """
+    """ Contains all attributes events and ocurrences share.
+
+    The ``start`` and ``end`` date and times are stored in UTC - that is, they
+    are stored internally without a timezone and are converted to UTC when
+    getting or setting, see :class:`UTCDateTime`. Use the properties
+    ``localized_start`` and ``localized_end`` to get the localized version of
+    the date and times.
+    """
 
     #: title of the event
     title = Column(Text, nullable=False)
@@ -21,22 +28,22 @@ class OccurrenceMixin(object):
     #: tags (categories) of the event
     tags = Column(Text, nullable=True)
 
-    #: start date/time of the event (of the first event if recurring); no
-    #  timezone here, it's UTC
-    start = Column(UTCDateTime, nullable=False)
-
-    #: end date/time of the event (of the first event if recurring); no
-    #  timezone here, it's UTC
-    end = Column(UTCDateTime, nullable=False)
-
-    #: timezone the event was submitted
+    #: timezone of the event
     timezone = Column(String, nullable=False)
 
-    def display_start(self, timezone=None):
-        return to_timezone(self.start, timezone or self.timezone)
+    #: start date and time of the event (of the first event if recurring)
+    start = Column(UTCDateTime, nullable=False)
 
-    def display_end(self, timezone=None):
-        return to_timezone(self.end, timezone or self.timezone)
+    @property
+    def localized_start(self):
+        return to_timezone(self.start, self.timezone)
+
+    #: end date and time of the event (of the first event if recurring)
+    end = Column(UTCDateTime, nullable=False)
+
+    @property
+    def localized_end(self):
+        return to_timezone(self.end, self.timezone)
 
     # todo: remove me with hstore!
     @property
@@ -85,10 +92,11 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
                     'start', 'end', 'timezone', 'recurrence'):
             self._update_occurrences()
 
-    def occurrence_dates(self, limit=True):
+    def occurrence_dates(self, limit=True, localize=False):
         """ Returns the start dates of all occurrences.
 
-        Limits the occurrences per default to this and the next year.
+        Returns non-localized dates per default. Limits the occurrences per
+        default to this and the next year.
         """
         occurrences = [self.start]
         if self.recurrence:
@@ -96,6 +104,10 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
             occurrences = list(
                 map(lambda x: standardize_date(x, self.timezone), occurrences)
             )
+            if localize:
+                occurrences = list(map(
+                    lambda x: to_timezone(x, self.timezone), occurrences
+                ))
             if limit:
                 max_year = datetime.today().year + 1
                 occurrences = list(
