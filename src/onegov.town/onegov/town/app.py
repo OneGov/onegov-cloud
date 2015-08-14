@@ -40,7 +40,8 @@ class TownApp(Framework, LibresIntegration):
         unless you use :meth:`update_town` or use the ORM directly.
 
         """
-        return self.cache.get_or_create('town', self.load_town)
+        return self.session().merge(
+            self.cache.get_or_create('town', self.load_town), load=False)
 
     def load_town(self):
         """ Loads the town from the SQL database. """

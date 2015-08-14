@@ -1,3 +1,4 @@
+import more.transaction
 import more.webassets
 import onegov.core
 import onegov.town
@@ -23,6 +24,7 @@ def town_password():
 def town_app(postgres_dsn, temporary_directory, town_password, smtpserver):
 
     config = setup()
+    config.scan(more.transaction)
     config.scan(more.webassets)
     config.scan(onegov.core)
     config.scan(onegov.town)
