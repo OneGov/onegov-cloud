@@ -1,3 +1,5 @@
+import transaction
+
 from onegov.core.utils import Bunch
 from onegov.town import TownApp
 
@@ -20,7 +22,14 @@ def test_send_email(smtpserver):
     app.mail_username = None
     app.mail_password = None
     app.mail_use_directory = False
+
     app.send_email(receivers=['civilian@example.org'], subject='Test')
+    assert len(smtpserver.outbox) == 0
+    transaction.abort()
+
+    app.send_email(receivers=['civilian@example.org'], subject='Test')
+    assert len(smtpserver.outbox) == 0
+    transaction.commit()
 
     assert len(smtpserver.outbox) == 1
     mail = smtpserver.outbox[0]

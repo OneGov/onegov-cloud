@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Emails are now sent only if the db transaction is successful.
+  [href]
+
 0.3.7 (2015-08-12)
 ~~~~~~~~~~~~~~~~~~~
 
