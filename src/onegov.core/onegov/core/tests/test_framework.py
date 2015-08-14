@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import transaction
 import pytest
 
 from datetime import datetime, timedelta
@@ -417,14 +418,14 @@ def test_send_email(smtpserver):
     app.mail_password = None
     app.mail_use_directory = False
 
-    result = app.send_email(
+    app.send_email(
         reply_to='info@example.org',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
         content="This e-mail is just a test"
     )
 
-    assert result.ok
+    transaction.commit()
 
     assert len(smtpserver.outbox) == 1
     message = smtpserver.outbox[0]
@@ -451,14 +452,14 @@ def test_send_email_with_name(smtpserver):
     app.mail_password = None
     app.mail_use_directory = False
 
-    result = app.send_email(
+    app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
         content="This e-mail is just a test"
     )
 
-    assert result.ok
+    transaction.commit()
 
     assert len(smtpserver.outbox) == 1
     message = smtpserver.outbox[0]
@@ -482,14 +483,17 @@ def test_send_email_to_maildir(temporary_directory):
     app.mail_use_directory = True
     app.mail_directory = temporary_directory
 
-    result = app.send_email(
+    app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
         content="This e-mail is just a test"
     )
 
-    assert result.ok
+    assert not os.listdir(temporary_directory)
+
+    transaction.commit()
+
     assert set(os.listdir(temporary_directory)) == {'cur', 'new', 'tmp'}
 
     new_emails = os.path.join(temporary_directory, 'new')
@@ -515,14 +519,15 @@ def test_send_email_unicode(smtpserver):
     app.mail_password = None
     app.mail_use_directory = False
 
-    result = app.send_email(
+    app.send_email(
         reply_to=u'Gövikon <info@example.org>',
         receivers=[u'recipient@example.org'],
         subject=u"Nüws",
         content=u"This e-mäil is just a test"
     )
 
-    assert result.ok
+    assert len(smtpserver.outbox) == 0
+    transaction.commit()
 
     assert len(smtpserver.outbox) == 1
     message = smtpserver.outbox[0]
@@ -582,3 +587,66 @@ def test_object_by_path():
     # works, because 'foobar' is a view of the root
     assert isinstance(app.object_by_path('/foobar'), Root)
     assert app.object_by_path('/asdf/asdf') is None
+
+
+def test_send_email_transaction(smtpserver):
+    config = setup()
+
+    import more.transaction
+    import more.webassets
+    import onegov.core
+
+    config.scan(more.transaction)
+    config.scan(more.webassets)
+    config.scan(onegov.core)
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.view(model=Root, name='send-fail')
+    def fail_send(self, request):
+        app.send_email(
+            reply_to=u'Gövikon <info@example.org>',
+            receivers=[u'recipient@example.org'],
+            subject=u"Nüws",
+            content=u"This e-mäil is just a test"
+        )
+        assert False
+
+    @App.view(model=Root, name='send-ok')
+    def success_send(self, request):
+        app.send_email(
+            reply_to=u'Gövikon <info@example.org>',
+            receivers=[u'recipient@example.org'],
+            subject=u"Nüws",
+            content=u"This e-mäil is just a test"
+        )
+
+    config.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(identity_secure=False)  # allow http
+    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_sender = u'noreply@example.org'
+    app.mail_force_tls = False
+    app.mail_username = None
+    app.mail_password = None
+    app.mail_use_directory = False
+
+    app.cache_backend = 'dogpile.cache.memory'
+    app.cache_backend_arguments = {}
+
+    client = Client(app)
+
+    with pytest.raises(AssertionError):
+        client.get('/send-fail')
+
+    assert len(smtpserver.outbox) == 0
+
+    client.get('/send-ok')
+    assert len(smtpserver.outbox) == 1

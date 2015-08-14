@@ -33,8 +33,8 @@ from more.transaction import TransactionApp
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
-from onegov.core import cache
-from onegov.core import utils
+from onegov.core import cache, utils
+from onegov.core.datamanager import MailDataManager
 from onegov.core.mail import Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
 from onegov.core.request import CoreRequest
@@ -505,12 +505,14 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         to the e-mail which is usually sent by a noreply kind of e-mail
         address.
 
+        E-mails sent through this method are bound to the current transaction.
+        If that transaction is aborted or not commited, the e-mail is not sent.
+
+        Usually you'll use this method inside a request, where transactions
+        are automatically commited at the end.
+
         For more complex use cases have a look at
         `<http://mailthon.readthedocs.org/>`_.
-
-        Note: If you implement your own email sending using the Mailthon API,
-        be sure to use 'iso-8859-1' encoding. If you use the default 'utf-8',
-        the repoze.sendmail qp command will not work correctly!
 
         """
         assert self.mail_sender
@@ -539,7 +541,8 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         envelope.headers['Sender'] = mail_sender
         envelope.headers['Reply-To'] = formataddr((name, address))
 
-        return self.postman.send(envelope)
+        # send e-mails through the transaction machinery
+        MailDataManager.send_email(self.postman, envelope)
 
     @cached_property
     def static_files(self):

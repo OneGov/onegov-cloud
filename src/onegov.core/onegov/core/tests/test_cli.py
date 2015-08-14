@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os.path
+import transaction
 import yaml
 
 from click.testing import CliRunner
@@ -50,14 +51,15 @@ def test_sendmail(smtpserver, temporary_directory):
     app.mail_use_directory = True
     app.mail_directory = os.path.join(temporary_directory, 'mails')
 
-    result = app.send_email(
+    app.send_email(
         reply_to='Govikon <info@example.org>',
         receivers=['recipient@example.org'],
         subject="Test E-Mail",
         content="This e-mail is just a test"
     )
 
-    assert result.ok
+    transaction.commit()
+
     assert len(smtpserver.outbox) == 0
 
     result = runner.invoke(cli, [
@@ -130,6 +132,8 @@ def test_sendmail_unicode(smtpserver, temporary_directory):
         subject=u"Test E-Mäil",
         content=u"This e-mäil is just a test"
     )
+
+    transaction.commit()
 
     CliRunner().invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),

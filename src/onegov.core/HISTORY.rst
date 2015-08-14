@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Binds all e-mails to the transaction. Only if the transaction commits are
+  the e-mails sent.
+
 - The memcached key is now limited in its size.
   [href]
 
