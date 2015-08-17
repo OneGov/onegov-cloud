@@ -1,6 +1,7 @@
 import json
 import pytest
 import sqlalchemy
+import time
 import transaction
 import uuid
 
@@ -10,11 +11,13 @@ from onegov.core.orm import SessionManager
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.framework import Framework
+from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
+from threading import Thread
 from webtest import TestApp as Client
 from webob.exc import HTTPUnauthorized
 
@@ -488,3 +491,56 @@ def test_extensions_schema(postgres_dsn):
         assert obj.data['schema'] == schema
 
     assert mgr.created_extensions == {'hstore'}
+
+
+def test_serialization_failure(postgres_dsn):
+
+    Base = declarative_base()
+
+    class Data(Base):
+        __tablename__ = 'data'
+        id = Column(Integer, primary_key=True)
+
+    class MayFailThread(Thread):
+
+        def __init__(self, dsn, base, schema):
+            Thread.__init__(self)
+            self.dsn = dsn
+            self.base = base
+            self.schema = schema
+
+        def run(self):
+            mgr = SessionManager(self.dsn, self.base)
+            mgr.set_current_schema(self.schema)
+
+            session = mgr.session()
+
+            session.add(Data())
+            session.query(Data).delete('fetch')
+
+            time.sleep(0.1)
+
+            try:
+                transaction.commit()
+            except Exception as e:
+                self.exception = e
+            else:
+                self.exception = None
+
+    # make sure the schema exists already, its creation is not threadsafe
+    SessionManager(postgres_dsn, Base).set_current_schema('foo')
+
+    threads = [
+        MayFailThread(postgres_dsn, Base, 'foo'),
+        MayFailThread(postgres_dsn, Base, 'foo')
+    ]
+
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+
+    exceptions = [t.exception for t in threads]
+
+    # one will have failed with a rollback error
+    rollbacks = [e for e in exceptions if e]
+    assert len(rollbacks) == 1
+    assert isinstance(rollbacks[0].orig, TransactionRollbackError)
