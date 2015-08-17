@@ -7,7 +7,7 @@ from onegov.town.layout import EventLayout, EventsLayout
 from onegov.event import Occurrence, OccurrenceCollection
 
 
-@TownApp.html(model=OccurrenceCollection, template='events.pt')
+@TownApp.html(model=OccurrenceCollection, template='occurrences.pt')
 def view_occurrences(self, request):
     """ View all occurrences of all events. """
 
@@ -37,7 +37,7 @@ def view_occurrences(self, request):
     }
 
 
-@TownApp.html(model=Occurrence, template='event.pt')
+@TownApp.html(model=Occurrence, template='occurrence.pt')
 def view_get_occurrence(self, request):
     """ View a single occurrence of an event. """
 
