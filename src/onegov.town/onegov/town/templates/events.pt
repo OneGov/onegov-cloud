@@ -7,12 +7,12 @@
 
             <div class="large-8 medium-8 columns">
                 <div class="row">
-                    <div class="large-12 columns">
+                    <div class="large-12 columns" tal:define="global lastdaydate 0">
                         <tal:block repeat="event events">
                             <div class="row">
                                 <div class="large-2 large-push-10 columns">
                                     <div class="events-day-date">
-                                        <div>
+                                        <div tal:condition="layout.format_date(event.localized_start, 'date') != lastdaydate">
                                             <span>${event.localized_start.day}.</span>
                                             <span>${layout.format_date(event.localized_start, 'month_abbr')}</span>
                                         </div>
@@ -26,6 +26,7 @@
                                     <hr>
                                 </div>
                             </div>
+                            <tal:block tal:define="global lastdaydate python: layout.format_date(event.localized_start, 'date')" />
                         </tal:block>
                         <div tal:condition="not events" i18n:translate="">No events found.</div>
                     </div>
