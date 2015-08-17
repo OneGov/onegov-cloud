@@ -230,9 +230,9 @@
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town">
     <div class="person-card person-list-card" tal:define="link request.link(person)">
         <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url)) or person.gravatar_url">
-            <img class="person-card-portrait" src="${url}?s=100" tal:condition="url">
-            <div class="person-card-portrait" tal:condition="not:url">
+            <div class="person-card-portrait portrait-small">
                 <i class="fa fa-user"></i>
+                <img src="${url}?s=100&d=404" style="display: none;" onload="this.style.display = 'block';" tal:condition="url">
             </div>
         </a>
         <ul>
@@ -255,9 +255,9 @@
 <metal:person_card define-macro="person_card" i18n:domain="onegov.town">
     <div class="person-card">
         <div aria-hidden="true" tal:define="url person.picture_url or person.gravatar_url">
-            <img class="person-card-portrait" src="${url}?s=200" tal:condition="url">
-            <div class="person-card-portrait" tal:condition="not:url">
+            <div class="person-card-portrait portrait-large">
                 <i class="fa fa-user"></i>
+                <img src="${url}?s=200&d=404" style="display: none;" onload="this.style.display = 'block';" tal:condition="url">
             </div>
         </div>
         <ul>

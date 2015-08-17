@@ -836,6 +836,7 @@ $max-page-width: 600px;
         height: 200px;
         margin-right: 1rem;
         padding-top: 0;
+        position: relative;
         text-align: center;
         width: 200px;
 
@@ -843,6 +844,27 @@ $max-page-width: 600px;
             color: $white;
             font-size: 200px;
         }
+
+        // stack the image and the icon of the portrait. if the image is loaded
+        // some javascript makes it visible at which point the image overlaps
+        // the icon
+        > * {
+            left: 0;
+            position: absolute;
+            top: 0;
+        }
+
+        i {
+            text-align: center;
+        }
+    }
+
+    .portrait-small i {
+        width: 80px;
+    }
+
+    .portrait-large i {
+        width: 200px;
     }
 
     ul {
