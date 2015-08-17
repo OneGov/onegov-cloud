@@ -209,6 +209,33 @@ class SessionManager(object):
         self.current_schema = schema
         self.ensure_schema_exists(schema)
 
+    def create_schema(self, schema, validate=True):
+        """ Creates the given schema. If said schema exists, expect this
+        method to throw an error. If you use :meth:`set_current_schema`,
+        this is invoked automatically if needed. So you usually shouldn't
+        have to care about this function.
+
+        """
+
+        if validate:
+            assert self.is_valid_schema(schema)
+
+        # psycopg2 doesn't know how to correctly build a CREATE
+        # SCHEMA statement, so we need to do it manually.
+        # self.is_valid_schema should've checked that no sql
+        # injections are possible.
+        #
+        # this is the *only* place where this happens - if anyone
+        # knows how to do this using sqlalchemy/psycopg2, come forward!
+        conn = self.engine.execution_options(schema=None)
+        conn.execute('CREATE SCHEMA "{}"'.format(schema))
+        conn.execute('COMMIT')
+
+    def create_schema_if_not_exists(self, schema, validate=True):
+        """ Creates the given schema if it doesn't exist yet. """
+        if not self.is_schema_found_on_database(schema):
+            self.create_schema(schema, validate)
+
     def bind_session(self, session):
         """ Bind the session to the current schema. """
         session.info['schema'] = self.current_schema
@@ -269,11 +296,8 @@ class SessionManager(object):
         """
         if self.required_extensions != self.created_extensions:
 
-            # extensions are a all added to a shared schema
-            if not self.is_schema_found_on_database('extensions'):
-                conn = self.engine.execution_options(schema=None)
-                conn.execute('CREATE SCHEMA "extensions"')
-                conn.execute('COMMIT')
+            # extensions are a all added to a shared schema (a reserved schema)
+            self.create_schema_if_not_exists('extensions', validate=False)
 
             conn = self.engine.execution_options(schema='extensions')
             for ext in self.required_extensions - self.created_extensions:
@@ -299,18 +323,7 @@ class SessionManager(object):
 
             # setup the extensions right before we activate our first schema
             self.create_required_extensions()
-
-            # psycopg2 doesn't know how to correctly build a CREATE
-            # SCHEMA statement, so we need to do it manually.
-            # self.is_valid_schema should've checked that no sql
-            # injections are possible.
-            #
-            # this is the *only* place where this happens - if anyone
-            # knows how to do this using sqlalchemy/psycopg2, come forward!
-            if not self.is_schema_found_on_database(schema):
-                conn = self.engine.execution_options(schema=None)
-                conn.execute('CREATE SCHEMA "{}"'.format(schema))
-                conn.execute('COMMIT')
+            self.create_schema_if_not_exists(schema)
 
             conn = self.engine.execution_options(schema=schema)
 
