@@ -10,8 +10,7 @@ from itsdangerous import (
 )
 from more.webassets.core import IncludeRequest
 from morepath.security import NO_IDENTITY
-from onegov.core import compat
-from onegov.core import utils
+from onegov.core import compat, utils
 from onegov.core.crypto import random_token
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF

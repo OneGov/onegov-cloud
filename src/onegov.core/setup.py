@@ -45,7 +45,7 @@ setup(
         'isodate',
         'mailthon>=0.1.1',
         'morepath>=0.11.1',
-        'more.transaction',
+        'more.transaction>=0.5',
         'more.webassets',
         'networkx',
         'onegov.server>=0.0.3',

@@ -1,5 +1,3 @@
-import more.webassets
-import onegov.core
 import os.path
 import time
 
@@ -44,6 +42,10 @@ def test_static_file_app(temporary_directory):
         serve_static_files = True
         static_files = temporary_directory
 
+    import onegov.core
+    import more.transaction
+    import more.webassets
+    config.scan(more.transaction)
     config.scan(more.webassets)
     config.scan(onegov.core)
     config.commit()
@@ -86,6 +88,10 @@ def test_root_file_app(temporary_directory):
     def get_favicon(app, absorb):
         return StaticFile.from_application(app, 'robots.txt')
 
+    import onegov.core
+    import more.transaction
+    import more.webassets
+    config.scan(more.transaction)
     config.scan(more.webassets)
     config.scan(onegov.core)
     config.commit()

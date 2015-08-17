@@ -30,17 +30,21 @@ from itsdangerous import BadSignature, Signer
 from mailthon import email
 from mailthon.middleware import TLS, Auth
 from more.transaction import TransactionApp
+from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
-from onegov.core import cache, utils
+from onegov.core import cache, log, utils
 from onegov.core.datamanager import MailDataManager
 from onegov.core.mail import Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
 from onegov.core.request import CoreRequest
 from onegov.server import Application as ServerApplication
+from psycopg2.extensions import TransactionRollbackError
 from purl import URL
+from sqlalchemy.exc import OperationalError
 from uuid import uuid4 as new_uuid
+from webob.exc import HTTPConflict
 
 
 class Framework(TransactionApp, WebassetsApp, ServerApplication):
@@ -737,3 +741,37 @@ def fix_webassets_url_factory(app, handler):
         return response
 
     return fix_webassets_url
+
+
+@Framework.setting(section='transaction', name='attempts')
+def get_retry_attempts():
+    return 2
+
+
+@Framework.tween_factory(over=transaction_tween_factory)
+def http_conflict_tween_factory(app, handler):
+    def http_conflict_tween(request):
+        """ When two transactions conflict, postgres raises an error which
+        more.transaction handles by retrying the transaction for the configured
+        amount of time. See :func:`get_retry_attempts`.
+
+        Once it exhausts all retries, it reraises the exception. Since that
+        doesn't give the user any information, we turn this general error into
+        a 409 Conflict code so we can show a custom error page on the server.
+
+        """
+
+        try:
+            return handler(request)
+        except OperationalError as e:
+            if not hasattr(e, 'orig'):
+                raise
+
+            if not isinstance(e.orig, TransactionRollbackError):
+                raise
+
+            log.warn("A transaction failed because there was a conflict")
+
+            return HTTPConflict()
+
+    return http_conflict_tween

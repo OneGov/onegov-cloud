@@ -3,6 +3,11 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Transactions are now automatically retried once if they fail. If the second
+  attempt also fails, a 409 Conflict HTTP Code is returned.
+  [href]
+
 0.4.23 (2015-08-14)
 ~~~~~~~~~~~~~~~~~~~
 

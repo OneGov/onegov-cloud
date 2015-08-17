@@ -1,5 +1,3 @@
-import more.webassets
-import onegov.core
 import os
 import os.path
 import polib
@@ -91,8 +89,12 @@ def test_chameleon_with_translation(temporary_directory):
 
         return render_macro(template.macros['testmacro'], request, {})
 
-    config.scan(onegov.core)
+    import onegov.core
+    import more.transaction
+    import more.webassets
+    config.scan(more.transaction)
     config.scan(more.webassets)
+    config.scan(onegov.core)
     config.commit()
 
     client = Client(App())

@@ -277,10 +277,13 @@ def test_request_messages():
 def test_fix_webassets_url():
     config = setup()
 
-    import more.webassets
     import onegov.core
+    import more.transaction
+    import more.webassets
+    config.scan(more.transaction)
     config.scan(more.webassets)
     config.scan(onegov.core)
+    config.commit()
 
     class App(Framework):
         testing_config = config

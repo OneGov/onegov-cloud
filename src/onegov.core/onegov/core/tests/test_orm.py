@@ -1,4 +1,5 @@
 import json
+import morepath
 import pytest
 import sqlalchemy
 import time
@@ -7,19 +8,21 @@ import uuid
 
 from datetime import datetime
 from morepath import setup
+from onegov.core.framework import Framework
 from onegov.core.orm import SessionManager
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import JSON, UTCDateTime, UUID
-from onegov.core.framework import Framework
+from onegov.core.security import Private
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
 from threading import Thread
+from webob.exc import HTTPUnauthorized, HTTPConflict
 from webtest import TestApp as Client
-from webob.exc import HTTPUnauthorized
 
 
 def test_is_valid_schema(postgres_dsn):
@@ -247,9 +250,12 @@ def test_orm_scenario(postgres_dsn):
 
     # this is required for the transactions to actually work, usually this
     # would be onegov.server's job
+    import onegov.core
     import more.transaction
+    import more.webassets
     config.scan(more.transaction)
-
+    config.scan(more.webassets)
+    config.scan(onegov.core)
     config.commit()
 
     app = App()
@@ -544,3 +550,120 @@ def test_serialization_failure(postgres_dsn):
     rollbacks = [e for e in exceptions if e]
     assert len(rollbacks) == 1
     assert isinstance(rollbacks[0].orig, TransactionRollbackError)
+
+
+@pytest.mark.parametrize("number_of_retries", range(1, 10))
+def test_application_retries(postgres_dsn, number_of_retries):
+
+    Base = declarative_base()
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='/foo/{id}/{uid}')
+    class Document(object):
+        def __init__(self, id, uid):
+            self.id = id
+            self.uid = uid
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    class Record(Base):
+        __tablename__ = 'records'
+        id = Column(Integer, primary_key=True)
+
+    @App.view(model=Root, name='init')
+    def init_schema(self, request):
+        pass  # the schema is initialized by the application
+
+    @App.view(model=Root, name='login')
+    def login(self, request):
+        @request.after
+        def remember(response):
+            identity = morepath.Identity(
+                userid='admin',
+                role='editor',
+                application_id=request.app.application_id
+            )
+
+            morepath.remember_identity(response, request, identity)
+
+    @App.view(model=Document, permission=Private)
+    def provoke_serialization_failure(self, request):
+        session = request.app.session()
+        session.add(Record())
+        session.query(Record).delete('fetch')
+
+        time.sleep(0.1)
+
+    @App.view(model=OperationalError)
+    def operational_error_handler(self, request):
+        if not hasattr(self, 'orig'):
+            return
+
+        if not isinstance(self.orig, TransactionRollbackError):
+            return
+
+        raise HTTPConflict()
+
+    @App.setting(section='transaction', name='attempts')
+    def get_retry_attempts():
+        return number_of_retries
+
+    import onegov.core
+    import more.transaction
+    import more.webassets
+    config.scan(more.transaction)
+    config.scan(more.webassets)
+    config.scan(onegov.core)
+    config.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        identity_secure=False,
+        disable_memcached=True
+    )
+    app.namespace = 'municipalities'
+
+    # make sure the schema exists already
+    app.set_application_id('municipalities/new-york')
+    Client(app).get('/init')
+
+    class RequestThread(Thread):
+        def __init__(self, app, path):
+            Thread.__init__(self)
+            self.app = app
+            self.path = path
+
+        def run(self):
+            try:
+                client = Client(self.app)
+                client.get('/login')
+                self.response = client.get(self.path, expect_errors=True)
+            except Exception as e:
+                self.exception = e
+            else:
+                self.exception = None
+
+    # the number of threads that succeed are the number of retries - 1
+    threads = [
+        RequestThread(app, '/foo/bar/baz')
+        for i in range(number_of_retries + 1)
+    ]
+
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+
+    # no exceptions should happen, we want proper http return codes
+    assert len([t.exception for t in threads if t.exception]) == 0
+    assert len([t.response for t in threads if t.response]) == len(threads)
+
+    # all responses should be okay, but for one which gets a 409 Conflict
+    status_codes = [t.response.status_code for t in threads]
+    assert sum(1 for c in status_codes if c == 200) == len(threads) - 1
+    assert sum(1 for c in status_codes if c == 409) == 1

@@ -1,6 +1,3 @@
-import onegov.core
-import more.webassets
-
 from morepath import setup
 from onegov.core import Framework
 from onegov.core.theme import get_filename
@@ -52,8 +49,12 @@ def test_theme_application(temporary_directory):
     def view_file(self, request):
         return request.theme_link
 
-    config.scan(onegov.core)
+    import onegov.core
+    import more.transaction
+    import more.webassets
+    config.scan(more.transaction)
     config.scan(more.webassets)
+    config.scan(onegov.core)
     config.commit()
 
     app = App()
