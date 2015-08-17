@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from datetime import date, datetime, timedelta
 from onegov.core.collection import Pagination
+from onegov.core.utils import normalize_for_url, increment_name
 from onegov.event.models import Event, Occurrence
 from sedate import as_datetime, replace_timezone, standardize_date
 from sqlalchemy import and_, distinct, or_
@@ -36,13 +37,24 @@ class EventCollection(EventCollectionPagination):
     def query(self):
         return self.session.query(Event)
 
+    def get_unique_name(self, name):
+        name = normalize_for_url(name)
+
+        session = self.session
+        while session.query(Event.name).filter(Event.name == name).count():
+            name = increment_name(name)
+
+        return name
+
     def add(self, title, start, end, timezone, **optional):
+        name = self.get_unique_name(title)
         event = Event(
             state='initiated',
             title=title,
             start=replace_timezone(start, timezone),
             end=replace_timezone(end, timezone),
             timezone=timezone,
+            name=self.get_unique_name(title),
             **optional
         )
 
@@ -199,6 +211,13 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
 
         return query
 
-    # todo: remove, replace with by name
-    def by_id(self, id):
-        return self.query().filter(Occurrence.id == id).first()
+    def by_name(self, name):
+        """ Returns an occurrence by its readable name.
+
+        The readable name is automatically constructed as followed:
+            ``unique name of the event``-``date of the occurrence``
+        e.g. ``squirrel-park-visit-6-2015-06-20``
+        """
+
+        query = self.session.query(Occurrence).filter(Occurrence.name == name)
+        return query.first()

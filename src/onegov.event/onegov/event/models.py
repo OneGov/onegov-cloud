@@ -22,6 +22,9 @@ class OccurrenceMixin(object):
     #: title of the event
     title = Column(Text, nullable=False)
 
+    #: a nice id for the url, readable by humans
+    name = Column(Text)
+
     #: description of the location of the event
     location = Column(Text, nullable=True)
 
@@ -88,7 +91,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
 
     def __setattr__(self, name, value):
         super(Event, self).__setattr__(name, value)
-        if name in ('state', 'title', 'location', 'tags',
+        if name in ('state', 'title', 'name', 'location', 'tags',
                     'start', 'end', 'timezone', 'recurrence'):
             self._update_occurrences()
 
@@ -130,9 +133,11 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
         # create all occurrences for this and next year
         for start in self.occurrence_dates():
             end = start + (self.end - self.start)
+            name = '{0}-{1}'.format(self.name, start.date().isoformat())
             self.occurrences.append(
                 Occurrence(
                     title=self.title,
+                    name=name,
                     location=self.location,
                     tags=self.tags,
                     start=start,

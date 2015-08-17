@@ -62,6 +62,7 @@ def test_create_event(session):
     event.location = location
     event.tags = tags
     event.meta = {'submitter': 'fat.pauly@squirrelpark.org'}
+    event.name = 'event'
     session.add(event)
 
     event.submit()
@@ -85,6 +86,7 @@ def test_create_event(session):
     assert event.description == description
     assert event.content == {'description': description}
     assert event.meta == {'submitter': 'fat.pauly@squirrelpark.org'}
+    assert event.name == 'event'
 
     occurrence = session.query(Occurrence).one()
     assert occurrence.timezone == timezone
@@ -100,6 +102,7 @@ def test_create_event(session):
     assert occurrence.location == location
     assert occurrence.tags == tags
     assert occurrence.event.description == description
+    assert occurrence.name == 'event-2008-02-07'
 
     assert [o.id for o in event.occurrences] == [occurrence.id]
     assert occurrence.event.id == event.id
@@ -171,6 +174,7 @@ def test_create_event_recurring(session):
     event.location = location
     event.tags = tags
     event.meta = {'submitter': 'fat.pauly@squirrelpark.org'}
+    event.name = 'event'
     session.add(event)
 
     event.submit()
@@ -195,6 +199,7 @@ def test_create_event_recurring(session):
     assert event.description == description
     assert event.content == {'description': description}
     assert event.meta == {'submitter': 'fat.pauly@squirrelpark.org'}
+    assert event.name == 'event'
 
     occurrences = session.query(Occurrence).all()
     assert len(occurrences) == 5
@@ -213,6 +218,7 @@ def test_create_event_recurring(session):
     assert occurrences[0].localized_start == start
     assert occurrences[0].end == end
     assert occurrences[0].localized_end == end
+    assert occurrences[0].name == 'event-2008-02-07'
 
     start = tzdatetime(2008, 2, 9, 10, 15, timezone)
     end = tzdatetime(2008, 2, 9, 16, 00, timezone)
@@ -220,6 +226,7 @@ def test_create_event_recurring(session):
     assert occurrences[1].localized_start == start
     assert occurrences[1].end == end
     assert occurrences[1].localized_end == end
+    assert occurrences[1].name == 'event-2008-02-09'
 
     start = tzdatetime(2008, 2, 11, 10, 15, timezone)
     end = tzdatetime(2008, 2, 11, 16, 00, timezone)
@@ -227,6 +234,7 @@ def test_create_event_recurring(session):
     assert occurrences[2].localized_start == start
     assert occurrences[2].end == end
     assert occurrences[2].localized_end == end
+    assert occurrences[2].name == 'event-2008-02-11'
 
     start = tzdatetime(2008, 2, 13, 10, 15, timezone)
     end = tzdatetime(2008, 2, 13, 16, 00, timezone)
@@ -234,6 +242,7 @@ def test_create_event_recurring(session):
     assert occurrences[3].localized_start == start
     assert occurrences[3].end == end
     assert occurrences[3].localized_end == end
+    assert occurrences[3].name == 'event-2008-02-13'
 
     start = tzdatetime(2008, 2, 15, 10, 15, timezone)
     end = tzdatetime(2008, 2, 15, 16, 00, timezone)
@@ -241,6 +250,7 @@ def test_create_event_recurring(session):
     assert occurrences[4].localized_start == start
     assert occurrences[4].end == end
     assert occurrences[4].localized_end == end
+    assert occurrences[4].name == 'event-2008-02-15'
 
     assert (sorted([o.id for o in event.occurrences]) ==
             sorted([o.id for o in occurrences]))
@@ -318,6 +328,7 @@ def test_update_event(session):
     event.content = {'description': '<em>Furry</em> things will happen!'}
     event.location = 'Squirrel Park'
     event.tags = 'fun, animals, furry'
+    event.name = 'event'
     session.add(event)
 
     event.submit()
@@ -335,6 +346,7 @@ def test_update_event(session):
     assert occurence.location == event.location
     assert occurence.event.tags == event.tags
     assert occurence.tags == event.tags
+    assert occurence.name == 'event-2008-02-07'
 
     event.start = tzdatetime(2009, 2, 7, 10, 15, timezone)
     event.end = tzdatetime(2009, 2, 7, 10, 15, timezone)
@@ -376,6 +388,14 @@ def test_update_event(session):
     assert occurrences[1].start == tzdatetime(2009, 2, 8, 10, 15, timezone)
     assert occurrences[1].end == tzdatetime(2009, 2, 8, 10, 15, timezone)
     assert occurrences[1].timezone == 'US/Eastern'
+
+    event.name = 'new-event'
+    assert session.query(Event).one().name == 'new-event'
+
+    occurrences = session.query(Event).one().occurrences
+    assert len(occurrences) == 2
+    assert occurrences[0].name == 'new-event-2009-02-07'
+    assert occurrences[1].name == 'new-event-2009-02-08'
 
     event.recurrence = ''
     assert session.query(Occurrence).count() == 1

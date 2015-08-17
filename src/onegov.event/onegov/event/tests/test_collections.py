@@ -218,7 +218,6 @@ def test_occurrence_collection(session):
                                  tags=['history']).count() == 1
 
 
-# for_filter
 def test_occurrence_collection_pagination(session):
     with patch.object(EventCollection, 'remove_old_events') as mock_method:
         timezone = 'US/Eastern'
@@ -320,3 +319,51 @@ def test_occurrence_collection_pagination(session):
         assert occurrences.start == date(2010, 5, 1)
         assert occurrences.end is None
         assert occurrences.tags == ['b', 'c']
+
+
+def test_unique_names(session):
+    with patch.object(EventCollection, 'remove_old_events') as mock_method:
+        events = EventCollection(session)
+        added = [
+            events.add(
+                title='Squirrel Park Visit',
+                start=datetime(2015, 6, 16, 9, 30),
+                end=datetime(2015, 6, 16, 18, 00),
+                timezone='US/Eastern',
+            ) for x in range(11)
+        ]
+        assert added[0].name == 'squirrel-park-visit'
+        assert added[1].name == 'squirrel-park-visit-1'
+        assert added[2].name == 'squirrel-park-visit-2'
+        assert added[3].name == 'squirrel-park-visit-3'
+        assert added[4].name == 'squirrel-park-visit-4'
+        assert added[5].name == 'squirrel-park-visit-5'
+        assert added[6].name == 'squirrel-park-visit-6'
+        assert added[7].name == 'squirrel-park-visit-7'
+        assert added[8].name == 'squirrel-park-visit-8'
+        assert added[9].name == 'squirrel-park-visit-9'
+        assert added[10].name == 'squirrel-park-visit-10'
+
+        events.delete(added[6])
+        event = events.add(
+            title='Squirrel Park Visit',
+            start=datetime(2015, 6, 16, 9, 30),
+            end=datetime(2015, 6, 16, 18, 00),
+            timezone='US/Eastern',
+            recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
+        )
+        assert event.name == 'squirrel-park-visit-6'
+
+        event.submit()
+        event.publish()
+        assert event.occurrences[0].name == 'squirrel-park-visit-6-2015-06-16'
+        assert event.occurrences[1].name == 'squirrel-park-visit-6-2015-06-17'
+        assert event.occurrences[2].name == 'squirrel-park-visit-6-2015-06-18'
+        assert event.occurrences[3].name == 'squirrel-park-visit-6-2015-06-19'
+        assert event.occurrences[4].name == 'squirrel-park-visit-6-2015-06-20'
+
+        occurrences = OccurrenceCollection(session)
+        assert occurrences.by_name('test') == None
+
+        occurrence = occurrences.by_name('squirrel-park-visit-6-2015-06-20')
+        assert occurrence == event.occurrences[4]
