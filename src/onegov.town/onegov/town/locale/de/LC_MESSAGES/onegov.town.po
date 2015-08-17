@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-17 11:32+0200\n"
+"POT-Creation-Date: 2015-08-17 16:29+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -96,6 +96,9 @@ msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
 
 msgid "There are existing reservations associated with this resource"
 msgstr "Es existieren Reservationen für diese Reservations-Ressource"
+
+msgid "List"
+msgstr "Auflisten"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
@@ -413,26 +416,8 @@ msgid ""
 "it for you."
 msgstr ""
 
-msgid "All occurrences of this event"
-msgstr "Alle Daten dieser Veranstaltung"
-
-msgid "No events found."
-msgstr "Keine Veranstaltungen gefunden."
-
-msgid "From"
-msgstr "Von"
-
-msgid "To"
-msgstr "Bis"
-
-msgid "Filter by date"
-msgstr "Nach Datum filtern"
-
-msgid "Submit your event"
-msgstr "Veranstaltung melden"
-
-msgid "Submit your own event"
-msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
+msgid "State:"
+msgstr "Status:"
 
 msgid "Upload"
 msgstr "Hochladen"
@@ -566,6 +551,27 @@ msgstr "Ticket Status abfragen"
 msgid "Your ticket has been reopened"
 msgstr "Ihr Ticket wurde wieder geöffnet"
 
+msgid "All occurrences of this event"
+msgstr "Alle Daten dieser Veranstaltung"
+
+msgid "No events found."
+msgstr "Keine Veranstaltungen gefunden."
+
+msgid "From"
+msgstr "Von"
+
+msgid "To"
+msgstr "Bis"
+
+msgid "Filter by date"
+msgstr "Nach Datum filtern"
+
+msgid "Submit your event"
+msgstr "Veranstaltung melden"
+
+msgid "Submit your own event"
+msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
+
 msgid ""
 "You've reached this site because you are logged in. Visitors are "
 "automatically redirected to the following link:"
@@ -651,9 +657,6 @@ msgstr ""
 "Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
 "Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
 
-msgid "State:"
-msgstr "Status:"
-
 msgid "Accept"
 msgstr "Annehmen"
 
@@ -662,6 +665,24 @@ msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "Submitted events"
+msgstr "Gemeldete Veranstaltungen"
+
+msgid "Published events"
+msgstr "Veröffentlichte Veranstaltungen"
+
+msgid "Submitted"
+msgstr "Gemeldet"
+
+msgid "Published"
+msgstr "Veröffentlich"
+
+msgid "Withdrawn"
+msgstr "Zurückgezogen"
+
+msgid "Withdrawn events"
+msgstr "Zurückgezogene Veranstaltungen"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

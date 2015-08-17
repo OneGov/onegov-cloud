@@ -518,6 +518,10 @@ input[type=color] {
     .delete-link:before {
         content: '\f014';
     }
+
+    .list-link:before {
+        content: '\f0ca';
+    }
 }
 
 /*
@@ -1176,7 +1180,7 @@ tr.ticket:hover {
 }
 
 /*
-    Events
+    Event occurrences
 */
 .occurrence-tag {
     @include label(
@@ -1246,4 +1250,27 @@ tr.ticket:hover {
 
 .js .occurrences-filter-date-submit {
     display: none;
+}
+
+/*
+    Events
+*/
+$event-edit-icon: '\f044';
+
+.events-table {
+    width: 100%;
+
+    tr.event:hover {
+        background-color: $yellow-pastel;
+    }
+
+    td.event-title {
+        font-weight: bold;
+
+        ::before {
+            content: $event-edit-icon;
+            font-family: 'FontAwesome';
+            font-weight: normal;
+        }
+    }
 }

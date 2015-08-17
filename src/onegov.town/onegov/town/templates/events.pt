@@ -1,0 +1,43 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <dl class="sub-nav events-filter">
+            <dt i18n:translate>State:</dt>
+            <tal:block repeat="link filters">
+                <dd class="${link.active and 'active' or ''}">
+                    <tal:block replace="structure link(request)"></tal:block>
+                </dd>
+            </tal:block>
+        </dl>
+        <table class="events-table">
+            <thead>
+                <tr>
+                    <th colspan="3">${layout.model.subset_count} ${events_title}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:block repeat="event events">
+                    <tr class="event">
+                        <td class="event-title">
+                            <a href="${request.link(event)}"> ${event.title}</a>
+                        </td>
+                        <td class="event-date">
+                            ${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}
+                            <span tal:condition="event.recurrence">+</span>
+                        </td>
+                        <td class="event-location">
+                            ${event.location}
+                        </td>
+                    </tr>
+                </tal:block>
+            </tbody>
+        </table>
+
+        <div class="pagination-centered">
+            <div metal:use-macro="layout.macros['pagination']" tal:define="
+            collection layout.model; current_page layout.model;" />
+        </div>
+    </tal:block>
+</div>

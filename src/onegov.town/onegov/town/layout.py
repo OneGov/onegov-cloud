@@ -173,6 +173,12 @@ class Layout(ChameleonLayout):
             self.request.transform(self.request.path)
         )
 
+    @cached_property
+    def events_url(self):
+        return self.request.link(
+            OccurrenceCollection(self.request.app.session())
+        )
+
     def include_editor(self):
         self.request.include('redactor')
         self.request.include('redactor_theme')
@@ -709,6 +715,17 @@ class OccurrencesLayout(OccurrenceBaseLayout):
             Link(_("Events"), self.request.link(self.model))
         ]
 
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                Link(
+                    text=_("List"),
+                    url=self.request.link(self.model, 'auflisten'),
+                    classes=('list-link', )
+                )
+            ]
+
 
 class OccurrenceLayout(OccurrenceBaseLayout):
 
@@ -723,3 +740,15 @@ class OccurrenceLayout(OccurrenceBaseLayout):
             Link(_("Events"), self.request.link(self.collection)),
             Link(self.model.title, '#')
         ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            # todo: Add a delete button?
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model.event),
+                    classes=('edit-link', )
+                )
+            ]
