@@ -31,7 +31,7 @@ if (!Modernizr.inputtypes.date) {
         dayOfWeekStart: 1, // Monday
         format: 'Y-m-d',   // HTML5 (RFC3339)
         lang: 'de',
-        lazyInit: true,
+        lazyInit: false,
         timepicker: false,
     });
 }

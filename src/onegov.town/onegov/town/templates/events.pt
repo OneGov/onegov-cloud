@@ -19,7 +19,7 @@
                                     </div>
                                 </div>
                                 <div class="large-10 large-pull-2 medium-12 small-12 columns">
-                                    <div><a href="${request.link(event)}">${event.title}</a></div>
+                                    <div><h3><a href="${request.link(event)}">${event.title}</a></h3></div>
                                     <div>${event.event.location}</div>
                                     <div>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}</div>
                                     <div><span tal:repeat="tag event.display_tags" class="event-tag">${tag}</span></div>
@@ -27,6 +27,7 @@
                                 </div>
                             </div>
                         </tal:block>
+                        <div tal:condition="not events" i18n:translate="">No events found.</div>
                     </div>
                 </div>
 
@@ -37,8 +38,6 @@
             </div>
 
             <div class="large-4 medium-4 columns">
-
-                <!-- todo: add map -->
 
                 <div class="events-filter-result">
                     <span>${number_of_events}</span>
@@ -53,26 +52,38 @@
                     </tal:block>
                 </div>
 
-                <div class="row events-filter-date">
-                    <!--  todo: add javascript for filtering, add fallback if no javascript available -->
-                    <div class="large-6 columns">
-                        <div class="row collapse">
-                            <label i18n:translate="">From</label>
-                            <input name="start" type="date" value="${start}">
+                <div class="events-filter-date">
+                    <form action="" method="GET">
+                        <tal:block tal:repeat="tag active_tags">
+                            <input type="hidden" name="tags" value="${tag}">
+                        </tal:block>
+                        <div class="row">
+                            <div class="large-6 columns">
+                                <div class="row collapse">
+                                    <label i18n:translate="">From</label>
+                                    <input name="start" type="date" value="${start}" placeholder="${date_placeholder}">
+                                </div>
+                            </div>
+                            <div class="large-6 columns">
+                                <div class="row collapse">
+                                    <label i18n:translate="">To</label>
+                                    <input name="end" type="date" value="${end}" placeholder="${date_placeholder}">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="large-6 columns">
-                        <div class="row collapse">
-                            <label i18n:translate="">To</label>
-                            <input name="end" type="date" value="${end}">
+                        <div class="row events-filter-date-submit">
+                            <div class="large-6 columns">
+                                <div class="row collapse">
+                                    <input type="submit" value="Filter by date" class="button" i18n:attributes="value">
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
                 <div class="events-add-box">
                     <dl>
                         <dt>
-                            <!-- todo: set url (and use link?) -->
                             <a href="#">
                                 <i class="fa fa-chevron-right"></i> <span i18n:translate="">Submit your event</span>
                             </a>

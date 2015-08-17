@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-13 11:58+0200\n"
+"POT-Creation-Date: 2015-08-17 11:32+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -416,11 +416,17 @@ msgstr ""
 msgid "All occurrences of this event"
 msgstr "Alle Daten dieser Veranstaltung"
 
+msgid "No events found."
+msgstr "Keine Veranstaltungen gefunden."
+
 msgid "From"
 msgstr "Von"
 
 msgid "To"
 msgstr "Bis"
+
+msgid "Filter by date"
+msgstr "Nach Datum filtern"
 
 msgid "Submit your event"
 msgstr "Veranstaltung melden"

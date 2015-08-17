@@ -1,5 +1,4 @@
 """ Contains the paths to the different models served by onegov.town. """
-from datetime import date
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.form import (
     FormDefinition,
@@ -11,6 +10,7 @@ from onegov.form import (
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
 from onegov.town.app import TownApp
+from onegov.town.converters import extended_date_converter
 from onegov.town.models import (
     Clipboard,
     Editor,
@@ -157,7 +157,8 @@ def get_sitecollection(app):
 
 
 @TownApp.path(model=OccurrenceCollection, path='/veranstaltungen',
-              converters=dict(start=date, end=date, tags=[]))
+              converters=dict(start=extended_date_converter,
+                              end=extended_date_converter, tags=[]))
 def get_occurrences(app, page=0, start=None, end=None, tags=None):
     return OccurrenceCollection(app.session(), page, start, end, tags)
 

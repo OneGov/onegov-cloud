@@ -1162,16 +1162,11 @@ tr.ticket:hover {
         $radius: 4px
     );
 
-    a {
-        color: inherit;
+    &.active {
+        @include label(
+            $radius: 4px
+        );
     }
-}
-
-.event-tag.active {
-    @include label(
-        // $bg: $secondary-color,
-        $radius: 4px
-    );
 
     a {
         color: inherit;
@@ -1225,4 +1220,8 @@ tr.ticket:hover {
 .event-tags,
 .event-description {
     margin-bottom: 2em;
+}
+
+.js .events-filter-date-submit {
+    display: none;
 }
