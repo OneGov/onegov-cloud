@@ -163,7 +163,6 @@ def get_occurrences(app, page=0, start=None, end=None, tags=None):
     return OccurrenceCollection(app.session(), page, start, end, tags)
 
 
-@TownApp.path(model=Occurrence, path='/veranstaltung/{id}')
-def get_occurrence(app, id):
-    # todo: Occurrence(app).by_name(name)
-    return OccurrenceCollection(app.session()).by_id(id)
+@TownApp.path(model=Occurrence, path='/veranstaltungen/{name}')
+def get_occurrence(app, name):
+    return OccurrenceCollection(app.session()).by_name(name)

@@ -721,6 +721,5 @@ class EventLayout(EventBaseLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Events"), self.request.link(self.collection)),
-            # todo:
-            # Link(self.model.id, '#')
+            Link(self.model.title, '#')
         ]
