@@ -362,6 +362,9 @@ def test_unique_names(session):
         assert event.occurrences[3].name == 'squirrel-park-visit-6-2015-06-19'
         assert event.occurrences[4].name == 'squirrel-park-visit-6-2015-06-20'
 
+        assert events.by_name('test') == None
+        assert events.by_name('squirrel-park-visit-6') == event
+
         occurrences = OccurrenceCollection(session)
         assert occurrences.by_name('test') == None
 

@@ -8,6 +8,7 @@ from sqlalchemy import and_, distinct, or_
 
 
 class EventCollectionPagination(Pagination):
+    """ Implements pagination for displaying events. """
 
     def __init__(self, session, page=0, state='submitted'):
         self.session = session
@@ -31,6 +32,10 @@ class EventCollectionPagination(Pagination):
     def page_by_index(self, index):
         return self.__class__(self.session, index, self.state)
 
+    def for_state(self, state):
+        """ Returns a new instance of the collection with the given state. """
+        return self.__class__(self.session, 0, state)
+
 
 class EventCollection(EventCollectionPagination):
 
@@ -38,6 +43,7 @@ class EventCollection(EventCollectionPagination):
         return self.session.query(Event)
 
     def get_unique_name(self, name):
+        """ Create a unique, URL-friendly name. """
         name = normalize_for_url(name)
 
         session = self.session
@@ -47,6 +53,13 @@ class EventCollection(EventCollectionPagination):
         return name
 
     def add(self, title, start, end, timezone, **optional):
+        """ Add a new event.
+
+        A unique, URL-friendly name is created automatically for this event
+        using the title and optionally numbers for duplicate names.
+
+        Every time a new event is added, old, past events are deleted.
+        """
         name = self.get_unique_name(title)
         event = Event(
             state='initiated',
@@ -66,10 +79,14 @@ class EventCollection(EventCollectionPagination):
         return event
 
     def delete(self, event):
+        """ Delete an event. """
+
         self.session.delete(event)
         self.session.flush()
 
     def remove_old_events(self, max_age=None):
+        """ Removes all events with the last occurrence older than 30 days. """
+
         if max_age is None:
             max_age = datetime.utcnow() - timedelta(days=30)
             max_age = standardize_date(max_age, 'UTC')
@@ -82,6 +99,12 @@ class EventCollection(EventCollectionPagination):
             self.session.delete(event)
 
         self.session.flush()
+
+    def by_name(self, name):
+        """ Returns an occurrence by its URL-friendly name."""
+
+        query = self.session.query(Event).filter(Event.name == name)
+        return query.first()
 
 
 class OccurrenceCollectionPagination(Pagination):
@@ -212,9 +235,9 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
         return query
 
     def by_name(self, name):
-        """ Returns an occurrence by its readable name.
+        """ Returns an occurrence by its URL-friendly name.
 
-        The readable name is automatically constructed as followed:
+        The URL-friendly name is automatically constructed as followed:
             ``unique name of the event``-``date of the occurrence``
         e.g. ``squirrel-park-visit-6-2015-06-20``
         """
