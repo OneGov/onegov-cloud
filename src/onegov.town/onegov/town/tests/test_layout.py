@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function
-
 import onegov.core
 import onegov.town
+import more.transaction
 import more.webassets
 
 from morepath import setup
@@ -182,6 +181,7 @@ def test_template_layout():
         layout.font_awesome_path = ''
         return {'layout': layout}
 
+    config.scan(more.transaction)
     config.scan(more.webassets)
     config.scan(onegov.core)
     config.scan(onegov.town)
