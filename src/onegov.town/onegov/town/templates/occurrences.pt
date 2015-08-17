@@ -8,27 +8,27 @@
             <div class="large-8 medium-8 columns">
                 <div class="row">
                     <div class="large-12 columns" tal:define="global lastdaydate 0">
-                        <tal:block repeat="event events">
+                        <tal:block repeat="occurrence occurrences">
                             <div class="row">
                                 <div class="large-2 large-push-10 columns">
-                                    <div class="events-day-date">
-                                        <div tal:condition="layout.format_date(event.localized_start, 'date') != lastdaydate">
-                                            <span>${event.localized_start.day}.</span>
-                                            <span>${layout.format_date(event.localized_start, 'month_abbr')}</span>
+                                    <div class="occurrences-day-date">
+                                        <div tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
+                                            <span>${occurrence.localized_start.day}.</span>
+                                            <span>${layout.format_date(occurrence.localized_start, 'month_abbr')}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="large-10 large-pull-2 medium-12 small-12 columns">
-                                    <div><h3><a href="${request.link(event)}">${event.title}</a></h3></div>
-                                    <div>${event.event.location}</div>
-                                    <div>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}</div>
-                                    <div><span tal:repeat="tag event.display_tags" class="event-tag">${tag}</span></div>
+                                    <div><h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3></div>
+                                    <div>${occurrence.event.location}</div>
+                                    <div>${layout.format_date(occurrence.localized_start, 'datetime')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
+                                    <div><span tal:repeat="tag occurrence.display_tags" class="occurrence-tag">${tag}</span></div>
                                     <hr>
                                 </div>
                             </div>
-                            <tal:block tal:define="global lastdaydate python: layout.format_date(event.localized_start, 'date')" />
+                            <tal:block tal:define="global lastdaydate python: layout.format_date(occurrence.localized_start, 'date')" />
                         </tal:block>
-                        <div tal:condition="not events" i18n:translate="">No events found.</div>
+                        <div tal:condition="not occurrences" i18n:translate="">No events found.</div>
                     </div>
                 </div>
 
@@ -40,20 +40,20 @@
 
             <div class="large-4 medium-4 columns">
 
-                <div class="events-filter-result">
-                    <span>${number_of_events}</span>
+                <div class="occurrences-filter-result">
+                    <span>${number_of_occurrences}</span>
                     <span i18n:translate="">Events</span>
                 </div>
 
-                <div class="events-filter-tags">
+                <div class="occurrences-filter-tags">
                     <tal:block tal:repeat="tag tags">
-                        <span class="event-tag ${tag.active and 'active' or ''}">
+                        <span class="occurrence-tag ${tag.active and 'active' or ''}">
                             <tal:block replace="structure tag(request)"></tal:block>
                         </span>
                     </tal:block>
                 </div>
 
-                <div class="events-filter-date">
+                <div class="occurrences-filter-date">
                     <form action="" method="GET">
                         <tal:block tal:repeat="tag active_tags">
                             <input type="hidden" name="tags" value="${tag}">
@@ -72,7 +72,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row events-filter-date-submit">
+                        <div class="row occurrences-filter-date-submit">
                             <div class="large-6 columns">
                                 <div class="row collapse">
                                     <input type="submit" value="Filter by date" class="button" i18n:attributes="value">
@@ -82,7 +82,7 @@
                     </form>
                 </div>
 
-                <div class="events-add-box">
+                <div class="occurrences-add-box">
                     <dl>
                         <dt>
                             <a href="#">

@@ -1178,7 +1178,7 @@ tr.ticket:hover {
 /*
     Events
 */
-.event-tag {
+.occurrence-tag {
     @include label(
         $bg: $secondary-color,
         $radius: 4px
@@ -1195,7 +1195,7 @@ tr.ticket:hover {
     }
 }
 
-.events-day-date {
+.occurrences-day-date {
     background-color: $white-smoke;
     min-height: 118px;
     width: 100%;
@@ -1213,7 +1213,7 @@ tr.ticket:hover {
     }
 }
 
-.events-filter-result {
+.occurrences-filter-result {
     margin-bottom: 1em;
 
     span:first-child {
@@ -1222,28 +1222,28 @@ tr.ticket:hover {
     }
 }
 
-.events-filter-tags,
-.events-filter-date {
+.occurrences-filter-tags,
+.occurrences-filter-date {
     margin-bottom: 1em;
 }
 
-.events-add-box {
+.occurrences-add-box {
     @include panel;
     @include smooth-edges;
 
     margin-top: 2em;
 }
 
-.event-lead {
+.occurrence-lead {
     font-size: $h5-font-size;
     font-weight: 300;
 }
 
-.event-tags,
-.event-description {
+.occurrence-tags,
+.occurrence-description {
     margin-bottom: 2em;
 }
 
-.js .events-filter-date-submit {
+.js .occurrences-filter-date-submit {
     display: none;
 }

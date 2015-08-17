@@ -676,7 +676,7 @@ class ResourceLayout(DefaultLayout):
             ]
 
 
-class EventBaseLayout(DefaultLayout):
+class OccurrenceBaseLayout(DefaultLayout):
 
     month_abbr_format = '%b'
     event_format = '%A, %d. %B %Y, %H:%M'
@@ -700,7 +700,7 @@ class EventBaseLayout(DefaultLayout):
         return date.strftime(getattr(self, format + '_format'))
 
 
-class EventsLayout(EventBaseLayout):
+class OccurrencesLayout(OccurrenceBaseLayout):
 
     @cached_property
     def breadcrumbs(self):
@@ -710,7 +710,7 @@ class EventsLayout(EventBaseLayout):
         ]
 
 
-class EventLayout(EventBaseLayout):
+class OccurrenceLayout(OccurrenceBaseLayout):
 
     @cached_property
     def collection(self):

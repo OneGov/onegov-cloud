@@ -3,7 +3,7 @@ from datetime import date
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
-from onegov.town.layout import EventLayout, EventsLayout
+from onegov.town.layout import OccurrenceLayout, OccurrencesLayout
 from onegov.event import Occurrence, OccurrenceCollection
 
 
@@ -14,7 +14,7 @@ def view_occurrences(self, request):
     request.include('common')
     request.include('events')
 
-    layout = EventsLayout(self, request)
+    layout = OccurrencesLayout(self, request)
 
     tags = (
         Link(
@@ -27,10 +27,10 @@ def view_occurrences(self, request):
     return {
         'layout': layout,
         'title': _(u'Events'),
-        'events': self.batch,
+        'occurrences': self.batch,
         'tags': tags,
         'active_tags': self.tags,
-        'number_of_events': self.subset().count(),
+        'number_of_occurrences': self.subset().count(),
         'start': self.start.isoformat() if self.start else '',
         'end': self.end.isoformat() if self.end else '',
         'date_placeholder': date.today().isoformat()
@@ -41,12 +41,12 @@ def view_occurrences(self, request):
 def view_get_occurrence(self, request):
     """ View a single occurrence of an event. """
 
-    layout = EventLayout(self, request)
+    layout = OccurrenceLayout(self, request)
     occurrences = self.event.occurrence_dates(localize=True)
 
     return {
         'layout': layout,
-        'event': self,
+        'occurrence': self,
         'occurrences': occurrences,
         'title': self.title,
     }

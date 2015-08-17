@@ -11,7 +11,7 @@ from onegov.people import PersonCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link, LinkGroup
-from onegov.town.layout import DefaultLayout, EventBaseLayout
+from onegov.town.layout import DefaultLayout, OccurrenceBaseLayout
 from onegov.town.models import Town
 
 
@@ -67,7 +67,7 @@ def view_town(self, request):
         links=online_counter_links
     )
 
-    event_layout = EventBaseLayout(self, request)
+    event_layout = OccurrenceBaseLayout(self, request)
     occurrences = OccurrenceCollection(session)
     latest_events = LinkGroup(
         title=u"Veranstaltungen",
