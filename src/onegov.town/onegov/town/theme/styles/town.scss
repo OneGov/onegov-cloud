@@ -202,6 +202,21 @@ form {
     }
 
     /*
+        One line checkboxes
+    */
+
+    .oneline-checkboxes {
+        li {
+            display: inline-block;
+        }
+
+        label {
+            margin-left: 0;
+            margin-right: .8rem;
+        }
+    }
+
+    /*
         Password quality meter
     */
     meter {

@@ -4,7 +4,7 @@ from datetime import datetime, time
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from onegov.form import Form, with_options
 from onegov.form.parser.core import FieldDependency
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import MultiCheckboxField, MultiCheckboxWidget
 from onegov.town import _
 from wtforms.validators import DataRequired, InputRequired
 from wtforms.fields import RadioField, TextField
@@ -14,13 +14,13 @@ from wtforms_components import If
 
 
 WEEKDAYS = (
-    (MO.weekday, _("Monday")),
-    (TU.weekday, _("Tuesday")),
-    (WE.weekday, _("Wednesday")),
-    (TH.weekday, _("Thursday")),
-    (FR.weekday, _("Friday")),
-    (SA.weekday, _("Saturday")),
-    (SU.weekday, _("Sunday")),
+    (MO.weekday, _("Mo")),
+    (TU.weekday, _("Tu")),
+    (WE.weekday, _("We")),
+    (TH.weekday, _("Th")),
+    (FR.weekday, _("Fr")),
+    (SA.weekday, _("Sa")),
+    (SU.weekday, _("Su")),
 )
 
 
@@ -39,6 +39,20 @@ class AllocationForm(Form):
     more about those values.
 
     """
+
+    start = DateField(_("Start"), [InputRequired()])
+    end = DateField(_("End"), [InputRequired()])
+
+    except_for = MultiCheckboxField(
+        _("Except for"),
+        choices=WEEKDAYS,
+        filters=[choices_as_integer],
+        widget=with_options(
+            MultiCheckboxWidget,
+            prefix_label=False,
+            class_='oneline-checkboxes'
+        )
+    )
 
     @property
     def dates(self):
@@ -99,17 +113,8 @@ class AllocationForm(Form):
 
 class DaypassAllocationForm(AllocationForm):
 
-    start = DateField(_("Start"), [InputRequired()])
-    end = DateField(_("End"), [InputRequired()])
-
     daypasses = IntegerField(_("Daypasses"), [InputRequired()])
     daypasses_limit = IntegerField(_("Daypasses Limit"), [InputRequired()])
-
-    except_for = MultiCheckboxField(
-        _("Except for"),
-        choices=WEEKDAYS,
-        filters=[choices_as_integer]
-    )
 
     whole_day = True
     data = None
@@ -128,9 +133,6 @@ class DaypassAllocationForm(AllocationForm):
 
 
 class RoomAllocationForm(AllocationForm):
-
-    start = DateField(_("Start"), [InputRequired()])
-    end = DateField(_("End"), [InputRequired()])
 
     as_whole_day = RadioField(_("Whole day"), choices=[
         ('yes', _("Yes")),
@@ -151,12 +153,6 @@ class RoomAllocationForm(AllocationForm):
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
         widget=with_options(TextInput, **as_whole_day_dependency.html_data)
-    )
-
-    except_for = MultiCheckboxField(
-        _("Except for"),
-        choices=WEEKDAYS,
-        filters=[choices_as_integer]
     )
 
     data = None
