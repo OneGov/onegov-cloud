@@ -229,10 +229,10 @@
 
 <metal:person_card define-macro="person_list_card" i18n:domain="onegov.town">
     <div class="person-card person-list-card" tal:define="link request.link(person)">
-        <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url)) or person.gravatar_url">
-            <div class="person-card-portrait portrait-small">
-                <i class="fa fa-user"></i>
-                <img src="${url}?s=100&d=404" style="display: none;" onload="this.style.display = 'block';" tal:condition="url">
+        <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+            <div class="person-card-portrait">
+                <i class="fa fa-user" tal:condition="not:url"></i>
+                <img src="${url}" tal:condition="url">
             </div>
         </a>
         <ul>
@@ -254,10 +254,10 @@
 
 <metal:person_card define-macro="person_card" i18n:domain="onegov.town">
     <div class="person-card">
-        <div aria-hidden="true" tal:define="url person.picture_url or person.gravatar_url">
-            <div class="person-card-portrait portrait-large">
-                <i class="fa fa-user"></i>
-                <img src="${url}?s=200&d=404" style="display: none;" onload="this.style.display = 'block';" tal:condition="url">
+        <div aria-hidden="true" tal:define="url person.picture_url">
+            <div class="person-card-portrait">
+                <i class="fa fa-user" tal:condition="not:url"></i>
+                <img src="${url}" tal:condition="url">
             </div>
         </div>
         <ul>
@@ -303,7 +303,7 @@
     <ul class="pagination" role="menubar" aria-label="Pagination">
         <tal:block repeat="page collection.pages">
             <tal:block define="
-                previous current_page.previous; 
+                previous current_page.previous;
                 next current_page.next;
                 is_current current_page == page;
             ">
@@ -312,7 +312,7 @@
                         <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
                     </li>
                 </tal:block>
-                
+
                 <li class="${is_current and 'current' or ''}">
                     <a href="${request.link(page)}">${page.page + 1}</a>
                 </li>

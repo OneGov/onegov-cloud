@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Removes Gravatar support.
+  [href]
+
 0.3.8 (2015-08-14)
 ~~~~~~~~~~~~~~~~~~~
 
