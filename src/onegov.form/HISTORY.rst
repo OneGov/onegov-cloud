@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a new widget for multiple checkbox fields.
+  [href]
+
 0.6.6 (2015-08-11)
 ~~~~~~~~~~~~~~~~~~~
 

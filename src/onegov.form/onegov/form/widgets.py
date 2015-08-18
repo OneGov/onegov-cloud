@@ -3,8 +3,16 @@ import humanize
 
 from cgi import escape
 
-from wtforms.widgets import FileInput
+from wtforms.widgets import ListWidget, FileInput
 from wtforms.widgets.core import HTMLString
+
+
+class MultiCheckboxWidget(ListWidget):
+    """ The default wtforms ListWidget, extended different default values. """
+
+    def __init__(self, *args, **kwargs):
+        kwargs['prefix_label'] = False
+        super(MultiCheckboxWidget, self).__init__(*args, **kwargs)
 
 
 class UploadWidget(FileInput):

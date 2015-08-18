@@ -3,13 +3,17 @@ import gzip
 import magic
 
 from onegov.core.compat import BytesIO
-from onegov.form.widgets import UploadWidget
+from onegov.form.widgets import MultiCheckboxWidget, UploadWidget
 from wtforms import FileField, SelectMultipleField, widgets
 
 
 class MultiCheckboxField(SelectMultipleField):
-    widget = widgets.ListWidget(prefix_label=False)
-    option_widget = widgets.CheckboxInput()
+
+    widget = MultiCheckboxWidget()
+
+    def __init__(self, *args, **kwargs):
+        kwargs['option_widget'] = widgets.CheckboxInput()
+        super(MultiCheckboxField, self).__init__(*args, **kwargs)
 
 
 class UploadField(FileField):
