@@ -11,7 +11,7 @@ def test_full_name(session):
     rachel = people.add(
         first_name='Rachel',
         last_name='Scott',
-        academic_title='Dr.'
+        salutation='Dr.'
     )
 
     assert tom.title == 'Tom Chandler'

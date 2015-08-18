@@ -13,16 +13,17 @@ class Person(Base, TimestampMixin):
 
     @property
     def title(self):
-        if self.academic_title:
-            return u" ".join(
-                (self.academic_title, self.first_name, self.last_name))
+        if self.salutation:
+            parts = self.salutation, self.first_name, self.last_name
         else:
-            return u" ".join((self.first_name, self.last_name))
+            parts = self.first_name, self.last_name
+
+        return u" ".join(parts)
 
     #: the unique id, part of the url
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    academic_title = Column(Text, nullable=True)
+    salutation = Column(Text, nullable=True)
 
     first_name = Column(Text, nullable=False)
 
