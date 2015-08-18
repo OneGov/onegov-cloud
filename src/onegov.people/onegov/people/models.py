@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from hashlib import md5
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -19,13 +18,6 @@ class Person(Base, TimestampMixin):
                 (self.academic_title, self.first_name, self.last_name))
         else:
             return u" ".join((self.first_name, self.last_name))
-
-    @property
-    def gravatar_url(self):
-        if self.email:
-            return 'https://www.gravatar.com/avatar/{}'.format(
-                md5(self.email.encode('utf-8')).hexdigest()
-            )
 
     #: the unique id, part of the url
     id = Column(UUID, primary_key=True, default=uuid4)
