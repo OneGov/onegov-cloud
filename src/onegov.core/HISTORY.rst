@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds support page titles consisting solely on emojis.
+  [href]
+
 - Transactions are now automatically retried once if they fail. If the second
   attempt also fails, a 409 Conflict HTTP Code is returned.
   [href]

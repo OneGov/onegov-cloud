@@ -262,6 +262,7 @@ class AdjacencyListCollection(object):
 
         """
         name = normalize_for_url(name)
+        name = name or 'page'
 
         siblings = self.query().filter(self.__listclass__.parent == parent)
         names = set(
