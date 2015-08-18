@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- A person's academic title is now a person's salutation.
+  [href]
+
 - Removes Gravatar support.
   [href]
 
