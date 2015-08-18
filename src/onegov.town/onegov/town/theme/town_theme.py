@@ -46,6 +46,7 @@ class TownTheme(BaseTheme):
             ('blue-pastel', '#d3e3fb'),
             ('red-pastel', '#f8d5d8'),
             ('yellow-pastel', '#fff4cc'),
+            ('green-pastel', '#d4ecd8'),
 
             # zurb overrides
             ('alert-color', '$red'),

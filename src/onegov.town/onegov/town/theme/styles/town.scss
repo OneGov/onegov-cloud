@@ -1141,8 +1141,30 @@ tr.ticket:hover {
         }
 
         .fc-event {
-            border-radius: 0;
-            margin: 0;
+            border: 0;
+            border-radius: 2px;
+            margin: 0 0 2px 0;
+            padding: 2px 4px;
+        }
+
+        .fc-bg {
+            background: none;
+        }
+
+        .fc-time {
+            display: none;
+        }
+
+        .event-unavailable {
+            background-color: $red;
+        }
+
+        .event-partly-available {
+            background-color: $yellow;
+        }
+
+        .event-available {
+            background-color: $green;
         }
 
         // fix borders missing with zurb foundation

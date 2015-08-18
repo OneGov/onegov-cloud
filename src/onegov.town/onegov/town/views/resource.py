@@ -147,12 +147,8 @@ def view_allocations_json(self, request):
         allocations = []
 
         for allocation in query.all():
-            allocations.append(
-                {
-                    'start': allocation.display_start().isoformat(),
-                    'end': allocation.display_end().isoformat()
-                }
-            )
+            info = utils.AllocationEventInfo(allocation, request)
+            allocations.append(info.as_dict())
 
         return allocations
     else:

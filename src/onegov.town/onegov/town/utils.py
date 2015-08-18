@@ -4,6 +4,7 @@ from datetime import datetime, time
 from isodate import parse_date, parse_datetime
 from lxml import etree
 from lxml.html import fragments_fromstring
+from onegov.town import _
 
 
 def mark_images(html):
@@ -62,3 +63,61 @@ def parse_fullcalendar_request(request, timezone):
         return start, end
     else:
         return None, None
+
+
+class AllocationEventInfo(object):
+
+    __slots__ = ['allocation', 'availability', 'request', 'translate']
+
+    def __init__(self, allocation, request):
+        self.allocation = allocation
+        self.availability = allocation.availability
+        self.request = request
+        self.translate = request.translate
+
+    @property
+    def event_start(self):
+        return self.allocation.display_start().isoformat()
+
+    @property
+    def event_end(self):
+        return self.allocation.display_end().isoformat()
+
+    @property
+    def event_title(self):
+        if self.allocation.whole_day:
+            time = self.translate(_("Whole day"))
+        else:
+            time = '{:%H:%M} - {:%H:%M}'.format(
+                self.allocation.display_start(),
+                self.allocation.display_end()
+            )
+
+        if self.allocation.partly_available:
+            available = self.translate(_("${percent}% available", mapping={
+                'percent': self.availability
+            }))
+        else:
+            available = self.translate(_("${num}/${max} available", mapping={
+                'num': self.allocation.quota,
+                'max': self.allocation.quota_left
+            }))
+
+        return '\n'.join((time, available))
+
+    @property
+    def event_class(self):
+        if self.availability >= 80.0:
+            return 'event-available'
+        if self.availability >= 20.0:
+            return 'event-partly-available'
+        else:
+            return 'event-unavailable'
+
+    def as_dict(self):
+        return {
+            'start': self.event_start,
+            'end': self.event_end,
+            'title': self.event_title,
+            'className': self.event_class
+        }
