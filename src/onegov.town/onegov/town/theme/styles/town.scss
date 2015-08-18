@@ -464,9 +464,10 @@ input[type=color] {
 }
 
 /*
-    edit bar
+    edit bar (and popup links)
 */
-.edit-bar {
+.edit-bar,
+.popup {
     background-color: $primary-color;
     margin-bottom: 2px;
     margin-top: -6px;
@@ -516,6 +517,10 @@ input[type=color] {
 
     .new-daypass:before {
         content: '\f145';
+    }
+
+    .new-reservation:before {
+        content: '\f271';
     }
 
     .copy-link:before {
@@ -1160,7 +1165,7 @@ tr.ticket:hover {
         }
 
         .event-partly-available {
-            background-color: $yellow;
+            background-color: $orange;
         }
 
         .event-available {
@@ -1171,6 +1176,18 @@ tr.ticket:hover {
         tbody div.fc-content-skeleton td {
             border-color: #ddd;
         }
+    }
+
+    .fc-event.event-unavailable.has-popup {
+        border-right: 5px solid $red-dark;
+    }
+
+    .fc-event.event-partly-available.has-popup {
+        border-right: 5px solid $orange-dark;
+    }
+
+    .fc-event.event-available.has-popup {
+        border-right: 5px solid $green-dark;
     }
 
     .fc button,
@@ -1195,97 +1212,54 @@ tr.ticket:hover {
 }
 
 /*
-    Event occurrences
+    Popup Menu
 */
-.occurrence-tag {
-    @include label(
-        $bg: $secondary-color,
-        $radius: 4px
-    );
-
-    &.active {
-        @include label(
-            $radius: 4px
-        );
-    }
+.popup {
+    background-color: #fff;
+    border: 1px solid $gainsboro;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, .3);
+    padding: 2px 6px;
+    position: relative;
 
     a {
-        color: inherit;
-    }
-}
-
-.occurrences-day-date {
-    background-color: $white-smoke;
-    min-height: 118px;
-    width: 100%;
-
-    div {
-        float: right;
-        padding: .1em 1.4em;
-        text-align: center;
-    }
-
-    span:first-child {
         display: block;
-        font-size: 1.4em;
-        font-weight: bold;
-    }
-}
+        font-size: .8rem;
 
-.occurrences-filter-result {
-    margin-bottom: 1em;
-
-    span:first-child {
-        font-size: 1.6em;
-        font-weight: bold;
-    }
-}
-
-.occurrences-filter-tags,
-.occurrences-filter-date {
-    margin-bottom: 1em;
-}
-
-.occurrences-add-box {
-    @include panel;
-    @include smooth-edges;
-
-    margin-top: 2em;
-}
-
-.occurrence-lead {
-    font-size: $h5-font-size;
-    font-weight: 300;
-}
-
-.occurrence-tags,
-.occurrence-description {
-    margin-bottom: 2em;
-}
-
-.js .occurrences-filter-date-submit {
-    display: none;
-}
-
-/*
-    Events
-*/
-$event-edit-icon: '\f044';
-
-.events-table {
-    width: 100%;
-
-    tr.event:hover {
-        background-color: $yellow-pastel;
-    }
-
-    td.event-title {
-        font-weight: bold;
-
-        ::before {
-            content: $event-edit-icon;
-            font-family: 'FontAwesome';
-            font-weight: normal;
+        &:hover {
+            text-decoration: underline;
         }
+
+        &:hover::before {
+            display: inline-block;
+            text-decoration: none;
+        }
+    }
+
+    // the arrow of the popup (which is currently shown right of the element)
+    // if other arrows are needed add classes for each direction
+    &:after,
+    &:before {
+        border: solid transparent;
+        content: ' ';
+        height: 0;
+        pointer-events: none;
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        width: 0;
+    }
+
+    &:after {
+        border-color: rgba(213, 213, 213, 0);
+        border-right-color: #fff;
+        border-width: 7px;
+        margin-top: -7px;
+    }
+
+    &:before {
+        border-color: rgba(245, 24, 172, 0);
+        border-right-color: $gainsboro;
+        border-width: 8px;
+        margin-top: -8px;
     }
 }

@@ -195,6 +195,7 @@ class TownApp(Framework, LibresIntegration):
             'js/moment.de.js',
             'js/fullcalendar.js',
             'js/fullcalendar.de.js',
+            'js/jquery.popupoverlay.js',
             'js/fullcalendar_custom.js',
             filters='jsmin',
             output='bundles/fullcalendar.bundle.js'

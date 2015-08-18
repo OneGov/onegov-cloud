@@ -11,6 +11,36 @@ var new_select_handler = function(url) {
     };
 };
 
+
+var spawn_popup = function(event, element) {
+
+    $(element).addClass('has-popup');
+
+    var popup_content = $('<div class="popup" />')
+        .append($(event.actions.join('')));
+
+    popup_content.popup({
+        'autoopen': true,
+        'blur': true,
+        'horizontal': 'right',
+        'offsetleft': -10,
+        'tooltipanchor': element,
+        'transition': 'all 0.3s',
+        'type': 'tooltip',
+        'onclose': function() {
+            $(element).removeClass('has-popup');
+            popup_content.parent().remove();
+        },
+        'detach': true
+    });
+};
+
+var event_after_render = function(event, element, view) {
+    $(element).click(function() {
+        spawn_popup(event, element);
+    });
+};
+
 var setup_calendar = function(calendar) {
     calendar.fullCalendar({
         events: calendar.data('feed'),
@@ -24,7 +54,8 @@ var setup_calendar = function(calendar) {
         maxTime: calendar.data('max-time'),
         selectable: calendar.data('selectable'),
         select: new_select_handler(calendar.data('select-url')),
-        defaultView: calendar.data('default-view')
+        defaultView: calendar.data('default-view'),
+        eventAfterRender: event_after_render
     });
 };
 

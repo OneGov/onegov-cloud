@@ -5,6 +5,7 @@ from isodate import parse_date, parse_datetime
 from lxml import etree
 from lxml.html import fragments_fromstring
 from onegov.town import _
+from onegov.town.elements import Link
 
 
 def mark_images(html):
@@ -114,10 +115,22 @@ class AllocationEventInfo(object):
         else:
             return 'event-unavailable'
 
+    @property
+    def event_actions(self):
+        yield Link(_("Reserve"), '#', classes=('new-reservation', ))
+
+        if self.request.is_logged_in:
+            yield Link(_("Edit"), '#', classes=('edit-link', ))
+            yield Link(_("Delete"), '#', classes=('delete-link', ))
+
     def as_dict(self):
         return {
             'start': self.event_start,
             'end': self.event_end,
             'title': self.event_title,
-            'className': self.event_class
+            'className': self.event_class,
+            'actions': [
+                link(self.request).decode('utf-8')
+                for link in self.event_actions
+            ]
         }

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-18 14:41+0200\n"
+"POT-Creation-Date: 2015-08-18 16:55+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -160,6 +160,9 @@ msgstr "${percent}% verfügbar"
 #, python-format
 msgid "${num}/${max} available"
 msgstr "${num}/${max} verfügbar"
+
+msgid "Reserve"
+msgstr "Reservieren"
 
 msgid "Mo"
 msgstr "Mo"

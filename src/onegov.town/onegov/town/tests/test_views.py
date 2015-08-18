@@ -968,13 +968,15 @@ def test_resource_slots(town_app):
             'start': '2015-08-04T00:00:00+02:00',
             'end': '2015-08-05T00:00:00+02:00',
             'className': 'event-available',
-            'title': u"Ganztägig\n1/1 verfügbar"
+            'title': u"Ganztägig\n1/1 verfügbar",
+            'actions': ['<a href="#" class="new-reservation">Reservieren</a>']
         },
         {
             'start': '2015-08-05T00:00:00+02:00',
             'end': '2015-08-06T00:00:00+02:00',
             'className': 'event-available',
-            'title': u"Ganztägig\n1/1 verfügbar"
+            'title': u"Ganztägig\n1/1 verfügbar",
+            'actions': ['<a href="#" class="new-reservation">Reservieren</a>']
         }
     ]
 
