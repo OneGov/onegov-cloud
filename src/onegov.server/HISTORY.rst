@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to define the port for the onegov-server cli command.
+  [href]
+
 0.0.4 (2015-07-16)
 ~~~~~~~~~~~~~~~~~~~
 

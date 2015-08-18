@@ -75,7 +75,13 @@ from xtermcolor import colorize
     type=click.Path(exists=True),
     default="onegov.yml"
 )
-def run(config_file):
+@click.option(
+    '--port',
+    '-p',
+    help="Port to bind to",
+    default=8080
+)
+def run(config_file, port):
     """ Runs the onegov server with the given configuration file in the
     foreground.
 
@@ -96,7 +102,7 @@ def run(config_file):
     def wsgi_factory():
         return Server(Config.from_yaml_file(config_file))
 
-    server = WsgiServer(wsgi_factory)
+    server = WsgiServer(wsgi_factory, port=port)
     server.start()
 
     observer = Observer()
