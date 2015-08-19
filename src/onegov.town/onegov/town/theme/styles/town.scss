@@ -1158,10 +1158,6 @@ tr.ticket:hover {
             background: none;
         }
 
-        .fc-time {
-            display: none;
-        }
-
         .event-unavailable {
             background-color: $red;
         }
@@ -1177,6 +1173,12 @@ tr.ticket:hover {
         // fix borders missing with zurb foundation
         tbody div.fc-content-skeleton td {
             border-color: #ddd;
+        }
+    }
+
+    .fc-event {
+        .fc-time {
+            display: none;
         }
     }
 
