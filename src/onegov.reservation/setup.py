@@ -34,7 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'libres>=0.1.0',
+        'libres>=0.1.1',
         'onegov.core>=0.4.0',
     ],
     extras_require=dict(
