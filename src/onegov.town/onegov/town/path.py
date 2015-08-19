@@ -1,10 +1,6 @@
 """ Contains the paths to the different models served by onegov.town. """
-from onegov.event import (
-    Event,
-    EventCollection,
-    Occurrence,
-    OccurrenceCollection
-)
+
+from libres.db.models import Allocation
 from onegov.form import (
     FormDefinition,
     FormCollection,
@@ -145,6 +141,15 @@ def get_resources(app):
 @TownApp.path(model=Resource, path='/reservation/{name}')
 def get_resource(app, name):
     return ResourceCollection(app.libres_context).by_name(name)
+
+
+@TownApp.path(model=Allocation, path='/einteilung/{resource}/{id}')
+def get_allocation(app, resource, id):
+    scheduler = ResourceCollection(
+        app.libres_context).scheduler_by_id(resource)
+
+    if scheduler:
+        return scheduler.allocations_by_ids((id, )).first()
 
 
 @TownApp.path(model=Clipboard, path='/clipboard/copy/{token}')

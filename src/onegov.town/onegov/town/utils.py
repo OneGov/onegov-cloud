@@ -5,7 +5,7 @@ from isodate import parse_date, parse_datetime
 from lxml import etree
 from lxml.html import fragments_fromstring
 from onegov.town import _
-from onegov.town.elements import Link
+from onegov.town.elements import DeleteLink, Link
 
 
 def mark_images(html):
@@ -85,15 +85,24 @@ class AllocationEventInfo(object):
         return self.allocation.display_end().isoformat()
 
     @property
-    def event_title(self):
+    def event_identification(self):
+        return '{:%d.%m.%Y}: {}'.format(
+            self.allocation.display_start(),
+            self.event_time
+        )
+
+    @property
+    def event_time(self):
         if self.allocation.whole_day:
-            time = self.translate(_("Whole day"))
+            return self.translate(_("Whole day"))
         else:
-            time = '{:%H:%M} - {:%H:%M}'.format(
+            return '{:%H:%M} - {:%H:%M}'.format(
                 self.allocation.display_start(),
                 self.allocation.display_end()
             )
 
+    @property
+    def event_title(self):
         if self.allocation.partly_available:
             available = self.translate(_("${percent}% available", mapping={
                 'percent': self.availability
@@ -104,7 +113,7 @@ class AllocationEventInfo(object):
                 'max': self.allocation.quota_left
             }))
 
-        return '\n'.join((time, available))
+        return '\n'.join((self.event_time, available))
 
     @property
     def event_class(self):
@@ -120,8 +129,33 @@ class AllocationEventInfo(object):
         yield Link(_("Reserve"), '#', classes=('new-reservation', ))
 
         if self.request.is_logged_in:
-            yield Link(_("Edit"), '#', classes=('edit-link', ))
-            yield Link(_("Delete"), '#', classes=('delete-link', ))
+            yield Link(
+                _("Edit"),
+                self.request.link(self.allocation, name='bearbeiten'),
+                classes=('edit-link', )
+            )
+
+            if self.availability == 100.0:
+                yield DeleteLink(
+                    _("Delete"),
+                    self.request.link(self.allocation),
+                    confirm=_("Do you really want to delete this allocation?"),
+                    extra_information=self.event_identification,
+                    yes_button_text=_("Delete allocation")
+                )
+            else:
+                yield DeleteLink(
+                    _("Delete"),
+                    self.request.link(self.allocation),
+                    confirm=_(
+                        "This allocation can't be deleted because there are "
+                        "existing reservations associated with it."
+                    ),
+                    extra_information=_(
+                        "To delete this allocation, all existing reservations "
+                        "need to be cancelled first."
+                    )
+                )
 
     def as_dict(self):
         return {

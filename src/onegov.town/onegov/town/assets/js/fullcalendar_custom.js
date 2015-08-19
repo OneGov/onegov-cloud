@@ -27,9 +27,17 @@ var spawn_popup = function(event, element) {
         'tooltipanchor': element,
         'transition': 'all 0.3s',
         'type': 'tooltip',
+        'onopen': function() {
+            // hookup the confirmation dialog
+            var confirm_links = $(this).find('a.confirm');
+            Intercooler.processNodes(confirm_links);
+            confirm_links.confirmation();
+            $(confirm_links).on('success.ic', function() {
+                $('.calendar').fullCalendar('refetchEvents');
+            });
+        },
         'onclose': function() {
             $(element).removeClass('has-popup');
-            popup_content.parent().remove();
         },
         'detach': true
     });

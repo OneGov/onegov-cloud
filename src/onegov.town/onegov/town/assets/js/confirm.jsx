@@ -136,7 +136,7 @@ $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
 });
 
 // handles the click on the link (or other elements)
-var handle_action = function(e, on_confirm) {
+var handle_confirmation = function(e, on_confirm) {
     var question = $(this).data('confirm');
     var yes = $(this).data('confirm-yes');
     var no = $(this).data('confirm-no');
@@ -147,7 +147,11 @@ var handle_action = function(e, on_confirm) {
 
 // hooks the targeted elements up
 $(document).ready(function() {
-    _.each($('a.confirm'), function(el) {
-        intercept(el, 'click', handle_action);
-    });
+    $.fn.confirmation = function() {
+        return this.each(function() {
+            intercept(this, 'click', handle_confirmation);
+        });
+    };
+
+    $('a.confirm').confirmation();
 });
