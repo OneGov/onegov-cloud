@@ -6,7 +6,12 @@ from onegov.libres import Resource, ResourceCollection
 from onegov.town import TownApp, _, utils
 from onegov.town.elements import Link
 from onegov.town.layout import ResourceLayout
-from onegov.town.forms import DaypassAllocationForm, RoomAllocationForm
+from onegov.town.forms import (
+    DaypassAllocationForm,
+    DaypassAllocationEditForm,
+    RoomAllocationForm,
+    RoomAllocationEditForm
+)
 
 
 @TownApp.json(model=Resource, name='slots', permission=Public)
@@ -31,13 +36,7 @@ def view_allocations_json(self, request):
         return []
 
 
-def get_allocation_form_class(obj, request):
-
-    if isinstance(obj, Allocation):
-        resource = ResourceCollection(
-            request.app.libres_context).by_id(obj.resource)
-    else:
-        resource = obj
+def get_new_allocation_form_class(resource, request):
 
     if resource.type == 'daypass':
         return DaypassAllocationForm
@@ -48,8 +47,22 @@ def get_allocation_form_class(obj, request):
     raise NotImplementedError
 
 
+def get_edit_allocation_form_class(allocation, request):
+
+    resource = ResourceCollection(
+        request.app.libres_context).by_id(allocation.resource)
+
+    if resource.type == 'daypass':
+        return DaypassAllocationEditForm
+
+    if resource.type == 'room':
+        return RoomAllocationEditForm
+
+    raise NotImplementedError
+
+
 @TownApp.form(model=Resource, template='form.pt', name='neue-einteilung',
-              permission=Private, form=get_allocation_form_class)
+              permission=Private, form=get_new_allocation_form_class)
 def handle_new_allocation(self, request, form):
 
     if form.submitted(request):
@@ -70,7 +83,7 @@ def handle_new_allocation(self, request, form):
         return morepath.redirect(request.link(self))
 
     layout = ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.breadcrumbs.append(Link(_("New allocation"), '#'))
 
     start, end = utils.parse_fullcalendar_request(request, self.timezone)
     whole_day = request.params.get('whole_day') == 'yes'
@@ -101,9 +114,38 @@ def handle_new_allocation(self, request, form):
 
 
 @TownApp.form(model=Allocation, template='form.pt', name='bearbeiten',
-              permission=Private, form=get_allocation_form_class)
+              permission=Private, form=get_edit_allocation_form_class)
 def handle_edit_allocation(self, request, form):
-    pass
+
+    resources = ResourceCollection(request.app.libres_context)
+    resource = resources.by_id(self.resource)
+
+    if form.submitted(request):
+        scheduler = resource.get_scheduler(request.app.libres_context)
+
+        new_start, new_end = form.dates
+
+        scheduler.move_allocation(
+            master_id=self.id,
+            new_start=new_start,
+            new_end=new_end,
+            new_quota=form.quota,
+            quota_limit=form.quota_limit
+        )
+
+        request.success(_("Your changes were saved"))
+        return morepath.redirect(request.link(resource))
+
+    layout = ResourceLayout(resource, request)
+    layout.breadcrumbs.append(Link(_("Edit allocation"), '#'))
+
+    form.apply_model(self)
+
+    return {
+        'layout': layout,
+        'title': _("Edit allocation"),
+        'form': form
+    }
 
 
 @TownApp.view(model=Allocation, request_method='DELETE', permission=Private)

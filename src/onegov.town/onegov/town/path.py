@@ -149,7 +149,10 @@ def get_allocation(app, resource, id):
         app.libres_context).scheduler_by_id(resource)
 
     if scheduler:
-        return scheduler.allocations_by_ids((id, )).first()
+        allocation = scheduler.allocations_by_ids((id, )).first()
+
+        # always get the master, even if another id is requested
+        return allocation and allocation.get_master()
 
 
 @TownApp.path(model=Clipboard, path='/clipboard/copy/{token}')

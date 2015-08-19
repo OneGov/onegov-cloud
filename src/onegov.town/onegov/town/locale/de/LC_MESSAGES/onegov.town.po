@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-18 16:55+0200\n"
+"POT-Creation-Date: 2015-08-19 11:20+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -164,6 +164,24 @@ msgstr "${num}/${max} verfügbar"
 msgid "Reserve"
 msgstr "Reservieren"
 
+msgid "Do you really want to delete this allocation?"
+msgstr "Möchten Sie diese Einteilung wirklich löschen?"
+
+msgid "Delete allocation"
+msgstr "Einteilung löschen"
+
+msgid ""
+"This allocation can't be deleted because there are existing reservations "
+"associated with it."
+msgstr "Diese Einteilung kann nicht gelöscht werden, da bestehende "
+"Reservationen betroffen wären."
+
+msgid ""
+"To delete this allocation, all existing reservations need to be cancelled "
+"first."
+msgstr "Um die Einteilung zu löschen, müssen zuerst alle bestehenden Reservationen "
+"abgesagt werden."
+
 msgid "Mo"
 msgstr "Mo"
 
@@ -194,6 +212,9 @@ msgstr "Bis"
 msgid "Except for"
 msgstr "Ausser an"
 
+msgid "Date"
+msgstr "Datum"
+
 msgid "Daypasses"
 msgstr "Tageskarten"
 
@@ -208,6 +229,12 @@ msgstr "HH:MM"
 
 msgid "Each ending at"
 msgstr "Jeweils bis"
+
+msgid "From"
+msgstr "Von"
+
+msgid "Until"
+msgstr "Bis"
 
 msgid "Yes"
 msgstr "Ja"
@@ -671,29 +698,21 @@ msgstr ""
 msgid "Accept"
 msgstr "Annehmen"
 
-msgid "A link was added to the clipboard"
-msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+msgid "New allocation"
+msgstr "Neue Einteilung"
+
+msgid "Edit allocation"
+msgstr "Einteilung bearbeiten"
+
+#, python-format
+msgid "Successfully added ${n} allocations"
+msgstr "${n} Einteilungen wurden hinzugefügt"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
-msgid "Submitted events"
-msgstr "Gemeldete Veranstaltungen"
-
-msgid "Published events"
-msgstr "Veröffentlichte Veranstaltungen"
-
-msgid "Submitted"
-msgstr "Gemeldet"
-
-msgid "Published"
-msgstr "Veröffentlich"
-
-msgid "Withdrawn"
-msgstr "Zurückgezogen"
-
-msgid "Withdrawn events"
-msgstr "Zurückgezogene Veranstaltungen"
+msgid "A link was added to the clipboard"
+msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
@@ -780,13 +799,6 @@ msgstr "Ein neuer Raum wurde hinzugefügt"
 
 msgid "New room"
 msgstr "Neuer Raum"
-
-msgid "New allocation"
-msgstr "Neue Einteilung"
-
-#, python-format
-msgid "Successfully added ${n} allocations"
-msgstr "${n} Einteilungen wurden hinzugefügt"
 
 msgid "Resources"
 msgstr "Reservationen"

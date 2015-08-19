@@ -1,6 +1,8 @@
 from onegov.town.forms.allocation import (
     DaypassAllocationForm,
-    RoomAllocationForm
+    DaypassAllocationEditForm,
+    RoomAllocationForm,
+    RoomAllocationEditForm
 )
 from onegov.town.forms.form_definition import (
     BuiltinDefinitionForm,
@@ -20,6 +22,7 @@ __all__ = [
     'BuiltinDefinitionForm',
     'CustomDefinitionForm',
     'DaypassAllocationForm',
+    'DaypassAllocationEditForm',
     'LinkForm',
     'LoginForm',
     'PageForm',
@@ -28,5 +31,6 @@ __all__ = [
     'ResourceForm',
     'RequestPasswordResetForm',
     'RoomAllocationForm',
+    'RoomAllocationEditForm',
     'SettingsForm',
 ]
