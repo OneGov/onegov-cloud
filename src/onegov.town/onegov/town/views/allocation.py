@@ -1,6 +1,7 @@
 import morepath
 
 from libres.db.models import Allocation
+from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
 from onegov.libres import Resource, ResourceCollection
 from onegov.town import TownApp, _, utils
@@ -68,19 +69,22 @@ def handle_new_allocation(self, request, form):
     if form.submitted(request):
         scheduler = self.get_scheduler(request.app.libres_context)
 
-        allocations = scheduler.allocate(
-            dates=form.dates,
-            whole_day=form.whole_day,
-            quota=form.quota,
-            quota_limit=form.quota_limit,
-            data=form.data
-        )
+        try:
+            allocations = scheduler.allocate(
+                dates=form.dates,
+                whole_day=form.whole_day,
+                quota=form.quota,
+                quota_limit=form.quota_limit,
+                data=form.data
+            )
+        except LibresError as e:
+            utils.show_libres_error(e, request)
+        else:
+            request.success(_("Successfully added ${n} allocations", mapping={
+                'n': len(allocations)
+            }))
 
-        request.success(_("Successfully added ${n} allocations", mapping={
-            'n': len(allocations)
-        }))
-
-        return morepath.redirect(request.link(self))
+            return morepath.redirect(request.link(self))
 
     layout = ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("New allocation"), '#'))
@@ -125,16 +129,19 @@ def handle_edit_allocation(self, request, form):
 
         new_start, new_end = form.dates
 
-        scheduler.move_allocation(
-            master_id=self.id,
-            new_start=new_start,
-            new_end=new_end,
-            new_quota=form.quota,
-            quota_limit=form.quota_limit
-        )
-
-        request.success(_("Your changes were saved"))
-        return morepath.redirect(request.link(resource))
+        try:
+            scheduler.move_allocation(
+                master_id=self.id,
+                new_start=new_start,
+                new_end=new_end,
+                new_quota=form.quota,
+                quota_limit=form.quota_limit
+            )
+        except LibresError as e:
+            utils.show_libres_error(e, request)
+        else:
+            request.success(_("Your changes were saved"))
+            return morepath.redirect(request.link(resource))
 
     layout = ResourceLayout(resource, request)
     layout.breadcrumbs.append(Link(_("Edit allocation"), '#'))

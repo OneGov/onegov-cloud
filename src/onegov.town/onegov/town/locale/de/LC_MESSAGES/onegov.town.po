@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-19 16:03+0200\n"
+"POT-Creation-Date: 2015-08-19 16:28+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -161,6 +161,50 @@ msgstr "Das Formular ist nicht gültig."
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
 msgstr ""
 "Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
+
+msgid "A conflicting allocation exists for the requested time period."
+msgstr "Es besteht bereits eine Einteilung im gewünschten Zeitruam."
+
+msgid "An existing reservation would be affected by the requested change."
+msgstr ""
+"Eine bestehende Reservation wäre von der gewünschten Änderung betroffen."
+
+msgid "A pending reservation would be affected by the requested change."
+msgstr "Eine offene Reservation wäre von der gewünschten Änderung betroffen."
+
+msgid "The requested period is no longer available."
+msgstr "Der gewünschte Zeitraum ist nicht mehr verfügbar."
+
+msgid "No reservable slot found."
+msgstr "Der gewünschte Zeitraum ist bereits besetzt."
+
+msgid "Reservations can't be made for more than 24 hours at a time."
+msgstr "Reservationen dürfen nicht länger als 24 Stunden lang sein."
+
+msgid "The given reservation paramters are invalid."
+msgstr "Die Reservationsparameter sind ungültig."
+
+msgid "The given reservation token is invalid."
+msgstr "Das Reservations-Token ist ungültig."
+
+msgid "The requested number of reservations is higher than allowed."
+msgstr "Die gewünschte Anzahl Reservationen ist höher als erlaubt."
+
+msgid "The requested quota is invalid (must be at least one)."
+msgstr ""
+"Die gewünschte Anzahl Reservationen ist ungültig (Mindestanzahl ist eins)."
+
+msgid "The allocation does not have enough free spots."
+msgstr "Die Einteilung hat nicht genügend freie Plätze."
+
+msgid "The resulting allocation would be invalid."
+msgstr "Die gewünschte Einteilung ist ungültig."
+
+msgid "No reservations to confirm."
+msgstr "Keine Reservationen gefunden die Bestätigt werden können."
+
+msgid "The given timerange is longer than the existing allocation."
+msgstr "Der gewünschte Zeitraum ist grösser als die Einteilung."
 
 msgid "Whole day"
 msgstr "Ganztägig"
@@ -780,39 +824,15 @@ msgstr "Ihre Änderungen wurden gespeichert"
 msgid "Submitted events"
 msgstr "Gemeldete Veranstaltungen"
 
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
 #, python-format
 msgid "You have published the event ${title}"
 msgstr "Sie haben die Veranstatlung ${title} veröffentlicht"
 
-#, python-format
-msgid "You have withdrawn the event ${title}"
-msgstr "Sie haben die Veranstatlung ${title} zurückgezogen"
-
-msgid "Submitted"
-msgstr "Gemeldet"
-
-msgid "Published"
-msgstr "Veröffentlich"
-
-msgid "Withdrawn"
-msgstr "Zurückgezogen"
-
-#, python-format
-msgid "Monthly on the day ${day} of the month until ${end}"
-msgstr "Montatlich am ${day}. bis zum ${end}."
-
-msgid "List"
-msgstr "Auflisten"
-
-msgid "Published events"
-msgstr "Veröffentlichte Veranstaltungen"
-
-#, python-format
-msgid "Every ${days} until ${end}"
-msgstr "Jeden ${days} bis zum ${end}."
-
-msgid "Withdrawn events"
-msgstr "Zurückgezogene Veranstaltungen"
+msgid "A link was added to the clipboard"
+msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

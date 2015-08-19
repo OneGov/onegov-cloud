@@ -2,6 +2,7 @@ import sedate
 
 from datetime import datetime, time
 from isodate import parse_date, parse_datetime
+from libres.modules import errors as libres_errors
 from lxml import etree
 from lxml.html import fragments_fromstring
 from onegov.town import _
@@ -169,3 +170,65 @@ class AllocationEventInfo(object):
             ],
             'editurl': self.request.link(self.allocation, name='bearbeiten')
         }
+
+
+libres_error_messages = {
+
+    libres_errors.OverlappingAllocationError:
+    _("A conflicting allocation exists for the requested time period."),
+
+    libres_errors.AffectedReservationError:
+    _("An existing reservation would be affected by the requested change."),
+
+    libres_errors.AffectedPendingReservationError:
+    _("A pending reservation would be affected by the requested change."),
+
+    libres_errors.AlreadyReservedError:
+    _("The requested period is no longer available."),
+
+    libres_errors.NotReservableError:
+    _("No reservable slot found."),
+
+    libres_errors.ReservationTooLong:
+    _("Reservations can't be made for more than 24 hours at a time."),
+
+    libres_errors.ReservationParametersInvalid:
+    _("The given reservation paramters are invalid."),
+
+    libres_errors.InvalidReservationToken:
+    _("The given reservation token is invalid."),
+
+    libres_errors.InvalidReservationError:
+    _("The given reservation paramters are invalid."),
+
+    libres_errors.QuotaOverLimit:
+    _("The requested number of reservations is higher than allowed."),
+
+    libres_errors.InvalidQuota:
+    _("The requested quota is invalid (must be at least one)."),
+
+    libres_errors.QuotaImpossible:
+    _("The allocation does not have enough free spots."),
+
+    libres_errors.InvalidAllocationError:
+    _("The resulting allocation would be invalid."),
+
+    libres_errors.NoReservationsToConfirm:
+    _("No reservations to confirm."),
+
+    libres_errors.TimerangeTooLong:
+    _("The given timerange is longer than the existing allocation.")
+}
+
+
+def show_libres_error(e, request):
+    """ Shows a human readable error message for the given libres exception,
+    using request.alert.
+
+    """
+
+    assert type(e) in libres_error_messages, (
+        "Unknown libres error {}".format(e)
+    )
+
+    request.alert(request.translate(libres_error_messages.get(type(e))))
