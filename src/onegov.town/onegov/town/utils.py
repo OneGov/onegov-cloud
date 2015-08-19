@@ -105,14 +105,25 @@ class AllocationEventInfo(object):
     @property
     def event_title(self):
         if self.allocation.partly_available:
-            available = self.translate(_("${percent}% available", mapping={
+            available = self.translate(_("${percent}% Available", mapping={
                 'percent': self.availability
             }))
         else:
-            available = self.translate(_("${num}/${max} available", mapping={
-                'num': self.allocation.quota,
-                'max': self.allocation.quota_left
-            }))
+            quota = self.allocation.quota
+            quota_left = self.allocation.quota_left
+
+            if quota == 1:
+                if quota_left:
+                    available = self.translate(_("Available"))
+                else:
+                    available = self.translate(_("Unavailable"))
+            else:
+                available = self.translate(
+                    _("${num}/${max} Available", mapping={
+                        'num': quota,
+                        'max': quota_left
+                    })
+                )
 
         return '\n'.join((self.event_time, available))
 
