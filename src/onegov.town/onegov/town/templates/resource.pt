@@ -22,6 +22,7 @@
                 data-selectable="${request.is_logged_in and 'true' or 'false'}"
                 data-select-url="${request.link(resource, name='neue-einteilung')}"
                 data-default-view="month"
+                data-editable="${request.is_logged_in and 'true' or 'false'}"
             />
         </tal:block>
         <tal:block condition="resource.type == 'room'">
@@ -35,6 +36,7 @@
                 data-selectable="${request.is_logged_in and 'true' or 'false'}"
                 data-select-url="${request.link(resource, name='neue-einteilung')}"
                 data-default-view="agendaWeek"
+                data-editable="${request.is_logged_in and 'true' or 'false'}"
             />
         </tal:block>
     </tal:block>

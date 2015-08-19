@@ -141,6 +141,11 @@ def handle_edit_allocation(self, request, form):
 
     form.apply_model(self)
 
+    start, end = utils.parse_fullcalendar_request(request, self.timezone)
+
+    if start and end:
+        form.apply_dates(start, end)
+
     return {
         'layout': layout,
         'title': _("Edit allocation"),

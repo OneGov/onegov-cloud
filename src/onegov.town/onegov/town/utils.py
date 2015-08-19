@@ -166,5 +166,6 @@ class AllocationEventInfo(object):
             'actions': [
                 link(self.request).decode('utf-8')
                 for link in self.event_actions
-            ]
+            ],
+            'editurl': self.request.link(self.allocation, name='bearbeiten')
         }

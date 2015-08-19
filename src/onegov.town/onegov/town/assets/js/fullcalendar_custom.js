@@ -11,6 +11,10 @@ var new_select_handler = function(url) {
     };
 };
 
+var edit_handler = function(event, delta, revertFunc, jsEvent, ui, view) {
+    location.href = event.editurl + '?start=' + event.start.toISOString() + '&end=' + event.end.toISOString();
+};
+
 
 var spawn_popup = function(event, element) {
 
@@ -63,7 +67,10 @@ var setup_calendar = function(calendar) {
         selectable: calendar.data('selectable'),
         select: new_select_handler(calendar.data('select-url')),
         defaultView: calendar.data('default-view'),
-        eventAfterRender: event_after_render
+        eventAfterRender: event_after_render,
+        editable: calendar.data('editable'),
+        eventDrop: edit_handler,
+        eventResize: edit_handler
     });
 };
 

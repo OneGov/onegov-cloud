@@ -193,6 +193,9 @@ class DaypassAllocationEditForm(AllocationEditForm):
     def quota_limit(self):
         return self.daypasses_limit.data
 
+    def apply_dates(self, start, end):
+        self.date.data = start.date()
+
     def apply_model(self, model):
         self.date.data = model.display_start().date()
         self.daypasses.data = model.quota
@@ -285,6 +288,11 @@ class RoomAllocationEditForm(AllocationEditForm):
                 self.combine_datetime('date', 'start_time'),
                 self.combine_datetime('date', 'end_time'),
             )
+
+    def apply_dates(self, start, end):
+        self.date.data = start.date()
+        self.start_time.data = '{:%H:%M}'.format(start)
+        self.end_time.data = '{:%H:%M}'.format(end)
 
     def apply_model(self, model):
         self.date.data = model.display_start().date()
