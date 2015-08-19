@@ -1,5 +1,6 @@
 """ The onegov town collection of images uploaded to the site. """
 from datetime import date
+from onegov.core.utils import linkify
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
@@ -43,10 +44,12 @@ def view_get_occurrence(self, request):
 
     layout = OccurrenceLayout(self, request)
     occurrences = self.event.occurrence_dates(localize=True)
+    description = linkify(self.event.description).replace('\n', '<br>')
 
     return {
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
         'title': self.title,
+        'description': description
     }

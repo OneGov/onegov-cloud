@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-19 14:26+0200\n"
+"POT-Creation-Date: 2015-08-19 15:42+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -97,14 +97,20 @@ msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
 msgid "There are existing reservations associated with this resource"
 msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 
-msgid "List"
-msgstr "Auflisten"
+msgid "Edit event"
+msgstr "Veranstaltung bearbeiten"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
+msgid "Publish event"
+msgstr "Veranstaltung veröffentlichen"
+
 msgid "Close ticket"
 msgstr "Ticket abschliessen"
+
+msgid "Withdraw event"
+msgstr "Veranstaltung zurückziehen"
 
 msgid "Form"
 msgstr "Formular"
@@ -246,6 +252,59 @@ msgstr "Nein"
 
 msgid "Title"
 msgstr "Titel"
+
+msgid "The title of this event."
+msgstr "Titel der Veranstaltung."
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "The description of this event."
+msgstr "Beschreibung der Veranstatlung."
+
+msgid "Location"
+msgstr "Ort"
+
+msgid "A description of the location of this event."
+msgstr "Beschreibung des Ortes der Veranstaltung"
+
+msgid "From"
+msgstr "Von"
+
+msgid "To"
+msgstr "Bis"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Repeats itself every"
+msgstr "Wiederholt sich jeden"
+
+msgid "Repeats itself every month"
+msgstr "Wiederholt sich jeden Monat"
+
+msgid "Until"
+msgstr "Bis zum"
+
+msgid "Tags"
+msgstr "Schlagworte"
+
+msgid "Please select only one type of recurrence."
+msgstr "Es kann nur eine Art von Wiederholung ausgewählt werden."
+
+msgid "Please set and end date if the event is recurring."
+msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."
+
+msgid "Please select a type of recurrence if the event is recurring."
+msgstr ""
+"Bitte eine Art von Wiederholung angeben, falls ein Enddatum für "
+"Wiederholungen ausgewählt ist."
+
+msgid "The end date must be later than the start date."
+msgstr "Das Enddatum muss nach dem Startdatum liegen."
+
+msgid "The weekday of the start date must be selected."
+msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
 
 msgid "Lead"
 msgstr "Einleitung"
@@ -456,6 +515,18 @@ msgid ""
 "it for you."
 msgstr ""
 
+msgid "State"
+msgstr "Status"
+
+msgid "Date and time"
+msgstr "Datum und Zeit"
+
+msgid "Recurrence"
+msgstr "Wiederholungen"
+
+msgid "All dates"
+msgstr "Alle Daten"
+
 msgid "State:"
 msgstr "Status:"
 
@@ -597,12 +668,6 @@ msgstr "Alle Daten dieser Veranstaltung"
 msgid "No events found."
 msgstr "Keine Veranstaltungen gefunden."
 
-msgid "From"
-msgstr "Von"
-
-msgid "To"
-msgstr "Bis"
-
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
 
@@ -670,9 +735,6 @@ msgstr "Eingabe Löschen"
 msgid "Ticket Number"
 msgstr "Referenz"
 
-msgid "State"
-msgstr "Status"
-
 msgid "Group"
 msgstr "Gruppe"
 
@@ -703,11 +765,39 @@ msgstr ""
 msgid "Accept"
 msgstr "Annehmen"
 
-msgid "New allocation"
-msgstr "Neue Einteilung"
+msgid "A link was added to the clipboard"
+msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
-msgid "Edit allocation"
-msgstr "Einteilung bearbeiten"
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "Submitted events"
+msgstr "Gemeldete Veranstaltungen"
+
+#, python-format
+msgid "You have published the event ${title}"
+msgstr "Sie haben die Veranstatlung ${title} veröffentlicht"
+
+#, python-format
+msgid "You have withdrawn the event ${title}"
+msgstr "Sie haben die Veranstatlung ${title} zurückgezogen"
+
+#, python-format
+msgid "Monthly on the day ${day} of the month until ${end}"
+msgstr "Montatlich am ${day}. bis zum ${end}."
+
+msgid "List"
+msgstr "Auflisten"
+
+msgid "Published events"
+msgstr "Veröffentlichte Veranstaltungen"
+
+#, python-format
+msgid "Every ${days} until ${end}"
+msgstr "Jeden ${days} bis zum ${end}."
+
+msgid "Submitted"
+msgstr "Gemeldet"
 
 #, python-format
 msgid "Successfully added ${n} allocations"

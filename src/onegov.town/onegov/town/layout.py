@@ -3,7 +3,7 @@ import arrow
 from cached_property import cached_property
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
-from onegov.event import OccurrenceCollection
+from onegov.event import OccurrenceCollection, EventCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.libres import ResourceCollection
 from onegov.page import Page, PageCollection
@@ -715,17 +715,6 @@ class OccurrencesLayout(OccurrenceBaseLayout):
             Link(_("Events"), self.request.link(self.model))
         ]
 
-    @cached_property
-    def editbar_links(self):
-        if self.request.is_logged_in:
-            return [
-                Link(
-                    text=_("List"),
-                    url=self.request.link(self.model, 'auflisten'),
-                    classes=('list-link', )
-                )
-            ]
-
 
 class OccurrenceLayout(OccurrenceBaseLayout):
 
@@ -752,3 +741,42 @@ class OccurrenceLayout(OccurrenceBaseLayout):
                     classes=('edit-link', )
                 )
             ]
+
+
+class EventLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Events"), self.events_url),
+            Link(self.model.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            links = [
+                Link(
+                    text=_("Edit event"),
+                    url=self.request.link(self.model, 'bearbeiten'),
+                    classes=('edit-link', )
+                )
+            ]
+
+            state = self.model.state
+            if state == 'submitted' or state == 'withdrawn':
+                links.append(Link(
+                    text=_("Publish event"),
+                    url=self.request.link(self.model, 'publish'),
+                    classes=('event-action', 'event-publish'),
+                ))
+
+            elif state == 'published':
+                links.append(Link(
+                    text=_("Withdraw event"),
+                    url=self.request.link(self.model, 'withdraw'),
+                    classes=('event-action', 'event-withdraw'),
+                ))
+
+            return links

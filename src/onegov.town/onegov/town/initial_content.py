@@ -6,10 +6,11 @@ import os
 from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
-from onegov.libres import LibresIntegration, ResourceCollection
 from onegov.form import FormCollection
+from onegov.libres import LibresIntegration, ResourceCollection
 from onegov.page import PageCollection
 from onegov.town.models import Town
+from sedate import as_datetime
 from wtforms.fields.html5 import EmailField
 
 
@@ -132,15 +133,26 @@ def add_resources(libres_context):
 
 
 def add_events(session):
-    today = datetime.today().date()
-    today = datetime(today.year, today.month, today.day)
+    start = as_datetime(datetime.today().date())
+    while start.weekday() != 6:
+        start = start + timedelta(days=1)
 
     events = EventCollection(session)
     event = events.add(
+        title=u"150 Jahre Govikon",
+        start=start + timedelta(hours=11, minutes=0),
+        end=start + timedelta(hours=22, minutes=0),
+        timezone="Europe/Zurich",
+        tags=u"Freizeit, Fest",
+        location=u"Sportanlage",
+        content={"description": u"Lorem ipsum."},
+    )
+    event.submit()
+    event.publish()
+    event = events.add(
         title=u"Gemeindeversammlung",
-        start=today + timedelta(days=16, hours=19, minutes=30),
-        end=today + timedelta(days=16, hours=21, minutes=0),
-        recurrence="RRULE:FREQ=MONTHLY;INTERVAL=1;COUNT=3",
+        start=start + timedelta(days=2, hours=20, minutes=0),
+        end=start + timedelta(days=2, hours=22, minutes=30),
         timezone="Europe/Zurich",
         tags=u"Politik",
         location=u"Gemeindesaal",
@@ -149,21 +161,14 @@ def add_events(session):
     event.submit()
     event.publish()
     event = events.add(
-        title=u"Grümpelturnier",
-        start=today + timedelta(days=22, hours=10, minutes=0),
-        end=today + timedelta(days=22, hours=18, minutes=0),
-        timezone="Europe/Zurich",
-        tags=u"Freizeit, Sport",
-        location=u"Sportanlage",
-        content={"description": u"Lorem ipsum."},
-    )
-    event.submit()
-    event.publish()
-    event = events.add(
         title=u"MuKi Turnen",
-        start=today + timedelta(days=26, hours=10, minutes=30),
-        end=today + timedelta(days=26, hours=18, minutes=0),
-        recurrence="RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=10",
+        start=start + timedelta(days=2, hours=10, minutes=0),
+        end=start + timedelta(days=2, hours=11, minutes=0),
+        recurrence=(
+            "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=TU,TH;UNTIL={0}".format(
+                (start + timedelta(days=31)).strftime('%Y%m%dT%H%M%SZ')
+            )
+        ),
         timezone="Europe/Zurich",
         tags=u"Freizeit, Sport",
         location=u"Turnhalle",
@@ -172,11 +177,17 @@ def add_events(session):
     event.submit()
     event.publish()
     event = events.add(
-        title=u"150 Jahre Govikon",
-        start=today + timedelta(days=31, hours=11, minutes=0),
-        end=today + timedelta(days=31, hours=22, minutes=0),
+        title=u"Grümpelturnier",
+        start=start + timedelta(days=7, hours=10, minutes=0),
+        end=start + timedelta(days=7, hours=18, minutes=0),
+        recurrence=(
+            "RRULE:FREQ=MONTHLY;BYMONTHDAY={0};UNTIL={1}".format(
+                (start + timedelta(days=7)).day,
+                (start + timedelta(days=60)).strftime('%Y%m%dT%H%M%SZ')
+            )
+        ),
         timezone="Europe/Zurich",
-        tags=u"Freizeit, Fest",
+        tags=u"Freizeit, Sport",
         location=u"Sportanlage",
         content={"description": u"Lorem ipsum."},
     )

@@ -13,7 +13,7 @@
             </div>
 
             <div class="occurrence-description">
-                ${occurrence.event.description}
+                <p tal:content="structure description"></p>
             </div>
         </div>
 

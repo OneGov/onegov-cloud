@@ -4,6 +4,7 @@ from onegov.town.forms.allocation import (
     RoomAllocationForm,
     RoomAllocationEditForm
 )
+from onegov.town.forms.event import EventForm
 from onegov.town.forms.form_definition import (
     BuiltinDefinitionForm,
     CustomDefinitionForm
@@ -22,7 +23,7 @@ __all__ = [
     'BuiltinDefinitionForm',
     'CustomDefinitionForm',
     'DaypassAllocationForm',
-    'DaypassAllocationEditForm',
+    'EventForm',
     'LinkForm',
     'LoginForm',
     'PageForm',

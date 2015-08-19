@@ -538,10 +538,6 @@ input[type=color] {
     .delete-link:before {
         content: '\f014';
     }
-
-    .list-link:before {
-        content: '\f0ca';
-    }
 }
 
 /*
@@ -1242,16 +1238,9 @@ tr.ticket:hover {
 /*
     Popup Menu
 */
-.popup {
-    background-color: #fff;
-    border: 1px solid $gainsboro;
-    box-shadow: 5px 5px 5px rgba(0, 0, 0, .3);
-    padding: 2px 6px;
-    position: relative;
-
-    a {
-        display: block;
-        font-size: .8rem;
+.events-table {
+    // todo: this is only a temporary view
+    width: 100%;
 
         &:hover {
             text-decoration: underline;
@@ -1277,17 +1266,34 @@ tr.ticket:hover {
         width: 0;
     }
 
-    &:after {
-        border-color: rgba(213, 213, 213, 0);
-        border-right-color: #fff;
-        border-width: 7px;
-        margin-top: -7px;
+        ::before {
+            content: '\f044';
+            font-family: 'FontAwesome';
+            font-weight: normal;
+        }
+    }
+}
+
+$event-action-icon: '\f1db';
+$event-action-icon-hover: '\f192';
+.event-action {
+    @include button(
+        $padding: $button-tny,
+        $bg: $success-color
+    );
+    float: right;
+    font-size: 1em;
+    margin: 0;
+
+    &::before {
+        content: $event-action-icon;
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
     }
 
-    &:before {
-        border-color: rgba(245, 24, 172, 0);
-        border-right-color: $gainsboro;
-        border-width: 8px;
-        margin-top: -8px;
+    &:hover::before {
+        content: $event-action-icon-hover;
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
     }
 }

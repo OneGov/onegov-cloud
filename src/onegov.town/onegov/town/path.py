@@ -183,9 +183,10 @@ def get_occurrence(app, name):
 
 @TownApp.path(model=EventCollection, path='/veranstaltungen/auflisten')
 def get_events(app, page=0, state='published'):
+    # todo: this is only a temporary view and should be removed
     return EventCollection(app.session(), page, state)
 
 
-@TownApp.path(model=Event, path='/veranstaltung/{name}/bearbeiten')
+@TownApp.path(model=Event, path='/veranstaltungen/{name}')
 def get_event(app, name):
     return EventCollection(app.session()).by_name(name)
