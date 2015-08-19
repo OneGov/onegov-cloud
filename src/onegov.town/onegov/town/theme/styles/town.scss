@@ -1116,16 +1116,22 @@ tr.ticket:hover {
 
 .calendar {
 
+    margin-bottom: 1.5rem;
+
     button:focus {
         // XXX fullcalendar focuses the buttons when they are clicked,
         // resulting in the chrome accessibility outline.. now this is
-        // helpful in allmost all the cases (and shoult not be disabled)
+        // helpful in allmost all the cases (and should not be disabled)
         // however, the calendar is not accessible as it is, so we might
         // as well remove this otherwise very jaring looking outline
         // -> the fullcalendar needs an accessible alternative, it can't
         // really be made accessible because it's a huge blob of html
         // tables designed to show a calendar...
         outline: none;
+    }
+
+    .fc-toolbar {
+        margin-bottom: 0;
     }
 
     table {
@@ -1208,6 +1214,28 @@ tr.ticket:hover {
             color: $jet;
             opacity: 1;
         }
+    }
+}
+
+/*
+    Fullcalendar Screen Flicker Prevention
+*/
+
+@media #{$small-only} {
+    .calendar {
+        min-height: $small-breakpoint * .5;
+    }
+}
+
+@media #{$medium-only} {
+    .calendar {
+        min-height: $medium-breakpoint * .5;
+    }
+}
+
+@media #{$large-up} {
+    .calendar {
+        min-height: $large-breakpoint * .5;
     }
 }
 
