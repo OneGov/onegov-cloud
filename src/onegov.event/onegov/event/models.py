@@ -51,7 +51,7 @@ class OccurrenceMixin(object):
     # todo: remove me with hstore!
     @property
     def display_tags(self):
-        return self.tags.split(',')
+        return [tag.strip() for tag in self.tags.split(',')]
 
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
