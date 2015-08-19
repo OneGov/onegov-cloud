@@ -963,22 +963,17 @@ def test_resource_slots(town_app):
 
     url = '/reservation/foo/slots?start=2015-08-04&end=2015-08-05'
 
-    assert client.get(url).json == [
-        {
-            'start': '2015-08-04T00:00:00+02:00',
-            'end': '2015-08-05T00:00:00+02:00',
-            'className': 'event-available',
-            'title': u"Ganztägig\n1/1 verfügbar",
-            'actions': ['<a href="#" class="new-reservation">Reservieren</a>']
-        },
-        {
-            'start': '2015-08-05T00:00:00+02:00',
-            'end': '2015-08-06T00:00:00+02:00',
-            'className': 'event-available',
-            'title': u"Ganztägig\n1/1 verfügbar",
-            'actions': ['<a href="#" class="new-reservation">Reservieren</a>']
-        }
-    ]
+    result = client.get(url).json
+
+    assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
+    assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
+    assert result[0]['className'] == 'event-available'
+    assert result[0]['title'] == u"Ganztägig\n1/1 verfügbar"
+
+    assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
+    assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
+    assert result[1]['className'] == 'event-available'
+    assert result[1]['title'] == u"Ganztägig\n1/1 verfügbar"
 
 
 def test_resources(town_app):
