@@ -85,7 +85,7 @@
                 <div class="occurrences-add-box">
                     <dl>
                         <dt>
-                            <a href="#">
+                            <a href="${add_link}">
                                 <i class="fa fa-chevron-right"></i> <span i18n:translate="">Submit your event</span>
                             </a>
                         </dt>

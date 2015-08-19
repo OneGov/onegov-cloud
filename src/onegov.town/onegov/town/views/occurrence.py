@@ -34,7 +34,8 @@ def view_occurrences(self, request):
         'number_of_occurrences': self.subset().count(),
         'start': self.start.isoformat() if self.start else '',
         'end': self.end.isoformat() if self.end else '',
-        'date_placeholder': date.today().isoformat()
+        'date_placeholder': date.today().isoformat(),
+        'add_link': request.link(self, name='neu')
     }
 
 
