@@ -761,6 +761,13 @@ class EventLayout(DefaultLayout):
                     text=_("Edit event"),
                     url=self.request.link(self.model, 'bearbeiten'),
                     classes=('edit-link', )
+                ),
+                DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model),
+                    confirm=_("Do you really want to delete this event?"),
+                    yes_button_text=_("Delete event"),
+                    redirect_after=self.events_url
                 )
             ]
 

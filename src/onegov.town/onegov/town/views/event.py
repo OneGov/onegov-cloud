@@ -146,7 +146,7 @@ def view_event(self, request):
 
 @TownApp.form(model=Event, name='bearbeiten', template='form.pt',
               permission=Private, form=EventForm)
-def handle_edit_resource(self, request, form):
+def handle_edit_event(self, request, form):
     if form.submitted(request):
         form.update_model(self)
 
@@ -165,3 +165,8 @@ def handle_edit_resource(self, request, form):
         'form': form,
         'form_width': 'large'
     }
+
+
+@TownApp.view(model=Event, request_method='DELETE', permission=Private)
+def handle_delete_event(self, request):
+    EventCollection(request.app.session()).delete(self)

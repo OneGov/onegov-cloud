@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-19 15:42+0200\n"
+"POT-Creation-Date: 2015-08-19 16:03+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -99,6 +99,12 @@ msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 
 msgid "Edit event"
 msgstr "Veranstaltung bearbeiten"
+
+msgid "Do you really want to delete this event?"
+msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
+
+msgid "Delete event"
+msgstr "Veranstaltung löschen"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
@@ -782,6 +788,15 @@ msgstr "Sie haben die Veranstatlung ${title} veröffentlicht"
 msgid "You have withdrawn the event ${title}"
 msgstr "Sie haben die Veranstatlung ${title} zurückgezogen"
 
+msgid "Submitted"
+msgstr "Gemeldet"
+
+msgid "Published"
+msgstr "Veröffentlich"
+
+msgid "Withdrawn"
+msgstr "Zurückgezogen"
+
 #, python-format
 msgid "Monthly on the day ${day} of the month until ${end}"
 msgstr "Montatlich am ${day}. bis zum ${end}."
@@ -796,18 +811,8 @@ msgstr "Veröffentlichte Veranstaltungen"
 msgid "Every ${days} until ${end}"
 msgstr "Jeden ${days} bis zum ${end}."
 
-msgid "Submitted"
-msgstr "Gemeldet"
-
-#, python-format
-msgid "Successfully added ${n} allocations"
-msgstr "${n} Einteilungen wurden hinzugefügt"
-
-msgid "Your changes were saved"
-msgstr "Ihre Änderungen wurden gespeichert"
-
-msgid "A link was added to the clipboard"
-msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+msgid "Withdrawn events"
+msgstr "Zurückgezogene Veranstaltungen"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
