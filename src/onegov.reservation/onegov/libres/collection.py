@@ -40,6 +40,12 @@ class ResourceCollection(object):
 
         return resource
 
+    def scheduler_by_id(self, id):
+        resource = self.query().filter(Resource.id == id).first()
+
+        if resource:
+            return resource.get_scheduler(self.libres_context)
+
     def by_id(self, id, ensure_type=any_type):
         query = self.query().filter(Resource.id == id)
 

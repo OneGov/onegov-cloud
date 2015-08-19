@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a convenience function to get the scheduler by resource id.
+  [href]
+
 0.0.3 (2015-08-05)
 ~~~~~~~~~~~~~~~~~~~
 
