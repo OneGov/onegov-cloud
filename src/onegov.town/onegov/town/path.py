@@ -181,12 +181,11 @@ def get_occurrence(app, name):
     return OccurrenceCollection(app.session()).by_name(name)
 
 
-@TownApp.path(model=EventCollection, path='/veranstaltungen/auflisten')
+@TownApp.path(model=EventCollection, path='/events')
 def get_events(app, page=0, state='published'):
-    # todo: this is only a temporary view and should be removed
     return EventCollection(app.session(), page, state)
 
 
-@TownApp.path(model=Event, path='/veranstaltungen/{name}')
+@TownApp.path(model=Event, path='/event/{name}')
 def get_event(app, name):
     return EventCollection(app.session()).by_name(name)

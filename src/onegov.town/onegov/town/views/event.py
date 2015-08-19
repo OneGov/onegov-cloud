@@ -57,7 +57,10 @@ def humanize_recurrence(request, recurrence):
 
 @TownApp.html(model=EventCollection, template='events.pt', permission=Private)
 def view_events(self, request):
-    # todo: this is only a temporary view and should be removed
+    """ Display all events in a list.
+
+    This view is not actually used.
+    """
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
@@ -100,6 +103,8 @@ def view_events(self, request):
 
 @TownApp.view(model=Event, name='publish', permission=Private)
 def publish_event(self, request):
+    """ Publish an event. """
+
     self.publish()
 
     request.success(_(u"You have published the event ${title}", mapping={
@@ -111,6 +116,8 @@ def publish_event(self, request):
 
 @TownApp.view(model=Event, name='withdraw', permission=Private)
 def withdraw_event(self, request):
+    """ Withdraw an event. """
+
     self.withdraw()
 
     request.success(_(u"You have withdrawn the event ${title}", mapping={
@@ -122,6 +129,8 @@ def withdraw_event(self, request):
 
 @TownApp.html(model=Event, template='event.pt', permission=Private)
 def view_event(self, request):
+    """ View an event. """
+
     description = self.description.replace('\n', '<br>')
     recurrence = humanize_recurrence(request, self.recurrence)
     occurrences = self.occurrence_dates(localize=True)
@@ -144,9 +153,58 @@ def view_event(self, request):
     }
 
 
+@TownApp.form(model=OccurrenceCollection, name='neu', template='form.pt',
+              form=EventForm)
+def handle_new_event(self, request, form):
+    """ Add event form. """
+    if request.is_logged_in:
+        self.title = _("Add an event")
+    else:
+        self.title = _("Submit an event")
+
+    if form.submitted(request):
+        model = Event()
+        form.update_model(model)
+
+        event = EventCollection(self.session).add(
+            title=model.title,
+            start=model.start,
+            end=model.end,
+            timezone=model.timezone,
+            recurrence=model.recurrence,
+            tags=model.tags,
+            location=model.location,
+            content=model.content,
+        )
+        # todo: add a preview before submitting?
+        event.submit()
+
+        # todo: create ticket and link the new event
+        if request.is_logged_in:
+            request.success(_("Event added"))
+            return morepath.redirect(request.link(event))
+        else:
+            # More like "Vielen Dank für Ihre Eingabe!" and thank you page etc.
+            # like in ticket system/form submission
+            request.success(_("Event submitted"))
+            return morepath.redirect(request.link(self))
+
+    layout = EventLayout(self, request)
+    layout.editbar_links = []
+
+    return {
+        'layout': layout,
+        'title': self.title,
+        'form': form,
+        'form_width': 'large'
+    }
+
+
 @TownApp.form(model=Event, name='bearbeiten', template='form.pt',
               permission=Private, form=EventForm)
 def handle_edit_event(self, request, form):
+    """ Edit an event. """
+
     if form.submitted(request):
         form.update_model(self)
 
@@ -169,4 +227,6 @@ def handle_edit_event(self, request, form):
 
 @TownApp.view(model=Event, request_method='DELETE', permission=Private)
 def handle_delete_event(self, request):
+    """ Delete an event. """
+
     EventCollection(request.app.session()).delete(self)

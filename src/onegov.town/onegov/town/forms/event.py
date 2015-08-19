@@ -91,8 +91,14 @@ class EventForm(Form):
         """
         result = super(EventForm, self).validate()
 
-        if self.end_date.data and self.start_date.data:
-            if self.end_date.data < self.start_date.data:
+        if self.start_time.data and self.end_time.data:
+            if self.start_time.data > self.end_time.data:
+                message = _("The end time must be later than the start time.")
+                self.end_time.errors.append(message)
+                result = False
+
+        if self.start_date.data and self.end_date.data:
+            if self.start_date.data > self.end_date.data:
                 message = _("The end date must be later than the start date.")
                 self.end_date.errors.append(message)
                 result = False
