@@ -12,13 +12,16 @@
                             <div class="row">
                                 <div class="occurrence">
                                     <div class="large-3 columns">
-                                        <div class="occurrences-day-date">
-                                            <div tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
-                                                <span>${occurrence.localized_start.day}</span>
-                                                <span>${layout.format_date(occurrence.localized_start, 'month_abbr')}</span>
-                                                <span>Mittwoch</span>
+                                        <tal:block tal:condition="layout.format_date(occurrence.localized_start, 'date') == lastdaydate">
+                                            <div class="show-for-large-up occurrences-day-date"></div>
+                                        </tal:block>
+                                        <tal:block tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
+                                            <div class="occurrences-day-date active">
+                                                <div>${layout.format_date(occurrence.localized_start, 'weekday')}</div>
+                                                <div class="day">${occurrence.localized_start.day}</div>
+                                                <div>${layout.format_date(occurrence.localized_start, 'month')}</div>
                                             </div>
-                                        </div>
+                                        </tal:block>
                                     </div>
                                     <div class="large-9 medium-12 small-12 columns">
                                         <div class="occurrence-date">${layout.format_date(occurrence.localized_start, 'date')}</div>

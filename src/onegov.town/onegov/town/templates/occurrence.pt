@@ -6,8 +6,8 @@
         <div class="row">
             <div class="large-8 medium-8 columns">
                 <div class="occurrence-lead">
-                    <span tal:condition="occurrence.event.location">${occurrence.event.location}, </span>
-                    <span>${layout.format_date(occurrence.localized_start, 'datetime')}-${layout.format_date(occurrence.localized_end, 'time')}</span>
+                    <div>${layout.format_date(occurrence.localized_start, 'event')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
+                    <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
                 </div>
 
                 <div class="occurrence-tags">
