@@ -87,7 +87,7 @@ class AllocationEventInfo(object):
 
     @property
     def event_identification(self):
-        return '{:%d.%m.%Y}: {}'.format(
+        return u'{:%d.%m.%Y}: {}'.format(
             self.allocation.display_start(),
             self.event_time
         )
