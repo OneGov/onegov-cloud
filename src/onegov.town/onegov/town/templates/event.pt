@@ -16,6 +16,13 @@
             <dt i18n:translate="">Location</dt>
             <dd>${event.location}</dd>
 
+            <dt i18n:translate="">Tags</dt>
+            <dd>
+                <ul>
+                    <li tal:repeat="tag event.display_tags">${tag}</li>
+                </ul>
+            </dd>
+
             <dt i18n:translate="">Date and time</dt>
             <dd>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')} (${event.timezone})</dd>
 
@@ -26,13 +33,6 @@
             <dd>
                 <ul>
                     <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'date')}</li>
-                </ul>
-            </dd>
-
-            <dt i18n:translate="">Tags</dt>
-            <dd>
-                <ul>
-                    <li tal:repeat="tag event.display_tags">${tag}</li>
                 </ul>
             </dd>
 
