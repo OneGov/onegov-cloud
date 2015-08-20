@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.24 (2015-08-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds support page titles consisting solely on emojis.
   [href]
