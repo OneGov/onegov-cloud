@@ -1,4 +1,6 @@
 """ Contains the paths to the different models served by onegov.town. """
+
+from datetime import date
 from libres.db.models import Allocation
 from onegov.event import (
     Event,
@@ -143,9 +145,14 @@ def get_resources(app):
     return ResourceCollection(app.libres_context)
 
 
-@TownApp.path(model=Resource, path='/reservation/{name}')
-def get_resource(app, name):
-    return ResourceCollection(app.libres_context).by_name(name)
+@TownApp.path(model=Resource, path='/reservation/{name}',
+              converters=dict(date=date))
+def get_resource(app, name, date=None):
+
+    resource = ResourceCollection(app.libres_context).by_name(name)
+    resource.date = date
+
+    return resource
 
 
 @TownApp.path(model=Allocation, path='/einteilung/{resource}/{id}')

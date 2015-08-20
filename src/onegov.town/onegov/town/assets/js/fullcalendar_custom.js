@@ -79,6 +79,10 @@ var setup_calendar = function(calendar) {
         eventDrop: edit_handler,
         eventResize: edit_handler
     });
+
+    if (calendar.data('goto-date')) {
+        calendar.fullCalendar('gotoDate', calendar.data('goto-date'));
+    }
 };
 
 $(document).ready(function() {
