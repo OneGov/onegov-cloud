@@ -953,6 +953,18 @@ def test_resource_slots(town_app):
         ],
         whole_day=True
     )
+    scheduler.allocate(
+        dates=[
+            (datetime(2015, 8, 6, 12, 0), datetime(2015, 8, 6, 16, 0)),
+        ],
+        whole_day=False
+    )
+    scheduler.approve_reservations(
+        scheduler.reserve(
+            'info@example.org',
+            (datetime(2015, 8, 6, 12, 0), datetime(2015, 8, 6, 16, 0)),
+        )
+    )
 
     transaction.commit()
 
@@ -962,8 +974,9 @@ def test_resource_slots(town_app):
     assert client.get(url).json == []
 
     url = '/reservation/foo/slots?start=2015-08-04&end=2015-08-05'
-
     result = client.get(url).json
+
+    assert len(result) == 2
 
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
@@ -974,6 +987,13 @@ def test_resource_slots(town_app):
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
     assert result[1]['className'] == 'event-available'
     assert result[1]['title'] == u"Ganztägig\nVerfügbar"
+
+    url = '/reservation/foo/slots?start=2015-08-06&end=2015-08-06'
+    result = client.get(url).json
+
+    assert len(result) == 1
+    assert result[0]['className'] == 'event-unavailable'
+    assert result[0]['title'] == u"12:00 - 16:00\nBesetzt"
 
 
 def test_resources(town_app):
