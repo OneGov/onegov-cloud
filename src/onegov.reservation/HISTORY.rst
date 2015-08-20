@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.4 (2015-08-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an allocation highlight function to the resource. Apps can use this for
   easy Morepath Path/UI integration.
   [href]
