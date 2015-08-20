@@ -968,12 +968,12 @@ def test_resource_slots(town_app):
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
     assert result[0]['className'] == 'event-available'
-    assert result[0]['title'] == u"Ganztägig\n1/1 verfügbar"
+    assert result[0]['title'] == u"Ganztägig\nVerfügbar"
 
     assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
     assert result[1]['className'] == 'event-available'
-    assert result[1]['title'] == u"Ganztägig\n1/1 verfügbar"
+    assert result[1]['title'] == u"Ganztägig\nVerfügbar"
 
 
 def test_resources(town_app):
