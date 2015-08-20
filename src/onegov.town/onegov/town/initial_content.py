@@ -180,12 +180,6 @@ def add_events(session):
         title=u"Grümpelturnier",
         start=start + timedelta(days=7, hours=10, minutes=0),
         end=start + timedelta(days=7, hours=18, minutes=0),
-        recurrence=(
-            "RRULE:FREQ=MONTHLY;BYMONTHDAY={0};UNTIL={1}".format(
-                (start + timedelta(days=7)).day,
-                (start + timedelta(days=60)).strftime('%Y%m%dT%H%M%SZ')
-            )
-        ),
         timezone="Europe/Zurich",
         tags=u"Freizeit, Sport",
         location=u"Sportanlage",

@@ -31,16 +31,7 @@ def humanize_recurrence(request, recurrence):
 
     if recurrence:
         rule = rrule.rrulestr(recurrence)
-        if rule._freq == rrule.MONTHLY:
-            result = _(
-                u"Monthly on the day ${day} of the month until ${end}",
-                mapping={
-                    'day': ', '.join((str(day) for day in rule._bymonthday)),
-                    'end': rule._until.date().strftime('%d.%m.%Y')
-                }
-            )
-
-        elif rule._freq == rrule.WEEKLY:
+        if rule._freq == rrule.WEEKLY:
             result = _(
                 u"Every ${days} until ${end}",
                 mapping={

@@ -27,8 +27,6 @@ WEEKDAYS = (
 class EventForm(Form):
     """ Defines the form for all events. """
 
-    # todo: check if descriptions work
-
     title = StringField(
         label=_("Title"),
         description=_("The title of this event."),
@@ -44,6 +42,11 @@ class EventForm(Form):
     location = StringField(
         label=_("Location"),
         description=_("A description of the location of this event.")
+    )
+
+    tags = MultiCheckboxField(
+        label=_("Tags"),
+        choices=TAGS,
     )
 
     start_time = TimeField(
@@ -67,24 +70,15 @@ class EventForm(Form):
         choices=WEEKDAYS,
     )
 
-    monthly = BooleanField(
-        label=_("Repeats itself every month"),
-    )
-
     end_date = DateField(
         label=_("Until"),
         validators=[validators.Optional()]
     )
 
-    tags = MultiCheckboxField(
-        label=_("Tags"),
-        choices=TAGS,
-    )
-
     def validate(self):
         """ Make sure a valid RRULE can be generated with the given fields.
 
-        Might be better to group weekly, monthly and end_date in an enclosure,
+        Might be better to group weekly and end_date in an enclosure,
         see See `<http://wtforms.readthedocs.org/en/latest/fields.html\
         #field-enclosures`_.
 
@@ -103,12 +97,6 @@ class EventForm(Form):
                 self.end_date.errors.append(message)
                 result = False
 
-        if self.weekly.data and self.monthly.data:
-            message = _("Please select only one type of recurrence.")
-            self.weekly.errors.append(message)
-            self.monthly.errors.append(message)
-            result = False
-
         if self.weekly.data and self.start_date.data:
             weekday = WEEKDAYS[self.start_date.data.weekday()][0]
             if weekday not in self.weekly.data:
@@ -116,12 +104,12 @@ class EventForm(Form):
                 self.weekly.errors.append(message)
                 result = False
 
-        if (self.weekly.data or self.monthly.data) and not self.end_date.data:
+        if self.weekly.data and not self.end_date.data:
             message = _("Please set and end date if the event is recurring.")
             self.end_date.errors.append(message)
             result = False
 
-        if self.end_date.data and not (self.weekly.data or self.monthly.data):
+        if self.end_date.data and not self.weekly.data:
             message = _(
                 "Please select a type of recurrence if the event is recurring."
             )
@@ -163,7 +151,7 @@ class EventForm(Form):
             ),
             model.timezone
         )
-        if (self.monthly.data or self.weekly.data) and self.end_date.data:
+        if self.weekly.data and self.end_date.data:
             until_date = to_timezone(
                 replace_timezone(
                     datetime(
@@ -175,20 +163,12 @@ class EventForm(Form):
                     ), model.timezone
                 ), 'UTC'
             )
-            if self.monthly.data:
-                model.recurrence = (
-                    "RRULE:FREQ=MONTHLY;BYMONTHDAY={0};UNTIL={1}".format(
-                        self.start_date.data.day,
-                        until_date.strftime('%Y%m%dT%H%M%SZ')
-                    )
+            model.recurrence = (
+                "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY={0};UNTIL={1}".format(
+                    ','.join(self.weekly.data),
+                    until_date.strftime('%Y%m%dT%H%M%SZ')
                 )
-            elif self.weekly.data:
-                model.recurrence = (
-                    "RRULE:FREQ=WEEKLY;WKST=MO;BYDAY={0};UNTIL={1}".format(
-                        ','.join(self.weekly.data),
-                        until_date.strftime('%Y%m%dT%H%M%SZ')
-                    )
-                )
+            )
 
     def apply_model(self, model):
         """ Stores the page values on the form. """
@@ -196,6 +176,7 @@ class EventForm(Form):
         self.title.data = model.title
         self.description.data = model.description
         self.location.data = model.location
+        self.tags.data = model.display_tags
         self.start_time.data = model.localized_start.time()
         self.end_time.data = model.localized_end.time()
         self.start_date.data = model.localized_start.date()
@@ -204,9 +185,7 @@ class EventForm(Form):
             self.end_date.data = last_occurrence.date()
 
             rule = rrule.rrulestr(model.recurrence)
-            self.monthly.data = rule._freq == rrule.MONTHLY
             if rule._freq == rrule.WEEKLY:
                 self.weekly.data = [
                     WEEKDAYS[day][0] for day in rule._byweekday
                 ]
-        self.tags.data = model.display_tags
