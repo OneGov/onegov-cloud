@@ -13,7 +13,7 @@ from onegov.town.layout import DefaultLayout, EventLayout
 from sedate import replace_timezone, to_timezone
 
 
-WEEKDAYS = (_("Mo"), _("Tu"), _("We"), _("Th"), _("Fr"), _("Sa"), _("Suy"))
+WEEKDAYS = (_("Mo"), _("Tu"), _("We"), _("Th"), _("Fr"), _("Sa"), _("Su"))
 
 
 def humanize_recurrence(request, recurrence):
