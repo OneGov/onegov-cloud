@@ -818,8 +818,15 @@ msgstr ""
 msgid "Accept"
 msgstr "Annehmen"
 
-msgid "A link was added to the clipboard"
-msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+msgid "New allocation"
+msgstr "Neue Einteilung"
+
+msgid "Edit allocation"
+msgstr "Einteilung bearbeiten"
+
+#, python-format
+msgid "Successfully added ${n} allocations"
+msgstr "${n} Einteilungen wurden hinzugefügt"
 
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
@@ -868,6 +875,9 @@ msgstr "Veranstaltung erstellt"
 
 msgid "Event submitted"
 msgstr "Veranstaltung gemeldet"
+
+msgid "A link was added to the clipboard"
+msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

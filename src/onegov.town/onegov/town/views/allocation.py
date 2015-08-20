@@ -6,7 +6,7 @@ from onegov.core.security import Public, Private
 from onegov.libres import Resource, ResourceCollection
 from onegov.town import TownApp, _, utils
 from onegov.town.elements import Link
-from onegov.town.layout import ResourceLayout, AllocationEditFormLayout
+from onegov.town.layout import ResourceLayout
 from onegov.town.forms import (
     DaypassAllocationForm,
     DaypassAllocationEditForm,
@@ -88,7 +88,6 @@ def handle_new_allocation(self, request, form):
 
     layout = ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("New allocation"), '#'))
-    layout.editbar_links = None
 
     start, end = utils.parse_fullcalendar_request(request, self.timezone)
     whole_day = request.params.get('whole_day') == 'yes'
@@ -126,8 +125,6 @@ def handle_edit_allocation(self, request, form):
     resource = resources.by_id(self.resource)
 
     if form.submitted(request):
-        resources = ResourceCollection(request.app.libres_context)
-        resource = resources.by_id(self.resource)
         scheduler = resource.get_scheduler(request.app.libres_context)
 
         new_start, new_end = form.dates
@@ -146,7 +143,8 @@ def handle_edit_allocation(self, request, form):
             request.success(_("Your changes were saved"))
             return morepath.redirect(request.link(resource))
 
-    layout = AllocationEditFormLayout(self, request)
+    layout = ResourceLayout(resource, request)
+    layout.breadcrumbs.append(Link(_("Edit allocation"), '#'))
 
     form.apply_model(self)
 

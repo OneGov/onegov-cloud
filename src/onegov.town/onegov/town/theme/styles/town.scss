@@ -1299,3 +1299,78 @@ $event-action-icon-hover: '\f192';
         margin-right: 1ex;
     }
 }
+
+/*
+    Fullcalendar Screen Flicker Prevention
+*/
+
+@media #{$small-only} {
+    .calendar {
+        min-height: $small-breakpoint * .5;
+    }
+}
+
+@media #{$medium-only} {
+    .calendar {
+        min-height: $medium-breakpoint * .5;
+    }
+}
+
+@media #{$large-up} {
+    .calendar {
+        min-height: $large-breakpoint * .5;
+    }
+}
+
+/*
+    Popup Menu
+*/
+.popup {
+    background-color: #fff;
+    border: 1px solid $gainsboro;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, .3);
+    padding: 2px 6px;
+    position: relative;
+
+    a {
+        display: block;
+        font-size: .8rem;
+
+        &:hover {
+            text-decoration: underline;
+        }
+
+        &:hover::before {
+            display: inline-block;
+            text-decoration: none;
+        }
+    }
+
+    // the arrow of the popup (which is currently shown right of the element)
+    // if other arrows are needed add classes for each direction
+    &:after,
+    &:before {
+        border: solid transparent;
+        content: ' ';
+        height: 0;
+        pointer-events: none;
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        width: 0;
+    }
+
+    &:after {
+        border-color: rgba(213, 213, 213, 0);
+        border-right-color: #fff;
+        border-width: 7px;
+        margin-top: -7px;
+    }
+
+    &:before {
+        border-color: rgba(245, 24, 172, 0);
+        border-right-color: $gainsboro;
+        border-width: 8px;
+        margin-top: -8px;
+    }
+}

@@ -23,6 +23,7 @@ __all__ = [
     'BuiltinDefinitionForm',
     'CustomDefinitionForm',
     'DaypassAllocationForm',
+    'DaypassAllocationEditForm',
     'EventForm',
     'LinkForm',
     'LoginForm',

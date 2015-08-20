@@ -1,6 +1,11 @@
 """ Contains the paths to the different models served by onegov.town. """
-
 from libres.db.models import Allocation
+from onegov.event import (
+    Event,
+    EventCollection,
+    Occurrence,
+    OccurrenceCollection
+)
 from onegov.form import (
     FormDefinition,
     FormCollection,
