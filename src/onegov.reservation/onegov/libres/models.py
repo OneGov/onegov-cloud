@@ -54,6 +54,17 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
         foreign_keys='Allocation.resource'
     )
 
+    #: the date to jump to in the view (if not None) -> not in the db!
+    date = None
+
+    #: a list of allocations ids to highlight in the view (if not None)
+    highlights = None
+
+    def highlight_allocations(self, allocations):
+        """ The allocation to jump to in the view. """
+        self.highlights = [a.id for a in allocations]
+        self.date = allocations[0].start.date()
+
     def get_scheduler(self, libres_context):
         assert self.id, "the id needs to be set"
         assert self.timezone, "the timezone needs to be set"

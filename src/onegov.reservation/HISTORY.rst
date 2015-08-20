@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an allocation highlight function to the resource. Apps can use this for
+  easy Morepath Path/UI integration.
+  [href]
+
 - Adds a convenience function to get the scheduler by resource id.
   [href]
 

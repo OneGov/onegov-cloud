@@ -1,6 +1,6 @@
 import pytest
 
-from datetime import datetime
+from datetime import date, datetime
 from onegov.libres import ResourceCollection
 
 
@@ -45,3 +45,20 @@ def test_resource_save_delete(libres_context):
     assert scheduler.managed_reservations().count() == 0
     assert scheduler.managed_reserved_slots().count() == 0
     assert scheduler.managed_allocations().count() == 0
+
+
+def test_resource_highlight_allocations(libres_context):
+    collection = ResourceCollection(libres_context)
+    resource = collection.add('Executive Lounge', 'Europe/Zurich')
+
+    assert resource.date is None
+    assert resource.highlights is None
+
+    scheduler = resource.get_scheduler(libres_context)
+    dates = (datetime(2015, 8, 5, 12), datetime(2015, 8, 5, 18))
+    allocations = scheduler.allocate(dates)
+
+    resource.highlight_allocations(allocations)
+
+    assert resource.date == date(2015, 8, 5)
+    assert resource.highlights == [allocations[0].id]
