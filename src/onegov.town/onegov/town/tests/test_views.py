@@ -3,6 +3,7 @@ import onegov.core
 import onegov.town
 import textwrap
 import transaction
+import re
 
 from datetime import datetime
 from lxml.html import document_fromstring
@@ -12,6 +13,13 @@ from onegov.testing import utils
 from onegov.ticket import TicketCollection
 from webtest import TestApp as Client
 from webtest import Upload
+
+
+def extract_href(link):
+    """ Takes a link (<a href...>) and returns the href address. """
+    result = re.search(r'(?:href|ic-delete-from)="([^"]+)', link)
+
+    return result and result.group(1) or None
 
 
 def test_view_permissions():
@@ -1113,3 +1121,100 @@ def test_sitecollection(town_app):
         'url': 'http://localhost/themen/bildung-gesellschaft',
         'group': 'Themen'
     }
+
+
+def test_allocations(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    # create a new daypass allocation
+    new = client.get((
+        '/reservation/sbb-tageskarte/neue-einteilung'
+        '?start=2015-08-04&end=2015-08-05'
+    ))
+
+    new.form['daypasses'] = 1
+    new.form['daypasses_limit'] = 1
+    new.form.submit()
+
+    # view the daypasses
+    slots = client.get((
+        '/reservation/sbb-tageskarte/slots'
+        '?start=2015-08-04&end=2015-08-05'
+    ))
+
+    assert len(slots.json) == 2
+    assert slots.json[0]['title'] == u"Ganztägig\nVerfügbar"
+
+    # change the daypasses
+    edit = client.get(extract_href(slots.json[0]['actions'][1]))
+    edit.form['daypasses'] = 2
+    edit.form.submit()
+
+    slots = client.get((
+        '/reservation/sbb-tageskarte/slots'
+        '?start=2015-08-04&end=2015-08-04'
+    ))
+
+    assert len(slots.json) == 1
+    assert slots.json[0]['title'] == u"Ganztägig\n2/2 Verfügbar"
+
+    # try to create a new allocation over an existing one
+    new = client.get((
+        '/reservation/sbb-tageskarte/neue-einteilung'
+        '?start=2015-08-04&end=2015-08-04'
+    ))
+
+    new.form['daypasses'] = 1
+    new.form['daypasses_limit'] = 1
+    new = new.form.submit()
+
+    assert u"Es besteht bereits eine Einteilung im gewünschten Zeitraum" in new
+
+    # move the existing allocations
+    slots = client.get((
+        '/reservation/sbb-tageskarte/slots'
+        '?start=2015-08-04&end=2015-08-05'
+    ))
+
+    edit = client.get(extract_href(slots.json[0]['actions'][1]))
+    edit.form['date'] = '2015-08-06'
+    edit.form.submit()
+
+    edit = client.get(extract_href(slots.json[1]['actions'][1]))
+    edit.form['date'] = '2015-08-07'
+    edit.form.submit()
+
+    # get the new slots
+    slots = client.get((
+        '/reservation/sbb-tageskarte/slots'
+        '?start=2015-08-06&end=2015-08-07'
+    ))
+
+    assert len(slots.json) == 2
+
+    # delete an allocation
+    client.delete(extract_href(slots.json[0]['actions'][2]))
+
+    # get the new slots
+    slots = client.get((
+        '/reservation/sbb-tageskarte/slots'
+        '?start=2015-08-06&end=2015-08-07'
+    ))
+
+    assert len(slots.json) == 1
+
+    # delete an allocation
+    client.delete(extract_href(slots.json[0]['actions'][2]))
+
+    # get the new slots
+    slots = client.get((
+        '/reservation/sbb-tageskarte/slots'
+        '?start=2015-08-06&end=2015-08-07'
+    ))
+
+    assert len(slots.json) == 0

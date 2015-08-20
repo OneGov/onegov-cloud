@@ -163,7 +163,7 @@ msgstr ""
 "Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
 
 msgid "A conflicting allocation exists for the requested time period."
-msgstr "Es besteht bereits eine Einteilung im gewünschten Zeitruam."
+msgstr "Es besteht bereits eine Einteilung im gewünschten Zeitraum."
 
 msgid "An existing reservation would be affected by the requested change."
 msgstr ""
