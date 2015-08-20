@@ -5,7 +5,7 @@ Calender of events for OneGov.
 
 Run the Tests
 -------------
-    
+
 Install tox and run it::
 
     pip install tox
@@ -40,8 +40,8 @@ Coverage
 
 Latests PyPI Release
 --------------------
-.. image:: https://pypip.in/v/onegov.event/badge.png
-  :target: https://crate.io/packages/onegov.event
+.. image:: https://img.shields.io/pypi/v/onegov.event.svg
+  :target: https://pypi.python.org/pypi/onegov.event
   :alt: Latest PyPI Release
 
 License
