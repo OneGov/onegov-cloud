@@ -32,12 +32,19 @@ var spawn_popup = function(event, element) {
         'transition': 'all 0.3s',
         'type': 'tooltip',
         'onopen': function() {
+            var popup = $(this);
+
             // hookup the confirmation dialog
-            var confirm_links = $(this).find('a.confirm');
+            var confirm_links = popup.find('a.confirm');
             Intercooler.processNodes(confirm_links);
             confirm_links.confirmation();
             $(confirm_links).on('success.ic', function() {
                 $('.calendar').fullCalendar('refetchEvents');
+            });
+
+            // any link clicked will close the popup
+            popup.find('a').click(function() {
+                popup.popup('hide');
             });
         },
         'onclose': function() {

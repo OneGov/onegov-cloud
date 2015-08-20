@@ -27,7 +27,7 @@ var Confirmation = React.createClass({
             <div className="reveal-modal medium confirm-modal" data-reveal role="dialog">
                 <h2>{this.props.question}</h2>
                 <p>{this.props.extra}</p>
-                <a tabIndex="1" className="button secondary no">
+                <a tabIndex="2" className="button secondary no">
                     {this.props.no}
                 </a>
                 <a tabIndex="1" className="button alert yes">
@@ -94,9 +94,13 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
         handle_yes();
         confirm_el.foundation('reveal', 'close');
     });
-    confirm_el.find('a.yes').click(handle_yes);
+    confirm_el.find('a.yes').enter(function() {
+        handle_yes();
+        confirm_el.foundation('reveal', 'close');
+    });
 
     confirm_el.foundation('reveal', 'open');
+    confirm_el.focus();
 };
 
 /*
@@ -128,6 +132,14 @@ var intercept = function(element, event, handler) {
     $(element)[event](new_handler);
 };
 
+// focus the yes button upon opening
+$(document).on('opened.fndtn.reveal', '[data-reveal]', function() {
+    var modal = $(this);
+    _.defer(function() {
+        modal.find('a.yes').focus();
+    });
+});
+
 // remove the div when the dialog closes
 $(document).on('closed.fndtn.reveal', '[data-reveal]', function () {
     if ($(this).parent().hasClass('confirm')) {
@@ -145,13 +157,29 @@ var handle_confirmation = function(e, on_confirm) {
     show_confirmation(question, yes, no, extra, on_confirm);
 };
 
+// adds an enter key handler to jQuery
+jQuery.fn.enter = function(callback) {
+   if(!callback) {
+      return;
+   }
+
+   $(this).keydown(function(e) {
+       var ev = e || event;
+       if(ev.keyCode == 13) {
+          callback();
+          return false;
+       }
+   });
+};
+
+// sets up a confirmation link with the dialog
+jQuery.fn.confirmation = function() {
+    return this.each(function() {
+         intercept(this, 'click', handle_confirmation);
+    });
+};
+
 // hooks the targeted elements up
 $(document).ready(function() {
-    $.fn.confirmation = function() {
-        return this.each(function() {
-            intercept(this, 'click', handle_confirmation);
-        });
-    };
-
     $('a.confirm').confirmation();
 });

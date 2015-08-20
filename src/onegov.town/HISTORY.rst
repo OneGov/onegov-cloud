@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to confirm the confirmation dialog using enter. To cancel
+  press escape.
+  [href]
+
 - A person's academic title is now a person's salutation.
   [href]
 
