@@ -682,108 +682,43 @@ class ResourceLayout(DefaultLayout):
             ]
 
 
-class OccurrenceBaseLayout(DefaultLayout):
+class AllocationEditFormLayout(DefaultLayout):
+    """ Same as the resource layout, but with different editbar links, because
+    there's not really an allocation view, but there are allocation forms.
 
-    month_abbr_format = '%b'
-    event_format = '%A, %d. %B %Y, %H:%M'
-
-    def format_date(self, date, format):
-        """ Takes a datetime and formats it.
-
-        This overrides :meth:`onegov.core.Layout.format_date` since we want to
-        display the date in the timezone given by the event, not a fixed one.
-
-        """
-        assert format in {
-            'date', 'time', 'datetime', 'relative', 'month_abbr', 'event'
-        }
-
-        if format == 'relative':
-            return arrow.get(date).humanize(locale=self.request.locale)
-
-        # todo: event and month_abbr need translation
-
-        return date.strftime(getattr(self, format + '_format'))
-
-
-class OccurrencesLayout(OccurrenceBaseLayout):
-
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Events"), self.request.link(self.model))
-        ]
-
-
-class OccurrenceLayout(OccurrenceBaseLayout):
+    """
 
     @cached_property
     def collection(self):
-        return OccurrenceCollection(self.request.app.session())
+        return ResourceCollection(self.request.app.libres_context)
 
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
-            Link(_("Events"), self.request.link(self.collection)),
-            Link(self.model.title, '#')
+            Link(_("Reservations"), self.request.link(self.collection)),
+            Link(_("Edit Allocation"), '#')
         ]
 
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
-            # todo: Add a delete button?
-            return [
-                Link(
-                    text=_("Edit"),
-                    url=self.request.link(self.model.event),
-                    classes=('edit-link', )
+            if self.model.availability == 100.0:
+                yield DeleteLink(
+                    _("Delete"),
+                    self.request.link(self.model),
+                    confirm=_("Do you really want to delete this allocation?"),
+                    yes_button_text=_("Delete allocation"),
+                    redirect_after=self.request.link(self.collection)
                 )
-            ]
-
-
-class EventLayout(DefaultLayout):
-
-    @cached_property
-    def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Events"), self.events_url),
-            Link(self.model.title, self.request.link(self.model)),
-        ]
-
-    @cached_property
-    def editbar_links(self):
-        if self.request.is_logged_in:
-            links = [
-                Link(
-                    text=_("Edit event"),
-                    url=self.request.link(self.model, 'bearbeiten'),
-                    classes=('edit-link', )
-                ),
-                DeleteLink(
+            else:
+                yield DeleteLink(
                     text=_("Delete"),
                     url=self.request.link(self.model),
-                    confirm=_("Do you really want to delete this event?"),
-                    yes_button_text=_("Delete event"),
-                    redirect_after=self.events_url
+                    confirm=_("This resource can't be deleted."),
+                    extra_information=_(
+                        "There are existing reservations associated "
+                        "with this resource"
+                    ),
+                    redirect_after=self.request.link(self.collection)
                 )
-            ]
-
-            state = self.model.state
-            if state == 'submitted' or state == 'withdrawn':
-                links.append(Link(
-                    text=_("Publish event"),
-                    url=self.request.link(self.model, 'publish'),
-                    classes=('event-action', 'event-publish'),
-                ))
-
-            elif state == 'published':
-                links.append(Link(
-                    text=_("Withdraw event"),
-                    url=self.request.link(self.model, 'withdraw'),
-                    classes=('event-action', 'event-withdraw'),
-                ))
-
-            return links
