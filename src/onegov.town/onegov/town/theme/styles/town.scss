@@ -1219,15 +1219,37 @@ tr.ticket:hover {
     Fullcalendar Screen Flicker Prevention
 */
 
+.occurrence {
+    padding-bottom: 1rem;
+}
+
+.occurrence-tag {
+    @include label(
+        $bg: $secondary-color,
+        $radius: 4px
+    );
+
 @media #{$small-only} {
     .calendar {
         min-height: $small-breakpoint * .5;
     }
 }
 
-@media #{$medium-only} {
-    .calendar {
-        min-height: $medium-breakpoint * .5;
+.occurrences-day-date {
+    background-color: $white-smoke;
+    min-height: 135px;
+    width: 100%;
+
+    div {
+        float: right;
+        padding: .1em 1.4em;
+        text-align: center;
+    }
+
+    span:first-child {
+        display: block;
+        font-size: 3em;
+        font-weight: bold;
     }
 }
 
@@ -1235,6 +1257,36 @@ tr.ticket:hover {
     .calendar {
         min-height: $large-breakpoint * .5;
     }
+}
+
+.occurrences-filter-tags,
+.occurrences-filter-date {
+    margin-bottom: 1em;
+}
+
+.occurrences-add-box {
+    @include panel;
+    @include smooth-edges;
+
+    margin-top: 2em;
+}
+
+.occurrence-lead {
+    font-size: $h5-font-size;
+    font-weight: 300;
+}
+
+.occurrence-tags,
+.occurrence-description {
+    margin-bottom: 2em;
+}
+
+.occurrence-date {
+    font-size: $small-font-size;
+}
+
+.js .occurrences-filter-date-submit {
+    display: none;
 }
 
 /*
