@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.9 (2015-08-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Reservation allocations can now be created/modified and deleted.
   [href]
 
