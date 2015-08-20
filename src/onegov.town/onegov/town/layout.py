@@ -686,7 +686,39 @@ class AllocationEditFormLayout(DefaultLayout):
     """ Same as the resource layout, but with different editbar links, because
     there's not really an allocation view, but there are allocation forms.
 
-    """
+    weekday_format = 'dddd'
+    month_format = 'MMMM'
+    smonth_format = 'MMM'
+    event_format = 'dddd, d. MMMM YYYY, HH:mm'
+
+    def format_date(self, date, format):
+        """ Takes a datetime and formats it.
+
+        This overrides :meth:`onegov.core.Layout.format_date` since we want to
+        display the date in the timezone given by the event, not a fixed one.
+
+        """
+        if format in ('date', 'time', 'datetime'):
+            return date.strftime(getattr(self, format + '_format'))
+
+        if format in ('weekday', 'month', 'smonth', 'event'):
+            return arrow.get(date).format(
+                getattr(self, format + '_format'),
+                locale=self.request.locale
+            )
+
+
+class OccurrencesLayout(OccurrenceBaseLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Events"), self.request.link(self.model))
+        ]
+
+
+class OccurrenceLayout(OccurrenceBaseLayout):
 
     @cached_property
     def collection(self):
