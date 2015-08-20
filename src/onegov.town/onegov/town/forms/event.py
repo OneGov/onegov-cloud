@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from dateutil import rrule
 from onegov.form import Form, with_options
-from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import MultiCheckboxField, MultiCheckboxWidget
 from onegov.town import _
 from sedate import replace_timezone, to_timezone
 from wtforms import BooleanField, StringField, TextAreaField, validators
@@ -14,13 +14,13 @@ from wtforms.widgets import TextArea
 TAGS = [(tag, tag) for tag in ('Fest', 'Freizeit', 'Politik', 'Sport')]
 
 WEEKDAYS = (
-    ("MO", _("Monday")),
-    ("TU", _("Tuesday")),
-    ("WE", _("Wednesday")),
-    ("TH", _("Thursday")),
-    ("FR", _("Friday")),
-    ("SA", _("Saturday")),
-    ("SU", _("Sunday")),
+    ("MO", _("Mo")),
+    ("TU", _("Tu")),
+    ("WE", _("We")),
+    ("TH", _("Th")),
+    ("FR", _("Fr")),
+    ("SA", _("Sa")),
+    ("SU", _("Su")),
 )
 
 
@@ -68,10 +68,15 @@ class EventForm(Form):
     weekly = MultiCheckboxField(
         label=_("Repeats itself every"),
         choices=WEEKDAYS,
+        widget=with_options(
+            MultiCheckboxWidget,
+            prefix_label=False,
+            class_='oneline-checkboxes'
+        )
     )
 
     end_date = DateField(
-        label=_("Until"),
+        label=_("... until"),
         validators=[validators.Optional()]
     )
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-20 09:39+0200\n"
+"POT-Creation-Date: 2015-08-20 10:02+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -298,7 +298,7 @@ msgid "From"
 msgstr "Von"
 
 msgid "Until"
-msgstr "Bis"
+msgstr "Bis zum"
 
 msgid "Yes"
 msgstr "Ja"
@@ -327,20 +327,14 @@ msgstr "Beschreibung des Ortes der Veranstaltung"
 msgid "Tags"
 msgstr "Schlagworte"
 
-msgid "From"
-msgstr "Von"
-
 msgid "To"
 msgstr "Bis"
-
-msgid "Date"
-msgstr "Datum"
 
 msgid "Repeats itself every"
 msgstr "Wiederholt sich jeden"
 
-msgid "Until"
-msgstr "Bis zum"
+msgid "... until"
+msgstr "... bis zum"
 
 msgid "Please set and end date if the event is recurring."
 msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."
@@ -831,6 +825,30 @@ msgstr "${n} Einteilungen wurden hinzugefügt"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
+msgid "A link was added to the clipboard"
+msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgid "Sunday"
+msgstr ""
+
 msgid "Submitted events"
 msgstr "Gemeldete Veranstaltungen"
 
@@ -875,9 +893,6 @@ msgstr "Veranstaltung erstellt"
 
 msgid "Event submitted"
 msgstr "Veranstaltung gemeldet"
-
-msgid "A link was added to the clipboard"
-msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

@@ -1278,6 +1278,7 @@ tr.ticket:hover {
 
 $event-action-icon: '\f1db';
 $event-action-icon-hover: '\f192';
+
 .event-action {
     @include button(
         $padding: $button-tny,
