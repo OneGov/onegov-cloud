@@ -1218,3 +1218,69 @@ def test_allocations(town_app):
     ))
 
     assert len(slots.json) == 0
+
+
+def test_allocation_times(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    new = client.get('/reservationen').click('Raum')
+    new.form['title'] = 'Meeting Room'
+    new.form.submit()
+
+    # 12:00 - 24:00
+    new = client.get('/reservation/meeting-room/neue-einteilung')
+    new.form['start'] = '2015-08-20'
+    new.form['end'] = '2015-08-20'
+    new.form['start_time'] = '12:00'
+    new.form['end_time'] = '24:00'
+    new.form['as_whole_day'] = 'no'
+    new.form.submit()
+
+    slots = client.get(
+        '/reservation/meeting-room/slots?start=2015-08-20&end=2015-08-20'
+    )
+
+    assert len(slots.json) == 1
+    assert slots.json[0]['start'] == '2015-08-20T12:00:00+02:00'
+    assert slots.json[0]['end'] == '2015-08-21T00:00:00+02:00'
+
+    # 00:00 - 02:00
+    new = client.get('/reservation/meeting-room/neue-einteilung')
+    new.form['start'] = '2015-08-22'
+    new.form['end'] = '2015-08-22'
+    new.form['start_time'] = '00:00'
+    new.form['end_time'] = '02:00'
+    new.form['as_whole_day'] = 'no'
+    new.form.submit()
+
+    slots = client.get(
+        '/reservation/meeting-room/slots?start=2015-08-22&end=2015-08-22'
+    )
+
+    assert len(slots.json) == 1
+    assert slots.json[0]['start'] == '2015-08-22T00:00:00+02:00'
+    assert slots.json[0]['end'] == '2015-08-22T02:00:00+02:00'
+
+    # 12:00 - 24:00 over two days
+    new = client.get('/reservation/meeting-room/neue-einteilung')
+    new.form['start'] = '2015-08-24'
+    new.form['end'] = '2015-08-25'
+    new.form['start_time'] = '12:00'
+    new.form['end_time'] = '24:00'
+    new.form['as_whole_day'] = 'no'
+    new.form.submit()
+
+    slots = client.get(
+        '/reservation/meeting-room/slots?start=2015-08-24&end=2015-08-25'
+    )
+
+    assert len(slots.json) == 2
+    assert slots.json[0]['start'] == '2015-08-24T12:00:00+02:00'
+    assert slots.json[0]['end'] == '2015-08-25T00:00:00+02:00'
+    assert slots.json[1]['start'] == '2015-08-25T12:00:00+02:00'
+    assert slots.json[1]['end'] == '2015-08-26T00:00:00+02:00'

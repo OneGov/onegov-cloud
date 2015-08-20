@@ -57,14 +57,22 @@ class AllocationFormHelpers(object):
         if start_time is None or end_time is None:
             return [(d, d) for d in dates]
         else:
+            if end_time < start_time:
+                end_offset = timedelta(days=1)
+            else:
+                end_offset = timedelta()
+
             return [
                 (
                     datetime.combine(d, start_time),
-                    datetime.combine(d, end_time)
+                    datetime.combine(d + end_offset, end_time)
                 ) for d in dates
             ]
 
     def as_time(self, text):
+        if text == '24:00':
+            text = '00:00'
+
         return time(*(int(s) for s in text.split(':'))) if text else None
 
     def combine_datetime(self, field, time_field=None):
@@ -235,8 +243,8 @@ class RoomAllocationForm(AllocationForm):
     @property
     def dates(self):
         return self.generate_dates(
-            self.combine_datetime('start'),
-            self.combine_datetime('end'),
+            self.start.data,
+            self.end.data,
             self.as_time(self.start_time.data),
             self.as_time(self.end_time.data)
         )
