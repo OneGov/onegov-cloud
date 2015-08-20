@@ -146,11 +146,12 @@ def get_resources(app):
 
 
 @TownApp.path(model=Resource, path='/reservation/{name}',
-              converters=dict(date=date))
-def get_resource(app, name, date=None):
+              converters=dict(date=date, highlights=[int]))
+def get_resource(app, name, date=None, highlights=tuple()):
 
     resource = ResourceCollection(app.libres_context).by_name(name)
     resource.date = date
+    resource.highlights = highlights
 
     return resource
 

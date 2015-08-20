@@ -1110,6 +1110,10 @@ tr.ticket:hover {
     Fullcalendar Integration
 */
 
+@keyframes fadeout-box-shadow {
+    to {box-shadow: none;}
+}
+
 .calendar {
 
     margin-bottom: 1.5rem;
@@ -1180,18 +1184,27 @@ tr.ticket:hover {
         .fc-time {
             display: none;
         }
-    }
 
-    .fc-event.event-unavailable.has-popup {
-        border-right: 5px solid $red-dark;
-    }
+        &.highlight {
+            animation-delay: 3s;
+            animation-duration: 2s;
+            animation-fill-mode: forwards;
+            animation-iteration-count: 1;
+            animation-name: fadeout-box-shadow;
+            box-shadow: 0 5px 0 $yellow;
+        }
 
-    .fc-event.event-partly-available.has-popup {
-        border-right: 5px solid $orange-dark;
-    }
+        &.event-unavailable.has-popup {
+            border-right: 5px solid $red-dark;
+        }
 
-    .fc-event.event-available.has-popup {
-        border-right: 5px solid $green-dark;
+        &.event-partly-available.has-popup {
+            border-right: 5px solid $orange-dark;
+        }
+
+        &.event-available.has-popup {
+            border-right: 5px solid $green-dark;
+        }
     }
 
     .fc button,

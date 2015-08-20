@@ -84,6 +84,7 @@ def handle_new_allocation(self, request, form):
                 'n': len(allocations)
             }))
 
+            self.highlight_allocations(allocations)
             return morepath.redirect(request.link(self))
 
     layout = ResourceLayout(self, request)
@@ -141,6 +142,7 @@ def handle_edit_allocation(self, request, form):
             utils.show_libres_error(e, request)
         else:
             request.success(_("Your changes were saved"))
+            resource.highlight_allocations([self])
             return morepath.redirect(request.link(resource))
 
     layout = ResourceLayout(resource, request)

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Reservation allocations can now be created/modified and deleted.
+  [href]
+
 - Adds the ability to confirm the confirmation dialog using enter. To cancel
   press escape.
   [href]

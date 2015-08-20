@@ -44,7 +44,7 @@ setup(
         'onegov.event',
         'onegov.form>=0.6.7',
         'onegov.foundation>=0.0.4',
-        'onegov.libres',
+        'onegov.libres>=0.0.4',
         'onegov.people>=0.0.2',
         'onegov.page>=0.1.0',
         'onegov.ticket>=0.0.2',

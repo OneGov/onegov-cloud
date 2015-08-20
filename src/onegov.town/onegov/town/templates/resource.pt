@@ -16,6 +16,7 @@
                 data-select-url="${request.link(resource, name='neue-einteilung')}"
                 data-default-view="month"
                 data-goto-date="${resource.date and resource.date.isoformat() or ''}"
+                data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
                 data-editable="${request.is_logged_in and 'true' or 'false'}"></div>
         </tal:block>
         <tal:block condition="resource.type == 'room'">
@@ -30,6 +31,7 @@
                 data-select-url="${request.link(resource, name='neue-einteilung')}"
                 data-default-view="agendaWeek"
                 data-goto-date="${resource.date and resource.date.isoformat() or ''}"
+                data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
                 data-editable="${request.is_logged_in and 'true' or 'false'}"></div>
         </tal:block>
 

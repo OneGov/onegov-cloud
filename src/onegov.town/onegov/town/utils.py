@@ -171,6 +171,7 @@ class AllocationEventInfo(object):
 
     def as_dict(self):
         return {
+            'id': self.allocation.id,
             'start': self.event_start,
             'end': self.event_end,
             'title': self.event_title,

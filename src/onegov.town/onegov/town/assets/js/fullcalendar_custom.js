@@ -7,7 +7,7 @@ var new_select_handler = function(url) {
         } else {
             params = '?start=' + start.toISOString() + '&end=' + end.toISOString() + '&whole_day=no';
         }
-        location.href = url + params;
+        location.href = url.split('?')[0] + params;
     };
 };
 
@@ -55,6 +55,11 @@ var spawn_popup = function(event, element) {
 };
 
 var event_after_render = function(event, element, view) {
+
+    if (_.contains(view.calendar.options.highlights, event.id)) {
+        $(element).addClass('highlight');
+    }
+
     $(element).click(function() {
         spawn_popup(event, element);
     });
@@ -77,7 +82,8 @@ var setup_calendar = function(calendar) {
         eventAfterRender: event_after_render,
         editable: calendar.data('editable'),
         eventDrop: edit_handler,
-        eventResize: edit_handler
+        eventResize: edit_handler,
+        highlights: calendar.data('highlights')
     });
 
     if (calendar.data('goto-date')) {
