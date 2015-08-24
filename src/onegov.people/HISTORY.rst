@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds compatibility with onegov.core 0.4.25
+  [href]
+
 0.0.2 (2015-08-18)
 ~~~~~~~~~~~~~~~~~~~
 
