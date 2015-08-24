@@ -6,7 +6,7 @@ from onegov.core.upgrade import upgrade_task
 
 
 @upgrade_task('Rename academic_title to salutation')
-def add_handler_id_to_ticket(context):
+def rename_academic_title_to_salutation(context):
 
     context.operations.alter_column(
         'people', 'academic_title', new_column_name='salutation')
