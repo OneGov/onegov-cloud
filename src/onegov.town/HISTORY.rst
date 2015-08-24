@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Depends on latest onegov.core - with this release the upgrade tables should
+  be set up correctly when creating new schemas.
+  [href]
+
 0.3.9 (2015-08-20)
 ~~~~~~~~~~~~~~~~~~~
 
