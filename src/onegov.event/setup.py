@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 name = 'onegov.event'
 description = (
-    'Calender of events for OneGov.'
+    'Calendar of events for OneGov.'
 )
 version = '0.0.1'
 
