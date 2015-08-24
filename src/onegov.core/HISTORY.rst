@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The upgrades table is now prefilled with all modules and tasks, when the
+  schema is first created. Fixes #8.
+  [href]
+
 - Ensures unique upgrade task function names. See #8.
   [href]
 

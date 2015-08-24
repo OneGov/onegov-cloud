@@ -10,6 +10,7 @@ from email.utils import parseaddr
 from freezegun import freeze_time
 from morepath import setup
 from onegov.core import Framework
+from onegov.core.upgrade import UpgradeState
 from onegov.server import Config, Server
 from webtest import TestApp as Client
 from wtforms import Form, StringField
@@ -110,6 +111,17 @@ def test_virtual_host_request():
         'X_VHM_ROOT': '/blog',
         'X_VHM_HOST': 'https://blog.example.org/'})
     assert response.body == b'https://blog.example.org/ - blog'
+
+
+def test_registered_upgrade_tasks(postgres_dsn):
+
+    app = Framework()
+
+    app.configure_application(dsn=postgres_dsn)
+    app.namespace = 'foo'
+    app.set_application_id('foo/bar')
+
+    assert app.session().query(UpgradeState).count() > 0
 
 
 def test_browser_session_request():

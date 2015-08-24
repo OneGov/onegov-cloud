@@ -317,6 +317,9 @@ class SessionManager(object):
 
         if schema not in self.created_schemas:
 
+            # XXX circular dependencies
+            from onegov.core import upgrade
+
             # this is important because CREATE SCHEMA is done in a possibly
             # dangerous way!
             assert self.is_valid_schema(schema)
@@ -326,11 +329,14 @@ class SessionManager(object):
             self.create_schema_if_not_exists(schema)
 
             conn = self.engine.execution_options(schema=schema)
+            declared_classes = set()
 
             try:
                 for base in self.bases:
                     base.metadata.schema = schema
                     base.metadata.create_all(conn)
+
+                    declared_classes.update(base._decl_class_registry.values())
 
                 conn.execute('COMMIT')
             finally:
@@ -338,5 +344,21 @@ class SessionManager(object):
                 # sticks around otherwise and haunts us in the tests
                 for base in self.bases:
                     base.metadata.schema = None
+
+            # if we have an upgrade state table, we want to prefill it with
+            # all the current modules/tasks, to get the correct initial update
+            # state (see https://github.com/OneGov/onegov.core/issues/8)
+            #
+            # we usually want to do that, but during testing, those upgrade
+            # state classes may not exist, that's why we check
+            if upgrade.UpgradeState in declared_classes:
+
+                # we use a special session that is not registered with the
+                # zope transaction extension -> we do this during a request
+                # and we don't want the whole request to be commited, just
+                # this small change.
+                session = sessionmaker(bind=self.engine)()
+                upgrade.register_all_modules_and_tasks(session)
+                session.commit()
 
             self.created_schemas.add(schema)

@@ -211,7 +211,7 @@ def get_tasks(upgrade_modules=None):
     return ordered_tasks
 
 
-def register_modules(request, modules, tasks):
+def register_modules(session, modules, tasks):
     """ Sets up the state tracking for all modules. Initially, all tasks
     are marekd as executed, because we assume tasks to upgrade older
     deployments to a new deployment.
@@ -225,9 +225,6 @@ def register_modules(request, modules, tasks):
     This function is idempotent.
 
     """
-
-    # add all modules and all their tasks
-    session = request.app.session()
 
     for module, upgrade_module in modules:
         query = session.query(UpgradeState)
@@ -246,6 +243,11 @@ def register_modules(request, modules, tasks):
         )
 
     session.flush()
+
+
+def register_all_modules_and_tasks(session):
+    """ Registers all the modules and all the tasks. """
+    register_modules(session, get_upgrade_modules(), get_tasks())
 
 
 class UpgradeTransaction(object):
@@ -338,7 +340,7 @@ class UpgradeRunner(object):
         return self.states[module]
 
     def register_modules(self, request):
-        register_modules(request, self.modules, self.tasks)
+        register_modules(request.app.session(), self.modules, self.tasks)
 
         if self.commit:
             transaction.commit()
