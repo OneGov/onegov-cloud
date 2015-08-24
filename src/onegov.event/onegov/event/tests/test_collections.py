@@ -1,3 +1,4 @@
+# coding=utf-8
 from datetime import date, datetime, timedelta
 from mock import patch
 from onegov.event import EventCollection, Occurrence, OccurrenceCollection
@@ -371,3 +372,54 @@ def test_unique_names(session):
 
         occurrence = occurrences.by_name('squirrel-park-visit-6-2015-06-20')
         assert occurrence == event.occurrences[4]
+
+
+def test_unicode(session):
+    with patch.object(EventCollection, 'remove_old_events') as mock_method:
+        event = EventCollection(session).add(
+            title=u'Salon du mieux-vivre, 16e édition',
+            start=datetime(2015, 6, 16, 9, 30),
+            end=datetime(2015, 6, 16, 18, 00),
+            timezone=u'Europe/Zurich',
+            content={
+                'description': u'Rendez-vous automnal des médecines.'
+            },
+            location=u'Salon du mieux-vivre à Saignelégier',
+            tags=[u'salons', u'congrès'],
+        )
+        event.submit()
+        event.publish()
+        event = EventCollection(session).add(
+            title=u'Témoins de Jéhovah',
+            start=datetime(2015, 6, 18, 14, 00),
+            end=datetime(2015, 6, 18, 16, 00),
+            timezone='Europe/Zurich',
+            content={
+                'description': u'Congrès en français et espagnol.'
+            },
+            location=u'Salon du mieux-vivre à Saignelégier',
+            tags=[u'témoins']
+        )
+        event.submit()
+        event.publish()
+
+        occurrences = OccurrenceCollection(session)
+
+        assert occurrences.query().count() == 2
+
+        tags = occurrences.used_tags
+        assert sorted(tags) == [u'congrès', u'salons', u'témoins']
+
+        occurrence = occurrences.query(tags=[u'congrès']).one()
+        assert occurrence.title == u'Salon du mieux-vivre, 16e édition'
+        assert occurrence.location == u'Salon du mieux-vivre à Saignelégier'
+        assert sorted(occurrence.tags) == [u'congrès', u'salons']
+        event = occurrence.event
+        assert event.description == u'Rendez-vous automnal des médecines.'
+
+        occurrence = occurrences.query(tags=[u'témoins']).one()
+        assert occurrence.title == u'Témoins de Jéhovah'
+        assert occurrence.location == u'Salon du mieux-vivre à Saignelégier'
+        assert occurrence.tags == [u'témoins']
+        event = occurrence.event
+        assert event.description == u'Congrès en français et espagnol.'

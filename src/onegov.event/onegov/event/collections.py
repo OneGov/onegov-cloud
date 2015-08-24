@@ -172,7 +172,14 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
 
     @cached_property
     def used_tags(self):
-        """ Returns a list of all the tags used by the occurrences. """
+        """ Returns a list of all the tags used by the occurrences.
+
+        This could be solve possibly more effienciently with the skey function
+        currently not supported by SQLAlchemy (e.g.
+        ``select distinct(skeys(tags))``), see
+        http://stackoverflow.com/q/12015942/3690178
+
+        """
         tags = []
         for result in self.session.query(distinct(Occurrence._tags.keys())):
             tags.extend(result[0])
