@@ -51,7 +51,7 @@ def test_create_event(session):
     title = 'Squirrel Park Visit'
     description = '<em>Furry</em> things will happen!'
     location = 'Squirrel Park'
-    tags = 'fun, animals, furry'
+    tags = ['fun', 'animals', 'furry']
 
     event = Event(state='initiated')
     event.timezone = timezone
@@ -82,7 +82,7 @@ def test_create_event(session):
     assert str(event.localized_end.tzinfo) == timezone
     assert event.title == title
     assert event.location == location
-    assert event.tags == tags
+    assert sorted(event.tags) == sorted(tags)
     assert event.description == description
     assert event.content == {'description': description}
     assert event.meta == {'submitter': 'fat.pauly@squirrelpark.org'}
@@ -100,7 +100,7 @@ def test_create_event(session):
     assert str(occurrence.localized_end.tzinfo) == timezone
     assert occurrence.title == title
     assert occurrence.location == location
-    assert occurrence.tags == tags
+    assert sorted(occurrence.tags) == sorted(tags)
     assert occurrence.event.description == description
     assert occurrence.name == 'event-2008-02-07'
 
@@ -162,7 +162,7 @@ def test_create_event_recurring(session):
     title = 'Squirrel Park Visit'
     description = '<em>Furry</em> things will happen!'
     location = 'Squirrel Park'
-    tags = 'fun, animals, furry'
+    tags = ['fun', 'animals', 'furry']
 
     event = Event(state='initiated')
     event.timezone = timezone
@@ -195,7 +195,7 @@ def test_create_event_recurring(session):
     assert event.recurrence == 'RRULE:FREQ=DAILY;INTERVAL=2;COUNT=5'
     assert event.title == title
     assert event.location == location
-    assert event.tags == tags
+    assert sorted(event.tags) == sorted(tags)
     assert event.description == description
     assert event.content == {'description': description}
     assert event.meta == {'submitter': 'fat.pauly@squirrelpark.org'}
@@ -211,7 +211,7 @@ def test_create_event_recurring(session):
         assert str(occurrence.localized_end.tzinfo) == timezone
         assert occurrence.title == title
         assert occurrence.location == location
-        assert occurrence.tags == tags
+        assert sorted(occurrence.tags) == sorted(tags)
         assert occurrence.event.description == description
 
     assert occurrences[0].start == start
@@ -327,7 +327,7 @@ def test_update_event(session):
     event.title = 'Squirrel Park Visit'
     event.content = {'description': '<em>Furry</em> things will happen!'}
     event.location = 'Squirrel Park'
-    event.tags = 'fun, animals, furry'
+    event.tags = ['fun', 'animals', 'furry']
     event.name = 'event'
     session.add(event)
 
@@ -344,8 +344,8 @@ def test_update_event(session):
     assert occurence.event.description == event.content['description']
     assert occurence.event.location == event.location
     assert occurence.location == event.location
-    assert occurence.event.tags == event.tags
-    assert occurence.tags == event.tags
+    assert sorted(occurence.event.tags) == sorted(event.tags)
+    assert sorted(occurence.tags) == sorted(event.tags)
     assert occurence.name == 'event-2008-02-07'
 
     event.start = tzdatetime(2009, 2, 7, 10, 15, timezone)
@@ -353,7 +353,7 @@ def test_update_event(session):
     event.title = 'Squirrel Park Visit - Cancelled'
     event.content = {'description': 'No <em>Furry</em> things will happen! :('}
     event.location = '-'
-    event.tags = 'no fun, no animals'
+    event.tags = ['no fun', 'no animals']
 
     assert len(session.query(Event).one().occurrences) == 1
     occurence = session.query(Event).one().occurrences[0]
@@ -366,8 +366,8 @@ def test_update_event(session):
     assert occurence.event.description == event.content['description']
     assert occurence.event.location == event.location
     assert occurence.location == event.location
-    assert occurence.event.tags == event.tags
-    assert occurence.tags == event.tags
+    assert sorted(occurence.event.tags) == sorted(event.tags)
+    assert sorted(occurence.tags) == sorted(event.tags)
 
     event.recurrence = 'RRULE:FREQ=DAILY;INTERVAL=1;COUNT=2'
     occurrences = session.query(Event).one().occurrences

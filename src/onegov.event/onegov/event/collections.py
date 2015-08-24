@@ -5,6 +5,7 @@ from onegov.core.utils import normalize_for_url, increment_name
 from onegov.event.models import Event, Occurrence
 from sedate import as_datetime, replace_timezone, standardize_date
 from sqlalchemy import and_, distinct, or_
+from sqlalchemy.dialects.postgresql import array
 
 
 class EventCollectionPagination(Pagination):
@@ -172,10 +173,9 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
     @cached_property
     def used_tags(self):
         """ Returns a list of all the tags used by the occurrences. """
-        # todo: optimize this with hstore
         tags = []
-        for occurrence in self.session.query(Occurrence):
-            tags.extend([tag.strip() for tag in occurrence.tags.split(',')])
+        for result in self.session.query(distinct(Occurrence._tags.keys())):
+            tags.extend(result[0])
 
         return sorted(set(tags))
 
@@ -225,10 +225,8 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
 
             query = query.filter(or_(*expressions))
 
-        if tags is not None:
-            query = query.filter(or_(*(
-                Occurrence.tags.like('%{0}%'.format(tag)) for tag in tags
-            )))
+        if tags:
+            query = query.filter(Occurrence._tags.has_any(array(tags)))
 
         query = query.order_by(Occurrence.start)
 

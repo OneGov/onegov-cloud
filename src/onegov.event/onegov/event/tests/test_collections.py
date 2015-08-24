@@ -22,7 +22,7 @@ def test_event_collection(session):
                 'description': '<em>Furry</em> things will happen!'
             },
             location='Squirrel Park',
-            tags='fun, animals',
+            tags=['fun', 'animals'],
             recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
         )
         event_1.submit()
@@ -36,7 +36,7 @@ def test_event_collection(session):
                 'description': 'Learn how the Park got so <em>furry</em>!'
             },
             location='Squirrel Park',
-            tags='history'
+            tags=['history']
         )
         event_2.submit()
         event_2.publish()
@@ -115,7 +115,7 @@ def test_event_collection_pagination(session):
                     start=datetime(year, month, 18, 14, 00),
                     end=datetime(year, month, 18, 16, 00),
                     timezone='US/Eastern',
-                    tags='year-{0}, month-{1}'.format(year, month),
+                    tags=['month-{0}'.format(month)],
                     recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4'
                 )
                 event.submit()
@@ -164,7 +164,7 @@ def test_occurrence_collection(session):
                 'description': '<em>Furry</em> things will happen!'
             },
             location='Squirrel Park',
-            tags='fun, park, animals',
+            tags=['fun', 'park', 'animals'],
             recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
         )
         event.submit()
@@ -178,7 +178,7 @@ def test_occurrence_collection(session):
                 'description': 'Learn how the Park got so <em>furry</em>!'
             },
             location='Squirrel Park',
-            tags='history'
+            tags=['history']
         )
         event.submit()
         event.publish()
@@ -234,7 +234,7 @@ def test_occurrence_collection_pagination(session):
                     start=datetime(year, month, 18, 14, 00),
                     end=datetime(year, month, 18, 16, 00),
                     timezone='US/Eastern',
-                    tags='year-{0}, month-{1}'.format(year, month),
+                    tags=['month-{0}'.format(month)],
                     recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4'
                 )
                 event.submit()
@@ -267,6 +267,7 @@ def test_occurrence_collection_pagination(session):
 
         occurrences = OccurrenceCollection(session,
                                            tags=['month-7', 'month-8'])
+
         assert occurrences.subset_count == 8
         assert all([o.start.year == 2009 and o.start.month in [7, 8]
                     for o in occurrences.batch])

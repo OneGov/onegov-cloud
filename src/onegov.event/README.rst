@@ -1,7 +1,12 @@
 Onegov Events
 =============
 
-Calender of events for OneGov.
+Calendar of events for OneGov.
+
+Requirements
+------------
+This package requires the `PostgreSQL HSTORE extension <http://www.postgresql.org/docs/9.4/static/hstore.html>`_.
+
 
 Run the Tests
 -------------

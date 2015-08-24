@@ -5,6 +5,8 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
 from sedate import standardize_date, to_timezone
 from sqlalchemy import Column, Enum, ForeignKey, Text, String
+from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import backref, relationship
 from uuid import uuid4
 
@@ -29,7 +31,15 @@ class OccurrenceMixin(object):
     location = Column(Text, nullable=True)
 
     #: tags (categories) of the event
-    tags = Column(Text, nullable=True)
+    _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
+
+    @property
+    def tags(self):
+        return list(self._tags.keys()) if self._tags else []
+
+    @tags.setter
+    def tags(self, value):
+        self._tags = dict(((key.strip(), '') for key in value))
 
     #: timezone of the event
     timezone = Column(String, nullable=False)
@@ -47,11 +57,6 @@ class OccurrenceMixin(object):
     @property
     def localized_end(self):
         return to_timezone(self.end, self.timezone)
-
-    # todo: remove me with hstore!
-    @property
-    def display_tags(self):
-        return [tag.strip() for tag in self.tags.split(',')]
 
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
