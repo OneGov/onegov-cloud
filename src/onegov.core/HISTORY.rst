@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.25 (2015-08-24)
+~~~~~~~~~~~~~~~~~~~
 
 - The upgrades table is now prefilled with all modules and tasks, when the
   schema is first created. Fixes #8.
