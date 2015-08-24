@@ -40,11 +40,11 @@ def test_upgrade_task_requirements():
     class Two(object):
 
         @upgrade_task(name='New Field', requires='one:Init Database')
-        def init(request):
+        def new_field(request):
             pass
 
         @upgrade_task(name='Destroy Database', requires='two:New Field')
-        def destroy(request):
+        def destroy_database(request):
             pass
 
     class One(object):
