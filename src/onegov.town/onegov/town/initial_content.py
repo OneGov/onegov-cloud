@@ -143,7 +143,7 @@ def add_events(session):
         start=start + timedelta(hours=11, minutes=0),
         end=start + timedelta(hours=22, minutes=0),
         timezone="Europe/Zurich",
-        tags=u"Freizeit, Fest",
+        tags=[u"Freizeit", u"Fest"],
         location=u"Sportanlage",
         content={"description": u"Lorem ipsum."},
     )
@@ -154,7 +154,7 @@ def add_events(session):
         start=start + timedelta(days=2, hours=20, minutes=0),
         end=start + timedelta(days=2, hours=22, minutes=30),
         timezone="Europe/Zurich",
-        tags=u"Politik",
+        tags=[u"Politik"],
         location=u"Gemeindesaal",
         content={"description": u"Lorem ipsum."},
     )
@@ -170,7 +170,7 @@ def add_events(session):
             )
         ),
         timezone="Europe/Zurich",
-        tags=u"Freizeit, Sport",
+        tags=[u"Freizeit", u"Sport"],
         location=u"Turnhalle",
         content={"description": u"Lorem ipsum."},
     )
@@ -181,7 +181,7 @@ def add_events(session):
         start=start + timedelta(days=7, hours=10, minutes=0),
         end=start + timedelta(days=7, hours=18, minutes=0),
         timezone="Europe/Zurich",
-        tags=u"Freizeit, Sport",
+        tags=[u"Freizeit", u"Sport"],
         location=u"Sportanlage",
         content={"description": u"Lorem ipsum."},
     )

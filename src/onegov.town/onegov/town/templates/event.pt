@@ -19,7 +19,7 @@
             <dt i18n:translate="">Tags</dt>
             <dd>
                 <ul>
-                    <li tal:repeat="tag event.display_tags">${tag}</li>
+                    <li tal:repeat="tag event.tags">${tag}</li>
                 </ul>
             </dd>
 

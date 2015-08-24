@@ -134,7 +134,7 @@ class EventForm(Form):
             'description': self.description.data
         }
         model.location = self.location.data
-        model.tags = ', '.join(self.tags.data)
+        model.tags = self.tags.data
         model.timezone = 'Europe/Zurich'
         model.start = replace_timezone(
             datetime(
@@ -181,7 +181,7 @@ class EventForm(Form):
         self.title.data = model.title
         self.description.data = model.description
         self.location.data = model.location
-        self.tags.data = model.display_tags
+        self.tags.data = model.tags
         self.start_time.data = model.localized_start.time()
         self.end_time.data = model.localized_end.time()
         self.start_date.data = model.localized_start.date()
