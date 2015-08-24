@@ -162,6 +162,7 @@ def get_tasks_by_id(upgrade_modules=None):
     """
 
     tasks = {}
+    fn_names = set()
 
     for distribution, upgrade_module in upgrade_modules:
 
@@ -170,6 +171,11 @@ def get_tasks_by_id(upgrade_modules=None):
 
             assert task_id not in tasks, "Duplicate task"
             tasks[task_id] = function
+
+            # make sure we don't have duplicate function names - it works, but
+            # it makes debugging harder
+            assert function.__name__ not in fn_names, "Duplicate function name"
+            fn_names.add(function.__name__)
 
     return tasks
 

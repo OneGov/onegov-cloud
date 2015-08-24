@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Ensures unique upgrade task function names. See #8.
+  [href]
+
 0.4.24 (2015-08-20)
 ~~~~~~~~~~~~~~~~~~~
 

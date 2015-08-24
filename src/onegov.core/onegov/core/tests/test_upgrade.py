@@ -82,6 +82,24 @@ def test_upgrade_duplicate_tasks():
         get_tasks([('onegov.core.tests', MyUpgradeModule)])
 
 
+def test_upgrade_duplicate_function_names():
+
+    class Foo(object):
+
+        @upgrade_task(name='Foo')
+        def task(request):
+            pass
+
+    class Bar(object):
+
+        @upgrade_task(name='Bar')
+        def task(request):
+            pass
+
+    with pytest.raises(AssertionError):
+        get_tasks([('foo', Foo), ('bar', Bar)])
+
+
 def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
 
     config = os.path.join(temporary_directory, 'test.yml')
