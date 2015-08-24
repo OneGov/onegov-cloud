@@ -131,7 +131,7 @@ class TownApp(Framework, LibresIntegration):
 
         dropzone = Bundle(
             'js/dropzone.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/dropzone.bundle.js'
         )
 
@@ -155,7 +155,7 @@ class TownApp(Framework, LibresIntegration):
             'js/imagemanager.js',
             'js/redactor.de.js',
             'js/editor.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/editor.bundle.js'
         )
 
@@ -164,7 +164,7 @@ class TownApp(Framework, LibresIntegration):
             'js/ace-mode-form.js',
             'js/ace-theme-tomorrow.js',
             'js/code_editor.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/code_editor.bundle.js'
         )
 
@@ -180,7 +180,7 @@ class TownApp(Framework, LibresIntegration):
             confirm,
             'js/jquery.datetimepicker.js',
             'js/common.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/common.bundle.js'
         )
 
@@ -197,7 +197,7 @@ class TownApp(Framework, LibresIntegration):
             'js/fullcalendar.de.js',
             'js/jquery.popupoverlay.js',
             'js/fullcalendar_custom.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/fullcalendar.bundle.js'
         )
 
@@ -210,7 +210,7 @@ class TownApp(Framework, LibresIntegration):
         check_password = Bundle(
             'js/zxcvbn.js',
             'js/check_password.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/check_password.bundle.js'
         )
 

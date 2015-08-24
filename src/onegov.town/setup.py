@@ -37,7 +37,7 @@ setup(
         'click',
         'cssmin',
         'isodate',
-        'jsmin',
+        'rjsmin',
         'lazy-object-proxy',
         'lxml',
         'onegov.core>=0.4.25',

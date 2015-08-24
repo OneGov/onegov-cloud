@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Replaces the broken 'jsmin' filter with the not so broken 'rjsmin' filter.
+  [href]
+
 - Depends on latest onegov.core - with this release the upgrade tables should
   be set up correctly when creating new schemas.
   [href]
