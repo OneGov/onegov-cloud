@@ -2,9 +2,10 @@ import more.transaction
 import more.webassets
 import onegov.core
 import onegov.town
-import os.path
 import pytest
+import tempfile
 import transaction
+import shutil
 
 from morepath import setup
 from onegov.core.crypto import hash_password
@@ -20,8 +21,15 @@ def town_password():
     return hash_password('hunter2')
 
 
+@pytest.yield_fixture(scope='session')
+def filestorage():
+    directory = tempfile.mkdtemp()
+    yield directory
+    shutil.rmtree(directory)
+
+
 @pytest.yield_fixture(scope="function")
-def town_app(postgres_dsn, temporary_directory, town_password, smtpserver):
+def town_app(postgres_dsn, filestorage, town_password, smtpserver):
 
     config = setup()
     config.scan(more.transaction)
@@ -36,7 +44,7 @@ def town_app(postgres_dsn, temporary_directory, town_password, smtpserver):
         dsn=postgres_dsn,
         filestorage='fs.osfs.OSFS',
         filestorage_options={
-            'root_path': os.path.join(temporary_directory, 'file-storage'),
+            'root_path': filestorage,
             'create': True
         },
         identity_secure=False,
