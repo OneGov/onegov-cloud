@@ -1,8 +1,9 @@
 import pytest
 
-from datetime import date, datetime
+from datetime import date, datetime, time
 from dateutil.rrule import MO, WE
 from onegov.town.forms import DaypassAllocationForm, RoomAllocationForm
+from onegov.town.forms.allocation import AllocationFormHelpers
 
 
 @pytest.mark.parametrize('form_class', [
@@ -130,3 +131,59 @@ def test_room_except_for():
         (datetime(2015, 8, 4, 12), datetime(2015, 8, 4, 16)),
         (datetime(2015, 8, 6, 12), datetime(2015, 8, 6, 16)),
     ]
+
+
+def test_generate_dates():
+    helper = AllocationFormHelpers()
+
+    assert helper.generate_dates(date(2015, 1, 1), date(2015, 1, 1)) == [
+        (datetime(2015, 1, 1), datetime(2015, 1, 1))
+    ]
+
+    assert helper.generate_dates(date(2015, 1, 1), date(2015, 1, 2)) == [
+        (datetime(2015, 1, 1), datetime(2015, 1, 1)),
+        (datetime(2015, 1, 2), datetime(2015, 1, 2)),
+    ]
+
+    assert helper.generate_dates(
+        date(2015, 1, 4), date(2015, 1, 10), weekdays=[0, 1, 2]) == [
+            (datetime(2015, 1, 5), datetime(2015, 1, 5)),
+            (datetime(2015, 1, 6), datetime(2015, 1, 6)),
+            (datetime(2015, 1, 7), datetime(2015, 1, 7)),
+    ]
+
+
+def test_generate_datetimes():
+    helper = AllocationFormHelpers()
+
+    assert helper.generate_dates(
+        date(2015, 1, 1), date(2015, 1, 1), time(12, 0), time(16, 0)) == [
+            (datetime(2015, 1, 1, 12), datetime(2015, 1, 1, 16))
+    ]
+
+    assert helper.generate_dates(
+        date(2015, 1, 1), date(2015, 1, 2), time(12, 0), time(16, 0)) == [
+            (datetime(2015, 1, 1, 12), datetime(2015, 1, 1, 16)),
+            (datetime(2015, 1, 2, 12), datetime(2015, 1, 2, 16))
+    ]
+
+    assert helper.generate_dates(
+        date(2015, 1, 4), date(2015, 1, 10),
+        time(12, 0), time(16, 0), weekdays=[0, 1, 2]) == [
+            (datetime(2015, 1, 5, 12), datetime(2015, 1, 5, 16)),
+            (datetime(2015, 1, 6, 12), datetime(2015, 1, 6, 16)),
+            (datetime(2015, 1, 7, 12), datetime(2015, 1, 7, 16))
+    ]
+
+    assert helper.generate_dates(
+        date(2015, 1, 1), date(2015, 1, 2), time(12, 0), time(0, 0)) == [
+            (datetime(2015, 1, 1, 12), datetime(2015, 1, 2)),
+            (datetime(2015, 1, 2, 12), datetime(2015, 1, 3))
+    ]
+
+
+def test_as_time():
+    helper = AllocationFormHelpers()
+    assert helper.as_time('00:00') == time(0, 0)
+    assert helper.as_time('16:20') == time(16, 20)
+    assert helper.as_time('24:00') == time(0, 0)

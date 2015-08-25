@@ -33,25 +33,22 @@ def choices_as_integer(choices):
 
 class AllocationFormHelpers(object):
 
-    def generate_dates(self, start, end, start_time=None, end_time=None):
+    def generate_dates(self, start, end,
+                       start_time=None, end_time=None, weekdays=None):
         """ Takes the given dates and generates the date tuples using rrule.
         The `except_for` field will be considered if present.
 
         """
 
-        if start and end:
-            start = sedate.as_datetime(start)
-            end = sedate.as_datetime(end)
+        if not (start and end):
+            return []
+
+        start = start and sedate.as_datetime(start)
+        end = end and sedate.as_datetime(end)
 
         if start == end:
             dates = (start, )
         else:
-            if hasattr(self, 'except_for'):
-                exceptions = {x for x in (self.except_for.data or tuple())}
-                weekdays = [
-                    int(d[0]) for d in WEEKDAYS if d[0] not in exceptions
-                ]
-
             dates = rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
 
         if start_time is None or end_time is None:
@@ -70,19 +67,17 @@ class AllocationFormHelpers(object):
             ]
 
     def as_time(self, text):
+        """ Takes the given text and turns it into a time. """
         if text == '24:00':
             text = '00:00'
 
         return time(*(int(s) for s in text.split(':'))) if text else None
 
-    def combine_datetime(self, field, time_field=None):
+    def combine_datetime(self, field, time_field):
+        """ Takes the given date field and combines it with the given time
+        field. """
 
-        time_field = time_field or (field + '_time')
-
-        d, t = (
-            getattr(self, field).data,
-            getattr(self, time_field).data
-        )
+        d, t = getattr(self, field).data, getattr(self, time_field).data
 
         if d and not t:
             return sedate.as_datetime(d)
@@ -114,6 +109,12 @@ class AllocationForm(Form, AllocationFormHelpers):
             class_='oneline-checkboxes'
         )
     )
+
+    @property
+    def weekdays(self):
+        """ The rrule weekdays derived from the except_for field. """
+        exceptions = {x for x in (self.except_for.data or tuple())}
+        return [int(d[0]) for d in WEEKDAYS if d[0] not in exceptions]
 
     @property
     def dates(self):
@@ -164,7 +165,11 @@ class DaypassAllocationForm(AllocationForm):
 
     @property
     def dates(self):
-        return self.generate_dates(self.start.data, self.end.data)
+        return self.generate_dates(
+            self.start.data,
+            self.end.data,
+            weekdays=self.weekdays
+        )
 
     @property
     def quota(self):
@@ -246,7 +251,8 @@ class RoomAllocationForm(AllocationForm):
             self.start.data,
             self.end.data,
             self.as_time(self.start_time.data),
-            self.as_time(self.end_time.data)
+            self.as_time(self.end_time.data),
+            self.weekdays
         )
 
 
