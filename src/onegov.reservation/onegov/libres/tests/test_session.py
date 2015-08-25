@@ -1,24 +1,19 @@
 from datetime import datetime
 from libres import new_scheduler
 from morepath import setup
+from onegov.core.orm import Base
 from onegov.core.framework import Framework
 from onegov.libres import LibresIntegration, ResourceCollection
 from sqlalchemy import Column, Integer
-from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
 from uuid import uuid4
 
 
 def test_setup_database(postgres_dsn):
-    Base = declarative_base()
     config = setup()
 
     class App(Framework, LibresIntegration):
         testing_config = config
-
-    class Document(Base):
-        __tablename__ = 'documents'
-        id = Column(Integer, primary_key=True)
 
     @App.path(path='/')
     class Root(object):
@@ -57,19 +52,16 @@ def test_setup_database(postgres_dsn):
 
     tables = set(r[0] for r in tables.fetchall())
 
-    assert tables == {
-        'documents',
-        'resources',
-        'allocations',
-        'reserved_slots',
-        'reservations'
-    }
+    assert 'resources' in tables
+    assert 'allocations' in tables
+    assert 'reserved_slots' in tables
+    assert 'resources' in tables
+    assert 'forms' in tables
 
     app.session_manager.dispose()
 
 
 def test_libres_context(postgres_dsn):
-    Base = declarative_base()
 
     class App(Framework, LibresIntegration):
         pass
@@ -87,12 +79,11 @@ def test_libres_context(postgres_dsn):
 
     tables = set(r[0] for r in tables.fetchall())
 
-    assert tables == {
-        'allocations',
-        'resources',
-        'reserved_slots',
-        'reservations'
-    }
+    assert 'resources' in tables
+    assert 'allocations' in tables
+    assert 'reserved_slots' in tables
+    assert 'resources' in tables
+    assert 'forms' in tables
 
     scheduler = new_scheduler(app.libres_context, uuid4(), 'Europe/Zurich')
     assert scheduler.managed_allocations().count() == 0
@@ -105,7 +96,6 @@ def test_libres_context(postgres_dsn):
 
 
 def test_transaction_integration(postgres_dsn):
-    Base = declarative_base()
     config = setup()
 
     class App(Framework, LibresIntegration):

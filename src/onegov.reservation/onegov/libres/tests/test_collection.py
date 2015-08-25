@@ -1,6 +1,7 @@
 import pytest
 
 from datetime import date, datetime
+from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
 
 
@@ -62,3 +63,37 @@ def test_resource_highlight_allocations(libres_context):
 
     assert resource.date == date(2015, 8, 5)
     assert resource.highlights == [allocations[0].id]
+
+
+def test_resource_definitions(libres_context):
+    collection = ResourceCollection(libres_context)
+    resource = collection.add(
+        'Executive Lounge', 'Europe/Zurich',
+        form_definition="""
+            First Name * = ___
+            Last Name * = ___
+            E-Mail * = @@@
+        """
+    )
+
+    form_class = resource.form_definition.form_class
+    assert hasattr(form_class, 'first_name')
+    assert hasattr(form_class, 'last_name')
+    assert hasattr(form_class, 'e_mail')
+
+    forms = FormCollection(collection.session)
+    assert forms.definitions.query().count() == 1
+
+    resource.form_definition.definition = """
+        X * = ___
+        Y * = ___
+        E-Mail * = @@@
+    """
+
+    form_class = resource.form_definition.form_class
+    assert hasattr(form_class, 'x')
+    assert hasattr(form_class, 'y')
+    assert hasattr(form_class, 'e_mail')
+
+    collection.delete(resource)
+    assert forms.definitions.query().count() == 0

@@ -1,3 +1,4 @@
+from onegov.form import FormCollection
 from onegov.core.utils import normalize_for_url
 from onegov.libres.models import Resource
 from sqlalchemy import inspect
@@ -22,7 +23,8 @@ class ResourceCollection(object):
     def query(self):
         return self.session.query(Resource)
 
-    def add(self, title, timezone, type=None, name=None, meta={}, content={}):
+    def add(self, title, timezone,
+            type=None, name=None, meta={}, content={}, form_definition=None):
 
         # look up the right class depending on the type
         _mapper = inspect(Resource).polymorphic_map.get(type)
@@ -34,6 +36,16 @@ class ResourceCollection(object):
         resource.timezone = timezone
         resource.meta = meta
         resource.content = content
+
+        # create a form definition alongside the resource
+        if form_definition:
+            forms = FormCollection(self.session)
+            definition = forms.definitions.add(
+                title=resource.title,
+                definition=form_definition,
+                type='reservation'
+            )
+            resource.form_definition_name = definition.name
 
         self.session.add(resource)
         self.session.flush()
@@ -74,4 +86,11 @@ class ResourceCollection(object):
             scheduler.extinguish_managed_records()
 
         self.session.delete(resource)
+
+        if resource.form_definition_name:
+            FormCollection(self.session).definitions.delete(
+                resource.form_definition_name,
+                with_submissions=including_reservations
+            )
+
         self.session.flush()
