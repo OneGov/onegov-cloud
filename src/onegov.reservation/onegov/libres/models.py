@@ -3,8 +3,7 @@ from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.form import FormDefinition
-from sqlalchemy import Column, ForeignKey, Text
+from sqlalchemy import Column, Text
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -39,10 +38,6 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
     #: the timezone this resource resides in
     timezone = Column(Text, nullable=False)
 
-    #: the form definition used for the reservations
-    form_definition_name = Column(
-        Text, ForeignKey(FormDefinition.name), nullable=True)
-
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
@@ -57,10 +52,6 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
         cascade="all, delete-orphan",
         primaryjoin='Resource.id == Allocation.resource',
         foreign_keys='Allocation.resource'
-    )
-
-    form_definition = relationship(
-        FormDefinition
     )
 
     #: the date to jump to in the view (if not None) -> not in the db!
@@ -79,11 +70,3 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
         assert self.timezone, "the timezone needs to be set"
 
         return new_scheduler(libres_context, self.id, self.timezone)
-
-
-class ReservationFormDefinition(FormDefinition):
-    """ Reservation form definition base on onegov.form. Transparently used
-    by the resource to define custom formcode.
-
-    """
-    __mapper_args__ = {'polymorphic_identity': 'reservation'}

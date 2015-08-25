@@ -4,14 +4,6 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Adds the ability to set a form definition for the resource. If one is set,
-  the resource collection will automatically create a onegov.form definition
-  record.
-
-  The idea is to use the onegov.form mechanisms for reservations with custom
-  fields.
-  [href]
-
 0.0.4 (2015-08-20)
 ~~~~~~~~~~~~~~~~~~~
 
