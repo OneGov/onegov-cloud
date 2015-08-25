@@ -1,14 +1,15 @@
 import sedate
 
-from datetime import datetime, time, timedelta
+from datetime import datetime, timedelta
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from onegov.form import Form, with_options
-from onegov.form.parser.core import FieldDependency
 from onegov.form.fields import MultiCheckboxField, MultiCheckboxWidget
+from onegov.form.parser.core import FieldDependency
 from onegov.town import _
-from wtforms.validators import DataRequired, InputRequired
+from onegov.town import utils
 from wtforms.fields import RadioField, TextField
 from wtforms.fields.html5 import DateField, IntegerField
+from wtforms.validators import DataRequired, InputRequired
 from wtforms.widgets import TextInput
 from wtforms_components import If
 
@@ -66,13 +67,6 @@ class AllocationFormHelpers(object):
                 ) for d in dates
             ]
 
-    def as_time(self, text):
-        """ Takes the given text and turns it into a time. """
-        if text == '24:00':
-            text = '00:00'
-
-        return time(*(int(s) for s in text.split(':'))) if text else None
-
     def combine_datetime(self, field, time_field):
         """ Takes the given date field and combines it with the given time
         field. """
@@ -85,7 +79,7 @@ class AllocationFormHelpers(object):
         if not t:
             return None
 
-        return datetime.combine(d, self.as_time(t))
+        return datetime.combine(d, utils.as_time(t))
 
 
 class AllocationForm(Form, AllocationFormHelpers):
@@ -250,8 +244,8 @@ class RoomAllocationForm(AllocationForm):
         return self.generate_dates(
             self.start.data,
             self.end.data,
-            self.as_time(self.start_time.data),
-            self.as_time(self.end_time.data),
+            utils.as_time(self.start_time.data),
+            utils.as_time(self.end_time.data),
             self.weekdays
         )
 

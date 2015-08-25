@@ -16,6 +16,7 @@ from onegov.town.forms.reset_password import (
     RequestPasswordResetForm,
     PasswordResetForm
 )
+from onegov.town.forms.reservation import ReservationForm
 from onegov.town.forms.resource import ResourceForm
 from onegov.town.forms.settings import SettingsForm
 
@@ -30,6 +31,7 @@ __all__ = [
     'PageForm',
     'PasswordResetForm',
     'PersonForm',
+    'ReservationForm',
     'ResourceForm',
     'RequestPasswordResetForm',
     'RoomAllocationForm',

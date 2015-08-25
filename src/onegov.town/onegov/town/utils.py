@@ -9,6 +9,14 @@ from onegov.town import _
 from onegov.town.elements import DeleteLink, Link
 
 
+def as_time(text):
+    """ Takes the given text and turns it into a time. """
+    if text == '24:00':
+        text = '00:00'
+
+    return time(*(int(s) for s in text.split(':'))) if text else None
+
+
 def mark_images(html):
     """ Takes the given html and marks every paragraph with an 'has-img'
     class, if the paragraph contains an img element.
