@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.10 (2015-08-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Replaces the broken 'jsmin' filter with the not so broken 'rjsmin' filter.
   [href]
 
