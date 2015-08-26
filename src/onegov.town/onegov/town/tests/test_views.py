@@ -978,10 +978,10 @@ def test_resource_slots(town_app):
 
     client = Client(town_app)
 
-    url = '/reservation/foo/slots'
+    url = '/ressource/foo/slots'
     assert client.get(url).json == []
 
-    url = '/reservation/foo/slots?start=2015-08-04&end=2015-08-05'
+    url = '/ressource/foo/slots?start=2015-08-04&end=2015-08-05'
     result = client.get(url).json
 
     assert len(result) == 2
@@ -996,7 +996,7 @@ def test_resource_slots(town_app):
     assert result[1]['className'] == 'event-available'
     assert result[1]['title'] == u"Ganztägig\nVerfügbar"
 
-    url = '/reservation/foo/slots?start=2015-08-06&end=2015-08-06'
+    url = '/ressource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
@@ -1012,7 +1012,7 @@ def test_resources(town_app):
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
-    resources = client.get('/reservationen')
+    resources = client.get('/ressourcen')
     assert 'SBB-Tageskarte' in resources
 
     resource = resources.click('SBB-Tageskarte')
@@ -1029,9 +1029,9 @@ def test_resources(town_app):
     edit.form['title'] = 'Besprechungsraum'
     edit.form.submit()
 
-    assert 'Besprechungsraum' in client.get('/reservationen')
+    assert 'Besprechungsraum' in client.get('/ressourcen')
 
-    assert client.delete('/reservation/meeting-room').status_code == 200
+    assert client.delete('/ressource/meeting-room').status_code == 200
 
 
 def test_clipboard(town_app):
@@ -1133,7 +1133,7 @@ def test_allocations(town_app):
 
     # create a new daypass allocation
     new = client.get((
-        '/reservation/sbb-tageskarte/neue-einteilung'
+        '/ressource/sbb-tageskarte/neue-einteilung'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1143,7 +1143,7 @@ def test_allocations(town_app):
 
     # view the daypasses
     slots = client.get((
-        '/reservation/sbb-tageskarte/slots'
+        '/ressource/sbb-tageskarte/slots'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1156,7 +1156,7 @@ def test_allocations(town_app):
     edit.form.submit()
 
     slots = client.get((
-        '/reservation/sbb-tageskarte/slots'
+        '/ressource/sbb-tageskarte/slots'
         '?start=2015-08-04&end=2015-08-04'
     ))
 
@@ -1165,7 +1165,7 @@ def test_allocations(town_app):
 
     # try to create a new allocation over an existing one
     new = client.get((
-        '/reservation/sbb-tageskarte/neue-einteilung'
+        '/ressource/sbb-tageskarte/neue-einteilung'
         '?start=2015-08-04&end=2015-08-04'
     ))
 
@@ -1177,7 +1177,7 @@ def test_allocations(town_app):
 
     # move the existing allocations
     slots = client.get((
-        '/reservation/sbb-tageskarte/slots'
+        '/ressource/sbb-tageskarte/slots'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1191,7 +1191,7 @@ def test_allocations(town_app):
 
     # get the new slots
     slots = client.get((
-        '/reservation/sbb-tageskarte/slots'
+        '/ressource/sbb-tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1202,7 +1202,7 @@ def test_allocations(town_app):
 
     # get the new slots
     slots = client.get((
-        '/reservation/sbb-tageskarte/slots'
+        '/ressource/sbb-tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1213,7 +1213,7 @@ def test_allocations(town_app):
 
     # get the new slots
     slots = client.get((
-        '/reservation/sbb-tageskarte/slots'
+        '/ressource/sbb-tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1228,12 +1228,12 @@ def test_allocation_times(town_app):
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
-    new = client.get('/reservationen').click('Raum')
+    new = client.get('/ressourcen').click('Raum')
     new.form['title'] = 'Meeting Room'
     new.form.submit()
 
     # 12:00 - 24:00
-    new = client.get('/reservation/meeting-room/neue-einteilung')
+    new = client.get('/ressource/meeting-room/neue-einteilung')
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
@@ -1242,7 +1242,7 @@ def test_allocation_times(town_app):
     new.form.submit()
 
     slots = client.get(
-        '/reservation/meeting-room/slots?start=2015-08-20&end=2015-08-20'
+        '/ressource/meeting-room/slots?start=2015-08-20&end=2015-08-20'
     )
 
     assert len(slots.json) == 1
@@ -1250,7 +1250,7 @@ def test_allocation_times(town_app):
     assert slots.json[0]['end'] == '2015-08-21T00:00:00+02:00'
 
     # 00:00 - 02:00
-    new = client.get('/reservation/meeting-room/neue-einteilung')
+    new = client.get('/ressource/meeting-room/neue-einteilung')
     new.form['start'] = '2015-08-22'
     new.form['end'] = '2015-08-22'
     new.form['start_time'] = '00:00'
@@ -1259,7 +1259,7 @@ def test_allocation_times(town_app):
     new.form.submit()
 
     slots = client.get(
-        '/reservation/meeting-room/slots?start=2015-08-22&end=2015-08-22'
+        '/ressource/meeting-room/slots?start=2015-08-22&end=2015-08-22'
     )
 
     assert len(slots.json) == 1
@@ -1267,7 +1267,7 @@ def test_allocation_times(town_app):
     assert slots.json[0]['end'] == '2015-08-22T02:00:00+02:00'
 
     # 12:00 - 24:00 over two days
-    new = client.get('/reservation/meeting-room/neue-einteilung')
+    new = client.get('/ressource/meeting-room/neue-einteilung')
     new.form['start'] = '2015-08-24'
     new.form['end'] = '2015-08-25'
     new.form['start_time'] = '12:00'
@@ -1276,7 +1276,7 @@ def test_allocation_times(town_app):
     new.form.submit()
 
     slots = client.get(
-        '/reservation/meeting-room/slots?start=2015-08-24&end=2015-08-25'
+        '/ressource/meeting-room/slots?start=2015-08-24&end=2015-08-25'
     )
 
     assert len(slots.json) == 2
