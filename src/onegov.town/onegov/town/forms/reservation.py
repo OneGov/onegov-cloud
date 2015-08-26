@@ -1,14 +1,19 @@
-from onegov.form import Form, parse_form
+from onegov.form import Form
 from onegov.town import _
 from wtforms.fields import TextField
-from wtforms.fields.html5 import IntegerField
-from wtforms.validators import InputRequired
+from wtforms.fields.html5 import EmailField, IntegerField
+from wtforms.validators import InputRequired, Email
 
 
 class ReservationForm(Form):
 
+    e_mail = EmailField(
+        label=_("E-Mail"),
+        validators=[InputRequired(), Email()]
+    )
+
     @classmethod
-    def for_allocation(cls, allocation, definition=None, *args, **kwargs):
+    def for_allocation(cls, allocation):
 
         class AdaptedReservationForm(cls):
             pass
@@ -36,7 +41,4 @@ class ReservationForm(Form):
                 default=1
             )
 
-        if definition:
-            form_class = parse_form(definition, base_class=form_class)
-
-        return form_class(*args, **kwargs)
+        return form_class

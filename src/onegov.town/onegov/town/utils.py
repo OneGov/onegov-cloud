@@ -146,7 +146,11 @@ class AllocationEventInfo(object):
 
     @property
     def event_actions(self):
-        yield Link(_("Reserve"), '#', classes=('new-reservation', ))
+        yield Link(
+            _("Reserve"),
+            self.request.link(self.allocation, name='reservieren'),
+            classes=('new-reservation', )
+        )
 
         if self.request.is_logged_in:
             yield Link(

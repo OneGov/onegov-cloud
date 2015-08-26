@@ -84,7 +84,12 @@
                 <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
             </tal:block>
         </tal:block>
-        <input type="submit" value="Submit" class="button" i18n:attributes="value">
+        <tal:block condition="not: button_text|nothing">
+            <input type="submit" value="Submit" class="button" i18n:attributes="value">
+        </tal:block>
+        <tal:block condition="button_text|nothing">
+            <input type="submit" value="${button_text}" class="button">
+        </tal:block>
     </form>
 </metal:search>
 
