@@ -78,6 +78,7 @@ def handle_new_resource(self, request, form, type):
 
     layout = ResourcesLayout(self, request)
     layout.include_editor()
+    layout.include_code_editor()
     layout.breadcrumbs.append(Link(RESOURCE_TYPES[type]['title'], '#'))
 
     return {
@@ -97,10 +98,12 @@ def handle_edit_resource(self, request, form):
         request.success(_(u"Your changes were saved"))
         return morepath.redirect(request.link(self))
 
-    form.apply_model(self)
+    elif not request.POST:
+        form.apply_model(self)
 
     layout = ResourceLayout(self, request)
     layout.include_editor()
+    layout.include_code_editor()
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
 
     return {

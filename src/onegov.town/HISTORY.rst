@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to define the reservation form on the resource.
+  [href]
+
 0.3.10 (2015-08-25)
 ~~~~~~~~~~~~~~~~~~~
 
