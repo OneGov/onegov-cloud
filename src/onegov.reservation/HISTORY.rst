@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.5 (2015-08-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a form definition field to the resource model.
   [href]
 
