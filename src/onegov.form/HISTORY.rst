@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.8 (2015-08-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an easier way for the often used "check if there's a required e-mail".
   [href]
 
