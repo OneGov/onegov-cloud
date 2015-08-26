@@ -68,7 +68,7 @@ def view_town(self, request):
     )
 
     event_layout = OccurrenceBaseLayout(self, request)
-    occurrences = OccurrenceCollection(session)
+    occurrences = OccurrenceCollection(session).query().limit(4)
     latest_events = LinkGroup(
         title=u"Veranstaltungen",
         links=[
@@ -78,7 +78,7 @@ def view_town(self, request):
                 subtitle=event_layout.format_date(occurrence.localized_start,
                                                   'event')
             )
-            for occurrence in occurrences.query().limit(4)
+            for occurrence in occurrences
         ]
     )
 
