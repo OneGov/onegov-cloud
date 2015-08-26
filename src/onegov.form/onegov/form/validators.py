@@ -4,7 +4,6 @@ import humanize
 from mimetypes import types_map
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms import ValidationError
-from wtforms.fields.html5 import EmailField
 
 
 class Stdnum(object):
@@ -122,11 +121,5 @@ class ValidFormDefinition(object):
                 raise ValidationError(field.gettext(self.message))
             else:
                 if self.require_email_field:
-                    matches = form.match_fields(
-                        include_classes=(EmailField, ),
-                        required=True,
-                        limit=1
-                    )
-
-                    if not matches:
+                    if not form.has_required_email_field:
                         raise ValidationError(field.gettext(self.email))
