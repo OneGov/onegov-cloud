@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an easier way for the often used "check if there's a required e-mail".
+  [href]
+
 - Adds the ability to add submissions whose form definitions are external.
   [href]
 

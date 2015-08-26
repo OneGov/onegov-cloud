@@ -5,6 +5,7 @@ from collections import OrderedDict
 from itertools import groupby
 from operator import itemgetter
 from wtforms import Form as BaseForm
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, DataRequired
 
 
@@ -87,6 +88,17 @@ class Form(BaseForm):
         if self.meta.csrf_field_name in self.errors:
             del self.errors[self.meta.csrf_field_name]
             self.csrf_token.errors = []
+
+    @property
+    def has_required_email_field(self):
+        """ Returns True if the form has a required e-mail field. """
+        matches = self.match_fields(
+            include_classes=(EmailField, ),
+            required=True,
+            limit=1
+        )
+
+        return matches and True or False
 
     def match_fields(self, include_classes=None, exclude_classes=None,
                      required=None, limit=None):
