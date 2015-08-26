@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to add submissions whose form definitions are external.
+  [href]
+
 0.6.7 (2015-08-18)
 ~~~~~~~~~~~~~~~~~~~
 

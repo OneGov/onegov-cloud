@@ -16,6 +16,7 @@ from onegov.form.models import (
     PendingFormSubmission,
     CompleteFormSubmission
 )
+from onegov.form.parser.core import parse_form
 
 __all__ = [
     'Form',
@@ -27,6 +28,7 @@ __all__ = [
     'FormSubmissionFile',
     'PendingFormSubmission',
     'CompleteFormSubmission',
+    'parse_form',
     'render_field',
     'with_options'
 ]

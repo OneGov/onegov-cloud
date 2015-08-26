@@ -133,10 +133,14 @@ class FormSubmissionCollection(object):
         return query
 
     def add(self, name, form, state):
-        """ Takes a form filled-out form instance and stores the submission
+        """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
         forms with this source may be stored).
+
+        This method expects the name of the form definition stored in the
+        database. Use :meth:`add_external` to add a submissions whose
+        definition is not stored in the form_definitions table.
 
         """
 
@@ -169,6 +173,19 @@ class FormSubmissionCollection(object):
         )
 
         return submission
+
+    def add_external(self, form, state):
+        """ Takes a filled-out form instance and stores the submission
+        in the database. The form instance is expected to have a ``_source``
+        parameter, which contains the source used to build the form (as only
+        forms with this source may be stored).
+
+        In contrast to :meth:`add`, this method is meant for submissions whose
+        definition is not stored in the form_definitions table.
+
+        """
+
+        return self.add(name=None, form=form, state=state)
 
     def complete_submission(self, submission):
         """ Changes the state to 'complete', if the data is valid. """

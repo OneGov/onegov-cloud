@@ -3,9 +3,10 @@ import pytest
 from datetime import datetime, timedelta
 from onegov.core.compat import BytesIO
 from onegov.form import (
+    CompleteFormSubmission,
     FormCollection,
     PendingFormSubmission,
-    CompleteFormSubmission
+    parse_form,
 )
 from onegov.form.models import FormSubmissionFile, hash_definition
 from onegov.form.errors import UnableToComplete
@@ -358,3 +359,20 @@ def test_get_current(session):
 
     assert not collection.submissions.by_id(submission.id, current_only=True)
     assert collection.submissions.by_id(submission.id, current_only=False)
+
+
+def test_add_externally_defined_submission(session):
+    collection = FormCollection(session)
+
+    form_class = parse_form("E-Mail *= @@@")
+    form = form_class(data={'e_mail': 'info@example.org'})
+
+    submission = collection.submissions.add_external(form, state='pending')
+
+    assert collection.definitions.query().count() == 0
+    assert collection.submissions.query().count() == 1
+
+    stored_form = submission.form_class(data=submission.data)
+
+    assert stored_form.e_mail.data == 'info@example.org'
+    assert stored_form.e_mail.data == form.e_mail.data

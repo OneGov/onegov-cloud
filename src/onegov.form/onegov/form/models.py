@@ -81,7 +81,7 @@ class FormSubmission(Base, TimestampMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: name of the form this submission belongs to
-    name = Column(Text, ForeignKey(FormDefinition.name), nullable=False)
+    name = Column(Text, ForeignKey(FormDefinition.name), nullable=True)
 
     #: the title of the submission, generated from the submitted fields
     #: NULL for submissions which are not complete
