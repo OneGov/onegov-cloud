@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The always run upgrade won't show up in the onegov.core upgrade output
+  anymore. Eventually we will remove this upgrade task.
+  [href]
+
 0.0.5 (2015-07-16)
 ~~~~~~~~~~~~~~~~~~~
 
