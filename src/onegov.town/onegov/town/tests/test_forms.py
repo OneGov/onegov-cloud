@@ -234,3 +234,15 @@ def test_reservation_form_quota():
     allocation.quota_limit = 0
     form = ReservationForm.for_allocation(allocation)
     assert hasattr(form, 'quota')
+
+
+def test_reservation_mixed_form():
+    allocation = Allocation()
+
+    allocation.quota = 2
+    allocation.quota_limit = 0
+    allocation.partly_available = False
+
+    form = ReservationForm.for_allocation(allocation, 'E-Mail *= ___')
+    assert hasattr(form, 'quota')
+    assert hasattr(form, 'e_mail')
