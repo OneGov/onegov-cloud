@@ -376,3 +376,13 @@ def test_add_externally_defined_submission(session):
 
     assert stored_form.e_mail.data == 'info@example.org'
     assert stored_form.e_mail.data == form.e_mail.data
+
+    # externally defined submission are not automatically removed
+    date = datetime.utcnow() + timedelta(seconds=60)
+
+    collection.submissions.remove_old_pending_submissions(older_than=date)
+    assert collection.submissions.query().count() == 1
+
+    collection.submissions.remove_old_pending_submissions(
+        older_than=date, include_external=True)
+    assert collection.submissions.query().count() == 0

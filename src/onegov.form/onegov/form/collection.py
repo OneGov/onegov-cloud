@@ -272,7 +272,8 @@ class FormSubmissionCollection(object):
             # are automatically propagated
             submission.data.changed()
 
-    def remove_old_pending_submissions(self, older_than):
+    def remove_old_pending_submissions(self, older_than,
+                                       include_external=False):
         """ Removes all pending submissions older than the given date. The
         date is expected to be in UTC!
 
@@ -287,6 +288,9 @@ class FormSubmissionCollection(object):
         submissions = submissions.filter(FormSubmission.state == 'pending')
         submissions = submissions.filter(
             FormSubmission.last_change < older_than)
+
+        if not include_external:
+            submissions = submissions.filter(FormSubmission.name != None)
 
         files = self.session.query(FormSubmissionFile)
         files = files.filter(FormSubmissionFile.submission_id.in_(
