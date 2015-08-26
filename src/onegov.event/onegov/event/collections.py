@@ -53,13 +53,16 @@ class EventCollection(EventCollectionPagination):
 
         return name
 
-    def add(self, title, start, end, timezone, **optional):
+    def add(self, title, start, end, timezone, autoclean=True, **optional):
         """ Add a new event.
 
         A unique, URL-friendly name is created automatically for this event
         using the title and optionally numbers for duplicate names.
 
-        Every time a new event is added, old, past events are deleted.
+        Every time a new event is added, old, past events are deleted unless
+        disabled with the ``autoclean`` option.
+
+        Returns the created event or None if already automatically deleted.
         """
         name = self.get_unique_name(title)
         event = Event(
@@ -75,9 +78,10 @@ class EventCollection(EventCollectionPagination):
         self.session.add(event)
         self.session.flush()
 
-        self.remove_old_events()
+        if autoclean:
+            self.remove_old_events()
 
-        return event
+        return self.query().filter(Event.id == event.id).first()
 
     def delete(self, event):
         """ Delete an event. """

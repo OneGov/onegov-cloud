@@ -10,6 +10,9 @@ Unreleased
 - Filter for current occurrences by default.
   [msom]
 
+- Add autoclean option to add event function.
+  [msom]
+
 0.0.1 (2015-08-20)
 ~~~~~~~~~~~~~~~~~~~
 
