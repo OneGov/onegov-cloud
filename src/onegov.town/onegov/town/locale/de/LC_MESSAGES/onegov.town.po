@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-20 11:44+0200\n"
+"POT-Creation-Date: 2015-08-26 16:41+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -35,8 +35,8 @@ msgstr "Tickets"
 msgid "Reservations"
 msgstr "Reservationen"
 
-msgid "Events"
-msgstr "Veranstaltungen"
+msgid "Edit allocation"
+msgstr "Einteilung bearbeiten"
 
 msgid "Logout"
 msgstr "Logout"
@@ -109,8 +109,11 @@ msgstr "Veranstaltung löschen"
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
 
-msgid "Publish event"
-msgstr "Veranstaltung veröffentlichen"
+msgid "Do you really want to delete this allocation?"
+msgstr "Möchten Sie diese Einteilung wirklich löschen?"
+
+msgid "Delete allocation"
+msgstr "Einteilung löschen"
 
 msgid "Close ticket"
 msgstr "Ticket abschliessen"
@@ -225,12 +228,6 @@ msgstr "Verfügbar"
 
 msgid "Unavailable"
 msgstr "Besetzt"
-
-msgid "Do you really want to delete this allocation?"
-msgstr "Möchten Sie diese Einteilung wirklich löschen?"
-
-msgid "Delete allocation"
-msgstr "Einteilung löschen"
 
 msgid ""
 "This allocation can't be deleted because there are existing reservations "
@@ -404,11 +401,17 @@ msgstr "Link zum Bild"
 msgid "Address"
 msgstr "Adresse"
 
+msgid "Quota"
+msgstr "Anzahl"
+
 msgid "New Password"
 msgstr "Neues Passwort"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
+
+msgid "Formdata"
+msgstr "Formulardaten"
 
 msgid "Name"
 msgstr "Name"
@@ -815,9 +818,6 @@ msgstr "Annehmen"
 msgid "New allocation"
 msgstr "Neue Einteilung"
 
-msgid "Edit allocation"
-msgstr "Einteilung bearbeiten"
-
 #, python-format
 msgid "Successfully added ${n} allocations"
 msgstr "${n} Einteilungen wurden hinzugefügt"
@@ -951,6 +951,22 @@ msgstr "Eine neue Person wurde hinzugefügt"
 
 msgid "New"
 msgstr "Neu"
+
+#, python-format
+msgid "New reservation for ${title}"
+msgstr "Neue Reservation für ${title}"
+
+msgid "Continue"
+msgstr "Weiter"
+
+msgid "Your reservation was completed"
+msgstr "Ihre Reservation wurde abgeschlossen"
+
+msgid "The reservation could not be completed"
+msgstr "Ihre Reservation konnte nicht abgeschlossen werden"
+
+msgid "Error"
+msgstr "Fehler"
 
 #, python-format
 msgid ""

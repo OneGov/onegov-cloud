@@ -85,7 +85,6 @@ def handle_reserve_allocation(self, request, form):
         'title': title,
         'form': form,
         'allocation': self,
-        'available': self.is_available,
         'button_text': _("Continue")
     }
 
@@ -116,7 +115,7 @@ def finalize_reservation(self, request):
         layout.breadcrumbs.append(Link(_("Error"), '#'))
 
         return {
-            'title': _("The reservation could not be finalized"),
+            'title': _("The reservation could not be completed"),
             'layout': ResourceLayout(resource, request),
         }
     else:

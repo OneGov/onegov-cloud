@@ -128,8 +128,8 @@ class AllocationEventInfo(object):
             else:
                 available = self.translate(
                     _("${num}/${max} Available", mapping={
-                        'num': quota,
-                        'max': quota_left
+                        'num': quota_left,
+                        'max': quota
                     })
                 )
 

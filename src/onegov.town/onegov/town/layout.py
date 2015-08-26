@@ -729,7 +729,7 @@ class OccurrenceLayout(OccurrenceBaseLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Reservations"), self.request.link(self.collection)),
-            Link(_("Edit Allocation"), '#')
+            Link(_("Edit allocation"), '#')
         ]
 
     @cached_property

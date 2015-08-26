@@ -22,7 +22,7 @@ class ResourceForm(Form):
         filters=[sanitize_html, mark_images])
 
     definition = TextAreaField(
-        label=_(u"Extra Formdata"),
+        label=_("Formdata"),
         validators=[
             validators.Optional(),
             ValidFormDefinition(require_email_field=False)
