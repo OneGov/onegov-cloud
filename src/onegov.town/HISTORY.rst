@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- All forms now retain the posted value if a validation error occurs.
+  [href]
+
 - Adds the ability to define the reservation form on the resource.
   [href]
 

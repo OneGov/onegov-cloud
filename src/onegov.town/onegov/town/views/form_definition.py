@@ -76,7 +76,7 @@ def handle_edit_definition(self, request, form):
 
         request.success(_("Your changes were saved"))
         return morepath.redirect(request.link(self))
-    else:
+    elif not request.POST:
         form.title.data = self.title
         form.definition.data = self.definition
         form.apply_model(self)

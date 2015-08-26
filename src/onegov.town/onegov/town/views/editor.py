@@ -72,7 +72,7 @@ def handle_edit_page(self, request, form):
         request.success(_(u"Your changes were saved"))
 
         return morepath.redirect(request.link(self.page))
-    else:
+    elif not request.POST:
         form.apply_model(self.page)
 
     site_title = self.page.trait_messages[self.trait]['edit_page_title']

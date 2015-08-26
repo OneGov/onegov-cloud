@@ -97,30 +97,31 @@ def handle_new_allocation(self, request, form):
 
             self.highlight_allocations(allocations)
             return morepath.redirect(request.link(self))
+    elif not request.POST:
+        start, end = utils.parse_fullcalendar_request(request, self.timezone)
+        whole_day = request.params.get('whole_day') == 'yes'
+
+        if start and end:
+            if whole_day:
+                form.start.data = start
+                form.end.data = end
+
+                if hasattr(form, 'as_whole_day'):
+                    form.as_whole_day.data = 'yes'
+            else:
+                form.start.data = start
+                form.end.data = end
+
+                if hasattr(form, 'as_whole_day'):
+                    form.as_whole_day.data = 'no'
+
+                if hasattr(form, 'start_time'):
+                    form.start_time.data = start.strftime('%H:%M')
+                    form.end_time.data = end.strftime('%H:%M')
 
     layout = ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("New allocation"), '#'))
-
-    start, end = utils.parse_fullcalendar_request(request, self.timezone)
-    whole_day = request.params.get('whole_day') == 'yes'
-
-    if start and end:
-        if whole_day:
-            form.start.data = start
-            form.end.data = end
-
-            if hasattr(form, 'as_whole_day'):
-                form.as_whole_day.data = 'yes'
-        else:
-            form.start.data = start
-            form.end.data = end
-
-            if hasattr(form, 'as_whole_day'):
-                form.as_whole_day.data = 'no'
-
-            if hasattr(form, 'start_time'):
-                form.start_time.data = start.strftime('%H:%M')
-                form.end_time.data = end.strftime('%H:%M')
+    layout.editbar_links = None
 
     return {
         'layout': layout,
@@ -156,19 +157,15 @@ def handle_edit_allocation(self, request, form):
             request.success(_("Your changes were saved"))
             resource.highlight_allocations([self])
             return morepath.redirect(request.link(resource))
+    elif not request.POST:
+        form.apply_model(self)
 
-    layout = ResourceLayout(resource, request)
-    layout.breadcrumbs.append(Link(_("Edit allocation"), '#'))
-
-    form.apply_model(self)
-
-    start, end = utils.parse_fullcalendar_request(request, self.timezone)
-
-    if start and end:
-        form.apply_dates(start, end)
+        start, end = utils.parse_fullcalendar_request(request, self.timezone)
+        if start and end:
+            form.apply_dates(start, end)
 
     return {
-        'layout': layout,
+        'layout': AllocationEditFormLayout(self, request),
         'title': _("Edit allocation"),
         'form': form
     }
