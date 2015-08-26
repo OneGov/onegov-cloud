@@ -22,7 +22,8 @@ class ResourceCollection(object):
     def query(self):
         return self.session.query(Resource)
 
-    def add(self, title, timezone, type=None, name=None, meta={}, content={}):
+    def add(self, title, timezone, type=None, name=None, meta={}, content={},
+            definition=None):
 
         # look up the right class depending on the type
         _mapper = inspect(Resource).polymorphic_map.get(type)
@@ -34,6 +35,7 @@ class ResourceCollection(object):
         resource.timezone = timezone
         resource.meta = meta
         resource.content = content
+        resource.definition = definition
 
         self.session.add(resource)
         self.session.flush()

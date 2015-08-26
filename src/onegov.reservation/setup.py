@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'libres>=0.1.1',
         'onegov.core>=0.4.0',
+        'onegov.form'
     ],
     extras_require=dict(
         test=[

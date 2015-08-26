@@ -3,8 +3,9 @@ from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.form import parse_form
 from sqlalchemy import Column, Text
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from uuid import uuid4
 
 
@@ -38,6 +39,9 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
     #: the timezone this resource resides in
     timezone = Column(Text, nullable=False)
 
+    #: the custom form definition used when creating a reservation
+    definition = Column(Text, nullable=True)
+
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
@@ -70,3 +74,22 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
         assert self.timezone, "the timezone needs to be set"
 
         return new_scheduler(libres_context, self.id, self.timezone)
+
+    @property
+    def form_class(self):
+        """ Parses the form definition and returns a form class. """
+
+        if not self.definition:
+            return None
+
+        return parse_form(self.definition)
+
+    @validates('definition')
+    def validate_definition(self, key, definition):
+        if not definition:
+            return
+
+        form_class = parse_form(definition)
+        assert form_class().has_required_email_field
+
+        return definition

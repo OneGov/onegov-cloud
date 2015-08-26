@@ -62,3 +62,24 @@ def test_resource_highlight_allocations(libres_context):
 
     assert resource.date == date(2015, 8, 5)
     assert resource.highlights == [allocations[0].id]
+
+
+def test_resource_form_definition(libres_context):
+    collection = ResourceCollection(libres_context)
+
+    with pytest.raises(AssertionError):
+        resource = collection.add(
+            title='Executive Lounge',
+            timezone='Europe/Zurich',
+            definition='Name *= ___'
+        )
+
+    resource = collection.add(
+        title='Executive Lounge',
+        timezone='Europe/Zurich',
+        definition='Mail *= @@@'
+    )
+    assert resource.form_class().mail is not None
+
+    resource.definition = None
+    assert resource.form_class is None
