@@ -1,13 +1,7 @@
 """ Contains the paths to the different models served by onegov.town. """
 
 from datetime import date
-from libres.db.models import Allocation
-from onegov.event import (
-    Event,
-    EventCollection,
-    Occurrence,
-    OccurrenceCollection
-)
+from libres.db.models import Allocation, Reservation
 from onegov.form import (
     FormDefinition,
     FormCollection,
@@ -140,12 +134,12 @@ def get_tickets(app, page=0, state='open'):
     return TicketCollection(app.session(), page, state)
 
 
-@TownApp.path(model=ResourceCollection, path='/reservationen')
+@TownApp.path(model=ResourceCollection, path='/ressourcen')
 def get_resources(app):
     return ResourceCollection(app.libres_context)
 
 
-@TownApp.path(model=Resource, path='/reservation/{name}',
+@TownApp.path(model=Resource, path='/ressource/{name}',
               converters=dict(date=date, highlights=[int]))
 def get_resource(app, name, date=None, highlights=tuple()):
 
@@ -167,6 +161,18 @@ def get_allocation(app, resource, id):
         # always get the master, even if another id is requested
         return allocation and allocation.get_master()
 
+
+@TownApp.path(model=Reservation, path='/reservation/{resource}/{id}')
+def get_reservation(app, resource, id):
+    scheduler = ResourceCollection(
+        app.libres_context).scheduler_by_id(resource)
+
+    if scheduler:
+        query = scheduler.managed_reservations()
+        query = query.filter(Reservation.id == id)
+
+        return query.first()
+    
 
 @TownApp.path(model=Clipboard, path='/clipboard/copy/{token}')
 def get_clipboard(request, token):

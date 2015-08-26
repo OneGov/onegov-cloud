@@ -22,8 +22,11 @@ class ResourceForm(Form):
         filters=[sanitize_html, mark_images])
 
     definition = TextAreaField(
-        label=_(u"Form Definition"),
-        validators=[validators.Optional(), ValidFormDefinition()],
+        label=_(u"Extra Formdata"),
+        validators=[
+            validators.Optional(),
+            ValidFormDefinition(require_email_field=False)
+        ],
         widget=with_options(TextArea, rows=32, **{'data-editor': 'form'}),
     )
 
