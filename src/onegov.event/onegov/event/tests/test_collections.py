@@ -192,31 +192,34 @@ def test_occurrence_collection(session):
         tags = occurrences.used_tags
         assert sorted(tags) == ['animals', 'fun', 'history', 'park']
 
-        assert occurrences.query().count() == 6
+        def query(**kwargs):
+            return occurrences.query(outdated=True, **kwargs)
 
-        assert occurrences.query(tags=['animals']).count() == 5
-        assert occurrences.query(tags=['park']).count() == 5
-        assert occurrences.query(tags=['park', 'fun']).count() == 5
-        assert occurrences.query(tags=['history']).count() == 1
-        assert occurrences.query(tags=['history', 'fun']).count() == 6
-        assert occurrences.query(tags=[]).count() == 6
+        assert query().count() == 6
 
-        assert occurrences.query(start=date(2015, 6, 17)).count() == 5
-        assert occurrences.query(start=date(2015, 6, 18)).count() == 4
-        assert occurrences.query(start=date(2015, 6, 19)).count() == 2
+        assert query(tags=['animals']).count() == 5
+        assert query(tags=['park']).count() == 5
+        assert query(tags=['park', 'fun']).count() == 5
+        assert query(tags=['history']).count() == 1
+        assert query(tags=['history', 'fun']).count() == 6
+        assert query(tags=[]).count() == 6
 
-        assert occurrences.query(end=date(2015, 6, 19)).count() == 5
-        assert occurrences.query(end=date(2015, 6, 18)).count() == 4
-        assert occurrences.query(end=date(2015, 6, 17)).count() == 2
+        assert query(start=date(2015, 6, 17)).count() == 5
+        assert query(start=date(2015, 6, 18)).count() == 4
+        assert query(start=date(2015, 6, 19)).count() == 2
 
-        assert occurrences.query(start=date(2015, 6, 17),
-                                 end=date(2015, 6, 18)).count() == 3
-        assert occurrences.query(start=date(2015, 6, 18),
-                                 end=date(2015, 6, 18)).count() == 2
+        assert query(end=date(2015, 6, 19)).count() == 5
+        assert query(end=date(2015, 6, 18)).count() == 4
+        assert query(end=date(2015, 6, 17)).count() == 2
 
-        assert occurrences.query(start=date(2015, 6, 18),
-                                 end=date(2015, 6, 18),
-                                 tags=['history']).count() == 1
+        assert query(start=date(2015, 6, 17),
+                     end=date(2015, 6, 18)).count() == 3
+        assert query(start=date(2015, 6, 18),
+                     end=date(2015, 6, 18)).count() == 2
+
+        assert query(start=date(2015, 6, 18),
+                     end=date(2015, 6, 18),
+                     tags=['history']).count() == 1
 
 
 def test_occurrence_collection_pagination(session):
@@ -244,50 +247,59 @@ def test_occurrence_collection_pagination(session):
                 if year > 2009:
                     event.withdraw()
 
+        class PatchedCollection(OccurrenceCollection):
+            def query(self, **kwargs):
+                return super(PatchedCollection, self).query(
+                    outdated=True, **kwargs
+                )
+
+        occurrences = PatchedCollection(session)
         assert occurrences.query().count() == 4*12
 
-        occurrences = OccurrenceCollection(session)
+        occurrences = PatchedCollection(session)
         assert occurrences.subset_count == 48
         assert all([o.start.year == 2009 for o in occurrences.batch])
 
-        occurrences = OccurrenceCollection(session, start=date(2009, 12, 1))
+        occurrences = PatchedCollection(session, start=date(2009, 12, 1))
         assert occurrences.subset_count == 4
         assert all([o.start.year == 2009 and o.start.month == 12
                     for o in occurrences.batch])
 
-        occurrences = OccurrenceCollection(session, end=date(2009, 1, 31))
+        occurrences = PatchedCollection(session, end=date(2009, 1, 31))
         assert occurrences.subset_count == 4
         assert all([o.start.year == 2009 and o.start.month == 1
                     for o in occurrences.batch])
 
-        occurrences = OccurrenceCollection(session, start=date(2009, 5, 1),
-                                           end=date(2009, 6, 30))
+        occurrences = PatchedCollection(session,
+                                        start=date(2009, 5, 1),
+                                        end=date(2009, 6, 30))
         assert occurrences.subset_count == 8
         assert all([o.start.year == 2009 and o.start.month in [5, 6]
                     for o in occurrences.batch])
 
-        occurrences = OccurrenceCollection(session,
-                                           tags=['month-7', 'month-8'])
+        occurrences = PatchedCollection(session, tags=['month-7', 'month-8'])
 
         assert occurrences.subset_count == 8
         assert all([o.start.year == 2009 and o.start.month in [7, 8]
                     for o in occurrences.batch])
 
-        occurrences = OccurrenceCollection(session, start=date(2009, 5, 1),
-                                           end=date(2009, 6, 30),
-                                           tags=['month-6'])
+        occurrences = PatchedCollection(session,
+                                        start=date(2009, 5, 1),
+                                        end=date(2009, 6, 30),
+                                        tags=['month-6'])
         assert occurrences.subset_count == 4
         assert all([o.start.year == 2009 and o.start.month == 6
                     for o in occurrences.batch])
 
-        occurrences = OccurrenceCollection(session).for_filter()
+        occurrences = PatchedCollection(session).for_filter()
         assert occurrences.start is None
         assert occurrences.end is None
         assert occurrences.tags == []
 
-        occurrences = OccurrenceCollection(session, start=date(2009, 5, 1),
-                                           end=date(2009, 6, 30),
-                                           tags=['month-6']).for_filter()
+        occurrences = PatchedCollection(session,
+                                        start=date(2009, 5, 1),
+                                        end=date(2009, 6, 30),
+                                        tags=['month-6']).for_filter()
         assert occurrences.start == date(2009, 5, 1)
         assert occurrences.end == date(2009, 6, 30)
         assert occurrences.tags == ['month-6']
@@ -321,6 +333,26 @@ def test_occurrence_collection_pagination(session):
         assert occurrences.start == date(2010, 5, 1)
         assert occurrences.end is None
         assert occurrences.tags == ['b', 'c']
+
+
+def test_occurrence_collection_outdated(session):
+    with patch.object(EventCollection, 'remove_old_events') as mock_method:
+        today = date.today()
+        for year in (today.year-1, today.year, today.year+1):
+            event = EventCollection(session).add(
+                title='Event {0}-{1}'.format(year, today.month),
+                start=datetime(year, today.month, today.day, 0, 0),
+                end=datetime(year, today.month, today.day, 23, 59),
+                timezone='US/Eastern',
+            )
+            event.submit()
+            event.publish()
+
+        occurrences = OccurrenceCollection(session)
+        assert occurrences.query().count() == 2
+        assert occurrences.query(outdated=True).count() == 3
+        assert occurrences.query(start=date(today.year-1, 1, 1)).count() == 3
+        assert occurrences.query(start=date(today.year-1, 1, 1)).count() == 3
 
 
 def test_unique_names(session):
@@ -364,11 +396,11 @@ def test_unique_names(session):
         assert event.occurrences[3].name == 'squirrel-park-visit-6-2015-06-19'
         assert event.occurrences[4].name == 'squirrel-park-visit-6-2015-06-20'
 
-        assert events.by_name('test') == None
+        assert events.by_name('test') is None
         assert events.by_name('squirrel-park-visit-6') == event
 
         occurrences = OccurrenceCollection(session)
-        assert occurrences.by_name('test') == None
+        assert occurrences.by_name('test') is None
 
         occurrence = occurrences.by_name('squirrel-park-visit-6-2015-06-20')
         assert occurrence == event.occurrences[4]
@@ -405,19 +437,19 @@ def test_unicode(session):
 
         occurrences = OccurrenceCollection(session)
 
-        assert occurrences.query().count() == 2
+        assert occurrences.query(outdated=True).count() == 2
 
         tags = occurrences.used_tags
         assert sorted(tags) == [u'congrès', u'salons', u'témoins']
 
-        occurrence = occurrences.query(tags=[u'congrès']).one()
+        occurrence = occurrences.query(outdated=True, tags=[u'congrès']).one()
         assert occurrence.title == u'Salon du mieux-vivre, 16e édition'
         assert occurrence.location == u'Salon du mieux-vivre à Saignelégier'
         assert sorted(occurrence.tags) == [u'congrès', u'salons']
         event = occurrence.event
         assert event.description == u'Rendez-vous automnal des médecines.'
 
-        occurrence = occurrences.query(tags=[u'témoins']).one()
+        occurrence = occurrences.query(outdated=True, tags=[u'témoins']).one()
         assert occurrence.title == u'Témoins de Jéhovah'
         assert occurrence.location == u'Salon du mieux-vivre à Saignelégier'
         assert occurrence.tags == [u'témoins']

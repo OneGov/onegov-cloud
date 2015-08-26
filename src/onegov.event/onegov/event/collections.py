@@ -113,10 +113,10 @@ class OccurrenceCollectionPagination(Pagination):
 
     def __init__(self, session, page=0, start=None, end=None, tags=None):
         self.session = session
+        self.page = page
         self.start = start
         self.end = end
         self.tags = tags if tags else []
-        self.page = page
 
     def __eq__(self, other):
         return self.page == other.page
@@ -161,6 +161,8 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
     automatically when adding a new event.
 
     Occurrences can be filtered by start and end dates as well as tags.
+
+    By default, only current occurrences are returned.
     """
 
     @cached_property
@@ -186,13 +188,16 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
 
         return sorted(set(tags))
 
-    def query(self, start=None, end=None, tags=None):
+    def query(self, start=None, end=None, tags=None, outdated=False):
         """ Queries occurrences with the given parameters.
 
         Finds all occurrences with any of the given tags and within the given
         start and end date. Start and end date are assumed to be dates only and
         therefore without a timezone - we search for the given date in the
         timezone of the occurrence!.
+
+        If no start date is given and ``outdated`` is not set, only current
+        occurrences are returned.
         """
 
         query = self.session.query(Occurrence)
@@ -200,6 +205,21 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
         if start is not None:
             assert type(start) is date
             start = as_datetime(start)
+
+            expressions = []
+            for timezone in self.used_timezones:
+                localized_start = replace_timezone(start, timezone)
+                localized_start = standardize_date(localized_start, timezone)
+                expressions.append(
+                    and_(
+                        Occurrence.timezone == timezone,
+                        Occurrence.start >= localized_start
+                    )
+                )
+
+            query = query.filter(or_(*expressions))
+        elif not outdated:
+            start = as_datetime(date.today())
 
             expressions = []
             for timezone in self.used_timezones:
