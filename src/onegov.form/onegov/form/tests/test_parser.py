@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from onegov.form import errors
+from onegov.form import Form, errors
 from onegov.form.parser import parse_form
 from textwrap import dedent
 from webob.multidict import MultiDict
@@ -40,6 +40,16 @@ def test_parse_text():
     assert form.comment.label.text == 'Comment'
     assert form.comment.widget(form.comment) == (
         '<textarea id="comment" name="comment" rows="8"></textarea>')
+
+
+def test_parse_different_base_class():
+
+    class Test(Form):
+        foo = 'bar'
+
+    form_class = parse_form('x = ___', Test)
+    assert form_class.foo == 'bar'
+    assert isinstance(form_class(), Test)
 
 
 def test_unicode():

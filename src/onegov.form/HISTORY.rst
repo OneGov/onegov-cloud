@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to pass a custom base class to the parse_form function.
+  [href]
+
 0.6.8 (2015-08-26)
 ~~~~~~~~~~~~~~~~~~~
 

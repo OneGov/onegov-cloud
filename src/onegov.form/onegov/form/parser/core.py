@@ -394,13 +394,13 @@ def construct_password(loader, node):
     return elements.password.parseString(node.value)
 
 
-def parse_form(text):
+def parse_form(text, base_class=Form):
     """ Takes the given form text, parses it and returns a WTForms form
     class (not an instance of it).
 
     """
 
-    builder = WTFormsClassBuilder(Form)
+    builder = WTFormsClassBuilder(base_class)
     parsed = yaml.load('\n'.join(translate_to_yaml(text)), CustomLoader)
 
     for fieldset in parsed:
@@ -696,9 +696,9 @@ class WTFormsClassBuilder(object):
         MyForm = builder.form_class
     """
 
-    def __init__(self, form_class):
+    def __init__(self, base_class):
 
-        class DynamicForm(form_class):
+        class DynamicForm(base_class):
             pass
 
         self.form_class = DynamicForm
