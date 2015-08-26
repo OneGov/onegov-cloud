@@ -3,6 +3,11 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Always run upgrades may now indicate if they did anything useful. If not,
+  they are hidden from the upgrade output.
+  [href]
+
 0.4.25 (2015-08-24)
 ~~~~~~~~~~~~~~~~~~~
 

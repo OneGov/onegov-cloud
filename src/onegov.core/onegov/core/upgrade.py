@@ -127,6 +127,9 @@ class upgrade_task(object):
 
         If the reference cannot be found, the upgrade fails.
 
+    Always run tasks may return ``False`` if they wish to be considered
+    as not run (and therefore not shown in the upgrade runner).
+
     """
 
     def __init__(self, name, always_run=False, requires=None):
@@ -364,14 +367,19 @@ class UpgradeRunner(object):
             upgrade = context.begin()
 
             try:
-                task(context)
+                result = task(context)
 
                 # mark all tasks as executed, even 'always run' ones
                 state.mark_as_executed(task)
                 upgrade.flush()
 
-                executed += 1
-                self.on_task_success(task)
+                # always-run tasks which return False are considered
+                # to have not run
+                hidden = task.always_run and result is False
+
+                if not hidden:
+                    executed += 1
+                    self.on_task_success(task)
 
             except:
                 upgrade.abort()
