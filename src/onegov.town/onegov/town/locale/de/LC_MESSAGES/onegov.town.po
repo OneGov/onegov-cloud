@@ -1002,7 +1002,7 @@ msgstr ""
 "und buntes Gesellschaftsleben. Ob Ausstellung, Konzert, Dorfmarkt oder "
 "Theateraufführung – bestimmt finden auch Sie eine attraktive Veranstaltung. "
 "Sie haben die Möglichkeit, einen Anlass in unseren Veranstaltungskalender "
-"einzufügen."
+"einzutragen."
 
 msgid "New person"
 msgstr "Neue Person"
