@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to specifiy the submission id manually.
+  [href]
+
 - Adds the ability to pass a custom base class to the parse_form function.
   [href]
 

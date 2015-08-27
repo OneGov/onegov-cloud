@@ -132,7 +132,7 @@ class FormSubmissionCollection(object):
 
         return query
 
-    def add(self, name, form, state):
+    def add(self, name, form, state, id=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -156,7 +156,7 @@ class FormSubmissionCollection(object):
         _mapper = inspect(FormSubmission).polymorphic_map.get(state)
 
         submission = (_mapper and _mapper.class_ or FormSubmission)()
-        submission.id = uuid4()
+        submission.id = id or uuid4()
         submission.name = name
         submission.state = state
 
@@ -174,7 +174,7 @@ class FormSubmissionCollection(object):
 
         return submission
 
-    def add_external(self, form, state):
+    def add_external(self, form, state, id=None):
         """ Takes a filled-out form instance and stores the submission
         in the database. The form instance is expected to have a ``_source``
         parameter, which contains the source used to build the form (as only
@@ -185,7 +185,7 @@ class FormSubmissionCollection(object):
 
         """
 
-        return self.add(name=None, form=form, state=state)
+        return self.add(name=None, form=form, state=state, id=id)
 
     def complete_submission(self, submission):
         """ Changes the state to 'complete', if the data is valid. """
