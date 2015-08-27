@@ -89,18 +89,36 @@ def handle_reserve_allocation(self, request, form):
     }
 
 
-@TownApp.html(model=Reservation, name='abschluss', permission=Public,
-              template='layout.pt')
-def finalize_reservation(self, request):
-    # this view is public, but only for reservations with a session id
+def assert_anonymous_access_only_temporary(self, request):
+    """ Raises exceptions if the current user is anonymous and no longer
+    should be given access to the reservation models.
+
+    This could probably be done using morepath's security system, but it would
+    not be quite as straight-forward. This approach is, though we have
+    to manually add this function to all reservation views the anonymous user
+    should be able to access when creating a new reservatin, but not anymore
+    after that.
+
+    """
+    if request.is_logged_in:
+        return
+
     if not self.session_id:
+        raise exc.HTTPForbidden()
+
+    if self.status == 'approved':
         raise exc.HTTPForbidden()
 
     if self.session_id != get_libres_session_id(request):
         raise exc.HTTPForbidden()
 
-    if self.status == 'approved':
-        raise exc.HTTPForbidden()
+
+@TownApp.html(model=Reservation, name='abschluss', permission=Public,
+              template='layout.pt')
+def finalize_reservation(self, request):
+
+    # this view is public, but only for a limited time
+    assert_anonymous_access_only_temporary(self, request)
 
     collection = ResourceCollection(request.app.libres_context)
     resource = collection.by_id(self.resource)
