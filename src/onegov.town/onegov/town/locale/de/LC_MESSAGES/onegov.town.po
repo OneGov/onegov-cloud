@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-27 10:32+0200\n"
+"POT-Creation-Date: 2015-08-27 13:06+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -458,8 +458,8 @@ msgstr "Neues Passwort"
 msgid "Describes what this reservation resource is about"
 msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
 
-msgid "Formdata"
-msgstr "Formulardaten"
+msgid "Details"
+msgstr "Details"
 
 msgid "Name"
 msgstr "Name"
@@ -526,6 +526,9 @@ msgstr "Älter"
 
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
+
+msgid "Edit details"
+msgstr "Details bearbeiten"
 
 msgid "Link"
 msgstr "Verknüpfung"
@@ -1020,14 +1023,14 @@ msgstr "Neue Reservation für ${title}"
 msgid "Continue"
 msgstr "Weiter"
 
-msgid "Your reservation was completed"
-msgstr "Ihre Reservation wurde abgeschlossen"
+msgid "Thank you for your reservation!"
+msgstr "Vielen Dank für Ihre Reservation!"
 
 msgid "The reservation could not be completed"
 msgstr "Ihre Reservation konnte nicht abgeschlossen werden"
 
-msgid "Further information about the reservation"
-msgstr "Weitere Angaben zur Reservation"
+msgid "Details about the reservation"
+msgstr "Details zu Ihrer Reservation"
 
 msgid "Error"
 msgstr "Fehler"

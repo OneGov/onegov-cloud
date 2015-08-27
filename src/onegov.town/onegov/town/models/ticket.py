@@ -146,4 +146,23 @@ class ReservationHandler(Handler):
         return ''.join(parts)
 
     def get_links(self, request):
-        return []
+
+        links = []
+
+        if self.submission:
+            edit_link = URL(request.link(self.submission))
+            edit_link = edit_link.query_param('edit', '')
+            edit_link = edit_link.query_param('return-to', request.url)
+            edit_link = edit_link.query_param('title', request.translate(
+                _("Details about the reservation"))
+            )
+
+            links.append(
+                Link(
+                    text=_('Edit details'),
+                    url=edit_link.as_string(),
+                    classes=('edit-link', )
+                )
+            )
+
+        return links

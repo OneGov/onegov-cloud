@@ -77,7 +77,7 @@ def handle_reserve_allocation(self, request, form):
             url = URL(request.link(submission))
             url = url.query_param('return-to', finalize_link)
             url = url.query_param('title', request.translate(
-                _("Further information about the reservation"))
+                _("Details about the reservation"))
             )
             url = url.query_param('edit', 1)
             url = url.query_param('quiet', 1)
