@@ -10,8 +10,24 @@ from wtforms.fields.html5 import DateField
 from wtforms.widgets import TextArea
 
 
-# todo: Where do we store the available tags?
-TAGS = [(tag, tag) for tag in ('Fest', 'Freizeit', 'Politik', 'Sport')]
+TAGS = [(tag, tag) for tag in (
+    _("Exhibition"),
+    _("Gastronomy"),
+    _("Health"),
+    _("Cinema"),
+    _("Congress"),
+    _("Concert"),
+    _("Art"),
+    _("Literature"),
+    _("Market"),
+    _("Music"),
+    _("Party"),
+    _("Politics"),
+    _("Religion"),
+    _("Sports"),
+    _("Dancing"),
+    _("Theater"),
+)]
 
 WEEKDAYS = (
     ("MO", _("Mo")),

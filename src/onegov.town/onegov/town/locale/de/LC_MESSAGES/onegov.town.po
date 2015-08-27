@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-26 16:41+0200\n"
+"POT-Creation-Date: 2015-08-27 08:58+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -340,6 +340,54 @@ msgid "Please select a type of recurrence if the event is recurring."
 msgstr ""
 "Bitte eine Art von Wiederholung angeben, falls ein Enddatum für "
 "Wiederholungen ausgewählt ist."
+
+msgid "Art"
+msgstr "Kunst"
+
+msgid "Cinema"
+msgstr "Kino"
+
+msgid "Concert"
+msgstr "Konzert"
+
+msgid "Congress"
+msgstr "Kongress"
+
+msgid "Dancing"
+msgstr "Tanz"
+
+msgid "Exhibition"
+msgstr "Ausstellung"
+
+msgid "Gastronomy"
+msgstr "Gastronomie"
+
+msgid "Health"
+msgstr "Gesundheit"
+
+msgid "Literature"
+msgstr "Literatur"
+
+msgid "Market"
+msgstr "Markt"
+
+msgid "Music"
+msgstr "Musik"
+
+msgid "Party"
+msgstr "Party"
+
+msgid "Politics"
+msgstr "Politik"
+
+msgid "Religion"
+msgstr "Religion"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Theater"
+msgstr "Theater"
 
 msgid "The end time must be later than the start time."
 msgstr "Das Ende der Veranstaltung muss nach dem Start liegen."
