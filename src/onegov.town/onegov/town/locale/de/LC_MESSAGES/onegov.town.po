@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-27 14:55+0200\n"
+"POT-Creation-Date: 2015-08-27 15:01+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -16,6 +16,27 @@ msgstr "Abbrechen"
 
 msgid "This site is hidden from the general public"
 msgstr "Diese Seite ist nicht öffentlich."
+
+msgid "Mo"
+msgstr "Mo"
+
+msgid "Tu"
+msgstr "Di"
+
+msgid "We"
+msgstr "Mi"
+
+msgid "Th"
+msgstr "Do"
+
+msgid "Fr"
+msgstr "Fr"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "So"
 
 msgid "Homepage"
 msgstr "Startseite"
@@ -37,6 +58,10 @@ msgstr "Reservationen"
 
 msgid "Edit allocation"
 msgstr "Einteilung bearbeiten"
+
+#, python-format
+msgid "Every ${days} until ${end}"
+msgstr "Jeden ${days} bis zum ${end}."
 
 msgid "Logout"
 msgstr "Logout"
@@ -242,27 +267,6 @@ msgid ""
 msgstr ""
 "Um die Einteilung zu löschen, müssen zuerst alle bestehenden Reservationen "
 "abgesagt werden."
-
-msgid "Mo"
-msgstr "Mo"
-
-msgid "Tu"
-msgstr "Di"
-
-msgid "We"
-msgstr "Mi"
-
-msgid "Th"
-msgstr "Do"
-
-msgid "Fr"
-msgstr "Fr"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "So"
 
 msgid "Start"
 msgstr "Von"
@@ -524,6 +528,9 @@ msgstr "Letztes Jahr"
 msgid "Older"
 msgstr "Älter"
 
+msgid "The event has been deleted."
+msgstr "Die Veranstaltung wurde gelöscht."
+
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
 
@@ -622,17 +629,18 @@ msgid ""
 "it for you."
 msgstr ""
 
-msgid "State"
-msgstr "Status"
+msgid ""
+"Your event submission is ready to be sent to the town. Please review your "
+"data and press \"Complete\" to finalize the process. If there's anything "
+"you'd like to change, click on \"Edit\" to return to the filled-out event."
+msgstr ""
+"Ihre Anfrage kann jetzt an die Gemeinde übermittelt werden. Bitte überprüfen "
+"Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um die Anfrage zu "
+"übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken Sie auf "
+"\"Bearbeiten\" um zum Formular zurückzukehren. "
 
-msgid "Date and time"
-msgstr "Datum und Zeit"
-
-msgid "Recurrence"
-msgstr "Wiederholungen"
-
-msgid "All dates"
-msgstr "Alle Termine"
+msgid "Complete"
+msgstr "Abschliessen"
 
 msgid "State:"
 msgstr "Status:"
@@ -726,6 +734,30 @@ msgstr "Vorherige Seite"
 
 msgid "Next Page"
 msgstr "Nächste Seite"
+
+msgid "State"
+msgstr "Status"
+
+msgid "Initiated"
+msgstr "Initiiert"
+
+msgid "Submitted"
+msgstr "Gemeldet"
+
+msgid "Published"
+msgstr "Veröffentlich"
+
+msgid "Withdrawn"
+msgstr "Zurückgezogen"
+
+msgid "Date and time"
+msgstr "Datum und Zeit"
+
+msgid "Recurrence"
+msgstr "Wiederholungen"
+
+msgid "All dates"
+msgstr "Alle Termine"
 
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
@@ -830,9 +862,6 @@ msgstr ""
 "übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken Sie auf "
 "\"Bearbeiten\" um zum Formular zurückzukehren. "
 
-msgid "Complete"
-msgstr "Abschliessen"
-
 msgid "Show"
 msgstr "Anzeigen"
 
@@ -888,29 +917,8 @@ msgstr "Ihre Änderungen wurden gespeichert"
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
-msgid "Monday"
-msgstr "Montag"
-
-msgid "Tuesday"
-msgstr "Dienstag"
-
-msgid "Wednesday"
-msgstr "Mittwoch"
-
-msgid "Thursday"
-msgstr "Donnerstag"
-
-msgid "Friday"
-msgstr "Freitag"
-
-msgid "Saturday"
-msgstr "Samstag"
-
-msgid "Sunday"
-msgstr "Sonntag"
-
-msgid "Submitted events"
-msgstr "Gemeldete Veranstaltungen"
+msgid "Initiated events"
+msgstr ""
 
 #, python-format
 msgid "You have published the event ${title}"
@@ -920,39 +928,26 @@ msgstr "Sie haben die Veranstatlung ${title} veröffentlicht"
 msgid "You have withdrawn the event ${title}"
 msgstr "Sie haben die Veranstatlung ${title} zurückgezogen"
 
-msgid "Submitted"
-msgstr "Gemeldet"
-
-msgid "Published"
-msgstr "Veröffentlich"
-
-msgid "Withdrawn"
-msgstr "Zurückgezogen"
-
 msgid "Add an event"
 msgstr "Veranstaltung hinzufügen"
 
 msgid "Submit an event"
 msgstr "Veranstaltung melden"
 
-#, python-format
-msgid "Every ${days} until ${end}"
-msgstr "Jeden ${days} bis zum ${end}."
-
 msgid "List"
 msgstr "Auflisten"
+
+msgid "Submitted events"
+msgstr "Gemeldete Veranstaltungen"
 
 msgid "Published events"
 msgstr "Veröffentlichte Veranstaltungen"
 
-msgid "Withdrawn events"
-msgstr "Zurückgezogene Veranstaltungen"
-
 msgid "Event added"
 msgstr "Veranstaltung erstellt"
 
-msgid "Event submitted"
-msgstr "Veranstaltung gemeldet"
+msgid "Withdrawn events"
+msgstr "Zurückgezogene Veranstaltungen"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"

@@ -986,7 +986,7 @@ $close-ticket-icon-hover: '\f05d';
 $reopen-ticket-icon: '\f1db';
 $reopen-ticket-icon-hover: '\f192';
 $frm-handler-icon: '\f044';
-$rsv-handler-icon: '\f073';
+$evn-handler-icon: '\f073';
 
 .tickets-table {
     width: 100%;
@@ -1010,8 +1010,8 @@ $rsv-handler-icon: '\f073';
     font-weight: normal;
 }
 
-.ticket-handler-RSV td:first-child::before {
-    content: $rsv-handler-icon;
+.ticket-handler-EVN td:first-child::before {
+    content: $evn-handler-icon;
     font-family: 'FontAwesome';
     font-weight: normal;
 }
@@ -1356,15 +1356,8 @@ tr.ticket:hover {
 $event-action-icon: '\f1db';
 $event-action-icon-hover: '\f192';
 
-.event-action {
-    @include button(
-        $padding: $button-tny,
-        $bg: $success-color
-    );
-    float: right;
-    font-size: 1em;
-    margin: 0;
-
+.event-publish,
+.event-withdraw {
     &::before {
         content: $event-action-icon;
         font-family: 'FontAwesome';
@@ -1376,6 +1369,16 @@ $event-action-icon-hover: '\f192';
         font-family: 'FontAwesome';
         margin-right: 1ex;
     }
+}
+
+.event-action {
+    @include button(
+        $padding: $button-tny,
+        $bg: $success-color
+    );
+    float: right;
+    font-size: 1em;
+    margin: 0;
 }
 
 /*

@@ -1,6 +1,7 @@
 import arrow
 
 from cached_property import cached_property
+from dateutil import rrule
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.event import OccurrenceCollection, EventCollection
@@ -17,6 +18,7 @@ from onegov.town.models import (
     SiteCollection,
     Thumbnail
 )
+
 from sqlalchemy import desc
 
 
@@ -744,16 +746,57 @@ class OccurrenceLayout(OccurrenceBaseLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
-            if self.model.availability == 100.0:
-                yield DeleteLink(
-                    _("Delete"),
-                    self.request.link(self.model),
-                    confirm=_("Do you really want to delete this allocation?"),
-                    yes_button_text=_("Delete allocation"),
-                    redirect_after=self.request.link(self.collection)
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model.event),
+                    classes=('edit-link', )
                 )
-            else:
-                yield DeleteLink(
+            ]
+
+
+class EventLayout(DefaultLayout):
+
+    def format_recurrence(self, recurrence):
+        """ Returns a human readable version of an RRULE used by us. """
+
+        WEEKDAYS = (_("Mo"), _("Tu"), _("We"), _("Th"), _("Fr"), _("Sa"),
+                    _("Su"))
+
+        if recurrence:
+            rule = rrule.rrulestr(recurrence)
+            if rule._freq == rrule.WEEKLY:
+                return _(
+                    u"Every ${days} until ${end}",
+                    mapping={
+                        'days': ', '.join((
+                            self.request.translate(WEEKDAYS[day])
+                            for day in rule._byweekday
+                        )),
+                        'end': rule._until.date().strftime('%d.%m.%Y')
+                    }
+                )
+
+        return ''
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Events"), self.events_url),
+            Link(self.model.title, self.request.link(self.model)),
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            links = [
+                Link(
+                    text=_("Edit event"),
+                    url=self.request.link(self.model, 'bearbeiten'),
+                    classes=('edit-link', )
+                ),
+                DeleteLink(
                     text=_("Delete"),
                     url=self.request.link(self.model),
                     confirm=_("This resource can't be deleted."),

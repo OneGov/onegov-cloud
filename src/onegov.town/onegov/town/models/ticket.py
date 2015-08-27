@@ -1,12 +1,13 @@
 from cached_property import cached_property
 from libres.db.models import Reservation
 from onegov.core.templates import render_macro
+from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
 from onegov.libres import Resource
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.town import _
-from onegov.town.elements import Link
-from onegov.town.layout import DefaultLayout
+from onegov.town.elements import DeleteLink, Link
+from onegov.town.layout import DefaultLayout, EventLayout
 from purl import URL
 
 
@@ -67,116 +68,79 @@ class FormSubmissionHandler(Handler):
         ]
 
 
-@handlers.registered_handler('RSV')
-class ReservationHandler(Handler):
+class EventSubmissionTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'EVN'}
+
+
+@handlers.registered_handler('EVN')
+class EventSubmissionHandler(Handler):
 
     @cached_property
-    def resource(self):
-        query = self.session.query(Resource)
-        query = query.filter(Resource.id == self.reservations[0].resource)
-
-        return query.one()
+    def collection(self):
+        return EventCollection(self.session)
 
     @cached_property
-    def reservations(self):
-        # libres allows for multiple reservations with a single request (token)
-        # for now we don't really have that case in onegov.town, but we
-        # try to be aware of it as much as possible
-        query = self.session.query(Reservation)
-        query = query.filter(Reservation.token == self.id)
-
-        return query.all()
+    def event(self):
+        return self.collection.by_id(self.id)
 
     @cached_property
-    def submission(self):
-        return FormSubmissionCollection(self.session).by_id(self.id)
-
-    @property
     def email(self):
-        # the e-mail is the same over all reservations
-        return self.reservations[0].email
+        return ''
 
     @property
     def title(self):
-        if self.resource.type == 'daypass':
-            template = '{start:%d.%m.%Y} ({quota})'
-        elif self.resource.type == 'room':
-            template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
-        else:
-            raise NotImplementedError
+        return self.event.title if self.event else ''
 
-        parts = []
-
-        for reservation in self.reservations:
-            parts.append(
-                template.format(
-                    start=reservation.display_start(),
-                    end=reservation.display_end(),
-                    quota=reservation.quota
-                )
-            )
-
-        return ', '.join(parts)
-
-    @property
+    @cached_property
     def group(self):
-        return self.resource.title
+        return "Veranstaltung"
 
     def get_summary(self, request):
-        layout = DefaultLayout(self.resource, request)
+        if not self.event:
+            return _("The event has been deleted.")
 
-        parts = []
-        parts.append(
-            render_macro(layout.macros['reservations'], request, {
-                'reservations': self.reservations,
-                'layout': layout
-            })
-        )
-
-        if self.submission:
-            form = self.submission.form_class(data=self.submission.data)
-
-            parts.append(
-                render_macro(layout.macros['display_form'], request, {
-                    'form': form,
-                    'layout': layout
-                })
-            )
-
-        return ''.join(parts)
+        layout = EventLayout(self.event, request)
+        return render_macro(layout.macros['display_event'], request, {
+            'event': self.event,
+            'layout': layout
+        })
 
     def get_links(self, request):
+        if not self.event:
+            return []
 
         links = []
+        if self.event.state == 'submitted' or self.event.state == 'withdrawn':
+            link = URL(request.link(self.event, 'publish'))
+            link = link.query_param('return-to', request.link(self.ticket))
+            links.append(Link(
+                text=_("Publish event"),
+                url=link.as_string(),
+                classes=('event-publish', ),
+            ))
+        elif self.event.state == 'published':
+            link = URL(request.link(self.event, 'withdraw'))
+            link = link.query_param('return-to', request.link(self.ticket))
+            links.append(Link(
+                text=_("Withdraw event"),
+                url=link.as_string(),
+                classes=('event-withdraw', ),
+            ))
 
-        data = self.reservations[0].data or {}
+        link = URL(request.link(self.event, 'bearbeiten'))
+        link = link.query_param('return-to', request.url)
+        links.append(Link(
+            text=_('Edit event'),
+            url=link.as_string(),
+            classes=('edit-link', )
+        ))
 
-        if not data.get('accepted'):
-            link = URL(request.link(self.reservations[0], 'annehmen'))
-            link = link.query_param('return-to', request.url)
-
-            links.append(
-                Link(
-                    text=_('Accept reservation'),
-                    url=link.as_string(),
-                    classes=('accept-link', )
-                )
-            )
-
-        if self.submission:
-            link = URL(request.link(self.submission))
-            link = link.query_param('edit', '')
-            link = link.query_param('return-to', request.url)
-            link = link.query_param('title', request.translate(
-                _("Details about the reservation"))
-            )
-
-            links.append(
-                Link(
-                    text=_('Edit details'),
-                    url=link.as_string(),
-                    classes=('edit-link', )
-                )
-            )
+        links.append(DeleteLink(
+            text=_("Delete event"),
+            url=request.link(self.event),
+            confirm=_("Do you really want to delete this event?"),
+            yes_button_text=_("Delete event"),
+            redirect_after=request.link(self.ticket)
+        ))
 
         return links
