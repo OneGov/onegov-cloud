@@ -106,9 +106,15 @@ class EventCollection(EventCollectionPagination):
         self.session.flush()
 
     def by_name(self, name):
-        """ Returns an occurrence by its URL-friendly name."""
+        """ Returns an event by its URL-friendly name."""
 
         query = self.session.query(Event).filter(Event.name == name)
+        return query.first()
+
+    def by_id(self, id):
+        """ Return an event by its id. """
+
+        query = self.session.query(Event).filter(Event.id == id)
         return query.first()
 
 
