@@ -62,33 +62,50 @@ def handle_pending_submission(self, request):
     user to turn the submission into a complete submission, once all data
     is valid.
 
+    Takes the following query parameters for customization::
+
+        * ``edit`` no validation is done on the first load if present
+        * ``return-to`` the view redirects to this url once complete if present
+        * ``title`` a custom title (required if external submission)
+        * ``quiet`` no success messages are rendered if present
+
     """
     collection = FormCollection(request.app.session())
 
     form = request.get_form(self.form_class, data=self.data)
     form.action = request.link(self)
-    form.validate()
+
+    if 'edit' not in request.GET:
+        form.validate()
 
     if not request.POST:
         form.ignore_csrf_error()
     else:
         collection.submissions.update(self, form)
 
-    if 'return-to' in request.GET:
-        action = URL(form.action)
-        action = action.query_param('return-to', request.GET['return-to'])
-
-        form.action = action.as_string()
+    # these parameters keep between form requests (the rest throw away)
+    for param in {'return-to', 'title', 'quiet'}:
+        if param in request.GET:
+            action = URL(form.action).query_param(param, request.GET[param])
+            form.action = action.as_string()
 
     completable = not form.errors and 'edit' not in request.GET
 
     if completable and 'return-to' in request.GET:
-        request.success(_(u"Your changes were saved"))
+
+        if 'quiet' not in request.GET:
+            request.success(_(u"Your changes were saved"))
+
         return morepath.redirect(request.GET['return-to'])
 
+    if 'title' in request.GET:
+        title = request.GET['title']
+    else:
+        title = self.form.title
+
     return {
-        'layout': FormSubmissionLayout(self, request),
-        'title': self.form.title,
+        'layout': FormSubmissionLayout(self, request, title),
+        'title': title,
         'form': form,
         'completable': completable,
         'edit_link': request.link(self) + '?edit',

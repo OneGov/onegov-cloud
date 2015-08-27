@@ -374,6 +374,10 @@ class FormEditorLayout(DefaultLayout):
 
 class FormSubmissionLayout(DefaultLayout):
 
+    def __init__(self, model, request, title=None):
+        super(FormSubmissionLayout, self).__init__(model, request)
+        self.title = title or self.form.title
+
     @cached_property
     def form(self):
         if hasattr(self.model, 'form'):
@@ -388,7 +392,7 @@ class FormSubmissionLayout(DefaultLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Forms"), self.request.link(collection)),
-            Link(self.form.title, '#')
+            Link(self.title, '#')
         ]
 
     @cached_property

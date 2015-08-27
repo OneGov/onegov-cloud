@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-27 09:32+0200\n"
+"POT-Creation-Date: 2015-08-27 10:32+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1025,6 +1025,9 @@ msgstr "Ihre Reservation wurde abgeschlossen"
 
 msgid "The reservation could not be completed"
 msgstr "Ihre Reservation konnte nicht abgeschlossen werden"
+
+msgid "Further information about the reservation"
+msgstr "Weitere Angaben zur Reservation"
 
 msgid "Error"
 msgstr "Fehler"

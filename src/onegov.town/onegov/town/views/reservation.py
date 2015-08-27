@@ -9,6 +9,7 @@ from onegov.town import TownApp, _, utils
 from onegov.town.elements import Link
 from onegov.town.forms import ReservationForm
 from onegov.town.layout import ResourceLayout
+from purl import URL
 from uuid import uuid4
 from webob import exc
 
@@ -54,27 +55,40 @@ def handle_reserve_allocation(self, request, form):
             # though it's possible for a token to have multiple reservations,
             # it is not something that can happen here -> therefore one!
             reservation = scheduler.reservations_by_token(token).one()
+            finalize_link = request.link(reservation, 'abschluss')
+
+            if not resource.definition:
+                return morepath.redirect(finalize_link)
 
             # if extra form data is required, this is the first step.
             # together with the unconfirmed, session-bound reservation,
             # we create a new external submission without any data in it.
             # the user is then redirected to the reservation data edit form
             # where the reservation is finalized and a ticket is opened.
-            if resource.definition:
-                FormCollection(request.app.session()).submissions.add_external(
-                    form=resource.form_class(),
-                    state='pending',
-                    id=reservation.id
-                )
+            forms = FormCollection(request.app.session())
+            submission = forms.submissions.add_external(
+                form=resource.form_class(),
+                state='pending',
+                id=reservation.token
+            )
 
-                next_view = 'daten'
-            else:
-                next_view = 'abschluss'
+            url = URL(request.link(submission))
+            url = url.query_param('return-to', finalize_link)
+            url = url.query_param('title', request.translate(
+                _("Further information about the reservation"))
+            )
+            url = url.query_param('edit', 1)
+            url = url.query_param('quiet', 1)
 
-            return morepath.redirect(request.link(reservation, next_view))
+            return morepath.redirect(url.as_string())
 
     layout = ResourceLayout(resource, request)
     layout.breadcrumbs.append(Link(_("Reserve"), '#'))
+
+    if resource.definition:
+        button_text = _("Continue")
+    else:
+        button_text = _("Submit")
 
     title = _("New reservation for ${title}", mapping={
         'title': resource.title,
@@ -85,7 +99,7 @@ def handle_reserve_allocation(self, request, form):
         'title': title,
         'form': form,
         'allocation': self,
-        'button_text': _("Continue")
+        'button_text': button_text
     }
 
 
