@@ -531,6 +531,10 @@ input[type=color] {
         content: '\f0ea';
     }
 
+    .accept-link:before {
+        content: '\f00c';
+    }
+
     .edit-link:before {
         content: '\f040';
     }

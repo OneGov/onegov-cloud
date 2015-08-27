@@ -5,5 +5,26 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       i18n:domain="onegov.town">
 <body>
+
+<metal:reservations define-macro="reservations" i18n:domain="onegov.town">
+    <tal:block condition="reservations">
+        <tal:block repeat="reservation reservations">
+            <tal:block define="start reservation.display_start(); end reservation.display_end()">
+                <p><span i18n:translate>Date</span>: <span>
+                    ${layout.format_date(start, 'date')}
+                    <!-- simple whole day check: -->
+                    <tal:block condition="start.time() != end.time()">
+                        ${layout.format_date(start, 'time')} -
+                        ${layout.format_date(end, 'time')}
+                    </tal:block>
+                </span></p>
+                <p><span i18n:translate>Quota</span>: <span>
+                    ${reservation.quota}
+                </span></p>
+            </tal:block>
+        </tal:block>
+    </tal:block>
+</metal:reservations>
+
 </body>
 </html>

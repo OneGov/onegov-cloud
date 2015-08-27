@@ -2,7 +2,7 @@ import morepath
 
 from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
 from onegov.ticket import TicketCollection
@@ -11,9 +11,12 @@ from onegov.town.elements import Link
 from onegov.town.forms import ReservationForm
 from onegov.town.layout import ResourceLayout
 from onegov.town.mail import send_html_mail
+from sqlalchemy.orm.attributes import flag_modified
 from purl import URL
 from uuid import uuid4
 from webob import exc
+
+
 
 
 def get_reservation_form_class(allocation, request):
@@ -178,3 +181,37 @@ def finalize_reservation(self, request):
         request.app.update_ticket_count()
 
         return morepath.redirect(request.link(ticket, 'status'))
+
+
+@TownApp.view(model=Reservation, name='annehmen', permission=Private)
+def accept_reservation(self, request):
+    if not self.data or not self.data.get('accepted'):
+        collection = ResourceCollection(request.app.libres_context)
+        resource = collection.by_id(self.resource)
+        scheduler = resource.get_scheduler(request.app.libres_context)
+        reservations = scheduler.reservations_by_token(self.token)
+
+        send_html_mail(
+            request=request,
+            template='mail_reservation_accepted.pt',
+            subject=_("Your reservation was accepted"),
+            receivers=(self.email, ),
+            content={
+                'model': self,
+                'resource': resource,
+                'reservations': reservations
+            }
+        )
+
+        for reservation in reservations:
+            reservation.data = reservation.data or {}
+            reservation.data['accepted'] = True
+
+            # libres does not automatically detect changes yet
+            flag_modified(reservation, 'data')
+
+        request.success(_("The reservation was accepted"))
+    else:
+        request.warning(_("The reservation has already been accepted"))
+
+    return morepath.redirect(request.params['return-to'])

@@ -149,18 +149,32 @@ class ReservationHandler(Handler):
 
         links = []
 
+        data = self.reservations[0].data or {}
+
+        if not data.get('accepted'):
+            link = URL(request.link(self.reservations[0], 'annehmen'))
+            link = link.query_param('return-to', request.url)
+
+            links.append(
+                Link(
+                    text=_('Accept reservation'),
+                    url=link.as_string(),
+                    classes=('accept-link', )
+                )
+            )
+
         if self.submission:
-            edit_link = URL(request.link(self.submission))
-            edit_link = edit_link.query_param('edit', '')
-            edit_link = edit_link.query_param('return-to', request.url)
-            edit_link = edit_link.query_param('title', request.translate(
+            link = URL(request.link(self.submission))
+            link = link.query_param('edit', '')
+            link = link.query_param('return-to', request.url)
+            link = link.query_param('title', request.translate(
                 _("Details about the reservation"))
             )
 
             links.append(
                 Link(
                     text=_('Edit details'),
-                    url=edit_link.as_string(),
+                    url=link.as_string(),
                     classes=('edit-link', )
                 )
             )
