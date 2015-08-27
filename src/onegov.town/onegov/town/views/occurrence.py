@@ -26,16 +26,17 @@ def view_occurrences(self, request):
     )
 
     return {
-        'layout': layout,
-        'title': _(u'Events'),
-        'occurrences': self.batch,
-        'tags': tags,
         'active_tags': self.tags,
-        'number_of_occurrences': self.subset().count(),
-        'start': self.start.isoformat() if self.start else '',
-        'end': self.end.isoformat() if self.end else '',
+        'add_link': request.link(self, name='neu'),
         'date_placeholder': date.today().isoformat(),
-        'add_link': request.link(self, name='neu')
+        'end': self.end.isoformat() if self.end else '',
+        'layout': layout,
+        'number_of_occurrences': self.subset().count(),
+        'occurrences': self.batch,
+        'start': self.start.isoformat() if self.start else '',
+        'tags': tags,
+        'title': _(u'Events'),
+        'town': request.app.town.name
     }
 
 
