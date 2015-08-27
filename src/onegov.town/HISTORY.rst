@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The edit links for the model shown on the ticket view are now only visible
+  if the ticket is in 'pending' state. To change something on the model, the
+  ticket needs to be accepted/reopened.
+  [href]
+
 - All forms now retain the posted value if a validation error occurs.
   [href]
 

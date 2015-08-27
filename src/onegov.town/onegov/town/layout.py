@@ -571,7 +571,12 @@ class TicketLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
-            links = self.model.handler.get_links(self.request)
+
+            # only show the model related links when the ticket is pending
+            if self.model.state == 'pending':
+                links = self.model.handler.get_links(self.request)
+            else:
+                links = []
 
             if self.model.state == 'open':
                 links.append(Link(
