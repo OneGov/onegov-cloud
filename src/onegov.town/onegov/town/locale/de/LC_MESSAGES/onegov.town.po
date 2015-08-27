@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-27 08:58+0200\n"
+"POT-Creation-Date: 2015-08-27 09:32+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -303,6 +303,54 @@ msgstr "Ja"
 msgid "No"
 msgstr "Nein"
 
+msgid "Exhibition"
+msgstr "Ausstellung"
+
+msgid "Gastronomy"
+msgstr "Gastronomie"
+
+msgid "Health"
+msgstr "Gesundheit"
+
+msgid "Cinema"
+msgstr "Kino"
+
+msgid "Congress"
+msgstr "Kongress"
+
+msgid "Concert"
+msgstr "Konzert"
+
+msgid "Art"
+msgstr "Kunst"
+
+msgid "Literature"
+msgstr "Literatur"
+
+msgid "Market"
+msgstr "Markt"
+
+msgid "Music"
+msgstr "Musik"
+
+msgid "Party"
+msgstr "Party"
+
+msgid "Politics"
+msgstr "Politik"
+
+msgid "Religion"
+msgstr "Religion"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Dancing"
+msgstr "Tanz"
+
+msgid "Theater"
+msgstr "Theater"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -340,54 +388,6 @@ msgid "Please select a type of recurrence if the event is recurring."
 msgstr ""
 "Bitte eine Art von Wiederholung angeben, falls ein Enddatum für "
 "Wiederholungen ausgewählt ist."
-
-msgid "Art"
-msgstr "Kunst"
-
-msgid "Cinema"
-msgstr "Kino"
-
-msgid "Concert"
-msgstr "Konzert"
-
-msgid "Congress"
-msgstr "Kongress"
-
-msgid "Dancing"
-msgstr "Tanz"
-
-msgid "Exhibition"
-msgstr "Ausstellung"
-
-msgid "Gastronomy"
-msgstr "Gastronomie"
-
-msgid "Health"
-msgstr "Gesundheit"
-
-msgid "Literature"
-msgstr "Literatur"
-
-msgid "Market"
-msgstr "Markt"
-
-msgid "Music"
-msgstr "Musik"
-
-msgid "Party"
-msgstr "Party"
-
-msgid "Politics"
-msgstr "Politik"
-
-msgid "Religion"
-msgstr "Religion"
-
-msgid "Sports"
-msgstr "Sport"
-
-msgid "Theater"
-msgstr "Theater"
 
 msgid "The end time must be later than the start time."
 msgstr "Das Ende der Veranstaltung muss nach dem Start liegen."
@@ -990,6 +990,19 @@ msgstr "Sie wurden eingeloggt."
 
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
+
+#, python-format
+msgid ""
+"${town} offers a versatile and colorful social life thanks to its generous "
+"and open culture. Whether exhibition, concert, village market or theater "
+"performance - there's an attractive event for everybody. You have the "
+"possibility to a submit to our event calendar."
+msgstr ""
+"${town} bietet dank seiner reichhaltigen und offenen Kultur ein vielseitiges "
+"und buntes Gesellschaftsleben. Ob Ausstellung, Konzert, Dorfmarkt oder "
+"Theateraufführung – bestimmt finden auch Sie eine attraktive Veranstaltung. "
+"Sie haben die Möglichkeit, einen Anlass in unseren Veranstaltungskalender "
+"einzufügen."
 
 msgid "New person"
 msgstr "Neue Person"
