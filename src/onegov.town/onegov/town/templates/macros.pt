@@ -332,3 +332,28 @@
         </tal:block>
     </ul>
 </metal:pagination>
+
+<metal:reservations define-macro="reservations" i18n:domain="onegov.town">
+    <div tal:condition="reservations" class="reservations">
+        <div tal:repeat="reservation reservations">
+            <tal:block define="start reservation.display_start(); end reservation.display_end()">
+                <div class="field-display">
+                    <div class="field-display-label" i18n:translate>Date</div>
+                    <div class="field-display-data" i18n:translate>
+                        ${layout.format_date(start, 'date')}
+                        <!-- simple whole day check: -->
+                        <tal:block condition="start.time() != end.time()">
+                            ${layout.format_date(start, 'time')} -
+                            ${layout.format_date(end, 'time')}
+                        </tal:block>
+                    </div>
+                </div>
+
+                <div class="field-display">
+                    <div class="field-display-label" i18n:translate>Anzahl</div>
+                    <div class="field-display-data" i18n:translate>${reservation.quota}</div>
+                </div>
+            </tal:block>
+        </div>
+    </div>
+</metal:reservations>

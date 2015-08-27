@@ -87,6 +87,10 @@ class ReservationHandler(Handler):
 
         return query.all()
 
+    @cached_property
+    def submission(self):
+        return FormSubmissionCollection(self.session).by_id(self.id)
+
     @property
     def email(self):
         # the e-mail is the same over all reservations
@@ -117,3 +121,29 @@ class ReservationHandler(Handler):
     @property
     def group(self):
         return self.resource.title
+
+    def get_summary(self, request):
+        layout = DefaultLayout(self.resource, request)
+
+        parts = []
+        parts.append(
+            render_macro(layout.macros['reservations'], request, {
+                'reservations': self.reservations,
+                'layout': layout
+            })
+        )
+
+        if self.submission:
+            form = self.submission.form_class(data=self.submission.data)
+
+            parts.append(
+                render_macro(layout.macros['display_form'], request, {
+                    'form': form,
+                    'layout': layout
+                })
+            )
+
+        return ''.join(parts)
+
+    def get_links(self, request):
+        return []
