@@ -67,13 +67,6 @@ def test_resource_highlight_allocations(libres_context):
 def test_resource_form_definition(libres_context):
     collection = ResourceCollection(libres_context)
 
-    with pytest.raises(AssertionError):
-        resource = collection.add(
-            title='Executive Lounge',
-            timezone='Europe/Zurich',
-            definition='Name *= ___'
-        )
-
     resource = collection.add(
         title='Executive Lounge',
         timezone='Europe/Zurich',

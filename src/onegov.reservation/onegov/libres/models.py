@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
 from sqlalchemy import Column, Text
-from sqlalchemy.orm import relationship, validates
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -83,13 +83,3 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
             return None
 
         return parse_form(self.definition)
-
-    @validates('definition')
-    def validate_definition(self, key, definition):
-        if not definition:
-            return
-
-        form_class = parse_form(definition)
-        assert form_class().has_required_email_field
-
-        return definition
