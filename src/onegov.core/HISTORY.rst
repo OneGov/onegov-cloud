@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes more than one task per module crashing the upgrade.
+  [href]
+
 - Always run upgrades may now indicate if they did anything useful. If not,
   they are hidden from the upgrade output.
   [href]
