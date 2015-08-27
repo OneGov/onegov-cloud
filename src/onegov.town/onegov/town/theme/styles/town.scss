@@ -982,6 +982,7 @@ $close-ticket-icon-hover: '\f05d';
 $reopen-ticket-icon: '\f1db';
 $reopen-ticket-icon-hover: '\f192';
 $frm-handler-icon: '\f044';
+$rsv-handler-icon: '\f073';
 
 .tickets-table {
     width: 100%;
@@ -1001,6 +1002,12 @@ $frm-handler-icon: '\f044';
 
 .ticket-handler-FRM td:first-child::before {
     content: $frm-handler-icon;
+    font-family: 'FontAwesome';
+    font-weight: normal;
+}
+
+.ticket-handler-RSV td:first-child::before {
+    content: $rsv-handler-icon;
     font-family: 'FontAwesome';
     font-weight: normal;
 }

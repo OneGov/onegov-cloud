@@ -5,10 +5,12 @@ from libres.modules.errors import LibresError
 from onegov.core.security import Public
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
+from onegov.ticket import TicketCollection
 from onegov.town import TownApp, _, utils
 from onegov.town.elements import Link
 from onegov.town.forms import ReservationForm
 from onegov.town.layout import ResourceLayout
+from onegov.town.mail import send_html_mail
 from purl import URL
 from uuid import uuid4
 from webob import exc
@@ -151,7 +153,27 @@ def finalize_reservation(self, request):
             'layout': ResourceLayout(resource, request),
         }
     else:
-        # TODO create ticket
+        forms = FormCollection(request.app.session())
+        submission = forms.submissions.by_id(self.token)
 
+        if submission:
+            forms.submissions.complete_submission(submission)
+
+        with forms.session.no_autoflush:
+            ticket = TicketCollection(request.app.session()).open_ticket(
+                handler_code='RSV', handler_id=self.token
+            )
+
+        send_html_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("A ticket has been opened"),
+            receivers=(self.email, ),
+            content={
+                'model': ticket
+            }
+        )
+
+        request.app.update_ticket_count()
         request.success(_("Your reservation was completed"))
         return morepath.redirect(request.link(resource))
