@@ -1,13 +1,14 @@
 import pytest
 
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from dateutil.rrule import MO, WE
 from libres.db.models import Allocation
 from onegov.core.utils import Bunch
 from onegov.town.forms import (
     DaypassAllocationForm,
     ReservationForm,
-    RoomAllocationForm
+    RoomAllocationForm,
+    RoomAllocationEditForm
 )
 from onegov.town.forms.allocation import AllocationFormHelpers
 
@@ -250,3 +251,36 @@ def test_reservation_form_quota():
     allocation.quota_limit = 0
     form = ReservationForm.for_allocation(allocation)()
     assert hasattr(form, 'quota')
+
+
+def test_edit_room_alllocation_form():
+
+    form = RoomAllocationEditForm()
+    form.apply_dates(datetime(2015, 1, 1, 12, 0), datetime(2015, 1, 1, 18, 0))
+
+    assert form.date.data == date(2015, 1, 1)
+    assert form.start_time.data == '12:00'
+    assert form.end_time.data == '18:00'
+
+    form.as_whole_day.data = 'no'
+    assert form.dates == (
+        datetime(2015, 1, 1, 12, 0),
+        datetime(2015, 1, 1, 18, 0)
+    )
+
+    form.as_whole_day.data = 'yes'
+    assert form.dates == (
+        datetime(2015, 1, 1),
+        datetime(2015, 1, 2) - timedelta(microseconds=1)
+    )
+
+    form.apply_model(Bunch(
+        display_start=lambda: datetime(2015, 1, 1, 12),
+        display_end=lambda: datetime(2015, 1, 1, 18),
+        whole_day=False
+    ))
+
+    assert form.dates == (
+        datetime(2015, 1, 1, 12, 0),
+        datetime(2015, 1, 1, 18, 0)
+    )

@@ -302,7 +302,5 @@ class RoomAllocationEditForm(AllocationEditForm):
         self.end_time.data = '{:%H:%M}'.format(end)
 
     def apply_model(self, model):
-        self.date.data = model.display_start().date()
+        self.apply_dates(model.display_start(), model.display_end())
         self.as_whole_day.data = model.whole_day and 'yes' or 'no'
-        self.start_time.data = '{:%H:%M}'.format(model.display_start())
-        self.end_time.data = '{:%H:%M}'.format(model.display_end())
