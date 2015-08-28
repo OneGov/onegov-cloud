@@ -6,8 +6,8 @@ from onegov.form import FormSubmissionCollection
 from onegov.libres import Resource
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.town import _
-from onegov.town.elements import DeleteLink, Link
-from onegov.town.layout import DefaultLayout, EventLayout
+from onegov.town.elements import Link, DeleteLink
+from onegov.town.layout import DefaultLayout
 from purl import URL
 
 
@@ -33,6 +33,10 @@ class FormSubmissionHandler(Handler):
     @cached_property
     def form(self):
         return self.submission.form_class(data=self.submission.data)
+
+    @property
+    def deleted(self):
+        return self.submission is None
 
     @property
     def email(self):
@@ -91,6 +95,10 @@ class ReservationHandler(Handler):
     @cached_property
     def submission(self):
         return FormSubmissionCollection(self.session).by_id(self.id)
+
+    @property
+    def deleted(self):
+        return False if self.reservations else True
 
     @property
     def email(self):
@@ -158,11 +166,27 @@ class ReservationHandler(Handler):
 
             links.append(
                 Link(
-                    text=_('Accept reservation'),
+                    text=_("Accept reservation"),
                     url=link.as_string(),
                     classes=('accept-link', )
                 )
             )
+
+        link = URL(request.link(self.reservations[0], 'absagen'))
+        link = link.query_param('return-to', request.url)
+        links.append(
+            DeleteLink(
+                text=_("Reject reservation"),
+                url=link.as_string(),
+                confirm=_("Do you really want to reject this reservation?"),
+                extra_information=_(
+                    "Rejecting this reservation can't be undone."
+                ),
+                yes_button_text=_("Reject reservation"),
+                request_method='GET',
+                redirect_after=request.url
+            )
+        )
 
         if self.submission:
             link = URL(request.link(self.submission))

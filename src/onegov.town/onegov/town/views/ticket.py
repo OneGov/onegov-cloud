@@ -12,16 +12,24 @@ from onegov.user import UserCollection
 @TownApp.html(model=Ticket, template='ticket.pt', permission=Private)
 def view_ticket(self, request):
 
-    # XXX this is very to do here, much harder when the ticket is updated
-    # because there's no good link to the ticket at that point - so when
-    # viewing the ticket we commit the sin of possibly changing data in a
-    # GET request.
-    self.handler.refresh()
+    handler = self.handler
+
+    if handler.deleted:
+        summary = self.snapshot.get('summary')
+    else:
+        # XXX this is very to do here, much harder when the ticket is updated
+        # because there's no good link to the ticket at that point - so when
+        # viewing the ticket we commit the sin of possibly changing data in a
+        # GET request.
+        handler.refresh()
+        summary = handler.get_summary(request)
 
     return {
         'title': self.number,
         'layout': TicketLayout(self, request),
-        'ticket': self
+        'ticket': self,
+        'summary': summary,
+        'deleted': handler.deleted
     }
 
 
@@ -49,11 +57,13 @@ def close_ticket(self, request):
         'number': self.number
     }))
 
+    email = self.snapshot.get('email') or self.handler.email
+
     send_html_mail(
         request=request,
         template='mail_ticket_closed.pt',
         subject=_("Your ticket has been closed"),
-        receivers=(self.handler.email, ),
+        receivers=(email, ),
         content={
             'model': self
         }
@@ -76,11 +86,13 @@ def reopen_ticket(self, request):
         'number': self.number
     }))
 
+    email = self.snapshot.get('email') or self.handler.email
+
     send_html_mail(
         request=request,
         template='mail_ticket_reopened.pt',
         subject=_("Your ticket has been reopened"),
-        receivers=(self.handler.email, ),
+        receivers=(email, ),
         content={
             'model': self
         }
