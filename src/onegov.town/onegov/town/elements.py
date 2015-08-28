@@ -105,7 +105,8 @@ class DeleteLink(Link):
                  yes_button_text=None,
                  no_button_text=None,
                  extra_information=None,
-                 redirect_after=None):
+                 redirect_after=None,
+                 request_method='DELETE'):
 
         attr = {
             'data-confirm': confirm
@@ -125,11 +126,15 @@ class DeleteLink(Link):
         if redirect_after:
             attr['redirect-after'] = redirect_after
 
+        if request_method == 'GET':
+            attr['ic-get-from'] = url
+            url = '#'
+
         super(DeleteLink, self).__init__(
             text=text,
             url=url,
             classes=('confirm', 'delete-link'),
-            request_method='DELETE',
+            request_method=request_method,
             attributes=attr
         )
 
