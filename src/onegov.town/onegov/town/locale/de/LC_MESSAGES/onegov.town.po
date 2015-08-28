@@ -1108,3 +1108,45 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
+
+#~ msgid "Quota"
+#~ msgstr "Anzahl"
+
+#~ msgid "Details"
+#~ msgstr "Details"
+
+#~ msgid "Details about the reservation"
+#~ msgstr "Details zu Ihrer Reservation"
+
+#~ msgid "Accept reservation"
+#~ msgstr "Reservation annehmen"
+
+#~ msgid "Edit details"
+#~ msgstr "Details bearbeiten"
+
+#~ msgid "Your reservation has been accepted:"
+#~ msgstr "Ihre Reservation wurde angenommen:"
+
+#~ msgid "New reservation for ${title}"
+#~ msgstr "Neue Reservation für ${title}"
+
+#~ msgid "Continue"
+#~ msgstr "Weiter"
+
+#~ msgid "Thank you for your reservation!"
+#~ msgstr "Vielen Dank für Ihre Reservation!"
+
+#~ msgid "The reservation was accepted"
+#~ msgstr "Die Reservation wurde angenommen"
+
+#~ msgid "The reservation has already been accepted"
+#~ msgstr "Die Reservation wurde bereits angenommen"
+
+#~ msgid "The reservation could not be completed"
+#~ msgstr "Ihre Reservation konnte nicht abgeschlossen werden"
+
+#~ msgid "Your reservation was accepted"
+#~ msgstr "Ihre Reservation wurde angenommen"
+
+#~ msgid "Error"
+#~ msgstr "Fehler"

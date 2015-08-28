@@ -68,6 +68,121 @@ class FormSubmissionHandler(Handler):
         ]
 
 
+@handlers.registered_handler('RSV')
+class ReservationHandler(Handler):
+
+    @cached_property
+    def resource(self):
+        query = self.session.query(Resource)
+        query = query.filter(Resource.id == self.reservations[0].resource)
+
+        return query.one()
+
+    @cached_property
+    def reservations(self):
+        # libres allows for multiple reservations with a single request (token)
+        # for now we don't really have that case in onegov.town, but we
+        # try to be aware of it as much as possible
+        query = self.session.query(Reservation)
+        query = query.filter(Reservation.token == self.id)
+
+        return query.all()
+
+    @cached_property
+    def submission(self):
+        return FormSubmissionCollection(self.session).by_id(self.id)
+
+    @property
+    def email(self):
+        # the e-mail is the same over all reservations
+        return self.reservations[0].email
+
+    @property
+    def title(self):
+        if self.resource.type == 'daypass':
+            template = '{start:%d.%m.%Y} ({quota})'
+        elif self.resource.type == 'room':
+            template = '{start:%d.%m.%Y} {start:%H:%M} - {end:%H:%M}'
+        else:
+            raise NotImplementedError
+
+        parts = []
+
+        for reservation in self.reservations:
+            parts.append(
+                template.format(
+                    start=reservation.display_start(),
+                    end=reservation.display_end(),
+                    quota=reservation.quota
+                )
+            )
+
+        return ', '.join(parts)
+
+    @property
+    def group(self):
+        return self.resource.title
+
+    def get_summary(self, request):
+        layout = DefaultLayout(self.resource, request)
+
+        parts = []
+        parts.append(
+            render_macro(layout.macros['reservations'], request, {
+                'reservations': self.reservations,
+                'layout': layout
+            })
+        )
+
+        if self.submission:
+            form = self.submission.form_class(data=self.submission.data)
+
+            parts.append(
+                render_macro(layout.macros['display_form'], request, {
+                    'form': form,
+                    'layout': layout
+                })
+            )
+
+        return ''.join(parts)
+
+    def get_links(self, request):
+
+        links = []
+
+        data = self.reservations[0].data or {}
+
+        if not data.get('accepted'):
+            link = URL(request.link(self.reservations[0], 'annehmen'))
+            link = link.query_param('return-to', request.url)
+
+            links.append(
+                Link(
+                    text=_('Accept reservation'),
+                    url=link.as_string(),
+                    classes=('accept-link', )
+                )
+            )
+
+        if self.submission:
+            link = URL(request.link(self.submission))
+            link = link.query_param('edit', '')
+            link = link.query_param('return-to', request.url)
+            link = link.query_param('title', request.translate(
+                _("Details about the reservation"))
+            )
+
+            links.append(
+                Link(
+                    text=_('Edit details'),
+                    url=link.as_string(),
+                    classes=('edit-link', )
+                )
+            )
+
+        return links
+
+
 class EventSubmissionTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EVN'}
 

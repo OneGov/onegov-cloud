@@ -697,6 +697,47 @@ class AllocationEditFormLayout(DefaultLayout):
     """ Same as the resource layout, but with different editbar links, because
     there's not really an allocation view, but there are allocation forms.
 
+    """
+
+    @cached_property
+    def collection(self):
+        return ResourceCollection(self.request.app.libres_context)
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Reservations"), self.request.link(self.collection)),
+            Link(_("Edit allocation"), '#')
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+
+            if self.model.availability == 100.0:
+                yield DeleteLink(
+                    _("Delete"),
+                    self.request.link(self.model),
+                    confirm=_("Do you really want to delete this allocation?"),
+                    yes_button_text=_("Delete allocation"),
+                    redirect_after=self.request.link(self.collection)
+                )
+            else:
+                yield DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model),
+                    confirm=_("This resource can't be deleted."),
+                    extra_information=_(
+                        "There are existing reservations associated "
+                        "with this resource"
+                    ),
+                    redirect_after=self.request.link(self.collection)
+                )
+
+
+class OccurrenceBaseLayout(DefaultLayout):
+
     weekday_format = 'dddd'
     month_format = 'MMMM'
     smonth_format = 'MMM'

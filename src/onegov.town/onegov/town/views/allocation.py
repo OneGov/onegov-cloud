@@ -6,7 +6,7 @@ from onegov.core.security import Public, Private
 from onegov.libres import Resource, ResourceCollection
 from onegov.town import TownApp, _, utils
 from onegov.town.elements import Link
-from onegov.town.layout import ResourceLayout
+from onegov.town.layout import ResourceLayout, AllocationEditFormLayout
 from onegov.town.forms import (
     DaypassAllocationForm,
     DaypassAllocationEditForm,

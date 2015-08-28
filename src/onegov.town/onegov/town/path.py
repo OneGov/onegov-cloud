@@ -1,7 +1,12 @@
 """ Contains the paths to the different models served by onegov.town. """
-
 from datetime import date
 from libres.db.models import Allocation, Reservation
+from onegov.event import (
+    Event,
+    EventCollection,
+    Occurrence,
+    OccurrenceCollection
+)
 from onegov.form import (
     FormDefinition,
     FormCollection,
@@ -172,7 +177,7 @@ def get_reservation(app, resource, id):
         query = query.filter(Reservation.id == id)
 
         return query.first()
-    
+
 
 @TownApp.path(model=Clipboard, path='/clipboard/copy/{token}')
 def get_clipboard(request, token):
