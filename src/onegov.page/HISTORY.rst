@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.2 (2015-08-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Moved most code out to onegov.core for similar modules to use.
   [href]
 
