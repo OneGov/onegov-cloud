@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.0.2 (2015-08-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Use hstore for tags.
   [msom]
