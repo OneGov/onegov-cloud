@@ -160,6 +160,9 @@ class ReservationHandler(Handler):
 
     def get_links(self, request):
 
+        if self.deleted:
+            return []
+
         links = []
 
         data = self.reservations[0].data or {}

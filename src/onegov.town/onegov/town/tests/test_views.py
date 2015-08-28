@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 import onegov.core
 import onegov.town
+import pytest
+import re
 import textwrap
 import transaction
-import re
 
 from datetime import datetime
+from libres.db.models import Reservation
+from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
-from onegov.form import FormCollection
+from onegov.form import FormCollection, FormSubmission
 from onegov.libres import ResourceCollection
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
@@ -1284,3 +1287,122 @@ def test_allocation_times(town_app):
     assert slots.json[0]['end'] == '2015-08-25T00:00:00+02:00'
     assert slots.json[1]['start'] == '2015-08-25T12:00:00+02:00'
     assert slots.json[1]['end'] == '2015-08-26T00:00:00+02:00'
+
+
+def test_reserve_allocation(town_app):
+
+    client = Client(town_app)
+
+    # prepate the required data
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    resource.definition = 'Note = ___'
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+    reserve_url = '/einteilung/{}/{}/reservieren'.format(
+        allocations[0].resource,
+        allocations[0].id
+    )
+
+    transaction.commit()
+
+    # create a reservation
+    reserve = client.get(reserve_url)
+    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['quota'] = 4
+
+    details = reserve.form.submit().follow()
+    details.form['note'] = 'Foobar'
+
+    ticket = details.form.submit().follow().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(town_app.smtpserver.outbox) == 1
+
+    # try to create another reservation the same time
+    reserve = client.get(reserve_url)
+    reserve.form['e_mail'] = 'info@example.org'
+    result = reserve.form.submit()
+
+    assert u"Der gewünschte Zeitraum ist nicht mehr verfügbar." in result
+
+    # try deleting the allocation with the existing reservation
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    slots = client.get((
+        '/ressource/sbb-tageskarte/slots'
+        '?start=2015-08-28&end=2015-08-28'
+    ))
+
+    assert len(slots.json) == 1
+
+    with pytest.raises(AffectedReservationError):
+        client.delete(extract_href(slots.json[0]['actions'][2]))
+
+    # open the created ticket
+    ticket = client.get('/tickets').click('Annehmen').follow()
+
+    assert 'Foobar' in ticket
+    assert '28.08.2015' in ticket
+    assert '4' in ticket
+
+    # accept it
+    assert 'Reservation annehmen' in ticket
+    ticket = ticket.click('Reservation annehmen').follow()
+
+    assert 'Reservation annehmen' not in ticket
+    assert len(town_app.smtpserver.outbox) == 2
+
+    message = town_app.smtpserver.outbox[1]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
+
+    assert 'SBB-Tageskarte' in message
+    assert '28.08.2015' in message
+    assert '4' in message
+
+    # edit its details
+    details = ticket.click('Details bearbeiten')
+    details.form['note'] = '0xdeadbeef'
+    ticket = details.form.submit().follow()
+
+    assert '0xdeadbeef' in ticket
+
+    # reject it
+    assert town_app.session().query(Reservation).count() == 1
+    assert town_app.session().query(FormSubmission).count() == 1
+
+    link = ticket.pyquery('a.delete-link')[0].attrib['ic-get-from']
+    ticket = client.get(link).follow()
+
+    assert town_app.session().query(Reservation).count() == 0
+    assert town_app.session().query(FormSubmission).count() == 0
+
+    assert u"Der hinterlegte Datensatz wurde entfernt" in ticket
+    assert '28.08.2015' in ticket
+    assert '4' in ticket
+    assert '0xdeadbeef' in ticket
+
+    assert len(town_app.smtpserver.outbox) == 3
+
+    message = town_app.smtpserver.outbox[2]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
+
+    assert 'SBB-Tageskarte' in message
+    assert '28.08.2015' in message
+    assert '4' in message
+
+    # close the ticket
+    ticket.click('Ticket abschliessen')
+
+    assert len(town_app.smtpserver.outbox) == 4
