@@ -39,7 +39,8 @@ setup(
         'onegov.form',
         'onegov.foundation>=0.0.4',
         'onegov.user',
-        'pyyaml'
+        'pyyaml',
+        'rjsmin'
     ],
     extras_require=dict(
         test=[

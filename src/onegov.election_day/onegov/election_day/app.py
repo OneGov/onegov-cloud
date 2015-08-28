@@ -80,7 +80,7 @@ class ElectionDayApp(Framework):
             'js/underscore.js',
             'js/stackable.js',
             'js/common.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/common.bundle.js'
         )
 
@@ -89,7 +89,7 @@ class ElectionDayApp(Framework):
             'js/d3tip.js',
             'js/topojson.js',
             'js/ballot-map.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/d3.bundle.js'
         )
 
