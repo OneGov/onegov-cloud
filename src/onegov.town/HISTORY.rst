@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.0 (2015-08-28)
+~~~~~~~~~~~~~~~~~~~
+
 - The allocation availability calculation is now faster and accurate.
   [href]
 
