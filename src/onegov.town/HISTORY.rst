@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The allocation availability calculation is now faster and accurate.
+  [href]
+
 - Expired reservation sessions are now automatically removed.
   [href]
 

@@ -79,9 +79,9 @@ class AllocationEventInfo(object):
 
     __slots__ = ['allocation', 'availability', 'request', 'translate']
 
-    def __init__(self, allocation, request):
+    def __init__(self, allocation, availability, request):
         self.allocation = allocation
-        self.availability = allocation.availability
+        self.availability = availability
         self.request = request
         self.translate = request.translate
 
@@ -118,7 +118,7 @@ class AllocationEventInfo(object):
             }))
         else:
             quota = self.allocation.quota
-            quota_left = self.allocation.quota_left
+            quota_left = int(quota * self.availability / 100)
 
             if quota == 1:
                 if quota_left:
