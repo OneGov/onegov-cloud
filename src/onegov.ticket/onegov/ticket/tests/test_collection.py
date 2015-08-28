@@ -84,6 +84,10 @@ def test_open_ticket(session, handlers):
     class EchoHandler(Handler):
 
         @property
+        def deleted(self):
+            return False
+
+        @property
         def email(self):
             return self.data.get('email')
 
@@ -138,3 +142,47 @@ def test_open_ticket(session, handlers):
     assert collection.by_id(ticket.id)
     assert collection.by_id(ticket.id, ensure_handler_code='FOO') is None
     assert collection.by_handler_id('1') is not None
+
+
+def test_snapshot_ticket(session, handlers):
+
+    @handlers.registered_handler('FOO')
+    class FooHandler(Handler):
+
+        @property
+        def deleted(self):
+            return False
+
+        @property
+        def title(self):
+            return 'Foo'
+
+        @property
+        def group(self):
+            return 'Bar'
+
+        @property
+        def handler_id(self):
+            return 1
+
+        @property
+        def handler_data(self):
+            return {}
+
+        @property
+        def email(self):
+            return 'foo@bar.com'
+
+        def get_summary(self, request):
+            return 'foobar'
+
+    collection = TicketCollection(session)
+
+    ticket = collection.open_ticket(
+        handler_id='1',
+        handler_code='FOO'
+    )
+
+    ticket.create_snapshot(request=object())
+    assert ticket.snapshot['email'] == 'foo@bar.com'
+    assert ticket.snapshot['summary'] == 'foobar'

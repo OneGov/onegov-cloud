@@ -42,6 +42,11 @@ class Ticket(Base, TimestampMixin):
     #: therefore deferred.
     handler_data = deferred(Column(JSON, nullable=False, default=dict))
 
+    #: a snapshot of the ticket containing the last summary that made any sense
+    #: use this before deleting the model behind a ticket, lest your ticket
+    #: becomes nothing more than a number.
+    snapshot = deferred(Column(JSON, nullable=False, default=dict))
+
     #: the state of this ticket (open, pending, closed)
     state = Column(
         Enum(
@@ -85,3 +90,18 @@ class Ticket(Base, TimestampMixin):
 
         self.user = user
         self.state = 'pending'
+
+    def create_snapshot(self, request):
+        """ Takes the current handler and stores the output of the summary
+        as a snapshot.
+
+        TODO: This doesn't support multiple langauges at this point. The
+        language of the user creating the snapshot will be what's stored.
+
+        In the future we might change this by iterating over all supported
+        languages and creating the summary for each language.
+
+        """
+
+        self.snapshot['summary'] = self.handler.get_summary(request)
+        self.snapshot['email'] = self.handler.email

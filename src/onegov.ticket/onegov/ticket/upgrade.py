@@ -2,6 +2,7 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.core.orm.types import JSON
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
 from sqlalchemy import Column, Text
@@ -28,3 +29,17 @@ def add_handler_id_to_ticket(context):
         context.operations.alter_column(
             'tickets', 'handler_id', nullable=False
         )
+
+
+@upgrade_task('Add snapshot json column to ticket')
+def add_snapshot_json_column_to_ticket(context):
+
+    context.operations.add_column(
+        'tickets', Column('snapshot', JSON, nullable=True)
+    )
+
+    for ticket in context.session.query(Ticket).all():
+        ticket.snapshot = {}
+
+    context.session.flush()
+    context.operations.alter_column('tickets', 'snapshot', nullable=False)

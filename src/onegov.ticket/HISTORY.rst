@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to delete the data behind a handler, creating a snapshot
+  before that happens.
+  [href]
+
 - The always run upgrade won't show up in the onegov.core upgrade output
   anymore. Eventually we will remove this upgrade task.
   [href]

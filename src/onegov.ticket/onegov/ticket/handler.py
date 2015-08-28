@@ -37,6 +37,9 @@ class Handler(object):
         """ Updates the current ticket with the latest data from the handler.
         """
 
+        if self.deleted:
+            return
+
         if self.ticket.title != self.title:
             self.ticket.title = self.title
 
@@ -68,6 +71,19 @@ class Handler(object):
         time, the handler must call :meth:`self.refresh` when there's a change.
 
         """
+        raise NotImplementedError
+
+    @property
+    def deleted(self):
+        """ Returns true if the underlying model was deleted. It is best to
+        never let that happen, as we want tickets to stay around forever.
+
+        However, this can make sense in certain scenarios. Note that if
+        you do delete your underlying model, make sure to call
+        :meth:`onegov.ticket.models.Ticket.create_snapshot` beforehand!
+
+        """
+
         raise NotImplementedError
 
     def get_summary(self, request):
