@@ -6,7 +6,7 @@ name = 'onegov.libres'
 description = (
     'Libres integration for OneGov Cloud.'
 )
-version = '0.0.5'
+version = '0.0.6'
 
 
 def get_long_description():

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.6 (2015-08-28)
+~~~~~~~~~~~~~~~~~~~
+
 - The form definition field no longer requires an e-mail address.
   [href]
 
