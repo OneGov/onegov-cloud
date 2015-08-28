@@ -17,8 +17,6 @@ from uuid import uuid4
 from webob import exc
 
 
-
-
 def get_reservation_form_class(allocation, request):
     return ReservationForm.for_allocation(allocation)
 
@@ -57,6 +55,10 @@ def handle_reserve_allocation(self, request, form):
         except LibresError as e:
             utils.show_libres_error(e, request)
         else:
+            # while we re at it, remove all expired sessions
+            resource.remove_expired_reservation_sessions(
+                request.app.libres_context)
+
             # though it's possible for a token to have multiple reservations,
             # it is not something that can happen here -> therefore one!
             reservation = scheduler.reservations_by_token(token).one()

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Expired reservation sessions are now automatically removed.
+  [href]
+
 - Adds the ability to create reservations and to accept/reject them.
   [href]
 
