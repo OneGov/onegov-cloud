@@ -101,6 +101,10 @@ def test_event_collection_remove_old_events(session):
         start=datetime(2010, 6, 1, 10),
         end=datetime(2010, 6, 1, 10) + timedelta(hours=1),
     )
+    assert events.query().count() == 1
+
+    max_stale = standardize_date(datetime.today()+timedelta(days=2), 'UTC')
+    events.remove_old_events(max_stale=max_stale)
     assert events.query().count() == 0
 
 

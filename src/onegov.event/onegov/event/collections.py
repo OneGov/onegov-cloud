@@ -89,17 +89,37 @@ class EventCollection(EventCollectionPagination):
         self.session.delete(event)
         self.session.flush()
 
-    def remove_old_events(self, max_age=None):
-        """ Removes all events with the last occurrence older than 30 days. """
+    def remove_old_events(self, max_age=None, max_stale=None):
+        """ Removes all events with the last occurrence older than 30 days or
+        initiated events created more than two days ago.
+
+        """
 
         if max_age is None:
             max_age = datetime.utcnow() - timedelta(days=30)
             max_age = standardize_date(max_age, 'UTC')
 
-        events = self.session.query(Event).filter(Event.start < max_age)
+        events = self.session.query(Event).filter(
+            Event.state != 'initiated',
+            Event.start < max_age
+        )
         events = list(filter(
             lambda x: max(x.occurrence_dates(limit=False)) < max_age, events
         ))
+        for event in events:
+            self.session.delete(event)
+
+        if max_stale is None:
+            max_stale = datetime.utcnow() - timedelta(days=2)
+            max_stale = standardize_date(max_stale, 'UTC')
+
+        events = self.session.query(Event).filter(
+            Event.state == 'initiated',
+            and_(
+                or_(Event.created < max_stale, Event.created.is_(None)),
+                or_(Event.modified < max_stale, Event.modified.is_(None))
+            )
+        )
         for event in events:
             self.session.delete(event)
 

@@ -16,6 +16,9 @@ Unreleased
 - Add by_id method for event collections.
   [msom]
 
+- Automatically remove old initiated events.
+  [msom]
+
 0.0.1 (2015-08-20)
 ~~~~~~~~~~~~~~~~~~~
 
