@@ -1406,3 +1406,109 @@ def test_reserve_allocation(town_app):
     ticket.click('Ticket abschliessen')
 
     assert len(town_app.smtpserver.outbox) == 4
+
+
+def test_reserve_no_definition(town_app):
+
+    client = Client(town_app)
+
+    # prepate the required data
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+    reserve_url = '/einteilung/{}/{}/reservieren'.format(
+        allocations[0].resource,
+        allocations[0].id
+    )
+
+    transaction.commit()
+
+    # create a reservation
+    reserve = client.get(reserve_url)
+    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['quota'] = 4
+
+    ticket = reserve.form.submit().follow().follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(town_app.smtpserver.outbox) == 1
+
+
+def test_reserve_session_bound(town_app):
+
+    client = Client(town_app)
+
+    # prepate the required data
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+    reserve_url = '/einteilung/{}/{}/reservieren'.format(
+        allocations[0].resource,
+        allocations[0].id
+    )
+
+    transaction.commit()
+
+    # create a reservation
+    reserve = client.get(reserve_url)
+    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['quota'] = 4
+
+    finalize = reserve.form.submit()
+
+    # make sure the finalize step can only be called by the original client
+    c2 = Client(town_app)
+
+    assert c2.get(finalize.location, expect_errors=True).status_code == 403
+    assert client.get(finalize.location).follow().status_code == 200
+
+
+def test_two_parallel_reservations(town_app):
+
+    # prepate the required data
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True
+    )
+    reserve_url = '/einteilung/{}/{}/reservieren'.format(
+        allocations[0].resource,
+        allocations[0].id
+    )
+
+    transaction.commit()
+
+    # create a reservation
+    c1 = Client(town_app)
+    reserve = c1.get(reserve_url)
+    reserve.form['e_mail'] = 'info@example.org'
+
+    f1 = reserve.form.submit()
+
+    # make sure the finalize step can only be called by the original client
+    c2 = Client(town_app)
+    reserve = c2.get(reserve_url)
+    reserve.form['e_mail'] = 'info@example.org'
+
+    f2 = reserve.form.submit()
+
+    # one will win, one will lose
+    assert f1.follow().status_code == 302
+    assert u"Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.follow()
