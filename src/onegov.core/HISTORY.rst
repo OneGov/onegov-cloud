@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.26 (2015-08-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes more than one task per module crashing the upgrade.
   [href]
