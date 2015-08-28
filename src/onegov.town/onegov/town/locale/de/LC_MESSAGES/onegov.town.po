@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-28 10:45+0200\n"
+"POT-Creation-Date: 2015-08-28 11:43+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -361,6 +361,12 @@ msgstr "Tanz"
 msgid "Theater"
 msgstr "Theater"
 
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Your E-Mail"
+msgstr "Ihre E-Mail Adresse"
+
 msgid "Title"
 msgstr "Titel"
 
@@ -391,16 +397,11 @@ msgstr "Wiederholt sich jeden"
 msgid "... until"
 msgstr "... bis zum"
 
-msgid "E-Mail"
-msgstr "E-Mail"
-
 msgid "Please set and end date if the event is recurring."
 msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."
 
-msgid "Please select a type of recurrence if the event is recurring."
-msgstr ""
-"Bitte eine Art von Wiederholung angeben, falls ein Enddatum für "
-"Wiederholungen ausgewählt ist."
+msgid "Please select a weekday if the event is recurring."
+msgstr "Bitte ein Wochentag auswählen für sich wiederholende Veranstaltungen."
 
 msgid "The end time must be later than the start time."
 msgstr "Das Ende der Veranstaltung muss nach dem Start liegen."
@@ -1120,3 +1121,8 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
+
+#~ msgid "Please select a type of recurrence if the event is recurring."
+#~ msgstr ""
+#~ "Bitte eine Art von Wiederholung angeben, falls ein Enddatum für "
+#~ "Wiederholungen ausgewählt ist."

@@ -43,6 +43,12 @@ WEEKDAYS = (
 class EventForm(Form):
     """ Defines the form for all events. """
 
+    email = EmailField(
+        label=_("E-Mail"),
+        description=_("Your E-Mail"),
+        validators=[validators.InputRequired(), validators.Email()]
+    )
+
     title = StringField(
         label=_("Title"),
         description=_("The title of this event."),
@@ -96,11 +102,6 @@ class EventForm(Form):
         validators=[validators.Optional()]
     )
 
-    email = EmailField(
-        label=_("E-Mail"),
-        validators=[validators.InputRequired(), validators.Email()]
-    )
-
     def validate(self):
         """ Make sure a valid RRULE can be generated with the given fields.
 
@@ -136,10 +137,8 @@ class EventForm(Form):
             result = False
 
         if self.end_date.data and not self.weekly.data:
-            message = _(
-                "Please select a type of recurrence if the event is recurring."
-            )
-            self.end_date.errors.append(message)
+            message = _("Please select a weekday if the event is recurring.")
+            self.weekly.errors.append(message)
             result = False
 
         return result
