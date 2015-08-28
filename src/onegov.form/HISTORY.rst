@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.9 (2015-08-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to specifiy the submission id manually.
   [href]
 
