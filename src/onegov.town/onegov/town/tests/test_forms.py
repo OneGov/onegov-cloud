@@ -3,6 +3,7 @@ import pytest
 from datetime import date, datetime, time
 from dateutil.rrule import MO, WE
 from libres.db.models import Allocation
+from onegov.core.utils import Bunch
 from onegov.town.forms import (
     DaypassAllocationForm,
     ReservationForm,
@@ -185,6 +186,21 @@ def test_generate_datetimes():
             (datetime(2015, 1, 1, 12), datetime(2015, 1, 2)),
             (datetime(2015, 1, 2, 12), datetime(2015, 1, 3))
     ]
+
+
+def test_combine_datetime():
+    helper = AllocationFormHelpers()
+
+    helper.date = Bunch(data=date(2015, 1, 1))
+    helper.time = Bunch(data=None)
+    assert helper.combine_datetime('date', 'time') == datetime(2015, 1, 1)
+
+    helper.time = Bunch(data='12:00')
+    assert helper.combine_datetime('date', 'time') == datetime(2015, 1, 1, 12)
+
+    helper.date = Bunch(data=None)
+    helper.time = Bunch(data=None)
+    assert helper.combine_datetime('date', 'time') is None
 
 
 def test_reservation_form_partly_available():
