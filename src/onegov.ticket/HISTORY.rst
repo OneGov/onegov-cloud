@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.6 (2015-08-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to delete the data behind a handler, creating a snapshot
   before that happens.
   [href]
