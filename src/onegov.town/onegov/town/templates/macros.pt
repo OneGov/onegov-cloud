@@ -367,6 +367,10 @@
             <dd i18n:translate="" tal:condition="event.state == 'published'">Published</dd>
             <dd i18n:translate="" tal:condition="event.state == 'withdrawn'">Withdrawn</dd>
         </tal:block>
+        <tal:block tal:condition="request.is_logged_in" tal:define="submitter event.meta.get('submitter_email') if event.meta else ''">
+            <dt i18n:translate="">Submitter</dt>
+            <dd>${submitter}</dd>
+        </tal:block>
         <dt i18n:translate="">Title</dt>
         <dd>${event.title}</dd>
         <dt i18n:translate="">Description</dt>
@@ -376,11 +380,14 @@
         <dt i18n:translate="">Tags</dt>
         <dd>
             <ul>
-                <li tal:repeat="tag event.tags">${tag}</li>
+                <li tal:repeat="tag event.tags" i18n:translate="">${tag}</li>
             </ul>
         </dd>
         <dt i18n:translate="">Date and time</dt>
-        <dd>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')} (${event.timezone})</dd>
+        <dd>
+            <tal:block>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}</tal:block>
+            <tal:block tal:condition="request.is_logged_in">(${event.timezone})</tal:block>
+        </dd>
         <dt i18n:translate="">Recurrence</dt>
         <dd>${layout.format_recurrence(event.recurrence)}</dd>
         <dt i18n:translate="">All dates</dt>

@@ -18,7 +18,6 @@ from onegov.town.models import (
     SiteCollection,
     Thumbnail
 )
-
 from sqlalchemy import desc
 
 
@@ -714,7 +713,6 @@ class AllocationEditFormLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
-
             if self.model.availability == 100.0:
                 yield DeleteLink(
                     _("Delete"),

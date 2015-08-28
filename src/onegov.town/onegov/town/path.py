@@ -1,4 +1,5 @@
 """ Contains the paths to the different models served by onegov.town. """
+
 from datetime import date
 from libres.db.models import Allocation, Reservation
 from onegov.event import (

@@ -6,7 +6,7 @@ from onegov.town import _
 from sedate import replace_timezone, to_timezone
 from wtforms import BooleanField, StringField, TextAreaField, validators
 from wtforms_components import TimeField
-from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import DateField, EmailField
 from wtforms.widgets import TextArea
 
 
@@ -94,6 +94,11 @@ class EventForm(Form):
     end_date = DateField(
         label=_("... until"),
         validators=[validators.Optional()]
+    )
+
+    email = EmailField(
+        label=_("E-Mail"),
+        validators=[validators.InputRequired(), validators.Email()]
     )
 
     def validate(self):
@@ -190,6 +195,9 @@ class EventForm(Form):
                     until_date.strftime('%Y%m%dT%H%M%SZ')
                 )
             )
+        model.meta = {
+            'submitter_email': self.email.data
+        }
 
     def apply_model(self, model):
         """ Stores the page values on the form. """
@@ -210,3 +218,5 @@ class EventForm(Form):
                 self.weekly.data = [
                     WEEKDAYS[day][0] for day in rule._byweekday
                 ]
+        if model.meta:
+            self.email.data = model.meta.get('submitter_email')

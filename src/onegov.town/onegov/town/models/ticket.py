@@ -19,6 +19,10 @@ class ReservationTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'RSV'}
 
 
+class EventSubmissionTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'EVN'}
+
+
 @handlers.registered_handler('FRM')
 class FormSubmissionHandler(Handler):
 
@@ -207,10 +211,6 @@ class ReservationHandler(Handler):
         return links
 
 
-class EventSubmissionTicket(Ticket):
-    __mapper_args__ = {'polymorphic_identity': 'EVN'}
-
-
 @handlers.registered_handler('EVN')
 class EventSubmissionHandler(Handler):
 
@@ -232,7 +232,7 @@ class EventSubmissionHandler(Handler):
 
     @cached_property
     def group(self):
-        return "Veranstaltung"
+        return _("Event")
 
     def get_summary(self, request):
         if not self.event:

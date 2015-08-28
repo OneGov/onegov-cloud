@@ -987,7 +987,7 @@ $reopen-ticket-icon: '\f1db';
 $reopen-ticket-icon-hover: '\f192';
 $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
-$evn-handler-icon: '\f073';
+$evn-handler-icon: '\f133';
 
 .tickets-table {
     width: 100%;
@@ -1019,7 +1019,6 @@ $evn-handler-icon: '\f073';
 
 .ticket-handler-EVN td:first-child::before {
     content: $evn-handler-icon;
-    content: $rsv-handler-icon;
     font-family: 'FontAwesome';
     font-weight: normal;
 }

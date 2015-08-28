@@ -1,14 +1,16 @@
 """ The onegov town collection of images uploaded to the site. """
 from datetime import date
+from onegov.core.security import Public
 from onegov.core.utils import linkify
+from onegov.event import Occurrence, OccurrenceCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import OccurrenceLayout, OccurrencesLayout
-from onegov.event import Occurrence, OccurrenceCollection
 
 
-@TownApp.html(model=OccurrenceCollection, template='occurrences.pt')
+@TownApp.html(model=OccurrenceCollection, template='occurrences.pt',
+              permission=Public)
 def view_occurrences(self, request):
     """ View all occurrences of all events. """
 
@@ -49,7 +51,7 @@ def view_occurrences(self, request):
     }
 
 
-@TownApp.html(model=Occurrence, template='occurrence.pt')
+@TownApp.html(model=Occurrence, template='occurrence.pt', permission=Public)
 def view_get_occurrence(self, request):
     """ View a single occurrence of an event. """
 
