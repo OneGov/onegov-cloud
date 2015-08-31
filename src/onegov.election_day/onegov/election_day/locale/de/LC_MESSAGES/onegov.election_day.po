@@ -82,7 +82,7 @@ msgstr "Stichfrage"
 
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:22
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:78
-msgid "Yays"
+msgid "Yeas"
 msgstr "JA Stimmen"
 
 #: /Users/denis/Code/onegov/src/onegov.election_day/onegov/election_day/templates/vote.pt:28

@@ -18,8 +18,8 @@
             <div class="row">
                 <div class="columns small-12 medium-6">
                     <dl>
-                        <dd class="accepted" >${'{0:.2f}'.format(vote.yays_percentage)}%</dd>
-                        <dt i18n:translate="">Yays</dt>
+                        <dd class="accepted" >${'{0:.2f}'.format(vote.yeas_percentage)}%</dd>
+                        <dt i18n:translate="">Yeas</dt>
                     </dl>
                 </div>
                 <div class="columns small-12 medium-6 end">
@@ -31,7 +31,7 @@
             </div>
 
             <div class="percentage">
-                <div class="yays"></div>
+                <div class="yeas"></div>
                 <div class="nays right" style="width:${'{0:.2f}'.format(vote.nays_percentage)}%"></div>
             </div>
         </tal:block>
@@ -76,7 +76,7 @@
                             <thead>
                                 <th i18n:translate="">Electoral District</th>
                                 <th i18n:translate="">Result</th>
-                                <th i18n:translate="" class="right-aligned">Yays</th>
+                                <th i18n:translate="" class="right-aligned">Yeas</th>
                                 <th i18n:translate="" class="right-aligned">Nays</th>
                                 <th i18n:translate="" class="right-aligned">Empty</th>
                                 <th i18n:translate="" class="right-aligned">Invalid</th>
@@ -92,11 +92,11 @@
                                         <td>${result.group}</td>
                                         <td class="accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
                                         <td class="rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
-                                        <td class="right-aligned">${layout.format_number(result.yays)}</td>
+                                        <td class="right-aligned">${layout.format_number(result.yeas)}</td>
                                         <td class="right-aligned">${layout.format_number(result.nays)}</td>
                                         <td class="right-aligned">${layout.format_number(result.empty)}</td>
                                         <td class="right-aligned">${layout.format_number(result.invalid)}</td>
-                                        <td class="right-aligned">${layout.format_number(result.yays_percentage)}</td>
+                                        <td class="right-aligned">${layout.format_number(result.yeas_percentage)}</td>
                                         <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
                                     </tal:block>
                                 </tr>

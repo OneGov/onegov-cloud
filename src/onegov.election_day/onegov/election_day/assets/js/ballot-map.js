@@ -22,18 +22,18 @@ var init_ballot_map = function(el) {
         .offset([-10, 0])
         .html(function(d) {
 
-            var yays_percentage =  Math.round(
-                d.properties.result.yays_percentage * 100) / 100;
+            var yeas_percentage =  Math.round(
+                d.properties.result.yeas_percentage * 100) / 100;
 
             var nays_percentage =  Math.round(
                 d.properties.result.nays_percentage * 100) / 100;
 
             // use symbols to avoid text which we would have to translate
             // also, only show the winning side, not both
-            if (yays_percentage > nays_percentage) {
+            if (yeas_percentage > nays_percentage) {
                 return [
                     '<strong>' + d.properties.name + '</strong>',
-                    '<i class="fa fa-thumbs-up"></i> ' + yays_percentage + '%'
+                    '<i class="fa fa-thumbs-up"></i> ' + yeas_percentage + '%'
                 ].join('<br/>');
             } else {
                 return [
@@ -62,7 +62,7 @@ var init_ballot_map = function(el) {
                     d.properties.result = data[d.properties.id];
 
                     if (! _.isUndefined(d.properties.result)) {
-                        return scale(d.properties.result.yays_percentage);
+                        return scale(d.properties.result.yeas_percentage);
                     }
                 })
                 .on('mouseover', tooltip.show)

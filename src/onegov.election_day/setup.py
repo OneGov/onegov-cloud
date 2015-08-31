@@ -34,8 +34,8 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core>=0.4.3',
-        'onegov.ballot',
+        'onegov.core>=0.4.27',
+        'onegov.ballot>=0.0.4',
         'onegov.form',
         'onegov.foundation>=0.0.4',
         'onegov.user',
