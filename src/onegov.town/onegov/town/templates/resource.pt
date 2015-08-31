@@ -42,10 +42,17 @@
             Select a free time span in the calendar below to create an allocation.
         </div>
 
-        <h2 i18n:translate>Further Information</h2>
-
-        <tal:block metal:use-macro="layout.macros.page_content"
-             tal:define="lead None; text resource.content.get('text'); people resource.people; contact resource.contact_html" />
+        <tal:block
+            define="
+                lead None; 
+                text resource.content.get('text'); 
+                people resource.people; 
+                contact resource.contact_html
+            "
+            condition="text or people or contact">
+            <h2 i18n:translate>Further Information</h2>
+            <tal:block metal:use-macro="layout.macros.page_content" />
+        </tal:block>
 
     </tal:block>
 </div>
