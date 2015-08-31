@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Sorts the children pages on the homepage by A-Z as well.
+  [href]
+
 - Includes the submitter e-mail address on the ticket view.
   [href]
 

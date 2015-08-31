@@ -7,6 +7,7 @@ from onegov.event import OccurrenceCollection
 from onegov.core.security import Public
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
+from onegov.page import PageCollection, Page
 from onegov.people import PersonCollection
 from onegov.town import _
 from onegov.town.app import TownApp
@@ -22,18 +23,27 @@ def view_town(self, request):
     session = request.app.session()
     libres_context = request.app.libres_context
     layout = DefaultLayout(self, request)
+
     Tile = namedtuple('Tile', ['page', 'links', 'number'])
 
-    tiles = [
-        Tile(
+    pages = PageCollection(session)
+    children_query = pages.query().order_by(Page.title)
+
+    tiles = []
+    for ix, page in enumerate(layout.root_pages):
+
+        if page.type == 'topic':
+            children = children_query.filter(Page.parent_id == page.id)
+            children = children.limit(3).all()
+
+        tiles.append(Tile(
             page=Link(page.title, request.link(page)),
             number=ix + 1,
             links=[
                 Link(c.title, request.link(c), classes=('tile-sub-link',))
-                for c in (page.children[:3] if page.type == 'topic' else [])
+                for c in children
             ]
-        ) for ix, page in enumerate(layout.root_pages)
-    ]
+        ))
 
     # the panels on the homepage are currently mostly place-holders, real
     # links as well as translatable text is added every time we implement
