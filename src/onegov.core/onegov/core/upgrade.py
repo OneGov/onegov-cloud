@@ -308,7 +308,7 @@ class UpgradeContext(object):
 
     def has_column(self, table, column):
         inspector = Inspector(self.operations_connection)
-        return column in {c['name'] for c in inspector.get_columns('tickets')}
+        return column in {c['name'] for c in inspector.get_columns(table)}
 
 
 class UpgradeRunner(object):

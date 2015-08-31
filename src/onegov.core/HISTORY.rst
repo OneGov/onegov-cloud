@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes ``has_column`` upgrade function not checking the given table.
+  [href]
+
 - Fixes browser session chocking on an invalid cookie.
   [href]
 
