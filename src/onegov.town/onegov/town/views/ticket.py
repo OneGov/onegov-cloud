@@ -29,7 +29,8 @@ def view_ticket(self, request):
         'layout': TicketLayout(self, request),
         'ticket': self,
         'summary': summary,
-        'deleted': handler.deleted
+        'deleted': handler.deleted,
+        'handler': handler
     }
 
 

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Includes the submitter e-mail address on the ticket view.
+  [href]
+
 0.4.0 (2015-08-28)
 ~~~~~~~~~~~~~~~~~~~
 

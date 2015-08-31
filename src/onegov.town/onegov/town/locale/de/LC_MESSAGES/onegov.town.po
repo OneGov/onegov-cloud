@@ -1,11 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-<<<<<<< HEAD
-"POT-Creation-Date: 2015-08-28 11:43+0200\n"
-=======
-"POT-Creation-Date: 2015-08-27 16:48+0200\n"
->>>>>>> master
+"POT-Creation-Date: 2015-08-31 09:24+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -903,8 +899,9 @@ msgstr "Eingabe Löschen"
 msgid ""
 "The record behind this ticket was removed. The following information is a "
 "snapshot kept for future reference."
-msgstr "Der hinterlegte Datensatz wurde entfernt. Die folgenden Informationen "
-"sind eine Momentaufnahme, erstellt vor der Löschung."
+msgstr ""
+"Der hinterlegte Datensatz wurde entfernt. Die folgenden Informationen sind "
+"eine Momentaufnahme, erstellt vor der Löschung."
 
 msgid "Ticket Number"
 msgstr "Referenz"
@@ -917,6 +914,9 @@ msgstr "Zuständig"
 
 msgid "Created"
 msgstr "Eingang"
+
+msgid "Submitter"
+msgstr "Antragsteller/in"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "

@@ -34,7 +34,7 @@
                         <tal:block condition="ticket.user_id">
                             <div class="field-display-label" i18n:translate>Owner</div>
                             <div class="field-display-data ticket-owner">
-                                ${ticket.user.username}
+                                <a href="mailto:${ticket.user.username}">${ticket.user.username}</a>
                             </div>
                         </tal:block>
 
@@ -43,6 +43,12 @@
                              ${layout.format_date(ticket.created, 'relative')}
                         </div>
 
+                        <tal:block define="submitter handler.email|ticket.snapshot.email|nothing" condition="submitter">
+                            <div class="field-display-label" i18n:translate>Submitter</div>
+                            <div class="field-display-data ticket-submitter">
+                                <a href="mailto:${submitter}">${submitter}</a>
+                            </div>
+                        </tal:block>
                     </div>
                 </div>
             </div>
