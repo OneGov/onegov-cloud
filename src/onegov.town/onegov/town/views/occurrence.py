@@ -21,7 +21,7 @@ def view_occurrences(self, request):
 
     tags = (
         Link(
-            text=tag,
+            text=request.translate(_(tag)),
             url=request.link(self.for_filter(tag=tag)),
             active=tag in self.tags and 'active' or ''
         ) for tag in self.used_tags

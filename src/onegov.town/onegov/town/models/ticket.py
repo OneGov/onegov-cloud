@@ -225,22 +225,23 @@ class EventSubmissionHandler(Handler):
     def event(self):
         return self.collection.by_id(self.id)
 
+    @property
+    def deleted(self):
+        return self.event is None
+
     @cached_property
     def email(self):
-        return ''
+        return self.event.meta.get('submitter_email')
 
     @property
     def title(self):
-        return self.event.title if self.event else ''
+        return self.event.title
 
     @cached_property
     def group(self):
         return _("Event")
 
     def get_summary(self, request):
-        if not self.event:
-            return _("The event has been deleted.")
-
         layout = EventLayout(self.event, request)
         return render_macro(layout.macros['display_event'], request, {
             'event': self.event,

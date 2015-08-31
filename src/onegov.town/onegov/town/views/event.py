@@ -108,6 +108,16 @@ def publish_event(self, request):
         'title': self.title
     }))
 
+    send_html_mail(
+        request=request,
+        template='mail_event_published.pt',
+        subject=_("Your event was published"),
+        receivers=(self.meta.get('submitter_email'), ),
+        content={
+            'model': self,
+        }
+    )
+
     if 'return-to' in request.GET:
         return morepath.redirect(request.GET['return-to'])
 
@@ -199,6 +209,9 @@ def view_event(self, request):
             ticket = TicketCollection(session).open_ticket(
                 handler_code='EVN', handler_id=self.id.hex
             )
+            # Create a snapshot of the ticket to keep the useful information.
+            # We do this here because events might be deleted automatically.
+            ticket.create_snapshot(request)
 
         send_html_mail(
             request=request,
@@ -239,6 +252,13 @@ def handle_edit_event(self, request, form):
     if form.submitted(request):
         form.update_model(self)
 
+        # Create a snapshot of the ticket to keep the useful information.
+        # We do this here because events might be deleted automatically.
+        tickets = TicketCollection(request.app.session())
+        ticket = tickets.by_handler_id(self.id.hex)
+        if ticket:
+            ticket.create_snapshot(request)
+
         request.success(_(u"Your changes were saved"))
 
         if 'return-to' in request.GET:
@@ -268,5 +288,15 @@ def handle_edit_event(self, request, form):
 @TownApp.view(model=Event, request_method='DELETE', permission=Private)
 def handle_delete_event(self, request):
     """ Delete an event. """
+
+    send_html_mail(
+        request=request,
+        template='mail_event_rejected.pt',
+        subject=_("Your event was rejected"),
+        receivers=(self.meta.get('submitter_email'), ),
+        content={
+            'model': self,
+        }
+    )
 
     EventCollection(request.app.session()).delete(self)

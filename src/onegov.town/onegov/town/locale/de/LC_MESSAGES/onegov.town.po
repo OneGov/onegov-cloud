@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-31 09:24+0200\n"
+"POT-Creation-Date: 2015-08-31 09:51+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -538,9 +538,6 @@ msgstr "Älter"
 msgid "Event"
 msgstr "Veranstaltung"
 
-msgid "The event has been deleted."
-msgstr "Die Veranstaltung wurde gelöscht."
-
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
 
@@ -786,6 +783,12 @@ msgstr "Alle Termine"
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
 
+msgid "Your event has been published:"
+msgstr "Ihre Veranstaltung wurde veröffentlicht:"
+
+msgid "Your event has unfortunately been rejected:"
+msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
+
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
 
@@ -974,8 +977,14 @@ msgstr "Auflisten"
 msgid "Submitted events"
 msgstr "Gemeldete Veranstaltungen"
 
+msgid "Your event was published"
+msgstr "Ihre Veranstaltung wurde veröffentlicht"
+
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
+
+msgid "Your event was rejected"
+msgstr "Ihre Veranstaltung wurde abgelehnt"
 
 msgid "Published events"
 msgstr "Veröffentlichte Veranstaltungen"
@@ -1145,8 +1154,3 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
-
-#~ msgid "Please select a type of recurrence if the event is recurring."
-#~ msgstr ""
-#~ "Bitte eine Art von Wiederholung angeben, falls ein Enddatum für "
-#~ "Wiederholungen ausgewählt ist."

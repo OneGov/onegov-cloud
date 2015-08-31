@@ -29,7 +29,7 @@
                                         <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
                                         <div>${occurrence.event.location}</div>
                                         <div>${layout.format_date(occurrence.localized_start, 'time')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
-                                        <div><span tal:repeat="tag occurrence.tags" class="occurrence-tag">${tag}</span></div>
+                                        <div><span tal:repeat="tag occurrence.tags" class="occurrence-tag" i18n:translate="">${tag}</span></div>
                                     </div>
                                     <div class="clearfix"></div>
                                 </div>

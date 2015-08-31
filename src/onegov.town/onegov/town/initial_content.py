@@ -153,9 +153,10 @@ def add_events(session):
         start=start + timedelta(hours=11, minutes=0),
         end=start + timedelta(hours=22, minutes=0),
         timezone="Europe/Zurich",
-        tags=[u"Freizeit", u"Fest"],
+        tags=["Party"],
         location=u"Sportanlage",
         content={"description": u"Lorem ipsum."},
+        meta={"submitter_email": u"info@example.org"},
     )
     event.submit()
     event.publish()
@@ -164,9 +165,10 @@ def add_events(session):
         start=start + timedelta(days=2, hours=20, minutes=0),
         end=start + timedelta(days=2, hours=22, minutes=30),
         timezone="Europe/Zurich",
-        tags=[u"Politik"],
+        tags=["Politics"],
         location=u"Gemeindesaal",
         content={"description": u"Lorem ipsum."},
+        meta={"submitter_email": u"info@example.org"},
     )
     event.submit()
     event.publish()
@@ -180,9 +182,10 @@ def add_events(session):
             )
         ),
         timezone="Europe/Zurich",
-        tags=[u"Freizeit", u"Sport"],
+        tags=["Sports"],
         location=u"Turnhalle",
         content={"description": u"Lorem ipsum."},
+        meta={"submitter_email": u"info@example.org"},
     )
     event.submit()
     event.publish()
@@ -191,9 +194,10 @@ def add_events(session):
         start=start + timedelta(days=7, hours=10, minutes=0),
         end=start + timedelta(days=7, hours=18, minutes=0),
         timezone="Europe/Zurich",
-        tags=[u"Freizeit", u"Sport"],
+        tags=["Sports"],
         location=u"Sportanlage",
         content={"description": u"Lorem ipsum."},
+        meta={"submitter_email": u"info@example.org"},
     )
     event.submit()
     event.publish()
