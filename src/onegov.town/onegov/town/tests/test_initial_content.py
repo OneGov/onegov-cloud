@@ -2,6 +2,7 @@
 import os
 
 from onegov.core.utils import module_path, rchop
+from onegov.event import EventCollection, OccurrenceCollection
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
 from onegov.page import PageCollection
@@ -36,3 +37,6 @@ def test_initial_content(town_app):
     assert resources == {
         'sbb-tageskarte': 'daypass'
     }
+
+    assert EventCollection(town_app.session()).query().count() == 4
+    assert OccurrenceCollection(town_app.session()).query().count() > 4

@@ -4,10 +4,16 @@ import onegov.town
 import more.transaction
 import more.webassets
 
+from datetime import datetime
 from morepath import setup
 from onegov.page import Page
 from onegov.town import TownApp
-from onegov.town.layout import Layout, PageLayout
+from onegov.town.layout import (
+    EventLayout,
+    Layout,
+    OccurrenceBaseLayout,
+    PageLayout
+)
 from webtest import TestApp as Client
 
 
@@ -16,6 +22,8 @@ class MockModel(object):
 
 
 class MockRequest(object):
+    locale = 'en'
+
     def include(self, *args, **kwargs):
         pass
 
@@ -197,3 +205,22 @@ def test_template_layout():
 
     assert '<!DOCTYPE html>' in response.text
     assert '<body id="model"' in response.text
+
+
+def test_events_layout_format_date():
+    then = datetime(2015, 7, 5, 10, 15)
+    request = MockRequest()
+
+    layout = OccurrenceBaseLayout(MockModel(), request)
+    assert layout.format_date(then, 'weekday') == 'Sunday'
+    assert layout.format_date(then, 'month') == 'July'
+    assert layout.format_date(then, 'event') == 'Sunday, 5. July 2015, 10:15'
+
+    request.locale = 'de'
+    layout = OccurrenceBaseLayout(MockModel(), request)
+    assert layout.format_date(then, 'date') == '05.07.2015'
+    assert layout.format_date(then, 'datetime') == '05.07.2015 10:15'
+    assert layout.format_date(then, 'time') == '10:15'
+    assert layout.format_date(then, 'weekday') == 'Sonntag'
+    assert layout.format_date(then, 'month') == 'Juli'
+    assert layout.format_date(then, 'event') == 'Sonntag, 5. Juli 2015, 10:15'
