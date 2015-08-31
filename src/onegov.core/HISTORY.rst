@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.27 (2015-08-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes ``has_column`` upgrade function not checking the given table.
   [href]
