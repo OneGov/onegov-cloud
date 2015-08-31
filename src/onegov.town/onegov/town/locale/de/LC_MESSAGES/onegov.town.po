@@ -1,7 +1,11 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
+<<<<<<< HEAD
 "POT-Creation-Date: 2015-08-28 11:43+0200\n"
+=======
+"POT-Creation-Date: 2015-08-27 16:48+0200\n"
+>>>>>>> master
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -544,6 +548,15 @@ msgstr "Die Veranstaltung wurde gelöscht."
 msgid "Edit submission"
 msgstr "Eingabe bearbeiten"
 
+msgid "Reject reservation"
+msgstr "Reservation absagen"
+
+msgid "Do you really want to reject this reservation?"
+msgstr "Möchten Sie diese Reservation wirklich absagen?"
+
+msgid "Rejecting this reservation can't be undone."
+msgstr "Eine Absage kann nicht rückgängig gemacht werden."
+
 msgid "Details about the reservation"
 msgstr "Details zu Ihrer Reservation"
 
@@ -785,6 +798,9 @@ msgstr ""
 
 msgid "Your reservation has been accepted:"
 msgstr "Ihre Reservation wurde angenommen:"
+
+msgid "Your reservation has unfortunately been rejected:"
+msgstr "Ihre Reservation musste leider abgesagt werden:"
 
 msgid "Your ticket has been closed"
 msgstr "Ihr Ticket wurde geschlossen"
@@ -1040,6 +1056,9 @@ msgstr "Neue Reservation für ${title}"
 msgid "Continue"
 msgstr "Weiter"
 
+msgid "The reservation was rejected"
+msgstr "Die Reservation wurde abgesagt"
+
 msgid "Thank you for your reservation!"
 msgstr "Vielen Dank für Ihre Reservation!"
 
@@ -1048,6 +1067,9 @@ msgstr "Die Reservation wurde angenommen"
 
 msgid "The reservation has already been accepted"
 msgstr "Die Reservation wurde bereits angenommen"
+
+msgid "Your reservation was rejected"
+msgstr "Ihre Reservation wurde abgesagt"
 
 msgid "The reservation could not be completed"
 msgstr "Ihre Reservation konnte nicht abgeschlossen werden"
