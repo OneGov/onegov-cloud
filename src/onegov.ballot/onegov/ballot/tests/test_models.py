@@ -23,7 +23,7 @@ def test_create_all_models(session):
     ballot_result = BallotResult(
         group='ZG/Rotkreuz',
         counted=True,
-        yays=4982,
+        yeas=4982,
         nays=4452,
         empty=500,
         invalid=66,
@@ -67,14 +67,14 @@ def test_ballot_answer_simple(session):
         BallotResult(
             group='Ort A',
             counted=True,
-            yays=100,
+            yeas=100,
             nays=50,
             municipality_id=1,
         ),
         BallotResult(
             group='Ort B',
             counted=False,
-            yays=100,
+            yeas=100,
             nays=50,
             municipality_id=1,
         )
@@ -91,7 +91,7 @@ def test_ballot_answer_simple(session):
 
     assert vote.answer == 'accepted'
 
-    # if there are as many nays as yays, we default to 'rejected' - in reality
+    # if there are as many nays as yeas, we default to 'rejected' - in reality
     # this is very unlikely to happen
     for result in ballot.results:
         result.nays = 100
@@ -116,13 +116,13 @@ def test_ballot_answer_proposal_wins(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yays=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yays=0, nays=100, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=100, counted=True, municipality_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
-            group='x', yays=0, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
 
     assert vote.answer == 'proposal'
 
@@ -144,13 +144,13 @@ def test_ballot_answer_counter_proposal_wins(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yays=0, nays=100, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=100, counted=True, municipality_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yays=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
-            group='x', yays=0, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
 
     assert vote.answer == 'counter-proposal'
 
@@ -172,17 +172,17 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yays=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yays=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
-            group='x', yays=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
 
     assert vote.answer == 'proposal'
 
-    vote.tie_breaker.results[0].yays = 0
+    vote.tie_breaker.results[0].yeas = 0
     vote.tie_breaker.results[0].nays = 100
 
     assert vote.answer == 'counter-proposal'
@@ -205,13 +205,13 @@ def test_ballot_answer_nobody_wins(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yays=0, nays=100, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=100, counted=True, municipality_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yays=0, nays=100, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=100, counted=True, municipality_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
-            group='x', yays=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
 
     assert vote.answer == 'rejected'
 
@@ -259,7 +259,7 @@ def test_turnout(session):
             group='1',
             counted=True,
             elegible_voters=100,
-            yays=10,
+            yeas=10,
             municipality_id=1
         )
     )
@@ -285,20 +285,20 @@ def test_percentage_by_municipality(session):
     vote.proposal.results.append(
         BallotResult(
             group='1', municipality_id=1,
-            counted=True, elegible_voters=100, yays=75, nays=25
+            counted=True, elegible_voters=100, yeas=75, nays=25
         )
     )
     vote.proposal.results.append(
         BallotResult(
             group='1', municipality_id=1,
-            counted=True, elegible_voters=100, yays=25, nays=75
+            counted=True, elegible_voters=100, yeas=25, nays=75
         )
     )
 
     session.flush()
 
     assert vote.proposal.percentage_by_municipality() == {
-        1: {'yays_percentage': 50.0, 'nays_percentage': 50.0}
+        1: {'yeas_percentage': 50.0, 'nays_percentage': 50.0}
     }
 
 
@@ -321,7 +321,7 @@ def test_ballot_results_aggregation(session):
         BallotResult(
             group='ZG/Rotkreuz',
             counted=True,
-            yays=507,
+            yeas=507,
             nays=69,
             empty=14,
             invalid=5,
@@ -330,7 +330,7 @@ def test_ballot_results_aggregation(session):
         BallotResult(
             group='ZG/Menzingen',
             counted=True,
-            yays=309,
+            yeas=309,
             nays=28,
             empty=5,
             invalid=0,
@@ -341,17 +341,17 @@ def test_ballot_results_aggregation(session):
     session.add(ballot)
     session.flush()
 
-    assert ballot.yays == 309 + 507
+    assert ballot.yeas == 309 + 507
     assert ballot.nays == 69 + 28
     assert ballot.empty == 14 + 5
     assert ballot.invalid == 5 + 0
     assert ballot.cast_ballots == 309 + 507 + 69 + 28 + 14 + 5 + 5 + 0
     assert ballot.accepted is True
     assert ballot.counted is True
-    assert round(ballot.yays_percentage, 2) == 89.38
+    assert round(ballot.yeas_percentage, 2) == 89.38
     assert round(ballot.nays_percentage, 2) == 10.62
 
-    session.query(Ballot.yays).first() == (309 + 507, )
+    session.query(Ballot.yeas).first() == (309 + 507, )
     session.query(Ballot.nays).first() == (69 + 28, )
     session.query(Ballot.empty).first() == (14 + 5, )
     session.query(Ballot.invalid).first() == (5 + 0, )
@@ -359,7 +359,7 @@ def test_ballot_results_aggregation(session):
     session.query(Ballot.counted).first() == (True, )
     session.query(Ballot.cast_ballots).first() == (
         309 + 507 + 69 + 28 + 14 + 5 + 5 + 0, )
-    round(session.query(Ballot.yays_percentage).first()[0], 2) == 89.38
+    round(session.query(Ballot.yeas_percentage).first()[0], 2) == 89.38
     round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
 
     ballot = session.query(Ballot).one()
@@ -372,17 +372,17 @@ def test_ballot_results_aggregation(session):
     )
     session.flush()
 
-    assert ballot.yays == 309 + 507
+    assert ballot.yeas == 309 + 507
     assert ballot.nays == 69 + 28
     assert ballot.empty == 14 + 5
     assert ballot.invalid == 5 + 0
     assert ballot.cast_ballots == 309 + 507 + 69 + 28 + 14 + 5 + 5 + 0
     assert ballot.accepted is None
     assert ballot.counted is False
-    assert round(ballot.yays_percentage, 2) == 89.38
+    assert round(ballot.yeas_percentage, 2) == 89.38
     assert round(ballot.nays_percentage, 2) == 10.62
 
-    session.query(Ballot.yays).first() == (309 + 507, )
+    session.query(Ballot.yeas).first() == (309 + 507, )
     session.query(Ballot.nays).first() == (69 + 28, )
     session.query(Ballot.empty).first() == (14 + 5, )
     session.query(Ballot.invalid).first() == (5 + 0, )
@@ -390,24 +390,24 @@ def test_ballot_results_aggregation(session):
     session.query(Ballot.counted).first() == (False, )
     session.query(Ballot.cast_ballots).first() == (
         309 + 507 + 69 + 28 + 14 + 5 + 5 + 0, )
-    round(session.query(Ballot.yays_percentage).first()[0], 2) == 89.38
+    round(session.query(Ballot.yeas_percentage).first()[0], 2) == 89.38
     round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
 
     # mark as counted, but don't change any results from 0
     ballot.results[-1].counted = True
     session.flush()
 
-    assert ballot.yays == 309 + 507
+    assert ballot.yeas == 309 + 507
     assert ballot.nays == 69 + 28
     assert ballot.empty == 14 + 5
     assert ballot.invalid == 5 + 0
     assert ballot.cast_ballots == 309 + 507 + 69 + 28 + 14 + 5 + 5 + 0
     assert ballot.accepted is True
     assert ballot.counted is True
-    assert round(ballot.yays_percentage, 2) == 89.38
+    assert round(ballot.yeas_percentage, 2) == 89.38
     assert round(ballot.nays_percentage, 2) == 10.62
 
-    session.query(Ballot.yays).first() == (309 + 507, )
+    session.query(Ballot.yeas).first() == (309 + 507, )
     session.query(Ballot.nays).first() == (69 + 28, )
     session.query(Ballot.empty).first() == (14 + 5, )
     session.query(Ballot.invalid).first() == (5 + 0, )
@@ -415,5 +415,5 @@ def test_ballot_results_aggregation(session):
     session.query(Ballot.counted).first() == (True, )
     session.query(Ballot.cast_ballots).first() == (
         309 + 507 + 69 + 28 + 14 + 5 + 5 + 0, )
-    round(session.query(Ballot.yays_percentage).first()[0], 2) == 89.38
+    round(session.query(Ballot.yeas_percentage).first()[0], 2) == 89.38
     round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62

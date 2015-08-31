@@ -31,32 +31,32 @@ from uuid import uuid4
 class DerivedPercentage(object):
 
     @hybrid_property
-    def yays_percentage(self):
-        """ The percentage of yays (discounts empty/invalid ballots). """
-        return self.yays / (self.yays + self.nays) * 100
+    def yeas_percentage(self):
+        """ The percentage of yeas (discounts empty/invalid ballots). """
+        return self.yeas / (self.yeas + self.nays) * 100
 
     @hybrid_property
     def nays_percentage(self):
         """ The percentage of nays (discounts empty/invalid ballots). """
-        return 100 - self.yays_percentage
+        return 100 - self.yeas_percentage
 
 
 class DerivedAcceptance(object):
 
     @hybrid_property
     def accepted(self):
-        return self.yays > self.nays if self.counted else None
+        return self.yeas > self.nays if self.counted else None
 
     @accepted.expression
     def accepted(cls):
-        return case({True: cls.yays > cls.nays}, cls.counted)
+        return case({True: cls.yeas > cls.nays}, cls.counted)
 
 
 class DerivedBallotsCount(object):
 
     @hybrid_property
     def cast_ballots(self):
-        return self.yays + self.nays + self.empty + self.invalid
+        return self.yeas + self.nays + self.empty + self.invalid
 
     @hybrid_property
     def turnout(self):
@@ -72,7 +72,7 @@ class Vote(Base, TimestampMixin, DerivedPercentage, DerivedBallotsCount):
     __tablename__ = 'votes'
 
     summarized_properties = [
-        'yays', 'nays', 'empty', 'invalid', 'elegible_voters',
+        'yeas', 'nays', 'empty', 'invalid', 'elegible_voters',
     ]
 
     #: identifies the vote, may be used in the url, generated from the title
@@ -220,7 +220,7 @@ class Ballot(Base, TimestampMixin,
     __tablename__ = 'ballots'
 
     summarized_properties = [
-        'yays', 'nays', 'empty', 'invalid', 'elegible_voters'
+        'yeas', 'nays', 'empty', 'invalid', 'elegible_voters'
     ]
 
     #: identifies the ballot, maybe used in the url
@@ -298,7 +298,7 @@ class Ballot(Base, TimestampMixin,
         return expr
 
     def percentage_by_municipality(self):
-        """ Returns the yays/nays percentage grouped and keyed by
+        """ Returns the yeas/nays percentage grouped and keyed by
         municipality_id.
 
         Uncounted municipalities are not included.
@@ -309,7 +309,7 @@ class Ballot(Base, TimestampMixin,
 
         query = query.with_entities(
             BallotResult.municipality_id,
-            func.sum(BallotResult.yays),
+            func.sum(BallotResult.yeas),
             func.sum(BallotResult.nays)
         )
 
@@ -319,10 +319,10 @@ class Ballot(Base, TimestampMixin,
 
         result = {}
 
-        for id, yays, nays in query.all():
+        for id, yeas, nays in query.all():
             result[id] = {}
-            result[id]['yays_percentage'] = yays / (yays + nays) * 100
-            result[id]['nays_percentage'] = 100 - result[id]['yays_percentage']
+            result[id]['yeas_percentage'] = yeas / (yeas + nays) * 100
+            result[id]['nays_percentage'] = 100 - result[id]['yeas_percentage']
 
         return result
 
@@ -353,9 +353,9 @@ class BallotResult(Base, TimestampMixin,
     #: If the result is definite, all the values below must be specified.
     counted = Column(Boolean, nullable=False)
 
-    #: number of yays, in case of variants, the number of yays for the first
+    #: number of yeas, in case of variants, the number of yeas for the first
     #: option of the tie breaker
-    yays = Column(Integer, nullable=False, default=lambda: 0)
+    yeas = Column(Integer, nullable=False, default=lambda: 0)
 
     #: number of nays, in case of variants, the number of nays for the first
     #: option of the tie breaker (so a yay for the second option)
@@ -381,9 +381,9 @@ def add_summarized_properties(mapper, cls):
     to the ballot. This results in a Ballot class that has all the following
     properties which will return the sum of the underlying results if called.
 
-    E.g. this will return all the yays of the joined ballot results::
+    E.g. this will return all the yeas of the joined ballot results::
 
-        ballot.yays
+        ballot.yeas
 
     """
 
