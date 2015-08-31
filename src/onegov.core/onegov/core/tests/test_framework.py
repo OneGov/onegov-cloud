@@ -177,6 +177,12 @@ def test_browser_session_request():
     c1.get('/status').text == 'logged in'
     c2.get('/status').text == 'logged out'
 
+    app.application_id = 'tset'
+    c1.get('/status').text == 'logged out'
+
+    app.application_id = 'test'
+    c1.get('/status').text == 'logged in'
+
 
 def test_browser_session_dirty():
     config = setup()

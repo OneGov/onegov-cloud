@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Fixes browser session chocking on an invalid cookie.
+  [href]
+
 0.4.26 (2015-08-28)
 ~~~~~~~~~~~~~~~~~~~
 

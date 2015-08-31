@@ -151,6 +151,7 @@ class CoreRequest(IncludeRequest):
 
         if 'session_id' in self.cookies:
             session_id = self.app.unsign(self.cookies['session_id'])
+            session_id = session_id or random_token()
         else:
             session_id = random_token()
 
