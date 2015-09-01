@@ -78,6 +78,28 @@ def test_ticket_count(session):
     assert count.closed == 1
 
 
+def test_handler_subset(session):
+    session.add(Ticket(
+        number='FOO-1000-0001',
+        title='test', group='test',
+        handler_code='FOO',
+        handler_id='1',
+        state='open'
+    ))
+
+    session.add(Ticket(
+        number='BAR-1000-0001',
+        title='test', group='test',
+        handler_code='BAR',
+        handler_id='2',
+        state='open'
+    ))
+
+    TicketCollection(session).subset().count() == 2
+    TicketCollection(session, handler='BAR').subset().count() == 1
+    TicketCollection(session, handler='FOO').subset().count() == 1
+
+
 def test_open_ticket(session, handlers):
 
     @handlers.registered_handler('ECO')

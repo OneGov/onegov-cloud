@@ -9,10 +9,11 @@ from sqlalchemy.orm import joinedload, undefer
 
 class TicketCollectionPagination(Pagination):
 
-    def __init__(self, session, page=0, state='open'):
+    def __init__(self, session, page=0, state='open', handler='ALL'):
         self.session = session
         self.page = page
         self.state = state
+        self.handler = handler
 
     def __eq__(self, other):
         return self.state == other.state and self.page == other.page
@@ -24,6 +25,9 @@ class TicketCollectionPagination(Pagination):
         query = query.options(undefer(Ticket.created))
         query = query.filter(Ticket.state == self.state)
 
+        if self.handler != 'ALL':
+            query = query.filter(Ticket.handler_code == self.handler)
+
         return query
 
     @property
@@ -34,7 +38,10 @@ class TicketCollectionPagination(Pagination):
         return self.__class__(self.session, index, self.state)
 
     def for_state(self, state):
-        return self.__class__(self.session, 0, state)
+        return self.__class__(self.session, 0, state, self.handler)
+
+    def for_handler(self, handler):
+        return self.__class__(self.session, 0, self.state, handler)
 
 
 TicketCount = namedtuple('TicketCount', ['open', 'pending', 'closed'])

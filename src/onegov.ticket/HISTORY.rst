@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to filter the tickets collection by handler.
+  [href]
+
 0.0.6 (2015-08-28)
 ~~~~~~~~~~~~~~~~~~~
 

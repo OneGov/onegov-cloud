@@ -109,6 +109,8 @@ class Handler(object):
 
 class HandlerRegistry(object):
 
+    _reserved_handler_codes = {'ALL'}
+
     def __init__(self):
         self.registry = {}
 
@@ -140,6 +142,7 @@ class HandlerRegistry(object):
 
         assert len(handler_code) == 3
         assert handler_code == handler_code.upper()
+        assert handler_code not in self._reserved_handler_codes
 
         if handler_code in self.registry:
             raise DuplicateHandlerError
