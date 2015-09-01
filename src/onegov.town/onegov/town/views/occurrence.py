@@ -43,7 +43,7 @@ def view_occurrences(self, request):
         'end': self.end.isoformat() if self.end else '',
         'layout': layout,
         'lead': lead,
-        'number_of_occurrences': self.subset().count(),
+        'number_of_occurrences': self.subset_count,
         'occurrences': self.batch,
         'start': self.start.isoformat() if self.start else '',
         'tags': tags,

@@ -27,7 +27,7 @@
                                     <div class="large-9 medium-12 small-12 columns">
                                         <div class="occurrence-date">${layout.format_date(occurrence.localized_start, 'date')}</div>
                                         <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
-                                        <div>${occurrence.event.location}</div>
+                                        <div>${occurrence.location}</div>
                                         <div>${layout.format_date(occurrence.localized_start, 'time')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
                                         <div><span tal:repeat="tag occurrence.tags" class="occurrence-tag" i18n:translate="">${tag}</span></div>
                                     </div>
