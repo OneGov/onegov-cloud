@@ -849,7 +849,8 @@ def test_with_people(town_app):
 def test_tickets(town_app):
     client = Client(town_app)
 
-    assert client.get('/tickets', expect_errors=True).status_code == 403
+    assert client.get(
+        '/tickets/ALL/open', expect_errors=True).status_code == 403
 
     assert len(client.get('/').pyquery('.ticket-count')) == 0
 
@@ -895,13 +896,14 @@ def test_tickets(town_app):
     assert client.get('/').pyquery('.ticket-count div').text()\
         == '1 Offen 0 In Bearbeitung'
 
-    tickets_page = client.get('/tickets')
-
-    assert '1 Offene Tickets' in tickets_page
+    tickets_page = client.get('/tickets/ALL/open')
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
 
     ticket_page = tickets_page.click('Annehmen').follow()
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
 
-    assert '1 Tickets in Bearbeitung' in client.get('/tickets?state=pending')
+    tickets_page = client.get('/tickets/ALL/pending')
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
 
     assert client.get('/').pyquery('.ticket-count div').text()\
         == '0 Offen 1 In Bearbeitung'
@@ -931,14 +933,14 @@ def test_tickets(town_app):
     assert 'Offen' in status_page
 
     assert 'Abgeschlossen' in ticket_page
-
-    tickets_page = client.get('/tickets?state=closed')
-    assert '1 Abgeschlossene Tickets' in tickets_page
+    tickets_page = client.get('/tickets/ALL/closed')
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
 
     ticket_page = client.get(ticket_url)
     ticket_page = ticket_page.click('Ticket wieder öffnen').follow()
 
-    assert '1 Tickets in Bearbeitung' in client.get('/tickets?state=pending')
+    tickets_page = client.get('/tickets/ALL/pending')
+    assert len(tickets_page.pyquery('tr.ticket')) == 1
 
     assert client.get('/').pyquery('.ticket-count div').text()\
         == '0 Offen 1 In Bearbeitung'
@@ -1349,7 +1351,7 @@ def test_reserve_allocation(town_app):
         client.delete(extract_href(slots.json[0]['actions'][2]))
 
     # open the created ticket
-    ticket = client.get('/tickets').click('Annehmen').follow()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     assert 'Foobar' in ticket
     assert '28.08.2015' in ticket

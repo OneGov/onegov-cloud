@@ -1003,6 +1003,30 @@ $evn-handler-icon: '\f133';
     td.ticket-action {
         white-space: nowrap;
     }
+
+    th {
+        button,
+        dl {
+            margin: 0;
+        }
+
+        dl dd {
+            margin-left: 0;
+        }
+
+        dd + dd {
+            margin-left: 1em;
+        }
+
+        button {
+            float: right;
+        }
+
+        ul li {
+            font-size: .8rem;
+            font-weight: normal;
+        }
+    }
 }
 
 .ticket-handler-FRM td:first-child::before {

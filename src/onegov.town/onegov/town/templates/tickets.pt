@@ -3,18 +3,35 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <dl class="sub-nav tickets-filter">
-            <dt i18n:translate>State:</dt>
-            <tal:block repeat="link filters">
-                <dd class="${link.active and 'active' or ''}">
-                    <tal:block replace="structure link(request)"></tal:block>
-                </dd>
-            </tal:block>
-        </dl>
         <table class="tickets-table">
             <thead>
                 <tr>
-                    <th colspan="6">${layout.model.subset_count} ${tickets_title}</th>
+                    <th colspan="6">
+                        <div class="row ticket-filters">
+                            <div class="columns small-12 medium-8">
+                                <dl class="sub-nav">
+                                    <dt class="show-for-sr" i18n:translate>State:</dt>
+                                    <tal:block repeat="link filters">
+                                        <dd class="${link.active and 'active' or ''}">
+                                            <tal:block replace="structure link(request)"></tal:block>
+                                        </dd>
+                                    </tal:block>
+                                </dl>
+                            </div>
+                            <div class="columns small-12 medium-4">
+                                <button href="#" data-dropdown="handlers" aria-controls="handlers" aria-expanded="false" class="${has_handler_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'}">
+                                    <tal:block repeat="link handlers">
+                                        <tal:block condition="link.active">
+                                            <span i18n:translate>Kind</span>: ${link.text}
+                                        </tal:block>
+                                    </tal:block>
+                                </button>
+                                <ul id="handlers" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                                    <li tal:repeat="link handlers"><tal:block replace="structure link(request)"></tal:block></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </th>
                 </tr>
             </thead>
             <tbody>

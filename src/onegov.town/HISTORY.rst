@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to filter tickets by handler.
+  [href]
+
 - Sorts the children pages on the homepage by A-Z as well.
   [href]
 

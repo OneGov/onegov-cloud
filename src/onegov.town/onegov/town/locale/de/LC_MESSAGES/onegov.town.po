@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-08-31 09:51+0200\n"
+"POT-Creation-Date: 2015-09-01 12:13+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -643,9 +643,10 @@ msgid ""
 "This page has subpages. Only administrators can delete pages with subpages. "
 "To delete this page, delete all subpages first or ask an administrator to do "
 "it for you."
-msgstr "Diese Seite hat Unterseiten. Nur Administratoren können Seiten mit "
-"Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle Unterseiten "
-"löschen, oder Sie wenden sich an einen Administrator."
+msgstr ""
+"Diese Seite hat Unterseiten. Nur Administratoren können Seiten mit "
+"Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
+"Unterseiten löschen, oder Sie wenden sich an einen Administrator."
 
 msgid ""
 "Your event submission is ready to be sent to the town. Please review your "
@@ -941,6 +942,12 @@ msgstr ""
 "Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
 "Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
 
+msgid "State:"
+msgstr "Status:"
+
+msgid "Kind"
+msgstr "Art"
+
 msgid "Accept"
 msgstr "Annehmen"
 
@@ -1151,6 +1158,12 @@ msgstr "Tickets in Bearbeitung"
 
 msgid "Your request has been processed"
 msgstr "Ihr Anliegen wurde abgeschlossen"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Form Submissions"
+msgstr "Formulareingaben"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"

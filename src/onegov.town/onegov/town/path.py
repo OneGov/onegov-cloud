@@ -135,9 +135,10 @@ def get_ticket(app, handler_code, id):
         id, ensure_handler_code=handler_code)
 
 
-@TownApp.path(model=TicketCollection, path='/tickets')
-def get_tickets(app, page=0, state='open'):
-    return TicketCollection(app.session(), page, state)
+@TownApp.path(model=TicketCollection, path='/tickets/{handler}/{state}')
+def get_tickets(app, handler='ALL', state='open', page=0):
+    return TicketCollection(
+        app.session(), handler=handler, state=state, page=page)
 
 
 @TownApp.path(model=ResourceCollection, path='/ressourcen')

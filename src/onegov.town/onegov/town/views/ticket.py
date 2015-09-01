@@ -148,6 +148,20 @@ def view_tickets(self, request):
                 active=self.state == id
             )
 
+    def get_handlers():
+        handlers = (
+            ('ALL', _("All")),
+            ('FRM', _("Form Submissions")),
+            ('RSV', _("Reservations")),
+        )
+
+        for id, text in handlers:
+            yield Link(
+                text=text,
+                url=request.link(self.for_handler(id)),
+                active=self.handler == id
+            )
+
     if self.state == 'open':
         tickets_title = _("Open Tickets")
     elif self.state == 'pending':
@@ -162,5 +176,7 @@ def view_tickets(self, request):
         'layout': TicketsLayout(self, request),
         'tickets': self.batch,
         'filters': tuple(get_filters()),
+        'handlers': tuple(get_handlers()),
         'tickets_title': tickets_title,
+        'has_handler_filter': self.handler != 'ALL'
     }
