@@ -635,6 +635,14 @@ div#redactor-droparea {
 }
 
 /*
+    hide the "open in new tab" element in the redactor
+*/
+
+#redactor-modal-link-insert label:last-child {
+    display: none;
+}
+
+/*
     confirm dialog styling
 */
 .confirm-modal .button {
