@@ -4,13 +4,16 @@ from datetime import date, datetime, time, timedelta
 from dateutil.rrule import MO, WE
 from libres.db.models import Allocation
 from onegov.core.utils import Bunch
+from onegov.event import Event
 from onegov.town.forms import (
     DaypassAllocationForm,
+    EventForm,
     ReservationForm,
+    RoomAllocationEditForm,
     RoomAllocationForm,
-    RoomAllocationEditForm
 )
 from onegov.town.forms.allocation import AllocationFormHelpers
+from webob.multidict import MultiDict
 
 
 @pytest.mark.parametrize('form_class', [
@@ -284,3 +287,123 @@ def test_edit_room_alllocation_form():
         datetime(2015, 1, 1, 12, 0),
         datetime(2015, 1, 1, 18, 0)
     )
+
+
+def test_event_form_update_apply():
+    form = EventForm(MultiDict([
+        ('description', u'Rendez-vous automnal des médecines.'),
+        ('email', u'info@example.org'),
+        ('end_date', ''),
+        ('end_time', '18:00'),
+        ('location', u'Salon du mieux-vivre à Saignelégier'),
+        ('start_date', '2015-06-16'),
+        ('start_time', '09:30'),
+        ('tags', u'Congress'),
+        ('tags', u'Health'),
+        ('title', u'Salon du mieux-vivre, 16e édition'),
+    ]))
+    assert form.validate()
+
+    event = Event()
+    form.update_model(event)
+    form = EventForm()
+    form.apply_model(event)
+    assert form.data['description'] == u'Rendez-vous automnal des médecines.'
+    assert form.data['email'] == u'info@example.org'
+    assert form.data['end_date'] == None
+    assert form.data['end_time'] == time(18, 0)
+    assert form.data['location'] == u'Salon du mieux-vivre à Saignelégier'
+    assert form.data['start_date'] == date(2015, 6, 16)
+    assert form.data['start_time'] == time(9, 30)
+    assert sorted(form.data['tags']) == [u'Congress', u'Health']
+    assert form.data['title'] == u'Salon du mieux-vivre, 16e édition'
+    assert form.data['weekly'] == None
+
+
+def test_event_form_validate():
+    form = EventForm(MultiDict([
+        ('email', u'info@example.org'),
+        ('end_date', ''),
+        ('end_time', '18:00'),
+        ('start_date', '2015-06-16'),
+        ('start_time', '19:30'),
+        ('title', u'Salon du mieux-vivre, 16e édition'),
+    ]))
+    assert not form.validate()
+    assert form.errors == {
+        'end_time': ['The end time must be later than the start time.']
+    }
+
+    form = EventForm(MultiDict([
+        ('email', u'info@example.org'),
+        ('end_date', '2015-06-23'),
+        ('end_time', '18:00'),
+        ('start_date', '2015-06-16'),
+        ('start_time', '09:30'),
+        ('title', u'Salon du mieux-vivre, 16e édition'),
+        ('weekly', u'MO'),
+    ]))
+    assert not form.validate()
+    assert form.errors == {
+        'weekly': ['The weekday of the start date must be selected.']
+    }
+
+    form = EventForm(MultiDict([
+        ('email', u'info@example.org'),
+        ('end_date', ''),
+        ('end_time', '18:00'),
+        ('start_date', '2015-06-16'),
+        ('start_time', '09:30'),
+        ('title', u'Salon du mieux-vivre, 16e édition'),
+        ('weekly', u'TU'),
+    ]))
+    assert not form.validate()
+    assert form.errors == {
+        'end_date': ['Please set and end date if the event is recurring.']
+    }
+
+    form = EventForm(MultiDict([
+        ('email', u'info@example.org'),
+        ('end_date', '2015-06-23'),
+        ('end_time', '18:00'),
+        ('start_date', '2015-06-16'),
+        ('start_time', '09:30'),
+        ('title', u'Salon du mieux-vivre, 16e édition'),
+    ]))
+    assert not form.validate()
+    assert form.errors == {
+        'weekly': ['Please select a weekday if the event is recurring.']
+    }
+
+
+def test_event_form_create_rrule():
+
+    def occurrences(form):
+        event = Event()
+        form.update_model(event)
+        return [occurrence.date() for occurrence in event.occurrence_dates()]
+
+    form = EventForm(data={
+        'start_time': time(9, 30),
+        'end_time': time(18, 0),
+        'start_date': date(2015, 6, 1),
+        'end_date': date(2015, 6, 7),
+        'weekly': ['MO'],
+        'tags': []
+    })
+    assert occurrences(form) == [date(2015, 6, 1)]
+
+    form.end_date.data = date(2015, 6, 8)
+    assert occurrences(form) == [date(2015, 6, 1), date(2015, 6, 8)]
+
+    form.end_date.data = date(2015, 6, 15)
+    assert occurrences(form) == [date(2015, 6, day) for day in (1, 8, 15)]
+
+    form.end_date.data = date(2015, 6, 10)
+    form.weekly.data = ['MO', 'WE']
+    assert occurrences(form) == [date(2015, 6, day) for day in (1, 3, 8, 10)]
+
+    form.start_date.data = date(2015, 6, 3)
+    form.end_date.data = date(2015, 6, 10)
+    form.weekly.data = ['MO', 'WE', 'FR']
+    assert occurrences(form) == [date(2015, 6, day) for day in (3, 5, 8, 10)]
