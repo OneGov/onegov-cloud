@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Updates redactor to 10.2.3.
+  [href]
+
 - Adds the ability to filter tickets by handler.
   [href]
 
