@@ -734,7 +734,7 @@ class AllocationEditFormLayout(DefaultLayout):
                 )
 
 
-class OccurrenceBaseLayout(DefaultLayout):
+class EventBaseLayout(DefaultLayout):
 
     weekday_format = 'dddd'
     month_format = 'MMMM'
@@ -756,8 +756,30 @@ class OccurrenceBaseLayout(DefaultLayout):
                 locale=self.request.locale
             )
 
+    def format_recurrence(self, recurrence):
+        """ Returns a human readable version of an RRULE used by us. """
 
-class OccurrencesLayout(OccurrenceBaseLayout):
+        WEEKDAYS = (_("Mo"), _("Tu"), _("We"), _("Th"), _("Fr"), _("Sa"),
+                    _("Su"))
+
+        if recurrence:
+            rule = rrule.rrulestr(recurrence)
+            if rule._freq == rrule.WEEKLY:
+                return _(
+                    u"Every ${days} until ${end}",
+                    mapping={
+                        'days': ', '.join((
+                            self.request.translate(WEEKDAYS[day])
+                            for day in rule._byweekday
+                        )),
+                        'end': rule._until.date().strftime('%d.%m.%Y')
+                    }
+                )
+
+        return ''
+
+
+class OccurrencesLayout(EventBaseLayout):
 
     @cached_property
     def breadcrumbs(self):
@@ -767,7 +789,7 @@ class OccurrencesLayout(OccurrenceBaseLayout):
         ]
 
 
-class OccurrenceLayout(OccurrenceBaseLayout):
+class OccurrenceLayout(EventBaseLayout):
 
     @cached_property
     def collection(self):
@@ -793,29 +815,7 @@ class OccurrenceLayout(OccurrenceBaseLayout):
             ]
 
 
-class EventLayout(DefaultLayout):
-
-    def format_recurrence(self, recurrence):
-        """ Returns a human readable version of an RRULE used by us. """
-
-        WEEKDAYS = (_("Mo"), _("Tu"), _("We"), _("Th"), _("Fr"), _("Sa"),
-                    _("Su"))
-
-        if recurrence:
-            rule = rrule.rrulestr(recurrence)
-            if rule._freq == rrule.WEEKLY:
-                return _(
-                    u"Every ${days} until ${end}",
-                    mapping={
-                        'days': ', '.join((
-                            self.request.translate(WEEKDAYS[day])
-                            for day in rule._byweekday
-                        )),
-                        'end': rule._until.date().strftime('%d.%m.%Y')
-                    }
-                )
-
-        return ''
+class EventLayout(EventBaseLayout):
 
     @cached_property
     def breadcrumbs(self):

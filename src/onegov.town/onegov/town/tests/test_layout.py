@@ -9,9 +9,8 @@ from morepath import setup
 from onegov.page import Page
 from onegov.town import TownApp
 from onegov.town.layout import (
-    EventLayout,
+    EventBaseLayout,
     Layout,
-    OccurrenceBaseLayout,
     PageLayout
 )
 from webtest import TestApp as Client
@@ -211,13 +210,13 @@ def test_events_layout_format_date():
     then = datetime(2015, 7, 5, 10, 15)
     request = MockRequest()
 
-    layout = OccurrenceBaseLayout(MockModel(), request)
+    layout = EventBaseLayout(MockModel(), request)
     assert layout.format_date(then, 'weekday') == 'Sunday'
     assert layout.format_date(then, 'month') == 'July'
     assert layout.format_date(then, 'event') == 'Sunday, 5. July 2015, 10:15'
 
     request.locale = 'de'
-    layout = OccurrenceBaseLayout(MockModel(), request)
+    layout = EventBaseLayout(MockModel(), request)
     assert layout.format_date(then, 'date') == '05.07.2015'
     assert layout.format_date(then, 'datetime') == '05.07.2015 10:15'
     assert layout.format_date(then, 'time') == '10:15'

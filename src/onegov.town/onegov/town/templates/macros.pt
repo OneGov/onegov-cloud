@@ -393,7 +393,7 @@
         <dt i18n:translate="">All dates</dt>
         <dd tal:define="occurrences event.occurrence_dates(localize=True)">
             <ul>
-                <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'date')}</li>
+                <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'weekday')} ${layout.format_date(occurrence, 'date')}</li>
             </ul>
         </dd>
     </dl>
