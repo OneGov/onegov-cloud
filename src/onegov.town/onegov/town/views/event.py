@@ -108,15 +108,16 @@ def publish_event(self, request):
         'title': self.title
     }))
 
-    send_html_mail(
-        request=request,
-        template='mail_event_published.pt',
-        subject=_("Your event was published"),
-        receivers=(self.meta.get('submitter_email'), ),
-        content={
-            'model': self,
-        }
-    )
+    if self.meta.get('submitter_email'):
+        send_html_mail(
+            request=request,
+            template='mail_event_published.pt',
+            subject=_("Your event was published"),
+            receivers=(self.meta.get('submitter_email'), ),
+            content={
+                'model': self,
+            }
+        )
 
     if 'return-to' in request.GET:
         return morepath.redirect(request.GET['return-to'])
@@ -289,14 +290,15 @@ def handle_edit_event(self, request, form):
 def handle_delete_event(self, request):
     """ Delete an event. """
 
-    send_html_mail(
-        request=request,
-        template='mail_event_rejected.pt',
-        subject=_("Your event was rejected"),
-        receivers=(self.meta.get('submitter_email'), ),
-        content={
-            'model': self,
-        }
-    )
+    if self.meta.get('submitter_email'):
+        send_html_mail(
+            request=request,
+            template='mail_event_rejected.pt',
+            subject=_("Your event was rejected"),
+            receivers=(self.meta.get('submitter_email'), ),
+            content={
+                'model': self,
+            }
+        )
 
     EventCollection(request.app.session()).delete(self)
