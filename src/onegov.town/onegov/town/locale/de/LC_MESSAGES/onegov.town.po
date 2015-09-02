@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-02 11:12+0200\n"
+"POT-Creation-Date: 2015-09-02 11:27+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1022,6 +1022,9 @@ msgstr "Online-Schalter"
 
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
+
+msgid "All events"
+msgstr "Alle Veranstaltungen"
 
 msgid "All contacts"
 msgstr "Alle Kontakte"

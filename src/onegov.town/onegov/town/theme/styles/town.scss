@@ -445,6 +445,20 @@ input[type=color] {
             margin-top: .375rem;
             overflow: hidden;
             text-overflow: ellipsis;
+
+            &.more-link {
+                font-size: .8em;
+                font-weight: normal;
+
+                &::before {
+                    content: '\f054';
+                    font-family: 'FontAwesome';
+                    font-size: .8em;
+                    font-weight: normal;
+                    margin-right: 1ex;
+                }
+            }
+
         }
 
         small {

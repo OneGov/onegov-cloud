@@ -79,17 +79,26 @@ def view_town(self, request):
 
     event_layout = EventBaseLayout(self, request)
     occurrences = OccurrenceCollection(session).query().limit(4)
+    event_links = [
+        Link(
+            text=occurrence.title,
+            url=request.link(occurrence),
+            subtitle=event_layout.format_date(occurrence.localized_start,
+                                              'event')
+        )
+        for occurrence in occurrences
+    ]
+    event_links.append(
+        Link(
+            text=_("All events"),
+            url=event_layout.events_url,
+            classes=('more-link', )
+        )
+    )
+
     latest_events = LinkGroup(
         title=u"Veranstaltungen",
-        links=[
-            Link(
-                text=occurrence.title,
-                url=request.link(occurrence),
-                subtitle=event_layout.format_date(occurrence.localized_start,
-                                                  'event')
-            )
-            for occurrence in occurrences
-        ]
+        links=event_links,
     )
 
     directories = LinkGroup(
