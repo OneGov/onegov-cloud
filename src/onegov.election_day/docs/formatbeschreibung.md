@@ -51,13 +51,12 @@ Die Anzahl eingelegter Stimmzettel (inkl. ungültiger Stimmzettel).
 
 ### Vorlage
 
-* XLS Vorlage: [https://github.com/OneGov/onegov.election_day/docs/vorlage.xls]()
-* CSV Vorlage: [https://github.com/OneGov/onegov.election_day/docs/vorlage.csv]()
-* XLSX Vorlage: [https://github.com/OneGov/onegov.election_day/docs/vorlage.xlsx]()
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage.xlsx]()
 
 ### Beispiel
 
 «Schluss mit den Steuerprivilegien für Millionäre (Abschaffung der Pauschalbesteuerung)»
 
-Resultate des Kanton Zug: 
-[https://github.com/OneGov/onegov.election_day/docs/steuerprivilegien.csv]()
+Resultate des Kanton Zug: [https://github.com/OneGov/onegov.election_day/blob/master/docs/steuerprivilegien.csv]()
