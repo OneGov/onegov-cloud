@@ -50,7 +50,7 @@ class EventCollection(EventCollectionPagination):
         name = normalize_for_url(name) or "event"
 
         session = self.session
-        while session.query(Event.name).filter(Event.name == name).count():
+        while session.query(Event.name).filter(Event.name == name).first():
             name = increment_name(name)
 
         return name
