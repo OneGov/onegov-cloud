@@ -1279,6 +1279,139 @@ tr.ticket:hover {
 }
 
 /*
+    Event occurrences
+*/
+
+.occurrence {
+    margin-bottom: 1.5rem;
+}
+
+.occurrence-tag {
+    @include label(
+        $bg: $secondary-color,
+        $radius: 4px
+    );
+
+    &.active {
+        @include label(
+            $radius: 4px
+        );
+    }
+
+    a {
+        color: inherit;
+    }
+}
+
+.occurrences-day-date {
+    min-height: 135px;
+    width: 100%;
+
+    &.active {
+        background-color: $white-smoke;
+    }
+
+    div {
+        text-align: center;
+
+        &.day {
+            font-size: 3em;
+            font-weight: bold;
+
+        }
+    }
+}
+
+.occurrences-filter-result {
+    margin-bottom: 1em;
+
+    span:first-child {
+        font-size: 1.6em;
+        font-weight: bold;
+    }
+}
+
+.occurrences-filter-tags,
+.occurrences-filter-date {
+    margin-bottom: 1em;
+}
+
+.occurrences-add-box {
+    @include panel;
+    @include smooth-edges;
+
+    margin-top: 2em;
+}
+
+.occurrence-lead {
+    font-size: $h5-font-size;
+    font-weight: 300;
+}
+
+.occurrence-tags,
+.occurrence-description {
+    margin-bottom: 2em;
+}
+
+.occurrence-date {
+    font-size: .8em;
+}
+
+.js .occurrences-filter-date-submit {
+    display: none;
+}
+
+/*
+    Events
+*/
+.events-table {
+    // todo: this is only a temporary view
+    width: 100%;
+
+    tr.event:hover {
+        background-color: $yellow-pastel;
+    }
+
+    td.event-title {
+        font-weight: bold;
+
+        ::before {
+            content: '\f044';
+            font-family: 'FontAwesome';
+            font-weight: normal;
+        }
+    }
+}
+
+$event-action-icon: '\f1db';
+$event-action-icon-hover: '\f192';
+
+.event-publish,
+.event-withdraw {
+    &::before {
+        content: $event-action-icon;
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
+    }
+
+    &:hover::before {
+        content: $event-action-icon-hover;
+        font-family: 'FontAwesome';
+        margin-right: 1ex;
+    }
+}
+
+.event-action {
+    @include button(
+        $padding: $button-tny,
+        $bg: $success-color
+    );
+    float: right;
+    font-size: 1em;
+    margin: 0;
+}
+
+/*
     Fullcalendar Screen Flicker Prevention
 */
 

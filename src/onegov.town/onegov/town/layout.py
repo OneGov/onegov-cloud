@@ -793,14 +793,14 @@ class OccurrenceLayout(EventBaseLayout):
 
     @cached_property
     def collection(self):
-        return ResourceCollection(self.request.app.libres_context)
+        return OccurrenceCollection(self.request.app.session())
 
     @cached_property
     def breadcrumbs(self):
         return [
             Link(_("Homepage"), self.homepage_url),
-            Link(_("Reservations"), self.request.link(self.collection)),
-            Link(_("Edit allocation"), '#')
+            Link(_("Events"), self.request.link(self.collection)),
+            Link(self.model.title, '#')
         ]
 
     @cached_property
@@ -837,10 +837,25 @@ class EventLayout(EventBaseLayout):
                 DeleteLink(
                     text=_("Delete"),
                     url=self.request.link(self.model),
-                    confirm=_("This resource can't be deleted."),
-                    extra_information=_(
-                        "There are existing reservations associated "
-                        "with this resource"
-                    ),
-                    redirect_after=self.request.link(self.collection)
+                    confirm=_("Do you really want to delete this event?"),
+                    yes_button_text=_("Delete event"),
+                    redirect_after=self.events_url
                 )
+            ]
+
+            state = self.model.state
+            if state == 'submitted' or state == 'withdrawn':
+                links.append(Link(
+                    text=_("Publish event"),
+                    url=self.request.link(self.model, 'publish'),
+                    classes=('event-action', 'event-publish'),
+                ))
+
+            elif state == 'published':
+                links.append(Link(
+                    text=_("Withdraw event"),
+                    url=self.request.link(self.model, 'withdraw'),
+                    classes=('event-action', 'event-withdraw'),
+                ))
+
+            return links

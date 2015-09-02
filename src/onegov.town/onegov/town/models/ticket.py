@@ -6,8 +6,8 @@ from onegov.form import FormSubmissionCollection
 from onegov.libres import Resource
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.town import _
-from onegov.town.elements import Link, DeleteLink
-from onegov.town.layout import DefaultLayout
+from onegov.town.elements import DeleteLink, Link
+from onegov.town.layout import DefaultLayout, EventLayout
 from purl import URL
 
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-01 12:13+0200\n"
+"POT-Creation-Date: 2015-09-02 08:57+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -59,12 +59,12 @@ msgstr "Reservationen"
 msgid "Edit allocation"
 msgstr "Einteilung bearbeiten"
 
-msgid "Events"
-msgstr "Veranstaltungen"
-
 #, python-format
 msgid "Every ${days} until ${end}"
 msgstr "Jeden ${days} bis zum ${end}."
+
+msgid "Events"
+msgstr "Veranstaltungen"
 
 msgid "Logout"
 msgstr "Logout"
@@ -770,7 +770,7 @@ msgid "Withdrawn"
 msgstr "Zurückgezogen"
 
 msgid "Submitter"
-msgstr "Übermittler"
+msgstr "Antragsteller/in"
 
 msgid "Date and time"
 msgstr "Datum und Zeit"
@@ -921,9 +921,6 @@ msgstr "Zuständig"
 msgid "Created"
 msgstr "Eingang"
 
-msgid "Submitter"
-msgstr "Antragsteller/in"
-
 msgid ""
 "Your request will be processed shortly. To see the state of your process "
 "your may return to this page at any time. All information on this page has "
@@ -941,9 +938,6 @@ msgstr ""
 "Ihre Anfrage wurde erfolgreich abgeschlossen. Falls Sie Dokumente über den "
 "Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
 "Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
-
-msgid "State:"
-msgstr "Status:"
 
 msgid "Kind"
 msgstr "Art"
@@ -984,20 +978,20 @@ msgstr "Auflisten"
 msgid "Submitted events"
 msgstr "Gemeldete Veranstaltungen"
 
-msgid "Your event was published"
-msgstr "Ihre Veranstaltung wurde veröffentlicht"
-
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
-
-msgid "Your event was rejected"
-msgstr "Ihre Veranstaltung wurde abgelehnt"
 
 msgid "Published events"
 msgstr "Veröffentlichte Veranstaltungen"
 
+msgid "Your event was published"
+msgstr "Ihre Veranstaltung wurde veröffentlicht"
+
 msgid "A ticket has been opened"
 msgstr "Ein neues Ticket wurde für Sie eröffnet"
+
+msgid "Your event was rejected"
+msgstr "Ihre Veranstaltung wurde abgelehnt"
 
 msgid "Withdrawn events"
 msgstr "Zurückgezogene Veranstaltungen"
