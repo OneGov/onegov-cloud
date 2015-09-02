@@ -66,7 +66,6 @@ class EventCollection(EventCollectionPagination):
 
         Returns the created event or None if already automatically deleted.
         """
-        name = self.get_unique_name(title)
         event = Event(
             state='initiated',
             title=title,
