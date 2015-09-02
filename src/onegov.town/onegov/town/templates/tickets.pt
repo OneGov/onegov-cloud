@@ -43,7 +43,7 @@
                             </a>
                         </td>
                         <td class="ticket-group">
-                            ${ticket.group}
+                            ${translate(ticket.group)}
                         </td>
                         <td class="ticket-title">
                             ${ticket.title}
