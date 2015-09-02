@@ -151,6 +151,7 @@ def view_tickets(self, request):
     def get_handlers():
         handlers = (
             ('ALL', _("All")),
+            ('EVN', _("Events")),
             ('FRM', _("Form Submissions")),
             ('RSV', _("Reservations")),
         )
