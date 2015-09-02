@@ -217,7 +217,7 @@ class TownApp(Framework, LibresIntegration):
         events = Bundle(
             'js/url.js',
             'js/events.js',
-            filters='jsmin',
+            filters='rjsmin',
             output='bundles/events.bundle.js'
         )
 
