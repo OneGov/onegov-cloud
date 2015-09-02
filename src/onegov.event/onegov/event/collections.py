@@ -45,7 +45,9 @@ class EventCollection(EventCollectionPagination):
 
     def get_unique_name(self, name):
         """ Create a unique, URL-friendly name. """
-        name = normalize_for_url(name)
+
+        # it's possible for `normalize_for_url` to return an empty string...
+        name = normalize_for_url(name) or "event"
 
         session = self.session
         while session.query(Event.name).filter(Event.name == name).count():
