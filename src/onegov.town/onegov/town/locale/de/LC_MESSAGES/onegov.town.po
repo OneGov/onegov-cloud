@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-02 11:04+0200\n"
+"POT-Creation-Date: 2015-09-02 11:12+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -361,6 +361,12 @@ msgstr "Tanz"
 msgid "Theater"
 msgstr "Theater"
 
+msgid "Meetup"
+msgstr "Treffen"
+
+msgid "Talk"
+msgstr "Vortrag"
+
 msgid "E-Mail"
 msgstr "E-Mail"
 
@@ -394,8 +400,8 @@ msgstr "Bis"
 msgid "Repeats itself every"
 msgstr "Wiederholt sich jeden"
 
-msgid "... until"
-msgstr "... bis zum"
+msgid "Until date"
+msgstr "Bis Datum"
 
 msgid "Please set and end date if the event is recurring."
 msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."

@@ -27,6 +27,8 @@ TAGS = [(tag, tag) for tag in (
     _("Sports"),
     _("Dancing"),
     _("Theater"),
+    _("Meetup"),
+    _("Talk"),
 )]
 
 WEEKDAYS = (
@@ -71,6 +73,12 @@ class EventForm(Form):
         choices=TAGS,
     )
 
+    start_date = DateField(
+        label=_("Date"),
+        validators=[validators.InputRequired()],
+        default=date.today
+    )
+
     start_time = TimeField(
         label=_("From"),
         validators=[validators.InputRequired()]
@@ -79,12 +87,6 @@ class EventForm(Form):
     end_time = TimeField(
         label=_("To"),
         validators=[validators.InputRequired()]
-    )
-
-    start_date = DateField(
-        label=_("Date"),
-        validators=[validators.InputRequired()],
-        default=date.today
     )
 
     weekly = MultiCheckboxField(
@@ -98,7 +100,7 @@ class EventForm(Form):
     )
 
     end_date = DateField(
-        label=_("... until"),
+        label=_("Until date"),
         validators=[validators.Optional()]
     )
 
