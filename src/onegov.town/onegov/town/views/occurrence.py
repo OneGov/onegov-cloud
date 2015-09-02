@@ -27,22 +27,12 @@ def view_occurrences(self, request):
         ) for tag in self.used_tags
     )
 
-    lead = _(
-        "${town} offers a versatile and colorful social life thanks to its "
-        "generous and open culture. Whether exhibition, concert, village "
-        "market or theater performance - there's an attractive event for "
-        "everybody. You have the possibility to a submit to our event "
-        "calendar.",
-        mapping={'town': request.app.town.name}
-    )
-
     return {
         'active_tags': self.tags,
         'add_link': request.link(self, name='neu'),
         'date_placeholder': date.today().isoformat(),
         'end': self.end.isoformat() if self.end else '',
         'layout': layout,
-        'lead': lead,
         'number_of_occurrences': self.subset_count,
         'occurrences': self.batch,
         'start': self.start.isoformat() if self.start else '',

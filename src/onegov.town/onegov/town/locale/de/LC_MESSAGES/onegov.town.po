@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-02 08:57+0200\n"
+"POT-Creation-Date: 2015-09-02 11:04+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1038,19 +1038,6 @@ msgstr "Sie wurden eingeloggt."
 
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
-
-#, python-format
-msgid ""
-"${town} offers a versatile and colorful social life thanks to its generous "
-"and open culture. Whether exhibition, concert, village market or theater "
-"performance - there's an attractive event for everybody. You have the "
-"possibility to a submit to our event calendar."
-msgstr ""
-"${town} bietet dank seiner reichhaltigen und offenen Kultur ein vielseitiges "
-"und buntes Gesellschaftsleben. Ob Ausstellung, Konzert, Dorfmarkt oder "
-"Theateraufführung – bestimmt finden auch Sie eine attraktive Veranstaltung. "
-"Sie haben die Möglichkeit, einen Anlass in unseren Veranstaltungskalender "
-"einzutragen."
 
 msgid "New person"
 msgstr "Neue Person"

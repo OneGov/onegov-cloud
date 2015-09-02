@@ -8,7 +8,6 @@
             <div class="large-8 medium-8 columns">
                 <div class="row">
                     <div class="large-12 columns" tal:define="global lastdaydate 0">
-                        <em class="page-lead">${lead}</em>
                         <tal:block repeat="occurrence occurrences">
                             <div class="row">
                                 <div class="occurrence">
