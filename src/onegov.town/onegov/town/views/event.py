@@ -10,9 +10,7 @@ from onegov.town.elements import Link
 from onegov.town.forms import EventForm
 from onegov.town.layout import DefaultLayout, EventLayout
 from onegov.town.mail import send_html_mail
-from onegov.user import UserCollection
 from purl import URL
-from sedate import replace_timezone, to_timezone
 from uuid import uuid4
 from webob import exc
 
