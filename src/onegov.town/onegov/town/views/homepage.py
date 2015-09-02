@@ -35,6 +35,8 @@ def view_town(self, request):
         if page.type == 'topic':
             children = children_query.filter(Page.parent_id == page.id)
             children = children.limit(3).all()
+        else:
+            children = tuple()
 
         tiles.append(Tile(
             page=Link(page.title, request.link(page)),
