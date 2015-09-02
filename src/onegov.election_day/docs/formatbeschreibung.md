@@ -4,22 +4,22 @@
 
 ### Einleitung
 
-Am Abstimmungssonntag werden Resultate zu einzelnen Abstimmungen laufend publiziert. Bei der neuen Wahlen & Abstimmungen Webapplikation geschieht dies über ein Webinterface, das CSV oder Excel Dateien mit laufenden oder definitiven Resultaten entgegennimmt.
+Am Abstimmungssonntag werden Resultate zu einzelnen Abstimmungen laufend publiziert. Bei der neuen "Wahlen & Abstimmungen" Webapplikation geschieht dies über ein Webinterface, das CSV oder Excel Dateien mit provisorischen oder definitiven Resultaten entgegennimmt.
 
 Dieses Dokument beschreibt das Format dieser CSV/Excel Dateien.
 
 ### Dateiformat
 
-Als Dateiformat werden CSV, XLS oder XLSX Dateien akzeptiert. Bei Excel Dateien ist zu beachten das nur das erste Arbeitsblatt berücksichtigt wird. Auch dürfen keine Formeln oder andersweitige Formatierungen gemacht werden.
+Als Dateiformat werden CSV, XLS oder XLSX Dateien akzeptiert. Bei Excel Dateien ist zu beachten, dass nur das erste Arbeitsblatt berücksichtigt wird. Auch dürfen keine Formeln oder andersweitige Formatierungen im Arbeitsblatt enthalten sein.
 
-Die Dateien bestehen unabhängig vom verwendeten Dateiformat aus einer Kopfzeile und einer beliebigen Anzahl von Resultatzeilen. Die Kopfzeile enthält die Namen der Spalten und ist *nicht* optional.
+Die Dateien bestehen unabhängig vom verwendeten Dateiformat aus einer Kopfzeile und einer beliebigen Anzahl von Resultatzeilen. Die Kopfzeile enthält die Namen der Spalten und ist *zwingend erforderlich*.
 
-Pro Abstimmungsvorlage besteht in der Regel eine CSV/Excel Datei. Gehört zu der Abstimmung jedoch ein Gegenvorschlag und eine Stichfrage, dann müssen drei Dateien geliefert werden. Eine Datei mit den Resultaten der Abstimmung, eine Datei mit den Resultaten des Gegenvorschlags und eine Datei mit den Resultaten der Stichfrage.
+Pro Abstimmungsvorlage besteht in der Regel eine CSV/Excel Datei. Beinhaltet die Abstimmung jedoch ein Gegenvorschlag und eine Stichfrage, dann müssen drei Dateien geliefert werden: Eine Datei mit den Resultaten der Abstimmung, eine Datei mit den Resultaten des Gegenvorschlags und eine Datei mit den Resultaten der Stichfrage.
 
 ### Felder
 
-Jede Zeile enthält das Resultat einer einzigen Gemeinde, sofern diese vollständig ausgezählt wurde.
-Folgende Felder/Spalten werden dabei in der hier gegebenen Reihenfolge erwartet:
+Jede Zeile enthält das Resultat einer einzelnen Gemeinde, sofern diese vollständig ausgezählt wurde.
+Folgende Felder/Spalten werden dabei in der hier aufgelisteten Reihenfolge erwartet:
 
 **Bezirk**
 
@@ -60,3 +60,17 @@ Die Anzahl eingelegter Stimmzettel (inkl. ungültiger Stimmzettel).
 «Schluss mit den Steuerprivilegien für Millionäre (Abschaffung der Pauschalbesteuerung)»
 
 Resultate des Kanton Zug: [https://github.com/OneGov/onegov.election_day/blob/master/docs/steuerprivilegien.csv]()
+
+| Bezirk | BFS-Nummer | Gemeinde    | Ja Stimmen | Nein Stimmen | Stimmberechtigte | Eingelegte Stimmzettel | 
+|--------|------------|-------------|------------|--------------|------------------|------------------------| 
+|        | 1711       | Zug         | 3515       | 6458         | 16914            | 10034                  | 
+|        | 1706       | Oberägeri   | 575        | 1422         | 3639             | 2000                   | 
+|        | 1709       | Unterägeri  | 901        | 1930         | 5325             | 2848                   | 
+|        | 1704       | Menzingen   | 435        | 1126         | 2960             | 1570                   | 
+|        | 1701       | Baar        | 2454       | 4967         | 13982            | 7481                   | 
+|        | 1702       | Cham        | 1741       | 3525         | 9768             | 5290                   | 
+|        | 1703       | Hünenberg   | 1063       | 2375         | 5925             | 3459                   | 
+|        | 1708       | Steinhausen | 1127       | 2178         | 5993             | 3324                   | 
+|        | 1707       | Risch       | 1008       | 2151         | 6115             | 3182                   | 
+|        | 1710       | Walchwil    | 369        | 985          | 2057             | 1358                   | 
+|        | 1705       | Neuheim     | 193        | 529          | 1299             | 724                    | 
