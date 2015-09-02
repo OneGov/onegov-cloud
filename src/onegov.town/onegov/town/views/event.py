@@ -288,6 +288,8 @@ def handle_edit_event(self, request, form):
 def handle_delete_event(self, request):
     """ Delete an event. """
 
+    request.assert_valid_csrf_token()
+
     if self.meta.get('submitter_email'):
         send_html_mail(
             request=request,
