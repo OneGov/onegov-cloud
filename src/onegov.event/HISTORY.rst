@@ -7,6 +7,9 @@ Unreleased
 - Add cli command for guidle import (experimental).
   [msom]
 
+- Add ical export functions.
+  [msom]
+
 0.0.3 (2015-09-03)
 ~~~~~~~~~~~~~~~~~~~
 

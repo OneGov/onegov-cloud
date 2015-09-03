@@ -35,6 +35,7 @@ setup(
     platforms='any',
     install_requires=[
         'bleach',
+        'icalendar',
         'lxml',
         'onegov.core>=0.4.0',
         'onegov.server',

@@ -1,3 +1,5 @@
+import icalendar
+
 from datetime import datetime
 from dateutil import rrule
 from onegov.core.orm import Base
@@ -57,6 +59,30 @@ class OccurrenceMixin(object):
     @property
     def localized_end(self):
         return to_timezone(self.end, self.timezone)
+
+    def as_ical(self, description=None, rrule=None):
+        """ Returns the occurrence as iCalendar string. """
+
+        event = icalendar.Event()
+        event.add('summary', self.title)
+        event.add('dtstart', self.localized_start)
+        event.add('dtend', self.localized_end)
+        event.add('last-modified',
+                  self.modified or self.created or datetime.utcnow())
+        event['location'] = icalendar.vText(self.location)
+        if description:
+            event['description'] = icalendar.vText(description)
+        if rrule:
+            event['rrule'] = icalendar.vRecur(
+                icalendar.vRecur.from_ical(rrule.replace('RRULE:', ''))
+            )
+
+        cal = icalendar.Calendar()
+        cal.add('prodid', '-//OneGov//onegov.event//')
+        cal.add('version', '2.0')
+        cal.add_component(event)
+
+        return cal.to_ical()
 
 
 class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
@@ -167,6 +193,14 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
     def description(self):
         return self.content.get('description', '')
 
+    def as_ical(self):
+        """ Returns the event and all its occurrences as iCalendar string. """
+
+        return super(Event, self).as_ical(
+            description=self.description,
+            rrule=self.recurrence
+        )
+
 
 class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     """ Defines an occurrence of an event. """
@@ -178,3 +212,10 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
 
     #: the event this occurrence belongs to
     event_id = Column(UUID, ForeignKey(Event.id), nullable=False)
+
+    def as_ical(self):
+        """ Returns the occurrence as iCalendar string. """
+
+        return super(Occurrence, self).as_ical(
+            description=self.event.description
+        )

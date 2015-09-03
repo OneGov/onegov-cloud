@@ -465,3 +465,55 @@ def test_delete_event(session):
     session.expire_all()
     assert session.query(Event).count() == 0
     assert session.query(Occurrence).count() == 0
+
+
+def test_as_ical():
+    event = Event(
+        state='initiated',
+        timezone='Europe/Zurich',
+        start=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),
+        end=tzdatetime(2008, 2, 7, 16, 00, 'Europe/Zurich'),
+        recurrence='RRULE:FREQ=DAILY;INTERVAL=2;COUNT=5',
+        title='Squirrel Park Visit',
+        content={'description': '<em>Furry</em> things will happen!'},
+        location='Squirrel Park',
+        tags=['fun', 'animals', 'furry'],
+        meta={'submitter': 'fat.pauly@squirrelpark.org'},
+        name='event',
+        modified=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),
+    )
+    assert event.as_ical().decode() == (
+        'BEGIN:VCALENDAR\r\n'
+        'VERSION:2.0\r\n'
+        'PRODID:-//OneGov//onegov.event//\r\n'
+        'BEGIN:VEVENT\r\n'
+        'SUMMARY:Squirrel Park Visit\r\n'
+        'DTSTART;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T101500\r\n'
+        'DTEND;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T160000\r\n'
+        'DESCRIPTION:<em>Furry</em> things will happen!\r\n'
+        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z\r\n'
+        'LOCATION:Squirrel Park\r\n'
+        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=2\r\n'
+        'END:VEVENT\r\n'
+        'END:VCALENDAR\r\n'
+    )
+
+    event.submit()
+    event.publish()
+    occurrence = event.occurrences[0]
+    occurrence.modified = tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich')
+
+    assert event.occurrences[0].as_ical().decode() == (
+        'BEGIN:VCALENDAR\r\n'
+        'VERSION:2.0\r\n'
+        'PRODID:-//OneGov//onegov.event//\r\n'
+        'BEGIN:VEVENT\r\n'
+        'SUMMARY:Squirrel Park Visit\r\n'
+        'DTSTART;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T101500\r\n'
+        'DTEND;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T160000\r\n'
+        'DESCRIPTION:<em>Furry</em> things will happen!\r\n'
+        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z\r\n'
+        'LOCATION:Squirrel Park\r\n'
+        'END:VEVENT\r\n'
+        'END:VCALENDAR\r\n'
+    )
