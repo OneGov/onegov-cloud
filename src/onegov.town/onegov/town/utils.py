@@ -5,6 +5,7 @@ from isodate import parse_date, parse_datetime
 from libres.modules import errors as libres_errors
 from lxml import etree
 from lxml.html import fragments_fromstring
+from onegov.ticket import TicketCollection
 from onegov.town import _
 from onegov.town.elements import DeleteLink, Link
 
@@ -157,6 +158,18 @@ class AllocationEventInfo(object):
                 _("Edit"),
                 self.request.link(self.allocation, name='bearbeiten'),
                 classes=('edit-link', )
+            )
+
+            yield Link(
+                _("Tickets"),
+                self.request.link(TicketCollection(
+                    session=self.request.app.session,
+                    handler='RSV',
+                    extra_parameters={
+                        'allocation_id': self.allocation.id
+                    }
+                )),
+                classes=('RSV-link', )
             )
 
             if self.availability == 100.0:

@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from libres.db.models import Reservation
+from libres.db.models import Allocation, Reservation
 from onegov.core.templates import render_macro
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
@@ -134,6 +134,24 @@ class ReservationHandler(Handler):
     @property
     def group(self):
         return self.resource.title
+
+    @classmethod
+    def handle_extra_parameters(cls, session, query, extra_parameters):
+        if 'allocation_id' in extra_parameters:
+            allocations = session.query(Allocation.group)
+            allocations = allocations.filter(
+                Allocation.id == int(extra_parameters['allocation_id']))
+
+            tokens = session.query(Reservation.token)
+            tokens = tokens.filter(
+                Reservation.target.in_(allocations.subquery()))
+
+            handler_ids = tuple(t[0].hex for t in tokens.all())
+
+            if handler_ids:
+                query = query.filter(Ticket.handler_id.in_(handler_ids))
+
+        return query
 
     def get_summary(self, request):
         layout = DefaultLayout(self.resource, request)

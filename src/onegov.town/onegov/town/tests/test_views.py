@@ -1203,7 +1203,7 @@ def test_allocations(town_app):
     assert len(slots.json) == 2
 
     # delete an allocation
-    client.delete(extract_href(slots.json[0]['actions'][2]))
+    client.delete(extract_href(slots.json[0]['actions'][3]))
 
     # get the new slots
     slots = client.get((
@@ -1214,7 +1214,7 @@ def test_allocations(town_app):
     assert len(slots.json) == 1
 
     # delete an allocation
-    client.delete(extract_href(slots.json[0]['actions'][2]))
+    client.delete(extract_href(slots.json[0]['actions'][3]))
 
     # get the new slots
     slots = client.get((
@@ -1348,7 +1348,7 @@ def test_reserve_allocation(town_app):
     assert len(slots.json) == 1
 
     with pytest.raises(AffectedReservationError):
-        client.delete(extract_href(slots.json[0]['actions'][2]))
+        client.delete(extract_href(slots.json[0]['actions'][3]))
 
     # open the created ticket
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
