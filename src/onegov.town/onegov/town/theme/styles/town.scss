@@ -24,6 +24,12 @@
     border-radius: 2px;
 }
 
+@mixin icon($icon) {
+    content: $icon;
+    font-family: 'FontAwesome';
+    font-weight: normal;
+}
+
 /*
     get rid of the jump that is introduced when switching from a site with
     scrollbar to a site without (or vice versa)
@@ -1011,6 +1017,7 @@ $close-ticket-icon: '\f1db';
 $close-ticket-icon-hover: '\f05d';
 $reopen-ticket-icon: '\f1db';
 $reopen-ticket-icon-hover: '\f192';
+$all-handler-icon: '\f069';
 $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
@@ -1055,22 +1062,29 @@ $evn-handler-icon: '\f133';
     }
 }
 
+.ALL-link::before { @include icon($all-handler-icon); }
+.FRM-link::before { @include icon($frm-handler-icon); }
+.RSV-link::before { @include icon($rsv-handler-icon); }
+.EVN-link::before { @include icon($evn-handler-icon); }
+
+.ALL-link::before,
+.FRM-link::before,
+.RSV-link::before,
+.EVN-link::before {
+    display: inline-block;
+    margin-right: 1ex;
+}
+
 .ticket-handler-FRM td:first-child::before {
-    content: $frm-handler-icon;
-    font-family: 'FontAwesome';
-    font-weight: normal;
+    @include icon($frm-handler-icon);
 }
 
 .ticket-handler-RSV td:first-child::before {
-    content: $rsv-handler-icon;
-    font-family: 'FontAwesome';
-    font-weight: normal;
+    @include icon($rsv-handler-icon);
 }
 
 .ticket-handler-EVN td:first-child::before {
-    content: $evn-handler-icon;
-    font-family: 'FontAwesome';
-    font-weight: normal;
+    @include icon($evn-handler-icon);
 }
 
 tr.ticket:hover {

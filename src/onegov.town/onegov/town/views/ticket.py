@@ -160,7 +160,8 @@ def view_tickets(self, request):
             yield Link(
                 text=text,
                 url=request.link(self.for_handler(id)),
-                active=self.handler == id
+                active=self.handler == id,
+                classes=(id + '-link', )
             )
 
     if self.state == 'open':

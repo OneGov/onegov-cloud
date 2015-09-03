@@ -22,7 +22,7 @@
                                 <button href="#" data-dropdown="handlers" aria-controls="handlers" aria-expanded="false" class="${has_handler_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'}">
                                     <tal:block repeat="link handlers">
                                         <tal:block condition="link.active">
-                                            <span i18n:translate>Kind</span>: ${link.text}
+                                            <span i18n:translate class="show-for-sr">Kind:</span> <span class="${' '.join(link.classes)}">${link.text}</span>
                                         </tal:block>
                                     </tal:block>
                                 </button>
