@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to influence the query used to get the tickets of a
+  collection. This can be used to influnce the tickets view for specific
+  handlers with custom parameters.
+  [href]
+
 0.0.7 (2015-09-01)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -2,6 +2,7 @@ import random
 
 from collections import namedtuple
 from onegov.core.collection import Pagination
+from onegov.ticket import handlers as global_handlers
 from onegov.ticket.model import Ticket
 from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload, undefer
@@ -9,11 +10,18 @@ from sqlalchemy.orm import joinedload, undefer
 
 class TicketCollectionPagination(Pagination):
 
-    def __init__(self, session, page=0, state='open', handler='ALL'):
+    def __init__(self, session, page=0, state='open', handler='ALL',
+                 extra_parameters=None):
         self.session = session
         self.page = page
         self.state = state
         self.handler = handler
+        self.handlers = global_handlers
+
+        if self.handler != 'ALL':
+            self.extra_parameters = extra_parameters or {}
+        else:
+            self.extra_parameters = {}
 
     def __eq__(self, other):
         return self.state == other.state and self.page == other.page
@@ -28,6 +36,12 @@ class TicketCollectionPagination(Pagination):
         if self.handler != 'ALL':
             query = query.filter(Ticket.handler_code == self.handler)
 
+            if self.extra_parameters:
+                handler_class = self.handlers.get(self.handler)
+                query = handler_class.handle_extra_parameters(
+                    self.session, query, self.extra_parameters
+                )
+
         return query
 
     @property
@@ -35,13 +49,16 @@ class TicketCollectionPagination(Pagination):
         return self.page
 
     def page_by_index(self, index):
-        return self.__class__(self.session, index, self.state)
+        return self.__class__(
+            self.session, index, self.state, self.extra_parameters)
 
     def for_state(self, state):
-        return self.__class__(self.session, 0, state, self.handler)
+        return self.__class__(
+            self.session, 0, state, self.handler, self.extra_parameters)
 
     def for_handler(self, handler):
-        return self.__class__(self.session, 0, self.state, handler)
+        return self.__class__(
+            self.session, 0, self.state, handler, self.extra_parameters)
 
 
 TicketCount = namedtuple('TicketCount', ['open', 'pending', 'closed'])

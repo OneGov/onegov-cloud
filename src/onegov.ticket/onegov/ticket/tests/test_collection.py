@@ -208,3 +208,61 @@ def test_snapshot_ticket(session, handlers):
     ticket.create_snapshot(request=object())
     assert ticket.snapshot['email'] == 'foo@bar.com'
     assert ticket.snapshot['summary'] == 'foobar'
+
+
+def test_handle_extra_options(session, handlers):
+
+    @handlers.registered_handler('LTD')
+    class LimitingHandler(Handler):
+
+        @property
+        def deleted(self):
+            return False
+
+        @property
+        def title(self):
+            return 'Foo'
+
+        @property
+        def group(self):
+            return 'Bar'
+
+        @property
+        def handler_id(self):
+            return 1
+
+        @property
+        def handler_data(self):
+            return {}
+
+        @property
+        def email(self):
+            return 'foo@bar.com'
+
+        def get_summary(self, request):
+            return 'foobar'
+
+        @classmethod
+        def handle_extra_parameters(cls, session, query, extra_parameters):
+            if 'limit' in extra_parameters:
+                return query.limit(extra_parameters['limit'])
+            else:
+                return query
+
+    collection = TicketCollection(session)
+    collection.handlers = handlers
+
+    collection.open_ticket(handler_id='1', handler_code='LTD')
+    collection.open_ticket(handler_id='2', handler_code='LTD')
+    collection.open_ticket(handler_id='3', handler_code='LTD')
+
+    assert collection.subset().count() == 3
+
+    collection.extra_parameters = {'limit': 1}
+    assert collection.subset().count() == 3
+
+    collection.handler = 'LTD'
+    assert collection.subset().count() == 1
+
+    collection.extra_parameters = {'limit': 2}
+    assert collection.subset().count() == 2

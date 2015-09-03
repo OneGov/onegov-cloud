@@ -86,6 +86,23 @@ class Handler(object):
 
         raise NotImplementedError
 
+    @classmethod
+    def handle_extra_parameters(self, session, query, extra_parameters):
+        """ Takes a dictionary of extra parameters and uses it to optionally
+        modifiy the query used for the collection.
+
+        Use this to add handler-defined custom filters with extra query
+        parameters. Only called if the collection is already limited to the
+        given handler. If all handlers are shown in the collection, this
+        method is not called.
+
+        If no extra paramaters were given, this method is *not* called.
+
+        Returns the modified or unmodified query.
+
+        """
+        return query
+
     def get_summary(self, request):
         """ Returns the summary of the current ticket as a html string. """
 
