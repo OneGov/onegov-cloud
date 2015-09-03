@@ -101,6 +101,10 @@ footer,
 /*
     alert boxes
 */
+$alert-icon: '\f06a';
+$info-icon: '\f05a';
+$success-icon: '\f058';
+$warning-icon: '\f071';
 
 .alert-box {
     border-color: scale-color($primary-color, $lightness: $alert-function-factor);
@@ -109,7 +113,6 @@ footer,
     vertical-align: middle;
 
     &::before {
-        font-family: 'FontAwesome';
         font-size: 1.5rem;
         line-height: .8;
         margin-left: -3.1rem;
@@ -119,21 +122,10 @@ footer,
         top: .25rem;
     }
 
-    &.success::before {
-        content: '\f058';
-    }
-
-    &.alert::before {
-        content: '\f06a';
-    }
-
-    &.info::before {
-        content: '\f05a';
-    }
-
-    &.warning::before {
-        content: '\f071';
-    }
+    &.alert::before { @include icon($alert-icon); }
+    &.info::before { @include icon($info-icon); }
+    &.success::before { @include icon($success-icon); }
+    &.warning::before { @include icon($warning-icon); }
 }
 
 /*
