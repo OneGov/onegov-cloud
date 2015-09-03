@@ -688,7 +688,12 @@ class ResourceLayout(DefaultLayout):
                     url=self.request.link(self.model, 'bearbeiten'),
                     classes=('edit-link', )
                 ),
-                delete_link
+                delete_link,
+                Link(
+                    text=_("Clean up"),
+                    url=self.request.link(self.model, 'cleanup'),
+                    classes=('cleanup-link', )
+                ),
             ]
 
 

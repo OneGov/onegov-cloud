@@ -6,7 +6,7 @@ import re
 import textwrap
 import transaction
 
-from datetime import datetime
+from datetime import datetime, date
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
@@ -1514,3 +1514,44 @@ def test_two_parallel_reservations(town_app):
     # one will win, one will lose
     assert f1.follow().status_code == 302
     assert u"Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.follow()
+
+
+def test_cleanup_allocations(town_app):
+
+    # prepate the required data
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(
+            datetime(2015, 8, 28), datetime(2015, 8, 28),
+            datetime(2015, 8, 29), datetime(2015, 8, 29)
+        ),
+        whole_day=True
+    )
+    scheduler.reserve(
+        'info@example.org', (allocations[0]._start, allocations[0]._end))
+
+    transaction.commit()
+
+    # clean up the data
+    client = Client(town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    cleanup = client.get('/ressource/sbb-tageskarte').click(u"Aufräumen")
+    cleanup.form['start'] = date(2015, 8, 31)
+    cleanup.form['end'] = date(2015, 8, 1)
+    cleanup = cleanup.form.submit()
+
+    assert u"Das End-Datum muss nach dem Start-Datum liegen" in cleanup
+
+    cleanup.form['start'] = date(2015, 8, 1)
+    cleanup.form['end'] = date(2015, 8, 31)
+    resource = cleanup.form.submit().follow()
+
+    assert u"1 Einteilungen wurden erfolgreich entfernt" in resource

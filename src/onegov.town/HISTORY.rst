@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to enter, list and manage events (parties, concerts, etc.).
+  [href]
+
+- Adds the ability to clean up unused allocations.
+  [href]
+
 - Updates redactor to 10.2.3.
   [href]
 

@@ -5,7 +5,7 @@ from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
 from onegov.town import TownApp, _
 from onegov.town.elements import Link
-from onegov.town.forms import ResourceForm
+from onegov.town.forms import ResourceForm, ResourceCleanupForm
 from onegov.town.models.resource import DaypassResource, RoomResource
 from onegov.town.layout import ResourcesLayout, ResourceLayout
 from webob import exc
@@ -132,3 +132,33 @@ def handle_delete_resource(self, request):
 
     collection = ResourceCollection(request.app.libres_context)
     collection.delete(self, including_reservations=False)
+
+
+@TownApp.form(model=Resource, permission=Private, name='cleanup',
+              form=ResourceCleanupForm, template='resource_cleanup.pt')
+def handle_cleanup_allocations(self, request, form):
+    """ Removes all unused allocations between the given dates. """
+
+    if form.submitted(request):
+        start, end = form.data['start'], form.data['end']
+
+        scheduler = self.get_scheduler(request.app.libres_context)
+        count = scheduler.remove_unused_allocations(start, end)
+
+        request.success(
+            _("Successfully removed ${count} unused allocations", mapping={
+                'count': count
+            })
+        )
+
+        return morepath.redirect(request.link(self))
+
+    layout = ResourceLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Clean up"), '#'))
+    layout.editbar_links = None
+
+    return {
+        'layout': layout,
+        'title': _("Clean up"),
+        'form': form
+    }

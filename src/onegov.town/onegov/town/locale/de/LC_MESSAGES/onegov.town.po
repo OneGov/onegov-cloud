@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-02 11:27+0200\n"
+"POT-Creation-Date: 2015-09-03 09:50+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -124,6 +124,9 @@ msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
 
 msgid "There are existing reservations associated with this resource"
 msgstr "Es existieren Reservationen für diese Reservations-Ressource"
+
+msgid "Clean up"
+msgstr "Aufräumen"
 
 msgid "Edit event"
 msgstr "Veranstaltung bearbeiten"
@@ -477,6 +480,9 @@ msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
 
 msgid "Details"
 msgstr "Details"
+
+msgid "The end date must be later than the start date"
+msgstr "Das End-Datum muss nach dem Start-Datum liegen"
 
 msgid "Name"
 msgstr "Name"
@@ -886,6 +892,10 @@ msgstr ""
 msgid "Further Information"
 msgstr "Weitere Informationen"
 
+msgid "Removes all unreserved allocations between the start and end date."
+msgstr ""
+"Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
+
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 
@@ -1115,6 +1125,10 @@ msgstr "Ein neuer Raum wurde hinzugefügt"
 
 msgid "New room"
 msgstr "Neuer Raum"
+
+#, python-format
+msgid "Successfully removed ${count} unused allocations"
+msgstr "${count} Einteilungen wurden erfolgreich entfernt"
 
 msgid "Resources"
 msgstr "Reservationen"
