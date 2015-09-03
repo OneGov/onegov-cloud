@@ -420,6 +420,8 @@ input[type=color] {
     panels
 */
 
+$more-link-icon: '\f054';
+
 .homepage-links-panel,
 .page-content-panel {
     background-color: $topbar-bg-color;
@@ -449,10 +451,8 @@ input[type=color] {
                 font-weight: normal;
 
                 &::before {
-                    content: '\f054';
-                    font-family: 'FontAwesome';
+                    @include icon($more-link-icon);
                     font-size: .8em;
-                    font-weight: normal;
                     margin-right: 1ex;
                 }
             }
@@ -478,6 +478,21 @@ input[type=color] {
 /*
     edit bar (and popup links)
 */
+$accept-link-icon: '\f00c';
+$cleanup-link-icon: '\f0d0';
+$copy-link-icon: '\f0c5';
+$delete-link-icon: '\f014';
+$edit-link-icon: '\f040';
+$new-daypass-icon: '\f145';
+$new-form-icon: '\f044';
+$new-link-icon: '\f0c1';
+$new-news-icon: '\f1ea';
+$new-page-icon: '\f0f6';
+$new-person-icon: '\f007';
+$new-reservation-icon: '\f271';
+$new-room-icon: '\f015';
+$paste-link-icon: '\f0ea';
+
 .edit-bar,
 .popup {
     background-color: $primary-color;
@@ -499,65 +514,23 @@ input[type=color] {
     }
 
     a:before {
-        font-family: 'FontAwesome';
         margin-right: .6em;
     }
 
-    .new-page:before {
-        content: '\f0f6';
-    }
-
-    .new-link:before {
-        content: '\f0c1';
-    }
-
-    .new-news:before {
-        content: '\f1ea';
-    }
-
-    .new-form:before {
-        content: '\f044';
-    }
-
-    .new-person:before {
-        content: '\f007';
-    }
-
-    .new-room:before {
-        content: '\f015';
-    }
-
-    .new-daypass:before {
-        content: '\f145';
-    }
-
-    .new-reservation:before {
-        content: '\f271';
-    }
-
-    .copy-link:before {
-        content: '\f0c5';
-    }
-
-    .paste-link:before {
-        content: '\f0ea';
-    }
-
-    .accept-link:before {
-        content: '\f00c';
-    }
-
-    .edit-link:before {
-        content: '\f040';
-    }
-
-    .delete-link:before {
-        content: '\f014';
-    }
-
-    .cleanup-link:before {
-        content: '\f0d0';
-    }
+    .accept-link:before { @include icon($accept-link-icon); }
+    .cleanup-link:before { @include icon($cleanup-link-icon); }
+    .copy-link:before { @include icon($copy-link-icon); }
+    .delete-link:before { @include icon($delete-link-icon); }
+    .edit-link:before { @include icon($edit-link-icon); }
+    .new-daypass:before { @include icon($new-daypass-icon); }
+    .new-form:before { @include icon($new-form-icon); }
+    .new-link:before { @include icon($new-link-icon); }
+    .new-news:before { @include icon($new-news-icon); }
+    .new-page:before { @include icon($new-page-icon); }
+    .new-person:before { @include icon($new-person-icon); }
+    .new-reservation:before { @include icon($new-reservation-icon); }
+    .new-room:before { @include icon($new-room-icon); }
+    .paste-link:before { @include icon($paste-link-icon); }
 }
 
 /*
@@ -858,21 +831,23 @@ $max-page-width: 600px;
     display: none;
 }
 
-
 /*
     the icon hinting at pages being hidden from the public
 */
-.hidden-from-public-hint:before {
-    color: $alert-color;
-    content: '\f070';
-    font-family: 'FontAwesome';
-    font-style: normal;
-}
+$hidden-page-icon: '\f070';
 
+.hidden-from-public-hint:before {
+    @include icon($hidden-page-icon);
+    color: $alert-color;
+}
 
 /*
     Person card
 */
+$person-website-icon: '\f0c1';
+$person-phone-icon: '\f095';
+$person-email-icon: '\f003';
+
 .person-card {
     margin: 0 1em 1em 0;
 
@@ -899,7 +874,6 @@ $max-page-width: 600px;
         margin-left: 0;
 
         li:before {
-            font-family: 'FontAwesome';
             margin-right: .5ex;
         }
     }
@@ -912,17 +886,9 @@ $max-page-width: 600px;
         }
     }
 
-    .person-card-website:before {
-        content: '\f0c1';
-    }
-
-    .person-card-phone:before {
-        content: '\f095';
-    }
-
-    .person-card-email:before {
-        content: '\f003';
-    }
+    .person-card-website:before { @include icon($person-website-icon); }
+    .person-card-phone:before { @include icon($person-phone-icon); }
+    .person-card-email:before { @include icon($person-email-icon); }
 }
 
 /*
@@ -1096,14 +1062,12 @@ tr.ticket:hover {
     float: right;
 
     &::before {
-        content: $accept-ticket-icon;
-        font-family: 'FontAwesome';
+        @include icon($accept-ticket-icon);
         margin-right: 1ex;
     }
 
     &:hover::before {
-        content: $accept-ticket-icon-hover;
-        font-family: 'FontAwesome';
+        @include icon($accept-ticket-icon-hover);
         margin-right: 1ex;
     }
 }
@@ -1112,14 +1076,12 @@ tr.ticket:hover {
     float: right;
 
     &::before {
-        content: $close-ticket-icon;
-        font-family: 'FontAwesome';
+        @include icon($close-ticket-icon);
         margin-right: 1ex;
     }
 
     &:hover::before {
-        content: $close-ticket-icon-hover;
-        font-family: 'FontAwesome';
+        @incude icon($close-ticket-icon-hover);
         margin-right: 1ex;
     }
 }
@@ -1128,14 +1090,12 @@ tr.ticket:hover {
     float: right;
 
     &::before {
-        content: $reopen-ticket-icon;
-        font-family: 'FontAwesome';
+        @include icon($reopen-ticket-icon);
         margin-right: 1ex;
     }
 
     &:hover::before {
-        content: $reopen-ticket-icon-hover;
-        font-family: 'FontAwesome';
+        @include icon($reopen-ticket-icon-hover);
         margin-right: 1ex;
     }
 }
@@ -1413,14 +1373,12 @@ $event-action-icon-hover: '\f192';
 .event-publish,
 .event-withdraw {
     &::before {
-        content: $event-action-icon;
-        font-family: 'FontAwesome';
+        @include icon($event-action-icon);
         margin-right: 1ex;
     }
 
     &:hover::before {
-        content: $event-action-icon-hover;
-        font-family: 'FontAwesome';
+        @include icon($event-action-icon-hover);
         margin-right: 1ex;
     }
 }
