@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.0.3 (2015-09-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Don't delete old event automatically.
   [msom]
