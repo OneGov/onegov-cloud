@@ -29,6 +29,8 @@ class Person(Base, TimestampMixin):
 
     last_name = Column(Text, nullable=False)
 
+    function = Column(Text, nullable=True)
+
     picture_url = Column(Text, nullable=True)
 
     email = Column(Text, nullable=True)

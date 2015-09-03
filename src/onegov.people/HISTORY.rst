@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a function field to the person.
+  [href]
+
 0.0.3 (2015-08-24)
 ~~~~~~~~~~~~~~~~~~~
 
