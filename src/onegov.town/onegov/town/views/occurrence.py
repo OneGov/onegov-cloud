@@ -8,6 +8,7 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import OccurrenceLayout, OccurrencesLayout
+from sedate import as_datetime, replace_timezone
 
 
 @TownApp.html(model=OccurrenceCollection, template='occurrences.pt',
@@ -47,7 +48,9 @@ def view_get_occurrence(self, request):
     """ View a single occurrence of an event. """
 
     layout = OccurrenceLayout(self, request)
+    today = replace_timezone(as_datetime(date.today()), self.timezone)
     occurrences = self.event.occurrence_dates(localize=True)
+    occurrences = list(filter(lambda x: x >= today, occurrences))
     description = linkify(self.event.description).replace('\n', '<br>')
     session = request.app.session()
     ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
