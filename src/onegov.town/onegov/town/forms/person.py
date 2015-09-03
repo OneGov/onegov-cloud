@@ -14,6 +14,8 @@ class PersonForm(Form):
     first_name = StringField(_("First name"), [validators.InputRequired()])
     last_name = StringField(_("Last name"), [validators.InputRequired()])
 
+    function = StringField(_("Function"))
+
     picture_url = StringField(
         label=_("Picture"),
         description=_("URL pointing to the picture")

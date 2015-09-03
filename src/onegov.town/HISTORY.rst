@@ -7,6 +7,9 @@ Unreleased
 - Adds the ability to enter, list and manage events (parties, concerts, etc.).
   [href]
 
+- Adds a function field to the person.
+  [href]
+
 - Adds the ability to clean up unused allocations.
   [href]
 

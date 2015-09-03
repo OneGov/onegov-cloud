@@ -266,6 +266,9 @@
             </div>
         </div>
         <ul>
+            <li tal:condition="person.function" class="person-card-function">
+                <em>${person.function}</em>
+            </li>
             <li tal:condition="person.address" class="person-card-address">
                 <span>${person.address}</span>
             </li>
