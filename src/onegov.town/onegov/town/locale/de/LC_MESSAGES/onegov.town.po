@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-03 09:50+0200\n"
+"POT-Creation-Date: 2015-09-03 15:32+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -128,9 +128,6 @@ msgstr "Es existieren Reservationen für diese Reservations-Ressource"
 msgid "Clean up"
 msgstr "Aufräumen"
 
-msgid "Edit event"
-msgstr "Veranstaltung bearbeiten"
-
 msgid "Do you really want to delete this event?"
 msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
 
@@ -146,14 +143,8 @@ msgstr "Möchten Sie diese Einteilung wirklich löschen?"
 msgid "Delete allocation"
 msgstr "Einteilung löschen"
 
-msgid "Publish event"
-msgstr "Veranstaltung veröffentlichen"
-
 msgid "Close ticket"
 msgstr "Ticket abschliessen"
-
-msgid "Withdraw event"
-msgstr "Veranstaltung zurückziehen"
 
 msgid "Form"
 msgstr "Formular"
@@ -454,6 +445,9 @@ msgstr "Vorname"
 msgid "Last name"
 msgstr "Nachname"
 
+msgid "Function"
+msgstr "Funktion"
+
 msgid "Phone"
 msgstr "Telefon"
 
@@ -529,9 +523,6 @@ msgstr "JavaScript für Web-Statistik"
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
 
-msgid "Function"
-msgstr "Funktion"
-
 msgid "This month"
 msgstr "Diesen Monat"
 
@@ -565,11 +556,26 @@ msgstr "Eine Absage kann nicht rückgängig gemacht werden."
 msgid "Details about the reservation"
 msgstr "Details zu Ihrer Reservation"
 
+msgid "Reject event"
+msgstr "Veranstaltung ablehnen"
+
+msgid "Do you really want to reject this event?"
+msgstr "Möchten Sie diese Veranstaltung wirklich absagen? "
+
+msgid "Rejecting this event can't be undone."
+msgstr "Eine Absage kann nicht rückgängig gemacht werden."
+
+msgid "Edit event"
+msgstr "Veranstaltung bearbeiten"
+
 msgid "Accept reservation"
 msgstr "Reservation annehmen"
 
 msgid "Edit details"
 msgstr "Details bearbeiten"
+
+msgid "Accept event"
+msgstr "Veranstaltung annehmen"
 
 msgid "Link"
 msgstr "Verknüpfung"
@@ -760,6 +766,9 @@ msgstr ""
 msgid "Closed"
 msgstr "Abgeschlossen"
 
+msgid "Ticket Number"
+msgstr "Referenz"
+
 msgid "Previous Page"
 msgstr "Vorherige Seite"
 
@@ -796,8 +805,8 @@ msgstr "Alle Termine"
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
 
-msgid "Your event has been published:"
-msgstr "Ihre Veranstaltung wurde veröffentlicht:"
+msgid "Your event has been accepted:"
+msgstr "Ihre Veranstaltung wurde angenommen:"
 
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
@@ -925,9 +934,6 @@ msgstr ""
 "Der hinterlegte Datensatz wurde entfernt. Die folgenden Informationen sind "
 "eine Momentaufnahme, erstellt vor der Löschung."
 
-msgid "Ticket Number"
-msgstr "Referenz"
-
 msgid "Group"
 msgstr "Gruppe"
 
@@ -955,8 +961,8 @@ msgstr ""
 "Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
 "Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
 
-msgid "Kind"
-msgstr "Art"
+msgid "Kind:"
+msgstr "Art:"
 
 msgid "Accept"
 msgstr "Annehmen"
@@ -981,12 +987,8 @@ msgid "Initiated events"
 msgstr ""
 
 #, python-format
-msgid "You have published the event ${title}"
-msgstr "Sie haben die Veranstatlung ${title} veröffentlicht"
-
-#, python-format
-msgid "You have withdrawn the event ${title}"
-msgstr "Sie haben die Veranstatlung ${title} zurückgezogen"
+msgid "You have accepted the event ${title}"
+msgstr "Sie haben die Veranstaltung ${title} angenommen"
 
 msgid "List"
 msgstr "Auflisten"
@@ -1000,8 +1002,8 @@ msgstr "Vielen Dank für Ihre Eingabe!"
 msgid "Published events"
 msgstr "Veröffentlichte Veranstaltungen"
 
-msgid "Your event was published"
-msgstr "Ihre Veranstaltung wurde veröffentlicht"
+msgid "Your event was accepted"
+msgstr "Ihre Veranstaltung wurde angenommen"
 
 msgid "A ticket has been opened"
 msgstr "Ein neues Ticket wurde für Sie eröffnet"

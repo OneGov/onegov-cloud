@@ -102,36 +102,20 @@ def publish_event(self, request):
 
     self.publish()
 
-    request.success(_(u"You have published the event ${title}", mapping={
+    request.success(_(u"You have accepted the event ${title}", mapping={
         'title': self.title
     }))
 
     if self.meta.get('submitter_email'):
         send_html_mail(
             request=request,
-            template='mail_event_published.pt',
-            subject=_("Your event was published"),
+            template='mail_event_accepted.pt',
+            subject=_("Your event was accepted"),
             receivers=(self.meta.get('submitter_email'), ),
             content={
                 'model': self,
             }
         )
-
-    if 'return-to' in request.GET:
-        return morepath.redirect(request.GET['return-to'])
-
-    return morepath.redirect(request.link(self))
-
-
-@TownApp.view(model=Event, name='withdraw', permission=Private)
-def withdraw_event(self, request):
-    """ Withdraw an event. """
-
-    self.withdraw()
-
-    request.success(_(u"You have withdrawn the event ${title}", mapping={
-        'title': self.title
-    }))
 
     if 'return-to' in request.GET:
         return morepath.redirect(request.GET['return-to'])

@@ -271,22 +271,25 @@ class EventSubmissionHandler(Handler):
             return []
 
         links = []
-        if self.event.state == 'submitted' or self.event.state == 'withdrawn':
+        if self.event.state == 'submitted':
             link = URL(request.link(self.event, 'publish'))
             link = link.query_param('return-to', request.link(self.ticket))
             links.append(Link(
-                text=_("Publish event"),
+                text=_("Accept event"),
                 url=link.as_string(),
-                classes=('event-publish', ),
+                classes=('accept-link', ),
             ))
-        elif self.event.state == 'published':
-            link = URL(request.link(self.event, 'withdraw'))
-            link = link.query_param('return-to', request.link(self.ticket))
-            links.append(Link(
-                text=_("Withdraw event"),
-                url=link.as_string(),
-                classes=('event-withdraw', ),
-            ))
+
+        links.append(DeleteLink(
+            text=_("Reject event"),
+            url=request.link(self.event),
+            confirm=_("Do you really want to reject this event?"),
+            extra_information=_(
+                "Rejecting this event can't be undone."
+            ),
+            yes_button_text=_("Reject event"),
+            redirect_after=request.link(self.ticket)
+        ))
 
         link = URL(request.link(self.event, 'bearbeiten'))
         link = link.query_param('return-to', request.url)
@@ -294,14 +297,6 @@ class EventSubmissionHandler(Handler):
             text=_('Edit event'),
             url=link.as_string(),
             classes=('edit-link', )
-        ))
-
-        links.append(DeleteLink(
-            text=_("Delete event"),
-            url=request.link(self.event),
-            confirm=_("Do you really want to delete this event?"),
-            yes_button_text=_("Delete event"),
-            redirect_after=request.link(self.ticket)
         ))
 
         return links
