@@ -24,7 +24,7 @@
                                         </tal:block>
                                     </div>
                                     <div class="large-9 medium-12 small-12 columns">
-                                        <div class="occurrence-date">${layout.format_date(occurrence.localized_start, 'date')}</div>
+                                        <div class="occurrence-date show-for-large-up">${layout.format_date(occurrence.localized_start, 'date')}</div>
                                         <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
                                         <div>${occurrence.location}</div>
                                         <div>${layout.format_date(occurrence.localized_start, 'time')}-${layout.format_date(occurrence.localized_end, 'time')}</div>

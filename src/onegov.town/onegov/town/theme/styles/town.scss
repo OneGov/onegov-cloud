@@ -1271,7 +1271,7 @@ tr.ticket:hover {
 */
 
 .occurrence {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .occurrence-tag {
@@ -1292,7 +1292,7 @@ tr.ticket:hover {
 }
 
 .occurrences-day-date {
-    min-height: 135px;
+    padding: .5em 0;
     width: 100%;
 
     &.active {
