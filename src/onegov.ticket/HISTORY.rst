@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.8 (2015-09-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to influence the query used to get the tickets of a
   collection. This can be used to influnce the tickets view for specific
   handlers with custom parameters.
