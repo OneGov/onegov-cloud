@@ -20,6 +20,8 @@
             </div>
 
             <div class="large-4 medium-4 columns">
+                <tal:block metal:use-macro="layout.macros['ticket_callout']" tal:define="ticket ticket"/>
+
                 <div class="occurrence-occurrences">
                     <span i18n:translate="">All occurrences of this event</span>
                     <ul>

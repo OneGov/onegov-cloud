@@ -307,6 +307,15 @@
     </div>
 </metal:ticket_status>
 
+<metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.town">
+    <div class="page-content-panel" tal:condition="request.is_logged_in and ticket">
+        <div class="field-display ticket-status-page">
+            <div class="field-display-label" i18n:translate="">Ticket Number</div>
+            <div class="field-display-data ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
+        </div>
+    </div>
+</metal:ticket_callout>
+
 <metal:pagination define-macro="pagination" i18n:domain="onegov.town">
     <ul class="pagination" role="menubar" aria-label="Pagination">
         <tal:block repeat="page collection.pages">

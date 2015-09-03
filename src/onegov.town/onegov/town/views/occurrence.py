@@ -3,6 +3,7 @@ from datetime import date
 from onegov.core.security import Public
 from onegov.core.utils import linkify
 from onegov.event import Occurrence, OccurrenceCollection
+from onegov.ticket import TicketCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
@@ -48,11 +49,14 @@ def view_get_occurrence(self, request):
     layout = OccurrenceLayout(self, request)
     occurrences = self.event.occurrence_dates(localize=True)
     description = linkify(self.event.description).replace('\n', '<br>')
+    session = request.app.session()
+    ticket = TicketCollection(session).by_handler_id(self.event.id.hex)
 
     return {
+        'description': description,
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
+        'ticket': ticket,
         'title': self.title,
-        'description': description
     }

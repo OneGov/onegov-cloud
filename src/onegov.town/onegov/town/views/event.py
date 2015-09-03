@@ -227,11 +227,15 @@ def view_event(self, request):
 
         return morepath.redirect(request.link(ticket, 'status'))
 
+    session = request.app.session()
+    ticket = TicketCollection(session).by_handler_id(self.id.hex)
+
     return {
         'completable': self.state == 'initiated',
         'edit_url': request.link(self, 'bearbeiten'),
         'event': self,
         'layout': EventLayout(self, request),
+        'ticket': ticket,
         'title': self.title,
     }
 

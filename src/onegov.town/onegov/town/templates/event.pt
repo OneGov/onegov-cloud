@@ -12,7 +12,13 @@
             </p>
         </div>
 
-        <tal:block metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
+        <div class="large-8 medium-8 columns">
+            <tal:block metal:use-macro="layout.macros['display_event']" tal:define="event event"/>
+        </div>
+
+        <div class="large-4 medium-4 columns">
+            <tal:block metal:use-macro="layout.macros['ticket_callout']" tal:define="ticket ticket"/>
+        </div>
 
         <div class="row fieldset-display-submit" tal:condition="completable">
             <div class="small-12 columns">
