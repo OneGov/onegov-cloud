@@ -18,6 +18,7 @@ from onegov.town.models import (
     SiteCollection,
     Thumbnail
 )
+from purl import URL
 from sqlalchemy import desc
 
 
@@ -811,11 +812,22 @@ class OccurrenceLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
+            edit_link = URL(self.request.link(self.model.event, 'bearbeiten'))
+            edit_link = edit_link.query_param('return-to',
+                                              self.request.link(self.model))
+
             return [
                 Link(
                     text=_("Edit"),
-                    url=self.request.link(self.model.event),
+                    url=edit_link.as_string(),
                     classes=('edit-link', )
+                ),
+                DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model.event),
+                    confirm=_("Do you really want to delete this event?"),
+                    yes_button_text=_("Delete event"),
+                    redirect_after=self.events_url
                 )
             ]
 
@@ -835,7 +847,7 @@ class EventLayout(EventBaseLayout):
         if self.request.is_logged_in:
             links = [
                 Link(
-                    text=_("Edit event"),
+                    text=_("Edit"),
                     url=self.request.link(self.model, 'bearbeiten'),
                     classes=('edit-link', )
                 ),
@@ -847,20 +859,5 @@ class EventLayout(EventBaseLayout):
                     redirect_after=self.events_url
                 )
             ]
-
-            state = self.model.state
-            if state == 'submitted' or state == 'withdrawn':
-                links.append(Link(
-                    text=_("Publish event"),
-                    url=self.request.link(self.model, 'publish'),
-                    classes=('event-action', 'event-publish'),
-                ))
-
-            elif state == 'published':
-                links.append(Link(
-                    text=_("Withdraw event"),
-                    url=self.request.link(self.model, 'withdraw'),
-                    classes=('event-action', 'event-withdraw'),
-                ))
 
             return links

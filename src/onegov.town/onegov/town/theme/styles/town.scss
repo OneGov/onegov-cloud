@@ -1371,31 +1371,6 @@ tr.ticket:hover {
     }
 }
 
-$event-action-icon: '\f1db';
-$event-action-icon-hover: '\f192';
-
-.event-publish,
-.event-withdraw {
-    &::before {
-        @include icon($event-action-icon);
-        margin-right: 1ex;
-    }
-
-    &:hover::before {
-        @include icon($event-action-icon-hover);
-        margin-right: 1ex;
-    }
-}
-
-.event-action {
-    @include button(
-        $padding: $button-tny,
-        $bg: $success-color
-    );
-    float: right;
-    font-size: 1em;
-    margin: 0;
-}
 
 /*
     Fullcalendar Screen Flicker Prevention
