@@ -23,8 +23,7 @@ def test_event_collection(session):
         },
         location='Squirrel Park',
         tags=['fun', 'animals'],
-        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
-        autoclean=False
+        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
     )
     event_1.submit()
     event_1.publish()
@@ -37,8 +36,7 @@ def test_event_collection(session):
             'description': 'Learn how the Park got so <em>furry</em>!'
         },
         location='Squirrel Park',
-        tags=['history'],
-        autoclean=False
+        tags=['history']
     )
     event_2.submit()
     event_2.publish()
@@ -50,52 +48,10 @@ def test_event_collection(session):
     assert session.query(Occurrence).count() == 0
 
 
-def test_event_collection_remove_old_events(session):
+def test_event_collection_remove_stale_events(session):
     timezone = 'UTC'
 
     events = EventCollection(session)
-    event_dates = (
-        (datetime(2015, 6, 1, 10), ''),
-        (datetime(2015, 6, 1, 11), 'RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=3'),
-        (datetime(2015, 6, 1, 12), 'RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=6'),
-        (datetime(2015, 7, 1, 13), ''),
-        (datetime(2015, 7, 1, 14), 'RRULE:FREQ=WEEKLY;INTERVAL=1;COUNT=4'),
-        (datetime(2015, 7, 25, 15), ''),
-    )
-
-    for date, rrule in event_dates:
-        event = events.add(title='Event', timezone=timezone, start=date,
-                           end=date + timedelta(hours=1), recurrence=rrule,
-                           autoclean=False)
-        event.submit()
-    for date, rrule in event_dates:
-        event = events.add(title='Event', timezone=timezone, start=date,
-                           end=date + timedelta(hours=1), recurrence=rrule,
-                           autoclean=False)
-        event.submit()
-        event.publish()
-    for date, rrule in event_dates:
-        event = events.add(title='Event', timezone=timezone, start=date,
-                           end=date + timedelta(hours=1), recurrence=rrule,
-                           autoclean=False)
-        event.submit()
-        event.publish()
-        event.withdraw()
-
-    events = EventCollection(session)
-
-    max_age = standardize_date(datetime(2015, 7, 1), 'UTC')
-    events.remove_old_events(max_age=max_age)
-    assert events.query().count() == 4*3
-
-    max_age = standardize_date(datetime(2015, 7, 20), 'UTC')
-    events.remove_old_events(max_age=max_age)
-    assert events.query().count() == 2*3
-
-    max_age = standardize_date(datetime(2015, 8, 1), 'UTC')
-    events.remove_old_events(max_age=max_age)
-    assert events.query().count() == 0
-
     event = events.add(
         title='Event', timezone=timezone,
         start=datetime(2010, 6, 1, 10),
@@ -104,7 +60,7 @@ def test_event_collection_remove_old_events(session):
     assert events.query().count() == 1
 
     max_stale = standardize_date(datetime.today()+timedelta(days=2), 'UTC')
-    events.remove_old_events(max_stale=max_stale)
+    events.remove_stale_events(max_stale=max_stale)
     assert events.query().count() == 0
 
 
@@ -123,8 +79,7 @@ def test_event_collection_pagination(session):
                 end=datetime(year, month, 18, 16, 00),
                 timezone='US/Eastern',
                 tags=['month-{0}'.format(month)],
-                recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4',
-                autoclean=False
+                recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4'
             )
             event.submit()
             if year > 2008:
@@ -172,8 +127,7 @@ def test_occurrence_collection(session):
         },
         location='Squirrel Park',
         tags=['fun', 'park', 'animals'],
-        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
-        autoclean=False
+        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
     )
     event.submit()
     event.publish()
@@ -186,8 +140,7 @@ def test_occurrence_collection(session):
             'description': 'Learn how the Park got so <em>furry</em>!'
         },
         location='Squirrel Park',
-        tags=['history'],
-        autoclean=False
+        tags=['history']
     )
     event.submit()
     event.publish()
@@ -243,8 +196,7 @@ def test_occurrence_collection_pagination(session):
                 end=datetime(year, month, 18, 16, 00),
                 timezone='US/Eastern',
                 tags=['month-{0}'.format(month)],
-                recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4',
-                autoclean=False
+                recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=4'
             )
             event.submit()
             if year > 2008:
@@ -347,8 +299,7 @@ def test_occurrence_collection_outdated(session):
             title='Event {0}-{1}'.format(year, today.month),
             start=datetime(year, today.month, today.day, 0, 0),
             end=datetime(year, today.month, today.day, 23, 59),
-            timezone='US/Eastern',
-            autoclean=False
+            timezone='US/Eastern'
         )
         event.submit()
         event.publish()
@@ -367,8 +318,7 @@ def test_unique_names(session):
             title='Squirrel Park Visit',
             start=datetime(2015, 6, 16, 9, 30),
             end=datetime(2015, 6, 16, 18, 00),
-            timezone='US/Eastern',
-            autoclean=False
+            timezone='US/Eastern'
         ) for x in range(11)
     ]
     assert added[0].name == 'squirrel-park-visit'
@@ -389,8 +339,7 @@ def test_unique_names(session):
         start=datetime(2015, 6, 16, 9, 30),
         end=datetime(2015, 6, 16, 18, 00),
         timezone='US/Eastern',
-        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5',
-        autoclean=False
+        recurrence='RRULE:FREQ=DAILY;INTERVAL=1;COUNT=5'
     )
     assert event.name == 'squirrel-park-visit-6'
 
@@ -422,8 +371,7 @@ def test_unicode(session):
             'description': u'Rendez-vous automnal des médecines.'
         },
         location=u'Salon du mieux-vivre à Saignelégier',
-        tags=[u'salons', u'congrès'],
-        autoclean=False
+        tags=[u'salons', u'congrès']
     )
     event.submit()
     event.publish()
@@ -436,8 +384,7 @@ def test_unicode(session):
             'description': u'Congrès en français et espagnol.'
         },
         location=u'Salon du mieux-vivre à Saignelégier',
-        tags=[u'témoins'],
-        autoclean=False
+        tags=[u'témoins']
     )
     event.submit()
     event.publish()

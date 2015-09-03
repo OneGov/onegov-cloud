@@ -61,7 +61,7 @@ class EventCollection(EventCollectionPagination):
         A unique, URL-friendly name is created automatically for this event
         using the title and optionally numbers for duplicate names.
 
-        Every time a new event is added, old, past events are deleted unless
+        Every time a new event is added, old, stale events are deleted unless
         disabled with the ``autoclean`` option.
 
         Returns the created event or None if already automatically deleted.
@@ -80,9 +80,9 @@ class EventCollection(EventCollectionPagination):
         self.session.flush()
 
         if autoclean:
-            self.remove_old_events()
+            self.remove_stale_events()
 
-        return self.query().filter(Event.id == event.id).first()
+        return event
 
     def delete(self, event):
         """ Delete an event. """
@@ -90,28 +90,14 @@ class EventCollection(EventCollectionPagination):
         self.session.delete(event)
         self.session.flush()
 
-    def remove_old_events(self, max_age=None, max_stale=None):
-        """ Removes all events with the last occurrence older than 30 days or
-        initiated events created more than two days ago.
+    def remove_stale_events(self, max_stale=None):
+        """ Remove events which have never been submitted and are created more
+        than five days ago.
 
         """
 
-        if max_age is None:
-            max_age = datetime.utcnow() - timedelta(days=30)
-            max_age = standardize_date(max_age, 'UTC')
-
-        events = self.session.query(Event).filter(
-            Event.state != 'initiated',
-            Event.start < max_age
-        )
-        events = list(filter(
-            lambda x: max(x.occurrence_dates(limit=False)) < max_age, events
-        ))
-        for event in events:
-            self.session.delete(event)
-
         if max_stale is None:
-            max_stale = datetime.utcnow() - timedelta(days=2)
+            max_stale = datetime.utcnow() - timedelta(days=5)
             max_stale = standardize_date(max_stale, 'UTC')
 
         events = self.session.query(Event).filter(
