@@ -34,9 +34,13 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'bleach',
+        'lxml',
         'onegov.core>=0.4.0',
+        'onegov.server',
         'python-dateutil',
-        'sedate'
+        'requests',
+        'sedate',
     ],
     extras_require=dict(
         test=[
@@ -45,11 +49,13 @@ setup(
             'pytest',
         ],
     ),
-    entry_points={
-        'onegov': [
-            'upgrade = onegov.event.upgrade'
-        ]
-    },
+    entry_points="""
+        [console_scripts]
+        onegov-event=onegov.event.cli:cli
+
+        [onegov]
+        upgrade=onegov.event.upgrade
+    """,
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',

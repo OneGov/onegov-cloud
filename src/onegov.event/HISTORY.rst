@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Add cli command for guidle import (experimental).
+  [msom]
+
 0.0.3 (2015-09-03)
 ~~~~~~~~~~~~~~~~~~~
 
