@@ -29,6 +29,10 @@ class Pagination(object):
         """
         raise NotImplementedError
 
+    @cached_property
+    def cached_subset(self):
+        return self.subset()
+
     @property
     def page_index(self):
         """ Returns the current page index (starting at 0). """
@@ -46,12 +50,14 @@ class Pagination(object):
         """ Returns the total number of elements this pagination represents.
 
         """
-        return self.subset().count()
+        return self.cached_subset.count()
 
     @cached_property
     def batch(self):
         """ Returns the elements on the current page. """
-        query = self.subset().slice(self.offset, self.offset + self.batch_size)
+        query = self.cached_subset.slice(
+            self.offset, self.offset + self.batch_size
+        )
         return query.all()
 
     @property

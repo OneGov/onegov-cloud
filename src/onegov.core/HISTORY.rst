@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Limits the 'subset' call for Pagination collections to once per instance.
+  [href]
+
 0.4.27 (2015-08-31)
 ~~~~~~~~~~~~~~~~~~~
 
