@@ -11,26 +11,13 @@ script:
     - tox -e $TOXENV
 after_success:
     - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
-#
-# Activate this after the repository has been added to travis.
-# If enabled, travis will automatically upload eggs to pypi every time
-# a tagged commit is encountered.
-#
-# To add the pypi password use this:
-#
-# gem install travis
-# travis encrypt --repo seantis/onegov.event
-#
-# Then replace 'encrypted...' below with the new encryption string (no need to
-# copy the quotes).
-#
-# deploy:
-#     provider: pypi
-#     distributions: "sdist bdist_wheel"
-#     user: seantis
-#     password:
-#       secure: encrypted...
-#     on:
-#         tags: true
-#         condition: $TOXENV = py34
-#
+
+deploy:
+    provider: pypi
+    distributions: "sdist bdist_wheel"
+    user: seantis
+    password:
+      secure: "f1yj3XJMfVkUtkmbngSPSIUl2LB1igjS3pTSpyM0Jw2H2XULVuMUjL2vaDytAw3QbkicK71/3HtTpHnSRbpE9egY3/Mw5/K+fGI4aOMMv5ytNRyafAiMgmFaeQIyUMnbscvXclNxkwBahnppUXcdFcfgTTW23v0ewW6NAArFt51o8YCH++S+OFJdovwc004XC3zr54V3tHsAtPTaw9JY1zWEJ7Q4nOTaXLrT2SoKOuxZLUieUg2fMzu3qNvB7DJGJsstSv8knpKv7ViV0Cf1/BJGM9FaLCNw/EYY2GFLLt6Q8qjNhFdnq1SxE3j9rD+Dv5W3iQ3i075bTcpzJz5fk6uhYBZgO1HVLr4eT3lS9RMITuhiW1syPXNYaK+/RONprRms1IbpIH411ZkEl59qFMIui0KI0yG0WEdslQkKgdNsSorf1HzmB7cKJKE7tU8ErOhMhBWetK+aXbktBed43ZK0rNOSi2zQWLNATIrol70Ut0tfNWR5DuUsaS5kbuFs2jXNE/oPSgmuhi6/m3C1tEZUHT0Mn4GMo3scZOtAAuuECuh6ZGQjq6RmzloLhTBMKYlUE3rrbI7zuY/Po0UNZKsoJS5hltQSBr7m7d3wTsCltgiJTtyrC14CQt3gr7AdiXP4bIqO2QMC7LX4xupFNdm5PFZN+ijh4xmg7pVhQ38="
+    on:
+        tags: true
+        condition: $TOXENV = py34
