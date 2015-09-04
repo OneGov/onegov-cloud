@@ -182,13 +182,13 @@
     <div class="row" tal:condition="lead or text or people or contact">
         <tal:block condition="not: people or contact">
             <div class="small-12 columns">
-                <em class="page-lead" tal:condition="lead" tal:content="lead" />
+                <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
             </div>
         </tal:block>
         <tal:block condition="people or contact">
             <div class="small-12 medium-8 columns">
-                <em class="page-lead" tal:condition="lead" tal:content="lead" />
+                <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
             </div>
             <div class="small-12 medium-4 columns" tal:condition="people or contact">

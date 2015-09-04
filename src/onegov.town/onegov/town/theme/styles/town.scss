@@ -30,6 +30,13 @@
     font-weight: normal;
 }
 
+
+/*
+    The maximum width of a line relative to the font. This limits textblocks
+    to a readable length.
+*/
+$max-line-width: 67ex;
+
 /*
     get rid of the jump that is introduced when switching from a site with
     scrollbar to a site without (or vice versa)
@@ -305,7 +312,7 @@ form {
 
 .list-lead {
     margin-bottom: .2em;
-    max-width: 500px;
+    max-width: $max-line-width;
 }
 
 /*
@@ -650,14 +657,12 @@ div#redactor-droparea {
 /*
     page lead
 */
-$max-page-width: 600px;
-
 .page-lead {
     display: block;
     font-size: $h5-font-size;
     font-weight: 300;
-    margin-bottom: 1.25rem;
-    max-width: $max-page-width;
+    margin-bottom: 1rem;
+    max-width: $max-line-width;
 }
 
 /*
@@ -681,7 +686,7 @@ $max-page-width: 600px;
     }
 
     p {
-        max-width: $max-page-width;
+        max-width: $max-line-width;
     }
 
     .has-img {
@@ -1382,14 +1387,13 @@ tr.ticket:hover {
     }
 }
 
-.occurrence-lead {
-    font-size: $h5-font-size;
-    font-weight: 300;
-}
-
 .occurrence-tags,
 .occurrence-description {
-    margin-bottom: 2em;
+    margin-bottom: 1.25em;
+}
+
+.occurrence-description {
+    max-width: $max-line-width;
 }
 
 .occurrence-date {
