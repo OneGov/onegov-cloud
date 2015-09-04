@@ -79,13 +79,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row occurrences-filter-date-submit">
-                            <div class="large-6 columns">
-                                <div class="row collapse">
-                                    <input type="submit" value="Filter by date" class="button" i18n:attributes="value">
+                        <noscript>
+                            <div class="row occurrences-filter-date-submit">
+                                <div class="large-6 columns">
+                                    <div class="row collapse">
+                                        <input type="submit" value="Filter by date" class="button" i18n:attributes="value">
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </noscript>
                     </form>
                 </div>
 
