@@ -5,7 +5,7 @@ Unreleased
 ~~~~~~~~~~
 
 - Adds the ability to enter, list and manage events (parties, concerts, etc.).
-  [href]
+  [msom]
 
 - Adds a function field to the person.
   [href]
