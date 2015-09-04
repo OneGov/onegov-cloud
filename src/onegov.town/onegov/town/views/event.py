@@ -8,7 +8,7 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.forms import EventForm
-from onegov.town.layout import DefaultLayout, EventLayout
+from onegov.town.layout import EventLayout
 from onegov.town.mail import send_html_mail
 from purl import URL
 from uuid import uuid4
@@ -45,55 +45,6 @@ def assert_anonymous_access_only_temporary(request, event):
 
     if session_id != get_session_id(request):
         raise exc.HTTPForbidden()
-
-
-@TownApp.html(model=EventCollection, template='events.pt', permission=Private)
-def view_events(self, request):
-    """ Display all events in a list.
-
-    This view is not actually used and may be removed later.
-    """
-
-    layout = DefaultLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Events"), layout.events_url),
-        Link(_("List"), '#')
-    ]
-
-    def get_filters():
-        states = (
-            ('initiated', _("Initiated")),
-            ('submitted', _("Submitted")),
-            ('published', _("Published")),
-            ('withdrawn', _("Withdrawn"))
-        )
-
-        for id, text in states:
-            yield Link(
-                text=text,
-                url=request.link(self.for_state(id)),
-                active=self.state == id
-            )
-
-    if self.state == 'initiated':
-        events_title = _("Initiated events")
-    elif self.state == 'submitted':
-        events_title = _("Submitted events")
-    elif self.state == 'published':
-        events_title = _("Published events")
-    elif self.state == 'withdrawn':
-        events_title = _("Withdrawn events")
-    else:
-        raise NotImplementedError
-
-    return {
-        'title': _("Events"),
-        'layout': layout,
-        'events': self.batch,
-        'filters': tuple(get_filters()),
-        'events_title': events_title,
-    }
 
 
 @TownApp.view(model=Event, name='publish', permission=Private)
