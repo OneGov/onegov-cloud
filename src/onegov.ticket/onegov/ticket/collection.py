@@ -31,7 +31,9 @@ class TicketCollectionPagination(Pagination):
         query = query.order_by(desc(Ticket.created))
         query = query.options(joinedload(Ticket.user))
         query = query.options(undefer(Ticket.created))
-        query = query.filter(Ticket.state == self.state)
+
+        if self.state != 'all':
+            query = query.filter(Ticket.state == self.state)
 
         if self.handler != 'ALL':
             query = query.filter(Ticket.handler_code == self.handler)
@@ -50,7 +52,9 @@ class TicketCollectionPagination(Pagination):
 
     def page_by_index(self, index):
         return self.__class__(
-            self.session, index, self.state, self.extra_parameters)
+            self.session, index, self.state, self.handler,
+            self.extra_parameters
+        )
 
     def for_state(self, state):
         return self.__class__(

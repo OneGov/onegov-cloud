@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to get tickets of any state from the collection.
+  [href]
+
+- Fixes pagination not working.
+  [href]
+
 0.0.8 (2015-09-03)
 ~~~~~~~~~~~~~~~~~~~
 

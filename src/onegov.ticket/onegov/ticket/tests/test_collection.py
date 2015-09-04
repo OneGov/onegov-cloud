@@ -77,6 +77,8 @@ def test_ticket_count(session):
     assert count.pending == 2
     assert count.closed == 1
 
+    assert TicketCollection(session).for_state('all').subset().count() == 6
+
 
 def test_handler_subset(session):
     session.add(Ticket(
