@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.5.0 (2015-09-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to enter, list and manage events (parties, concerts, etc.).
   [msom]
 
