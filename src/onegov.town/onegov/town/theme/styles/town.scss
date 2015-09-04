@@ -983,20 +983,47 @@ $all-handler-icon: '\f069';
 $frm-handler-icon: '\f044';
 $rsv-handler-icon: '\f073';
 $evn-handler-icon: '\f133';
+$open-ticket-icon: '\f10c';
+$pending-ticket-icon: '\f192';
+$closed-ticket-icon: '\f05d';
+$all-ticket-icon: '\f055';
+
+.ticket-filter-open::before {
+    @include icon($open-ticket-icon);
+    padding-right: .8ex;
+}
+
+.ticket-filter-pending::before {
+    @include icon($pending-ticket-icon);
+    padding-right: .8ex;
+}
+
+.ticket-filter-closed::before {
+    @include icon($closed-ticket-icon);
+    padding-right: .8ex;
+}
+
+.ticket-filter-all::before {
+    @include icon($all-ticket-icon);
+    padding-right: .8ex;
+}
 
 .tickets-table {
     width: 100%;
 
     td {
         vertical-align: top;
-    }
 
-    // forces the ticket-title to break on newlines
-    td.ticket-number-plain,
-    td.ticket-date,
-    td.ticket-group,
-    td.ticket-action {
-        white-space: nowrap;
+        &.ticket-user {
+            text-align: right;
+        }
+
+        // forces the ticket-title and group to break on newlines
+        &.ticket-number-plain,
+        &.ticket-date,
+        &.ticket-action {
+            white-space: nowrap;
+        }
     }
 
     th {
@@ -1010,7 +1037,7 @@ $evn-handler-icon: '\f133';
         }
 
         dd + dd {
-            margin-left: 1em;
+            margin-left: .75em;
         }
 
         button {
@@ -1047,6 +1074,19 @@ $evn-handler-icon: '\f133';
 
 .ticket-handler-EVN td:first-child::before {
     @include icon($evn-handler-icon);
+    color: $monsoon;
+}
+
+.ticket-row-state-pending td:last-child::after {
+    @include icon($pending-ticket-icon);
+    color: $monsoon;
+    padding-left: .5ex;
+}
+
+.ticket-row-state-closed td:last-child::after {
+    @include icon($closed-ticket-icon);
+    color: $monsoon;
+    padding-left: .5ex;
 }
 
 tr.ticket:hover {

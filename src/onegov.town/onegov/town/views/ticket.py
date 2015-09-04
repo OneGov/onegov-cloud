@@ -138,14 +138,16 @@ def view_tickets(self, request):
         states = (
             ('open', _("Open")),
             ('pending', _("Pending")),
-            ('closed', _("Closed"))
+            ('closed', _("Closed")),
+            ('all', _("All"))
         )
 
         for id, text in states:
             yield Link(
                 text=text,
                 url=request.link(self.for_state(id)),
-                active=self.state == id
+                active=self.state == id,
+                classes=('ticket-filter-' + id, )
             )
 
     def get_handlers():
@@ -170,6 +172,8 @@ def view_tickets(self, request):
         tickets_title = _("Pending Tickets")
     elif self.state == 'closed':
         tickets_title = _("Closed Tickets")
+    elif self.state == 'all':
+        tickets_title = _("All Tickets")
     else:
         raise NotImplementedError
 
@@ -180,5 +184,6 @@ def view_tickets(self, request):
         'filters': tuple(get_filters()),
         'handlers': tuple(get_handlers()),
         'tickets_title': tickets_title,
+        'tickets_state': self.state,
         'has_handler_filter': self.handler != 'ALL'
     }

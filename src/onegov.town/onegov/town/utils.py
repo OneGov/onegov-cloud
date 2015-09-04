@@ -165,6 +165,7 @@ class AllocationEventInfo(object):
                 self.request.link(TicketCollection(
                     session=self.request.app.session,
                     handler='RSV',
+                    state='all',
                     extra_parameters={
                         'allocation_id': self.allocation.id
                     }

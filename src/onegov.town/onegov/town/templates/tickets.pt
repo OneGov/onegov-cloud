@@ -3,7 +3,7 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <table class="tickets-table">
+        <table class="tickets-table tickets-state-${tickets_state}">
             <thead>
                 <tr>
                     <th colspan="6">
@@ -36,7 +36,7 @@
             </thead>
             <tbody>
                 <tal:block repeat="ticket tickets">
-                    <tr tal:define="ticket_url request.link(ticket)" class="ticket ticket-handler-${ticket.handler_code}">
+                    <tr tal:define="ticket_url request.link(ticket)" class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}">
                         <td class="ticket-number-plain">
                             <a href="${ticket_url}">
                                 ${ticket.number}
@@ -52,15 +52,15 @@
                             ${layout.format_date(ticket.created, 'relative')}
                         </td>
                         <td class="ticket-user">
-                            <tal:block condition="ticket.user_id">
-                                ${ticket.user.username}
-                            </tal:block>
-                        </td>
-                        <td>
                             <tal:block condition="ticket.state == 'open'">
                                 <a class="ticket-action ticket-accept" href="${request.link(ticket, 'accept')}" i18n:translate>
                                     Accept
                                 </a>
+                            </tal:block>
+                            <tal:block condition="ticket.state != 'open'">
+                                <tal:block condition="ticket.user_id">
+                                    ${ticket.user.username}
+                                </tal:block>
                             </tal:block>
                         </td>
                     </tr>

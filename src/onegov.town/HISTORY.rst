@@ -19,6 +19,12 @@ Unreleased
 - Adds the ability to filter tickets by handler.
   [href]
 
+- Adds the ability to show all tickets of all states in one table.
+  [href]
+
+- Adds a link between allocation and tickets.
+  [href]
+
 - Sorts the children pages on the homepage by A-Z as well.
   [href]
 
