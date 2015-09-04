@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.9 (2015-09-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to get tickets of any state from the collection.
   [href]
 
