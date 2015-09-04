@@ -20,10 +20,12 @@
             </div>
 
             <div class="large-4 medium-4 columns">
-                <tal:block metal:use-macro="layout.macros['ticket_callout']" tal:define="ticket ticket"/>
+                <tal:block metal:use-macro="layout.macros['ticket_callout']" 
+                    tal:condition="request.is_logged_in and ticket"
+                />
 
                 <div class="occurrence-occurrences">
-                    <span i18n:translate="">All occurrences of this event</span>
+                    <h2 i18n:translate="">All occurrences of this event</h2>
                     <ul>
                         <li tal:repeat="occurrence occurrences">
                             ${layout.format_date(occurrence, 'date')}

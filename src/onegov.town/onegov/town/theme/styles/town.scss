@@ -1312,6 +1312,10 @@ tr.ticket:hover {
 
 .occurrence {
     margin-bottom: 2rem;
+
+    h2 {
+        font-size: $h3-font-size - $h3-font-reduction;
+    }
 }
 
 .occurrence-tag {
@@ -1369,6 +1373,13 @@ tr.ticket:hover {
     @include smooth-edges;
 
     margin-top: 2em;
+
+    h2 {
+        color: $primary-color;
+        display: inline;
+        font-size: 1rem;
+        font-weight: bold;
+    }
 }
 
 .occurrence-lead {
@@ -1383,6 +1394,12 @@ tr.ticket:hover {
 
 .occurrence-date {
     font-size: .8em;
+}
+
+.occurrence-occurrences {
+    h2 {
+        font-size: 1rem;
+    }
 }
 
 /*
