@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.28 (2015-09-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a is_uuid utility function.
   [href]
