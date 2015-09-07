@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds on_insert/on_update/on_delete signals to the session manager.
+  [href]
+
 0.4.28 (2015-09-07)
 ~~~~~~~~~~~~~~~~~~~
 

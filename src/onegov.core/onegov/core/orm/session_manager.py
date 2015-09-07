@@ -3,9 +3,22 @@ import re
 import weakref
 import zope.sqlalchemy
 
+from blinker import Signal
 from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
+from sqlalchemy.orm.query import Query
+
+
+class ForceFetchQueryClass(Query):
+    """ Alters the buitlin query class, ensuring that the delete query always
+    fetches the data first, which is important for the bulk delete events
+    to get the actual objects affected by the change.
+
+    """
+
+    def delete(self, synchronize_session=None):
+        return super(ForceFetchQueryClass, self).delete('fetch')
 
 
 class SessionManager(object):
@@ -81,6 +94,63 @@ class SessionManager(object):
         You may therefore use the list of the required extensions below and
         create a schema 'extensions' with those extensions inside.
 
+        **Signals**
+
+        The session manager supports the following signals:
+
+        ``self.on_insert``
+
+        Called with the schema and each object when an insert happens.
+
+        ``self.on_update``
+
+        Called with the schema and each object when a change happens.
+
+        ``self.on_delete``
+
+        Called with the scheam and each object when a change happens. Note that
+        because those objects basically do not exist anymore, only the
+        primary keys of those objects contain actual values!
+
+        Signals abstracts SQLAlchemy ORM events. Since those handle events
+        of the Session, only things happening on sessions provided by this
+        sessionmanager are caught. Raw SQL queries, other sessions and other
+        outside changes to the database are not caught!
+
+        The signals are implemented using blinker:
+        `<https://pythonhosted.org/blinker/>`_
+
+        Note that signal handler functions are by default attached as weakrefs,
+        that means if you create your signal handling function inside another
+        function, the signal will stop working once the outer function
+        completes.
+
+        To avoid this behavior use ``connect_via``. See examples below:
+
+        Examples::
+
+            mgr = SessionManager(dsn)
+
+            # connect to the insert signal, disconnecting automatically once
+            # the handler function is garbage collected
+            @mgr.on_insert.connect
+            def on_insert(schema, obj):
+                print("Inserted {} @ {}".format(obj, schema))
+
+            # connect to the update signal, limited to a specific schema, also
+            # disconnecting automatically once the handler function falls out
+            # of scope
+            @mgr.on_update.connect_via('my-schema')
+            def on_update(schema, obj):
+                print("Updated {} @ {}".format(obj, schema))
+
+            # connect to the delete signal for all schemas -> here, the
+            # handler is strongly referenced and may be used in a closure
+            from blinker import ANY
+            @mgr.on_delete.connect_via(ANY, weak=False)
+            def on_delete(schema, obj):
+                print("Deleted {} @ {}".format(obj, schema))
+
         """
         assert 'postgres' in dsn, "Onegov only supports Postgres!"
 
@@ -89,8 +159,11 @@ class SessionManager(object):
         self.created_schemas = set()
         self.current_schema = None
 
-        # onegov.core creates extensions that it requires in a separate schema
+        self.on_insert = Signal()
+        self.on_update = Signal()
+        self.on_delete = Signal()
 
+        # onegov.core creates extensions that it requires in a separate schema
         # in the future, this might become something we can configure through
         # the setuptools entry_points -> modules could advertise what they need
         # and the core would install the extensions the modules require
@@ -104,10 +177,14 @@ class SessionManager(object):
         self.register_engine(self.engine)
 
         self.session_factory = scoped_session(
-            sessionmaker(bind=self.engine, **session_config),
-            scopefunc=self._scopefunc
+            sessionmaker(
+                bind=self.engine,
+                query_cls=ForceFetchQueryClass,
+                **session_config
+            ),
+            scopefunc=self._scopefunc,
         )
-        zope.sqlalchemy.register(self.session_factory)
+        self.register_session(self.session_factory)
 
     def register_engine(self, engine):
         """ Takes the given engine and registers it with the schema
@@ -139,6 +216,43 @@ class SessionManager(object):
 
             if schema is not None:
                 cursor.execute("SET search_path TO %s, extensions", (schema, ))
+
+    def register_session(self, session):
+        """ Takes the given session and registers it with zope.sqlalchemy and
+        various orm events.
+
+        """
+
+        signals = (
+            (self.on_insert, lambda session: session.new),
+            (self.on_update, lambda session: session.dirty),
+            (self.on_delete, lambda session: session.deleted)
+        )
+
+        @event.listens_for(session, 'after_flush')
+        def on_after_flush(session, flush_context):
+            for signal, get_objects in signals:
+                if signal.receivers:
+                    for obj in get_objects(session):
+                        signal.send(self.current_schema, obj=obj)
+
+        @event.listens_for(session, 'after_bulk_update')
+        def on_after_bulk_update(update_context):
+            if self.on_update.receivers:
+                for obj in update_context.matched_objects:
+                    self.on_update.send(self.current_schema, obj=obj)
+
+        @event.listens_for(session, 'after_bulk_delete')
+        def on_after_bulk_delete(delete_context):
+            if self.on_delete.receivers:
+                for row in delete_context.matched_rows:
+                    obj = delete_context.mapper.class_(**{
+                        c.name: v for c, v
+                        in zip(delete_context.mapper.primary_key, row)
+                    })
+                    self.on_delete.send(self.current_schema, obj=obj)
+
+        zope.sqlalchemy.register(session)
 
     def _scopefunc(self):
         """ Returns the scope of the scoped_session used to create new

@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'alembic',
         'arrow',
+        'blinker',
         'bcrypt',
         'bleach',
         'cached_property',

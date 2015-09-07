@@ -667,3 +667,238 @@ def test_application_retries(postgres_dsn, number_of_retries):
     status_codes = [t.response.status_code for t in threads]
     assert sum(1 for c in status_codes if c == 200) == len(threads) - 1
     assert sum(1 for c in status_codes if c == 409) == 1
+
+
+def test_orm_signals_independence(postgres_dsn):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+        id = Column(Integer, primary_key=True)
+
+    m1 = SessionManager(postgres_dsn, Base)
+    m2 = SessionManager(postgres_dsn, Base)
+
+    m1.set_current_schema('foo')
+    m2.set_current_schema('foo')
+
+    m1_inserted, m2_inserted = [], []
+
+    @m1.on_insert.connect
+    def on_m1_insert(schema, obj):
+        m1_inserted.append((obj, schema))
+
+    @m2.on_insert.connect
+    def on_m2_insert(schema, obj):
+        m2_inserted.append((obj, schema))
+
+    m1.session().add(Document())
+    m1.session().flush()
+
+    assert len(m1_inserted) == 1
+    assert len(m2_inserted) == 0
+
+    m2.session().add(Document())
+    m2.session().flush()
+
+    assert len(m1_inserted) == 1
+    assert len(m2_inserted) == 1
+
+
+def test_orm_signals_schema(postgres_dsn):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+        id = Column(Integer, primary_key=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+
+    inserted = []
+
+    @mgr.on_insert.connect
+    def on_insert(schema, obj):
+        inserted.append((obj, schema))
+
+    mgr.set_current_schema('foo')
+    session = mgr.session()
+    session.add(Document())
+    session.flush()
+
+    assert inserted[0][1] == 'foo'
+
+    mgr.set_current_schema('bar')
+    session.add(Document())
+    session.flush()
+
+    assert inserted[1][1] == 'bar'
+
+
+def test_scoped_signals(postgres_dsn):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+        id = Column(Integer, primary_key=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+
+    inserted = []
+
+    @mgr.on_insert.connect_via('bar')
+    def on_insert(schema, obj):
+        inserted.append((obj, schema))
+
+    mgr.set_current_schema('foo')
+    mgr.session().add(Document())
+    mgr.session().flush()
+
+    assert len(inserted) == 0
+
+    mgr.set_current_schema('bar')
+    mgr.session().add(Document())
+    mgr.session().flush()
+
+    assert len(inserted) == 1
+
+
+def test_orm_signals_data_flushed(postgres_dsn):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+        id = Column(Integer, primary_key=True)
+        body = Column(Text, nullable=True, default=lambda: 'asdf')
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('foo')
+
+    inserted = []
+
+    @mgr.on_insert.connect
+    def on_insert(schema, obj):
+        inserted.append((obj, schema))
+
+    mgr.session().add(Document())
+    mgr.session().flush()
+
+    assert inserted[0][0].id > 0
+    assert inserted[0][0].body == 'asdf'
+
+
+def test_orm_signals(postgres_dsn):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+        id = Column(Integer, primary_key=True)
+        body = Column(Text, nullable=True)
+
+    class Comment(Base):
+        __tablename__ = 'comments'
+        id = Column(Integer, primary_key=True)
+        document_id = Column(Integer, primary_key=True)
+        body = Column(Text, nullable=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+
+    inserted, updated, deleted = [], [], []
+
+    @mgr.on_insert.connect
+    def on_insert(schema, obj):
+        inserted.append((obj, schema))
+
+    @mgr.on_update.connect
+    def on_update(schema, obj):
+        updated.append((obj, schema))
+
+    @mgr.on_delete.connect
+    def on_delete(schema, obj):
+        deleted.append((obj, schema))
+
+    mgr.set_current_schema('foo')
+    session = mgr.session()
+
+    # test on_insert
+    session.add(Document(id=1))
+    session.add(Comment(id=1, document_id=1))
+    assert len(inserted) == 0
+
+    session.flush()
+    assert len(inserted) == 2
+
+    # the event order is random
+    doc = hasattr(inserted[0][0], 'document_id') and inserted[1] or inserted[0]
+    com = hasattr(inserted[0][0], 'document_id') and inserted[0] or inserted[1]
+
+    assert doc[0].id == 1
+    assert doc[1] == 'foo'
+
+    assert com[0].id == 1
+    assert com[0].document_id == 1
+    assert com[1] == 'foo'
+
+    transaction.commit()
+    assert len(inserted) == 2
+
+    # test on_update
+    document = session.query(Document).filter(Document.id == 1).one()
+    document.id = 3
+    assert len(updated) == 0
+
+    session.flush()
+    assert len(updated) == 1
+    assert updated[0][0].id == 3
+    assert updated[0][1] == 'foo'
+
+    transaction.commit()
+    assert len(updated) == 1
+
+    # test on_delete
+    session.delete(document)
+    assert len(deleted) == 0
+
+    session.flush()
+    assert len(deleted) == 1
+
+    session.flush()
+    assert len(deleted) == 1
+    assert deleted[0][0].id == 3
+    assert deleted[0][1] == 'foo'
+
+    # test on_update with bulk update
+    del inserted[:]
+    del updated[:]
+    del deleted[:]
+
+    session.add(Document(id=1))
+    session.add(Document(id=2))
+    session.flush()
+
+    assert len(inserted) == 2
+
+    session.query(Document).update({'body': 'hello world'})
+    assert len(updated) == 2
+    assert updated[0][0].body == 'hello world'
+    assert updated[0][1] == 'foo'
+    assert updated[1][0].body == 'hello world'
+    assert updated[1][1] == 'foo'
+
+    transaction.commit()
+
+    # test on_delete with bulk delete
+    session.add(Comment(id=1, document_id=2, body='foo'))
+    session.add(Comment(id=2, document_id=2, body='bar'))
+    transaction.commit()
+    session.query(Comment).filter(Comment.document_id == 2).delete()
+    assert len(deleted) == 2
+    assert deleted[0][0].id == 1
+    assert deleted[0][0].document_id == 2
+    assert deleted[0][1] == 'foo'
+    assert deleted[1][0].id == 2
+    assert deleted[1][0].document_id == 2
+    assert deleted[1][1] == 'foo'
+
+    # .. since those objects are never loaded, the body is not present
+    assert not deleted[0][0].body
+    assert not deleted[1][0].body
