@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes page link ordering below page content.
+  [href]
+
 0.5.0 (2015-09-04)
 ~~~~~~~~~~~~~~~~~~~
 
