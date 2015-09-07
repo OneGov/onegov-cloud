@@ -1,3 +1,4 @@
+from onegov.core import utils
 from onegov.people.models import Person
 
 
@@ -22,4 +23,5 @@ class PersonCollection(object):
         self.session.flush()
 
     def by_id(self, id):
-        return self.query().filter(Person.id == id).first()
+        if utils.is_uuid(id):
+            return self.query().filter(Person.id == id).first()
