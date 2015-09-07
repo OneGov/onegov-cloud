@@ -5,6 +5,8 @@ Leumundszeugnis
 Vorname * = ___
 Name * = ___
 Geburtsdatum * = YYYY.MM.DD
+Heimatort = ___
+Beruf = ___
 
 # Adresse
 Strasse (inkl. Hausnummer) * = ___
