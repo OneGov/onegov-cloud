@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a is_uuid utility function.
+  [href]
+
 - Limits the 'subset' call for Pagination collections to once per instance.
   [href]
 

@@ -16,12 +16,15 @@ from cProfile import Profile
 from purl import URL
 from unidecode import unidecode
 from webob import static
+from uuid import UUID
 
 
 # http://stackoverflow.com/a/13500078
 _unwanted_characters = re.compile(r'[\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
 _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
+_uuid = re.compile(
+    r'[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}')
 
 
 def normalize_for_url(text):
@@ -297,3 +300,13 @@ def ensure_scheme(url, default='http'):
         return url
 
     return _url.scheme(default).as_string()
+
+
+def is_uuid(value):
+    """ Returns true if the given value is a uuid. The value may be a string
+    or of type UUID. If it's a string, the uuid is checked with a regex.
+    """
+    if isinstance(value, compat.string_types):
+        return _uuid.match(compat.text_type(value))
+
+    return isinstance(value, UUID)

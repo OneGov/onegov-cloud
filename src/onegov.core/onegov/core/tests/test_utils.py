@@ -4,6 +4,8 @@ import onegov.core
 import os.path
 
 from onegov.core import utils
+from onegov.core.compat import text_type
+from uuid import uuid4
 
 
 def test_normalize_for_url():
@@ -91,3 +93,12 @@ def test_ensure_scheme():
         == 'http://google.ch?q=onegov.cloud'
 
     assert utils.ensure_scheme('https://abc.xyz') == 'https://abc.xyz'
+
+
+def test_is_uuid():
+    assert not utils.is_uuid(None)
+    assert not utils.is_uuid('')
+    assert not utils.is_uuid('asdf')
+    assert utils.is_uuid(uuid4())
+    assert utils.is_uuid(text_type(uuid4()))
+    assert utils.is_uuid(uuid4().hex)
