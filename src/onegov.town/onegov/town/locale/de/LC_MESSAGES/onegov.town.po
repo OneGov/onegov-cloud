@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-08 17:08+0200\n"
+"POT-Creation-Date: 2015-09-08 17:45+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -407,9 +407,6 @@ msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."
 
 msgid "Please select a weekday if the event is recurring."
 msgstr "Bitte ein Wochentag auswählen für sich wiederholende Veranstaltungen."
-
-msgid "The end time must be later than the start time."
-msgstr "Das Ende der Veranstaltung muss nach dem Start liegen."
 
 msgid "The end date must be later than the start date."
 msgstr "Das Enddatum muss nach dem Startdatum liegen."

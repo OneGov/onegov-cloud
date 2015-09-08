@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from dateutil import rrule
 from onegov.form import Form, with_options
 from onegov.form.fields import MultiCheckboxField, MultiCheckboxWidget
@@ -116,12 +116,6 @@ class EventForm(Form):
         """
         result = super(EventForm, self).validate()
 
-        if self.start_time.data and self.end_time.data:
-            if self.start_time.data > self.end_time.data:
-                message = _("The end time must be later than the start time.")
-                self.end_time.errors.append(message)
-                result = False
-
         if self.start_date.data and self.end_date.data:
             if self.start_date.data > self.end_date.data:
                 message = _("The end date must be later than the start date.")
@@ -170,11 +164,14 @@ class EventForm(Form):
             ),
             model.timezone
         )
+        end_date = self.start_date.data
+        if self.end_time.data <= self.start_time.data:
+            end_date += timedelta(days=1)
         model.end = replace_timezone(
             datetime(
-                self.start_date.data.year,
-                self.start_date.data.month,
-                self.start_date.data.day,
+                end_date.year,
+                end_date.month,
+                end_date.day,
                 self.end_time.data.hour,
                 self.end_time.data.minute
             ),
