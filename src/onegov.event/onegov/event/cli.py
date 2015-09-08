@@ -50,21 +50,38 @@ def cli(ctx, config, namespace):
 
 
 @cli.command()
-@click.argument('schema')
+@click.option('--confirm/--no-confirm', default=True,
+              help="Ask for confirmation (disabling this is dangerous!)")
+@click.argument('town')
 @click.pass_context
-def clear(ctx, schema):
-    """ Deletes all events for the given schema. """
+def clear(ctx, confirm, town):
+    """ Deletes all events for the given town. """
+
+    if ctx.obj.namespace == '*':
+        click.confirm(
+            "Are you sure that you want to update all namespaces?",
+            default=False, abort=True
+        )
+
+    if confirm:
+        click.confirm(
+            "Do you really want override all your local data?",
+            default=False, abort=True
+        )
 
     for appcfg in ctx.obj.appconfigs:
 
         dsn = appcfg.configuration.get('dsn')
         if dsn:
+            schema = '{}-{}'.format(appcfg.namespace, town)
+            print("Processing {}".format(schema))
+
             mgr = SessionManager(dsn, base=Base)
             mgr.set_current_schema(schema)
 
             events = EventCollection(mgr.session())
 
-            print("Deleting {} events.".format(events.query().count()))
+            print("  Deleting {} events.".format(events.query().count()))
             for event in events.query():
                 events.delete(event)
 
@@ -72,11 +89,17 @@ def clear(ctx, schema):
 
 
 @cli.command(name='guidle-import')
-@click.argument('schema')
+@click.argument('town')
 @click.argument('url')
 @click.pass_context
-def guidle_import(ctx, schema, url):
-    """ Imports events from guilde to the given schema. """
+def guidle_import(ctx, town, url):
+    """ Imports events from guilde to the given town. """
+
+    if ctx.obj.namespace == '*':
+        click.confirm(
+            "Are you sure that you want to update all namespaces?",
+            default=False, abort=True
+        )
 
     print("Downloading events at {0}".format(url))
     root = objectify.fromstring(bytes(requests.get(url).text, 'utf-8'))
@@ -90,12 +113,15 @@ def guidle_import(ctx, schema, url):
         if not dsn:
             continue
 
+        schema = '{}-{}'.format(appcfg.namespace, town)
+        print("Processing {}".format(schema))
+
         mgr = SessionManager(dsn, base=Base)
         mgr.set_current_schema(schema)
         event_collection = EventCollection(mgr.session())
 
         for index, offer in enumerate(offers):
-            print("Importing offer {0}/{1}".format(index+1, len(offers)))
+            print("  Importing offer {}/{}".format(index+1, len(offers)))
 
             events = []
             for date in [d for d in offer.schedules.iterchildren()]:
