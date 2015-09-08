@@ -198,9 +198,8 @@ class EventForm(Form):
                     until_date.strftime('%Y%m%dT%H%M%SZ')
                 )
             )
-        model.meta = {
-            'submitter_email': self.email.data
-        }
+        model.meta = model.meta or {}
+        model.meta['submitter_email'] = self.email.data
 
     def apply_model(self, model):
         """ Stores the page values on the form. """
