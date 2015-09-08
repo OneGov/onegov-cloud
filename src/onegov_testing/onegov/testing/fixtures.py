@@ -94,7 +94,7 @@ def temporary_directory():
 
 
 @pytest.yield_fixture(scope="session")
-def elasticsearch_process():
+def es_process():
     binary = subprocess.check_output(['which', 'elasticsearch'])
     binary = binary.decode('utf-8').rstrip('\n')
 
@@ -158,13 +158,13 @@ def elasticsearch_process():
 
 
 @pytest.yield_fixture(scope="function")
-def elasticsearch_url(elasticsearch_process):
+def es_url(es_process):
     """ Provides an url to an elasticsearch cluster that is guaranteed to be
     empty at the beginning of each test.
 
     """
 
-    url = elasticsearch_process.url.geturl()
+    url = es_process.url.geturl()
     yield url
 
     es = Elasticsearch(url)
@@ -172,6 +172,6 @@ def elasticsearch_url(elasticsearch_process):
 
 
 @pytest.yield_fixture(scope="function")
-def es_client(elasticsearch_url):
+def es_client(es_url):
     """ Provides an elasticsearch client. """
-    yield Elasticsearch(elasticsearch_url)
+    yield Elasticsearch(es_url)
