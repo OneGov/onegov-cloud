@@ -819,7 +819,7 @@ class OccurrenceLayout(EventBaseLayout):
         if self.request.is_logged_in:
             edit_url = URL(self.request.link(self.model.event, 'bearbeiten'))
             edit_url = edit_url.query_param('return-to',
-                                            self.request.link(self.model))
+                                            self.request.link(self.model.event))
             edit_link = Link(
                 text=_("Edit"),
                 url=edit_url.as_string(),
