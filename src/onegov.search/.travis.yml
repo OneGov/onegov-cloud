@@ -1,0 +1,36 @@
+language: python
+
+env:
+    - TOXENV=py27
+    - TOXENV=py34
+    - TOXENV=pep8
+install:
+    - pip install tox
+    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+script:
+    - tox -e $TOXENV
+after_success:
+    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+#
+# Activate this after the repository has been added to travis.
+# If enabled, travis will automatically upload eggs to pypi every time
+# a tagged commit is encountered.
+#
+# To add the pypi password use this:
+#
+# gem install travis
+# travis encrypt --repo seantis/onegov.search
+#
+# Then replace 'encrypted...' below with the new encryption string (no need to
+# copy the quotes).
+#
+# deploy:
+#     provider: pypi
+#     distributions: "sdist bdist_wheel"
+#     user: seantis
+#     password:
+#       secure: encrypted...
+#     on:
+#         tags: true
+#         condition: $TOXENV = py34
+#
