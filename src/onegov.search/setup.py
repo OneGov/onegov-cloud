@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'elasticsearch',
         'onegov.core>=0.4.0'
     ],
     extras_require=dict(
