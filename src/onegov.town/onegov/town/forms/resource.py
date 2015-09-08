@@ -23,7 +23,7 @@ class ResourceForm(Form):
         filters=[sanitize_html, mark_images])
 
     definition = TextAreaField(
-        label=_("Details"),
+        label=_("Extra Fields Definition"),
         validators=[
             validators.Optional(),
             ValidFormDefinition(require_email_field=False)
@@ -52,7 +52,7 @@ class ResourceForm(Form):
 
 class ResourceCleanupForm(Form):
     """ Defines the form to remove multiple allocations. """
-    
+
     start = DateField(
         label=_("Start"),
         validators=[validators.InputRequired()]
