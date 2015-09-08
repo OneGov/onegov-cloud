@@ -272,7 +272,7 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
         if tags:
             query = query.filter(Occurrence._tags.has_any(array(tags)))
 
-        query = query.order_by(Occurrence.start)
+        query = query.order_by(Occurrence.start, Occurrence.title)
 
         return query
 
