@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-08 09:17+0200\n"
+"POT-Creation-Date: 2015-09-08 10:22+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -133,6 +133,14 @@ msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
 
 msgid "Delete event"
 msgstr "Veranstaltung löschen"
+
+msgid "This event can't be deleted."
+msgstr "Diese Veranstaltung kann nicht gelöscht werden."
+
+msgid "To remove this event, go to the ticket and reject it."
+msgstr ""
+"Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie zu "
+"entfernen."
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
@@ -853,6 +861,12 @@ msgstr "Ticket Status abfragen"
 msgid "Your ticket has been reopened"
 msgstr "Ihr Ticket wurde wieder geöffnet"
 
+msgid "Export this event"
+msgstr "Diesen Termin exportieren"
+
+msgid "Export all occurrences of this event"
+msgstr "Alle Termine exportieren"
+
 msgid "All occurrences of this event"
 msgstr "Alle Termine dieser Veranstaltung"
 
@@ -1044,12 +1058,6 @@ msgstr "Sie wurden eingeloggt."
 
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
-
-msgid "Export this event"
-msgstr "Diesen Termin exportieren"
-
-msgid "Export all occurrences of this event"
-msgstr "Alle Termine exportieren"
 
 msgid "New person"
 msgstr "Neue Person"

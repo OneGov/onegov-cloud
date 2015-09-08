@@ -784,6 +784,11 @@ class EventBaseLayout(DefaultLayout):
 
         return ''
 
+    def event_deletable(self, event):
+        tickets = TicketCollection(self.app.session())
+        ticket = tickets.by_handler_id(event.id.hex)
+        return False if ticket else True
+
 
 class OccurrencesLayout(EventBaseLayout):
 
@@ -812,24 +817,34 @@ class OccurrenceLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
-            edit_link = URL(self.request.link(self.model.event, 'bearbeiten'))
-            edit_link = edit_link.query_param('return-to',
-                                              self.request.link(self.model))
+            edit_url = URL(self.request.link(self.model.event, 'bearbeiten'))
+            edit_url = edit_url.query_param('return-to',
+                                            self.request.link(self.model))
+            edit_link = Link(
+                text=_("Edit"),
+                url=edit_url.as_string(),
+                classes=('edit-link', )
+            )
 
-            return [
-                Link(
-                    text=_("Edit"),
-                    url=edit_link.as_string(),
-                    classes=('edit-link', )
-                ),
-                DeleteLink(
+            if self.event_deletable(self.model.event):
+                delete_link = DeleteLink(
                     text=_("Delete"),
                     url=self.request.link(self.model.event),
                     confirm=_("Do you really want to delete this event?"),
                     yes_button_text=_("Delete event"),
                     redirect_after=self.events_url
                 )
-            ]
+            else:
+                delete_link = DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model.event),
+                    confirm=_("This event can't be deleted."),
+                    extra_information=_(
+                        "To remove this event, go to the ticket and reject it."
+                    )
+                )
+
+            return [edit_link, delete_link]
 
 
 class EventLayout(EventBaseLayout):
@@ -845,19 +860,27 @@ class EventLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
-            links = [
-                Link(
+            edit_link = Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'bearbeiten'),
                     classes=('edit-link', )
-                ),
-                DeleteLink(
+            )
+            if self.event_deletable(self.model):
+                delete_link = DeleteLink(
                     text=_("Delete"),
                     url=self.request.link(self.model),
                     confirm=_("Do you really want to delete this event?"),
                     yes_button_text=_("Delete event"),
                     redirect_after=self.events_url
                 )
-            ]
+            else:
+                delete_link = DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model),
+                    confirm=_("This event can't be deleted."),
+                    extra_information=_(
+                        "To remove this event, go to the ticket and reject it."
+                    )
+                )
 
-            return links
+            return [edit_link, delete_link]

@@ -13,6 +13,9 @@ Unreleased
 - Adds ical exports to events.
   [msom]
 
+- Disables delete event link if a ticket exists.
+  [msom]
+
 0.5.0 (2015-09-04)
 ~~~~~~~~~~~~~~~~~~~
 
