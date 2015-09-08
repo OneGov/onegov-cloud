@@ -3,7 +3,7 @@ from elasticsearch import Elasticsearch
 
 class ESIntegration(object):
     """ Provides elasticsearch integration for
-    :class:ònegov.core.framework.Framework` based applications.
+    :class:`onegov.core.framework.Framework` based applications.
 
     The application must be connected to a database.
 
