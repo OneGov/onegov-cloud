@@ -321,20 +321,22 @@ def test_event_form_update_apply():
     assert form.data['weekly'] == None
 
 
-def test_event_form_validate():
+def test_event_form_update_after_midnight():
     form = EventForm(MultiDict([
         ('email', u'info@example.org'),
-        ('end_date', ''),
-        ('end_time', '18:00'),
+        ('end_time', '8:00'),
         ('start_date', '2015-06-16'),
-        ('start_time', '19:30'),
+        ('start_time', '09:30'),
         ('title', u'Salon du mieux-vivre, 16e édition'),
     ]))
-    assert not form.validate()
-    assert form.errors == {
-        'end_time': ['The end time must be later than the start time.']
-    }
+    assert form.validate()
 
+    event = Event()
+    form.update_model(event)
+    assert event.end.day == 17
+
+
+def test_event_form_validate():
     form = EventForm(MultiDict([
         ('email', u'info@example.org'),
         ('end_date', '2015-06-23'),
