@@ -10,6 +10,7 @@ import re
 
 from contextlib import contextmanager
 from datetime import datetime
+from functools import partial
 from itertools import groupby
 from onegov.core import compat
 from cProfile import Profile
@@ -25,6 +26,13 @@ _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
 _uuid = re.compile(
     r'[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}')
+
+# only temporary until bleach has a release > 1.4.1 -
+_email_regex = re.compile((
+    "([a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`"
+    "{|}~-]+)*(@|\sat\s)(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(\.|"
+    "\sdot\s))+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)"
+))
 
 
 def normalize_for_url(text):
@@ -276,13 +284,38 @@ def linkify(text, escape=True):
     if not text:
         return text
 
-    linkified = bleach.linkify(text, parse_email=True)
+    # do not parse email until this is fixed:
+    # https://github.com/jsocol/bleach/issues/154
+
+    # .. use a simple substitute instead
+    text = emailify(text)
+
+    linkified = bleach.linkify(text, parse_email=False)
 
     if not escape:
         return linkified
 
     return bleach.clean(
         linkified, tags=['a'], attributes={'a': ['href', 'rel']})
+
+
+def emailify(text):
+    # the link generating code below is not necessarily safe, so we need
+    # to clean the result of each generation
+    clean = partial(bleach.clean, tags=['a'], attributes={'a': ['href']})
+
+    emails = (
+        email[0] for email in re.findall(_email_regex, text)
+        if not email[0].startswith('//')
+    )
+
+    for email in emails:
+        link = '<a href="mailto:{email}">{email}</a>'.format(email=email)
+        link = clean(link)
+
+        text = text.replace(email, link)
+
+    return text
 
 
 def ensure_scheme(url, default='http'):
