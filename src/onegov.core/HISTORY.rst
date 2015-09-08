@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- E-Mails containing unicode are now sent properly.
+  [href]
+
 - Adds on_insert/on_update/on_delete signals to the session manager.
   [href]
 

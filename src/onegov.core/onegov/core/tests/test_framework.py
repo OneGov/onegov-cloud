@@ -456,10 +456,10 @@ def test_send_email(smtpserver):
     assert message['Reply-To'] == 'info@example.org'
     assert message['Subject'] == 'Test E-Mail'
     assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/html; charset="iso-8859-1"\n'
+        'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: quoted-printable\n\n'
-        'This e-mail is just a test'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
     )
 
 
@@ -490,10 +490,10 @@ def test_send_email_with_name(smtpserver):
     assert message['Reply-To'] == 'Govikon <info@example.org>'
     assert message['Subject'] == 'Test E-Mail'
     assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/html; charset="iso-8859-1"\n'
+        'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: quoted-printable\n\n'
-        'This e-mail is just a test'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
     )
 
 
@@ -531,7 +531,7 @@ def test_send_email_to_maildir(temporary_directory):
     assert 'To: recipient@example.org' in email
 
 
-def test_send_email_unicode(smtpserver):
+def test_send_email_is_8859_1(smtpserver):
     app = Framework()
     app.mail_host, app.mail_port = smtpserver.addr
     app.mail_sender = u'noreply@example.org'
@@ -571,10 +571,55 @@ def test_send_email_unicode(smtpserver):
         == u"Nüws"
 
     assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/html; charset="iso-8859-1"\n'
+        'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: quoted-printable\n\n'
-        'This e-m=E4il is just a test'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW3DpGlsIGlzIGp1c3QgYSB0ZXN0\n'
+    )
+
+
+def test_send_email_unicode(smtpserver):
+    app = Framework()
+    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_sender = u'noreply@example.org'
+    app.mail_force_tls = False
+    app.mail_username = None
+    app.mail_password = None
+    app.mail_use_directory = False
+
+    app.send_email(
+        reply_to=u'👴 <info@example.org>',
+        receivers=[u'recipient@example.org'],
+        subject=u"👍",
+        content=u"👍"
+    )
+
+    assert len(smtpserver.outbox) == 0
+    transaction.commit()
+
+    assert len(smtpserver.outbox) == 1
+    message = smtpserver.outbox[0]
+
+    def decode(header):
+        name, addr = parseaddr(header)
+
+        try:
+            name = decode_header(name)[0][0].decode('utf-8')
+        except AttributeError:
+            pass
+
+        return name, addr
+
+    assert decode(message['Sender']) == (u"👴", 'noreply@example.org')
+    assert decode(message['From']) == (u"👴", 'noreply@example.org')
+    assert decode(message['Reply-To']) == (u"👴", 'info@example.org')
+    assert decode_header(message['Subject'])[0][0].decode('utf-8') == u"👍"
+
+    assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/html; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        '8J+RjQ==\n'
     )
 
 

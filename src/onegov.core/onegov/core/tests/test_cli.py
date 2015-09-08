@@ -89,10 +89,10 @@ def test_sendmail(smtpserver, temporary_directory):
     assert message['Reply-To'] == 'Govikon <info@example.org>'
     assert message['Subject'] == 'Test E-Mail'
     assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/html; charset="iso-8859-1"\n'
+        'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: quoted-printable\n\n'
-        'This e-mail is just a test'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
     )
 
 
@@ -130,7 +130,7 @@ def test_sendmail_unicode(smtpserver, temporary_directory):
         reply_to=u'Gövikon <info@example.org>',
         receivers=[u'recipient@example.org'],
         subject=u"Test E-Mäil",
-        content=u"This e-mäil is just a test"
+        content=u"👍"
     )
 
     transaction.commit()
@@ -161,8 +161,8 @@ def test_sendmail_unicode(smtpserver, temporary_directory):
         == u"Test E-Mäil"
 
     assert message.get_payload()[0].as_string() == (
-        'Content-Type: text/html; charset="iso-8859-1"\n'
+        'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
-        'Content-Transfer-Encoding: quoted-printable\n\n'
-        'This e-m=E4il is just a test'
+        'Content-Transfer-Encoding: base64\n\n'
+        '8J+RjQ==\n'
     )

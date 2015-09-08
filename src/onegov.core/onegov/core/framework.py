@@ -502,7 +502,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             )
 
     def send_email(self, reply_to, receivers=(), cc=(), bcc=(),
-                   subject=None, content=None, encoding='iso-8859-1',
+                   subject=None, content=None, encoding='utf-8',
                    attachments=()):
         """ Sends a plain-text e-mail using :attr:`postman` to the given
         recipients. A reply to address is used to enable people to answer
