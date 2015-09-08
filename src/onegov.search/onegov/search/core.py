@@ -1,7 +1,7 @@
 from elasticsearch import Elasticsearch
 
 
-class SearchIntegration(object):
+class ESIntegration(object):
     """ Provides elasticsearch integration for
     :class:ònegov.core.framework.Framework` based applications.
 
@@ -11,7 +11,7 @@ class SearchIntegration(object):
 
         from onegov.core import Framework
 
-        class MyApp(Framework, SearchIntegration):
+        class MyApp(Framework, ESIntegration):
             pass
 
     """
