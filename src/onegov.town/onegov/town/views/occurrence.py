@@ -1,5 +1,6 @@
 """ The onegov town collection of images uploaded to the site. """
 from datetime import date
+from morepath.request import Response
 from onegov.core.security import Public
 from onegov.core.utils import linkify
 from onegov.event import Occurrence, OccurrenceCollection
@@ -63,3 +64,11 @@ def view_get_occurrence(self, request):
         'ticket': ticket,
         'title': self.title,
     }
+
+
+@TownApp.view(model=Occurrence, name='ical', permission=Public)
+def ical_export_occurence(self, request):
+    """ Returns the occurrence as ics. """
+
+    return Response(self.as_ical(), content_type='text/calendar',
+                    content_disposition='inline; filename=calendar.ics')

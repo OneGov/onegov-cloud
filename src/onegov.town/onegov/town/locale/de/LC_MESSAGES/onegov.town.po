@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-03 15:32+0200\n"
+"POT-Creation-Date: 2015-09-08 09:17+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -679,9 +679,6 @@ msgstr ""
 msgid "Complete"
 msgstr "Abschliessen"
 
-msgid "State:"
-msgstr "Status:"
-
 msgid "Upload"
 msgstr "Hochladen"
 
@@ -961,6 +958,9 @@ msgstr ""
 "Postweg verlangt haben, sollten Sie in den kommenden Tagen Post erhalten. "
 "Falls Sie Dokumente am Schalter abholen wollten, so können Sie das jetzt tun."
 
+msgid "State:"
+msgstr "Status:"
+
 msgid "Kind:"
 msgstr "Art:"
 
@@ -983,24 +983,12 @@ msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 msgid "Submit an event"
 msgstr "Veranstaltung melden"
 
-msgid "Initiated events"
-msgstr ""
-
 #, python-format
 msgid "You have accepted the event ${title}"
 msgstr "Sie haben die Veranstaltung ${title} angenommen"
 
-msgid "List"
-msgstr "Auflisten"
-
-msgid "Submitted events"
-msgstr "Gemeldete Veranstaltungen"
-
 msgid "Thank you for your submission!"
 msgstr "Vielen Dank für Ihre Eingabe!"
-
-msgid "Published events"
-msgstr "Veröffentlichte Veranstaltungen"
 
 msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
@@ -1010,9 +998,6 @@ msgstr "Ein neues Ticket wurde für Sie eröffnet"
 
 msgid "Your event was rejected"
 msgstr "Ihre Veranstaltung wurde abgelehnt"
-
-msgid "Withdrawn events"
-msgstr "Zurückgezogene Veranstaltungen"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
@@ -1059,6 +1044,12 @@ msgstr "Sie wurden eingeloggt."
 
 msgid "Wrong username or password."
 msgstr "Unbekannter Benutzername oder falsches Passwort."
+
+msgid "Export this event"
+msgstr "Diesen Termin exportieren"
+
+msgid "Export all occurrences of this event"
+msgstr "Alle Termine exportieren"
 
 msgid "New person"
 msgstr "Neue Person"
@@ -1173,3 +1164,6 @@ msgstr "Formulareingaben"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
+
+msgid "All Tickets"
+msgstr "Alle Tickets"

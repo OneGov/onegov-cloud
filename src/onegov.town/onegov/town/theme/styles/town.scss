@@ -1322,7 +1322,7 @@ tr.ticket:hover {
 }
 
 /*
-    Event occurrences
+    Events
 */
 
 .occurrence {
@@ -1410,31 +1410,20 @@ tr.ticket:hover {
     font-size: .8em;
 }
 
-.occurrence-occurrences {
+.occurrence-exports {
+    @include panel;
+    @include smooth-edges;
+
+    margin-bottom: 1.5em;
+
     h2 {
         font-size: 1rem;
     }
 }
 
-/*
-    Events
-*/
-.events-table {
-    // todo: this is only a temporary view
-    width: 100%;
-
-    tr.event:hover {
-        background-color: $yellow-pastel;
-    }
-
-    td.event-title {
-        font-weight: bold;
-
-        ::before {
-            content: '\f044';
-            font-family: 'FontAwesome';
-            font-weight: normal;
-        }
+.occurrence-occurrences {
+    h2 {
+        font-size: 1rem;
     }
 }
 

@@ -10,6 +10,9 @@ Unreleased
 - Fixes page link ordering below page content.
   [href]
 
+- Adds ical exports to events.
+  [msom]
+
 0.5.0 (2015-09-04)
 ~~~~~~~~~~~~~~~~~~~
 

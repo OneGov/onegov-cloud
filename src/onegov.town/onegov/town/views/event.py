@@ -1,6 +1,7 @@
 """ The onegov town collection of images uploaded to the site. """
 import morepath
 
+from morepath.request import Response
 from onegov.core.security import Private, Public
 from onegov.event import Event, EventCollection, OccurrenceCollection
 from onegov.ticket import TicketCollection
@@ -237,3 +238,11 @@ def handle_delete_event(self, request):
         )
 
     EventCollection(request.app.session()).delete(self)
+
+
+@TownApp.view(model=Event, name='ical', permission=Public)
+def ical_export_event(self, request):
+    """ Returns the event with all occurrences as ics. """
+
+    return Response(self.as_ical(), content_type='text/calendar',
+                    content_disposition='inline; filename=calendar.ics')
