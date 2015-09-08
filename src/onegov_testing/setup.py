@@ -35,9 +35,12 @@ setup(
     platforms='any',
     install_requires=[
         'coverage',
+        'elasticsearch',
+        'mirakuru',
         'mock',
         'onegov.core',
         'Pillow',
+        'port-for',
         'pytest',
         'sqlalchemy',
         'testing.postgresql'

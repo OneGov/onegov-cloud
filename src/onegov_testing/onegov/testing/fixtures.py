@@ -1,8 +1,13 @@
+import os
+import port_for
 import pytest
+import shutil
+import subprocess
 import tempfile
 import transaction
-import shutil
 
+from elasticsearch import Elasticsearch
+from mirakuru import HTTPExecutor
 from onegov.core.orm import Base, SessionManager
 from sqlalchemy import create_engine
 from testing.postgresql import Postgresql
@@ -86,3 +91,87 @@ def temporary_directory():
     directory = tempfile.mkdtemp()
     yield directory
     shutil.rmtree(directory)
+
+
+@pytest.yield_fixture(scope="session")
+def elasticsearch_process():
+    binary = subprocess.check_output(['which', 'elasticsearch'])
+    binary = binary.decode('utf-8').rstrip('\n')
+
+    port = port_for.select_random()
+    cluster_name = 'es_cluster_{}'.format(port)
+
+    base = tempfile.mkdtemp()
+    home = os.path.join(base, 'home')
+    logs = os.path.join(base, 'logs')
+    work = os.path.join(base, 'work')
+    conf = os.path.join(base, 'conf')
+    pid = os.path.join(base, 'cluster.pid')
+
+    for path in (home, logs, work, conf):
+        os.mkdir(path)
+
+    # this logging config is required to successfully launch elasticsearch
+    with open(os.path.join(conf, 'logging.yml'), 'w') as f:
+        f.write("""
+            es.logger.level: ERROR
+            rootLogger: ERROR, console
+
+            appender:
+                console:
+                    type: console
+                    layout:
+                        type: consolePattern
+                        conversionPattern: "[%d{ISO8601}][%-5p][%-25c] %m%n"
+        """)
+
+    command = """
+        {binary} -p {pidfile}
+        --http.port={port}
+        --path.home={home}
+        --default.path.logs={logs}
+        --default.path.work={work}
+        --default.path.conf={conf}
+        --cluster.name={cluster_name}
+        --network.publish_host='127.0.0.1'
+        --discovery.zen.ping.multicast.enabled=false
+        --index.store.type=memory
+    """.format(
+        binary=binary,
+        pidfile=pid,
+        port=port,
+        home=home,
+        logs=logs,
+        work=work,
+        conf=conf,
+        cluster_name=cluster_name,
+    )
+
+    url = 'http://127.0.0.1:{}'.format(port)
+    executor = HTTPExecutor(command, url)
+    executor.start()
+
+    yield executor
+
+    executor.stop()
+    shutil.rmtree(base)
+
+
+@pytest.yield_fixture(scope="function")
+def elasticsearch_url(elasticsearch_process):
+    """ Provides an url to an elasticsearch cluster that is guaranteed to be
+    empty at the beginning of each test.
+
+    """
+
+    url = elasticsearch_process.url.geturl()
+    yield url
+
+    es = Elasticsearch(url)
+    es.indices.delete(index='*')
+
+
+@pytest.yield_fixture(scope="function")
+def es_client(elasticsearch_url):
+    """ Provides an elasticsearch client. """
+    yield Elasticsearch(elasticsearch_url)
