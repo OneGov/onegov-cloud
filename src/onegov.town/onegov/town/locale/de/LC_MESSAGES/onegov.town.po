@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-08 10:22+0200\n"
+"POT-Creation-Date: 2015-09-08 10:48+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -372,26 +372,23 @@ msgstr "Vortrag"
 msgid "E-Mail"
 msgstr "E-Mail"
 
-msgid "Your E-Mail"
-msgstr "Ihre E-Mail Adresse"
-
 msgid "Title"
 msgstr "Titel"
 
-msgid "The title of this event."
-msgstr "Titel der Veranstaltung."
+msgid "Concerto in the castle garden"
+msgstr "Konzert im Schlossgarten"
 
 msgid "Description"
 msgstr "Beschreibung"
 
-msgid "The description of this event."
-msgstr "Beschreibung der Veranstatlung."
+msgid "Enjoy a concerto in the castle garden."
+msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
 
 msgid "Location"
 msgstr "Ort"
 
-msgid "A description of the location of this event."
-msgstr "Beschreibung des Ortes der Veranstaltung"
+msgid "Castle garden"
+msgstr "Schlossgarten"
 
 msgid "Tags"
 msgstr "Schlagworte"

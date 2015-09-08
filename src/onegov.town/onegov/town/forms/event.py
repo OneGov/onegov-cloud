@@ -47,25 +47,25 @@ class EventForm(Form):
 
     email = EmailField(
         label=_("E-Mail"),
-        description=_("Your E-Mail"),
+        description="max.muster@example.org",
         validators=[validators.InputRequired(), validators.Email()]
     )
 
     title = StringField(
         label=_("Title"),
-        description=_("The title of this event."),
+        description=_("Concerto in the castle garden"),
         validators=[validators.InputRequired()]
     )
 
     description = TextAreaField(
         label=_("Description"),
-        description=_("The description of this event."),
+        description=_("Enjoy a concerto in the castle garden."),
         widget=with_options(TextArea, rows=12)
     )
 
     location = StringField(
         label=_("Location"),
-        description=_("A description of the location of this event.")
+        description=_("Castle garden")
     )
 
     tags = MultiCheckboxField(
@@ -81,11 +81,13 @@ class EventForm(Form):
 
     start_time = TimeField(
         label=_("From"),
+        description="18:00",
         validators=[validators.InputRequired()]
     )
 
     end_time = TimeField(
         label=_("To"),
+        description="19:15",
         validators=[validators.InputRequired()]
     )
 
