@@ -237,13 +237,13 @@
         <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
             <div class="person-card-portrait">
                 <i class="fa fa-user" tal:condition="not:url"></i>
-                <img src="${url}" tal:condition="url">
+                <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
             </div>
         </a>
         <ul>
             <li class="person-card-title">
                 <a href="${link}">
-                    <span>${person.title}</span
+                    <span>${person.title}</span>
                 </a>
             </li>
             <li tal:condition="person.email" class="person-card-email">
@@ -262,7 +262,7 @@
         <div aria-hidden="true" tal:define="url person.picture_url">
             <div class="person-card-portrait">
                 <i class="fa fa-user" tal:condition="not:url"></i>
-                <img src="${url}" tal:condition="url">
+                <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
             </div>
         </div>
         <ul>

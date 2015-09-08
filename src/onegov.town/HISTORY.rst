@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The people's portraits are now always covering their surrounding block.
+  [href]
+
 - Fixes page link ordering below page content.
   [href]
 
