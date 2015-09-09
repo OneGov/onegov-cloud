@@ -434,6 +434,14 @@ $more-link-icon: '\f054';
     background-color: $topbar-bg-color;
     margin-bottom: 1.5em;
     padding: 1em;
+    
+    /* add dots for oveflowing links */
+    a {
+        display: block; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        white-space: nowrap;
+    }
 
     h2 {
         font-size: 1em;
