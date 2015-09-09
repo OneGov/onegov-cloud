@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-08 17:45+0200\n"
+"POT-Creation-Date: 2015-09-09 18:08+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -1028,8 +1028,17 @@ msgstr "Online-Schalter"
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
 
+msgid "Daypasses and rooms"
+msgstr "Tageskarten und Räume"
+
 msgid "All events"
 msgstr "Alle Veranstaltungen"
+
+msgid "SBB Daypass"
+msgstr "SBB Tageskarte"
+
+msgid "Generalabonnement for Towns"
+msgstr "Generalabonnement Gemeinde"
 
 msgid "All contacts"
 msgstr "Alle Kontakte"

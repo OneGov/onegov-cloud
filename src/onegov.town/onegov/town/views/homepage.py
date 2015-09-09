@@ -57,20 +57,22 @@ def view_town(self, request):
             subtitle=_("Forms and applications")
         ),
         Link(
-            text=u"Raumreservationen",
+            text=_("Reservations"),
             url=request.link(ResourceCollection(libres_context)),
-            subtitle=u"Turnhalle und Gesellschaftsräume"
+            subtitle=_("Daypasses and rooms")
         ),
     ]
 
-    daypasses = ResourceCollection(libres_context).by_name('ga-tageskarte')
+    # ga-tageskarte is the legacy name..
+    sbb = ResourceCollection(libres_context).by_name('sbb-tageskarte')
+    sbb = sbb or ResourceCollection(libres_context).by_name('ga-tageskarte')
 
-    if daypasses:
+    if sbb:
         online_counter_links.append(
             Link(
-                text=u"SBB-Tageskarte",
-                url=request.link(daypasses),
-                subtitle=u"Generalabonnement Gemeinde"
+                text=_("SBB Daypass"),
+                url=request.link(sbb),
+                subtitle=_("Generalabonnement for Towns")
             )
         )
 
@@ -99,7 +101,7 @@ def view_town(self, request):
     )
 
     latest_events = LinkGroup(
-        title=u"Veranstaltungen",
+        title=_("Events"),
         links=event_links,
     )
 
