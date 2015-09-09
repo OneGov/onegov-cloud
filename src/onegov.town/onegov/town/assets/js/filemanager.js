@@ -19,7 +19,7 @@
 
                 $('#redactor-modal-file-upload-box').addClass('redactor-tab redactor-tab1');
 
-                var $box = $('<div id="redactor-file-manager-box" style="overflow: auto; height: 300px;" class="redactor-tab redactor-tab2">').hide();
+                var $box = $('<div id="redactor-file-manager-box" style="overflow: auto; height: 450px;" class="redactor-tab redactor-tab2">').hide();
                 $modal.append($box);
 
 
