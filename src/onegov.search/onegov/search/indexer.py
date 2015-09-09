@@ -47,18 +47,27 @@ class IndexManager(object):
         self.mappings[type_name] = TypeMapping(mapping)
 
     def query_indices(self):
-        """ Returns a set of indices existing on the elasticsearch cluster. """
+        """ Queryies the elasticsearch cluster for indices belonging to this
+        hostname. """
+
+        hostname = utils.normalize_index_segment(self.hostname)
 
         return set(
-            self.es_client.indices.get('_all', feature='_settings').keys()
+            ix for ix in self.es_client.indices.get(
+                '{}-*'.format(hostname), feature='_settings'
+            )
         )
 
     def query_aliases(self):
-        """ Returns a set of aliases existing on the elasticsearch cluster. """
+        """ Queryies the elasticsearch cluster for aliases belonging to this
+        hostname. """
 
         result = set()
 
-        for info in self.es_client.indices.get_aliases('_all').values():
+        hostname = utils.normalize_index_segment(self.hostname)
+        infos = self.es_client.indices.get_aliases('{}-*'.format(hostname))
+
+        for info in infos.values():
             for alias in info['aliases']:
                 result.add(alias)
 
@@ -95,21 +104,53 @@ class IndexManager(object):
         if internal in self.created_indices:
             return external
 
-        if not self.es_client.indices.exists(internal):
-            self.es_client.indices.create(internal, {
-                'properties': {
-                    type_name: mapping.mapping
-                }
-            })
+        if self.es_client.indices.exists(internal):
+            self.created_indices.add(internal)
+            return external
 
-        if not self.es_client.indices.exists_alias(external):
-            self.es_client.indices.put_alias(external, index=internal)
+        # create the index
+        self.es_client.indices.create(internal, {
+            'properties': {
+                type_name: mapping.mapping
+            }
+        })
 
+        # point the alias to the new index
+        self.es_client.indices.put_alias(external, index=internal)
+
+        # cache the result
         self.created_indices.add(internal)
 
         return external
 
+    def remove_expired_indices(self):
+        """ Removes all expired indices. An index is expired if it's version
+        number is no longer known in the current mappings.
+
+        :return: The number of indices that were deleted.
+
+        """
+        active_versions = set(m.version for m in self.mappings.values())
+
+        count = 0
+        for index in self.query_indices():
+            info = self.parse_index_name(index)
+
+            if info['version'] and info['version'] not in active_versions:
+                self.es_client.indices.delete(index)
+                self.created_indices.remove(index)
+                count += 1
+
+        return count
+
     def parse_index_name(self, index_name):
+        """ Takes the given index name and returns the hostname, schema,
+        language and type_name in a dictionary.
+
+        * If the index_name doesn't match the pattern, all values are None.
+        * If the index_name has no version, the version is None.
+
+        """
         if index_name.count('-') == 3:
             hostname, schema, language, type_name = index_name.split('-')
             version = None
@@ -132,12 +173,16 @@ class IndexManager(object):
         }
 
     def get_external_index_name(self, schema, language, type_name):
+        """ Generates the external index name from the given parameters. """
+
         segments = (self.hostname, schema, language, type_name)
         segments = (utils.normalize_index_segment(s) for s in segments)
 
         return '-'.join(segments)
 
     def get_internal_index_name(self, schema, language, type_name, version):
+        """ Generates the internal index name from the given parameters. """
+
         return '-'.join((
             self.get_external_index_name(schema, language, type_name),
             utils.normalize_index_segment(version)

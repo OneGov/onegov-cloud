@@ -38,6 +38,28 @@ def test_index_manager_connection(es_url, es_client):
     assert ixmgr.es_client.ping()
 
 
+def test_index_manager_separation(es_url):
+    foo = IndexManager(hostname='foo', es_url=es_url)
+    bar = IndexManager(hostname='bar', es_url=es_url)
+
+    for mgr in (foo, bar):
+        mgr.register_type('page', {
+            'properties': {
+                'title': {'type': 'string'}
+            }
+        })
+
+    foo.ensure_index('foo', 'en', 'page')
+    bar.ensure_index('bar', 'en', 'page')
+
+    version = foo.mappings['page'].version
+
+    assert foo.query_indices() == {'foo-foo-en-page' + '-' + version}
+    assert bar.query_indices() == {'bar-bar-en-page' + '-' + version}
+    assert foo.query_aliases() == {'foo-foo-en-page'}
+    assert bar.query_aliases() == {'bar-bar-en-page'}
+
+
 def test_index_creation(es_url):
     ixmgr = IndexManager(hostname='example.org', es_url=es_url)
     ixmgr.register_type('page', {
@@ -94,6 +116,9 @@ def test_index_creation(es_url):
     }
     assert ixmgr.query_indices() == ixmgr.created_indices
     assert ixmgr.query_aliases() == {index}
+
+    # this leads to some indices no longer being used
+    assert ixmgr.remove_expired_indices() == 1
 
 
 @pytest.mark.parametrize("is_valid", [
