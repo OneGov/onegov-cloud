@@ -29,7 +29,7 @@ var spawn_popup = function(event, element) {
         'horizontal': 'right',
         'offsetleft': -10,
         'tooltipanchor': element,
-        'transition': 'all 0.3s',
+        'transition': null,
         'type': 'tooltip',
         'onopen': function() {
             var popup = $(this);
