@@ -41,6 +41,7 @@ setup(
         test=[
             'coverage',
             'onegov.testing',
+            'sqlalchemy',
             'pytest',
         ],
     ),
