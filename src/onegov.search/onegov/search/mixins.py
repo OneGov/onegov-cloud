@@ -14,8 +14,24 @@ class Searchable(object):
 
     @property
     def es_language(self):
-        """ Returns the ISO 639-1 language code of the content. """
+        """ Returns the ISO 639-1 language code of the content. Note that
+        the object's id may not be the same over differing languages.
+
+        That is to say, this is not valid:
+
+            Object(id=1, language='de')
+            Object(id=2, language='en')
+
+        """
         raise NotImplementedError
+
+    @property
+    def es_public(self):
+        """ Returns True if the model is available to be found by the public.
+        If false, only editors/admins will see this object in the search
+        results.
+
+        """
 
     @property
     def es_type_name(self):
