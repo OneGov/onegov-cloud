@@ -121,6 +121,33 @@ def test_index_creation(es_url):
     assert ixmgr.remove_expired_indices() == 1
 
 
+def test_parse_index_name(es_url):
+    ixmgr = IndexManager('foo', es_url)
+    assert ixmgr.parse_index_name('hostname_org-my_schema-de-posts') == {
+        'hostname': 'hostname_org',
+        'schema': 'my_schema',
+        'language': 'de',
+        'type_name': 'posts',
+        'version': None
+    }
+
+    assert ixmgr.parse_index_name('hostname_org-my_schema-de-posts-1') == {
+        'hostname': 'hostname_org',
+        'schema': 'my_schema',
+        'language': 'de',
+        'type_name': 'posts',
+        'version': '1'
+    }
+
+    assert ixmgr.parse_index_name('asdf') == {
+        'hostname': None,
+        'schema': None,
+        'language': None,
+        'type_name': None,
+        'version': None
+    }
+
+
 @pytest.mark.parametrize("is_valid", [
     utils.is_valid_index_name,
     utils.is_valid_type_name
