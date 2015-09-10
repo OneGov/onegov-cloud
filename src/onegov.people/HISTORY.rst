@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.5 (2015-09-10)
+~~~~~~~~~~~~~~~~~~~
+
 - No longer raise an error if the provided id is not a uuid.
   [href]
 
