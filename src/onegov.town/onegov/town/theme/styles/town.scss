@@ -256,6 +256,10 @@ form {
         margin-bottom: 1em;
     }
 
+    .error .code-editor-wrapper {
+        margin-bottom: 0;
+    }
+
     .read-only {
         background-color: $input-disabled-bg;
         color: $steel;
@@ -273,6 +277,11 @@ form {
         font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
         font-size: 12px;
         line-height: 12px;
+    }
+
+    .ace-syntax-error {
+        background: $yellow-light;
+        position: absolute;
     }
     /*
     <--

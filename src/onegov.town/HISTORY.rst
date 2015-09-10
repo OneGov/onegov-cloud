@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Improves the error handling in form definitions.
+  [href]
+
 - The people's portraits are now always covering their surrounding block.
   [href]
 

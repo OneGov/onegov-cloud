@@ -610,6 +610,17 @@ def test_add_custom_form(town_app):
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
+    # this error is not strictly line based, so there's a general error
+    form_page = client.get('/formulare/neu')
+    form_page.form['title'] = "My Form"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = "There are many like it, but this one's mine"
+    form_page.form['definition'] = "abc ="
+    form_page = form_page.form.submit()
+
+    assert u"Das Formular ist nicht gültig." in form_page
+
+    # this error is line based
     form_page = client.get('/formulare/neu')
     form_page.form['title'] = "My Form"
     form_page.form['lead'] = "This is a form"
@@ -617,7 +628,8 @@ def test_add_custom_form(town_app):
     form_page.form['definition'] = "xxx = !!!"
     form_page = form_page.form.submit()
 
-    assert u"Das Formular ist nicht gültig." in form_page
+    assert u"Der Syntax in der 1. Zeile ist ungültig." in form_page
+    assert 'data-highlight-line="1"' in form_page
 
     form_page.form['definition'] = "Name * = ___\nE-Mail * = @@@"
     form_page = form_page.form.submit().follow()

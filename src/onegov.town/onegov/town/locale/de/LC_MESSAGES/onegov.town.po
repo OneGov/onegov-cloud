@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-09 18:08+0200\n"
+"POT-Creation-Date: 2015-09-10 14:30+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -197,6 +197,10 @@ msgstr "Das Formular ist nicht gültig."
 msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
 msgstr ""
 "Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
+
+#, python-format
+msgid "The syntax on line {line} is not valid."
+msgstr "Der Syntax in der {line}. Zeile ist ungültig."
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Einteilung im gewünschten Zeitraum."

@@ -27,6 +27,17 @@ $(function () {
         editor.getSession().setMode("ace/mode/" + mode);
         editor.setTheme("ace/theme/tomorrow");
 
+        var highlighted_line = null;
+
+        if (textarea.data('highlight-line')) {
+            var Range = ace.require('ace/range').Range;
+            var line = textarea.data('highlight-line');
+
+            highlighted_line = editor.getSession().addMarker(
+                new Range(line-1, 0, line-1, 100000), "ace-syntax-error", "fullLine", false
+            );
+        }
+
         if (readonly === true) {
             outside.addClass('read-only');
             inside.addClass('read-only');
@@ -36,7 +47,11 @@ $(function () {
             editor.getSession().setMode("ace/mode/text");
         }
 
-        editor.getSession().on('change', function(){
+        editor.getSession().on('change', function() {
+            if (highlighted_line !== null) {
+                editor.getSession().removeMarker(highlighted_line);
+                highlighted_line = null;
+            }
             textarea.val(editor.getSession().getValue());
         });
     });
