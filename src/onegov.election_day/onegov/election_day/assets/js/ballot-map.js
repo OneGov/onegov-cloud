@@ -68,15 +68,17 @@ var init_ballot_map = function(el) {
                 .on('mouseover', tooltip.show)
                 .on('mouseout', tooltip.hide);
 
-            svg.append('g')
-                .attr('class', 'lake')
-                .selectAll('path')
-                .data(
-                    topojson.feature(
-                        mapdata, mapdata.objects.lakes).features
-                )
-                .enter().append('path')
-                .attr('d', path);
+            if (mapdata.objects.lakes !== undefined) {
+                svg.append('g')
+                    .attr('class', 'lake')
+                    .selectAll('path')
+                    .data(
+                        topojson.feature(
+                            mapdata, mapdata.objects.lakes).features
+                    )
+                    .enter().append('path')
+                    .attr('d', path);
+            }
 
             svg.append('path')
                 .datum(topojson.mesh(
