@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.5.0 (2015-09-10)
+~~~~~~~~~~~~~~~~~~~
 
 - E-Mails containing unicode are now sent properly.
   [href]
