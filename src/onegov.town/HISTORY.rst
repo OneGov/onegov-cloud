@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.5.1 (2015-09-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves the error handling in form definitions.
   [href]
 
