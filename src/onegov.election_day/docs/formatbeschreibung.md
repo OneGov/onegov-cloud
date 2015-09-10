@@ -45,9 +45,13 @@ Die Anzahl Nein Stimmen der Abstimmung.
 
 Die Anzahl Stimmberechtigter.
 
-**Eingelegte Stimmzettel**
+**Leere Stimmzettel**
 
-Die Anzahl eingelegter Stimmzettel (inkl. ungültiger Stimmzettel).
+Die Anzahl leer eingelegter Stimmzettel.
+
+**Ungültige Stimmzettel**
+
+Die Anzahl ungültiger Stimmzettel.
 
 ### Vorlage
 
