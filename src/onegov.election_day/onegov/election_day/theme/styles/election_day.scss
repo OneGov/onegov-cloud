@@ -20,8 +20,15 @@ html {
 */
 .before-content {
     background-color: $white-smoke;
+    left: calc(100% - 100vw);
     margin-bottom: 2rem;
-    padding-top: 2.5rem;
+    padding-top: 2.5rem;   
+    position: relative;
+    width: 100vw;
+
+    .columns {
+        padding: 0 2em;
+    }
 
     h1 small {
         display: block;
