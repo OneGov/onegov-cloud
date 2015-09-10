@@ -280,7 +280,7 @@ from wtforms import (
     TextAreaField
 )
 from wtforms.fields.html5 import DateField, DateTimeLocalField, EmailField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, Optional
 from wtforms.widgets import TextArea
 from wtforms_components import Email, If, TimeField
 
@@ -733,6 +733,8 @@ class WTFormsClassBuilder(object):
                 validator.field_flags = ('required', )
 
                 validators.insert(0, validator)
+        else:
+            validators.insert(0, Optional())
 
         # try to find a smart field_id that contains the dependency or the
         # current fieldset name - if all fails, an error will be thrown,

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes an error where optional fields had to be filled out.
+  [href]
+
 - Adds rudimentary syntax checking with information about which line wrong.
   [href]
 

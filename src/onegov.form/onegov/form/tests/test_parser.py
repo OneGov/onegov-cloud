@@ -6,6 +6,7 @@ from onegov.form.parser import parse_form
 from textwrap import dedent
 from webob.multidict import MultiDict
 from wtforms import FileField
+from wtforms import validators
 from wtforms.fields.html5 import (
     DateField,
     DateTimeLocalField,
@@ -30,12 +31,16 @@ def test_parse_text():
 
     assert form.first_name.label.text == 'First name'
     assert len(form.first_name.validators) == 1
+    assert isinstance(form.first_name.validators[0], validators.DataRequired)
 
     assert form.last_name.label.text == 'Last name'
-    assert len(form.last_name.validators) == 0
+    assert len(form.last_name.validators) == 1
+    assert isinstance(form.country.validators[0], validators.Optional)
 
     assert form.country.label.text == 'Country'
-    assert len(form.country.validators) == 1
+    assert len(form.country.validators) == 2
+    assert isinstance(form.country.validators[0], validators.Optional)
+    assert isinstance(form.country.validators[1], validators.Length)
 
     assert form.comment.label.text == 'Comment'
     assert form.comment.widget(form.comment) == (
@@ -343,6 +348,27 @@ def test_stdnum_field():
 
     form.validate()
     assert form.errors
+
+
+def test_optional_date():
+
+    text = "Date = YYYY.MM.DD"
+
+    form_class = parse_form(text)
+
+    form = form_class(MultiDict([
+        ('date', '30.02.2015')
+    ]))
+
+    form.validate()
+    assert form.errors == {'date': ['Not a valid date value']}
+
+    form = form_class(MultiDict([
+        ('date', '')
+    ]))
+
+    form.validate()
+    assert not form.errors
 
 
 def test_invalid_syntax():
