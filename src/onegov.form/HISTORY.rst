@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.7.0 (2015-09-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes an error where optional fields had to be filled out.
   [href]
 
