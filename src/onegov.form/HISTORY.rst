@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds rudimentary syntax checking with information about which line wrong.
+  [href]
+
 0.6.9 (2015-08-28)
 ~~~~~~~~~~~~~~~~~~~
 

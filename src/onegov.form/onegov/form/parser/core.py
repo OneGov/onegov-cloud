@@ -592,8 +592,8 @@ def prepare(text):
     """
 
     lines = (l.rstrip() for l in text.split('\n'))
-    lines = (l for l in lines if l)
-    lines = (l for l in ensure_a_fieldset(lines))
+    lines = ((ix, l) for ix, l in enumerate(lines) if l)
+    lines = ((ix, l) for ix, l in ensure_a_fieldset(lines))
 
     for line in lines:
         yield line
@@ -606,18 +606,18 @@ def ensure_a_fieldset(lines):
     """
     found_fieldset = False
 
-    for line in lines:
+    for ix, line in lines:
         if found_fieldset:
-            yield line
+            yield ix, line
             continue
 
         if match(elements.fieldset_title, line):
             found_fieldset = True
-            yield line
+            yield ix, line
         else:
             found_fieldset = True
-            yield '# ...'
-            yield line
+            yield -1, '# ...'
+            yield ix, line
 
 
 def translate_to_yaml(text):
@@ -626,9 +626,9 @@ def translate_to_yaml(text):
 
     """
 
-    lines = (l for l in prepare(text))
+    lines = ((ix, l) for ix, l in prepare(text))
 
-    for line in lines:
+    for ix, line in lines:
 
         # the top level are the fieldsets
         if match(elements.fieldset_title, line):
@@ -658,13 +658,18 @@ def translate_to_yaml(text):
 
         # identifiers which are alone contain nested checkboxes/radios
         if match(elements.identifier, line):
+
+            # this should have been matched by the single line field above
+            if not line.endswith('='):
+                raise errors.InvalidFormSyntax(line=ix + 1)
+
             yield u'{indent}- "{identifier}":'.format(
                 indent=' ' * (4 + (len(line) - len(line.lstrip()))),
                 identifier=line.strip()
             )
             continue
 
-        assert False, "The given text could not be parsed"
+        raise errors.InvalidFormSyntax(line=ix + 1)
 
 
 class FieldDependency(object):

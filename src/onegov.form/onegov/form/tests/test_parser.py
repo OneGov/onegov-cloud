@@ -343,3 +343,22 @@ def test_stdnum_field():
 
     form.validate()
     assert form.errors
+
+
+def test_invalid_syntax():
+    with pytest.raises(errors.InvalidFormSyntax) as e:
+        parse_form(".")
+    assert e.value.line == 1
+
+    with pytest.raises(errors.InvalidFormSyntax) as e:
+        parse_form("Test = __")
+    assert e.value.line == 1
+
+    with pytest.raises(errors.InvalidFormSyntax) as e:
+        parse_form('\n'.join((
+            "# Fields",
+            "",
+            "First Name *= ___",
+            "Last Name * __"
+        )))
+    assert e.value.line == 4

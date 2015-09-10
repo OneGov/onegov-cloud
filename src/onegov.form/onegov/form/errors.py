@@ -17,3 +17,8 @@ class InvalidMimeType(FormError):
 
 class UnableToComplete(FormError):
     pass
+
+
+class InvalidFormSyntax(FormError):
+    def __init__(self, line):
+        self.line = line
