@@ -9,6 +9,20 @@ class Searchable(object):
         The returned object needs to be a dict or an object that provides
         a ``to_dict`` method.
 
+        Internally, onegov.search stores differing languages in different
+        indices. For this reason you should mark all fields which are
+        specific to :attr:`es_language` like this:
+
+            @property
+            def es_properties(self):
+
+                return {
+                    'title': { 'type': 'localized' }
+                }
+
+        Onegov.search will automatically insert the right analyzer for
+        types like these.
+
         """
         raise NotImplementedError
 

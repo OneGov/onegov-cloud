@@ -1,6 +1,13 @@
 from elasticsearch import Elasticsearch
 from onegov.search import utils
 
+ES_ANALYZER_MAP = {
+    'en': 'english',
+    'fr': 'french',
+    'de': 'german',
+    'it': 'italian'
+}
+
 
 class TypeMapping(object):
 
@@ -9,6 +16,41 @@ class TypeMapping(object):
     def __init__(self, mapping):
         self.mapping = mapping
         self.version = utils.hash_mapping(mapping)
+
+    def for_language(self, language):
+        """ Returns the mapping for the given language. Mappings can
+        be slightly different for each language. That is, the analyzer
+        changes.
+
+        Because the :class:`IndexManager` puts each language into its own
+        index we do not have to worry about creating different versions
+        of the same mapping here.
+
+        """
+        return self.supplement_analyzer(self.mapping.copy(), language)
+
+    def supplement_analyzer(self, dictionary, language):
+        """ Iterate through the dictionary found in the type mapping and
+        replace the 'localized' type with a 'string' type that includes a
+        language specific analyzer.
+
+        """
+        supplement = False
+
+        for key, value in dictionary.items():
+
+            if hasattr(value, 'items'):
+                dictionary[key] = self.supplement_analyzer(value, language)
+
+            elif key == 'type' and value == 'localized':
+                supplement = True
+
+        if supplement:
+            assert 'analyzer' not in dictionary
+            dictionary[key] = 'string'
+            dictionary['analyzer'] = ES_ANALYZER_MAP[language]
+
+        return dictionary
 
 
 class IndexManager(object):
@@ -111,7 +153,7 @@ class IndexManager(object):
         # create the index
         self.es_client.indices.create(internal, {
             'properties': {
-                type_name: mapping.mapping
+                type_name: mapping.for_language(language)
             }
         })
 

@@ -1,7 +1,7 @@
 import pytest
 
 from onegov.search import utils
-from onegov.search.indexer import IndexManager
+from onegov.search.indexer import IndexManager, TypeMapping
 
 
 def test_index_manager_assertions(es_url):
@@ -172,3 +172,36 @@ def test_is_valid_name(is_valid):
     assert not is_valid('a|b')
     assert not is_valid('a b')
     assert not is_valid('a,b')
+
+
+def test_mapping_for_language():
+
+    mapping = TypeMapping({
+        'title': {
+            'type': 'localized'
+        }
+    })
+
+    assert mapping.for_language('en') == {
+        'title': {
+            'type': 'string',
+            'analyzer': 'english'
+        }
+    }
+
+    mapping = TypeMapping({
+        'title': {
+            'properties': {
+                'type': 'localized'
+            }
+        }
+    })
+
+    assert mapping.for_language('de') == {
+        'title': {
+            'properties': {
+                'type': 'string',
+                'analyzer': 'german'
+            }
+        }
+    }
