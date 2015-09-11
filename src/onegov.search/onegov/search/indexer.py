@@ -1,7 +1,7 @@
 from elasticsearch import Elasticsearch
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, utils
-from queue import Queue, Full
+from onegov.search.compat import Queue, Full
 
 ES_ANALYZER_MAP = {
     'en': 'english',
