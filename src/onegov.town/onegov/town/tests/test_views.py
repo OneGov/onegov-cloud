@@ -1567,3 +1567,122 @@ def test_cleanup_allocations(town_app):
     resource = cleanup.form.submit().follow()
 
     assert u"1 Einteilungen wurden erfolgreich entfernt" in resource
+
+
+def test_view_occurrences_on_startpage(town_app):
+    client = Client(town_app)
+    links = [
+        a.text for a in client.get('/').pyquery('.homepage-links-panel li a')
+    ]
+    events = (
+        '150 Jahre Govikon',
+        'Alle Veranstaltungen',
+        'Gemeindeversammlung',
+        'MuKi Turnen',
+    )
+    assert set(events) <= set(links)
+
+
+def test_view_occurrences(town_app):
+    client = Client(town_app)
+
+    def events(query=''):
+        page = client.get('/veranstaltungen/?{}'.format(query))
+        return [event.text for event in page.pyquery('h2 a')]
+
+    def total_events(query=''):
+        page = client.get('/veranstaltungen/?{}'.format(query))
+        return int(page.pyquery('.occurrences-filter-result span')[0].text)
+
+    def dates(query=''):
+        page = client.get('/veranstaltungen/?{}'.format(query))
+        return [datetime.strptime(div.text, '%d.%m.%Y').date() for div
+                in page.pyquery('.occurrence-date')]
+
+    def tags(query=''):
+        page = client.get('/veranstaltungen/?{}'.format(query))
+        tags = [tag.text.strip() for tag in page.pyquery('.occurrence-tag')]
+        return list(set([tag for tag in tags if tag]))
+
+    assert total_events() == 12
+    assert len(events()) == 10
+    assert total_events('page=1') == 12
+    assert len(events('page=1')) == 2
+    assert dates() == sorted(dates())
+
+    query = 'tags=Party'
+    assert tags(query) == ["Party"]
+    assert total_events(query) == 1
+    assert events(query) == ["150 Jahre Govikon"]
+
+    query = 'tags=Politics'
+    assert tags(query) == ["Politik"]
+    assert total_events(query) == 1
+    assert events(query) == ["Gemeindeversammlung"]
+
+    query = 'tags=Sports'
+    assert tags(query) == ["Sport"]
+    assert total_events(query) == 10
+    assert set(events(query)) == set(["MuKi Turnen", u"Grümpelturnier"])
+
+    query = 'tags=Politics&tags=Party'
+    assert sorted(tags(query)) == ["Party", "Politik"]
+    assert total_events(query) == 2
+    assert set(events(query)) == set(["150 Jahre Govikon",
+                                      "Gemeindeversammlung"])
+
+    unique_dates = sorted(set(dates()))
+
+    query = 'start={}'.format(unique_dates[1].isoformat())
+    assert unique_dates[0] not in dates(query)
+
+    query = 'end={}'.format(unique_dates[-2].isoformat())
+    assert unique_dates[-1] not in dates(query)
+
+    query = 'start={}&end={}'.format(unique_dates[1].isoformat(),
+                                     unique_dates[-2].isoformat())
+    assert unique_dates[0] not in dates(query)
+
+    query = 'start={}&end={}'.format(unique_dates[1].isoformat(),
+                                     unique_dates[-2].isoformat())
+    assert unique_dates[-1] not in dates(query)
+
+    query = 'start={}&end={}&tags=Sports'.format(
+        unique_dates[1].isoformat(),
+        unique_dates[-2].isoformat()
+    )
+
+    assert tags(query) == ["Sport"]
+    assert min(dates(query)) == unique_dates[1]
+    assert max(dates(query)) == unique_dates[-2]
+
+
+def test_view_occurrence(town_app):
+    client = Client(town_app)
+    events = client.get('/veranstaltungen')
+
+    event = events.click("Gemeindeversammlung")
+    assert event.pyquery('h1.main-title').text() == "Gemeindeversammlung"
+    assert "Gemeindesaal" in event
+    assert "Politik" in event
+    assert "Lorem ipsum." in event
+    assert len(event.pyquery('.occurrence-occurrences li')) == 1
+    assert len(event.pyquery('.occurrence-exports h2')) == 1
+    assert event.click('Diesen Termin exportieren').text.startswith(
+        'BEGIN:VCALENDAR'
+    )
+
+    event = events.click("MuKi Turnen", index=0)
+    assert event.pyquery('h1.main-title').text() == "MuKi Turnen"
+    assert "Turnhalle" in event
+    assert "Politik" in event
+    assert "Lorem ipsum." in event
+    assert len(event.pyquery('.occurrence-occurrences li')) == 9
+    assert len(event.pyquery('.occurrence-exports h2')) == 2
+
+    export = event.click('Diesen Termin exportieren').text.startswith(
+        'BEGIN:VCALENDAR'
+    )
+    export = event.click('Alle Termine exportieren').text.startswith(
+        'BEGIN:VCALENDAR'
+    )
