@@ -102,3 +102,12 @@ def test_is_uuid():
     assert utils.is_uuid(uuid4())
     assert utils.is_uuid(text_type(uuid4()))
     assert utils.is_uuid(uuid4().hex)
+
+
+def test_is_non_string_iterable():
+    assert utils.is_non_string_iterable([])
+    assert utils.is_non_string_iterable(tuple())
+    assert utils.is_non_string_iterable({})
+    assert not utils.is_non_string_iterable('abc')
+    assert not utils.is_non_string_iterable(b'abc')
+    assert not utils.is_non_string_iterable(None)

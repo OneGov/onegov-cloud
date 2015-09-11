@@ -8,16 +8,17 @@ import os.path
 import pydoc
 import re
 
+from collections import Iterable
 from contextlib import contextmanager
+from cProfile import Profile
 from datetime import datetime
 from functools import partial
 from itertools import groupby
 from onegov.core import compat
-from cProfile import Profile
 from purl import URL
 from unidecode import unidecode
-from webob import static
 from uuid import UUID
+from webob import static
 
 
 # http://stackoverflow.com/a/13500078
@@ -343,3 +344,9 @@ def is_uuid(value):
         return _uuid.match(compat.text_type(value))
 
     return isinstance(value, UUID)
+
+
+def is_non_string_iterable(obj):
+    """ Returns true if the given obj is an iterable, but not a string. """
+    return not (isinstance(obj, compat.text_type) or isinstance(obj, bytes))\
+        and isinstance(obj, Iterable)

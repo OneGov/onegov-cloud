@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds an utility function to check if an object is iterable but not a string.
+  [href]
+
 0.5.0 (2015-09-10)
 ~~~~~~~~~~~~~~~~~~~
 
