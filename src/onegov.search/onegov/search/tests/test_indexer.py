@@ -1,9 +1,8 @@
 import logging
 import pytest
-import sys
 
 from datetime import datetime
-from onegov.search import log, Searchable, utils
+from onegov.search import Searchable, utils
 from onegov.search.indexer import (
     IndexManager,
     TypeMapping,
