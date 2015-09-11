@@ -2,6 +2,16 @@ class Searchable(object):
     """ Defines the interface required for an object to be searchable. """
 
     @property
+    def es_id(self):
+        """ The id with which this document is stored in the cluster. Should
+        not be changed after creation. If you use this on an ORM model, be sure
+        to use a primary key, all other properties are not available during
+        deletion.
+
+        """
+        raise NotImplementedError
+
+    @property
     def es_properties(self):
         """ Returns the type mapping of this model. Each property in the
         mapping will be read from the model instance.
@@ -22,6 +32,10 @@ class Searchable(object):
 
         Onegov.search will automatically insert the right analyzer for
         types like these.
+
+        There's currently only limited support for properties here, namely
+        objects and nested mappings do not work! This is going to be added
+        in the future though.
 
         """
         raise NotImplementedError

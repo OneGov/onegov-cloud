@@ -1,7 +1,14 @@
+import logging
 import pytest
+import sys
 
-from onegov.search import utils
-from onegov.search.indexer import IndexManager, TypeMapping
+from datetime import datetime
+from onegov.search import log, Searchable, utils
+from onegov.search.indexer import (
+    IndexManager,
+    TypeMapping,
+    ORMEventTranslator
+)
 
 
 def test_index_manager_assertions(es_url):
@@ -186,6 +193,9 @@ def test_mapping_for_language():
         'title': {
             'type': 'string',
             'analyzer': 'english'
+        },
+        'public': {
+            'type': 'boolean'
         }
     }
 
@@ -203,5 +213,118 @@ def test_mapping_for_language():
                 'type': 'string',
                 'analyzer': 'german'
             }
+        },
+        'public': {
+            'type': 'boolean'
         }
     }
+
+
+def test_orm_event_translator_properties():
+
+    class Page(Searchable):
+
+        es_type_name = 'page'
+        es_properties = {
+            'title': {'type': 'localized'},
+            'body': {'type': 'localized'},
+            'tags': {'type': 'string'},
+            'date': {'type': 'date'},
+            'published': {'type': 'boolean'},
+            'likes': {'type': 'long'}
+        }
+
+        def __init__(self, id, **kwargs):
+            self.id = id
+            self.language = kwargs.pop('language', 'en')
+            self.public = kwargs.pop('public', True)
+
+            for k, v in kwargs.items():
+                setattr(self, k, v)
+
+        @property
+        def es_id(self):
+            return self.id
+
+        @property
+        def es_language(self):
+            return self.language
+
+        @property
+        def es_public(self):
+            return self.public
+
+    translator = ORMEventTranslator()
+
+    for on_event in (translator.on_insert, translator.on_update):
+        on_event('my-schema', Page(
+            id=1,
+            title='About',
+            body='We are Pied Piper',
+            tags=['aboutus', 'company'],
+            date=datetime(2015, 9, 11),
+            published=True,
+            likes=1000
+        ))
+
+        assert translator.queue.get() == {
+            'action': 'index',
+            'schema': 'my-schema',
+            'type': 'page',
+            'id': 1,
+            'language': 'en',
+            'public': True,
+            'properties': {
+                'title': 'About',
+                'body': 'We are Pied Piper',
+                'tags': ['aboutus', 'company'],
+                'date': '2015-09-11T00:00:00',
+                'likes': 1000,
+                'published': True
+            }
+        }
+        assert translator.queue.empty()
+
+
+def test_orm_event_translator_delete():
+
+    class Page(Searchable):
+
+        es_id = 1
+        es_type_name = 'page'
+
+    translator = ORMEventTranslator()
+    translator.on_delete('foobar', Page())
+
+    assert translator.queue.get() == {
+        'action': 'delete',
+        'schema': 'foobar',
+        'type': 'page',
+        'id': 1
+    }
+    assert translator.queue.empty()
+
+
+def test_orm_event_queue_overflow(caplog):
+
+    caplog.setLevel(logging.ERROR, logger='onegov.search')
+
+    class Tweet(Searchable):
+        es_id = 1
+        es_type_name = 'page'
+        es_language = 'en'
+        es_public = True
+        es_properties = {}
+
+    translator = ORMEventTranslator(max_queue_size=3)
+    translator.on_insert('foobar', Tweet())
+    translator.on_update('foobar', Tweet())
+    translator.on_delete('foobar', Tweet())
+
+    assert len(caplog.records()) == 0
+
+    translator.on_insert('foobar', Tweet())
+
+    assert len(caplog.records()) == 1
+    assert caplog.records()[0].message == \
+        'The orm event translator queue is full!'

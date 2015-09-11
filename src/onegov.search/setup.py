@@ -43,6 +43,7 @@ setup(
             'onegov.testing',
             'sqlalchemy',
             'pytest',
+            'pytest-capturelog'
         ],
     ),
     entry_points={

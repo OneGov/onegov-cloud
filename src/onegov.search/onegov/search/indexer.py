@@ -1,5 +1,7 @@
 from elasticsearch import Elasticsearch
-from onegov.search import utils
+from onegov.core.utils import is_non_string_iterable
+from onegov.search import log, utils
+from queue import Queue, Full
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -14,8 +16,13 @@ class TypeMapping(object):
     __slots__ = ['mapping', 'version']
 
     def __init__(self, mapping):
-        self.mapping = mapping
+        self.mapping = self.add_defaults(mapping)
         self.version = utils.hash_mapping(mapping)
+
+    def add_defaults(self, mapping):
+        mapping['public'] = {'type': 'boolean'}
+
+        return mapping
 
     def for_language(self, language):
         """ Returns the mapping for the given language. Mappings can
@@ -229,3 +236,69 @@ class IndexManager(object):
             self.get_external_index_name(schema, language, type_name),
             utils.normalize_index_segment(version)
         ))
+
+
+class ORMEventTranslator(object):
+    """ Handles the onegov.core orm events, translates them into indexing
+    actions and puts the result into a queue for the indexer to consume.
+
+    The queue may be limited. Once the limit is reached, new events are no
+    longer processed and an error is logged.
+
+    """
+
+    converters = {
+        'date': lambda dt: dt.isoformat(),
+    }
+
+    def __init__(self, max_queue_size=0):
+        self.queue = Queue(maxsize=max_queue_size)
+
+    def on_insert(self, schema, obj):
+        self.index(schema, obj)
+
+    def on_update(self, schema, obj):
+        self.index(schema, obj)
+
+    def on_delete(self, schema, obj):
+        self.delete(schema, obj)
+
+    def put(self, translation):
+        try:
+            self.queue.put_nowait(translation)
+        except Full:
+            log.error("The orm event translator queue is full!")
+
+    def index(self, schema, obj):
+
+        translation = {
+            'action': 'index',
+            'schema': schema,
+            'type': obj.es_type_name,
+            'id': obj.es_id,
+            'language': obj.es_language,
+            'public': obj.es_public,
+            'properties': {}
+        }
+
+        for prop, mapping in obj.es_properties.items():
+            convert = self.converters.get(mapping['type'], lambda v: v)
+            raw = getattr(obj, prop)
+
+            if is_non_string_iterable(raw):
+                translation['properties'][prop] = [convert(v) for v in raw]
+            else:
+                translation['properties'][prop] = convert(raw)
+
+        self.put(translation)
+
+    def delete(self, schema, obj):
+
+        translation = {
+            'action': 'delete',
+            'schema': schema,
+            'type': obj.es_type_name,
+            'id': obj.es_id
+        }
+
+        self.put(translation)
