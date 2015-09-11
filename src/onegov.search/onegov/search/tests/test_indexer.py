@@ -5,8 +5,9 @@ from datetime import datetime
 from onegov.search import Searchable, utils
 from onegov.search.indexer import (
     IndexManager,
+    ORMEventTranslator,
     TypeMapping,
-    ORMEventTranslator
+    TypeMappingRegistry
 )
 
 
@@ -20,20 +21,26 @@ def test_index_manager_assertions(es_url):
 
     ixmgr = IndexManager(hostname='test.example.org', es_url=es_url)
 
-    with pytest.raises(AssertionError):
-        ixmgr.ensure_index(schema='', language='de', type_name='pages')
+    page = TypeMapping('page', {
+        'properties': {
+            'title': {'type': 'string'}
+        }
+    })
 
     with pytest.raises(AssertionError):
-        ixmgr.ensure_index(schema='asdf', language='', type_name='pages')
+        ixmgr.ensure_index(schema='', language='de', mapping=page)
 
     with pytest.raises(AssertionError):
-        ixmgr.ensure_index(schema='asdf', language='de', type_name='')
+        ixmgr.ensure_index(schema='asdf', language='', mapping=page)
 
     with pytest.raises(AssertionError):
-        ixmgr.ensure_index(schema='asdf', language='deu', type_name='pages')
+        ixmgr.ensure_index(schema='asdf', language='de', mapping='')
 
     with pytest.raises(AssertionError):
-        ixmgr.ensure_index(schema='asdf', language='de', type_name='')
+        ixmgr.ensure_index(schema='asdf', language='deu', mapping=page)
+
+    with pytest.raises(AssertionError):
+        ixmgr.ensure_index(schema='asdf', language='de', mapping='')
 
 
 def test_index_manager_connection(es_url, es_client):
@@ -48,27 +55,25 @@ def test_index_manager_separation(es_url):
     foo = IndexManager(hostname='foo', es_url=es_url)
     bar = IndexManager(hostname='bar', es_url=es_url)
 
-    for mgr in (foo, bar):
-        mgr.register_type('page', {
-            'properties': {
-                'title': {'type': 'string'}
-            }
-        })
+    page = TypeMapping('page', {
+        'properties': {
+            'title': {'type': 'string'}
+        }
+    })
 
-    foo.ensure_index('foo', 'en', 'page')
-    bar.ensure_index('bar', 'en', 'page')
+    foo.ensure_index('foo', 'en', page)
+    bar.ensure_index('bar', 'en', page)
 
-    version = foo.mappings['page'].version
-
-    assert foo.query_indices() == {'foo-foo-en-page' + '-' + version}
-    assert bar.query_indices() == {'bar-bar-en-page' + '-' + version}
+    assert foo.query_indices() == {'foo-foo-en-page' + '-' + page.version}
+    assert bar.query_indices() == {'bar-bar-en-page' + '-' + page.version}
     assert foo.query_aliases() == {'foo-foo-en-page'}
     assert bar.query_aliases() == {'bar-bar-en-page'}
 
 
 def test_index_creation(es_url):
     ixmgr = IndexManager(hostname='example.org', es_url=es_url)
-    ixmgr.register_type('page', {
+
+    page = TypeMapping('page', {
         'properties': {
             'title': {'type': 'string'}
         }
@@ -78,12 +83,10 @@ def test_index_creation(es_url):
     index = ixmgr.ensure_index(
         schema='foo_bar',
         language='en',
-        type_name='page'
+        mapping=page
     )
     assert index == 'example_org-foo_bar-en-page'
-    assert ixmgr.created_indices == {
-        index + '-' + ixmgr.mappings['page'].version
-    }
+    assert ixmgr.created_indices == {index + '-' + page.version}
     assert ixmgr.query_indices() == ixmgr.created_indices
     assert ixmgr.query_aliases() == {index}
 
@@ -91,20 +94,16 @@ def test_index_creation(es_url):
     index = ixmgr.ensure_index(
         schema='foo-bar',
         language='en',
-        type_name='page'
+        mapping=page
     )
     assert index == 'example_org-foo_bar-en-page'
-    assert ixmgr.created_indices == {
-        index + '-' + ixmgr.mappings['page'].version
-    }
+    assert ixmgr.created_indices == {index + '-' + page.version}
     assert ixmgr.query_indices() == ixmgr.created_indices
     assert ixmgr.query_aliases() == {index}
 
     # if we change a mapping (which we won't usually do at runtime), we
     # should get a new index
-    previous_version = ixmgr.mappings['page'].version
-    del ixmgr.mappings['page']
-    ixmgr.register_type('page', {
+    new_page = TypeMapping('page', {
         'properties': {
             'title': {'type': 'string'},
             'body': {'type': 'string'}
@@ -113,18 +112,18 @@ def test_index_creation(es_url):
     index = ixmgr.ensure_index(
         schema='foo-bar',
         language='en',
-        type_name='page'
+        mapping=new_page
     )
     assert index == 'example_org-foo_bar-en-page'
     assert ixmgr.created_indices == {
-        index + '-' + previous_version,
-        index + '-' + ixmgr.mappings['page'].version
+        index + '-' + page.version,
+        index + '-' + new_page.version
     }
     assert ixmgr.query_indices() == ixmgr.created_indices
     assert ixmgr.query_aliases() == {index}
 
     # this leads to some indices no longer being used
-    assert ixmgr.remove_expired_indices() == 1
+    assert ixmgr.remove_expired_indices(current_mappings=[new_page]) == 1
 
 
 def test_parse_index_name(es_url):
@@ -182,7 +181,7 @@ def test_is_valid_name(is_valid):
 
 def test_mapping_for_language():
 
-    mapping = TypeMapping({
+    mapping = TypeMapping('foo', {
         'title': {
             'type': 'localized'
         }
@@ -198,7 +197,7 @@ def test_mapping_for_language():
         }
     }
 
-    mapping = TypeMapping({
+    mapping = TypeMapping('bar', {
         'title': {
             'properties': {
                 'type': 'localized'
@@ -327,3 +326,19 @@ def test_orm_event_queue_overflow(caplog):
     assert len(caplog.records()) == 1
     assert caplog.records()[0].message == \
         'The orm event translator queue is full!'
+
+
+def test_type_mapping_registry():
+
+    registry = TypeMappingRegistry()
+    registry.register_type('page', {
+        'title': {'type': 'string'}
+    })
+    registry.register_type('comment', {
+        'comment': {'type': 'string'}
+    })
+
+    assert set(t.name for t in registry) == {'page', 'comment'}
+
+    with pytest.raises(AssertionError):
+        registry.register_type('page', {})

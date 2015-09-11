@@ -13,9 +13,10 @@ ES_ANALYZER_MAP = {
 
 class TypeMapping(object):
 
-    __slots__ = ['mapping', 'version']
+    __slots__ = ['name', 'mapping', 'version']
 
-    def __init__(self, mapping):
+    def __init__(self, name, mapping):
+        self.name = name
         self.mapping = self.add_defaults(mapping)
         self.version = utils.hash_mapping(mapping)
 
@@ -60,20 +61,25 @@ class TypeMapping(object):
         return dictionary
 
 
-class IndexManager(object):
-    """ Manages the creation/destruction of indices. The indices it creates
-    have an internal name and an external alias. To facilitate that, versions
-    are used.
+class TypeMappingRegistry(object):
 
-    """
-
-    def __init__(self, hostname, es_url=None, es_client=None):
-        assert hostname and (es_url or es_client)
-
-        self.hostname = hostname
-        self.es_client = es_client or Elasticsearch(es_url)
+    def __init__(self):
         self.mappings = {}
-        self.created_indices = set()
+
+    def __getitem__(self, key):
+        return self.mappings[key]
+
+    def __iter__(self):
+        for mapping in self.mappings.values():
+            yield mapping
+
+    def register_orm_base(self, base):
+        """ Takes the given SQLAlchemy base and registers all
+        :class:`~onegov.search.mixins.Searchable` objects.
+
+        """
+        for model in utils.searchable_sqlalchemy_models(base):
+            self.register_type(model.es_type_name, model.es_properties)
 
     def register_type(self, type_name, mapping):
         """ Registers the given type with the given mapping. The mapping is
@@ -93,7 +99,22 @@ class IndexManager(object):
         """
 
         assert type_name not in self.mappings
-        self.mappings[type_name] = TypeMapping(mapping)
+        self.mappings[type_name] = TypeMapping(type_name, mapping)
+
+
+class IndexManager(object):
+    """ Manages the creation/destruction of indices. The indices it creates
+    have an internal name and an external alias. To facilitate that, versions
+    are used.
+
+    """
+
+    def __init__(self, hostname, es_url=None, es_client=None):
+        assert hostname and (es_url or es_client)
+
+        self.hostname = hostname
+        self.es_client = es_client or Elasticsearch(es_url)
+        self.created_indices = set()
 
     def query_indices(self):
         """ Queryies the elasticsearch cluster for indices belonging to this
@@ -122,7 +143,7 @@ class IndexManager(object):
 
         return result
 
-    def ensure_index(self, schema, language, type_name):
+    def ensure_index(self, schema, language, mapping):
         """ Takes the given database schema, language and type name and
         creates an internal index with a version number and an external
         alias without the version number.
@@ -133,22 +154,19 @@ class IndexManager(object):
         :language:
             The language in ISO 639-1 format.
 
-        :type:
-            The type used in this index (must be registered through
-            :meth:`register_type`)
+        :mapping:
+            The :class:`TypeMapping` mapping used in this index.
 
         :return:
             The (external/aliased) name of the created index.
 
         """
-        assert schema and language and type_name
+        assert schema and language and mapping
         assert len(language) == 2
 
-        mapping = self.mappings[type_name]
-
-        external = self.get_external_index_name(schema, language, type_name)
+        external = self.get_external_index_name(schema, language, mapping.name)
         internal = self.get_internal_index_name(
-            schema, language, type_name, mapping.version)
+            schema, language, mapping.name, mapping.version)
 
         if internal in self.created_indices:
             return external
@@ -160,7 +178,7 @@ class IndexManager(object):
         # create the index
         self.es_client.indices.create(internal, {
             'properties': {
-                type_name: mapping.for_language(language)
+                mapping.name: mapping.for_language(language)
             }
         })
 
@@ -172,14 +190,14 @@ class IndexManager(object):
 
         return external
 
-    def remove_expired_indices(self):
+    def remove_expired_indices(self, current_mappings):
         """ Removes all expired indices. An index is expired if it's version
         number is no longer known in the current mappings.
 
         :return: The number of indices that were deleted.
 
         """
-        active_versions = set(m.version for m in self.mappings.values())
+        active_versions = set(m.version for m in current_mappings)
 
         count = 0
         for index in self.query_indices():
