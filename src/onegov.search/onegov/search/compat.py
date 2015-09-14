@@ -1,4 +1,4 @@
 try:
-    from queue import Queue, Full
+    from queue import Queue, Empty, Full
 except ImportError:
-    from Queue import Queue, Full  # pragma: nocoverage # noqa
+    from Queue import Queue, Empty, Full  # pragma: nocoverage # noqa

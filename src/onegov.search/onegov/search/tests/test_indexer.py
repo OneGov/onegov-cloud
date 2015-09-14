@@ -3,7 +3,9 @@ import pytest
 
 from datetime import datetime
 from onegov.search import Searchable, utils
+from onegov.search.compat import Queue
 from onegov.search.indexer import (
+    Indexer,
     IndexManager,
     ORMEventTranslator,
     TypeMapping,
@@ -22,9 +24,7 @@ def test_index_manager_assertions(es_url):
     ixmgr = IndexManager(hostname='test.example.org', es_url=es_url)
 
     page = TypeMapping('page', {
-        'properties': {
-            'title': {'type': 'string'}
-        }
+        'title': {'type': 'string'}
     })
 
     with pytest.raises(AssertionError):
@@ -56,9 +56,7 @@ def test_index_manager_separation(es_url):
     bar = IndexManager(hostname='bar', es_url=es_url)
 
     page = TypeMapping('page', {
-        'properties': {
-            'title': {'type': 'string'}
-        }
+        'title': {'type': 'string'}
     })
 
     foo.ensure_index('foo', 'en', page)
@@ -74,9 +72,7 @@ def test_index_creation(es_url):
     ixmgr = IndexManager(hostname='example.org', es_url=es_url)
 
     page = TypeMapping('page', {
-        'properties': {
-            'title': {'type': 'string'}
-        }
+        'title': {'type': 'string'}
     })
 
     # create an index
@@ -104,10 +100,8 @@ def test_index_creation(es_url):
     # if we change a mapping (which we won't usually do at runtime), we
     # should get a new index
     new_page = TypeMapping('page', {
-        'properties': {
-            'title': {'type': 'string'},
-            'body': {'type': 'string'}
-        }
+        'title': {'type': 'string'},
+        'body': {'type': 'string'}
     })
     index = ixmgr.ensure_index(
         schema='foo-bar',
@@ -252,7 +246,10 @@ def test_orm_event_translator_properties():
         def es_public(self):
             return self.public
 
-    translator = ORMEventTranslator()
+    mappings = TypeMappingRegistry()
+    mappings.register_type('page', Page.es_properties)
+
+    translator = ORMEventTranslator(mappings)
 
     for on_event in (translator.on_insert, translator.on_update):
         on_event('my-schema', Page(
@@ -268,18 +265,9 @@ def test_orm_event_translator_properties():
         assert translator.queue.get() == {
             'action': 'index',
             'schema': 'my-schema',
-            'type': 'page',
+            'type_name': 'page',
             'id': 1,
             'language': 'en',
-            'mapping': {
-                'title': {'type': 'string', 'analyzer': 'english'},
-                'body': {'type': 'string', 'analyzer': 'english'},
-                'tags': {'type': 'string'},
-                'date': {'type': 'date'},
-                'published': {'type': 'boolean'},
-                'likes': {'type': 'long'},
-                'es_public': {'type': 'boolean'}
-            },
             'properties': {
                 'title': 'About',
                 'body': 'We are Pied Piper',
@@ -300,13 +288,16 @@ def test_orm_event_translator_delete():
         es_id = 1
         es_type_name = 'page'
 
-    translator = ORMEventTranslator()
+    mappings = TypeMappingRegistry()
+    mappings.register_type('page', {})
+
+    translator = ORMEventTranslator(mappings)
     translator.on_delete('foobar', Page())
 
     assert translator.queue.get() == {
         'action': 'delete',
         'schema': 'foobar',
-        'type': 'page',
+        'type_name': 'page',
         'id': 1
     }
     assert translator.queue.empty()
@@ -318,12 +309,15 @@ def test_orm_event_queue_overflow(caplog):
 
     class Tweet(Searchable):
         es_id = 1
-        es_type_name = 'page'
+        es_type_name = 'tweet'
         es_language = 'en'
         es_public = True
         es_properties = {}
 
-    translator = ORMEventTranslator(max_queue_size=3)
+    mappings = TypeMappingRegistry()
+    mappings.register_type('tweet', {})
+
+    translator = ORMEventTranslator(mappings, max_queue_size=3)
     translator.on_insert('foobar', Tweet())
     translator.on_update('foobar', Tweet())
     translator.on_delete('foobar', Tweet())
@@ -351,3 +345,64 @@ def test_type_mapping_registry():
 
     with pytest.raises(AssertionError):
         registry.register_type('page', {})
+
+
+def test_indexer_process(es_url, es_client):
+    mappings = TypeMappingRegistry()
+    mappings.register_type('page', {
+        'title': {'type': 'localized'},
+    })
+
+    index = "foo_bar-my_schema-en-page"
+    indexer = Indexer(es_url, mappings, Queue(), hostname='foo.bar')
+
+    indexer.queue.put({
+        'action': 'index',
+        'schema': 'my-schema',
+        'type_name': 'page',
+        'id': 1,
+        'language': 'en',
+        'properties': {
+            'title': 'Go ahead and jump',
+            'es_public': True
+        }
+    })
+
+    assert indexer.process() == 1
+    assert indexer.process() == 0
+    es_client.indices.refresh(index=index)
+
+    search = es_client.search(index=index)
+    assert search['hits']['total'] == 1
+    assert search['hits']['hits'][0]['_id'] == '1'
+    assert search['hits']['hits'][0]['_source'] == {
+        'title': 'Go ahead and jump',
+        'es_public': True
+    }
+    assert search['hits']['hits'][0]['_type'] == 'page'
+
+    # check if the analyzer was applied correctly (stopword removal)
+    search = es_client.search(
+        index=index, body={'query': {'match': {'title': 'and'}}})
+
+    assert search['hits']['total'] == 0
+
+    search = es_client.search(
+        index=index, body={'query': {'match': {'title': 'go jump'}}})
+
+    assert search['hits']['total'] == 1
+
+    # remove the document again
+    indexer.queue.put({
+        'action': 'remove',
+        'schema': 'my-schema',
+        'type_name': 'page',
+        'id': 1
+    })
+
+    assert indexer.process() == 1
+    assert indexer.process() == 0
+    es_client.indices.refresh(index=index)
+
+    es_client.search(index=index)
+    assert search['hits']['total'] == 1

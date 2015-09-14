@@ -1,7 +1,9 @@
+import platform
+
 from elasticsearch import Elasticsearch
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, utils
-from onegov.search.compat import Queue, Full
+from onegov.search.compat import Queue, Empty, Full
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -9,6 +11,80 @@ ES_ANALYZER_MAP = {
     'de': 'german',
     'it': 'italian'
 }
+
+
+class Indexer(object):
+    """ Takes actions from a queue and executes them on the elasticsearch
+    cluster. Depends on :class:`IndexManager` for index management and expects
+    to have the same :class:`TypeRegistry` as :class:`ORMEventTranslator`.
+
+    The idea is that this class does the indexing/deindexing, the index manager
+    sets up the indices and the orm event translator listens for changes in
+    the ORM.
+
+    A queue is used so the indexer can be run in a separate thread.
+
+    """
+
+    def __init__(self, es_url, mappings, queue, hostname=None):
+        self.es_client = Elasticsearch(es_url)
+        self.queue = queue
+        self.hostname = hostname or platform.node()
+        self.ixmgr = IndexManager(self.hostname, es_client=self.es_client)
+        self.mappings = mappings
+
+    def process(self, block=False, timeout=None):
+        try:
+            processed = 0
+            while True:
+                self.process_task(self.queue.get(block, timeout))
+                processed += 1
+        except Empty:
+            pass
+
+        return processed
+
+    def process_task(self, task):
+        if task['action'] == 'index':
+            self.index(task)
+        elif task['action'] == 'remove':
+            self.remove(task)
+        else:
+            raise NotImplementedError
+
+        self.queue.task_done()
+
+    def ensure_index(self, task):
+        return self.ixmgr.ensure_index(
+            task['schema'],
+            task['language'],
+            self.mappings[task['type_name']]
+        )
+
+    def index(self, task):
+        index = self.ensure_index(task)
+
+        self.es_client.index(
+            index=index,
+            doc_type=task['type_name'],
+            id=task['id'],
+            body=task['properties']
+        )
+
+    def remove(self, task):
+        # XXX not very pretty - we don't necessarily know the langauge anymore
+        # here, so we need to remove the document from all indices at the
+        # same time
+        index = self.ixmgr.get_external_index_name(
+            schema=task['schema'],
+            language='0xdeadbeef',
+            type_name=task['type_name']
+        )
+        index = index.replace('0xdeadbeef', '*')
+        self.es_client.delete_by_query(
+            index=index,
+            doc_type=task['type_name'], q='_id:{}'.format(task['id'])
+        )
 
 
 class TypeMapping(object):
@@ -176,9 +252,9 @@ class IndexManager(object):
             return external
 
         # create the index
-        self.es_client.indices.create(internal, {
-            'properties': {
-                mapping.name: mapping.for_language(language)
+        self.es_client.indices.create(internal, body={
+            'mappings': {
+                mapping.name: {'properties': mapping.for_language(language)}
             }
         })
 
@@ -269,7 +345,8 @@ class ORMEventTranslator(object):
         'date': lambda dt: dt.isoformat(),
     }
 
-    def __init__(self, max_queue_size=0):
+    def __init__(self, mappings, max_queue_size=0):
+        self.mappings = mappings
         self.queue = Queue(maxsize=max_queue_size)
 
     def on_insert(self, schema, obj):
@@ -288,18 +365,16 @@ class ORMEventTranslator(object):
             log.error("The orm event translator queue is full!")
 
     def index(self, schema, obj):
-        mapping = TypeMapping(obj.es_type_name, obj.es_properties)
-        mapping = mapping.for_language(obj.es_language)
-
         translation = {
             'action': 'index',
             'id': obj.es_id,
             'schema': schema,
-            'type': obj.es_type_name,
+            'type_name': obj.es_type_name,
             'language': obj.es_language,
-            'mapping': mapping,
             'properties': {}
         }
+
+        mapping = self.mappings[obj.es_type_name].for_language(obj.es_language)
 
         for prop, mapping in mapping.items():
             convert = self.converters.get(mapping['type'], lambda v: v)
@@ -317,7 +392,7 @@ class ORMEventTranslator(object):
         translation = {
             'action': 'delete',
             'schema': schema,
-            'type': obj.es_type_name,
+            'type_name': obj.es_type_name,
             'id': obj.es_id
         }
 
