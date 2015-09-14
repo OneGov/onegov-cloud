@@ -13,6 +13,38 @@ ES_ANALYZER_MAP = {
 }
 
 
+ANALYSIS_CONFIG = {
+    "filter": {
+        "english_stop": {
+            "type": "stop",
+            "stopwords": "_english_"
+        },
+        "english_stemmer": {
+            "type": "stemmer",
+            "language": "english"
+        },
+        "english_possessive_stemmer": {
+            "type": "stemmer",
+            "language": "possessive_english"
+        }
+    },
+    "analyzer": {
+        "english_html": {
+            "tokenizer": "standard",
+            "char_filter": [
+                "html_strip"
+            ],
+            "filter": [
+                "english_possessive_stemmer",
+                "lowercase",
+                "english_stop",
+                "english_stemmer"
+            ]
+        }
+    }
+}
+
+
 class Indexer(object):
     """ Takes actions from a queue and executes them on the elasticsearch
     cluster. Depends on :class:`IndexManager` for index management and expects
@@ -255,6 +287,9 @@ class IndexManager(object):
         self.es_client.indices.create(internal, body={
             'mappings': {
                 mapping.name: {'properties': mapping.for_language(language)}
+            },
+            'settings': {
+                'analysis': ANALYSIS_CONFIG
             }
         })
 

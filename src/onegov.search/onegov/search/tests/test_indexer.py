@@ -406,3 +406,26 @@ def test_indexer_process(es_url, es_client):
 
     es_client.search(index=index)
     assert search['hits']['total'] == 1
+
+
+def test_extra_analyzers(es_url, es_client):
+
+    page = TypeMapping('page', {
+        'title': {'type': 'string'}
+    })
+
+    ixmgr = IndexManager(hostname='foo.bar', es_client=es_client)
+    index = ixmgr.ensure_index(
+        schema='foo_bar',
+        language='en',
+        mapping=page
+    )
+
+    result = es_client.indices.analyze(
+        index=index,
+        body='Do you <em>really</em> want to continue?',
+        analyzer='english_html'
+    )
+    assert [v['token'] for v in result['tokens']] == [
+        'do', 'you', 'realli', 'want', 'continu'
+    ]
