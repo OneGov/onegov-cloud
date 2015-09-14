@@ -6,7 +6,7 @@ import re
 import textwrap
 import transaction
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
@@ -1686,3 +1686,237 @@ def test_view_occurrence(town_app):
     export = event.click('Alle Termine exportieren').text.startswith(
         'BEGIN:VCALENDAR'
     )
+
+
+def test_submit_event(town_app):
+    client = Client(town_app)
+    form_page = client.get('/veranstaltungen').click("Veranstaltung melden")
+
+    assert "Das Formular enthält Fehler" in form_page.form.submit()
+
+    # Fill out event
+    start_date = date.today() + timedelta(days=1)
+    end_date = start_date + timedelta(days=4)
+    form_page.form['email'] = "test@example.org"
+    form_page.form['title'] = "My Ewent"
+    form_page.form['description'] = "My event is an event."
+    form_page.form['location'] = "Location"
+    form_page.form.set('tags', True, index=0)
+    form_page.form.set('tags', True, index=1)
+    form_page.form['start_date'] = start_date.isoformat()
+    form_page.form['start_time'] = "18:00"
+    form_page.form['end_time'] = "22:00"
+    form_page.form['end_date'] = end_date.isoformat()
+    form_page.form.set('weekly', True, index=0)
+    form_page.form.set('weekly', True, index=1)
+    form_page.form.set('weekly', True, index=2)
+    form_page.form.set('weekly', True, index=3)
+    form_page.form.set('weekly', True, index=4)
+    form_page.form.set('weekly', True, index=5)
+    form_page.form.set('weekly', True, index=6)
+
+    preview_page = form_page.form.submit().follow()
+    assert "My Ewent" in preview_page
+    assert "My event is an event." in preview_page
+    assert "Location" in preview_page
+    assert "Ausstellung" in preview_page
+    assert "Gastronomie" in preview_page
+    assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in \
+        preview_page
+    assert "Jeden Mo, Di, Mi, Do, Fr, Sa, So bis zum {}".format(
+        end_date.strftime('%d.%m.%Y')
+    ) in preview_page
+    for days in range(5):
+        assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
+            preview_page
+
+    # Edit event
+    form_page = preview_page.click("Bearbeiten")
+    form_page.form['title'] = "My Event"
+
+    preview_page = form_page.form.submit().follow()
+
+    assert "My Ewent" not in preview_page
+    assert "My Event" in preview_page
+
+    # Submit event
+    confirmation_page = preview_page.form.submit().follow()
+
+    assert "Vielen Dank für Ihre Eingabe!" in confirmation_page
+    ticket_nr = confirmation_page.pyquery('.ticket-number').text()
+    assert "EVN-" in ticket_nr
+
+    assert "My Event" not in client.get('/veranstaltungen')
+
+    assert len(town_app.smtpserver.outbox) == 1
+    message = town_app.smtpserver.outbox[0]
+    assert message.get('to') == "test@example.org"
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('utf-8')
+    assert ticket_nr in message
+
+    assert "Zugriff verweigert" in preview_page.form.submit(expect_errors=True)
+
+    # Accept ticket
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    assert client.get('/').pyquery('.ticket-count div').text()\
+        == "1 Offen 0 In Bearbeitung"
+
+    ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    assert ticket_nr in ticket_page
+    assert "test@example.org" in ticket_page
+    assert "My Event" in ticket_page
+    assert "My event is an event." in ticket_page
+    assert "Location" in ticket_page
+    assert "Ausstellung" in ticket_page
+    assert "Gastronomie" in ticket_page
+    assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in \
+        ticket_page
+    assert "(Europe/Zurich)" in ticket_page
+    assert "Jeden Mo, Di, Mi, Do, Fr, Sa, So bis zum {}".format(
+        end_date.strftime('%d.%m.%Y')
+    ) in ticket_page
+    for days in range(5):
+        assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
+            ticket_page
+
+    # Publish event
+    ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
+
+    assert "My Event" in client.get('/veranstaltungen')
+
+    assert len(town_app.smtpserver.outbox) == 2
+    message = town_app.smtpserver.outbox[1]
+    assert message.get('to') == "test@example.org"
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('utf-8')
+    assert "My Event" in message
+    assert "My event is an event." in message
+    assert "Location" in message
+    assert "Ausstellung" in message
+    assert "Gastronomie" in message
+    assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in message
+    for days in range(5):
+        assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
+            message
+    assert "Ihre Veranstaltung wurde angenommen" in message
+
+    # Close ticket
+    ticket_page.click("Ticket abschliessen").follow()
+
+    assert len(town_app.smtpserver.outbox) == 3
+    message = town_app.smtpserver.outbox[2]
+    assert message.get('to') == "test@example.org"
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('utf-8')
+    assert ticket_nr in message
+
+
+def test_edit_event(town_app):
+    client = Client(town_app)
+
+    # Submit and publish an event
+    form_page = client.get('/veranstaltungen').click("Veranstaltung melden")
+    event_date = date.today()+timedelta(days=1)
+    form_page.form['email'] = "test@example.org"
+    form_page.form['title'] = "My Ewent"
+    form_page.form['location'] = "Lokation"
+    form_page.form['start_date'] = event_date.isoformat()
+    form_page.form['start_time'] = "18:00"
+    form_page.form['end_time'] = "22:00"
+    form_page.form.submit().follow().form.submit().follow()
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
+
+    assert "My Ewent" in client.get('/veranstaltungen')
+    assert "Lokation" in client.get('/veranstaltungen')
+
+    # Edit a submitted event
+    event_page = client.get('/veranstaltungen').click("My Ewent")
+    event_page = event_page.click("Bearbeiten")
+    event_page.form['title'] = "My Event"
+    event_page.form.submit().follow()
+
+    assert "My Ewent" not in client.get('/veranstaltungen')
+    assert "My Event" in client.get('/veranstaltungen')
+
+    # Edit a submitted event via the ticket
+    event_page = ticket_page.click("Veranstaltung bearbeiten")
+    event_page.form['location'] = "Location"
+    event_page.form.submit().follow()
+
+    assert "Lokation" not in client.get('/veranstaltungen')
+    assert "Location" in client.get('/veranstaltungen')
+
+    # Edit a non-submitted event
+    event_page = client.get('/veranstaltungen').click("150 Jahre Govikon")
+    event_page = event_page.click("Bearbeiten")
+    event_page.form['title'] = "Stadtfest"
+    event_page.form.submit().follow()
+
+    assert "150 Jahre Govikon" not in client.get('/veranstaltungen')
+    assert "Stadtfest" in client.get('/veranstaltungen')
+
+
+def test_delete_event(town_app):
+    client = Client(town_app)
+
+    # Submit and publish an event
+    form_page = client.get('/veranstaltungen').click("Veranstaltung melden")
+    event_date = date.today()+timedelta(days=1)
+    form_page.form['email'] = "test@example.org"
+    form_page.form['title'] = "My Event"
+    form_page.form['start_date'] = event_date.isoformat()
+    form_page.form['start_time'] = "18:00"
+    form_page.form['end_time'] = "22:00"
+    form_page.form.submit().follow().form.submit().follow()
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
+    ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
+
+    assert "My Event" in client.get('/veranstaltungen')
+
+    # Try to delete a submitted event directly
+    event_page = client.get('/veranstaltungen').click("My Event")
+
+    assert u"Diese Veranstaltung kann nicht gelöscht werden." in \
+        event_page.pyquery('a.delete-link')[0].values()
+
+    # Delete the event via the ticket
+    delete_link = ticket_page.pyquery('a.delete-link').attr('ic-delete-from')
+    client.delete(delete_link)
+
+    assert len(town_app.smtpserver.outbox) == 3
+    message = town_app.smtpserver.outbox[2]
+    assert message.get('to') == "test@example.org"
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('utf-8')
+    assert "My Event" in message
+    assert "Ihre Veranstaltung musste leider abgelehnt werden" in message
+
+    assert "My Event" not in client.get('/veranstaltungen')
+
+    # Delete a non-submitted event
+    event_page = client.get('/veranstaltungen').click("Gemeindeversammlung")
+    assert u"Möchten Sie die Veranstaltung wirklich löschen?" in \
+        event_page.pyquery('a.delete-link')[0].values()
+
+    delete_link = event_page.pyquery('a.delete-link').attr('ic-delete-from')
+    client.delete(delete_link)
+
+    assert "Gemeindeversammlung" not in client.get('/veranstaltungen')
