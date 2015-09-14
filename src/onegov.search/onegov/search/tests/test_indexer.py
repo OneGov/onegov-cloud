@@ -271,6 +271,15 @@ def test_orm_event_translator_properties():
             'type': 'page',
             'id': 1,
             'language': 'en',
+            'mapping': {
+                'title': {'type': 'string', 'analyzer': 'english'},
+                'body': {'type': 'string', 'analyzer': 'english'},
+                'tags': {'type': 'string'},
+                'date': {'type': 'date'},
+                'published': {'type': 'boolean'},
+                'likes': {'type': 'long'},
+                'es_public': {'type': 'boolean'}
+            },
             'properties': {
                 'title': 'About',
                 'body': 'We are Pied Piper',

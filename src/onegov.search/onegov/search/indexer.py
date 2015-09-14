@@ -297,6 +297,7 @@ class ORMEventTranslator(object):
             'schema': schema,
             'type': obj.es_type_name,
             'language': obj.es_language,
+            'mapping': mapping,
             'properties': {}
         }
 
