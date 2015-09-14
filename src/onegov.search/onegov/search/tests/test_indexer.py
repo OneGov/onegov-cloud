@@ -192,7 +192,7 @@ def test_mapping_for_language():
             'type': 'string',
             'analyzer': 'english'
         },
-        'public': {
+        'es_public': {
             'type': 'boolean'
         }
     }
@@ -212,7 +212,7 @@ def test_mapping_for_language():
                 'analyzer': 'german'
             }
         },
-        'public': {
+        'es_public': {
             'type': 'boolean'
         }
     }
@@ -271,14 +271,14 @@ def test_orm_event_translator_properties():
             'type': 'page',
             'id': 1,
             'language': 'en',
-            'public': True,
             'properties': {
                 'title': 'About',
                 'body': 'We are Pied Piper',
                 'tags': ['aboutus', 'company'],
                 'date': '2015-09-11T00:00:00',
                 'likes': 1000,
-                'published': True
+                'published': True,
+                'es_public': True
             }
         }
         assert translator.queue.empty()

@@ -21,7 +21,7 @@ class TypeMapping(object):
         self.version = utils.hash_mapping(mapping)
 
     def add_defaults(self, mapping):
-        mapping['public'] = {'type': 'boolean'}
+        mapping['es_public'] = {'type': 'boolean'}
 
         return mapping
 
@@ -288,18 +288,19 @@ class ORMEventTranslator(object):
             log.error("The orm event translator queue is full!")
 
     def index(self, schema, obj):
+        mapping = TypeMapping(obj.es_type_name, obj.es_properties)
+        mapping = mapping.for_language(obj.es_language)
 
         translation = {
             'action': 'index',
+            'id': obj.es_id,
             'schema': schema,
             'type': obj.es_type_name,
-            'id': obj.es_id,
             'language': obj.es_language,
-            'public': obj.es_public,
             'properties': {}
         }
 
-        for prop, mapping in obj.es_properties.items():
+        for prop, mapping in mapping.items():
             convert = self.converters.get(mapping['type'], lambda v: v)
             raw = getattr(obj, prop)
 
