@@ -211,6 +211,26 @@ def test_mapping_for_language():
         }
     }
 
+    mapping = TypeMapping('baz', {
+        'title': {
+            'properties': {
+                'type': 'localized_html'
+            }
+        }
+    })
+
+    assert mapping.for_language('en') == {
+        'title': {
+            'properties': {
+                'type': 'string',
+                'analyzer': 'english_html'
+            }
+        },
+        'es_public': {
+            'type': 'boolean'
+        }
+    }
+
 
 def test_orm_event_translator_properties():
 

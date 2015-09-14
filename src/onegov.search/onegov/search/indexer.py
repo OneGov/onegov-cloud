@@ -9,7 +9,8 @@ ES_ANALYZER_MAP = {
     'en': 'english',
     'fr': 'french',
     'de': 'german',
-    'it': 'italian'
+    'it': 'italian',
+    'en_html': 'english_html',
 }
 
 
@@ -158,13 +159,13 @@ class TypeMapping(object):
             if hasattr(value, 'items'):
                 dictionary[key] = self.supplement_analyzer(value, language)
 
-            elif key == 'type' and value == 'localized':
-                supplement = True
+            elif key == 'type' and value.startswith('localized'):
+                supplement = value.replace('localized', language)
 
         if supplement:
             assert 'analyzer' not in dictionary
             dictionary[key] = 'string'
-            dictionary['analyzer'] = ES_ANALYZER_MAP[language]
+            dictionary['analyzer'] = ES_ANALYZER_MAP[supplement]
 
         return dictionary
 
