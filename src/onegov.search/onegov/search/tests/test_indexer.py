@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import logging
 import pytest
 
@@ -448,4 +449,13 @@ def test_extra_analyzers(es_url, es_client):
     )
     assert [v['token'] for v in result['tokens']] == [
         'do', 'you', 'realli', 'want', 'continu'
+    ]
+
+    result = es_client.indices.analyze(
+        index=index,
+        body=u'Möchten Sie <em>wirklich</em> weiterfahren?',
+        analyzer='german_html'
+    )
+    assert [v['token'] for v in result['tokens']] == [
+        u'mocht', u'wirklich', u'weiterfahr'
     ]

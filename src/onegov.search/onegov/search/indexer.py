@@ -7,12 +7,10 @@ from onegov.search.compat import Queue, Empty, Full
 
 ES_ANALYZER_MAP = {
     'en': 'english',
-    'fr': 'french',
     'de': 'german',
-    'it': 'italian',
     'en_html': 'english_html',
+    'de_html': 'german_html'
 }
-
 
 ANALYSIS_CONFIG = {
     "filter": {
@@ -27,6 +25,14 @@ ANALYSIS_CONFIG = {
         "english_possessive_stemmer": {
             "type": "stemmer",
             "language": "possessive_english"
+        },
+        "german_stop": {
+            "type": "stop",
+            "stopwords": "_german_"
+        },
+        "german_stemmer": {
+            "type": "stemmer",
+            "language": "light_german"
         }
     },
     "analyzer": {
@@ -40,6 +46,18 @@ ANALYSIS_CONFIG = {
                 "lowercase",
                 "english_stop",
                 "english_stemmer"
+            ]
+        },
+        "german_html": {
+            "tokenizer": "standard",
+            "char_filter": [
+                "html_strip"
+            ],
+            "filter": [
+                "lowercase",
+                "german_stop",
+                "german_normalization",
+                "german_stemmer"
             ]
         }
     }
