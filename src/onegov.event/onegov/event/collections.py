@@ -9,7 +9,6 @@ from sqlalchemy.dialects.postgresql import array
 
 
 class EventCollectionPagination(Pagination):
-    """ Implements pagination for displaying events. """
 
     def __init__(self, session, page=0, state='submitted'):
         self.session = session
@@ -35,15 +34,17 @@ class EventCollectionPagination(Pagination):
 
     def for_state(self, state):
         """ Returns a new instance of the collection with the given state. """
+
         return self.__class__(self.session, 0, state)
 
 
 class EventCollection(EventCollectionPagination):
+    """ Manage a list of events. """
 
     def query(self):
         return self.session.query(Event)
 
-    def get_unique_name(self, name):
+    def _get_unique_name(self, name):
         """ Create a unique, URL-friendly name. """
 
         # it's possible for `normalize_for_url` to return an empty string...
@@ -72,7 +73,7 @@ class EventCollection(EventCollectionPagination):
             start=replace_timezone(start, timezone),
             end=replace_timezone(end, timezone),
             timezone=timezone,
-            name=self.get_unique_name(title),
+            name=self._get_unique_name(title),
             **optional
         )
 
@@ -126,7 +127,6 @@ class EventCollection(EventCollectionPagination):
 
 
 class OccurrenceCollectionPagination(Pagination):
-    """ Implements pagination for displaying event occurrences. """
 
     def __init__(self, session, page=0, start=None, end=None, tags=None):
         self.session = session
@@ -185,6 +185,7 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
     @cached_property
     def used_timezones(self):
         """ Returns a list of all the timezones used by the occurrences. """
+
         return [
             tz[0] for tz in self.session.query(distinct(Occurrence.timezone))
         ]

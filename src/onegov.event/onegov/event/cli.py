@@ -1,7 +1,14 @@
 # -*- coding: utf-8 -*-
 """ Provides commands related to the onegov.event.
 
+Use this **for debugging/development only**.
+
+Example::
+
+    onegov-event clear govikon
+
 """
+
 import bleach
 import click
 import requests

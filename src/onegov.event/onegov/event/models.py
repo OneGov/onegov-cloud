@@ -23,41 +23,47 @@ class OccurrenceMixin(object):
     the date and times.
     """
 
-    #: title of the event
+    #: Title of the event
     title = Column(Text, nullable=False)
 
-    #: a nice id for the url, readable by humans
+    #: A nice id for the url, readable by humans
     name = Column(Text)
 
-    #: description of the location of the event
+    #: Description of the location of the event
     location = Column(Text, nullable=True)
 
-    #: tags (categories) of the event
+    #: Tags/Categories of the event
     _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
 
     @property
     def tags(self):
+        """ Tags/Categories of the event. """
+
         return list(self._tags.keys()) if self._tags else []
 
     @tags.setter
     def tags(self, value):
         self._tags = dict(((key.strip(), '') for key in value))
 
-    #: timezone of the event
+    #: Timezone of the event
     timezone = Column(String, nullable=False)
 
-    #: start date and time of the event (of the first event if recurring)
+    #: Start date and time of the event (of the first event if recurring)
     start = Column(UTCDateTime, nullable=False)
 
     @property
     def localized_start(self):
+        """ The localized version of the start date/time. """
+
         return to_timezone(self.start, self.timezone)
 
-    #: end date and time of the event (of the first event if recurring)
+    #: End date and time of the event (of the first event if recurring)
     end = Column(UTCDateTime, nullable=False)
 
     @property
     def localized_end(self):
+        """ The localized version of the end date/time. """
+
         return to_timezone(self.end, self.timezone)
 
     def as_ical(self, description=None, rrule=None, url=None):
@@ -100,10 +106,10 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
 
     __tablename__ = 'events'
 
-    #: the internal number of the event
+    #: Internal number of the event
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: state of the event
+    #: State of the event
     state = Column(
         Enum('initiated', 'submitted', 'published', 'withdrawn',
              name='event_state'),
@@ -111,10 +117,15 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
         default='initiated'
     )
 
-    #: recurrence of the event (RRULE, see RFC2445)
+    @property
+    def description(self):
+        """ Description of the event """
+        return self.content.get('description', '')
+
+    #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
 
-    #: occurences of this event
+    #: Occurences of the event
     occurrences = relationship(
         "Occurrence",
         cascade="all, delete-orphan",
@@ -123,6 +134,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
     )
 
     def __setattr__(self, name, value):
+        """ Automatically update the occurrences if shared attributes change.
+        """
+
         super(Event, self).__setattr__(name, value)
         if name in ('state', 'title', 'name', 'location', 'tags',
                     'start', 'end', 'timezone', 'recurrence'):
@@ -134,6 +148,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
         Returns non-localized dates per default. Limits the occurrences per
         default to this and the next year.
         """
+
         occurrences = [self.start]
         if self.recurrence:
             occurrences = rrule.rrulestr(self.recurrence, dtstart=self.start)
@@ -152,6 +167,13 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
         return occurrences
 
     def _update_occurrences(self):
+        """ Updates the occurrences.
+
+        Removes all occurrences if the event is not published or no start and
+        end date/time is set. Only occurrences for this and next year are
+        created.
+        """
+
         # clear old occurrences
         self.occurrences = []
 
@@ -180,20 +202,27 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
             )
 
     def submit(self):
+        """ Submit the event. """
+
         assert self.state == 'initiated'
         self.state = 'submitted'
 
     def publish(self):
+        """ Publish the event.
+
+        Publishing the event will generate the occurrences.
+        """
+
         assert self.state == 'submitted' or self.state == 'withdrawn'
         self.state = 'published'
 
     def withdraw(self):
+        """ Withdraw the event.
+
+        Withdraw the event will delete the occurrences."""
+
         assert self.state == 'published'
         self.state = 'withdrawn'
-
-    @property
-    def description(self):
-        return self.content.get('description', '')
 
     def as_ical(self, url=None):
         """ Returns the event and all its occurrences as iCalendar string. """
@@ -210,10 +239,10 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
 
     __tablename__ = 'event_occurrences'
 
-    #: the internal number of the occurence
+    #: Internal number of the occurence
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the event this occurrence belongs to
+    #: Event this occurrence belongs to
     event_id = Column(UUID, ForeignKey(Event.id), nullable=False)
 
     def as_ical(self, url=None):
