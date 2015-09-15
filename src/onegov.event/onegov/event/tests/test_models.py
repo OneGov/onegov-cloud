@@ -468,6 +468,7 @@ def test_delete_event(session):
 
 
 def test_as_ical():
+    url = 'https://example.org/my-event'
     event = Event(
         state='initiated',
         timezone='Europe/Zurich',
@@ -482,7 +483,7 @@ def test_as_ical():
         name='event',
         modified=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),
     )
-    assert event.as_ical().decode() == (
+    assert event.as_ical(url=url).decode() == (
         'BEGIN:VCALENDAR\r\n'
         'VERSION:2.0\r\n'
         'PRODID:-//OneGov//onegov.event//\r\n'
@@ -494,6 +495,7 @@ def test_as_ical():
         'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z\r\n'
         'LOCATION:Squirrel Park\r\n'
         'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=2\r\n'
+        'URL:https://example.org/my-event\r\n'
         'END:VEVENT\r\n'
         'END:VCALENDAR\r\n'
     )
@@ -503,7 +505,7 @@ def test_as_ical():
     occurrence = event.occurrences[0]
     occurrence.modified = tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich')
 
-    assert event.occurrences[0].as_ical().decode() == (
+    assert event.occurrences[0].as_ical(url=url).decode() == (
         'BEGIN:VCALENDAR\r\n'
         'VERSION:2.0\r\n'
         'PRODID:-//OneGov//onegov.event//\r\n'
@@ -514,6 +516,7 @@ def test_as_ical():
         'DESCRIPTION:<em>Furry</em> things will happen!\r\n'
         'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z\r\n'
         'LOCATION:Squirrel Park\r\n'
+        'URL:https://example.org/my-event\r\n'
         'END:VEVENT\r\n'
         'END:VCALENDAR\r\n'
     )

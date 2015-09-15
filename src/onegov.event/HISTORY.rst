@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Add an optional URL to ical exports.
+  [msom]
+
 0.0.4 (2015-09-08)
 ~~~~~~~~~~~~~~~~~~~
 

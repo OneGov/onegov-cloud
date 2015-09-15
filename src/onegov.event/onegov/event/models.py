@@ -60,7 +60,7 @@ class OccurrenceMixin(object):
     def localized_end(self):
         return to_timezone(self.end, self.timezone)
 
-    def as_ical(self, description=None, rrule=None):
+    def as_ical(self, description=None, rrule=None, url=None):
         """ Returns the occurrence as iCalendar string. """
 
         event = icalendar.Event()
@@ -76,6 +76,8 @@ class OccurrenceMixin(object):
             event['rrule'] = icalendar.vRecur(
                 icalendar.vRecur.from_ical(rrule.replace('RRULE:', ''))
             )
+        if url:
+            event.add('url', url)
 
         cal = icalendar.Calendar()
         cal.add('prodid', '-//OneGov//onegov.event//')
@@ -193,12 +195,13 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
     def description(self):
         return self.content.get('description', '')
 
-    def as_ical(self):
+    def as_ical(self, url=None):
         """ Returns the event and all its occurrences as iCalendar string. """
 
         return super(Event, self).as_ical(
             description=self.description,
-            rrule=self.recurrence
+            rrule=self.recurrence,
+            url=url
         )
 
 
@@ -213,9 +216,10 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     #: the event this occurrence belongs to
     event_id = Column(UUID, ForeignKey(Event.id), nullable=False)
 
-    def as_ical(self):
+    def as_ical(self, url=None):
         """ Returns the occurrence as iCalendar string. """
 
         return super(Occurrence, self).as_ical(
-            description=self.event.description
+            description=self.event.description,
+            url=url
         )
