@@ -50,6 +50,8 @@ class ElasticsearchApp(morepath.App):
             'http://localhost:19200'
         ))
 
+        max_queue_size = int(cfg.get('elasticsarch_max_queue_size', '10000'))
+
         self.es_client = Elasticsearch(hosts, sniff_on_start=True)
 
         if self.has_database_connection:
@@ -58,7 +60,10 @@ class ElasticsearchApp(morepath.App):
             for base in self.session_manager.bases:
                 self.es_mappings.register_orm_base(base)
 
-            self.es_orm_events = ORMEventTranslator(self.es_mappings)
+            self.es_orm_events = ORMEventTranslator(
+                self.es_mappings,
+                max_queue_size=max_queue_size
+            )
 
             self.es_indexer = Indexer(
                 self.es_mappings,
