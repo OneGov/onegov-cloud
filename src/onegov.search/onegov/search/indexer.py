@@ -77,8 +77,9 @@ class Indexer(object):
 
     """
 
-    def __init__(self, es_url, mappings, queue, hostname=None):
-        self.es_client = Elasticsearch(es_url)
+    def __init__(self, mappings, queue,
+                 es_url=None, es_client=None, hostname=None):
+        self.es_client = es_client or Elasticsearch(es_url)
         self.queue = queue
         self.hostname = hostname or platform.node()
         self.ixmgr = IndexManager(self.hostname, es_client=self.es_client)
@@ -98,8 +99,8 @@ class Indexer(object):
     def process_task(self, task):
         if task['action'] == 'index':
             self.index(task)
-        elif task['action'] == 'remove':
-            self.remove(task)
+        elif task['action'] == 'delete':
+            self.delete(task)
         else:
             raise NotImplementedError
 
@@ -122,9 +123,9 @@ class Indexer(object):
             body=task['properties']
         )
 
-    def remove(self, task):
+    def delete(self, task):
         # XXX not very pretty - we don't necessarily know the langauge anymore
-        # here, so we need to remove the document from all indices at the
+        # here, so we need to delete the document from all indices at the
         # same time
         index = self.ixmgr.get_external_index_name(
             schema=task['schema'],
@@ -206,7 +207,8 @@ class TypeMappingRegistry(object):
 
         """
         for model in utils.searchable_sqlalchemy_models(base):
-            self.register_type(model.es_type_name, model.es_properties)
+            obj = model()
+            self.register_type(obj.es_type_name, obj.es_properties)
 
     def register_type(self, type_name, mapping):
         """ Registers the given type with the given mapping. The mapping is

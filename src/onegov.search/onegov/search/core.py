@@ -1,7 +1,17 @@
+import morepath
+
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import ElasticsearchException
+from more.transaction.main import transaction_tween_factory
+from onegov.search import log
+from onegov.search.indexer import (
+    Indexer,
+    ORMEventTranslator,
+    TypeMappingRegistry
+)
 
 
-class ESIntegration(object):
+class ElasticsearchApp(morepath.App):
     """ Provides elasticsearch integration for
     :class:`onegov.core.framework.Framework` based applications.
 
@@ -43,3 +53,40 @@ class ESIntegration(object):
         ))
 
         self.es_client = Elasticsearch(hosts, sniff_on_start=True)
+
+        if self.has_database_connection:
+            self.es_mappings = TypeMappingRegistry()
+
+            for base in self.session_manager.bases:
+                self.es_mappings.register_orm_base(base)
+
+            self.es_orm_events = ORMEventTranslator(self.es_mappings)
+
+            self.es_indexer = Indexer(
+                self.es_mappings,
+                self.es_orm_events.queue,
+                es_client=self.es_client
+            )
+
+            self.session_manager.on_insert.connect(
+                self.es_orm_events.on_insert)
+            self.session_manager.on_update.connect(
+                self.es_orm_events.on_update)
+            self.session_manager.on_delete.connect(
+                self.es_orm_events.on_delete)
+
+
+@ElasticsearchApp.tween_factory(over=transaction_tween_factory)
+def process_indexer_tween_factory(app, handler):
+    def process_indexer_tween(request):
+
+        result = handler(request)
+
+        try:
+            request.app.es_indexer.process()
+        except ElasticsearchException:
+            log.exception("Elasticsearch failed to run")
+
+        return result
+
+    return process_indexer_tween

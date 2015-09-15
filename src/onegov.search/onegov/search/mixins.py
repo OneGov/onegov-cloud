@@ -60,8 +60,24 @@ class Searchable(object):
         results.
 
         """
+        raise NotImplementedError
 
     @property
     def es_type_name(self):
         """ Returns the unique type name of the model. """
         raise NotImplementedError
+
+
+class ORMSearchable(Searchable):
+    """ Extends the default :class:`Searchable` class with sensible defaults
+    for SQLAlchemy orm models.
+
+    """
+
+    @property
+    def es_id(self):
+        return self.id
+
+    @property
+    def es_type_name(self):
+        return self.__tablename__

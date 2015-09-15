@@ -375,7 +375,7 @@ def test_indexer_process(es_url, es_client):
     })
 
     index = "foo_bar-my_schema-en-page"
-    indexer = Indexer(es_url, mappings, Queue(), hostname='foo.bar')
+    indexer = Indexer(mappings, Queue(), hostname='foo.bar', es_url=es_url)
 
     indexer.queue.put({
         'action': 'index',
@@ -413,9 +413,9 @@ def test_indexer_process(es_url, es_client):
 
     assert search['hits']['total'] == 1
 
-    # remove the document again
+    # delete the document again
     indexer.queue.put({
-        'action': 'remove',
+        'action': 'delete',
         'schema': 'my-schema',
         'type_name': 'page',
         'id': 1
