@@ -1,9 +1,7 @@
 import morepath
 
 from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import ElasticsearchException
 from more.transaction.main import transaction_tween_factory
-from onegov.search import log
 from onegov.search.indexer import (
     Indexer,
     ORMEventTranslator,
@@ -81,12 +79,7 @@ def process_indexer_tween_factory(app, handler):
     def process_indexer_tween(request):
 
         result = handler(request)
-
-        try:
-            request.app.es_indexer.process()
-        except ElasticsearchException:
-            log.exception("Elasticsearch failed to run")
-
+        request.app.es_indexer.process()
         return result
 
     return process_indexer_tween

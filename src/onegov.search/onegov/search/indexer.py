@@ -1,6 +1,7 @@
 import platform
 
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import ElasticsearchException
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, utils
 from onegov.search.compat import Queue, Empty, Full
@@ -84,27 +85,38 @@ class Indexer(object):
         self.hostname = hostname or platform.node()
         self.ixmgr = IndexManager(self.hostname, es_client=self.es_client)
         self.mappings = mappings
+        self.failed_task = None
 
     def process(self, block=False, timeout=None):
         try:
             processed = 0
             while True:
-                self.process_task(self.queue.get(block, timeout))
-                processed += 1
+
+                # get the previously failed task or a new one
+                task = self.failed_task or self.queue.get(block, timeout)
+                self.failed_task = None
+
+                if self.process_task(task):
+                    processed += 1
+                else:
+                    # if the task failed, keep it for the next run and give up
+                    self.failed_task = task
+                    return processed
+
         except Empty:
             pass
 
         return processed
 
     def process_task(self, task):
-        if task['action'] == 'index':
-            self.index(task)
-        elif task['action'] == 'delete':
-            self.delete(task)
-        else:
-            raise NotImplementedError
+        try:
+            getattr(self, task['action'])(task)
+        except ElasticsearchException:
+            log.exception("Failure during elasticsearch index task")
+            return False
 
         self.queue.task_done()
+        return True
 
     def ensure_index(self, task):
         return self.ixmgr.ensure_index(

@@ -3,6 +3,9 @@ import logging
 import pytest
 
 from datetime import datetime
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import ConnectionError
+from mock import Mock
 from onegov.search import Searchable, utils
 from onegov.search.compat import Queue
 from onegov.search.indexer import (
@@ -459,3 +462,59 @@ def test_extra_analyzers(es_url, es_client):
     assert [v['token'] for v in result['tokens']] == [
         u'mocht', u'wirklich', u'weiterfahr'
     ]
+
+
+def test_elasticsearch_outage(es_url, es_client):
+    mappings = TypeMappingRegistry()
+    mappings.register_type('page', {
+        'title': {'type': 'localized'},
+    })
+
+    indexer = Indexer(mappings, Queue(), hostname='foo.bar', es_url=es_url)
+
+    indexer.queue.put({
+        'action': 'index',
+        'schema': 'my-schema',
+        'type_name': 'page',
+        'id': 1,
+        'language': 'en',
+        'properties': {
+            'title': 'Foo',
+            'es_public': True
+        }
+    })
+
+    indexer.es_client.index = Mock(side_effect=ConnectionError)
+
+    for i in range(0, 2):
+        assert indexer.process() == 0
+        assert indexer.queue.empty()
+        assert indexer.failed_task is not None
+
+    indexer.queue.put({
+        'action': 'index',
+        'schema': 'my-schema',
+        'type_name': 'page',
+        'id': 2,
+        'language': 'en',
+        'properties': {
+            'title': 'Bar',
+            'es_public': True
+        }
+    })
+
+    for i in range(0, 2):
+        assert indexer.process() == 0
+        assert not indexer.queue.empty()
+        assert indexer.failed_task is not None
+
+    indexer.es_client = Elasticsearch(es_url)
+
+    indexer.es_client.indices.refresh(index='_all')
+    assert indexer.es_client.search(index='_all')['hits']['total'] == 0
+
+    assert indexer.process() == 2
+    assert indexer.failed_task is None
+
+    indexer.es_client.indices.refresh(index='_all')
+    assert indexer.es_client.search(index='_all')['hits']['total'] == 2
