@@ -70,5 +70,8 @@ def view_get_occurrence(self, request):
 def ical_export_occurence(self, request):
     """ Returns the occurrence as ics. """
 
-    return Response(self.as_ical(), content_type='text/calendar',
-                    content_disposition='inline; filename=calendar.ics')
+    return Response(
+        self.as_ical(url=request.link(self)),
+        content_type='text/calendar',
+        content_disposition='inline; filename=calendar.ics'
+    )

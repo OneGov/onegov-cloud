@@ -244,5 +244,13 @@ def handle_delete_event(self, request):
 def ical_export_event(self, request):
     """ Returns the event with all occurrences as ics. """
 
-    return Response(self.as_ical(), content_type='text/calendar',
-                    content_disposition='inline; filename=calendar.ics')
+    try:
+        url = request.link(self.occurrences[0])
+    except IndexError:
+        url = EventLayout(self, request).events_url
+
+    return Response(
+        self.as_ical(url=url),
+        content_type='text/calendar',
+        content_disposition='inline; filename=calendar.ics'
+    )
