@@ -195,6 +195,16 @@ def test_mapping_for_language():
         }
     }
 
+    assert mapping.for_language('de') == {
+        'title': {
+            'type': 'string',
+            'analyzer': 'german'
+        },
+        'es_public': {
+            'type': 'boolean'
+        }
+    }
+
     mapping = TypeMapping('bar', {
         'title': {
             'properties': {

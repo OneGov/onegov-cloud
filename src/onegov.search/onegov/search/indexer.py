@@ -1,5 +1,6 @@
 import platform
 
+from copy import deepcopy
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import ElasticsearchException
 from onegov.core.utils import is_non_string_iterable
@@ -175,7 +176,7 @@ class TypeMapping(object):
         of the same mapping here.
 
         """
-        return self.supplement_analyzer(self.mapping.copy(), language)
+        return self.supplement_analyzer(deepcopy(self.mapping), language)
 
     def supplement_analyzer(self, dictionary, language):
         """ Iterate through the dictionary found in the type mapping and
