@@ -191,7 +191,9 @@ def test_mapping_for_language():
             'analyzer': 'english'
         },
         'es_public': {
-            'type': 'boolean'
+            'type': 'boolean',
+            'index': 'not_analyzed',
+            'include_in_all': False
         }
     }
 
@@ -201,7 +203,9 @@ def test_mapping_for_language():
             'analyzer': 'german'
         },
         'es_public': {
-            'type': 'boolean'
+            'type': 'boolean',
+            'index': 'not_analyzed',
+            'include_in_all': False
         }
     }
 
@@ -221,7 +225,9 @@ def test_mapping_for_language():
             }
         },
         'es_public': {
-            'type': 'boolean'
+            'type': 'boolean',
+            'index': 'not_analyzed',
+            'include_in_all': False
         }
     }
 
@@ -241,7 +247,9 @@ def test_mapping_for_language():
             }
         },
         'es_public': {
-            'type': 'boolean'
+            'type': 'boolean',
+            'index': 'not_analyzed',
+            'include_in_all': False
         }
     }
 

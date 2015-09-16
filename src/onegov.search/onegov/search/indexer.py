@@ -159,10 +159,9 @@ class Indexer(object):
         # same time
         index = self.ixmgr.get_external_index_name(
             schema=task['schema'],
-            language='0xdeadbeef',
+            language='*',
             type_name=task['type_name']
         )
-        index = index.replace('0xdeadbeef', '*')
         self.es_client.delete_by_query(
             index=index,
             doc_type=task['type_name'], q='_id:{}'.format(task['id'])
@@ -179,7 +178,11 @@ class TypeMapping(object):
         self.version = utils.hash_mapping(mapping)
 
     def add_defaults(self, mapping):
-        mapping['es_public'] = {'type': 'boolean'}
+        mapping['es_public'] = {
+            'type': 'boolean',
+            'index': 'not_analyzed',
+            'include_in_all': False
+        }
 
         return mapping
 
@@ -275,15 +278,18 @@ class IndexManager(object):
         self.es_client = es_client or Elasticsearch(es_url)
         self.created_indices = set()
 
+    @property
+    def normalized_hostname(self):
+        return utils.normalize_index_segment(
+            self.hostname, allow_wildcards=False)
+
     def query_indices(self):
         """ Queryies the elasticsearch cluster for indices belonging to this
         hostname. """
 
-        hostname = utils.normalize_index_segment(self.hostname)
-
         return set(
             ix for ix in self.es_client.indices.get(
-                '{}-*'.format(hostname), feature='_settings'
+                '{}-*'.format(self.normalized_hostname), feature='_settings'
             )
         )
 
@@ -293,8 +299,8 @@ class IndexManager(object):
 
         result = set()
 
-        hostname = utils.normalize_index_segment(self.hostname)
-        infos = self.es_client.indices.get_aliases('{}-*'.format(hostname))
+        infos = self.es_client.indices.get_aliases(
+            '{}-*'.format(self.normalized_hostname))
 
         for info in infos.values():
             for alias in info['aliases']:
@@ -401,11 +407,29 @@ class IndexManager(object):
             'version': version
         }
 
+    def get_external_index_names(self, schema, languages='*', types='*'):
+        """ Returns a comma separated string of external index names that
+        match the given arguments. Useful to pass on to elasticsearch when
+        targeting multiple indices.
+
+        """
+        indices = []
+
+        for language in languages:
+            for type_name in types:
+                indices.append(
+                    self.get_external_index_name(schema, language, type_name))
+
+        return ','.join(indices)
+
     def get_external_index_name(self, schema, language, type_name):
         """ Generates the external index name from the given parameters. """
 
         segments = (self.hostname, schema, language, type_name)
-        segments = (utils.normalize_index_segment(s) for s in segments)
+        segments = (
+            utils.normalize_index_segment(s, allow_wildcards=True)
+            for s in segments
+        )
 
         return '-'.join(segments)
 
@@ -414,7 +438,7 @@ class IndexManager(object):
 
         return '-'.join((
             self.get_external_index_name(schema, language, type_name),
-            utils.normalize_index_segment(version)
+            utils.normalize_index_segment(version, allow_wildcards=False)
         ))
 
 

@@ -1,10 +1,11 @@
 import json
+import transaction
 
 from morepath import setup
 from onegov.core import Framework
 from onegov.search import ElasticsearchApp, ORMSearchable
 from onegov.testing.utils import scan_morepath_modules
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
 
@@ -23,6 +24,94 @@ def test_app_integration(es_url):
     assert len(app.es_client.transport.hosts) == 1
     assert app.es_client.transport.hosts[0]['port'] \
         == int(es_url.split(':')[-1])
+
+
+def test_search_query(es_url, postgres_dsn):
+    config = setup()
+
+    class App(Framework, ElasticsearchApp):
+        testing_config = config
+
+    Base = declarative_base()
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=False)
+        body = Column(Text, nullable=True)
+        public = Column(Boolean, nullable=False)
+        language = Column(Text, nullable=False)
+
+        es_properties = {
+            'title': {'type': 'localized'},
+            'body': {'type': 'localized'}
+        }
+
+        @property
+        def es_public(self):
+            return self.public
+
+        @property
+        def es_language(self):
+            return self.language
+
+    scan_morepath_modules(App, config)
+    config.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        elasticsearch_hosts=[es_url]
+    )
+
+    app.namespace = 'documents'
+    app.set_application_id('documents/home')
+
+    session = app.session()
+    session.add(Document(
+        title="Public",
+        body="This document can be seen by anyone",
+        language='en',
+        public=True
+    ))
+    session.add(Document(
+        title="Private",
+        body="This document is a secret",
+        language='en',
+        public=False
+    ))
+    session.add(Document(
+        title=u"Öffentlich",
+        body="Dieses Dokument kann jeder sehen",
+        language='de',
+        public=True
+    ))
+    session.add(Document(
+        title="Privat",
+        body="Dieses Dokument ist geheim",
+        language='de',
+        public=False
+    ))
+    transaction.commit()
+    app.es_indexer.process()
+    app.es_client.indices.refresh(index='_all')
+
+    assert app.es_search().execute().hits.total == 2
+    assert app.es_search(include_private=True).execute().hits.total == 4
+
+    result = app.es_search(languages=['en']).execute()
+    assert result.hits.total == 1
+
+    result = app.es_search(languages=['de'], include_private=True).execute()
+    assert result.hits.total == 2
+
+    search = app.es_search(languages=['de'])
+    assert search.query('match', body='Dokumente').execute().hits.total == 1
+
+    search = app.es_search(languages=['de'], include_private=True)
+    assert search.query('match', body='Dokumente').execute().hits.total == 2
 
 
 def test_orm_integration(es_url, postgres_dsn):

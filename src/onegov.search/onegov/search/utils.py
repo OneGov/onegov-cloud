@@ -16,7 +16,7 @@ def searchable_sqlalchemy_models(base):
             yield class_
 
 
-_invalid_index_characters = re.compile(r'[\\/*?"<>|\s,A-Z:]+')
+_invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')
 
 
 def is_valid_index_name(name):
@@ -32,6 +32,9 @@ def is_valid_index_name(name):
     if _invalid_index_characters.search(name):
         return False
 
+    if '*' in name:
+        return False
+
     return True
 
 
@@ -40,8 +43,12 @@ def is_valid_type_name(name):
     return is_valid_index_name(name)
 
 
-def normalize_index_segment(segment):
+def normalize_index_segment(segment, allow_wildcards):
     valid = _invalid_index_characters.sub('_', segment).lower()
+
+    if not allow_wildcards:
+        valid = valid.replace('*', '_')
+
     return valid.replace('.', '_').replace('-', '_')
 
 

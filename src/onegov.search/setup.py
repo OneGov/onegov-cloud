@@ -35,6 +35,7 @@ setup(
     platforms='any',
     install_requires=[
         'elasticsearch',
+        'elasticsearch-dsl',
         'onegov.core>=0.4.0'
     ],
     extras_require=dict(

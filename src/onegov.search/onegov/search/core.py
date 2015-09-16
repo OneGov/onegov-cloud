@@ -1,6 +1,7 @@
 import morepath
 
 from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search
 from more.transaction.main import transaction_tween_factory
 from onegov.search.indexer import (
     Indexer,
@@ -77,6 +78,39 @@ class ElasticsearchApp(morepath.App):
                 self.es_orm_events.on_update)
             self.session_manager.on_delete.connect(
                 self.es_orm_events.on_delete)
+
+    def es_search(self, languages='*', types='*', include_private=False):
+        """ Returns a search scoped to the current application, with the
+        given languages, types and private documents excluded by default.
+
+        """
+
+        search = Search(
+            using=self.es_client,
+            index=self.es_indexer.ixmgr.get_external_index_names(
+                schema=self.schema,
+                languages=languages,
+                types=types
+            )
+        )
+
+        if not include_private:
+            search = search.filter("term", es_public=True)
+
+        return search
+
+    def es_search_by_request(self, request, types=None):
+        """ Takes the current :class:`~onegov.core.request.CoreRequest` and
+        returns an elastic search scoped to the current application, the
+        requests language and it's access rights.
+
+        """
+
+        return self.es_search(
+            languages=[request.locale],
+            types=types,
+            include_private=request.is_logged_in
+        )
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
