@@ -89,6 +89,23 @@ class Indexer(object):
         self.failed_task = None
 
     def process(self, block=False, timeout=None):
+        """ Processes the queue until it is empty or until there's an error.
+
+        If there's an error, the next call to this function will try to
+        execute the failed task again. This is mainly meant for elasticsearch
+        outages.
+
+        :block:
+            If True, the process waits for the queue to be available. Useful
+            if you run this in a separate thread.
+
+        :timeout:
+            How long the blocking call should block. Has no effect if
+            ``block`` is False.
+
+        :return: The number of successfully processed items
+
+        """
         try:
             processed = 0
             while True:
