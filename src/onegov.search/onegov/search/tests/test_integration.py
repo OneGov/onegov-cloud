@@ -1,9 +1,9 @@
 import json
 
-from importlib import import_module
 from morepath import setup
 from onegov.core import Framework
 from onegov.search import ElasticsearchApp, ORMSearchable
+from onegov.testing.utils import scan_morepath_modules
 from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
@@ -80,7 +80,7 @@ def test_orm_integration(es_url, postgres_dsn):
         ))
 
     @App.json(model=Root, name='update')
-    def view_add_document(self, request):
+    def view_update_document(self, request):
         session = request.app.session()
         query = session.query(Document)
         query = query.filter(Document.id == request.params.get('id'))
@@ -96,16 +96,7 @@ def test_orm_integration(es_url, postgres_dsn):
         query = query.filter(Document.id == request.params.get('id'))
         query.delete('fetch')
 
-    morepath_modules = (
-        'more.transaction',
-        'more.webassets',
-        'onegov.core',
-        'onegov.search'
-    )
-
-    for module in morepath_modules:
-        config.scan(import_module(module))
-
+    scan_morepath_modules(App, config)
     config.commit()
 
     app = App()
