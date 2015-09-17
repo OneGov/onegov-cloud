@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Stops accidentally messing with the encoding provided by the request.
+  [href]
+
 - Adds the ability to define the port for the onegov-server cli command.
   [href]
 
