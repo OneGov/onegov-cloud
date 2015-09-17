@@ -21,7 +21,7 @@ class Searchable(object):
 
         Internally, onegov.search stores differing languages in different
         indices. For this reason you should mark all fields which are
-        specific to :attr:`es_language` like this:
+        specific to :attr:`es_language` like this::
 
             @property
             def es_properties(self):
@@ -45,7 +45,7 @@ class Searchable(object):
         """ Returns the ISO 639-1 language code of the content. Note that
         the object's id may not be the same over differing languages.
 
-        That is to say, this is not valid:
+        That is to say, this is not valid::
 
             Object(id=1, language='de')
             Object(id=2, language='en')
