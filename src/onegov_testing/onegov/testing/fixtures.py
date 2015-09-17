@@ -7,11 +7,20 @@ import tempfile
 import transaction
 
 from elasticsearch import Elasticsearch
-from mirakuru import HTTPExecutor
+from mirakuru import HTTPExecutor as HTTPExecutorBase
 from onegov.core.orm import Base, SessionManager
 from sqlalchemy import create_engine
 from testing.postgresql import Postgresql
 from uuid import uuid4
+
+
+class HTTPExecutor(HTTPExecutorBase):
+
+    def __del__(self):
+        try:
+            super(HTTPExecutor, self).__del__()
+        except:
+            pass
 
 
 @pytest.yield_fixture(scope="session")
@@ -154,6 +163,7 @@ def es_process():
     yield executor
 
     executor.stop()
+    executor.kill()
     shutil.rmtree(base)
 
 
