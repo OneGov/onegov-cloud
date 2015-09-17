@@ -114,6 +114,30 @@ def test_search_query(es_url, postgres_dsn):
     search = app.es_search(languages=['de'], include_private=True)
     assert search.query('match', body='Dokumente').execute().hits.total == 2
 
+    # test result loading in one query
+    result = app.es_search(languages=['de'], include_private=True).execute()
+    records = result.load()
+    assert len(records) == 2
+    assert isinstance(records[0], Document)
+    assert True in (records[0].es_public, records[1].es_public)
+    assert False in (records[0].es_public, records[1].es_public)
+
+    # test result loading query
+    result = app.es_search(languages=['de'], include_private=True).execute()
+    query = result.query(type='documents')
+    assert query.count() == 2
+    assert query.filter(Document.public == True).count() == 1
+
+    # test single result loading
+    document = app.es_search(languages=['de']).execute()[0].load()
+    assert document.title == u"Öffentlich"
+    assert document.public
+
+    # test single result query
+    document = app.es_search(languages=['de']).execute()[0].query().one()
+    assert document.title == u"Öffentlich"
+    assert document.public
+
 
 def test_orm_integration(es_url, postgres_dsn):
     config = setup()

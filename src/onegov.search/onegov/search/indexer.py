@@ -170,12 +170,13 @@ class Indexer(object):
 
 class TypeMapping(object):
 
-    __slots__ = ['name', 'mapping', 'version']
+    __slots__ = ['name', 'mapping', 'version', 'model']
 
-    def __init__(self, name, mapping):
+    def __init__(self, name, mapping, model=None):
         self.name = name
         self.mapping = self.add_defaults(mapping)
         self.version = utils.hash_mapping(mapping)
+        self.model = model
 
     def add_defaults(self, mapping):
         mapping['es_public'] = {
@@ -241,9 +242,9 @@ class TypeMappingRegistry(object):
         """
         for model in utils.searchable_sqlalchemy_models(base):
             obj = model()
-            self.register_type(obj.es_type_name, obj.es_properties)
+            self.register_type(obj.es_type_name, obj.es_properties, model)
 
-    def register_type(self, type_name, mapping):
+    def register_type(self, type_name, mapping, model=None):
         """ Registers the given type with the given mapping. The mapping is
         as dictionary representing the part below the ``mappings/type_name``.
 
@@ -261,7 +262,7 @@ class TypeMappingRegistry(object):
         """
 
         assert type_name not in self.mappings
-        self.mappings[type_name] = TypeMapping(type_name, mapping)
+        self.mappings[type_name] = TypeMapping(type_name, mapping, model)
 
 
 class IndexManager(object):

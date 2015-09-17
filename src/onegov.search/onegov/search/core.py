@@ -1,8 +1,8 @@
 import morepath
 
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
 from more.transaction.main import transaction_tween_factory
+from onegov.search import Search
 from onegov.search.indexer import (
     Indexer,
     ORMEventTranslator,
@@ -86,6 +86,8 @@ class ElasticsearchApp(morepath.App):
         """
 
         search = Search(
+            session=self.session(),
+            mappings=self.es_mappings,
             using=self.es_client,
             index=self.es_indexer.ixmgr.get_external_index_names(
                 schema=self.schema,

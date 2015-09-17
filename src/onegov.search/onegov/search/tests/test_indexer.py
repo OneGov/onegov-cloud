@@ -345,9 +345,9 @@ def test_orm_event_translator_delete():
     assert translator.queue.empty()
 
 
-def test_orm_event_queue_overflow(caplog):
+def test_orm_event_queue_overflow(capturelog):
 
-    caplog.setLevel(logging.ERROR, logger='onegov.search')
+    capturelog.setLevel(logging.ERROR, logger='onegov.search')
 
     class Tweet(Searchable):
         es_id = 1
@@ -364,12 +364,12 @@ def test_orm_event_queue_overflow(caplog):
     translator.on_update('foobar', Tweet())
     translator.on_delete('foobar', Tweet())
 
-    assert len(caplog.records()) == 0
+    assert len(capturelog.records()) == 0
 
     translator.on_insert('foobar', Tweet())
 
-    assert len(caplog.records()) == 1
-    assert caplog.records()[0].message == \
+    assert len(capturelog.records()) == 1
+    assert capturelog.records()[0].message == \
         'The orm event translator queue is full!'
 
 
