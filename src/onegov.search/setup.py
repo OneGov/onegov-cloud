@@ -36,7 +36,8 @@ setup(
     install_requires=[
         'elasticsearch',
         'elasticsearch-dsl',
-        'onegov.core>=0.4.0'
+        'onegov.core>=0.4.0',
+        'webtest'
     ],
     extras_require=dict(
         test=[
@@ -47,6 +48,9 @@ setup(
         ],
     ),
     entry_points={
+        'console_scripts': [
+            'onegov-search = onegov.search.cli:cli'
+        ],
         'onegov': [
             'upgrade = onegov.search.upgrade'
         ]

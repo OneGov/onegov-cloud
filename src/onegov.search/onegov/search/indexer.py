@@ -407,6 +407,16 @@ class IndexManager(object):
             'version': version
         }
 
+    def get_managed_indices_wildcard(self, schema):
+        """ Returns a wildcard index name for all indices managed. """
+        return '-'.join((
+            utils.normalize_index_segment(
+                self.hostname, allow_wildcards=False),
+            utils.normalize_index_segment(
+                schema, allow_wildcards=False),
+            '*'
+        ))
+
     def get_external_index_names(self, schema, languages='*', types='*'):
         """ Returns a comma separated string of external index names that
         match the given arguments. Useful to pass on to elasticsearch when
