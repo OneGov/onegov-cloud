@@ -1,17 +1,34 @@
+from onegov.search.utils import classproperty
+
+
 class Searchable(object):
-    """ Defines the interface required for an object to be searchable. """
+    """ Defines the interface required for an object to be searchable.
 
-    @property
-    def es_id(self):
-        """ The id with which this document is stored in the cluster. Should
-        not be changed after creation. If you use this on an ORM model, be sure
-        to use a primary key, all other properties are not available during
-        deletion.
+    Note that ``es_properties`` and ``es_type_name`` must be class properties,
+    not instance properties. So do this::
 
-        """
-        raise NotImplementedError
+        class X(Searchable):
 
-    @property
+            es_properties = {}
+            es_type_name = 'x'
+
+    But do not do this::
+
+        class X(Searchable):
+
+            @property
+            def es_properties(self):
+                return {}
+
+            @property
+            def es_type_name(self):
+                return 'x'
+
+    The rest of the properties may be normal properties.
+
+    """
+
+    @classproperty
     def es_properties(self):
         """ Returns the type mapping of this model. Each property in the
         mapping will be read from the model instance.
@@ -40,6 +57,21 @@ class Searchable(object):
         """
         raise NotImplementedError
 
+    @classproperty
+    def es_type_name(self):
+        """ Returns the unique type name of the model. """
+        raise NotImplementedError
+
+    @property
+    def es_id(self):
+        """ The id with which this document is stored in the cluster. Should
+        not be changed after creation. If you use this on an ORM model, be sure
+        to use a primary key, all other properties are not available during
+        deletion.
+
+        """
+        raise NotImplementedError
+
     @property
     def es_language(self):
         """ Returns the ISO 639-1 language code of the content. Note that
@@ -62,11 +94,6 @@ class Searchable(object):
         """
         raise NotImplementedError
 
-    @property
-    def es_type_name(self):
-        """ Returns the unique type name of the model. """
-        raise NotImplementedError
-
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults
@@ -78,6 +105,6 @@ class ORMSearchable(Searchable):
     def es_id(self):
         return self.id
 
-    @property
+    @classproperty
     def es_type_name(self):
         return self.__tablename__

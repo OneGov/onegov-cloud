@@ -101,7 +101,7 @@ class ElasticsearchApp(morepath.App):
 
         return search
 
-    def es_search_by_request(self, request, types=None):
+    def es_search_by_request(self, request, types='*'):
         """ Takes the current :class:`~onegov.core.request.CoreRequest` and
         returns an elastic search scoped to the current application, the
         requests language and it's access rights.

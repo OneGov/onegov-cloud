@@ -4,7 +4,7 @@ from copy import deepcopy
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import ElasticsearchException
 from onegov.core.utils import is_non_string_iterable
-from onegov.search import log, utils
+from onegov.search import log, Searchable, utils
 from onegov.search.compat import Queue, Empty, Full
 
 ES_ANALYZER_MAP = {
@@ -241,8 +241,7 @@ class TypeMappingRegistry(object):
 
         """
         for model in utils.searchable_sqlalchemy_models(base):
-            obj = model()
-            self.register_type(obj.es_type_name, obj.es_properties, model)
+            self.register_type(model.es_type_name, model.es_properties, model)
 
     def register_type(self, type_name, mapping, model=None):
         """ Registers the given type with the given mapping. The mapping is
@@ -461,13 +460,16 @@ class ORMEventTranslator(object):
         self.queue = Queue(maxsize=max_queue_size)
 
     def on_insert(self, schema, obj):
-        self.index(schema, obj)
+        if isinstance(obj, Searchable):
+            self.index(schema, obj)
 
     def on_update(self, schema, obj):
-        self.index(schema, obj)
+        if isinstance(obj, Searchable):
+            self.index(schema, obj)
 
     def on_delete(self, schema, obj):
-        self.delete(schema, obj)
+        if isinstance(obj, Searchable):
+            self.delete(schema, obj)
 
     def put(self, translation):
         try:
