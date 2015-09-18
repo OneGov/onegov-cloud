@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.3 (2015-09-18)
+~~~~~~~~~~~~~~~~~~~
+
 - No longer require elasticsearch to run when configuring the application.
   [href]
 
