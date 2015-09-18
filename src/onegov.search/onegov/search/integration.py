@@ -53,7 +53,7 @@ class ElasticsearchApp(morepath.App):
 
         max_queue_size = int(cfg.get('elasticsarch_max_queue_size', '10000'))
 
-        self.es_client = Elasticsearch(hosts, sniff_on_start=True)
+        self.es_client = Elasticsearch(hosts)
 
         if self.has_database_connection:
             self.es_mappings = TypeMappingRegistry()
