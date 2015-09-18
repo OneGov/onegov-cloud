@@ -8,7 +8,15 @@ class BuiltinFormDefinition(FormDefinition, HiddenFromPublicExtension,
                             ContactExtension, PersonLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'builtin'}
 
+    @property
+    def es_public(self):
+        return not self.is_hidden_from_public
+
 
 class CustomFormDefinition(FormDefinition, HiddenFromPublicExtension,
                            ContactExtension, PersonLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'custom'}
+
+    @property
+    def es_public(self):
+        return not self.is_hidden_from_public
