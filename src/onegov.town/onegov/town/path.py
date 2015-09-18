@@ -2,6 +2,7 @@
 
 from datetime import date
 from libres.db.models import Allocation, Reservation
+from onegov.core.compat import unquote_plus
 from onegov.event import (
     Event,
     EventCollection,
@@ -27,6 +28,7 @@ from onegov.town.models import (
     Image,
     ImageCollection,
     News,
+    Search,
     SiteCollection,
     Thumbnail,
     Topic,
@@ -221,3 +223,8 @@ def get_events(app, page=0, state='published'):
 @TownApp.path(model=Event, path='/event/{name}')
 def get_event(app, name):
     return EventCollection(app.session()).by_name(name)
+
+
+@TownApp.path(model=Search, path='/suche/{query}')
+def get_search(request, query, page=0):
+    return Search(request, query, page)

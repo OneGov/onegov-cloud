@@ -1,5 +1,6 @@
 from onegov.core import utils
 from onegov.page import Page
+from onegov.search import ORMSearchable
 from onegov.town.forms import LinkForm, PageForm
 from onegov.town.models.traitinfo import TraitInfo
 from onegov.town.models.extensions import (
@@ -11,9 +12,36 @@ from sqlalchemy import desc
 from sqlalchemy.orm import undefer, object_session
 
 
-class Topic(Page, TraitInfo,
+class SearchablePage(ORMSearchable):
+
+    es_properties = {
+        'title': {'type': 'localized'},
+        'lead': {'type': 'localized'},
+        'text': {'type': 'localized_html'}
+    }
+
+    @property
+    def lead(self):
+        return self.content.get('lead', '')
+
+    @property
+    def text(self):
+        return self.content.get('text', '')
+
+    @property
+    def es_public(self):
+        return not self.is_hidden_from_public
+
+    @property
+    def es_language(self):
+        return 'de'  # xxx for now there's no other language
+
+
+class Topic(Page, TraitInfo, SearchablePage,
             HiddenFromPublicExtension, ContactExtension, PersonLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
+
+    es_type_name = 'topics'
 
     @property
     def deletable(self):
@@ -57,9 +85,11 @@ class Topic(Page, TraitInfo,
         raise NotImplementedError
 
 
-class News(Page, TraitInfo,
+class News(Page, TraitInfo, SearchablePage,
            HiddenFromPublicExtension, ContactExtension, PersonLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
+
+    es_type_name = 'news'
 
     @property
     def absorb(self):
