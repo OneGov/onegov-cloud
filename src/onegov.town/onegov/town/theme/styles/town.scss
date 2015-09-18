@@ -1532,3 +1532,23 @@ tr.ticket:hover {
         margin-top: -8px;
     }
 }
+
+/*
+    Search box
+*/
+.searchbox {
+    input[type='submit'] {
+        font-family: 'FontAwesome';
+        padding: 0;
+    }
+}
+
+/*
+    Search results
+*/
+.searchresults {
+    em {
+        font-style: normal;
+        font-weight: bold;
+    }
+}

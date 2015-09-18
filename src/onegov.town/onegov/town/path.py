@@ -225,6 +225,6 @@ def get_event(app, name):
     return EventCollection(app.session()).by_name(name)
 
 
-@TownApp.path(model=Search, path='/suche/{query}')
-def get_search(request, query, page=0):
-    return Search(request, query, page)
+@TownApp.path(model=Search, path='/suche')
+def get_search(request, q='', page=0):
+    return Search(request, q, page)

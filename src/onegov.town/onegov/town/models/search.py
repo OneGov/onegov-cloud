@@ -11,6 +11,17 @@ class Search(Pagination):
         self.query = query
         self.page = page
 
+    @cached_property
+    def available_documents(self):
+        search = self.request.app.es_search_by_request(self.request)
+        search = search.params(search_type="count")
+
+        return search.execute().hits.total
+
+    @property
+    def q(self):
+        return self.query
+
     def __eq__(self, other):
         return self.page == other.page and self.query == other.query
 

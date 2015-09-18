@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-10 14:30+0200\n"
+"POT-Creation-Date: 2015-09-18 16:15+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -917,6 +917,12 @@ msgstr ""
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 
+msgid "Search"
+msgstr "Suche"
+
+msgid "Your search returned no results."
+msgstr "Zu Ihrer Suche wurde nichts gefunden"
+
 msgid ""
 "Your form submission is ready to be sent to the town. Please review your "
 "data and press \"Complete\" to finalize the process. If there's anything "
@@ -1138,6 +1144,14 @@ msgstr "Neuer Raum"
 msgid "Successfully removed ${count} unused allocations"
 msgstr "${count} Einteilungen wurden erfolgreich entfernt"
 
+#, python-format
+msgid "Search through ${count} indexed documents"
+msgstr "Durchsuchen Sie ${count} indexierte Dokumente"
+
+#, python-format
+msgid "${count} Results"
+msgstr "${count} Resultate"
+
 msgid "Resources"
 msgstr "Reservationen"
 
@@ -1182,3 +1196,9 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
+
+#~ msgid "Search through ${model.available_documents} indexed documents"
+#~ msgstr "Durchsuchen Sie ${model.available_documents} indexierte Dokumente"
+
+#~ msgid "${model.batch.hits.total} Results"
+#~ msgstr "${model.batch.hits.total} Resultate"
