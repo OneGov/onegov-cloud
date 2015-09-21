@@ -2,7 +2,7 @@ import platform
 
 from copy import deepcopy
 from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import ElasticsearchException
+from elasticsearch.exceptions import ConnectionError
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
 from onegov.search.compat import Queue, Empty, Full
@@ -129,7 +129,7 @@ class Indexer(object):
     def process_task(self, task):
         try:
             getattr(self, task['action'])(task)
-        except ElasticsearchException:
+        except ConnectionError:
             log.exception("Failure during elasticsearch index task")
             return False
 
@@ -154,17 +154,27 @@ class Indexer(object):
         )
 
     def delete(self, task):
-        # XXX not very pretty - we don't necessarily know the langauge anymore
-        # here, so we need to delete the document from all indices at the
-        # same time
-        index = self.ixmgr.get_external_index_name(
-            schema=task['schema'],
-            language='*',
-            type_name=task['type_name']
-        )
+        # get all the types this model could be stored in (with polymorphic)
+        # identites, this could be many
+        mapping = self.mappings[task['type_name']]
+
+        if mapping.model:
+            types = utils.related_types(mapping.model)
+        else:
+            types = (mapping.name, )
+
+        # delete the document from all languages (because we don't know
+        # which one anymore) - and delete from all related types (polymorphic)
+        indices = []
+        for type in types:
+            indices.append(self.ixmgr.get_external_index_name(
+                schema=task['schema'],
+                language='*',
+                type_name=type
+            ))
         self.es_client.delete_by_query(
-            index=index,
-            doc_type=task['type_name'], q='_id:{}'.format(task['id'])
+            index=','.join(indices), doc_type=','.join(types),
+            q='_id:{}'.format(task['id']), allow_no_indices=True
         )
 
 

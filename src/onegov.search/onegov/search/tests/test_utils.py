@@ -1,6 +1,6 @@
-from onegov.search import Searchable
+from onegov.search import ORMSearchable, Searchable
 from onegov.search import utils
-from sqlalchemy import Column, Integer
+from sqlalchemy import Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 
 
@@ -45,3 +45,34 @@ def test_get_searchable_sqlalchemy_models_inheritance(postgres_dsn):
     assert list(utils.searchable_sqlalchemy_models(Base)) == [
         Page, Topic, News
     ]
+
+
+def test_related_types():
+
+    Base = declarative_base()
+
+    class Page(Base, ORMSearchable):
+        __tablename__ = 'pages'
+        id = Column(Integer, primary_key=True)
+        type = Column(Text, nullable=False)
+
+        __mapper_args__ = {
+            "polymorphic_on": 'type'
+        }
+
+    class Topic(Page):
+        __mapper_args__ = {'polymorphic_identity': 'topic'}
+        es_type_name = 'topic'
+
+    class News(Page):
+        __mapper_args__ = {'polymorphic_identity': 'news'}
+        es_type_name = 'news'
+
+    class Temp(Page):
+        __mapper_args__ = {'polymorphic_identity': 'temp'}
+        es_type_name = None
+
+    assert utils.related_types(Page) == {'pages', 'topic', 'news'}
+    assert utils.related_types(Topic) == {'pages', 'topic', 'news'}
+    assert utils.related_types(News) == {'pages', 'topic', 'news'}
+    assert utils.related_types(Temp) == {'pages', 'topic', 'news'}

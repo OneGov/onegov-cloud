@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds support for polymorphic SQLAlchemy models.
+  [href]
+
 - ORM Models now may use any name for their primary key attribute.
   [href]
 

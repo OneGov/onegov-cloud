@@ -308,3 +308,86 @@ def test_alternate_id_property(es_url, postgres_dsn):
     assert root.query().count() == 1
     assert root.load().name == 'root'
     assert root.load().fullname == "Lil' Root"
+
+
+def test_orm_polymorphic(es_url, postgres_dsn):
+    config = setup()
+
+    class App(Framework, ElasticsearchApp):
+        testing_config = config
+
+    Base = declarative_base()
+
+    class Page(Base, ORMSearchable):
+        __tablename__ = 'pages'
+
+        es_properties = {
+            'content': {'type': 'localized'}
+        }
+        es_language = 'en'
+        es_public = True
+
+        id = Column(Integer, primary_key=True)
+        content = Column(Text, nullable=True)
+        type = Column(Text, nullable=False)
+
+        __mapper_args__ = {
+            "polymorphic_on": 'type'
+        }
+
+    class Topic(Page):
+        __mapper_args__ = {'polymorphic_identity': 'topic'}
+        es_type_name = 'topic'
+
+    class News(Page):
+        __mapper_args__ = {'polymorphic_identity': 'news'}
+        es_type_name = 'news'
+
+    class Breaking(News):
+        __mapper_args__ = {'polymorphic_identity': 'breaking'}
+        es_type_name = 'breaking'
+
+    scan_morepath_modules(App, config)
+    config.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        elasticsearch_hosts=[es_url]
+    )
+
+    app.namespace = 'pages'
+    app.set_application_id('pages/site')
+
+    session = app.session()
+    session.add(Topic(content="Topic", type='topic'))
+    session.add(News(content="News", type='news'))
+    session.add(Breaking(content="Breaking", type='breaking'))
+
+    def update():
+        transaction.commit()
+        app.es_indexer.process()
+        app.es_client.indices.refresh(index='_all')
+
+    update()
+    assert app.es_search().count() == 3
+
+    newsitem = session.query(Page).filter(Page.type == 'news').one()
+    assert isinstance(newsitem, News)
+
+    newsitem.content = 'Story'
+    update()
+    assert app.es_search().query('match', content='story').count() == 1
+
+    session.query(Page).filter(Page.type == 'news').delete()
+    update()
+    assert app.es_search().count() == 2
+
+    session.delete(session.query(Page).filter(Page.type == 'breaking').one())
+    update()
+    assert app.es_search().count() == 1
+
+    session.query(Page).delete()
+    update()
+    assert app.es_search().count() == 0

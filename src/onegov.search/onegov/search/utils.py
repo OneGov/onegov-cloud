@@ -66,3 +66,39 @@ class classproperty(object):
 
     def __get__(self, obj, owner):
         return self.f(owner)
+
+
+def iter_subclasses(baseclass):
+    for subclass in baseclass.__subclasses__():
+        yield subclass
+
+        for subclass in subclass.__subclasses__():
+            yield subclass
+
+
+def related_types(model):
+    """ Gathers all related es type names from the given model. A type is
+    counted as related a model is part of a polymorphic setup.
+
+    If no polymorphic identity is found, the result is simply a set with the
+    model's type itself.
+
+    """
+
+    result = {model.es_type_name}
+
+    if hasattr(model, '__mapper_args__'):
+        if 'polymorphic_on' in model.__mapper_args__:
+            for subclass in iter_subclasses(model):
+                if getattr(subclass, 'es_type_name', None):
+                    result.add(subclass.es_type_name)
+
+        elif 'polymorphic_identity' in model.__mapper_args__:
+            for parentclass in model.__mro__:
+                if not hasattr(model, '__mapper_args__'):
+                    continue
+
+                if 'polymorphic_on' in parentclass.__mapper_args__:
+                    return related_types(parentclass)
+
+    return result
