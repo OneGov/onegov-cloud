@@ -361,7 +361,7 @@ class IndexManager(object):
         })
 
         # point the alias to the new index
-        self.es_client.indices.put_alias(external, index=internal)
+        self.es_client.indices.put_alias(name=external, index=internal)
 
         # cache the result
         self.created_indices.add(internal)
@@ -498,6 +498,9 @@ class ORMEventTranslator(object):
             log.error("The orm event translator queue is full!")
 
     def index(self, schema, obj):
+        if obj.es_skip:
+            return
+
         translation = {
             'action': 'index',
             'id': getattr(obj, obj.es_id),

@@ -105,6 +105,12 @@ class Searchable(object):
         """
         raise NotImplementedError
 
+    @property
+    def es_skip(self):
+        """ Returns True if the indexing of this specific model instance
+        should be skipped. """
+        return False
+
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults
