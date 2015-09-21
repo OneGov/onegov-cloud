@@ -303,7 +303,7 @@ def test_alternate_id_property(es_url, postgres_dsn):
 
     assert app.es_search().execute().query(type='users').count() == 2
     assert len(app.es_search().execute().load()) == 2
-    
+
     root = app.es_search().query('match', fullname='Root').execute()[0]
     assert root.query().count() == 1
     assert root.load().name == 'root'

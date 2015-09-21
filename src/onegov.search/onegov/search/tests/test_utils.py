@@ -26,3 +26,22 @@ def test_get_searchable_sqlalchemy_models(postgres_dsn):
 
     assert list(utils.searchable_sqlalchemy_models(Foo)) == [B]
     assert list(utils.searchable_sqlalchemy_models(Bar)) == [D]
+
+
+def test_get_searchable_sqlalchemy_models_inheritance(postgres_dsn):
+
+    Base = declarative_base()
+
+    class Page(Base, Searchable):
+        __tablename__ = 'pages'
+        id = Column(Integer, primary_key=True)
+
+    class Topic(Page):
+        pass
+
+    class News(Page):
+        pass
+
+    assert list(utils.searchable_sqlalchemy_models(Base)) == [
+        Page, Topic, News
+    ]
