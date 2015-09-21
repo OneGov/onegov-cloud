@@ -85,7 +85,9 @@ class Response(BaseResponse):
 
         model = self.mappings[type].model
         query = self.session.query(model)
-        query = query.filter(model.id.in_(h.meta.id for h in hits))
+
+        model_ids = (h.meta.id for h in hits)
+        query = query.filter(getattr(model, model.es_id).in_(model_ids))
 
         return query
 
@@ -110,7 +112,8 @@ class Response(BaseResponse):
         # this has the potential of resulting in fewer queries
         for type in types:
             for result in self.query(type).all():
-                results[positions[(type, str(result.id))]] = result
+                object_id = str(getattr(result, result.es_id))
+                results[positions[(type, object_id)]] = result
 
         return results
 
@@ -135,7 +138,8 @@ class Result(BaseResult):
     def query(self):
         """ Returns the SQLAlchemy query for this result. """
         query = self.session.query(self.model)
-        query = query.filter(self.model.id == self.meta.id)
+        model_id = getattr(self.model, self.model.es_id)
+        query = query.filter(model_id == self.meta.id)
 
         return query
 

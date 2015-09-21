@@ -490,7 +490,7 @@ class ORMEventTranslator(object):
     def index(self, schema, obj):
         translation = {
             'action': 'index',
-            'id': obj.es_id,
+            'id': getattr(obj, obj.es_id),
             'schema': schema,
             'type_name': obj.es_type_name,
             'language': obj.es_language,
@@ -516,7 +516,7 @@ class ORMEventTranslator(object):
             'action': 'delete',
             'schema': schema,
             'type_name': obj.es_type_name,
-            'id': obj.es_id
+            'id': getattr(obj, obj.es_id)
         }
 
         self.put(translation)

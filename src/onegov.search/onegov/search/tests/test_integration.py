@@ -249,3 +249,62 @@ def test_orm_integration(es_url, postgres_dsn):
 
     documents = json.loads(client.get('/?q=business').text)
     assert documents['hits']['total'] == 1
+
+
+def test_alternate_id_property(es_url, postgres_dsn):
+    config = setup()
+
+    class App(Framework, ElasticsearchApp):
+        testing_config = config
+
+    Base = declarative_base()
+
+    class User(Base, ORMSearchable):
+        __tablename__ = 'users'
+
+        name = Column(Text, primary_key=True)
+        fullname = Column(Text, nullable=False)
+
+        es_id = 'name'
+        es_properties = {
+            'fullname': {'type': 'string'},
+        }
+        es_language = 'en'
+        es_public = True
+
+    scan_morepath_modules(App, config)
+    config.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        elasticsearch_hosts=[es_url]
+    )
+
+    app.namespace = 'users'
+    app.set_application_id('users/corporate')
+
+    session = app.session()
+    session.add(User(
+        name="root",
+        fullname="Lil' Root"
+    ))
+    session.add(User(
+        name="user",
+        fullname="Lil' User"
+    ))
+    transaction.commit()
+    app.es_indexer.process()
+    app.es_client.indices.refresh(index='_all')
+
+    assert app.es_search().count() == 2
+    assert app.es_search().query('match', fullname='Root').count() == 1
+
+    assert app.es_search().execute().query(type='users').count() == 2
+    assert len(app.es_search().execute().load()) == 2
+    
+    root = app.es_search().query('match', fullname='Root').execute()[0]
+    assert root.query().count() == 1
+    assert root.load().name == 'root'
+    assert root.load().fullname == "Lil' Root"

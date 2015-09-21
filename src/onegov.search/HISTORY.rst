@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- ORM Models now may use any name for their primary key attribute.
+  [href]
+
 0.0.3 (2015-09-18)
 ~~~~~~~~~~~~~~~~~~~
 

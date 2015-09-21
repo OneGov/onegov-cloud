@@ -4,8 +4,8 @@ from onegov.search.utils import classproperty
 class Searchable(object):
     """ Defines the interface required for an object to be searchable.
 
-    Note that ``es_properties`` and ``es_type_name`` must be class properties,
-    not instance properties. So do this::
+    Note that ``es_id ``, ``es_properties`` and ``es_type_name`` must be class
+    properties, not instance properties. So do this::
 
         class X(Searchable):
 
@@ -62,12 +62,12 @@ class Searchable(object):
         """ Returns the unique type name of the model. """
         raise NotImplementedError
 
-    @property
+    @classproperty
     def es_id(self):
-        """ The id with which this document is stored in the cluster. Should
-        not be changed after creation. If you use this on an ORM model, be sure
-        to use a primary key, all other properties are not available during
-        deletion.
+        """ The name of the id attribute (not the actual value!).
+
+        If you use this on an ORM model, be sure to use a primary key, all
+        other properties are not available during deletion.
 
         """
         raise NotImplementedError
@@ -101,9 +101,9 @@ class ORMSearchable(Searchable):
 
     """
 
-    @property
+    @classproperty
     def es_id(self):
-        return self.id
+        return 'id'
 
     @classproperty
     def es_type_name(self):

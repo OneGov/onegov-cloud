@@ -258,6 +258,7 @@ def test_orm_event_translator_properties():
 
     class Page(Searchable):
 
+        es_id = 'id'
         es_type_name = 'page'
         es_properties = {
             'title': {'type': 'localized'},
@@ -275,10 +276,6 @@ def test_orm_event_translator_properties():
 
             for k, v in kwargs.items():
                 setattr(self, k, v)
-
-        @property
-        def es_id(self):
-            return self.id
 
         @property
         def es_language(self):
@@ -327,20 +324,23 @@ def test_orm_event_translator_delete():
 
     class Page(Searchable):
 
-        es_id = 1
+        def __init__(self, id):
+            self.id = id
+
+        es_id = 'id'
         es_type_name = 'page'
 
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {})
 
     translator = ORMEventTranslator(mappings)
-    translator.on_delete('foobar', Page())
+    translator.on_delete('foobar', Page(123))
 
     assert translator.queue.get() == {
         'action': 'delete',
         'schema': 'foobar',
         'type_name': 'page',
-        'id': 1
+        'id': 123
     }
     assert translator.queue.empty()
 
@@ -350,7 +350,11 @@ def test_orm_event_queue_overflow(capturelog):
     capturelog.setLevel(logging.ERROR, logger='onegov.search')
 
     class Tweet(Searchable):
-        es_id = 1
+
+        def __init__(self, id):
+            self.id = id
+
+        es_id = 'id'
         es_type_name = 'tweet'
         es_language = 'en'
         es_public = True
@@ -360,13 +364,13 @@ def test_orm_event_queue_overflow(capturelog):
     mappings.register_type('tweet', {})
 
     translator = ORMEventTranslator(mappings, max_queue_size=3)
-    translator.on_insert('foobar', Tweet())
-    translator.on_update('foobar', Tweet())
-    translator.on_delete('foobar', Tweet())
+    translator.on_insert('foobar', Tweet(1))
+    translator.on_update('foobar', Tweet(2))
+    translator.on_delete('foobar', Tweet(3))
 
     assert len(capturelog.records()) == 0
 
-    translator.on_insert('foobar', Tweet())
+    translator.on_insert('foobar', Tweet(4))
 
     assert len(capturelog.records()) == 1
     assert capturelog.records()[0].message == \
