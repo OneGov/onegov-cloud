@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Exclude all _source fields by default.
+  [href]
+
 - Adds support for polymorphic SQLAlchemy models.
   [href]
 

@@ -99,6 +99,10 @@ class ElasticsearchApp(morepath.App):
         if not include_private:
             search = search.filter("term", es_public=True)
 
+        # by default, do not include any fields (this will still include
+        # the id and the type, which is enough for the orm querying)
+        search = search.fields([])
+
         return search
 
     def es_search_by_request(self, request, types='*'):
