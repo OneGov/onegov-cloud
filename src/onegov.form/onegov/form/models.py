@@ -5,6 +5,7 @@ from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
+from onegov.search import ORMSearchable
 from sedate import utcnow
 from sqlalchemy import Column, Enum, ForeignKey, Text
 from sqlalchemy.orm import (
@@ -22,7 +23,36 @@ def hash_definition(definition):
     return md5(definition.encode('utf-8')).hexdigest()
 
 
-class FormDefinition(Base, ContentMixin, TimestampMixin):
+class SearchableDefinition(ORMSearchable):
+    """ Defines how the definitions are searchable. For now, submissions are
+    not searched as they are usually accessed through the ticket, at least in
+    onegov.town. If other modules need this, it can be added here and
+    onegov.town can decied not to search for submissions.
+
+    """
+    es_id = 'name'
+    es_public = True
+
+    es_properties = {
+        'title': {'type': 'localized'},
+        'lead': {'type': 'localized'},
+        'text': {'type': 'localized_html'}
+    }
+
+    @property
+    def es_language(self):
+        return 'de'  # XXX add to database in the future
+
+    @property
+    def lead(self):
+        return self.meta.get('lead', '')
+
+    @property
+    def text(self):
+        return self.content.get('text', '')
+
+
+class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
     """ Defines a form stored in the database. """
 
     __tablename__ = 'forms'

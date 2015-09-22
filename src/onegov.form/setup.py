@@ -38,6 +38,7 @@ setup(
         'humanize',
         'jsonpickle',
         'onegov.core>=0.4.4',
+        'onegov.search',
         'pyparsing',
         'pyyaml',
         'python-magic',

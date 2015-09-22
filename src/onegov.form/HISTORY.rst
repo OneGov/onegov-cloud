@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds onegov.search integration for form definitions.
+  [href]
+
 0.7.0 (2015-09-10)
 ~~~~~~~~~~~~~~~~~~~
 
