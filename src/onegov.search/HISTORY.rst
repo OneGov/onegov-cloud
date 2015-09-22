@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Stops the reindex command to create unwanted indices.
+  [href]
+
 - Exclude all _source fields by default.
   [href]
 

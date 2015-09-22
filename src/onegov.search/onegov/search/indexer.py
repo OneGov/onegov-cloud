@@ -140,7 +140,8 @@ class Indexer(object):
         return self.ixmgr.ensure_index(
             task['schema'],
             task['language'],
-            self.mappings[task['type_name']]
+            self.mappings[task['type_name']],
+            return_index='internal'
         )
 
     def index(self, task):
@@ -318,7 +319,7 @@ class IndexManager(object):
 
         return result
 
-    def ensure_index(self, schema, language, mapping):
+    def ensure_index(self, schema, language, mapping, return_index='external'):
         """ Takes the given database schema, language and type name and
         creates an internal index with a version number and an external
         alias without the version number.
@@ -332,23 +333,29 @@ class IndexManager(object):
         :mapping:
             The :class:`TypeMapping` mapping used in this index.
 
+        :return_index:
+            The index name to return. Either 'external' or 'internal'.
+
         :return:
             The (external/aliased) name of the created index.
 
         """
         assert schema and language and mapping
         assert len(language) == 2
+        assert return_index == 'external' or return_index == 'internal'
 
         external = self.get_external_index_name(schema, language, mapping.name)
         internal = self.get_internal_index_name(
             schema, language, mapping.name, mapping.version)
 
+        return_value = return_index == 'external' and external or internal
+
         if internal in self.created_indices:
-            return external
+            return return_value
 
         if self.es_client.indices.exists(internal):
             self.created_indices.add(internal)
-            return external
+            return return_value
 
         # create the index
         self.es_client.indices.create(internal, body={
@@ -366,7 +373,7 @@ class IndexManager(object):
         # cache the result
         self.created_indices.add(internal)
 
-        return external
+        return return_value
 
     def remove_expired_indices(self, current_mappings):
         """ Removes all expired indices. An index is expired if it's version

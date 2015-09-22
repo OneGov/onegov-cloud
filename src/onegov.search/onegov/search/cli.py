@@ -59,6 +59,8 @@ def reindex(ctx):
             session = app.session()
             es_client = app.es_client
 
+            app.es_indexer.ixmgr.created_indices = set()
+
             # delete all existing indices for this town
             ixs = app.es_indexer.ixmgr.get_managed_indices_wildcard(app.schema)
             es_client.indices.delete(ixs)
