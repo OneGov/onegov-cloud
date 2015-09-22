@@ -87,7 +87,7 @@ def reindex(ctx):
                     'configuration': appcfg.configuration
                 }
             ]
-        }), configure_morepath=False)
+        }), configure_morepath=True)
 
         # build the path to the update view and call it
         c = Client(server)

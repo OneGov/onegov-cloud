@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes reindex not properly working with onegov.town.
+  [href]
+
 0.0.4 (2015-09-22)
 ~~~~~~~~~~~~~~~~~~~
 
