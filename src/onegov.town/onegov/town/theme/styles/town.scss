@@ -70,6 +70,15 @@ body {
     min-height: 100%;
 }
 
+.header {
+    // the header is fixed and the logo in it tries to fill it out
+    // therefore an svg logo should be used!
+    height: 7rem;
+    img {
+        height: 100%;
+    }
+}
+
 footer,
 .push {
     animation-duration: 3s;
@@ -443,12 +452,12 @@ $more-link-icon: '\f054';
     background-color: $topbar-bg-color;
     margin-bottom: 1.5em;
     padding: 1em;
-    
+
     /* add dots for oveflowing links */
     a {
-        display: block; 
-        overflow: hidden; 
-        text-overflow: ellipsis; 
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
         white-space: nowrap;
     }
 
@@ -1540,6 +1549,17 @@ tr.ticket:hover {
     input[type='submit'] {
         font-family: 'FontAwesome';
         padding: 0;
+    }
+}
+
+.header .searchbox,
+.logged-in .header .searchbox {
+    margin-top: 1rem;
+}
+
+@media #{$medium-up} {
+    .header .searchbox {
+        margin-top: 2.25rem;
     }
 }
 

@@ -24,16 +24,16 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 
-<body id="${layout.page_id}">
+<body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}">
     <div id="inner-body">
-      <div class="row">
-        <div class="small-12 medium-7 columns">
+      <div class="row header">
+        <div class="small-12 medium-8 columns">
           <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing">
             <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
             <h1 tal:condition="not:logo_url">${layout.town.name}</h1>
           </a>
         </div>
-        <div class="small-12 medium-5 columns">
+        <div class="small-12 medium-4 columns">
           <tal:block condition="request.is_logged_in">
             <tal:block define="ticket_count layout.request.app.ticket_count">
               <div class="ticket-count">
@@ -51,8 +51,19 @@
                     </a>
                   </div>
               </div>
+              <div class="clearfix"></div>
             </tal:block>
           </tal:block>
+          <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing">
+            <div class="row collapse">
+                <div class="columns small-10">
+                    <input type="text" name="q" placeholder="Search" i18n:attributes="placeholder" />
+                </div>
+                <div class="columns small-2">
+                    <input class="button postfix" type="submit" alt="Search" value="&#xf002" i18n:attributes="alt" />
+                </div>
+            </div>
+          </form>
         </div>
       </div>
       <div class="row">

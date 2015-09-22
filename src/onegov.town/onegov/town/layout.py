@@ -4,7 +4,7 @@ from cached_property import cached_property
 from dateutil import rrule
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
-from onegov.event import OccurrenceCollection, EventCollection
+from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.libres import ResourceCollection
 from onegov.page import Page, PageCollection
@@ -15,6 +15,7 @@ from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import (
     FileCollection,
     ImageCollection,
+    Search,
     SiteCollection,
     Thumbnail
 )
@@ -151,6 +152,11 @@ class Layout(ChameleonLayout):
     def homepage_url(self):
         """ Returns the url to the main page. """
         return self.request.link(self.app.town)
+
+    @cached_property
+    def search_url(self):
+        """ Returns the url to the main page. """
+        return self.request.link(Search(self.request, None, None))
 
     @cached_property
     def open_tickets_url(self):
@@ -818,8 +824,9 @@ class OccurrenceLayout(EventBaseLayout):
     def editbar_links(self):
         if self.request.is_logged_in:
             edit_url = URL(self.request.link(self.model.event, 'bearbeiten'))
-            edit_url = edit_url.query_param('return-to',
-                                            self.request.link(self.model.event))
+            edit_url = edit_url.query_param(
+                'return-to', self.request.link(self.model.event)
+            )
             edit_link = Link(
                 text=_("Edit"),
                 url=edit_url.as_string(),
@@ -861,9 +868,9 @@ class EventLayout(EventBaseLayout):
     def editbar_links(self):
         if self.request.is_logged_in:
             edit_link = Link(
-                    text=_("Edit"),
-                    url=self.request.link(self.model, 'bearbeiten'),
-                    classes=('edit-link', )
+                text=_("Edit"),
+                url=self.request.link(self.model, 'bearbeiten'),
+                classes=('edit-link', )
             )
             if self.event_deletable(self.model):
                 delete_link = DeleteLink(
