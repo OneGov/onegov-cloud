@@ -3,13 +3,25 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.search import ORMSearchable
 from sqlalchemy import Column, Text
 from uuid import uuid4
 
 
-class Person(Base, TimestampMixin):
+class Person(Base, TimestampMixin, ORMSearchable):
 
     __tablename__ = 'people'
+
+    es_public = True
+    es_properties = {
+        'title': {'type': 'string'},
+        'function': {'type': 'localized'},
+        'email': {'type': 'string'},
+    }
+
+    @property
+    def es_language(self):
+        return 'de'  # XXX add to database in the future
 
     @property
     def title(self):
