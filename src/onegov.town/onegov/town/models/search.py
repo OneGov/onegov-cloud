@@ -40,7 +40,7 @@ class Search(Pagination):
         search = self.request.app.es_search_by_request(self.request)
         search = search.query('multi_match', query=self.query, fields=[
             'title', 'lead', 'text', 'email', 'function', 'number',
-            'ticket_email', 'ticket_data'
+            'ticket_email', 'ticket_data', 'description', 'location'
         ], fuzziness='AUTO', analyzer='german')
         search = search[self.offset:self.offset + self.batch_size]
 

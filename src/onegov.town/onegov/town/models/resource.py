@@ -6,6 +6,7 @@ from onegov.town.models.extensions import (
     ContactExtension,
     PersonLinkExtension
 )
+from onegov.search import ORMSearchable
 
 
 class SharedMethods(object):
@@ -44,11 +45,40 @@ class SharedMethods(object):
         query.delete('fetch')
 
 
-class DaypassResource(Resource, HiddenFromPublicExtension,
+class SearchableResource(ORMSearchable):
+
+    es_properties = {
+        'title': {'type': 'localized'},
+        'lead': {'type': 'localized'},
+        'text': {'type': 'localized_html'}
+    }
+
+    @property
+    def lead(self):
+        return self.meta.get('lead', '')
+
+    @property
+    def text(self):
+        return self.content.get('text', '')
+
+    @property
+    def es_language(self):
+        return 'de'  # XXX add to database in the future
+
+    @property
+    def es_public(self):
+        return not self.is_hidden_from_public
+
+
+class DaypassResource(Resource, HiddenFromPublicExtension, SearchableResource,
                       ContactExtension, PersonLinkExtension, SharedMethods):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
+    es_type_name = 'daypasses'
 
-class RoomResource(Resource, HiddenFromPublicExtension,
+
+class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
                    ContactExtension, PersonLinkExtension, SharedMethods):
     __mapper_args__ = {'polymorphic_identity': 'room'}
+
+    es_type_name = 'rooms'
