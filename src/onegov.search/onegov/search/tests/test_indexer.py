@@ -212,7 +212,8 @@ def test_mapping_for_language():
     mapping = TypeMapping('bar', {
         'title': {
             'properties': {
-                'type': 'localized'
+                'type': 'localized',
+                'index': 'not_analyzed'
             }
         }
     })
@@ -221,7 +222,8 @@ def test_mapping_for_language():
         'title': {
             'properties': {
                 'type': 'string',
-                'analyzer': 'german'
+                'analyzer': 'german',
+                'index': 'not_analyzed'
             }
         },
         'es_public': {

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes localized mapping not working correctly in certain cases.
+  [href]
+
 - Stops the reindex command to create unwanted indices.
   [href]
 

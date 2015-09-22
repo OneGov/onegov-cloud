@@ -225,6 +225,7 @@ class TypeMapping(object):
 
             elif key == 'type' and value.startswith('localized'):
                 supplement = value.replace('localized', language)
+                break
 
         if supplement:
             assert 'analyzer' not in dictionary
