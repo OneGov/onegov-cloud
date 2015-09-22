@@ -145,6 +145,7 @@ def es_process():
         --network.publish_host='127.0.0.1'
         --discovery.zen.ping.multicast.enabled=false
         --index.store.type=memory
+        --action.auto_create_index=false
     """.format(
         binary=binary,
         pidfile=pid,
