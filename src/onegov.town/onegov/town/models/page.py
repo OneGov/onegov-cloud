@@ -36,6 +36,10 @@ class SearchablePage(ORMSearchable):
     def es_language(self):
         return 'de'  # xxx for now there's no other language
 
+    @property
+    def es_skip(self):
+        return self.meta.get('trait') == 'link'  # do not index links
+
 
 class Topic(Page, TraitInfo, SearchablePage,
             HiddenFromPublicExtension, ContactExtension, PersonLinkExtension):
