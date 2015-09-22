@@ -1546,9 +1546,9 @@ tr.ticket:hover {
 /*
     Search results
 */
-.searchresults {
-    em {
-        font-style: normal;
-        font-weight: bold;
+.search-results {
+    ul {
+        list-style-type: none;
+        margin-left: 0;
     }
 }

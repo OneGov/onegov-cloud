@@ -1,4 +1,4 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+<div metal:use-macro="layout.base" i18n:domain="onen.town">
     <tal:block metal:fill-slot="title">
         ${title}
     </tal:block>
@@ -25,10 +25,37 @@
                 <div class="columns medium-8 small-12">
                     <p tal:condition="not: model.batch.hits.total" i18n:translate="">Your search returned no results.</p>
 
-                    <ul tal:repeat="result model.batch.load()">
-                        <li>
-                            <a href="${request.link(result)}">${result.title}</a>
-                            <p tal:condition="result.lead|nothing">${result.lead}</p>
+                    <ul tal:repeat="result model.batch.load()" class="search-results">
+                        <li class="search-result-${result.es_type_name}">
+                            <tal:block switch="result.__tablename__">
+
+                                <tal:block case="'tickets'">
+                                    <a href="${request.link(result)}">${result.number}</a>
+                                    <ul>
+                                        <li>${result.title}</li>
+                                        <li>${translate(result.group)}</li>
+                                        <li>${layout.format_date(result.created, 'relative')}</li>
+                                    </ul>
+                                </tal:block>
+
+                                <tal:block case="'events'">
+                                    <a href="${request.link(result, 'latest')}">${result.title}</a>
+                                    <p tal:condition="result.description|nothing">
+                                        ${result.description[:160]}<tal:block condition="len(result.description) > 160">...</tal:block>
+                                    </p>
+                                </tal:block>
+
+                                <tal:block case="'people'">
+                                    <a href="${request.link(result)}">${result.title}</a>
+                                    <p tal:condition="result.function|nothing">${result.function}</p>
+                                </tal:block>
+
+                                <tal:block case="default">
+                                    <a href="${request.link(result)}">${result.title}</a>
+                                    <p tal:condition="result.lead|nothing">${result.lead}</p>
+                                </tal:block>
+
+                            </tal:block>
                         </li>
                     </ul>
 

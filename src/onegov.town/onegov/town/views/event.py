@@ -11,6 +11,7 @@ from onegov.town.elements import Link
 from onegov.town.forms import EventForm
 from onegov.town.layout import EventLayout
 from onegov.town.mail import send_html_mail
+from sedate import utcnow
 from purl import URL
 from uuid import uuid4
 from webob import exc
@@ -254,3 +255,20 @@ def ical_export_event(self, request):
         content_type='text/calendar',
         content_disposition='inline; filename=calendar.ics'
     )
+
+
+@TownApp.view(model=Event, permission=Public, name='latest')
+def view_latest_event(self, request):
+    """ Redirects to the latest occurrence of an event that is, either the
+    next future event or the last event in the past if there are no more
+    future events.
+
+    """
+
+    now = utcnow()
+
+    for occurrence in self.occurrences:
+        if now < occurrence.start:
+            return morepath.redirect(request.link(occurrence))
+
+    return morepath.redirect(request.link(occurrence))
