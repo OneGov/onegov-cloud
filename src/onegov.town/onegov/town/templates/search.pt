@@ -28,7 +28,7 @@
                     <ul tal:repeat="result model.batch.load()">
                         <li>
                             <a href="${request.link(result)}">${result.title}</a>
-                            <p>${result.lead}</p>
+                            <p tal:condition="result.lead|nothing">${result.lead}</p>
                         </li>
                     </ul>
 

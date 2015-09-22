@@ -39,7 +39,7 @@ class Search(Pagination):
     def batch(self):
         search = self.request.app.es_search_by_request(self.request)
         search = search.query('multi_match', query=self.query, fields=[
-            'title', 'lead', 'text'
+            'title', 'lead', 'text', 'email', 'function'
         ], fuzziness='AUTO', analyzer='german')
         search = search[self.offset:self.offset + self.batch_size]
 
