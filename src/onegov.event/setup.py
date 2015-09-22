@@ -38,6 +38,7 @@ setup(
         'icalendar',
         'lxml',
         'onegov.core>=0.4.0',
+        'onegov.search',
         'onegov.server',
         'python-dateutil',
         'requests',

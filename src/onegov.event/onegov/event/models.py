@@ -5,6 +5,7 @@ from dateutil import rrule
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.search import ORMSearchable
 from sedate import standardize_date, to_timezone
 from sqlalchemy import Column, Enum, ForeignKey, Text, String
 from sqlalchemy.dialects.postgresql import HSTORE
@@ -93,7 +94,8 @@ class OccurrenceMixin(object):
         return cal.to_ical()
 
 
-class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
+class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
+            ORMSearchable):
     """ Defines an event.
 
     Occurrences are stored in a seperate table containing only a minimal set
@@ -132,6 +134,20 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin):
         backref=backref("event"),
         lazy='joined',
     )
+
+    es_properties = {
+        'title': {'type': 'localized'},
+        'description': {'type': 'localized'},
+        'location': {'type': 'localized'},
+    }
+
+    @property
+    def es_public(self):
+        return self.state == 'published'
+
+    @property
+    def es_language(self):
+        return 'de'  # XXX add to database in the future
 
     def __setattr__(self, name, value):
         """ Automatically update the occurrences if shared attributes change.
