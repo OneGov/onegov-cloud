@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.4 (2015-09-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes localized mapping not working correctly in certain cases.
   [href]
 
