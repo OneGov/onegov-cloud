@@ -86,6 +86,15 @@ class Handler(object):
 
         raise NotImplementedError
 
+    @property
+    def extra_data(self):
+        """ An array of string values which are indexed in elasticsearch when
+        the ticket is stored there.
+
+        """
+
+        return tuple()
+
     @classmethod
     def handle_extra_parameters(self, session, query, extra_parameters):
         """ Takes a dictionary of extra parameters and uses it to optionally

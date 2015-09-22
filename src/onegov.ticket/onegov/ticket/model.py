@@ -1,6 +1,7 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
+from onegov.search import ORMSearchable
 from onegov.ticket import handlers
 from onegov.user.model import User
 from sqlalchemy import Column, Enum, ForeignKey, Text
@@ -8,7 +9,7 @@ from sqlalchemy.orm import deferred, relationship
 from uuid import uuid4
 
 
-class Ticket(Base, TimestampMixin):
+class Ticket(Base, TimestampMixin, ORMSearchable):
     """ Defines a ticket. """
 
     __tablename__ = 'tickets'
@@ -66,6 +67,33 @@ class Ticket(Base, TimestampMixin):
     __mapper_args__ = {
         'polymorphic_on': handler_code
     }
+
+    # limit the search to the ticket number -> the rest can be found
+    es_public = False
+    es_properties = {
+        'number': {'type': 'string'},
+        'title': {'type': 'string'},
+        'ticket_email': {'type': 'string', 'index': 'not_analyzed'},
+        'ticket_data': {'type': 'localized'}
+    }
+
+    @property
+    def es_language(self):
+        return 'de'  # XXX add to database in the future
+
+    @property
+    def ticket_email(self):
+        if self.handler.deleted:
+            return self.snapshot.get('email')
+        else:
+            return self.handler.email
+
+    @property
+    def ticket_data(self):
+        if self.handler.deleted:
+            return self.snapshot.get('summary')
+        else:
+            return self.handler.extra_data
 
     @property
     def handler(self):

@@ -35,6 +35,7 @@ setup(
     platforms='any',
     install_requires=[
         'onegov.core>=0.4.11',
+        'onegov.search',
         'onegov.user'
     ],
     extras_require=dict(
