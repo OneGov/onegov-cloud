@@ -1,10 +1,12 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import UTCDateTime
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers
 from onegov.user.model import User
 from sqlalchemy import Column, Enum, ForeignKey, Text
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred, relationship
 from uuid import uuid4
 
@@ -48,6 +50,12 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: becomes nothing more than a number.
     snapshot = deferred(Column(JSON, nullable=False, default=dict))
 
+    # override the created attribute from the timestamp mixin - we don't want
+    # it to be deferred by default because we usually need it
+    @declared_attr
+    def created(cls):
+        return Column(UTCDateTime, default=cls.timestamp)
+
     #: the state of this ticket (open, pending, closed)
     state = Column(
         Enum(
@@ -73,8 +81,9 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     es_properties = {
         'number': {'type': 'string'},
         'title': {'type': 'string'},
+        'group': {'type': 'string'},
         'ticket_email': {'type': 'string', 'index': 'not_analyzed'},
-        'ticket_data': {'type': 'localized'}
+        'ticket_data': {'type': 'localized_html'}
     }
 
     @property

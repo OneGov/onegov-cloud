@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Load created date undeferred by default.
+  [href]
+
 - Adds onegov.search integration.
   [href]
 
