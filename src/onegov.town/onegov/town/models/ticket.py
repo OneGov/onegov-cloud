@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from libres.db.models import Allocation, Reservation
+from onegov.core import utils
 from onegov.core.templates import render_macro
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
@@ -13,14 +14,17 @@ from purl import URL
 
 class FormSubmissionTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FRM'}
+    es_type_name = 'submission_tickets'
 
 
 class ReservationTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'RSV'}
+    es_type_name = 'reservation_tickets'
 
 
 class EventSubmissionTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'EVN'}
+    es_type_name = 'event_tickets'
 
 
 @handlers.registered_handler('FRM')
@@ -53,6 +57,13 @@ class FormSubmissionHandler(Handler):
     @property
     def group(self):
         return self.submission.form.title
+
+    @property
+    def extra_data(self):
+        return self.submission and [
+            v for v in self.submission.data.values()
+            if not utils.is_non_string_iterable(v)
+        ]
 
     def get_summary(self, request):
         layout = DefaultLayout(self.submission, request)
@@ -103,6 +114,13 @@ class ReservationHandler(Handler):
     @property
     def deleted(self):
         return False if self.reservations else True
+
+    @property
+    def extra_data(self):
+        return self.submission and [
+            v for v in self.submission.data.values()
+            if not utils.is_non_string_iterable(v)
+        ]
 
     @property
     def email(self):
@@ -254,6 +272,14 @@ class EventSubmissionHandler(Handler):
     @property
     def title(self):
         return self.event.title
+
+    @property
+    def extra_data(self):
+        return [
+            self.event.description,
+            self.event.title,
+            self.event.location
+        ]
 
     @cached_property
     def group(self):
