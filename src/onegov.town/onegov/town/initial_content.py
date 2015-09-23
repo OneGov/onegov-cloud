@@ -11,7 +11,6 @@ from onegov.libres import LibresIntegration, ResourceCollection
 from onegov.page import PageCollection
 from onegov.town.models import Town
 from sedate import as_datetime
-from wtforms.fields.html5 import EmailField
 
 
 def add_initial_content(libres_registry, session_manager, town_name,

@@ -2,11 +2,9 @@
 
 import PIL
 
-from collections import OrderedDict
 from dateutil.relativedelta import relativedelta
-from datetime import datetime, timedelta
+from datetime import datetime
 from datetime import date
-from itertools import groupby
 from onegov.town import _
 from onegov.town.models import File
 from onegov.town.models import FileCollection

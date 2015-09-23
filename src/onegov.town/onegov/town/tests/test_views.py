@@ -1706,12 +1706,8 @@ def test_view_occurrence(town_app):
     assert len(event.pyquery('.occurrence-occurrences li')) == 9
     assert len(event.pyquery('.occurrence-exports h2')) == 2
 
-    export = event.click('Diesen Termin exportieren').text.startswith(
-        'BEGIN:VCALENDAR'
-    )
-    export = event.click('Alle Termine exportieren').text.startswith(
-        'BEGIN:VCALENDAR'
-    )
+    event.click('Diesen Termin exportieren').text.startswith('BEGIN:VCALENDAR')
+    event.click('Alle Termine exportieren').text.startswith('BEGIN:VCALENDAR')
 
 
 def test_submit_event(town_app):
@@ -1847,7 +1843,7 @@ def test_edit_event(town_app):
 
     # Submit and publish an event
     form_page = client.get('/veranstaltungen').click("Veranstaltung melden")
-    event_date = date.today()+timedelta(days=1)
+    event_date = date.today() + timedelta(days=1)
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Ewent"
     form_page.form['location'] = "Lokation"
@@ -1899,7 +1895,7 @@ def test_delete_event(town_app):
 
     # Submit and publish an event
     form_page = client.get('/veranstaltungen').click("Veranstaltung melden")
-    event_date = date.today()+timedelta(days=1)
+    event_date = date.today() + timedelta(days=1)
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Event"
     form_page.form['start_date'] = event_date.isoformat()

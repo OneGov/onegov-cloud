@@ -4,7 +4,7 @@ from onegov.form import Form, with_options
 from onegov.form.fields import MultiCheckboxField, MultiCheckboxWidget
 from onegov.town import _
 from sedate import replace_timezone, to_timezone
-from wtforms import BooleanField, StringField, TextAreaField, validators
+from wtforms import StringField, TextAreaField, validators
 from wtforms_components import TimeField
 from wtforms.fields.html5 import DateField, EmailField
 from wtforms.widgets import TextArea

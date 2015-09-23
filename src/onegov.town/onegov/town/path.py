@@ -2,7 +2,6 @@
 
 from datetime import date
 from libres.db.models import Allocation, Reservation
-from onegov.core.compat import unquote_plus
 from onegov.event import (
     Event,
     EventCollection,
