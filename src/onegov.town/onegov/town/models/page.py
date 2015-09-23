@@ -40,6 +40,12 @@ class SearchablePage(ORMSearchable):
     def es_skip(self):
         return self.meta.get('trait') == 'link'  # do not index links
 
+    @property
+    def es_suggestions(self):
+        return {
+            "input": [self.title.lower()]
+        }
+
 
 class Topic(Page, TraitInfo, SearchablePage,
             HiddenFromPublicExtension, ContactExtension, PersonLinkExtension):

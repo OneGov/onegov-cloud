@@ -22,3 +22,8 @@ def search(self, request):
             'count': self.subset_count
         })
     }
+
+
+@TownApp.json(model=Search, name='suggest', permission=Public)
+def suggestions(self, request):
+    return tuple(self.suggestions())

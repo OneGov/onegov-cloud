@@ -50,3 +50,14 @@ class Search(Pagination):
     @cached_property
     def subset_count(self):
         return self.cached_subset.hits.total
+
+    def suggestions(self):
+        suggestions = self.request.app.es_suggestions_by_request(
+            self.request, self.query
+        )
+
+        for suggestion in suggestions:
+            yield (
+                suggestion,
+                self.request.link(Search(self.request, suggestion, 0))
+            )
