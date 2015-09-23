@@ -3,7 +3,7 @@ import transaction
 
 from datetime import datetime
 from onegov.event import Event, Occurrence
-from sedate import replace_timezone, to_timezone
+from sedate import replace_timezone
 
 
 def tzdatetime(year, month, day, hour, minute, timezone):
@@ -122,14 +122,14 @@ def test_occurrence_dates(session):
     dates = event.occurrence_dates()
     assert len(dates) == 2
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[1] == tzdatetime(year+1, 2, 7, 10, 15, 'Europe/Zurich')
+    assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'UTC'
     assert str(dates[1].tzinfo) == 'UTC'
 
     dates = event.occurrence_dates(localize=True)
     assert len(dates) == 2
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[1] == tzdatetime(year+1, 2, 7, 10, 15, 'Europe/Zurich')
+    assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'Europe/Zurich'
     assert str(dates[1].tzinfo) == 'Europe/Zurich'
 
@@ -143,14 +143,14 @@ def test_occurrence_dates(session):
     dates = event.occurrence_dates()
     assert len(dates) == 2
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[1] == tzdatetime(year+1, 2, 7, 10, 15, 'Europe/Zurich')
+    assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'UTC'
     assert str(dates[1].tzinfo) == 'UTC'
 
     dates = event.occurrence_dates(localize=True)
     assert len(dates) == 2
     assert dates[0] == tzdatetime(year, 2, 7, 10, 15, 'Europe/Zurich')
-    assert dates[1] == tzdatetime(year+1, 2, 7, 10, 15, 'Europe/Zurich')
+    assert dates[1] == tzdatetime(year + 1, 2, 7, 10, 15, 'Europe/Zurich')
     assert str(dates[0].tzinfo) == 'Europe/Zurich'
     assert str(dates[1].tzinfo) == 'Europe/Zurich'
 
@@ -313,8 +313,8 @@ def test_create_event_recurring_limit(session):
     assert len(occurrences) == 2
     assert occurrences[0].start == tzdatetime(year, 2, 7, 10, 15, timezone)
     assert occurrences[0].end == tzdatetime(year, 2, 7, 16, 00, timezone)
-    assert occurrences[1].start == tzdatetime(year+1, 2, 7, 10, 15, timezone)
-    assert occurrences[1].end == tzdatetime(year+1, 2, 7, 16, 00, timezone)
+    assert occurrences[1].start == tzdatetime(year + 1, 2, 7, 10, 15, timezone)
+    assert occurrences[1].end == tzdatetime(year + 1, 2, 7, 16, 00, timezone)
 
 
 def test_update_event(session):

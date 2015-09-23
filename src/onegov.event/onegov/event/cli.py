@@ -128,9 +128,8 @@ def guidle_import(ctx, town, url):
         event_collection = EventCollection(mgr.session())
 
         for index, offer in enumerate(offers):
-            print("  Importing offer {}/{}".format(index+1, len(offers)))
+            print("  Importing offer {}/{}".format(index + 1, len(offers)))
 
-            events = []
             for date in [d for d in offer.schedules.iterchildren()]:
                 # parse start, end, recurrence
                 start = parse(getattr(date, 'startDate', Empty).text)

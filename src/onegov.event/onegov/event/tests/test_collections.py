@@ -1,6 +1,5 @@
 # coding=utf-8
 from datetime import date, datetime, timedelta
-from mock import patch
 from onegov.event import EventCollection, Occurrence, OccurrenceCollection
 from sedate import replace_timezone, standardize_date
 
@@ -52,14 +51,14 @@ def test_event_collection_remove_stale_events(session):
     timezone = 'UTC'
 
     events = EventCollection(session)
-    event = events.add(
+    events.add(
         title='Event', timezone=timezone,
         start=datetime(2010, 6, 1, 10),
         end=datetime(2010, 6, 1, 10) + timedelta(hours=1),
     )
     assert events.query().count() == 1
 
-    max_stale = standardize_date(datetime.today()+timedelta(days=2), 'UTC')
+    max_stale = standardize_date(datetime.today() + timedelta(days=2), 'UTC')
     events.remove_stale_events(max_stale=max_stale)
     assert events.query().count() == 0
 
@@ -86,7 +85,7 @@ def test_event_collection_pagination(session):
                 event.publish()
             if year > 2009:
                 event.withdraw()
-    assert events.query().count() == 3*12
+    assert events.query().count() == 3 * 12
 
     events = EventCollection(session, state='initiated')
     assert events.subset_count == 0
@@ -181,7 +180,6 @@ def test_occurrence_collection(session):
 
 
 def test_occurrence_collection_pagination(session):
-    timezone = 'US/Eastern'
 
     occurrences = OccurrenceCollection(session)
     assert occurrences.page_index == 0
@@ -211,7 +209,7 @@ def test_occurrence_collection_pagination(session):
             )
 
     occurrences = PatchedCollection(session)
-    assert occurrences.query().count() == 4*12
+    assert occurrences.query().count() == 4 * 12
 
     occurrences = PatchedCollection(session)
     assert occurrences.subset_count == 48
@@ -294,7 +292,7 @@ def test_occurrence_collection_pagination(session):
 
 def test_occurrence_collection_outdated(session):
     today = date.today()
-    for year in (today.year-1, today.year, today.year+1):
+    for year in (today.year - 1, today.year, today.year + 1):
         event = EventCollection(session).add(
             title='Event {0}-{1}'.format(year, today.month),
             start=datetime(year, today.month, today.day, 0, 0),
@@ -307,8 +305,8 @@ def test_occurrence_collection_outdated(session):
     occurrences = OccurrenceCollection(session)
     assert occurrences.query().count() == 2
     assert occurrences.query(outdated=True).count() == 3
-    assert occurrences.query(start=date(today.year-1, 1, 1)).count() == 3
-    assert occurrences.query(start=date(today.year-1, 1, 1)).count() == 3
+    assert occurrences.query(start=date(today.year - 1, 1, 1)).count() == 3
+    assert occurrences.query(start=date(today.year - 1, 1, 1)).count() == 3
 
 
 def test_unique_names(session):
@@ -400,7 +398,8 @@ def test_unicode(session):
     assert occurrence.title == u'Salon du mieux-vivre, 16e édition'
     assert occurrence.location == u'Salon du mieux-vivre à Saignelégier'
     assert sorted(occurrence.tags) == [u'congrès', u'salons']
-    assert occurrence.event.description == u'Rendez-vous automnal des médecines.'
+    assert occurrence.event.description \
+        == u'Rendez-vous automnal des médecines.'
 
     occurrence = occurrences.query(outdated=True, tags=[u'témoins']).one()
     assert occurrence.title == u'Témoins de Jéhovah'
