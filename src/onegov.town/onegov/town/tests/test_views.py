@@ -14,8 +14,34 @@ from onegov.form import FormCollection, FormSubmission
 from onegov.libres import ResourceCollection
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
-from webtest import TestApp as Client
+from webtest import TestApp, TestResponse, TestRequest
 from webtest import Upload
+
+
+class SkipFirstForm(object):
+
+    @property
+    def form(self):
+        """ Ignore the first form, which is the general search form on
+        the top of the page.
+
+        """
+        if len(self.forms) > 1:
+            return self.forms[1]
+        else:
+            return super(SkipFirstForm, self).form
+
+
+class Response(SkipFirstForm, TestResponse):
+    pass
+
+
+class Request(SkipFirstForm, TestRequest):
+    ResponseClass = Response
+
+
+class Client(SkipFirstForm, TestApp):
+    RequestClass = Request
 
 
 def extract_href(link):
