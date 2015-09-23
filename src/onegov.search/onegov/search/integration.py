@@ -89,11 +89,7 @@ class ElasticsearchApp(morepath.App):
             session=self.session(),
             mappings=self.es_mappings,
             using=self.es_client,
-            index=self.es_indexer.ixmgr.get_external_index_names(
-                schema=self.schema,
-                languages=languages,
-                types=types
-            )
+            index=self.es_indices(languages, types)
         )
 
         if not include_private:
@@ -105,6 +101,13 @@ class ElasticsearchApp(morepath.App):
 
         return search
 
+    def es_indices(self, languages='*', types='*'):
+        return self.es_indexer.ixmgr.get_external_index_names(
+            schema=self.schema,
+            languages=languages,
+            types=types
+        )
+
     def es_search_by_request(self, request, types='*'):
         """ Takes the current :class:`~onegov.core.request.CoreRequest` and
         returns an elastic search scoped to the current application, the
@@ -113,6 +116,53 @@ class ElasticsearchApp(morepath.App):
         """
 
         return self.es_search(
+            languages=[request.locale],
+            types=types,
+            include_private=request.is_logged_in
+        )
+
+    def es_suggestions(self, query, languages='*', types='*',
+                       include_private=False):
+        """ Returns suggestions for the given query. """
+
+        if not query:
+            return []
+
+        if include_private:
+            context = ['public', 'private']
+        else:
+            context = ['public']
+
+        result = self.es_client.suggest(
+            index=self.es_indices(languages=languages, types=types),
+            body={
+                'suggestions': {
+                    'text': query,
+                    'completion': {
+                        'field': 'es_suggestion',
+                        "context": {
+                            "es_public_categories": context
+                        }
+                    },
+                }
+            }
+        )
+
+        suggestions = []
+
+        for suggestion in result.get('suggestions', []):
+            for item in suggestion['options']:
+                suggestions.append(item['text'])
+
+        return suggestions
+
+    def es_suggestions_by_request(self, request, query, types='*'):
+        """ Returns suggestions for the given query, scoped to the language
+        and the login status of the given requst.
+
+        """
+        return self.es_suggestions(
+            query,
             languages=[request.locale],
             types=types,
             include_private=request.is_logged_in

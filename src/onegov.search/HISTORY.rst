@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds completion suggestions for search-as-you-type.
+  [href]
+
 - Fixes reindex not properly working with onegov.town.
   [href]
 

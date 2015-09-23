@@ -196,6 +196,26 @@ class TypeMapping(object):
             'include_in_all': False
         }
 
+        # contains ['public'] if public or ['private'] if private - used
+        # because completion categories don't work with booleans if we want
+        # to query for both true and false
+        mapping['es_public_categories'] = {
+            'type': 'string',
+            'index': 'not_analyzed',
+            'include_in_all': False
+        }
+        mapping['es_suggestion'] = {
+            'type': 'completion',
+            'payloads': True,
+            'index_analyzer': 'standard',
+            'search_analyzer': 'standard',
+            "context": {
+                "es_public_categories": {
+                    "type": "category",
+                    "path": "es_public_categories"
+                }
+            }
+        }
         return mapping
 
     def for_language(self, language):
@@ -521,6 +541,10 @@ class ORMEventTranslator(object):
         mapping = self.mappings[obj.es_type_name].for_language(obj.es_language)
 
         for prop, mapping in mapping.items():
+
+            if prop in ('es_public_categories', 'es_suggestion'):
+                continue
+
             convert = self.converters.get(mapping['type'], lambda v: v)
             raw = getattr(obj, prop)
 
@@ -528,6 +552,16 @@ class ORMEventTranslator(object):
                 translation['properties'][prop] = [convert(v) for v in raw]
             else:
                 translation['properties'][prop] = convert(raw)
+
+        if obj.es_public:
+            translation['properties']['es_public_categories'] = ['public']
+        else:
+            translation['properties']['es_public_categories'] = ['private']
+
+        translation['properties']['es_suggestion'] = {
+            'input': [obj.es_suggestion],
+            'output': obj.es_suggestion,
+        }
 
         self.put(translation)
 

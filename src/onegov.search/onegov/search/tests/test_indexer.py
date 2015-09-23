@@ -194,6 +194,23 @@ def test_mapping_for_language():
             'type': 'boolean',
             'index': 'not_analyzed',
             'include_in_all': False
+        },
+        'es_public_categories': {
+            'include_in_all': False,
+            'index': 'not_analyzed',
+            'type': 'string'
+        },
+        'es_suggestion': {
+            'context': {
+                'es_public_categories': {
+                    'path': 'es_public_categories',
+                    'type': 'category'
+                }
+            },
+            'index_analyzer': 'standard',
+            'payloads': True,
+            'search_analyzer': 'standard',
+            'type': 'completion'
         }
     }
 
@@ -206,6 +223,23 @@ def test_mapping_for_language():
             'type': 'boolean',
             'index': 'not_analyzed',
             'include_in_all': False
+        },
+        'es_public_categories': {
+            'include_in_all': False,
+            'index': 'not_analyzed',
+            'type': 'string'
+        },
+        'es_suggestion': {
+            'context': {
+                'es_public_categories': {
+                    'path': 'es_public_categories',
+                    'type': 'category'
+                }
+            },
+            'index_analyzer': 'standard',
+            'payloads': True,
+            'search_analyzer': 'standard',
+            'type': 'completion'
         }
     }
 
@@ -230,6 +264,23 @@ def test_mapping_for_language():
             'type': 'boolean',
             'index': 'not_analyzed',
             'include_in_all': False
+        },
+        'es_public_categories': {
+            'include_in_all': False,
+            'index': 'not_analyzed',
+            'type': 'string'
+        },
+        'es_suggestion': {
+            'context': {
+                'es_public_categories': {
+                    'path': 'es_public_categories',
+                    'type': 'category'
+                }
+            },
+            'index_analyzer': 'standard',
+            'payloads': True,
+            'search_analyzer': 'standard',
+            'type': 'completion'
         }
     }
 
@@ -252,6 +303,23 @@ def test_mapping_for_language():
             'type': 'boolean',
             'index': 'not_analyzed',
             'include_in_all': False
+        },
+        'es_public_categories': {
+            'include_in_all': False,
+            'index': 'not_analyzed',
+            'type': 'string'
+        },
+        'es_suggestion': {
+            'context': {
+                'es_public_categories': {
+                    'path': 'es_public_categories',
+                    'type': 'category'
+                }
+            },
+            'index_analyzer': 'standard',
+            'payloads': True,
+            'search_analyzer': 'standard',
+            'type': 'completion'
         }
     }
 
@@ -287,6 +355,10 @@ def test_orm_event_translator_properties():
         def es_public(self):
             return self.public
 
+        @property
+        def es_suggest(self):
+            return self.title
+
     mappings = TypeMappingRegistry()
     mappings.register_type('page', Page.es_properties)
 
@@ -316,7 +388,12 @@ def test_orm_event_translator_properties():
                 'date': '2015-09-11T00:00:00',
                 'likes': 1000,
                 'published': True,
-                'es_public': True
+                'es_public': True,
+                'es_public_categories': ['public'],
+                'es_suggestion': {
+                    'input': ['About'],
+                    'output': 'About'
+                }
             }
         }
         assert translator.queue.empty()
@@ -355,6 +432,10 @@ def test_orm_event_queue_overflow(capturelog):
 
         def __init__(self, id):
             self.id = id
+
+        @property
+        def es_suggestion(self):
+            return self.id
 
         es_id = 'id'
         es_type_name = 'tweet'

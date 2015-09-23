@@ -111,6 +111,15 @@ class Searchable(object):
         should be skipped. """
         return False
 
+    @property
+    def es_suggestion(self):
+        """ Returns suggest-as-you-type value of the document.
+        The field used for this property should also be indexed, or the
+        suggestion will lead to nowhere.
+
+        """
+        return self.title
+
 
 class ORMSearchable(Searchable):
     """ Extends the default :class:`Searchable` class with sensible defaults

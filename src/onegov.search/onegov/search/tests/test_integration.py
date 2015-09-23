@@ -50,6 +50,10 @@ def test_search_query(es_url, postgres_dsn):
         }
 
         @property
+        def es_suggestion(self):
+            return self.title
+
+        @property
         def es_public(self):
             return self.public
 
@@ -153,6 +157,10 @@ def test_orm_integration(es_url, postgres_dsn):
         id = Column(Integer, primary_key=True)
         title = Column(Text, nullable=False)
         body = Column(Text, nullable=True)
+
+        @property
+        def es_suggestion(self):
+            return self.title
 
         es_public = True
         es_language = 'en'
@@ -265,6 +273,10 @@ def test_alternate_id_property(es_url, postgres_dsn):
         name = Column(Text, primary_key=True)
         fullname = Column(Text, nullable=False)
 
+        @property
+        def es_suggestion(self):
+            return self.name
+
         es_id = 'name'
         es_properties = {
             'fullname': {'type': 'string'},
@@ -326,6 +338,10 @@ def test_orm_polymorphic(es_url, postgres_dsn):
         }
         es_language = 'en'
         es_public = True
+
+        @property
+        def es_suggestion(self):
+            return self.content
 
         id = Column(Integer, primary_key=True)
         content = Column(Text, nullable=True)
@@ -391,3 +407,90 @@ def test_orm_polymorphic(es_url, postgres_dsn):
     session.query(Page).delete()
     update()
     assert app.es_search().count() == 0
+
+
+def test_suggestions(es_url, postgres_dsn):
+    config = setup()
+
+    class App(Framework, ElasticsearchApp):
+        testing_config = config
+
+    Base = declarative_base()
+
+    class Document(Base, ORMSearchable):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=False)
+        public = Column(Boolean, nullable=False)
+        language = Column(Text, nullable=False)
+
+        es_properties = {
+            'title': {'type': 'localized'}
+        }
+
+        @property
+        def es_public(self):
+            return self.public
+
+        @property
+        def es_language(self):
+            return self.language
+
+    scan_morepath_modules(App, config)
+    config.commit()
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        elasticsearch_hosts=[es_url]
+    )
+
+    app.namespace = 'documents'
+    app.set_application_id('documents/home')
+
+    session = app.session()
+    session.add(Document(
+        title="Public Document",
+        language='en',
+        public=True
+    ))
+    session.add(Document(
+        title="Private Document",
+        language='en',
+        public=False
+    ))
+    session.add(Document(
+        title=u"Öffentliches Dokument",
+        language='de',
+        public=True
+    ))
+    session.add(Document(
+        title=u"Privates Dokument",
+        language='de',
+        public=False
+    ))
+    transaction.commit()
+    app.es_indexer.process()
+    app.es_client.indices.refresh(index='_all')
+
+    assert set(app.es_suggestions(query='p')) == {"Public Document"}
+    assert set(app.es_suggestions(query='p', include_private=True)) == {
+        "Public Document",
+        "Private Document",
+        "Privates Dokument"
+    }
+    assert set(app.es_suggestions(query='ö', languages=['de'])) == {
+        u"Öffentliches Dokument",
+    }
+
+    assert set(app.es_suggestions(
+        query='ö', languages=['de'], include_private=True)) == {
+        u"Öffentliches Dokument",
+    }
+
+    assert set(app.es_suggestions(
+        query='p', languages=['de'], include_private=True)) == {
+        "Privates Dokument",
+    }
