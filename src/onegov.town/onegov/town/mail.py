@@ -1,5 +1,4 @@
 from onegov.core.templates import render_template
-from onegov.town import log
 from onegov.town.layout import DefaultMailLayout
 
 
@@ -29,7 +28,5 @@ def send_html_mail(request, template, content, **kwargs):
 
     kwargs['content'] = render_template(template, request, content)
 
-    try:
-        request.app.send_email(**kwargs)
-    except ConnectionRefusedError:
-        log.exception("Failed to send e-mail - no connection to server")
+    # the email is queued here, not actually sent!
+    request.app.send_email(**kwargs)
