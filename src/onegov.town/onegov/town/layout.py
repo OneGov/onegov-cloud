@@ -155,8 +155,13 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def search_url(self):
-        """ Returns the url to the main page. """
+        """ Returns the url to the search page. """
         return self.request.link(Search(self.request, None, None))
+
+    @cached_property
+    def suggestions_url(self):
+        """ Returns the url to the suggestions json view. """
+        return self.request.link(Search(self.request, None, None), 'suggest')
 
     @cached_property
     def open_tickets_url(self):

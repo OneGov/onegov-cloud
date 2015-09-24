@@ -47,17 +47,21 @@ class Search(Pagination):
 
         return search.execute()
 
+    def feeling_lucky(self):
+        if self.batch:
+            first_entry = self.batch[0].load()
+
+            # XXX the default view to the event should be doing the redirect
+            if first_entry.__tablename__ == 'events':
+                return self.request.link(first_entry, 'latest')
+            else:
+                return self.request.link(first_entry)
+
     @cached_property
     def subset_count(self):
         return self.cached_subset.hits.total
 
     def suggestions(self):
-        suggestions = self.request.app.es_suggestions_by_request(
+        return tuple(self.request.app.es_suggestions_by_request(
             self.request, self.query
-        )
-
-        for suggestion in suggestions:
-            yield (
-                suggestion,
-                self.request.link(Search(self.request, suggestion, 0))
-            )
+        ))

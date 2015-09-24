@@ -54,14 +54,20 @@
               <div class="clearfix"></div>
             </tal:block>
           </tal:block>
-          <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing">
+          <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
             <div class="row collapse">
                 <div class="columns small-10">
-                    <input type="text" name="q" placeholder="Search" i18n:attributes="placeholder" />
+                    <input data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" />
                 </div>
                 <div class="columns small-2">
-                    <input class="button postfix" type="submit" alt="Search" value="&#xf002" i18n:attributes="alt" />
+                    <button type="submit" class="button postfix" alt="Search" i18n:attributes="alt">
+                      <i class="fa fa-search" data-typeahead-spinner></i>
+                    </button>
                 </div>
+            </div>
+            <div class="row typeahead">
+              <div class="columns small-12" data-typeahead-container>
+              </div>
             </div>
           </form>
         </div>

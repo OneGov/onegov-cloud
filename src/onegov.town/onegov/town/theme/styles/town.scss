@@ -74,6 +74,7 @@ body {
     // the header is fixed and the logo in it tries to fill it out
     // therefore an svg logo should be used!
     height: 7rem;
+
     img {
         height: 100%;
     }
@@ -1546,8 +1547,14 @@ tr.ticket:hover {
     Search box
 */
 .searchbox {
-    input[type='submit'] {
-        font-family: 'FontAwesome';
+    margin-bottom: 1em;
+
+    input {
+        margin-bottom: 0;
+    }
+
+    button {
+        margin-bottom: 0;
         padding: 0;
     }
 }
@@ -1570,5 +1577,66 @@ tr.ticket:hover {
     ul {
         list-style-type: none;
         margin-left: 0;
+    }
+}
+
+/*
+    Search result typeahead
+*/
+.typeahead {
+    position: relative;
+
+    ul {
+        background-color: $white;
+        border-width: 0 1px 1px;
+        box-shadow: 0 0 5px $jumbo;
+        left: 1em;
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        right: 1em;
+        z-index: 1;
+    }
+
+    a {
+        color: $input-font-color;
+        display: block;
+        font-size: $input-font-size;
+    }
+
+    li {
+        padding: 0 5px;
+
+        // highlight links with the active class
+        &.active {
+            background-color: $topbar-bg-color;
+
+            a {
+                color: $primary-color;
+                font-weight: bold;
+            }
+        }
+
+        // highlight links when hovering
+        &:hover {
+            background-color: $topbar-bg-color !important;
+
+            a {
+                color: $primary-color !important;
+                font-weight: bold !important;
+            }
+        }
+    }
+
+    // do not highlight links with the active class when hovering (so we
+    // get a different highlight when hovering)
+    &:hover li.active {
+        background-color: $white;
+
+        a {
+            color: $body-font-color;
+            font-weight: normal;
+        }
     }
 }

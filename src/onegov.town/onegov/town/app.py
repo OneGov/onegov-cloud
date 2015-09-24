@@ -136,6 +136,12 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             output='bundles/dropzone.bundle.js'
         )
 
+        typeahead = Bundle(
+            'js/typeahead.jsx',
+            filters='jsx',
+            output='bundles/typeahead.bundle.js'
+        )
+
         # do NOT minify the redactor, or the copyright notice goes away, which
         # is something we are not allowed to do per our license
         # ->
@@ -179,6 +185,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'js/react.js',
             'js/form_dependencies.js',
             confirm,
+            typeahead,
             'js/jquery.datetimepicker.js',
             'js/common.js',
             filters='rjsmin',

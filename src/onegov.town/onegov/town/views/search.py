@@ -1,3 +1,5 @@
+import morepath
+
 from onegov.core.security import Public
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
@@ -7,6 +9,13 @@ from onegov.town.layout import DefaultLayout
 
 @TownApp.html(model=Search, template='search.pt', permission=Public)
 def search(self, request):
+
+    if 'lucky' in request.GET:
+        url = self.feeling_lucky()
+
+        if url:
+            return morepath.redirect(url)
+
     layout = DefaultLayout(self, request)
     layout.breadcrumbs.append(Link(_("Search"), '#'))
 
