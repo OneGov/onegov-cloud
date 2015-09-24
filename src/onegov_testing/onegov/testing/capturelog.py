@@ -50,25 +50,15 @@ class CaptureLogPlugin(object):
         root_logger.addHandler(item.capturelog_handler)
         root_logger.setLevel(logging.NOTSET)
 
-    def pytest_runtest_makereport(self, __multicall__, item, call):
-        """Add captured log messages for this report."""
+    def pytest_runtest_teardown(self, item, nextitem):
+        # Detach the handler from the root logger to ensure no
+        # further access to the handler.
+        root_logger = logging.getLogger()
+        root_logger.removeHandler(item.capturelog_handler)
 
-        report = __multicall__.execute()
-
-        # This fn called after setup, call and teardown.  Only
-        # interested in just after test call has finished.
-        if call.when == 'call':
-
-            # Detach the handler from the root logger to ensure no
-            # further access to the handler.
-            root_logger = logging.getLogger()
-            root_logger.removeHandler(item.capturelog_handler)
-
-            # Release the handler resources.
-            item.capturelog_handler.close()
-            del item.capturelog_handler
-
-        return report
+        # Release the handler resources.
+        item.capturelog_handler.close()
+        del item.capturelog_handler
 
 
 class CaptureLogHandler(logging.StreamHandler):
