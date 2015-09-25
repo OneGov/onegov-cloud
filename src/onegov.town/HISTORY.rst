@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a fulltext search feature with fast results and autocomplete.
+  [href]
+
 - Adds URLs to ical exports.
   [msom]
 
