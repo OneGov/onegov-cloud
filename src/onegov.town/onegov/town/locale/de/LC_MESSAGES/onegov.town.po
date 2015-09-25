@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-18 16:15+0200\n"
+"POT-Creation-Date: 2015-09-25 15:43+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -740,6 +740,9 @@ msgstr "Offen"
 msgid "Pending"
 msgstr "In Bearbeitung"
 
+msgid "Search"
+msgstr "Suche"
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
@@ -917,8 +920,11 @@ msgstr ""
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 
-msgid "Search"
-msgstr "Suche"
+msgid ""
+"Searching is currently unavailable due to technical difficulties. Please "
+"excuse the inconvenience and try again later."
+msgstr "Die Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht verfügbar. "
+"Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später wieder."
 
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden"
@@ -1146,11 +1152,14 @@ msgstr "${count} Einteilungen wurden erfolgreich entfernt"
 
 #, python-format
 msgid "Search through ${count} indexed documents"
-msgstr "Durchsuchen Sie ${count} indexierte Dokumente"
+msgstr "Durchsuchen Sie ${count} indizierte Dokumente"
 
 #, python-format
 msgid "${count} Results"
 msgstr "${count} Resultate"
+
+msgid "Search Unavailable"
+msgstr "Suche Nicht Verfügbar"
 
 msgid "Resources"
 msgstr "Reservationen"
@@ -1196,9 +1205,3 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
-
-#~ msgid "Search through ${model.available_documents} indexed documents"
-#~ msgstr "Durchsuchen Sie ${model.available_documents} indexierte Dokumente"
-
-#~ msgid "${model.batch.hits.total} Results"
-#~ msgstr "${model.batch.hits.total} Resultate"

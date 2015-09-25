@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'click',
         'cssmin',
+        'elasticsearch',
         'isodate',
         'rjsmin',
         'lazy-object-proxy',

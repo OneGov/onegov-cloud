@@ -3,7 +3,14 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <div class="row">
+        <div class="row" tal:condition="not:connection">
+            <div class="columns small-12 medium-8" i18n:translate>
+                Searching is currently unavailable due to technical difficulties.
+                Please excuse the inconvenience and try again later.
+            </div>
+        </div>
+
+        <div class="row" tal:condition="connection">
             <div class="columns small-12 medium-8">
                 <form class="searchbox" action="${request.link(model)}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${request.url}">
                     <div class="row collapse">
@@ -25,7 +32,7 @@
             </div>
         </div>
 
-        <tal:block condition="model.query">
+        <tal:block condition="connection and model.query">
             <h2 i18n:translate>${resultslabel}</h2>
             <div class="row">
                 <div class="columns medium-8 small-12">
