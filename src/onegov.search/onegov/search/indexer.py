@@ -1,7 +1,6 @@
 import platform
 
 from copy import deepcopy
-from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import ConnectionError
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
