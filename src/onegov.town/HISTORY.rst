@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.0 (2015-09-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a fulltext search feature with fast results and autocomplete.
   [href]
 
