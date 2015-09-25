@@ -1573,10 +1573,18 @@ tr.ticket:hover {
 /*
     Search results
 */
-.search-results {
+ul.search-results {
+    a {
+        font-weight: bold;
+    }
+
     ul {
         list-style-type: none;
         margin-left: 0;
+    }
+
+    > li {
+        margin-bottom: 1em;
     }
 }
 

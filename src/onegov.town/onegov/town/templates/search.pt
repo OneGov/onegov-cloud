@@ -31,8 +31,8 @@
                 <div class="columns medium-8 small-12">
                     <p tal:condition="not: model.batch.hits.total" i18n:translate="">Your search returned no results.</p>
 
-                    <ul tal:repeat="result model.batch.load()" class="search-results">
-                        <li class="search-result-${result.es_type_name}">
+                    <ul class="search-results">
+                        <li class="search-result-${result.es_type_name}" tal:repeat="result model.batch.load()">
                             <tal:block switch="result.__tablename__">
 
                                 <tal:block case="'tickets'">
