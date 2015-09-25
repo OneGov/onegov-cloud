@@ -6,7 +6,7 @@ name = 'onegov.people'
 description = (
     'People for OneGov.'
 )
-version = '0.0.5'
+version = '0.0.6'
 
 
 def get_long_description():
