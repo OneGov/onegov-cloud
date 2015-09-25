@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.5 (2015-09-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Stops accidentally messing with the encoding provided by the request.
   [href]
 
