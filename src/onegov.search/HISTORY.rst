@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.5 (2015-09-25)
+~~~~~~~~~~~~~~~~~~~
+
 - The certificates of elasticsearch hosts are now verified by default.
   [href]
 
