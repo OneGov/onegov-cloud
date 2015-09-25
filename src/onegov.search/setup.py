@@ -34,6 +34,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'certifi',
         'elasticsearch',
         'elasticsearch-dsl',
         'onegov.core>=0.4.0',

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- The certificates of elasticsearch hosts are now verified by default.
+  [href]
+
 - Adds completion suggestions for search-as-you-type.
   [href]
 

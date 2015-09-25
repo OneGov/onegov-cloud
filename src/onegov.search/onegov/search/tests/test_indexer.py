@@ -17,15 +17,12 @@ from onegov.search.indexer import (
 )
 
 
-def test_index_manager_assertions(es_url):
+def test_index_manager_assertions(es_client):
 
     with pytest.raises(AssertionError):
-        IndexManager(hostname='', es_url=es_url)
+        IndexManager(hostname='', es_client=es_client)
 
-    with pytest.raises(AssertionError):
-        IndexManager(hostname='example.org', es_url='')
-
-    ixmgr = IndexManager(hostname='test.example.org', es_url=es_url)
+    ixmgr = IndexManager(hostname='test.example.org', es_client=es_client)
 
     page = TypeMapping('page', {
         'title': {'type': 'string'}
@@ -47,17 +44,14 @@ def test_index_manager_assertions(es_url):
         ixmgr.ensure_index(schema='asdf', language='de', mapping='')
 
 
-def test_index_manager_connection(es_url, es_client):
+def test_index_manager_connection(es_client):
     ixmgr = IndexManager(hostname='foobar', es_client=es_client)
     assert ixmgr.es_client.ping()
 
-    ixmgr = IndexManager(hostname='foobar', es_url=es_url)
-    assert ixmgr.es_client.ping()
 
-
-def test_index_manager_separation(es_url):
-    foo = IndexManager(hostname='foo', es_url=es_url)
-    bar = IndexManager(hostname='bar', es_url=es_url)
+def test_index_manager_separation(es_client):
+    foo = IndexManager(hostname='foo', es_client=es_client)
+    bar = IndexManager(hostname='bar', es_client=es_client)
 
     page = TypeMapping('page', {
         'title': {'type': 'string'}
@@ -72,8 +66,8 @@ def test_index_manager_separation(es_url):
     assert bar.query_aliases() == {'bar-bar-en-page'}
 
 
-def test_index_creation(es_url):
-    ixmgr = IndexManager(hostname='example.org', es_url=es_url)
+def test_index_creation(es_client):
+    ixmgr = IndexManager(hostname='example.org', es_client=es_client)
 
     page = TypeMapping('page', {
         'title': {'type': 'string'}
@@ -124,8 +118,8 @@ def test_index_creation(es_url):
     assert ixmgr.remove_expired_indices(current_mappings=[new_page]) == 1
 
 
-def test_parse_index_name(es_url):
-    ixmgr = IndexManager('foo', es_url)
+def test_parse_index_name(es_client):
+    ixmgr = IndexManager('foo', es_client)
     assert ixmgr.parse_index_name('hostname_org-my_schema-de-posts') == {
         'hostname': 'hostname_org',
         'schema': 'my_schema',
@@ -476,14 +470,15 @@ def test_type_mapping_registry():
         registry.register_type('page', {})
 
 
-def test_indexer_process(es_url, es_client):
+def test_indexer_process(es_client):
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'title': {'type': 'localized'},
     })
 
     index = "foo_bar-my_schema-en-page"
-    indexer = Indexer(mappings, Queue(), hostname='foo.bar', es_url=es_url)
+    indexer = Indexer(
+        mappings, Queue(), hostname='foo.bar', es_client=es_client)
 
     indexer.queue.put({
         'action': 'index',
@@ -537,7 +532,7 @@ def test_indexer_process(es_url, es_client):
     assert search['hits']['total'] == 1
 
 
-def test_extra_analyzers(es_url, es_client):
+def test_extra_analyzers(es_client):
 
     page = TypeMapping('page', {
         'title': {'type': 'string'}
@@ -569,13 +564,14 @@ def test_extra_analyzers(es_url, es_client):
     ]
 
 
-def test_elasticsearch_outage(es_url, es_client):
+def test_elasticsearch_outage(es_client, es_url):
     mappings = TypeMappingRegistry()
     mappings.register_type('page', {
         'title': {'type': 'localized'},
     })
 
-    indexer = Indexer(mappings, Queue(), hostname='foo.bar', es_url=es_url)
+    indexer = Indexer(
+        mappings, Queue(), hostname='foo.bar', es_client=es_client)
 
     indexer.queue.put({
         'action': 'index',

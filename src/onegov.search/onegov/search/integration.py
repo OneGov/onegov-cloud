@@ -1,3 +1,4 @@
+import certifi
 import morepath
 
 from elasticsearch import Elasticsearch
@@ -44,6 +45,19 @@ class ElasticsearchApp(morepath.App):
 
             At least one host in the list of servers must be up at startup.
 
+        :elasticsearch_may_queue_size:
+            The maximum queue size reserved for documents to be indexed. This
+            queue is filling up if the elasticsearch cluster cannot be reached.
+
+            Once the queue is full, warnings are emitted.
+
+            Defaults to 10'000
+
+        :elasticsearch_verify_certs:
+            If true, the elasticsearch client verifies the certificates of
+            the ssl connection. Defaults to true. Do not disable, unless you
+            are in testing!
+
         """
 
         hosts = cfg.get('elasticsearch_hosts', (
@@ -52,8 +66,13 @@ class ElasticsearchApp(morepath.App):
         ))
 
         max_queue_size = int(cfg.get('elasticsarch_max_queue_size', '10000'))
+        verify_certs = cfg.get('elasticsearch_verify_certs', True)
 
-        self.es_client = Elasticsearch(hosts)
+        if verify_certs:
+            self.es_client = Elasticsearch(
+                hosts, verify_certs=True, ca_certs=certifi.where())
+        else:
+            self.es_client = Elasticsearch(hosts)
 
         if self.has_database_connection:
             self.es_mappings = TypeMappingRegistry()

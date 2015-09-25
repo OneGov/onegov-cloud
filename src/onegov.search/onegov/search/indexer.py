@@ -79,9 +79,8 @@ class Indexer(object):
 
     """
 
-    def __init__(self, mappings, queue,
-                 es_url=None, es_client=None, hostname=None):
-        self.es_client = es_client or Elasticsearch(es_url)
+    def __init__(self, mappings, queue, es_client, hostname=None):
+        self.es_client = es_client
         self.queue = queue
         self.hostname = hostname or platform.node()
         self.ixmgr = IndexManager(self.hostname, es_client=self.es_client)
@@ -303,11 +302,11 @@ class IndexManager(object):
 
     """
 
-    def __init__(self, hostname, es_url=None, es_client=None):
-        assert hostname and (es_url or es_client)
+    def __init__(self, hostname, es_client):
+        assert hostname and es_client
 
         self.hostname = hostname
-        self.es_client = es_client or Elasticsearch(es_url)
+        self.es_client = es_client
         self.created_indices = set()
 
     @property
