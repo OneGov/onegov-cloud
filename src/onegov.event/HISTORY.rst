@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.0.6 (2015-09-25)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds onegov.search integration.
   [href]
