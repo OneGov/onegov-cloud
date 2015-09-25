@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.10 (2015-09-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Load created date undeferred by default.
   [href]
 

@@ -6,7 +6,7 @@ name = 'onegov.ticket'
 description = (
     'A simple ticketing system for OneGov.'
 )
-version = '0.0.9'
+version = '0.0.10'
 
 
 def get_long_description():
