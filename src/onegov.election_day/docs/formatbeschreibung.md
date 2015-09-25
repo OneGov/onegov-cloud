@@ -65,16 +65,16 @@ Die Anzahl ungültiger Stimmzettel.
 
 Resultate des Kanton Zug: [https://github.com/OneGov/onegov.election_day/blob/master/docs/steuerprivilegien.csv]()
 
-| Bezirk | BFS-Nummer | Gemeinde    | Ja Stimmen | Nein Stimmen | Stimmberechtigte | Eingelegte Stimmzettel | 
-|--------|------------|-------------|------------|--------------|------------------|------------------------| 
-|        | 1711       | Zug         | 3515       | 6458         | 16914            | 10034                  | 
-|        | 1706       | Oberägeri   | 575        | 1422         | 3639             | 2000                   | 
-|        | 1709       | Unterägeri  | 901        | 1930         | 5325             | 2848                   | 
-|        | 1704       | Menzingen   | 435        | 1126         | 2960             | 1570                   | 
-|        | 1701       | Baar        | 2454       | 4967         | 13982            | 7481                   | 
-|        | 1702       | Cham        | 1741       | 3525         | 9768             | 5290                   | 
-|        | 1703       | Hünenberg   | 1063       | 2375         | 5925             | 3459                   | 
-|        | 1708       | Steinhausen | 1127       | 2178         | 5993             | 3324                   | 
-|        | 1707       | Risch       | 1008       | 2151         | 6115             | 3182                   | 
-|        | 1710       | Walchwil    | 369        | 985          | 2057             | 1358                   | 
-|        | 1705       | Neuheim     | 193        | 529          | 1299             | 724                    | 
+| Bezirk | BFS-Nummer | Gemeinde    | Ja Stimmen | Nein Stimmen | Stimmberechtigte | Leere Stimmzettel | Ungültige Stimmzettel | 
+|--------|------------|-------------|------------|--------------|------------------|-------------------|-----------------------| 
+|        | 1711       | Zug         | 3515       | 6458         | 16914            | 123               | 123                   | 
+|        | 1706       | Oberägeri   | 575        | 1422         | 3639             | 123               | 123                   | 
+|        | 1709       | Unterägeri  | 901        | 1930         | 5325             | 123               | 123                   | 
+|        | 1704       | Menzingen   | 435        | 1126         | 2960             | 123               | 123                   | 
+|        | 1701       | Baar        | 2454       | 4967         | 13982            | 123               | 123                   | 
+|        | 1702       | Cham        | 1741       | 3525         | 9768             | 123               | 123                   | 
+|        | 1703       | Hünenberg   | 1063       | 2375         | 5925             | 123               | 123                   | 
+|        | 1708       | Steinhausen | 1127       | 2178         | 5993             | 123               | 123                   | 
+|        | 1707       | Risch       | 1008       | 2151         | 6115             | 123               | 123                   | 
+|        | 1710       | Walchwil    | 369        | 985          | 2057             | 123               | 123                   | 
+|        | 1705       | Neuheim     | 193        | 529          | 1299             | 123               | 123                   | 
