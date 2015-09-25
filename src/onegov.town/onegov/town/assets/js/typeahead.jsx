@@ -105,11 +105,10 @@ var TypeAhead = function(form) {
     var update_suggestions = _.debounce(function(text) {
         if (text.length === 0) {
             update_typeahead([]);
+            spinner.attr('class', 'fa fa-search');
             return;
         }
 
-        spinner.attr('class', 'fa fa-refresh fa-spin');
-        window.spinner = spinner;
         var request = $.get(source + '?q=' + text);
 
         request.always(function() {
@@ -163,6 +162,7 @@ var TypeAhead = function(form) {
     $(subject).on('keyup', function(event) {
         // actual characters or backspace
         if (event.keyCode >= 48 || event.keyCode == 8) {
+            spinner.attr('class', 'fa fa-refresh fa-spin');
             update_suggestions($(this).val());
             event.preventDefault();
         }
