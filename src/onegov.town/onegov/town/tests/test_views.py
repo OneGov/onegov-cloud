@@ -14,7 +14,11 @@ from onegov.form import FormCollection, FormSubmission
 from onegov.libres import ResourceCollection
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
-from webtest import TestApp, TestResponse, TestRequest
+from webtest import (
+    TestApp as BaseApp,
+    TestResponse as BaseResponse,
+    TestRequest as BaseRequest
+)
 from webtest import Upload
 
 
@@ -32,15 +36,15 @@ class SkipFirstForm(object):
             return super(SkipFirstForm, self).form
 
 
-class Response(SkipFirstForm, TestResponse):
+class Response(SkipFirstForm, BaseResponse):
     pass
 
 
-class Request(SkipFirstForm, TestRequest):
+class Request(SkipFirstForm, BaseRequest):
     ResponseClass = Response
 
 
-class Client(SkipFirstForm, TestApp):
+class Client(SkipFirstForm, BaseApp):
     RequestClass = Request
 
 
