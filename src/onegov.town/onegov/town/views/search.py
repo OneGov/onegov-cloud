@@ -1,6 +1,6 @@
 import morepath
 
-from elasticsearch import ConnectionError
+from elasticsearch import TransportError
 from onegov.core.security import Public
 from onegov.town import _, log, TownApp
 from onegov.town.elements import Link
@@ -18,7 +18,7 @@ def search(self, request):
     try:
         request.app.es_client.ping()
         log.warn("Elasticsearch cluster is offline")
-    except ConnectionError:
+    except TransportError:
         return {
             'title': _("Search Unavailable"),
             'layout': layout,
@@ -50,5 +50,5 @@ def search(self, request):
 def suggestions(self, request):
     try:
         return tuple(self.suggestions())
-    except ConnectionError:
+    except TransportError:
         raise exc.HTTPNotFound()
