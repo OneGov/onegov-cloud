@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.11 (2015-09-28)
+~~~~~~~~~~~~~~~~~~~
+
 - FRM-* suggestions now work with and without dash.
   [href]
 
