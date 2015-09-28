@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Add a switch to disable elasticsearch integration.
+  [href]
+
 0.0.5 (2015-09-25)
 ~~~~~~~~~~~~~~~~~~~
 

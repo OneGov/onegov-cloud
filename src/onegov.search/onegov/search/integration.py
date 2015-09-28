@@ -34,6 +34,9 @@ class ElasticsearchApp(morepath.App):
 
         The following configuration options are accepted:
 
+        :enable_elasticsearch:
+            If True, elasticsearch is enabled (defaults to True).
+
         :elasticsearch_hosts:
             A list of elasticsearch clusters, including username, password,
             protocol and port.
@@ -59,6 +62,10 @@ class ElasticsearchApp(morepath.App):
             are in testing!
 
         """
+
+        if not cfg.get('enable_elasticsearch', True):
+            self.es_client = None
+            return
 
         hosts = cfg.get('elasticsearch_hosts', (
             'http://localhost:9200',
@@ -191,6 +198,9 @@ class ElasticsearchApp(morepath.App):
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
 def process_indexer_tween_factory(app, handler):
     def process_indexer_tween(request):
+
+        if not request.app.es_client:
+            return handler(request)
 
         result = handler(request)
         request.app.es_indexer.process()
