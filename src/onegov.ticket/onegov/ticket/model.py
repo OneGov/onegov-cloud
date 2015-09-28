@@ -88,7 +88,10 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     @property
     def es_suggestion(self):
-        return self.number
+        return [
+            self.number,
+            self.number.replace('-', '')
+        ]
 
     @property
     def es_language(self):
