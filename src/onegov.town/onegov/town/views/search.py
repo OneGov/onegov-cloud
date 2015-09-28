@@ -2,7 +2,7 @@ import morepath
 
 from elasticsearch import ConnectionError
 from onegov.core.security import Public
-from onegov.town import _, TownApp
+from onegov.town import _, log, TownApp
 from onegov.town.elements import Link
 from onegov.town.models import Search
 from onegov.town.layout import DefaultLayout
@@ -17,6 +17,7 @@ def search(self, request):
 
     try:
         request.app.es_client.ping()
+        log.warn("Elasticsearch cluster is offline")
     except ConnectionError:
         return {
             'title': _("Search Unavailable"),
