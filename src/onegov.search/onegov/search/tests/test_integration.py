@@ -437,6 +437,27 @@ def test_suggestions(es_url, postgres_dsn):
         def es_language(self):
             return self.language
 
+    class Person(Base, ORMSearchable):
+        __tablename__ = 'people'
+        id = Column(Integer, primary_key=True)
+        first_name = Column(Text, nullable=False)
+        last_name = Column(Text, nullable=False)
+
+        @property
+        def title(self):
+            return ' '.join((self.first_name, self.last_name))
+
+        es_properties = {'title': {'type': 'localized'}}
+        es_public = True
+        es_language = 'en'
+
+        @property
+        def es_suggestion(self):
+            return [
+                ' '.join((self.first_name, self.last_name)),
+                ' '.join((self.last_name, self.first_name))
+            ]
+
     scan_morepath_modules(App, config)
     config.commit()
 
@@ -471,6 +492,10 @@ def test_suggestions(es_url, postgres_dsn):
         language='de',
         public=False
     ))
+    session.add(Person(
+        first_name='Jeff',
+        last_name='Winger'
+    ))
     transaction.commit()
     app.es_indexer.process()
     app.es_client.indices.refresh(index='_all')
@@ -493,4 +518,12 @@ def test_suggestions(es_url, postgres_dsn):
     assert set(app.es_suggestions(
         query='p', languages=['de'], include_private=True)) == {
         "Privates Dokument",
+    }
+
+    assert set(app.es_suggestions(query='j', languages=['en'])) == {
+        'Jeff Winger'
+    }
+
+    assert set(app.es_suggestions(query='w', languages=['en'])) == {
+        'Jeff Winger'
     }

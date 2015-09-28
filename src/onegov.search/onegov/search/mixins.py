@@ -117,6 +117,12 @@ class Searchable(object):
         The field used for this property should also be indexed, or the
         suggestion will lead to nowhere.
 
+        If a single string is returned, the completion input equals the
+        completion output. (My Title -> My Title)
+
+        If an array of strings is returned, all values are possible inputs and
+        the first value is the output. (My Title/Title My -> My Title)
+
         """
         return self.title
 

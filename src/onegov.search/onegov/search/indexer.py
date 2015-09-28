@@ -556,10 +556,18 @@ class ORMEventTranslator(object):
         else:
             translation['properties']['es_public_categories'] = ['private']
 
-        translation['properties']['es_suggestion'] = {
-            'input': [obj.es_suggestion],
-            'output': obj.es_suggestion,
-        }
+        suggestion = obj.es_suggestion
+
+        if is_non_string_iterable(suggestion):
+            translation['properties']['es_suggestion'] = {
+                'input': suggestion,
+                'output': suggestion[0]
+            }
+        else:
+            translation['properties']['es_suggestion'] = {
+                'input': [suggestion],
+                'output': suggestion,
+            }
 
         self.put(translation)
 
