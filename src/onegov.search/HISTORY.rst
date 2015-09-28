@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.6 (2015-09-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to define multiple suggestion inputs per document.
   [href]
 
