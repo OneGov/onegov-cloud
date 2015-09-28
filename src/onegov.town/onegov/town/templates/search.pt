@@ -12,7 +12,7 @@
 
         <div class="row" tal:condition="connection">
             <div class="columns small-12 medium-8">
-                <form class="searchbox" action="${request.link(model)}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${request.url}">
+                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${request.url}">
                     <div class="row collapse">
                         <label>${searchlabel}</label>
                         <div class="columns small-11">

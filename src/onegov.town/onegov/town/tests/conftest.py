@@ -1,5 +1,3 @@
-import more.transaction
-import more.webassets
 import onegov.core
 import onegov.town
 import pytest
@@ -9,6 +7,7 @@ import shutil
 
 from morepath import setup
 from onegov.core.crypto import hash_password
+from onegov.testing.utils import scan_morepath_modules
 from onegov.town.initial_content import (
     add_initial_content, builtin_form_definitions
 )
@@ -38,12 +37,25 @@ def form_definitions():
 @pytest.yield_fixture(scope='function')
 def town_app(postgres_dsn, filestorage, town_password, smtpserver,
              form_definitions):
+    yield new_town_app(
+        postgres_dsn, filestorage, town_password, smtpserver, form_definitions
+    )
+
+
+@pytest.yield_fixture(scope='function')
+def es_town_app(postgres_dsn, filestorage, town_password, smtpserver,
+                form_definitions, es_url):
+    yield new_town_app(
+        postgres_dsn, filestorage, town_password, smtpserver, form_definitions,
+        es_url
+    )
+
+
+def new_town_app(postgres_dsn, filestorage, town_password, smtpserver,
+                 form_definitions, es_url=None):
 
     config = setup()
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.scan(onegov.town)
+    scan_morepath_modules(onegov.town.TownApp, config)
     config.commit()
 
     app = onegov.town.TownApp()
@@ -56,7 +68,9 @@ def town_app(postgres_dsn, filestorage, town_password, smtpserver,
             'create': True
         },
         identity_secure=False,
-        disable_memcached=True
+        disable_memcached=True,
+        enable_elasticsearch=es_url and True or False,
+        elasticsearch_hosts=[es_url]
     )
     app.set_application_id(app.namespace + '/' + 'test')
     add_initial_content(
@@ -96,4 +110,4 @@ def town_app(postgres_dsn, filestorage, town_password, smtpserver,
 
     transaction.commit()
 
-    yield app
+    return app

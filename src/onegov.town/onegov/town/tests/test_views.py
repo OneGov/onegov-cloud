@@ -1946,3 +1946,65 @@ def test_delete_event(town_app):
     client.delete(delete_link)
 
     assert "Gemeindeversammlung" not in client.get('/veranstaltungen')
+
+
+def test_basic_search(es_town_app):
+    client = Client(es_town_app)
+
+    login_page = client.get('/login')
+    login_page.form['email'] = 'admin@example.org'
+    login_page.form['password'] = 'hunter2'
+    login_page.form.submit().follow()
+
+    add_news = client.get('/aktuelles').click('Nachricht')
+    add_news.form['title'] = "Now supporting fulltext search"
+    add_news.form['lead'] = "It is pretty awesome"
+    add_news.form['text'] = "Much <em>wow</em>"
+    news = add_news.form.submit().follow()
+
+    es_town_app.es_client.indices.refresh(index='_all')
+
+    root_page = client.get('/')
+    root_page.form['q'] = "fulltext"
+
+    search_page = root_page.form.submit()
+    assert "fulltext" in search_page
+    assert "Now supporting fulltext search" in search_page
+    assert "It is pretty awesome" in search_page
+
+    search_page.form['q'] = "wow"
+    search_page = search_page.form.submit()
+    assert "fulltext" in search_page
+    assert "Now supporting fulltext search" in search_page
+    assert "It is pretty awesome" in search_page
+
+    # make sure anonymous doesn't see hidden things in the search results
+    assert "fulltext" in Client(es_town_app).get('/suche?q=fulltext')
+    edit_news = news.click("Bearbeiten")
+    edit_news.form['is_hidden_from_public'] = True
+    edit_news.form.submit()
+
+    es_town_app.es_client.indices.refresh(index='_all')
+
+    assert "Now supporting" not in Client(es_town_app).get('/suche?q=fulltext')
+    assert "Now supporting" in client.get('/suche?q=fulltext')
+
+
+def test_basic_autocomplete(es_town_app):
+    client = Client(es_town_app)
+
+    login_page = client.get('/login')
+    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    people = client.get('/personen')
+
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'Flash'
+    new_person.form['last_name'] = 'Gordon'
+    new_person.form.submit()
+
+    es_town_app.es_client.indices.refresh(index='_all')
+    assert client.get('/suche/suggest?q=Fl').json == ["Flash Gordon"]
+    assert client.get('/suche/suggest?q=Go').json == []
