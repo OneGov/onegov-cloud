@@ -76,12 +76,18 @@
 <metal:search define-macro="form">
     <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" method="POST" enctype="multipart/form-data">
         <tal:block repeat="fieldset form.fieldsets">
-            <fieldset tal:condition="fieldset.is_visible">
+            <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
                 <legend>${fieldset.label}</legend>
-                <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                <div class="formfields">
+                    <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                    <div class="clearfix"></div>
+                </div>
             </fieldset>
             <tal:block condition="not:fieldset.is_visible">
-                <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                <div class="formfields">
+                    <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                    <div class="clearfix"></div>
+                </div>
             </tal:block>
         </tal:block>
         <tal:block condition="not: button_text|nothing">

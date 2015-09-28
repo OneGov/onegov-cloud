@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Limits the height of the people's list in the edit dialog.
+  [href]
+
 - Updates redactor to 10.2.4.
   [href]
 
