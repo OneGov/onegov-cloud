@@ -48,7 +48,7 @@ var TypeaheadList = React.createClass({
             return false;
         }
 
-        window.location = this.props.target + '?q=' + this.state.active;
+        window.location = this.props.target + '?q=' + encodeURIComponent(this.state.active);
         return true;
     },
     right: function() {
@@ -56,7 +56,7 @@ var TypeaheadList = React.createClass({
             return false;
         }
 
-        window.location = this.props.target + '?lucky&q=' + this.state.active;
+        window.location = this.props.target + '?lucky&q=' + encodeURIComponent(this.state.active);
         return true;
     },
     up: function() {
