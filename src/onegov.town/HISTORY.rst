@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.1 (2015-09-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Limits the height of the people's list in the edit dialog.
   [href]
 
