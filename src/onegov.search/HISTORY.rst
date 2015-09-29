@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.7 (2015-09-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Catch all significant errors during indexing.
   [href]
 
