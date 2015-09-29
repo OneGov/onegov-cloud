@@ -125,6 +125,8 @@ def test_ballot_answer_proposal_wins(session):
             group='x', yeas=0, nays=0, counted=True, municipality_id=1))
 
     assert vote.answer == 'proposal'
+    assert vote.yeas_percentage == 100.0
+    assert vote.nays_percentage == 0
 
 
 def test_ballot_answer_counter_proposal_wins(session):
@@ -153,6 +155,8 @@ def test_ballot_answer_counter_proposal_wins(session):
             group='x', yeas=0, nays=0, counted=True, municipality_id=1))
 
     assert vote.answer == 'counter-proposal'
+    assert vote.yeas_percentage == 100.0
+    assert vote.nays_percentage == 0
 
 
 def test_ballot_answer_counter_tie_breaker_decides(session):
@@ -172,20 +176,24 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=70, nays=30, counted=True, municipality_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=80, nays=20, counted=True, municipality_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
             group='x', yeas=100, nays=0, counted=True, municipality_id=1))
 
     assert vote.answer == 'proposal'
+    assert vote.yeas_percentage == 70.0
+    assert vote.nays_percentage == 30.0
 
     vote.tie_breaker.results[0].yeas = 0
     vote.tie_breaker.results[0].nays = 100
 
     assert vote.answer == 'counter-proposal'
+    assert vote.yeas_percentage == 80.0
+    assert vote.nays_percentage == 20.0
 
 
 def test_ballot_answer_nobody_wins(session):

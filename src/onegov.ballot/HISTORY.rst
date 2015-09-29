@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Yeas/Nays on the vote are no longer simple summations if a counter-proposal
+  is present. In this case, the absolute total is taken from the winning
+  proposition (say the yeas of the proposal or the counter-proposal, but
+  not a merge of the two.).
+  [href]
+
 0.0.4 (2015-08-31)
 ~~~~~~~~~~~~~~~~~~~
 

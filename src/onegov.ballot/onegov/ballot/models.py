@@ -63,7 +63,7 @@ class DerivedBallotsCount(object):
         return self.cast_ballots / self.elegible_voters * 100
 
 
-class Vote(Base, TimestampMixin, DerivedPercentage, DerivedBallotsCount):
+class Vote(Base, TimestampMixin, DerivedBallotsCount):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
@@ -162,6 +162,32 @@ class Vote(Base, TimestampMixin, DerivedPercentage, DerivedBallotsCount):
         # on a federal level)
         else:
             raise NotImplementedError
+
+    @property
+    def yeas_percentage(self):
+        """ The percentage of yeas (discounts empty/invalid ballots). """
+        answer = self.answer
+
+        if answer is None:
+            return 0.0
+
+        # if we have no counter proposal, the yeas are a simple sum
+        if not self.counter_proposal:
+            subject = self
+        else:
+            if self.answer in ('proposal', 'rejected'):
+                # if the proposal won or both proposal and counter-proposal
+                # were rejected, we show the yeas/nays of the proposal
+                subject = self.proposal
+            else:
+                subject = self.counter_proposal
+
+        return subject.yeas / (subject.yeas + subject.nays) * 100
+
+    @property
+    def nays_percentage(self):
+        """ The percentage of nays (discounts empty/invalid ballots). """
+        return 100 - self.yeas_percentage
 
     @property
     def progress(self):
