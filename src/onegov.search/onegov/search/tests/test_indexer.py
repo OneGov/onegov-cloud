@@ -4,7 +4,7 @@ import pytest
 
 from datetime import datetime
 from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import ConnectionError
+from elasticsearch.exceptions import TransportError
 from mock import Mock
 from onegov.search import Searchable, utils
 from onegov.search.compat import Queue
@@ -585,7 +585,7 @@ def test_elasticsearch_outage(es_client, es_url):
         }
     })
 
-    indexer.es_client.index = Mock(side_effect=ConnectionError)
+    indexer.es_client.index = Mock(side_effect=TransportError)
 
     for i in range(0, 2):
         assert indexer.process() == 0
