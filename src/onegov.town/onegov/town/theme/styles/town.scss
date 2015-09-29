@@ -771,6 +771,16 @@ div#redactor-droparea {
     }
 }
 
+@media #{$small-only} {
+    .breadcrumbs li {
+        float: none;
+
+        &::before {
+            margin-left: 0;
+        }
+    }
+}
+
 /*
     sidebar navigation
 */
@@ -1238,6 +1248,12 @@ tr.ticket:hover {
     }
 }
 
+@media #{$small-only} {
+    .ticket-count {
+        border-radius: 3px;
+        width: 100%;
+    }
+}
 
 /*
     Fullcalendar Integration

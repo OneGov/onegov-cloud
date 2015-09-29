@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes small design issues on mobile.
+  [href]
+
 0.6.1 (2015-09-28)
 ~~~~~~~~~~~~~~~~~~~
 
