@@ -1,3 +1,4 @@
+from onegov.town.models.atoz import AtoZ
 from onegov.town.models.clipboard import Clipboard
 from onegov.town.models.editor import Editor
 from onegov.town.models.file import File, FileCollection
@@ -12,6 +13,7 @@ from onegov.town.models.traitinfo import TraitInfo
 
 
 __all__ = [
+    'AtoZ',
     'BuiltinFormDefinition',
     'Clipboard',
     'CustomFormDefinition',

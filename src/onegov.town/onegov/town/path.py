@@ -20,6 +20,7 @@ from onegov.libres.models import Resource
 from onegov.town.app import TownApp
 from onegov.town.converters import extended_date_converter
 from onegov.town.models import (
+    AtoZ,
     Clipboard,
     Editor,
     File,
@@ -227,3 +228,8 @@ def get_event(app, name):
 @TownApp.path(model=Search, path='/suche')
 def get_search(request, q='', page=0):
     return Search(request, q, page)
+
+
+@TownApp.path(model=AtoZ, path='/a-z')
+def get_a_to_z(request):
+    return AtoZ(request)

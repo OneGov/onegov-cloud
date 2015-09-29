@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-25 15:43+0200\n"
+"POT-Creation-Date: 2015-09-29 11:49+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -923,8 +923,10 @@ msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 msgid ""
 "Searching is currently unavailable due to technical difficulties. Please "
 "excuse the inconvenience and try again later."
-msgstr "Die Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht verfügbar. "
-"Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später wieder."
+msgstr ""
+"Die Suche ist zur Zeit aufgrund technischer Schwierigkeiten nicht verfügbar. "
+"Bitte entschuldigen Sie die Unannehmlichkeiten und versuchen Sie es später "
+"wieder."
 
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden"
@@ -1001,6 +1003,9 @@ msgstr "${n} Einteilungen wurden hinzugefügt"
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
 
+msgid "Catalog A-Z"
+msgstr "Katalog A-Z"
+
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
@@ -1061,9 +1066,6 @@ msgstr "Alle Kontakte"
 
 msgid "Topics"
 msgstr "Themen"
-
-msgid "Catalog A-Z"
-msgstr "Katalog A-Z"
 
 #, python-format
 msgid "Login to ${town}"
