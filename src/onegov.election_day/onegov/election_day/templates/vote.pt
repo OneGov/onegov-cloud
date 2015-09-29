@@ -57,6 +57,13 @@
         </ul>
 
         <tal:block tal:repeat="ballot vote.ballots">
+            <h2 tal:condition="vote.counter_proposal">
+                <span tal:define="ballot_type ballot.type" metal:use-macro="layout.macros['ballot-type']" />
+            </h2>
+            <h2 tal:condition="not:vote.counter_proposal" i18n:translate>
+                Results
+            </h2>
+
             <div class="row">
                 <div class="small-12 small-centered medium-8 large-6 columns">
                     <div class="ballot-map"
