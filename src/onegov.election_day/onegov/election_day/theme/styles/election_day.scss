@@ -246,3 +246,28 @@ footer {
     margin-top: 2rem;
     padding: 1rem 0;
 }
+
+
+/* 
+    Results Navigation
+*/
+.results-navigation {
+    h2 {
+        display: inline-block;
+        margin-bottom: 1rem;
+        margin-right: .4ex;
+    }
+
+    a {
+        color: $base;
+        font-size: $h2-font-size;
+    }
+
+    > *::after {
+        content: ' / ';
+    }
+
+    > *:last-child::after {
+        content: '';
+    }
+}

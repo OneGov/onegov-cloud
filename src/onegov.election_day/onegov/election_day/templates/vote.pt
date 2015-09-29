@@ -57,9 +57,17 @@
         </ul>
 
         <tal:block tal:repeat="ballot vote.ballots">
-            <h2 tal:condition="vote.counter_proposal">
-                <span tal:define="ballot_type ballot.type" metal:use-macro="layout.macros['ballot-type']" />
-            </h2>
+            <div class="results-navigation" tal:condition="vote.counter_proposal" tal:define="types python: ['proposal', 'counter-proposal', 'tie-breaker']">
+                <tal:block repeat="type types">
+                    <h2 id="${ballot.type}" tal:condition="type == ballot.type">
+                        <metal:type use-macro="layout.macros['ballot-type']" tal:define="ballot_type type" />
+                    </h2>
+                    <a href="#${type}" tal:condition="type != ballot.type">
+                        <metal:type use-macro="layout.macros['ballot-type']" tal:define="ballot_type type" />
+                    </a>
+                </tal:block>
+            </div>
+
             <h2 tal:condition="not:vote.counter_proposal" i18n:translate>
                 Results
             </h2>
