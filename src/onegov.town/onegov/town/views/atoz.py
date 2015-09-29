@@ -9,10 +9,10 @@ from onegov.town.models import AtoZ
 def atoz(self, request):
 
     layout = DefaultLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Catalog A-Z"), '#'))
+    layout.breadcrumbs.append(Link(_("Topics A-Z"), '#'))
 
     return {
-        'title': _("Catalog A-Z"),
+        'title': _("Topics A-Z"),
         'model': self,
         'layout': layout
     }
