@@ -855,7 +855,9 @@ div#redactor-droparea {
     news list
 */
 
-.news-list-item {
+.newslist .news-list-item {
+    margin-bottom: .5rem;
+
     a h2 {
         color: $side-nav-link-color;
         font-size: $h4-font-size;
@@ -872,7 +874,8 @@ div#redactor-droparea {
         margin-bottom: .5rem;
     }
 
-    .news-lead {
+    .news-lead,
+    .news-continue {
         margin-bottom: .5rem;
     }
 }
