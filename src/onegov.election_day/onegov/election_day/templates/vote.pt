@@ -100,6 +100,18 @@
                                         <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
                                     </tal:block>
                                 </tr>
+
+                                <tr class="total">
+                                    <td i18n:translate>Total</td>
+                                    <td class="accepted" tal:condition="ballot.accepted" i18n:translate="">Accepted</td>
+                                    <td class="rejected" tal:condition="not: ballot.accepted" i18n:translate="">Rejected</td>
+                                    <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
+                                    <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
+                                    <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
+                                    <td class="right-aligned">${layout.format_number(ballot.invalid)}</td>
+                                    <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
+                                    <td class="right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

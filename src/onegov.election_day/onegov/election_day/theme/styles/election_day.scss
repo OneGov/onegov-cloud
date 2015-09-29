@@ -102,6 +102,13 @@ table {
         }
     }
 
+    tr.total {
+        border: 1px solid $gainsboro;
+        border-width: 1px 0;
+        font-weight: bold;
+    }
+
+
     // overview table on the homepage -> specified widths because we have
     // multiple tables which should align vertically
     &.overview {
@@ -161,10 +168,11 @@ table {
 */
 
 .legend {
-    margin-top: 1rem;
     margin-bottom: 2rem;
     margin-left: 25%;
     margin-right: 25%;
+    margin-top: 1rem;
+
     ul {
         list-style: none;
         margin: 0;
