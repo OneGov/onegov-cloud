@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes search being unable to find certain people.
+  [href]
+
 0.6.3 (2015-09-29)
 ~~~~~~~~~~~~~~~~~~~
 

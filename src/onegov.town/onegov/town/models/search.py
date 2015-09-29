@@ -42,7 +42,7 @@ class Search(Pagination):
             'title', 'lead', 'text', 'email', 'function', 'number',
             'ticket_email', 'ticket_data', 'description', 'location',
             'group'
-        ], fuzziness='AUTO', analyzer='german')
+        ], fuzziness='AUTO')
         search = search[self.offset:self.offset + self.batch_size]
 
         return search.execute()
