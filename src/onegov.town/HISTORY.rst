@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.3 (2015-09-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds catalog A-Z.
   [href]
 
