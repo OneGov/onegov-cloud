@@ -24,6 +24,10 @@
     border-radius: 2px;
 }
 
+@mixin circle() {
+    border-radius: 1000px;
+}
+
 @mixin icon($icon) {
     content: $icon;
     font-family: 'FontAwesome';
@@ -932,7 +936,7 @@ $person-email-icon: '\f003';
     margin: 0 1em 1em 0;
 
     .person-card-portrait {
-        @include smooth-edges;
+        @include circle;
 
         background: $topbar-bg-color;
         float: left;
@@ -985,12 +989,23 @@ $person-email-icon: '\f003';
     .person-card-email:before { @include icon($person-email-icon); }
 }
 
+@media #{$small-only} {
+    .person-card {
+        .person-card-portrait {
+            float: none;
+            margin-bottom: 1em;
+        }
+    }
+}
+
 /*
     Person card in lists
 */
 
 .person-list-card {
     .person-card-portrait {
+        @include circle;
+        
         height: 5rem; // enough to show three lines of text
         width: 5rem;
 

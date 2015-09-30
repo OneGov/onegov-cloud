@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- People portraits are now round and work better on mobile.
+  [href]
+
 - Improve page panel design, allowing for longer function texts.
   [href]
 
