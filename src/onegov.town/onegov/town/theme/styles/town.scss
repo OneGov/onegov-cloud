@@ -475,8 +475,6 @@ $more-link-icon: '\f054';
         a {
             display: block;
             font-weight: bold;
-            margin-bottom: -.375rem;
-            margin-top: .375rem;
             overflow: hidden;
             text-overflow: ellipsis;
 
@@ -493,7 +491,16 @@ $more-link-icon: '\f054';
 
         }
 
+        li {
+            margin-bottom: .5em;
+        }
+
+        li:last-child {
+            margin-bottom: 0;
+        }
+
         small {
+            display: block;
             font-size: .8em;
         }
     }
@@ -506,6 +513,21 @@ $more-link-icon: '\f054';
         p:first-line {
             font-weight: bold;
         }
+    }
+}
+
+.page-content-panel {
+    li a {
+        font-size: .8em;
+    }
+
+    > p {
+        font-size: .8em;
+    }
+
+    h2 {
+        font-size: .8em;
+        font-weight: bold;
     }
 }
 
@@ -1675,10 +1697,10 @@ ul.search-results {
     a better way of doing this.
 */
 #fieldset-people > div {
+    border: 1px solid $iron;
     border-color: $iron;
     border-style: solid;
     border-width: 1px;
-    border: 1px solid $iron;
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
     max-height: 500px;
     overflow-x: hidden;

@@ -202,9 +202,9 @@
                     <p tal:content="structure contact.rstrip('\n').replace('\n', '<br>')"></p>
                 </div>
                 <div class="page-content-panel people-panel" tal:condition="people">
-                    <h2 i18n:translate>People</h2>
-                    <ul tal:repeat="person people">
-                        <li>
+                    <h2 class="show-for-sr" i18n:translate>People</h2>
+                    <ul>
+                        <li tal:repeat="person people">
                             <a href="${request.link(person)}">${person.title}</a>
                             <small>${person.context_specific_function}</small>
                         </li>

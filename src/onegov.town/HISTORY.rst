@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Improve page panel design, allowing for longer function texts.
+  [href]
+
 - Fixes elasticsearch offline warning being recorded mistakenly.
   [href]
 
