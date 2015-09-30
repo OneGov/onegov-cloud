@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes elasticsearch offline warning being recorded mistakenly.
+  [href]
+
 0.6.4 (2015-09-29)
 ~~~~~~~~~~~~~~~~~~~
 
