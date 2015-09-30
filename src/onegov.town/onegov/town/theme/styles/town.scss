@@ -505,7 +505,7 @@ $more-link-icon: '\f054';
 
         small {
             display: block;
-            font-size: .8em;
+            font-size: 1em;
         }
     }
 
@@ -520,20 +520,20 @@ $more-link-icon: '\f054';
     }
 }
 
-.page-content-panel {
-    li a {
-        font-size: .8em;
-    }
+// .page-content-panel {
+//     li a {
+//         font-size: .8em;
+//     }
 
-    > p {
-        font-size: .8em;
-    }
+//     > p {
+//         font-size: .8em;
+//     }
 
-    h2 {
-        font-size: .8em;
-        font-weight: bold;
-    }
-}
+//     h2 {
+//         font-size: .8em;
+//         font-weight: bold;
+//     }
+// }
 
 /*
     edit bar (and popup links)
@@ -1005,7 +1005,7 @@ $person-email-icon: '\f003';
 .person-list-card {
     .person-card-portrait {
         @include circle;
-        
+
         height: 5rem; // enough to show three lines of text
         width: 5rem;
 
