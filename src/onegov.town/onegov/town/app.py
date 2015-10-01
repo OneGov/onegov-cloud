@@ -254,14 +254,12 @@ def get_theme():
     return TownTheme()
 
 
-@TownApp.setting(section='i18n', name='domain')
-def get_i18n_domain():
-    return 'onegov.town'
-
-
-@TownApp.setting(section='i18n', name='localedir')
-def get_i18n_localedir():
-    return utils.module_path('onegov.town', 'locale')
+@TownApp.setting(section='i18n', name='localedirs')
+def get_i18n_localedirs():
+    return [
+        utils.module_path('onegov.town', 'locale'),
+        utils.module_path('onegov.form', 'locale')
+    ]
 
 
 @TownApp.setting(section='i18n', name='default_locale')

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-09-29 15:25+0200\n"
+"POT-Creation-Date: 2015-10-01 15:55+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -171,36 +171,6 @@ msgstr "Tagskarte"
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
-
-msgid "Uploaded file"
-msgstr "Hochgeladene Datei"
-
-msgid "Keep file"
-msgstr "Datei behalten"
-
-msgid "Replace file"
-msgstr "Datei ersetzen"
-
-msgid "Delete file"
-msgstr "Datei löschen"
-
-#, python-format
-msgid "The file is too large, please provide a file smaller than {}."
-msgstr "Die Datei ist zu gross, bitte senden Sie eine Datei kleiner als {}."
-
-msgid "Files of this type are not supported."
-msgstr "Dateien dieses Typs werde nicht unterstützt."
-
-msgid "The form could not be parsed."
-msgstr "Das Formular ist nicht gültig."
-
-msgid "Define at least one required e-mail field ('E-Mail * = @@@')"
-msgstr ""
-"Definieren Sie mindestens ein benötigtes E-Mail Feld (z.B. 'E-Mail * = @@@')"
-
-#, python-format
-msgid "The syntax on line {line} is not valid."
-msgstr "Der Syntax in der {line}. Zeile ist ungültig."
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Einteilung im gewünschten Zeitraum."
