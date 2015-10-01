@@ -3,6 +3,9 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
+        <!--! The form is either rendered with a panel on the right (boxed), or
+        without one (normal). Since the panel takes up some space and the
+        column sizes are relative we need to adjust for that. -->
         <?python
             size = {
                 'small': 'small-12 medium-7 large-5 columns',
