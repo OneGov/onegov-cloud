@@ -29,12 +29,13 @@ html {
     background-color: $white-smoke;
     left: calc(100% - 100vw);
     margin-bottom: 2rem;
+    padding-left: calc(100vw - 100%);
     padding-top: 2.5rem;   
     position: relative;
     width: 100vw;
 
     .columns {
-        padding: 0 2em;
+        padding: 0 1em;
     }
 
     h1 small {
