@@ -2,6 +2,7 @@ import importlib
 import humanize
 
 from mimetypes import types_map
+from onegov.form import _
 from onegov.form.core import with_options
 from onegov.form.errors import InvalidFormSyntax
 from stdnum.exceptions import ValidationError as StdnumValidationError
@@ -38,7 +39,9 @@ class FileSizeLimit(object):
 
     """
 
-    message = "The file is too large, please provide a file smaller than {}."
+    message = _(
+        "The file is too large, please provide a file smaller than {}."
+    )
 
     def __init__(self, max_bytes):
         self.max_bytes = max_bytes
@@ -71,7 +74,7 @@ class WhitelistedMimeType(object):
         'text/plain',
     }
 
-    message = "Files of this type are not supported."
+    message = _("Files of this type are not supported.")
 
     def __init__(self, whitelist=None):
         if whitelist is not None:
@@ -105,9 +108,9 @@ class ExpectedExtensions(WhitelistedMimeType):
 class ValidFormDefinition(object):
     """ Makes sure the given text is a valid onegov.form definition. """
 
-    message = "The form could not be parsed."
-    email = "Define at least one required e-mail field ('E-Mail * = @@@')"
-    syntax = "The syntax on line {line} is not valid."
+    message = _("The form could not be parsed.")
+    email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
+    syntax = _("The syntax on line {line} is not valid.")
 
     def __init__(self, require_email_field=True):
         self.require_email_field = require_email_field

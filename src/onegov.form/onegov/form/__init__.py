@@ -2,6 +2,9 @@ import logging
 log = logging.getLogger('onegov.form')  # noqa
 log.addHandler(logging.NullHandler())  # noqa
 
+from translationstring import TranslationStringFactory
+_ = TranslationStringFactory('onegov.form')  # noqa
+
 from onegov.form.collection import (
     FormCollection,
     FormSubmissionCollection,

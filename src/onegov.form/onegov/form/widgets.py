@@ -2,7 +2,7 @@
 import humanize
 
 from cgi import escape
-
+from onegov.form import _
 from wtforms.widgets import ListWidget, FileInput
 from wtforms.widgets.core import HTMLString
 
@@ -73,8 +73,8 @@ class UploadWidget(FileInput):
                 filename=escape(field.data['filename'], quote=True),
                 name=field.id,
                 input_html=input_html,
-                existing_file_label=field.gettext('Uploaded file'),
-                keep_label=field.gettext('Keep file'),
-                delete_label=field.gettext('Delete file'),
-                replace_label=field.gettext('Replace file')
+                existing_file_label=field.gettext(_('Uploaded file')),
+                keep_label=field.gettext(_('Keep file')),
+                delete_label=field.gettext(_('Delete file')),
+                replace_label=field.gettext(_('Replace file'))
             ))
