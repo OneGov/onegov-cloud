@@ -656,15 +656,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         """ Returns all available translations keyed by langauge. """
 
         try:
-            if not self.registry.settings.i18n.domain:
-                return {}
-
-            if not self.registry.settings.i18n.localedir:
+            if not self.registry.settings.i18n.localedirs:
                 return {}
 
             return self.modules.i18n.get_translations(
-                self.registry.settings.i18n.domain,
-                self.registry.settings.i18n.localedir
+                self.registry.settings.i18n.localedirs
             )
         except AttributeError:
             return {}

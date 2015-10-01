@@ -60,13 +60,9 @@ def test_chameleon_with_translation(temporary_directory):
     def get_template_directory():
         return templates
 
-    @App.setting(section='i18n', name='localedir')
-    def get_locale_directory():
-        return locale
-
-    @App.setting(section='i18n', name='domain')
-    def get_i18n_domain():
-        return 'onegov.test'
+    @App.setting(section='i18n', name='localedirs')
+    def get_localedirs():
+        return [locale]
 
     @App.setting(section='i18n', name='default_locale')
     def get_i18n_default_locale():

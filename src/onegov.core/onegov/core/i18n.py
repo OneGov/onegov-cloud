@@ -2,11 +2,10 @@
 
 Applications wishing to use i18n need to define two settings:
 
-:i18n.domain:
-    The domain of the translation (e.g. onegov.town)
-
-:i18n.localedir:
-    The absolute path the gettext locale dir.
+:i18n.localedirs:
+    A list of gettext locale directories. The first directory is considered
+    to be the main directory, all other directories are added to the
+    translation object as fallbacks.
 
 :i18n.default_locale:
     The fallback locale that is used if no locale more suitable to the user
@@ -20,13 +19,12 @@ For example::
     class App(Framework):
         pass
 
-    @TownApp.setting(section='i18n', name='domain')
-    def get_i18n_domain():
-        return 'onegov.town'
-
-    @TownApp.setting(section='i18n', name='localedir')
-    def get_i18n_localedir():
-        return utils.module_path('onegov.town', 'locale')
+    @TownApp.setting(section='i18n', name='localedirs')
+    def get_i18n_localedirs():
+        return [
+            utils.module_path('onegov.town', 'locale')
+            utils.module_path('onegov.form', 'locale')
+        ]
 
     @TownApp.setting(section='i18n', name='default_locale')
     def get_i18n_default_locale():
@@ -47,16 +45,10 @@ from translationstring import ChameleonTranslate
 from translationstring import Translator
 
 
-@Framework.setting(section='i18n', name='domain')
-def get_i18n_domain():
-    """ Returns the gettext domain used for the translations. """
-    return None
-
-
-@Framework.setting(section='i18n', name='localedir')
-def get_i18n_localedir():
+@Framework.setting(section='i18n', name='localedirs')
+def get_i18n_localedirs():
     """ Returns the gettext locale dir. """
-    return None
+    return tuple()
 
 
 @Framework.setting(section='i18n', name='default_locale')
@@ -116,9 +108,11 @@ def pofiles(localedir):
             yield path, pofile
 
 
-def get_translations(domain, localedir):
-    """ Takes the given domain and locale dir and loads the po files
-    found.
+def get_translations(localedirs):
+    """ Takes the given gettext locale directories and loads the po files
+    found. The first found po file is assumed to be the main
+    translations file (and should for performance reasons contain most of the
+    translations). The other po files are added as fallbacks.
 
     The pofiles are compiled on-the-fly, using polib. This makes mofiles
     unnecessary.
@@ -130,19 +124,18 @@ def get_translations(domain, localedir):
 
     result = {}
 
-    for language, pofile_path in pofiles(localedir):
-
-        if not pofile_path.endswith('{}.po'.format(domain)):
-            log.info("Skipping pofile {}".format(pofile_path))
-            continue
-        else:
+    for localedir in localedirs:
+        for language, pofile_path in pofiles(localedir):
             log.info("Compiling pofile {}".format(pofile_path))
 
-        mofile = BytesIO()
-        mofile.write(polib.pofile(pofile_path).to_binary())
-        mofile.seek(0)
+            mofile = BytesIO()
+            mofile.write(polib.pofile(pofile_path).to_binary())
+            mofile.seek(0)
 
-        result[language] = gettext.GNUTranslations(mofile)
+            if language not in result:
+                result[language] = gettext.GNUTranslations(mofile)
+            else:
+                result[language].add_fallback(gettext.GNUTranslations(mofile))
 
     return result
 

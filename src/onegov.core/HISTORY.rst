@@ -3,6 +3,14 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Allows more than one translation directory to be set by the application. This
+  enables us to use translations defined in packages outside the app. For
+  example, onegov.form now keeps its own translations. Onegov.town and
+  onegov.election_day simply point to onegov.form's translations to have
+  them included.
+  [href]
+
 0.5.1 (2015-09-11)
 ~~~~~~~~~~~~~~~~~~~
 
