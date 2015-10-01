@@ -109,14 +109,12 @@ def get_theme():
     return ElectionDayTheme()
 
 
-@ElectionDayApp.setting(section='i18n', name='domain')
-def get_i18n_domain():
-    return 'onegov.election_day'
-
-
-@ElectionDayApp.setting(section='i18n', name='localedir')
+@ElectionDayApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedir():
-    return utils.module_path('onegov.election_day', 'locale')
+    return [
+        utils.module_path('onegov.election_day', 'locale'),
+        utils.module_path('onegov.form', 'locale')
+    ]
 
 
 @ElectionDayApp.setting(section='i18n', name='default_locale')
