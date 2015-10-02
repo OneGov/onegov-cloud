@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.6.0 (2015-10-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows more than one translation directory to be set by the application. This
   enables us to use translations defined in packages outside the app. For
