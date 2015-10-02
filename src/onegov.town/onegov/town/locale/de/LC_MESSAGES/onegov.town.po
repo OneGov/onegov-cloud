@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-10-01 15:55+0200\n"
+"POT-Creation-Date: 2015-10-02 11:01+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -400,12 +400,6 @@ msgstr "Text"
 msgid "Definition"
 msgstr "Definition"
 
-msgid "Email Address"
-msgstr "E-Mail Adresse"
-
-msgid "Password"
-msgstr "Passwort"
-
 msgid "URL"
 msgstr "URL"
 
@@ -441,6 +435,9 @@ msgstr "Adresse"
 
 msgid "Quota"
 msgstr "Anzahl"
+
+msgid "Email Address"
+msgstr "E-Mail Adresse"
 
 msgid "New Password"
 msgstr "Neues Passwort"

@@ -258,7 +258,8 @@ def get_theme():
 def get_i18n_localedirs():
     return [
         utils.module_path('onegov.town', 'locale'),
-        utils.module_path('onegov.form', 'locale')
+        utils.module_path('onegov.form', 'locale'),
+        utils.module_path('onegov.user', 'locale')
     ]
 
 

@@ -6,9 +6,9 @@ from onegov.core.security import Public, Private
 from onegov.town import _, log
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
-from onegov.town.forms import LoginForm
 from onegov.town.layout import DefaultLayout
 from onegov.town.models import Town
+from onegov.user.forms import LoginForm
 from purl import URL
 
 
