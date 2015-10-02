@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.0.3 (2015-10-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a generic login form
   [href]
 
