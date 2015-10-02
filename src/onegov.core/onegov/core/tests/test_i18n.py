@@ -1,9 +1,10 @@
 import os
 import os.path
 import polib
+import pytest
 
-from onegov.core import i18n
-from onegov.core import utils
+from gettext import GNUTranslations
+from onegov.core import i18n, utils
 from webob import Request
 from webob.acceptparse import Accept
 from wtforms import Label
@@ -17,6 +18,52 @@ def test_pofiles(temporary_directory):
     result = list(i18n.pofiles(temporary_directory))
     assert result[0][0] == 'de'
     assert result[0][1].endswith('onegov.test.po')
+
+
+def test_merge_translations():
+    t1 = GNUTranslations()
+    t1._catalog = {
+        'We are here': 'Hier sind wir',
+        'Welcome': 'Willkommen'
+    }
+
+    t2 = GNUTranslations()
+    t2._catalog = {
+        'We are here': 'Wir sind hier',
+        'Hi': 'Hallo'
+    }
+
+    t3 = GNUTranslations()
+    t3._catalog = {
+        'We are here': 'Sind wir hier',
+        'Morning': 'Moin'
+    }
+
+    with pytest.raises(AssertionError):
+        i18n.merge([])
+
+    with pytest.raises(AssertionError):
+        i18n.merge([i18n.clone(t1)])
+
+    assert i18n.merge([i18n.clone(t1), i18n.clone(t2)])._catalog == {
+        'We are here': 'Hier sind wir',
+        'Welcome': 'Willkommen',
+        'Hi': 'Hallo'
+    }
+
+    assert i18n.merge([i18n.clone(t2), i18n.clone(t3)])._catalog == {
+        'We are here': 'Wir sind hier',
+        'Morning': 'Moin',
+        'Hi': 'Hallo'
+    }
+
+    assert i18n.merge(
+        [i18n.clone(t1), i18n.clone(t2), i18n.clone(t3)])._catalog == {
+        'We are here': 'Hier sind wir',
+        'Welcome': 'Willkommen',
+        'Morning': 'Moin',
+        'Hi': 'Hallo'
+    }
 
 
 def test_get_translations(temporary_directory):

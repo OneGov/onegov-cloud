@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Merges multiple translations into one for faster lookups.
+  [href]
+
 0.6.0 (2015-10-02)
 ~~~~~~~~~~~~~~~~~~~
 

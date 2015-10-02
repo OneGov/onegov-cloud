@@ -13,7 +13,7 @@ from contextlib import contextmanager
 from cProfile import Profile
 from datetime import datetime
 from functools import partial
-from itertools import groupby
+from itertools import groupby, tee
 from onegov.core import compat
 from purl import URL
 from unidecode import unidecode
@@ -350,3 +350,10 @@ def is_non_string_iterable(obj):
     """ Returns true if the given obj is an iterable, but not a string. """
     return not (isinstance(obj, compat.text_type) or isinstance(obj, bytes))\
         and isinstance(obj, Iterable)
+
+
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)

@@ -39,8 +39,8 @@ import os.path
 import polib
 
 from io import BytesIO
-from onegov.core import log
-from onegov.core import Framework
+from onegov.core import Framework, log
+from onegov.core.utils import pairwise
 from translationstring import ChameleonTranslate
 from translationstring import Translator
 
@@ -135,7 +135,9 @@ def get_translations(localedirs):
             if language not in result:
                 result[language] = gettext.GNUTranslations(mofile)
             else:
-                result[language].add_fallback(gettext.GNUTranslations(mofile))
+                result[language] = merge(
+                    (result[language], gettext.GNUTranslations(mofile))
+                )
 
     return result
 
@@ -213,3 +215,36 @@ def get_translation_bound_form(form_class, translate):
         Meta = MetaClass
 
     return TranslationBoundForm
+
+
+def merge(translations):
+    """ Takes the given translations (a list) and merges them into
+    each other. The translations at the end of the list are overwritten
+    by the translations at the start of the list.
+
+    This is preferrable to adding fallbacks, as they increases the average
+    complexity of the lookup function each time.
+
+    Note that the translations are *not* copied before merging, so that means
+    all existing translations are changed during this processed. To avoid
+    this, clone the translation first (see :func:`clone`).
+
+    :return: The last GNUTranslations object with all other translation
+    objects merged into it. The first element overrides the second and so on.
+
+    """
+    assert len(translations) > 1
+
+    for current, following in pairwise(translations):
+        if following is not None:
+            following._catalog.update(current._catalog)
+
+    return translations[-1]
+
+
+def clone(translation):
+    """ Clones the given translation, creating an independent copy. """
+    clone = gettext.GNUTranslations()
+    clone._catalog = translation._catalog.copy()
+
+    return clone
