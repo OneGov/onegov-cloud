@@ -36,6 +36,7 @@ setup(
     install_requires=[
         'click',
         'onegov.core>=0.4.0',
+        'onegov.form',
         'sqlalchemy'
     ],
     extras_require=dict(
