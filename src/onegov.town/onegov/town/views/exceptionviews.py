@@ -1,7 +1,6 @@
 from onegov.core.security import Public
 from onegov.town import _, TownApp
 from onegov.town.layout import DefaultLayout
-from purl import URL
 from webob.exc import HTTPForbidden
 
 
@@ -17,11 +16,10 @@ def handle_forbidden(self, request):
     def set_status_code(response):
         response.status_code = self.code  # pass along 403
 
-    url = URL(request.link(request.app.town, name='login'))
-    url = url.query_param('to', request.url)
+    layout = DefaultLayout(self, request)
 
     return {
-        'layout': DefaultLayout(self, request),
+        'layout': layout,
         'title': _(u"Access Denied"),
-        'login_url': url
+        'login_url': layout.login_url
     }

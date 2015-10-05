@@ -15,6 +15,7 @@ from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import (
     FileCollection,
     ImageCollection,
+    Auth,
     Search,
     SiteCollection,
     Thumbnail
@@ -181,10 +182,16 @@ class Layout(ChameleonLayout):
     @cached_property
     def login_url(self):
         """ Returns the login url for the current page. """
-        return '{}?to={}'.format(
-            self.request.link(self.town, 'login'),
-            self.request.transform(self.request.path)
-        )
+        return self.request.link(
+            Auth(self.request, to=self.request.transform(self.request.path)),
+            name='login')
+
+    @cached_property
+    def logout_url(self):
+        """ Returns the logout url for the current page. """
+        return self.request.link(
+            Auth(self.request, to=self.request.transform(self.request.path)),
+            name='logout')
 
     @cached_property
     def events_url(self):
@@ -273,7 +280,7 @@ class DefaultLayout(Layout):
 
         if request.current_role == 'editor':
             return [
-                Link(_(u'Logout'), request.link(self.town, 'logout')),
+                Link(_(u'Logout'), self.logout_url),
                 Link(_(u'Files'), request.link(FileCollection(self.app))),
                 Link(_(u'Images'), request.link(ImageCollection(self.app))),
                 Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
@@ -281,7 +288,7 @@ class DefaultLayout(Layout):
             ]
         elif request.current_role == 'admin':
             return [
-                Link(_(u'Logout'), request.link(self.town, 'logout')),
+                Link(_(u'Logout'), self.logout_url),
                 Link(_(u'Files'), request.link(FileCollection(self.app))),
                 Link(_(u'Images'), request.link(ImageCollection(self.app))),
                 Link(_(u'Settings'), request.link(self.town, 'einstellungen')),

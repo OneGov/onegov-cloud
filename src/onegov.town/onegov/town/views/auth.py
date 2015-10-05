@@ -1,4 +1,4 @@
-""" The login/logout views. """
+""" The authentication views. """
 
 import morepath
 
@@ -7,32 +7,20 @@ from onegov.town import _, log
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
-from onegov.town.models import Town
+from onegov.town.models import Auth
 from onegov.user.forms import LoginForm
-from purl import URL
 
 
-@TownApp.form(
-    model=Town, name='login', template='login.pt', permission=Public,
-    form=LoginForm
-)
+@TownApp.form(model=Auth, name='login', template='login.pt', permission=Public,
+              form=LoginForm)
 def handle_login(self, request, form):
-    """ Handles the GET and POST login requests. """
-
-    if 'to' in request.params:
-        url = URL(form.action).query_param('to', request.params['to'])
-        form.action = url.as_string()
+    """ Handles the login requests. """
 
     if form.submitted(request):
         identity = form.get_identity(request)
 
         if identity is not None:
-
-            # redirect to the url the 'to' parameter points to, or to the
-            # homepage of the town
-            to = request.params.get('to', request.link(self))
-            response = morepath.redirect(to)
-
+            response = morepath.redirect(self.to)
             morepath.remember_identity(response, request, identity)
 
             request.success(_("You have been logged in."))
@@ -49,19 +37,20 @@ def handle_login(self, request, form):
 
     return {
         'layout': layout,
-        'password_reset_link': request.link(self, name='request-password'),
-        'title': _(u'Login to ${town}', mapping={'town': self.name}),
+        'password_reset_link': request.link(
+            request.app.town, name='request-password'),
+        'title': _(u'Login to ${town}', mapping={
+            'town': request.app.town.name
+        }),
         'form': form
     }
 
 
-@TownApp.html(
-    model=Town, name='logout', permission=Private,
-    request_method='GET')
+@TownApp.html(model=Auth, name='logout', permission=Private)
 def view_logout(self, request):
     """ Handles the logout requests. """
 
-    response = morepath.redirect(request.link(self))
+    response = morepath.redirect(self.to)
     morepath.forget_identity(response, request)
 
     request.info(_("You have been logged out."))

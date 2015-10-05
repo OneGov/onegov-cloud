@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Logouts now redirect to the current page, just like logins.
+  [href]
+
 - Fixes various little design issues.
   [href]
 
