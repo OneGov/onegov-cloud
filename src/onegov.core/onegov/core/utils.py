@@ -357,3 +357,20 @@ def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
+
+
+def relative_url(absolute_url):
+    """ Removes everything in front of the path, including scheme, host,
+    username, password and port.
+
+    """
+    url = URL._mutate(
+        URL(absolute_url),
+        scheme=None,
+        username=None,
+        password=None,
+        host=None,
+        port=None
+    )
+
+    return url.as_string()

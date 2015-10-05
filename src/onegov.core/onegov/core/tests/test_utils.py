@@ -111,3 +111,11 @@ def test_is_non_string_iterable():
     assert not utils.is_non_string_iterable('abc')
     assert not utils.is_non_string_iterable(b'abc')
     assert not utils.is_non_string_iterable(None)
+
+
+def test_relative_url():
+    assert utils.relative_url('https://www.google.ch/test') == '/test'
+    assert utils.relative_url('https://usr:pwd@localhost:443/test') == '/test'
+    assert utils.relative_url('/test') == '/test'
+    assert utils.relative_url('/test?x=1&y=2') == '/test?x=1&y=2'
+    assert utils.relative_url('/test?x=1&y=2#link') == '/test?x=1&y=2#link'

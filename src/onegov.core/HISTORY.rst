@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a relative_url utility function.
+  [href]
+
 - Merges multiple translations into one for faster lookups.
   [href]
 
