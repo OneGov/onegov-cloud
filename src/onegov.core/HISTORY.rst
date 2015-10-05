@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.6.1 (2015-10-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a relative_url utility function.
   [href]
