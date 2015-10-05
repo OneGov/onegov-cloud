@@ -20,7 +20,6 @@ from onegov.town import log
 from onegov.town.initial_content import add_builtin_forms
 from onegov.town.models import Town
 from onegov.town.theme import TownTheme
-from onegov.user import Auth
 from webassets import Bundle
 
 
