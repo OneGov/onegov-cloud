@@ -42,7 +42,9 @@ setup(
     extras_require=dict(
         test=[
             'coverage',
-            'onegov.testing'
+            'more.itsdangerous',
+            'onegov.testing',
+            'webtest'
         ],
     ),
     entry_points="""

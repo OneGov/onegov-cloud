@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a generic authentication model for login/logout views.
+  [href]
+
 0.0.3 (2015-10-02)
 ~~~~~~~~~~~~~~~~~~~
 
