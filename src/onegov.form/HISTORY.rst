@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.7.2 (2015-10-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds German translations, no more defining those outside the package.
   [href]
 
