@@ -15,11 +15,11 @@ from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import (
     FileCollection,
     ImageCollection,
-    Auth,
     Search,
     SiteCollection,
     Thumbnail
 )
+from onegov.user import Auth
 from purl import URL
 from sqlalchemy import desc
 
@@ -183,15 +183,17 @@ class Layout(ChameleonLayout):
     def login_url(self):
         """ Returns the login url for the current page. """
         return self.request.link(
-            Auth(self.request, to=self.request.transform(self.request.path)),
-            name='login')
+            Auth.from_app(self.app, self.request.transform(self.request.path)),
+            name='login'
+        )
 
     @cached_property
     def logout_url(self):
         """ Returns the logout url for the current page. """
         return self.request.link(
-            Auth(self.request, to=self.request.transform(self.request.path)),
-            name='logout')
+            Auth.from_app(self.app, self.request.transform(self.request.path)),
+            name='logout'
+        )
 
     @cached_property
     def events_url(self):

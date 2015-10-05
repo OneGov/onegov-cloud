@@ -84,7 +84,7 @@ def test_view_login(town_app):
 
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
-    response.form.set('email', 'admin@example.org')
+    response.form.set('username', 'admin@example.org')
     response = response.form.submit()
     assert response.status_code == 200
     assert u"E-Mail Adresse" in response
@@ -92,7 +92,7 @@ def test_view_login(town_app):
     assert u"Dieses Feld wird benötigt." in response
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
-    response.form.set('email', 'admin@example.org')
+    response.form.set('username', 'admin@example.org')
     response.form.set('password', 'hunter2')
     response = response.form.submit()
 
@@ -108,7 +108,7 @@ def test_view_files(town_app):
     assert client.get('/dateien', expect_errors=True).status_code == 403
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -130,7 +130,7 @@ def test_view_images(town_app):
     assert client.get('/bilder', expect_errors=True).status_code == 403
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -206,19 +206,19 @@ def test_login(town_app):
     assert links.text() == 'Login'
 
     login_page = client.get(links.attr('href'))
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = ''
     login_page = login_page.form.submit()
 
     assert u"Dieses Feld wird benötigt" in login_page.text
 
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'wrong'
     login_page = login_page.form.submit()
 
     assert "Unbekannter Benutzername oder falsches Passwort" in login_page.text
 
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
 
     index_page = login_page.form.submit().follow()
@@ -282,12 +282,12 @@ def test_reset_password(town_app):
     reset_page = reset_page.form.submit()
     assert u"Ungültiger Addresse oder abgelaufener Link" in reset_page.text
 
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     login_page = login_page.form.submit()
     assert "Unbekannter Benutzername oder falsches Passwort" in login_page.text
 
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'new_password'
     assert "Sie wurden eingeloggt" in login_page.form.submit().follow().text
 
@@ -298,7 +298,7 @@ def test_settings(town_app):
     assert client.get('/einstellungen', expect_errors=True).status_code == 403
 
     login_page = client.get('/auth/login')
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     login_page.form.submit()
 
@@ -349,7 +349,7 @@ def test_unauthorized(town_app):
 
     link = unauth_page.pyquery('#alternate-login-link')[0]
     login_page = client.get(link.attrib.get('href'))
-    login_page.form['email'] = 'editor@example.org'
+    login_page.form['username'] = 'editor@example.org'
     login_page.form['password'] = 'hunter2'
     unauth_page = login_page.form.submit().follow(expect_errors=True)
 
@@ -358,7 +358,7 @@ def test_unauthorized(town_app):
 
     link = unauth_page.pyquery('#alternate-login-link')[0]
     login_page = client.get(link.attrib.get('href'))
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     settings_page = login_page.form.submit().follow()
 
@@ -373,7 +373,7 @@ def test_pages(town_app):
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
     login_page = client.get('/auth/login?to={}'.format(root_url))
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     root_page = login_page.form.submit().follow()
 
@@ -425,7 +425,7 @@ def test_news(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     page = login_page.form.submit().follow()
 
@@ -476,7 +476,7 @@ def test_delete_pages(town_app):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
 
     login_page = client.get('/auth/login?to={}'.format(root_url))
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
 
     root_page = login_page.form.submit().follow()
@@ -503,7 +503,7 @@ def test_links(town_app):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
 
     login_page = client.get('/auth/login?to={}'.format(root_url))
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     root_page = login_page.form.submit().follow()
 
@@ -618,7 +618,7 @@ def test_edit_builtin_form(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -636,7 +636,7 @@ def test_add_custom_form(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -685,7 +685,7 @@ def test_delete_builtin_form(town_app):
     assert response.status_code == 403
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -697,7 +697,7 @@ def test_delete_custom_form(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -719,7 +719,7 @@ def test_show_uploaded_file(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -743,7 +743,7 @@ def test_hide_page(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -769,7 +769,7 @@ def test_hide_news(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -795,7 +795,7 @@ def test_hide_form(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -820,7 +820,7 @@ def test_people_view(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -855,7 +855,7 @@ def test_with_people(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -897,7 +897,7 @@ def test_tickets(town_app):
     assert len(client.get('/').pyquery('.ticket-count')) == 0
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -931,7 +931,7 @@ def test_tickets(town_app):
     assert 'Offen' in status_page
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1055,7 +1055,7 @@ def test_resources(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1085,7 +1085,7 @@ def test_clipboard(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1107,7 +1107,7 @@ def test_clipboard_separation(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1120,7 +1120,7 @@ def test_clipboard_separation(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1131,7 +1131,7 @@ def test_copy_pages_to_news(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1157,7 +1157,7 @@ def test_sitecollection(town_app):
     assert client.get('/sitecollection', expect_errors=True).status_code == 403
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1174,7 +1174,7 @@ def test_allocations(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1271,7 +1271,7 @@ def test_allocation_times(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1378,7 +1378,7 @@ def test_reserve_allocation(town_app):
 
     # try deleting the allocation with the existing reservation
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1581,7 +1581,7 @@ def test_cleanup_allocations(town_app):
     client = Client(town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'admin@example.org')
+    login_page.form.set('username', 'admin@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1785,7 +1785,7 @@ def test_submit_event(town_app):
 
     # Accept ticket
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1857,7 +1857,7 @@ def test_edit_event(town_app):
     form_page.form.submit().follow().form.submit().follow()
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1908,7 +1908,7 @@ def test_delete_event(town_app):
     form_page.form.submit().follow().form.submit().follow()
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
@@ -1952,7 +1952,7 @@ def test_basic_search(es_town_app):
     client = Client(es_town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form['email'] = 'admin@example.org'
+    login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     login_page.form.submit().follow()
 
@@ -1994,7 +1994,7 @@ def test_basic_autocomplete(es_town_app):
     client = Client(es_town_app)
 
     login_page = client.get('/auth/login')
-    login_page.form.set('email', 'editor@example.org')
+    login_page.form.set('username', 'editor@example.org')
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 

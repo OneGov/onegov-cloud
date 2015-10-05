@@ -1,13 +1,11 @@
 """ The authentication views. """
 
-import morepath
-
 from onegov.core.security import Public, Private
-from onegov.town import _, log
+from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
-from onegov.town.models import Auth
+from onegov.user import Auth
 from onegov.user.forms import LoginForm
 
 
@@ -17,17 +15,13 @@ def handle_login(self, request, form):
     """ Handles the login requests. """
 
     if form.submitted(request):
-        identity = form.get_identity(request)
+        response = self.login_to(request=request, **form.login_data)
 
-        if identity is not None:
-            response = morepath.redirect(self.to)
-            morepath.remember_identity(response, request, identity)
-
+        if response:
             request.success(_("You have been logged in."))
             return response
-        else:
-            request.alert(_("Wrong username or password."))
-            log.info("Failed login attempt by {}".format(request.client_addr))
+
+        request.alert(_("Wrong username or password."))
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
@@ -50,8 +44,5 @@ def handle_login(self, request, form):
 def view_logout(self, request):
     """ Handles the logout requests. """
 
-    response = morepath.redirect(self.to)
-    morepath.forget_identity(response, request)
-
     request.info(_("You have been logged out."))
-    return response
+    return self.logout_to(request)

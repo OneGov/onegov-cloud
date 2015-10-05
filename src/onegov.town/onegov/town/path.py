@@ -21,7 +21,6 @@ from onegov.town.app import TownApp
 from onegov.town.converters import extended_date_converter
 from onegov.town.models import (
     AtoZ,
-    Auth,
     Clipboard,
     Editor,
     File,
@@ -38,6 +37,7 @@ from onegov.town.models import (
 from onegov.page import PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.ticket import Ticket, TicketCollection
+from onegov.user import Auth
 
 
 @TownApp.path(model=Town, path='/')
@@ -46,8 +46,8 @@ def get_town(app):
 
 
 @TownApp.path(model=Auth, path='/auth')
-def get_auth(request, to=None):
-    return Auth(request, to)
+def get_auth(app, to='/'):
+    return Auth.from_app(app, to)
 
 
 @TownApp.path(model=Topic, path='/themen', absorb=True)
