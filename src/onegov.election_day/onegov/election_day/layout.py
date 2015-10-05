@@ -2,6 +2,7 @@ from cached_property import cached_property
 from datetime import datetime
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
+from onegov.user import Auth
 
 
 class Layout(ChameleonLayout):
@@ -28,6 +29,18 @@ class Layout(ChameleonLayout):
     @cached_property
     def copyright_year(self):
         return datetime.utcnow().year
+
+    @cached_property
+    def login_link(self):
+        if not self.request.is_logged_in:
+            return self.request.link(
+                Auth.from_request(self.request), name='login')
+
+    @cached_property
+    def logout_link(self):
+        if self.request.is_logged_in:
+            return self.request.link(
+                Auth.from_request(self.request), name='logout')
 
 
 class DefaultLayout(Layout):

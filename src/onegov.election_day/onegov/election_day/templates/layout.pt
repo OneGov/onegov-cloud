@@ -29,7 +29,7 @@ metal:define-macro="layout">
     <div class="row header">
         <div class="small-12 columns">
             <a href="${layout.homepage_link}" title="Back to the latest elections &amp; votes" i18n:attributes="title">
-                <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" />
+                <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
             </a>
         </div>
     </div>
@@ -52,8 +52,15 @@ metal:define-macro="layout">
 
     <footer>
         <div class="row">
-            <div class="small-12 columns">
+            <div class="small-8 columns">
                 &copy; ${layout.copyright_year} ${layout.app.principal.name}, <a href="https://onegovcloud.ch">OneGov Cloud</a>
+            </div>
+            <div class="small-4 columns text-right">
+                <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>
+                <tal:block condition="layout.logout_link" >
+                    <span i18n:translate>You are logged in: </span>
+                    <a href="${layout.logout_link}" i18n:translate>Logout</a>
+                </tal:block>
             </div>
         </div>
     </footer>

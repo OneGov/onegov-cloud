@@ -1,8 +1,11 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-09-29 15:32+0200\n"
+"POT-Creation-Date: 2015-10-05 16:20+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
 
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
@@ -34,6 +37,15 @@ msgstr "Gemeldet"
 msgid "Back to the latest elections &amp; votes"
 msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
 
+msgid "Login"
+msgstr "Anmelden"
+
+msgid "You are logged in:"
+msgstr "Sie sind angemeldet:"
+
+msgid "Logout"
+msgstr "Abmelden"
+
 msgid "Accepted"
 msgstr "Angenommen"
 
@@ -54,6 +66,9 @@ msgstr "Gegenentwurf"
 
 msgid "Tie-Breaker"
 msgstr "Stichfrage"
+
+msgid "Submit"
+msgstr "Absenden"
 
 msgid "Yeas"
 msgstr "JA Stimmen"
@@ -93,3 +108,6 @@ msgstr "Ungültig"
 
 msgid "Total"
 msgstr "Total"
+
+msgid "Wrong username or password"
+msgstr "Unbekannter Benutzername oder falsches Passwort"

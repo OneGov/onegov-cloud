@@ -1,21 +1,28 @@
-import more.webassets
 import onegov.core
 import onegov.election_day
 import os.path
 import pytest
 import textwrap
+import transaction
 
 from morepath import setup
+from onegov.core.crypto import hash_password
+from onegov.testing.utils import scan_morepath_modules
+from onegov.user import User
 from uuid import uuid4
 
 
+@pytest.fixture(scope='session')
+def election_day_password():
+    # only hash the password for the test users once per test session
+    return hash_password('hunter2')
+
+
 @pytest.yield_fixture(scope="function")
-def election_day_app(postgres_dsn, temporary_directory):
+def election_day_app(postgres_dsn, temporary_directory, election_day_password):
 
     config = setup()
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.scan(onegov.election_day)
+    scan_morepath_modules(onegov.election_day.ElectionDayApp, config)
     config.commit()
 
     app = onegov.election_day.ElectionDayApp()
@@ -38,5 +45,13 @@ def election_day_app(postgres_dsn, temporary_directory):
         canton: zg
         color: '#000'
     """))
+
+    app.session().add(User(
+        username='admin@example.org',
+        password_hash=election_day_password,
+        role='admin'
+    ))
+
+    transaction.commit()
 
     yield app

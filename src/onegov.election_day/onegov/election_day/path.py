@@ -1,6 +1,12 @@
 from onegov.ballot import Ballot, BallotCollection, Vote, VoteCollection
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.model import Principal
+from onegov.user import Auth
+
+
+@ElectionDayApp.path(model=Auth, path='/auth')
+def get_auth(request):
+    return Auth.from_request(request)
 
 
 @ElectionDayApp.path(model=Principal, path='/')
