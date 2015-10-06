@@ -52,3 +52,12 @@ class Layout(ChameleonLayout):
 
 class DefaultLayout(Layout):
     pass
+
+
+class ManageLayout(DefaultLayout):
+    pass
+
+    def __init__(self, request, model):
+        super(ManageLayout, self).__init__(request, model)
+        self.request.include('datetimepicker_js')
+        self.request.include('datetimepicker_css')

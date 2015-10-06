@@ -84,6 +84,19 @@ class ElectionDayApp(Framework):
             output='bundles/common.bundle.js'
         )
 
+        datetimepicker_js = Bundle(
+            'js/jquery.datetimepicker.js',
+            'js/datetimepicker.js',
+            filters='rjsmin',
+            output='bundles/jquery.datetimepicker.bundle.js'
+        )
+
+        datetimepicker_css = Bundle(
+            'css/jquery.datetimepicker.css',
+            filters='cssmin',
+            output='bundles/jquery.datetimepicker.bundle.css'
+        )
+
         ballot_map = Bundle(
             'js/d3.js',
             'js/d3tip.js',
@@ -95,7 +108,9 @@ class ElectionDayApp(Framework):
 
         return {
             'common': common,
-            'ballot_map': ballot_map
+            'ballot_map': ballot_map,
+            'datetimepicker_js': datetimepicker_js,
+            'datetimepicker_css': datetimepicker_css,
         }
 
 
