@@ -1,17 +1,22 @@
 from onegov.ballot import Ballot, BallotCollection, Vote, VoteCollection
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.models import Principal
+from onegov.election_day.models import Manage, Principal
 from onegov.user import Auth
 
 
 @ElectionDayApp.path(model=Auth, path='/auth')
-def get_auth(request):
-    return Auth.from_request(request)
+def get_auth(request, to='/'):
+    return Auth.from_request(request, to)
 
 
 @ElectionDayApp.path(model=Principal, path='/')
 def get_principal(app):
     return app.principal
+
+
+@ElectionDayApp.path(model=Manage, path='/manage')
+def get_manage(app):
+    return Manage(app.session())
 
 
 @ElectionDayApp.path(model=Vote, path='/vote/{id}')

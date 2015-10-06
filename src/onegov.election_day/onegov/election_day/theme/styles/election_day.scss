@@ -272,3 +272,29 @@ footer {
         content: '';
     }
 }
+
+
+/* 
+    Manage view actions
+*/
+ul.actions {
+    list-style-type: none;
+    margin: 0;
+
+    li {
+        display: inline-block;
+        font-size: $table-row-font-size;
+
+        + li::before {
+            content: '| ';
+        }
+    }
+}
+
+
+/*
+    Forms
+*/
+.cancel-button {
+    margin-right: .5rem;
+}

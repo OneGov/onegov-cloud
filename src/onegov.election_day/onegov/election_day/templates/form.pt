@@ -12,6 +12,7 @@
                     <a href="#" class="close">&times;</a>
                 </div>
 
+                <p tal:condition="message|nothing">${message}</p>
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>

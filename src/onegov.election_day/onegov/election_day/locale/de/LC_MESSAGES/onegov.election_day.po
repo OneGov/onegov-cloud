@@ -1,11 +1,12 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-10-06 09:30+0200\n"
+"POT-Creation-Date: 2015-10-06 11:07+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "The form contains errors. Please check the fields marked in red."
-msgstr "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
@@ -43,6 +44,9 @@ msgstr "Anmelden"
 msgid "You are logged in:"
 msgstr "Sie sind angemeldet:"
 
+msgid "Manage"
+msgstr "Verwalten"
+
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -67,8 +71,32 @@ msgstr "Gegenentwurf"
 msgid "Tie-Breaker"
 msgstr "Stichfrage"
 
+msgid "Cancel"
+msgstr "Abbrechen"
+
 msgid "Submit"
 msgstr "Absenden"
+
+msgid "Votes"
+msgstr "Abstimmungen"
+
+msgid "No votes yet."
+msgstr "Noch keine Abstimmungen erfasst."
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Actions"
+msgstr "Aktionen"
+
+msgid "View"
+msgstr "Anzeigen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Delete"
+msgstr "Löschen"
 
 msgid "Yeas"
 msgstr "JA Stimmen"
@@ -111,3 +139,13 @@ msgstr "Total"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
+
+#, python-format
+msgid "Do you really want to delete \"${vote}\"?"
+msgstr "Möchten Sie die Abstimmung \"${vote}\" wirklich löschen?"
+
+msgid "Confirmation"
+msgstr "Bestätigung"
+
+msgid "Delete vote"
+msgstr "Abstimmung löschen"

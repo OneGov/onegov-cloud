@@ -2,6 +2,7 @@ from cached_property import cached_property
 from datetime import datetime
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
+from onegov.election_day.models import Manage
 from onegov.user import Auth
 
 
@@ -31,10 +32,16 @@ class Layout(ChameleonLayout):
         return datetime.utcnow().year
 
     @cached_property
+    def manage_link(self):
+        return self.request.link(Manage(self.app.session()))
+
+    @cached_property
     def login_link(self):
         if not self.request.is_logged_in:
             return self.request.link(
-                Auth.from_request(self.request), name='login')
+                Auth.from_request(self.request, to=self.manage_link),
+                name='login'
+            )
 
     @cached_property
     def logout_link(self):
