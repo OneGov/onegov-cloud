@@ -60,7 +60,7 @@ class DerivedBallotsCount(object):
 
     @hybrid_property
     def turnout(self):
-        return self.cast_ballots / self.elegible_voters * 100
+        return self.cast_ballots / self.elegible_voters * 100 if self.elegible_voters else 0
 
 
 class Vote(Base, TimestampMixin, DerivedBallotsCount):
@@ -121,10 +121,14 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount):
 
     @observes('title')
     def title_observer(self, title):
-        self.id = normalize_for_url(title)
+        if not self.id:
+            self.id = normalize_for_url(title)
 
     @property
     def counted(self):
+        if not self.ballots:
+            return False
+
         for ballot in self.ballots:
             if not ballot.counted:
                 return False

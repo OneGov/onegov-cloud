@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes the counts/results/percentages for votes without results.
+  [href]
+
 - Yeas/Nays on the vote are no longer simple summations if a counter-proposal
   is present. In this case, the absolute total is taken from the winning
   proposition (say the yeas of the proposal or the counter-proposal, but
