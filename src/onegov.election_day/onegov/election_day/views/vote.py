@@ -57,6 +57,7 @@ def edit_vote(self, request, form):
         'layout': DefaultLayout(self, request),
         'form': form,
         'title': self.title,
+        'subtitle': _("Edit"),
         'cancel': request.link(Manage(request.app.session()))
     }
 
@@ -78,8 +79,20 @@ def delete_vote(self, request, form):
         ),
         'layout': DefaultLayout(self, request),
         'form': form,
-        'title': _("Confirmation"),
+        'title': self.title,
+        'subtitle': _("Delete vote"),
         'button_text': _("Delete vote"),
         'button_class': 'alert',
         'cancel': request.link(Manage(request.app.session()))
+    }
+
+
+@ElectionDayApp.html(model=Vote, name='upload', template='upload.pt',
+                     permission=Private)
+def view_upload(self, request):
+
+    return {
+        'layout': DefaultLayout(self, request),
+        'title': self.title,
+        'subtitle': _("Upload results")
     }

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-10-06 12:09+0200\n"
+"POT-Creation-Date: 2015-10-06 16:12+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -92,6 +92,9 @@ msgstr "Absenden"
 msgid "Votes"
 msgstr "Abstimmungen"
 
+msgid "New Vote"
+msgstr "Neue Abstimmung"
+
 msgid "No votes yet."
 msgstr "Noch keine Abstimmungen erfasst."
 
@@ -109,6 +112,9 @@ msgstr "Anzeigen"
 
 msgid "Edit"
 msgstr "Bearbeiten"
+
+msgid "Upload Results"
+msgstr "Resultate Hochladen"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -155,15 +161,12 @@ msgstr "Total"
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
 
-msgid "New Vote"
-msgstr "Neue Abstimmung"
-
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
 msgstr "Möchten Sie die Abstimmung \"${vote}\" wirklich löschen?"
 
-msgid "Confirmation"
-msgstr "Bestätigung"
-
 msgid "Delete vote"
 msgstr "Abstimmung löschen"
+
+msgid "Upload results"
+msgstr "Resultate hochladen"

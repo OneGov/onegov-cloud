@@ -22,7 +22,7 @@ def handle_login(self, request, form):
     return response or {
         'layout': Layout(self, request),
         'title': _("Login"),
-        'form': form,
+        'form': form
     }
 
 
