@@ -14,5 +14,6 @@ def view_manage(self, request):
     return {
         'layout': Layout(self, request),
         'title': _("Manage"),
-        'votes': self.votes
+        'votes': self.votes,
+        'new_vote': request.link(self, 'new-vote')
     }

@@ -22,6 +22,6 @@ class Manage(object):
     @property
     def votes(self):
         query = VoteCollection(self.session).query()
-        query = query.order_by(self.direction(self.order_by))
+        query = query.order_by(self.direction(self.order_by), Vote.title)
 
         return query.all()

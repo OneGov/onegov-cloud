@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import onegov.election_day
-import transaction
 
 from datetime import date
-from onegov.ballot import Vote
 from onegov.testing import utils
 from webtest import TestApp as Client
 
@@ -46,15 +44,17 @@ def test_view_manage(election_day_app):
     manage = client.get('/manage')
     assert "Noch keine Abstimmungen erfasst" in manage
 
-    election_day_app.session().add(Vote(
-        title="Vote for a better tomorrow",
-        domain='federation',
-        date=date(2015, 6, 14)
-    ))
+    new = manage.click('Neue Abstimmung')
+    new.form['vote'] = 'Vote for a better yesterday'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'federation'
+    manage = new.form.submit().follow()
 
-    transaction.commit()
+    assert "Vote for a better yesterday" in manage
+    edit = manage.click('Bearbeiten')
+    edit.form['vote'] = 'Vote for a better tomorrow'
+    manage = edit.form.submit().follow()
 
-    manage = client.get('/manage')
     assert "Vote for a better tomorrow" in manage
 
     delete = manage.click(u"Löschen")

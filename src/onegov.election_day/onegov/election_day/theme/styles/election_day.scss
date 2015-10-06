@@ -30,7 +30,7 @@ html {
     left: calc(100% - 100vw);
     margin-bottom: 2rem;
     padding-left: calc(100vw - 100%);
-    padding-top: 2.5rem;   
+    padding-top: 2.5rem;
     position: relative;
     width: 100vw;
 
@@ -249,7 +249,7 @@ footer {
 }
 
 
-/* 
+/*
     Results Navigation
 */
 .results-navigation {
@@ -274,7 +274,7 @@ footer {
 }
 
 
-/* 
+/*
     Manage view actions
 */
 ul.actions {
@@ -292,9 +292,36 @@ ul.actions {
 }
 
 
+.top-actions {
+    font-size: 1.5rem;
+    list-style-type: none;
+    margin: 1.2rem 0 0;
+
+    .action-new::before {
+        content: '\f055';
+        font-family: 'FontAwesome';
+        margin-right: .75ex;
+    }
+}
+
 /*
     Forms
 */
+
+form {
+    label > ul {
+        list-style: none;
+
+        margin: 0;
+        margin-bottom: 1rem;
+
+        li input[type="checkbox"],
+        li input[type="radio"] {
+            margin: 0;
+        }
+    }
+}
+
 .cancel-button {
     margin-right: .5rem;
 }

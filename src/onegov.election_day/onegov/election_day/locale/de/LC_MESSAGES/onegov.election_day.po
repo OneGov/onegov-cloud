@@ -1,8 +1,23 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-10-06 11:07+0200\n"
+"POT-Creation-Date: 2015-10-06 12:09+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+msgid "Type"
+msgstr "Art"
+
+msgid "Vote"
+msgstr "Vorlage"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "Federal Vote"
+msgstr "Nationale Abstimmung"
+
+msgid "Cantonal Vote"
+msgstr "Kantonale Abstimmung"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -19,9 +34,6 @@ msgstr "Eidgenössische Abstimmungen vom ${date}"
 
 msgid "Cantonal Votes on ${date}"
 msgstr "Kantonale Abstimmungen vom ${date}"
-
-msgid "Vote"
-msgstr "Vorlage"
 
 msgid "Result"
 msgstr "Resultat"
@@ -83,11 +95,14 @@ msgstr "Abstimmungen"
 msgid "No votes yet."
 msgstr "Noch keine Abstimmungen erfasst."
 
-msgid "Date"
-msgstr "Datum"
-
 msgid "Actions"
 msgstr "Aktionen"
+
+msgid "Federal"
+msgstr "National"
+
+msgid "Cantonal"
+msgstr "Kantonal"
 
 msgid "View"
 msgstr "Anzeigen"
@@ -139,6 +154,9 @@ msgstr "Total"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
+
+msgid "New Vote"
+msgstr "Neue Abstimmung"
 
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
