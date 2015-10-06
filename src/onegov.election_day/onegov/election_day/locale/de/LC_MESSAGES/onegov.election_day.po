@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-10-05 16:20+0200\n"
+"POT-Creation-Date: 2015-10-06 09:30+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "The form contains errors. Please check the fields marked in red."
-msgstr ""
+msgstr "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
