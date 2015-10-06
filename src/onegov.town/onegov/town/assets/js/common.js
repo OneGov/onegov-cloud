@@ -32,6 +32,6 @@ if (!Modernizr.inputtypes.date) {
         format: 'Y-m-d',   // HTML5 (RFC3339)
         lang: 'de',
         lazyInit: false,
-        timepicker: false,
+        timepicker: false
     });
 }
