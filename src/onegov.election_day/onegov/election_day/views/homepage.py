@@ -3,7 +3,7 @@ from onegov.core.utils import groupbylist
 from onegov.ballot import VoteCollection
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
-from onegov.election_day.model import Principal
+from onegov.election_day.models import Principal
 
 
 @ElectionDayApp.html(model=Principal, template='homepage.pt',

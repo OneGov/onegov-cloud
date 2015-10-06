@@ -1,6 +1,6 @@
 import textwrap
 
-from onegov.election_day.model import Principal
+from onegov.election_day.models import Principal
 
 
 def test_load_principal():

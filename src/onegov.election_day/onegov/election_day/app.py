@@ -2,7 +2,7 @@ from cached_property import cached_property
 from onegov.core import Framework, utils
 from onegov.core.filestorage import FilestorageFile
 from onegov.election_day.theme import ElectionDayTheme
-from onegov.election_day.model import Principal
+from onegov.election_day.models import Principal
 from webassets import Bundle
 
 
@@ -17,7 +17,7 @@ class ElectionDayApp(Framework):
     @property
     def principal(self):
         """ Returns the principal of the election day app. See
-        :class:`onegov.election_day.model.Principal`.
+        :class:`onegov.election_day.models.principal.Principal`.
 
         """
         return self.cache.get_or_create('principal', self.load_principal)

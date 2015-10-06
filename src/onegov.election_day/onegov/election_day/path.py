@@ -1,6 +1,6 @@
 from onegov.ballot import Ballot, BallotCollection, Vote, VoteCollection
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.model import Principal
+from onegov.election_day.models import Principal
 from onegov.user import Auth
 
 
