@@ -60,7 +60,8 @@ class DerivedBallotsCount(object):
 
     @hybrid_property
     def turnout(self):
-        return self.cast_ballots / self.elegible_voters * 100 if self.elegible_voters else 0
+        return self.cast_ballots / self.elegible_voters * 100\
+            if self.elegible_voters else 0
 
 
 class Vote(Base, TimestampMixin, DerivedBallotsCount):
