@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes 'to' parameter not being passed on by Auth.from_request.
+  [href]
+
 0.1.0 (2015-10-05)
 ~~~~~~~~~~~~~~~~~~~
 

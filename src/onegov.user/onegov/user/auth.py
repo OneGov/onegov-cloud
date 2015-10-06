@@ -29,7 +29,7 @@ class Auth(object):
 
     @classmethod
     def from_request(cls, request, to='/'):
-        return cls.from_app(request.app)
+        return cls.from_app(request.app, to)
 
     @property
     def users(self):
