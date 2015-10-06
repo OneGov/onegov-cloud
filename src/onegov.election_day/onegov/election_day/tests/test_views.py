@@ -58,7 +58,7 @@ def test_view_manage(election_day_app):
     assert "Vote for a better tomorrow" in manage
 
     delete = manage.click(u"Löschen")
-    assert u"Bestätigung" in delete
+    assert u"Abstimmung löschen" in delete
     assert "Vote for a better tomorrow" in delete
     assert "Bearbeiten" in delete.click("Abbrechen")
 
