@@ -167,7 +167,7 @@ class AllocationEventInfo(object):
                     handler='RSV',
                     state='all',
                     extra_parameters={
-                        'allocation_id': self.allocation.id
+                        'allocation_id': str(self.allocation.id)
                     }
                 )),
                 classes=('RSV-link', )
