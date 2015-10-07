@@ -1,0 +1,23 @@
+language: python
+
+env:
+    - TOXENV=py27
+    - TOXENV=py34
+    - TOXENV=pep8
+install:
+    - pip install tox
+    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+script:
+    - tox -e $TOXENV
+after_success:
+    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+
+deploy:
+    provider: pypi
+    distributions: "sdist bdist_wheel"
+    user: seantis
+    password:
+      secure: "gTUKcgcWv2fd7+ohgetgLz5vQ06++VDwbatNLYfG/0DOFiHJHYIaDyO26JDJlhvY0xva9f8bAHzZXVAlKjPtpR9hXJf2GVhn/XABXazmWF+m7YMbA42BF0XEFrQqtAPtVO4fd/SJKoNKRJOkrVSZrKOsMLbTmd+DtlXh2K3CVuVHKkq9q/ViTY/jLKcabFvEQZMYG6YWQxH2Aq17fNwNNz7krZr/f80CZmnafkBMdYIoyPbjSMB6rNbFAQEWz+H942gtUQ6q9P0mMMiRASSBeAJ71lEvQkeApdQBXIJDt0ZXA+beQ70v+A3OAGQ1lP8iljTNVOiz/G/U9qCLPUoBvcrEjZP1qo+DQ9yzeYnecErbgFZlai7wdRsZyIOv5w7EDlgm+3rITkrZC+qqPgjfOUiRK6/V3e1fCVOfrbcpXAC2ixMtKR5QMMLK9QOV6aIoFw/3XGhzQtcBL3s1F34tpUGxqvIaunYCUHx47n18mm77TBpEo+v6JNPUcAMk5V7m+ma69dl3uqcawb51T5nSzMj09f9v+ClxsaGtrEXfntkjEu8UKmpqxif3eO9LYe+OE52X9z5jrHwX+hHaUrHcBJ8oA/C4srSrKVp+xLRMgzF7uykc2VsI2b59MZrUamJB/hunM5hjAe43rJxFacBCHWmqR0oHlDsYZYspu4fZUmA="
+    on:
+        tags: true
+        condition: $TOXENV = py34
