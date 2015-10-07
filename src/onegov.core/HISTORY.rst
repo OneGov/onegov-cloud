@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds an is_subpath function.
+  [href]
+
 0.6.1 (2015-10-05)
 ~~~~~~~~~~~~~~~~~~~
 

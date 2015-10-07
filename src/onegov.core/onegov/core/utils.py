@@ -143,8 +143,13 @@ def module_path(module, subpath):
 
     assert module is not None
 
-    path = os.path.dirname(inspect.getfile(module))
-    return os.path.join(path, subpath)
+    parent = os.path.dirname(inspect.getfile(module))
+    path = os.path.join(parent, subpath)
+
+    # always be paranoid with path manipulation
+    assert is_subpath(parent, path)
+
+    return path
 
 
 def touch(file_path):
@@ -374,3 +379,13 @@ def relative_url(absolute_url):
     )
 
     return url.as_string()
+
+
+def is_subpath(directory, path):
+    """ Returns true if the given path is inside the given directory. """
+    directory = os.path.join(os.path.realpath(directory), '')
+    path = os.path.realpath(path)
+
+    # return true, if the common prefix of both is equal to directory
+    # e.g. /a/b/c/d.rst and directory is /a/b, the common prefix is /a/b
+    return os.path.commonprefix([path, directory]) == directory

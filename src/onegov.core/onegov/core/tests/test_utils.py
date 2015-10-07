@@ -119,3 +119,11 @@ def test_relative_url():
     assert utils.relative_url('/test') == '/test'
     assert utils.relative_url('/test?x=1&y=2') == '/test?x=1&y=2'
     assert utils.relative_url('/test?x=1&y=2#link') == '/test?x=1&y=2#link'
+
+
+def test_is_subpath():
+    assert utils.is_subpath('/', '/test')
+    assert utils.is_subpath('/asdf', '/asdf/asdf')
+    assert not utils.is_subpath('/asdf/', '/asdf')
+    assert not utils.is_subpath('/a', '/b')
+    assert not utils.is_subpath('/a', '/a/../b')
