@@ -6,5 +6,14 @@
         <h1>${title}</h1>
         <h2 class="subheader">${subtitle}</h2>
 
+        <div class="panel">
+            <i class="fa fa-info-circle"></i>
+            <span i18n:translate>Please use the following format:</span><br>
+            <a href="https://github.com/OneGov/onegov.election_day/blob/master/docs/formatbeschreibung.md" i18n:translate>
+                Format Description
+            </a>
+        </div>
+
+        <div metal:use-macro="layout.macros['form']" />
     </tal:block>
 </div>

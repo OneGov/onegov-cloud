@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from onegov.core import Framework, utils
 from onegov.core.filestorage import FilestorageFile
+from onegov.shared import asset
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.election_day.models import Principal
 from webassets import Bundle
@@ -84,14 +85,15 @@ class ElectionDayApp(Framework):
             output='bundles/common.bundle.js'
         )
 
-        datetimepicker_js = Bundle(
+        form_js = Bundle(
             'js/jquery.datetimepicker.js',
             'js/datetimepicker.js',
+            asset('js/form_dependencies.js'),
             filters='rjsmin',
             output='bundles/jquery.datetimepicker.bundle.js'
         )
 
-        datetimepicker_css = Bundle(
+        form_css = Bundle(
             'css/jquery.datetimepicker.css',
             filters='cssmin',
             output='bundles/jquery.datetimepicker.bundle.css'
@@ -109,8 +111,8 @@ class ElectionDayApp(Framework):
         return {
             'common': common,
             'ballot_map': ballot_map,
-            'datetimepicker_js': datetimepicker_js,
-            'datetimepicker_css': datetimepicker_css,
+            'form_js': form_js,
+            'form_css': form_css,
         }
 
 

@@ -59,5 +59,5 @@ class ManageLayout(DefaultLayout):
 
     def __init__(self, request, model):
         super(ManageLayout, self).__init__(request, model)
-        self.request.include('datetimepicker_js')
-        self.request.include('datetimepicker_css')
+        self.request.include('form_js')
+        self.request.include('form_css')

@@ -39,6 +39,7 @@ setup(
         'onegov.ballot>=0.0.4',
         'onegov.form',
         'onegov.foundation>=0.0.4',
+        'onegov.shared',
         'onegov.user',
         'pyyaml',
         'rjsmin'

@@ -1,11 +1,26 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-10-06 16:12+0200\n"
+"POT-Creation-Date: 2015-10-07 15:30+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Type"
 msgstr "Art"
+
+msgid "Proposal"
+msgstr "Initiative"
+
+msgid "Counter-Proposal"
+msgstr "Gegenentwurf"
+
+msgid "Tie-Breaker"
+msgstr "Stichfrage"
+
+msgid "Simple Vote"
+msgstr "Einfache Vorlage"
+
+msgid "Vote with Counter-Proposal"
+msgstr "Vorlage mit Gegenvorschlag"
 
 msgid "Vote"
 msgstr "Vorlage"
@@ -68,20 +83,11 @@ msgstr "Angenommen"
 msgid "Rejected"
 msgstr "Abgelehnt"
 
-msgid "Proposal"
-msgstr "Initiative"
-
 msgid "Counter Proposal"
 msgstr "Gegenentwurf"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
-
-msgid "Counter-Proposal"
-msgstr "Gegenentwurf"
-
-msgid "Tie-Breaker"
-msgstr "Stichfrage"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -118,6 +124,12 @@ msgstr "Resultate Hochladen"
 
 msgid "Delete"
 msgstr "Löschen"
+
+msgid "Please use the following format:"
+msgstr "Bitte verwenden Sie das folgende Format:"
+
+msgid "Format Description"
+msgstr "Formatbeschreibung"
 
 msgid "Yeas"
 msgstr "JA Stimmen"
