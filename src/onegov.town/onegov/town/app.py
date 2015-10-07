@@ -13,8 +13,9 @@ from cached_property import cached_property
 from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
-from onegov.search import ElasticsearchApp
 from onegov.libres import LibresIntegration
+from onegov.search import ElasticsearchApp
+from onegov.shared import asset
 from onegov.ticket import TicketCollection
 from onegov.town import log
 from onegov.town.initial_content import add_builtin_forms
@@ -183,7 +184,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'js/intercooler.js',
             'js/underscore.js',
             'js/react.js',
-            'js/form_dependencies.js',
+            asset('js/form_dependencies.js'),
             confirm,
             typeahead,
             'js/jquery.datetimepicker.js',
