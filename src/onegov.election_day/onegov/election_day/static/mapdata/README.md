@@ -20,3 +20,6 @@ The resulting files in the `/topo` folders are used as follows:
 
 4. The resulting files are put into the folder of their respective year. For
    example: `static/mapdata/2015/*.json`
+
+There's a python script which does all of this automatically:
+https://github.com/seantis/swiss-maps/blob/master/generate.py
