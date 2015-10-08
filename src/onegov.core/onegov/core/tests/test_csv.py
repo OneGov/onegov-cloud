@@ -34,10 +34,10 @@ def test_normalize_header():
 def test_detect_encoding():
     assert detect_encoding(BytesIO(b''))['encoding'] is None
 
-    assert detect_encoding(BytesIO('jöö'.encode('ISO-8859-2')))['encoding'] \
+    assert detect_encoding(BytesIO(u'jöö'.encode('ISO-8859-2')))['encoding'] \
         == 'ISO-8859-2'
 
-    assert detect_encoding(BytesIO('jöö'.encode('utf-8')))['encoding'] \
+    assert detect_encoding(BytesIO(u'jöö'.encode('utf-8')))['encoding'] \
         == 'utf-8'
 
 
