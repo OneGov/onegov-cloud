@@ -1,4 +1,5 @@
 """ Offers tools to deal with csv (and xls, xlsx) files. """
+from __future__ import absolute_import
 
 import sys
 
