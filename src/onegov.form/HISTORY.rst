@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.7.3 (2015-10-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to force the UploadWidget to show no special options.
   [href]
   
