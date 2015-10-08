@@ -41,6 +41,7 @@ setup(
         'chameleon',
         'click',
         'dogpile.cache',
+        'editdistance',
         'fs',
         'itsdangerous',
         'isodate',

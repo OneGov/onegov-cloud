@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds a csv module which helps with importing flawed csv files.
+  [href]
+
 0.6.2 (2015-10-07)
 ~~~~~~~~~~~~~~~~~~~
 
