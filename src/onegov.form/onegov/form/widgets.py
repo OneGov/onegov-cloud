@@ -27,9 +27,10 @@ class UploadWidget(FileInput):
     """
 
     def __call__(self, field, **kwargs):
+        force_simple = kwargs.pop('force_simple', False)
         input_html = super(UploadWidget, self).__call__(field, **kwargs)
 
-        if not field.data:
+        if force_simple or not field.data:
             return HTMLString(u"""
                 <div class="upload-widget without-data">
                     {}
