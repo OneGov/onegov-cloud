@@ -6,7 +6,7 @@ from onegov.ballot import Vote
 from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.forms import DeleteForm, UploadForm, VoteForm
+from onegov.election_day.forms import DeleteForm, VoteForm
 from onegov.election_day.layout import ManageLayout
 from onegov.election_day.models import Manage
 
@@ -82,19 +82,4 @@ def delete_vote(self, request, form):
         'button_text': _("Delete vote"),
         'button_class': 'alert',
         'cancel': request.link(Manage(request.app.session()))
-    }
-
-
-@ElectionDayApp.form(model=Vote, name='upload', template='upload.pt',
-                     permission=Private, form=UploadForm)
-def view_upload(self, request, form):
-
-    if form.submitted(request):
-        pass
-
-    return {
-        'layout': ManageLayout(self, request),
-        'title': self.title,
-        'subtitle': _("Upload results"),
-        'form': form
     }
