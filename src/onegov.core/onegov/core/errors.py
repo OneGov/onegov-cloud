@@ -14,3 +14,11 @@ class AmbiguousColumnsError(CSVError):
 
 class DuplicateColumnNames(CSVError):
     pass
+
+
+class InvalidFormat(CSVError):
+    pass
+
+
+class EmptyFile(CSVError):
+    pass

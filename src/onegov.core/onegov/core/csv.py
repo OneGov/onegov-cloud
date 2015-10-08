@@ -1,15 +1,98 @@
+# -*- coding: utf-8 -*-
 """ Offers tools to deal with csv (and xls, xlsx) files. """
+
 from __future__ import absolute_import
 
+import codecs
+import re
 import sys
 
+from chardet.universaldetector import UniversalDetector
+from collections import namedtuple, OrderedDict
 from csv import reader as csv_reader, Sniffer
 from editdistance import eval as distance
 from itertools import permutations
 from onegov.core import errors
+from unidecode import unidecode
 
 
 VALID_CSV_DELIMITERS = {',', ';', '\t'}
+WHITESPACE = re.compile(r'\s+')
+
+
+class CSVFile(object):
+
+    def __init__(self, csvfile, expected_headers):
+        # prepare a reader which always returns utf-8
+        csvfile.seek(0)
+
+        encoding = detect_encoding(csvfile)['encoding']
+        if encoding is None:
+            raise errors.InvalidFormat()
+
+        self.csvfile = codecs.getreader(encoding)(csvfile)
+
+        # find out the dialect
+        self.csvfile.seek(0)
+        self.dialect = sniff_dialect(self.csvfile.read(1024))
+
+        # match the headers
+        self.csvfile.seek(0)
+        self.headers = OrderedDict(
+            (h, c) for c, h in enumerate(match_headers(
+                headers=parse_header(self.csvfile.readline(), self.dialect),
+                expected=expected_headers
+            ))
+        )
+
+        # create an output type
+        assert 'rownumber' not in expected_headers, """
+            rownumber can't be used as a header
+        """
+
+        self.rowtype = namedtuple(
+            "CSVFileRow", ['rownumber'] + list(self.headers.keys())
+        )
+
+    @property
+    def lines(self):
+        self.csvfile.seek(0)
+
+        for ix, line in enumerate(csv_reader(self.csvfile, self.dialect)):
+
+            # the first line is the header
+            if ix == 0:
+                continue
+
+            yield self.rowtype(
+                rownumber=ix + 1,  # row numbers are for customers, not coders
+                **{
+                    header: line[column]
+                    for header, column in self.headers.items()
+                }
+            )
+
+
+def detect_encoding(csvfile):
+    """ Runs the chardet detector incrementally against the given csv file.
+    Once it is confident enough, it will return a value.
+
+    See: http://chardet.readthedocs.org/
+
+    """
+    detector = UniversalDetector()
+    csvfile.seek(0)
+
+    try:
+        for line in csvfile:
+            detector.feed(line)
+
+            if detector.done:
+                break
+    finally:
+        detector.close()
+
+    return detector.result
 
 
 def sniff_dialect(csv):
@@ -19,18 +102,32 @@ def sniff_dialect(csv):
 
     """
     if not csv:
-        return None
+        raise errors.EmptyFile()
 
     dialect = Sniffer().sniff(csv)
 
     if dialect.delimiter not in VALID_CSV_DELIMITERS:
-        return None
+        raise errors.InvalidFormat()
 
     return dialect
 
 
 def normalize_header(header):
-    return header.strip().lower()
+    """ Normalizes a header value to be as uniform as possible.
+
+    This includes:
+        * stripping the whitespace around it
+        * lowercasing everything
+        * transliterating unicode (e.g. 'ä' becomes 'a')
+        * removing duplicate whitespace inside it
+    """
+
+    header = header.strip()
+    header = header.lower()
+    header = unidecode(header)
+    header = WHITESPACE.sub(' ', header)
+
+    return header
 
 
 def parse_header(csv, dialect=None):
@@ -42,10 +139,13 @@ def parse_header(csv, dialect=None):
     :return: A list of headers in the order of appearance.
 
     """
-    if not csv:
+    try:
+        dialect = dialect or sniff_dialect(csv)
+    except errors.InvalidFormat:
+        dialect = None  # let the csv reader try, it might still work
+    except errors.EmptyFile:
         return []
 
-    dialect = dialect or sniff_dialect(csv)
     headers = next(csv_reader(csv.splitlines(), dialect=dialect))
     headers = [normalize_header(h) for h in headers]
 
