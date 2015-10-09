@@ -73,7 +73,6 @@ setup(
         test=[
             'coverage',
             'freezegun',
-            'mock',
             'onegov.testing',
             'pytest-localserver'
         ],

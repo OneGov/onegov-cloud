@@ -3,9 +3,9 @@ import pytest
 import textwrap
 
 from click.testing import CliRunner
-from mock import patch
 from onegov.core.cli import cli
 from onegov.core.upgrade import get_tasks, upgrade_task
+from unittest.mock import patch
 
 
 def test_upgrade_task_registration():
