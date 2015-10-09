@@ -1,20 +1,17 @@
-# -*- coding: utf-8 -*-
-
 import onegov.core
 import os.path
 
 from onegov.core import utils
-from onegov.core.compat import text_type
 from uuid import uuid4
 
 
 def test_normalize_for_url():
-    assert utils.normalize_for_url(u'asdf') == 'asdf'
-    assert utils.normalize_for_url(u'Asdf') == 'asdf'
-    assert utils.normalize_for_url(u'A S d f') == 'a-s-d-f'
-    assert utils.normalize_for_url(u'far  away') == 'far-away'
-    assert utils.normalize_for_url(u'währung') == 'wahrung'
-    assert utils.normalize_for_url(u'one/two') == 'one-two'
+    assert utils.normalize_for_url('asdf') == 'asdf'
+    assert utils.normalize_for_url('Asdf') == 'asdf'
+    assert utils.normalize_for_url('A S d f') == 'a-s-d-f'
+    assert utils.normalize_for_url('far  away') == 'far-away'
+    assert utils.normalize_for_url('währung') == 'wahrung'
+    assert utils.normalize_for_url('one/two') == 'one-two'
     assert utils.normalize_for_url('far / away') == 'far-away'
     assert utils.normalize_for_url('far <away>') == 'far-away'
     assert utils.normalize_for_url('far (away)') == 'far-away'
@@ -100,7 +97,7 @@ def test_is_uuid():
     assert not utils.is_uuid('')
     assert not utils.is_uuid('asdf')
     assert utils.is_uuid(uuid4())
-    assert utils.is_uuid(text_type(uuid4()))
+    assert utils.is_uuid(str(uuid4()))
     assert utils.is_uuid(uuid4().hex)
 
 

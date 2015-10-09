@@ -10,7 +10,7 @@ from itsdangerous import (
 )
 from more.webassets.core import IncludeRequest
 from morepath.security import NO_IDENTITY
-from onegov.core import compat, utils
+from onegov.core import utils
 from onegov.core.crypto import random_token
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
@@ -212,11 +212,7 @@ class CoreRequest(IncludeRequest):
     def translator(self):
         """ Returns the translate function for basic string translations. """
         translator = self.get_translate()
-
-        if compat.PY3:
-            return lambda text: text.interpolate(translator.gettext(text))
-        else:
-            return lambda text: text.interpolate(translator.ugettext(text))
+        return lambda text: text.interpolate(translator.gettext(text))
 
     @cached_property
     def locale(self):
@@ -279,9 +275,7 @@ class CoreRequest(IncludeRequest):
 
         """
         if self.browser_session.has('messages'):
-            for message in self.browser_session.messages:
-                yield message
-
+            yield from self.browser_session.messages
             del self.browser_session.messages
 
     def success(self, text):

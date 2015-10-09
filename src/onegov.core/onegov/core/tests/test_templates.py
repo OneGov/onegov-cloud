@@ -20,16 +20,16 @@ def test_chameleon_with_translation(temporary_directory):
 
     po = polib.POFile()
     po.append(polib.POEntry(
-        msgid=u'Welcome',
-        msgstr=u'Willkommen'
+        msgid='Welcome',
+        msgstr='Willkommen'
     ))
     po.append(polib.POEntry(
-        msgid=u"We're sinking, we're sinking!",
-        msgstr=u'Wir denken, wir denken!'
+        msgid="We're sinking, we're sinking!",
+        msgstr='Wir denken, wir denken!'
     ))
     po.append(polib.POEntry(
-        msgid=u"Macro",
-        msgstr=u"Makro"
+        msgid="Macro",
+        msgstr="Makro"
     ))
     po.save(os.path.join(locale, 'de/LC_MESSAGES/onegov.test.po'))
 

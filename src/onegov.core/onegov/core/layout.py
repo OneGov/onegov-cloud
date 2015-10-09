@@ -3,9 +3,9 @@ import numbers
 
 from cached_property import cached_property
 from datetime import datetime
-from onegov.core.compat import zip_longest
-from pytz import timezone
+from itertools import zip_longest
 from purl import URL
+from pytz import timezone
 
 
 class Layout(object):

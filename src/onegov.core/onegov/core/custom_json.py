@@ -14,7 +14,6 @@ import isodate
 import json
 import types
 
-from onegov.core import compat
 from onegov.core import utils
 
 
@@ -29,7 +28,7 @@ class CustomJSONEncoder(json.JSONEncoder):
         elif isinstance(o, types.GeneratorType):
             return list(o)
         else:
-            if isinstance(o, compat.string_types):
+            if isinstance(o, str):
                 # make sure the reserved words can't be added as a string by
                 # some smartass that wants to screw with us
                 o = utils.lchop(o, '__datetime__@')
@@ -39,16 +38,16 @@ class CustomJSONEncoder(json.JSONEncoder):
 
 
 def custom_json_decoder(value):
-    if not isinstance(value, compat.string_types):
+    if not isinstance(value, str):
         return value
 
-    if value.startswith(u'__date__@'):
+    if value.startswith('__date__@'):
         return isodate.parse_date(value[9:])
 
-    if value.startswith(u'__datetime__@'):
+    if value.startswith('__datetime__@'):
         return isodate.parse_datetime(value[13:])
 
-    if value.startswith(u'__time__@'):
+    if value.startswith('__time__@'):
         return isodate.parse_time(value[9:])
 
     return value
@@ -57,7 +56,7 @@ def custom_json_decoder(value):
 def json_loads_object_hook(dictionary):
     for key, value in dictionary.items():
 
-        if isinstance(value, compat.string_types):
+        if isinstance(value, str):
             dictionary[key] = custom_json_decoder(value)
 
         elif isinstance(value, (list, tuple)):

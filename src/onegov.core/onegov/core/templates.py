@@ -118,4 +118,4 @@ def render_macro(macro, request, content):
     stream = list()
     macro.include(stream, Scope(variables), {})
 
-    return u''.join(stream)
+    return ''.join(stream)

@@ -121,9 +121,7 @@ class AdjacencyList(Base):
     def ancestors(self):
         """ Returns all ancestors of this item. """
         if self.parent:
-            for ancestor in self.parent.ancestors:
-                yield ancestor
-
+            yield from self.parent.ancestors
             yield self.parent
 
     @property

@@ -1,4 +1,4 @@
-from onegov.core.compat import StringIO
+from io import StringIO
 from onegov.core.jsx import JsxFilter
 
 

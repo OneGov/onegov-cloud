@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """ Provides commands related to the onegov.core Framework. Currently only
 updates.
 
@@ -13,7 +12,6 @@ import subprocess
 
 from mailthon.middleware import TLS, Auth
 from morepath import setup
-from onegov.core.compat import text_type, PY3
 from onegov.core.mail import Postman
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
@@ -91,9 +89,7 @@ def sendmail(ctx, hostname, port, force_tls, username, password):
 
             for filename in maildir.keys():
                 msg_str = maildir.get_file(filename).read()
-
-                if PY3:
-                    msg_str = msg_str.decode('utf-8')
+                msg_str = msg_str.decode('utf-8')
 
                 msg = email.message_from_string(msg_str)
 
@@ -321,10 +317,10 @@ def upgrade(ctx, dry_run):
         c = Client(server)
 
         def on_success(task):
-            print(click.style("* " + text_type(task.task_name), fg='green'))
+            print(click.style("* " + str(task.task_name), fg='green'))
 
         def on_fail(task):
-            print(click.style("* " + text_type(task.task_name), fg='red'))
+            print(click.style("* " + str(task.task_name), fg='red'))
 
         for schema in schemas:
             # we *need* a new upgrade runner for each schema

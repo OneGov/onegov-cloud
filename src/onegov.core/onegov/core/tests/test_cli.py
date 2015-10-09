@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os.path
 import transaction
 import yaml
@@ -122,15 +121,15 @@ def test_sendmail_unicode(smtpserver, temporary_directory):
         f.write(yaml.dump(cfg))
 
     app = Framework()
-    app.mail_sender = u'noreply@example.org'
+    app.mail_sender = 'noreply@example.org'
     app.mail_use_directory = True
     app.mail_directory = os.path.join(temporary_directory, 'mails')
 
     app.send_email(
-        reply_to=u'Gövikon <info@example.org>',
-        receivers=[u'recipient@example.org'],
-        subject=u"Test E-Mäil",
-        content=u"👍"
+        reply_to='Gövikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mäil",
+        content="👍"
     )
 
     transaction.commit()
@@ -154,11 +153,11 @@ def test_sendmail_unicode(smtpserver, temporary_directory):
 
         return name, addr
 
-    assert decode(message['Sender']) == (u"Gövikon", 'noreply@example.org')
-    assert decode(message['From']) == (u"Gövikon", 'noreply@example.org')
-    assert decode(message['Reply-To']) == (u"Gövikon", 'info@example.org')
+    assert decode(message['Sender']) == ("Gövikon", 'noreply@example.org')
+    assert decode(message['From']) == ("Gövikon", 'noreply@example.org')
+    assert decode(message['Reply-To']) == ("Gövikon", 'info@example.org')
     assert decode_header(message['Subject'])[0][0].decode('utf-8')\
-        == u"Test E-Mäil"
+        == "Test E-Mäil"
 
     assert message.get_payload()[0].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'

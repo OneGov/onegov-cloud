@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 import pytest
 
-from onegov.core.compat import BytesIO
+from io import BytesIO
 from onegov.core.csv import (
     CSVFile,
     detect_encoding,
@@ -27,17 +26,17 @@ def test_parse_header():
 
 def test_normalize_header():
     assert normalize_header("") == ""
-    assert normalize_header(u"Wääh") == "waah"
+    assert normalize_header("Wääh") == "waah"
     assert normalize_header(" a   b\tc ") == "a b c"
 
 
 def test_detect_encoding():
     assert detect_encoding(BytesIO(b''))['encoding'] is None
 
-    assert detect_encoding(BytesIO(u'jöö'.encode('ISO-8859-2')))['encoding'] \
+    assert detect_encoding(BytesIO('jöö'.encode('ISO-8859-2')))['encoding'] \
         == 'ISO-8859-2'
 
-    assert detect_encoding(BytesIO(u'jöö'.encode('utf-8')))['encoding'] \
+    assert detect_encoding(BytesIO('jöö'.encode('utf-8')))['encoding'] \
         == 'utf-8'
 
 
@@ -49,7 +48,7 @@ def test_simple_csv_file():
     )
 
     csv = CSVFile(
-        BytesIO(data), [u'datum', u'reale_temperatur', u'gefuhlte_temperatur']
+        BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
     )
 
     csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
@@ -58,7 +57,7 @@ def test_simple_csv_file():
             rownumber=1,
             datum='01.01.2015',
             reale_temperatur='5',
-            gefuhlte_temperatur=u'kühl'
+            gefuhlte_temperatur='kühl'
         ),
         csv.rowtype(
             rownumber=2,

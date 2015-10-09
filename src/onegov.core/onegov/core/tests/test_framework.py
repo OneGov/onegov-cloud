@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import os
 import transaction
@@ -386,7 +385,7 @@ def test_csrf_secret_key():
 def test_csrf():
 
     class MyForm(Form):
-        name = StringField(u'Name')
+        name = StringField('Name')
 
     config = setup()
 
@@ -534,17 +533,17 @@ def test_send_email_to_maildir(temporary_directory):
 def test_send_email_is_8859_1(smtpserver):
     app = Framework()
     app.mail_host, app.mail_port = smtpserver.addr
-    app.mail_sender = u'noreply@example.org'
+    app.mail_sender = 'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
     app.mail_password = None
     app.mail_use_directory = False
 
     app.send_email(
-        reply_to=u'Gövikon <info@example.org>',
-        receivers=[u'recipient@example.org'],
-        subject=u"Nüws",
-        content=u"This e-mäil is just a test"
+        reply_to='Gövikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Nüws",
+        content="This e-mäil is just a test"
     )
 
     assert len(smtpserver.outbox) == 0
@@ -563,12 +562,12 @@ def test_send_email_is_8859_1(smtpserver):
 
         return name, addr
 
-    assert decode(message['Sender']) == (u"Gövikon", 'noreply@example.org')
-    assert decode(message['From']) == (u"Gövikon", 'noreply@example.org')
-    assert decode(message['Reply-To']) == (u"Gövikon", 'info@example.org')
+    assert decode(message['Sender']) == ("Gövikon", 'noreply@example.org')
+    assert decode(message['From']) == ("Gövikon", 'noreply@example.org')
+    assert decode(message['Reply-To']) == ("Gövikon", 'info@example.org')
 
     assert decode_header(message['Subject'])[0][0].decode('utf-8') \
-        == u"Nüws"
+        == "Nüws"
 
     assert message.get_payload()[0].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'
@@ -581,17 +580,17 @@ def test_send_email_is_8859_1(smtpserver):
 def test_send_email_unicode(smtpserver):
     app = Framework()
     app.mail_host, app.mail_port = smtpserver.addr
-    app.mail_sender = u'noreply@example.org'
+    app.mail_sender = 'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
     app.mail_password = None
     app.mail_use_directory = False
 
     app.send_email(
-        reply_to=u'👴 <info@example.org>',
-        receivers=[u'recipient@example.org'],
-        subject=u"👍",
-        content=u"👍"
+        reply_to='👴 <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="👍",
+        content="👍"
     )
 
     assert len(smtpserver.outbox) == 0
@@ -610,10 +609,10 @@ def test_send_email_unicode(smtpserver):
 
         return name, addr
 
-    assert decode(message['Sender']) == (u"👴", 'noreply@example.org')
-    assert decode(message['From']) == (u"👴", 'noreply@example.org')
-    assert decode(message['Reply-To']) == (u"👴", 'info@example.org')
-    assert decode_header(message['Subject'])[0][0].decode('utf-8') == u"👍"
+    assert decode(message['Sender']) == ("👴", 'noreply@example.org')
+    assert decode(message['From']) == ("👴", 'noreply@example.org')
+    assert decode(message['Reply-To']) == ("👴", 'info@example.org')
+    assert decode_header(message['Subject'])[0][0].decode('utf-8') == "👍"
 
     assert message.get_payload()[0].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'
@@ -676,20 +675,20 @@ def test_send_email_transaction(smtpserver):
     @App.view(model=Root, name='send-fail')
     def fail_send(self, request):
         app.send_email(
-            reply_to=u'Gövikon <info@example.org>',
-            receivers=[u'recipient@example.org'],
-            subject=u"Nüws",
-            content=u"This e-mäil is just a test"
+            reply_to='Gövikon <info@example.org>',
+            receivers=['recipient@example.org'],
+            subject="Nüws",
+            content="This e-mäil is just a test"
         )
         assert False
 
     @App.view(model=Root, name='send-ok')
     def success_send(self, request):
         app.send_email(
-            reply_to=u'Gövikon <info@example.org>',
-            receivers=[u'recipient@example.org'],
-            subject=u"Nüws",
-            content=u"This e-mäil is just a test"
+            reply_to='Gövikon <info@example.org>',
+            receivers=['recipient@example.org'],
+            subject="Nüws",
+            content="This e-mäil is just a test"
         )
 
     config.commit()
@@ -698,7 +697,7 @@ def test_send_email_transaction(smtpserver):
     app.application_id = 'test'
     app.configure_application(identity_secure=False)  # allow http
     app.mail_host, app.mail_port = smtpserver.addr
-    app.mail_sender = u'noreply@example.org'
+    app.mail_sender = 'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
     app.mail_password = None

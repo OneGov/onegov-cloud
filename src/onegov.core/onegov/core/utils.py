@@ -14,7 +14,6 @@ from cProfile import Profile
 from datetime import datetime
 from functools import partial
 from itertools import groupby, tee
-from onegov.core import compat
 from purl import URL
 from unidecode import unidecode
 from uuid import UUID
@@ -138,7 +137,7 @@ def module_path(module, subpath):
 
     subpath = subpath.strip('/')
 
-    if isinstance(module, compat.string_types):
+    if isinstance(module, str):
         module = pydoc.locate(module)
 
     assert module is not None
@@ -345,15 +344,15 @@ def is_uuid(value):
     """ Returns true if the given value is a uuid. The value may be a string
     or of type UUID. If it's a string, the uuid is checked with a regex.
     """
-    if isinstance(value, compat.string_types):
-        return _uuid.match(compat.text_type(value))
+    if isinstance(value, str):
+        return _uuid.match(str(value))
 
     return isinstance(value, UUID)
 
 
 def is_non_string_iterable(obj):
     """ Returns true if the given obj is an iterable, but not a string. """
-    return not (isinstance(obj, compat.text_type) or isinstance(obj, bytes))\
+    return not (isinstance(obj, str) or isinstance(obj, bytes))\
         and isinstance(obj, Iterable)
 
 

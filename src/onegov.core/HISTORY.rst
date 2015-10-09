@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Drops Python 2 support!
+  [href]
+
 - Adds a csv module which helps with importing flawed csv files.
   [href]
 

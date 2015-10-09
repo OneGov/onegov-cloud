@@ -70,8 +70,8 @@ def test_get_translations(temporary_directory):
     os.makedirs(os.path.join(temporary_directory, '1/de/LC_MESSAGES'))
     po = polib.POFile()
     po.append(polib.POEntry(
-        msgid=u'Welcome',
-        msgstr=u'Willkommen'
+        msgid='Welcome',
+        msgstr='Willkommen'
     ))
     po.save(os.path.join(
         temporary_directory, '1/de/LC_MESSAGES/onegov.test.po'))
@@ -79,8 +79,8 @@ def test_get_translations(temporary_directory):
     os.makedirs(os.path.join(temporary_directory, '2/de/LC_MESSAGES'))
     po = polib.POFile()
     po.append(polib.POEntry(
-        msgid=u'Morning',
-        msgstr=u'Moin'
+        msgid='Morning',
+        msgstr='Moin'
     ))
     po.save(os.path.join(
         temporary_directory, '2/de/LC_MESSAGES/onegov.test.po'))
@@ -88,8 +88,8 @@ def test_get_translations(temporary_directory):
     os.makedirs(os.path.join(temporary_directory, '2/fr/LC_MESSAGES'))
     po = polib.POFile()
     po.append(polib.POEntry(
-        msgid=u'Welcome',
-        msgstr=u'Bienvenue'
+        msgid='Welcome',
+        msgstr='Bienvenue'
     ))
     po.save(os.path.join(
         temporary_directory, '2/fr/LC_MESSAGES/onegov.test.po'))
@@ -100,24 +100,24 @@ def test_get_translations(temporary_directory):
     ])
     assert list(sorted(translations.keys())) == list(sorted(['de', 'fr']))
 
-    translations['de'].gettext(u'Welcome') == u'Willkommen'
-    translations['de'].gettext(u'Morning') == u'Moin'
-    translations['fr'].gettext(u'Welcome') == u'Bienvenue'
+    translations['de'].gettext('Welcome') == 'Willkommen'
+    translations['de'].gettext('Morning') == 'Moin'
+    translations['fr'].gettext('Welcome') == 'Bienvenue'
 
     translations = i18n.get_translations([
         temporary_directory + '/1',
     ])
     assert list(sorted(translations.keys())) == list(sorted(['de']))
-    translations['de'].gettext(u'Welcome') == u'Willkommen'
-    translations['de'].gettext(u'Morning') == u'Morning'
+    translations['de'].gettext('Welcome') == 'Willkommen'
+    translations['de'].gettext('Morning') == 'Morning'
 
     translations = i18n.get_translations([
         temporary_directory + '/2',
     ])
     assert list(sorted(translations.keys())) == list(sorted(['de', 'fr']))
-    translations['de'].gettext(u'Welcome') == u'Welcome'
-    translations['de'].gettext(u'Morning') == u'Moin'
-    translations['fr'].gettext(u'Welcome') == u'Bienvenue'
+    translations['de'].gettext('Welcome') == 'Welcome'
+    translations['de'].gettext('Morning') == 'Moin'
+    translations['fr'].gettext('Welcome') == 'Bienvenue'
 
 
 def test_default_locale_negotiator():
