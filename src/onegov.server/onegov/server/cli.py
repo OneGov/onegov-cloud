@@ -46,8 +46,6 @@ A onegov.yml file looks like this:
         handlers: [console]
 """
 
-from __future__ import print_function
-
 import click
 import multiprocessing
 import objgraph
