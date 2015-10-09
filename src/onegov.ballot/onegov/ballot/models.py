@@ -10,9 +10,6 @@ As of this writing onegov.ballot only aims to implement votes, not elections.
 Though it will do so in the future.
 
 """
-
-from __future__ import division
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
