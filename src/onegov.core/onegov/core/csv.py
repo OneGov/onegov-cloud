@@ -64,7 +64,7 @@ class CSVFile(object):
             yield self.rowtype(
                 rownumber=ix + 1,  # row numbers are for customers, not coders
                 **{
-                    header: line[column]
+                    header: line[column].strip()
                     for header, column in self.headers.items()
                 }
             )
