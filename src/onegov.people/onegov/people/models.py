@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -30,7 +28,7 @@ class Person(Base, TimestampMixin, ORMSearchable):
         else:
             parts = self.first_name, self.last_name
 
-        return u" ".join(parts)
+        return " ".join(parts)
 
     #: the unique id, part of the url
     id = Column(UUID, primary_key=True, default=uuid4)
