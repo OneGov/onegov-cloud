@@ -11,7 +11,7 @@ def test_application_mapping():
 
         def __call__(self, environ, start_response):
             response = Response()
-            response.text = u', '.join(
+            response.text = ', '.join(
                 (self.application_base_path, self.application_id))
 
             return response(environ, start_response)
@@ -59,7 +59,7 @@ def test_path_prefix():
             request = BaseRequest(environ)
 
             response = Response()
-            response.text = u', '.join(
+            response.text = ', '.join(
                 (request.script_name, request.path_info))
 
             return response(environ, start_response)
@@ -94,7 +94,7 @@ def test_environ_changes():
 
         def __call__(self, environ, start_response):
             response = Response()
-            response.text = u', '.join((
+            response.text = ', '.join((
                 environ['SCRIPT_NAME'],
                 environ['PATH_INFO']
             ))
@@ -131,7 +131,7 @@ def test_invalid_host_request():
 
         def __call__(self, environ, start_response):
             response = Response()
-            response.text = u'hello'
+            response.text = 'hello'
 
             return response(environ, start_response)
 
@@ -173,7 +173,7 @@ def test_aliases():
 
         def __call__(self, environ, start_response):
             response = Response()
-            response.text = u''.join((self.application_id))
+            response.text = ''.join((self.application_id))
 
             return response(environ, start_response)
 
