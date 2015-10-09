@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import transaction
 
@@ -88,7 +87,7 @@ def test_search_query(es_url, postgres_dsn):
         public=False
     ))
     session.add(Document(
-        title=u"Öffentlich",
+        title="Öffentlich",
         body="Dieses Dokument kann jeder sehen",
         language='de',
         public=True
@@ -134,12 +133,12 @@ def test_search_query(es_url, postgres_dsn):
 
     # test single result loading
     document = app.es_search(languages=['de']).execute()[0].load()
-    assert document.title == u"Öffentlich"
+    assert document.title == "Öffentlich"
     assert document.public
 
     # test single result query
     document = app.es_search(languages=['de']).execute()[0].query().one()
-    assert document.title == u"Öffentlich"
+    assert document.title == "Öffentlich"
     assert document.public
 
 
@@ -483,12 +482,12 @@ def test_suggestions(es_url, postgres_dsn):
         public=False
     ))
     session.add(Document(
-        title=u"Öffentliches Dokument",
+        title="Öffentliches Dokument",
         language='de',
         public=True
     ))
     session.add(Document(
-        title=u"Privates Dokument",
+        title="Privates Dokument",
         language='de',
         public=False
     ))
@@ -507,12 +506,12 @@ def test_suggestions(es_url, postgres_dsn):
         "Privates Dokument"
     }
     assert set(app.es_suggestions(query='ö', languages=['de'])) == {
-        u"Öffentliches Dokument",
+        "Öffentliches Dokument",
     }
 
     assert set(app.es_suggestions(
         query='ö', languages=['de'], include_private=True)) == {
-        u"Öffentliches Dokument",
+        "Öffentliches Dokument",
     }
 
     assert set(app.es_suggestions(

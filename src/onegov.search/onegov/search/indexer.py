@@ -4,7 +4,7 @@ from copy import deepcopy
 from elasticsearch.exceptions import TransportError
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
-from onegov.search.compat import Queue, Empty, Full
+from queue import Queue, Empty, Full
 
 ES_ANALYZER_MAP = {
     'en': 'english',
@@ -262,8 +262,7 @@ class TypeMappingRegistry(object):
         return self.mappings[key]
 
     def __iter__(self):
-        for mapping in self.mappings.values():
-            yield mapping
+        yield from self.mappings.values()
 
     def register_orm_base(self, base):
         """ Takes the given SQLAlchemy base and registers all

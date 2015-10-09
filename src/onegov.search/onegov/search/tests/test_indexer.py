@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
 import logging
 import pytest
 
 from datetime import datetime
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import TransportError
-from mock import Mock
 from onegov.search import Searchable, utils
-from onegov.search.compat import Queue
 from onegov.search.indexer import (
     Indexer,
     IndexManager,
@@ -15,6 +12,8 @@ from onegov.search.indexer import (
     TypeMapping,
     TypeMappingRegistry
 )
+from queue import Queue
+from unittest.mock import Mock
 
 
 def test_index_manager_assertions(es_client):
@@ -556,11 +555,11 @@ def test_extra_analyzers(es_client):
 
     result = es_client.indices.analyze(
         index=index,
-        body=u'Möchten Sie <em>wirklich</em> weiterfahren?',
+        body='Möchten Sie <em>wirklich</em> weiterfahren?',
         analyzer='german_html'
     )
     assert [v['token'] for v in result['tokens']] == [
-        u'mocht', u'wirklich', u'weiterfahr'
+        'mocht', 'wirklich', 'weiterfahr'
     ]
 
 
