@@ -69,7 +69,7 @@ def handle_new_page(self, request, form, src=None):
 def handle_edit_page(self, request, form):
     if form.submitted(request):
         form.update_model(self.page)
-        request.success(_(u"Your changes were saved"))
+        request.success(_("Your changes were saved"))
 
         return morepath.redirect(request.link(self.page))
     elif not request.POST:

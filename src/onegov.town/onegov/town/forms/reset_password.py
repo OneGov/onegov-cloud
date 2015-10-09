@@ -10,7 +10,7 @@ class RequestPasswordResetForm(Form):
     """ Defines the password reset request form for onegov town. """
 
     email = StringField(
-        _(u"Email Address"),
+        _("Email Address"),
         [validators.InputRequired(), validators.Email()]
     )
 
@@ -36,11 +36,11 @@ class PasswordResetForm(Form):
     """ Defines the password reset form for onegov town. """
 
     email = StringField(
-        _(u"Email Address"),
+        _("Email Address"),
         [validators.InputRequired(), validators.Email()]
     )
     password = PasswordField(
-        _(u"New Password"),
+        _("New Password"),
         [validators.InputRequired(), validators.Length(min=8)]
     )
     token = HiddenField()

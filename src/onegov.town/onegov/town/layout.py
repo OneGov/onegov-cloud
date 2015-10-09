@@ -282,29 +282,29 @@ class DefaultLayout(Layout):
 
         if request.current_role == 'editor':
             return [
-                Link(_(u'Logout'), self.logout_url),
-                Link(_(u'Files'), request.link(FileCollection(self.app))),
-                Link(_(u'Images'), request.link(ImageCollection(self.app))),
-                Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
-                Link(u'Seantis GmbH', 'https://www.seantis.ch')
+                Link(_('Logout'), self.logout_url),
+                Link(_('Files'), request.link(FileCollection(self.app))),
+                Link(_('Images'), request.link(ImageCollection(self.app))),
+                Link('OneGov Cloud', 'http://www.onegovcloud.ch'),
+                Link('Seantis GmbH', 'https://www.seantis.ch')
             ]
         elif request.current_role == 'admin':
             return [
-                Link(_(u'Logout'), self.logout_url),
-                Link(_(u'Files'), request.link(FileCollection(self.app))),
-                Link(_(u'Images'), request.link(ImageCollection(self.app))),
-                Link(_(u'Settings'), request.link(self.town, 'einstellungen')),
-                Link(_(u'Tickets'), request.link(TicketCollection(
+                Link(_('Logout'), self.logout_url),
+                Link(_('Files'), request.link(FileCollection(self.app))),
+                Link(_('Images'), request.link(ImageCollection(self.app))),
+                Link(_('Settings'), request.link(self.town, 'einstellungen')),
+                Link(_('Tickets'), request.link(TicketCollection(
                     self.app.session()
                 ))),
-                Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
-                Link(u'Seantis GmbH', 'https://www.seantis.ch')
+                Link('OneGov Cloud', 'http://www.onegovcloud.ch'),
+                Link('Seantis GmbH', 'https://www.seantis.ch')
             ]
         else:
             return [
-                Link(_(u'Login'), self.login_url),
-                Link(u'OneGov Cloud', 'http://www.onegovcloud.ch'),
-                Link(u'Seantis GmbH', 'https://www.seantis.ch')
+                Link(_('Login'), self.login_url),
+                Link('OneGov Cloud', 'http://www.onegovcloud.ch'),
+                Link('Seantis GmbH', 'https://www.seantis.ch')
             ]
 
 
@@ -792,7 +792,7 @@ class EventBaseLayout(DefaultLayout):
             rule = rrule.rrulestr(recurrence)
             if rule._freq == rrule.WEEKLY:
                 return _(
-                    u"Every ${days} until ${end}",
+                    "Every ${days} until ${end}",
                     mapping={
                         'days': ', '.join((
                             self.request.translate(WEEKDAYS[day])

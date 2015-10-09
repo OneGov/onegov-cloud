@@ -94,7 +94,7 @@ def handle_pending_submission(self, request):
     if completable and 'return-to' in request.GET:
 
         if 'quiet' not in request.GET:
-            request.success(_(u"Your changes were saved"))
+            request.success(_("Your changes were saved"))
 
         return morepath.redirect(request.GET['return-to'])
 
@@ -132,7 +132,7 @@ def handle_complete_submission(self, request):
     else:
         if self.state == 'complete':
             self.data.changed()  # trigger updates
-            request.success(_(u"Your changes were saved"))
+            request.success(_("Your changes were saved"))
 
             return morepath.redirect(request.link(
                 FormCollection(request.app.session()).scoped_submissions(

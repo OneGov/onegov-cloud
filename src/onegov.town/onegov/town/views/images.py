@@ -26,7 +26,7 @@ def view_get_image_collection(self, request):
 
     return {
         'layout': layout,
-        'title': _(u'Images'),
+        'title': _('Images'),
         'image_groups': image_groups,
     }
 

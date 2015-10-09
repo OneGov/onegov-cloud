@@ -35,7 +35,7 @@ class PageForm(PageBaseForm):
         widget=with_options(TextArea, rows=4))
 
     text = TextAreaField(
-        label=_(u"Text"),
+        label=_("Text"),
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html, mark_images])
 

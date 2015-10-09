@@ -6,4 +6,4 @@ exist in external packages which provide no translations.
 from onegov.town import _
 
 # messages defined in wtforms-components
-_(u"Not a valid color.")
+_("Not a valid color.")

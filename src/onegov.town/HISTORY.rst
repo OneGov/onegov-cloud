@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Removes Python 2.x support.
+  [href]
+
 - Logouts now redirect to the current page, just like logins.
   [href]
 

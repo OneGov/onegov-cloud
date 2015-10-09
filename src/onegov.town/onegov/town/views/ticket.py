@@ -41,7 +41,7 @@ def accept_ticket(self, request):
 
     self.accept_ticket(user)
 
-    request.success(_(u"You have accepted ticket ${number}", mapping={
+    request.success(_("You have accepted ticket ${number}", mapping={
         'number': self.number
     }))
 
@@ -54,7 +54,7 @@ def accept_ticket(self, request):
 def close_ticket(self, request):
     self.close_ticket()
 
-    request.success(_(u"You have closed ticket ${number}", mapping={
+    request.success(_("You have closed ticket ${number}", mapping={
         'number': self.number
     }))
 
@@ -83,7 +83,7 @@ def reopen_ticket(self, request):
 
     self.reopen_ticket(user)
 
-    request.success(_(u"You have reopened ticket ${number}", mapping={
+    request.success(_("You have reopened ticket ${number}", mapping={
         'number': self.number
     }))
 

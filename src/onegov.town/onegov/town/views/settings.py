@@ -32,7 +32,7 @@ def handle_settings(self, request, form):
                 'analytics_code': form.analytics_code.data
             }
 
-        request.success(_(u"Your changes were saved"))
+        request.success(_("Your changes were saved"))
     else:
         form.name.data = self.name
         form.logo_url.data = self.logo_url
@@ -50,7 +50,7 @@ def handle_settings(self, request, form):
 
     return {
         'layout': layout,
-        'title': _(u'Settings'),
+        'title': _('Settings'),
         'form': form,
         'form_width': 'large'
     }

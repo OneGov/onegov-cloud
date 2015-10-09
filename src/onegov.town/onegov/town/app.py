@@ -88,9 +88,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
 
         assert 'reply_to' in self.town.meta
 
-        reply_to = u"{} <{}>".format(
-            self.town.name, self.town.meta['reply_to']
-        )
+        reply_to = "{} <{}>".format(self.town.name, self.town.meta['reply_to'])
 
         return super(TownApp, self).send_email(reply_to=reply_to, **kwargs)
 

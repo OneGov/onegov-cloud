@@ -29,7 +29,7 @@ def view_get_file_collection(self, request):
 
     return {
         'layout': layout,
-        'title': _(u'Files'),
+        'title': _('Files'),
         'files': files,
     }
 

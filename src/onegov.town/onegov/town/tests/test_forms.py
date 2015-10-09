@@ -1,4 +1,3 @@
-# coding=utf-8
 import pytest
 
 from datetime import date, datetime, time, timedelta
@@ -292,16 +291,16 @@ def test_edit_room_alllocation_form():
 
 def test_event_form_update_apply():
     form = EventForm(MultiDict([
-        ('description', u'Rendez-vous automnal des médecines.'),
-        ('email', u'info@example.org'),
+        ('description', 'Rendez-vous automnal des médecines.'),
+        ('email', 'info@example.org'),
         ('end_date', ''),
         ('end_time', '18:00'),
-        ('location', u'Salon du mieux-vivre à Saignelégier'),
+        ('location', 'Salon du mieux-vivre à Saignelégier'),
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
-        ('tags', u'Congress'),
-        ('tags', u'Health'),
-        ('title', u'Salon du mieux-vivre, 16e édition'),
+        ('tags', 'Congress'),
+        ('tags', 'Health'),
+        ('title', 'Salon du mieux-vivre, 16e édition'),
     ]))
     assert form.validate()
 
@@ -309,25 +308,25 @@ def test_event_form_update_apply():
     form.update_model(event)
     form = EventForm()
     form.apply_model(event)
-    assert form.data['description'] == u'Rendez-vous automnal des médecines.'
-    assert form.data['email'] == u'info@example.org'
+    assert form.data['description'] == 'Rendez-vous automnal des médecines.'
+    assert form.data['email'] == 'info@example.org'
     assert form.data['end_date'] == None
     assert form.data['end_time'] == time(18, 0)
-    assert form.data['location'] == u'Salon du mieux-vivre à Saignelégier'
+    assert form.data['location'] == 'Salon du mieux-vivre à Saignelégier'
     assert form.data['start_date'] == date(2015, 6, 16)
     assert form.data['start_time'] == time(9, 30)
-    assert sorted(form.data['tags']) == [u'Congress', u'Health']
-    assert form.data['title'] == u'Salon du mieux-vivre, 16e édition'
+    assert sorted(form.data['tags']) == ['Congress', 'Health']
+    assert form.data['title'] == 'Salon du mieux-vivre, 16e édition'
     assert form.data['weekly'] == None
 
 
 def test_event_form_update_after_midnight():
     form = EventForm(MultiDict([
-        ('email', u'info@example.org'),
+        ('email', 'info@example.org'),
         ('end_time', '8:00'),
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
-        ('title', u'Salon du mieux-vivre, 16e édition'),
+        ('title', 'Salon du mieux-vivre, 16e édition'),
     ]))
     assert form.validate()
 
@@ -338,13 +337,13 @@ def test_event_form_update_after_midnight():
 
 def test_event_form_validate():
     form = EventForm(MultiDict([
-        ('email', u'info@example.org'),
+        ('email', 'info@example.org'),
         ('end_date', '2015-06-23'),
         ('end_time', '18:00'),
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
-        ('title', u'Salon du mieux-vivre, 16e édition'),
-        ('weekly', u'MO'),
+        ('title', 'Salon du mieux-vivre, 16e édition'),
+        ('weekly', 'MO'),
     ]))
     assert not form.validate()
     assert form.errors == {
@@ -352,13 +351,13 @@ def test_event_form_validate():
     }
 
     form = EventForm(MultiDict([
-        ('email', u'info@example.org'),
+        ('email', 'info@example.org'),
         ('end_date', ''),
         ('end_time', '18:00'),
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
-        ('title', u'Salon du mieux-vivre, 16e édition'),
-        ('weekly', u'TU'),
+        ('title', 'Salon du mieux-vivre, 16e édition'),
+        ('weekly', 'TU'),
     ]))
     assert not form.validate()
     assert form.errors == {
@@ -366,12 +365,12 @@ def test_event_form_validate():
     }
 
     form = EventForm(MultiDict([
-        ('email', u'info@example.org'),
+        ('email', 'info@example.org'),
         ('end_date', '2015-06-23'),
         ('end_time', '18:00'),
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
-        ('title', u'Salon du mieux-vivre, 16e édition'),
+        ('title', 'Salon du mieux-vivre, 16e édition'),
     ]))
     assert not form.validate()
     assert form.errors == {

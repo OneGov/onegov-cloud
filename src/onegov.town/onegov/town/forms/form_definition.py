@@ -18,7 +18,7 @@ class FormDefinitionBaseForm(Form):
         widget=with_options(TextArea, rows=4))
 
     text = TextAreaField(
-        label=_(u"Text"),
+        label=_("Text"),
         widget=with_options(TextArea, class_='editor'),
         filters=[sanitize_html, mark_images])
 
@@ -42,7 +42,7 @@ class BuiltinDefinitionForm(FormDefinitionBaseForm):
     """ Form to edit builtin forms. """
 
     definition = TextAreaField(
-        label=_(u"Definition"),
+        label=_("Definition"),
         validators=[validators.InputRequired(), ValidFormDefinition()],
         widget=with_options(
             TextArea, rows=24, readonly='readonly',
@@ -58,7 +58,7 @@ class CustomDefinitionForm(FormDefinitionBaseForm):
     """
 
     definition = TextAreaField(
-        label=_(u"Definition"),
+        label=_("Definition"),
         validators=[validators.InputRequired(), ValidFormDefinition()],
         widget=with_options(TextArea, rows=32, **{'data-editor': 'form'}),
     )

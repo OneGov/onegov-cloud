@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import codecs
 import os
 
@@ -128,7 +126,7 @@ def load_definition(path):
         formlines = formfile.readlines()
 
         title = formlines[0].strip()
-        definition = u''.join(formlines[3:])
+        definition = ''.join(formlines[3:])
 
         return title, definition
 
@@ -150,31 +148,31 @@ def add_events(session):
 
     events = EventCollection(session)
     event = events.add(
-        title=u"150 Jahre Govikon",
+        title="150 Jahre Govikon",
         start=start + timedelta(hours=11, minutes=0),
         end=start + timedelta(hours=22, minutes=0),
         timezone="Europe/Zurich",
         tags=["Party"],
-        location=u"Sportanlage",
-        content={"description": u"Lorem ipsum."},
-        meta={"submitter_email": u"info@example.org"},
+        location="Sportanlage",
+        content={"description": "Lorem ipsum."},
+        meta={"submitter_email": "info@example.org"},
     )
     event.submit()
     event.publish()
     event = events.add(
-        title=u"Gemeindeversammlung",
+        title="Gemeindeversammlung",
         start=start + timedelta(days=2, hours=20, minutes=0),
         end=start + timedelta(days=2, hours=22, minutes=30),
         timezone="Europe/Zurich",
         tags=["Politics"],
-        location=u"Gemeindesaal",
-        content={"description": u"Lorem ipsum."},
-        meta={"submitter_email": u"info@example.org"},
+        location="Gemeindesaal",
+        content={"description": "Lorem ipsum."},
+        meta={"submitter_email": "info@example.org"},
     )
     event.submit()
     event.publish()
     event = events.add(
-        title=u"MuKi Turnen",
+        title="MuKi Turnen",
         start=start + timedelta(days=2, hours=10, minutes=0),
         end=start + timedelta(days=2, hours=11, minutes=0),
         recurrence=(
@@ -184,21 +182,21 @@ def add_events(session):
         ),
         timezone="Europe/Zurich",
         tags=["Sports"],
-        location=u"Turnhalle",
-        content={"description": u"Lorem ipsum."},
-        meta={"submitter_email": u"info@example.org"},
+        location="Turnhalle",
+        content={"description": "Lorem ipsum."},
+        meta={"submitter_email": "info@example.org"},
     )
     event.submit()
     event.publish()
     event = events.add(
-        title=u"Grümpelturnier",
+        title="Grümpelturnier",
         start=start + timedelta(days=7, hours=10, minutes=0),
         end=start + timedelta(days=7, hours=18, minutes=0),
         timezone="Europe/Zurich",
         tags=["Sports"],
-        location=u"Sportanlage",
-        content={"description": u"Lorem ipsum."},
-        meta={"submitter_email": u"info@example.org"},
+        location="Sportanlage",
+        content={"description": "Lorem ipsum."},
+        meta={"submitter_email": "info@example.org"},
     )
     event.submit()
     event.publish()

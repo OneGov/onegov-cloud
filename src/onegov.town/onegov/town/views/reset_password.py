@@ -40,8 +40,8 @@ def handle_password_reset_request(self, request, form):
 
         response = morepath.redirect(request.link(self))
         request.success(
-            _((u'A password reset link has been sent to ${email}, provided an '
-               u'account exists for this email address.'),
+            _(('A password reset link has been sent to ${email}, provided an '
+               'account exists for this email address.'),
               mapping={'email': form.email.data})
         )
         return response
@@ -54,7 +54,7 @@ def handle_password_reset_request(self, request, form):
 
     return {
         'layout': layout,
-        'title': _(u'Reset password'),
+        'title': _('Reset password'),
         'form': form,
         'form_width': 'small'
     }
@@ -96,7 +96,7 @@ def handle_password_reset(self, request, form):
 
     return {
         'layout': layout,
-        'title': _(u'Reset password'),
+        'title': _('Reset password'),
         'form': form,
         'form_width': 'small'
     }

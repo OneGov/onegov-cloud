@@ -1,11 +1,11 @@
 import os
 
 from datetime import datetime, date
-from mock import Mock, patch
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path, rchop
 from onegov.testing import utils
 from onegov.town.models import Clipboard, ImageCollection, SiteCollection
+from unittest.mock import Mock, patch
 
 
 def test_image_collection(town_app):

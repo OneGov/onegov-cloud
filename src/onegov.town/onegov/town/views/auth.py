@@ -33,7 +33,7 @@ def handle_login(self, request, form):
         'layout': layout,
         'password_reset_link': request.link(
             request.app.town, name='request-password'),
-        'title': _(u'Login to ${town}', mapping={
+        'title': _('Login to ${town}', mapping={
             'town': request.app.town.name
         }),
         'form': form

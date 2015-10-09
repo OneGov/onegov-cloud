@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import onegov.core
 import onegov.town
 import pytest
@@ -64,7 +63,7 @@ def test_view_form_alert(town_app):
     login = Client(town_app).get('/auth/login')
     login = login.form.submit()
 
-    assert u'Das Formular enthält Fehler' in login
+    assert 'Das Formular enthält Fehler' in login
 
 
 def test_view_login(town_app):
@@ -79,17 +78,17 @@ def test_view_login(town_app):
     # (the default *is* English, but it needs to be added as a locale, or it
     # won't be used)
     assert response.status_code == 200
-    assert u"E-Mail Adresse" in response
-    assert u"Passwort" in response
+    assert "E-Mail Adresse" in response
+    assert "Passwort" in response
 
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
     response.form.set('username', 'admin@example.org')
     response = response.form.submit()
     assert response.status_code == 200
-    assert u"E-Mail Adresse" in response
-    assert u"Passwort" in response
-    assert u"Dieses Feld wird benötigt." in response
+    assert "E-Mail Adresse" in response
+    assert "Passwort" in response
+    assert "Dieses Feld wird benötigt." in response
     assert client.get('/auth/logout', expect_errors=True).status_code == 403
 
     response.form.set('username', 'admin@example.org')
@@ -210,7 +209,7 @@ def test_login(town_app):
     login_page.form['password'] = ''
     login_page = login_page.form.submit()
 
-    assert u"Dieses Feld wird benötigt" in login_page.text
+    assert "Dieses Feld wird benötigt" in login_page.text
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'wrong'
@@ -241,8 +240,8 @@ def test_reset_password(town_app):
     assert links.text() == 'Login'
     login_page = client.get(links.attr('href'))
 
-    request_page = login_page.click(u'Passwort zurücksetzen')
-    assert u'Passwort zurücksetzen' in request_page.text
+    request_page = login_page.click('Passwort zurücksetzen')
+    assert 'Passwort zurücksetzen' in request_page.text
 
     request_page.form['email'] = 'someone@example.org'
     assert 'someone@example.org' in request_page.form.submit().follow()
@@ -264,7 +263,7 @@ def test_reset_password(town_app):
     reset_page.form['email'] = 'someone_else@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert u"Ungültiger Addresse oder abgelaufener Link" in reset_page.text
+    assert "Ungültiger Addresse oder abgelaufener Link" in reset_page.text
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
@@ -275,12 +274,12 @@ def test_reset_password(town_app):
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
-    assert u"Passwort geändert" in reset_page.form.submit().follow().text
+    assert "Passwort geändert" in reset_page.form.submit().follow().text
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert u"Ungültiger Addresse oder abgelaufener Link" in reset_page.text
+    assert "Ungültiger Addresse oder abgelaufener Link" in reset_page.text
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
@@ -312,13 +311,13 @@ def test_settings(town_app):
     settings_page.form['reply_to'] = 'info@govikon.ch'
     settings_page = settings_page.form.submit()
 
-    assert u"Ungültige Farbe." in settings_page.text
+    assert "Ungültige Farbe." in settings_page.text
 
     settings_page.form['primary_color'] = '#ccddee'
     settings_page.form['reply_to'] = 'info@govikon.ch'
     settings_page = settings_page.form.submit()
 
-    assert u"Ungültige Farbe." not in settings_page.text
+    assert "Ungültige Farbe." not in settings_page.text
 
     settings_page.form['logo_url'] = 'https://seantis.ch/logo.img'
     settings_page.form['reply_to'] = 'info@govikon.ch'
@@ -344,8 +343,8 @@ def test_unauthorized(town_app):
     client = Client(town_app)
 
     unauth_page = client.get('/einstellungen', expect_errors=True)
-    assert u"Zugriff verweigert" in unauth_page.text
-    assert u"folgen Sie diesem Link um sich anzumelden" in unauth_page.text
+    assert "Zugriff verweigert" in unauth_page.text
+    assert "folgen Sie diesem Link um sich anzumelden" in unauth_page.text
 
     link = unauth_page.pyquery('#alternate-login-link')[0]
     login_page = client.get(link.attrib.get('href'))
@@ -353,8 +352,8 @@ def test_unauthorized(town_app):
     login_page.form['password'] = 'hunter2'
     unauth_page = login_page.form.submit().follow(expect_errors=True)
 
-    assert u"Zugriff verweigert" in unauth_page.text
-    assert u"mit einem anderen Benutzer anzumelden" in unauth_page.text
+    assert "Zugriff verweigert" in unauth_page.text
+    assert "mit einem anderen Benutzer anzumelden" in unauth_page.text
 
     link = unauth_page.pyquery('#alternate-login-link')[0]
     login_page = client.get(link.attrib.get('href'))
@@ -363,7 +362,7 @@ def test_unauthorized(town_app):
     settings_page = login_page.form.submit().follow()
 
     assert settings_page.status_code == 200
-    assert u"Zugriff verweigert" not in settings_page
+    assert "Zugriff verweigert" not in settings_page
 
 
 def test_pages(town_app):
@@ -507,8 +506,8 @@ def test_links(town_app):
     login_page.form['password'] = 'hunter2'
     root_page = login_page.form.submit().follow()
 
-    new_link = root_page.click(u"Verknüpfung")
-    assert u"Neue Verknüpfung" in new_link
+    new_link = root_page.click("Verknüpfung")
+    assert "Neue Verknüpfung" in new_link
 
     new_link.form['title'] = 'Google'
     new_link.form['url'] = 'https://www.google.ch'
@@ -606,9 +605,9 @@ def test_pending_submission_successful_file_upload(town_app):
     form_page = form_page.form.submit().follow()
 
     assert "README.txt" in form_page.text
-    assert u"Datei ersetzen" in form_page.text
-    assert u"Datei löschen" in form_page.text
-    assert u"Datei behalten" in form_page.text
+    assert "Datei ersetzen" in form_page.text
+    assert "Datei löschen" in form_page.text
+    assert "Datei behalten" in form_page.text
 
     # unfortunately we can't test more here, as webtest doesn't support
     # multiple differing fields of the same name...
@@ -648,7 +647,7 @@ def test_add_custom_form(town_app):
     form_page.form['definition'] = "abc ="
     form_page = form_page.form.submit()
 
-    assert u"Das Formular ist nicht gültig." in form_page
+    assert "Das Formular ist nicht gültig." in form_page
 
     # this error is line based
     form_page = client.get('/formulare/neu')
@@ -658,7 +657,7 @@ def test_add_custom_form(town_app):
     form_page.form['definition'] = "xxx = !!!"
     form_page = form_page.form.submit()
 
-    assert u"Der Syntax in der 1. Zeile ist ungültig." in form_page
+    assert "Der Syntax in der 1. Zeile ist ungültig." in form_page
     assert 'data-highlight-line="1"' in form_page
 
     form_page.form['definition'] = "Name * = ___\nE-Mail * = @@@"
@@ -1036,19 +1035,19 @@ def test_resource_slots(town_app):
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
     assert result[0]['className'] == 'event-available'
-    assert result[0]['title'] == u"Ganztägig\nVerfügbar"
+    assert result[0]['title'] == "Ganztägig\nVerfügbar"
 
     assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
     assert result[1]['className'] == 'event-available'
-    assert result[1]['title'] == u"Ganztägig\nVerfügbar"
+    assert result[1]['title'] == "Ganztägig\nVerfügbar"
 
     url = '/ressource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
     assert result[0]['className'] == 'event-unavailable'
-    assert result[0]['title'] == u"12:00 - 16:00\nBesetzt"
+    assert result[0]['title'] == "12:00 - 16:00\nBesetzt"
 
 
 def test_resources(town_app):
@@ -1195,7 +1194,7 @@ def test_allocations(town_app):
     ))
 
     assert len(slots.json) == 2
-    assert slots.json[0]['title'] == u"Ganztägig\nVerfügbar"
+    assert slots.json[0]['title'] == "Ganztägig\nVerfügbar"
 
     # change the daypasses
     edit = client.get(extract_href(slots.json[0]['actions'][1]))
@@ -1208,7 +1207,7 @@ def test_allocations(town_app):
     ))
 
     assert len(slots.json) == 1
-    assert slots.json[0]['title'] == u"Ganztägig\n2/2 Verfügbar"
+    assert slots.json[0]['title'] == "Ganztägig\n2/2 Verfügbar"
 
     # try to create a new allocation over an existing one
     new = client.get((
@@ -1220,7 +1219,7 @@ def test_allocations(town_app):
     new.form['daypasses_limit'] = 1
     new = new.form.submit()
 
-    assert u"Es besteht bereits eine Einteilung im gewünschten Zeitraum" in new
+    assert "Es besteht bereits eine Einteilung im gewünschten Zeitraum" in new
 
     # move the existing allocations
     slots = client.get((
@@ -1374,7 +1373,7 @@ def test_reserve_allocation(town_app):
     reserve.form['e_mail'] = 'info@example.org'
     result = reserve.form.submit()
 
-    assert u"Der gewünschte Zeitraum ist nicht mehr verfügbar." in result
+    assert "Der gewünschte Zeitraum ist nicht mehr verfügbar." in result
 
     # try deleting the allocation with the existing reservation
     login_page = client.get('/auth/login')
@@ -1431,7 +1430,7 @@ def test_reserve_allocation(town_app):
     assert town_app.session().query(Reservation).count() == 0
     assert town_app.session().query(FormSubmission).count() == 0
 
-    assert u"Der hinterlegte Datensatz wurde entfernt" in ticket
+    assert "Der hinterlegte Datensatz wurde entfernt" in ticket
     assert '28.08.2015' in ticket
     assert '4' in ticket
     assert '0xdeadbeef' in ticket
@@ -1555,7 +1554,7 @@ def test_two_parallel_reservations(town_app):
 
     # one will win, one will lose
     assert f1.follow().status_code == 302
-    assert u"Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.follow()
+    assert "Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.follow()
 
 
 def test_cleanup_allocations(town_app):
@@ -1585,18 +1584,18 @@ def test_cleanup_allocations(town_app):
     login_page.form.set('password', 'hunter2')
     login_page.form.submit()
 
-    cleanup = client.get('/ressource/sbb-tageskarte').click(u"Aufräumen")
+    cleanup = client.get('/ressource/sbb-tageskarte').click("Aufräumen")
     cleanup.form['start'] = date(2015, 8, 31)
     cleanup.form['end'] = date(2015, 8, 1)
     cleanup = cleanup.form.submit()
 
-    assert u"Das End-Datum muss nach dem Start-Datum liegen" in cleanup
+    assert "Das End-Datum muss nach dem Start-Datum liegen" in cleanup
 
     cleanup.form['start'] = date(2015, 8, 1)
     cleanup.form['end'] = date(2015, 8, 31)
     resource = cleanup.form.submit().follow()
 
-    assert u"1 Einteilungen wurden erfolgreich entfernt" in resource
+    assert "1 Einteilungen wurden erfolgreich entfernt" in resource
 
 
 def test_view_occurrences_on_startpage(town_app):
@@ -1653,7 +1652,7 @@ def test_view_occurrences(town_app):
     query = 'tags=Sports'
     assert tags(query) == ["Sport"]
     assert total_events(query) == 10
-    assert set(events(query)) == set(["MuKi Turnen", u"Grümpelturnier"])
+    assert set(events(query)) == set(["MuKi Turnen", "Grümpelturnier"])
 
     query = 'tags=Politics&tags=Party'
     assert sorted(tags(query)) == ["Party", "Politik"]
@@ -1920,7 +1919,7 @@ def test_delete_event(town_app):
     # Try to delete a submitted event directly
     event_page = client.get('/veranstaltungen').click("My Event")
 
-    assert u"Diese Veranstaltung kann nicht gelöscht werden." in \
+    assert "Diese Veranstaltung kann nicht gelöscht werden." in \
         event_page.pyquery('a.delete-link')[0].values()
 
     # Delete the event via the ticket
@@ -1939,7 +1938,7 @@ def test_delete_event(town_app):
 
     # Delete a non-submitted event
     event_page = client.get('/veranstaltungen').click("Gemeindeversammlung")
-    assert u"Möchten Sie die Veranstaltung wirklich löschen?" in \
+    assert "Möchten Sie die Veranstaltung wirklich löschen?" in \
         event_page.pyquery('a.delete-link')[0].values()
 
     delete_link = event_page.pyquery('a.delete-link').attr('ic-delete-from')

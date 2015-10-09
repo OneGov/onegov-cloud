@@ -111,7 +111,7 @@ class ContactExtension(ContentExtension):
 
         class ContactPageForm(form_class):
             contact_address = TextAreaField(
-                label=_(u"Address"),
+                label=_("Address"),
                 fieldset=_("Contact"),
                 widget=with_options(TextArea, rows=5)
             )

@@ -40,7 +40,7 @@ def view_occurrences(self, request):
         'occurrences': self.batch,
         'start': self.start.isoformat() if self.start else '',
         'tags': tags,
-        'title': _(u'Events'),
+        'title': _('Events'),
     }
 
 

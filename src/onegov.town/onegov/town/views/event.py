@@ -55,7 +55,7 @@ def publish_event(self, request):
 
     self.publish()
 
-    request.success(_(u"You have accepted the event ${title}", mapping={
+    request.success(_("You have accepted the event ${title}", mapping={
         'title': self.title
     }))
 
@@ -189,7 +189,7 @@ def handle_edit_event(self, request, form):
     if form.submitted(request):
         form.update_model(self)
 
-        request.success(_(u"Your changes were saved"))
+        request.success(_("Your changes were saved"))
 
         if 'return-to' in request.GET:
             return morepath.redirect(request.GET['return-to'])

@@ -98,7 +98,7 @@ class TraitInfo(object):
         links = list(self.get_edit_links(request))
         links.append(
             LinkGroup(
-                title=_(u'Add'),
+                title=_('Add'),
                 links=tuple(self.get_add_links(request))
             )
         )

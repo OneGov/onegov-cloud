@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ The onegov town homepage. """
 
 from collections import namedtuple

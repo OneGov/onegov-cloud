@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import onegov.core
 import onegov.town
 import more.transaction

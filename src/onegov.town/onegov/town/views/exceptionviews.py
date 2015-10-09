@@ -20,6 +20,6 @@ def handle_forbidden(self, request):
 
     return {
         'layout': layout,
-        'title': _(u"Access Denied"),
+        'title': _("Access Denied"),
         'login_url': layout.login_url
     }
