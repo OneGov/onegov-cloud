@@ -12,7 +12,7 @@ after_success:
     - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
 deploy:
     provider: pypi
-    distributions: "sdist"
+    distributions: "sdist bdist_wheel"
     user: seantis
     password:
       secure: OfF5P5BYhD4EVe8qoGAbXTkQhUAIB7StGa/uVEFRfEgY2JiaF/MMa+0udMx1atacUU3F7IDcm95r7yVpPH4nFKDrxqKrSgnlmsmxkCU2YTRyThQimos2c+/h1BL1h4oK+k7v98jCGDO4tzQoNG5HVIxasBuE5p7NKvGBlkDlwlI=
