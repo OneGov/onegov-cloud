@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ Contains renderers to display form fields. """
 
 import humanize
@@ -111,7 +109,7 @@ class UploadFieldRenderer(BaseRenderer):
 class RadioFieldRenderer(BaseRenderer):
 
     def __call__(self, field):
-        return u"✓ " + self.escape(field.data)
+        return "✓ " + self.escape(field.data)
 
 
 @registry.register_for('MultiCheckboxField')
@@ -119,7 +117,7 @@ class MultiCheckboxFieldRenderer(BaseRenderer):
 
     def __call__(self, field):
         return "".join(
-            u"✓ " + self.escape(value) + '<br>' for value in field.data
+            "✓ " + self.escape(value) + '<br>' for value in field.data
         )[:-4]
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime, time
 from onegov.form import render_field
 
@@ -36,9 +35,9 @@ def test_render_upload_field():
 
 
 def test_render_radio_field():
-    assert render_field(MockField('RadioField', 'selected')) == u'✓ selected'
+    assert render_field(MockField('RadioField', 'selected')) == '✓ selected'
 
 
 def test_render_multi_checkbox_field():
     assert render_field(MockField('MultiCheckboxField', ['a', 'b']))\
-        == u'✓ a<br>✓ b'
+        == '✓ a<br>✓ b'

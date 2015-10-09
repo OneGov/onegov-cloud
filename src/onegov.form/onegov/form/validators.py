@@ -28,7 +28,7 @@ class Stdnum(object):
         try:
             self.format.validate(field.data)
         except StdnumValidationError:
-            raise ValidationError(field.gettext(u'Invalid input.'))
+            raise ValidationError(field.gettext('Invalid input.'))
 
 
 class FileSizeLimit(object):

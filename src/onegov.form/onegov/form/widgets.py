@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import humanize
 
 from cgi import escape
@@ -31,13 +30,13 @@ class UploadWidget(FileInput):
         input_html = super(UploadWidget, self).__call__(field, **kwargs)
 
         if force_simple or not field.data:
-            return HTMLString(u"""
+            return HTMLString("""
                 <div class="upload-widget without-data">
                     {}
                 </div>
             """.format(input_html))
         else:
-            return HTMLString(u"""
+            return HTMLString("""
                 <div class="upload-widget with-data">
                     <p>{existing_file_label}: {filename} ({filesize}) ✓</p>
                     <ul>

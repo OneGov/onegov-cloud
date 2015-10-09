@@ -3,7 +3,7 @@ import tempfile
 
 from cgi import FieldStorage
 from gzip import GzipFile
-from onegov.core.compat import BytesIO
+from io import BytesIO
 from onegov.form import Form
 from onegov.form.fields import UploadField
 

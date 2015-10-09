@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from onegov.form.parser.grammar import (
     checkbox,
     date,

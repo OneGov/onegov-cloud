@@ -176,7 +176,7 @@ class FormSubmission(Base, TimestampMixin):
             )
 
             if title_fields:
-                self.title = u', '.join(
+                self.title = ', '.join(
                     render_field(form._fields[id]) for id in title_fields
                 )
 

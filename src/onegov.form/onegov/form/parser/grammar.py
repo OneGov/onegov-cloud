@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from onegov.form.compat import unicode_characters
 from pyparsing import (
     alphanums,
     Combine,
@@ -20,6 +18,8 @@ from pyparsing import (
 # we want newlines to be significant
 ParserElement.setDefaultWhitespaceChars(' \t')
 
+unicode_characters = ''.join(
+    chr(c) for c in range(65536) if not chr(c).isspace())
 text = Word(unicode_characters)
 numeric = Word(nums)
 

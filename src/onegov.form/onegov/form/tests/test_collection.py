@@ -1,7 +1,7 @@
 import pytest
 
 from datetime import datetime, timedelta
-from onegov.core.compat import BytesIO
+from io import BytesIO
 from onegov.form import (
     CompleteFormSubmission,
     FormCollection,

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from onegov.form import Form, errors
@@ -58,7 +57,7 @@ def test_parse_different_base_class():
 
 
 def test_unicode():
-    text = dedent(u"""
+    text = dedent("""
         # Persönliche Informationen
         Bürgerort = ___
         Geschlecht =
@@ -68,11 +67,11 @@ def test_unicode():
 
     form = parse_form(text)()
 
-    assert form.personliche_informationen_burgerort.label.text == u'Bürgerort'
-    assert u'Persönliche Informationen' == form.fieldsets[0].label
+    assert form.personliche_informationen_burgerort.label.text == 'Bürgerort'
+    assert 'Persönliche Informationen' == form.fieldsets[0].label
     assert form.personliche_informationen_geschlecht.choices == [
-        (u'Männlich', u'Männlich'),
-        (u'Weiblich', u'Weiblich')
+        ('Männlich', 'Männlich'),
+        ('Weiblich', 'Weiblich')
     ]
 
 

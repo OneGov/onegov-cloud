@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Removes Python 2.x support.
+  [href]
+
 0.7.3 (2015-10-08)
 ~~~~~~~~~~~~~~~~~~~
 
