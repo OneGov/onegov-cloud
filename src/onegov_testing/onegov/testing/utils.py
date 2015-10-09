@@ -3,9 +3,9 @@ import onegov.core
 
 from importlib import import_module
 from io import BytesIO
-from mock import patch
 from morepath import setup
 from PIL import Image
+from unittest.mock import patch
 
 
 def create_image():

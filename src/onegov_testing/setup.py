@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from setuptools import setup, find_packages
 
 name = 'onegov.testing'
@@ -37,7 +35,6 @@ setup(
         'coverage',
         'elasticsearch',
         'mirakuru',
-        'mock',
         'onegov.core',
         'Pillow',
         'port-for',
@@ -53,7 +50,9 @@ setup(
     classifiers=[
         'Intended Audience :: Developers',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
     ]
