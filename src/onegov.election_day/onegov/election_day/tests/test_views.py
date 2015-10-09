@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import onegov.election_day
 
 from datetime import date
@@ -57,8 +56,8 @@ def test_view_manage(election_day_app):
 
     assert "Vote for a better tomorrow" in manage
 
-    delete = manage.click(u"Löschen")
-    assert u"Abstimmung löschen" in delete
+    delete = manage.click("Löschen")
+    assert "Abstimmung löschen" in delete
     assert "Vote for a better tomorrow" in delete
     assert "Bearbeiten" in delete.click("Abbrechen")
 
