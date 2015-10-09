@@ -48,8 +48,14 @@ class CSVFile(object):
         """
 
         self.rowtype = namedtuple(
-            "CSVFileRow", ['rownumber'] + list(self.headers.keys())
+            "CSVFileRow", ['rownumber'] + list(
+                self.as_valid_identifier(k)
+                for k in self.headers.keys()
+            )
         )
+
+    def as_valid_identifier(self, value):
+        return normalize_header(value).replace('-', '_').replace(' ', '_')
 
     @property
     def lines(self):
@@ -64,7 +70,7 @@ class CSVFile(object):
             yield self.rowtype(
                 rownumber=ix + 1,  # row numbers are for customers, not coders
                 **{
-                    header: line[column].strip()
+                    self.as_valid_identifier(header): line[column].strip()
                     for header, column in self.headers.items()
                 }
             )
