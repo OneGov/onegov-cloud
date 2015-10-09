@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-10-07 15:30+0200\n"
+"POT-Creation-Date: 2015-10-09 17:41+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -131,6 +131,37 @@ msgstr "Bitte verwenden Sie das folgende Format:"
 msgid "Format Description"
 msgstr "Formatbeschreibung"
 
+msgid "Your results were uploaded successfully."
+msgstr "Ihre Resultate wurden erfolgreich hochgeladen."
+
+msgid "Click here to see the updated results page."
+msgstr ""
+"Hier klicken um die Seite mit den aktualisierten Resultaten anzuzeigen."
+
+msgid "Your results could not be uploaded."
+msgstr "Ihre Resultate konnten leider nicht hochgeladen werden."
+
+msgid "No errors found in proposal"
+msgstr "Keine Fehler im Vorschlag"
+
+msgid "Errors found in proposal"
+msgstr "Fehler im Vorschlag"
+
+msgid "Line"
+msgstr "Zeile"
+
+msgid "No errors found in counter proposal"
+msgstr "Keine Fehler im Gegenvorschlag"
+
+msgid "Errors found in counter proposal"
+msgstr "Fehler im Gegenvorschlag"
+
+msgid "No errors found in tie-breaker"
+msgstr "Keine Fehler in der Stichfrage"
+
+msgid "Errors found in tie-breaker"
+msgstr "Fehler in der Stichfrage"
+
 msgid "Yeas"
 msgstr "JA Stimmen"
 
@@ -182,3 +213,61 @@ msgstr "Abstimmung löschen"
 
 msgid "Upload results"
 msgstr "Resultate hochladen"
+
+msgid "Missing municipality"
+msgstr "Fehlender Ort"
+
+#, python-format
+msgid "${group} was found twice"
+msgstr "${group} kommt zweimal vor"
+
+msgid "More cast votes than elegible voters"
+msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
+
+msgid "No elegible voters"
+msgstr "Keine Stimmberechtigen"
+
+msgid "Invalid municipality id"
+msgstr "Ungültige BFS Nummer"
+
+#, python-format
+msgid "municipality id ${id} was found twice"
+msgstr "BFS Nummer ${id} kommt zweimal vor"
+
+msgid "Could not read yeas"
+msgstr "Konnte 'Ja Stimmen' nicht lesen"
+
+msgid "Could not read nays"
+msgstr "Konnte 'Nein Stimmen' nicht lesen"
+
+msgid "Could not read the elegible voters"
+msgstr "Konnte 'Stimmberechtigte' nicht lesen"
+
+msgid "Could not read the empty votes"
+msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
+
+msgid "Could not read the invalid votes"
+msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
+
+msgid "No data found"
+msgstr "Keine Daten gefunden"
+
+#, python-format
+msgid "Missing columns: '${cols}'"
+msgstr "Fehlende Spalten: ${cols}"
+
+msgid ""
+"Could not find the expected columns, make sure all required columns exist "
+"and that there are no extra columns."
+msgstr ""
+"Die benötigten Spalten wurden nicht gefunden. Bitte stellen Sie sicher dass "
+"die Spalten existieren und keine zusätzlichen Spalten vorhanden sind."
+
+msgid "Some column names appear twice."
+msgstr "Einige Spaltennamen erscheinen doppelt."
+
+msgid "Not a valid csv/xls/xlsx file."
+msgstr "Keine gültige CSV/XLS/XLSX Datei."
+
+msgid "The csv/xls/xlsx file is empty."
+msgstr "Die CSV/XLS/XLSX Date ist leer."

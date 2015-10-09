@@ -47,14 +47,14 @@ def import_file(vote, ballot_type, file, mimetype):
 
     try:
         csv = CSVFile(csvfile, expected_headers=[
-            'bezirk',
-            'bfs_nummer',
-            'gemeinde',
-            'ja_stimmen',
-            'nein_stimmen',
-            'stimmberechtigte',
-            'leere_stimmzettel',
-            'ungueltige_stimmzettel'
+            'Bezirk',
+            'BFS Nummer',
+            'Gemeinde',
+            'Ja Stimmen',
+            'Nein Stimmen',
+            'Stimmberechtigte',
+            'Leere Stimmzettel',
+            'Ungültige Stimmzettel'
         ])
     except MissingColumnsError as e:
         return {'status': 'error', 'errors': [
@@ -113,7 +113,7 @@ def import_file(vote, ballot_type, file, mimetype):
             line_errors.append(_("Missing municipality"))
 
         if group in existing_groups:
-            line_errors.append(_("{group} was found twice"), mapping={
+            line_errors.append(_("${group} was found twice"), mapping={
                 'group': group
             })
 
@@ -127,7 +127,7 @@ def import_file(vote, ballot_type, file, mimetype):
         else:
             if municipality_id in existing_municipality_ids:
                 line_errors.append(
-                    _("municipality id {id} was found twice"), mapping={
+                    _("municipality id ${id} was found twice"), mapping={
                         'id': municipality_id
                     }
                 )
@@ -160,7 +160,7 @@ def import_file(vote, ballot_type, file, mimetype):
 
         # the invalid votes
         try:
-            invalid = int(line.leere_stimmzettel or 0)
+            invalid = int(line.ungultige_stimmzettel or 0)
         except ValueError:
             line_errors.append(_("Could not read the invalid votes"))
 
@@ -248,5 +248,6 @@ def view_upload(self, request, form):
         'form': form,
         'cancel': request.link(Manage(request.app.session())),
         'results': results,
-        'status': status
+        'status': status,
+        'vote': self
     }

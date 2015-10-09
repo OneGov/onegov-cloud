@@ -337,3 +337,43 @@ form {
 .cancel-button {
     margin-right: .5rem;
 }
+
+
+/*
+    Upload errors
+*/
+
+.after-upload {
+    h3 {
+        font-size: 1em;
+        font-weight: bold;
+    }
+
+    ul {
+        list-style-type: none;
+        margin-left: 0;
+    }
+
+    li {
+        background-color: $secondary-color;
+        border: 1px solid $gainsboro;
+        font-size: .875rem;
+        margin-bottom: .5em;
+    }
+
+    .error-line {
+        background-color: $white;
+        color: $steel;
+        display: inline-block;
+        padding: 2px 6px;
+
+        > span {
+            margin-right: .5ex;
+        }
+    }
+
+    .error-message {
+        display: inline-block;
+        padding: 2px 6px;
+    }
+}

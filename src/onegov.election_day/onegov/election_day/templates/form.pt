@@ -18,7 +18,6 @@
                 <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
                     <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
                     <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
-                    <a href="#" class="close">&times;</a>
                 </div>
                 <div metal:use-macro="layout.macros['form']" />
             </div>
