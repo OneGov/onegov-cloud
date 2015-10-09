@@ -1,4 +1,3 @@
-# coding=utf-8
 from datetime import date, datetime, timedelta
 from onegov.event import EventCollection, Occurrence, OccurrenceCollection
 from sedate import replace_timezone, standardize_date
@@ -361,28 +360,28 @@ def test_unique_names(session):
 
 def test_unicode(session):
     event = EventCollection(session).add(
-        title=u'Salon du mieux-vivre, 16e édition',
+        title='Salon du mieux-vivre, 16e édition',
         start=datetime(2015, 6, 16, 9, 30),
         end=datetime(2015, 6, 16, 18, 00),
-        timezone=u'Europe/Zurich',
+        timezone='Europe/Zurich',
         content={
-            'description': u'Rendez-vous automnal des médecines.'
+            'description': 'Rendez-vous automnal des médecines.'
         },
-        location=u'Salon du mieux-vivre à Saignelégier',
-        tags=[u'salons', u'congrès']
+        location='Salon du mieux-vivre à Saignelégier',
+        tags=['salons', 'congrès']
     )
     event.submit()
     event.publish()
     event = EventCollection(session).add(
-        title=u'Témoins de Jéhovah',
+        title='Témoins de Jéhovah',
         start=datetime(2015, 6, 18, 14, 00),
         end=datetime(2015, 6, 18, 16, 00),
         timezone='Europe/Zurich',
         content={
-            'description': u'Congrès en français et espagnol.'
+            'description': 'Congrès en français et espagnol.'
         },
-        location=u'Salon du mieux-vivre à Saignelégier',
-        tags=[u'témoins']
+        location='Salon du mieux-vivre à Saignelégier',
+        tags=['témoins']
     )
     event.submit()
     event.publish()
@@ -392,17 +391,17 @@ def test_unicode(session):
     assert occurrences.query(outdated=True).count() == 2
 
     tags = occurrences.used_tags
-    assert sorted(tags) == [u'congrès', u'salons', u'témoins']
+    assert sorted(tags) == ['congrès', 'salons', 'témoins']
 
-    occurrence = occurrences.query(outdated=True, tags=[u'congrès']).one()
-    assert occurrence.title == u'Salon du mieux-vivre, 16e édition'
-    assert occurrence.location == u'Salon du mieux-vivre à Saignelégier'
-    assert sorted(occurrence.tags) == [u'congrès', u'salons']
+    occurrence = occurrences.query(outdated=True, tags=['congrès']).one()
+    assert occurrence.title == 'Salon du mieux-vivre, 16e édition'
+    assert occurrence.location == 'Salon du mieux-vivre à Saignelégier'
+    assert sorted(occurrence.tags) == ['congrès', 'salons']
     assert occurrence.event.description \
-        == u'Rendez-vous automnal des médecines.'
+        == 'Rendez-vous automnal des médecines.'
 
-    occurrence = occurrences.query(outdated=True, tags=[u'témoins']).one()
-    assert occurrence.title == u'Témoins de Jéhovah'
-    assert occurrence.location == u'Salon du mieux-vivre à Saignelégier'
-    assert occurrence.tags == [u'témoins']
-    assert occurrence.event.description == u'Congrès en français et espagnol.'
+    occurrence = occurrences.query(outdated=True, tags=['témoins']).one()
+    assert occurrence.title == 'Témoins de Jéhovah'
+    assert occurrence.location == 'Salon du mieux-vivre à Saignelégier'
+    assert occurrence.tags == ['témoins']
+    assert occurrence.event.description == 'Congrès en français et espagnol.'
