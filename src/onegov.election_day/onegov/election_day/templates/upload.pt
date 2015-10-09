@@ -6,13 +6,15 @@
         <h1>${title}</h1>
         <h2 class="subheader">${subtitle}</h2>
 
-        <div class="panel">
-            <i class="fa fa-info-circle"></i>
-            <span i18n:translate>Please use the following format:</span><br>
-            <a href="https://github.com/OneGov/onegov.election_day/blob/master/docs/formatbeschreibung.md" i18n:translate>
-                Format Description
-            </a>
-        </div>
+        <tal:block condition="status == 'open'">
+            <div class="panel">
+                <i class="fa fa-info-circle"></i>
+                <span i18n:translate>Please use the following format:</span><br>
+                <a href="https://github.com/OneGov/onegov.election_day/blob/master/docs/formatbeschreibung.md" i18n:translate>
+                    Format Description
+                </a>
+            </div>
+        </tal:block>
 
         <div class="after-import" tal:condition="status == 'success'">
             <h3 class="success" i18n:translate>
@@ -29,7 +31,7 @@
                 i18n:translate>The proposal was okay</h4>
             <h4 class="error" tal:condition="'proposal' in results and results['proposal']['status'] != 'ok'"
                 i18n:translate>Errors found in proposal</h4>
-            <ul>
+            <ul tal:condition="'proposal' in results">
                 <li tal:repeat="error results['proposal']['errors']">
                     <span tal:condition="error.line"><span i18n:translate>Line: </span>${error.line}, </span>${error.error}
                 </li>
@@ -39,7 +41,7 @@
                 i18n:translate>The counter proposal was okay</h4>
             <h4 class="error" tal:condition="'counter-proposal' in results and results['counter-proposal']['status'] != 'ok'"
                 i18n:translate>Errors found in counter proposal</h4>
-            <ul>
+            <ul tal:condition="'counter-proposal' in results">
                 <li tal:repeat="error results['counter-proposal']['errors']">
                     <span tal:condition="error.line"><span i18n:translate>Line: </span>${error.line}, </span>${error.error}
                 </li>
@@ -49,7 +51,7 @@
                 i18n:translate>The counter tie breaker was okay</h4>
             <h4 class="error" tal:condition="'tie-breaker' in results and results['tie-breaker']['status'] != 'ok'"
                 i18n:translate>Errors found in tie-breaker</h4>
-            <ul>
+            <ul tal:condition="'tie-breaker' in results">
                 <li tal:repeat="error results['tie-breaker']['errors']">
                     <span tal:condition="error.line"><span i18n:translate>Line: </span>${error.line}, </span>${error.error}
                 </li>
@@ -57,5 +59,6 @@
         </div>
 
         <div metal:use-macro="layout.macros['form']" />
+
     </tal:block>
 </div>

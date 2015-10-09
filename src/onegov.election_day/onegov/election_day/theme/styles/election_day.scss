@@ -166,6 +166,10 @@ table {
     fill: none;
 }
 
+.municipality {
+    fill: transparent;  // the initial color of the municipalities
+}
+
 .municipality .selected {
     stroke: $white;
     stroke-linecap: round;

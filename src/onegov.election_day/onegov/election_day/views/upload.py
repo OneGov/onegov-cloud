@@ -44,8 +44,6 @@ def import_file(vote, ballot_type, file, mimetype):
 
     if mimetype == 'text/plain':
         csvfile = file
-    else:
-        import pdb; pdb.set_trace()
 
     try:
         csv = CSVFile(csvfile, expected_headers=[
