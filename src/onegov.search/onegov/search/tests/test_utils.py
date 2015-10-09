@@ -76,3 +76,28 @@ def test_related_types():
     assert utils.related_types(Topic) == {'pages', 'topic', 'news'}
     assert utils.related_types(News) == {'pages', 'topic', 'news'}
     assert utils.related_types(Temp) == {'pages', 'topic', 'news'}
+
+
+def test_related_types_unsearchable_base():
+
+    Base = declarative_base()
+
+    # compared to test_related_types, this base class is not searchable
+    class Page(Base):
+        __tablename__ = 'pages'
+        id = Column(Integer, primary_key=True)
+        type = Column(Text, nullable=False)
+
+        __mapper_args__ = {
+            "polymorphic_on": 'type'
+        }
+
+    class Topic(Page):
+        __mapper_args__ = {'polymorphic_identity': 'topic'}
+        es_type_name = 'topic'
+
+    class News(Page):
+        __mapper_args__ = {'polymorphic_identity': 'news'}
+        es_type_name = 'news'
+
+    assert utils.related_types(Page) == {'news', 'topic'}

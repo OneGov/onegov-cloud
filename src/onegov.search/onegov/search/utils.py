@@ -85,7 +85,10 @@ def related_types(model):
 
     """
 
-    result = {model.es_type_name}
+    if hasattr(model, 'es_type_name'):
+        result = {model.es_type_name}
+    else:
+        result = set()
 
     if hasattr(model, '__mapper_args__'):
         if 'polymorphic_on' in model.__mapper_args__:

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes the delete process failing under certain polymorphic configurations.
+  [href]
+
 - Removes Python 2.x support.
   [href]
 
