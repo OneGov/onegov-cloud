@@ -10,15 +10,10 @@ when ready generate the data with the following make command:
 
 The resulting files in the `/topo` folders are used as follows:
 
-1. The cantons that have lakes, are taken with lakes.
-
-2. The cantons that do not have lakes lack a lakes file, so the alternative
-   file is used instead
-
-3. The files are renamed from `xx-municipalities-lakes.json` to `xx.json`, or
+1. The files are renamed from `xx-municipalities.json` to `xx.json`, or
    from `xx-municipalities.json` to `xx.json`.
 
-4. The resulting files are put into the folder of their respective year. For
+2. The resulting files are put into the folder of their respective year. For
    example: `static/mapdata/2015/*.json`
 
 There's a python script which does all of this automatically:
