@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """ OneGov Ballot models the aggregated results of Swiss ballots.
 It takes hints from the CH-0155 Standard.
 
