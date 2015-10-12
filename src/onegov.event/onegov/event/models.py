@@ -153,7 +153,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         """ Automatically update the occurrences if shared attributes change.
         """
 
-        super(Event, self).__setattr__(name, value)
+        super().__setattr__(name, value)
         if name in ('state', 'title', 'name', 'location', 'tags',
                     'start', 'end', 'timezone', 'recurrence'):
             self._update_occurrences()
@@ -243,7 +243,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     def as_ical(self, url=None):
         """ Returns the event and all its occurrences as iCalendar string. """
 
-        return super(Event, self).as_ical(
+        return super().as_ical(
             description=self.description,
             rrule=self.recurrence,
             url=url
@@ -264,7 +264,7 @@ class Occurrence(Base, OccurrenceMixin, TimestampMixin):
     def as_ical(self, url=None):
         """ Returns the occurrence as iCalendar string. """
 
-        return super(Occurrence, self).as_ical(
+        return super().as_ical(
             description=self.event.description,
             url=url
         )

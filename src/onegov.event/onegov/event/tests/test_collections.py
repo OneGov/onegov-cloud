@@ -203,9 +203,7 @@ def test_occurrence_collection_pagination(session):
 
     class PatchedCollection(OccurrenceCollection):
         def query(self, **kwargs):
-            return super(PatchedCollection, self).query(
-                outdated=True, **kwargs
-            )
+            return super().query(outdated=True, **kwargs)
 
     occurrences = PatchedCollection(session)
     assert occurrences.query().count() == 4 * 12
