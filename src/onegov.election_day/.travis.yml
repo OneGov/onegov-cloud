@@ -10,9 +10,19 @@ script:
     - tox -e $TOXENV
 after_success:
     - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+    - 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\.]+)-v([0-9\.]+)$/\1==\2/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
 
 deploy:
-    provider: pypi
+  - provider: releases
+    api_key:
+        secure: "mrzPxXNe5Cmw59rtSK87W6NcOyvXFjABs3WcnGzpouhpkaokfX+MrWoXEivtUDTm8uGZKsZG2LouSQjZMZAagDN34ilPuyglWa1WSVrHdcpKcXKZ7VFSlAdl/csbwDnS4C4rX7xFYILwvXJpqHSH8yHTGetok67Rg9VCk3y0DjACaPzEY2+JILB0LtjvgNUKYyJ61H/3OEGH5ELndvh8YLuGJGrmCpf3i+SKcA/JAf7kfX+CgjpMqlM2sRUhcOgpvkBr4QeSa6OieRF+rrZfyHkebf4TyYx+aJzixVwBZwmDI7yau1q69M1S22XfQN1XFHUTHIeSZCNWBDHeArMv4iNFg90htaiwZ/VKUgiEPMzetPp7Qb5LqC2AZZoV912mLtQ1x95jW10j8XWxM0cGF8W9g/j7abjzBXBveavGCSQSVH5rmq1H+vAE8HlKcSfR+8ddmCkqg6wJdMyDeUPDZq2b22/GCT3GStCxXIDezzyjwU52wX0bBZSSRSpolLBDNiVqgX6APRYHZfRvH0j3zHpjJn0sSeoKNL7OjX+6LCkMmI5u0lX1WMyajRc/FcCZnk50hffmF4VH6NYKkfbrJdzdWgiwi+HIa5VerK0z6H3X1tXf6LRC4l8oqMwhOjFYWZhqb2Vcqj+xHJ1QZ0nxoh7BPPZT1qzn/oHP2NQj7F8="
+    file: requirements.txt
+    skip_cleanup: true
+    on:
+        tags: true
+        condition: $TOXENV = py34
+
+  - provider: pypi
     distributions: "sdist bdist_wheel"
     user: seantis
     password:
@@ -20,4 +30,3 @@ deploy:
     on:
         tags: true
         condition: $TOXENV = py34
-
