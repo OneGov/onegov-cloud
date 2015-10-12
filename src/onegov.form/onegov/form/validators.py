@@ -102,7 +102,7 @@ class ExpectedExtensions(WhitelistedMimeType):
     def __init__(self, extensions):
         mimetypes = set(
             types_map.get('.' + ext.lstrip('.'), None) for ext in extensions)
-        super(ExpectedExtensions, self).__init__(whitelist=mimetypes)
+        super().__init__(whitelist=mimetypes)
 
 
 class ValidFormDefinition(object):

@@ -13,7 +13,7 @@ class MultiCheckboxField(SelectMultipleField):
 
     def __init__(self, *args, **kwargs):
         kwargs['option_widget'] = widgets.CheckboxInput()
-        super(MultiCheckboxField, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class UploadField(FileField):

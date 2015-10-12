@@ -55,7 +55,7 @@ class Form(BaseForm):
             for field_id, field in self._unbound_fields
         ]
 
-        super(Form, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # use the consumed fieldset attribute to build fieldsets
         self.fieldsets = []
@@ -215,7 +215,7 @@ def with_options(widget, **render_options):
 
             def __call__(self, *args, **kwargs):
                 render_options.update(kwargs)
-                return super(Widget, self).__call__(*args, **render_options)
+                return super().__call__(*args, **render_options)
 
         return Widget()
     else:

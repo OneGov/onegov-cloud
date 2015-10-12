@@ -11,7 +11,7 @@ class MultiCheckboxWidget(ListWidget):
 
     def __init__(self, *args, **kwargs):
         kwargs['prefix_label'] = False
-        super(MultiCheckboxWidget, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
 
 class UploadWidget(FileInput):
@@ -27,7 +27,7 @@ class UploadWidget(FileInput):
 
     def __call__(self, field, **kwargs):
         force_simple = kwargs.pop('force_simple', False)
-        input_html = super(UploadWidget, self).__call__(field, **kwargs)
+        input_html = super().__call__(field, **kwargs)
 
         if force_simple or not field.data:
             return HTMLString("""
