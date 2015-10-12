@@ -18,7 +18,7 @@ class HTTPExecutor(HTTPExecutorBase):
 
     def __del__(self):
         try:
-            super(HTTPExecutor, self).__del__()
+            super().__del__()
         except:
             pass
 
