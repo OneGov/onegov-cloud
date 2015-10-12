@@ -32,7 +32,7 @@ class SkipFirstForm(object):
         if len(self.forms) > 1:
             return self.forms[1]
         else:
-            return super(SkipFirstForm, self).form
+            return super().form
 
 
 class Response(SkipFirstForm, BaseResponse):

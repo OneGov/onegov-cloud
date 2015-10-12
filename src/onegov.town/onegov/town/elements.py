@@ -130,7 +130,7 @@ class DeleteLink(Link):
             attr['ic-get-from'] = url
             url = '#'
 
-        super(DeleteLink, self).__init__(
+        super().__init__(
             text=text,
             url=url,
             classes=('confirm', 'delete-link'),

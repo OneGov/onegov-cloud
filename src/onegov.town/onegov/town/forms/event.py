@@ -114,7 +114,7 @@ class EventForm(Form):
         #field-enclosures`_.
 
         """
-        result = super(EventForm, self).validate()
+        result = super().validate()
 
         if self.start_date.data and self.end_date.data:
             if self.start_date.data > self.end_date.data:

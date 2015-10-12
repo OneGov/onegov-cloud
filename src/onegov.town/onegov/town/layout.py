@@ -250,7 +250,7 @@ class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """
 
     def __init__(self, model, request):
-        super(Layout, self).__init__(model, request)
+        super().__init__(model, request)
 
         # always include the common js files
         self.request.include('common')
@@ -374,7 +374,7 @@ class NewsLayout(AdjacencyListLayout):
 class EditorLayout(AdjacencyListLayout):
 
     def __init__(self, model, request, site_title):
-        super(EditorLayout, self).__init__(model, request)
+        super().__init__(model, request)
         self.site_title = site_title
         self.include_editor()
 
@@ -389,7 +389,7 @@ class EditorLayout(AdjacencyListLayout):
 class FormEditorLayout(DefaultLayout):
 
     def __init__(self, model, request):
-        super(FormEditorLayout, self).__init__(model, request)
+        super().__init__(model, request)
         self.include_editor()
         self.include_code_editor()
 
@@ -397,7 +397,7 @@ class FormEditorLayout(DefaultLayout):
 class FormSubmissionLayout(DefaultLayout):
 
     def __init__(self, model, request, title=None):
-        super(FormSubmissionLayout, self).__init__(model, request)
+        super().__init__(model, request)
         self.title = title or self.form.title
 
     @cached_property
@@ -664,7 +664,7 @@ class ResourcesLayout(DefaultLayout):
 class ResourceLayout(DefaultLayout):
 
     def __init__(self, model, request):
-        super(ResourceLayout, self).__init__(model, request)
+        super().__init__(model, request)
 
         self.request.include('fullcalendar')
         self.request.include('fullcalendar_css')

@@ -75,11 +75,11 @@ class HiddenFromPublicExtension(ContentExtension):
             is_hidden_from_public = BooleanField(_("Hide from the public"))
 
             def update_model(self, model):
-                super(HiddenPageForm, self).update_model(model)
+                super().update_model(model)
                 model.is_hidden_from_public = self.is_hidden_from_public.data
 
             def apply_model(self, model):
-                super(HiddenPageForm, self).apply_model(model)
+                super().apply_model(model)
                 self.is_hidden_from_public.data = model.is_hidden_from_public
 
         return HiddenPageForm
@@ -117,11 +117,11 @@ class ContactExtension(ContentExtension):
             )
 
             def update_model(self, model):
-                super(ContactPageForm, self).update_model(model)
+                super().update_model(model)
                 model.contact = self.contact_address.data
 
             def apply_model(self, model):
-                super(ContactPageForm, self).apply_model(model)
+                super().apply_model(model)
                 self.contact_address.data = model.content.get('contact', '')
 
         return ContactPageForm
@@ -179,11 +179,11 @@ class PersonLinkExtension(ContentExtension):
                         yield person_id, function
 
             def update_model(self, model):
-                super(PeoplePageForm, self).update_model(model)
+                super().update_model(model)
                 model.content['people'] = list(self.get_people_and_function())
 
             def apply_model(self, model):
-                super(PeoplePageForm, self).apply_model(model)
+                super().apply_model(model)
 
                 fields = self.get_people_fields(with_function=False)
                 people = dict(model.content.get('people', []))

@@ -90,10 +90,10 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
 
         reply_to = "{} <{}>".format(self.town.name, self.town.meta['reply_to'])
 
-        return super(TownApp, self).send_email(reply_to=reply_to, **kwargs)
+        return super().send_email(reply_to=reply_to, **kwargs)
 
     def configure_application(self, **cfg):
-        super(TownApp, self).configure_application(**cfg)
+        super().configure_application(**cfg)
 
         if self.has_database_connection:
             schema_prefix = self.namespace + '-'
