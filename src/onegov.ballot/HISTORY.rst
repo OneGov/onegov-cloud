@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to query the votes by year.
+  [href]
+
 - Removes Python 2.x support.
   [href]
 
