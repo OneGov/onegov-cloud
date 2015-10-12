@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-10-09 17:41+0200\n"
+"POT-Creation-Date: 2015-10-12 13:13+0200\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
@@ -34,33 +34,18 @@ msgstr "Nationale Abstimmung"
 msgid "Cantonal Vote"
 msgstr "Kantonale Abstimmung"
 
-msgid "The form contains errors. Please check the fields marked in red."
-msgstr ""
-"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
-
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
 
 msgid "There are no votes defined yet."
 msgstr "Es wurden noch keine Abstimmungen eingetragen."
 
-msgid "Federal Votes on ${date}"
-msgstr "Eidgenössische Abstimmungen vom ${date}"
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
-msgid "Cantonal Votes on ${date}"
-msgstr "Kantonale Abstimmungen vom ${date}"
-
-msgid "Result"
-msgstr "Resultat"
-
-msgid "Yes %"
-msgstr "JA %"
-
-msgid "No %"
-msgstr "NEIN %"
-
-msgid "Reported"
-msgstr "Gemeldet"
+msgid "Archived Votes"
+msgstr "Abstimmungsarchiv"
 
 msgid "Back to the latest elections &amp; votes"
 msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
@@ -94,6 +79,24 @@ msgstr "Abbrechen"
 
 msgid "Submit"
 msgstr "Absenden"
+
+msgid "Federal Votes on ${date}"
+msgstr "Eidgenössische Abstimmungen vom ${date}"
+
+msgid "Cantonal Votes on ${date}"
+msgstr "Kantonale Abstimmungen vom ${date}"
+
+msgid "Result"
+msgstr "Resultat"
+
+msgid "Yes %"
+msgstr "JA %"
+
+msgid "No %"
+msgstr "NEIN %"
+
+msgid "Reported"
+msgstr "Gemeldet"
 
 msgid "Votes"
 msgstr "Abstimmungen"

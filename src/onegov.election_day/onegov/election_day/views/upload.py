@@ -210,19 +210,47 @@ def import_file(vote, ballot_type, file, mimetype):
     return {'status': 'ok', 'errors': errors}
 
 
+def get_form_class(vote, request):
+    if not vote.ballots:
+        return UploadForm
+
+    class LimitedUploadForm(UploadForm):
+        pass
+
+    if len(vote.ballots) == 1:
+        LimitedUploadForm.type.kwargs['default'] = 'simple'
+        LimitedUploadForm.type.kwargs['choices'] = [
+            ('simple', _("Simple Vote"))
+        ]
+    else:
+        LimitedUploadForm.type.kwargs['default'] = 'complex'
+        LimitedUploadForm.type.kwargs['choices'] = [
+            ('complex', _("Vote with Counter-Proposal"))
+        ]
+
+    return LimitedUploadForm
+
+
 @ElectionDayApp.form(model=Vote, name='upload', template='upload.pt',
                      permission=Private, form=UploadForm)
 def view_upload(self, request, form):
 
     results = {}
 
+    # if the vote already has results, do not give the user the choice to
+    # switch between the different ballot types
+    if self.counter_proposal:
+        form.type.choices = form.type.choices[1:]
+        form.type.data = 'complex'
+    else:
+        form.type.choices = form.type.choices[:1]
+        form.type.data = 'simple'
+
     if form.submitted(request):
         if form.data['type'] == 'simple':
             ballot_types = ('proposal', )
         else:
             ballot_types = BALLOT_TYPES
-
-        results = {}
 
         for ballot_type in ballot_types:
             field = getattr(form, ballot_type.replace('-', '_'))

@@ -81,6 +81,21 @@ html {
     font-size: $h4-font-size;
 }
 
+.archive {
+    ul {
+        list-style-type: none;
+        margin: 0;
+        
+        li {
+            display: inline-block;
+
+            + li::before {
+                content: '/ ';
+            }
+        }
+    }
+}
+
 /*
     Voting states
 */
@@ -168,13 +183,13 @@ table {
 
 .municipality {
     fill: transparent;  // the initial color of the municipalities
-}
-
-.municipality .selected {
-    stroke: $white;
-    stroke-linecap: round;
-    stroke-opacity: .8;
-    stroke-width: 1px;
+    
+    .selected {
+        stroke: $white;
+        stroke-linecap: round;
+        stroke-opacity: .8;
+        stroke-width: 1px;
+    }
 }
 
 .lake {

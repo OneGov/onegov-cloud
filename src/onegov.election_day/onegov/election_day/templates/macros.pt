@@ -98,4 +98,54 @@
     </tal:block>
 </metal:fields>
 
+<metal:fields define-macro="votes_by_domain_and_date" i18n:domain="onegov.election_day">
+    <tal:block repeat="(group, votes) votes_by_domain_and_date">
+        <tal:block define="(domain, date) group">
+            <tal:block condition="domain == 'federation'">
+                <h2 i18n:translate="">
+                    Federal Votes on <span tal:replace="layout.format_date(date, 'date')" i18n:name='date' />
+                </h2>
+            </tal:block>
+            <tal:block condition="domain == 'canton'">
+                <h2 i18n:translate="">
+                    Cantonal Votes on <span tal:replace="layout.format_date(date, 'date')" i18n:name='date' />
+                </h2>
+            </tal:block>
+
+            <table class="overview stackable">
+                <thead>
+                    <tr>
+                        <th i18n:translate="">Vote</th>
+                        <th i18n:translate="">Result</th>
+                        <th i18n:translate="" class="right-aligned">Yes %</th>
+                        <th i18n:translate="" class="right-aligned">No %</th>
+                        <th i18n:translate="" class="right-aligned">Reported</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr tal:repeat="vote votes">
+                        <td><a href="${request.link(vote)}">${vote.title}</a></td>
+                        <td>
+                            <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
+                        </td>
+                        <td class="right-aligned">
+                            <tal:block tal:condition="vote.counted">
+                                ${layout.format_number(vote.yeas_percentage)}
+                            </tal:block>
+                        </td>
+                        <td class="right-aligned">
+                            <tal:block tal:condition="vote.counted">
+                                ${layout.format_number(vote.nays_percentage)}
+                            </tal:block>
+                        </td>
+                        <td class="right-aligned">
+                            <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </tal:block>
+    </tal:block>
+</metal:fields>
+
 </body>

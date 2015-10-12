@@ -3,15 +3,13 @@ from onegov.core.utils import groupbylist
 from onegov.ballot import VoteCollection
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
-from onegov.election_day.models import Principal
 
 
-@ElectionDayApp.html(model=Principal, template='homepage.pt',
+@ElectionDayApp.html(model=VoteCollection, template='archive.pt',
                      permission=Public)
-def view_principal(self, request):
+def view_archive(self, request):
 
-    collection = VoteCollection(request.app.session())
-    votes = collection.get_latest()
+    votes = self.by_year()
 
     if votes:
         votes_by_domain_and_date = groupbylist(
@@ -19,13 +17,8 @@ def view_principal(self, request):
     else:
         votes_by_domain_and_date = None
 
-    years = [
-        (year, request.link(collection.for_year(year)))
-        for year in collection.get_years()
-    ]
-
     return {
-        'votes_by_domain_and_date': votes_by_domain_and_date,
         'layout': DefaultLayout(self, request),
-        'years': years
+        'year': self.year,
+        'votes_by_domain_and_date': votes_by_domain_and_date
     }

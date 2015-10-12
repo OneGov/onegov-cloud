@@ -9,7 +9,7 @@ from onegov.user import Auth
 class Layout(ChameleonLayout):
 
     def __init__(self, request, model):
-        super(Layout, self).__init__(request, model)
+        super().__init__(request, model)
         self.request.include('common')
 
     @cached_property
@@ -58,6 +58,6 @@ class ManageLayout(DefaultLayout):
     pass
 
     def __init__(self, request, model):
-        super(ManageLayout, self).__init__(request, model)
+        super().__init__(request, model)
         self.request.include('form_js')
         self.request.include('form_css')
