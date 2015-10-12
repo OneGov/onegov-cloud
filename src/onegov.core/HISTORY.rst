@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.7.0 (2015-10-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Drops Python 2 support!
   [href]
