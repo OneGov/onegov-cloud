@@ -242,7 +242,7 @@ def view_upload(self, request, form):
     if self.counter_proposal:
         form.type.choices = form.type.choices[1:]
         form.type.data = 'complex'
-    else:
+    elif self.proposal:
         form.type.choices = form.type.choices[:1]
         form.type.data = 'simple'
 

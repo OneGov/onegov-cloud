@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix upload not allowing for different ballot types initially.
+  [href]
+
 0.1.2 (2015-10-12)
 ~~~~~~~~~~~~~~~~~~~
 
