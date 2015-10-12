@@ -20,7 +20,7 @@ class Search(BaseSearch):
         self.session = kwargs.pop('session', None)
         self.mappings = kwargs.pop('mappings', None)
 
-        super(Search, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         assert not self._doc_type_map
 
@@ -38,7 +38,7 @@ class Search(BaseSearch):
                     )
 
     def _clone(self):
-        search = super(Search, self)._clone()
+        search = super()._clone()
         search.session = self.session
         search.mappings = self.mappings
 
@@ -46,7 +46,7 @@ class Search(BaseSearch):
 
     def execute(self):
         response = Response.bind(self.session, self.mappings)
-        return super(Search, self).execute(response_class=response)
+        return super().execute(response_class=response)
 
 
 class Response(BaseResponse):
