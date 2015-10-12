@@ -37,8 +37,9 @@ class ElectionDayApp(Framework):
         assert self.has_filestorage
 
         if self.filestorage.isfile('principal.yml'):
-            yaml_source = self.filestorage.open('principal.yml').read()
-            return Principal.from_yaml(yaml_source)
+            return Principal.from_yaml(
+                self.filestorage.open('principal.yml', encoding='utf-8').read()
+            )
 
     @property
     def logo(self):
