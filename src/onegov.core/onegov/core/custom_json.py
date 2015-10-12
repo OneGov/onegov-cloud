@@ -34,7 +34,7 @@ class CustomJSONEncoder(json.JSONEncoder):
                 o = utils.lchop(o, '__datetime__@')
                 o = utils.lchop(o, '__date__@')
                 o = utils.lchop(o, '__time__@')
-            return super(CustomJSONEncoder, self).default(o)
+            return super().default(o)
 
 
 def custom_json_decoder(value):

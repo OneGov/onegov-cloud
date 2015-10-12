@@ -34,9 +34,8 @@ class HtmlHandleFormDirective(HtmlDirective):
     def __init__(self, app, model, form, render=None, template=None,
                  permission=None, internal=False, **predicates):
         self.form = form
-        super(HtmlHandleFormDirective, self).__init__(app, model, render,
-                                                      template, permission,
-                                                      internal, **predicates)
+        super().__init__(app, model, render, template, permission, internal,
+                         **predicates)
 
     def perform(self, registry, obj):
         registry.install_predicates(generic.view)

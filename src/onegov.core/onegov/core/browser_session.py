@@ -68,7 +68,7 @@ class BrowserSession(object):
 
     def __setattr__(self, name, value):
         if name.startswith('_'):
-            super(BrowserSession, self).__setattr__(name, value)
+            super().__setattr__(name, value)
         else:
             self._cache.set(self.mangle(name), value)
 
@@ -79,7 +79,7 @@ class BrowserSession(object):
 
     def __delattr__(self, name):
         if name.startswith('_'):
-            super(BrowserSession, self).__delattr__(name)
+            super().__delattr__(name)
         else:
             self._cache.delete(self.mangle(name))
 

@@ -16,4 +16,4 @@ class UUID(BaseUUID):
     """
 
     def __init__(self, as_uuid=True):
-        super(UUID, self).__init__(as_uuid=as_uuid)
+        super().__init__(as_uuid=as_uuid)

@@ -18,7 +18,7 @@ class ForceFetchQueryClass(Query):
     """
 
     def delete(self, synchronize_session=None):
-        return super(ForceFetchQueryClass, self).delete('fetch')
+        return super().delete('fetch')
 
 
 class SessionManager(object):

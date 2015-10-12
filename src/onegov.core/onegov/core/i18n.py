@@ -160,7 +160,7 @@ def get_translation_bound_meta(meta_class, translate):
     class TranslationBoundMeta(meta_class):
 
         def get_translations(self, form):
-            default = super(TranslationBoundMeta, self).get_translations(form)
+            default = super().get_translations(form)
 
             if not default._fallback:
                 default.add_fallback(translate)
@@ -193,7 +193,7 @@ def get_translation_bound_meta(meta_class, translate):
             if hasattr(field, 'label'):
                 field.label.text = self._translations.gettext(field.label.text)
 
-            return super(TranslationBoundMeta, self).render_field(
+            return super().render_field(
                 field, render_kw)
 
     return TranslationBoundMeta

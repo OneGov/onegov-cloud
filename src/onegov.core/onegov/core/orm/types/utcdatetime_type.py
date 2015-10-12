@@ -14,7 +14,7 @@ class UTCDateTime(types.TypeDecorator):
     impl = types.DateTime
 
     def __init__(self):
-        super(UTCDateTime, self).__init__(timezone=False)
+        super().__init__(timezone=False)
 
     def process_bind_param(self, value, engine):
         if value is not None:

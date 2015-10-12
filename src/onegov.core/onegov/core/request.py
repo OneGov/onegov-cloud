@@ -96,8 +96,7 @@ class CoreRequest(IncludeRequest):
 
     def link(self, *args, **kwargs):
         """ Extends the default link generating function of Morepath. """
-        return self.transform(
-            super(CoreRequest, self).link(*args, **kwargs))
+        return self.transform(super().link(*args, **kwargs))
 
     def filestorage_link(self, path):
         """ Takes the given filestorage path and returns an url if the path

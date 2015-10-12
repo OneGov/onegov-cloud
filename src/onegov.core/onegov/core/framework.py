@@ -63,7 +63,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def __call__(self):
         """ Intercept all wsgi calls so we can attach debug tools. """
 
-        fn = super(Framework, self).__call__
+        fn = super().__call__
 
         if getattr(self, 'sql_query_report', False):
             fn = self.with_query_report(fn)
@@ -269,7 +269,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         """
 
-        super(Framework, self).configure_application(**cfg)
+        super().configure_application(**cfg)
 
         members = sorted(
             inspect.getmembers(self.__class__, callable),
@@ -361,7 +361,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         is present.
 
         """
-        super(Framework, self).set_application_id(application_id)
+        super().set_application_id(application_id)
 
         # replace the dashes in the id with underlines since the schema
         # should not include double dashes and IDNA leads to those
