@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.0 (2015-10-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes the delete process failing under certain polymorphic configurations.
   [href]
 
