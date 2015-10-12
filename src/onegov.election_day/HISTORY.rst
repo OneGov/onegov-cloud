@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.2 (2015-10-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Explicitly passes the encoding when reading the yaml file to avoid getting
   the wrong one through the environment.
   [href]
