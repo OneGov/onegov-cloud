@@ -71,14 +71,6 @@ def import_file(vote, ballot_type, file, mimetype):
                 "extra columns."
             ))
         ]}
-    except AmbiguousColumnsError as e:
-        return {'status': 'error', 'errors': [
-            FileImportError(None, _(
-                "Could not find the expected columns, "
-                "make sure all required columns exist and that there are no "
-                "extra columns."
-            ))
-        ]}
     except DuplicateColumnNames as e:
         return {'status': 'error', 'errors': [
             FileImportError(None, _("Some column names appear twice."))
@@ -114,9 +106,9 @@ def import_file(vote, ballot_type, file, mimetype):
             line_errors.append(_("Missing municipality"))
 
         if group in existing_groups:
-            line_errors.append(_("${group} was found twice"), mapping={
+            line_errors.append(_("${group} was found twice", mapping={
                 'group': group
-            })
+            }))
 
         existing_groups.add(group)
 
@@ -128,9 +120,9 @@ def import_file(vote, ballot_type, file, mimetype):
         else:
             if municipality_id in existing_municipality_ids:
                 line_errors.append(
-                    _("municipality id ${id} was found twice"), mapping={
+                    _("municipality id ${id} was found twice", mapping={
                         'id': municipality_id
-                    }
+                    })
                 )
 
             existing_municipality_ids.add(municipality_id)
@@ -166,11 +158,15 @@ def import_file(vote, ballot_type, file, mimetype):
             line_errors.append(_("Could not read the invalid votes"))
 
         # now let's do some sanity checks
-        if (yeas + nays + empty + invalid) > elegible_voters:
-            line_errors.append(_("More cast votes than elegible voters"))
+        try:
+            if not elegible_voters:
+                line_errors.append(_("No elegible voters"))
 
-        if not elegible_voters:
-            line_errors.append(_("No elegible voters"))
+            if (yeas + nays + empty + invalid) > elegible_voters:
+                line_errors.append(_("More cast votes than elegible voters"))
+
+        except UnboundLocalError:
+            pass
 
         # pass the errors
         if line_errors:

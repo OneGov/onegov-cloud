@@ -228,7 +228,7 @@ msgid "More cast votes than elegible voters"
 msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 
 msgid "No elegible voters"
-msgstr "Keine Stimmberechtigen"
+msgstr "Keine Stimmberechtigten"
 
 msgid "Invalid municipality id"
 msgstr "Ungültige BFS Nummer"
