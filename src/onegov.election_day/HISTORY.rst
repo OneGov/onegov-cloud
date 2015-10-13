@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Make sure all uploads are aborted if one file fails.
+  [href]
+
 - Fix javascript in map when hovering over a lake.
   [href]
 

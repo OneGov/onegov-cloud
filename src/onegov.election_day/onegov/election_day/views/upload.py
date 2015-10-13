@@ -1,4 +1,5 @@
 """ The upload view. """
+import transaction
 
 from onegov.ballot import Ballot, BallotResult, Vote
 from onegov.core.csv import CSVFile
@@ -268,6 +269,9 @@ def view_upload(self, request, form):
             status = 'error'
     else:
         status = 'open'
+
+    if status == 'error':
+        transaction.abort()
 
     return {
         'layout': ManageLayout(self, request),
