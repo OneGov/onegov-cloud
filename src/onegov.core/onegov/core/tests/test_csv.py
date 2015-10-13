@@ -31,13 +31,12 @@ def test_normalize_header():
 
 
 def test_detect_encoding():
-    assert detect_encoding(BytesIO(b''))['encoding'] is None
+    assert detect_encoding(BytesIO('jöö'.encode('ISO-8859-2'))) == 'cp1252'
+    assert detect_encoding(BytesIO('jöö'.encode('utf-8'))) == 'utf-8'
 
-    assert detect_encoding(BytesIO('jöö'.encode('ISO-8859-2')))['encoding'] \
-        == 'ISO-8859-2'
-
-    assert detect_encoding(BytesIO('jöö'.encode('utf-8')))['encoding'] \
-        == 'utf-8'
+    assert detect_encoding(
+        BytesIO('abcdefabcdefabcdefabcdefö'.encode('utf-8'))
+    ) == 'utf-8'
 
 
 def test_simple_csv_file():

@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- The csv encoding detection function will now either look for cp1152 or utf-8.
+  [href]
+
 0.7.0 (2015-10-12)
 ~~~~~~~~~~~~~~~~~~~
 

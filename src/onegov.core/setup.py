@@ -38,7 +38,6 @@ setup(
         'bleach',
         'cached_property',
         'chameleon',
-        'chardet',
         'click',
         'dogpile.cache',
         'editdistance',

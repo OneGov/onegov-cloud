@@ -4,7 +4,6 @@ import codecs
 import re
 import sys
 
-from chardet.universaldetector import UniversalDetector
 from collections import namedtuple, OrderedDict
 from csv import reader as csv_reader, Sniffer
 from editdistance import eval as distance
@@ -21,9 +20,7 @@ class CSVFile(object):
 
     def __init__(self, csvfile, expected_headers):
         # prepare a reader which always returns utf-8
-        csvfile.seek(0)
-
-        encoding = detect_encoding(csvfile)['encoding']
+        encoding = detect_encoding(csvfile)
         if encoding is None:
             raise errors.InvalidFormat()
 
@@ -77,25 +74,21 @@ class CSVFile(object):
 
 
 def detect_encoding(csvfile):
-    """ Runs the chardet detector incrementally against the given csv file.
-    Once it is confident enough, it will return a value.
-
-    See: http://chardet.readthedocs.org/
+    """ Since encoding detection is hard to get right (and work correctly
+    every time), we limit ourselves here to UTF-8 or CP1252, whichever works
+    first. CP1252 is basically the csv format you get if you use windows and
+    excel and it is a superset of ISO-8859-1/LATIN1.
 
     """
-    detector = UniversalDetector()
     csvfile.seek(0)
 
     try:
-        for line in csvfile:
-            detector.feed(line)
+        for line in csvfile.readlines():
+            line.decode('utf-8')
 
-            if detector.done:
-                break
-    finally:
-        detector.close()
-
-    return detector.result
+        return 'utf-8'
+    except UnicodeDecodeError:
+        return 'cp1252'
 
 
 def sniff_dialect(csv):
