@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fix javascript in map when hovering over a lake.
+  [href]
+
 0.1.3 (2015-10-12)
 ~~~~~~~~~~~~~~~~~~~
 

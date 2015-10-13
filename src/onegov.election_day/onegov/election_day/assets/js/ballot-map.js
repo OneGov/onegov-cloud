@@ -22,6 +22,10 @@ var init_ballot_map = function(el) {
         .offset([-10, 0])
         .html(function(d) {
 
+            if (_.isUndefined(d.properties.result.yeas_percentage)) {
+                return;
+            }
+
             var yeas_percentage =  Math.round(
                 d.properties.result.yeas_percentage * 100) / 100;
 
