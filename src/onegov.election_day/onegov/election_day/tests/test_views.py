@@ -1,5 +1,4 @@
 import onegov.election_day
-import pytest
 
 from datetime import date
 from onegov.ballot import VoteCollection
@@ -132,7 +131,6 @@ def test_upload_all_or_nothing(election_day_app):
     assert not vote.ballots
 
 
-@pytest.mark.xfail  # currently fails because of encoding issues
 def test_upload_success(election_day_app):
     client = Client(election_day_app)
 
@@ -178,16 +176,16 @@ def test_upload_success(election_day_app):
     assert "20'076" in results
 
     # entered votes
-    assert "17'394" in results
+    assert "17'934" in results
 
     # turnout
     assert "89.33 %" in results
 
     # yea %
-    assert '<dd class="accepted">51.20%</dd>' in results
+    assert '<dd class="accepted" >51.20%</dd>' in results
 
     # nay %
-    assert '<dd class="rejected">48.80%</dd>' in results
+    assert '<dd class="rejected" >48.80%</dd>' in results
 
 
 def test_upload_validation(election_day_app):
