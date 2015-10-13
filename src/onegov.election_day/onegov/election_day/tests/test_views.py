@@ -1,6 +1,8 @@
 import onegov.election_day
+import pytest
 
 from datetime import date
+from onegov.ballot import VoteCollection
 from onegov.testing import utils
 from webtest import TestApp as Client
 from webtest.forms import Upload
@@ -76,6 +78,116 @@ def test_view_manage(election_day_app):
 
     manage = delete.form.submit().follow()
     assert "Noch keine Abstimmungen erfasst" in manage
+
+
+def test_upload_all_or_nothing(election_day_app):
+    client = Client(election_day_app)
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-vote')
+    new.form['vote'] = 'Bacon, yea or nay?'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # when uploading a proposal, a counter-proposal and a tie-breaker we
+    # want the process to stop completely if any of these three files has
+    # an error
+
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'complex'
+
+    passes = '\n'.join((
+        ','.join(COLUMNS),
+        ',1711,Zug,8321,7405,16516,80,1'
+    ))
+
+    fails = '\n'.join((
+        ','.join(COLUMNS),
+        ',abc,Zug,8321,7405,16516,80,1'
+    ))
+
+    upload.form['proposal'] = Upload(
+        'data.csv', passes.encode('utf-8'), 'text/plain'
+    )
+    upload.form['counter_proposal'] = Upload(
+        'data.csv', passes.encode('utf-8'), 'text/plain'
+    )
+    upload.form['tie_breaker'] = Upload(
+        'data.csv', fails.encode('utf-8'), 'text/plain'
+    )
+    upload = upload.form.submit()
+
+    assert "Keine Fehler im Vorschlag" in upload
+    assert "Keine Fehler im Gegenvorschlag" in upload
+    assert "Fehler in der Stichfrage" in upload
+    assert "Ungültige BFS Nummer" in upload
+    assert '<span class="error-line"><span>Zeile</span>2</span>' in upload
+
+    vote = VoteCollection(election_day_app.session()).by_id('bacon-yea-or-nay')
+    assert not vote.ballots
+
+
+@pytest.mark.xfail  # currently fails because of encoding issues
+def test_upload_success(election_day_app):
+    client = Client(election_day_app)
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-vote')
+    new.form['vote'] = 'Bacon, yea or nay?'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # when uploading a proposal, a counter-proposal and a tie-breaker we
+    # want the process to stop completely if any of these three files has
+    # an error
+
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'simple'
+
+    csv = '\n'.join((
+        ','.join(COLUMNS),
+        ',1711,Zug,8321,7405,16516,80,1',
+        ',1706,Oberägeri,811,1298,3560,18,'
+    ))
+
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain'
+    )
+
+    results = upload.form.submit().click("Hier klicken")
+
+    assert 'Zug' in results
+    assert "8'321" in results
+    assert "7'405" in results
+
+    assert 'Oberägeri' in results
+    assert "811" in results
+    assert "1'298" in results
+
+    # all elegible voters
+    assert "20'076" in results
+
+    # entered votes
+    assert "17'394" in results
+
+    # turnout
+    assert "89.33 %" in results
+
+    # yea %
+    assert '<dd class="accepted">51.20%</dd>' in results
+
+    # nay %
+    assert '<dd class="rejected">48.80%</dd>' in results
 
 
 def test_upload_validation(election_day_app):
