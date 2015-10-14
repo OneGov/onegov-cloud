@@ -3,6 +3,11 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- The format_number function now uses the locale specific grouping/decimal
+  separators.
+  [href]
+
 0.7.1 (2015-10-13)
 ~~~~~~~~~~~~~~~~~~~
 

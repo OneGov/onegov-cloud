@@ -1,4 +1,5 @@
 import arrow
+import babel.numbers
 import numbers
 
 from cached_property import cached_property
@@ -33,7 +34,6 @@ class Layout(object):
     time_format = '%H:%M'
     date_format = '%d.%m.%Y'
     datetime_format = ' '.join((date_format, time_format))
-    thousands_separator = "'"
 
     def __init__(self, model, request):
         self.model = model
@@ -92,8 +92,7 @@ class Layout(object):
         return datetime.isoformat(date)
 
     def format_number(self, number, decimal_places=None):
-        """ Takes the given numer and formats it according to locale (in the
-        future, for now the format is fixed).
+        """ Takes the given numer and formats it according to locale.
 
         If the number is an integer, the default decimal places are 0,
         otherwise 2.
@@ -105,9 +104,13 @@ class Layout(object):
             else:
                 decimal_places = 2
 
-        format = '{{:,.{}f}}'.format(decimal_places)
+        locale = self.request.locale
 
-        return format.format(number).replace(',', self.thousands_separator)
+        decimal = babel.numbers.get_decimal_symbol(locale)
+        group = babel.numbers.get_group_symbol(locale)
+
+        result = '{{:,.{}f}}'.format(decimal_places).format(number)
+        return result.translate({ord(','): group, ord('.'): decimal})
 
 
 class ChameleonLayout(Layout):

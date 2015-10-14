@@ -27,13 +27,21 @@ def test_format_date():
 
 def test_format_number():
 
-    layout = Layout(model=object(), request=object())
+    layout = Layout(model=object(), request=Bunch())
 
+    layout.request.locale = 'de_ch'
     assert layout.format_number(100) == "100"
     assert layout.format_number(100, 2) == "100.00"
     assert layout.format_number(1000) == "1'000"
     assert layout.format_number(1000.00) == "1'000.00"
     assert layout.format_number(1000.00, 0) == "1'000"
+
+    layout.request.locale = 'de'
+    assert layout.format_number(100) == "100"
+    assert layout.format_number(100, 2) == "100,00"
+    assert layout.format_number(1000) == "1.000"
+    assert layout.format_number(1000.00) == "1.000,00"
+    assert layout.format_number(1000.00, 0) == "1.000"
 
 
 def test_relative_date():
