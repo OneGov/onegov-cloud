@@ -104,8 +104,11 @@ def temporary_directory():
 
 @pytest.yield_fixture(scope="session")
 def es_process():
-    binary = subprocess.check_output(['which', 'elasticsearch'])
-    binary = binary.decode('utf-8').rstrip('\n')
+    binary = os.environ.get('ES_BINARY', None)
+
+    if not binary:
+        binary = subprocess.check_output(['which', 'elasticsearch'])
+        binary = binary.decode('utf-8').rstrip('\n')
 
     port = port_for.select_random()
     cluster_name = 'es_cluster_{}'.format(port)
