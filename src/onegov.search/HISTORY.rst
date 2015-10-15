@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes a number of Elasticsearch 2.0 specific bugs.
+  [href]
+
 0.1.1 (2015-10-15)
 ~~~~~~~~~~~~~~~~~~~
 

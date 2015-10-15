@@ -200,9 +200,7 @@ def test_mapping_for_language():
                     'type': 'category'
                 }
             },
-            'index_analyzer': 'standard',
             'payloads': True,
-            'search_analyzer': 'standard',
             'type': 'completion'
         }
     }
@@ -229,9 +227,7 @@ def test_mapping_for_language():
                     'type': 'category'
                 }
             },
-            'index_analyzer': 'standard',
             'payloads': True,
-            'search_analyzer': 'standard',
             'type': 'completion'
         }
     }
@@ -270,9 +266,7 @@ def test_mapping_for_language():
                     'type': 'category'
                 }
             },
-            'index_analyzer': 'standard',
             'payloads': True,
-            'search_analyzer': 'standard',
             'type': 'completion'
         }
     }
@@ -309,9 +303,7 @@ def test_mapping_for_language():
                     'type': 'category'
                 }
             },
-            'index_analyzer': 'standard',
             'payloads': True,
-            'search_analyzer': 'standard',
             'type': 'completion'
         }
     }

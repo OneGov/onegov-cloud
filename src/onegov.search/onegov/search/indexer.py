@@ -211,8 +211,6 @@ class TypeMapping(object):
         mapping['es_suggestion'] = {
             'type': 'completion',
             'payloads': True,
-            'index_analyzer': 'standard',
-            'search_analyzer': 'standard',
             "context": {
                 "es_public_categories": {
                     "type": "category",
