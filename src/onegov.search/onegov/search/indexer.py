@@ -1,7 +1,7 @@
 import platform
 
 from copy import deepcopy
-from elasticsearch.exceptions import TransportError
+from elasticsearch.exceptions import NotFoundError, TransportError
 from onegov.core.utils import is_non_string_iterable
 from onegov.search import log, Searchable, utils
 from queue import Queue, Empty, Full
@@ -164,17 +164,23 @@ class Indexer(object):
 
         # delete the document from all languages (because we don't know
         # which one anymore) - and delete from all related types (polymorphic)
-        indices = []
         for type in types:
-            indices.append(self.ixmgr.get_external_index_name(
+            ix = self.ixmgr.get_external_index_name(
                 schema=task['schema'],
                 language='*',
                 type_name=type
-            ))
-        self.es_client.delete_by_query(
-            index=','.join(indices), doc_type=','.join(types),
-            q='_id:{}'.format(task['id']), allow_no_indices=True
-        )
+            )
+
+            # for the delete operation we need the internal index names
+            for internal in self.es_client.indices.get_alias(index=ix).keys():
+                try:
+                    self.es_client.delete(
+                        index=internal,
+                        doc_type=type,
+                        id=task['id']
+                    )
+                except NotFoundError:
+                    pass
 
 
 class TypeMapping(object):

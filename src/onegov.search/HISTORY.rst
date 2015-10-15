@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds compatibility with Elasticserach 2.0.
+  [href]
+
 - Use 'de_CH' translation instead of 'de'.
   [href]
 
