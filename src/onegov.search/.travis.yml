@@ -1,11 +1,12 @@
 language: python
 python: "3.4"
 env:
-    - TOXENV=py34
-    - TOXENV=pep8
-install:
-    - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - TOXENV=py34 ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-1.7.2.tar.gz
+    - TOXENV=py34 ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.0.0-beta1/elasticsearch-2.0.0-beta1.tar.gz
+    - TOXENV=pep8 ES_URL=no
+
+install: ./travis-install.sh
+
 script:
     - tox -e $TOXENV
 after_success:
