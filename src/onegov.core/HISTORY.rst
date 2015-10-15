@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.7.2 (2015-10-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves i18n support, removing bugs, adding support for de_CH and the like.
   [href]
