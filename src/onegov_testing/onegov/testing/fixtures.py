@@ -9,6 +9,7 @@ import transaction
 from elasticsearch import Elasticsearch
 from mirakuru import HTTPExecutor as HTTPExecutorBase
 from onegov.core.orm import Base, SessionManager
+from pathlib import Path
 from sqlalchemy import create_engine
 from testing.postgresql import Postgresql
 from uuid import uuid4
@@ -109,6 +110,8 @@ def es_process():
     if not binary:
         binary = subprocess.check_output(['which', 'elasticsearch'])
         binary = binary.decode('utf-8').rstrip('\n')
+
+    assert Path(binary).exists()
 
     port = port_for.select_random()
     cluster_name = 'es_cluster_{}'.format(port)
