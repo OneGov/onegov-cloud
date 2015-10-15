@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Fix being unable to load languages not conforming to our exact format.
+  [href]
+
 0.7.2 (2015-10-15)
 ~~~~~~~~~~~~~~~~~~~
 

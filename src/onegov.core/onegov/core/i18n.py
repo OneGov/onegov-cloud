@@ -134,6 +134,13 @@ def get_translations(localedirs):
     for localedir in localedirs:
         for language, pofile_path in pofiles(localedir):
 
+            # try to automatically fix up the language
+            if '_' in language:
+                code, country = language.split('_')
+                language = '_'.join((code.lower(), country.upper()))
+            else:
+                language = language.lower()
+
             assert VALID_LANGUAGE_EXPRESSION.match(language), """
                 make sure to use languages in the following format:
                 de_CH, en_GB, de, fr - note the case!
