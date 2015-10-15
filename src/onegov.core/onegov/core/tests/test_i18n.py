@@ -3,7 +3,7 @@ import os.path
 import polib
 import pytest
 
-from gettext import GNUTranslations
+from gettext import GNUTranslations, NullTranslations
 from onegov.core import i18n, utils
 from webob import Request
 from webob.acceptparse import Accept
@@ -136,6 +136,39 @@ def test_default_locale_negotiator():
     request.accept_language = Accept('de')
     request.cookies['language'] = 'en'
     assert negotiate(['en', 'de'], request) == 'en'
+
+
+def test_add_fallback_to_tail():
+
+    root = NullTranslations()
+    child = NullTranslations()
+    grandchild = NullTranslations()
+
+    i18n.add_fallback_to_tail(root, child)
+
+    assert root._fallback is child
+    assert child._fallback is None
+
+    i18n.add_fallback_to_tail(root, grandchild)
+
+    assert root._fallback is child
+    assert child._fallback is grandchild
+    assert grandchild._fallback is None
+    assert root._fallback._fallback is grandchild
+
+    i18n.add_fallback_to_tail(root, child)
+
+    assert root._fallback is child
+    assert child._fallback is grandchild
+    assert grandchild._fallback is None
+    assert root._fallback._fallback is grandchild
+
+    i18n.add_fallback_to_tail(root, grandchild)
+
+    assert root._fallback is child
+    assert child._fallback is grandchild
+    assert grandchild._fallback is None
+    assert root._fallback._fallback is grandchild
 
 
 def test_get_translation_bound_form():

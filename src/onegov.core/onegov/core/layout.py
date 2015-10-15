@@ -1,4 +1,5 @@
 import arrow
+import babel.dates
 import babel.numbers
 import numbers
 
@@ -30,10 +31,29 @@ class Layout(object):
     #: remain close to the layout, and not necessarily close to the request.
     timezone = timezone('Europe/Zurich')
 
-    #: Just like the timezone, these values are fixed for Switzerland now
-    time_format = '%H:%M'
-    date_format = '%d.%m.%Y'
-    datetime_format = ' '.join((date_format, time_format))
+    #: Just like the timezone, these values are fixed for Switzerland now,
+    #: though the non-numerical information is actually translated.
+    #: Format:
+    #: http://www.unicode.org\
+    #:       /reports/tr35/tr35-39/tr35-dates.html#Date_Format_Patterns
+    #:
+    #: Classes inheriting from :class:`Layout` may add their own formats, as
+    #: long as they end in ``_format``. For example::
+    #:
+    #:    class MyLayout(Layout):
+    #:        my_format = 'dd.MMMM'
+    #:
+    #:    MyLayout().format_date(dt, 'my')
+    #:
+    #: XXX this is not yet i18n and could be done better
+    time_format = 'HH:mm'
+    date_format = 'dd.MM.YYYY'
+    datetime_format = 'dd.MM.YYYY HH:mm'
+
+    date_long_format = 'dd.MMMM YYYY'
+    datetime_long_format = 'd.MMMM YYYY HH:mm'
+    weekday_long_format = 'EEEE'
+    month_long_format = 'MMMM'
 
     def __init__(self, model, request):
         self.model = model
@@ -72,20 +92,32 @@ class Layout(object):
         """ Adds a csrf token to the given url. """
         return URL(url).query_param('csrf-token', self.csrf_token).as_string()
 
-    def format_date(self, date, format):
+    def format_date(self, dt, format):
         """ Takes a datetime and formats it according to local timezone and
         the given format.
 
         """
-        assert format in {'date', 'time', 'datetime', 'relative'}
-
-        if hasattr(date, 'astimezone'):
-            date = self.timezone.normalize(date.astimezone(self.timezone))
+        if getattr(dt, 'tzinfo', None) is not None:
+            dt = self.timezone.normalize(dt.astimezone(self.timezone))
 
         if format == 'relative':
-            return arrow.get(date).humanize(locale=self.request.locale)
+            dt = arrow.get(dt)
 
-        return date.strftime(getattr(self, format + '_format'))
+            try:
+                return dt.humanize(locale=self.request.locale)
+            except ValueError:
+                return dt.humanize(locale=self.request.locale.split('_')[0])
+
+        if hasattr(dt, 'hour'):
+            formatter = babel.dates.format_datetime
+        else:
+            formatter = babel.dates.format_date
+
+        return formatter(
+            dt,
+            format=getattr(self, format + '_format'),
+            locale=self.request.locale
+        )
 
     def isodate(self, date):
         """ Returns the given date in the ISO 8601 format. """

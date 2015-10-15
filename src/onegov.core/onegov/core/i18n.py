@@ -37,12 +37,19 @@ import glob
 import os
 import os.path
 import polib
+import re
 
 from io import BytesIO
 from onegov.core import Framework, log
 from onegov.core.utils import pairwise
 from translationstring import ChameleonTranslate
 from translationstring import Translator
+
+
+# the language codes must be written thusly: de_CH, en_GB, en, fr and so on
+# this is important because other libs like wtforms use the same scheme and
+# will fail to deal with our langauges correctly if they differ in case
+VALID_LANGUAGE_EXPRESSION = re.compile(r'^[a-z]{2}(_[A-Z]{2})?$')
 
 
 @Framework.setting(section='i18n', name='localedirs')
@@ -126,6 +133,12 @@ def get_translations(localedirs):
 
     for localedir in localedirs:
         for language, pofile_path in pofiles(localedir):
+
+            assert VALID_LANGUAGE_EXPRESSION.match(language), """
+                make sure to use languages in the following format:
+                de_CH, en_GB, de, fr - note the case!
+            """
+
             log.info("Compiling pofile {}".format(pofile_path))
 
             mofile = BytesIO()
@@ -151,6 +164,23 @@ def wrap_translations_for_chameleon(translations):
     }
 
 
+def add_fallback_to_tail(translation, fallback):
+    """ Adds the given fallback to the given translation, if it isn't already
+    found somewhere in the fallback chain.
+
+    """
+
+    assert translation is not fallback
+
+    while translation._fallback is not None:
+        translation = translation._fallback
+
+        if translation is fallback:
+            return
+
+    translation.add_fallback(fallback)
+
+
 def get_translation_bound_meta(meta_class, translate):
     """ Takes a wtforms Meta class and combines our translate class with
     the one provided by WTForms itself.
@@ -161,9 +191,7 @@ def get_translation_bound_meta(meta_class, translate):
 
         def get_translations(self, form):
             default = super().get_translations(form)
-
-            if not default._fallback:
-                default.add_fallback(translate)
+            add_fallback_to_tail(default, translate)
 
             # Cache for reuse in render_field. I'm not sure this is perfectly
             # sane, as WTForms does use it's own caching mechanism with

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Improves i18n support, removing bugs, adding support for de_CH and the like.
+  [href]
+
 - The format_number function now uses the locale specific grouping/decimal
   separators.
   [href]

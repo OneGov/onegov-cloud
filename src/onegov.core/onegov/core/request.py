@@ -221,6 +221,11 @@ class CoreRequest(IncludeRequest):
         locale = settings.i18n.locale_negotiator(self.app.languages, self)
         return locale or settings.i18n.default_locale
 
+    @cached_property
+    def html_lang(self):
+        """ The language code for the html tag. """
+        return self.locale and self.locale.replace('_', '-') or ''
+
     def get_translate(self, for_chameleon=False):
         """ Returns the translate method to the given request, or None
         if no such method is availabe.
