@@ -150,8 +150,8 @@ def es_process():
         --cluster.name={cluster_name}
         --network.publish_host='127.0.0.1'
         --discovery.zen.ping.multicast.enabled=false
-        --index.store.type=memory
         --action.auto_create_index=false
+        --security.manager.enabled=false
     """.format(
         binary=binary,
         pidfile=pid,
