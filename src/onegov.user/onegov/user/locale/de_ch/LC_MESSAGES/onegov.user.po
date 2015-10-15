@@ -1,0 +1,25 @@
+#
+# German translations for PACKAGE package
+# German translation for PACKAGE
+# This file is distributed under the same license as the PACKAGE package.
+# Denis Krienbühl <denis.krienbuehl@seantis.ch>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2015-10-15 09:44+0200\n"
+"PO-Revision-Date: 2015-10-15 09:44+0200\n"
+"Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
+"Language-Team: German\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.11\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Username/E-Mail Address"
+msgstr "Benutzername/E-Mail Adresse"
+
+msgid "Password"
+msgstr "Passwort"
