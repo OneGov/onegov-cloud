@@ -103,12 +103,12 @@
         <tal:block define="(domain, date) group">
             <tal:block condition="domain == 'federation'">
                 <h2 i18n:translate="">
-                    Federal Votes on <span tal:replace="layout.format_date(date, 'date')" i18n:name='date' />
+                    Federal Votes on <span tal:replace="layout.format_date(date, 'date_long')" i18n:name='date' />
                 </h2>
             </tal:block>
             <tal:block condition="domain == 'canton'">
                 <h2 i18n:translate="">
-                    Cantonal Votes on <span tal:replace="layout.format_date(date, 'date')" i18n:name='date' />
+                    Cantonal Votes on <span tal:replace="layout.format_date(date, 'date_long')" i18n:name='date' />
                 </h2>
             </tal:block>
 

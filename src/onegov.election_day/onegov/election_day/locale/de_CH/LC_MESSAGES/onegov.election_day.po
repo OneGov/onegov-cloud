@@ -1,8 +1,16 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2015-10-12 13:13+0200\n"
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2015-10-14 17:18+0200\n"
+"PO-Revision-Date: 2015-10-14 17:17+0200\n"
+"Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
+"Language-Team: German\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "Type"
 msgstr "Art"
@@ -224,12 +232,6 @@ msgstr "Fehlender Ort"
 msgid "${group} was found twice"
 msgstr "${group} kommt zweimal vor"
 
-msgid "More cast votes than elegible voters"
-msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
-
-msgid "No elegible voters"
-msgstr "Keine Stimmberechtigten"
-
 msgid "Invalid municipality id"
 msgstr "Ungültige BFS Nummer"
 
@@ -251,6 +253,12 @@ msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
 
 msgid "Could not read the invalid votes"
 msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
+
+msgid "No elegible voters"
+msgstr "Keine Stimmberechtigten"
+
+msgid "More cast votes than elegible voters"
+msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 
 msgid "No data found"
 msgstr "Keine Daten gefunden"

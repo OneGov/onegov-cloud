@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Switch from 'de' to 'de_CH' to properly support Swiss formatting.
+  [href]
+
 - Make sure all uploads are aborted if one file fails.
   [href]
 
