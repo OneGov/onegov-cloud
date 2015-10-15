@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Updates redactor to 10.2.5.
+  [href]
+
 - Switch from 'de' to 'de_CH' to properly support Swiss formatting.
   [href]
 
