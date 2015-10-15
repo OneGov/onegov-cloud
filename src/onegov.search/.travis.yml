@@ -5,7 +5,7 @@ env:
     - TOXENV=py34 ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.0.0-beta1/elasticsearch-2.0.0-beta1.tar.gz
     - TOXENV=pep8 ES_URL=no
 
-install: ./travis-install.sh
+install: ./.travis-install.sh
 
 script:
     - tox -e $TOXENV
