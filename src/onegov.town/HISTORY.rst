@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Switch from 'de' to 'de_CH' to properly support Swiss formatting.
+  [href]
+
 - Removes Python 2.x support.
   [href]
 

@@ -1,5 +1,3 @@
-import arrow
-
 from cached_property import cached_property
 from dateutil import rrule
 from onegov.core.layout import ChameleonLayout
@@ -762,25 +760,7 @@ class AllocationEditFormLayout(DefaultLayout):
 
 class EventBaseLayout(DefaultLayout):
 
-    weekday_format = 'dddd'
-    month_format = 'MMMM'
-    event_format = 'dddd, D. MMMM YYYY, HH:mm'
-
-    def format_date(self, date, format):
-        """ Takes a datetime and formats it.
-
-        This overrides :meth:`onegov.core.Layout.format_date` since we want to
-        display the date in the timezone given by the event, not a fixed one.
-
-        """
-        if format in ('date', 'time', 'datetime'):
-            return date.strftime(getattr(self, format + '_format'))
-
-        if format in ('weekday', 'month', 'smonth', 'event'):
-            return arrow.get(date).format(
-                getattr(self, format + '_format'),
-                locale=self.request.locale
-            )
+    event_format = 'EEEE, d. MMMM YYYY, HH:mm'
 
     def format_recurrence(self, recurrence):
         """ Returns a human readable version of an RRULE used by us. """

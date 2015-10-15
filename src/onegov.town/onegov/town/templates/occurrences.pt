@@ -17,9 +17,9 @@
                                         </tal:block>
                                         <tal:block tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
                                             <div class="occurrences-day-date active">
-                                                <div>${layout.format_date(occurrence.localized_start, 'weekday')}</div>
+                                                <div>${layout.format_date(occurrence.localized_start, 'weekday_long')}</div>
                                                 <div class="day">${occurrence.localized_start.day}</div>
-                                                <div>${layout.format_date(occurrence.localized_start, 'month')}</div>
+                                                <div>${layout.format_date(occurrence.localized_start, 'month_long')}</div>
                                             </div>
                                         </tal:block>
                                     </div>

@@ -210,8 +210,8 @@ def test_events_layout_format_date():
     request = MockRequest()
 
     layout = EventBaseLayout(MockModel(), request)
-    assert layout.format_date(then, 'weekday') == 'Sunday'
-    assert layout.format_date(then, 'month') == 'July'
+    assert layout.format_date(then, 'weekday_long') == 'Sunday'
+    assert layout.format_date(then, 'month_long') == 'July'
     assert layout.format_date(then, 'event') == 'Sunday, 5. July 2015, 10:15'
 
     request.locale = 'de'
@@ -219,6 +219,6 @@ def test_events_layout_format_date():
     assert layout.format_date(then, 'date') == '05.07.2015'
     assert layout.format_date(then, 'datetime') == '05.07.2015 10:15'
     assert layout.format_date(then, 'time') == '10:15'
-    assert layout.format_date(then, 'weekday') == 'Sonntag'
-    assert layout.format_date(then, 'month') == 'Juli'
+    assert layout.format_date(then, 'weekday_long') == 'Sonntag'
+    assert layout.format_date(then, 'month_long') == 'Juli'
     assert layout.format_date(then, 'event') == 'Sonntag, 5. Juli 2015, 10:15'
