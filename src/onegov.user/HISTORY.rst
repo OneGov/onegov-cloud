@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.1 (2015-10-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Use 'de_CH' translation instead of 'de'.
   [href]
 
