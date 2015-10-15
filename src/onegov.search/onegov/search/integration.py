@@ -142,7 +142,7 @@ class ElasticsearchApp(morepath.App):
         """
 
         return self.es_search(
-            languages=[request.locale],
+            languages=[request.locale.split('_')[0]],
             types=types,
             include_private=request.is_logged_in
         )
@@ -189,7 +189,7 @@ class ElasticsearchApp(morepath.App):
         """
         return self.es_suggestions(
             query,
-            languages=[request.locale],
+            languages=[request.locale.split('_')[0]],
             types=types,
             include_private=request.is_logged_in
         )
