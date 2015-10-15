@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.1 (2015-10-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds compatibility with Elasticserach 2.0.
   [href]
 
