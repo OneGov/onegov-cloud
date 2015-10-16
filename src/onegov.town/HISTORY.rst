@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.5 (2015-10-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Updates redactor to 10.2.5.
   [href]
 
