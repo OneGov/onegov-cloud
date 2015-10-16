@@ -7,7 +7,7 @@ class ElectionDayTheme(BaseTheme):
 
     # don't touch this number, it's incremented using bumpversion, so every
     # release will automatically trigger a rebuild of the theme
-    version = '0.1.3'
+    version = '0.1.4'
 
     @property
     def post_imports(self):

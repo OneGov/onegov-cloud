@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.4 (2015-10-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to leave out uncounted towns in the upload. Missing towns
   are assumed to be uncounted.
   [href]
