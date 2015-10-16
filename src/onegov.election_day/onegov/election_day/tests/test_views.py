@@ -89,7 +89,7 @@ def test_upload_all_or_nothing(election_day_app):
 
     new = client.get('/manage/new-vote')
     new.form['vote'] = 'Bacon, yea or nay?'
-    new.form['date'] = date(2016, 1, 1)
+    new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -141,7 +141,7 @@ def test_upload_success(election_day_app):
 
     new = client.get('/manage/new-vote')
     new.form['vote'] = 'Bacon, yea or nay?'
-    new.form['date'] = date(2016, 1, 1)
+    new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
 
@@ -154,8 +154,17 @@ def test_upload_success(election_day_app):
 
     csv = '\n'.join((
         ','.join(COLUMNS),
-        ',1711,Zug,8321,7405,16516,80,1',
-        ',1706,Oberägeri,811,1298,3560,18,'
+        ',1711,Zug,3821,7405,16516,80,1',
+        ',1706,Oberägeri,811,1298,3560,18,',
+        ',1709,Unterägeri,1096,2083,5245,18,1',
+        ',1704,Menzingen,599,1171,2917,17,',
+        ',1701,Baar,3049,5111,13828,54,3',
+        ',1702,Cham,2190,3347,9687,60,',
+        ',1703,Hünenberg,1497,2089,5842,15,1',
+        ',1708,Steinhausen,1211,2350,5989,17,',
+        ',1707,Risch,1302,1779,6068,17,',
+        ',1710,Walchwil,651,743,2016,8,',
+        ',1705,Neuheim,307,522,1289,10,1',
     ))
 
     upload.form['proposal'] = Upload(
@@ -165,27 +174,24 @@ def test_upload_success(election_day_app):
     results = upload.form.submit().click("Hier klicken")
 
     assert 'Zug' in results
-    assert "8'321" in results
-    assert "7'405" in results
-
     assert 'Oberägeri' in results
-    assert "811" in results
-    assert "1'298" in results
+    assert "16'534" in results
+    assert "27'898" in results
 
     # all elegible voters
-    assert "20'076" in results
+    assert "72'957" in results
 
     # entered votes
-    assert "17'934" in results
+    assert "44'753" in results
 
     # turnout
-    assert "89.33 %" in results
+    assert "61.34 %" in results
 
     # yea %
-    assert '<dd class="accepted" >51.20%</dd>' in results
+    assert '<dd class="accepted" >37.21%</dd>' in results
 
     # nay %
-    assert '<dd class="rejected" >48.80%</dd>' in results
+    assert '<dd class="rejected" >62.79%</dd>' in results
 
 
 def test_upload_validation(election_day_app):
@@ -198,7 +204,7 @@ def test_upload_validation(election_day_app):
 
     new = client.get('/manage/new-vote')
     new.form['vote'] = 'Bacon, yea or nay?'
-    new.form['date'] = date(2016, 1, 1)
+    new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
 

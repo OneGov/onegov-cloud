@@ -47,10 +47,11 @@ def import_file(principal, vote, ballot_type, file, mimetype):
         csvfile = file
 
     if vote.date.year not in principal.municipalities:
-        raise FileImportError(
-            _("The year ${year} is not yet supported", mapping={
-                'year': vote.date.year
-            }))
+        return {'status': 'error', 'errors': [
+            FileImportError(_("The year ${year} is not yet supported",
+                mapping={'year': vote.date.year}
+            ))
+        ]}
 
     municipalities = principal.municipalities[vote.date.year]
 
@@ -223,7 +224,7 @@ def import_file(principal, vote, ballot_type, file, mimetype):
             )
 
     if errors:
-        return {'status': 'fail', 'errors': errors}
+        return {'status': 'fail', 'errors': errors, 'records': 0}
 
     if ballot_results:
         session = object_session(vote)
@@ -232,7 +233,11 @@ def import_file(principal, vote, ballot_type, file, mimetype):
         for result in ballot_results:
             ballot.results.append(result)
 
-    return {'status': 'ok', 'errors': errors}
+    return {
+        'status': 'ok',
+        'errors': errors,
+        'records': len(added_municipality_ids)
+    }
 
 
 def get_form_class(vote, request):
@@ -290,7 +295,22 @@ def view_upload(self, request, form):
 
     if results:
         if all(r['status'] == 'ok' for r in results.values()):
-            status = 'success'
+
+            records = max(r['records'] for r in results.values())
+
+            # make sure all imports have the same amount of records
+            for result in results.values():
+                if result['records'] < records:
+                    result['status'] = 'error'
+                    result['errors'].append(
+                        FileImportError(
+                            _("This ballot has fewer results than the others")
+                        )
+                    )
+                    status = 'error'
+                    break
+            else:
+                status = 'success'
         else:
             status = 'error'
     else:
