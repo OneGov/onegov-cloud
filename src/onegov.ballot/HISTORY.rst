@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.1 (2015-10-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a last_result_change property on the vote, indicating the last time a
   result was added or changed.
   [href]
