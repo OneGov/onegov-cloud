@@ -3,6 +3,7 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
+        <span class="shortcode large" tal:condition="shortcode|nothing">${shortcode}</span>
         <h1>${title}</h1>
         <h2 class="subheader">${subtitle}</h2>
 

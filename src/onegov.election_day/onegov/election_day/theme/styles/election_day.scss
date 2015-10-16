@@ -183,14 +183,14 @@ table {
     }
 
     .st-head-row {
-        background-color: white;
+        background-color: $white;
         border-bottom: 5px solid $gainsboro;
-        text-align: center;
         font-size: 1.2em;
+        text-align: center;
     }
     .stackable .answer {
-        text-align: right;
         font-weight: bold;
+        text-align: right;
     }
 }
 
@@ -200,6 +200,10 @@ table {
 .ballot-results {
     tr:hover {
         outline: 1px solid $gainsboro;
+    }
+
+    tr.total:hover {
+        outline: 0;
     }
 }
 
@@ -420,5 +424,19 @@ form {
     .error-message {
         display: inline-block;
         padding: 2px 6px;
+    }
+}
+
+
+/*
+    Shortcode
+*/
+.shortcode {
+    display: inline-block;
+    font-family: $font-family-monospace;
+    font-weight: bold;
+
+    &.large {
+        font-size: 1.5em;
     }
 }

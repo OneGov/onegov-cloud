@@ -272,6 +272,7 @@ def view_upload(self, request, form):
     return {
         'layout': ManageLayout(self, request),
         'title': self.title,
+        'shortcode': self.shortcode,
         'subtitle': _("Upload results"),
         'form': form,
         'cancel': request.link(Manage(request.app.session())),

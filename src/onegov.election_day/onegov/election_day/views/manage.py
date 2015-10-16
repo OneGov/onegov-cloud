@@ -55,6 +55,7 @@ def edit_vote(self, request, form):
         'layout': ManageLayout(self, request),
         'form': form,
         'title': self.title,
+        'shortcode': self.shortcode,
         'subtitle': _("Edit"),
         'cancel': request.link(Manage(request.app.session()))
     }
@@ -78,6 +79,7 @@ def delete_vote(self, request, form):
         'layout': ManageLayout(self, request),
         'form': form,
         'title': self.title,
+        'shortcode': self.shortcode,
         'subtitle': _("Delete vote"),
         'button_text': _("Delete vote"),
         'button_class': 'alert',

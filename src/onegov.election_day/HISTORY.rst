@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds internal shortcode for votes.
+  [href]
+
 - Improves the design of uncounted votes.
   [href]
 

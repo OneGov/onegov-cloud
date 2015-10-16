@@ -24,6 +24,7 @@
                     <thead>
                         <tr>
                             <th i18n:translate>Vote</th>
+                            <th i18n:translate>Shortcode</th>
                             <th i18n:translate>Date</th>
                             <th i18n:translate>Type</th>
                             <th i18n:translate>Actions</th>
@@ -32,6 +33,7 @@
                     <tbody>
                     <tr tal:repeat="vote votes">
                         <td>${vote.title}</td>
+                        <td><span class="shortcode" tal:condition="vote.shortcode">${vote.shortcode}</span></td>
                         <td>${layout.format_date(vote.date, 'date')}</td>
                         <td tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
                         <td tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>

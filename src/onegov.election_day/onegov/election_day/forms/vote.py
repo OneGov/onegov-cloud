@@ -12,6 +12,10 @@ class VoteForm(Form):
         validators=[InputRequired()]
     )
 
+    shortcode = StringField(
+        label=_("Shortcode")
+    )
+
     date = DateField(
         label=_("Date"),
         validators=[InputRequired()],
@@ -27,8 +31,10 @@ class VoteForm(Form):
         model.title = self.vote.data
         model.date = self.date.data
         model.domain = self.domain.data
+        model.shortcode = self.shortcode.data
 
     def apply_model(self, model):
         self.vote.data = model.title
         self.date.data = model.date
         self.domain.data = model.domain
+        self.shortcode.data = model.shortcode
