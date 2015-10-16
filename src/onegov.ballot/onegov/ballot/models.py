@@ -74,6 +74,9 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount):
     #: identifies the vote, may be used in the url, generated from the title
     id = Column(Text, primary_key=True)
 
+    #: shortcode for cantons that use it
+    shortcode = Column(Text, nullable=True)
+
     #: title of the vote
     title = Column(Text, nullable=False)
 

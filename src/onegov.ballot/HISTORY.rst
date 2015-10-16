@@ -7,6 +7,9 @@ Unreleased
 0.1.0 (2015-10-12)
 ~~~~~~~~~~~~~~~~~~~
 
+- Adds a shortcode to each vote for internal reference.
+  [href]
+
 - Adds the ability to query the votes by year.
   [href]
 
