@@ -6,16 +6,16 @@
 <body>
 
 <metal:navigation define-macro="answer" i18n:domain="onegov.election_day">
-    <span tal:condition="answer == 'accepted'" class="accepted" i18n:translate="">
+    <span tal:condition="answer == 'accepted'" class="answer accepted" i18n:translate="">
         Accepted
     </span>
-    <span tal:condition="answer == 'rejected'" class="rejected" i18n:translate="">
+    <span tal:condition="answer == 'rejected'" class="answer rejected" i18n:translate="">
         Rejected
     </span>
-    <span tal:condition="answer == 'proposal'" class="accepted" i18n:translate="">
+    <span tal:condition="answer == 'proposal'" class="answer accepted" i18n:translate="">
         Proposal
     </span>
-    <span tal:condition="answer == 'counter-proposal'" class="rejected" i18n:translate="">
+    <span tal:condition="answer == 'counter-proposal'" class="answer rejected" i18n:translate="">
         Counter Proposal
     </span>
 </metal:navigation>
