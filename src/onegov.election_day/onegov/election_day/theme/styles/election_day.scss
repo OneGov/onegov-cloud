@@ -1,3 +1,6 @@
+$accepted-color: #0571b0;
+$rejected-color: #ca0020;
+
 /*
     get rid of the jump that is introduced when switching from a site with
     scrollbar to a site without (or vice versa)
@@ -63,11 +66,11 @@ html {
     }
 
     .percentage {
-        background: $success-color;
+        background: $accepted-color;
         height: .5rem;
 
         .nays {
-            background: $alert-color;
+            background: $rejected-color;
             height: .5rem;
         }
     }
@@ -100,12 +103,12 @@ html {
     Voting states
 */
 .accepted {
-    color: $success-color;
+    color: $accepted-color;
     font-weight: bold;
 }
 
 .rejected {
-    color: $alert-color;
+    color: $rejected-color;
     font-weight: bold;
 }
 
@@ -244,11 +247,11 @@ table {
     padding: 12px;
 
     .fa-thumbs-up {
-        color: $success-color;
+        color: $accepted-color;
     }
 
     .fa-thumbs-down {
-        color: $alert-color;
+        color: $rejected-color;
     }
 }
 

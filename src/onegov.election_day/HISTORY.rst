@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Colors are now always blue if rejected, red if accepted, without exception.
+  [href]
+
 - Switch from 'de' to 'de_CH' to properly support Swiss formatting.
   [href]
 
