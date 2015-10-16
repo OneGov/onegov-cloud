@@ -15,7 +15,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
-from sqlalchemy import select, func, case
+from sqlalchemy import select, func, case, desc
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, relationship, object_session
@@ -229,6 +229,28 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount):
 
         return expr
 
+    @property
+    def last_result_change(self):
+        """ Gets the latest created/modified date amongst the results of
+        this vote.
+
+        """
+
+        session = object_session(self)
+
+        ballot_ids = session.query(Ballot)
+        ballot_ids = ballot_ids.with_entities(Ballot.id)
+        ballot_ids = ballot_ids.filter(Ballot.vote_id == self.id)
+        ballot_ids = ballot_ids.subquery()
+
+        results = session.query(BallotResult)
+        results = results.with_entities(BallotResult.last_change)
+        results = results.order_by(desc(BallotResult.last_change))
+        results = results.filter(BallotResult.ballot_id.in_(ballot_ids))
+
+        last_change = results.first()
+        return last_change and last_change[0] or None
+
 
 class Ballot(Base, TimestampMixin,
              DerivedPercentage, DerivedAcceptance, DerivedBallotsCount):
@@ -339,19 +361,27 @@ class Ballot(Base, TimestampMixin,
         query = query.with_entities(
             BallotResult.municipality_id,
             func.sum(BallotResult.yeas),
-            func.sum(BallotResult.nays)
+            func.sum(BallotResult.nays),
+            BallotResult.counted
         )
 
-        query = query.group_by(BallotResult.municipality_id)
-        query = query.filter(BallotResult.counted == True)
+        query = query.group_by(
+            BallotResult.municipality_id,
+            BallotResult.counted
+        )
+
         query = query.filter(BallotResult.ballot_id == self.id)
 
         result = {}
 
-        for id, yeas, nays in query.all():
-            result[id] = {}
-            result[id]['yeas_percentage'] = yeas / (yeas + nays) * 100
-            result[id]['nays_percentage'] = 100 - result[id]['yeas_percentage']
+        for id, yeas, nays, counted in query.all():
+            r = {'counted': counted}
+
+            if counted:
+                r['yeas_percentage'] = yeas / (yeas + nays) * 100
+                r['nays_percentage'] = 100 - r['yeas_percentage']
+
+            result[id] = r
 
         return result
 

@@ -4,11 +4,15 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-0.1.0 (2015-10-12)
-~~~~~~~~~~~~~~~~~~~
+- Adds a last_result_change property on the vote, indicating the last time a
+  result was added or changed.
+  [href]
 
 - Adds a shortcode to each vote for internal reference.
   [href]
+
+0.1.0 (2015-10-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to query the votes by year.
   [href]

@@ -1,4 +1,5 @@
 from datetime import date
+from freezegun import freeze_time
 from onegov.ballot import Ballot, BallotResult, Vote
 
 
@@ -425,3 +426,41 @@ def test_ballot_results_aggregation(session):
         309 + 507 + 69 + 28 + 14 + 5 + 5 + 0, )
     round(session.query(Ballot.yeas_percentage).first()[0], 2) == 89.38
     round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
+
+
+def test_vote_last_result_change(session):
+    vote = Vote(
+        title="Abstimmung",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    vote.ballots.append(Ballot(type='proposal'))
+
+    session.add(vote)
+    session.flush()
+
+    # if only the proposal is accepted, the proposal wins
+    with freeze_time("2015-01-01 12:00"):
+        vote.proposal.results.append(BallotResult(
+            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
+        vote.proposal.results.append(BallotResult(
+            group='y', yeas=0, nays=100, counted=True, municipality_id=1))
+
+        session.flush()
+
+    assert vote.last_result_change.isoformat() == '2015-01-01T12:00:00+00:00'
+
+    with freeze_time("2015-01-01 13:00"):
+        vote.proposal.results.append(BallotResult(
+            group='z', yeas=100, nays=0, counted=True, municipality_id=1))
+
+        session.flush()
+
+    assert vote.last_result_change.isoformat() == '2015-01-01T13:00:00+00:00'
+
+    with freeze_time("2015-01-01 14:00"):
+        vote.proposal.results[0].group = 'q'
+        session.flush()
+
+    assert vote.last_result_change.isoformat() == '2015-01-01T14:00:00+00:00'
