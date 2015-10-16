@@ -307,7 +307,7 @@ def test_percentage_by_municipality(session):
     session.flush()
 
     assert vote.proposal.percentage_by_municipality() == {
-        1: {'yeas_percentage': 50.0, 'nays_percentage': 50.0}
+        1: {'counted': True, 'yeas_percentage': 50.0, 'nays_percentage': 50.0}
     }
 
 
