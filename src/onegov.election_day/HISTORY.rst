@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Improves the design of uncounted votes.
+  [href]
+
 - Colors are now always blue if rejected, red if accepted, without exception.
   [href]
 

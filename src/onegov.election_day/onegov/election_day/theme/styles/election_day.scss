@@ -178,6 +178,29 @@ table {
     .stacktable.large-only { display: none; }
     .stacktable.small-only { display: table; }
     .stacktable th.st-head-row-main { display: none; }
+    .stackable .answer {
+        text-align: right;
+    }
+
+    .st-head-row {
+        background-color: white;
+        border-bottom: 5px solid $gainsboro;
+        text-align: center;
+        font-size: 1.2em;
+    }
+    .stackable .answer {
+        text-align: right;
+        font-weight: bold;
+    }
+}
+
+/*
+    Results table
+*/
+.ballot-results {
+    tr:hover {
+        outline: 1px solid $gainsboro;
+    }
 }
 
 /*

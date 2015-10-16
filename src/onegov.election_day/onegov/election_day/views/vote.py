@@ -13,6 +13,7 @@ def view_vote(self, request):
     return {
         'vote': self,
         'layout': layout,
+        'counted': self.counted
     }
 
 

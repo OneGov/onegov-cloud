@@ -1,7 +1,8 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
     <tal:block metal:fill-slot="before-content">
-        <tal:block condition="not:vote.answer">
+        <tal:block condition="not:counted">
             <h1>
+                <small i18n:translate>Not yet counted.</small>
                 ${vote.title}
             </h1>
 
@@ -42,15 +43,19 @@
                 <span i18n:translate="">Counted municipalities</span>
                 <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" /></strong>
             </li>
-            <li>
+            <li tal:condition="not:counted">
+                <span i18n:translate="">Last change</span>
+                <strong>${layout.format_date(vote.last_result_change, 'relative')}</strong>
+            </li>
+            <li tal:condition="counted">
                 <span i18n:translate="">Elegible Voters</span>
                 <strong>${layout.format_number(vote.elegible_voters)}</strong>
             </li>
-            <li>
+            <li tal:condition="counted">
                 <span i18n:translate="">Cast Ballots</span>
                 <strong>${layout.format_number(vote.cast_ballots)}</strong>
             </li>
-            <li>
+            <li tal:condition="counted">
                 <span i18n:translate="">Turnout</span>
                 <strong>${'{0:.2f}'.format(vote.turnout)} %</strong>
             </li>
@@ -101,12 +106,13 @@
                             <tbody>
                                 <tr tal:repeat="result ballot.results">
                                     <tal:block condition="not: result.counted">
-                                        <td colspan="8">${result.group}</td>
+                                        <td >${result.group}</td>
+                                        <td class="answer" colspan="7" i18n:translate>Not yet counted.</td>
                                     </tal:block>
                                     <tal:block condition="result.counted">
                                         <td>${result.group}</td>
-                                        <td class="accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                                        <td class="rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
+                                        <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
+                                        <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
                                         <td class="right-aligned">${layout.format_number(result.yeas)}</td>
                                         <td class="right-aligned">${layout.format_number(result.nays)}</td>
                                         <td class="right-aligned">${layout.format_number(result.empty)}</td>
@@ -118,8 +124,9 @@
 
                                 <tr class="total">
                                     <td i18n:translate>Total</td>
-                                    <td class="accepted" tal:condition="ballot.accepted" i18n:translate="">Accepted</td>
-                                    <td class="rejected" tal:condition="not: ballot.accepted" i18n:translate="">Rejected</td>
+                                    <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
+                                    <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
+                                    <td class="answer rejected" tal:condition="counted and not ballot.accepted" i18n:translate="">Rejected</td>
                                     <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
                                     <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
                                     <td class="right-aligned">${layout.format_number(ballot.empty)}</td>

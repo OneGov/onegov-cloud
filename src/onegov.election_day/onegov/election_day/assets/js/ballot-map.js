@@ -4,6 +4,17 @@ var init_ballot_map = function(el) {
     var path = d3.geo.path().projection(null);
     var svg = d3.select(el).append('svg');
 
+    svg.append('defs')
+       .append('pattern')
+           .attr('id', 'uncounted')
+           .attr('patternUnits', 'userSpaceOnUse')
+           .attr('width', 4)
+           .attr('height', 4)
+       .append('path')
+           .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+           .attr('stroke', '#999')
+           .attr('stroke-width', 1);
+
     var mapurl = map.data('mapurl');
     var dataurl = map.data('dataurl');
     var canton = map.data('canton');
@@ -23,7 +34,7 @@ var init_ballot_map = function(el) {
         .html(function(d) {
 
             if (_.isUndefined(d.properties.result.yeas_percentage)) {
-                return;
+                return '<strong>' + d.properties.name + '</strong>';
             }
 
             var yeas_percentage =  Math.round(
@@ -66,7 +77,11 @@ var init_ballot_map = function(el) {
                     d.properties.result = data[d.properties.id];
 
                     if (! _.isUndefined(d.properties.result)) {
-                        return scale(d.properties.result.yeas_percentage);
+                        if (d.properties.result.counted) {
+                            return scale(d.properties.result.yeas_percentage);
+                        } else {
+                            return 'url(#uncounted)';
+                        }
                     }
                 })
                 .on('mouseover', tooltip.show)
