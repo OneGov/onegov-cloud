@@ -84,6 +84,15 @@ var init_ballot_map = function(el) {
                         }
                     }
                 })
+                .attr('class', function(d) {
+                    if (! _.isUndefined(d.properties.result)) {
+                        if (d.properties.result.counted) {
+                            return 'counted';
+                        } else {
+                            return 'uncounted';
+                        }
+                    }
+                })
                 .on('mouseover', tooltip.show)
                 .on('mouseout', tooltip.hide);
 
@@ -145,11 +154,11 @@ var init_ballot_map = function(el) {
                             $(this).removeClass('selected');
                         }
                     );
-                    $(this).attr('class', 'selected');
+                    $(this).attr('class', $(this).attr('class') + ' selected');
                     $(this).parent(this).prepend(this);
                 });
                 $(path).on('mouseleave', function() {
-                    $(this).attr('class', '');
+                    $(this).attr('class', $(this).attr('class').replace('selected', ''));
                 });
             });
         });

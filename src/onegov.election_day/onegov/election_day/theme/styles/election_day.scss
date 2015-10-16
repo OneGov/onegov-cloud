@@ -230,6 +230,11 @@ table {
         stroke-opacity: .8;
         stroke-width: 2px;
     }
+
+    .uncounted.selected {
+        stroke: $oil;
+        stroke-width: 1px;
+    }
 }
 
 .lake {
