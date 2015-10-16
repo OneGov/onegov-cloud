@@ -1,0 +1,678 @@
+{
+    "1": {
+        "district": "Affoltern",
+        "name": "Aeugst am Albis"
+    },
+    "2": {
+        "district": "Affoltern",
+        "name": "Affoltern am Albis"
+    },
+    "3": {
+        "district": "Affoltern",
+        "name": "Bonstetten"
+    },
+    "4": {
+        "district": "Affoltern",
+        "name": "Hausen am Albis"
+    },
+    "5": {
+        "district": "Affoltern",
+        "name": "Hedingen"
+    },
+    "6": {
+        "district": "Affoltern",
+        "name": "Kappel am Albis"
+    },
+    "7": {
+        "district": "Affoltern",
+        "name": "Knonau"
+    },
+    "8": {
+        "district": "Affoltern",
+        "name": "Maschwanden"
+    },
+    "9": {
+        "district": "Affoltern",
+        "name": "Mettmenstetten"
+    },
+    "10": {
+        "district": "Affoltern",
+        "name": "Obfelden"
+    },
+    "11": {
+        "district": "Affoltern",
+        "name": "Ottenbach"
+    },
+    "12": {
+        "district": "Affoltern",
+        "name": "Rifferswil"
+    },
+    "13": {
+        "district": "Affoltern",
+        "name": "Stallikon"
+    },
+    "14": {
+        "district": "Affoltern",
+        "name": "Wettswil am Albis"
+    },
+    "21": {
+        "district": "Andelfingen",
+        "name": "Adlikon"
+    },
+    "22": {
+        "district": "Andelfingen",
+        "name": "Benken (ZH)"
+    },
+    "23": {
+        "district": "Andelfingen",
+        "name": "Berg am Irchel"
+    },
+    "24": {
+        "district": "Andelfingen",
+        "name": "Buch am Irchel"
+    },
+    "25": {
+        "district": "Andelfingen",
+        "name": "Dachsen"
+    },
+    "26": {
+        "district": "Andelfingen",
+        "name": "Dorf"
+    },
+    "27": {
+        "district": "Andelfingen",
+        "name": "Feuerthalen"
+    },
+    "28": {
+        "district": "Andelfingen",
+        "name": "Flaach"
+    },
+    "29": {
+        "district": "Andelfingen",
+        "name": "Flurlingen"
+    },
+    "30": {
+        "district": "Andelfingen",
+        "name": "Andelfingen"
+    },
+    "31": {
+        "district": "Andelfingen",
+        "name": "Henggart"
+    },
+    "32": {
+        "district": "Andelfingen",
+        "name": "Humlikon"
+    },
+    "33": {
+        "district": "Andelfingen",
+        "name": "Kleinandelfingen"
+    },
+    "34": {
+        "district": "Andelfingen",
+        "name": "Laufen-Uhwiesen"
+    },
+    "35": {
+        "district": "Andelfingen",
+        "name": "Marthalen"
+    },
+    "36": {
+        "district": "Andelfingen",
+        "name": "Oberstammheim"
+    },
+    "37": {
+        "district": "Andelfingen",
+        "name": "Ossingen"
+    },
+    "38": {
+        "district": "Andelfingen",
+        "name": "Rheinau"
+    },
+    "39": {
+        "district": "Andelfingen",
+        "name": "Thalheim an der Thur"
+    },
+    "40": {
+        "district": "Andelfingen",
+        "name": "Tr\u00fcllikon"
+    },
+    "41": {
+        "district": "Andelfingen",
+        "name": "Truttikon"
+    },
+    "42": {
+        "district": "Andelfingen",
+        "name": "Unterstammheim"
+    },
+    "43": {
+        "district": "Andelfingen",
+        "name": "Volken"
+    },
+    "44": {
+        "district": "Andelfingen",
+        "name": "Waltalingen"
+    },
+    "51": {
+        "district": "B\u00fclach",
+        "name": "Bachenb\u00fclach"
+    },
+    "52": {
+        "district": "B\u00fclach",
+        "name": "Bassersdorf"
+    },
+    "53": {
+        "district": "B\u00fclach",
+        "name": "B\u00fclach"
+    },
+    "54": {
+        "district": "B\u00fclach",
+        "name": "Dietlikon"
+    },
+    "55": {
+        "district": "B\u00fclach",
+        "name": "Eglisau"
+    },
+    "56": {
+        "district": "B\u00fclach",
+        "name": "Embrach"
+    },
+    "57": {
+        "district": "B\u00fclach",
+        "name": "Freienstein-Teufen"
+    },
+    "58": {
+        "district": "B\u00fclach",
+        "name": "Glattfelden"
+    },
+    "59": {
+        "district": "B\u00fclach",
+        "name": "Hochfelden"
+    },
+    "60": {
+        "district": "B\u00fclach",
+        "name": "H\u00f6ri"
+    },
+    "61": {
+        "district": "B\u00fclach",
+        "name": "H\u00fcntwangen"
+    },
+    "62": {
+        "district": "B\u00fclach",
+        "name": "Kloten"
+    },
+    "63": {
+        "district": "B\u00fclach",
+        "name": "Lufingen"
+    },
+    "64": {
+        "district": "B\u00fclach",
+        "name": "N\u00fcrensdorf"
+    },
+    "65": {
+        "district": "B\u00fclach",
+        "name": "Oberembrach"
+    },
+    "66": {
+        "district": "B\u00fclach",
+        "name": "Opfikon"
+    },
+    "67": {
+        "district": "B\u00fclach",
+        "name": "Rafz"
+    },
+    "68": {
+        "district": "B\u00fclach",
+        "name": "Rorbas"
+    },
+    "69": {
+        "district": "B\u00fclach",
+        "name": "Wallisellen"
+    },
+    "70": {
+        "district": "B\u00fclach",
+        "name": "Wasterkingen"
+    },
+    "71": {
+        "district": "B\u00fclach",
+        "name": "Wil (ZH)"
+    },
+    "72": {
+        "district": "B\u00fclach",
+        "name": "Winkel"
+    },
+    "81": {
+        "district": "Dielsdorf",
+        "name": "Bachs"
+    },
+    "82": {
+        "district": "Dielsdorf",
+        "name": "Boppelsen"
+    },
+    "83": {
+        "district": "Dielsdorf",
+        "name": "Buchs (ZH)"
+    },
+    "84": {
+        "district": "Dielsdorf",
+        "name": "D\u00e4llikon"
+    },
+    "85": {
+        "district": "Dielsdorf",
+        "name": "D\u00e4nikon"
+    },
+    "86": {
+        "district": "Dielsdorf",
+        "name": "Dielsdorf"
+    },
+    "87": {
+        "district": "Dielsdorf",
+        "name": "H\u00fcttikon"
+    },
+    "88": {
+        "district": "Dielsdorf",
+        "name": "Neerach"
+    },
+    "89": {
+        "district": "Dielsdorf",
+        "name": "Niederglatt"
+    },
+    "90": {
+        "district": "Dielsdorf",
+        "name": "Niederhasli"
+    },
+    "91": {
+        "district": "Dielsdorf",
+        "name": "Niederweningen"
+    },
+    "92": {
+        "district": "Dielsdorf",
+        "name": "Oberglatt"
+    },
+    "93": {
+        "district": "Dielsdorf",
+        "name": "Oberweningen"
+    },
+    "94": {
+        "district": "Dielsdorf",
+        "name": "Otelfingen"
+    },
+    "95": {
+        "district": "Dielsdorf",
+        "name": "Regensberg"
+    },
+    "96": {
+        "district": "Dielsdorf",
+        "name": "Regensdorf"
+    },
+    "97": {
+        "district": "Dielsdorf",
+        "name": "R\u00fcmlang"
+    },
+    "98": {
+        "district": "Dielsdorf",
+        "name": "Schleinikon"
+    },
+    "99": {
+        "district": "Dielsdorf",
+        "name": "Sch\u00f6fflisdorf"
+    },
+    "100": {
+        "district": "Dielsdorf",
+        "name": "Stadel"
+    },
+    "101": {
+        "district": "Dielsdorf",
+        "name": "Steinmaur"
+    },
+    "102": {
+        "district": "Dielsdorf",
+        "name": "Weiach"
+    },
+    "111": {
+        "district": "Hinwil",
+        "name": "B\u00e4retswil"
+    },
+    "112": {
+        "district": "Hinwil",
+        "name": "Bubikon"
+    },
+    "113": {
+        "district": "Hinwil",
+        "name": "D\u00fcrnten"
+    },
+    "114": {
+        "district": "Hinwil",
+        "name": "Fischenthal"
+    },
+    "115": {
+        "district": "Hinwil",
+        "name": "Gossau (ZH)"
+    },
+    "116": {
+        "district": "Hinwil",
+        "name": "Gr\u00fcningen"
+    },
+    "117": {
+        "district": "Hinwil",
+        "name": "Hinwil"
+    },
+    "118": {
+        "district": "Hinwil",
+        "name": "R\u00fcti (ZH)"
+    },
+    "119": {
+        "district": "Hinwil",
+        "name": "Seegr\u00e4ben"
+    },
+    "120": {
+        "district": "Hinwil",
+        "name": "Wald (ZH)"
+    },
+    "121": {
+        "district": "Hinwil",
+        "name": "Wetzikon (ZH)"
+    },
+    "131": {
+        "district": "Horgen",
+        "name": "Adliswil"
+    },
+    "132": {
+        "district": "Horgen",
+        "name": "Hirzel"
+    },
+    "133": {
+        "district": "Horgen",
+        "name": "Horgen"
+    },
+    "134": {
+        "district": "Horgen",
+        "name": "H\u00fctten"
+    },
+    "135": {
+        "district": "Horgen",
+        "name": "Kilchberg (ZH)"
+    },
+    "136": {
+        "district": "Horgen",
+        "name": "Langnau am Albis"
+    },
+    "137": {
+        "district": "Horgen",
+        "name": "Oberrieden"
+    },
+    "138": {
+        "district": "Horgen",
+        "name": "Richterswil"
+    },
+    "139": {
+        "district": "Horgen",
+        "name": "R\u00fcschlikon"
+    },
+    "140": {
+        "district": "Horgen",
+        "name": "Sch\u00f6nenberg (ZH)"
+    },
+    "141": {
+        "district": "Horgen",
+        "name": "Thalwil"
+    },
+    "142": {
+        "district": "Horgen",
+        "name": "W\u00e4denswil"
+    },
+    "151": {
+        "district": "Meilen",
+        "name": "Erlenbach (ZH)"
+    },
+    "152": {
+        "district": "Meilen",
+        "name": "Herrliberg"
+    },
+    "153": {
+        "district": "Meilen",
+        "name": "Hombrechtikon"
+    },
+    "154": {
+        "district": "Meilen",
+        "name": "K\u00fcsnacht (ZH)"
+    },
+    "155": {
+        "district": "Meilen",
+        "name": "M\u00e4nnedorf"
+    },
+    "156": {
+        "district": "Meilen",
+        "name": "Meilen"
+    },
+    "157": {
+        "district": "Meilen",
+        "name": "Oetwil am See"
+    },
+    "158": {
+        "district": "Meilen",
+        "name": "St\u00e4fa"
+    },
+    "159": {
+        "district": "Meilen",
+        "name": "Uetikon am See"
+    },
+    "160": {
+        "district": "Meilen",
+        "name": "Zumikon"
+    },
+    "161": {
+        "district": "Meilen",
+        "name": "Zollikon"
+    },
+    "172": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Fehraltorf"
+    },
+    "173": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Hittnau"
+    },
+    "174": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Illnau-Effretikon"
+    },
+    "175": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Kyburg"
+    },
+    "176": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Lindau"
+    },
+    "177": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Pf\u00e4ffikon"
+    },
+    "178": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Russikon"
+    },
+    "180": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Weisslingen"
+    },
+    "181": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Wila"
+    },
+    "182": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Wildberg"
+    },
+    "191": {
+        "district": "Uster",
+        "name": "D\u00fcbendorf"
+    },
+    "192": {
+        "district": "Uster",
+        "name": "Egg"
+    },
+    "193": {
+        "district": "Uster",
+        "name": "F\u00e4llanden"
+    },
+    "194": {
+        "district": "Uster",
+        "name": "Greifensee"
+    },
+    "195": {
+        "district": "Uster",
+        "name": "Maur"
+    },
+    "196": {
+        "district": "Uster",
+        "name": "M\u00f6nchaltorf"
+    },
+    "197": {
+        "district": "Uster",
+        "name": "Schwerzenbach"
+    },
+    "198": {
+        "district": "Uster",
+        "name": "Uster"
+    },
+    "199": {
+        "district": "Uster",
+        "name": "Volketswil"
+    },
+    "200": {
+        "district": "Uster",
+        "name": "Wangen-Br\u00fcttisellen"
+    },
+    "211": {
+        "district": "Winterthur",
+        "name": "Altikon"
+    },
+    "213": {
+        "district": "Winterthur",
+        "name": "Br\u00fctten"
+    },
+    "214": {
+        "district": "Winterthur",
+        "name": "D\u00e4gerlen"
+    },
+    "215": {
+        "district": "Winterthur",
+        "name": "D\u00e4ttlikon"
+    },
+    "216": {
+        "district": "Winterthur",
+        "name": "Dinhard"
+    },
+    "217": {
+        "district": "Winterthur",
+        "name": "Elgg"
+    },
+    "218": {
+        "district": "Winterthur",
+        "name": "Ellikon an der Thur"
+    },
+    "219": {
+        "district": "Winterthur",
+        "name": "Elsau"
+    },
+    "220": {
+        "district": "Winterthur",
+        "name": "Hagenbuch"
+    },
+    "221": {
+        "district": "Winterthur",
+        "name": "Hettlingen"
+    },
+    "222": {
+        "district": "Winterthur",
+        "name": "Hofstetten (ZH)"
+    },
+    "223": {
+        "district": "Winterthur",
+        "name": "Neftenbach"
+    },
+    "224": {
+        "district": "Winterthur",
+        "name": "Pfungen"
+    },
+    "225": {
+        "district": "Winterthur",
+        "name": "Rickenbach (ZH)"
+    },
+    "226": {
+        "district": "Winterthur",
+        "name": "Schlatt (ZH)"
+    },
+    "227": {
+        "district": "Winterthur",
+        "name": "Seuzach"
+    },
+    "228": {
+        "district": "Winterthur",
+        "name": "Turbenthal"
+    },
+    "230": {
+        "district": "Winterthur",
+        "name": "Winterthur"
+    },
+    "231": {
+        "district": "Winterthur",
+        "name": "Zell (ZH)"
+    },
+    "241": {
+        "district": "Dietikon",
+        "name": "Aesch (ZH)"
+    },
+    "242": {
+        "district": "Dietikon",
+        "name": "Birmensdorf (ZH)"
+    },
+    "243": {
+        "district": "Dietikon",
+        "name": "Dietikon"
+    },
+    "244": {
+        "district": "Dietikon",
+        "name": "Geroldswil"
+    },
+    "245": {
+        "district": "Dietikon",
+        "name": "Oberengstringen"
+    },
+    "246": {
+        "district": "Dietikon",
+        "name": "Oetwil an der Limmat"
+    },
+    "247": {
+        "district": "Dietikon",
+        "name": "Schlieren"
+    },
+    "248": {
+        "district": "Dietikon",
+        "name": "Uitikon"
+    },
+    "249": {
+        "district": "Dietikon",
+        "name": "Unterengstringen"
+    },
+    "250": {
+        "district": "Dietikon",
+        "name": "Urdorf"
+    },
+    "251": {
+        "district": "Dietikon",
+        "name": "Weiningen (ZH)"
+    },
+    "261": {
+        "district": "Z\u00fcrich",
+        "name": "Z\u00fcrich"
+    },
+    "297": {
+        "district": "Pf\u00e4ffikon",
+        "name": "Bauma"
+    },
+    "298": {
+        "district": "Winterthur",
+        "name": "Wiesendangen"
+    }
+}

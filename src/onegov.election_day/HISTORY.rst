@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to leave out uncounted towns in the upload. Missing towns
+  are assumed to be uncounted.
+  [href]
+
 - Adds internal shortcode for votes.
   [href]
 

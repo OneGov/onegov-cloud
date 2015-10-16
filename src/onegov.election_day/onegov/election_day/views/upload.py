@@ -25,12 +25,12 @@ BALLOT_TYPES = {'proposal', 'counter-proposal', 'tie-breaker'}
 class FileImportError(object):
     __slots__ = ['line', 'error']
 
-    def __init__(self, line, error):
-        self.line = line
+    def __init__(self, error, line=None):
         self.error = error
+        self.line = line
 
 
-def import_file(vote, ballot_type, file, mimetype):
+def import_file(principal, vote, ballot_type, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.
 
@@ -46,6 +46,14 @@ def import_file(vote, ballot_type, file, mimetype):
     if mimetype == 'text/plain':
         csvfile = file
 
+    if vote.date.year not in principal.municipalities:
+        raise FileImportError(
+            _("The year ${year} is not yet supported", mapping={
+                'year': vote.date.year
+            }))
+
+    municipalities = principal.municipalities[vote.date.year]
+
     try:
         csv = CSVFile(csvfile, expected_headers=[
             'Bezirk',
@@ -59,13 +67,13 @@ def import_file(vote, ballot_type, file, mimetype):
         ])
     except MissingColumnsError as e:
         return {'status': 'error', 'errors': [
-            FileImportError(None, _("Missing columns: '${cols}'", mapping={
+            FileImportError(_("Missing columns: '${cols}'", mapping={
                 'cols': ', '.join(e.columns)
             }))
         ]}
     except AmbiguousColumnsError as e:
         return {'status': 'error', 'errors': [
-            FileImportError(None, _(
+            FileImportError(_(
                 "Could not find the expected columns, "
                 "make sure all required columns exist and that there are no "
                 "extra columns."
@@ -73,15 +81,15 @@ def import_file(vote, ballot_type, file, mimetype):
         ]}
     except DuplicateColumnNames as e:
         return {'status': 'error', 'errors': [
-            FileImportError(None, _("Some column names appear twice."))
+            FileImportError(_("Some column names appear twice."))
         ]}
     except InvalidFormat as e:
         return {'status': 'error', 'errors': [
-            FileImportError(None, _("Not a valid csv/xls/xlsx file."))
+            FileImportError(_("Not a valid csv/xls/xlsx file."))
         ]}
     except EmptyFile as e:
         return {'status': 'error', 'errors': [
-            FileImportError(None, _("The csv/xls/xlsx file is empty."))
+            FileImportError(_("The csv/xls/xlsx file is empty."))
         ]}
 
     ballot = next((b for b in vote.ballots if b.type == ballot_type), None)
@@ -93,8 +101,8 @@ def import_file(vote, ballot_type, file, mimetype):
     ballot_results = []
     errors = []
 
-    existing_municipality_ids = set()
-    existing_groups = set()
+    added_municipality_ids = set()
+    added_groups = set()
 
     for line in csv.lines:
         line_errors = []
@@ -105,12 +113,12 @@ def import_file(vote, ballot_type, file, mimetype):
         if not group.strip().replace('/', ''):
             line_errors.append(_("Missing municipality"))
 
-        if group in existing_groups:
+        if group in added_groups:
             line_errors.append(_("${group} was found twice", mapping={
                 'group': group
             }))
 
-        existing_groups.add(group)
+        added_groups.add(group)
 
         # the id of the municipality
         try:
@@ -118,14 +126,19 @@ def import_file(vote, ballot_type, file, mimetype):
         except ValueError:
             line_errors.append(_("Invalid municipality id"))
         else:
-            if municipality_id in existing_municipality_ids:
+            if municipality_id in added_municipality_ids:
                 line_errors.append(
                     _("municipality id ${id} was found twice", mapping={
                         'id': municipality_id
-                    })
-                )
+                    }))
 
-            existing_municipality_ids.add(municipality_id)
+            if municipality_id not in municipalities:
+                line_errors.append(
+                    _("municipality id ${id} is unknown", mapping={
+                        'id': municipality_id
+                    }))
+            else:
+                added_municipality_ids.add(municipality_id)
 
         # the yeas
         try:
@@ -171,7 +184,7 @@ def import_file(vote, ballot_type, file, mimetype):
         # pass the errors
         if line_errors:
             errors.extend(
-                FileImportError(line=line.rownumber, error=err)
+                FileImportError(error=err, line=line.rownumber)
                 for err in line_errors
             )
             continue
@@ -192,7 +205,22 @@ def import_file(vote, ballot_type, file, mimetype):
             )
 
     if not errors and not ballot_results:
-        errors.append(FileImportError(line=None, error=_("No data found")))
+        errors.append(FileImportError(_("No data found")))
+
+    if not errors:
+        for id in (municipalities.keys() - added_municipality_ids):
+            municipality = municipalities[id]
+
+            ballot_results.append(
+                BallotResult(
+                    group='/'.join(p for p in (
+                        municipality.get('district'),
+                        municipality['name']
+                    ) if p is not None),
+                    counted=False,
+                    municipality_id=id
+                )
+            )
 
     if errors:
         return {'status': 'fail', 'errors': errors}
@@ -253,7 +281,9 @@ def view_upload(self, request, form):
             field = getattr(form, ballot_type.replace('-', '_'))
 
             results[ballot_type] = import_file(
-                self, ballot_type,
+                request.app.principal,
+                self,
+                ballot_type,
                 field.raw_data[0].file,
                 field.data['mimetype']
             )

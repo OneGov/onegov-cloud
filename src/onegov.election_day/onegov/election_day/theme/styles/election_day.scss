@@ -102,6 +102,12 @@ html {
 /*
     Voting states
 */
+
+.answer {
+    color: $black;
+    font-weight: bold;
+}
+
 .accepted {
     color: $accepted-color;
     font-weight: bold;
@@ -112,8 +118,8 @@ html {
     font-weight: bold;
 }
 
-td .answer {
-    color: #000;
+.overview .answer {
+    color: $black;
 }
 
 /*
@@ -188,8 +194,8 @@ table {
         font-size: 1.2em;
         text-align: center;
     }
+
     .stackable .answer {
-        font-weight: bold;
         text-align: right;
     }
 }
@@ -334,6 +340,11 @@ footer {
     }
 }
 
+@media #{$small-only} {
+    .results-navigation a {
+        font-size: $h2-font-size - $h2-font-reduction;
+    }
+}
 
 /*
     Manage view actions

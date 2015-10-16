@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'cached_property',
         'cssmin',
         'onegov.core>=0.4.27',
         'onegov.ballot>=0.0.4',
