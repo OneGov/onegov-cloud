@@ -50,8 +50,8 @@ class Layout(object):
     date_format = 'dd.MM.YYYY'
     datetime_format = 'dd.MM.YYYY HH:mm'
 
-    date_long_format = 'dd.MMMM YYYY'
-    datetime_long_format = 'd.MMMM YYYY HH:mm'
+    date_long_format = 'dd. MMMM YYYY'
+    datetime_long_format = 'd. MMMM YYYY HH:mm'
     weekday_long_format = 'EEEE'
     month_long_format = 'MMMM'
 

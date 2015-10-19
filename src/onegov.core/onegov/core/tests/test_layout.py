@@ -20,9 +20,9 @@ def test_format_date():
 
     layout.request.locale = 'de_CH'
     assert layout.format_date(dt, 'datetime') == '17.06.2015 15:00'
-    assert layout.format_date(dt, 'datetime_long') == '17.Juni 2015 15:00'
+    assert layout.format_date(dt, 'datetime_long') == '17. Juni 2015 15:00'
     assert layout.format_date(dt, 'date') == '17.06.2015'
-    assert layout.format_date(dt, 'date_long') == '17.Juni 2015'
+    assert layout.format_date(dt, 'date_long') == '17. Juni 2015'
     assert layout.format_date(dt, 'weekday_long') == 'Mittwoch'
     assert layout.format_date(dt, 'month_long') == 'Juni'
     assert layout.format_date(dt.date(), 'date') == '17.06.2015'

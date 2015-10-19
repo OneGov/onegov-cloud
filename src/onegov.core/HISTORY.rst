@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds missing space to long date formats.
+  [href]
+
 0.7.3 (2015-10-15)
 ~~~~~~~~~~~~~~~~~~~
 
