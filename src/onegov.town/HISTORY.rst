@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.6.6 (2015-10-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Change default locale from 'de_ch' to 'de_CH', as the former does not exist.
   [href]
 
