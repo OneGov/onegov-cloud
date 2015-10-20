@@ -25,11 +25,10 @@ def view_town(self, request):
     Tile = namedtuple('Tile', ['page', 'links', 'number'])
 
     pages = PageCollection(session)
-    children_query = pages.query().order_by(Page.title)
+    children_query = pages.query()
 
     tiles = []
     for ix, page in enumerate(layout.root_pages):
-
         if page.type == 'topic':
             children = children_query.filter(Page.parent_id == page.id)
             children = children.limit(3).all()

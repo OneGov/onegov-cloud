@@ -45,7 +45,7 @@ def view_topic(self, request):
         'page': self,
         'children': [
             Link(child.title, request.link(child), model=child)
-            for child in sorted(children, key=lambda c: c.title)
+            for child in children
         ]
     }
 

@@ -37,7 +37,6 @@ setup(
         'elasticsearch',
         'isodate',
         'rjsmin',
-        'lazy-object-proxy',
         'lxml',
         'onegov.core>=0.4.25',
         'onegov.event>=0.0.5',
