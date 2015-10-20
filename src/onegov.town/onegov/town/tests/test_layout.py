@@ -7,6 +7,7 @@ from datetime import datetime
 from morepath import setup
 from onegov.page import Page
 from onegov.town import TownApp
+from onegov.town.elements import Link
 from onegov.town.layout import (
     EventBaseLayout,
     Layout,
@@ -74,47 +75,33 @@ def test_page_layout_sidebar(session):
     layout = PageLayout(page, MockRequest())
     layout.homepage_url = 'http://nohost'
 
-    assert len(layout.sidebar_links) == 3
-
-    assert layout.sidebar_links[0].url == 'grandma'
-    assert layout.sidebar_links[0].text == 'Grandma'
-    assert layout.sidebar_links[0].active
-
-    assert layout.sidebar_links[1].url == 'grandma/ma'
-    assert layout.sidebar_links[1].text == 'Ma'
-    assert layout.sidebar_links[1].classes == ('childpage', )
-
-    assert layout.sidebar_links[2].url == '#'
-    assert layout.sidebar_links[2].text == '...'
-    assert layout.sidebar_links[2].classes == ('new-content-placeholder', )
+    assert len(layout.sidebar_links) == 1
+    assert layout.sidebar_links[0].title == 'Grandma'
+    assert layout.sidebar_links[0].model == page
+    assert layout.sidebar_links[0].links == (
+        Link(
+            text='Ma', url='grandma/ma', model=page.children[0]
+        ),
+    )
 
     layout = PageLayout(page.children[0], MockRequest())
 
-    assert len(layout.sidebar_links) == 3
-
-    assert layout.sidebar_links[0].url == 'grandma/ma'
-    assert layout.sidebar_links[0].text == 'Ma'
-    assert layout.sidebar_links[0].active
-
-    assert layout.sidebar_links[1].url == 'grandma/ma/ada'
-    assert layout.sidebar_links[1].text == 'Ada'
-    assert layout.sidebar_links[1].classes == ('childpage', )
-
-    assert layout.sidebar_links[2].url == '#'
-    assert layout.sidebar_links[2].text == '...'
-    assert layout.sidebar_links[2].classes == ('new-content-placeholder', )
+    assert len(layout.sidebar_links) == 1
+    assert layout.sidebar_links[0].title == 'Ma'
+    assert layout.sidebar_links[0].model == page.children[0]
+    assert layout.sidebar_links[0].links == (
+        Link(
+            text='Ada', url='grandma/ma/ada',
+            model=page.children[0].children[0]
+        ),
+    )
 
     layout = PageLayout(page.children[0].children[0], MockRequest())
 
-    assert len(layout.sidebar_links) == 2
-
-    assert layout.sidebar_links[0].url == 'grandma/ma/ada'
-    assert layout.sidebar_links[0].text == 'Ada'
-    assert layout.sidebar_links[0].active
-
-    assert layout.sidebar_links[1].url == '#'
-    assert layout.sidebar_links[1].text == '...'
-    assert layout.sidebar_links[1].classes == ('new-content-placeholder', )
+    assert len(layout.sidebar_links) == 1
+    assert layout.sidebar_links[0].title == 'Ada'
+    assert layout.sidebar_links[0].model == page.children[0].children[0]
+    assert not layout.sidebar_links[0].links
 
 
 def test_page_layout_breadcrumbs(session):

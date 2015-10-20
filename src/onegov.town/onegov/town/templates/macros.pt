@@ -298,9 +298,23 @@
 
 <metal:sidebar define-macro="sidebar" i18n:domain="onegov.town">
     <ul class="side-nav">
-        <li tal:repeat="link layout.sidebar_links" tal:attributes="class getattr(link, 'active', None) and 'active' or ''">
-            <tal:block replace="structure link(request)" />
-        </li>
+        <tal:block repeat="link layout.sidebar_links">
+            <li tal:define="is_group hasattr(link, 'links')" class="${is_group and 'active' or ''}">
+                <tal:block condition="not:is_group" replace="structure link(request)" />
+
+                <tal:block condition="is_group">
+                    <a href="#" class="group-title">${link.title}
+                        <metal:block use-macro="layout.macros['hidden_from_public_hint']" tal:define="item link"/>
+                    </a>
+                    <ul class="children" tal:condition="link.links">
+                        <li tal:repeat="child link.links">
+                            <tal:block replace="structure child(request)" />
+                        </li>
+                        <li class="new-content-placeholder"></li>
+                    </ul>
+                </tal:block>
+            </li>
+        </tal:block>
     </ul>
 </metal:sidebar>
 

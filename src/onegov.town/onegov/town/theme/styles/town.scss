@@ -797,24 +797,30 @@ div#redactor-droparea {
 */
 
 .sidebar {
-    li {
-        a.childpage,
-        a.new-content-placeholder {
-            color: $oil;
-            overflow: hidden;
-            padding-left: 1.5rem;
-            text-overflow: ellipsis;
-        }
-
-        a.new-content-placeholder {
-            display: none;
-        }
-    }
-}
-
-.sidebar-bottom {
     ul {
-        padding-left: 0;
+        list-style: none;
+
+        li .group-title {
+            display: block;
+            margin-bottom: .4rem;
+        }
+
+        .children {
+            margin-left: 0;
+
+            .new-content-placeholder,
+            a {
+                color: $oil;
+                overflow: hidden;
+                padding-left: 2rem;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .new-content-placeholder {
+                display: none;
+            }
+        }
     }
 }
 

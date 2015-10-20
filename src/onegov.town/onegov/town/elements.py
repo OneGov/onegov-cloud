@@ -8,7 +8,21 @@ from onegov.town import _
 from purl import URL
 
 
-class Link(object):
+class HiddenElementMixin(object):
+
+    @property
+    def is_hidden_from_public(self):
+        """ Returns True if Link is hidden from the public. Pass extra keyword
+        ``model`` to ``__init__`` to have this work automatically.
+
+        """
+        if self.model and self.model.is_hidden_from_public:
+            return True
+        else:
+            return False
+
+
+class Link(HiddenElementMixin):
     """ Represents a link rendered in a template. """
 
     __slots__ = [
@@ -51,16 +65,11 @@ class Link(object):
         #: Shown as a subtitle below certain links (not automatically rendered)
         self.subtitle = subtitle
 
-    @property
-    def is_hidden_from_public(self):
-        """ Returns True if Link is hidden from the public. Pass extra keyword
-        ``model`` to ``__init__`` to have this work automatically.
-
-        """
-        if self.model and self.model.is_hidden_from_public:
-            return True
-        else:
-            return False
+    def __eq__(self, other):
+        for attr in self.__slots__:
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+        return True
 
     def __call__(self, request, extra_classes=None):
         """ Renders the element. """
@@ -158,11 +167,12 @@ class Img(object):
         self.url = url
 
 
-class LinkGroup(object):
+class LinkGroup(HiddenElementMixin):
     """ Represents a list of links. """
 
-    __slots__ = ['title', 'links']
+    __slots__ = ['title', 'links', 'model']
 
-    def __init__(self, title, links):
+    def __init__(self, title, links, model=None):
         self.title = title
         self.links = links
+        self.model = model

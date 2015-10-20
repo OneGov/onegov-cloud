@@ -325,44 +325,40 @@ class AdjacencyListLayout(DefaultLayout):
     def get_sidebar(self, type=None):
         """ Yields the sidebar for the given adjacency list item. """
         query = self.model.siblings.filter(self.model.__class__.type == type)
+        items = self.request.exclude_invisible(query.all())
 
-        for item in self.request.exclude_invisible(query.all()):
-            url = self.request.link(item)
-
+        for item in items:
             if item != self.model:
-                yield Link(item.title, url, model=item)
+                yield Link(item.title, self.request.link(item), model=item)
             else:
-                yield Link(item.title, url, model=item, active=True)
+                children = (
+                    Link(c.title, self.request.link(c), model=c) for c
+                    in self.request.exclude_invisible(self.model.children)
+                )
 
-                children = self.request.exclude_invisible(self.model.children)
-
-                for item in children:
-                    yield Link(
-                        text=item.title,
-                        url=self.request.link(item),
-                        classes=('childpage', ),
-                        model=item
-                    )
-
-                yield Link("...", "#", classes=('new-content-placeholder', ))
+                yield LinkGroup(
+                    title=item.title,
+                    links=tuple(children),
+                    model=item
+                )
 
 
 class PageLayout(AdjacencyListLayout):
 
     @cached_property
     def breadcrumbs(self):
-        return list(self.get_breadcrumbs(self.model))
+        return tuple(self.get_breadcrumbs(self.model))
 
     @cached_property
     def sidebar_links(self):
-        return list(self.get_sidebar(type='topic'))
+        return tuple(self.get_sidebar(type='topic'))
 
 
 class NewsLayout(AdjacencyListLayout):
 
     @cached_property
     def breadcrumbs(self):
-        return list(self.get_breadcrumbs(self.model))
+        return tuple(self.get_breadcrumbs(self.model))
 
 
 class EditorLayout(AdjacencyListLayout):
