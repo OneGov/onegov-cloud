@@ -116,7 +116,8 @@ class AdjacencyList(Base):
 
             # have a sort index by parent/children as we often select by parent
             # and order by children/siblings
-            Index(cls.__name__.lower() + '_order',
+            Index(
+                cls.__name__.lower() + '_order',
                 nullsfirst('parent_id'),
                 nullsfirst('"order"')
             )
