@@ -1,6 +1,8 @@
+from enum import Enum
 from itertools import chain
+from lazy_object_proxy import Proxy
 from onegov.core.orm import Base
-from onegov.core.utils import normalize_for_url, increment_name
+from onegov.core.utils import normalize_for_url, increment_name, is_sorted
 from sqlalchemy import Column, ForeignKey, Integer, Text, inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -10,8 +12,34 @@ from sqlalchemy.orm import (
     relationship,
     validates
 )
+from sqlalchemy.orm.attributes import get_history
 from sqlalchemy.schema import Index
-from sqlalchemy.sql.expression import column
+from sqlalchemy.sql.expression import column, nullsfirst
+from sqlalchemy_utils import observes
+
+
+class MoveDirection(Enum):
+    """ Describs the possible directions for the
+    :meth:`AdjacencyListCollection.move` method.
+
+    """
+
+    #: Moves the subject above the target
+    above = 1
+
+    #: Moves the subject below the target
+    below = 2
+
+
+def sort_siblings(siblings, key, reverse=False):
+    """ Sorts the siblings by the given key, writing the order to the
+    database.
+
+    """
+    new_order = sorted(siblings, key=key, reverse=reverse)
+
+    for ix, sibling in enumerate(new_order):
+        sibling.order = ix
 
 
 class AdjacencyList(Base):
@@ -47,6 +75,7 @@ class AdjacencyList(Base):
     def children(cls):
         return relationship(
             cls.__name__,
+            order_by=cls.order,
 
             # cascade deletions - it's not the job of this model to prevent
             # the user from deleting all his content
@@ -83,7 +112,14 @@ class AdjacencyList(Base):
             # in Postgres (and other SQL dbs) can't be unique in an index
             Index(
                 cls.__name__.lower() + '_root_name', 'name', unique=True,
-                postgresql_where=column('parent_id') == None)
+                postgresql_where=column('parent_id') == None),
+
+            # have a sort index by parent/children as we often select by parent
+            # and order by children/siblings
+            Index(cls.__name__.lower() + '_order',
+                nullsfirst('parent_id'),
+                nullsfirst('"order"')
+            )
         )
 
     @validates('name')
@@ -93,6 +129,46 @@ class AdjacencyList(Base):
         )
 
         return name
+
+    @property
+    def sort_key(self):
+        """ The sort key used for sorting the siblings if the title changes.
+
+        """
+        return AdjacencyListCollection.sort_key
+
+    @declared_attr
+    def sort_on_title_change(cls):
+        """ Makes sure the A-Z sorting is kept when a title changes. """
+
+        class OldItemProxy(Proxy):
+            title = None
+
+        # we need to wrap this here because this is an abstract base class
+        @observes('title')
+        def sort_on_title_change(self, title):
+
+            # the title value has already changed at this point, and we
+            # probably don't want to touch 'self' which is in transition,
+            # so we create a sort key which fixes this for us, with an item
+            # proxy that pretends to have the old value
+            deleted = get_history(self, 'title').deleted
+
+            if not deleted:
+                return
+
+            old_item = OldItemProxy(lambda: self)
+            old_item.title = deleted[0]
+
+            def old_sort_key(item):
+                return self.sort_key(item is self and old_item or item)
+
+            siblings = self.siblings.all()
+
+            if is_sorted(siblings, key=old_sort_key):
+                sort_siblings(siblings, key=self.sort_key)
+
+        return sort_on_title_change
 
     def __init__(self, title, parent=None, **kwargs):
         """ Initializes a new item with the given title. If no parent
@@ -131,6 +207,7 @@ class AdjacencyList(Base):
 
         """
         query = object_session(self).query(self.__class__)
+        query = query.order_by(self.__class__.order)
         query = query.filter(self.__class__.parent == self.parent)
 
         return query
@@ -179,12 +256,22 @@ class AdjacencyListCollection(object):
     def __init__(self, session):
         self.session = session
 
-    def query(self):
+    @staticmethod
+    def sort_key(item):
+        """ The sort key with which the items are sorted into their siblings.
+
+        """
+        return normalize_for_url(item.title)
+
+    def query(self, ordered=True):
         """ Returns a query using
         :attr:`AdjacencyListCollection.__listclass__`.
 
         """
-        return self.session.query(self.__listclass__)
+        query = self.session.query(self.__listclass__)
+        query = ordered and query.order_by(self.__listclass__.order) or query
+
+        return query
 
     def by_id(self, item_id):
         """ Takes the given page id and returns the page. Try to keep this
@@ -194,7 +281,10 @@ class AdjacencyListCollection(object):
         If possible use the path instead.
 
         """
-        return self.query().filter(self.__listclass__.id == item_id).first()
+        query = self.query(ordered=False)
+        query = query.filter(self.__listclass__.id == item_id).first()
+
+        return query
 
     def by_path(self, path, ensure_type=None):
         """ Takes a path and returns the page associated with it.
@@ -235,13 +325,13 @@ class AdjacencyListCollection(object):
 
         fragments = path.strip('/').split('/')
 
-        item = self.query().filter(
+        item = self.query(ordered=False).filter(
             self.__listclass__.name == fragments.pop(0),
             self.__listclass__.parent_id == None
         ).first()
 
         while item and fragments:
-            item = self.query().filter(
+            item = self.query(ordered=False).filter(
                 self.__listclass__.name == fragments.pop(0),
                 self.__listclass__.parent_id == item.id
             ).first()
@@ -262,7 +352,9 @@ class AdjacencyListCollection(object):
         name = normalize_for_url(name)
         name = name or 'page'
 
-        siblings = self.query().filter(self.__listclass__.parent == parent)
+        siblings = self.query(ordered=False).filter(
+            self.__listclass__.parent == parent)
+
         names = set(
             s[0] for s in siblings.with_entities(self.__listclass__.name).all()
         )
@@ -288,6 +380,15 @@ class AdjacencyListCollection(object):
         self.session.add(page)
         self.session.flush()
 
+        # impose an order, unless one is given
+        if kwargs.get('order') is not None:
+            return page
+
+        siblings = page.siblings.all()
+
+        if is_sorted((s for s in siblings if s != page), key=self.sort_key):
+            sort_siblings(siblings, key=self.sort_key)
+
         return page
 
     def add_root(self, title, name=None, **kwargs):
@@ -297,7 +398,8 @@ class AdjacencyListCollection(object):
 
         name = name or normalize_for_url(title)
 
-        query = self.query().filter(self.__listclass__.parent == parent)
+        query = self.query(ordered=False)
+        query = query.filter(self.__listclass__.parent == parent)
         query = query.filter(self.__listclass__.name == name)
 
         item = query.first()
@@ -315,7 +417,57 @@ class AdjacencyListCollection(object):
         self.session.delete(page)
         self.session.flush()
 
-    def move(self, page, new_parent):
-        """ Takes the given page and moves it under the new_parent. """
-        page.parent = new_parent
-        self.session.flush()
+    def move_above(self, subject, target):
+        return self.move(subject, target, MoveDirection.above)
+
+    def move_below(self, subject, target):
+        return self.move(subject, target, MoveDirection.below)
+
+    def move(self, subject, target, direction):
+        """ Takes the given subject and moves it somehwere in relation to the
+        target.
+
+        :subject:
+            The item to be moved.
+
+        :target:
+            The item above which or below which the subject is moved.
+
+        :direction:
+            The direction relative to the target. Either
+            :attr:`MoveDirection.above` if the subject should be moved
+            above the target, or :attr:`MoveDirection.below` if the subject
+            should be moved below the target.
+
+        """
+        assert direction in MoveDirection
+        assert subject != target
+
+        # we might allow for something like this in the future, but for now
+        # we keep it safe and simple
+        assert target.parent_id == subject.parent_id, (
+            "The subject's and the target's parent must be the same. This "
+            "includes root nodes (both should have no parent)."
+        )
+
+        siblings = target.siblings.all()
+
+        def new_order():
+            for sibling in siblings:
+                if sibling == subject:
+                    continue
+
+                if sibling == target and direction == MoveDirection.above:
+                    yield subject
+                    yield target
+                    continue
+
+                if sibling == target and direction == MoveDirection.below:
+                    yield target
+                    yield subject
+                    continue
+
+                yield sibling
+
+        for order, sibling in enumerate(new_order()):
+            sibling.order = order

@@ -124,3 +124,11 @@ def test_is_subpath():
     assert not utils.is_subpath('/asdf/', '/asdf')
     assert not utils.is_subpath('/a', '/b')
     assert not utils.is_subpath('/a', '/a/../b')
+
+
+def test_is_sorted():
+    assert utils.is_sorted('abc')
+    assert not utils.is_sorted('aBc')
+    assert utils.is_sorted('aBc', key=lambda i: i.lower())
+    assert not utils.is_sorted('321')
+    assert utils.is_sorted('321', reverse=True)

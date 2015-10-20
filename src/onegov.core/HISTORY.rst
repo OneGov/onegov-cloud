@@ -4,6 +4,14 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adjacency lists are now always ordered by the value in their 'order' column.
+  
+  When adding new items to a parent, A-Z is enforced between the children, as
+  long as the children are already sorted A-Z. Once this holds no longer true,
+  no sorting will be imposed on the unsorted children until they are sorted
+  again.
+  [href]
+
 - Adds missing space to long date formats.
   [href]
 

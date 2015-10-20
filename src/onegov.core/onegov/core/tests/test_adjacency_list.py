@@ -1,6 +1,11 @@
 import pytest
 
-from onegov.core.orm.abstract import AdjacencyList, AdjacencyListCollection
+from onegov.core.orm.abstract import (
+    AdjacencyList,
+    AdjacencyListCollection,
+    MoveDirection,
+    sort_siblings,
+)
 
 
 class FamilyMember(AdjacencyList):
@@ -73,20 +78,6 @@ def test_add_unique_page(session):
     assert c3.name == 'test-2'
 
 
-def test_move_page(session):
-
-    family = FamilyMemberCollection(session)
-    root = family.add_root(title='Root')
-
-    c1 = family.add(parent=root, title='One')
-    c2 = family.add(parent=root, title='Two')
-
-    family.move(c1, new_parent=c2)
-
-    assert c1.parent is c2
-    assert c2.parent is root
-
-
 def test_add_or_get_page(session):
 
     family = FamilyMemberCollection(session)
@@ -141,19 +132,141 @@ def test_polymorphic(session):
     member = family.add(parent=eve, title='Steve')
     assert not isinstance(member, DeadFamilyMember)
 
-    member = family.add(parent=eve, title='Don', type='other')
-    assert not isinstance(member, DeadFamilyMember)
+    with pytest.raises(AssertionError) as assertion_info:
+        member = family.add(parent=eve, title='Don', type='other')
+
+    assert "No such polymorphic_identity" in str(assertion_info.value)
 
     assert isinstance(family.by_path('/eve'), FamilyMember)
     assert isinstance(family.by_path('/eve/lara'), DeadFamilyMember)
     assert isinstance(family.by_path('/eve/steve'), FamilyMember)
 
-    with pytest.raises(AssertionError) as assertion_info:
-        assert not isinstance(family.by_path('/eve/don'), DeadFamilyMember)
-
-    assert "No such polymorphic_identity" in str(assertion_info.value)
-
     assert family.by_path('/eve/lara')
     assert family.by_path('/eve/lara', ensure_type='dead')
     assert not family.by_path('/eve/lara', ensure_type='missing')
     assert not family.by_path('/eve/inexistant', ensure_type='dead')
+
+
+def test_move_root(session):
+
+    family = FamilyMemberCollection(session)
+    a = family.add_root("a")
+    b = family.add_root("b")
+    assert family.query(ordered=True).all() == [a, b]
+
+    family.move_below(target=a, subject=b)
+    assert family.query(ordered=True).all() == [a, b]
+
+    family.move_above(target=a, subject=b)
+    assert family.query(ordered=True).all() == [b, a]
+
+    family.move_below(target=b, subject=a)
+    assert family.query(ordered=True).all() == [b, a]
+
+    family.move_above(target=b, subject=a)
+    assert family.query(ordered=True).all() == [a, b]
+
+
+def test_move(session):
+
+    family = FamilyMemberCollection(session)
+
+    root = family.add_root("root")
+    a = family.add(parent=root, title='a')
+    b = family.add(parent=root, title='b')
+
+    assert a.siblings.all() == [a, b]
+
+    family.move_below(target=a, subject=b)
+    assert a.siblings.all() == [a, b]
+
+    family.move_above(target=a, subject=b)
+    assert a.siblings.all() == [b, a]
+
+    family.move_below(target=b, subject=a)
+    assert a.siblings.all() == [b, a]
+
+    family.move_above(target=b, subject=a)
+    assert a.siblings.all() == [a, b]
+
+
+def test_move_keep_hierarchy(session):
+
+    family = FamilyMemberCollection(session)
+
+    a = family.add_root("a")
+    b = family.add(parent=a, title='b')
+    c = family.add(parent=b, title='c')
+
+    for direction in MoveDirection:
+        for target in (a, b, c):
+            with pytest.raises(AssertionError):
+                family.move(target=target, subject=a, direction=direction)
+
+            with pytest.raises(AssertionError):
+                family.move(target=target, subject=b, direction=direction)
+
+            with pytest.raises(AssertionError):
+                family.move(target=target, subject=c, direction=direction)
+
+
+def test_add_sorted(session):
+    family = FamilyMemberCollection(session)
+
+    root = family.add_root("root")
+    e = family.add(parent=root, title='e')
+    c = family.add(parent=root, title='c')
+    a = family.add(parent=root, title='a')
+
+    query = family.query(ordered=True).filter(FamilyMember.parent_id != None)
+
+    assert query.all() == [a, c, e]
+
+    b = family.add(parent=root, title='b')
+
+    assert query.all() == [a, b, c, e]
+
+    # once the tree is unsorted, items are added at the bottom
+    family.move_above(target=a, subject=e)
+    assert query.all() == [e, a, b, c]
+
+    d = family.add(parent=root, title='d')
+
+    assert query.all() == [e, a, b, c, d]
+
+    # until it is sorted again
+    sort_siblings(a.siblings.all(), family.sort_key)
+    assert query.all() == [a, b, c, d, e]
+
+    aa = family.add(parent=root, title='aa')
+    assert query.all() == [a, aa, b, c, d, e]
+
+
+def test_change_title(session):
+    family = FamilyMemberCollection(session)
+
+    root = family.add_root("root")
+    a = family.add(parent=root, title='a')
+    b = family.add(parent=root, title='b')
+    c = family.add(parent=root, title='c')
+
+    assert a.siblings.all() == [a, b, c]
+
+    b.title = 'd'
+
+    assert a.siblings.all() == [a, c, b]
+
+
+def test_change_title_unordered(session):
+    family = FamilyMemberCollection(session)
+
+    root = family.add_root("root")
+    a = family.add(parent=root, title='a', order=3)
+    b = family.add(parent=root, title='b', order=1)
+    c = family.add(parent=root, title='c', order=2)
+
+    assert a.siblings.all() == [b, c, a]
+
+    b.title = 'z'
+
+    assert a.siblings.all() == [b, c, a]

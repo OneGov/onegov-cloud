@@ -388,3 +388,15 @@ def is_subpath(directory, path):
     # return true, if the common prefix of both is equal to directory
     # e.g. /a/b/c/d.rst and directory is /a/b, the common prefix is /a/b
     return os.path.commonprefix([path, directory]) == directory
+
+
+def is_sorted(iterable, key=lambda i: i, reverse=False):
+    """ Returns True if the iterable is sorted. """
+
+    i1, i2 = tee(iterable)
+
+    for a, b in zip(i1, sorted(i2, key=key, reverse=reverse)):
+        if a is not b:
+            return False
+
+    return True
