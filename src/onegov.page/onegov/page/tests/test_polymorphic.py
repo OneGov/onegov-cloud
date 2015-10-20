@@ -16,14 +16,13 @@ def test_article(session):
     page = pages.add(parent=root, title='Page')
     assert not isinstance(page, Article)
 
-    page = pages.add(parent=root, title='Test', type='generic')
-    assert not isinstance(page, Article)
+    with pytest.raises(AssertionError) as assertion_info:
+        page = pages.add(parent=root, title='Test', type='generic')
+
+    assert "No such polymorphic_identity" in str(assertion_info.value)
 
     assert isinstance(pages.by_path('/root/article'), Article)
     assert not isinstance(pages.by_path('/root/page'), Article)
-
-    with pytest.raises(AssertionError) as assertion_info:
-        assert not isinstance(pages.by_path('/root/test'), Article)
 
     assert "No such polymorphic_identity" in str(assertion_info.value)
 

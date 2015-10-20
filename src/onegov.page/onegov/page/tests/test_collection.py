@@ -53,20 +53,6 @@ def test_add_unique_page(session):
     assert c3.name == 'test-2'
 
 
-def test_move_page(session):
-
-    pages = PageCollection(session)
-    root = pages.add_root(title='Root')
-
-    c1 = pages.add(parent=root, title='One')
-    c2 = pages.add(parent=root, title='Two')
-
-    pages.move(c1, new_parent=c2)
-
-    assert c1.parent is c2
-    assert c2.parent is root
-
-
 def test_add_or_get_page(session):
 
     pages = PageCollection(session)
