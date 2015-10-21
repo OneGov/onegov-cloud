@@ -345,6 +345,12 @@ class AdjacencyListLayout(DefaultLayout):
 
 class PageLayout(AdjacencyListLayout):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.request.is_logged_in:
+            self.request.include('sortable')
+
     @cached_property
     def breadcrumbs(self):
         return tuple(self.get_breadcrumbs(self.model))

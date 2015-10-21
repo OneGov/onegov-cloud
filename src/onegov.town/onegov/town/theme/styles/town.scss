@@ -825,6 +825,33 @@ div#redactor-droparea {
 }
 
 /*
+    Sidebar drag & drop
+*/
+.dragging {
+    opacity: 1;
+
+    &.sortable-ghost {
+        opacity: 0;
+    }
+}
+
+@keyframes flash {
+    0% { color: transparent; }
+    20% { color: $primary-color; }
+    80% { color: $primary-color; }
+    100% { color: transparent; }
+}
+
+.flash-ok > a:after {
+    animation-duration: .6s;
+    animation-name: flash;
+    color: transparent;
+    content: ' \f00c';
+    font-family: 'FontAwesome';
+    margin-left: 3px;
+}
+
+/*
     content block
 */
 .content {

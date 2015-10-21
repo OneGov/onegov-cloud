@@ -22,6 +22,7 @@ class MockModel(object):
 
 class MockRequest(object):
     locale = 'en'
+    is_logged_in = False
 
     def include(self, *args, **kwargs):
         pass

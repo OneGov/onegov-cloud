@@ -12,10 +12,15 @@ $('a').on('success.ic', function(evt, elt, data, textStatus, xhr) {
 // show the new content placeholder when hovering over the add content dropdown
 $('.show-new-content-placeholder')
     .on('mouseenter', function() {
-        $('.new-content-placeholder').text($(this).text()).show();
+        var placeholder = $('<li>').
+            text($(this).text())
+            .addClass('new-content-placeholder');
+
+        $('.children').append(placeholder);
+        placeholder.show();
     })
     .on('mouseleave', function() {
-        $('.new-content-placeholder').hide();
+        $('.new-content-placeholder').remove();
     });
 
 // initialize all foundation functions

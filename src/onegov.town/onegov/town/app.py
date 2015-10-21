@@ -123,6 +123,8 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
     @cached_property
     def webassets_bundles(self):
 
+        jsminifier = None
+
         confirm = Bundle(
             'js/confirm.jsx',
             filters='jsx',
@@ -131,7 +133,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
 
         dropzone = Bundle(
             'js/dropzone.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/dropzone.bundle.js'
         )
 
@@ -161,7 +163,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'js/imagemanager.js',
             'js/redactor.de.js',
             'js/editor.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/editor.bundle.js'
         )
 
@@ -170,7 +172,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'js/ace-mode-form.js',
             'js/ace-theme-tomorrow.js',
             'js/code_editor.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/code_editor.bundle.js'
         )
 
@@ -187,7 +189,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             typeahead,
             'js/jquery.datetimepicker.js',
             'js/common.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/common.bundle.js'
         )
 
@@ -204,7 +206,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'js/fullcalendar.de.js',
             'js/jquery.popupoverlay.js',
             'js/fullcalendar_custom.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/fullcalendar.bundle.js'
         )
 
@@ -217,15 +219,22 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
         check_password = Bundle(
             'js/zxcvbn.js',
             'js/check_password.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/check_password.bundle.js'
         )
 
         events = Bundle(
             'js/url.js',
             'js/events.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/events.bundle.js'
+        )
+
+        sortable = Bundle(
+            'js/sortable.js',
+            'js/sortable_custom.js',
+            filters=jsminifier,
+            output='bundles/sortable.bundle.js'
         )
 
         return {
@@ -240,6 +249,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'fullcalendar': fullcalendar,
             'fullcalendar_css': fullcalendar_css,
             'events': events,
+            'sortable': sortable
         }
 
 
