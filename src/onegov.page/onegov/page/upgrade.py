@@ -3,7 +3,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy.sql.expression import nullsfirst, text
+from sqlalchemy.sql.expression import text
 
 
 @upgrade_task('Add parent order index')
