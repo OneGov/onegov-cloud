@@ -28,6 +28,7 @@ from onegov.town.models import (
     Image,
     ImageCollection,
     News,
+    PageMove,
     Search,
     SiteCollection,
     Thumbnail,
@@ -207,6 +208,19 @@ def get_clipboard(request, token):
 @TownApp.path(model=SiteCollection, path='/sitecollection')
 def get_sitecollection(app):
     return SiteCollection(app.session())
+
+
+@TownApp.path(model=PageMove,
+              path='/page-move/{subject_id}/{direction}/{target_id}')
+def get_page_move(app, subject_id, direction, target_id):
+    session = app.session()
+    pages = PageCollection(session)
+
+    subject = pages.by_id(subject_id)
+    target = pages.by_id(target_id)
+
+    if subject and target:
+        return PageMove(session, subject, target, direction)
 
 
 @TownApp.path(model=OccurrenceCollection, path='/veranstaltungen',

@@ -4,12 +4,16 @@ from onegov.town import _
 from onegov.town.utils import mark_images
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
-from wtforms.widgets import TextArea
+from wtforms.widgets import TextInput, TextArea
 
 
 class PageBaseForm(Form):
     """ Defines the base form for all pages. """
-    title = StringField(_("Title"), [validators.InputRequired()])
+    title = StringField(
+        label=_("Title"),
+        validators=[validators.InputRequired()],
+        widget=with_options(TextInput, autofocus='')
+    )
 
 
 class LinkForm(PageBaseForm):

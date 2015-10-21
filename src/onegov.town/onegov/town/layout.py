@@ -13,6 +13,7 @@ from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import (
     FileCollection,
     ImageCollection,
+    PageMove,
     Search,
     SiteCollection,
     Thumbnail
@@ -311,6 +312,12 @@ class AdjacencyListLayout(DefaultLayout):
     :class:`onegov.core.orm.abstract.AdjacencyList`
 
     """
+
+    @cached_property
+    def sortable_url_template(self):
+        return self.csrf_protected_url(
+            self.request.link(PageMove.for_url_template())
+        )
 
     def get_breadcrumbs(self, item):
         """ Yields the breadcrumbs for the given adjacency list item. """

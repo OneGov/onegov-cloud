@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to order pages using drag & drop in the sidebar.
+  [href]
+
 0.6.6 (2015-10-19)
 ~~~~~~~~~~~~~~~~~~~
 

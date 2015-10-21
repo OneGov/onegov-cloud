@@ -34,6 +34,12 @@
     font-weight: normal;
 }
 
+@mixin prefix ($prop, $val) {
+    -webkit-#{$prop}: #{$val};
+    -moz-#{$prop}: #{$val};
+    -ms-#{$prop}: #{$val};
+    #{$prop}: #{$val};
+}
 
 /*
     The maximum width of a line relative to the font. This limits textblocks
@@ -86,7 +92,7 @@ body {
 
 footer,
 .push {
-    animation-duration: 3s;
+    @include prefix(animation-duration, 3s);
     height: $footer-height; /* .push must be the same height as .footer */
 }
 
@@ -835,20 +841,43 @@ div#redactor-droparea {
     }
 }
 
-@keyframes flash {
+@keyframes flash-success {
     0% { color: transparent; }
     20% { color: $primary-color; }
+    25% { color: $primary-color; }
+    50% { color: lighten($primary-color, 20%); }
+    75% { color: $primary-color; }    
     80% { color: $primary-color; }
     100% { color: transparent; }
 }
 
-.flash-ok > a:after {
-    animation-duration: .6s;
-    animation-name: flash;
-    color: transparent;
-    content: ' \f00c';
+@keyframes flash-failure {
+    0% { color: transparent; }
+    20% { color: $alert-color; }
+    25% { color: $alert-color; }
+    50% { color: lighten($alert-color, 20%); }
+    75% { color: $alert-color; }    
+    80% { color: $alert-color; }
+    100% { color: transparent; }
+}
+
+.flash > a:after {
+    @include prefix(animation-duration, .7s);
+    @include prefix(animation-fill-mode, forwards);
     font-family: 'FontAwesome';
     margin-left: 3px;
+}
+
+.flash.success > a:after {
+    @include prefix(animation-name, flash-success);
+    color: $primary-color;
+    content: ' \f0c7';
+}
+
+.flash.failure > a:after {
+    @include prefix(animation-name, flash-failure);
+    color: $alert-color;
+    content: ' \f05e';
 }
 
 /*
@@ -1393,11 +1422,11 @@ tr.ticket:hover {
         }
 
         &.highlight {
-            animation-delay: 3s;
-            animation-duration: 2s;
-            animation-fill-mode: forwards;
-            animation-iteration-count: 1;
-            animation-name: fadeout-box-shadow;
+            @include prefix(animation-delay, 3s);
+            @include prefix(animation-duration, 2s);
+            @include prefix(animation-fill-mode, forwards);
+            @include prefix(animation-iteration-count, 1);
+            @include prefix(animation-name, fadeout-box-shadow);
             box-shadow: 0 5px 0 $yellow;
         }
 
