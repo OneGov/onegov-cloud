@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.1 (2015-10-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds support as well as an upgrade step for the latest onegov.core release.
   [href]
 
