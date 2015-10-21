@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.7.4 (2015-10-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Adjacency lists are now always ordered by the value in their 'order' column.
   
