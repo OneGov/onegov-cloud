@@ -69,6 +69,7 @@ setup(
         'unidecode',
         'webtest',
         'wtforms',
+        'xlrd',
         'zope.sqlalchemy'
     ],
     extras_require=dict(

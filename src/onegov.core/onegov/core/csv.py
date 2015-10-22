@@ -3,11 +3,13 @@
 import codecs
 import re
 import sys
+import xlrd
 
 from collections import namedtuple, OrderedDict
-from csv import reader as csv_reader, Sniffer
+from csv import reader as csv_reader, writer as csv_writer, Sniffer, QUOTE_ALL
 from editdistance import eval as distance
 from itertools import permutations
+from io import BytesIO, StringIO
 from onegov.core import errors
 from unidecode import unidecode
 
@@ -58,9 +60,17 @@ class CSVFile(object):
     def lines(self):
         self.csvfile.seek(0)
 
+        encountered_empty_line = False
+
         for ix, line in enumerate(csv_reader(self.csvfile, self.dialect)):
 
+            # raise an empty line error if we found one somewhere in the
+            # middle -> at the end they don't count
             if not line:
+                encountered_empty_line = True
+                continue
+
+            if line and encountered_empty_line:
                 raise errors.EmptyLineInFileError()
 
             # the first line is the header
@@ -127,6 +137,65 @@ def normalize_header(header):
     header = WHITESPACE.sub(' ', header)
 
     return header
+
+
+def convert_xls_to_csv(xls):
+    """ Takes an XLS/XLSX file and returns a csv file using the first
+    worksheet found.
+
+    """
+
+    xls.seek(0)
+
+    try:
+        excel = xlrd.open_workbook(file_contents=xls.read())
+    except UnicodeDecodeError:
+        raise IOError(
+            "Could not read excel file, "
+            "be sure to open the file in binary mode!"
+        )
+
+    sheet = excel.sheet_by_index(0)
+
+    # XXX we want the output to be bytes encoded, which is not possible using
+    # python's csv module. I'm sure there's a clever way of doing this by
+    # using a custom StringIO class which encodes on the fly, but I haven't
+    # looked into it yet. So for now a conversion is done with some memory
+    # overhead.
+    text_output = StringIO()
+    writecsv = csv_writer(text_output, quoting=QUOTE_ALL)
+
+    for rownum in range(0, sheet.nrows):
+        values = []
+
+        for cell in sheet.row(rownum):
+
+            if cell.ctype == xlrd.XL_CELL_TEXT:
+                value = cell.value
+            elif cell.ctype in (xlrd.XL_CELL_EMPTY, xlrd.XL_CELL_BLANK):
+                value = ''
+            elif cell.ctype == xlrd.XL_CELL_NUMBER:
+                if cell.value.is_integer():
+                    value = str(int(cell.value))
+                else:
+                    value = str(cell.value)
+            elif cell.ctype == xlrd.XL_CELL_DATE:
+                value = xlrd.xldate_as_tuple(cell.value, excel.datemode)
+                value = value.isoformat()
+            else:
+                raise NotImplementedError
+
+            values.append(value)
+
+        writecsv.writerow(values)
+
+    text_output.seek(0)
+    output = BytesIO()
+
+    for line in text_output.readlines():
+        output.write(line.encode('utf-8'))
+
+    return output
 
 
 def parse_header(csv, dialect=None):

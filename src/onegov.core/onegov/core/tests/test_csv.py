@@ -1,12 +1,14 @@
 import pytest
 
 from io import BytesIO
+from onegov.core import utils
 from onegov.core.csv import (
     CSVFile,
+    convert_xls_to_csv,
     detect_encoding,
     match_headers,
     normalize_header,
-    parse_header
+    parse_header,
 )
 
 from onegov.core.errors import (
@@ -51,7 +53,9 @@ def test_simple_csv_file():
         BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
     )
 
-    csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    assert list(csv.headers.keys()) == [
+        'datum', 'reale_temperatur', 'gefuhlte_temperatur'
+    ]
     list(csv.lines) == [
         csv.rowtype(
             rownumber=1,
@@ -68,6 +72,31 @@ def test_simple_csv_file():
     ]
 
 
+@pytest.mark.parametrize("excel_file", [
+    utils.module_path('onegov.core', 'tests/fixtures/excel.xls'),
+    utils.module_path('onegov.core', 'tests/fixtures/excel.xlsx'),
+])
+def test_convert_to_csv(excel_file):
+    with open(excel_file, 'rb') as f:
+        csv = CSVFile(convert_xls_to_csv(f), ['ID', 'Namä', 'Date'])
+
+        assert list(csv.headers.keys()) == ['ID', 'Namä', 'Date']
+        list(csv.lines) == [
+            csv.rowtype(
+                rownumber=1,
+                id='1',
+                nama='Döner',
+                date='2015-12-31'
+            ),
+            csv.rowtype(
+                rownumber=2,
+                id='2',
+                nama='"Cola"',
+                date='2015-12-31 12:00'
+            )
+        ]
+
+
 def test_empty_line_csv_file():
     data = (
         b'Datum, Reale Temperatur, Gef\xfchlte Temperatur\n'
@@ -82,6 +111,21 @@ def test_empty_line_csv_file():
     csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
     with pytest.raises(EmptyLineInFileError):
         list(csv.lines)
+
+    # accept empty lines at the end
+    data = (
+        b'Datum, Reale Temperatur, Gef\xfchlte Temperatur\n'
+        b'02.01.2015, 0, kalt'
+        b'\n'
+        b'\n'
+    )
+
+    csv = CSVFile(
+        BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    )
+
+    csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    assert list(csv.lines)
 
 
 def test_match_headers_duplicate():

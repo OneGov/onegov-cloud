@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to convert xls/xlsx files to csv.
+  [href]
+
 - Fixes empty lines in csv tripping up the parser in unexpected ways.
   [href]
 
