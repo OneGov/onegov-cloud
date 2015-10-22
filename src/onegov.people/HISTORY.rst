@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.1 (2015-10-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Removes the salutation from the title and puts the last name first.
   [href]
 
