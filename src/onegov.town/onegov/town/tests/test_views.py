@@ -876,15 +876,15 @@ def test_with_people(town_app):
     assert 'Ming Merciless' in new_page
 
     new_page.form['title'] = 'About Flash'
-    new_page.form['people_flash_gordon'] = True
-    new_page.form['people_flash_gordon_function'] = 'Astronaut'
+    new_page.form['people_gordon_flash'] = True
+    new_page.form['people_gordon_flash_function'] = 'Astronaut'
     edit_page = new_page.form.submit().follow().click('Bearbeiten')
 
-    assert edit_page.form['people_flash_gordon'].value == 'y'
-    assert edit_page.form['people_flash_gordon_function'].value == 'Astronaut'
+    assert edit_page.form['people_gordon_flash'].value == 'y'
+    assert edit_page.form['people_gordon_flash_function'].value == 'Astronaut'
 
-    assert edit_page.form['people_merciless_ming'].value is None
-    assert edit_page.form['people_merciless_ming_function'].value == ''
+    assert edit_page.form['people_ming_merciless'].value is None
+    assert edit_page.form['people_ming_merciless_function'].value == ''
 
 
 def test_tickets(town_app):
