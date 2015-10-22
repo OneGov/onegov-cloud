@@ -22,7 +22,7 @@ class CSVFile(object):
         # prepare a reader which always returns utf-8
         encoding = detect_encoding(csvfile)
         if encoding is None:
-            raise errors.InvalidFormat()
+            raise errors.InvalidFormatError()
 
         self.csvfile = codecs.getreader(encoding)(csvfile)
 
@@ -59,6 +59,9 @@ class CSVFile(object):
         self.csvfile.seek(0)
 
         for ix, line in enumerate(csv_reader(self.csvfile, self.dialect)):
+
+            if not line:
+                raise errors.EmptyLineInFileError()
 
             # the first line is the header
             if ix == 0:
@@ -98,12 +101,12 @@ def sniff_dialect(csv):
 
     """
     if not csv:
-        raise errors.EmptyFile()
+        raise errors.EmptyFileError()
 
     dialect = Sniffer().sniff(csv)
 
     if dialect.delimiter not in VALID_CSV_DELIMITERS:
-        raise errors.InvalidFormat()
+        raise errors.InvalidFormatError()
 
     return dialect
 
@@ -137,9 +140,9 @@ def parse_header(csv, dialect=None):
     """
     try:
         dialect = dialect or sniff_dialect(csv)
-    except errors.InvalidFormat:
+    except errors.InvalidFormatError:
         dialect = None  # let the csv reader try, it might still work
-    except errors.EmptyFile:
+    except errors.EmptyFileError:
         return []
 
     headers = next(csv_reader(csv.splitlines(), dialect=dialect))
@@ -174,7 +177,7 @@ def match_headers(headers, expected):
     If no match is possible, an
     :exception:`~onegov.core.errors.MissingColumnsError`, or
     :exception:`~onegov.core.errors.AmbiguousColumnsError` or
-    :exception:`~onegov.core.errors.DuplicateColumnNames` error is raised.
+    :exception:`~onegov.core.errors.DuplicateColumnNamesError` error is raised.
 
     :return: The matched headers in the order of appearance.
 
@@ -182,7 +185,7 @@ def match_headers(headers, expected):
 
     # for this to work we need unique header names
     if len(headers) != len(set(headers)):
-        raise errors.DuplicateColumnNames()
+        raise errors.DuplicateColumnNamesError()
 
     # we calculate a 'sane' levenshtein distance by comparing the
     # the distances between all headers, permutations, as well as the lengths

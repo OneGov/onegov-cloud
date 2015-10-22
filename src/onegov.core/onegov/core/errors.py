@@ -12,13 +12,17 @@ class AmbiguousColumnsError(CSVError):
         self.columns = columns
 
 
-class DuplicateColumnNames(CSVError):
+class DuplicateColumnNamesError(CSVError):
     pass
 
 
-class InvalidFormat(CSVError):
+class InvalidFormatError(CSVError):
     pass
 
 
-class EmptyFile(CSVError):
+class EmptyFileError(CSVError):
+    pass
+
+
+class EmptyLineInFileError(CSVError):
     pass

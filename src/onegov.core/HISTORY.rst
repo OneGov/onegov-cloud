@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Fixes empty lines in csv tripping up the parser in unexpected ways.
+  [href]
+
 0.7.4 (2015-10-21)
 ~~~~~~~~~~~~~~~~~~~
 

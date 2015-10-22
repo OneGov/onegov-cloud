@@ -11,8 +11,9 @@ from onegov.core.csv import (
 
 from onegov.core.errors import (
     AmbiguousColumnsError,
-    DuplicateColumnNames,
-    MissingColumnsError
+    DuplicateColumnNamesError,
+    EmptyLineInFileError,
+    MissingColumnsError,
 )
 
 
@@ -67,8 +68,24 @@ def test_simple_csv_file():
     ]
 
 
+def test_empty_line_csv_file():
+    data = (
+        b'Datum, Reale Temperatur, Gef\xfchlte Temperatur\n'
+        b'\n'
+        b'02.01.2015, 0, kalt'
+    )
+
+    csv = CSVFile(
+        BytesIO(data), ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    )
+
+    csv.headers == ['datum', 'reale_temperatur', 'gefuhlte_temperatur']
+    with pytest.raises(EmptyLineInFileError):
+        list(csv.lines)
+
+
 def test_match_headers_duplicate():
-    with pytest.raises(DuplicateColumnNames):
+    with pytest.raises(DuplicateColumnNamesError):
         match_headers(['first_name', 'first_name'], expected=None)
 
 
