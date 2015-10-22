@@ -23,6 +23,10 @@ class Person(Base, TimestampMixin, ORMSearchable):
 
     @property
     def title(self):
+        return self.last_name + " " + self.first_name
+
+    @property
+    def spoken_title(self):
         if self.salutation:
             parts = self.salutation, self.first_name, self.last_name
         else:

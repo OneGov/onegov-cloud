@@ -14,5 +14,5 @@ def test_full_name(session):
         salutation='Dr.'
     )
 
-    assert tom.title == 'Tom Chandler'
-    assert rachel.title == 'Dr. Rachel Scott'
+    assert tom.title == 'Chandler Tom'
+    assert rachel.title == 'Scott Rachel'
