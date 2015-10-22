@@ -68,13 +68,39 @@ var undo_move_element = function(list, element, new_index, old_index) {
 };
 
 var setup_sortable_list = function(list_element) {
+    var list = $(list_element);
+
     var sortable = Sortable.create(list_element, {
-        onUpdate: function(event) {
-            on_move_element(list_element, event.item, event.newIndex, event.oldIndex);
+        onStart: function(event) {
+            if ($(event.element).parent().hasClass('children')) {
+                return;
+            }
+
+            // add an element at the bottom if the last item has children,
+            // otherwise it's not possible to drop elements below it, as
+            // there's no actual drop-area
+            var last_element = list.find('> li').last();
+
+            if (last_element.find('.children').length !== 0) {
+                list.append($('<li class="empty">&nbsp;</li>'));
+            }
+        },
+        onEnd: function(event) {
+            list.find('> .empty').remove();
+
+            var new_index = event.newIndex;
+
+            if (new_index >= list.find('> li').length) {
+                new_index = list.find('> li').length - 1;
+            }
+
+            if (new_index != event.oldIndex) {
+                on_move_element(list_element, event.item, new_index, event.oldIndex);
+            }
         }
     });
 
-    $(list_element).children('li').each(function() {
+    list.children('li').each(function() {
         this.addEventListener('dragstart', function(event) {
             $(event.target).addClass('dragging');
         });
