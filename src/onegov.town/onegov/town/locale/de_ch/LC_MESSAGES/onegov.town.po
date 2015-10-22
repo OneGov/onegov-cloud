@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-10-15 09:42+0200\n"
+"POT-Creation-Date: 2015-10-22 11:39+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -497,6 +497,9 @@ msgstr "JavaScript für Web-Statistik"
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
 
+msgid "Visible on homepage"
+msgstr "Auf der Startseite anzeigen"
+
 msgid "This month"
 msgstr "Diesen Monat"
 
@@ -727,8 +730,8 @@ msgstr "Absenden"
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
 
-msgid "read on..."
-msgstr "weiterlesen..."
+msgid "read on…"
+msgstr "weiterlesen…"
 
 msgid ""
 "This site is hidden from the general public. To show it to everyone, edit "

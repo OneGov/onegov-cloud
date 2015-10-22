@@ -5,7 +5,6 @@ from onegov.event import OccurrenceCollection
 from onegov.core.security import Public
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
-from onegov.page import PageCollection, Page
 from onegov.people import PersonCollection
 from onegov.town import _
 from onegov.town.app import TownApp
@@ -24,14 +23,15 @@ def view_town(self, request):
 
     Tile = namedtuple('Tile', ['page', 'links', 'number'])
 
-    pages = PageCollection(session)
-    children_query = pages.query()
-
     tiles = []
+    homepage_pages = request.app.homepage_pages
     for ix, page in enumerate(layout.root_pages):
         if page.type == 'topic':
-            children = children_query.filter(Page.parent_id == page.id)
-            children = children.limit(3).all()
+            children = homepage_pages.get(page.id, tuple())
+            children = (session.merge(c, load=False) for c in children)
+
+            if not request.is_logged_in:
+                children = (c for c in children if not c.is_hidden_from_public)
         else:
             children = tuple()
 
@@ -39,8 +39,10 @@ def view_town(self, request):
             page=Link(page.title, request.link(page)),
             number=ix + 1,
             links=[
-                Link(c.title, request.link(c), classes=('tile-sub-link',))
-                for c in children
+                Link(
+                    c.title, request.link(c),
+                    classes=('tile-sub-link',), model=c
+                ) for c in children
             ]
         ))
 

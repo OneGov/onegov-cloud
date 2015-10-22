@@ -54,7 +54,7 @@
                                 <tal:block case="'events'">
                                     <a href="${request.link(result, 'latest')}">${result.title}</a>
                                     <p tal:condition="result.description|nothing">
-                                        ${result.description[:160]}<tal:block condition="len(result.description) > 160">...</tal:block>
+                                        ${result.description[:160]}<tal:block condition="len(result.description) > 160">…</tal:block>
                                     </p>
                                 </tal:block>
 
@@ -65,7 +65,7 @@
 
                                 <tal:block case="default">
                                     <a href="${request.link(result)}">${result.title}</a>
-                                    ${result.lead[:160]}<tal:block condition="len(result.lead) > 160">...</tal:block>
+                                    ${result.lead[:160]}<tal:block condition="len(result.lead) > 160">…</tal:block>
                                 </tal:block>
 
                             </tal:block>

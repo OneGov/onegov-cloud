@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds the ability to have topics and links appear on the frontpage by
+  selecting a checkbox on the edit dialog.
+  [href]
+
 - Adds the ability to order pages using drag & drop in the sidebar.
   [href]
 

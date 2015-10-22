@@ -25,7 +25,7 @@ class ContentExtension(object):
             if ContentExtension in cls.__bases__:
                 yield cls
 
-    def with_content_extensions(self, form_class, request):
+    def with_content_extensions(self, form_class, request, extensions=None):
         """ Takes the given form and request and extends the form with
         all content extensions in the order in which they occur in the base
         class list.
@@ -40,7 +40,7 @@ class ContentExtension(object):
         assert hasattr(form_class, 'update_model')
         assert hasattr(form_class, 'apply_model')
 
-        for extension in self.content_extensions:
+        for extension in extensions or self.content_extensions:
             form_class = extension.extend_form(self, form_class, request)
 
         return form_class
@@ -83,6 +83,43 @@ class HiddenFromPublicExtension(ContentExtension):
                 self.is_hidden_from_public.data = model.is_hidden_from_public
 
         return HiddenPageForm
+
+
+class VisibleOnHomepageExtension(ContentExtension):
+    """ Extends any class that has a meta dictionary field with the ability to
+    a boolean indicating if the page should be shown on the homepage or not.
+
+    """
+
+    @property
+    def is_visible_on_homepage(self):
+        return self.meta.get('is_visible_on_homepage', False)
+
+    @is_visible_on_homepage.setter
+    def is_visible_on_homepage(self, is_visible):
+        if is_visible:
+            self.meta['is_visible_on_homepage'] = True
+        elif 'is_visible_on_homepage' in self.meta:
+            del self.meta['is_visible_on_homepage']
+
+    def extend_form(self, form_class, request):
+
+        # do not show on root pages
+        if self.parent_id is None:
+            return form_class
+
+        class VisibleOnHomepageForm(form_class):
+            is_visible_on_homepage = BooleanField(_("Visible on homepage"))
+
+            def update_model(self, model):
+                super().update_model(model)
+                model.is_visible_on_homepage = self.is_visible_on_homepage.data
+
+            def apply_model(self, model):
+                super().apply_model(model)
+                self.is_visible_on_homepage.data = model.is_visible_on_homepage
+
+        return VisibleOnHomepageForm
 
 
 class ContactExtension(ContentExtension):

@@ -455,7 +455,7 @@ def test_news(town_app):
     assert "It is very good" in page.text
     assert "It is lots of fun" not in page.text
 
-    page = page.click('weiterlesen...')
+    page = page.click('weiterlesen…')
 
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
@@ -2007,3 +2007,37 @@ def test_basic_autocomplete(es_town_app):
     es_town_app.es_client.indices.refresh(index='_all')
     assert client.get('/suche/suggest?q=Fl').json == ["Flash Gordon"]
     assert client.get('/suche/suggest?q=Go').json == []
+
+
+def test_pages_on_homepage(es_town_app):
+    client = Client(es_town_app)
+
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    new_page = client.get('/themen/bildung-gesellschaft').click('Thema')
+    new_page.form['title'] = "0xdeadbeef"
+    new_page = new_page.form.submit().follow()
+
+    assert '0xdeadbeef' not in client.get('/')
+
+    edit_page = new_page.click('Bearbeiten')
+    edit_page.form['is_visible_on_homepage'] = True
+    edit_page.form.submit()
+
+    assert '0xdeadbeef' in client.get('/')
+
+    edit_page = new_page.click('Bearbeiten')
+    edit_page.form['is_hidden_from_public'] = True
+    edit_page.form.submit()
+
+    assert '0xdeadbeef' in client.get('/')
+    assert '0xdeadbeef' not in Client(es_town_app).get('/')
+
+    client.delete(
+        new_page.pyquery('a[ic-delete-from]')[0].attrib['ic-delete-from']
+    )
+
+    assert '0xdeadbeef' not in client.get('/')

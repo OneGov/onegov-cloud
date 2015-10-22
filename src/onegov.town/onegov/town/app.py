@@ -10,16 +10,18 @@ use different templating languages.
 import transaction
 
 from cached_property import cached_property
+from collections import defaultdict
 from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
 from onegov.libres import LibresIntegration
+from onegov.page import PageCollection
 from onegov.search import ElasticsearchApp
 from onegov.shared import asset
 from onegov.ticket import TicketCollection
 from onegov.town import log
 from onegov.town.initial_content import add_builtin_forms
-from onegov.town.models import Town
+from onegov.town.models import Town, Topic
 from onegov.town.theme import TownTheme
 from webassets import Bundle
 
@@ -79,6 +81,37 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
     def update_ticket_count(self):
         return self.cache.delete('ticket_count')
 
+    @property
+    def homepage_pages(self):
+        return self.cache.get_or_create(
+            'homepage_pages', self.load_homepage_pages)
+
+    def load_homepage_pages(self):
+        pages = PageCollection(self.session()).query()
+        pages = pages.filter(Topic.type == 'topic')
+
+        # XXX use JSON/JSONB for this (the attribute is not there if it's
+        # false, so this is not too bad speed-wise but it's still awful)
+        pages = pages.filter(Topic.meta.contains(
+            'is_visible_on_homepage'
+        ))
+
+        result = defaultdict(list)
+        for page in pages.all():
+            if page.is_visible_on_homepage:
+                result[page.root.id].append(page)
+
+        for key in result:
+            result[key] = list(sorted(
+                result[key],
+                key=lambda p: utils.normalize_for_url(p.title)
+            ))
+
+        return result
+
+    def update_homepage_pages(self):
+        return self.cache.delete('homepage_pages')
+
     def send_email(self, **kwargs):
         """ Wraps :meth:`onegov.core.framework.Framework.send_email`, setting
         the reply_to address by using the reply address from the town
@@ -123,7 +156,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
     @cached_property
     def webassets_bundles(self):
 
-        jsminifier = None
+        jsminifier = 'rjsmin'
 
         confirm = Bundle(
             'js/confirm.jsx',

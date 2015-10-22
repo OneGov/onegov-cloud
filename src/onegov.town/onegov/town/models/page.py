@@ -7,6 +7,7 @@ from onegov.town.models.extensions import (
     ContactExtension,
     HiddenFromPublicExtension,
     PersonLinkExtension,
+    VisibleOnHomepageExtension,
 )
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer, object_session
@@ -47,8 +48,8 @@ class SearchablePage(ORMSearchable):
         }
 
 
-class Topic(Page, TraitInfo, SearchablePage,
-            HiddenFromPublicExtension, ContactExtension, PersonLinkExtension):
+class Topic(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
+            VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     es_type_name = 'topics'
@@ -87,7 +88,10 @@ class Topic(Page, TraitInfo, SearchablePage,
 
     def get_form_class(self, trait, request):
         if trait == 'link':
-            return LinkForm
+            return self.with_content_extensions(LinkForm, request, extensions=[
+                HiddenFromPublicExtension,
+                VisibleOnHomepageExtension
+            ])
 
         if trait == 'page':
             return self.with_content_extensions(PageForm, request)
