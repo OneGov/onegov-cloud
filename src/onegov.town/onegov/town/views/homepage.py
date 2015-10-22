@@ -10,7 +10,7 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link, LinkGroup
 from onegov.town.layout import DefaultLayout, EventBaseLayout
-from onegov.town.models import AtoZ, Town
+from onegov.town.models import AtoZPages, Town
 
 
 @TownApp.html(model=Town, template='homepage.pt', permission=Public)
@@ -114,7 +114,7 @@ def view_town(self, request):
             ),
             Link(
                 text=_("Topics"),
-                url=request.link(AtoZ(request)),
+                url=request.link(AtoZPages(request)),
                 subtitle=_("Catalog A-Z")
             ),
         ]

@@ -11,6 +11,9 @@ Unreleased
 - Adds the ability to order pages using drag & drop in the sidebar.
   [href]
 
+- People are now always rendered "Firstname Lastname", without salutation.
+  [href]
+
 0.6.6 (2015-10-19)
 ~~~~~~~~~~~~~~~~~~~
 

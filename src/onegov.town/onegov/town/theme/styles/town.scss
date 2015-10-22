@@ -1769,3 +1769,28 @@ ul.search-results {
     overflow-y: scroll;
     padding: 1em;
 }
+
+/*
+    People list
+*/
+.people-list li {
+    list-style: none;
+}
+
+/*
+    A-Z Blocks
+*/
+
+.atoz-block {
+    h2 {
+        border-bottom: 1px solid $gray-pastel;
+    }
+}
+
+@media #{$large-only} {
+    .atoz-block {
+        h2 {
+            max-width: 50%;
+        }
+    }
+}

@@ -831,18 +831,18 @@ def test_people_view(town_app):
     new_person.form['last_name'] = 'Gordon'
     person = new_person.form.submit().follow()
 
-    assert 'Flash Gordon' in person
+    assert 'Gordon Flash' in person
 
     people = client.get('/personen')
 
-    assert 'Flash Gordon' in people
+    assert 'Gordon Flash' in people
 
     edit_person = person.click('Bearbeiten')
     edit_person.form['first_name'] = 'Merciless'
     edit_person.form['last_name'] = 'Ming'
     person = edit_person.form.submit().follow()
 
-    assert 'Merciless Ming' in person
+    assert 'Ming Merciless' in person
 
     client.delete(person.request.url)
 
@@ -872,8 +872,8 @@ def test_with_people(town_app):
 
     new_page = client.get('/themen/leben-wohnen').click('Thema')
 
-    assert 'Flash Gordon' in new_page
-    assert 'Merciless Ming' in new_page
+    assert 'Gordon Flash' in new_page
+    assert 'Ming Merciless' in new_page
 
     new_page.form['title'] = 'About Flash'
     new_page.form['people_flash_gordon'] = True
@@ -2005,8 +2005,8 @@ def test_basic_autocomplete(es_town_app):
     new_person.form.submit()
 
     es_town_app.es_client.indices.refresh(index='_all')
-    assert client.get('/suche/suggest?q=Fl').json == ["Flash Gordon"]
-    assert client.get('/suche/suggest?q=Go').json == []
+    assert client.get('/suche/suggest?q=Go').json == ["Gordon Flash"]
+    assert client.get('/suche/suggest?q=Fl').json == []
 
 
 def test_pages_on_homepage(es_town_app):

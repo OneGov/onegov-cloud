@@ -3,24 +3,35 @@ import morepath
 from onegov.core.security import Public, Private
 from onegov.people import Person, PersonCollection
 from onegov.town import _, TownApp
-from onegov.town.forms import PersonForm
 from onegov.town.elements import Link
+from onegov.town.forms import PersonForm
 from onegov.town.layout import PersonLayout, PersonCollectionLayout
+from onegov.town.models import AtoZ
 
 
 @TownApp.html(model=PersonCollection, template='people.pt', permission=Public)
 def view_people(self, request):
-    people = self.query().order_by(Person.last_name, Person.first_name).all()
+
+    people = self.query().order_by(Person.last_name, Person.first_name)
+
+    class AtoZPeople(AtoZ):
+
+        def get_title(self, item):
+            return item.title
+
+        def get_items(self):
+            return people
 
     return {
         'title': _("People"),
-        'people': people,
+        'people': AtoZPeople(request).get_items_by_letter().items(),
         'layout': PersonCollectionLayout(self, request)
     }
 
 
 @TownApp.html(model=Person, template='person.pt', permission=Public)
 def view_person(self, request):
+
     return {
         'title': self.title,
         'person': self,

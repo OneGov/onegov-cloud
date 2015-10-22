@@ -6,9 +6,11 @@
         <p tal:condition="not:people" i18n:translate="">No people added yet.</p>
 
         <div tal:condition="people" class="people-list">
-            <tal:block repeat="person people">
-                <div metal:use-macro="layout.macros['person_list_card']" />
-            </tal:block>
+            <div metal:use-macro="layout.macros['atoz']" tal:define="items people">
+                <tal:block metal:fill-slot="item-detail">
+                    <div metal:use-macro="layout.macros['person_list_card']" tal:define="person detail"/>
+                </tal:block>
+            </div>
         </div>
     </tal:block>
 </div>

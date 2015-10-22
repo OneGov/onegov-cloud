@@ -432,3 +432,17 @@
         </dd>
     </dl>
 </metal:display_event>
+
+<metal:atoz define-macro="atoz" i18n:domain="onegov.town">
+    <div class="atoz-block" tal:repeat="item items">
+        <h2>${item[0]}</h2>
+        <ul>
+            <li tal:repeat="detail item[1]">
+                <div metal:define-slot="item-detail">
+                    <a href="${request.link(detail)}">${detail.title}</a>
+                    <metal:hint tal:define="item detail" use-macro="layout.macros['hidden_from_public_hint']" />
+                </div>
+            </li>
+        </ul>
+    </div>
+</metal:atoz>

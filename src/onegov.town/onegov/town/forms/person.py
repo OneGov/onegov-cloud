@@ -9,8 +9,6 @@ from wtforms.widgets import TextArea
 class PersonForm(Form):
     """ Form to edit people. """
 
-    salutation = StringField(_("Salutation"))
-
     first_name = StringField(_("First name"), [validators.InputRequired()])
     last_name = StringField(_("Last name"), [validators.InputRequired()])
 

@@ -1,4 +1,3 @@
-from cached_property import cached_property
 from collections import OrderedDict
 from itertools import groupby
 from unidecode import unidecode
@@ -9,33 +8,21 @@ class AtoZ(object):
     def __init__(self, request):
         self.request = request
 
-    def sortkey(self, page):
-        return unidecode(page.title[0].upper())
+    def sortkey(self, item):
+        return unidecode(self.get_title(item)[0].upper())
 
-    @cached_property
-    def pages(self):
-        from onegov.town.models.page import Topic
+    def get_items_by_letter(self):
+        items_by_letter = OrderedDict()
 
-        # XXX implement correct collation support on the database level
-        topics = self.request.app.session().query(Topic).all()
-        topics = sorted(topics, key=self.sortkey)
-
-        if self.request.is_logged_in:
-            return [topic for topic in topics if topic.trait == 'page']
-        else:
-            return [
-                topic for topic in topics if topic.trait == 'page'
-                and not topic.is_hidden_from_public
-            ]
-
-    def pages_by_letter(self):
-        pages_by_letter = OrderedDict()
-
-        for letter, pages in groupby(self.pages, self.sortkey):
-            # sort the pages again, because for the grouping we only use the
-            # first letter
-            pages_by_letter[unidecode(letter)] = tuple(
-                sorted(pages, key=lambda p: unidecode(p.title))
+        for letter, items in groupby(self.get_items(), self.sortkey):
+            items_by_letter[unidecode(letter)] = tuple(
+                sorted(items, key=lambda i: unidecode(self.get_title(i)))
             )
 
-        return pages_by_letter
+        return items_by_letter
+
+    def get_title(self, item):
+        raise NotImplementedError
+
+    def get_items(self):
+        raise NotImplementedError
