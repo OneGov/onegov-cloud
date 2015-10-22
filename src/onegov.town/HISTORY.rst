@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.7.0 (2015-10-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to have topics and links appear on the frontpage by
   selecting a checkbox on the edit dialog.
   [href]
