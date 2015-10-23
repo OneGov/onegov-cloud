@@ -245,13 +245,13 @@ def test_reset_password(town_app):
 
     request_page.form['email'] = 'someone@example.org'
     assert 'someone@example.org' in request_page.form.submit().follow()
-    assert len(town_app.smtpserver.outbox) == 0
+    assert len(town_app.smtp.outbox) == 0
 
     request_page.form['email'] = 'admin@example.org'
     assert 'admin@example.org' in request_page.form.submit().follow()
-    assert len(town_app.smtpserver.outbox) == 1
+    assert len(town_app.smtp.outbox) == 1
 
-    message = town_app.smtpserver.outbox[0]
+    message = town_app.smtp.outbox[0]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
     link = list(document_fromstring(message).iterlinks())[0][2]
@@ -913,13 +913,13 @@ def test_tickets(town_app):
     form_page = client.get('/formular/newsletter')
     form_page.form['e_mail'] = 'info@seantis.ch'
 
-    assert len(town_app.smtpserver.outbox) == 0
+    assert len(town_app.smtp.outbox) == 0
 
     status_page = form_page.form.submit().follow().form.submit().follow()
 
-    assert len(town_app.smtpserver.outbox) == 1
+    assert len(town_app.smtp.outbox) == 1
 
-    message = town_app.smtpserver.outbox[0]
+    message = town_app.smtp.outbox[0]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -961,9 +961,9 @@ def test_tickets(town_app):
     assert client.get('/').pyquery('.ticket-count div').text()\
         == '0 Offen 0 In Bearbeitung'
 
-    assert len(town_app.smtpserver.outbox) == 2
+    assert len(town_app.smtp.outbox) == 2
 
-    message = town_app.smtpserver.outbox[1]
+    message = town_app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -986,7 +986,7 @@ def test_tickets(town_app):
     assert client.get('/').pyquery('.ticket-count div').text()\
         == '0 Offen 1 In Bearbeitung'
 
-    message = town_app.smtpserver.outbox[2]
+    message = town_app.smtp.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -1366,7 +1366,7 @@ def test_reserve_allocation(town_app):
     ticket = details.form.submit().follow().follow()
 
     assert 'RSV-' in ticket.text
-    assert len(town_app.smtpserver.outbox) == 1
+    assert len(town_app.smtp.outbox) == 1
 
     # try to create another reservation the same time
     reserve = client.get(reserve_url)
@@ -1403,9 +1403,9 @@ def test_reserve_allocation(town_app):
     ticket = ticket.click('Reservation annehmen').follow()
 
     assert 'Reservation annehmen' not in ticket
-    assert len(town_app.smtpserver.outbox) == 2
+    assert len(town_app.smtp.outbox) == 2
 
-    message = town_app.smtpserver.outbox[1]
+    message = town_app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -1435,9 +1435,9 @@ def test_reserve_allocation(town_app):
     assert '4' in ticket
     assert '0xdeadbeef' in ticket
 
-    assert len(town_app.smtpserver.outbox) == 3
+    assert len(town_app.smtp.outbox) == 3
 
-    message = town_app.smtpserver.outbox[2]
+    message = town_app.smtp.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
@@ -1448,7 +1448,7 @@ def test_reserve_allocation(town_app):
     # close the ticket
     ticket.click('Ticket abschliessen')
 
-    assert len(town_app.smtpserver.outbox) == 4
+    assert len(town_app.smtp.outbox) == 4
 
 
 def test_reserve_no_definition(town_app):
@@ -1481,7 +1481,7 @@ def test_reserve_no_definition(town_app):
     ticket = reserve.form.submit().follow().follow()
 
     assert 'RSV-' in ticket.text
-    assert len(town_app.smtpserver.outbox) == 1
+    assert len(town_app.smtp.outbox) == 1
 
 
 def test_reserve_session_bound(town_app):
@@ -1773,8 +1773,8 @@ def test_submit_event(town_app):
 
     assert "My Event" not in client.get('/veranstaltungen')
 
-    assert len(town_app.smtpserver.outbox) == 1
-    message = town_app.smtpserver.outbox[0]
+    assert len(town_app.smtp.outbox) == 1
+    message = town_app.smtp.outbox[0]
     assert message.get('to') == "test@example.org"
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
@@ -1814,8 +1814,8 @@ def test_submit_event(town_app):
 
     assert "My Event" in client.get('/veranstaltungen')
 
-    assert len(town_app.smtpserver.outbox) == 2
-    message = town_app.smtpserver.outbox[1]
+    assert len(town_app.smtp.outbox) == 2
+    message = town_app.smtp.outbox[1]
     assert message.get('to') == "test@example.org"
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
@@ -1833,8 +1833,8 @@ def test_submit_event(town_app):
     # Close ticket
     ticket_page.click("Ticket abschliessen").follow()
 
-    assert len(town_app.smtpserver.outbox) == 3
-    message = town_app.smtpserver.outbox[2]
+    assert len(town_app.smtp.outbox) == 3
+    message = town_app.smtp.outbox[2]
     assert message.get('to') == "test@example.org"
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')
@@ -1926,8 +1926,8 @@ def test_delete_event(town_app):
     delete_link = ticket_page.pyquery('a.delete-link').attr('ic-delete-from')
     client.delete(delete_link)
 
-    assert len(town_app.smtpserver.outbox) == 3
-    message = town_app.smtpserver.outbox[2]
+    assert len(town_app.smtp.outbox) == 3
+    message = town_app.smtp.outbox[2]
     assert message.get('to') == "test@example.org"
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('utf-8')

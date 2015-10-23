@@ -4,7 +4,7 @@ from onegov.core.utils import Bunch
 from onegov.town import TownApp
 
 
-def test_send_email(smtpserver):
+def test_send_email(smtp):
 
     class App(TownApp):
 
@@ -16,7 +16,7 @@ def test_send_email(smtpserver):
             )
 
     app = App()
-    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'mails@govikon.ch'
     app.mail_force_tls = False
     app.mail_username = None
@@ -24,15 +24,15 @@ def test_send_email(smtpserver):
     app.mail_use_directory = False
 
     app.send_email(receivers=['civilian@example.org'], subject='Test')
-    assert len(smtpserver.outbox) == 0
+    assert len(smtp.outbox) == 0
     transaction.abort()
 
     app.send_email(receivers=['civilian@example.org'], subject='Test')
-    assert len(smtpserver.outbox) == 0
+    assert len(smtp.outbox) == 0
     transaction.commit()
 
-    assert len(smtpserver.outbox) == 1
-    mail = smtpserver.outbox[0]
+    assert len(smtp.outbox) == 1
+    mail = smtp.outbox[0]
 
     assert mail['Reply-To'] == 'Gemeinde Govikon <info@govikon.ch>'
     assert mail['Subject'] == 'Test'

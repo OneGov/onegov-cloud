@@ -35,23 +35,23 @@ def form_definitions():
 
 
 @pytest.yield_fixture(scope='function')
-def town_app(postgres_dsn, filestorage, town_password, smtpserver,
+def town_app(postgres_dsn, filestorage, town_password, smtp,
              form_definitions):
     yield new_town_app(
-        postgres_dsn, filestorage, town_password, smtpserver, form_definitions
+        postgres_dsn, filestorage, town_password, smtp, form_definitions
     )
 
 
 @pytest.yield_fixture(scope='function')
-def es_town_app(postgres_dsn, filestorage, town_password, smtpserver,
+def es_town_app(postgres_dsn, filestorage, town_password, smtp,
                 form_definitions, es_url):
     yield new_town_app(
-        postgres_dsn, filestorage, town_password, smtpserver, form_definitions,
+        postgres_dsn, filestorage, town_password, smtp, form_definitions,
         es_url
     )
 
 
-def new_town_app(postgres_dsn, filestorage, town_password, smtpserver,
+def new_town_app(postgres_dsn, filestorage, town_password, smtp,
                  form_definitions, es_url=None):
 
     config = setup()
@@ -85,13 +85,13 @@ def new_town_app(postgres_dsn, filestorage, town_password, smtpserver,
     town = session.query(Town).one()
     town.meta['reply_to'] = 'mails@govikon.ch'
 
-    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'mails@govikon.ch'
     app.mail_force_tls = False
     app.mail_username = None
     app.mail_password = None
     app.mail_use_directory = False
-    app.smtpserver = smtpserver
+    app.smtp = smtp
 
     # usually we don't want to create the users directly, anywhere else you
     # *need* to go through the UserCollection. Here however, we can improve
