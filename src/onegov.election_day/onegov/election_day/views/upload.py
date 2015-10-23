@@ -5,9 +5,10 @@ from onegov.ballot import Ballot, BallotResult, Vote
 from onegov.core.csv import CSVFile
 from onegov.core.errors import (
     AmbiguousColumnsError,
-    DuplicateColumnNames,
-    EmptyFile,
-    InvalidFormat,
+    DuplicateColumnNamesError,
+    EmptyFileError,
+    EmptyLineInFileError,
+    InvalidFormatError,
     MissingColumnsError,
 )
 from onegov.core.security import Private
@@ -80,17 +81,21 @@ def import_file(principal, vote, ballot_type, file, mimetype):
                 "extra columns."
             ))
         ]}
-    except DuplicateColumnNames as e:
+    except DuplicateColumnNamesError as e:
         return {'status': 'error', 'errors': [
             FileImportError(_("Some column names appear twice."))
         ]}
-    except InvalidFormat as e:
+    except InvalidFormatError as e:
         return {'status': 'error', 'errors': [
             FileImportError(_("Not a valid csv/xls/xlsx file."))
         ]}
-    except EmptyFile as e:
+    except EmptyFileError as e:
         return {'status': 'error', 'errors': [
             FileImportError(_("The csv/xls/xlsx file is empty."))
+        ]}
+    except EmptyLineInFileError as e:
+        return {'status': 'error', 'errors': [
+            FileImportError(_("The file contains an empty line."))
         ]}
 
     ballot = next((b for b in vote.ballots if b.type == ballot_type), None)
