@@ -192,3 +192,25 @@ def es_url(es_process):
 def es_client(es_url):
     """ Provides an elasticsearch client. """
     yield Elasticsearch(es_url)
+
+
+@pytest.yield_fixture(scope="function")
+def smtp():
+    # replacement for smtpserver fixture, which also works on Python 3.5
+    # see https://bitbucket.org/pytest-dev/pytest-localserver
+    # /issues/13/broken-on-python-35
+    from pytest_localserver import smtp
+
+    class Server(smtp.Server):
+
+        def getsockname(self):
+            return self.socket.getsockname()
+
+        @property
+        def address(self):
+            return self.addr[:2]
+
+    server = Server()
+    server.start()
+    yield server
+    server.stop()
