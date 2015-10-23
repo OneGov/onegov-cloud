@@ -9,7 +9,7 @@ from onegov.core import Framework
 from onegov.core.cli import cli
 
 
-def test_sendmail(smtpserver, temporary_directory):
+def test_sendmail(smtp, temporary_directory):
 
     cfg = {
         'applications': [
@@ -38,12 +38,12 @@ def test_sendmail(smtpserver, temporary_directory):
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
         'sendmail',
-        '--hostname', smtpserver.addr[0],
-        '--port', smtpserver.addr[1]
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
     ])
 
     assert result.exit_code == 0
-    assert len(smtpserver.outbox) == 0
+    assert len(smtp.outbox) == 0
 
     app = Framework()
     app.mail_sender = 'noreply@example.org'
@@ -59,29 +59,29 @@ def test_sendmail(smtpserver, temporary_directory):
 
     transaction.commit()
 
-    assert len(smtpserver.outbox) == 0
+    assert len(smtp.outbox) == 0
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
         'sendmail',
-        '--hostname', smtpserver.addr[0],
-        '--port', smtpserver.addr[1]
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
     ])
 
     assert result.exit_code == 0
-    assert len(smtpserver.outbox) == 1
+    assert len(smtp.outbox) == 1
 
     result = runner.invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
         'sendmail',
-        '--hostname', smtpserver.addr[0],
-        '--port', smtpserver.addr[1]
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
     ])
 
     assert result.exit_code == 0
-    assert len(smtpserver.outbox) == 1
+    assert len(smtp.outbox) == 1
 
-    message = smtpserver.outbox[0]
+    message = smtp.outbox[0]
 
     assert message['Sender'] == 'Govikon <noreply@example.org>'
     assert message['From'] == 'Govikon <noreply@example.org>'
@@ -95,7 +95,7 @@ def test_sendmail(smtpserver, temporary_directory):
     )
 
 
-def test_sendmail_unicode(smtpserver, temporary_directory):
+def test_sendmail_unicode(smtp, temporary_directory):
 
     cfg = {
         'applications': [
@@ -137,11 +137,11 @@ def test_sendmail_unicode(smtpserver, temporary_directory):
     CliRunner().invoke(cli, [
         '--config', os.path.join(temporary_directory, 'onegov.yml'),
         'sendmail',
-        '--hostname', smtpserver.addr[0],
-        '--port', smtpserver.addr[1]
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
     ])
 
-    message = smtpserver.outbox[0]
+    message = smtp.outbox[0]
 
     def decode(header):
         name, addr = parseaddr(header)

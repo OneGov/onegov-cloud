@@ -428,10 +428,10 @@ def test_csrf():
         assert client.post('/', {'csrf_token': csrf_token}).text == 'fail'
 
 
-def test_send_email(smtpserver):
+def test_send_email(smtp):
 
     app = Framework()
-    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
@@ -447,8 +447,8 @@ def test_send_email(smtpserver):
 
     transaction.commit()
 
-    assert len(smtpserver.outbox) == 1
-    message = smtpserver.outbox[0]
+    assert len(smtp.outbox) == 1
+    message = smtp.outbox[0]
 
     assert message['Sender'] == 'noreply@example.org'
     assert message['From'] == 'noreply@example.org'
@@ -462,10 +462,10 @@ def test_send_email(smtpserver):
     )
 
 
-def test_send_email_with_name(smtpserver):
+def test_send_email_with_name(smtp):
 
     app = Framework()
-    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
@@ -481,8 +481,8 @@ def test_send_email_with_name(smtpserver):
 
     transaction.commit()
 
-    assert len(smtpserver.outbox) == 1
-    message = smtpserver.outbox[0]
+    assert len(smtp.outbox) == 1
+    message = smtp.outbox[0]
 
     assert message['Sender'] == 'Govikon <noreply@example.org>'
     assert message['From'] == 'Govikon <noreply@example.org>'
@@ -530,9 +530,9 @@ def test_send_email_to_maildir(temporary_directory):
     assert 'To: recipient@example.org' in email
 
 
-def test_send_email_is_8859_1(smtpserver):
+def test_send_email_is_8859_1(smtp):
     app = Framework()
-    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
@@ -546,11 +546,11 @@ def test_send_email_is_8859_1(smtpserver):
         content="This e-mäil is just a test"
     )
 
-    assert len(smtpserver.outbox) == 0
+    assert len(smtp.outbox) == 0
     transaction.commit()
 
-    assert len(smtpserver.outbox) == 1
-    message = smtpserver.outbox[0]
+    assert len(smtp.outbox) == 1
+    message = smtp.outbox[0]
 
     def decode(header):
         name, addr = parseaddr(header)
@@ -577,9 +577,9 @@ def test_send_email_is_8859_1(smtpserver):
     )
 
 
-def test_send_email_unicode(smtpserver):
+def test_send_email_unicode(smtp):
     app = Framework()
-    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
@@ -593,11 +593,11 @@ def test_send_email_unicode(smtpserver):
         content="👍"
     )
 
-    assert len(smtpserver.outbox) == 0
+    assert len(smtp.outbox) == 0
     transaction.commit()
 
-    assert len(smtpserver.outbox) == 1
-    message = smtpserver.outbox[0]
+    assert len(smtp.outbox) == 1
+    message = smtp.outbox[0]
 
     def decode(header):
         name, addr = parseaddr(header)
@@ -654,7 +654,7 @@ def test_object_by_path():
     assert app.object_by_path('/asdf/asdf') is None
 
 
-def test_send_email_transaction(smtpserver):
+def test_send_email_transaction(smtp):
     config = setup()
 
     import more.transaction
@@ -696,7 +696,7 @@ def test_send_email_transaction(smtpserver):
     app = App()
     app.application_id = 'test'
     app.configure_application(identity_secure=False)  # allow http
-    app.mail_host, app.mail_port = smtpserver.addr
+    app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'noreply@example.org'
     app.mail_force_tls = False
     app.mail_username = None
@@ -711,7 +711,7 @@ def test_send_email_transaction(smtpserver):
     with pytest.raises(AssertionError):
         client.get('/send-fail')
 
-    assert len(smtpserver.outbox) == 0
+    assert len(smtp.outbox) == 0
 
     client.get('/send-ok')
-    assert len(smtpserver.outbox) == 1
+    assert len(smtp.outbox) == 1
