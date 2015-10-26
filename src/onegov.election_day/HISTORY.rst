@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes display issues with IE9+.
+  [href]
+
 - Factoids are now shown for each ballot without being summarized on the vote.
   [href]
 

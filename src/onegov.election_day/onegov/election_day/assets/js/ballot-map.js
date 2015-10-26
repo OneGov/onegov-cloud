@@ -1,3 +1,29 @@
+var is_ie = function() {
+    var ua = window.navigator.userAgent;
+
+    var msie = ua.indexOf('MSIE ');
+    if (msie > 0) {
+        // IE 10 or older => return version number
+        return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+    }
+
+    var trident = ua.indexOf('Trident/');
+    if (trident > 0) {
+        // IE 11 => return version number
+        var rv = ua.indexOf('rv:');
+        return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+    }
+
+    var edge = ua.indexOf('Edge/');
+    if (edge > 0) {
+       // IE 12 => return version number
+       return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+    }
+
+    // other browser
+    return false;
+};
+
 var init_ballot_map = function(el) {
 
     var map = $(el);
@@ -59,9 +85,8 @@ var init_ballot_map = function(el) {
         });
 
     // load the map and then the data
-    d3.json(mapurl, function(error, mapdata) {
-        d3.json(dataurl, function(error, data) {
-
+    $.ajax({ url: mapurl }).done(function(mapdata) {
+        $.ajax({ url: dataurl }).done(function(data) {
             svg.append('g')
                 .attr('class', 'municipality')
                 .selectAll('path')
@@ -139,9 +164,16 @@ var init_ballot_map = function(el) {
             // set the svg element size to the bounding box, to avoid extra
             // whitespace around the map
             var bbox = svg[0][0].getBBox();
+
             svg.attr('viewBox',
                 [bbox.x, bbox.y, bbox.width, bbox.height].join(' ')
             );
+
+            // browsers other than ie figure out a nice size by themselves
+            if (is_ie()) {
+                svg.attr('width', 470);
+                svg.attr('height', 470 * (bbox.height/bbox.width));    
+            }
 
             svg.call(tooltip);
 
@@ -163,6 +195,12 @@ var init_ballot_map = function(el) {
             });
         });
     });
+    // d3.json(mapurl, function(error, mapdata) {
+    //     d3.json(dataurl, function(error, data) {
+
+            
+    //     });
+    // });
 };
 
 (function($) {

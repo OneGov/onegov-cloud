@@ -74,6 +74,8 @@ class ElectionDayApp(Framework):
     @cached_property
     def webassets_bundles(self):
 
+        jsminifier = None
+
         common = Bundle(
             'js/modernizr.js',
             'js/jquery.js',
@@ -82,7 +84,7 @@ class ElectionDayApp(Framework):
             'js/underscore.js',
             'js/stackable.js',
             'js/common.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/common.bundle.js'
         )
 
@@ -90,7 +92,7 @@ class ElectionDayApp(Framework):
             'js/jquery.datetimepicker.js',
             'js/datetimepicker.js',
             asset('js/form_dependencies.js'),
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/jquery.datetimepicker.bundle.js'
         )
 
@@ -105,7 +107,7 @@ class ElectionDayApp(Framework):
             'js/d3tip.js',
             'js/topojson.js',
             'js/ballot-map.js',
-            filters='rjsmin',
+            filters=jsminifier,
             output='bundles/d3.bundle.js'
         )
 
