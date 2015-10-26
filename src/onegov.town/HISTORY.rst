@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.7.1 (2015-10-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Makes sure the page move api only accepts numbers for its ids.
   [href]
 
