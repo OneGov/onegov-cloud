@@ -69,6 +69,7 @@ var undo_move_element = function(list, element, new_index, old_index) {
 
 var setup_sortable_list = function(list_element) {
     var list = $(list_element);
+    var start = null;
 
     var sortable = Sortable.create(list_element, {
         onStart: function(event) {
@@ -84,6 +85,8 @@ var setup_sortable_list = function(list_element) {
             if (last_element.find('.children').length !== 0) {
                 list.append($('<li class="empty">&nbsp;</li>'));
             }
+
+            start = (new Date()).getTime();
         },
         onEnd: function(event) {
             list.find('> .empty').remove();
@@ -94,8 +97,14 @@ var setup_sortable_list = function(list_element) {
                 new_index = list.find('> li').length - 1;
             }
 
+            // only continue with the drag & drop operation if the whole thing
+            // took more than 200ms, below that we assume it was an accident
             if (new_index != event.oldIndex) {
-                on_move_element(list_element, event.item, new_index, event.oldIndex);
+                if (((new Date()).getTime() - start) <= 200) {
+                    undo_move_element(list_element, event.item, new_index, event.oldIndex);
+                } else {
+                    on_move_element(list_element, event.item, new_index, event.oldIndex);
+                }
             }
         }
     });

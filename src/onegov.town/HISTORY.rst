@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Introduces a delay to drag & drop operations to prevent accidents.
+  [href]
+
 0.7.0 (2015-10-22)
 ~~~~~~~~~~~~~~~~~~~
 
