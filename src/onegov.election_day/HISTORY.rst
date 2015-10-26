@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds accidentally removed 'last change' factoid.
+  [href]
+
+- Adds missing translations.
+  [href]
+
 0.1.5 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

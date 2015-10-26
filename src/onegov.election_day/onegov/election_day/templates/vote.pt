@@ -62,6 +62,10 @@
                     <span i18n:translate="">Counted municipalities</span>
                     <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress ballot.progress" /></strong>
                 </li>
+                <li tal:condition="not:counted">
+                    <span i18n:translate="">Last change</span>
+                    <strong>${layout.format_date(vote.last_result_change, 'relative')}</strong>
+                </li>
                 <li tal:condition="counted">
                     <span i18n:translate="">Elegible Voters</span>
                     <strong>${layout.format_number(ballot.elegible_voters)}</strong>

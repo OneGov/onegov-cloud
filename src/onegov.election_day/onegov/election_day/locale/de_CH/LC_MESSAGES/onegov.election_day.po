@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-10-23 11:37+0200\n"
+"POT-Creation-Date: 2015-10-26 16:34+0100\n"
 "PO-Revision-Date: 2015-10-14 17:17+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -185,6 +185,12 @@ msgstr "JA Stimmen"
 msgid "Nays"
 msgstr "NEIN Stimmen"
 
+msgid "No results yet"
+msgstr "Noch keine Resultate"
+
+msgid "Results"
+msgstr "Resultate"
+
 msgid "Counted municipalities"
 msgstr "Ausgezählte Gemeinden"
 
@@ -199,9 +205,6 @@ msgstr "Eingegangene Stimmzettel"
 
 msgid "Turnout"
 msgstr "Wahlbeteiligung"
-
-msgid "Results"
-msgstr "Resultate"
 
 msgid "Yay"
 msgstr "JA"
