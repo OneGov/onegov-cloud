@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Factoids are now shown for each ballot without being summarized on the vote.
+  [href]
+
 - Fixes division by zero error occuring on votes without any results.
   [href]
 

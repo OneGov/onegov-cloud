@@ -38,28 +38,8 @@
         </tal:block>
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <ul class="small-block-grid-1 medium-block-grid-4 factoids">
-            <li>
-                <span i18n:translate="">Counted municipalities</span>
-                <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" /></strong>
-            </li>
-            <li tal:condition="not:counted">
-                <span i18n:translate="">Last change</span>
-                <strong>${layout.format_date(vote.last_result_change, 'relative')}</strong>
-            </li>
-            <li tal:condition="counted">
-                <span i18n:translate="">Elegible Voters</span>
-                <strong>${layout.format_number(vote.elegible_voters)}</strong>
-            </li>
-            <li tal:condition="counted">
-                <span i18n:translate="">Cast Ballots</span>
-                <strong>${layout.format_number(vote.cast_ballots)}</strong>
-            </li>
-            <li tal:condition="counted">
-                <span i18n:translate="">Turnout</span>
-                <strong>${'{0:.2f}'.format(vote.turnout)} %</strong>
-            </li>
-        </ul>
+
+        <h2 tal:condition="not:vote.ballots" i18n:translate>No results yet</h2>
 
         <tal:block tal:repeat="ballot vote.ballots">
             <div class="results-navigation" tal:condition="vote.counter_proposal" tal:define="types python: ['proposal', 'counter-proposal', 'tie-breaker']">
@@ -76,6 +56,25 @@
             <h2 tal:condition="not:vote.counter_proposal" i18n:translate>
                 Results
             </h2>
+
+            <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+                <li>
+                    <span i18n:translate="">Counted municipalities</span>
+                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress ballot.progress" /></strong>
+                </li>
+                <li tal:condition="counted">
+                    <span i18n:translate="">Elegible Voters</span>
+                    <strong>${layout.format_number(ballot.elegible_voters)}</strong>
+                </li>
+                <li tal:condition="counted">
+                    <span i18n:translate="">Cast Ballots</span>
+                    <strong>${layout.format_number(ballot.cast_ballots)}</strong>
+                </li>
+                <li tal:condition="counted">
+                    <span i18n:translate="">Turnout</span>
+                    <strong>${'{0:.2f}'.format(ballot.turnout)} %</strong>
+                </li>
+            </ul>
 
             <div class="row">
                 <div class="small-12 small-centered medium-8 large-6 columns">
