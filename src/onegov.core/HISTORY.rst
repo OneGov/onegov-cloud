@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.7.5 (2015-10-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to convert xls/xlsx files to csv.
   [href]
