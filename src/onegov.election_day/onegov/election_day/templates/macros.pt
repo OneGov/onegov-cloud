@@ -22,9 +22,9 @@
 
 <metal:navigation define-macro="progress" i18n:domain="onegov.election_day">
     <tal:block i18n:translate>
-        <span tal:replace="int(progress[0] / len(vote.ballots))" i18n:name='counted' />
+        <span tal:replace="int(progress[0] / (len(vote.ballots) or 1))" i18n:name='counted' />
             of
-        <span tal:replace="int(progress[1] / len(vote.ballots))" i18n:name='total' />
+        <span tal:replace="int(progress[1] / (len(vote.ballots) or 1))" i18n:name='total' />
     </tal:block>
 </metal:navigation>
 

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes division by zero error occuring on votes without any results.
+  [href]
+
 0.1.4 (2015-10-16)
 ~~~~~~~~~~~~~~~~~~~
 
