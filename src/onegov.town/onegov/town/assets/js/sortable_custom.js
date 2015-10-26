@@ -71,7 +71,6 @@ var setup_sortable_list = function(list_element) {
     var list = $(list_element);
 
     var sortable = Sortable.create(list_element, {
-        delay: 50,
         onStart: function(event) {
             if ($(event.element).parent().hasClass('children')) {
                 return;
