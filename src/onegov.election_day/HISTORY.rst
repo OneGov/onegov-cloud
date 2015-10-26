@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.6 (2015-10-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds accidentally removed 'last change' factoid.
   [href]
 
