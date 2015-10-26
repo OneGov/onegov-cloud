@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Makes sure the page move api only accepts numbers for its ids.
+  [href]
+
 - Introduces a delay to drag & drop operations to prevent accidents.
   [href]
 

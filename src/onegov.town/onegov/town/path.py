@@ -211,7 +211,8 @@ def get_sitecollection(app):
 
 
 @TownApp.path(model=PageMove,
-              path='/page-move/{subject_id}/{direction}/{target_id}')
+              path='/page-move/{subject_id}/{direction}/{target_id}',
+              converters=dict(subject_id=int, target_id=int))
 def get_page_move(app, subject_id, direction, target_id):
     session = app.session()
     pages = PageCollection(session)
