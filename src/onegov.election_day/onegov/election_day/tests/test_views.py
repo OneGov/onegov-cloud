@@ -361,3 +361,55 @@ def test_upload_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Keine Stimmberechtigten" in upload
+
+
+def test_upload_missing_town(election_day_app):
+    client = Client(election_day_app)
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-vote')
+    new.form['vote'] = 'Bacon, yea or nay?'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # when uploading a proposal, a counter-proposal and a tie-breaker we
+    # want the process to stop completely if any of these three files has
+    # an error
+
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'complex'
+
+    proposal = '\n'.join((
+        ','.join(COLUMNS),
+        ',1711,Zug,3821,7405,16516,80,1',
+        ',1706,Oberägeri,811,1298,3560,18,',
+    ))
+    counter_proposal = '\n'.join((
+        ','.join(COLUMNS),
+        ',1711,Zug,3821,7405,16516,80,1',
+        ',1706,Oberägeri,811,1298,3560,18,',
+    ))
+    tie_breaker = '\n'.join((
+        ','.join(COLUMNS),
+        ',1711,Zug,3821,7405,16516,80,1',
+    ))
+
+    upload.form['proposal'] = Upload(
+        'data.csv', proposal.encode('utf-8'), 'text/plain'
+    )
+
+    upload.form['counter_proposal'] = Upload(
+        'data.csv', counter_proposal.encode('utf-8'), 'text/plain'
+    )
+
+    upload.form['tie_breaker'] = Upload(
+        'data.csv', tie_breaker.encode('utf-8'), 'text/plain'
+    )
+
+    assert "Diese Vorlage hat weniger Resultate als die Anderen" in \
+        upload.form.submit()
