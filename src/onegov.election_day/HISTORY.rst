@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Improves display of votes with long titles in the manage table.
+  [href]
+
 - Fixes display issues with IE9+.
   [href]
 
