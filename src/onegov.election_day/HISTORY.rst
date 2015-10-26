@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.5 (2015-10-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds XLS/XLSX support.
   [href]
 
