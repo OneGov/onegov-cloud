@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds XLS/XLSX support.
+  [href]
+
 - Improves display of votes with long titles in the manage table.
   [href]
 

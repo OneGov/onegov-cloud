@@ -2,7 +2,7 @@
 import transaction
 
 from onegov.ballot import Ballot, BallotResult, Vote
-from onegov.core.csv import CSVFile
+from onegov.core.csv import CSVFile, convert_xls_to_csv
 from onegov.core.errors import (
     AmbiguousColumnsError,
     DuplicateColumnNamesError,
@@ -46,6 +46,8 @@ def import_file(principal, vote, ballot_type, file, mimetype):
 
     if mimetype == 'text/plain':
         csvfile = file
+    else:
+        csvfile = convert_xls_to_csv(file)
 
     if vote.date.year not in principal.municipalities:
         return {'status': 'error', 'errors': [
