@@ -54,7 +54,9 @@ $max-line-width: 67ex;
     (100vw includes the scrollbar, 100% does not)
 */
 html {
-    margin-left: calc(100vw - 100%);
+    @media not print {
+        margin-left: calc(100vw - 100%);
+    }
 }
 
 /*
@@ -77,7 +79,10 @@ body {
 
 #inner-body {
     margin: 0 auto -$footer-height;
-    min-height: 100%;
+
+    @media not print {
+      min-height: 100%;
+    }
 }
 
 .header {
@@ -1796,5 +1801,25 @@ ul.search-results {
         h2 {
             max-width: 50%;
         }
+    }
+}
+
+
+/*
+    Print Styles
+*/
+@media print {
+    .ticket-count,
+    .searchbox,
+    .top-bar,
+    .edit-bar,
+    .alert-box,
+    .side-nav,
+    .bottom-links,
+    .occurrences-day-date,
+    .occurrences-filter-tags,
+    .occurrences-filter-date {
+        display: none;
+
     }
 }
