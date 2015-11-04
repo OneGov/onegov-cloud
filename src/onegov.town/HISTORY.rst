@@ -7,6 +7,9 @@ Unreleased
 - Improve print styles.
   [msom]
 
+- Add image captions.
+  [msom]
+
 0.7.1 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

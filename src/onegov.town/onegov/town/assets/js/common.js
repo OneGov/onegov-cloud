@@ -40,3 +40,9 @@ if (!Modernizr.inputtypes.date) {
         timepicker: false
     });
 }
+
+// Add image captions
+$('.page-text img[alt]').each(function(){
+    var caption = $("<span>").text($(this).attr('alt'));
+    $(this).after(caption);
+});
