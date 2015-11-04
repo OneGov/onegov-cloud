@@ -1829,6 +1829,7 @@ def test_submit_event(town_app):
         assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
             message
     assert "Ihre Veranstaltung wurde angenommen" in message
+    assert ticket_nr in message
 
     # Close ticket
     ticket_page.click("Ticket abschliessen").follow()
@@ -1933,6 +1934,7 @@ def test_delete_event(town_app):
     message = message.decode('utf-8')
     assert "My Event" in message
     assert "Ihre Veranstaltung musste leider abgelehnt werden" in message
+    assert ticket_nr in message
 
     assert "My Event" not in client.get('/veranstaltungen')
 

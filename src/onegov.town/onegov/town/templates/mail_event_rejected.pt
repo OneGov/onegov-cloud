@@ -7,5 +7,11 @@
         <p i18n:translate>Your event has unfortunately been rejected:</p>
 
         <tal:block metal:use-macro="layout.macros['event']"></tal:block>
+
+        <tal:block tal:condition="ticket">
+            <p>&nbsp;</p>
+            <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${ticket.number}</span></p>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
+        </tal:block>
     </tal:block>
 </div>

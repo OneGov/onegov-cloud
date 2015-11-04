@@ -60,6 +60,10 @@ def publish_event(self, request):
     }))
 
     if self.meta.get('submitter_email'):
+
+        session = request.app.session()
+        ticket = TicketCollection(session).by_handler_id(self.id.hex)
+
         send_html_mail(
             request=request,
             template='mail_event_accepted.pt',
@@ -67,6 +71,7 @@ def publish_event(self, request):
             receivers=(self.meta.get('submitter_email'), ),
             content={
                 'model': self,
+                'ticket': ticket
             }
         )
 
@@ -235,6 +240,7 @@ def handle_delete_event(self, request):
             receivers=(self.meta.get('submitter_email'), ),
             content={
                 'model': self,
+                'ticket': ticket
             }
         )
 

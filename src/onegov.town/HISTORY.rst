@@ -13,6 +13,9 @@ Unreleased
 - Improve event list for mobiles.
   [msom]
 
+- Add ticket reference to event mails.
+  [msom]
+
 0.7.1 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

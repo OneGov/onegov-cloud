@@ -30,10 +30,14 @@
     <p>${model.title}</p>
     <p>${model.location}</p>
     <p tal:content="structure model.description.replace('\n', '<br />')" />
-    <ul tal:define="occurrences model.occurrence_dates(localize=True)">
-        <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'datetime')}-${layout.format_date(model.localized_end, 'time')}</li>
-    </ul>
-    <ul><li tal:repeat="tag model.tags" i18n:translate="">${tag}</li></ul>
+    <p>
+        <ul tal:define="occurrences model.occurrence_dates(localize=True)">
+            <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'datetime')}-${layout.format_date(model.localized_end, 'time')}</li>
+        </ul>
+    </p>
+    <p>
+        <ul><li tal:repeat="tag model.tags" i18n:translate="">${tag}</li></ul>
+    </p>
 </metal:event>
 
 </body>
