@@ -10,6 +10,9 @@ Unreleased
 - Add image captions.
   [msom]
 
+- Improve event list for mobiles.
+  [msom]
+
 0.7.1 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

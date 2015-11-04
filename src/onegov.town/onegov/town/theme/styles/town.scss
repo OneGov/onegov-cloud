@@ -1510,13 +1510,20 @@ tr.ticket:hover {
         background-color: $white-smoke;
     }
 
-    div {
-        text-align: center;
+    @media #{$large-up} {
+        span {
+            display: block;
+            font-size: 1rem;
+            text-align: center;
 
-        &.day {
-            font-size: 3em;
-            font-weight: bold;
+            &.day {
+                font-size: 3rem;
+                font-weight: bold;
+            }
 
+            &.dot {
+                display: none;
+            }
         }
     }
 }
