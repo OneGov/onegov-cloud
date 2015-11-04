@@ -1617,7 +1617,7 @@ def test_view_occurrences(town_app):
 
     def events(query=''):
         page = client.get('/veranstaltungen/?{}'.format(query))
-        return [event.text for event in page.pyquery('h2 a')]
+        return [event.text for event in page.pyquery('h3 a')]
 
     def total_events(query=''):
         page = client.get('/veranstaltungen/?{}'.format(query))
