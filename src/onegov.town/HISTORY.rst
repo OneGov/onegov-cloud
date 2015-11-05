@@ -16,6 +16,9 @@ Unreleased
 - Add ticket reference to event mails.
   [msom]
 
+- Hide "open in new tab" and "text orientation" in image edit dialog.
+  [msom]
+
 0.7.1 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 
