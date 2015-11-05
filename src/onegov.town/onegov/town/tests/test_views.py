@@ -1914,6 +1914,7 @@ def test_delete_event(town_app):
 
     ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     ticket_page = ticket_page.click("Veranstaltung annehmen").follow()
+    ticket_nr = ticket_page.pyquery('.ticket-number').text()
 
     assert "My Event" in client.get('/veranstaltungen')
 
