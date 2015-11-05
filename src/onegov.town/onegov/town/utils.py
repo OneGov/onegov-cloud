@@ -44,7 +44,6 @@ def mark_images(html):
             else:
                 paragraph.attrib['class'] = 'has-img'
 
-    # return ''.join(etree.tostring(e).decode('utf-8') for e in fragments)
     return ''.join(tostring(e).decode('utf-8') for e in fragments)
 
 
