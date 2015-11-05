@@ -19,6 +19,9 @@ Unreleased
 - Hide "open in new tab" and "text orientation" in image edit dialog.
   [msom]
 
+- Fix generation of faulty empty tags in mark_images.
+  [msom]
+
 0.7.1 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

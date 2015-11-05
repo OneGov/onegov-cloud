@@ -3,8 +3,7 @@ import sedate
 from datetime import datetime, time
 from isodate import parse_date, parse_datetime
 from libres.modules import errors as libres_errors
-from lxml import etree
-from lxml.html import fragments_fromstring
+from lxml.html import fragments_fromstring, tostring
 from onegov.ticket import TicketCollection
 from onegov.town import _
 from onegov.town.elements import DeleteLink, Link
@@ -45,7 +44,8 @@ def mark_images(html):
             else:
                 paragraph.attrib['class'] = 'has-img'
 
-    return ''.join(etree.tostring(e).decode('utf-8') for e in fragments)
+    # return ''.join(etree.tostring(e).decode('utf-8') for e in fragments)
+    return ''.join(tostring(e).decode('utf-8') for e in fragments)
 
 
 def parse_fullcalendar_request(request, timezone):
