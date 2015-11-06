@@ -35,18 +35,18 @@ class SettingsForm(Form):
         widget=with_options(TextArea, rows=8),
         fieldset=_("General")
     )
+    opening_hours = TextAreaField(
+        label=_("Opening Hours"),
+        description=_("The opening hours of the municipality"),
+        widget=with_options(TextArea, rows=8),
+        fieldset=_("General")
+    )
     homepage_images = TextAreaField(
         label=_("Homepage Images"),
         description=_(
             "Up to six URLs pointing to images for the tiles on the homepage."
         ),
         widget=with_options(TextArea, rows=6),
-        fieldset=_("Homepage")
-    )
-    opening_hours = TextAreaField(
-        label=_("Opening Hours"),
-        description=_("The opening hours of the municipality"),
-        widget=with_options(TextArea, rows=8),
         fieldset=_("Homepage")
     )
     online_counter_label = StringField(
