@@ -49,9 +49,14 @@ class Form(BaseForm):
     def __init__(self, *args, **kwargs):
 
         # consume the fieldset attribute of all unbound fields, as WTForms
-        # doesn't know it
+        # doesn't know it -> move it to the field which is a *class* attribute
+        # (so this only happens once per class)
+        for field_id, field in self._unbound_fields:
+            if not hasattr(field, 'fieldset'):
+                field.fieldset = field.kwargs.pop('fieldset', None)
+
         fields_by_fieldset = [
-            (field.kwargs.pop('fieldset', None), field_id)
+            (field.fieldset, field_id)
             for field_id, field in self._unbound_fields
         ]
 
