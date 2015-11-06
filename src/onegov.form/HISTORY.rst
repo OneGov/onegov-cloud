@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes fieldsets only showing up once on static forms.
+  [href]
+
 0.8.1 (2015-10-15)
 ~~~~~~~~~~~~~~~~~~~
 
