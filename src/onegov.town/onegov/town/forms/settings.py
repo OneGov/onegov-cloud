@@ -10,37 +10,65 @@ from onegov.town.theme import user_options
 class SettingsForm(Form):
     """ Defines the settings form for onegov town. """
 
-    name = StringField(_("Name"), [validators.InputRequired()])
+    name = StringField(
+        label=_("Name"),
+        validators=[validators.InputRequired()],
+        fieldset=_("General")
+    )
     logo_url = StringField(
         label=_("Logo"),
-        description=_("URL pointing to the logo")
+        description=_("URL pointing to the logo"),
+        fieldset=_("General")
     )
     reply_to = EmailField(
         _("E-Mail Reply Address"), [validators.InputRequired()],
         description=_("Replies to automated e-mails go to this address."),
+        fieldset=_("General")
     )
-    primary_color = ColorField(_("Primary Color"))
+    primary_color = ColorField(
+        label=_("Primary Color"),
+        fieldset=_("General")
+    )
+    contact = TextAreaField(
+        label=_("Contact"),
+        description=_("The address and phone number of the municipality"),
+        widget=with_options(TextArea, rows=8),
+        fieldset=_("General")
+    )
     homepage_images = TextAreaField(
         label=_("Homepage Images"),
         description=_(
             "Up to six URLs pointing to images for the tiles on the homepage."
         ),
-        widget=with_options(TextArea, rows=6)
-    )
-    contact = TextAreaField(
-        label=_("Contact"),
-        description=_("The address and phone number of the municipality"),
-        widget=with_options(TextArea, rows=8)
+        widget=with_options(TextArea, rows=6),
+        fieldset=_("Homepage")
     )
     opening_hours = TextAreaField(
         label=_("Opening Hours"),
         description=_("The opening hours of the municipality"),
-        widget=with_options(TextArea, rows=8)
+        widget=with_options(TextArea, rows=8),
+        fieldset=_("Homepage")
+    )
+    online_counter_label = StringField(
+        label=_("Online Counter Label"),
+        description=_("Forms and applications"),
+        fieldset=_("Homepage")
+    )
+    reservations_label = StringField(
+        label=_("Reservations Label"),
+        description=_("Daypasses and rooms"),
+        fieldset=_("Homepage")
+    )
+    sbb_daypass_label = StringField(
+        label=_("SBB Daypass Label"),
+        description=_("Generalabonnement for Towns"),
+        fieldset=_("Homepage")
     )
     analytics_code = TextAreaField(
         label=_("Analytics Code"),
         description=_("JavaScript for web statistics support"),
-        widget=with_options(TextArea, rows=10)
+        widget=with_options(TextArea, rows=10),
+        fieldset=_("Advanced")
     )
 
     # the footer height is determined by javascript, see town.scss and

@@ -29,7 +29,10 @@ def handle_settings(self, request, form):
                 'opening_hours_html': linkify(
                     form.opening_hours.data).replace('\n', '<br>'),
                 'reply_to': form.reply_to.data,
-                'analytics_code': form.analytics_code.data
+                'analytics_code': form.analytics_code.data,
+                'online_counter_label': form.online_counter_label.data,
+                'reservations_label': form.reservations_label.data,
+                'sbb_daypass_label': form.sbb_daypass_label.data,
             }
 
         request.success(_("Your changes were saved"))
@@ -41,6 +44,9 @@ def handle_settings(self, request, form):
         form.opening_hours.data = self.meta.get('opening_hours')
         form.reply_to.data = self.meta.get('reply_to')
         form.analytics_code.data = self.meta.get('analytics_code')
+        form.online_counter_label.data = self.meta.get('online_counter_label')
+        form.reservations_label.data = self.meta.get('reservations_label')
+        form.sbb_daypass_label.data = self.meta.get('sbb_daypass_label')
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [

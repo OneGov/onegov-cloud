@@ -4,22 +4,26 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Improve print styles.
+- Adds the ability to override the default labels for the online counter,
+  the reservations and the sbb daypass on the homepage.
+  [href]
+
+- Improves print styles.
   [msom]
 
-- Add image captions.
+- Adds image captions.
   [msom]
 
-- Improve event list for mobiles.
+- Improves event list for mobiles.
   [msom]
 
-- Add ticket reference to event mails.
+- Adds ticket reference to event mails.
   [msom]
 
-- Hide "open in new tab" and "text orientation" in image edit dialog.
+- Hides "open in new tab" and "text orientation" in image edit dialog.
   [msom]
 
-- Fix generation of faulty empty tags in mark_images.
+- Fixes generation of faulty empty tags in mark_images.
   [msom]
 
 0.7.1 (2015-10-26)

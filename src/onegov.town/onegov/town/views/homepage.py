@@ -53,12 +53,14 @@ def view_town(self, request):
         Link(
             text=_("Online Counter"),
             url=request.link(FormCollection(session)),
-            subtitle=_("Forms and applications")
+            subtitle=self.meta.get('online_counter_label')
+            or _("Forms and applications")
         ),
         Link(
             text=_("Reservations"),
             url=request.link(ResourceCollection(libres_context)),
-            subtitle=_("Daypasses and rooms")
+            subtitle=self.meta.get('reservations_label')
+            or _("Daypasses and rooms")
         ),
     ]
 
@@ -71,7 +73,8 @@ def view_town(self, request):
             Link(
                 text=_("SBB Daypass"),
                 url=request.link(sbb),
-                subtitle=_("Generalabonnement for Towns")
+                subtitle=self.meta.get('sbb_daypass_label')
+                or _("Generalabonnement for Towns")
             )
         )
 
