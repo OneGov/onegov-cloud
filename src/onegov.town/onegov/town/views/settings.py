@@ -25,9 +25,11 @@ def handle_settings(self, request, form):
                 'contact': form.contact.data,
                 'contact_html': linkify(
                     form.contact.data).replace('\n', '<br>'),
+                'contact_url': form.contact_url.data,
                 'opening_hours': form.opening_hours.data,
                 'opening_hours_html': linkify(
                     form.opening_hours.data).replace('\n', '<br>'),
+                'opening_hours_url': form.opening_hours_url.data,
                 'reply_to': form.reply_to.data,
                 'facebook_url': form.facebook_url.data,
                 'twitter_url': form.twitter_url.data,
@@ -43,7 +45,9 @@ def handle_settings(self, request, form):
         form.logo_url.data = self.logo_url
         form.theme_options = self.theme_options
         form.contact.data = self.meta.get('contact')
+        form.contact_url.data = self.meta.get('contact_url')
         form.opening_hours.data = self.meta.get('opening_hours')
+        form.opening_hours_url.data = self.meta.get('opening_hours_url')
         form.reply_to.data = self.meta.get('reply_to')
         form.facebook_url.data = self.meta.get('facebook_url')
         form.twitter_url.data = self.meta.get('twitter_url')

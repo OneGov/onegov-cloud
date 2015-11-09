@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-09 14:02+0100\n"
+"POT-Creation-Date: 2015-11-09 14:53+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -476,11 +476,23 @@ msgstr "Kontakt"
 msgid "The address and phone number of the municipality"
 msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
+msgid "Contact Page"
+msgstr "Kontakt Seite"
+
+msgid "URL pointing to a contact page"
+msgstr "Link zur Kontakt Seite"
+
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
+
+msgid "Opening Hours Page"
+msgstr "Öffnungszeiten Seite"
+
+msgid "URL pointing to an opening hours page"
+msgstr "Link zur Öffnungszeiten Seite"
 
 msgid "Facebook"
 msgstr "Facebook"
@@ -750,6 +762,9 @@ msgstr "Suche"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "more..."
+msgstr "mehr..."
 
 msgid "Social Media"
 msgstr "Soziale Medien"

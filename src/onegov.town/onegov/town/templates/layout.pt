@@ -120,19 +120,23 @@
       <div class="push"></div>
     </div>
     <footer class="row footer" tal:define="contact layout.town.meta.contact_html|nothing;
+                                           contact_url layout.town.meta.contact_url|nothing;
                                            opening_hours layout.town.meta.opening_hours_html|nothing;
+                                           opening_hours_url layout.town.meta.opening_hours_url|nothing;
                                            facebook layout.town.meta.facebook_url|nothing;
                                            twitter layout.town.meta.twitter_url|nothing;">
       <div class="small-12 columns">
 
-        <div class="row footer-columns" tal:condition="contact|opening_hours|facebook|twitter">
+        <div class="row footer-columns" tal:condition="contact|contact_url|opening_hours|opening_hours_url|facebook|twitter">
           <div class="small-12 medium-3 columns">
-            <h2 i18n:translate="" tal:condition="contact">Contact</h2>
+            <h2 i18n:translate="" tal:condition="contact|contact_url">Contact</h2>
             <div tal:content="structure layout.town.meta.contact_html" />
+            <a i18n:translate="" tal:condition="contact_url" tal:attributes="href contact_url">more...</a>
           </div>
           <div class="small-12 medium-6 columns">
-            <h2 i18n:translate="" tal:condition="opening_hours">Opening Hours</h2>
+            <h2 i18n:translate="" tal:condition="opening_hours|opening_hours_url">Opening Hours</h2>
             <div tal:content="structure layout.town.meta.opening_hours_html" />
+            <a i18n:translate="" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more...</a>
           </div>
           <div class="small-12 medium-3 columns">
             <h2 i18n:translate="" tal:condition="facebook|twitter">Social Media</h2>

@@ -26,10 +26,13 @@ Unreleased
 - Fixes generation of faulty empty tags in mark_images.
   [msom]
 
-- Sort uploaded files alphabetically.
+- Sorts uploaded files alphabetically.
   [msom]
 
-- Add social media links.
+- Adds social media links.
+  [msom]
+
+- Adds links to contact page and opening hours page.
   [msom]
 
 0.7.1 (2015-10-26)

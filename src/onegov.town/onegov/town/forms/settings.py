@@ -35,10 +35,20 @@ class SettingsForm(Form):
         widget=with_options(TextArea, rows=8),
         fieldset=_("General")
     )
+    contact_url = StringField(
+        label=_("Contact Page"),
+        description=_("URL pointing to a contact page"),
+        fieldset=_("General")
+    )
     opening_hours = TextAreaField(
         label=_("Opening Hours"),
         description=_("The opening hours of the municipality"),
         widget=with_options(TextArea, rows=8),
+        fieldset=_("General")
+    )
+    opening_hours_url = StringField(
+        label=_("Opening Hours Page"),
+        description=_("URL pointing to an opening hours page"),
         fieldset=_("General")
     )
     facebook_url = StringField(
