@@ -119,9 +119,13 @@
       </div>
       <div class="push"></div>
     </div>
-    <footer class="row footer" tal:define="contact layout.town.meta.contact_html|nothing; opening_hours layout.town.meta.opening_hours_html|nothing">
+    <footer class="row footer" tal:define="contact layout.town.meta.contact_html|nothing;
+                                           opening_hours layout.town.meta.opening_hours_html|nothing;
+                                           facebook layout.town.meta.facebook_url|nothing;
+                                           twitter layout.town.meta.twitter_url|nothing;">
       <div class="small-12 columns">
-        <div class="row footer-columns" tal:condition="contact|opening_hours">
+
+        <div class="row footer-columns" tal:condition="contact|opening_hours|facebook|twitter">
           <div class="small-12 medium-3 columns">
             <h2 i18n:translate="" tal:condition="contact">Contact</h2>
             <div tal:content="structure layout.town.meta.contact_html" />
@@ -130,7 +134,11 @@
             <h2 i18n:translate="" tal:condition="opening_hours">Opening Hours</h2>
             <div tal:content="structure layout.town.meta.opening_hours_html" />
           </div>
-          <div class="small-12 medium-3 columns"></div>
+          <div class="small-12 medium-3 columns">
+            <h2 i18n:translate="" tal:condition="facebook|twitter">Social Media</h2>
+            <a tal:condition="facebook" tal:attributes="href facebook"><i class="fa fa-facebook-official"></i> Facebook</a><br>
+            <a tal:condition="twitter" tal:attributes="href twitter"><i class="fa fa-twitter"></i> Twitter</a>
+          </div>
         </div>
         <div class="row footer-links">
           <div class="small-12 columns">

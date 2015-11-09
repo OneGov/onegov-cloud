@@ -29,6 +29,9 @@ Unreleased
 - Sort uploaded files alphabetically.
   [msom]
 
+- Add social media links.
+  [msom]
+
 0.7.1 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -41,6 +41,16 @@ class SettingsForm(Form):
         widget=with_options(TextArea, rows=8),
         fieldset=_("General")
     )
+    facebook_url = StringField(
+        label=_("Facebook"),
+        description=_("URL pointing to the facebook site"),
+        fieldset=_("General")
+    )
+    twitter_url = StringField(
+        label=_("Twitter"),
+        description=_("URL pointing to the twitter site"),
+        fieldset=_("General")
+    )
     homepage_images = TextAreaField(
         label=_("Homepage Images"),
         description=_(

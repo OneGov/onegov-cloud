@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-06 14:56+0100\n"
+"POT-Creation-Date: 2015-11-09 14:02+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -476,26 +476,47 @@ msgstr "Kontakt"
 msgid "The address and phone number of the municipality"
 msgstr "Die Adresse, Telefonnummer und E-Mail Adresse der Gemeindeverwaltung"
 
-msgid "Homepage Images"
-msgstr "Bilder auf der Startseite"
-
-msgid "Up to six URLs pointing to images for the tiles on the homepage."
-msgstr "Bis zu sechs Links zu Bildern für die Kacheln auf der Startseite"
-
 msgid "Opening Hours"
 msgstr "Öffnungszeiten"
 
 msgid "The opening hours of the municipality"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
 
+msgid "Facebook"
+msgstr "Facebook"
+
+msgid "URL pointing to the facebook site"
+msgstr "URL zu Facebook"
+
+msgid "Twitter"
+msgstr "Twitter"
+
+msgid "URL pointing to the twitter site"
+msgstr "URL zu Twitter"
+
+msgid "Homepage Images"
+msgstr "Bilder auf der Startseite"
+
+msgid "Up to six URLs pointing to images for the tiles on the homepage."
+msgstr "Bis zu sechs Links zu Bildern für die Kacheln auf der Startseite"
+
 msgid "Online Counter Label"
 msgstr "Online Schalter Beschreibung"
+
+msgid "Forms and applications"
+msgstr "Formulare und Gesuche"
 
 msgid "Reservations Label"
 msgstr "Reservations Beschreibung"
 
+msgid "Daypasses and rooms"
+msgstr "Tageskarten und Räume"
+
 msgid "SBB Daypass Label"
 msgstr "SBB Tageskarte Beschreibung"
+
+msgid "Generalabonnement for Towns"
+msgstr "Generalabonnement Gemeinde"
 
 msgid "Analytics Code"
 msgstr "Analytics Code"
@@ -729,6 +750,9 @@ msgstr "Suche"
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "Social Media"
+msgstr ""
 
 msgid "Forgot your password?"
 msgstr "Haben Sie Ihr Passwort vergessen?"
@@ -1045,17 +1069,8 @@ msgstr "Online-Schalter"
 msgid "All events"
 msgstr "Alle Veranstaltungen"
 
-msgid "Forms and applications"
-msgstr "Formulare und Gesuche"
-
-msgid "Daypasses and rooms"
-msgstr "Tageskarten und Räume"
-
 msgid "SBB Daypass"
 msgstr "SBB Tageskarte"
-
-msgid "Generalabonnement for Towns"
-msgstr "Generalabonnement Gemeinde"
 
 msgid "All contacts"
 msgstr "Alle Kontakte"

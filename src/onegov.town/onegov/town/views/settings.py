@@ -29,6 +29,8 @@ def handle_settings(self, request, form):
                 'opening_hours_html': linkify(
                     form.opening_hours.data).replace('\n', '<br>'),
                 'reply_to': form.reply_to.data,
+                'facebook_url': form.facebook_url.data,
+                'twitter_url': form.twitter_url.data,
                 'analytics_code': form.analytics_code.data,
                 'online_counter_label': form.online_counter_label.data,
                 'reservations_label': form.reservations_label.data,
@@ -43,6 +45,8 @@ def handle_settings(self, request, form):
         form.contact.data = self.meta.get('contact')
         form.opening_hours.data = self.meta.get('opening_hours')
         form.reply_to.data = self.meta.get('reply_to')
+        form.facebook_url.data = self.meta.get('facebook_url')
+        form.twitter_url.data = self.meta.get('twitter_url')
         form.analytics_code.data = self.meta.get('analytics_code')
         form.online_counter_label.data = self.meta.get('online_counter_label')
         form.reservations_label.data = self.meta.get('reservations_label')
