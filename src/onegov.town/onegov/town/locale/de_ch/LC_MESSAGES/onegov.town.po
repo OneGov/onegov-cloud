@@ -752,7 +752,7 @@ msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
 
 msgid "Social Media"
-msgstr ""
+msgstr "Soziale Medien"
 
 msgid "Forgot your password?"
 msgstr "Haben Sie Ihr Passwort vergessen?"
