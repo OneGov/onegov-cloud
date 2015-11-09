@@ -1,11 +1,39 @@
 import os
 
 from datetime import datetime, date
+from io import BytesIO
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path, rchop
 from onegov.testing import utils
-from onegov.town.models import Clipboard, ImageCollection, SiteCollection
+from onegov.town.models import (
+    Clipboard,
+    FileCollection,
+    ImageCollection,
+    SiteCollection
+)
 from unittest.mock import Mock, patch
+
+
+def test_file_collection(town_app):
+
+    collection = FileCollection(town_app)
+    assert list(collection.files) == []
+    assert collection.get_file_by_filename('b.txt') is None
+
+    collection.store_file(BytesIO(b'test'), 'b.txt')
+    assert len(list(collection.files)) == 1
+    assert collection.get_file_by_filename('b.txt') is not None
+
+    collection.store_file(BytesIO(b'test'), 'a.txt')
+    assert len(list(collection.files)) == 2
+    assert collection.get_file_by_filename('a.txt') is not None
+    assert [f.filename for f in collection.files] == ['a.txt', 'b.txt']
+
+    collection.delete_file_by_filename('a.txt')
+    collection.delete_file_by_filename('b.txt')
+    assert len(list(collection.files)) == 0
+    assert collection.get_file_by_filename('a.txt') is None
+    assert collection.get_file_by_filename('b.txt') is None
 
 
 def test_image_collection(town_app):

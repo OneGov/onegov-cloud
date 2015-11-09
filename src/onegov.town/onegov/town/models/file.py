@@ -5,6 +5,7 @@ import magic
 
 from onegov.core.filestorage import FilestorageFile
 from webob.exc import HTTPUnsupportedMediaType
+from unidecode import unidecode
 
 
 class FileCollection(object):
@@ -36,6 +37,15 @@ class FileCollection(object):
         self.path_prefix = 'files/'
         self.file_storage = app.filestorage.makeopendir('files')
 
+    def sortkey(self, item):
+        try:
+            filename = base64.urlsafe_b64decode(str(item[0].split('-')[0]))
+            filename = filename.decode("utf-8")
+        except ValueError:
+            filename = str(item[0])
+
+        return unidecode(filename.strip().upper())
+
     @property
     def files(self):
         """ Returns the :class:`~onegov.town.model.File` instances in this
@@ -43,7 +53,7 @@ class FileCollection(object):
 
         """
         files = self.file_storage.ilistdirinfo(files_only=True)
-        files = sorted(files, key=lambda i: i[1]['modified_time'])
+        files = sorted(files, key=self.sortkey)
 
         for filename, info in files:
             yield File(filename, info)

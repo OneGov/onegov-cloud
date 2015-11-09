@@ -26,6 +26,9 @@ Unreleased
 - Fixes generation of faulty empty tags in mark_images.
   [msom]
 
+- Sort uploaded files alphabetically.
+  [msom]
+
 0.7.1 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 
