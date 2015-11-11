@@ -16,6 +16,9 @@ from onegov.town.models import Town
 def handle_settings(self, request, form):
     """ Handles the GET and POST login requests. """
 
+    request.include('common')
+    request.include('check_contrast')
+
     if form.submitted(request):
         with request.app.update_town() as town:
             town.name = form.name.data

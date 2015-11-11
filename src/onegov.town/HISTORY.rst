@@ -35,6 +35,9 @@ Unreleased
 - Adds links to contact page and opening hours page.
   [msom]
 
+- Visualize contrast ration of primary color with meter.
+  [msom]
+
 0.7.1 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

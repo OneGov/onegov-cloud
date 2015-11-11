@@ -256,6 +256,12 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             output='bundles/check_password.bundle.js'
         )
 
+        check_contrast = Bundle(
+            'js/check_contrast.js',
+            filters=jsminifier,
+            output='bundles/check_contrast.bundle.js'
+        )
+
         events = Bundle(
             'js/url.js',
             'js/events.js',
@@ -279,6 +285,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'editor': editor,
             'code_editor': code_editor,
             'check_password': check_password,
+            'check_contrast': check_contrast,
             'fullcalendar': fullcalendar,
             'fullcalendar_css': fullcalendar_css,
             'events': events,
