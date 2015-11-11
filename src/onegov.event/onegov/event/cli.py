@@ -18,6 +18,7 @@ from dateutil.parser import parse
 from lxml import objectify
 from onegov.core.orm import Base, SessionManager
 from onegov.event import EventCollection
+from onegov.event.utils import export_csv, import_csv
 from onegov.server.config import Config
 
 
@@ -228,3 +229,59 @@ def guidle_import(ctx, town, url):
                 event.publish()
 
             transaction.commit()
+
+
+@cli.command(name='csv-export')
+@click.argument('town')
+@click.pass_context
+def csv_export(ctx, town):
+    """ Export events to a given csv. """
+
+    for appcfg in ctx.obj.appconfigs:
+
+        dsn = appcfg.configuration.get('dsn')
+        if not dsn:
+            continue
+
+        schema = '{}-{}'.format(appcfg.namespace, town)
+        print("Processing {}".format(schema))
+
+        mgr = SessionManager(dsn, base=Base)
+        mgr.set_current_schema(schema)
+
+        with open('{}.csv'.format(schema), 'w') as csvfile:
+            count = export_csv(EventCollection(mgr.session()), csvfile)
+        print("{} events exported".format(count))
+
+
+@cli.command(name='csv-import')
+@click.argument('town')
+@click.argument('filename')
+@click.pass_context
+def csv_import(ctx, town, filename):
+    """ Imports events from a given csv. """
+
+    if ctx.obj.namespace == '*':
+        click.confirm(
+            "Are you sure that you want to update all namespaces?",
+            default=False, abort=True
+        )
+
+    for appcfg in ctx.obj.appconfigs:
+
+        dsn = appcfg.configuration.get('dsn')
+        if not dsn:
+            continue
+
+        schema = '{}-{}'.format(appcfg.namespace, town)
+        print("Processing {}".format(schema))
+
+        mgr = SessionManager(dsn, base=Base)
+        mgr.set_current_schema(schema)
+
+        with open(filename) as csvfile:
+            count = import_csv(EventCollection(mgr.session()), csvfile)
+
+        print("{} events imported".format(count))
+
+        transaction.commit()
