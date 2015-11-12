@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.2.0 (2015-11-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds CSV import and export.
   [msom]
