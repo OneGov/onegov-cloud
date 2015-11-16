@@ -4,7 +4,7 @@ import humanize
 from mimetypes import types_map
 from onegov.form import _
 from onegov.form.core import with_options
-from onegov.form.errors import InvalidFormSyntax
+from onegov.form.errors import InvalidFormSyntax, DuplicateLabelError
 from stdnum.exceptions import ValidationError as StdnumValidationError
 from wtforms import ValidationError
 
@@ -111,6 +111,7 @@ class ValidFormDefinition(object):
     message = _("The form could not be parsed.")
     email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
     syntax = _("The syntax on line {line} is not valid.")
+    duplicate = _("The field '{label}' exists more than once.")
 
     def __init__(self, require_email_field=True):
         self.require_email_field = require_email_field
@@ -128,6 +129,10 @@ class ValidFormDefinition(object):
                 )
                 raise ValidationError(
                     field.gettext(self.syntax).format(line=e.line)
+                )
+            except DuplicateLabelError as e:
+                raise ValidationError(
+                    field.gettext(self.duplicate).format(label=e.label)
                 )
             except AttributeError:
                 raise ValidationError(field.gettext(self.message))

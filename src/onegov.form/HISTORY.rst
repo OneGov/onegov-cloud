@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an error message for duplicate labels.
+  [href]
+
 - Fixes fieldsets only showing up once on static forms.
   [href]
 
