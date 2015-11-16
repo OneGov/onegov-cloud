@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an error message if the form indentation is wrong.
+  [href]
+
 - Adds an error message for duplicate labels.
   [href]
 

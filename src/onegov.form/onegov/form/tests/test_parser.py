@@ -387,3 +387,11 @@ def test_invalid_syntax():
             "Last Name * __"
         )))
     assert e.value.line == 4
+
+    with pytest.raises(errors.InvalidFormSyntax) as e:
+        parse_form('\n'.join((
+            "# Fields",
+            "",
+            "    [x] What",
+        )))
+    assert e.value.line == 3

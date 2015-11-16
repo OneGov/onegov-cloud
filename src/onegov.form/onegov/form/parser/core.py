@@ -627,30 +627,39 @@ def translate_to_yaml(text):
     """
 
     lines = ((ix, l) for ix, l in prepare(text))
+    expect_nested = False
 
     for ix, line in lines:
+
+        indent = ' ' * (4 + (len(line) - len(line.lstrip())))
 
         # the top level are the fieldsets
         if match(elements.fieldset_title, line):
             yield '- "{}":'.format(line.lstrip('# ').rstrip())
+            expect_nested = False
             continue
 
         # fields are nested lists of dictionaries
         parse_result = try_parse(elements.single_line_fields, line)
         if parse_result is not None:
             yield '{indent}- "{identifier}": !{type} "{definition}"'.format(
-                indent=' ' * (4 + (len(line) - len(line.lstrip()))),
+                indent=indent,
                 type=parse_result.type,
                 identifier=line.split('=')[0].strip(),
                 definition=line.split('=')[1].strip()
             )
+            expect_nested = indent and True or False
             continue
 
         # checkboxes/radios come without identifier
         parse_result = try_parse(elements.boxes, line)
         if parse_result is not None:
+
+            if not expect_nested:
+                raise errors.InvalidFormSyntax(line=ix + 1)
+
             yield '{indent}- !{type} "{definition}":'.format(
-                indent=' ' * (4 + (len(line) - len(line.lstrip()))),
+                indent=indent,
                 type=parse_result.type,
                 definition=line.strip()
             )
@@ -664,9 +673,11 @@ def translate_to_yaml(text):
                 raise errors.InvalidFormSyntax(line=ix + 1)
 
             yield '{indent}- "{identifier}":'.format(
-                indent=' ' * (4 + (len(line) - len(line.lstrip()))),
+                indent=indent,
                 identifier=line.strip()
             )
+
+            expect_nested = True
             continue
 
         raise errors.InvalidFormSyntax(line=ix + 1)
