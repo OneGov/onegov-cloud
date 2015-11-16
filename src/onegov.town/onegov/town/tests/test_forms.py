@@ -162,6 +162,12 @@ def test_generate_dates():
             (datetime(2015, 1, 7), datetime(2015, 1, 7)),
     ]
 
+    assert helper.generate_dates(date(2016, 3, 26), date(2016, 3, 28)) == [
+        (datetime(2016, 3, 26), datetime(2016, 3, 26)),
+        (datetime(2016, 3, 27), datetime(2016, 3, 27)),
+        (datetime(2016, 3, 28), datetime(2016, 3, 28)),
+    ]
+
 
 def test_generate_datetimes():
     helper = AllocationFormHelpers()
