@@ -184,6 +184,18 @@
     </tal:block>
 </metal:hidden_page_hint>
 
+<metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.town">
+    <tal:block condition="item.text and not item.lead and request.is_logged_in|nothing">
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="panel callout">
+                    <p i18n:translate>This site contains no lead.</p>
+                </div>
+            </div>
+        </div>
+    </tal:block>
+</metal:empty_lead_hint>
+
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town">
     <div class="row">
         <tal:block condition="not: people or contact">

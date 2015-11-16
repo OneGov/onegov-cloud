@@ -35,7 +35,10 @@ Unreleased
 - Adds links to contact page and opening hours page.
   [msom]
 
-- Visualize contrast ration of primary color with meter.
+- Visualizes the contrast ratio of the primary color with a meter.
+  [msom]
+
+- Shows a warning if a page contains no lead.
   [msom]
 
 0.7.1 (2015-10-26)
