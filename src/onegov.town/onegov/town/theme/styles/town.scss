@@ -1568,6 +1568,7 @@ tr.ticket:hover {
     @include smooth-edges;
 
     margin-top: 2em;
+    padding: 1rem 1rem .5rem;
 
     h2 {
         color: $primary-color;
