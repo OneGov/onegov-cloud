@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.8.2 (2015-11-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an error message if the form indentation is wrong.
   [href]
 
