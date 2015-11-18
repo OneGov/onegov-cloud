@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.8.0 (2015-11-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to override the default labels for the online counter,
   the reservations and the sbb daypass on the homepage.
   [href]
