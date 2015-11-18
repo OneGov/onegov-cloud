@@ -1368,6 +1368,10 @@ def test_reserve_allocation(town_app):
     assert 'RSV-' in ticket.text
     assert len(town_app.smtp.outbox) == 1
 
+    # make sure the resulting reservation has no session_id set
+    ids = [r.session_id for r in scheduler.managed_reservations()]
+    assert not any(ids)
+
     # try to create another reservation the same time
     reserve = client.get(reserve_url)
     reserve.form['e_mail'] = 'info@example.org'

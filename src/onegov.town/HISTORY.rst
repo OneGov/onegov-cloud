@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes a critical issue which could result in lost reservations.
+  [href]
+
 0.8.0 (2015-11-18)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -144,8 +144,10 @@ def finalize_reservation(self, request):
     collection = ResourceCollection(request.app.libres_context)
     resource = collection.by_id(self.resource)
     scheduler = resource.get_scheduler(request.app.libres_context)
+    session_id = get_libres_session_id(request)
 
     try:
+        scheduler.queries.confirm_reservations_for_session(session_id)
         scheduler.approve_reservations(self.token)
     except LibresError as e:
         utils.show_libres_error(e, request)
