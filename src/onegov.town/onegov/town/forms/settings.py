@@ -1,6 +1,6 @@
 from onegov.form import Form, with_options
 from wtforms import HiddenField, StringField, TextAreaField, validators
-from wtforms.fields.html5 import EmailField
+from wtforms.fields.html5 import EmailField, URLField
 from wtforms.widgets import TextArea
 from wtforms_components import ColorField
 from onegov.town import _
@@ -35,7 +35,7 @@ class SettingsForm(Form):
         widget=with_options(TextArea, rows=8),
         fieldset=_("General")
     )
-    contact_url = StringField(
+    contact_url = URLField(
         label=_("Contact Page"),
         description=_("URL pointing to a contact page"),
         fieldset=_("General")
@@ -46,17 +46,17 @@ class SettingsForm(Form):
         widget=with_options(TextArea, rows=8),
         fieldset=_("General")
     )
-    opening_hours_url = StringField(
+    opening_hours_url = URLField(
         label=_("Opening Hours Page"),
         description=_("URL pointing to an opening hours page"),
         fieldset=_("General")
     )
-    facebook_url = StringField(
+    facebook_url = URLField(
         label=_("Facebook"),
         description=_("URL pointing to the facebook site"),
         fieldset=_("General")
     )
-    twitter_url = StringField(
+    twitter_url = URLField(
         label=_("Twitter"),
         description=_("URL pointing to the twitter site"),
         fieldset=_("General")

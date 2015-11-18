@@ -127,21 +127,23 @@
                                            twitter layout.town.meta.twitter_url|nothing;">
       <div class="small-12 columns">
 
-        <div class="row footer-columns" tal:condition="contact|contact_url|opening_hours|opening_hours_url|facebook|twitter">
+        <div class="row footer-columns" tal:condition="contact or contact_url or opening_hours or opening_hours_url or facebook or twitter">
           <div class="small-12 medium-3 columns">
-            <h2 i18n:translate="" tal:condition="contact|contact_url">Contact</h2>
+            <h2 i18n:translate="" tal:condition="contact or contact_url">Contact</h2>
             <div tal:content="structure layout.town.meta.contact_html" />
-            <a i18n:translate="" tal:condition="contact_url" tal:attributes="href contact_url">more...</a>
+            <a i18n:translate="" tal:condition="contact_url" tal:attributes="href contact_url">more…</a>
           </div>
           <div class="small-12 medium-6 columns">
-            <h2 i18n:translate="" tal:condition="opening_hours|opening_hours_url">Opening Hours</h2>
+            <h2 i18n:translate="" tal:condition="opening_hours or opening_hours_url">Opening Hours</h2>
             <div tal:content="structure layout.town.meta.opening_hours_html" />
-            <a i18n:translate="" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more...</a>
+            <a i18n:translate="" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more…</a>
           </div>
           <div class="small-12 medium-3 columns">
-            <h2 i18n:translate="" tal:condition="facebook|twitter">Social Media</h2>
-            <a tal:condition="facebook" tal:attributes="href facebook"><i class="fa fa-facebook-official"></i> Facebook</a><br>
-            <a tal:condition="twitter" tal:attributes="href twitter"><i class="fa fa-twitter"></i> Twitter</a>
+            <h2 i18n:translate="" tal:condition="facebook or twitter">Social Media</h2>
+            <ul class="social-media-links" tal:condition="facebook or twitter">
+                <li tal:condition="facebook"><a tal:attributes="href facebook"><i class="fa fa-facebook-official"></i> Facebook</a></li>
+                <li tal:condition="twitter"><a tal:attributes="href twitter"><i class="fa fa-twitter"></i> Twitter</a></li>
+            </ul>
           </div>
         </div>
         <div class="row footer-links">
