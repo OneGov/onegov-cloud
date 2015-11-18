@@ -40,9 +40,10 @@ Coverage
 
 Latests PyPI Release
 --------------------
-.. image:: https://pypip.in/v/onegov.town/badge.png
-  :target: https://crate.io/packages/onegov.town
-  :alt: Latest PyPI Release
+
+.. image:: https://badge.fury.io/py/onegov.town.svg
+    :target: https://badge.fury.io/py/onegov.town
+    :alt: Latest PyPI Release
 
 License
 -------
