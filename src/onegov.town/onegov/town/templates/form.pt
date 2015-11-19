@@ -20,9 +20,12 @@
             }[econtext.get('form_width', 'normal')]
         ?>
 
-        <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" tal:define="item definition|nothing" tal:condition="item" />
+        <tal:block tal:define="item definition|nothing" tal:condition="item">
+            <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" />
+            <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
+        </tal:block>
 
-        <tal:block metal:use-macro="layout.macros.page_content" 
+        <tal:block metal:use-macro="layout.macros.page_content"
                    tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing">
             <tal:block metal:fill-slot="after-text">
                 <div class="row">

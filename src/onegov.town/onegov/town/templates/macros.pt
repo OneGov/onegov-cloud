@@ -185,7 +185,7 @@
 </metal:hidden_page_hint>
 
 <metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.town">
-    <tal:block condition="item.text and not item.lead and request.is_logged_in|nothing">
+    <tal:block condition="not item.lead and request.is_logged_in|nothing">
         <div class="row">
             <div class="small-12 columns">
                 <div class="panel callout">

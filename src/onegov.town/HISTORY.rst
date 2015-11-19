@@ -7,6 +7,9 @@ Unreleased
 - Hides hidden resources in the overview.
   [href]
 
+- Shows missing lead info on resources and forms in addition to pages.
+  [href]
+
 0.8.1 (2015-11-18)
 ~~~~~~~~~~~~~~~~~~~
 
