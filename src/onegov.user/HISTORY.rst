@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds 2FA support with Yubikey as the first possible option.
+  [href]
+
 0.2.1 (2015-10-15)
 ~~~~~~~~~~~~~~~~~~~
 

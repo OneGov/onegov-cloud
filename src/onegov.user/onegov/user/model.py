@@ -34,6 +34,23 @@ class User(Base, TimestampMixin):
     #:
     data = deferred(Column(JSON, nullable=True))
 
+    #: two-factor authentication schemes are enabled with this property
+    #: if no two-factor auth is used, the value is NULL, if one *is* used,
+    #: there should be a dictionary with the type of the two-factor
+    #: authentication as well as custom values required by the two-factor
+    #: implementation.
+    #:
+    #: e.g.::
+    #:
+    #:      {
+    #:          'type': 'yubikey',
+    #:          'data': 'ccccccbcgujh'
+    #:      }
+    #:
+    #: Note that 'data' could also be a nested dictionary!
+    #:
+    second_factor = Column(JSON, nullable=True)
+
     @hybrid_property
     def password(self):
         """ An alias for :attr:`password_hash`. """

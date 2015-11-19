@@ -2,6 +2,39 @@ import morepath
 from onegov.core.utils import relative_url
 from onegov.user import log
 from onegov.user.collection import UserCollection
+from yubico_client import Yubico
+
+
+def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
+    """ Asks the yubico validation servers if the given yubikey OTP is valid.
+
+    :client_id:
+        The yubico API client id.
+
+    :secret_key:
+        The yubico API secret key.
+
+    :expected_yubikey_id:
+        The expected yubikey id. The yubikey id is defined as the first twelve
+        characters of any yubikey value. Each user should have a yubikey
+        associated with it's account. If the yubikey value comes from a
+        different key, the key is invalid.
+
+    :yubikey:
+        The actual yubikey value that should be verified.
+
+    :return: True if yubico confirmed the validity of the key.
+
+    """
+    assert client_id and secret_key and expected_yubikey_id and yubikey
+    assert len(expected_yubikey_id) == 12
+
+    # if the yubikey doesn't start with the expected yubikey id we do not
+    # need to make a roundtrip to the validation server
+    if not yubikey.startswith(expected_yubikey_id):
+        return False
+
+    return Yubico(client_id, secret_key).verify(yubikey)
 
 
 class Auth(object):
@@ -12,7 +45,8 @@ class Auth(object):
 
     identity_class = morepath.Identity
 
-    def __init__(self, session, application_id, to='/'):
+    def __init__(self, session, application_id, to='/',
+                 yubikey_client_id=None, yubikey_secret_key=None):
         assert application_id  # may not be empty!
 
         self.session = session
@@ -23,9 +57,18 @@ class Auth(object):
         # password and being redirected to a phising site.
         self.to = relative_url(to)
 
+        self.yubikey_client_id = yubikey_client_id
+        self.yubikey_secret_key = yubikey_secret_key
+
     @classmethod
     def from_app(cls, app, to='/'):
-        return cls(app.session(), app.application_id, to)
+        return cls(
+            session=app.session(),
+            application_id=app.application_id,
+            yubikey_client_id=getattr(app, 'yubikey_client_id', None),
+            yubikey_secret_key=getattr(app, 'yubikey_secret_key', None),
+            to=to
+        )
 
     @classmethod
     def from_request(cls, request, to='/'):
@@ -35,7 +78,24 @@ class Auth(object):
     def users(self):
         return UserCollection(self.session)
 
-    def login(self, username, password, client='unknown'):
+    def is_valid_second_factor(self, user, second_factor_value):
+        if not user.second_factor:
+            return True
+
+        if not second_factor_value:
+            return False
+
+        if user.second_factor['type'] == 'yubikey':
+            return is_valid_yubikey(
+                client_id=self.yubikey_client_id,
+                secret_key=self.yubikey_secret_key,
+                expected_yubikey_id=user.second_factor['data'],
+                yubikey=second_factor_value
+            )
+        else:
+            raise NotImplementedError
+
+    def login(self, username, password, client='unknown', second_factor=None):
         """ Takes the given username and password and matches them against
         the users collection.
 
@@ -50,9 +110,15 @@ class Auth(object):
 
         user = self.users.by_username_and_password(username, password)
 
-        if user is None:
+        def fail():
             log.info("Failed login by {} ({})".format(client, username))
             return None
+
+        if user is None:
+            return fail()
+
+        if not self.is_valid_second_factor(user, second_factor):
+            return fail()
 
         log.info("Successful login by {} ({})".format(client, username))
 

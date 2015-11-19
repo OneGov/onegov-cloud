@@ -2,8 +2,10 @@ import morepath
 import transaction
 
 from more.itsdangerous import IdentityPolicy
-from onegov.user import Auth, UserCollection
+from onegov.user import Auth, is_valid_yubikey, UserCollection
 from webtest import TestApp as Client
+from unittest.mock import patch
+from yubico_client import Yubico
 
 
 def test_auth_login(session):
@@ -17,6 +19,94 @@ def test_auth_login(session):
     assert identity.userid == 'AzureDiamond'
     assert identity.role == 'irc-user'
     assert identity.application_id == 'my-app'
+
+
+def test_is_valid_yubikey_otp(session):
+
+    assert not is_valid_yubikey(
+        client_id='abc',
+        secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
+        expected_yubikey_id='ccccccbcgujx',
+        yubikey='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+    )
+
+    with patch.object(Yubico, 'verify') as verify:
+        verify.return_value = True
+
+        assert is_valid_yubikey(
+            client_id='abc',
+            secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE=',
+            expected_yubikey_id='ccccccbcgujh',
+            yubikey='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+        )
+
+
+def test_auth_login_yubikey(session):
+    UserCollection(session).add(
+        username='admin@example.org',
+        password='p@ssw0rd',
+        role='admin',
+        second_factor={
+            'type': 'yubikey',
+            'data': 'ccccccbcgujh'
+        }
+    )
+
+    auth = Auth(
+        session=session,
+        application_id='my-app',
+        yubikey_client_id='abc',
+        yubikey_secret_key='dGhlIHdvcmxkIGlzIGNvbnRyb2xsZWQgYnkgbGl6YXJkcyE='
+    )
+
+    assert not auth.login(username='admin@example.org', password='p@ssw0rd')
+    assert not auth.login(
+        username='admin@example.org',
+        password='p@ssw0rd',
+        second_factor='xxxxxxbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+    )
+
+    with patch.object(Yubico, 'verify') as verify:
+        verify.return_value = False
+
+        assert not auth.login(
+            username='admin@example.org',
+            password='p@ssw0rd',
+            second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+        )
+
+    with patch.object(Yubico, 'verify') as verify:
+        verify.return_value = True
+
+        identity = auth.login(
+            username='admin@example.org',
+            password='p@ssw0rd',
+            second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+        )
+
+    assert identity.userid == 'admin@example.org'
+    assert identity.role == 'admin'
+    assert identity.application_id == 'my-app'
+
+
+def test_auth_login_unnecessary_yubikey(session):
+    UserCollection(session).add(
+        username='admin@example.org',
+        password='p@ssw0rd',
+        role='admin'
+    )
+
+    auth = Auth(
+        session=session,
+        application_id='my-app',
+    )
+
+    # simply ignore the second factor
+    assert auth.login(
+        username='admin@example.org',
+        password='p@ssw0rd',
+        second_factor='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
+    )
 
 
 def test_auth_logging(session, capturelog):

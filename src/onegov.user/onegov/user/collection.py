@@ -20,7 +20,7 @@ class UserCollection(object):
         """ Returns a query using :class:`onegov.user.model.User`. """
         return self.session.query(User)
 
-    def add(self, username, password, role, data=None):
+    def add(self, username, password, role, data=None, second_factor=None):
         """ Add a user to the collection.
 
             :username:
@@ -36,7 +36,13 @@ class UserCollection(object):
         """
         assert username and password and role
 
-        user = User(username=username, password=password, role=role, data=data)
+        user = User(
+            username=username,
+            password=password,
+            role=role,
+            data=data,
+            second_factor=second_factor
+        )
 
         self.session.add(user)
         self.session.flush()

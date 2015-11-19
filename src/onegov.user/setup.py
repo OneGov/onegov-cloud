@@ -35,7 +35,8 @@ setup(
         'click',
         'onegov.core>=0.4.0',
         'onegov.form',
-        'sqlalchemy'
+        'sqlalchemy',
+        'yubico-client'
     ],
     extras_require=dict(
         test=[
