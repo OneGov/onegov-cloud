@@ -7,12 +7,16 @@ class LoginForm(Form):
     """ A generic login form for onegov.user """
 
     username = StringField(
-        label=_("Username/E-Mail Address"),
+        label=_("E-Mail Address"),
         validators=[validators.InputRequired(), validators.Email()]
     )
     password = PasswordField(
         label=_("Password"),
         validators=[validators.InputRequired()]
+    )
+    yubikey = PasswordField(
+        label=_("YubiKey"),
+        description=_("Plug your YubiKey into a USB slot and press it.")
     )
 
     @property
@@ -25,4 +29,5 @@ class LoginForm(Form):
         return {
             'username': self.username.data,
             'password': self.password.data,
+            'second_factor': self.yubikey.data.strip() or None
         }

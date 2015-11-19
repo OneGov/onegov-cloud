@@ -128,7 +128,7 @@ class Auth(object):
             application_id=self.application_id
         )
 
-    def login_to(self, username, password, request):
+    def login_to(self, username, password, request, second_factor=None):
         """ Matches the username and password against the users collection,
         just like :meth:`login`. Unlike said method it returns no identity
         however, instead a redirect response is returned which will remember
@@ -139,7 +139,8 @@ class Auth(object):
 
         """
 
-        identity = self.login(username, password, request.client_addr)
+        identity = self.login(username, password, request.client_addr,
+                              second_factor)
 
         if identity is None:
             return None
