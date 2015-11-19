@@ -46,9 +46,12 @@ def get_resource_form(self, request, type=None):
 @TownApp.html(model=ResourceCollection, template='resources.pt',
               permission=Public)
 def view_resources(self, request):
+    resources = self.query().order_by(Resource.title).all()
+    resources = request.exclude_invisible(resources)
+
     return {
         'title': _("Reservations"),
-        'resources': self.query().order_by(Resource.title).all(),
+        'resources': resources,
         'layout': ResourcesLayout(self, request)
     }
 
