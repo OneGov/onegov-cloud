@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds yubikey_client_id and yubikey_secret_key to configuration.
+  [href]
+
 0.7.5 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

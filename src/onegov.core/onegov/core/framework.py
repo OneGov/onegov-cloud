@@ -326,6 +326,10 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         # you don't want to use the keys given in the example file
         assert self.csrf_secret != 'another-very-secret-key'
 
+    def configure_yubikey(self, **cfg):
+        self.yubikey_client_id = cfg.get('yubikey_client_id', None)
+        self.yubikey_secret_key = cfg.get('yubikey_secret_key', None)
+
     def configure_filestorage(self, **cfg):
 
         if 'filestorage' in cfg:
