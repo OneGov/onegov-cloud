@@ -10,6 +10,12 @@ Unreleased
 - Shows missing lead info on resources and forms in addition to pages.
   [href]
 
+- The user is no longer logged-in right after a password reset.
+
+  This increases security by making sure that this is not a backdoor to
+  circumvent future 2FA implementations.
+  [href]
+
 0.8.1 (2015-11-18)
 ~~~~~~~~~~~~~~~~~~~
 

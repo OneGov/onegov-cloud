@@ -274,7 +274,9 @@ def test_reset_password(town_app):
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
-    assert "Passwort geändert" in reset_page.form.submit().follow().text
+    homepage = reset_page.form.submit().follow().text
+    assert "Passwort geändert" in homepage
+    assert "Login" in homepage  # do not automatically log in the user
 
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'

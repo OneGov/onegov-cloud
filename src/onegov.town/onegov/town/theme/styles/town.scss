@@ -259,6 +259,10 @@ form {
         width: 100%;
     }
 
+    label.error > meter {
+        top: -.55rem;
+    }
+
     meter::-webkit-meter-bar {
         background: $input-border-color !important;
         border: 0;

@@ -1,5 +1,3 @@
-import morepath
-
 from onegov.form import Form
 from onegov.town import _
 from onegov.user import UserCollection
@@ -45,23 +43,30 @@ class PasswordResetForm(Form):
     )
     token = HiddenField()
 
-    def get_identity(self, request):
-        """ Returns the given user by username, token and the new password.
-        If the username is not found or the token invalid, None is returned.
+    def update_password(self, request):
+        """ Updates the password using the form data (if permitted to do so).
 
+        Returns True if successful, False if not successful.
         """
         data = request.load_url_safe_token(self.token.data, max_age=86400)
-        if data and data['username'] == self.email.data:
-            users = UserCollection(request.app.session())
-            user = users.by_username(self.email.data)
-            if user:
-                modified = user.modified.isoformat() if user.modified else ''
-                if modified == data['modified']:
-                    user.password = self.password.data
-                    return morepath.Identity(
-                        userid=user.username,
-                        role=user.role,
-                        application_id=request.app.application_id
-                    )
 
-        return None
+        if not data:
+            return False
+
+        if not data.get('username') == self.email.data:
+            return False
+
+        users = UserCollection(request.app.session())
+        user = users.by_username(self.email.data)
+
+        if not user:
+            return False
+
+        modified = user.modified.isoformat() if user.modified else ''
+
+        if modified != data['modified']:
+            return False
+
+        user.password = self.password.data
+
+        return True
