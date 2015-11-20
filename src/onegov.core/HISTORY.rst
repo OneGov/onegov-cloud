@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a random password generator (for pronouncable passwords).
+  [href]
+
 - Adds yubikey_client_id and yubikey_secret_key to configuration.
   [href]
 

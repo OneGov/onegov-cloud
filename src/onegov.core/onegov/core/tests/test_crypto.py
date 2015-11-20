@@ -1,6 +1,11 @@
 import pytest
 
-from onegov.core.crypto import hash_password, random_token, verify_password
+from onegov.core.crypto import (
+    hash_password,
+    random_token,
+    verify_password,
+    random_password
+)
 
 
 def test_hash_password():
@@ -32,3 +37,8 @@ def test_no_null_bytes():
 
     with pytest.raises(AssertionError):
         assert verify_password("\0", "hash")
+
+
+def test_random_password():
+    assert len(random_password(16)) == 16
+    assert len(random_password(32)) == 32
