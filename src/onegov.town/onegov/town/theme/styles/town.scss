@@ -650,36 +650,67 @@ $paste-link-icon: '\f0ea';
     margin-bottom: 1rem;
     padding: 1rem;
 
+    .dz-message {
+        margin-bottom: 1em;
+    }
+
     .dz-preview {
         float: left;
         margin-right: 1rem;
     }
 
-    .dz-details,
-    .dz-error-mark,
-    .dz-image,
-    .dz-success-mark {
-        margin-top: 1rem;
+    .dz-success-mark,
+    .dz-error-mark {
+        display: none;
+    }
+
+    .dz-progress {
+        display: block;
+        height: 5px;
+        width: 100%;
+
+        > span {
+            background-color: $info-color;
+            display: block;
+            height: 5px;
+        }
+    }
+
+    .dz-success {
+        .dz-progress span {
+            background-color: $success-color;
+        }
+
+        .dz-size::after {
+            content: ' \f00c';
+            font-family: 'FontAwesome';
+        }
+    }
+
+    .dz-error {
+        .dz-progress span {
+            background-color: $alert-color;
+        }
+
+        .dz-size::after {
+            content: ' \f071';
+            font-family: 'FontAwesome';
+        }
+    }
+
+    .dz-error-message {
+        color: $steel;
+        font-size: rem-calc(12);
+        margin: 1em 0;
     }
 
     .dz-filename {
-        display: none;
-    }
-
-    .dz-success .dz-error-mark {
-        display: none;
-    }
-
-    .dz-error .dz-success-mark {
-        display: none;
-    }
-
-    .dz-success-mark * {
-        fill: $success-color;
-    }
-
-    .dz-error-mark * {
-        fill: $alert-color;
+        font-size: rem-calc(12);
+        margin-bottom: .5em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 125px;
     }
 
     > div:last-child {

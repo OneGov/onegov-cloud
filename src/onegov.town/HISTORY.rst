@@ -19,6 +19,9 @@ Unreleased
 - Removes the double scrollbars in the file select dialog.
   [href]
 
+- Improves file/image upload styling, adding a progress bar for uploads.
+  [href]
+
 0.8.1 (2015-11-18)
 ~~~~~~~~~~~~~~~~~~~
 
