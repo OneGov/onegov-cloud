@@ -4,8 +4,11 @@
     </tal:block>
 
     <tal:block metal:fill-slot="content">
-        <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" tal:define="item page"/>
-        <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item page"/>
+        <!--! do not show on the news overview site -->
+        <tal:block condition="not:page.trait == 'news' and children">
+            <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" tal:define="item page"/>
+            <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item page"/>
+        </tal:block>
 
         <tal:block condition="page.trait == 'page'">
 
