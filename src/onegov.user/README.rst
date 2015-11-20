@@ -38,11 +38,12 @@ Coverage
   :target: https://coveralls.io/r/OneGov/onegov.user?branch=master
   :alt: Project Coverage
 
-Latests PyPI Release
---------------------
-.. image:: https://pypip.in/v/onegov.user/badge.png
-  :target: https://crate.io/packages/onegov.user
-  :alt: Latest PyPI Release
+Latest PyPI Release
+-------------------
+
+.. image:: https://badge.fury.io/py/onegov.user.svg
+    :target: https://badge.fury.io/py/onegov.user
+    :alt: Latest PyPI Release
 
 License
 -------
