@@ -40,6 +40,7 @@ import transaction
 
 from getpass import getpass
 from onegov.user import UserCollection
+from onegov.core.crypto import random_password
 from onegov.core.orm import Base, SessionManager
 
 
@@ -61,8 +62,12 @@ def cli(ctx, dsn, schema):
 @click.argument('role')
 @click.argument('username')
 @click.option('--password', help="Password to give the user", default=None)
+@click.option('--yubikey',
+              help="The yubikey code to use for 2fa", default=None)
+@click.option('--no-prompt', help="If no questions should be asked",
+              default=False, is_flag=True)
 @click.pass_context
-def add(ctx, role, username, password):
+def add(ctx, role, username, password, yubikey, no_prompt):
     """ Adds a user with the given name to the database. """
 
     session = ctx.obj['session']
@@ -72,9 +77,30 @@ def add(ctx, role, username, password):
         click.secho("The user {} already exists".format(username), fg='red')
         sys.exit(1)
 
-    password = password or getpass("Enter password: ")
+    if not password:
+        password = random_password(16)
+        print()
+        print("Using the following random password:")
+        click.secho(password, fg='green')
+        print()
 
-    users.add(username, password, role)
+    if not yubikey and not no_prompt:
+        yubikey = getpass(
+            "Optionally plug in your yubi-key and press the button"
+        )
+
+        yubikey = yubikey.strip()
+
+    if yubikey:
+        second_factor = {
+            'type': 'yubikey',
+            'data': yubikey[:12]
+        }
+    else:
+        second_factor = None
+
+    users.add(username, password, role, second_factor=second_factor)
+
     transaction.commit()
 
     click.secho("The user {} was added".format(username), fg='green')
@@ -134,6 +160,33 @@ def change_password(ctx, username, password):
 
     user = users.by_username(username)
     user.password = password
+
+    transaction.commit()
+
+    click.secho("The password for {} was changed".format(username), fg='green')
+
+
+@cli.command(name='change-yubikey')
+@click.argument('username')
+@click.option('--yubikey', help="Yubikey to use", default=None)
+@click.pass_context
+def change_yubikey(ctx, username, yubikey):
+    """ Changes the yubikey of the given username. """
+
+    session = ctx.obj['session']
+    users = UserCollection(session)
+
+    if not users.exists(username):
+        click.secho("The user {} does not exist".format(username), fg='red')
+        sys.exit(1)
+
+    yubikey = (yubikey or getpass("Enter yubikey: ")).strip()[:12]
+
+    user = users.by_username(username)
+    user.second_factor = {
+        'type': 'yubikey',
+        'data': yubikey
+    }
 
     transaction.commit()
 

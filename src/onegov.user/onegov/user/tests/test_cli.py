@@ -9,7 +9,8 @@ def test_cli(postgres_dsn):
         '--dsn', postgres_dsn,
         '--schema', 'test-add-user',
         'add', 'admin', 'admin@example.org',
-        '--password', 'hunter2'
+        '--password', 'hunter2',
+        '--no-prompt',
     ])
 
     assert result.exit_code == 0
@@ -19,7 +20,8 @@ def test_cli(postgres_dsn):
         '--dsn', postgres_dsn,
         '--schema', 'test-add-user',
         'add', 'admin', 'admin@example.org',
-        '--password', 'hunter2'
+        '--password', 'hunter2',
+        '--no-prompt',
     ])
 
     assert result.exit_code == 1
