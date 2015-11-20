@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.9.0 (2015-11-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Hides hidden resources in the overview.
   [href]
 
