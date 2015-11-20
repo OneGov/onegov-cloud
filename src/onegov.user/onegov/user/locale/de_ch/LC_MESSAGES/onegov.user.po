@@ -29,6 +29,3 @@ msgstr "YubiKey"
 
 msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "YubiKey anschliessen und Knopf drücken."
-
-#~ msgid "Username/E-Mail Address"
-#~ msgstr "Benutzername/E-Mail Adresse"
