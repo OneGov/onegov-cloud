@@ -7,6 +7,9 @@ Unreleased
 - Hides 'no lead-in' hint on news overview.
   [href]
 
+- Renders image captions a bit more subtle.
+  [href]
+
 0.9.0 (2015-11-20)
 ~~~~~~~~~~~~~~~~~~~
 
