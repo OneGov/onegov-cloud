@@ -16,6 +16,9 @@ Unreleased
   circumvent future 2FA implementations.
   [href]
 
+- Removes the double scrollbars in the file select dialog.
+  [href]
+
 0.8.1 (2015-11-18)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -101,6 +101,11 @@ footer,
     height: $footer-height; /* .push must be the same height as .footer */
 }
 
+#redactor-modal-box footer {
+    // the redactor also contains a footer which doesn't need a specific height
+    height: auto;
+}
+
 /*
     Rounded corners for panels.
 */
@@ -713,16 +718,11 @@ div#redactor-droparea {
 }
 
 /*
-    the file manager redactor list doesn't need a max height, it has a limited
-    container already, but since we can't switch back to 'auto', we use a
-    really large value
+    make the file manager box a bit larger than it is by default
 */
 #redactor-file-manager-box > ul {
-    max-height: 10000px !important;
-}
-
-#redactor-modal-file-insert {
-    padding-bottom: 0 !important;  // ..we also don't need this extra space
+    margin: 0 !important;
+    max-height: 450px !important;
 }
 
 /*
