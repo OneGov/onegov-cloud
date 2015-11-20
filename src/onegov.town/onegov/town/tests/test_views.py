@@ -215,7 +215,8 @@ def test_login(town_app):
     login_page.form['password'] = 'wrong'
     login_page = login_page.form.submit()
 
-    assert "Unbekannter Benutzername oder falsches Passwort" in login_page.text
+    assert "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."\
+        in login_page.text
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
@@ -286,7 +287,8 @@ def test_reset_password(town_app):
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'
     login_page = login_page.form.submit()
-    assert "Unbekannter Benutzername oder falsches Passwort" in login_page.text
+    assert "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."\
+        in login_page.text
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'new_password'

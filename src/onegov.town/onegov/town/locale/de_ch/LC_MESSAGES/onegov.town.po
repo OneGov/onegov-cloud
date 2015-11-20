@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-18 10:41+0100\n"
+"POT-Creation-Date: 2015-11-20 15:27+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1038,8 +1038,8 @@ msgstr "${town} Login"
 msgid "You have been logged out."
 msgstr "Sie wurden ausgeloggt."
 
-msgid "Wrong username or password."
-msgstr "Unbekannter Benutzername oder falsches Passwort."
+msgid "Wrong e-mail address, password or yubikey."
+msgstr "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."
 
 msgid "You have been logged in."
 msgstr "Sie wurden eingeloggt."
@@ -1226,3 +1226,6 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
+
+#~ msgid "Wrong username or password."
+#~ msgstr "Unbekannter Benutzername oder falsches Passwort."

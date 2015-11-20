@@ -21,7 +21,7 @@ def handle_login(self, request, form):
             request.success(_("You have been logged in."))
             return response
 
-        request.alert(_("Wrong username or password."))
+        request.alert(_("Wrong e-mail address, password or yubikey."))
 
     layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
