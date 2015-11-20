@@ -86,7 +86,7 @@ def add(ctx, role, username, password, yubikey, no_prompt):
 
     if not yubikey and not no_prompt:
         yubikey = getpass(
-            "Optionally plug in your yubi-key and press the button"
+            "Optionally plug in your yubi-key and press the button: "
         )
 
         yubikey = yubikey.strip()
@@ -190,4 +190,4 @@ def change_yubikey(ctx, username, yubikey):
 
     transaction.commit()
 
-    click.secho("The password for {} was changed".format(username), fg='green')
+    click.secho("The yubikey for {} was changed".format(username), fg='green')
