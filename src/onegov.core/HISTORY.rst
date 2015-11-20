@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.8.0 (2015-11-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a random password generator (for pronouncable passwords).
   [href]
