@@ -1417,6 +1417,14 @@ tr.ticket:hover {
 }
 
 /*
+    Reservations Form
+*/
+.reservation-form h2 {
+    font-size: $h3-font-size - $h3-font-reduction;
+    font-weight: bold;
+}
+
+/*
     Fullcalendar Integration
 */
 

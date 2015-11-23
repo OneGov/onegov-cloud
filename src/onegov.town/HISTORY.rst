@@ -13,6 +13,9 @@ Unreleased
 - Improves the legibility of small allocations in the calendar.
   [href]
 
+- Improves display of new reservation form.
+  [href]
+
 0.9.0 (2015-11-20)
 ~~~~~~~~~~~~~~~~~~~
 
