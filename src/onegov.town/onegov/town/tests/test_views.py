@@ -1039,19 +1039,19 @@ def test_resource_slots(town_app):
     assert result[0]['start'] == '2015-08-04T00:00:00+02:00'
     assert result[0]['end'] == '2015-08-05T00:00:00+02:00'
     assert result[0]['className'] == 'event-available'
-    assert result[0]['title'] == "Ganztägig\nVerfügbar"
+    assert result[0]['title'] == "Ganztägig \nVerfügbar"
 
     assert result[1]['start'] == '2015-08-05T00:00:00+02:00'
     assert result[1]['end'] == '2015-08-06T00:00:00+02:00'
     assert result[1]['className'] == 'event-available'
-    assert result[1]['title'] == "Ganztägig\nVerfügbar"
+    assert result[1]['title'] == "Ganztägig \nVerfügbar"
 
     url = '/ressource/foo/slots?start=2015-08-06&end=2015-08-06'
     result = client.get(url).json
 
     assert len(result) == 1
     assert result[0]['className'] == 'event-unavailable'
-    assert result[0]['title'] == "12:00 - 16:00\nBesetzt"
+    assert result[0]['title'] == "12:00 - 16:00 \nBesetzt"
 
 
 def test_resources(town_app):
@@ -1198,7 +1198,7 @@ def test_allocations(town_app):
     ))
 
     assert len(slots.json) == 2
-    assert slots.json[0]['title'] == "Ganztägig\nVerfügbar"
+    assert slots.json[0]['title'] == "Ganztägig \nVerfügbar"
 
     # change the daypasses
     edit = client.get(extract_href(slots.json[0]['actions'][1]))
@@ -1211,7 +1211,7 @@ def test_allocations(town_app):
     ))
 
     assert len(slots.json) == 1
-    assert slots.json[0]['title'] == "Ganztägig\n2/2 Verfügbar"
+    assert slots.json[0]['title'] == "Ganztägig \n2/2 Verfügbar"
 
     # try to create a new allocation over an existing one
     new = client.get((

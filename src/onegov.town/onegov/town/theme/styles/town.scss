@@ -1491,8 +1491,14 @@ tr.ticket:hover {
     }
 
     .fc-event {
-        .fc-time {
+        div.fc-time {
             display: none;
+        }
+
+        &.fc-short .fc-title {
+            br {
+                display: none;
+            }
         }
 
         &.highlight {

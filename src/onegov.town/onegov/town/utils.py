@@ -133,7 +133,10 @@ class AllocationEventInfo(object):
                     })
                 )
 
-        return '\n'.join((self.event_time, available))
+        # add an extra space at the end of the event time, so we can hide
+        # the <br> tag on the output without having the time and the
+        # availability seemingly joined together without space.
+        return '\n'.join((self.event_time + ' ', available))
 
     @property
     def event_class(self):

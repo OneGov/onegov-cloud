@@ -10,6 +10,9 @@ Unreleased
 - Renders image captions a bit more subtle.
   [href]
 
+- Improves the legibility of small allocations in the calendar.
+  [href]
+
 0.9.0 (2015-11-20)
 ~~~~~~~~~~~~~~~~~~~
 
