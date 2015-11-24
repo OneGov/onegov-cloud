@@ -1500,7 +1500,8 @@ tr.ticket:hover {
     }
 
     .fc-event {
-        div.fc-time {
+        div.fc-time,
+        span.fc-time {
             display: none;
         }
 
