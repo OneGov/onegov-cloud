@@ -137,7 +137,6 @@ class AllocationForm(Form, AllocationFormHelpers):
     @property
     def quota(self):
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
-        import pdb; pdb.set_trace()
         raise NotImplementedError
 
     @property
