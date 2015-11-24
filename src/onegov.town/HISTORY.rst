@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.9.1 (2015-11-24)
+~~~~~~~~~~~~~~~~~~~
+
 - Hides 'no lead-in' hint on news overview.
   [href]
 
