@@ -1453,6 +1453,28 @@ tr.ticket:hover {
         margin-bottom: 0;
     }
 
+    .calendar-occupied {
+        background: repeating-linear-gradient(
+            45deg,
+            #666,
+            #666 10px,
+            #bbb 10px,
+            #bbb 20px
+        );
+    }
+
+    .changing {
+        .calendar-occupied {
+            background: none;
+        }
+    }
+
+    .fc-helper-skeleton *,
+    .changing,
+    .changing * {
+        background-color: $primary-color !important;
+    }
+
     table {
         background-color: transparent;
         margin-bottom: 0;

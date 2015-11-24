@@ -43,7 +43,7 @@ def handle_reserve_allocation(self, request, form):
 
         if self.partly_available:
             start, end = sedate.get_date_range(
-                self.start,
+                sedate.to_timezone(self.start, self.timezone),
                 time(*(int(p) for p in form.data['start'].split(':'))),
                 time(*(int(p) for p in form.data['end'].split(':')))
             )

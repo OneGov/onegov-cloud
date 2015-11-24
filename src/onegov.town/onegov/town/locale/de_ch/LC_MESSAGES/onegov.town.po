@@ -294,7 +294,7 @@ msgid "No"
 msgstr "Nein"
 
 msgid "Yes, parts of the allocation may be reserved."
-msgstr "Ja, Einteilung können teilweise reserviert werden."
+msgstr "Ja, Teilreservationen erlauben."
 
 msgid "No, the allocation must be reserved as a whole."
 msgstr "Nein, die Einteilung muss als Ganzes reserviert werden."
