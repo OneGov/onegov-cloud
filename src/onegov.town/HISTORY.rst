@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.9.2 (2015-11-24)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes display issue in the calendar.
   [href]
 
