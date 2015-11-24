@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-23 17:13+0100\n"
+"POT-Creation-Date: 2015-11-24 16:09+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -254,23 +254,20 @@ msgstr ""
 msgid "Start"
 msgstr "Von"
 
+msgid "Date"
+msgstr "Datum"
+
 msgid "End"
 msgstr "Bis"
 
 msgid "Except for"
 msgstr "Ausser an"
 
-msgid "Date"
-msgstr "Datum"
-
 msgid "Daypasses"
 msgstr "Tageskarten"
 
 msgid "Daypasses Limit"
 msgstr "Tageskarten pro Person und Tag"
-
-msgid "Partly available"
-msgstr "Teilweise verfügbar"
 
 msgid "Each starting at"
 msgstr "Jeweils von"
@@ -280,6 +277,12 @@ msgstr "HH:MM"
 
 msgid "Each ending at"
 msgstr "Jeweils bis"
+
+msgid "May be partially reserved"
+msgstr "Kann teilweise reserviert werden"
+
+msgid "Options"
+msgstr "Optionen"
 
 msgid "From"
 msgstr "Von"
@@ -292,12 +295,6 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
-
-msgid "Yes, parts of the allocation may be reserved."
-msgstr "Ja, Teilreservationen erlauben."
-
-msgid "No, the allocation must be reserved as a whole."
-msgstr "Nein, die Einteilung muss als Ganzes reserviert werden."
 
 msgid "Exhibition"
 msgstr "Ausstellung"
@@ -1238,6 +1235,3 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
-
-#~ msgid "Wrong username or password."
-#~ msgstr "Unbekannter Benutzername oder falsches Passwort."

@@ -162,12 +162,15 @@ var render_partitions = function(event, element, calendar) {
 
     var free = _.template('<div style="height:<%= height %>%;"></div>');
     var used = _.template('<div style="height:<%= height %>%;" class="calendar-occupied"></div>');
-    var partition_block = _.template('<div style="height:<%= height %>px; margin-top: 1px;"><%= partitions %></div>');
+    var partition_block = _.template('<div style="height:<%= height %>px;"><%= partitions %></div>');
 
     // build the individual partitions
     var event_partitions = adjust_partitions(
-        event, calendar.options.minTime, calendar.options.maxTime
+        event,
+        moment.duration(calendar.options.minTime).hours(),
+        moment.duration(calendar.options.maxTime).hours()
     );
+
     var partitions = '';
     _.each(event_partitions, function(partition) {
         var reserved = partition[1];
@@ -179,7 +182,7 @@ var render_partitions = function(event, element, calendar) {
     });
 
     // locks the height during resizing
-    var height = element.outerHeight(false);
+    var height = element.outerHeight(true);
     if (event.is_changing) {
         height = event.height;
         $(element).addClass('changing');

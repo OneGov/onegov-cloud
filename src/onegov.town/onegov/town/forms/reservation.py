@@ -7,11 +7,6 @@ from wtforms.validators import Email, InputRequired, Regexp
 
 class ReservationForm(Form):
 
-    e_mail = EmailField(
-        label=_("E-Mail"),
-        validators=[InputRequired(), Email()]
-    )
-
     @classmethod
     def for_allocation(cls, allocation):
 
@@ -37,6 +32,11 @@ class ReservationForm(Form):
                 validators=[InputRequired(), time_validator],
                 default='{:%H:%M}'.format(allocation.display_end())
             )
+
+        form_class.e_mail = EmailField(
+            label=_("E-Mail"),
+            validators=[InputRequired(), Email()]
+        )
 
         if (allocation.quota or 1) > 1 and allocation.quota_limit != 1:
             form_class.quota = IntegerField(

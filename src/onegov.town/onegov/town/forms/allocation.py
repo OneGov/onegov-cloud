@@ -91,17 +91,26 @@ class AllocationForm(Form, AllocationFormHelpers):
 
     """
 
-    start = DateField(_("Start"), [InputRequired()])
-    end = DateField(_("End"), [InputRequired()])
+    start = DateField(
+        label=_("Start"),
+        validators=[InputRequired()],
+        fieldset=_("Date")
+    )
+    end = DateField(
+        label=_("End"),
+        validators=[InputRequired()],
+        fieldset=_("Date")
+    )
 
     except_for = MultiCheckboxField(
-        _("Except for"),
+        label=_("Except for"),
         choices=WEEKDAYS,
         widget=with_options(
             MultiCheckboxWidget,
             prefix_label=False,
             class_='oneline-checkboxes'
-        )
+        ),
+        fieldset=("Date")
     )
 
     @property
@@ -128,6 +137,7 @@ class AllocationForm(Form, AllocationFormHelpers):
     @property
     def quota(self):
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
+        import pdb; pdb.set_trace()
         raise NotImplementedError
 
     @property
@@ -151,17 +161,38 @@ class AllocationEditForm(Form, AllocationFormHelpers):
 
     """
 
-    date = DateField(_("Date"), [InputRequired()])
+    date = DateField(
+        label=_("Date"),
+        validators=[InputRequired()],
+        fieldset=_("Date")
+    )
 
 
 class DaypassAllocationForm(AllocationForm):
 
-    daypasses = IntegerField(_("Daypasses"), [InputRequired()])
-    daypasses_limit = IntegerField(_("Daypasses Limit"), [InputRequired()])
+    daypasses = IntegerField(
+        label=_("Daypasses"),
+        validators=[InputRequired()],
+        fieldset=_("Daypasses")
+    )
+
+    daypasses_limit = IntegerField(
+        label=_("Daypasses Limit"),
+        validators=[InputRequired()],
+        fieldset=_("Daypasses")
+    )
 
     whole_day = True
     partly_available = False
     data = None
+
+    @property
+    def quota(self):
+        return self.daypasses.data
+
+    @property
+    def quota_limit(self):
+        return self.daypasses_limit.data
 
     @property
     def dates(self):
@@ -171,6 +202,25 @@ class DaypassAllocationForm(AllocationForm):
             weekdays=self.weekdays
         )
 
+
+class DaypassAllocationEditForm(AllocationEditForm):
+
+    daypasses = IntegerField(
+        label=_("Daypasses"),
+        validators=[InputRequired()],
+        fieldset=_("Daypasses")
+    )
+
+    daypasses_limit = IntegerField(
+        label=_("Daypasses Limit"),
+        validators=[InputRequired()],
+        fieldset=_("Daypasses")
+    )
+
+    whole_day = True
+    partly_available = False
+    data = None
+
     @property
     def quota(self):
         return self.daypasses.data
@@ -178,16 +228,6 @@ class DaypassAllocationForm(AllocationForm):
     @property
     def quota_limit(self):
         return self.daypasses_limit.data
-
-
-class DaypassAllocationEditForm(AllocationEditForm):
-
-    daypasses = IntegerField(_("Daypasses"), [InputRequired()])
-    daypasses_limit = IntegerField(_("Daypasses Limit"), [InputRequired()])
-
-    whole_day = True
-    partly_available = False
-    data = None
 
     @property
     def dates(self):
@@ -197,14 +237,6 @@ class DaypassAllocationEditForm(AllocationEditForm):
                 days=1, microseconds=-1
             )
         )
-
-    @property
-    def quota(self):
-        return self.daypasses.data
-
-    @property
-    def quota_limit(self):
-        return self.daypasses_limit.data
 
     def apply_dates(self, start, end):
         self.date.data = start.date()
@@ -217,10 +249,15 @@ class DaypassAllocationEditForm(AllocationEditForm):
 
 class RoomAllocationForm(AllocationForm):
 
-    as_whole_day = RadioField(_("Whole day"), choices=[
-        ('yes', _("Yes")),
-        ('no', _("No"))
-    ], default='yes')
+    as_whole_day = RadioField(
+        label=_("Whole day"),
+        choices=[
+            ('yes', _("Yes")),
+            ('no', _("No"))
+        ],
+        default='yes',
+        fieldset=_("Date")
+    )
 
     as_whole_day_dependency = FieldDependency('as_whole_day', 'no')
 
@@ -228,20 +265,27 @@ class RoomAllocationForm(AllocationForm):
         label=_("Each starting at"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TextInput, **as_whole_day_dependency.html_data)
+        widget=with_options(TextInput, **as_whole_day_dependency.html_data),
+        fieldset=_("Date")
     )
 
     end_time = TextField(
         label=_("Each ending at"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TextInput, **as_whole_day_dependency.html_data)
+        widget=with_options(TextInput, **as_whole_day_dependency.html_data),
+        fieldset=_("Date")
     )
 
-    is_partly_available = RadioField(_("Partly available"), choices=[
-        ('yes', _("Yes, parts of the allocation may be reserved.")),
-        ('no', _("No, the allocation must be reserved as a whole."))
-    ], default='yes')
+    is_partly_available = RadioField(
+        label=_("May be partially reserved"),
+        choices=[
+            ('yes', _("Yes")),
+            ('no', _("No"))
+        ],
+        default='yes',
+        fieldset=_("Options")
+    )
 
     data = None
     quota = 1
@@ -268,10 +312,15 @@ class RoomAllocationForm(AllocationForm):
 
 class RoomAllocationEditForm(AllocationEditForm):
 
-    as_whole_day = RadioField(_("Whole day"), choices=[
-        ('yes', _("Yes")),
-        ('no', _("No"))
-    ], default='yes')
+    as_whole_day = RadioField(
+        label=_("Whole day"),
+        choices=[
+            ('yes', _("Yes")),
+            ('no', _("No"))
+        ],
+        default='yes',
+        fieldset=_("Date")
+    )
 
     as_whole_day_dependency = FieldDependency('as_whole_day', 'no')
 
@@ -279,20 +328,17 @@ class RoomAllocationEditForm(AllocationEditForm):
         label=_("From"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TextInput, **as_whole_day_dependency.html_data)
+        widget=with_options(TextInput, **as_whole_day_dependency.html_data),
+        fieldset=_("Date")
     )
 
     end_time = TextField(
         label=_("Until"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TextInput, **as_whole_day_dependency.html_data)
+        widget=with_options(TextInput, **as_whole_day_dependency.html_data),
+        fieldset=_("Date")
     )
-
-    is_partly_available = RadioField(_("Partly available"), choices=[
-        ('yes', _("Yes, parts of the allocation may be reserved.")),
-        ('no', _("No, the allocation must be reserved as a whole."))
-    ], default='yes')
 
     data = None
     quota = 1
