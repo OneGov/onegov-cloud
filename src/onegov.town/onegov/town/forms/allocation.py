@@ -121,6 +121,11 @@ class AllocationForm(Form, AllocationFormHelpers):
         raise NotImplementedError
 
     @property
+    def partly_available(self):
+        """  Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
+        raise NotImplementedError
+
+    @property
     def quota(self):
         """ Passed to :meth:`libres.db.scheduler.Scheduler.allocate`. """
         raise NotImplementedError
@@ -155,6 +160,7 @@ class DaypassAllocationForm(AllocationForm):
     daypasses_limit = IntegerField(_("Daypasses Limit"), [InputRequired()])
 
     whole_day = True
+    partly_available = False
     data = None
 
     @property
@@ -180,6 +186,7 @@ class DaypassAllocationEditForm(AllocationEditForm):
     daypasses_limit = IntegerField(_("Daypasses Limit"), [InputRequired()])
 
     whole_day = True
+    partly_available = False
     data = None
 
     @property
@@ -231,6 +238,11 @@ class RoomAllocationForm(AllocationForm):
         widget=with_options(TextInput, **as_whole_day_dependency.html_data)
     )
 
+    is_partly_available = RadioField(_("Partly available"), choices=[
+        ('yes', _("Yes, parts of the allocation may be reserved.")),
+        ('no', _("No, the allocation must be reserved as a whole."))
+    ], default='yes')
+
     data = None
     quota = 1
     quota_limit = 1
@@ -238,6 +250,10 @@ class RoomAllocationForm(AllocationForm):
     @property
     def whole_day(self):
         return self.as_whole_day.data == 'yes'
+
+    @property
+    def partly_available(self):
+        return self.is_partly_available.data == 'yes'
 
     @property
     def dates(self):
@@ -273,6 +289,11 @@ class RoomAllocationEditForm(AllocationEditForm):
         widget=with_options(TextInput, **as_whole_day_dependency.html_data)
     )
 
+    is_partly_available = RadioField(_("Partly available"), choices=[
+        ('yes', _("Yes, parts of the allocation may be reserved.")),
+        ('no', _("No, the allocation must be reserved as a whole."))
+    ], default='yes')
+
     data = None
     quota = 1
     quota_limit = 1
@@ -280,6 +301,10 @@ class RoomAllocationEditForm(AllocationEditForm):
     @property
     def whole_day(self):
         return self.as_whole_day.data == 'yes'
+
+    @property
+    def partly_available(self):
+        return self.is_partly_available.data == 'yes'
 
     @property
     def dates(self):

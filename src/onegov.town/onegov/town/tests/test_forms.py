@@ -30,12 +30,12 @@ def test_allocation_form_dates(form_class):
     assert hasattr(form, 'quota')
     assert hasattr(form, 'quota_limit')
     assert hasattr(form, 'data')
+    assert hasattr(form, 'partly_available')
 
     # those are not (yet) customizable in onegov.town
     assert not hasattr(form, 'grouped')
     assert not hasattr(form, 'raster')
     assert not hasattr(form, 'approve_manually')
-    assert not hasattr(form, 'partly_available')
 
 
 def test_daypass_single_date():

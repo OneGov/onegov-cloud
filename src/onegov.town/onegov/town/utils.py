@@ -114,7 +114,7 @@ class AllocationEventInfo(object):
     def event_title(self):
         if self.allocation.partly_available:
             available = self.translate(_("${percent}% Available", mapping={
-                'percent': self.availability
+                'percent': int(self.availability)
             }))
         else:
             quota = self.allocation.quota
@@ -204,6 +204,7 @@ class AllocationEventInfo(object):
             'end': self.event_end,
             'title': self.event_title,
             'className': self.event_class,
+            'partitions': self.allocation.availability_partitions(),
             'actions': [
                 link(self.request).decode('utf-8')
                 for link in self.event_actions

@@ -1,5 +1,7 @@
 import morepath
+import sedate
 
+from datetime import time
 from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
@@ -40,7 +42,11 @@ def handle_reserve_allocation(self, request, form):
     if form.submitted(request):
 
         if self.partly_available:
-            start, end = form.data['start'], form.data['end']
+            start, end = sedate.get_date_range(
+                self.start,
+                time(*(int(p) for p in form.data['start'].split(':'))),
+                time(*(int(p) for p in form.data['end'].split(':')))
+            )
         else:
             start, end = self.start, self.end
 

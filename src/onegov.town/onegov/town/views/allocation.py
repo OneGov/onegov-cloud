@@ -107,7 +107,8 @@ def handle_new_allocation(self, request, form):
                 whole_day=form.whole_day,
                 quota=form.quota,
                 quota_limit=form.quota_limit,
-                data=form.data
+                data=form.data,
+                partly_available=form.partly_available
             )
         except LibresError as e:
             utils.show_libres_error(e, request)

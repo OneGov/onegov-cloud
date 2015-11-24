@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-20 15:27+0100\n"
+"POT-Creation-Date: 2015-11-23 17:13+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -269,6 +269,9 @@ msgstr "Tageskarten"
 msgid "Daypasses Limit"
 msgstr "Tageskarten pro Person und Tag"
 
+msgid "Partly available"
+msgstr "Teilweise verfügbar"
+
 msgid "Each starting at"
 msgstr "Jeweils von"
 
@@ -289,6 +292,12 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "Yes, parts of the allocation may be reserved."
+msgstr "Ja, Einteilung können teilweise reserviert werden."
+
+msgid "No, the allocation must be reserved as a whole."
+msgstr "Nein, die Einteilung muss als Ganzes reserviert werden."
 
 msgid "Exhibition"
 msgstr "Ausstellung"
@@ -430,6 +439,9 @@ msgstr "Link zum Bild"
 
 msgid "Address"
 msgstr "Adresse"
+
+msgid "The format of the time is HH:MM (e.g. 14:30)"
+msgstr "Das Format der Zeit ist HH:MM (z.B. 14:30)"
 
 msgid "Quota"
 msgstr "Anzahl"
