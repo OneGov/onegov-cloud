@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-24 16:09+0100\n"
+"POT-Creation-Date: 2015-11-25 10:06+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -215,7 +215,10 @@ msgid "No reservations to confirm."
 msgstr "Keine Reservationen gefunden die Bestätigt werden können."
 
 msgid "The given timerange is longer than the existing allocation."
-msgstr "Der gewünschte Zeitraum ist grösser als die Einteilung."
+msgstr "Der gewünschte Zeitraum liegt ausserhalb der Einteilung."
+
+msgid "Reservation too short. A reservation must last at least 5 minutes."
+msgstr "Die Reservation ist zu kurz. Eine Reservation muss mindestens 5 Minuten dauern."
 
 msgid "Whole day"
 msgstr "Ganztägig"

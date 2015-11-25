@@ -214,7 +214,6 @@ class AllocationEventInfo(object):
 
 
 libres_error_messages = {
-
     libres_errors.OverlappingAllocationError:
     _("A conflicting allocation exists for the requested time period."),
 
@@ -258,7 +257,10 @@ libres_error_messages = {
     _("No reservations to confirm."),
 
     libres_errors.TimerangeTooLong:
-    _("The given timerange is longer than the existing allocation.")
+    _("The given timerange is longer than the existing allocation."),
+
+    libres_errors.ReservationTooShort:
+    _("Reservation too short. A reservation must last at least 5 minutes.")
 }
 
 
@@ -269,7 +271,7 @@ def show_libres_error(e, request):
     """
 
     assert type(e) in libres_error_messages, (
-        "Unknown libres error {}".format(e)
+        "Unknown libres error {}".format(type(e))
     )
 
     request.alert(request.translate(libres_error_messages.get(type(e))))
