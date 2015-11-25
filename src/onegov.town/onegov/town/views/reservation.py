@@ -9,7 +9,7 @@ from onegov.ticket import TicketCollection
 from onegov.town import TownApp, _, utils
 from onegov.town.elements import Link
 from onegov.town.forms import ReservationForm
-from onegov.town.layout import ResourceLayout
+from onegov.town.layout import ReservationLayout
 from onegov.town.mail import send_html_mail
 from sqlalchemy.orm.attributes import flag_modified
 from purl import URL
@@ -98,7 +98,7 @@ def handle_reserve_allocation(self, request, form):
                 get_submission_link(request, submission, confirm_link)
             )
 
-    layout = ResourceLayout(resource, request)
+    layout = ReservationLayout(resource, request)
     layout.breadcrumbs.append(Link(_("Reserve"), '#'))
 
     title = _("New reservation for ${title}", mapping={
@@ -150,7 +150,7 @@ def handle_edit_reservation(self, request, form):
 
     form.apply_model(self)
 
-    layout = ResourceLayout(resource, request)
+    layout = ReservationLayout(resource, request)
     layout.breadcrumbs.append(Link(_("Edit Reservation"), '#'))
 
     title = _("Change reservation for ${title}", mapping={
@@ -208,9 +208,12 @@ def confirm_reservation(self, request):
     else:
         form = None
 
+    layout = ReservationLayout(resource, request)
+    layout.breadcrumbs.append(Link(_("Confirm"), '#'))
+
     return {
         'title': _("Confirm your reservation"),
-        'layout': ResourceLayout(resource, request),
+        'layout': layout,
         'form': form,
         'resource': resource,
         'allocation': self._target_allocations().first(),
@@ -238,12 +241,12 @@ def finalize_reservation(self, request):
     except LibresError as e:
         utils.show_libres_error(e, request)
 
-        layout = ResourceLayout(resource, request)
+        layout = ReservationLayout(resource, request)
         layout.breadcrumbs.append(Link(_("Error"), '#'))
 
         return {
             'title': _("The reservation could not be completed"),
-            'layout': ResourceLayout(resource, request),
+            'layout': layout,
         }
     else:
         forms = FormCollection(request.app.session())

@@ -721,6 +721,10 @@ class ResourceLayout(DefaultLayout):
             ]
 
 
+class ReservationLayout(ResourceLayout):
+    editbar_links = None
+
+
 class AllocationEditFormLayout(DefaultLayout):
     """ Same as the resource layout, but with different editbar links, because
     there's not really an allocation view, but there are allocation forms.
