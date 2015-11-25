@@ -1,7 +1,5 @@
 import morepath
-import sedate
 
-from datetime import time
 from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
@@ -19,8 +17,15 @@ from uuid import uuid4
 from webob import exc
 
 
-def get_reservation_form_class(allocation, request):
-    return ReservationForm.for_allocation(allocation)
+def get_reservation_form_class(model, request):
+    if isinstance(model, Allocation):
+        return ReservationForm.for_allocation(model)
+
+    if isinstance(model, Reservation):
+        allocation = model._target_allocations().first()
+        return ReservationForm.for_allocation(allocation)
+
+    raise NotImplementedError
 
 
 def get_libres_session_id(request):
@@ -28,6 +33,18 @@ def get_libres_session_id(request):
         request.browser_session.libres_session_id = uuid4()
 
     return request.browser_session.libres_session_id
+
+
+def get_submission_link(request, submission, confirm_link):
+    url = URL(request.link(submission))
+    url = url.query_param('return-to', confirm_link)
+    url = url.query_param('title', request.translate(
+        _("Details about the reservation"))
+    )
+    url = url.query_param('edit', 1)
+    url = url.query_param('quiet', 1)
+
+    return url.as_string()
 
 
 @TownApp.form(model=Allocation, name='reservieren', template='reservation.pt',
@@ -40,20 +57,12 @@ def handle_reserve_allocation(self, request, form):
     resource = collection.by_id(self.resource)
 
     if form.submitted(request):
-
-        if self.partly_available:
-            start, end = sedate.get_date_range(
-                sedate.to_timezone(self.start, self.timezone),
-                time(*(int(p) for p in form.data['start'].split(':'))),
-                time(*(int(p) for p in form.data['end'].split(':')))
-            )
-        else:
-            start, end = self.start, self.end
+        start, end = form.get_date_range()
 
         try:
             scheduler = resource.get_scheduler(request.app.libres_context)
             token = scheduler.reserve(
-                email=form.data['e_mail'],
+                email=form.data['email'],
                 dates=(start, end),
                 quota=int(form.data.get('quota', 1)),
                 session_id=get_libres_session_id(request)
@@ -68,10 +77,10 @@ def handle_reserve_allocation(self, request, form):
             # though it's possible for a token to have multiple reservations,
             # it is not something that can happen here -> therefore one!
             reservation = scheduler.reservations_by_token(token).one()
-            finalize_link = request.link(reservation, 'abschluss')
+            confirm_link = request.link(reservation, 'bestaetigung')
 
             if not resource.definition:
-                return morepath.redirect(finalize_link)
+                return morepath.redirect(confirm_link)
 
             # if extra form data is required, this is the first step.
             # together with the unconfirmed, session-bound reservation,
@@ -85,23 +94,12 @@ def handle_reserve_allocation(self, request, form):
                 id=reservation.token
             )
 
-            url = URL(request.link(submission))
-            url = url.query_param('return-to', finalize_link)
-            url = url.query_param('title', request.translate(
-                _("Details about the reservation"))
+            return morepath.redirect(
+                get_submission_link(request, submission, confirm_link)
             )
-            url = url.query_param('edit', 1)
-            url = url.query_param('quiet', 1)
-
-            return morepath.redirect(url.as_string())
 
     layout = ResourceLayout(resource, request)
     layout.breadcrumbs.append(Link(_("Reserve"), '#'))
-
-    if resource.definition:
-        button_text = _("Continue")
-    else:
-        button_text = _("Submit")
 
     title = _("New reservation for ${title}", mapping={
         'title': resource.title,
@@ -112,7 +110,59 @@ def handle_reserve_allocation(self, request, form):
         'title': title,
         'form': form,
         'allocation': self,
-        'button_text': button_text
+        'button_text': _("Continue")
+    }
+
+
+@TownApp.form(model=Reservation, name='bearbeiten', template='reservation.pt',
+              permission=Public, form=get_reservation_form_class)
+def handle_edit_reservation(self, request, form):
+
+    # this view is public, but only for a limited time
+    assert_anonymous_access_only_temporary(self, request)
+
+    collection = ResourceCollection(request.app.libres_context)
+    resource = collection.by_id(self.resource)
+
+    if form.submitted(request):
+        scheduler = resource.get_scheduler(request.app.libres_context)
+        try:
+            if self.email != form.email.data:
+                scheduler.change_email(self.token, form.email.data)
+
+            start, end = form.get_date_range()
+            scheduler.change_reservation(
+                self.token, self.id, start, end, quota=form.data.get('quota')
+            )
+        except LibresError as e:
+            utils.show_libres_error(e, request)
+        else:
+            forms = FormCollection(request.app.session())
+            submission = forms.submissions.by_id(self.token)
+            confirm_link = request.link(self, 'bestaetigung')
+
+            if submission is None:
+                return morepath.redirect(confirm_link)
+            else:
+                return morepath.redirect(
+                    get_submission_link(request, submission, confirm_link)
+                )
+
+    form.apply_model(self)
+
+    layout = ResourceLayout(resource, request)
+    layout.breadcrumbs.append(Link(_("Edit Reservation"), '#'))
+
+    title = _("Change reservation for ${title}", mapping={
+        'title': resource.title,
+    })
+
+    return {
+        'layout': layout,
+        'title': title,
+        'form': form,
+        'allocation': self,
+        'button_text': _("Continue")
     }
 
 
@@ -138,6 +188,36 @@ def assert_anonymous_access_only_temporary(self, request):
 
     if self.session_id != get_libres_session_id(request):
         raise exc.HTTPForbidden()
+
+
+@TownApp.html(model=Reservation, name='bestaetigung', permission=Public,
+              template='reservation_confirmation.pt')
+def confirm_reservation(self, request):
+
+    # this view is public, but only for a limited time
+    assert_anonymous_access_only_temporary(self, request)
+
+    collection = ResourceCollection(request.app.libres_context)
+    resource = collection.by_id(self.resource)
+
+    forms = FormCollection(request.app.session())
+    submission = forms.submissions.by_id(self.token)
+
+    if submission:
+        form = request.get_form(submission.form_class, data=submission.data)
+    else:
+        form = None
+
+    return {
+        'title': _("Confirm your reservation"),
+        'layout': ResourceLayout(resource, request),
+        'form': form,
+        'resource': resource,
+        'allocation': self._target_allocations().first(),
+        'reservation': self,
+        'finalize_link': request.link(self, 'abschluss'),
+        'edit_link': request.link(self, 'bearbeiten')
+    }
 
 
 @TownApp.html(model=Reservation, name='abschluss', permission=Public,

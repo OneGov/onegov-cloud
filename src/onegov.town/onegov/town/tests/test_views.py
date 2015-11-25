@@ -1361,13 +1361,13 @@ def test_reserve_allocation(town_app):
 
     # create a reservation
     reserve = client.get(reserve_url)
-    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['email'] = 'info@example.org'
     reserve.form['quota'] = 4
 
     details = reserve.form.submit().follow()
     details.form['note'] = 'Foobar'
 
-    ticket = details.form.submit().follow().follow()
+    ticket = details.form.submit().follow().click('Abschliessen').follow()
 
     assert 'RSV-' in ticket.text
     assert len(town_app.smtp.outbox) == 1
@@ -1378,7 +1378,7 @@ def test_reserve_allocation(town_app):
 
     # try to create another reservation the same time
     reserve = client.get(reserve_url)
-    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['email'] = 'info@example.org'
     result = reserve.form.submit()
 
     assert "Der gewünschte Zeitraum ist nicht mehr verfügbar." in result
@@ -1459,6 +1459,68 @@ def test_reserve_allocation(town_app):
     assert len(town_app.smtp.outbox) == 4
 
 
+def test_reserve_allocation_partially(town_app):
+
+    client = Client(town_app)
+
+    # prepate the required data
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True
+    )
+    reserve_url = '/einteilung/{}/{}/reservieren'.format(
+        allocations[0].resource,
+        allocations[0].id
+    )
+
+    transaction.commit()
+
+    # create a reservation
+    reserve = client.get(reserve_url)
+    reserve.form['email'] = "info@example.org"
+    reserve.form['start'] = "10:00"
+    reserve.form['end'] = "12:00"
+
+    ticket = reserve.form.submit().follow().click("Abschliessen").follow()
+
+    assert 'RSV-' in ticket.text
+    assert len(town_app.smtp.outbox) == 1
+
+    # open the created ticket
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    assert "info@example.org" in ticket
+    assert "10:00" in ticket
+    assert "12:00" in ticket
+
+    # accept it
+    ticket = ticket.click('Reservation annehmen').follow()
+
+    message = town_app.smtp.outbox[1]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('iso-8859-1')
+
+    assert "SBB-Tageskarte" in message
+    assert "28.08.2015" in message
+    assert "10:00" in message
+    assert "12:00" in message
+
+    # see if the slots are partitioned correctly
+    url = '/ressource/sbb-tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    slots = client.get(url).json
+    assert slots[0]['partitions'] == [[50.0, True], [50.0, False]]
+
+
 def test_reserve_no_definition(town_app):
 
     client = Client(town_app)
@@ -1483,13 +1545,115 @@ def test_reserve_no_definition(town_app):
 
     # create a reservation
     reserve = client.get(reserve_url)
-    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['email'] = 'info@example.org'
     reserve.form['quota'] = 4
 
-    ticket = reserve.form.submit().follow().follow()
+    ticket = reserve.form.submit().follow().click('Abschliessen').follow()
 
     assert 'RSV-' in ticket.text
     assert len(town_app.smtp.outbox) == 1
+
+
+def test_reserve_confirmation_no_definition(town_app):
+
+    client = Client(town_app)
+
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+    reserve_url = '/einteilung/{}/{}/reservieren'.format(
+        allocations[0].resource,
+        allocations[0].id
+    )
+
+    transaction.commit()
+
+    # create a reservation
+    reserve = client.get(reserve_url)
+    reserve.form['email'] = "info@example.org"
+    reserve.form['quota'] = 4
+    confirmation = reserve.form.submit().follow()
+
+    assert "Bestätigen Sie Ihre Reservation" in confirmation
+    assert "Den ganzen Tag" in confirmation
+    assert "4" in confirmation
+    assert "info@example.org" in confirmation
+
+    reserve = confirmation.click("Bearbeiten")
+    assert "info@example.org" in reserve
+    assert "4" in reserve
+
+    reserve.form['email'] = "changed@example.org"
+    reserve.form['quota'] = 10
+    assert "nicht mehr verfügbar" in reserve.form.submit()
+
+    reserve.form['quota'] = 3
+    confirmation = reserve.form.submit().follow()
+
+    assert "Bestätigen Sie Ihre Reservation" in confirmation
+    assert "Den ganzen Tag" in confirmation
+    assert "3" in confirmation
+    assert "changed@example.org" in confirmation
+
+
+def test_reserve_confirmation_with_definition(town_app):
+
+    client = Client(town_app)
+
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    resource.definition = "Vorname *= ___\nNachname *= ___"
+
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 12)),
+        whole_day=False,
+        partly_available=True
+    )
+    reserve_url = '/einteilung/{}/{}/reservieren'.format(
+        allocations[0].resource,
+        allocations[0].id
+    )
+
+    transaction.commit()
+
+    # create a reservation
+    reserve = client.get(reserve_url)
+    reserve.form['email'] = "info@example.org"
+    reserve.form['start'] = "10:30"
+    reserve.form['end'] = "12:00"
+
+    details = reserve.form.submit().follow()
+    details.form['vorname'] = "Thomas"
+    details.form['nachname'] = "Anderson"
+
+    confirmation = details.form.submit().follow()
+    assert "10:30" in confirmation
+    assert "12:00" in confirmation
+    assert "Thomas" in confirmation
+    assert "Anderson" in confirmation
+
+    # edit the reservation
+    reserve = confirmation.click("Bearbeiten")
+    reserve.form['end'] = "11:00"
+
+    details = reserve.form.submit().follow()
+    details.form['vorname'] = "Elliot"
+    details.form['nachname'] = "Alderson"
+
+    confirmation = details.form.submit().follow()
+    assert "10:30" in confirmation
+    assert "11:00" in confirmation
+    assert "Elliot" in confirmation
+    assert "Alderson" in confirmation
 
 
 def test_reserve_session_bound(town_app):
@@ -1516,16 +1680,17 @@ def test_reserve_session_bound(town_app):
 
     # create a reservation
     reserve = client.get(reserve_url)
-    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['email'] = 'info@example.org'
     reserve.form['quota'] = 4
 
-    finalize = reserve.form.submit()
+    confirm = reserve.form.submit().follow()
+    finalize_url = confirm.pyquery('a.button:first').attr('href')
 
     # make sure the finalize step can only be called by the original client
     c2 = Client(town_app)
 
-    assert c2.get(finalize.location, expect_errors=True).status_code == 403
-    assert client.get(finalize.location).follow().status_code == 200
+    assert c2.get(finalize_url, expect_errors=True).status_code == 403
+    assert client.get(finalize_url).follow().status_code == 200
 
 
 def test_two_parallel_reservations(town_app):
@@ -1549,20 +1714,22 @@ def test_two_parallel_reservations(town_app):
     # create a reservation
     c1 = Client(town_app)
     reserve = c1.get(reserve_url)
-    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['email'] = 'info@example.org'
 
-    f1 = reserve.form.submit()
+    f1 = reserve.form.submit().follow()
 
     # make sure the finalize step can only be called by the original client
     c2 = Client(town_app)
     reserve = c2.get(reserve_url)
-    reserve.form['e_mail'] = 'info@example.org'
+    reserve.form['email'] = 'info@example.org'
 
-    f2 = reserve.form.submit()
+    f2 = reserve.form.submit().follow()
 
     # one will win, one will lose
-    assert f1.follow().status_code == 302
-    assert "Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.follow()
+    assert f1.click('Abschliessen').status_code == 302
+    assert "Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.click(
+        'Abschliessen'
+    )
 
 
 def test_cleanup_allocations(town_app):

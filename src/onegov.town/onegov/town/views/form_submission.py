@@ -111,7 +111,7 @@ def handle_pending_submission(self, request):
         'edit_link': request.link(self) + '?edit',
         'complete_link': request.link(self, 'complete'),
         'is_pending': self.state == 'pending',
-        'readonly': 'readonly' in request.GET
+        'readonly': 'readonly' in request.GET,
     }
 
 

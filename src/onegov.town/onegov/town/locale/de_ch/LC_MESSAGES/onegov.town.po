@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-25 10:06+0100\n"
+"POT-Creation-Date: 2015-11-25 11:51+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -218,7 +218,9 @@ msgid "The given timerange is longer than the existing allocation."
 msgstr "Der gewünschte Zeitraum liegt ausserhalb der Einteilung."
 
 msgid "Reservation too short. A reservation must last at least 5 minutes."
-msgstr "Die Reservation ist zu kurz. Eine Reservation muss mindestens 5 Minuten dauern."
+msgstr ""
+"Die Reservation ist zu kurz. Eine Reservation muss mindestens 5 Minuten "
+"dauern."
 
 msgid "Whole day"
 msgstr "Ganztägig"
@@ -705,7 +707,7 @@ msgid ""
 "data and press \"Complete\" to finalize the process. If there's anything "
 "you'd like to change, click on \"Edit\" to return to the filled-out event."
 msgstr ""
-"Ihre Anfrage kann jetzt an die Gemeinde übermittelt werden. Bitte überprüfen "
+"Ihre Veranstaltung kann jetzt an die Gemeinde übermittelt werden. Bitte überprüfen "
 "Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um die Anfrage zu "
 "übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken Sie auf "
 "\"Bearbeiten\" um zum Formular zurückzukehren. "
@@ -937,6 +939,22 @@ msgstr ""
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
 
+msgid ""
+"Your reservation is ready to be sent to the town. Please review your data "
+"and press \"Complete\" to finalize the process. If there's anything you'd "
+"like to change, click on \"Edit\" to return to the filled-out form."
+msgstr ""
+"Ihre Reservation kann jetzt an die Gemeinde übermittelt werden. Bitte überprüfen "
+"Sie Ihre Angaben und klicken Sie auf \"Abschliessen\" um die Anfrage zu "
+"übermitteln. Wenn Sie Änderungen vornehmen möchten, klicken Sie auf "
+"\"Bearbeiten\" um zum Formular zurückzukehren. "
+
+msgid "Timespan"
+msgstr "Zeitraum"
+
+msgid "The whole day"
+msgstr "Den ganzen Tag"
+
 msgid "Click on any of the blocks in the calendar below to make a reservation."
 msgstr ""
 "Klicken Sie auf einen der Blöcke im Kalender um eine Reservation zu "
@@ -1124,11 +1142,21 @@ msgstr "Neu"
 msgid "New reservation for ${title}"
 msgstr "Neue Reservation für ${title}"
 
+#, python-format
+msgid "Change reservation for ${title}"
+msgstr "Reservation für ${title} ändern"
+
 msgid "Continue"
 msgstr "Weiter"
 
+msgid "Confirm your reservation"
+msgstr "Bestätigen Sie Ihre Reservation"
+
 msgid "The reservation was rejected"
 msgstr "Die Reservation wurde abgesagt"
+
+msgid "Edit Reservation"
+msgstr "Reservation bearbeiten"
 
 msgid "Thank you for your reservation!"
 msgstr "Vielen Dank für Ihre Reservation!"
