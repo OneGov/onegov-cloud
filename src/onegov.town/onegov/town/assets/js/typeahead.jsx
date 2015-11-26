@@ -109,7 +109,7 @@ var TypeAhead = function(form) {
             return;
         }
 
-        var request = $.get(source + '?q=' + text);
+        var request = $.get(source + '?q=' + encodeURIComponent(text));
 
         request.always(function() {
             spinner.attr('class', 'fa fa-search');

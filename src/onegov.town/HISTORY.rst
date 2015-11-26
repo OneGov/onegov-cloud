@@ -18,6 +18,9 @@ Unreleased
 - Removes extra spaces occurring on certain contact panels.
   [href]
 
+- Fixes umlauts in the search box leading to decoding errors.
+  [href]
+
 0.9.2 (2015-11-24)
 ~~~~~~~~~~~~~~~~~~~
 
