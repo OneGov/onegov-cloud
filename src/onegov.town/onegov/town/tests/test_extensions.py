@@ -138,10 +138,12 @@ def test_contact_extension():
     )
 
     assert topic.contact_html == (
-        "Steve Jobs\n"
-        '<a href="mailto:steve@apple.com">steve@apple.com</a>\n'
-        '<a href="https://www.apple.com" rel="nofollow">'
-        'https://www.apple.com</a>'
+        '<ul>'
+        '<li>Steve Jobs</li>'
+        '<li><a href="mailto:steve@apple.com">steve@apple.com</a></li>'
+        '<li><a href="https://www.apple.com" rel="nofollow">'
+        'https://www.apple.com</a></li>'
+        '</ul>'
     )
 
     form_class = topic.with_content_extensions(TopicForm, request=object())
