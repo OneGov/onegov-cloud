@@ -628,6 +628,7 @@ def translate_to_yaml(text):
 
     lines = ((ix, l) for ix, l in prepare(text))
     expect_nested = False
+    actual_fields = 0
 
     for ix, line in lines:
 
@@ -649,6 +650,7 @@ def translate_to_yaml(text):
                 definition=line.split('=')[1].strip()
             )
             expect_nested = indent and True or False
+            actual_fields += 1
             continue
 
         # checkboxes/radios come without identifier
@@ -678,8 +680,12 @@ def translate_to_yaml(text):
             )
 
             expect_nested = True
+            actual_fields += 1
             continue
 
+        raise errors.InvalidFormSyntax(line=ix + 1)
+
+    if not actual_fields:
         raise errors.InvalidFormSyntax(line=ix + 1)
 
 

@@ -395,3 +395,7 @@ def test_invalid_syntax():
             "    [x] What",
         )))
     assert e.value.line == 3
+
+    with pytest.raises(errors.InvalidFormSyntax) as e:
+        parse_form('# Personalien')
+    assert e.value.line == 1
