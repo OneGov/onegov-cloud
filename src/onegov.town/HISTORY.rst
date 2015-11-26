@@ -6,9 +6,13 @@ Unreleased
 
 - Adds an extra confirmation step to the reservations to be more consistent
   with the way form and event submissions work.
+  [href]
 
 - Adds the ability to reserve parts of an allocation. Allocations in rooms are
   partly reservable by default.
+  [href]
+
+- Don't show a grey box below images with an empty alt text.
   [href]
 
 0.9.2 (2015-11-24)
