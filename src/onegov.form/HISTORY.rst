@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.8.3 (2015-11-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an error message if no actual field was defined in a definition.
   [href]
 
