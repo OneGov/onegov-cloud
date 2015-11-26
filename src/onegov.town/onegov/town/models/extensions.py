@@ -135,7 +135,9 @@ class ContactExtension(ContentExtension):
     @contact.setter
     def contact(self, value):
         self.content['contact'] = value
-        self.content['contact_html'] = linkify(value)
+        self.content['contact_html'] = '<ul><li>{}</li></ul>'.format(
+            '</li><li>'.join(linkify(value).splitlines())
+        )
 
     @property
     def contact_html(self):

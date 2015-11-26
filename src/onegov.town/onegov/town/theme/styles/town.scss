@@ -543,12 +543,19 @@ $more-link-icon: '\f054';
     }
 
     &.contact-panel {
-        p {
-            margin-bottom: 0;
+        ul {
+            list-style-type: none;
         }
 
-        p:first-line {
+        li:first-child {
             font-weight: bold;
+        }
+
+        li {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+            min-height: 1rem;
         }
     }
 }

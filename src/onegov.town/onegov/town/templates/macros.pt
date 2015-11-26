@@ -214,7 +214,7 @@
             </div>
             <div class="small-12 medium-4 columns" tal:condition="people or contact">
                 <div class="page-content-panel contact-panel" tal:condition="contact">
-                    <p tal:content="structure contact.rstrip('\n').replace('\n', '<br>')"></p>
+                    <tal:block content="structure contact" />
                 </div>
                 <div class="page-content-panel people-panel" tal:condition="people">
                     <h2 i18n:translate>People</h2>

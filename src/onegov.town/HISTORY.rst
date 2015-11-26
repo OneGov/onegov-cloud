@@ -15,6 +15,9 @@ Unreleased
 - Don't show a grey box below images with an empty alt text.
   [href]
 
+- Removes extra spaces occurring on certain contact panels.
+  [href]
+
 0.9.2 (2015-11-24)
 ~~~~~~~~~~~~~~~~~~~
 

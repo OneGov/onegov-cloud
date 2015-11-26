@@ -4,9 +4,12 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.core.orm.abstract import sort_siblings
 from onegov.core.upgrade import upgrade_task
+from onegov.form import FormCollection
+from onegov.libres import ResourceCollection
+from onegov.page import PageCollection
 from onegov.town import TownApp
 from onegov.town.initial_content import add_resources
-from onegov.page import PageCollection
+from onegov.town.models.extensions import ContactExtension
 
 
 @upgrade_task('Add initial libres resources', always_run=False)
@@ -30,3 +33,25 @@ def add_order_to_all_pages(context):
         sort_siblings(siblings, key=PageCollection.sort_key)
 
         processed_siblings.update(ids)
+
+
+@upgrade_task('Update contact html')
+def change_contact_html(context):
+    items = []
+
+    items.extend(PageCollection(context.session).query().all())
+    items.extend(FormCollection(context.session).definitions.query().all())
+
+    if isinstance(context.app, TownApp):
+        items.extend(
+            ResourceCollection(context.app.libres_context).query().all()
+        )
+
+    for item in items:
+        if not isinstance(item, ContactExtension):
+            continue
+        if not item.contact:
+            continue
+
+        # forces a re-render of the contact html
+        item.contact = item.contact
