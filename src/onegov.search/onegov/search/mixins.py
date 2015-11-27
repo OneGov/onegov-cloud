@@ -26,8 +26,7 @@ class Searchable(object):
 
     The rest of the properties may be normal properties.
 
-    Polymorphic Identities
-    ======================
+    **Polymorphic Identities**
 
     If SQLAlchemy's Polymorphic Identities are used, each identity must
     have it's own unqiue ``es_type_name``. Though such models may share
