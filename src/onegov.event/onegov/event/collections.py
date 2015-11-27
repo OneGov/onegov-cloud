@@ -114,7 +114,7 @@ class EventCollection(EventCollectionPagination):
         self.session.flush()
 
     def by_name(self, name):
-        """ Returns an event by its URL-friendly name."""
+        """ Returns an event by its URL-friendly name. """
 
         query = self.session.query(Event).filter(Event.name == name)
         return query.first()
@@ -280,9 +280,14 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
     def by_name(self, name):
         """ Returns an occurrence by its URL-friendly name.
 
-        The URL-friendly name is automatically constructed as followed:
-            ``unique name of the event``-``date of the occurrence``
-        e.g. ``squirrel-park-visit-6-2015-06-20``
+        The URL-friendly name is automatically constructed as follows:
+
+        ``unique name of the event``-``date of the occurrence``
+
+        e.g.
+
+        ``squirrel-park-visit-6-2015-06-20``
+
         """
 
         query = self.session.query(Occurrence).filter(Occurrence.name == name)
