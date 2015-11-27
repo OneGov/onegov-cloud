@@ -189,7 +189,7 @@
         <div class="row">
             <div class="small-12 columns">
                 <div class="panel callout">
-                    <p i18n:translate>This site contains no lead.</p>
+                    <p i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
                 </div>
             </div>
         </div>
