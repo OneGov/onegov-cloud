@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Enables YubiKey integration.
+  [href]
+
 0.1.6 (2015-10-26)
 ~~~~~~~~~~~~~~~~~~~
 
