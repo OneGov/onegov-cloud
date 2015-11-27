@@ -34,16 +34,17 @@ class Layout(object):
     #: Just like the timezone, these values are fixed for Switzerland now,
     #: though the non-numerical information is actually translated.
     #: Format:
-    #: http://www.unicode.org\
-    #:       /reports/tr35/tr35-39/tr35-dates.html#Date_Format_Patterns
+    #
+    #: http://www.unicode.org/reports/tr35/tr35-39/tr35-dates.html
+    #: #Date_Format_Patterns
     #:
     #: Classes inheriting from :class:`Layout` may add their own formats, as
     #: long as they end in ``_format``. For example::
     #:
-    #:    class MyLayout(Layout):
-    #:        my_format = 'dd.MMMM'
+    #:     class MyLayout(Layout):
+    #:         my_format = 'dd.MMMM'
     #:
-    #:    MyLayout().format_date(dt, 'my')
+    #:     MyLayout().format_date(dt, 'my')
     #:
     #: XXX this is not yet i18n and could be done better
     time_format = 'HH:mm'

@@ -218,7 +218,7 @@ def hash_dictionary(dictionary):
 
 
 def groupbylist(*args, **kwargs):
-    """ Works just like Python's ``itertools.groupby``function, but instead
+    """ Works just like Python's ``itertools.groupby`` function, but instead
     of returning generators, it returns lists.
 
     """

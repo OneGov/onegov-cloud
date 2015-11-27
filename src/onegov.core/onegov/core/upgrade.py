@@ -65,11 +65,11 @@ def get_upgrade_modules():
     """ Returns all modules that registered themselves for onegov.core
     upgrades like this::
 
-    entry_points={
-        'onegov.core': [
-            'upgrade = onegov.mypackage.upgrade'
-        ]
-    }
+        entry_points={
+            'onegov.core': [
+                'upgrade = onegov.mypackage.upgrade'
+            ]
+        }
 
     """
     for distribution, entry_map in get_distributions_with_entry_map('onegov'):

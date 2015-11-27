@@ -1,4 +1,4 @@
-""" Provies tools and methods for internationalization (i18n).
+""" Provides tools and methods for internationalization (i18n).
 
 Applications wishing to use i18n need to define two settings:
 
@@ -258,8 +258,10 @@ def merge(translations):
     all existing translations are changed during this processed. To avoid
     this, clone the translation first (see :func:`clone`).
 
-    :return: The last GNUTranslations object with all other translation
-    objects merged into it. The first element overrides the second and so on.
+    :returns:
+        The last GNUTranslations object with all other translation
+        objects merged into it. The first element overrides the second and so
+        on.
 
     """
     assert len(translations) > 1

@@ -134,11 +134,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
     def configure_application(self, **cfg):
         """ Configures the application. This function calls all methods on
-        the current class which start with 'configure_', passing the
+        the current class which start with ``configure_``, passing the
         configuration as keyword arguments.
 
         The core itself supports the following parameters. Additional
-        parameters are made available by extra 'configure_' methods.
+        parameters are made available by extra ``configure_`` methods.
 
         :dsn:
             The database connection to use. May be None.
