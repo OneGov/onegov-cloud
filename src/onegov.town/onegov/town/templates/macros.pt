@@ -218,8 +218,8 @@
                 </div>
                 <div class="page-content-panel people-panel" tal:condition="people">
                     <h2 i18n:translate>People</h2>
-                    <ul>
-                        <li tal:repeat="person people">
+                    <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
+                        <li tal:repeat="person people" data-sortable-id="${request.is_logged_in and person.id}">
                             <a href="${request.link(person)}">${person.title}</a>
                             <small>${person.context_specific_function}</small>
                         </li>

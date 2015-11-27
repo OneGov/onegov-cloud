@@ -29,6 +29,7 @@ from onegov.town.models import (
     ImageCollection,
     News,
     PageMove,
+    PersonMove,
     Search,
     SiteCollection,
     Thumbnail,
@@ -211,7 +212,7 @@ def get_sitecollection(app):
 
 
 @TownApp.path(model=PageMove,
-              path='/page-move/{subject_id}/{direction}/{target_id}',
+              path='/move/page/{subject_id}/{direction}/{target_id}',
               converters=dict(subject_id=int, target_id=int))
 def get_page_move(app, subject_id, direction, target_id):
     session = app.session()
@@ -222,6 +223,19 @@ def get_page_move(app, subject_id, direction, target_id):
 
     if subject and target:
         return PageMove(session, subject, target, direction)
+
+
+@TownApp.path(model=PersonMove,
+              path='/move/person/{page_id}/{subject}/{direction}/{target}')
+def get_person_move(app, page_id, subject, direction, target):
+    session = app.session()
+    page = PageCollection(session).by_id(page_id)
+
+    if page:
+        subject = subject.replace('-', '')
+        target = target.replace('-', '')
+
+        return PersonMove(session, page, subject, target, direction)
 
 
 @TownApp.path(model=OccurrenceCollection, path='/veranstaltungen',

@@ -12,6 +12,10 @@ Unreleased
   partly reservable by default.
   [href]
 
+- Adds the ability to re-order people in the people's panel. Works just like
+  page reorderings do.
+  [href]
+
 - Don't show a grey box below images with an empty alt text.
   [href]
 

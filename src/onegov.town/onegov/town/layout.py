@@ -14,10 +14,12 @@ from onegov.town.models import (
     FileCollection,
     ImageCollection,
     PageMove,
+    PersonMove,
     Search,
     SiteCollection,
     Thumbnail
 )
+from onegov.town.models.extensions import PersonLinkExtension
 from onegov.user import Auth
 from purl import URL
 from sqlalchemy import desc
@@ -231,6 +233,13 @@ class Layout(ChameleonLayout):
         if field.data.get('data', '').startswith('@'):
             return self.request.link(
                 FormSubmissionFile(id=field.data['data'].lstrip('@')))
+
+    @cached_property
+    def move_person_url_template(self):
+        assert isinstance(self.model, PersonLinkExtension)
+        return self.csrf_protected_url(
+            self.request.link(PersonMove.for_url_template(page=self.model))
+        )
 
 
 class DefaultMailLayout(Layout):
