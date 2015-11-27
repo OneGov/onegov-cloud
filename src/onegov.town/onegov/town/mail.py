@@ -5,7 +5,7 @@ from onegov.town.layout import DefaultMailLayout
 def send_html_mail(request, template, content, **kwargs):
     """" Sends an email rendered from the given template.
 
-    Example:
+    Example::
 
         send_html_mail(request, 'mail_template.pt', {'model': self},
             subject=_("Test subject")
