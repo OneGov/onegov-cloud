@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.10.0 (2015-11-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an extra confirmation step to the reservations to be more consistent
   with the way form and event submissions work.
   [href]
