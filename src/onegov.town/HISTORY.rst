@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.10.1 (2015-11-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds people re-ordering for forms and resources in addition to pages.
   [href]
 
