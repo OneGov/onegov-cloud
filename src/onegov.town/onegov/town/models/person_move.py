@@ -1,30 +1,70 @@
+from onegov.page import Page
+from onegov.form import FormDefinition
+from onegov.libres.models import Resource
+
+
 class PersonMove(object):
     """ Represents a single move of a linked person. """
 
-    def __init__(self, session, page, subject, target, direction):
+    def __init__(self, session, obj, subject, target, direction):
         self.session = session
-        self.page = page
-        self.subject = subject
-        self.target = target
+        self.obj = obj
+
+        # remove the dashes from the uuid
+        self.subject = subject.replace('-', '')
+        self.target = target.replace('-', '')
         self.direction = direction
 
+    def execute(self):
+        self.obj.move_person(
+            subject=self.subject,
+            target=self.target,
+            direction=self.direction
+        )
+
     @classmethod
-    def for_url_template(cls, page):
+    def for_url_template(cls, obj):
         return cls(
             session=None,
-            page=page,
+            obj=obj,
             subject='{subject_id}',
             target='{target_id}',
             direction='{direction}'
         )
 
-    @property
-    def page_id(self):
-        return self.page.id
+    @staticmethod
+    def get_implementation(obj):
+        if isinstance(obj, Page):
+            return PagePersonMove
 
-    def execute(self):
-        self.page.move_person(
-            subject=self.subject,
-            target=self.target,
-            direction=self.direction
-        )
+        if isinstance(obj, FormDefinition):
+            return FormPersonMove
+
+        if isinstance(obj, Resource):
+            return ResourcePersonMove
+
+        raise NotImplementedError
+
+
+class PagePersonMove(PersonMove):
+    """ Represents a single move of a linked person on a page. """
+
+    @property
+    def key(self):
+        return self.obj.id
+
+
+class FormPersonMove(PersonMove):
+    """ Represents a single move of a linked person on a form definition. """
+
+    @property
+    def key(self):
+        return self.obj.name
+
+
+class ResourcePersonMove(PersonMove):
+    """ Represents a single move of a linked person on a form definition. """
+
+    @property
+    def key(self):
+        return self.obj.id

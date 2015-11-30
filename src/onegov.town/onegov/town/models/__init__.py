@@ -6,7 +6,12 @@ from onegov.town.models.form import BuiltinFormDefinition, CustomFormDefinition
 from onegov.town.models.image import Image, ImageCollection, Thumbnail
 from onegov.town.models.page import AtoZPages, News, Topic
 from onegov.town.models.page_move import PageMove
-from onegov.town.models.person_move import PersonMove
+from onegov.town.models.person_move import (
+    FormPersonMove,
+    PagePersonMove,
+    PersonMove,
+    ResourcePersonMove,
+)
 from onegov.town.models.resource import DaypassResource
 from onegov.town.models.search import Search
 from onegov.town.models.sitecollection import SiteCollection
@@ -24,11 +29,14 @@ __all__ = [
     'Editor',
     'File',
     'FileCollection',
+    'FormPersonMove',
     'Image',
     'ImageCollection',
     'News',
     'PageMove',
+    'PagePersonMove',
     'PersonMove',
+    'ResourcePersonMove',
     'Search',
     'SiteCollection',
     'Thumbnail',

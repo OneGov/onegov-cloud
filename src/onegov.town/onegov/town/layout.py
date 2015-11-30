@@ -237,9 +237,11 @@ class Layout(ChameleonLayout):
     @cached_property
     def move_person_url_template(self):
         assert isinstance(self.model, PersonLinkExtension)
-        return self.csrf_protected_url(
-            self.request.link(PersonMove.for_url_template(page=self.model))
-        )
+
+        implementation = PersonMove.get_implementation(self.model)
+        move = implementation.for_url_template(self.model)
+
+        return self.csrf_protected_url(self.request.link(move))
 
 
 class DefaultMailLayout(Layout):
@@ -263,6 +265,9 @@ class DefaultLayout(Layout):
         # always include the common js files
         self.request.include('common')
         self.request.include('common_css')
+
+        if self.request.is_logged_in:
+            self.request.include('sortable')
 
     @cached_property
     def breadcrumbs(self):
@@ -360,12 +365,6 @@ class AdjacencyListLayout(DefaultLayout):
 
 
 class PageLayout(AdjacencyListLayout):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if self.request.is_logged_in:
-            self.request.include('sortable')
 
     @cached_property
     def breadcrumbs(self):

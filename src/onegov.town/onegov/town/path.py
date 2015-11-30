@@ -25,16 +25,18 @@ from onegov.town.models import (
     Editor,
     File,
     FileCollection,
+    FormPersonMove,
     Image,
     ImageCollection,
     News,
     PageMove,
-    PersonMove,
+    PagePersonMove,
+    ResourcePersonMove,
     Search,
     SiteCollection,
     Thumbnail,
     Topic,
-    Town
+    Town,
 )
 from onegov.page import PageCollection
 from onegov.people import Person, PersonCollection
@@ -225,17 +227,36 @@ def get_page_move(app, subject_id, direction, target_id):
         return PageMove(session, subject, target, direction)
 
 
-@TownApp.path(model=PersonMove,
-              path='/move/person/{page_id}/{subject}/{direction}/{target}')
-def get_person_move(app, page_id, subject, direction, target):
+@TownApp.path(model=PagePersonMove,
+              path='/move/page-person/{key}/{subject}/{direction}/{target}')
+def get_person_move(app, key, subject, direction, target):
     session = app.session()
-    page = PageCollection(session).by_id(page_id)
+    page = PageCollection(session).by_id(key)
 
     if page:
-        subject = subject.replace('-', '')
-        target = target.replace('-', '')
+        return PagePersonMove(session, page, subject, target, direction)
 
-        return PersonMove(session, page, subject, target, direction)
+
+@TownApp.path(model=FormPersonMove,
+              path='/move/form-person/{key}/{subject}/{direction}/{target}')
+def get_form_move(app, key, subject, direction, target):
+    session = app.session()
+    form = FormCollection(session).definitions.by_name(key)
+
+    if form:
+        return FormPersonMove(session, form, subject, target, direction)
+
+
+@TownApp.path(
+    model=ResourcePersonMove,
+    path='/move/resource-person/{key}/{subject}/{direction}/{target}')
+def get_resource_move(app, key, subject, direction, target):
+    session = app.session()
+    resource = ResourceCollection(app.libres_context).by_id(key)
+
+    if resource:
+        return ResourcePersonMove(
+            session, resource, subject, target, direction)
 
 
 @TownApp.path(model=OccurrenceCollection, path='/veranstaltungen',
