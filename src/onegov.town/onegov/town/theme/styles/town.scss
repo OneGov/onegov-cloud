@@ -1482,6 +1482,13 @@ tr.ticket:hover {
         background-color: $primary-color !important;
     }
 
+    .fc-month-view {
+        .fc-day-number {
+            font-size: .875rem;
+            padding: .25rem .5rem;
+        }
+    }
+
     table {
         background-color: transparent;
         margin-bottom: 0;
@@ -1534,7 +1541,15 @@ tr.ticket:hover {
             display: none;
         }
 
+        .fc-title {
+            font-size: .8rem;
+        }
+
         &.fc-short .fc-title {
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
             br {
                 display: none;
             }

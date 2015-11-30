@@ -7,6 +7,9 @@ Unreleased
 - Adds people re-ordering for forms and resources in addition to pages.
   [href]
 
+- Improvres readability of fullcalendar.
+  [href]
+
 0.10.0 (2015-11-27)
 ~~~~~~~~~~~~~~~~~~~
 
