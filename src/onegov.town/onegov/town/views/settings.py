@@ -16,7 +16,9 @@ from onegov.town.models import Town
 def handle_settings(self, request, form):
     """ Handles the GET and POST login requests. """
 
-    request.include('common')
+    layout = DefaultLayout(self, request)
+    layout.include_editor()
+
     request.include('check_contrast')
 
     if form.submitted(request):
@@ -59,7 +61,6 @@ def handle_settings(self, request, form):
         form.reservations_label.data = self.meta.get('reservations_label')
         form.sbb_daypass_label.data = self.meta.get('sbb_daypass_label')
 
-    layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Settings"), request.link(self))

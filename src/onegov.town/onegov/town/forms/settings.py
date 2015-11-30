@@ -1,7 +1,7 @@
 from onegov.form import Form, with_options
 from wtforms import HiddenField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.widgets import TextArea
+from wtforms.widgets import TextArea, TextInput
 from wtforms_components import ColorField
 from onegov.town import _
 from onegov.town.theme import user_options
@@ -18,7 +18,8 @@ class SettingsForm(Form):
     logo_url = StringField(
         label=_("Logo"),
         description=_("URL pointing to the logo"),
-        fieldset=_("General")
+        fieldset=_("General"),
+        widget=with_options(TextInput, class_='image-url')
     )
     reply_to = EmailField(
         _("E-Mail Reply Address"), [validators.InputRequired()],
