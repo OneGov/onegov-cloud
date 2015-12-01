@@ -18,7 +18,13 @@ class PageBaseForm(Form):
 
 class LinkForm(PageBaseForm):
     """ Defines the form for pages with the 'link' trait. """
-    url = URLField(_("URL"), [validators.InputRequired()])
+    url = URLField(
+        label=_("URL"),
+        validators=[validators.InputRequired()],
+        widget=with_options(
+            TextInput, class_='image-url file-url internal-url'
+        )
+    )
 
     def update_model(self, model):
         """ Stores the form values on the page. """
