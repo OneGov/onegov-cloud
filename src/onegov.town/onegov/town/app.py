@@ -195,6 +195,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'js/filemanager.js',
             'js/imagemanager.js',
             'js/redactor.de.js',
+            'js/input_with_button.js',
             'js/editor.js',
             filters=jsminifier,
             output='bundles/editor.bundle.js'
@@ -221,6 +222,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             confirm,
             typeahead,
             'js/jquery.datetimepicker.js',
+            'js/jquery.popupoverlay.js',
             'js/common.js',
             filters=jsminifier,
             output='bundles/common.bundle.js'
@@ -237,7 +239,6 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'js/moment.de.js',
             'js/fullcalendar.js',
             'js/fullcalendar.de.js',
-            'js/jquery.popupoverlay.js',
             'js/fullcalendar_custom.js',
             filters=jsminifier,
             output='bundles/fullcalendar.bundle.js'

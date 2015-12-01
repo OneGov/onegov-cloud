@@ -15,23 +15,77 @@
 // see http://foundation.zurb.com/sites/docs/v/5.5.3/components/forms.html#pre-postfix-labels-amp-actions
 //
 // the result is a reference to the button
-var wrap_input_with_button = function(input) {
+var setup_internal_link_select = function(input) {
     input = $(input);
+
+    var types = get_types(input);
+    var button = get_button_face(types);
+
+    if (types.length === 0) {
+        return;
+    }
 
     input.wrap('<div class="small-11 columns"></div>');
     input.closest('.columns').wrap('<div class="row collapse input-with-button">');
     input.closest('.row').append(
-        '<div class="small-1 columns"><a href="#" class="button postfix">…</div>'
+        '<div class="small-1 columns"><a class="button secondary postfix">' + button + '</div>'
     );
 
-    var types = get_types(input);
     var row = input.closest('.row');
-
     for (var i=0; i<types.length; i++) {
         row.addClass(types[i]);
     }
 
-    return input.closest('.row').find('a.button');
+    if (types.length == 1) {
+        row.find('.button').click(function(e) {
+            on_internal_link_button_click(input, types[0]);
+            e.preventDefault();
+            return false;
+        });
+    } else {
+        row.find('.button').click(function(e) {
+            var popup_content = $('<div class="popup" />');
+
+            if (types.indexOf('image-url') != -1) {
+                popup_content.append($('<a class="image-url">Bild</a>'));
+            }
+
+            if (types.indexOf('file-url') != -1) {
+                popup_content.append($('<a class="file-url">Datei</a>'));
+            }
+
+            if (types.indexOf('internal-url') != -1) {
+                popup_content.append($('<a class="internal-url">Interner Link</a>'));
+            }
+
+            popup_content.popup({
+                'autoopen': true,
+                'horizontal': 'right',
+                'offsetleft': -10,
+                'tooltipanchor': row.find('.button'),
+                'transition': null,
+                'type': 'tooltip',
+                'onopen': function() {
+                    var popup = $(this);
+
+                    // any link clicked will close the popup
+                    popup.find('a').click(function() {
+                        popup.popup('hide');
+                    });
+
+                    popup.find('a').click(function(e) {
+                        var type = get_types($(this))[0];
+                        on_internal_link_button_click(input, type);
+                        e.preventDefault();
+                    });
+                },
+                'detach': true
+            });
+
+            e.preventDefault();
+            return false;
+        });
+    }
 };
 
 var get_types = function(input) {
@@ -50,16 +104,23 @@ var get_types = function(input) {
     return types;
 };
 
-var setup_internal_link_select = function(el) {
-    var button = wrap_input_with_button(el);
-    button.on('click', function(e) {
-        on_internal_link_button_click(el);
-        e.preventDefault();
-        return false;
-    });
+var get_button_face = function(types) {
+    if (types.length == 1) {
+        if (types[0] == 'image-url') {
+            return '<i class="fa fa-file-image-o"></i>';
+        }
+        if (types[0] == 'file-url') {
+            return '<i class="fa fa-paperclip"></i>';
+        }
+        if (types[0] == 'internal-url') {
+            return '<i class="fa fa-link"></i>';
+        }
+    }
+
+    return '…';
 };
 
-var on_internal_link_button_click = function(input) {
+var on_internal_link_button_click = function(input, type) {
     var form = $(input).closest('form');
 
     var virtual = $('<textarea><p></p></textarea>').redactor({
@@ -104,24 +165,13 @@ var on_internal_link_button_click = function(input) {
         }
     );
 
-    var $input = $(input);
+    var mapping = {
+        'image-url': 'image.show',
+        'file-url': 'file.show',
+        'internal-url': 'link.show'
+    };
 
-    if ($input.hasClass('image-url')) {
-        $(virtual).redactor('image.show');
-    }
-
-    else if ($input.hasClass('file-url')) {
-        $(virtual).redactor('file.show');
-    }
-
-    else if ($input.hasClass('internal-url')) {
-        $(virtual).redactor('link.show');
-    }
-
-    else {
-        throw "Unknown button type";
-    }
-
+    $(virtual).redactor(mapping[type]);
 };
 
 jQuery.fn.internal_link_select = function() {
