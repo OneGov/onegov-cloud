@@ -9,6 +9,10 @@
     It will then show a small button next to the input element which will
     allow for selection if an image url, a file url or an internal url
     respecitively.
+
+    It's possible to use all of these classes at the same time. In this case
+    a popup is shown when clicking the button. The user may then select if
+    he wants to use an image, a file or an internal url.
 */
 
 // takes the given input element and wraps it with a button
@@ -28,7 +32,7 @@ var setup_internal_link_select = function(input) {
     input.wrap('<div class="small-11 columns"></div>');
     input.closest('.columns').wrap('<div class="row collapse input-with-button">');
     input.closest('.row').append(
-        '<div class="small-1 columns"><a class="button secondary postfix">' + button + '</div>'
+        '<div class="small-1 columns"><a class="button secondary postfix">' + button + '</a></div>'
     );
 
     var row = input.closest('.row');
@@ -46,6 +50,7 @@ var setup_internal_link_select = function(input) {
         row.find('.button').click(function(e) {
             var popup_content = $('<div class="popup" />');
 
+            // XXX put translatable strings in a separate file
             if (types.indexOf('image-url') != -1) {
                 popup_content.append($('<a class="image-url">Bild</a>'));
             }
@@ -136,15 +141,12 @@ var on_internal_link_button_click = function(input, type) {
     var redactor = virtual.data('redactor');
 
     redactor.insert.html = jQuery.proxy(function(html) {
-        var input = $(this[0]);
-        var redactor = this[1];
+        var input = $(this);
 
         input.val(
             $(html).attr('src') || $(html).attr('href')
         );
-
-        redactor.core.destroy();
-    }, [input, redactor]);
+    }, input);
 
     redactor.$textarea.on('insertedLinkCallback.redactor',
         jQuery.proxy(function(args) {
@@ -155,7 +157,6 @@ var on_internal_link_button_click = function(input, type) {
                 $(redactor.modal.getModal()).find('input[type="url"]').val()
             );
 
-            redactor.core.destroy();
         }, [input, redactor])
     );
 
@@ -164,6 +165,19 @@ var on_internal_link_button_click = function(input, type) {
             this.$modal.addClass('input-with-button');
         }
     );
+
+    redactor.$textarea.on('modalClosedCallback.redactor',
+        function() {
+            this.core.destroy();
+        }
+    );
+
+    // required for IE to work >
+    redactor.selection.addRange = function() {};
+    redactor.selection.getCurrent = function() {
+        return $(virtual).find('p');
+    };
+    // <
 
     var mapping = {
         'image-url': 'image.show',
