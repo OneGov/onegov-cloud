@@ -39,7 +39,8 @@ class SettingsForm(Form):
     contact_url = URLField(
         label=_("Contact Page"),
         description=_("URL pointing to a contact page"),
-        fieldset=_("General")
+        fieldset=_("General"),
+        widget=with_options(TextInput, class_='internal-url')
     )
     opening_hours = TextAreaField(
         label=_("Opening Hours"),
@@ -50,7 +51,8 @@ class SettingsForm(Form):
     opening_hours_url = URLField(
         label=_("Opening Hours Page"),
         description=_("URL pointing to an opening hours page"),
-        fieldset=_("General")
+        fieldset=_("General"),
+        widget=with_options(TextInput, class_='internal-url')
     )
     facebook_url = URLField(
         label=_("Facebook"),

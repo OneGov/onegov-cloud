@@ -327,6 +327,22 @@ form {
 }
 
 /*
+    input buttons
+*/
+.input-with-button {
+    .button {
+        padding: 0;
+    }
+
+    #redactor-modal-link-insert {
+        > input,
+        > label {
+            display: none;
+        }
+    }
+}
+
+/*
     form display rendering
 */
 .fieldset-display {
