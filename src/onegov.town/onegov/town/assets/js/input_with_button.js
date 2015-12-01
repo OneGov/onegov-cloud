@@ -61,7 +61,7 @@ var setup_internal_link_select = function(input) {
             popup_content.popup({
                 'autoopen': true,
                 'horizontal': 'right',
-                'offsetleft': -10,
+                'offsetleft': 8,
                 'tooltipanchor': row.find('.button'),
                 'transition': null,
                 'type': 'tooltip',
@@ -107,7 +107,7 @@ var get_types = function(input) {
 var get_button_face = function(types) {
     if (types.length == 1) {
         if (types[0] == 'image-url') {
-            return '<i class="fa fa-file-image-o"></i>';
+            return '<i class="fa fa-picture-o"></i>';
         }
         if (types[0] == 'file-url') {
             return '<i class="fa fa-paperclip"></i>';

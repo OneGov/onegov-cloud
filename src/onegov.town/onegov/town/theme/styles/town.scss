@@ -594,6 +594,9 @@ $new-person-icon: '\f007';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $paste-link-icon: '\f0ea';
+$file-link-icon: '\f0c6';
+$image-link-icon: '\f03e';
+$internal-link-icon: '\f0c1';
 
 .edit-bar,
 .popup {
@@ -616,7 +619,10 @@ $paste-link-icon: '\f0ea';
     }
 
     a:before {
-        margin-right: .6em;
+        display: inline-block;
+        margin-right: 5px;
+        text-align: center;
+        width: 15px;
     }
 
     .accept-link:before { @include icon($accept-link-icon); }
@@ -633,6 +639,9 @@ $paste-link-icon: '\f0ea';
     .new-reservation:before { @include icon($new-reservation-icon); }
     .new-room:before { @include icon($new-room-icon); }
     .paste-link:before { @include icon($paste-link-icon); }
+    .file-url:before { @include icon($file-link-icon); }
+    .image-url:before { @include icon($image-link-icon); }
+    .internal-url:before { @include icon($internal-link-icon); }
 }
 
 /*
