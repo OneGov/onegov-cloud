@@ -64,12 +64,34 @@ class SettingsForm(Form):
         description=_("URL pointing to the twitter site"),
         fieldset=_("General")
     )
-    homepage_images = TextAreaField(
-        label=_("Homepage Images"),
-        description=_(
-            "Up to six URLs pointing to images for the tiles on the homepage."
-        ),
-        widget=with_options(TextArea, rows=6),
+    homepage_image_1 = StringField(
+        label=_("Homepage Image #1"),
+        widget=with_options(TextInput, class_='image-url'),
+        fieldset=_("Homepage")
+    )
+    homepage_image_2 = StringField(
+        label=_("Homepage Image #2"),
+        widget=with_options(TextInput, class_='image-url'),
+        fieldset=_("Homepage")
+    )
+    homepage_image_3 = StringField(
+        label=_("Homepage Image #3"),
+        widget=with_options(TextInput, class_='image-url'),
+        fieldset=_("Homepage")
+    )
+    homepage_image_4 = StringField(
+        label=_("Homepage Image #4"),
+        widget=with_options(TextInput, class_='image-url'),
+        fieldset=_("Homepage")
+    )
+    homepage_image_5 = StringField(
+        label=_("Homepage Image #5"),
+        widget=with_options(TextInput, class_='image-url'),
+        fieldset=_("Homepage")
+    )
+    homepage_image_6 = StringField(
+        label=_("Homepage Image #6"),
+        widget=with_options(TextInput, class_='image-url'),
         fieldset=_("Homepage")
     )
     online_counter_label = StringField(
@@ -102,7 +124,13 @@ class SettingsForm(Form):
     def theme_options(self):
         options = {
             'primary-color': self.primary_color.data.get_hex(),
-            'footer-height': self.footer_height.data
+            'footer-height': self.footer_height.data,
+            'tile-image-1': '"{}"'.format(self.homepage_image_1.data),
+            'tile-image-2': '"{}"'.format(self.homepage_image_2.data),
+            'tile-image-3': '"{}"'.format(self.homepage_image_3.data),
+            'tile-image-4': '"{}"'.format(self.homepage_image_4.data),
+            'tile-image-5': '"{}"'.format(self.homepage_image_5.data),
+            'tile-image-6': '"{}"'.format(self.homepage_image_6.data),
         }
 
         # override the options using the default vaules if no value was given
@@ -110,22 +138,15 @@ class SettingsForm(Form):
             if not options[key]:
                 options[key] = user_options[key]
 
-        urls = (url.strip() for url in self.homepage_images.data.split('\n'))
-        urls = (url for url in urls if url)
-
-        for ix, url in enumerate(urls):
-            # put the url in apostrophes, because it's a sass string
-            options['tile-image-{}'.format(ix + 1)] = '"{}"'.format(url)
-
         return options
 
     @theme_options.setter
-    def theme_options(self, theme_options):
-        self.primary_color.data = theme_options.get('primary-color')
-        self.footer_height.data = theme_options.get('footer-height')
-
-        tile_image_keys = ('tile-image-{}'.format(ix) for ix in range(1, 7))
-        urls = (theme_options.get(key) for key in tile_image_keys)
-        urls = (url.strip('"') for url in urls if url)
-
-        self.homepage_images.data = '\n'.join(urls)
+    def theme_options(self, options):
+        self.primary_color.data = options.get('primary-color')
+        self.footer_height.data = options.get('footer-height')
+        self.homepage_image_1.data = options.get('tile-image-1').strip('"')
+        self.homepage_image_2.data = options.get('tile-image-2').strip('"')
+        self.homepage_image_3.data = options.get('tile-image-3').strip('"')
+        self.homepage_image_4.data = options.get('tile-image-4').strip('"')
+        self.homepage_image_5.data = options.get('tile-image-5').strip('"')
+        self.homepage_image_6.data = options.get('tile-image-6').strip('"')
