@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-27 10:27+0100\n"
+"POT-Creation-Date: 2015-12-01 15:56+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -520,11 +520,23 @@ msgstr "Twitter"
 msgid "URL pointing to the twitter site"
 msgstr "URL zu Twitter"
 
-msgid "Homepage Images"
-msgstr "Bilder auf der Startseite"
+msgid "Homepage Image #1"
+msgstr "Startseiten Bild #1"
 
-msgid "Up to six URLs pointing to images for the tiles on the homepage."
-msgstr "Bis zu sechs Links zu Bildern für die Kacheln auf der Startseite"
+msgid "Homepage Image #2"
+msgstr "Startseiten Bild #2"
+
+msgid "Homepage Image #3"
+msgstr "Startseiten Bild #3"
+
+msgid "Homepage Image #4"
+msgstr "Startseiten Bild #4"
+
+msgid "Homepage Image #5"
+msgstr "Startseiten Bild #5"
+
+msgid "Homepage Image #6"
+msgstr "Startseiten Bild #6"
 
 msgid "Online Counter Label"
 msgstr "Online Schalter Beschreibung"
@@ -807,7 +819,9 @@ msgstr ""
 
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
-msgstr "Diese Seite hat keine Einleitungen. Die Einleitung ist wichtig für die Suche und Auflistungen."
+msgstr ""
+"Diese Seite hat keine Einleitungen. Die Einleitung ist wichtig für die Suche "
+"und Auflistungen."
 
 msgid "Closed"
 msgstr "Abgeschlossen"
@@ -1270,6 +1284,3 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
-
-#~ msgid "This site contains no lead."
-#~ msgstr "Diese Seite hat keine Einleitung."

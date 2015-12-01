@@ -329,10 +329,8 @@ def test_settings(town_app):
 
     assert '<img src="https://seantis.ch/logo.img"' in settings_page.text
 
-    settings_page.form['homepage_images'] = """
-        http://images/one
-        http://images/two
-    """
+    settings_page.form['homepage_image_1'] = "http://images/one"
+    settings_page.form['homepage_image_2'] = "http://images/two"
     settings_page = settings_page.form.submit()
 
     assert 'http://images/one' in settings_page
