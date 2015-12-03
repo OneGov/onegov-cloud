@@ -37,17 +37,16 @@
           <tal:block condition="request.is_logged_in">
             <tal:block define="ticket_count layout.request.app.ticket_count">
               <div class="ticket-count">
-                  <span i18n:translate>Tickets:</span>
-                  <div class="ticket-count-open">
+                  <div class="ticket-count-open ${ticket_count.open > 0 and 'highlight' or ''}">
                     <a href="${layout.open_tickets_url}">
                       <span class="number">${ticket_count.open}</span>
-                      <span class="text" i18n:translate>Open</span>
+                      <span class="text" i18n:translate>Open Tickets</span>
                     </a>
                   </div>
-                  <div class="ticket-count-pending">
+                  <div class="ticket-count-pending ${ticket_count.pending > 0 and 'highlight' or ''}">
                     <a href="${layout.pending_tickets_url}">
                       <span class="number">${ticket_count.pending}</span>
-                      <span class="text" i18n:translate>Pending</span>
+                      <span class="text" i18n:translate>Pending Tickets</span>
                     </a>
                   </div>
               </div>

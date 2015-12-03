@@ -773,14 +773,11 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
-msgid "Tickets:"
-msgstr "Tickets:"
+msgid "Open Tickets"
+msgstr "Offene Tickets"
 
-msgid "Open"
-msgstr "Offen"
-
-msgid "Pending"
-msgstr "In Bearbeitung"
+msgid "Pending Tickets"
+msgstr "Tickets in Bearbeitung"
 
 msgid "Search"
 msgstr "Suche"
@@ -822,6 +819,12 @@ msgid ""
 msgstr ""
 "Diese Seite hat keine Einleitungen. Die Einleitung ist wichtig für die Suche "
 "und Auflistungen."
+
+msgid "Open"
+msgstr "Offen"
+
+msgid "Pending"
+msgstr "In Bearbeitung"
 
 msgid "Closed"
 msgstr "Abgeschlossen"
@@ -1270,17 +1273,11 @@ msgstr "Sie haben das Ticket ${number} wieder geöffnet"
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
-msgid "Open Tickets"
-msgstr "Offene Tickets"
-
 msgid "Your request is currently pending"
 msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
 
 msgid "Ticket Status"
 msgstr "Ticket Status"
-
-msgid "Pending Tickets"
-msgstr "Tickets in Bearbeitung"
 
 msgid "Your request has been processed"
 msgstr "Ihr Anliegen wurde abgeschlossen"

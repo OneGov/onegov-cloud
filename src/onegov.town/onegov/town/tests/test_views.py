@@ -903,7 +903,7 @@ def test_tickets(town_app):
     login_page.form.submit()
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offen 0 In Bearbeitung'
+        == '0 Offene Tickets 0 Tickets in Bearbeitung'
 
     form_page = client.get('/formulare/neu')
     form_page.form['title'] = "Newsletter"
@@ -937,7 +937,7 @@ def test_tickets(town_app):
     login_page.form.submit()
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '1 Offen 0 In Bearbeitung'
+        == '1 Offene Tickets 0 Tickets in Bearbeitung'
 
     tickets_page = client.get('/tickets/ALL/open')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
@@ -949,7 +949,7 @@ def test_tickets(town_app):
     assert len(tickets_page.pyquery('tr.ticket')) == 1
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offen 1 In Bearbeitung'
+        == '0 Offene Tickets 1 Tickets in Bearbeitung'
 
     assert 'editor@example.org' in ticket_page
     assert 'Newsletter' in ticket_page
@@ -961,7 +961,7 @@ def test_tickets(town_app):
     ticket_page = ticket_page.click('Ticket abschliessen').follow()
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offen 0 In Bearbeitung'
+        == '0 Offene Tickets 0 Tickets in Bearbeitung'
 
     assert len(town_app.smtp.outbox) == 2
 
@@ -986,7 +986,7 @@ def test_tickets(town_app):
     assert len(tickets_page.pyquery('tr.ticket')) == 1
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offen 1 In Bearbeitung'
+        == '0 Offene Tickets 1 Tickets in Bearbeitung'
 
     message = town_app.smtp.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
@@ -1962,7 +1962,7 @@ def test_submit_event(town_app):
     login_page.form.submit()
 
     assert client.get('/').pyquery('.ticket-count div').text()\
-        == "1 Offen 0 In Bearbeitung"
+        == "1 Offene Tickets 0 Tickets in Bearbeitung"
 
     ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     assert ticket_nr in ticket_page

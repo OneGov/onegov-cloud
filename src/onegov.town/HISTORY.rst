@@ -10,6 +10,10 @@ Unreleased
 - Adds terms to events submission form.
   [msom]
 
+- Improves the display of open/pending tickets for logged in users.
+  [href]
+
+
 0.10.1 (2015-11-30)
 ~~~~~~~~~~~~~~~~~~~
 
