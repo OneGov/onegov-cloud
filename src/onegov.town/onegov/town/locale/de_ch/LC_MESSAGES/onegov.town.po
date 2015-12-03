@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-01 15:56+0100\n"
+"POT-Creation-Date: 2015-12-03 14:02+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1094,6 +1094,18 @@ msgstr "Ein Verweis wurde in die Zwischenablage kopiert"
 
 msgid "Submit an event"
 msgstr "Veranstaltung melden"
+
+#, python-format
+msgid ""
+"Only non-commercial events which take place in ${town} will be published. "
+"Published events might be deleted any time without giving reasons."
+msgstr ""
+"Im Veranstaltungskalender werden Anlässe jeglicher Art publiziert, welche "
+"innerhalb der Gemeinde ${town} oder im Zusammenhang mit einem Verein der "
+"Gemeinde ${town} durchgeführt werden. Nicht publiziert werden rein "
+"kommerzielle Veranstaltungen. Es besteht kein Publikationsrecht und bereits "
+"publizierte Veranstaltungen können jederzeit und ohne Angabe von Gründen "
+"gelöscht werden."
 
 #, python-format
 msgid "You have accepted the event ${title}"

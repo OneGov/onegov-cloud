@@ -7,6 +7,9 @@ Unreleased
 - Adds the ability to select images, files and internal links throug dialogs.
   [href]
 
+- Adds terms to events submission form.
+  [msom]
+
 0.10.1 (2015-11-30)
 ~~~~~~~~~~~~~~~~~~~
 

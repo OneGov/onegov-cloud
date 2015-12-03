@@ -93,6 +93,13 @@ def handle_new_event(self, request, form):
 
     self.title = _("Submit an event")
 
+    terms = _(
+        ("Only non-commercial events which take place in ${town} will be "
+         "published. Published events might be deleted any time without "
+         "giving reasons."),
+        mapping={'town': request.app.town.name}
+    )
+
     if form.submitted(request):
         model = Event()
         form.update_model(model)
@@ -120,7 +127,8 @@ def handle_new_event(self, request, form):
         'layout': layout,
         'title': self.title,
         'form': form,
-        'form_width': 'large'
+        'form_width': 'large',
+        'lead': terms
     }
 
 
