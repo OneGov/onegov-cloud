@@ -42,6 +42,7 @@ from onegov.page import PageCollection
 from onegov.people import Person, PersonCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import Auth
+from webob import exc
 
 
 @TownApp.path(model=Town, path='/')
@@ -217,6 +218,9 @@ def get_sitecollection(app):
               path='/move/page/{subject_id}/{direction}/{target_id}',
               converters=dict(subject_id=int, target_id=int))
 def get_page_move(app, subject_id, direction, target_id):
+    if subject_id == target_id:
+        raise exc.HTTPBadRequest()
+
     session = app.session()
     pages = PageCollection(session)
 
@@ -230,6 +234,9 @@ def get_page_move(app, subject_id, direction, target_id):
 @TownApp.path(model=PagePersonMove,
               path='/move/page-person/{key}/{subject}/{direction}/{target}')
 def get_person_move(app, key, subject, direction, target):
+    if subject == target:
+        raise exc.HTTPBadRequest()
+
     session = app.session()
     page = PageCollection(session).by_id(key)
 

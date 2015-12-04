@@ -16,6 +16,9 @@ Unreleased
 - Fixes invalid start/end times in allocations leading to an exception.
   [href]
 
+- Stops person/page move from leading to an exception in certain cases.
+  [href]
+
 0.10.1 (2015-11-30)
 ~~~~~~~~~~~~~~~~~~~
 
