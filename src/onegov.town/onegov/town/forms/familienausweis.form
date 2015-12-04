@@ -21,10 +21,10 @@ Datum Eheschliessung * = YYYY.MM.DD
 
 # Versand
 Versand * =
+    ( ) Ich möchte das Dokument am Schalter abholen
     (x) Ich möchte die Unterlagen mittels Post erhalten
         Strasse (inkl. Hausnummer) * = ___
         PLZ / Ort * = ___
-    ( ) Ich möchte das Dokument am Schalter abholen
 
 # Kontakt & Bemerkungen
 Telefon * = ___

@@ -17,13 +17,13 @@ Ebenfalls eine Bestätigung erstellen für =
 
 # Versand
 Versand * =
+    ( ) Ich möchte das Dokument am Schalter abholen
     (x) Ich möchte das Dokument mittels Post erhalten
         Abweichende Versandadresse =
             (x) Nein
             ( ) Ja
                 Strasse (inkl. Hausnummer) * = ___
                 PLZ / Ort * = ___
-    ( ) Ich möchte das Dokument am Schalter abholen
 
 # Kontakt & Bemerkungen
 Telefon * = ___

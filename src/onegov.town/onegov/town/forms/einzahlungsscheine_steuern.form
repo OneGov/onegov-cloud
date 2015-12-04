@@ -12,10 +12,10 @@ Anzahl Einzahlungsscheine = ___
 
 # Versand
 Versand * =
+    ( ) Ich möchte die Einzahlungsscheine am Schalter abholen
     (x) Ich möchte die Einzahlungsscheine mittels Post erhalten
         Strasse (inkl. Hausnummer) * = ___
         PLZ / Ort * = ___
-    ( ) Ich möchte die Einzahlungsscheine am Schalter abholen
 
 # Kontakt & Bemerkungen
 Telefon * = ___
