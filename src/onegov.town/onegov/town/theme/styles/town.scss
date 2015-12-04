@@ -1079,6 +1079,7 @@ div#redactor-droparea {
     .news-lead,
     .news-continue {
         margin-bottom: .5rem;
+        max-width: $max-line-width;
     }
 }
 
