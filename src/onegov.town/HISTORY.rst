@@ -19,6 +19,9 @@ Unreleased
 - Stops person/page move from leading to an exception in certain cases.
   [href]
 
+- Displays the function of a person in the overview.
+  [href]
+
 0.10.1 (2015-11-30)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1146,9 +1146,20 @@ $person-email-icon: '\f003';
         }
     }
 
-    .person-card-website:before { @include icon($person-website-icon); }
-    .person-card-phone:before { @include icon($person-phone-icon); }
-    .person-card-email:before { @include icon($person-email-icon); }
+    &.person-single-item {
+        .person-card-website:before {
+            @include icon($person-website-icon);
+            color: $primary-color;
+        }
+        .person-card-phone:before {
+            @include icon($person-phone-icon);
+            color: $primary-color;
+        }
+        .person-card-email:before {
+            @include icon($person-email-icon);
+            color: $primary-color;
+        }
+    }
 }
 
 @media #{$small-only} {
@@ -1176,8 +1187,17 @@ $person-email-icon: '\f003';
         }
     }
 
+    ul > li {
+        font-size: .875rem;
+    }
+
     .person-card-title {
+        font-size: 1rem;
         font-weight: bold;
+    }
+
+    .person-card-function {
+        margin-bottom: 0;
     }
 }
 

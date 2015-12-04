@@ -267,6 +267,9 @@
                     <span>${person.title}</span>
                 </a>
             </li>
+            <li tal:condition="person.function" class="person-card-function">
+                <em>${person.function}</em>
+            </li>
             <li tal:condition="person.email" class="person-card-email">
                 <a href="mailto:${person.email}">${person.email}</a>
             </li>
@@ -279,7 +282,7 @@
 </metal:person_card>
 
 <metal:person_card define-macro="person_card" i18n:domain="onegov.town">
-    <div class="person-card">
+    <div class="person-card person-single-item">
         <div aria-hidden="true" tal:define="url person.picture_url">
             <div class="person-card-portrait">
                 <i class="fa fa-user" tal:condition="not:url"></i>
