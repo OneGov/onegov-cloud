@@ -1280,12 +1280,12 @@ def test_allocation_times(town_app):
     new.form['title'] = 'Meeting Room'
     new.form.submit()
 
-    # 12:00 - 24:00
+    # 12:00 - 00:00
     new = client.get('/ressource/meeting-room/neue-einteilung')
     new.form['start'] = '2015-08-20'
     new.form['end'] = '2015-08-20'
     new.form['start_time'] = '12:00'
-    new.form['end_time'] = '24:00'
+    new.form['end_time'] = '00:00'
     new.form['as_whole_day'] = 'no'
     new.form.submit()
 
@@ -1314,12 +1314,12 @@ def test_allocation_times(town_app):
     assert slots.json[0]['start'] == '2015-08-22T00:00:00+02:00'
     assert slots.json[0]['end'] == '2015-08-22T02:00:00+02:00'
 
-    # 12:00 - 24:00 over two days
+    # 12:00 - 00:00 over two days
     new = client.get('/ressource/meeting-room/neue-einteilung')
     new.form['start'] = '2015-08-24'
     new.form['end'] = '2015-08-25'
     new.form['start_time'] = '12:00'
-    new.form['end_time'] = '24:00'
+    new.form['end_time'] = '00:00'
     new.form['as_whole_day'] = 'no'
     new.form.submit()
 

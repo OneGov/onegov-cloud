@@ -85,8 +85,8 @@ def test_room_single_date():
     form = RoomAllocationForm(data={
         'start': date(2015, 8, 4),
         'end': date(2015, 8, 4),
-        'start_time': '12:00',
-        'end_time': '16:00',
+        'start_time': time(12, 00),
+        'end_time': time(16, 00),
         'as_whole_day': 'no'
     })
 
@@ -115,8 +115,8 @@ def test_room_multiple_dates():
     form = RoomAllocationForm(data={
         'start': date(2015, 8, 4),
         'end': date(2015, 8, 8),
-        'start_time': '12:00',
-        'end_time': '16:00'
+        'start_time': time(12, 00),
+        'end_time': time(16, 00)
     })
 
     assert form.dates == [
@@ -132,8 +132,8 @@ def test_room_except_for():
     form = RoomAllocationForm(data={
         'start': date(2015, 8, 3),
         'end': date(2015, 8, 6),
-        'start_time': '12:00',
-        'end_time': '16:00',
+        'start_time': time(12, 00),
+        'end_time': time(16, 00),
         'except_for': [MO.weekday, WE.weekday]
     })
 
@@ -205,7 +205,7 @@ def test_combine_datetime():
     helper.time = Bunch(data=None)
     assert helper.combine_datetime('date', 'time') == datetime(2015, 1, 1)
 
-    helper.time = Bunch(data='12:00')
+    helper.time = Bunch(data=time(12, 00))
     assert helper.combine_datetime('date', 'time') == datetime(2015, 1, 1, 12)
 
     helper.date = Bunch(data=None)
@@ -224,8 +224,8 @@ def test_reservation_form_partly_available():
     form = ReservationForm.for_allocation(allocation)()
     assert hasattr(form, 'start')
     assert hasattr(form, 'end')
-    assert form.start.default == '10:00'
-    assert form.end.default == '16:00'
+    assert form.start.default == time(10, 00)
+    assert form.end.default == time(16, 00)
 
     allocation.partly_available = False
     form = ReservationForm.for_allocation(allocation)()
@@ -268,8 +268,8 @@ def test_edit_room_alllocation_form():
     form.apply_dates(datetime(2015, 1, 1, 12, 0), datetime(2015, 1, 1, 18, 0))
 
     assert form.date.data == date(2015, 1, 1)
-    assert form.start_time.data == '12:00'
-    assert form.end_time.data == '18:00'
+    assert form.start_time.data == time(12, 00)
+    assert form.end_time.data == time(18, 00)
 
     form.as_whole_day.data = 'no'
     assert form.dates == (

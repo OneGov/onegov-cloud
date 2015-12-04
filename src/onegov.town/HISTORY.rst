@@ -13,6 +13,8 @@ Unreleased
 - Improves the display of open/pending tickets for logged in users.
   [href]
 
+- Fixes invalid start/end times in allocations leading to an exception.
+  [href]
 
 0.10.1 (2015-11-30)
 ~~~~~~~~~~~~~~~~~~~

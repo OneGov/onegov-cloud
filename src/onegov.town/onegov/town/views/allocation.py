@@ -138,8 +138,8 @@ def handle_new_allocation(self, request, form):
                     form.as_whole_day.data = 'no'
 
                 if hasattr(form, 'start_time'):
-                    form.start_time.data = start.strftime('%H:%M')
-                    form.end_time.data = end.strftime('%H:%M')
+                    form.start_time.data = start
+                    form.end_time.data = end
 
     layout = ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("New allocation"), '#'))

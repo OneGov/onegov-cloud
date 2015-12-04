@@ -6,12 +6,11 @@ from onegov.form import Form, with_options
 from onegov.form.fields import MultiCheckboxField, MultiCheckboxWidget
 from onegov.form.parser.core import FieldDependency
 from onegov.town import _
-from onegov.town import utils
-from wtforms.fields import RadioField, TextField
+from wtforms.fields import RadioField
 from wtforms.fields.html5 import DateField, IntegerField
 from wtforms.validators import DataRequired, InputRequired
-from wtforms.widgets import TextInput
-from wtforms_components import If
+from wtforms_components import If, TimeField
+from wtforms_components.widgets import TimeInput
 
 
 WEEKDAYS = (
@@ -79,7 +78,7 @@ class AllocationFormHelpers(object):
         if not t:
             return None
 
-        return datetime.combine(d, utils.as_time(t))
+        return datetime.combine(d, t)
 
 
 class AllocationForm(Form, AllocationFormHelpers):
@@ -260,19 +259,19 @@ class RoomAllocationForm(AllocationForm):
 
     as_whole_day_dependency = FieldDependency('as_whole_day', 'no')
 
-    start_time = TextField(
+    start_time = TimeField(
         label=_("Each starting at"),
         description=_("HH:MM"),
-        validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TextInput, **as_whole_day_dependency.html_data),
+        validators=[If(as_whole_day_dependency.fulfilled, InputRequired())],
+        widget=with_options(TimeInput, **as_whole_day_dependency.html_data),
         fieldset=_("Date")
     )
 
-    end_time = TextField(
+    end_time = TimeField(
         label=_("Each ending at"),
         description=_("HH:MM"),
-        validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TextInput, **as_whole_day_dependency.html_data),
+        validators=[If(as_whole_day_dependency.fulfilled, InputRequired())],
+        widget=with_options(TimeInput, **as_whole_day_dependency.html_data),
         fieldset=_("Date")
     )
 
@@ -303,8 +302,8 @@ class RoomAllocationForm(AllocationForm):
         return self.generate_dates(
             self.start.data,
             self.end.data,
-            utils.as_time(self.start_time.data),
-            utils.as_time(self.end_time.data),
+            self.start_time.data,
+            self.end_time.data,
             self.weekdays
         )
 
@@ -323,19 +322,19 @@ class RoomAllocationEditForm(AllocationEditForm):
 
     as_whole_day_dependency = FieldDependency('as_whole_day', 'no')
 
-    start_time = TextField(
+    start_time = TimeField(
         label=_("From"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TextInput, **as_whole_day_dependency.html_data),
+        widget=with_options(TimeInput, **as_whole_day_dependency.html_data),
         fieldset=_("Date")
     )
 
-    end_time = TextField(
+    end_time = TimeField(
         label=_("Until"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TextInput, **as_whole_day_dependency.html_data),
+        widget=with_options(TimeInput, **as_whole_day_dependency.html_data),
         fieldset=_("Date")
     )
 
@@ -368,8 +367,8 @@ class RoomAllocationEditForm(AllocationEditForm):
 
     def apply_dates(self, start, end):
         self.date.data = start.date()
-        self.start_time.data = '{:%H:%M}'.format(start)
-        self.end_time.data = '{:%H:%M}'.format(end)
+        self.start_time.data = start.time()
+        self.end_time.data = end.time()
 
     def apply_model(self, model):
         self.apply_dates(model.display_start(), model.display_end())
