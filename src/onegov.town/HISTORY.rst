@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.11.0 (2015-12-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to select images, files and internal links throug dialogs.
   [href]
 
