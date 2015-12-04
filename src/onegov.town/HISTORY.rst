@@ -7,6 +7,9 @@ Unreleased
 - Properly uses singular/plural for ticket display.
   [href]
 
+- Improves the display of the footer.
+  [href]
+
 0.11.0 (2015-12-04)
 ~~~~~~~~~~~~~~~~~~~
 

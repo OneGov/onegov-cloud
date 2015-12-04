@@ -432,6 +432,14 @@ input[type=color] {
 /*
     social media links in the footer
 */
+
+@media #{$medium-up} {
+    // ligns the footer values up with sidebar on the right (index)
+    .footer-columns > div:last-child {
+        padding-left: 1.3rem;
+    }
+}
+
 .social-media-links {
     font-size: 1em;
     list-style-type: none;
@@ -1039,6 +1047,12 @@ div#redactor-droparea {
     }
 }
 
+@media #{$small-only} {
+    .footer .columns > div {
+        margin-bottom: 1rem;
+    }
+}
+
 /*
     news list
 */
@@ -1151,10 +1165,12 @@ $person-email-icon: '\f003';
             @include icon($person-website-icon);
             color: $primary-color;
         }
+
         .person-card-phone:before {
             @include icon($person-phone-icon);
             color: $primary-color;
         }
+
         .person-card-email:before {
             @include icon($person-email-icon);
             color: $primary-color;

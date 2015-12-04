@@ -134,12 +134,12 @@
             <div tal:content="structure layout.town.meta.contact_html" />
             <a i18n:translate="" tal:condition="contact_url" tal:attributes="href contact_url">more…</a>
           </div>
-          <div class="small-12 medium-6 columns">
+          <div class="small-12 medium-5 columns">
             <h2 i18n:translate="" tal:condition="opening_hours or opening_hours_url">Opening Hours</h2>
             <div tal:content="structure layout.town.meta.opening_hours_html" />
             <a i18n:translate="" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more…</a>
           </div>
-          <div class="small-12 medium-3 columns">
+          <div class="small-12 medium-4 columns">
             <h2 i18n:translate="" tal:condition="facebook or twitter">Social Media</h2>
             <ul class="social-media-links" tal:condition="facebook or twitter">
                 <li tal:condition="facebook"><a tal:attributes="href facebook"><i class="fa fa-facebook-official"></i> Facebook</a></li>
