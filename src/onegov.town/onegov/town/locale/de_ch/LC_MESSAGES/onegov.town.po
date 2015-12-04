@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-03 14:02+0100\n"
+"POT-Creation-Date: 2015-12-04 14:53+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -442,9 +442,6 @@ msgstr "Link zum Bild"
 msgid "Address"
 msgstr "Adresse"
 
-msgid "The format of the time is HH:MM (e.g. 14:30)"
-msgstr "Das Format der Zeit ist HH:MM (z.B. 14:30)"
-
 msgid "Quota"
 msgstr "Anzahl"
 
@@ -773,8 +770,14 @@ msgstr "Noch keine Bilder hochgeladen"
 msgid "Town Logo"
 msgstr "Logo der Gemeinde"
 
+msgid "Open Ticket"
+msgstr "Offenes Ticket"
+
 msgid "Open Tickets"
 msgstr "Offene Tickets"
+
+msgid "Pending Ticket"
+msgstr "Ticket in Bearbeitung"
 
 msgid "Pending Tickets"
 msgstr "Tickets in Bearbeitung"
@@ -1293,3 +1296,6 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
+
+#~ msgid "The format of the time is HH:MM (e.g. 14:30)"
+#~ msgstr "Das Format der Zeit ist HH:MM (z.B. 14:30)"

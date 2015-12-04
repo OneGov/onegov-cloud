@@ -40,13 +40,15 @@
                   <div class="ticket-count-open ${ticket_count.open > 0 and 'highlight' or ''}">
                     <a href="${layout.open_tickets_url}">
                       <span class="number">${ticket_count.open}</span>
-                      <span class="text" i18n:translate>Open Tickets</span>
+                      <span class="text" i18n:translate tal:condition="ticket_count.open == 1">Open Ticket</span>
+                      <span class="text" i18n:translate tal:condition="ticket_count.open != 1">Open Tickets</span>
                     </a>
                   </div>
                   <div class="ticket-count-pending ${ticket_count.pending > 0 and 'highlight' or ''}">
                     <a href="${layout.pending_tickets_url}">
                       <span class="number">${ticket_count.pending}</span>
-                      <span class="text" i18n:translate>Pending Tickets</span>
+                      <span class="text" i18n:translate tal:condition="ticket_count.pending == 1">Pending Ticket</span>
+                      <span class="text" i18n:translate tal:condition="ticket_count.pending != 1">Pending Tickets</span>
                     </a>
                   </div>
               </div>
