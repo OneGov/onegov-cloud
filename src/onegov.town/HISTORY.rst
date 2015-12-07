@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.11.1 (2015-12-07)
+~~~~~~~~~~~~~~~~~~~
+
 - Properly uses singular/plural for ticket display.
   [href]
 
