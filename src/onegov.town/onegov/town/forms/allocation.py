@@ -8,7 +8,7 @@ from onegov.form.parser.core import FieldDependency
 from onegov.town import _
 from wtforms.fields import RadioField
 from wtforms.fields.html5 import DateField, IntegerField
-from wtforms.validators import DataRequired, InputRequired
+from wtforms.validators import DataRequired, NumberRange, InputRequired
 from wtforms_components import If, TimeField
 from wtforms_components.widgets import TimeInput
 
@@ -166,19 +166,28 @@ class AllocationEditForm(Form, AllocationFormHelpers):
     )
 
 
-class DaypassAllocationForm(AllocationForm):
+class Daypasses(object):
 
     daypasses = IntegerField(
         label=_("Daypasses"),
-        validators=[InputRequired()],
+        validators=[
+            InputRequired(),
+            NumberRange(1, 999)
+        ],
         fieldset=_("Daypasses")
     )
 
     daypasses_limit = IntegerField(
         label=_("Daypasses Limit"),
-        validators=[InputRequired()],
+        validators=[
+            InputRequired(),
+            NumberRange(0, 999)
+        ],
         fieldset=_("Daypasses")
     )
+
+
+class DaypassAllocationForm(AllocationForm, Daypasses):
 
     whole_day = True
     partly_available = False
@@ -201,19 +210,7 @@ class DaypassAllocationForm(AllocationForm):
         )
 
 
-class DaypassAllocationEditForm(AllocationEditForm):
-
-    daypasses = IntegerField(
-        label=_("Daypasses"),
-        validators=[InputRequired()],
-        fieldset=_("Daypasses")
-    )
-
-    daypasses_limit = IntegerField(
-        label=_("Daypasses Limit"),
-        validators=[InputRequired()],
-        fieldset=_("Daypasses")
-    )
+class DaypassAllocationEditForm(AllocationEditForm, Daypasses):
 
     whole_day = True
     partly_available = False
