@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.8.1 (2015-12-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Attaches the current request to each form instance, allowing for
   validation logic on the form which talks to the database.
