@@ -100,6 +100,50 @@ def test_ballot_answer_simple(session):
     assert vote.answer == 'rejected'
 
 
+def test_ballot_nobody_voted_right(session):
+
+    # if nobody casts a valid vote, the result is 100% no
+    result = BallotResult(
+        group='Ort A',
+        counted=True,
+        yeas=0,
+        nays=0,
+        invalid=100,
+        empty=100
+    )
+
+    assert result.yeas_percentage == 0
+    assert result.nays_percentage == 100.0
+
+    # make sure this works in an aggregated fashion as well
+    vote = Vote(
+        title="Should we go voting?",
+        domain='federation',
+        date=date(2015, 6, 18)
+    )
+
+    vote.ballots.append(Ballot(type='proposal'))
+
+    session.add(vote)
+    session.flush()
+
+    vote.proposal.results.append(
+        BallotResult(
+            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
+    vote.proposal.results.append(
+        BallotResult(
+            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
+    vote.proposal.results.append(
+        BallotResult(
+            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
+
+    session.flush()
+
+    query = session.query(BallotResult)
+    query = query.filter(BallotResult.yeas_percentage == 0.0)
+    assert query.count() == 3
+
+
 def test_ballot_answer_proposal_wins(session):
     vote = Vote(
         title="Abstimmung mit Gegenentwurf",

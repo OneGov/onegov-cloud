@@ -28,7 +28,20 @@ class DerivedPercentage(object):
     @hybrid_property
     def yeas_percentage(self):
         """ The percentage of yeas (discounts empty/invalid ballots). """
-        return self.yeas / (self.yeas + self.nays) * 100
+        return self.yeas / ((self.yeas + self.nays) or 1) * 100
+
+    @yeas_percentage.expression
+    def yeas_percentage(self):
+        # coalesce will pick the first non-null result
+        # nullif will return null if division by zero
+        # => when all yeas and nays are zero the yeas percentage is 0%
+        return 100 * (
+            self.yeas / (
+                func.coalesce(
+                    func.nullif(self.yeas + self.nays, 0), 1
+                )
+            )
+        )
 
     @hybrid_property
     def nays_percentage(self):
@@ -378,7 +391,7 @@ class Ballot(Base, TimestampMixin,
             r = {'counted': counted}
 
             if counted:
-                r['yeas_percentage'] = yeas / (yeas + nays) * 100
+                r['yeas_percentage'] = yeas / ((yeas + nays) or 1) * 100
                 r['nays_percentage'] = 100 - r['yeas_percentage']
 
             result[id] = r

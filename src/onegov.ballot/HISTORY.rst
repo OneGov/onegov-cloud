@@ -4,6 +4,10 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- If nobody votes on an issue the yeas percentage is now assumed to be 0%.
+  Before it was undefined and lead to a division by zero.
+  [href]
+
 - Changes the votes order to date, domain, shortcode, title.
   [href]
 
