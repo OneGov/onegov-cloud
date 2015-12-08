@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Shows the votes archive at the bottom of.. the votes archive.
+  [gref]
+
 0.2.1 (2015-12-08)
 ~~~~~~~~~~~~~~~~~~~
 

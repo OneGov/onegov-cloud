@@ -16,5 +16,8 @@
                 <div metal:use-macro="layout.macros['votes_by_domain_and_date']" />
             </tal:block>
         </div>
+
+        <div metal:use-macro="layout.macros['archive']" />
+
     </tal:block>
 </div>
