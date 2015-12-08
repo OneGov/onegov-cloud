@@ -197,7 +197,12 @@ class CoreRequest(IncludeRequest):
             meta['csrf_time_limit'] = timedelta(
                 seconds=self.app.csrf_time_limit)
 
-        return form_class(self.POST, meta=meta, data=data)
+        form = form_class(self.POST, meta=meta, data=data)
+
+        assert not hasattr(form, 'request')
+        form.request = self
+
+        return form
 
     def translate(self, text):
         """ Transalates the given text, if it's a translatable text. """
