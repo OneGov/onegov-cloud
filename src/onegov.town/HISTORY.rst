@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.11.2 (2015-12-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Displays a helpful error when the daypass quota is invalid.
   [href]
 
