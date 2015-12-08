@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.2 (2015-12-08)
+~~~~~~~~~~~~~~~~~~~
+
 - If nobody votes on an issue the yeas percentage is now assumed to be 0%.
   Before it was undefined and lead to a division by zero.
   [href]
