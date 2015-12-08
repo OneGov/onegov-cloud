@@ -1492,9 +1492,9 @@ tr.ticket:hover {
         .number {
             background-color: $white-smoke;
             border-radius: 50px;
-            height: 1.27em;
-            line-height: 1.29em;
-            min-width: 1.27em;
+            height: 1.3em;
+            line-height: 1.3em;
+            min-width: 1.3em;
             text-align: center;
         }
     }
@@ -1515,7 +1515,7 @@ tr.ticket:hover {
     .ticket-count-pending {
         &.highlight {
             .number {
-                background-color: $primary-color;
+                background-color: $blue-dark;
                 color: $white;
             }
 

@@ -7,6 +7,9 @@ Unreleased
 - Displays a helpful error when the daypass quota is invalid.
   [href]
 
+- Ensures a difference between the pending and the open tickets color.
+  [href]
+
 0.11.1 (2015-12-07)
 ~~~~~~~~~~~~~~~~~~~
 
