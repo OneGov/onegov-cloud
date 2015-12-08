@@ -79,7 +79,7 @@
             </tal:block>
             <tal:block condition="input_type != 'hidden'">
                 <label tal:attributes="class field.errors and 'error' or None">
-                    <!-- render the label after the field if it's a boolean field -->
+                    <!--! render the label after the field if it's a boolean field -->
                     <tal:block condition="field.type == 'BooleanField'">
                         ${field(placeholder=request.translate(field.description))}
                         <span class="label-text">${field.label.text}</span>
