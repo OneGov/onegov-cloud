@@ -7,7 +7,7 @@ from onegov.town.models import SiteCollection
 def get_site_collection(self, request):
     """ Returns a list of internal links to be used by the redactor.
 
-    See ``<http://imperavi.com/redactor/plugins/predefined-links/>`_
+    See `<http://imperavi.com/redactor/plugins/predefined-links/>`_
 
     """
 

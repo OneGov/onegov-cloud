@@ -110,8 +110,8 @@ class EventForm(Form):
         """ Make sure a valid RRULE can be generated with the given fields.
 
         Might be better to group weekly and end_date in an enclosure,
-        see See `<http://wtforms.readthedocs.org/en/latest/fields.html\
-        #field-enclosures`_.
+        see See http://wtforms.readthedocs.org/en/latest/fields.html
+        #field-enclosures.
 
         """
         result = super().validate()
