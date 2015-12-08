@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Shows the votes archive at the bottom of each vote.
+  [href]
+
 0.2.0 (2015-11-27)
 ~~~~~~~~~~~~~~~~~~~
 

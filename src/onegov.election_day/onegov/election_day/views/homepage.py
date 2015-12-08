@@ -19,13 +19,7 @@ def view_principal(self, request):
     else:
         votes_by_domain_and_date = None
 
-    years = [
-        (year, request.link(collection.for_year(year)))
-        for year in collection.get_years()
-    ]
-
     return {
-        'votes_by_domain_and_date': votes_by_domain_and_date,
         'layout': DefaultLayout(self, request),
-        'years': years
+        'votes_by_domain_and_date': votes_by_domain_and_date
     }

@@ -40,6 +40,20 @@
     </span>
 </metal:navigation>
 
+<metal:archive define-macro="archive" i18n:domain="onegov.election_day">
+    <div class="row archive" tal:define="years layout.vote_collection.get_years()" tal:condition="years">
+        <div class="columns small-12 small-centered">
+            <h2 i18n:translate>Archived Votes</h2>
+            <ul>
+                <li tal:repeat="year years">
+                    <a href="${request.link(layout.vote_collection.for_year(year))}">${year}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</metal:archive>
+ 
+
 <metal:search define-macro="form" i18n:domain="onegov.election_day">
     <form tal:attributes="action form.action" method="POST" enctype="multipart/form-data">
         <tal:block repeat="fieldset form.fieldsets">

@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from datetime import datetime
+from onegov.ballot import VoteCollection
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day.models import Manage
@@ -48,6 +49,10 @@ class Layout(ChameleonLayout):
         if self.request.is_logged_in:
             return self.request.link(
                 Auth.from_request(self.request), name='logout')
+
+    @cached_property
+    def vote_collection(self):
+        return VoteCollection(self.request.app.session())
 
 
 class DefaultLayout(Layout):

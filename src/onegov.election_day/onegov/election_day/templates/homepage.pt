@@ -16,19 +16,8 @@
             <tal:block condition="votes_by_domain_and_date">
                 <div metal:use-macro="layout.macros['votes_by_domain_and_date']" />
             </tal:block>
-
-            <div class="row archive">
-                <div class="columns small-12 small-centered">
-                    <h2 i18n:translate>
-                        Archived Votes
-                    </h2>
-                    <ul>
-                        <li tal:repeat="(year, link) years">
-                            <a href="${link}">${year}</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
         </div>
+
+        <div metal:use-macro="layout.macros['archive']" />
     </tal:block>
 </div>

@@ -143,5 +143,8 @@
                 </div>
             </div>
         </tal:block>
+
+        <div metal:use-macro="layout.macros['archive']" />
+
     </tal:block>
 </div>
