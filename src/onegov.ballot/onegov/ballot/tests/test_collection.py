@@ -100,3 +100,24 @@ def test_by_years(session):
     assert votes.by_year(2014)[0].title == "older"
 
     assert len(votes.by_year(2013)) == 0
+
+
+def test_shortcode_order(session):
+    session.add(Vote(
+        title="A",
+        shortcode="Z",
+        domain='federation',
+        date=date(2015, 6, 14)
+    ))
+    session.add(Vote(
+        title="Z",
+        shortcode="A",
+        domain='federation',
+        date=date(2015, 6, 14)
+    ))
+
+    session.flush()
+
+    votes = VoteCollection(session, year=2015).by_year()
+    assert votes[0].title == "Z"
+    assert votes[1].title == "A"

@@ -40,7 +40,7 @@ class VoteCollection(object):
 
         query = self.query()
         query = query.filter(Vote.date == date)
-        query = query.order_by(Vote.domain, Vote.title)
+        query = query.order_by(Vote.domain, Vote.shortcode, Vote.title)
 
         return query.all()
 
@@ -51,7 +51,9 @@ class VoteCollection(object):
 
         query = self.query()
         query = query.filter(extract('year', Vote.date) == year)
-        query = query.order_by(Vote.date, Vote.domain, Vote.title)
+        query = query.order_by(
+            Vote.date, Vote.domain, Vote.shortcode, Vote.title
+        )
 
         return query.all()
 

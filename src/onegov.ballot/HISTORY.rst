@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Changes the votes order to date, domain, shortcode, title.
+  [href]
+
 0.1.1 (2015-10-16)
 ~~~~~~~~~~~~~~~~~~~
 
