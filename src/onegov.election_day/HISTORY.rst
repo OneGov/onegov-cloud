@@ -7,6 +7,9 @@ Unreleased
 - Shows the votes archive at the bottom of each vote.
   [href]
 
+- Shows a helpful error message if a vote exists already.
+  [href]
+
 0.2.0 (2015-11-27)
 ~~~~~~~~~~~~~~~~~~~
 

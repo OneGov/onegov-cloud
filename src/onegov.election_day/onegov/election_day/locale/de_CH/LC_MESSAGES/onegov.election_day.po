@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-10-26 16:34+0100\n"
+"POT-Creation-Date: 2015-12-08 14:59+0100\n"
 "PO-Revision-Date: 2015-10-14 17:17+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -39,6 +39,9 @@ msgstr "Kürzel"
 msgid "Date"
 msgstr "Datum"
 
+msgid "A vote with this title exists already"
+msgstr "Eine Abstimmung mit diesem Titel existiert bereits"
+
 msgid "Federal Vote"
 msgstr "Nationale Abstimmung"
 
@@ -54,9 +57,6 @@ msgstr "Es wurden noch keine Abstimmungen eingetragen."
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
-
-msgid "Archived Votes"
-msgstr "Abstimmungsarchiv"
 
 msgid "Back to the latest elections &amp; votes"
 msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
@@ -84,6 +84,9 @@ msgstr "Gegenentwurf"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
+
+msgid "Archived Votes"
+msgstr "Abstimmungsarchiv"
 
 msgid "Cancel"
 msgstr "Abbrechen"
