@@ -264,6 +264,82 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount):
         last_change = results.first()
         return last_change and last_change[0] or None
 
+    def export(self):
+        """ Returns all date connected to this vote as list with dicts.
+
+        This is meant as a base for json/csv/excel exports. The result is
+        therefore a flat list of dictionaries with repeating values to avoid
+        the nesting of values. Each record in the resulting list is a single
+        ballot result.
+
+        Each entry in the list (row) has the following format:
+
+        * ``title``:
+            Title of the vote.
+
+        * ``date``:
+            The date of the vote (an ISO 8601 date string).
+
+        * ``shortcode``:
+            Internal shortcode (defines the ordering of votes on the same day).
+
+        * ``domain``:
+            ``federation`` for federal, ``canton`` for cantonal votes.
+
+        * ``type``:
+            ``proposal`` (Vorschlag), ``counter-proposal`` (Gegenvorschlag) or
+            ``tie-breaker`` (Stichfrage).
+
+        * ``group``: The designation of the result. May be the district and
+            the town's name divided by a slash, the city's name and the
+            city's district divided by a slash or simply the town's name. This
+            depends entirely on the canton.
+
+        * ``municipality_id``: The id of the municipality/locale. Better known
+            as the "BFS Nummer".
+
+        * ``counted``: True if the result was counted, False if the result is
+            not known yet (the voting counts are not final yet).
+
+        * ``yeas``:
+            The number of yes votes.
+
+        * ``nays``:
+            The number of no votes.
+
+        * ``invalid``:
+            The number of invalid votes.
+
+        * ``empty``:
+            The number of empty votes.
+
+        * ``elegible_voters``:
+            The number of people elegible to vote.
+
+        """
+
+        rows = []
+
+        for ballot in self.ballots:
+            for result in ballot.results:
+                rows.append({
+                    'title': self.title,
+                    'date': self.date.isoformat(),
+                    'shortcode': self.shortcode,
+                    'domain': self.domain,
+                    'type': ballot.type,
+                    'group': result.group,
+                    'municipality_id': result.municipality_id,
+                    'counted': result.counted,
+                    'yeas': result.yeas,
+                    'nays': result.nays,
+                    'invalid': result.invalid,
+                    'empty': result.empty,
+                    'elegible_voters': result.elegible_voters
+                })
+
+        return rows
+
 
 class Ballot(Base, TimestampMixin,
              DerivedPercentage, DerivedAcceptance, DerivedBallotsCount):

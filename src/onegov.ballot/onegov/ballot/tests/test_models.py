@@ -508,3 +508,97 @@ def test_vote_last_result_change(session):
         session.flush()
 
     assert vote.last_result_change.isoformat() == '2015-01-01T14:00:00+00:00'
+
+
+def test_export(session):
+    vote = Vote(
+        title="Is this a test?",
+        shortcode="FOO",
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+
+    session.add(vote)
+    session.flush()
+
+    assert vote.export() == []
+
+    vote.ballots.append(Ballot(type='proposal'))
+    vote.ballots.append(Ballot(type='counter-proposal'))
+    vote.ballots.append(Ballot(type='tie-breaker'))
+    vote.proposal.results.append(
+        BallotResult(
+            group='Foo Town',
+            counted=True,
+            yeas=90,
+            nays=45,
+            invalid=5,
+            empty=10,
+            elegible_voters=150,
+            municipality_id=1,
+        )
+    )
+    vote.proposal.results.append(
+        BallotResult(
+            group='Bar Town',
+            counted=False,
+            municipality_id=2,
+        )
+    )
+    vote.counter_proposal.results.append(
+        BallotResult(
+            group='Foo Town',
+            counted=False,
+            municipality_id=1,
+        )
+    )
+
+    session.flush()
+
+    assert vote.export() == [
+        {
+            'title': "Is this a test?",
+            'date': "2015-06-14",
+            'shortcode': "FOO",
+            'domain': "federation",
+            'type': "proposal",
+            'counted': True,
+            'group': "Foo Town",
+            'municipality_id': 1,
+            'yeas': 90,
+            'nays': 45,
+            'invalid': 5,
+            'empty': 10,
+            'elegible_voters': 150,
+        },
+        {
+            'title': "Is this a test?",
+            'date': "2015-06-14",
+            'shortcode': "FOO",
+            'domain': "federation",
+            'type': "proposal",
+            'counted': False,
+            'group': "Bar Town",
+            'municipality_id': 2,
+            'yeas': 0,
+            'nays': 0,
+            'invalid': 0,
+            'empty': 0,
+            'elegible_voters': 0
+        },
+        {
+            'title': "Is this a test?",
+            'date': "2015-06-14",
+            'shortcode': "FOO",
+            'domain': "federation",
+            'type': "counter-proposal",
+            'counted': False,
+            'group': "Foo Town",
+            'municipality_id': 1,
+            'yeas': 0,
+            'nays': 0,
+            'invalid': 0,
+            'empty': 0,
+            'elegible_voters': 0
+        }
+    ]
