@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.0 (2015-12-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to create an exportable representation of a vote.
   [href]
 
