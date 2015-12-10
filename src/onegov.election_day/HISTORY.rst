@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.0 (2015-12-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds JSON/CSV and XLSX export of all votes.
   [href]
 
