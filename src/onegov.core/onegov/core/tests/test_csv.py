@@ -4,6 +4,7 @@ from io import BytesIO
 from onegov.core import utils
 from onegov.core.csv import (
     CSVFile,
+    convert_list_of_dicts_to_csv,
     convert_xls_to_csv,
     detect_encoding,
     match_headers,
@@ -180,3 +181,59 @@ def test_match_headers_ambiguous():
 
     assert list(e.value.columns.keys()) == ['bcd']
     assert set(e.value.columns['bcd']) == {'abcd', 'bcde'}
+
+
+def test_convert_list_of_dicts_to_csv():
+    data = [
+        {
+            'first_name': 'Dick',
+            'last_name': 'Cheney'
+        },
+        {
+            'first_name': 'Donald',
+            'last_name': 'Rumsfeld'
+        }
+    ]
+
+    # without providing a list of fields, the order of fields is random
+    csv = convert_list_of_dicts_to_csv(data)
+    header, dick, donald = csv.splitlines()
+
+    assert 'first_name' in header
+    assert 'last_name' in header
+
+    assert 'Dick' in dick
+    assert 'Cheney' in dick
+
+    assert 'Donald' in donald
+    assert 'Rumsfeld' in donald
+
+    # we can change this by being explicit
+    csv = convert_list_of_dicts_to_csv(data, ('first_name', 'last_name'))
+    header, dick, donald = csv.splitlines()
+
+    assert header == 'first_name,last_name'
+    assert dick == 'Dick,Cheney'
+    assert donald == 'Donald,Rumsfeld'
+
+    csv = convert_list_of_dicts_to_csv(data, ('last_name', 'first_name'))
+    header, dick, donald = csv.splitlines()
+
+    assert header == 'last_name,first_name'
+    assert dick == 'Cheney,Dick'
+    assert donald == 'Rumsfeld,Donald'
+
+
+def test_convert_list_of_dicts_to_csv_escaping():
+    data = [
+        {
+            'value': ',;"'
+        }
+    ]
+
+    # without providing a list of fields, the order of fields is random
+    csv = convert_list_of_dicts_to_csv(data)
+    header, row = csv.splitlines()
+
+    assert header == 'value'
+    assert row == '",;"""'

@@ -6,10 +6,12 @@ import sys
 import xlrd
 
 from collections import namedtuple, OrderedDict
-from csv import reader as csv_reader, writer as csv_writer, Sniffer, QUOTE_ALL
+from csv import DictWriter, Sniffer, QUOTE_ALL
+from csv import reader as csv_reader
+from csv import writer as csv_writer
 from editdistance import eval as distance
-from itertools import permutations
 from io import BytesIO, StringIO
+from itertools import permutations
 from onegov.core import errors
 from unidecode import unidecode
 
@@ -196,6 +198,35 @@ def convert_xls_to_csv(xls):
         output.write(line.encode('utf-8'))
 
     return output
+
+
+def convert_list_of_dicts_to_csv(rows, fields=None):
+    """ Takes a list of dictionaries and returns a csv.
+
+    If no fields are provided, all fields are included in the order of the keys
+    of the first dict. With regular dictionaries this is random. Use an ordered
+    dict or provide a list of fields to have a fixed order.
+
+    The function returns a string created in memory. Therefore this function
+    is limited to small-ish datasets.
+
+    """
+
+    if not rows:
+        return ''
+
+    fields = fields or rows[0].keys()
+
+    output = StringIO()
+    writer = DictWriter(output, fieldnames=fields)
+
+    writer.writeheader()
+
+    for row in rows:
+        writer.writerow({field: row[field] for field in fields})
+
+    output.seek(0)
+    return output.read()
 
 
 def parse_header(csv, dialect=None):
