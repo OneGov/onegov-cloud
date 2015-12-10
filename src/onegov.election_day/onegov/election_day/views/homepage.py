@@ -23,3 +23,11 @@ def view_principal(self, request):
         'layout': DefaultLayout(self, request),
         'votes_by_domain_and_date': votes_by_domain_and_date
     }
+
+
+@ElectionDayApp.html(model=Principal, template='opendata.pt', name='opendata',
+                     permission=Public)
+def view_opendata(self, request):
+    return {
+        'layout': DefaultLayout(self, request),
+    }

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds JSON/CSV and XLSX export of all votes.
+  [href]
+
 - Shows the votes archive at the bottom of.. the votes archive.
   [gref]
 

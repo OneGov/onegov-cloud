@@ -18,6 +18,10 @@ class Layout(ChameleonLayout):
         return self.request.link(self.request.app.principal)
 
     @cached_property
+    def opendata_link(self):
+        return self.request.link(self.request.app.principal, 'opendata')
+
+    @cached_property
     def font_awesome_path(self):
         static_file = StaticFile.from_application(
             self.app, 'font-awesome/css/font-awesome.min.css')

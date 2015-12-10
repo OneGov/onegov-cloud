@@ -462,3 +462,63 @@ form {
         font-size: 1.5em;
     }
 }
+
+/*
+    Download results button in votes view header
+*/
+.download-results {
+    position: absolute;
+    right: 20px;
+    top: -13px;
+
+    > a {
+        background-color: $white;
+        border: 3px solid $gainsboro;
+        border-radius: 50px;
+        color: $gainsboro;
+        display: block;
+        font-size: 16px;
+        height: 32px;
+        line-height: 25px;
+        text-align: center;
+        width: 32px;
+    }
+
+    a.open,
+    &:hover > a {
+        border-color: $primary-color;
+        color: $primary-color;
+    }
+
+    > ul {
+        border-radius: 2px;
+        box-shadow: 2px 2px 8px rgba(0, 0, 0, .15);
+        width: 170px !important;
+
+        &:focus {
+            outline: none;
+        }
+
+        li a:before {
+            display: inline-block;
+            font-family: 'FontAwesome';
+            margin-right: 1ex;
+        }
+
+        li:nth-child(1) a:before {
+            content: '\f016';
+        }
+
+        li:nth-child(2) a:before {
+            content: '\f0f6';
+        }
+
+        li:nth-child(3) a:before {
+            content: '\f1c3';
+        }
+
+        li:nth-child(4) a:before {
+            content: '\f059';
+        }
+    }
+}

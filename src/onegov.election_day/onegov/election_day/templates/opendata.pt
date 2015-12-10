@@ -1,0 +1,72 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="before-content">
+        <h1>
+            <small>${layout.app.principal.name}</small>
+            <tal:block i18n:translate="">Elections &amp; Votes: Open Data</tal:block>
+        </h1>
+
+        <hr />
+    </tal:block>
+
+    <tal:block metal:fill-slot="content">
+        <div class="format">
+            <h2 i18n:translate>Format</h2>
+
+            <p i18n:translate>The raw data used to display the results of votes is available in the following formats:</p>
+
+            <ul>
+                <li>JSON</li>
+                <li>CSV</li>
+                <li>XLSX</li>
+            </ul>
+
+            <h3>Fields</h3>
+
+            <p i18n:translate>The following fields are included in all formats:</p>
+
+            <dl>
+                <dt>title</dt>
+                <dd i18n:translate>Title of the vote.</dd>
+
+                <dt>date</dt>
+                <dd i18n:translate>The date of the vote (an ISO 8601 date string).</dd>
+
+                <dt>shortcode</dt>
+                <dd i18n:translate>Internal shortcode (defines the ordering of votes on the same day).</dd>
+
+                <dt>domain</dt>
+                <dd i18n:translate>"federation" for federal, "canton" for cantonal votes.</dd>
+
+                <dt>type</dt>
+                <dd i18n:translate>"proposal" (Vorschlag), "counter-proposal" (Gegenvorschlag) or "tie-breaker" (Stichfrage).</dd>
+
+                <dt>group</dt>
+                <dd i18n:translate>The designation of the result. May be the district, the town's name divided by a slash, the city's name and the city's district divided by a slash or simply the town's name. This
+                depends entirely on the canton.</dd>
+
+                <dt>municipality_id</dt>
+                <dd i18n:translate>The id of the municipality/locale. Better known as "BFS Nummer"</dd>
+
+                <dt>counted</dt>
+                <dd i18n:translate>True if the result was counted, False if the result not known yet (the voting counts are not final yet).</dd>
+
+                <dt>yeas</dt>
+                <dd i18n:translate>The number of yes votes.</dd>
+
+                <dt>nays</dt>
+                <dd i18n:translate>The number of no votes.</dd>
+
+                <dt>invalid</dt>
+                <dd i18n:translate>The number of invalid votes.</dd>
+
+                <dt>empty</dt>
+                <dd i18n:translate>The number of empty votes.</dd>
+
+                <dt>elegible_voters</dt>
+                <dd i18n:translate>The number of people elegible to vote.</dd>
+            </dl>
+        </div>
+
+        <div metal:use-macro="layout.macros['archive']" />
+    </tal:block>
+</div>

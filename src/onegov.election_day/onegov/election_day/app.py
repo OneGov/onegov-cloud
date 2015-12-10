@@ -74,7 +74,7 @@ class ElectionDayApp(Framework):
     @cached_property
     def webassets_bundles(self):
 
-        jsminifier = None
+        jsminifier = 'rjsmin'
 
         common = Bundle(
             'js/modernizr.js',
