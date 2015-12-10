@@ -7,6 +7,9 @@ Unreleased
 - Adds a method which takes a list of dicts and turns it into a csv string.
   [href]
 
+- Adds a method which takes a list of dicts and turns it into a xlsx.
+  [href]
+
 0.8.1 (2015-12-08)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -3,6 +3,7 @@
 import codecs
 import re
 import sys
+import tempfile
 import xlrd
 
 from collections import namedtuple, OrderedDict
@@ -14,6 +15,7 @@ from io import BytesIO, StringIO
 from itertools import permutations
 from onegov.core import errors
 from unidecode import unidecode
+from xlsxwriter.workbook import Workbook
 
 
 VALID_CSV_DELIMITERS = {',', ';', '\t'}
@@ -227,6 +229,32 @@ def convert_list_of_dicts_to_csv(rows, fields=None):
 
     output.seek(0)
     return output.read()
+
+
+def convert_list_of_dicts_to_xlsx(rows, fields=None):
+    """ Takes a list of dictionaries and returns a xlsx.
+
+    This behaves the same way as :func:`convert_list_of_dicts_to_csv`.
+
+    """
+
+    with tempfile.NamedTemporaryFile() as file:
+        workbook = Workbook(file.name, options={'constant_memory': True})
+        worksheet = workbook.add_worksheet()
+
+        fields = fields or rows[0].keys()
+
+        # write the header
+        worksheet.write_row(0, 0, fields)
+
+        # write the rows
+        for r, row in enumerate(rows, start=1):
+            worksheet.write_row(r, 0, (row[field] for field in fields))
+
+        workbook.close()
+
+        file.seek(0)
+        return file.read()
 
 
 def parse_header(csv, dialect=None):

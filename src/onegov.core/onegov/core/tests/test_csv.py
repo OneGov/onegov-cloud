@@ -1,23 +1,25 @@
 import pytest
+import tempfile
 
 from io import BytesIO
 from onegov.core import utils
 from onegov.core.csv import (
     CSVFile,
     convert_list_of_dicts_to_csv,
+    convert_list_of_dicts_to_xlsx,
     convert_xls_to_csv,
     detect_encoding,
     match_headers,
     normalize_header,
     parse_header,
 )
-
 from onegov.core.errors import (
     AmbiguousColumnsError,
     DuplicateColumnNamesError,
     EmptyLineInFileError,
     MissingColumnsError,
 )
+from openpyxl import load_workbook
 
 
 def test_parse_header():
@@ -237,3 +239,29 @@ def test_convert_list_of_dicts_to_csv_escaping():
 
     assert header == 'value'
     assert row == '",;"""'
+
+
+def test_convert_list_of_dicts_to_xlsx():
+    data = [
+        {
+            'first_name': 'Dick',
+            'last_name': 'Cheney'
+        },
+        {
+            'first_name': 'Donald',
+            'last_name': 'Rumsfeld'
+        }
+    ]
+
+    xlsx = convert_list_of_dicts_to_xlsx(data, ('first_name', 'last_name'))
+
+    with tempfile.NamedTemporaryFile() as f:
+        f.write(xlsx)
+        workbook = load_workbook(f)
+
+        assert workbook.active.rows[0][0].value == 'first_name'
+        assert workbook.active.rows[0][1].value == 'last_name'
+        assert workbook.active.rows[1][0].value == 'Dick'
+        assert workbook.active.rows[1][1].value == 'Cheney'
+        assert workbook.active.rows[2][0].value == 'Donald'
+        assert workbook.active.rows[2][1].value == 'Rumsfeld'

@@ -70,6 +70,7 @@ setup(
         'webtest',
         'wtforms',
         'xlrd',
+        'xlsxwriter',
         'zope.sqlalchemy'
     ],
     extras_require=dict(
@@ -77,6 +78,7 @@ setup(
             'coverage',
             'freezegun',
             'onegov.testing',
+            'openpyxl',
             'pytest-localserver'
         ],
     ),
