@@ -10,6 +10,7 @@ As of this writing onegov.ballot only aims to implement votes, not elections.
 Though it will do so in the future.
 
 """
+from collections import OrderedDict
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -322,21 +323,24 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount):
 
         for ballot in self.ballots:
             for result in ballot.results:
-                rows.append({
-                    'title': self.title,
-                    'date': self.date.isoformat(),
-                    'shortcode': self.shortcode,
-                    'domain': self.domain,
-                    'type': ballot.type,
-                    'group': result.group,
-                    'municipality_id': result.municipality_id,
-                    'counted': result.counted,
-                    'yeas': result.yeas,
-                    'nays': result.nays,
-                    'invalid': result.invalid,
-                    'empty': result.empty,
-                    'elegible_voters': result.elegible_voters
-                })
+                # have the dict ordered so it works directly with onegov.core's
+                # :func:`onegov.core.csv.convert_list_of_dicts_to_csv`
+                row = OrderedDict()
+                row['title'] = self.title
+                row['date'] = self.date.isoformat()
+                row['shortcode'] = self.shortcode
+                row['domain'] = self.domain
+                row['type'] = ballot.type
+                row['group'] = result.group
+                row['municipality_id'] = result.municipality_id
+                row['counted'] = result.counted
+                row['yeas'] = result.yeas
+                row['nays'] = result.nays
+                row['invalid'] = result.invalid
+                row['empty'] = result.empty
+                row['elegible_voters'] = result.elegible_voters
+
+                rows.append(row)
 
         return rows
 
