@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.9.0 (2015-12-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a method which takes a list of dicts and turns it into a csv string.
   [href]
