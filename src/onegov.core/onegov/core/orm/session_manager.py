@@ -185,6 +185,7 @@ class SessionManager(object):
             scopefunc=self._scopefunc,
         )
         self.register_session(self.session_factory)
+        self.setup_manager_instance_sharing(self.bases)
 
     def register_engine(self, engine):
         """ Takes the given engine and registers it with the schema
@@ -253,6 +254,25 @@ class SessionManager(object):
                     self.on_delete.send(self.current_schema, obj=obj)
 
         zope.sqlalchemy.register(session)
+
+    def setup_manager_instance_sharing(self, bases):
+        """ Shares this instance with all mapped classes of all bases.
+
+        This enables each model to look up the current schema, the current
+        locale and so on.
+
+        """
+
+        def share_session_manager(target, *args, **kwargs):
+            nonlocal self
+            target.session_manager = weakref.proxy(self)
+
+        for base in bases:
+            if base:
+                for cls in base._decl_class_registry.values():
+                    if isinstance(cls, base.__class__):
+                        event.listen(cls, 'init', share_session_manager)
+                        event.listen(cls, 'load', share_session_manager)
 
     def _scopefunc(self):
         """ Returns the scope of the scoped_session used to create new

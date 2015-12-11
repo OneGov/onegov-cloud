@@ -3,6 +3,14 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Shares the session_manager with all ORM mapped instances which may access
+  it through ``self.session_manager``.
+
+  This is a plumbing feature to enable integration of localized database
+  fields.
+  [href]
+
 0.9.0 (2015-12-10)
 ~~~~~~~~~~~~~~~~~~~
 

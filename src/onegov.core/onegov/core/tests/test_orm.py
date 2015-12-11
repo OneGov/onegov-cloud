@@ -334,6 +334,30 @@ def test_json_type(postgres_dsn):
     mgr.dispose()
 
 
+def test_session_manager_sharing(postgres_dsn):
+    Base = declarative_base()
+
+    class Test(Base):
+        __tablename__ = 'test'
+        id = Column(Integer, primary_key=True)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+
+    test = Test(id=1)
+
+    # session_manager is a weakref proxy so we need to go through some hoops
+    # to get the actual instance for a proper identity test
+    assert test.session_manager.__repr__.__self__ is mgr
+
+    session = mgr.session()
+    session.add(test)
+    transaction.commit()
+
+    assert session.query(Test).one().session_manager.__repr__.__self__ is mgr
+    mgr.dispose()
+
+
 def test_uuid_type(postgres_dsn):
     Base = declarative_base()
 
