@@ -9,14 +9,14 @@ import uuid
 from datetime import datetime
 from morepath import setup
 from onegov.core.framework import Framework
-from onegov.core.orm import SessionManager
+from onegov.core.orm import SessionManager, translation_hybrid
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import JSON, UTCDateTime, UUID
+from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
 from onegov.core.security import Private
+from onegov.testing.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sqlalchemy import Column, Integer, Text
-from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
@@ -295,6 +295,61 @@ def test_orm_scenario(postgres_dsn):
     app.session_manager.dispose()
 
 
+def test_i18n_with_request(postgres_dsn):
+    Base = declarative_base()
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+
+        title_translations = Column(HSTORE, nullable=False)
+        title = translation_hybrid(title_translations)
+
+    @App.path(model=Document, path='document')
+    def get_document(app):
+        return app.session().query(Document).first() or Document(id=1)
+
+    @App.json(model=Document)
+    def view_document(self, request):
+        return {'title': self.title}
+
+    @App.json(model=Document, request_method='PUT')
+    def put_document(self, request):
+        self.title = request.params.get('title')
+        app.session().merge(self)
+
+    @App.setting(section='i18n', name='default_locale')
+    def get_i18n_default_locale():
+        return 'de_CH'
+
+    scan_morepath_modules(App, config)
+    config.commit()
+
+    app = App()
+    app.configure_application(dsn=postgres_dsn, base=Base)
+    app.namespace = 'municipalities'
+    app.set_application_id('municipalities/new-york')
+    app.languages = ['de_CH', 'en_US']
+
+    c = Client(app)
+    c.put('/document?title=Dokument')
+    assert c.get('/document').json == {'title': 'Dokument'}
+
+    c.set_cookie('language', 'en_US')
+    c.put('/document?title=Document')
+    assert c.get('/document').json == {'title': 'Document'}
+
+    c.set_cookie('language', '')
+    assert c.get('/document').json == {'title': 'Dokument'}
+
+    app.session_manager.dispose()
+
+
 def test_json_type(postgres_dsn):
     Base = declarative_base()
 
@@ -355,6 +410,45 @@ def test_session_manager_sharing(postgres_dsn):
     transaction.commit()
 
     assert session.query(Test).one().session_manager.__repr__.__self__ is mgr
+    mgr.dispose()
+
+
+def test_session_manager_i18n(postgres_dsn):
+    Base = declarative_base()
+
+    class Test(Base):
+        __tablename__ = 'test'
+        id = Column(Integer, primary_key=True)
+
+        text_translations = Column(HSTORE)
+        text = translation_hybrid(text_translations)
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('testing')
+    mgr.set_locale(default_locale='en_us', current_locale='en_us')
+
+    test = Test(id=1, text='no')
+    assert test.text == 'no'
+
+    mgr.set_locale(default_locale='en_us', current_locale='de_ch')
+    assert test.text == 'no'
+
+    test.text_translations['de_ch'] = 'nein'
+    assert test.text == 'nein'
+
+    mgr.set_locale(default_locale='en_us', current_locale='en_us')
+    assert test.text == 'no'
+
+    session = mgr.session()
+    session.add(test)
+    transaction.commit()
+
+    test = session.query(Test).one()
+    assert test.text == 'no'
+
+    mgr.set_locale(default_locale='en_us', current_locale='de_ch')
+    assert test.text == 'nein'
+
     mgr.dispose()
 
 

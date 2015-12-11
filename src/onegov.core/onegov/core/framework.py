@@ -775,3 +775,22 @@ def http_conflict_tween_factory(app, handler):
             return HTTPConflict()
 
     return http_conflict_tween
+
+
+@Framework.tween_factory(over=http_conflict_tween_factory)
+def current_language_tween_factory(app, handler):
+    def current_language_tween(request):
+        """ Set the current language on the session manager for each request,
+        for translatable database columns.
+
+        """
+
+        if app.has_database_connection:
+            app.session_manager.set_locale(
+                default_locale=request.default_locale,
+                current_locale=request.locale
+            )
+
+        return handler(request)
+
+    return current_language_tween

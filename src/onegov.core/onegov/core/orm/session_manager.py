@@ -274,6 +274,18 @@ class SessionManager(object):
                         event.listen(cls, 'init', share_session_manager)
                         event.listen(cls, 'load', share_session_manager)
 
+    def set_locale(self, default_locale, current_locale):
+        """ Sets the default locale and the current locale so it may be
+        shared with the translated ORM columns.
+
+        Note that the locales may be NONE. It is up to the consumer of these
+        settings to assert their existence.
+
+        """
+
+        self.default_locale = default_locale
+        self.current_locale = current_locale
+
     def _scopefunc(self):
         """ Returns the scope of the scoped_session used to create new
         sessions. Relies on self.current_schema being set before the

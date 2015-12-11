@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Integrates localized database fields.
+
+  Use ``onegov.core.orm.translation_hybrid`` together with sqlalchemy utils:
+  http://sqlalchemy-utils.readthedocs.org/en/latest/internationalization.html
+
 - Shares the session_manager with all ORM mapped instances which may access
   it through ``self.session_manager``.
 

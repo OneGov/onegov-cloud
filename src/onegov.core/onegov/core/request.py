@@ -219,6 +219,11 @@ class CoreRequest(IncludeRequest):
         return lambda text: text.interpolate(translator.gettext(text))
 
     @cached_property
+    def default_locale(self):
+        """ Returns the default locale. """
+        return self.app.registry.settings.i18n.default_locale
+
+    @cached_property
     def locale(self):
         """ Returns the current locale of this request. """
         settings = self.app.registry.settings
