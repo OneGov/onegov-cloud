@@ -92,6 +92,11 @@ def session(session_manager):
 
     """
     session_manager.set_current_schema('test_' + uuid4().hex)
+
+    # TODO remove the 'hasattr' once the new onegov.core is out (0.9.0+)
+    if hasattr(session_manager, 'set_locale'):
+        session_manager.set_locale('de_CH', 'de_CH')
+
     yield session_manager.session()
 
 
