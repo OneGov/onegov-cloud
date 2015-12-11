@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Enables translation of the votes title in the database.
+  [href]
+
 0.2.0 (2015-12-10)
 ~~~~~~~~~~~~~~~~~~~
 

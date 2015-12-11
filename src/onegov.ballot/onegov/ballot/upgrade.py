@@ -2,6 +2,8 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from onegov.ballot import Vote
+from onegov.core.orm.types import HSTORE
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Column, Text
 
@@ -19,3 +21,24 @@ def rename_yays_to_yeas(context):
 @upgrade_task('Add shortcode column')
 def add_shortcode_column(context):
     context.operations.add_column('votes', Column('shortcode', Text()))
+
+
+@upgrade_task('Enable translation of vote title')
+def enable_translation_of_vote_title(context):
+
+    # get the existing votes before removing the old column
+    query = context.session.execute('SELECT id, title FROM votes')
+    votes = dict(query.fetchall())
+
+    context.operations.drop_column('votes', 'title')
+    context.operations.add_column('votes', Column(
+        'title_translations', HSTORE, nullable=True
+    ))
+
+    for vote in context.session.query(Vote).all():
+        vote.title = votes[vote.id]
+    context.session.flush()
+
+    context.operations.alter_column(
+        'votes', 'title_translations', nullable=False
+    )

@@ -11,9 +11,9 @@ Though it will do so in the future.
 
 """
 from collections import OrderedDict
-from onegov.core.orm import Base
+from onegov.core.orm import Base, translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import HSTORE, UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
 from sqlalchemy import select, func, case, desc
@@ -92,7 +92,8 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount):
     shortcode = Column(Text, nullable=True)
 
     #: title of the vote
-    title = Column(Text, nullable=False)
+    title_translations = Column(HSTORE, nullable=False)
+    title = translation_hybrid(title_translations)
 
     #: identifies the date of the vote
     date = Column(Date, nullable=False)
@@ -132,10 +133,10 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount):
     def tie_breaker(self):
         return len(self.ballots) == 3 and self.ballots[2]
 
-    @observes('title')
-    def title_observer(self, title):
+    @observes('title_translations')
+    def title_observer(self, translations):
         if not self.id:
-            self.id = normalize_for_url(title)
+            self.id = normalize_for_url(self.title)
 
     @property
     def counted(self):
