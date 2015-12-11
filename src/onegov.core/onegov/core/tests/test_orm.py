@@ -718,7 +718,7 @@ def test_application_retries(postgres_dsn, number_of_retries):
         session.add(Record())
         session.query(Record).delete('fetch')
 
-        time.sleep(0.1)
+        time.sleep(0.2)
 
     @App.view(model=OperationalError)
     def operational_error_handler(self, request):
