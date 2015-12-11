@@ -13,7 +13,7 @@ from onegov.core.orm import SessionManager, translation_hybrid
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
 from onegov.core.security import Private
-from onegov.testing.utils import scan_morepath_modules
+from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
 from sqlalchemy import Column, Integer, Text

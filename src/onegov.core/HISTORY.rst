@@ -16,6 +16,11 @@ Unreleased
   fields.
   [href]
 
+- Adds a method to automatically scan all morepath dependencies. It is not
+  guaranteed to always work and should only be relied upon for testing and
+  upgrades.
+  [href]
+
 0.9.0 (2015-12-10)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -15,6 +15,7 @@ from morepath import setup
 from onegov.core.mail import Postman
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
+from onegov.core.utils import scan_morepath_modules
 from onegov.server.config import Config
 from onegov.server.core import Server
 from uuid import uuid4
@@ -295,6 +296,7 @@ def upgrade(ctx, dry_run):
             else:
                 print("no pending upgrade tasks found")
 
+        scan_morepath_modules(appcfg.application_class, config)
         config.commit()
 
         # get all applications by looking at the existing schemas
