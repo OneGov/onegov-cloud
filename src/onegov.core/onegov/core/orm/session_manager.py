@@ -261,18 +261,33 @@ class SessionManager(object):
         This enables each model to look up the current schema, the current
         locale and so on.
 
+        This is a rather complicated way to make sure we don't use a global
+        variable. One might argue that this would warrant an exception
+        to the rule...
+
         """
 
-        def share_session_manager(target, *args, **kwargs):
+        # the instance is shared with all classes, loaded or created
+        def share_with_class(target, *args, **kwargs):
             nonlocal self
             target.session_manager = weakref.proxy(self)
+
+        # and it is shared with all query types, at which point there is
+        # no type available yet.
+        def share_with_query(query):
+            nonlocal self
+
+            for desc in query.column_descriptions:
+                desc['type'].session_manager = weakref.proxy(self)
+
+        event.listen(Query, 'before_compile', share_with_query, retval=False)
 
         for base in bases:
             if base:
                 for cls in base._decl_class_registry.values():
                     if isinstance(cls, base.__class__):
-                        event.listen(cls, 'init', share_session_manager)
-                        event.listen(cls, 'load', share_session_manager)
+                        event.listen(cls, 'init', share_with_class)
+                        event.listen(cls, 'load', share_with_class)
 
     def set_locale(self, default_locale, current_locale):
         """ Sets the default locale and the current locale so it may be

@@ -449,6 +449,9 @@ def test_session_manager_i18n(postgres_dsn):
     mgr.set_locale(default_locale='en_us', current_locale='de_ch')
     assert test.text == 'nein'
 
+    # make sure the locale is shared with the query as well
+    assert mgr.session().query(Test).order_by(Test.text).first()
+
     mgr.dispose()
 
 

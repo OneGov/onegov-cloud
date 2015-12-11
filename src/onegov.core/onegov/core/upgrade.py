@@ -289,6 +289,12 @@ class UpgradeContext(object):
         self.schema = request.app.session_manager.current_schema
         self.engine = self.session.bind
 
+        # The locale of the upgrade is the default locale
+        request.app.session_manager.set_locale(
+            current_locale=self.request.locale,
+            default_locale=self.request.default_locale
+        )
+
         # Make sure the connection is the same for the session, the engine
         # and the alembic migrations context. Otherwise the upgrade locks up.
         # If that happens again, test with this:
