@@ -1,6 +1,7 @@
 import json
 import morepath
 import pytest
+import pickle
 import sqlalchemy
 import time
 import transaction
@@ -10,6 +11,7 @@ from datetime import datetime
 from morepath import setup
 from onegov.core.framework import Framework
 from onegov.core.orm import SessionManager, translation_hybrid
+from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
 from onegov.core.security import Private
@@ -23,6 +25,10 @@ from sqlalchemy.ext.mutable import MutableDict
 from threading import Thread
 from webob.exc import HTTPUnauthorized, HTTPConflict
 from webtest import TestApp as Client
+
+
+class PicklePage(AdjacencyList):
+    __tablename__ = 'picklepages'
 
 
 def test_is_valid_schema(postgres_dsn):
@@ -905,6 +911,33 @@ def test_orm_signals_data_flushed(postgres_dsn):
 
     assert inserted[0][0].id > 0
     assert inserted[0][0].body == 'asdf'
+
+
+def test_pickle_model(postgres_dsn):
+
+    # pickling doesn't work with inline classes, so we need to use the
+    # PicklePage class defined in thos module
+    from onegov.core.orm import Base
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('foo')
+
+    # pickling will fail if the session_manager is still attached
+    page = PicklePage(name='foobar', title='Foobar')
+    assert page.session_manager.__repr__.__self__ is mgr
+
+    # this is why we automatically remove it internally when we pickle
+    page = pickle.loads(pickle.dumps(page))
+
+    assert page.name == 'foobar'
+    assert page.title == 'Foobar'
+
+    # loading the pickle dump will show that we have lost the session_manager
+    assert not hasattr(page, 'session_manager')
+
+    # to get it back we need to merge the object back into the sesssion,
+    # which is standard practice for sqlalchemy objects stored in a cache
+    page = mgr.session().merge(page)
+    assert page.session_manager.__repr__.__self__ is mgr
 
 
 def test_orm_signals(postgres_dsn):
