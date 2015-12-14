@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.10.0 (2015-12-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Integrates localized database fields.
 
