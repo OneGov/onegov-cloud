@@ -25,7 +25,7 @@ def test_view_permissions():
 
 def test_view_login_logout(election_day_app):
     client = Client(election_day_app)
-    client.set_cookie('locale', 'de_CH')
+    client.get('/locale/de_CH').follow()
 
     login = client.get('/').click('Anmelden')
     login.form['username'] = 'admin@example.org'
@@ -47,7 +47,7 @@ def test_view_login_logout(election_day_app):
 
 def test_view_manage(election_day_app):
     client = Client(election_day_app)
-    client.set_cookie('locale', 'de_CH')
+    client.get('/locale/de_CH').follow()
 
     assert client.get('/manage', expect_errors=True).status_code == 403
 
@@ -83,7 +83,7 @@ def test_view_manage(election_day_app):
 
 def test_upload_all_or_nothing(election_day_app):
     client = Client(election_day_app)
-    client.set_cookie('locale', 'de_CH')
+    client.get('/locale/de_CH').follow()
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -136,7 +136,7 @@ def test_upload_all_or_nothing(election_day_app):
 
 def test_upload_success(election_day_app):
     client = Client(election_day_app)
-    client.set_cookie('locale', 'de_CH')
+    client.get('/locale/de_CH').follow()
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -200,7 +200,7 @@ def test_upload_success(election_day_app):
 
 def test_upload_validation(election_day_app):
     client = Client(election_day_app)
-    client.set_cookie('locale', 'de_CH')
+    client.get('/locale/de_CH').follow()
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -370,7 +370,7 @@ def test_upload_validation(election_day_app):
 
 def test_upload_missing_town(election_day_app):
     client = Client(election_day_app)
-    client.set_cookie('locale', 'de_CH')
+    client.get('/locale/de_CH').follow()
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -423,7 +423,7 @@ def test_upload_missing_town(election_day_app):
 
 def test_i18n(election_day_app):
     client = Client(election_day_app)
-    client.set_cookie('locale', 'de_CH')
+    client.get('/locale/de_CH').follow()
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
