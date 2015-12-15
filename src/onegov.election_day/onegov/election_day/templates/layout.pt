@@ -27,7 +27,10 @@ metal:define-macro="layout">
 </head>
 <body>
     <div class="row header">
-        <div class="small-12 columns">
+        <div class="small-12 medium-4 columns text-left">
+            <a href="#" class="back-to-base">Kanton Zug</a>
+        </div>
+        <div class="small-12 medium-8 columns">
             <a href="${layout.homepage_link}" title="Back to the latest elections &amp; votes" i18n:attributes="title">
                 <img aria-hidden="true" alt="Elections &amp; Votes" i18n:attributes="alt" src="${request.link(request.app.logo)}" tal:condition="request.app.logo|nothing" />
             </a>

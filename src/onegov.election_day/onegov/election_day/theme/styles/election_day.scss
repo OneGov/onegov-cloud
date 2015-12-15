@@ -541,3 +541,21 @@ form {
         }
     }
 }
+
+/*
+    Link back to canton site
+*/
+
+.back-to-base {
+    display: inline-block;
+    font-size: .875rem;
+    font-weight: bold;
+    margin-top: 1.5em;
+
+    &::before {
+        content: '\f100 ';
+        font-family: 'FontAwesome';
+        font-weight: normal;
+        margin-right: 1ex;
+    }
+}

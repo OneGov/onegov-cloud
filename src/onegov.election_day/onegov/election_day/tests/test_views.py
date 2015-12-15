@@ -25,6 +25,7 @@ def test_view_permissions():
 
 def test_view_login_logout(election_day_app):
     client = Client(election_day_app)
+    client.set_cookie('locale', 'de_CH')
 
     login = client.get('/').click('Anmelden')
     login.form['username'] = 'admin@example.org'
@@ -46,6 +47,7 @@ def test_view_login_logout(election_day_app):
 
 def test_view_manage(election_day_app):
     client = Client(election_day_app)
+    client.set_cookie('locale', 'de_CH')
 
     assert client.get('/manage', expect_errors=True).status_code == 403
 
@@ -58,14 +60,14 @@ def test_view_manage(election_day_app):
     assert "Noch keine Abstimmungen erfasst" in manage
 
     new = manage.click('Neue Abstimmung')
-    new.form['vote'] = 'Vote for a better yesterday'
+    new.form['vote_de'] = 'Vote for a better yesterday'
     new.form['date'] = date(2016, 1, 1)
     new.form['domain'] = 'federation'
     manage = new.form.submit().follow()
 
     assert "Vote for a better yesterday" in manage
     edit = manage.click('Bearbeiten')
-    edit.form['vote'] = 'Vote for a better tomorrow'
+    edit.form['vote_de'] = 'Vote for a better tomorrow'
     manage = edit.form.submit().follow()
 
     assert "Vote for a better tomorrow" in manage
@@ -81,6 +83,7 @@ def test_view_manage(election_day_app):
 
 def test_upload_all_or_nothing(election_day_app):
     client = Client(election_day_app)
+    client.set_cookie('locale', 'de_CH')
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -88,7 +91,7 @@ def test_upload_all_or_nothing(election_day_app):
     login.form.submit()
 
     new = client.get('/manage/new-vote')
-    new.form['vote'] = 'Bacon, yea or nay?'
+    new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -133,6 +136,7 @@ def test_upload_all_or_nothing(election_day_app):
 
 def test_upload_success(election_day_app):
     client = Client(election_day_app)
+    client.set_cookie('locale', 'de_CH')
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -140,7 +144,7 @@ def test_upload_success(election_day_app):
     login.form.submit()
 
     new = client.get('/manage/new-vote')
-    new.form['vote'] = 'Bacon, yea or nay?'
+    new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -196,6 +200,7 @@ def test_upload_success(election_day_app):
 
 def test_upload_validation(election_day_app):
     client = Client(election_day_app)
+    client.set_cookie('locale', 'de_CH')
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -203,7 +208,7 @@ def test_upload_validation(election_day_app):
     login.form.submit()
 
     new = client.get('/manage/new-vote')
-    new.form['vote'] = 'Bacon, yea or nay?'
+    new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
@@ -365,6 +370,7 @@ def test_upload_validation(election_day_app):
 
 def test_upload_missing_town(election_day_app):
     client = Client(election_day_app)
+    client.set_cookie('locale', 'de_CH')
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -372,7 +378,7 @@ def test_upload_missing_town(election_day_app):
     login.form.submit()
 
     new = client.get('/manage/new-vote')
-    new.form['vote'] = 'Bacon, yea or nay?'
+    new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
