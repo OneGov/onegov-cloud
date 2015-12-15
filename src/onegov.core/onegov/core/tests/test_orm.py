@@ -340,7 +340,7 @@ def test_i18n_with_request(postgres_dsn):
     app.configure_application(dsn=postgres_dsn, base=Base)
     app.namespace = 'municipalities'
     app.set_application_id('municipalities/new-york')
-    app.languages = ['de_CH', 'en_US']
+    app.locales = ['de_CH', 'en_US']
 
     c = Client(app)
     c.put('/document?title=Dokument')
