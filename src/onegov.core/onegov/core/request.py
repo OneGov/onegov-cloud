@@ -187,7 +187,7 @@ class CoreRequest(IncludeRequest):
             form_class = self.app.modules.i18n.get_translation_bound_form(
                 form_class, translate)
 
-            meta['locales'] = self.app.languages
+            meta['locales'] = self.app.locales
 
         if csrf_support:
             meta['csrf'] = True,
@@ -228,7 +228,7 @@ class CoreRequest(IncludeRequest):
         """ Returns the current locale of this request. """
         settings = self.app.registry.settings
 
-        locale = settings.i18n.locale_negotiator(self.app.languages, self)
+        locale = settings.i18n.locale_negotiator(self.app.locales, self)
         return locale or settings.i18n.default_locale
 
     @cached_property
@@ -245,7 +245,7 @@ class CoreRequest(IncludeRequest):
             special).
 
         """
-        if not self.app.languages:
+        if not self.app.locales:
             return None
 
         if for_chameleon:

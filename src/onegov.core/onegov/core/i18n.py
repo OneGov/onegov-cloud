@@ -34,6 +34,7 @@ For example::
 
 import gettext
 import glob
+import morepath
 import os
 import os.path
 import polib
@@ -75,12 +76,12 @@ def get_i18n_locale_negotiatior():
     return default_locale_negotiator
 
 
-def default_locale_negotiator(languages, request):
+def default_locale_negotiator(locales, request):
     """ The default locale negotiator.
 
-    Will select one of the given languages by:
+    Will select one of the given locales by:
 
-    1. Examining the 'language' cookie which will be preferred if the
+    1. Examining the 'locale' cookie which will be preferred if the
        language in the cookie actually exists
 
     2. Selecting the best match from the accept_language header
@@ -89,12 +90,12 @@ def default_locale_negotiator(languages, request):
     deal with that (possibly getting :meth:`get_i18n_default_locale`).
 
     """
-    user_language = request.cookies.get('language')
+    user_locale = request.cookies.get('locale')
 
-    if user_language in languages:
-        return user_language
+    if user_locale in locales:
+        return user_locale
 
-    return request.accept_language.best_match(languages)
+    return request.accept_language.best_match(locales)
 
 
 def pofiles(localedir):
@@ -279,3 +280,26 @@ def clone(translation):
     clone._catalog = translation._catalog.copy()
 
     return clone
+
+
+class SiteLocale(object):
+    """ A model representing the locale of the site.
+
+    Use this model to enable the user to change his locale through a path.
+
+    """
+
+    @classmethod
+    def for_path(cls, app, locale, to):
+        if locale in app.locales:
+            return cls(locale, to)
+
+    def __init__(self, locale, to):
+        self.locale = locale
+        self.to = to
+
+    def redirect(self):
+        response = morepath.redirect(self.to)
+        response.set_cookie('locale', self.locale)
+
+        return response

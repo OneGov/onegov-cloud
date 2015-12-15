@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds a site locale model and renames 'languages' to 'locales'.
+  [href]
+
 0.10.0 (2015-12-14)
 ~~~~~~~~~~~~~~~~~~~
 

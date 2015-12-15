@@ -346,11 +346,11 @@ def test_i18n_with_request(postgres_dsn):
     c.put('/document?title=Dokument')
     assert c.get('/document').json == {'title': 'Dokument'}
 
-    c.set_cookie('language', 'en_US')
+    c.set_cookie('locale', 'en_US')
     c.put('/document?title=Document')
     assert c.get('/document').json == {'title': 'Document'}
 
-    c.set_cookie('language', '')
+    c.set_cookie('locale', '')
     assert c.get('/document').json == {'title': 'Dokument'}
 
     app.session_manager.dispose()

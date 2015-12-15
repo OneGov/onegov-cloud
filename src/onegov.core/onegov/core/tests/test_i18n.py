@@ -134,7 +134,7 @@ def test_default_locale_negotiator():
     assert negotiate(['en', 'de'], request) == 'de'
 
     request.accept_language = Accept('de')
-    request.cookies['language'] = 'en'
+    request.cookies['locale'] = 'en'
     assert negotiate(['en', 'de'], request) == 'en'
 
 

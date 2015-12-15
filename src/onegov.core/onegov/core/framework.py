@@ -677,8 +677,8 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         )
 
     @cached_property
-    def languages(self):
-        """ Returns all available languages in a set. """
+    def locales(self):
+        """ Returns all available locales in a set. """
         return set(self.translations.keys())
 
     def sign(self, text):
