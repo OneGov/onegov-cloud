@@ -36,7 +36,10 @@ def enable_translation_of_vote_title(context):
     ))
 
     for vote in context.session.query(Vote).all():
-        vote.title = votes[vote.id]
+        vote.title_translations = {
+            locale: votes[vote.id].strip()
+            for locale in context.app.locales
+        }
     context.session.flush()
 
     context.operations.alter_column(
