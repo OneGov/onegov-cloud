@@ -419,3 +419,34 @@ def test_upload_missing_town(election_day_app):
 
     assert "Diese Vorlage hat weniger Resultate als die Anderen" in \
         upload.form.submit()
+
+
+def test_i18n(election_day_app):
+    client = Client(election_day_app)
+    client.set_cookie('locale', 'de_CH')
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-vote')
+    new.form['vote_de'] = 'Foo'
+    new.form['vote_fr'] = 'Bar'
+    new.form['vote_it'] = 'Baz'
+    new.form['vote_rm'] = 'Qux'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    homepage = client.get('/')
+    assert "Foo" in homepage
+
+    homepage = homepage.click('Français').follow()
+    assert "Bar" in homepage
+
+    homepage = homepage.click('Italiano').follow()
+    assert "Baz" in homepage
+
+    homepage = homepage.click('Rumantsch').follow()
+    assert "Qux" in homepage
