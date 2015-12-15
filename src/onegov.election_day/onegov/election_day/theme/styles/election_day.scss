@@ -522,3 +522,22 @@ form {
         }
     }
 }
+
+/*
+    Locales switcher
+*/
+
+.locales {
+    display: inline-block;
+    font-size: .875rem;
+    list-style: none;
+    margin: 0;
+
+    li {
+        display: inline-block;
+
+        + li:before {
+            content: '|';
+        }
+    }
+}

@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds italian, french and romansh locale.
+  [href]
+
 0.3.0 (2015-12-10)
 ~~~~~~~~~~~~~~~~~~~
 

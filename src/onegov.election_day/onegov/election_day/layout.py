@@ -1,6 +1,8 @@
+from babel import Locale
 from cached_property import cached_property
 from datetime import datetime
 from onegov.ballot import VoteCollection
+from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day.models import Manage
@@ -57,6 +59,21 @@ class Layout(ChameleonLayout):
     @cached_property
     def vote_collection(self):
         return VoteCollection(self.request.app.session())
+
+    @cached_property
+    def locales(self):
+        to = self.request.url
+
+        def get_name(locale):
+            return Locale.parse(locale).get_language_name().capitalize()
+
+        def get_link(locale):
+            return self.request.link(SiteLocale(locale, to))
+
+        return [
+            (get_name(locale), get_link(locale))
+            for locale in sorted(self.app.locales)
+        ]
 
 
 class DefaultLayout(Layout):

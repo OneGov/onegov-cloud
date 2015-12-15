@@ -52,8 +52,16 @@ metal:define-macro="layout">
 
     <footer>
         <div class="row">
-            <div class="small-8 columns">
+            <div class="small-4 columns">
                 &copy; ${layout.copyright_year} ${layout.app.principal.name}, <a href="https://onegovcloud.ch">OneGov Cloud</a>
+            </div>
+            <div class="small-4 columns text-center">
+                <ul class="locales">
+                    <li tal:repeat="(name, url) layout.locales">
+                        <a tal:condition="request.locale not in url" href="${url}">${name}</a>
+                        <strong tal:condition="request.locale in url">${name}</strong>
+                    </li>
+                </ul>
             </div>
             <div class="small-4 columns text-right">
                 <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>

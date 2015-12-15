@@ -1,0 +1,372 @@
+#
+# Romansh translations for PACKAGE package
+# This file is distributed under the same license as the PACKAGE package.
+# Denis Krienbühl <EMAIL@ADDRESS>, 2015.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2015-12-15 10:56+0100\n"
+"PO-Revision-Date: 2015-12-14 16:03+0100\n"
+"Last-Translator: Denis Krienbühl <EMAIL@ADDRESS>\n"
+"Language-Team: Romansh\n"
+"Language: rm\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+
+msgid "Type"
+msgstr ""
+
+msgid "Proposal"
+msgstr ""
+
+msgid "Counter-Proposal"
+msgstr ""
+
+msgid "Tie-Breaker"
+msgstr ""
+
+msgid "Simple Vote"
+msgstr ""
+
+msgid "Vote with Counter-Proposal"
+msgstr ""
+
+msgid "Vote"
+msgstr ""
+
+msgid "Shortcode"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "A vote with this title exists already"
+msgstr ""
+
+msgid "Federal Vote"
+msgstr ""
+
+msgid "Cantonal Vote"
+msgstr ""
+
+msgid "Elections &amp; Votes"
+msgstr ""
+
+msgid "There are no votes defined yet."
+msgstr ""
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+
+msgid "Back to the latest elections &amp; votes"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "You are logged in:"
+msgstr ""
+
+msgid "Manage"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Accepted"
+msgstr ""
+
+msgid "Rejected"
+msgstr ""
+
+msgid "Counter Proposal"
+msgstr ""
+
+msgid "${counted} of ${total}"
+msgstr ""
+
+msgid "Archived Votes"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Submit"
+msgstr ""
+
+msgid "Federal Votes on ${date}"
+msgstr ""
+
+msgid "Cantonal Votes on ${date}"
+msgstr ""
+
+msgid "Result"
+msgstr ""
+
+msgid "Yes %"
+msgstr ""
+
+msgid "No %"
+msgstr ""
+
+msgid "Reported"
+msgstr ""
+
+msgid "Votes"
+msgstr ""
+
+msgid "New Vote"
+msgstr ""
+
+msgid "No votes yet."
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Federal"
+msgstr ""
+
+msgid "Cantonal"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Upload Results"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Elections &amp; Votes: Open Data"
+msgstr ""
+
+msgid "Format"
+msgstr ""
+
+msgid ""
+"The raw data used to display the results of votes is available in the "
+"following formats:"
+msgstr ""
+
+msgid "The following fields are included in all formats:"
+msgstr ""
+
+msgid "Title of the vote."
+msgstr ""
+
+msgid "The date of the vote (an ISO 8601 date string)."
+msgstr ""
+
+msgid "Internal shortcode (defines the ordering of votes on the same day)."
+msgstr ""
+
+msgid "\"federation\" for federal, \"canton\" for cantonal votes."
+msgstr ""
+
+msgid ""
+"\"proposal\" (Vorschlag), \"counter-proposal\" (Gegenvorschlag) or \"tie-"
+"breaker\" (Stichfrage)."
+msgstr ""
+
+msgid ""
+"The designation of the result. May be the district, the town's name divided "
+"by a slash, the city's name and the city's district divided by a slash or "
+"simply the town's name. This depends entirely on the canton."
+msgstr ""
+
+msgid "The id of the municipality/locale. Better known as \"BFS Nummer\""
+msgstr ""
+
+msgid ""
+"True if the result was counted, False if the result not known yet (the "
+"voting counts are not final yet)."
+msgstr ""
+
+msgid "The number of yes votes."
+msgstr ""
+
+msgid "The number of no votes."
+msgstr ""
+
+msgid "The number of invalid votes."
+msgstr ""
+
+msgid "The number of empty votes."
+msgstr ""
+
+msgid "The number of people elegible to vote."
+msgstr ""
+
+msgid "Please use the following format:"
+msgstr ""
+
+msgid "Format Description"
+msgstr ""
+
+msgid "Your results were uploaded successfully."
+msgstr ""
+
+msgid "Click here to see the updated results page."
+msgstr ""
+
+msgid "Your results could not be uploaded."
+msgstr ""
+
+msgid "No errors found in proposal"
+msgstr ""
+
+msgid "Errors found in proposal"
+msgstr ""
+
+msgid "Line"
+msgstr ""
+
+msgid "No errors found in counter proposal"
+msgstr ""
+
+msgid "Errors found in counter proposal"
+msgstr ""
+
+msgid "No errors found in tie-breaker"
+msgstr ""
+
+msgid "Errors found in tie-breaker"
+msgstr ""
+
+msgid "Not yet counted."
+msgstr ""
+
+msgid "Yeas"
+msgstr ""
+
+msgid "Nays"
+msgstr ""
+
+msgid "No results yet"
+msgstr ""
+
+msgid "Results"
+msgstr ""
+
+msgid "Counted municipalities"
+msgstr ""
+
+msgid "Last change"
+msgstr ""
+
+msgid "Elegible Voters"
+msgstr ""
+
+msgid "Cast Ballots"
+msgstr ""
+
+msgid "Turnout"
+msgstr ""
+
+msgid "Yay"
+msgstr ""
+
+msgid "Nay"
+msgstr ""
+
+msgid "Electoral District"
+msgstr ""
+
+msgid "Empty"
+msgstr ""
+
+msgid "Invalid"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Wrong username or password"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to delete \"${vote}\"?"
+msgstr ""
+
+msgid "Delete vote"
+msgstr ""
+
+msgid "Upload results"
+msgstr ""
+
+msgid "Missing municipality"
+msgstr ""
+
+#, python-format
+msgid "${group} was found twice"
+msgstr ""
+
+msgid "No data found"
+msgstr ""
+
+#, python-format
+msgid "The year ${year} is not yet supported"
+msgstr ""
+
+msgid "Invalid municipality id"
+msgstr ""
+
+#, python-format
+msgid "municipality id ${id} was found twice"
+msgstr ""
+
+#, python-format
+msgid "municipality id ${id} is unknown"
+msgstr ""
+
+msgid "Could not read yeas"
+msgstr ""
+
+msgid "Could not read nays"
+msgstr ""
+
+msgid "Could not read the elegible voters"
+msgstr ""
+
+msgid "Could not read the empty votes"
+msgstr ""
+
+msgid "Could not read the invalid votes"
+msgstr ""
+
+msgid "No elegible voters"
+msgstr ""
+
+msgid "More cast votes than elegible voters"
+msgstr ""
+
+#, python-format
+msgid "Missing columns: '${cols}'"
+msgstr ""
+
+msgid ""
+"Could not find the expected columns, make sure all required columns exist "
+"and that there are no extra columns."
+msgstr ""
+
+msgid "Some column names appear twice."
+msgstr ""
+
+msgid "Not a valid csv/xls/xlsx file."
+msgstr ""
+
+msgid "The csv/xls/xlsx file is empty."
+msgstr ""
+
+msgid "The file contains an empty line."
+msgstr ""
+
+msgid "This ballot has fewer results than the others"
+msgstr ""

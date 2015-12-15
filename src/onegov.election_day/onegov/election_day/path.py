@@ -1,3 +1,4 @@
+from onegov.core.i18n import SiteLocale
 from onegov.ballot import Ballot, BallotCollection, Vote, VoteCollection
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.models import Manage, Principal
@@ -32,3 +33,9 @@ def get_ballot(app, id):
 @ElectionDayApp.path(model=VoteCollection, path='/votes/{year}')
 def get_votes(app, year):
     return VoteCollection(app.session(), year)
+
+
+@ElectionDayApp.path(model=SiteLocale, path='/locale/{locale}')
+def get_locale(request, app, locale, to=None):
+    to = to or request.link(app.principal)
+    return SiteLocale.for_path(app, locale, to)

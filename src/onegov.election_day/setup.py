@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'babel',
         'cached_property',
         'cssmin',
         'onegov.core>=0.4.27',
