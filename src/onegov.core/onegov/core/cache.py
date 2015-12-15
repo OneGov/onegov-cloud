@@ -57,7 +57,7 @@ def create_backend(namespace, backend, arguments={}, expiration_time=None):
 
     return make_region(key_mangler=prefix_key_mangler(prefix)).configure(
         backend,
-        expiration_time=None,
+        expiration_time=expiration_time,
         arguments=arguments,
         wrap=[IgnoreUnreachableBackend]
     )
