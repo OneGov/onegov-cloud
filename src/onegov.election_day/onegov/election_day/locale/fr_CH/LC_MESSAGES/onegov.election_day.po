@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-15 10:56+0100\n"
+"POT-Creation-Date: 2015-12-15 11:06+0100\n"
 "PO-Revision-Date: 2015-12-15 10:56+0100\n"
 "Last-Translator: Denis Krienbühl <EMAIL@ADDRESS>\n"
 "Language-Team: French\n"
@@ -35,7 +35,16 @@ msgstr ""
 msgid "Vote with Counter-Proposal"
 msgstr ""
 
-msgid "Vote"
+msgid "Vote (German)"
+msgstr ""
+
+msgid "Vote (French)"
+msgstr ""
+
+msgid "Vote (Italian)"
+msgstr ""
+
+msgid "Vote (Romansh)"
 msgstr ""
 
 msgid "Shortcode"
@@ -102,6 +111,9 @@ msgid "Federal Votes on ${date}"
 msgstr ""
 
 msgid "Cantonal Votes on ${date}"
+msgstr ""
+
+msgid "Vote"
 msgstr ""
 
 msgid "Result"
