@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.11.1 (2015-12-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes site locale creating many instead of one locale cookie.
   [href]
