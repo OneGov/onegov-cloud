@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.11.2 (2015-12-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes cache expiration time having no effect.
   [href]
