@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a 5 minute cache for all anonymous pages.
+  [href]
+
 - Adds italian, french and romansh locale.
   [href]
 

@@ -450,3 +450,32 @@ def test_i18n(election_day_app):
 
     homepage = homepage.click('Rumantsch').follow()
     assert "Qux" in homepage
+
+
+def test_pages_cache(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-vote')
+    new.form['vote_de'] = '0xdeadbeef'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    anonymous = Client(election_day_app)
+    assert '0xdeadbeef' in anonymous.get('/')
+
+    edit = client.get('/vote/0xdeadbeef/edit')
+    edit.form['vote_de'] = '0xdeadc0de'
+    edit.form.submit()
+
+    assert '0xdeadc0de' in client.get('/')
+    assert '0xdeadbeef' in anonymous.get('/')
+    assert '0xdeadc0de' in anonymous.get('/', headers=[
+        ('Cache-Control', 'no-cache')
+    ])

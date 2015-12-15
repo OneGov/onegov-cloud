@@ -1,5 +1,8 @@
+import re
+
 from cached_property import cached_property
 from onegov.core import Framework, utils
+from onegov.core.framework import transaction_tween_factory
 from onegov.core.filestorage import FilestorageFile
 from onegov.shared import asset
 from onegov.election_day.theme import ElectionDayTheme
@@ -66,6 +69,11 @@ class ElectionDayApp(Framework):
         return {
             'primary-color': self.principal.color
         }
+
+    @property
+    def pages_cache(self):
+        """ A one minute cache for pages. """
+        return self.get_cache(self.application_id + ':5m', expiration_time=300)
 
     @cached_property
     def webassets_path(self):
@@ -141,3 +149,42 @@ def get_i18n_localedirs():
 @ElectionDayApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de_CH'
+
+
+@ElectionDayApp.tween_factory(over=transaction_tween_factory)
+def micro_cache_anonymous_pages_tween_factory(app, handler):
+
+    cache_paths = (
+        '/',
+        '/ballot/.*',
+        '/vote/.*',
+        '/votes/.*',
+    )
+
+    cache_paths = re.compile(r'^({})$'.format('|'.join(cache_paths)))
+
+    def micro_cache_anonymous_pages_tween(request):
+        """ Set the current language on the session manager for each request,
+        for translatable database columns.
+
+        """
+
+        # no cache if the user is logged in
+        if request.is_logged_in:
+            return handler(request)
+
+        # only cache whitelisted paths
+        if not cache_paths.match(request.path_info):
+            return handler(request)
+
+        # allow cache busting through browser shift+f5
+        if request.headers.get('cache-control') == 'no-cache':
+            return handler(request)
+
+        # each page is cached once per language (and by application id as the
+        # pages_cache is bound to it)
+        key = ':'.join((request.locale, request.path_info))
+
+        return app.pages_cache.get_or_create(key, lambda: handler(request))
+
+    return micro_cache_anonymous_pages_tween
