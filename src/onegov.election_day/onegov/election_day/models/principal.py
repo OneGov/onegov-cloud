@@ -18,13 +18,14 @@ class Principal(object):
 
     """
 
-    def __init__(self, name, logo, canton, color):
+    def __init__(self, name, logo, canton, color, base=None):
         assert canton in cantons
 
         self.name = name
         self.logo = logo
         self.canton = canton
         self.color = color
+        self.base = base
 
     @classmethod
     def from_yaml(cls, yaml_source):

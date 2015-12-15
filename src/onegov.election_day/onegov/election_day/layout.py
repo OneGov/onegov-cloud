@@ -16,12 +16,16 @@ class Layout(ChameleonLayout):
         self.request.include('common')
 
     @cached_property
+    def principal(self):
+        return self.request.app.principal
+
+    @cached_property
     def homepage_link(self):
-        return self.request.link(self.request.app.principal)
+        return self.request.link(self.principal)
 
     @cached_property
     def opendata_link(self):
-        return self.request.link(self.request.app.principal, 'opendata')
+        return self.request.link(self.principal, 'opendata')
 
     @cached_property
     def font_awesome_path(self):

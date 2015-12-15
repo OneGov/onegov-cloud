@@ -21,7 +21,8 @@ def view_principal(self, request):
 
     return {
         'layout': DefaultLayout(self, request),
-        'votes_by_domain_and_date': votes_by_domain_and_date
+        'votes_by_domain_and_date': votes_by_domain_and_date,
+        'show_base_link': True
     }
 
 
