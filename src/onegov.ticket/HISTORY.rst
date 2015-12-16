@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.1 (2015-12-16)
+~~~~~~~~~~~~~~~~~~~
+
 - State change functions are now idempotent.
   [href]
 
