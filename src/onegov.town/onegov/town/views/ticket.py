@@ -2,6 +2,7 @@ import morepath
 
 from onegov.core.security import Public, Private
 from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket.errors import InvalidStateChange
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
 from onegov.town.mail import send_html_mail
@@ -39,11 +40,14 @@ def accept_ticket(self, request):
     user = UserCollection(request.app.session()).by_username(
         request.identity.userid)
 
-    self.accept_ticket(user)
-
-    request.success(_("You have accepted ticket ${number}", mapping={
-        'number': self.number
-    }))
+    try:
+        self.accept_ticket(user)
+    except InvalidStateChange:
+        request.alert(_("The ticket cannot be accepted because it's not open"))
+    else:
+        request.success(_("You have accepted ticket ${number}", mapping={
+            'number': self.number
+        }))
 
     request.app.update_ticket_count()
 
@@ -52,11 +56,17 @@ def accept_ticket(self, request):
 
 @TownApp.view(model=Ticket, name='close', permission=Private)
 def close_ticket(self, request):
-    self.close_ticket()
 
-    request.success(_("You have closed ticket ${number}", mapping={
-        'number': self.number
-    }))
+    try:
+        self.close_ticket()
+    except InvalidStateChange:
+        request.alert(
+            _("The ticket cannot be closed because it's not pending")
+        )
+    else:
+        request.success(_("You have closed ticket ${number}", mapping={
+            'number': self.number
+        }))
 
     email = self.snapshot.get('email') or self.handler.email
 
@@ -81,11 +91,16 @@ def reopen_ticket(self, request):
     user = UserCollection(request.app.session()).by_username(
         request.identity.userid)
 
-    self.reopen_ticket(user)
-
-    request.success(_("You have reopened ticket ${number}", mapping={
-        'number': self.number
-    }))
+    try:
+        self.reopen_ticket(user)
+    except InvalidStateChange:
+        request.alert(
+            _("The ticket cannot be re-opened because it's not closed.")
+        )
+    else:
+        request.success(_("You have reopened ticket ${number}", mapping={
+            'number': self.number
+        }))
 
     email = self.snapshot.get('email') or self.handler.email
 
