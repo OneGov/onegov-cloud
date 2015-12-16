@@ -29,18 +29,6 @@ $(document).foundation();
 // get the footer height and write it to the footer_height setting if possible
 $(document).find('#footer_height').val($('footer > div').height() + 'px');
 
-// load the datetimepicker for date inputs if the browser does not support it
-if (!Modernizr.inputtypes.date) {
-    $('input[type=date]').datetimepicker({
-        allowBlank: true,
-        dayOfWeekStart: 1, // Monday
-        format: 'Y-m-d',   // HTML5 (RFC3339)
-        lang: 'de',
-        lazyInit: false,
-        timepicker: false
-    });
-}
-
 // Add image captions
 $('.page-text img[alt][alt!=""]').each(function() {
     var caption = $("<span>").text($(this).attr('alt'));

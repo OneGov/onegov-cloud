@@ -222,6 +222,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             confirm,
             typeahead,
             'js/jquery.datetimepicker.js',
+            'js/datetimepicker.js',
             'js/jquery.popupoverlay.js',
             'js/common.js',
             filters=jsminifier,
