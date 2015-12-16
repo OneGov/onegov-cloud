@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Replayed Yubikeys no longer lead to an exception.
+  [href]
+
 0.3.0 (2015-11-20)
 ~~~~~~~~~~~~~~~~~~~
 

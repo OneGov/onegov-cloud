@@ -3,6 +3,7 @@ from onegov.core.utils import relative_url
 from onegov.user import log
 from onegov.user.collection import UserCollection
 from yubico_client import Yubico
+from yubico_client.yubico_exceptions import StatusCodeError
 
 
 def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
@@ -34,7 +35,13 @@ def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
     if not yubikey.startswith(expected_yubikey_id):
         return False
 
-    return Yubico(client_id, secret_key).verify(yubikey)
+    try:
+        return Yubico(client_id, secret_key).verify(yubikey)
+    except StatusCodeError as e:
+        if e.status_code != 'REPLAYED_OTP':
+            raise e
+
+        return False
 
 
 class Auth(object):
