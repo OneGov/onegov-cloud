@@ -213,6 +213,10 @@ def with_options(widget, **render_options):
 
     field = StringField(widget=with_options(TextArea, class_="markdown"))
 
+    Note: With wtforms 2.1 this is no longer necssary. Instead use the
+    render_kw parameter of the field class. This function will be deprecated
+    in a future release.
+
     """
 
     if inspect.isclass(widget):
