@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.1 (2015-12-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Turns the Yubikey field into an ordinary string field.
   [href]
 
