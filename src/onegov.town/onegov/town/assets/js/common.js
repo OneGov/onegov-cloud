@@ -42,7 +42,10 @@ if (!Modernizr.inputtypes.date) {
 }
 
 // Add image captions
-$('.page-text img[alt][alt!=""]').each(function(){
+$('.page-text img[alt][alt!=""]').each(function() {
     var caption = $("<span>").text($(this).attr('alt'));
     $(this).after(caption);
 });
+
+// Make sure files open in another window
+$('.page-text a[href*="/datei/"]').attr('target', '_blank');

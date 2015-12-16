@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Opens links pointing to files in a new tab.
+  [href]
+
 - Improves ticket state change error handling.
   [href]
 
