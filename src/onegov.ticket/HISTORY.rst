@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- State change functions are now idempotent.
+  [href]
+
+- Adds a proper exception for invalid state changes.
+  [href]
+
 0.1.0 (2015-10-12)
 ~~~~~~~~~~~~~~~~~~~
 

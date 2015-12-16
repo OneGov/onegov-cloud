@@ -4,6 +4,7 @@ from onegov.core.orm.types import JSON, UUID
 from onegov.core.orm.types import UTCDateTime
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers
+from onegov.ticket.errors import InvalidStateChange
 from onegov.user.model import User
 from sqlalchemy import Column, Enum, ForeignKey, Text
 from sqlalchemy.ext.declarative import declared_attr
@@ -119,21 +120,35 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             self, self.handler_id, self.handler_data)
 
     def accept_ticket(self, user):
-        assert self.state == 'open'
 
-        self.user = user
+        if self.state == 'pending' and self.user == user:
+            return
+
+        if self.state != 'open':
+            raise InvalidStateChange()
+
         self.state = 'pending'
+        self.user = user
 
     def close_ticket(self):
-        assert self.state == 'pending'
+
+        if self.state == 'closed':
+            return
+
+        if self.state != 'pending':
+            raise InvalidStateChange()
 
         self.state = 'closed'
 
     def reopen_ticket(self, user):
-        assert self.state == 'closed'
+        if self.state == 'pending' and self.user == user:
+            return
 
-        self.user = user
+        if self.state != 'closed':
+            raise InvalidStateChange()
+
         self.state = 'pending'
+        self.user = user
 
     def create_snapshot(self, request):
         """ Takes the current handler and stores the output of the summary
