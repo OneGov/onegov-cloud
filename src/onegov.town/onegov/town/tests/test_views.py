@@ -253,7 +253,7 @@ def test_reset_password(town_app):
     assert len(town_app.smtp.outbox) == 1
 
     message = town_app.smtp.outbox[0]
-    message = message.get_payload(0).get_payload(decode=True)
+    message = message.get_payload(1).get_payload(decode=True)
     message = message.decode('iso-8859-1')
     link = list(document_fromstring(message).iterlinks())[0][2]
     token = link.split('token=')[1]
