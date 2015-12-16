@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Turns the Yubikey field into an ordinary string field.
+  [href]
+
 - Replayed Yubikeys no longer lead to an exception.
   [href]
 

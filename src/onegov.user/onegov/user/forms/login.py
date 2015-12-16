@@ -14,9 +14,10 @@ class LoginForm(Form):
         label=_("Password"),
         validators=[validators.InputRequired()]
     )
-    yubikey = PasswordField(
+    yubikey = StringField(
         label=_("YubiKey"),
-        description=_("Plug your YubiKey into a USB slot and press it.")
+        description=_("Plug your YubiKey into a USB slot and press it."),
+        render_kw={'autocomplete': 'off'}
     )
 
     @property
