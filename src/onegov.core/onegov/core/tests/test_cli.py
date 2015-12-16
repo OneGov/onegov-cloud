@@ -88,6 +88,12 @@ def test_sendmail(smtp, temporary_directory):
     assert message['Reply-To'] == 'Govikon <info@example.org>'
     assert message['Subject'] == 'Test E-Mail'
     assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/plain; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
+    )
+    assert message.get_payload()[1].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
         'Content-Transfer-Encoding: base64\n\n'
@@ -160,6 +166,13 @@ def test_sendmail_unicode(smtp, temporary_directory):
         == "Test E-Mäil"
 
     assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/plain; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        '8J+RjQ==\n'
+    )
+
+    assert message.get_payload()[1].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
         'Content-Transfer-Encoding: base64\n\n'

@@ -27,7 +27,6 @@ from cached_property import cached_property
 from datetime import datetime
 from email.utils import parseaddr, formataddr
 from itsdangerous import BadSignature, Signer
-from mailthon import email
 from mailthon.middleware import TLS, Auth
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
@@ -36,7 +35,7 @@ from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache, log, utils
 from onegov.core.datamanager import MailDataManager
-from onegov.core.mail import Postman, MaildirPostman
+from onegov.core.mail import email, Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
 from onegov.core.request import CoreRequest
 from onegov.server import Application as ServerApplication

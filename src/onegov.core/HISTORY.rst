@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Includes a plain text alternative in all HTML E-Mails.
+  [href]
+
 0.11.2 (2015-12-15)
 ~~~~~~~~~~~~~~~~~~~
 

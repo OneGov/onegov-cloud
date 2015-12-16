@@ -3,6 +3,7 @@ import os
 import transaction
 import pytest
 
+from base64 import b64decode
 from datetime import datetime, timedelta
 from email.header import decode_header
 from email.utils import parseaddr
@@ -455,6 +456,12 @@ def test_send_email(smtp):
     assert message['Reply-To'] == 'info@example.org'
     assert message['Subject'] == 'Test E-Mail'
     assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/plain; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
+    )
+    assert message.get_payload()[1].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
         'Content-Transfer-Encoding: base64\n\n'
@@ -489,6 +496,12 @@ def test_send_email_with_name(smtp):
     assert message['Reply-To'] == 'Govikon <info@example.org>'
     assert message['Subject'] == 'Test E-Mail'
     assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/plain; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW1haWwgaXMganVzdCBhIHRlc3Q=\n'
+    )
+    assert message.get_payload()[1].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
         'Content-Transfer-Encoding: base64\n\n'
@@ -530,7 +543,7 @@ def test_send_email_to_maildir(temporary_directory):
     assert 'To: recipient@example.org' in email
 
 
-def test_send_email_is_8859_1(smtp):
+def test_send_email_iso_8859_1(smtp):
     app = Framework()
     app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'noreply@example.org'
@@ -570,6 +583,12 @@ def test_send_email_is_8859_1(smtp):
         == "Nüws"
 
     assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/plain; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        'VGhpcyBlLW3DpGlsIGlzIGp1c3QgYSB0ZXN0\n'
+    )
+    assert message.get_payload()[1].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
         'Content-Transfer-Encoding: base64\n\n'
@@ -615,6 +634,13 @@ def test_send_email_unicode(smtp):
     assert decode_header(message['Subject'])[0][0].decode('utf-8') == "👍"
 
     assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/plain; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        '8J+RjQ==\n'
+    )
+
+    assert message.get_payload()[1].as_string() == (
         'Content-Type: text/html; charset="utf-8"\n'
         'MIME-Version: 1.0\n'
         'Content-Transfer-Encoding: base64\n\n'
@@ -715,3 +741,55 @@ def test_send_email_transaction(smtp):
 
     client.get('/send-ok')
     assert len(smtp.outbox) == 1
+
+
+def test_send_email_plaintext_alternative(smtp):
+    app = Framework()
+    app.mail_host, app.mail_port = smtp.address
+    app.mail_sender = 'noreply@example.org'
+    app.mail_force_tls = False
+    app.mail_username = None
+    app.mail_password = None
+    app.mail_use_directory = False
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="<a href='http://example.org'>This e-mail is just a test</a>"
+    )
+
+    transaction.commit()
+
+    assert len(smtp.outbox) == 1
+    message = smtp.outbox[0]
+
+    assert message['Sender'] == 'Govikon <noreply@example.org>'
+    assert message['From'] == 'Govikon <noreply@example.org>'
+    assert message['Reply-To'] == 'Govikon <info@example.org>'
+    assert message['Subject'] == 'Test E-Mail'
+
+    assert message.get_payload()[0].as_string() == (
+        'Content-Type: text/plain; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        'W1RoaXMgZS1tYWlsIGlzIGp1c3QgYSB0ZXN0XShodHRwOi8vZXhhbXBsZS5vcmcp\n'
+    )
+
+    content = message.get_payload()[0].as_string().splitlines()[-1]
+    assert b64decode(content) == (
+        b"[This e-mail is just a test](http://example.org)"
+    )
+
+    assert message.get_payload()[1].as_string() == (
+        'Content-Type: text/html; charset="utf-8"\n'
+        'MIME-Version: 1.0\n'
+        'Content-Transfer-Encoding: base64\n\n'
+        'PGEgaHJlZj0naHR0cDovL2V4YW1wbGUub3JnJz5UaGlzI'
+        'GUtbWFpbCBpcyBqdXN0IGEgdGVzdDwv\nYT4=\n'
+    )
+
+    content = ''.join(message.get_payload()[1].as_string().splitlines()[-2:])
+    assert b64decode(content) == (
+        b"<a href='http://example.org'>This e-mail is just a test</a>"
+    )

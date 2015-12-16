@@ -1,7 +1,89 @@
+import mailthon.headers as headers
 import os.path
+import re
 
+from email.mime.multipart import MIMEMultipart
+from html2text import html2text
 from mailbox import Maildir, MaildirMessage
+from mailthon.enclosure import HTML, PlainText, Attachment
+from mailthon.envelope import Envelope as BaseEnvelope
 from mailthon.postman import Postman
+
+
+def email(sender=None, receivers=(), cc=(), bcc=(),
+          subject=None, content=None, encoding='utf8',
+          attachments=()):
+    """
+    Creates an Envelope object with a HTML *content*, as well as a *plaintext*
+    alternative generated from the HTML content.
+
+    :param content: HTML content.
+    :param encoding: Encoding of the email.
+    :param attachments: List of filenames to
+        attach to the email.
+
+    Note: this is basically a copy of :func:`mailthon.api.email`, though it
+    adds the plaintext alternative.
+    """
+
+    if content:
+        # turn the html email into a plaintext representation
+        # this leads to a lower spam rating
+        any_character = re.compile(r"""
+            [
+                \d  # decimals
+                \w  # words
+                \n  # new lines
+
+                # emojis
+                \U00002600-\U000027BF
+                \U0001f300-\U0001f64F
+                \U0001f680-\U0001f6FF
+            ]+
+        """, re.VERBOSE)
+
+        # filter out duplicated lines and lines without any text
+        lines = html2text(content, encoding, bodywidth=0).splitlines()
+        lines = (l.strip() for l in lines)
+        lines = (l for l in lines if any_character.search(l))
+
+        # use double newlines to get paragraphs
+        plaintext = '\n\n'.join(lines)
+    else:
+        plaintext = None
+
+    # According to RFC 2046, the last part of a multipart message, in this case
+    # the HTML message, is best and preferred
+    enclosure = [
+        PlainText(plaintext, encoding),
+        HTML(content, encoding),
+    ]
+    enclosure.extend(Attachment(k) for k in attachments)
+    return Envelope(
+        headers=[
+            headers.subject(subject),
+            headers.sender(sender),
+            headers.to(*receivers),
+            headers.cc(*cc),
+            headers.bcc(*bcc),
+            headers.date(),
+            headers.message_id(),
+        ],
+        enclosure=enclosure,
+    )
+
+
+class Envelope(BaseEnvelope):
+    """ Changes the mailthon envelope to use mime-multipart/alternative.
+
+    """
+
+    def mime(self):
+        mime = MIMEMultipart('alternative')
+        for item in self.enclosure:
+            mime.attach(item.mime())
+        self.headers.prepare(mime)
+        return mime
 
 
 class MaildirTransport(object):

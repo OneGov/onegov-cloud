@@ -43,6 +43,7 @@ setup(
         'dogpile.cache',
         'editdistance',
         'fs',
+        'html2text',
         'itsdangerous',
         'isodate',
         'lazy-object-proxy',
