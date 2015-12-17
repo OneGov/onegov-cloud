@@ -1,10 +1,10 @@
-<!--! 
+<!--!
     This is the OneGov E-Mail template. Tested against https://litmus.com/
     (same system used internally by Mailchimp).
-    
+
     The following rules apply:
-    
-    * CSS styles must always be inlined. 
+
+    * CSS styles must always be inlined.
     * Content is always contained in tables.
     * The template is based on https://github.com/leemunroe/responsive-html-email-template.
 
@@ -22,14 +22,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <title><div metal:define-slot="title"></div></title>
     <style tal:define="primary_color layout.town.theme_options.get('primary-color', '#006fba')">
-    /*csslint 
+    /*csslint
         important:false,
         universal-selector:false,
         unique-headings:false,
         box-model:false
     */
 
-    /* 
+    /*
         Global
     */
     * {
@@ -103,6 +103,7 @@
 
     .ticket-number {
         font-family: Consolas, "Liberation Mono", Courier, monospace;
+        font-weight: bold;
     }
 
     /*
@@ -121,14 +122,14 @@
         Footer
     */
     table.footer-wrap {
-        width: 100%;    
+        width: 100%;
         clear: both!important;
     }
 
-    .footer-wrap .container p {
+    .footer-wrap .container p,
+    .footer-wrap .container a {
         font-size: 12px;
         color: #666;
-        
     }
 
     table.footer-wrap a {
@@ -230,7 +231,9 @@
                     <table>
                         <tr>
                             <td align="center">
-                                <p>${layout.town.name}</p>
+                                <p>
+                                    <tal:block replace="structure layout.town.meta.contact_html" />
+                                </p>
                             </td>
                         </tr>
                     </table>
