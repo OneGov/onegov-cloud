@@ -232,7 +232,7 @@
                         <tr>
                             <td align="center">
                                 <p>
-                                    <tal:block replace="structure layout.town.meta.contact_html" />
+                                    <tal:block replace="structure layout.town.meta.contact_html|layout.town.name" />
                                 </p>
                             </td>
                         </tr>
