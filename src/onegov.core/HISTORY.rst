@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.12.1 (2015-12-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes broken dependency.
   [href]
