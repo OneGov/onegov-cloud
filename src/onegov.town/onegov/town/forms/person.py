@@ -16,7 +16,8 @@ class PersonForm(Form):
 
     picture_url = StringField(
         label=_("Picture"),
-        description=_("URL pointing to the picture")
+        description=_("URL pointing to the picture"),
+        render_kw={'class_': 'image-url'}
     )
 
     email = EmailField(_("E-Mail"))

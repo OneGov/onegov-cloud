@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Enables picture upload on person edit view.
+  [href]
+
 - Fixes datetime picker not working in the events view.
   [href]
 

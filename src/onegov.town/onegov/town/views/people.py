@@ -51,6 +51,7 @@ def handle_new_person(self, request, form):
 
     layout = PersonCollectionLayout(self, request)
     layout.breadcrumbs.append(Link(_("New"), '#'))
+    layout.include_editor()
 
     return {
         'layout': layout,
@@ -73,10 +74,11 @@ def handle_edit_person(self, request, form):
 
     layout = PersonLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))
+    layout.include_editor()
 
     return {
         'layout': layout,
-        'title': _("New person"),
+        'title': self.title,
         'form': form
     }
 
