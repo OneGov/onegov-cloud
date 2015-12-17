@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Shows a helpful error if a form with an existing name is added.
+  [href]
+
 - Enables picture upload on person edit view.
   [href]
 

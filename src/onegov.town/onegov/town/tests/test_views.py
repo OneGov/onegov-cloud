@@ -678,6 +678,33 @@ def test_add_custom_form(town_app):
     form_page.form.submit().follow()
 
 
+def test_add_duplicate_form(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    form_page = client.get('/formulare/neu')
+    form_page.form['title'] = "My Form"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = "There are many like it, but this one's mine"
+    form_page.form['definition'] = "email *= @@@"
+    form_page = form_page.form.submit().follow()
+
+    assert "Ein neues Formular wurd hinzugefügt" in form_page
+
+    form_page = client.get('/formulare/neu')
+    form_page.form['title'] = "My Form"
+    form_page.form['lead'] = "This is a form"
+    form_page.form['text'] = "There are many like it, but this one's mine"
+    form_page.form['definition'] = "email *= @@@"
+    form_page = form_page.form.submit()
+
+    assert "Ein Formular mit diesem Namen existiert bereits" in form_page
+
+
 def test_delete_builtin_form(town_app):
     client = Client(town_app)
     builtin_form = '/formular/wohnsitzbestaetigung'

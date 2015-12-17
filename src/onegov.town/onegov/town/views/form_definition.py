@@ -1,7 +1,7 @@
 import morepath
 
 from onegov.core.security import Private
-from onegov.core.utils import Bunch
+from onegov.core.utils import Bunch, normalize_for_url
 from onegov.form import FormCollection, FormDefinition
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
@@ -35,17 +35,21 @@ def handle_new_definition(self, request, form):
         )
         form.update_model(model)
 
-        # forms added online are always custom forms
-        new_form = self.definitions.add(
-            title=model.title,
-            definition=model.definition,
-            type='custom',
-            meta=model.meta,
-            content=model.content
-        )
+        if self.definitions.by_name(normalize_for_url(model.title)):
+            request.alert(_("A form with this name already exists"))
+        else:
 
-        request.success(_("Added a new form"))
-        return morepath.redirect(request.link(new_form))
+            # forms added online are always custom forms
+            new_form = self.definitions.add(
+                title=model.title,
+                definition=model.definition,
+                type='custom',
+                meta=model.meta,
+                content=model.content
+            )
+
+            request.success(_("Added a new form"))
+            return morepath.redirect(request.link(new_form))
 
     layout = FormEditorLayout(self, request)
     layout.breadcrumbs = [
