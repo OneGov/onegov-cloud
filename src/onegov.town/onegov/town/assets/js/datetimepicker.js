@@ -5,25 +5,25 @@ if (!Modernizr.inputtypes.date) {
             dayOfWeekStart: 1, // Monday
             format: 'd.m.Y',
             placeholder: 'TT.MM.JJJJ',
-            lang: 'de',
+            lang: 'de'
         },
         it_CH: {
             dayOfWeekStart: 1,
             format: 'd.m.Y',
             placeholder: 'gg.mm.aaaa',
-            lang: 'it',
+            lang: 'it'
         },
         fr_CH: {
             dayOfWeekStart: 1,
             format: 'd.m.Y',
             placeholder: 'jj.mm.aaaa',
-            lang: 'fr',
+            lang: 'fr'
         },
         rm_CH: {
             dayOfWeekStart: 1,
             format: 'd-m-Y',
             placeholder: 'dd-mm-oooo',
-            lang: 'rm',
+            lang: 'rm'
         }
     };
 
@@ -54,7 +54,7 @@ if (!Modernizr.inputtypes.date) {
             timepicker: false,
             dayOfWeekStart: datetimepicker_i18n[locale].dayOfWeekStart,
             format: datetimepicker_i18n[locale].format,
-            lang: datetimepicker_i18n[locale].lang,
+            lang: datetimepicker_i18n[locale].lang
         });
         $(this).attr('placeholder', datetimepicker_i18n[locale].placeholder);
         $(this).val(convert_date($(this).val(), 'Y-m-d', datetimepicker_i18n[locale].format));
