@@ -1,17 +1,38 @@
 // load the datetimepicker for date inputs if the browser does not support it
 if (!Modernizr.inputtypes.date) {
     var datetimepicker_i18n = {
-    		de_CH: {
+        de_CH: {
             dayOfWeekStart: 1, // Monday
             format: 'd.m.Y',
             placeholder: 'TT.MM.JJJJ',
             lang: 'de',
+        },
+        it_CH: {
+            dayOfWeekStart: 1,
+            format: 'd.m.Y',
+            placeholder: 'gg.mm.aaaa',
+            lang: 'it',
+        },
+        fr_CH: {
+            dayOfWeekStart: 1,
+            format: 'd.m.Y',
+            placeholder: 'jj.mm.aaaa',
+            lang: 'fr',
+        },
+        rm_CH: {
+            dayOfWeekStart: 1,
+            format: 'd-m-Y',
+            placeholder: 'dd-mm-oooo',
+            lang: 'rm',
         }
     };
 
     var locale = $('html').attr('lang');
-    if (locale ) {
+    if (locale) {
         locale = locale.replace('-', '_');
+        if (!(locale in datetimepicker_i18n)) {
+            locale = 'de_CH';
+        }
     } else {
         locale = 'de_CH';
     }
