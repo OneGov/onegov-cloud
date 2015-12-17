@@ -16,6 +16,9 @@ Unreleased
 - Replaces the town name with the contact info in the email footer.
   [href]
 
+- Improves datetime picker on Firefox/Safari/Internet Explorer.
+  [href]
+
 0.11.2 (2015-12-08)
 ~~~~~~~~~~~~~~~~~~~
 
