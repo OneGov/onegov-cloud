@@ -7,6 +7,12 @@ Unreleased
 - Localize date input format.
   [msom]
 
+- Opens links pointing to files in a new tab.
+  [href]
+
+- Improves ticket state change error handling.
+  [href]
+
 0.11.2 (2015-12-08)
 ~~~~~~~~~~~~~~~~~~~
 
