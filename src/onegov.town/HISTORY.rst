@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Be more consistent with the use of secondary buttons in input fields.
+  [href]
+
 1.0.1 (2015-12-17)
 ~~~~~~~~~~~~~~~~~~~
 
