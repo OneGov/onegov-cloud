@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+1.0.1 (2015-12-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows a helpful error if a form with an existing name is added.
   [href]
 
