@@ -1,69 +1,78 @@
-// load the datetimepicker for date inputs if the browser does not support it
-if (!Modernizr.inputtypes.date) {
-    var datetimepicker_i18n = {
-        de_CH: {
-            dayOfWeekStart: 1, // Monday
-            format: 'd.m.Y',
-            placeholder: 'TT.MM.JJJJ',
-            lang: 'de'
-        },
-        it_CH: {
-            dayOfWeekStart: 1,
-            format: 'd.m.Y',
-            placeholder: 'gg.mm.aaaa',
-            lang: 'it'
-        },
-        fr_CH: {
-            dayOfWeekStart: 1,
-            format: 'd.m.Y',
-            placeholder: 'jj.mm.aaaa',
-            lang: 'fr'
-        },
-        rm_CH: {
-            dayOfWeekStart: 1,
-            format: 'd-m-Y',
-            placeholder: 'dd-mm-oooo',
-            lang: 'rm'
-        }
-    };
+var datetimepicker_i18n = {
+    de_CH: {
+        dayOfWeekStart: 1, // Monday
+        format: 'd.m.Y',
+        placeholder: 'TT.MM.JJJJ',
+        lang: 'de'
+    },
+    it_CH: {
+        dayOfWeekStart: 1,
+        format: 'd.m.Y',
+        placeholder: 'gg.mm.aaaa',
+        lang: 'it'
+    },
+    fr_CH: {
+        dayOfWeekStart: 1,
+        format: 'd.m.Y',
+        placeholder: 'jj.mm.aaaa',
+        lang: 'fr'
+    },
+    rm_CH: {
+        dayOfWeekStart: 1,
+        format: 'd-m-Y',
+        placeholder: 'dd-mm-oooo',
+        lang: 'rm'
+    }
+};
 
+
+var convert_date = function(value, from_format, to_format) {
+    if (value) {
+        var as_date = Date.parseDate(value, from_format);
+        if (as_date) {
+            return as_date.dateFormat(to_format);
+        }
+    }
+    return value;
+};
+
+var get_locale = function() {
     var locale = $('html').attr('lang');
     if (locale) {
-        locale = locale.replace('-', '_');
-        if (!(locale in datetimepicker_i18n)) {
-            locale = 'de_CH';
-        }
+        return locale.replace('-', '_');
     } else {
-        locale = 'de_CH';
+        return 'de_CH';
     }
+};
 
-    var convert_date = function(value, from_format, to_format) {
-        if (value) {
-            var as_date = Date.parseDate(value, from_format);
-            if (as_date) {
-                return as_date.dateFormat(to_format);
-            }
-        }
-        return value;
-    };
+// load the datetimepicker for date inputs if the browser does not support it
+if (!Modernizr.inputtypes.date) {
+    var locale = get_locale();
 
     $('input[type=date]').each(function() {
         var input = $(this);
+        var large_column = 'small-11';
+        var small_column = 'small-1';
+
+        if (input.is('.small')) {
+            large_column = 'small-10';
+            small_column = 'small-2';
+        }
 
         // inject a button with which to launch the datetime picker
         var button = $('<a href="#" class="button postfix datetimepicker"><i class="fa fa-calendar"></i></a>');
         var grid = $([
             '<div class="row collapse">',
-            '<div class="small-11 columns"></div>',
-            '<div class="small-1 columns"></div>',
+            '<div class="' + large_column + ' columns"></div>',
+            '<div class="' + small_column + ' columns"></div>',
             '</div>'
         ].join(''));
 
         var visible = false;
 
         input.closest('.columns').append(grid);
-        input.detach().appendTo(grid.find('.small-11'));
-        button.appendTo(grid.find('.small-1'));
+        input.detach().appendTo(grid.find('.' + large_column));
+        button.appendTo(grid.find('.' + small_column));
 
         // hide/show the datetime picker when clicking on the button
         button.click(function(e) {

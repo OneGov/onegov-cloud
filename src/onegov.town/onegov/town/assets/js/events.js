@@ -1,7 +1,7 @@
 // set date filter on input change
 var set_date_filter = function(name, value) {
     var location = new Url();
-    location.query[name] = value;
+    location.query[name] = convert_date(value, datetimepicker_i18n[get_locale()].format, 'Y-m-d');
     delete location.query.page;
     window.location.href = location.toString();
 };

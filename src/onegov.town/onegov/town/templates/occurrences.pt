@@ -70,13 +70,13 @@
                             <div class="large-6 columns">
                                 <div class="row collapse">
                                     <label i18n:translate="">From</label>
-                                    <input name="start" type="date" value="${start}" placeholder="${date_placeholder}">
+                                    <input class="small" name="start" type="date" value="${start}" placeholder="${date_placeholder}">
                                 </div>
                             </div>
                             <div class="large-6 columns">
                                 <div class="row collapse">
                                     <label i18n:translate="">To</label>
-                                    <input name="end" type="date" value="${end}" placeholder="${date_placeholder}">
+                                    <input class="small" name="end" type="date" value="${end}" placeholder="${date_placeholder}">
                                 </div>
                             </div>
                         </div>

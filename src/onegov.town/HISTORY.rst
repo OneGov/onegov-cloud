@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes datetime picker not working in the events view.
+  [href]
+
 1.0.0 (2015-12-17)
 ~~~~~~~~~~~~~~~~~~~
 
