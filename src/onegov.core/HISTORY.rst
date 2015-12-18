@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.12.2 (2015-12-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Ensures a proper cleanup of the existing db schemas before completeing the
   transfer command.
