@@ -221,25 +221,35 @@ def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
                 'ssh', server, '-C',
                 (
                     "sudo -u postgres pg_dump "
-                    "--format=c --no-owner --no-privileges --clean {}".format(
+                    "--no-owner --no-privileges --clean {}".format(
                         remote_db
                     )
                 ),
             ])
 
-            with open('dump.sql', 'wb') as f:
-                f.write(database_dump)
+            with open('dump.sql', 'w') as f:
+                # add cascade to all drop schema lines
+                # http://www.postgresql.org/message-id/50EC9574.9060500
+                for line in database_dump.splitlines():
+                    line = line.decode('utf-8')
+
+                    if line.startswith('DROP SCHEMA'):
+                        if 'CASCADE' not in line:
+                            if 'DROP SCHEMA extensions' not in line:
+                                line = line.replace(';', ' CASCADE;')
+
+                    f.write(line + os.linesep)
 
             try:
                 if platform.system() == 'Darwin':
                     subprocess.check_output([
-                        "cat dump.sql | pg_restore -d {}".format(local_db)
+                        "cat dump.sql | psql {}".format(local_db)
                     ], stderr=subprocess.STDOUT, shell=True)
                 elif platform.system() == 'Linux':
                     subprocess.check_output([
                         (
                             "cat dump.sql "
-                            "| sudo -u postgres pg_restore -d {}".format(
+                            "| sudo -u postgres psql -d {}".format(
                                 local_db
                             )
                         )
