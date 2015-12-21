@@ -7,7 +7,7 @@ import transaction
 
 from morepath import setup
 from onegov.core.crypto import hash_password
-from onegov.testing.utils import scan_morepath_modules
+from onegov.core.utils import scan_morepath_modules
 from onegov.user import User
 from uuid import uuid4
 
