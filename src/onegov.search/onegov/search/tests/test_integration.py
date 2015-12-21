@@ -4,7 +4,7 @@ import transaction
 from morepath import setup
 from onegov.core import Framework
 from onegov.search import ElasticsearchApp, ORMSearchable
-from onegov.testing.utils import scan_morepath_modules
+from onegov.core.utils import scan_morepath_modules
 from sqlalchemy import Boolean, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from webtest import TestApp as Client
