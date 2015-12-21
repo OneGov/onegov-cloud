@@ -48,11 +48,11 @@ class Layout(object):
     #:
     #: XXX this is not yet i18n and could be done better
     time_format = 'HH:mm'
-    date_format = 'dd.MM.YYYY'
-    datetime_format = 'dd.MM.YYYY HH:mm'
+    date_format = 'dd.MM.yyyy'
+    datetime_format = 'dd.MM.yyyy HH:mm'
 
-    date_long_format = 'dd. MMMM YYYY'
-    datetime_long_format = 'd. MMMM YYYY HH:mm'
+    date_long_format = 'dd. MMMM yyyy'
+    datetime_long_format = 'd. MMMM yyyy HH:mm'
     weekday_long_format = 'EEEE'
     month_long_format = 'MMMM'
 

@@ -3,6 +3,11 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Fixes incorrect year in date format. Before the week's year was used instead
+  of the date's year. This lead to incorrect output when formatting a date.
+  [href]
+
 0.12.2 (2015-12-18)
 ~~~~~~~~~~~~~~~~~~~
 

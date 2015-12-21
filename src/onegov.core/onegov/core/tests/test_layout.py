@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from sedate import replace_timezone, utcnow
 from onegov.core.layout import Layout
 from onegov.core.utils import Bunch
@@ -28,6 +28,7 @@ def test_format_date():
     assert layout.format_date(dt.date(), 'date') == '17.06.2015'
     assert layout.format_date(dt, 'time') == '15:00'
     assert layout.format_date(dt, 'time') == '15:00'
+    assert layout.format_date(date(2016, 1, 3), 'date') == '03.01.2016'
 
 
 def test_format_number():
