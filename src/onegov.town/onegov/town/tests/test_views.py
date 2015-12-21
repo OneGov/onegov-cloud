@@ -367,6 +367,14 @@ def test_unauthorized(town_app):
     assert "Zugriff verweigert" not in settings_page
 
 
+def test_notfound(town_app):
+    client = Client(town_app)
+
+    notfound_page = client.get('/foobar', expect_errors=True)
+    assert "Seite nicht gefunden" in notfound_page
+    assert notfound_page.status_code == 404
+
+
 def test_pages(town_app):
     client = Client(town_app)
 

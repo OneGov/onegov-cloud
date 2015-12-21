@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a custom 404 page.
+  [href]
+
 1.0.2 (2015-12-21)
 ~~~~~~~~~~~~~~~~~~~
 

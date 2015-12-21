@@ -1,7 +1,7 @@
 from onegov.core.security import Public
 from onegov.town import _, TownApp
 from onegov.town.layout import DefaultLayout
-from webob.exc import HTTPForbidden
+from webob.exc import HTTPForbidden, HTTPNotFound
 
 
 @TownApp.html(model=HTTPForbidden, permission=Public, template='forbidden.pt')
@@ -22,4 +22,17 @@ def handle_forbidden(self, request):
         'layout': layout,
         'title': _("Access Denied"),
         'login_url': layout.login_url
+    }
+
+
+@TownApp.html(model=HTTPNotFound, permission=Public, template='notfound.pt')
+def handle_notfound(self, request):
+
+    @request.after
+    def set_status_code(response):
+        response.status_code = self.code  # pass along 404
+
+    return {
+        'layout': DefaultLayout(self, request),
+        'title': _("Not Found"),
     }

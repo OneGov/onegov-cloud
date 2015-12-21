@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-17 14:53+0100\n"
+"POT-Creation-Date: 2015-12-21 11:56+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -922,6 +922,13 @@ msgstr ""
 msgid "Your ticket has been reopened"
 msgstr "Ihr Ticket wurde wieder geöffnet"
 
+msgid ""
+"Sorry, the page you are looking for could not be found. Try checking the URL "
+"for errors or use the search box on the top."
+msgstr ""
+"Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden werden. "
+"Bitte überprüfen Sie die Internetadresse oder verwenden Sie die Suche im Navigationsbereich."
+
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
 
@@ -1131,6 +1138,9 @@ msgstr "Ihre Veranstaltung wurde abgelehnt"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
+
+msgid "Not Found"
+msgstr "Seite nicht gefunden"
 
 msgid "New Form"
 msgstr "Neues Formular"
