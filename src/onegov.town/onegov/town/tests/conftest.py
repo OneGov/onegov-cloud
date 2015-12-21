@@ -7,7 +7,7 @@ import shutil
 
 from morepath import setup
 from onegov.core.crypto import hash_password
-from onegov.testing.utils import scan_morepath_modules
+from onegov.core.utils import scan_morepath_modules
 from onegov.town.initial_content import (
     add_initial_content, builtin_form_definitions
 )
