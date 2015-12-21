@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+1.0.2 (2015-12-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Depends on latest onegov.core which fixes an issue with date display.
   [href]
 
