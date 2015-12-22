@@ -28,6 +28,9 @@ Unreleased
 - Improves ticket confirmation text.
   [href]
 
+- Improves the event publication terms and conditions text.
+  [href]
+
 1.0.2 (2015-12-21)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -94,10 +94,11 @@ def handle_new_event(self, request, form):
     self.title = _("Submit an event")
 
     terms = _(
-        ("Only non-commercial events which take place in ${town} will be "
-         "published. Published events might be deleted any time without "
-         "giving reasons."),
-        mapping={'town': request.app.town.name}
+        "Only events taking place inside the town or events related to "
+        "town societies are published. Events which are purely commercial are "
+        "not published. There's no right to be published and already "
+        "published events may be removed from the page without notification "
+        "or reason."
     )
 
     if form.submitted(request):
