@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.2 (2015-12-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Lowers the connection timeout to 5 seconds and uses sniff_on_connection_fail.
   [href]
 
