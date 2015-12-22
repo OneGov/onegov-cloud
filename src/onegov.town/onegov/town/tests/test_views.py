@@ -779,7 +779,7 @@ def test_show_uploaded_file(town_app):
         form_page.pyquery('.ticket-number a').attr('href'))
 
     assert 'test.txt' in ticket_page.text
-    file_response = ticket_page.click('test.txt')
+    file_response = ticket_page.click('test.txt', index=0)
 
     assert file_response.content_type == 'text/plain'
     assert file_response.text == 'foobar'
