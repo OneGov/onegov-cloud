@@ -20,6 +20,10 @@ Unreleased
 - Ensures that page links are always rendered right after the text.
   [href]
 
+- Only updates the builtin forms if there have been any changes. This leads
+  to faster startup time and improves the page rendering time if elasticsearch
+  is offline when the process is restarted.
+
 1.0.2 (2015-12-21)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -89,8 +89,10 @@ def add_builtin_forms(session, definitions=None):
 
         if form:
             # update
-            form.title = title
-            form.definition = definition
+            if form.title != title:
+                form.title = title
+            if form.definition != definition:
+                form.definition = definition
         else:
             # add
             form = forms.add(
