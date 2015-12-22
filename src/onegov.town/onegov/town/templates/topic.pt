@@ -10,17 +10,19 @@
         <tal:block condition="page.trait == 'page'">
 
             <tal:block metal:use-macro="layout.macros.page_content"
-             tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html" />
-
-            <div class="row" tal:condition="children">
-                <div class="small-12 columns">
-                    <ul class="inline-list page-links">
-                        <li tal:repeat="link children">
-                            <tal:block replace="structure link(request)" />
-                        </li>
-                    </ul>
-                </div>
-            </div>
+             tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html">
+                <tal:block metal:fill-slot="after-text">
+                     <div class="row" tal:condition="children">
+                        <div class="small-12 columns">
+                            <ul class="inline-list page-links">
+                                <li tal:repeat="link children">
+                                    <tal:block replace="structure link(request)" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </tal:block>
+            </tal:block>
         </tal:block>
         <tal:block condition="page.trait == 'link'">
             <div class="row">

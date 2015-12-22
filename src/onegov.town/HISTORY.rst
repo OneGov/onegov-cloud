@@ -4,9 +4,6 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Improves printing styles, especially the printing of tickets.
-  [href]
-
 - Adds an "all news" link to the homepage and removes the 'more...' links.
   [href]
 
@@ -15,6 +12,12 @@ Unreleased
   [href]
 
 - Adds a custom 404 page.
+  [href]
+
+- Improves printing styles, especially the printing of tickets.
+  [href]
+
+- Ensures that page links are always rendered right after the text.
   [href]
 
 1.0.2 (2015-12-21)
