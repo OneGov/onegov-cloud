@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Improves printing styles, especially the printing of tickets.
+  [href]
+
 - Adds an "all news" link to the homepage and removes the 'more...' links.
   [href]
 

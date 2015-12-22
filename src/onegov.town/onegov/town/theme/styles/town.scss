@@ -95,10 +95,12 @@ body {
     }
 }
 
-footer,
-.push {
-    @include prefix(animation-duration, 3s);
-    height: $footer-height; /* .push must be the same height as .footer */
+@media not print {
+    footer,
+    .push {
+        @include prefix(animation-duration, 3s);
+        height: $footer-height; /* .push must be the same height as .footer */
+    }
 }
 
 #redactor-modal-box footer {
@@ -2074,18 +2076,30 @@ ul.search-results {
     Print Styles
 */
 @media print {
-    .ticket-count,
-    .searchbox,
-    .top-bar,
-    .edit-bar,
     .alert-box,
-    .side-nav,
     .bottom-links,
+    .edit-bar,
+    .footer,
     .occurrences-day-date,
+    .occurrences-filter-date,
     .occurrences-filter-tags,
-    .occurrences-filter-date {
+    .occurrence-exports,
+    .page-links,
+    .searchbox,
+    .side-nav,
+    .ticket-count,
+    div.push,
+    .top-bar {
         display: none;
+    }
 
+    .page-content-panel {
+        border: 1px solid $tuatara;
+        border-radius: 3px;
+    }
+
+    body {
+        font-size: 12px !important;
     }
 }
 

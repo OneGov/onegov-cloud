@@ -8645,7 +8645,7 @@ var momComputableOptions = {
 			format += ' ddd'; // for RTL, add day-of-week to end
 		}
 		else {
-			format = 'ddd ' + format; // for LTR, add day-of-week to beginning
+			format = 'ddd. ' + format; // for LTR, add day-of-week to beginning
 		}
 		return format;
 	},
