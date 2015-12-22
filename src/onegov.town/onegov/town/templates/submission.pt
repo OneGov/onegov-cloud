@@ -12,7 +12,6 @@
             <div class="small-12 medium-12 large-12 columns">
                 <div class="panel callout" tal:condition="is_pending">
                     <p i18n:translate="">
-                        Your form submission is ready to be sent to the town.
                         Please review your data and press "Complete" to finalize the process.
                         If there's anything you'd like to change, click on "Edit" to return
                         to the filled-out form.

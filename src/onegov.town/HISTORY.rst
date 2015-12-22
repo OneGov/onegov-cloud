@@ -23,6 +23,10 @@ Unreleased
 - Only updates the builtin forms if there have been any changes. This leads
   to faster startup time and improves the page rendering time if elasticsearch
   is offline when the process is restarted.
+  [href]
+
+- Improves ticket confirmation text.
+  [href]
 
 1.0.2 (2015-12-21)
 ~~~~~~~~~~~~~~~~~~~
