@@ -515,7 +515,7 @@ input[type=color] {
     panels
 */
 
-$more-link-icon: '\f054';
+$more-link-icon: '\f105';
 
 .homepage-links-panel,
 .page-content-panel {
@@ -548,12 +548,12 @@ $more-link-icon: '\f054';
             text-overflow: ellipsis;
 
             &.more-link {
-                font-size: .8em;
+                font-size: .875rem;
                 font-weight: normal;
 
                 &::before {
                     @include icon($more-link-icon);
-                    font-size: .8em;
+                    font-size: .875rem;
                     margin-right: 1ex;
                 }
             }
@@ -1062,7 +1062,7 @@ div#redactor-droparea {
 
     a h2 {
         color: $side-nav-link-color;
-        font-size: $h4-font-size;
+        font-size: $h3-font-size - $h3-font-reduction;
         margin-bottom: .5rem;
     }
 
@@ -1083,6 +1083,31 @@ div#redactor-droparea {
     }
 }
 
+.news-years {
+    list-style: none;
+    margin-left: 0;
+    padding: 0;
+
+    li {
+        display: inline;
+
+        + li::before {
+            content: '/';
+        }
+    }
+}
+
+.all-news {
+    font-size: 1em;
+}
+
+.all-news::before {
+    color: $primary-color;
+    content: $more-link-icon;
+    font-family: 'FontAwesome';
+    font-size: 1em;
+    margin-right: 1ex;
+}
 
 /*
     hide the news in the topbar

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-21 11:56+0100\n"
+"POT-Creation-Date: 2015-12-21 17:18+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -755,6 +755,9 @@ msgstr "Es wurden noch keine Formulare definiert."
 msgid "Latest news"
 msgstr "Aktuelles"
 
+msgid "All news"
+msgstr "Alle Nachrichten"
+
 msgid "All Images"
 msgstr "Alle Bilder"
 
@@ -806,9 +809,6 @@ msgstr "Absenden"
 
 msgid "Drop files to upload"
 msgstr "Dateien hierhin ziehen um sie hochzuladen"
-
-msgid "read on…"
-msgstr "weiterlesen…"
 
 msgid ""
 "This site is hidden from the general public. To show it to everyone, edit "
@@ -926,8 +926,9 @@ msgid ""
 "Sorry, the page you are looking for could not be found. Try checking the URL "
 "for errors or use the search box on the top."
 msgstr ""
-"Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden werden. "
-"Bitte überprüfen Sie die Internetadresse oder verwenden Sie die Suche im Navigationsbereich."
+"Es tut uns leid, aber die Seite nach der Sie suchen konnte nicht gefunden "
+"werden. Bitte überprüfen Sie die Internetadresse oder verwenden Sie die "
+"Suche im Navigationsbereich."
 
 msgid "Export this event"
 msgstr "Diesen Termin exportieren"
@@ -949,20 +950,6 @@ msgstr "Veranstaltung melden"
 
 msgid "Submit your own event"
 msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
-
-msgid ""
-"You've reached this site because you are logged in. Visitors are "
-"automatically redirected to the following link:"
-msgstr ""
-"Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
-"zum folgenden Verweis weitergeleitet:"
-
-msgid ""
-"You are not automatically redirected so you have a chance to edit or delete "
-"this link."
-msgstr ""
-"Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
-"den Verweis zu bearbeiten oder zu löschen."
 
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
@@ -1075,6 +1062,20 @@ msgstr "Art:"
 
 msgid "Accept"
 msgstr "Annehmen"
+
+msgid ""
+"You've reached this site because you are logged in. Visitors are "
+"automatically redirected to the following link:"
+msgstr ""
+"Sie sehen diese Seite weil Sie eingeloggt sind. Besucher werden automatisch "
+"zum folgenden Verweis weitergeleitet:"
+
+msgid ""
+"You are not automatically redirected so you have a chance to edit or delete "
+"this link."
+msgstr ""
+"Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
+"den Verweis zu bearbeiten oder zu löschen."
 
 msgid "New allocation"
 msgstr "Neue Einteilung"
@@ -1320,6 +1321,9 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
+
+#~ msgid "read on…"
+#~ msgstr "weiterlesen…"
 
 #~ msgid "The format of the time is HH:MM (e.g. 14:30)"
 #~ msgstr "Das Format der Zeit ist HH:MM (z.B. 14:30)"

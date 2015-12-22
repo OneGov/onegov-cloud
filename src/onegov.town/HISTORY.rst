@@ -4,6 +4,13 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an "all news" link to the homepage and removes the 'more...' links.
+  [href]
+
+- Adds the ability to filter the news page by year. In addition each available
+  year is linked on the frontpage.
+  [href]
+
 - Adds a custom 404 page.
   [href]
 

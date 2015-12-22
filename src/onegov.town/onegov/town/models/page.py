@@ -11,6 +11,7 @@ from onegov.town.models.extensions import (
     VisibleOnHomepageExtension,
 )
 from sqlalchemy import desc
+from sqlalchemy import func
 from sqlalchemy.orm import undefer, object_session
 
 
@@ -151,6 +152,15 @@ class News(Page, TraitInfo, SearchablePage,
         query = query.options(undefer('content'))
 
         return query
+
+    @property
+    def years(self):
+        query = object_session(self).query(News)
+        query = query.with_entities(func.date_part('year', Page.created))
+        query = query.group_by(func.date_part('year', Page.created))
+        query = query.filter(Page.parent == self)
+
+        return sorted([int(r[0]) for r in query.all()], reverse=True)
 
 
 class AtoZPages(AtoZ):

@@ -165,37 +165,40 @@ def test_startpage(town_app):
 
     links = client.get('/').pyquery('.top-bar-section a')
 
-    links[0].text == 'Leben & Wohnen'
-    links[0].attrib.get('href') == '/gemeinde/leben-wohnen'
+    assert links[0].text == 'Bildung & Gesellschaft'
+    assert links[0].attrib.get('href').endswith('/themen/bildung-gesellschaft')
 
-    links[1].text == 'Kultur & Freizeit'
-    links[1].attrib.get('href') == '/gemeinde/kultur-freizeit'
+    assert links[1].text == 'Gewerbe & Tourismus'
+    assert links[1].attrib.get('href').endswith('/themen/gewerbe-tourismus')
 
-    links[2].text == 'Bildung & Gesellschaft'
-    links[2].attrib.get('href') == '/gemeinde/bildung-gesellschaft'
+    assert links[2].text == 'Kultur & Freizeit'
+    assert links[2].attrib.get('href').endswith('/themen/kultur-freizeit')
 
-    links[3].text == 'Gewerbe & Tourismus'
-    links[3].attrib.get('href') == '/gemeinde/gewerbe-tourismus'
+    assert links[3].text == 'Leben & Wohnen'
+    assert links[3].attrib.get('href').endswith('/themen/leben-wohnen')
 
-    links[4].text == 'Politik & Verwaltung'
-    links[4].attrib.get('href') == '/gemeinde/politik-verwaltung'
+    assert links[4].text == 'Politik & Verwaltung'
+    assert links[4].attrib.get('href').endswith('/themen/politik-verwaltung')
 
     links = client.get('/').pyquery('.homepage-tiles a')
 
-    links[0].text == 'Leben & Wohnen'
-    links[0].attrib.get('href') == '/gemeinde/leben-wohnen'
+    assert links[0].find('h2').text == 'Bildung & Gesellschaft'
+    assert links[0].attrib.get('href').endswith('/themen/bildung-gesellschaft')
 
-    links[1].text == 'Kultur & Freizeit'
-    links[1].attrib.get('href') == '/gemeinde/kultur-freizeit'
+    assert links[1].find('h2').text == 'Gewerbe & Tourismus'
+    assert links[1].attrib.get('href').endswith('/themen/gewerbe-tourismus')
 
-    links[2].text == 'Bildung & Gesellschaft'
-    links[2].attrib.get('href') == '/gemeinde/bildung-gesellschaft'
+    assert links[2].find('h2').text == 'Kultur & Freizeit'
+    assert links[2].attrib.get('href').endswith('/themen/kultur-freizeit')
 
-    links[3].text == 'Gewerbe & Tourismus'
-    links[3].attrib.get('href') == '/gemeinde/gewerbe-tourismus'
+    assert links[3].find('h2').text == 'Leben & Wohnen'
+    assert links[3].attrib.get('href').endswith('/themen/leben-wohnen')
 
-    links[4].text == 'Politik & Verwaltung'
-    links[4].attrib.get('href') == '/gemeinde/politik-verwaltung'
+    assert links[4].find('h2').text == 'Politik & Verwaltung'
+    assert links[4].attrib.get('href').endswith('/themen/politik-verwaltung')
+
+    assert links[5].find('h2').text == 'Aktuelles'
+    assert links[5].attrib.get('href').endswith('/aktuelles')
 
 
 def test_login(town_app):
@@ -441,6 +444,8 @@ def test_news(town_app):
     assert len(page.pyquery('.latest-news')) == 0
 
     page = page.click('Aktuelles', index=1)
+    assert str(datetime.utcnow().year) not in page.text
+
     page = page.click('Nachricht')
 
     page.form['title'] = "We have a new homepage"
@@ -452,6 +457,7 @@ def test_news(town_app):
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" in page.text
+    assert str(datetime.utcnow().year) not in page.text
 
     page = client.get('/aktuelles')
 
@@ -459,13 +465,17 @@ def test_news(town_app):
     assert "It is very good" in page.text
     assert "It is lots of fun" not in page.text
 
+    # do not show the year in the news list if there's only one
+    assert str(datetime.utcnow().year) not in page.text
+
     page = client.get('/')
 
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text
     assert "It is lots of fun" not in page.text
+    assert str(datetime.utcnow().year) in page.text
 
-    page = page.click('weiterlesen…')
+    page = page.click('We have a new homepage')
 
     assert "We have a new homepage" in page.text
     assert "It is very good" in page.text

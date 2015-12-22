@@ -23,6 +23,8 @@ def view_town(self, request):
 
     Tile = namedtuple('Tile', ['page', 'links', 'number'])
 
+    news_query = layout.root_pages[-1].news_query
+
     tiles = []
     homepage_pages = request.app.homepage_pages
     for ix, page in enumerate(layout.root_pages):
@@ -32,19 +34,32 @@ def view_town(self, request):
 
             if not request.is_logged_in:
                 children = (c for c in children if not c.is_hidden_from_public)
-        else:
-            children = tuple()
 
-        tiles.append(Tile(
-            page=Link(page.title, request.link(page)),
-            number=ix + 1,
-            links=[
-                Link(
-                    c.title, request.link(c),
-                    classes=('tile-sub-link',), model=c
-                ) for c in children
-            ]
-        ))
+            tiles.append(Tile(
+                page=Link(page.title, request.link(page)),
+                number=ix + 1,
+                links=[
+                    Link(
+                        c.title, request.link(c),
+                        classes=('tile-sub-link',), model=c
+                    ) for c in children
+                ]
+            ))
+        elif page.type == 'news':
+            news_url = request.link(page)
+            years = (str(year) for year in page.years)
+            tiles.append(Tile(
+                page=Link(page.title, news_url),
+                number=ix + 1,
+                links=[
+                    Link(
+                        year, news_url + '?' + year,
+                        classes=('tile-sub-link',)
+                    ) for year in years
+                ]
+            ))
+        else:
+            raise NotImplementedError
 
     # the panels on the homepage are currently mostly place-holders, real
     # links as well as translatable text is added every time we implement
@@ -127,9 +142,8 @@ def view_town(self, request):
         'layout': layout,
         'title': self.name,
         'tiles': tiles,
-        'news': request.exclude_invisible(
-            layout.root_pages[-1].news_query.limit(2).all(),
-        ),
+        'news': request.exclude_invisible(news_query.limit(2).all(),),
+        'news_url': news_url,
         'panels': [
             online_counter,
             latest_events,

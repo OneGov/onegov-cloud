@@ -26,6 +26,8 @@
                     <div class="columns small-12">
                         <h2 i18n:translate="">Latest news</h2>
                         <div metal:use-macro="layout.macros.newslist" />
+
+                        <h2 class="all-news"><a href="${news_url}" i18n:translate>All news</a><h2>
                     </div>
                 </div>
             </div>

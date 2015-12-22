@@ -1,9 +1,11 @@
 import os
+import pytz
 
 from datetime import datetime, date
 from io import BytesIO
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path, rchop
+from onegov.page import PageCollection
 from onegov.testing import utils
 from onegov.town.models import (
     Clipboard,
@@ -107,6 +109,21 @@ def test_sitecollection(town_app):
     assert {o.name for o in objects['forms']} == set(builtin_forms)
 
     assert {o.name for o in objects['resources']} == {'sbb-tageskarte'}
+
+
+def test_news_years(town_app):
+
+    collection = PageCollection(town_app.session())
+    news = collection.add_root("News", type='news')
+    one = collection.add(news, title="One", type='news')
+    two = collection.add(news, title="Two", type='news')
+
+    assert news.years == [datetime.utcnow().year]
+
+    one.created = datetime(2016, 2, 1, tzinfo=pytz.utc)
+    two.created = datetime(2015, 2, 1, tzinfo=pytz.utc)
+
+    assert news.years == [2016, 2015]
 
 
 def test_image_grouping(town_app):
