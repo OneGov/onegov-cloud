@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Lowers the connection timeout to 5 seconds and uses sniff_on_connection_fail.
+  [href]
+
+- Adds compatibility with Elasticsearch 2.1.
+  [href]
+
 - Fixes a number of Elasticsearch 2.0 specific bugs.
   [href]
 

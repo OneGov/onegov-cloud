@@ -77,9 +77,13 @@ class ElasticsearchApp(morepath.App):
 
         if verify_certs:
             self.es_client = Elasticsearch(
-                hosts, verify_certs=True, ca_certs=certifi.where())
+                hosts, verify_certs=True, ca_certs=certifi.where(),
+                sniff_on_connection_fail=True, timeout=5
+            )
         else:
-            self.es_client = Elasticsearch(hosts)
+            self.es_client = Elasticsearch(
+                hosts, sniff_on_connection_fail=True, timeout=5
+            )
 
         if self.has_database_connection:
             self.es_mappings = TypeMappingRegistry()
