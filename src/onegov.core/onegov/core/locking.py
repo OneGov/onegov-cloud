@@ -52,6 +52,11 @@ def lock(session, namespace, key):
     feature we are interested in. We want a guarantee that only one process or
     thread at any given time is doing something using a lock. This works.
 
+    Example:
+
+        with lock(session, 'cronjobs', 'send-email'):
+            pass  # send email
+
     """
     id = get_lock_id(namespace, key)
 
