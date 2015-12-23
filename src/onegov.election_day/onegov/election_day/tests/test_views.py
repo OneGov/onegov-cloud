@@ -454,7 +454,7 @@ def test_i18n(election_day_app):
 
 def test_pages_cache(election_day_app):
     client = Client(election_day_app)
-    client.get('/locale/de_CH').follow()
+    client.get('/locale/de_CH')
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
