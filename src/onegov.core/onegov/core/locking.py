@@ -27,11 +27,11 @@ def lock(session, namespace, key):
     The locks are bound to the session and are not relased automatically
     if the current transaction is commited or rolled back. You don't have
     to worry about that though, the context manager releases all locks
-    it creates once it done.
+    it creates once it's done.
 
     :session:
         The session to use for locking. The same lock may be acquired multiple
-        times by the same sesssion.
+        times by the same session.
 
     :namespace:
         The namespace of the lock (any string).
