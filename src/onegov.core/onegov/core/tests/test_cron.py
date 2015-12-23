@@ -20,6 +20,7 @@ def test_is_scheduled_at():
     assert job.hour == 8
     assert job.minute == 0
     assert job.timezone == ensure_timezone('CET')
+    assert job.name == 'test_is_scheduled_at.<locals>.each_morning'
 
     # dates must be timezone aware
     assert job.is_scheduled_at(

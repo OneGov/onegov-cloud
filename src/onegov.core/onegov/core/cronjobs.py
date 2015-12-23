@@ -44,6 +44,12 @@ class Job(object):
         # the id is used to call the job as an anonymous user using an url
         # therefore it needs to be unguessable
         self.id = random_token()
+
+        # the name is used to make sure the job is only run by one process
+        # at a time in multi process environment. It needs to be unqiue
+        # for each process but the same in all processes.
+        self.name = function.__qualname__
+
         self.function = function
         self.hour = hour
         self.minute = minute
