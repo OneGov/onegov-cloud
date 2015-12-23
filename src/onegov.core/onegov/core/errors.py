@@ -26,3 +26,7 @@ class EmptyFileError(CSVError):
 
 class EmptyLineInFileError(CSVError):
     pass
+
+
+class AlreadyLockedError(Exception):
+    """ Raised if :func:`onegov.core.locking.lock` fails to acquire a lock. """
