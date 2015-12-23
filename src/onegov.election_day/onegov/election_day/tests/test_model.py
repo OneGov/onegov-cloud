@@ -35,7 +35,8 @@ def test_municipalities():
     assert principal.municipalities == {
         2013: municipalities,
         2014: municipalities,
-        2015: municipalities
+        2015: municipalities,
+        2016: municipalities,
     }
 
     for canton in cantons:
