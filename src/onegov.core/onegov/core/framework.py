@@ -100,6 +100,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         """
         from onegov.core import browser_session
+        from onegov.core import cronjobs
         from onegov.core import filestorage
         from onegov.core import i18n
         from onegov.core import security
@@ -108,6 +109,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         return utils.Bunch(
             browser_session=browser_session,
+            cronjobs=cronjobs,
             filestorage=filestorage,
             i18n=i18n,
             security=security,
@@ -793,3 +795,31 @@ def current_language_tween_factory(app, handler):
         return handler(request)
 
     return current_language_tween
+
+
+@Framework.tween_factory(under=current_language_tween_factory)
+def spawn_cronjob_thread_tween_factory(app, handler):
+
+    from onegov.core.cronjobs import ApplicationBoundCronjobs
+    registry = app.registry
+
+    if not hasattr(registry, 'cronjobs'):
+        return handler
+
+    assert app.has_database_connection, """
+        Cronjobs require a database connection for inter-process locking.
+    """
+
+    def spawn_cronjob_thread_tween(request):
+        if app.application_id not in registry.cronjob_threads:
+            thread = ApplicationBoundCronjobs(
+                request, registry.cronjobs.values(), app.session_manager
+            )
+
+            registry.cronjob_threads[request.app.application_id] = thread
+
+            thread.start()
+
+        return handler(request)
+
+    return spawn_cronjob_thread_tween

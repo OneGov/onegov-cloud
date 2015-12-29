@@ -1,40 +1,55 @@
+""" Provides a way to specify cronjobs which should be called at an exact time.
+
+Example:
+
+    @App.cronjob(hour=8, minute=0, timezone='Europe/Zurich')
+    def cleanup_stuff(request):
+        pass
+
+Functions registered like this will be called through a regular request. That
+means they are just like any other view and have all the power associated with
+it.
+
+WARNING: The function is called ONCE for EACH application id. So at the given
+time there might be a number of calls more or less at the same time, run
+against your function.
+
+In terms of operations this means that there should be more processes than
+application ids (tennants). In terms of development this means that you
+should keep the time spent in a cronjob to an absolute minimum! Long running
+jobs (more than 30 seconds) are reported.
+
+This feature should really be used sparingly and only for things where the
+exact time is relevant. Cleanup jobs for example should be combined with
+delete/update/add jobs for example, not pushed off to a cronjob.
+
+We also make sure that there's only one job each 5 minutes (at 00:00, 00:05,
+and so on) and that there are no two jobs run at the same time.
+
+For now cronjobs are furthermore limited to be run once a day. In the future
+we might add a model more akin to classic cronjobs.
+
+"""
+
+import pycurl
+
+from contextlib import suppress
 from datetime import datetime, time, timedelta
-from functools import wraps
+from onegov.core import Framework, log
 from onegov.core.crypto import random_token
+from onegov.core.locking import lock, AlreadyLockedError
+from onegov.core.security import Public
 from sedate import ensure_timezone, replace_timezone
+from threading import Thread
+from time import sleep
 
 
-class Cronjobs(object):
-    """ A registry of cronjobs. Does not execute them, only keeps them. """
+# the number of seconds the cronjob thread waits between polls, 45 was chosen
+# because it means that each thread is run at least once a minute
+CRONJOB_POLL_RESOLUTION = 45
 
-    def __init__(self):
-        self.jobs = []
-
-    def cron(self, hour, minute, timezone):
-        """ Decorator which adds decorated functions to the jobs list.
-
-        :hour:
-            The hour this cronjob should be run in.
-
-        :minute:
-            The minute this cronjob should be run in.
-
-        :timezone:
-            The timezone to which hour and minute refer.
-
-        More cron-like arguments (like hour='*/5') are *not yet implemented*,
-        but they may be in the future by changing this function.
-
-        """
-        def decorator(fn):
-            self.jobs.append(Job(fn, hour, minute, timezone))
-
-            @wraps(fn)
-            def wrapper(*args, **kwargs):
-                return fn(*args, **kwargs)
-            return wrapper
-
-        return decorator
+# a job that takes longer than this (seconds) will be reported
+CRONJOB_MAX_DURATION = 30
 
 
 class Job(object):
@@ -54,6 +69,29 @@ class Job(object):
         self.hour = hour
         self.minute = minute
         self.timezone = ensure_timezone(timezone)
+
+    def as_request_call(self, request):
+        """ Returns a new job which does the same as the old job, but it does
+        so by calling an url which will execute the original job.
+
+        """
+
+        url = request.link(self)
+
+        def execute():
+            # use curl for this because the urllib randomly hangs if we
+            # use threads (it's fine with procsesses). requests has the same
+            # problem because it uses urllib internally. My guess is there's
+            # a race condition between code listening for new connections
+            # and urllib. In any case, using pycurl gets rid of this problem
+            # without introducing a rather expensive subprocess.
+            c = pycurl.Curl()
+            c.setopt(c.URL, url)
+            c.setopt(pycurl.WRITEFUNCTION, lambda bytes: len(bytes))
+            c.perform()
+            c.close()
+
+        return self.__class__(execute, self.hour, self.minute, self.timezone)
 
     def is_scheduled_at(self, point, timezone=None):
         """ Returns True if the job is scheduled to run at the given date.
@@ -81,3 +119,83 @@ class Job(object):
         start = replace_timezone(start, self.timezone)
 
         return start <= point < (start + timedelta(minutes=1))
+
+
+class ApplicationBoundCronjobs(Thread):
+    """ A daemon thread which runs the cronjobs it is given in the background.
+
+    The cronjobs are not actually run in the same thread. Instead a request to
+    the actual cronjob is made. This way the thread is pretty much limited to
+    basic IO work (GET request) and the actual cronjob is called with a normal
+    request.
+
+    Basically there is no difference between calling the url of the cronjob
+    at a scheduled time and using this cronjob.
+
+    This also avoids any and all locking problems as we don't have to write
+    OneGov applications in a thread safe way. The actual work is always done
+    on the main thread.
+
+    Each application id is meant to have its own thread. To avoid extra
+    work we make sure that only one thread per application exists on each
+    server. This is accomplished by holding a postgres advisory lock during
+    the lifetime of the thread.
+
+    """
+
+    def __init__(self, request, jobs, session_manager):
+        Thread.__init__(self, daemon=True)
+        self.application_id = request.app.application_id
+        self.jobs = tuple(job.as_request_call(request) for job in jobs)
+        self.session_manager = session_manager
+
+    def run(self):
+        session = self.session_manager.session()
+
+        # the lock ensures that only one thread per application id is
+        # in charge of running the scheduled jobs. If another thread already
+        # has the lock, this thread will end immediately and be GC'd.
+        with suppress(AlreadyLockedError):
+            with lock(session, 'cronjobs-thread', self.application_id):
+                while not sleep(CRONJOB_POLL_RESOLUTION):
+                    self.run_scheduled_jobs()
+
+    def run_scheduled_jobs(self):
+        point = replace_timezone(datetime.utcnow(), 'UTC')
+
+        for job in self.jobs:
+            if job.is_scheduled_at(point):
+
+                start = datetime.utcnow()
+                job.function()
+                duration = (datetime.utcnow() - start).total_seconds()
+
+                if duration > CRONJOB_MAX_DURATION:
+                    log.warn(
+                        "The job for {} at {}:{} took too long ({}s)".format(
+                            self.application_id, job.hour, job.minute, duration
+                        )
+                    )
+
+
+@Framework.path(model=Job, path='/cronjobs/{id}')
+def get_job(app, id):
+    """ The internal path to the cronjob. The id can't be guessed. """
+    return getattr(app.registry, 'cronjobs', {}).get(id)
+
+
+@Framework.view(model=Job, permission=Public)
+def run_job(self, request):
+    """ Executes the job. """
+    self.function(request)
+
+
+def register_cronjob(registry, function, hour, minute, timezone):
+    assert minute % 5 == 0, "The cronjobs must be added in 5 minute increments"
+
+    if not hasattr(registry, 'cronjobs'):
+        registry.cronjobs = {}
+        registry.cronjob_threads = {}
+
+    job = Job(function, hour, minute, timezone)
+    registry.cronjobs[job.id] = job

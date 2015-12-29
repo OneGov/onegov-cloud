@@ -59,6 +59,7 @@ setup(
         'python-memcached>=1.57',
         'psycopg2',
         'pylru',
+        'pycurl',
         'pyreact',
         'pytz',
         'purl',

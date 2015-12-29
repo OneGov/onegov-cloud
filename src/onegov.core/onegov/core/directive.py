@@ -1,7 +1,10 @@
+from datetime import datetime
 from inspect import isfunction
 from morepath import generic
-from morepath.directive import HtmlDirective, register_view
+from morepath.directive import Directive, HtmlDirective, register_view
+from onegov.core.cronjobs import register_cronjob
 from onegov.core.framework import Framework
+from sedate import to_timezone, replace_timezone
 
 
 @Framework.directive('form')
@@ -83,3 +86,28 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
         return obj(self, request, form)
 
     return handle_form
+
+
+@Framework.directive('cronjob')
+class CronjobDirective(Directive):
+    """ Register a cronjob."""
+
+    def __init__(self, app, hour, minute, timezone):
+        super().__init__(app)
+
+        self.hour = hour
+        self.minute = minute
+        self.timezone = timezone
+
+    def identifier(self, registry):
+        # return a key to the hour/minute on a fixed day, this way it's
+        # impossible to have two cronjobs running at the exact same time.
+        return to_timezone(
+            replace_timezone(
+                datetime(2016, 1, 1, self.hour, self.minute),
+                self.timezone
+            ), 'UTC'
+        )
+
+    def perform(self, registry, func):
+        register_cronjob(registry, func, self.hour, self.minute, self.timezone)

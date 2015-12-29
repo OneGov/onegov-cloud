@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a cronjob directive to specify tasks which have to run at an exact time.
+  [href]
+
 - Adds a distributed lock mechanism using postgres.
   [href]
 
