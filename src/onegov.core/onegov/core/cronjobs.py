@@ -154,6 +154,11 @@ class ApplicationBoundCronjobs(Thread):
         self.jobs = tuple(job.as_request_call(request) for job in jobs)
         self.session_manager = session_manager
 
+        for job in jobs:
+            log.info(
+                'Activated Cronjob {} ({})'.format(job.name, request.link(job))
+            )
+
     def run(self):
         session = self.session_manager.session()
 
