@@ -60,6 +60,7 @@ def test_multischema_threaded_locking(postgres_dsn):
     Base = declarative_base()
 
     session_manager = SessionManager(postgres_dsn, Base)
+    session_manager.set_current_schema('foo')
 
     threads = [
         LockingThread(session_manager, 'namespace', 'key', 'foo'),

@@ -81,7 +81,8 @@ setup(
             'freezegun',
             'onegov.testing',
             'openpyxl',
-            'pytest-localserver'
+            'pytest-localserver',
+            'requests'
         ],
     ),
     entry_points="""
