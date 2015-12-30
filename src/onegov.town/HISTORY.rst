@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes being unable to save a page after a linked person has been deleted.
+  [href]
+
 - Adds an "all news" link to the homepage and removes the 'more...' links.
   [href]
 

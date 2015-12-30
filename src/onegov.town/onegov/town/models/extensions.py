@@ -290,17 +290,19 @@ class PersonLinkExtension(ContentExtension):
                 if not existing_people:
                     return True
 
-                existing_people = OrderedDict(existing_people)
                 ordered_people = OrderedDict(self.get_people_and_function(
                     selected_only=False
                 ))
 
-                sorted_existing_people = sorted(
-                    [key for key in existing_people],
-                    key=list(ordered_people.keys()).index
-                )
+                existing_people = [
+                    key for key, value in existing_people
+                    if key in ordered_people
+                ]
 
-                return list(existing_people.keys()) == sorted_existing_people
+                sorted_existing_people = sorted(
+                    existing_people, key=list(ordered_people.keys()).index)
+
+                return existing_people == sorted_existing_people
 
             def update_model(self, model):
                 previous_people = model.content.get('people', [])

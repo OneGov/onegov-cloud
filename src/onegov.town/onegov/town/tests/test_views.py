@@ -934,6 +934,35 @@ def test_with_people(town_app):
     assert edit_page.form['people_ming_merciless_function'].value == ''
 
 
+def test_delete_linked_person_issue_149(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    people = client.get('/personen')
+
+    new_person = people.click('Person')
+    new_person.form['first_name'] = 'Flash'
+    new_person.form['last_name'] = 'Gordon'
+    new_person.form.submit()
+
+    new_page = client.get('/themen/leben-wohnen').click('Thema')
+    new_page.form['title'] = 'About Flash'
+    new_page.form['people_gordon_flash'] = True
+    new_page.form['people_gordon_flash_function'] = 'Astronaut'
+    edit_page = new_page.form.submit().follow().click('Bearbeiten')
+
+    person = client.get('/personen').click('Gordon Flash')
+    delete_link = person.pyquery('a.delete-link').attr('ic-delete-from')
+    client.delete(delete_link)
+
+    # this used to throw an error before issue 149 was fixed
+    edit_page.form.submit().follow()
+
+
 def test_tickets(town_app):
     client = Client(town_app)
 
