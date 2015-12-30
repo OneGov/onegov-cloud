@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+1.1.0 (2015-12-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes being unable to save a page after a linked person has been deleted.
   [href]
 
