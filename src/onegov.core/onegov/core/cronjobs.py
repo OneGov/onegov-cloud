@@ -29,6 +29,11 @@ and so on) and that there are no two jobs run at the same time.
 For now cronjobs are furthermore limited to be run once a day. In the future
 we might add a model more akin to classic cronjobs.
 
+Finally note that cronjobs for any given application id are only run once the
+first request to the application with that id has been made. The reason for
+this is the fact that the background thread needs a real request to be
+initialized.
+
 """
 
 import pycurl
