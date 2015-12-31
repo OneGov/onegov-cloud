@@ -154,9 +154,11 @@ class ApplicationBoundCronjobs(Thread):
         self.jobs = tuple(job.as_request_call(request) for job in jobs)
         self.session_manager = session_manager
 
+        log.info("Starting Cronjob Thread for {}".format(self.application_id))
+
         for job in jobs:
             log.info(
-                'Activated Cronjob {} ({})'.format(job.name, request.link(job))
+                "Enabling Cronjob {} ({})".format(job.name, request.link(job))
             )
 
     def run(self):
@@ -169,6 +171,13 @@ class ApplicationBoundCronjobs(Thread):
             with lock(session, 'cronjobs-thread', self.application_id):
                 while not sleep(CRONJOB_POLL_RESOLUTION):
                     self.run_scheduled_jobs()
+
+        # we need to close the session again or it will stay open forever
+        session.close()
+
+        log.info("Stopping Cronjob Thread for {}, already locked!".format(
+            self.application_id
+        ))
 
     def run_scheduled_jobs(self):
         point = replace_timezone(datetime.utcnow(), 'UTC')
