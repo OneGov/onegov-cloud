@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.13.0 (2015-12-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a cronjob directive to specify tasks which have to run at an exact time.
   [href]
