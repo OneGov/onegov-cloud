@@ -54,3 +54,5 @@ class Person(Base, TimestampMixin, ORMSearchable):
     website = Column(Text, nullable=True)
 
     address = Column(Text, nullable=True)
+
+    notes = Column(Text, nullable=True)

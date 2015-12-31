@@ -17,3 +17,9 @@ def rename_academic_title_to_salutation(context):
 def add_function_column(context):
     context.operations.add_column(
         'people', Column('function', Text, nullable=True))
+
+
+@upgrade_task('Add notes column')
+def add_notes_column(context):
+    context.operations.add_column(
+        'people', Column('notes', Text, nullable=True))
