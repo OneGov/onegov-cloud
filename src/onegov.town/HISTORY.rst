@@ -16,6 +16,9 @@ Unreleased
 - Greys out the 'reserve' link for unavailable allocations.
   [href]
 
+- Adds the ability to add extra notes to people.
+  [href]
+
 1.1.0 (2015-12-30)
 ~~~~~~~~~~~~~~~~~~~
 

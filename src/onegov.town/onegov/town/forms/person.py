@@ -1,9 +1,8 @@
 from onegov.core.utils import ensure_scheme
-from onegov.form import Form, with_options
+from onegov.form import Form
 from onegov.town import _
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
-from wtforms.widgets import TextArea
 
 
 class PersonForm(Form):
@@ -26,5 +25,11 @@ class PersonForm(Form):
 
     address = TextAreaField(
         label=_("Address"),
-        widget=with_options(TextArea, rows=5)
+        render_kw={'rows': 5}
+    )
+
+    notes = TextAreaField(
+        label=_("Notes"),
+        description=_("Public extra information about this person"),
+        render_kw={'rows': 5}
     )

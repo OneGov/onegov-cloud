@@ -1144,13 +1144,9 @@ $person-email-icon: '\f003';
         @include circle;
 
         background: $topbar-bg-color;
-        float: left;
-        height: 200px;
-        margin-right: 1rem;
+        height: 9rem;
         overflow: hidden;
-        padding-top: 0;
-        text-align: center;
-        width: 200px;
+        width: 9rem;
 
         // this would be nicer with object-position and object-fit, but IE
         // doesn't support it at all and Safari only somewhat.
@@ -1183,6 +1179,14 @@ $person-email-icon: '\f003';
 
     .person-card-address {
         margin-bottom: 1em;
+
+        span {
+            white-space: pre-line;
+        }
+    }
+
+    .person-card-notes {
+        padding-top: 1em;
 
         span {
             white-space: pre-line;
