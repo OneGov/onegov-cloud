@@ -614,6 +614,7 @@ $paste-link-icon: '\f0ea';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $internal-link-icon: '\f0c1';
+$disabled-icon: '\f05e';
 
 .edit-bar,
 .popup {
@@ -1891,6 +1892,18 @@ tr.ticket:hover {
         &:hover::before {
             display: inline-block;
             text-decoration: none;
+        }
+
+        &.disabled {
+            color: $monsoon;
+
+            &:hover {
+                text-decoration: none;
+            }
+            &::before {
+                @include icon($disabled-icon);
+                color: $monsoon;
+            }
         }
     }
 

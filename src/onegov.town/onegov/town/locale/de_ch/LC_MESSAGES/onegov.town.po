@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-31 11:55+0100\n"
+"POT-Creation-Date: 2015-12-31 15:19+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -236,18 +236,18 @@ msgstr "Ganztägig"
 msgid "${percent}% Available"
 msgstr "${percent}% Verfügbar"
 
-msgid "Reserve"
-msgstr "Reservieren"
-
 #, python-format
 msgid "${num}/${max} Available"
 msgstr "${num}/${max} Verfügbar"
 
-msgid "Available"
-msgstr "Verfügbar"
-
 msgid "Unavailable"
 msgstr "Besetzt"
+
+msgid "Reserve"
+msgstr "Reservieren"
+
+msgid "Available"
+msgstr "Verfügbar"
 
 msgid ""
 "This allocation can't be deleted because there are existing reservations "
@@ -884,7 +884,8 @@ msgid "This is what happend on the ${town} website yesterday:"
 msgstr "Folgendes ist gestern auf der ${town} Webseite geschehen:"
 
 msgid "This is what happend on the ${town} website over the weekend:"
-msgstr "Folgendes ist während des Wochenendes auf der ${town} Webseite geschehen:"
+msgstr ""
+"Folgendes ist während des Wochenendes auf der ${town} Webseite geschehen:"
 
 msgid "tickets were opened."
 msgstr "Tickets wurden eröffnet."

@@ -13,6 +13,9 @@ Unreleased
 - Shows the contact address in emails in a single line.
   [href]
 
+- Greys out the 'reserve' link for unavailable allocations.
+  [href]
+
 1.1.0 (2015-12-30)
 ~~~~~~~~~~~~~~~~~~~
 
