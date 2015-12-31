@@ -31,6 +31,6 @@
         <p i18n:translate>The OneGov Cloud Team</p>
     </tal:block>
     <tal:block metal:fill-slot="above-footer">
-        <span i18n:translate>This is the daily OneGov Cloud status e-mail. If you don't want to receive this e-mail you may deactivate it in your user profile</span>
+        <p i18n:translate>This is the daily OneGov Cloud status e-mail. If you don't want to receive this e-mail you may deactivate it in your user profile</p>
     </tal:block>
 </div>

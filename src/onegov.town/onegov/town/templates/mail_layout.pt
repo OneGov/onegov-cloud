@@ -50,6 +50,7 @@
         -ms-text-size-adjust: none;
         width: 100%!important;
         height: 100%;
+        font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
     }
 
     /*
@@ -230,7 +231,7 @@
                     <table>
                         <tr>
                             <td align="center">
-                                <div metal:define-slot="above-footer"></div>
+                                <p metal:define-slot="above-footer"></p>
                             </td>
                         </tr>
                         <tr>

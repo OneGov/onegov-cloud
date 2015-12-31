@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-30 16:02+0100\n"
+"POT-Creation-Date: 2015-12-31 11:55+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -73,6 +73,9 @@ msgstr "Veranstaltungen"
 
 msgid "Logout"
 msgstr "Logout"
+
+msgid "User Profile"
+msgstr "Benutzerprofil"
 
 msgid "Files"
 msgstr "Dateien"
@@ -566,6 +569,9 @@ msgstr "JavaScript für Web-Statistik"
 msgid "Advanced"
 msgstr "Erweitert"
 
+msgid "Send me a daily e-mail with information about the website's state."
+msgstr "Ich möchte ein tägliches Status E-Mail erhalten."
+
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
 
@@ -878,19 +884,19 @@ msgid "This is what happend on the ${town} website yesterday:"
 msgstr "Folgendes ist gestern auf der ${town} Webseite geschehen:"
 
 msgid "This is what happend on the ${town} website over the weekend:"
-msgstr "Folgendes ist über das Wochenende auf der ${town} Webseite geschehen:"
+msgstr "Folgendes ist während des Wochenendes auf der ${town} Webseite geschehen:"
 
 msgid "tickets were opened."
-msgstr "Tickets wurden geöffnet."
+msgstr "Tickets wurden eröffnet."
 
 msgid "ticket was opened."
-msgstr "Ticket wurde geöffnet."
+msgstr "Ticket wurde eröffnet."
 
 msgid "tickets were accepted."
-msgstr "Tickets wurden akzeptiert."
+msgstr "Tickets wurden angenommen."
 
 msgid "ticket was accepted."
-msgstr "Ticket wurde akzeptiert."
+msgstr "Ticket wurde angenommen."
 
 msgid "tickets were closed."
 msgstr "Tickets wurden geschlossen."
@@ -1115,6 +1121,12 @@ msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
 "den Verweis zu bearbeiten oder zu löschen."
 
+msgid "Username"
+msgstr "Benutzername"
+
+msgid "Role"
+msgstr "Rolle"
+
 msgid "New allocation"
 msgstr "Neue Einteilung"
 
@@ -1335,7 +1347,7 @@ msgid "Ticket Status"
 msgstr "Ticket Status"
 
 msgid "The ticket cannot be accepted because it's not open"
-msgstr "Das Ticket kann nicht akzeptiert werden da es nicht offen ist"
+msgstr "Das Ticket kann nicht angenommen werden da es nicht offen ist"
 
 msgid "The ticket cannot be closed because it's not pending"
 msgstr ""

@@ -163,9 +163,9 @@ def test_ticket_statistics(town_app, smtp, handlers):
 
     assert message['subject'] == 'Govikon Webseiten-Status'
     txt = message['text']
-    assert "Folgendes ist über das Wochenende auf der Govikon Webseite" in txt
-    assert "6 Tickets wurden geöffnet." in txt
-    assert "2 Tickets wurden akzeptiert." in txt
+    assert "Folgendes ist während des Wochenendes auf der Govikon" in txt
+    assert "6 Tickets wurden eröffnet." in txt
+    assert "2 Tickets wurden angenommen." in txt
     assert "3 Tickets wurden geschlossen." in txt
     assert "Zur Zeit ist 1 Ticket offen" in txt
     assert "2 Tickets sind in Bearbeitung" in txt

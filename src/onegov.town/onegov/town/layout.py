@@ -309,6 +309,9 @@ class DefaultLayout(Layout):
         if request.current_role == 'editor':
             return [
                 Link(_('Logout'), self.logout_url),
+                Link(_('User Profile'), request.link(
+                    self.town, 'benutzerprofil'
+                )),
                 Link(_('Files'), request.link(FileCollection(self.app))),
                 Link(_('Images'), request.link(ImageCollection(self.app))),
                 Link('OneGov Cloud', 'http://www.onegovcloud.ch'),
@@ -317,12 +320,12 @@ class DefaultLayout(Layout):
         elif request.current_role == 'admin':
             return [
                 Link(_('Logout'), self.logout_url),
+                Link(_('User Profile'), request.link(
+                    self.town, 'benutzerprofil'
+                )),
                 Link(_('Files'), request.link(FileCollection(self.app))),
                 Link(_('Images'), request.link(ImageCollection(self.app))),
                 Link(_('Settings'), request.link(self.town, 'einstellungen')),
-                Link(_('Tickets'), request.link(TicketCollection(
-                    self.app.session()
-                ))),
                 Link('OneGov Cloud', 'http://www.onegovcloud.ch'),
                 Link('Seantis GmbH', 'https://www.seantis.ch')
             ]

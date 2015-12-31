@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a status mail sent to all users daily at 08:30.
+  [href]
+
+- Adds a user profile where users can change their settings.
+  [href]
+
 - Shows the contact address in emails in a single line.
   [href]
 

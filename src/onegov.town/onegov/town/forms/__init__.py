@@ -18,6 +18,7 @@ from onegov.town.forms.reset_password import (
 from onegov.town.forms.reservation import ReservationForm
 from onegov.town.forms.resource import ResourceForm, ResourceCleanupForm
 from onegov.town.forms.settings import SettingsForm
+from onegov.town.forms.userprofile import UserProfileForm
 
 __all__ = [
     'BuiltinDefinitionForm',
@@ -36,4 +37,5 @@ __all__ = [
     'RoomAllocationForm',
     'RoomAllocationEditForm',
     'SettingsForm',
+    'UserProfileForm'
 ]
