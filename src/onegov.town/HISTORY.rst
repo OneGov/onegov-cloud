@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Shows the contact address in emails in a single line.
+  [href]
+
 1.1.0 (2015-12-30)
 ~~~~~~~~~~~~~~~~~~~
 

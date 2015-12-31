@@ -2,6 +2,7 @@ from cached_property import cached_property
 from dateutil import rrule
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
+from onegov.core.utils import linkify
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
 from onegov.libres import ResourceCollection
@@ -254,6 +255,18 @@ class DefaultMailLayout(Layout):
     @cached_property
     def macros(self):
         return self.template_loader['mail_macros.pt']
+
+    @cached_property
+    def contact_html(self):
+        """ Returns the contacts html, but instead of breaking it into multiple
+        lines (like on the site footer), this version puts it all on one line.
+
+        """
+
+        lines = (l.strip() for l in self.town.meta['contact'].splitlines())
+        lines = (l for l in lines if l)
+
+        return linkify(', '.join(lines))
 
 
 class DefaultLayout(Layout):
