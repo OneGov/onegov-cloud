@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.1.2 (2015-12-31)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an extra notes field for people.
   [href]
 
