@@ -749,6 +749,16 @@ def get_retry_attempts():
     return 2
 
 
+@Framework.setting(section='cronjobs', name='enabled')
+def get_cronjobs_enabled():
+    """ If this value is set to False, all cronjobs are disabled. Only use
+    this during testing. Cronjobs have no impact on your application, unless
+    there are defined cronjobs, in which case they are there for a reason.
+
+    """
+    return True
+
+
 @Framework.tween_factory(over=transaction_tween_factory)
 def http_conflict_tween_factory(app, handler):
     def http_conflict_tween(request):
@@ -804,6 +814,9 @@ def spawn_cronjob_thread_tween_factory(app, handler):
     registry = app.registry
 
     if not hasattr(registry, 'cronjobs'):
+        return handler
+
+    if not registry.settings.cronjobs.enabled:
         return handler
 
     assert app.has_database_connection, """

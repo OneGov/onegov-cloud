@@ -11,6 +11,7 @@ from pytest_localserver.http import WSGIServer
 from sedate import ensure_timezone, replace_timezone
 from sqlalchemy.ext.declarative import declarative_base
 from time import sleep
+from webtest import TestApp as Client
 
 
 def test_is_scheduled_at():
@@ -124,3 +125,39 @@ def test_cronjobs_integration(postgres_dsn):
         server.stop()
 
     assert result is True
+
+
+def test_disable_cronjobs():
+    config = setup()
+
+    class App(Framework):
+        testing_config = config
+
+    @App.path(path='')
+    class Root(object):
+        pass
+
+    @App.json(model=Root)
+    def view_root(self, request):
+        return {}
+
+    @App.cronjob(hour=8, minute=0, timezone='UTC')
+    def run_test_cronjob(request):
+        pass
+
+    @App.setting(section='cronjobs', name='enabled')
+    def cronjobs_enabled():
+        return False
+
+    scan_morepath_modules(App, config)
+    config.commit()
+
+    app = App()
+    app.configure_application()
+    app.namespace = 'municipalities'
+    app.set_application_id('municipalities/new-york')
+
+    client = Client(app)
+    client.get('/')
+
+    assert not app.registry.cronjob_threads
