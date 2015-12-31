@@ -7,13 +7,19 @@ import shutil
 
 from morepath import setup
 from onegov.core.crypto import hash_password
-from onegov.core.utils import scan_morepath_modules
+from onegov.core.utils import Bunch, scan_morepath_modules
 from onegov.town.initial_content import (
     add_initial_content, builtin_form_definitions
 )
 from onegov.town.models import Town
 from onegov.user import User
 from uuid import uuid4
+
+
+@pytest.yield_fixture(scope='session')
+def handlers():
+    yield onegov.ticket.handlers
+    onegov.ticket.handlers.registry = {}
 
 
 @pytest.fixture(scope='session')
@@ -80,6 +86,10 @@ def new_town_app(postgres_dsn, filestorage, town_password, smtp,
         form_definitions
     )
 
+    # cronjobs leave lingering sessions open, in real life this is not a
+    # problem, but in testing it leads to connection pool exhaustion
+    app.registry.settings.cronjobs = Bunch(enabled=False)
+
     session = app.session()
 
     town = session.query(Town).one()
@@ -109,5 +119,6 @@ def new_town_app(postgres_dsn, filestorage, town_password, smtp,
     ))
 
     transaction.commit()
+    session.close_all()
 
     return app

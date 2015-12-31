@@ -164,6 +164,10 @@ def test_template_layout():
         def configure_libres(self, **cfg):
             pass
 
+    @App.setting(section='cronjobs', name='enabled')
+    def get_cronjobs_enabled():
+        return False
+
     @App.path('/model')
     class Model(object):
         pass

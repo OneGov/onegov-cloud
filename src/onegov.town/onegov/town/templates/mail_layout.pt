@@ -196,7 +196,6 @@
     .content table {
         width: 100%;
     }
-
     </style>
 </head>
 <body bgcolor="#f6f6f6">
@@ -231,7 +230,12 @@
                     <table>
                         <tr>
                             <td align="center">
-                                <p>
+                                <div metal:define-slot="above-footer"></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="center">
+                                <p metal:define-slot="footer">
                                     <tal:block replace="structure layout.town.meta.contact_html|layout.town.name" />
                                 </p>
                             </td>

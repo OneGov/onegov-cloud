@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-22 16:24+0100\n"
+"POT-Creation-Date: 2015-12-30 16:02+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -11,6 +11,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "${town} Website Status"
+msgstr "${town} Webseiten-Status"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -867,6 +871,61 @@ msgstr "Wiederholungen"
 msgid "All dates"
 msgstr "Alle Termine"
 
+msgid "Good morning,"
+msgstr "Guten Morgen"
+
+msgid "This is what happend on the ${town} website yesterday:"
+msgstr "Folgendes ist gestern auf der ${town} Webseite geschehen:"
+
+msgid "This is what happend on the ${town} website over the weekend:"
+msgstr "Folgendes ist über das Wochenende auf der ${town} Webseite geschehen:"
+
+msgid "tickets were opened."
+msgstr "Tickets wurden geöffnet."
+
+msgid "ticket was opened."
+msgstr "Ticket wurde geöffnet."
+
+msgid "tickets were accepted."
+msgstr "Tickets wurden akzeptiert."
+
+msgid "ticket was accepted."
+msgstr "Ticket wurde akzeptiert."
+
+msgid "tickets were closed."
+msgstr "Tickets wurden geschlossen."
+
+msgid "ticket was closed."
+msgstr "Ticket wurde geschlossen."
+
+msgid "There are currently ${currently_open} tickets open and"
+msgstr "Zur Zeit sind ${currently_open} Tickets offen und"
+
+msgid "There is currently ${currently_open} ticket open and"
+msgstr "Zur Zeit ist ${currently_open} Ticket offen und"
+
+msgid "tickets are pending."
+msgstr "Tickets sind in Bearbeitung."
+
+msgid "ticket is pending."
+msgstr "Ticket ist in Bearbeitung."
+
+msgid "Have a great week!"
+msgstr "Wir wünschen Ihnen eine schöne Woche!"
+
+msgid "Have a great day!"
+msgstr "Wir wünschen Ihnen einen schönen Tag!"
+
+msgid "The OneGov Cloud Team"
+msgstr "Das OneGov Cloud Team"
+
+msgid ""
+"This is the daily OneGov Cloud status e-mail. If you don't want to receive "
+"this e-mail you may deactivate it in your user profile"
+msgstr ""
+"Dies ist das tägliche Status E-Mail der OneGov Cloud. Sie können dieses "
+"jederzeit über das Benutzerprofil abbestellen."
+
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
 
@@ -1095,11 +1154,10 @@ msgid ""
 "the page without notification or reason."
 msgstr ""
 "Im Veranstaltungskalender werden Anlässe jeglicher Art publiziert, welche "
-"innerhalb der Gemeinde oder im Zusammenhang mit einem Verein der "
-"Gemeinde durchgeführt werden. Nicht publiziert werden rein "
-"kommerzielle Veranstaltungen. Es besteht kein Publikationsrecht und "
-"bereits publizierte Veranstaltungen können jederzeit und ohne Angabe von "
-"Gründen gelöscht werden."
+"innerhalb der Gemeinde oder im Zusammenhang mit einem Verein der Gemeinde "
+"durchgeführt werden. Nicht publiziert werden rein kommerzielle "
+"Veranstaltungen. Es besteht kein Publikationsrecht und bereits publizierte "
+"Veranstaltungen können jederzeit und ohne Angabe von Gründen gelöscht werden."
 
 #, python-format
 msgid "You have accepted the event ${title}"
@@ -1302,27 +1360,22 @@ msgstr "Abgeschlossene Tickets"
 msgid "All Tickets"
 msgstr "Alle Tickets"
 
-#~ msgid ""
-#~ "Only events taking place inside the town or events related to the town "
-#~ "are published. Events which are purely commercial are not published. "
-#~ "There's no right to be published and already published events may be "
-#~ "removed from the page without notification or specific reason."
-#~ msgstr ""
-#~ "Im Veranstaltungskalender werden Anlässe jeglicher Art publiziert, welche "
-#~ "innerhalb der Gemeinde oder im Zusammenhang mit einem Verein der Gemeinde "
-#~ "durchgeführt werden. Nicht publiziert werden rein kommerzielle "
-#~ "Veranstaltungen. Es besteht kein Publikationsrecht und bereits "
-#~ "publizierte Veranstaltungen können jederzeit und ohne Angabe von Gründen "
-#~ "gelöscht werden."
+#~ msgid "This is the daily OneGov Cloud status e-mail."
+#~ msgstr "Dies ist das tägliche Status E-Mail der OneGov Cloud."
 
 #~ msgid ""
-#~ "Only non-commercial events which take place in the town will be "
-#~ "published. Published events might be deleted any time without specific "
-#~ "reason."
-#~ msgstr ""
-#~ "Im Veranstaltungskalender werden Anlässe jeglicher Art publiziert, welche "
-#~ "innerhalb der Gemeinde oder im Zusammenhang mit einem Verein der Gemeinde "
-#~ "durchgeführt werden. Nicht publiziert werden rein kommerzielle "
-#~ "Veranstaltungen. Es besteht kein Publikationsrecht und bereits "
-#~ "publizierte Veranstaltungen können jederzeit und ohne Angabe von Gründen "
-#~ "gelöscht werden."
+#~ "If you don't want to receive this e-mail you may deactivate it in your "
+#~ "user profile"
+#~ msgstr "Sie können dieses jederzeit über das Benutzerprofil deaktivieren."
+
+#~ msgid "There are currently ${currently_open} tickets open"
+#~ msgstr "Zur Zeit sind ${currently_open} Tickets offen"
+
+#~ msgid "There is currently ${currently_open} ticket open"
+#~ msgstr "Zur Zeit ist ${currently_open} Ticket offen"
+
+#~ msgid "and ${currently_pending} tickets are pending."
+#~ msgstr "und ${currently_pending} Tickets sind in Bearbeitung."
+
+#~ msgid "and ${currently_pending} ticket is pending."
+#~ msgstr "und ${currently_pending} Ticket ist in Bearbeitung."
