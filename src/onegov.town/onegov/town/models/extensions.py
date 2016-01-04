@@ -1,12 +1,10 @@
 from collections import OrderedDict
 from onegov.core.utils import linkify
-from onegov.form import with_options
 from onegov.form.parser.core import WTFormsClassBuilder, FieldDependency
 from onegov.people import Person, PersonCollection
 from onegov.town import _
 from sqlalchemy.orm import object_session
 from wtforms import BooleanField, StringField, TextAreaField
-from wtforms.widgets import TextArea
 
 
 class ContentExtension(object):
@@ -156,7 +154,7 @@ class ContactExtension(ContentExtension):
             contact_address = TextAreaField(
                 label=_("Address"),
                 fieldset=_("Contact"),
-                widget=with_options(TextArea, rows=5)
+                render_kw={'rows': 5}
             )
 
             def update_model(self, model):

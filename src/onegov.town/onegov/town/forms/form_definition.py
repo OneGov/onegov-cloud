@@ -1,10 +1,9 @@
 from onegov.core.utils import sanitize_html
-from onegov.form import Form, with_options
+from onegov.form import Form
 from onegov.form.validators import ValidFormDefinition
 from onegov.town import _
 from onegov.town.utils import mark_images
 from wtforms import StringField, TextAreaField, validators
-from wtforms.widgets import TextArea
 
 
 class FormDefinitionBaseForm(Form):
@@ -15,11 +14,11 @@ class FormDefinitionBaseForm(Form):
     lead = TextAreaField(
         label=_("Lead"),
         description=_("Describes what this form is about"),
-        widget=with_options(TextArea, rows=4))
+        render_kw={'rows': 4})
 
     text = TextAreaField(
         label=_("Text"),
-        widget=with_options(TextArea, class_='editor'),
+        render_kw={'class_': 'editor'},
         filters=[sanitize_html, mark_images])
 
     def update_model(self, model):
@@ -44,10 +43,11 @@ class BuiltinDefinitionForm(FormDefinitionBaseForm):
     definition = TextAreaField(
         label=_("Definition"),
         validators=[validators.InputRequired(), ValidFormDefinition()],
-        widget=with_options(
-            TextArea, rows=24, readonly='readonly',
-            **{'data-editor': 'form'}
-        ),
+        render_kw={
+            'rows': 24,
+            'readonly': 'readonly',
+            'data-editor': 'form'
+        }
     )
 
 
@@ -60,5 +60,5 @@ class CustomDefinitionForm(FormDefinitionBaseForm):
     definition = TextAreaField(
         label=_("Definition"),
         validators=[validators.InputRequired(), ValidFormDefinition()],
-        widget=with_options(TextArea, rows=32, **{'data-editor': 'form'}),
+        render_kw={'rows': 32, 'data-editor': 'form'}
     )

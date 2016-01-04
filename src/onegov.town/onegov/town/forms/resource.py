@@ -1,11 +1,10 @@
 from onegov.core.utils import sanitize_html
-from onegov.form import Form, with_options
+from onegov.form import Form
 from onegov.form.validators import ValidFormDefinition
 from onegov.town import _
 from onegov.town.utils import mark_images
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import DateField
-from wtforms.widgets import TextArea
 
 
 class ResourceForm(Form):
@@ -15,11 +14,11 @@ class ResourceForm(Form):
     lead = TextAreaField(
         label=_("Lead"),
         description=_("Describes what this reservation resource is about"),
-        widget=with_options(TextArea, rows=4))
+        render_kw={'rows': 4})
 
     text = TextAreaField(
         label=_("Text"),
-        widget=with_options(TextArea, class_='editor'),
+        render_kw={'class_': 'editor'},
         filters=[sanitize_html, mark_images])
 
     definition = TextAreaField(
@@ -28,7 +27,7 @@ class ResourceForm(Form):
             validators.Optional(),
             ValidFormDefinition(require_email_field=False)
         ],
-        widget=with_options(TextArea, rows=32, **{'data-editor': 'form'}),
+        render_kw={'rows': 32, 'data-editor': 'form'}
     )
 
     def update_model(self, model):

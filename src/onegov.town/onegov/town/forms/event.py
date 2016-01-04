@@ -1,13 +1,12 @@
 from datetime import date, datetime, timedelta
 from dateutil import rrule
-from onegov.form import Form, with_options
-from onegov.form.fields import MultiCheckboxField, MultiCheckboxWidget
+from onegov.form import Form
+from onegov.form.fields import MultiCheckboxField
 from onegov.town import _
 from sedate import replace_timezone, to_timezone
 from wtforms import StringField, TextAreaField, validators
 from wtforms_components import TimeField
 from wtforms.fields.html5 import DateField, EmailField
-from wtforms.widgets import TextArea
 
 
 TAGS = [(tag, tag) for tag in (
@@ -60,7 +59,7 @@ class EventForm(Form):
     description = TextAreaField(
         label=_("Description"),
         description=_("Enjoy a concerto in the castle garden."),
-        widget=with_options(TextArea, rows=12)
+        render_kw={'rows': 12}
     )
 
     location = StringField(
@@ -94,11 +93,7 @@ class EventForm(Form):
     weekly = MultiCheckboxField(
         label=_("Repeats itself every"),
         choices=WEEKDAYS,
-        widget=with_options(
-            MultiCheckboxWidget,
-            prefix_label=False,
-            class_='oneline-checkboxes'
-        )
+        render_kw={'prefix_label': False, 'class_': 'oneline-checkboxes'}
     )
 
     end_date = DateField(

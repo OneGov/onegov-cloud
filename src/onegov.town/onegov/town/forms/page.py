@@ -1,10 +1,9 @@
 from onegov.core.utils import sanitize_html
-from onegov.form import Form, with_options
+from onegov.form import Form
 from onegov.town import _
 from onegov.town.utils import mark_images
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
-from wtforms.widgets import TextInput, TextArea
 
 
 class PageBaseForm(Form):
@@ -12,7 +11,7 @@ class PageBaseForm(Form):
     title = StringField(
         label=_("Title"),
         validators=[validators.InputRequired()],
-        widget=with_options(TextInput, autofocus='')
+        render_kw={'autofocus': ''}
     )
 
 
@@ -21,9 +20,7 @@ class LinkForm(PageBaseForm):
     url = URLField(
         label=_("URL"),
         validators=[validators.InputRequired()],
-        widget=with_options(
-            TextInput, class_='image-url file-url internal-url'
-        )
+        render_kw={'class_': 'image-url file-url internal-url'}
     )
 
     def update_model(self, model):
@@ -42,11 +39,11 @@ class PageForm(PageBaseForm):
     lead = TextAreaField(
         label=_("Lead"),
         description=_("Describes what this page is about"),
-        widget=with_options(TextArea, rows=4))
+        render_kw={'rows': 4})
 
     text = TextAreaField(
         label=_("Text"),
-        widget=with_options(TextArea, class_='editor'),
+        render_kw={'class_': 'editor'},
         filters=[sanitize_html, mark_images])
 
     def update_model(self, model):

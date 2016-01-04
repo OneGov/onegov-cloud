@@ -1,7 +1,6 @@
-from onegov.form import Form, with_options
+from onegov.form import Form
 from wtforms import HiddenField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField, URLField
-from wtforms.widgets import TextArea, TextInput
 from wtforms_components import ColorField
 from onegov.town import _
 from onegov.town.theme import user_options
@@ -19,7 +18,7 @@ class SettingsForm(Form):
         label=_("Logo"),
         description=_("URL pointing to the logo"),
         fieldset=_("General"),
-        widget=with_options(TextInput, class_='image-url')
+        render_kw={'class_': 'image-url'}
     )
     reply_to = EmailField(
         _("E-Mail Reply Address"), [validators.InputRequired()],
@@ -33,26 +32,26 @@ class SettingsForm(Form):
     contact = TextAreaField(
         label=_("Contact"),
         description=_("The address and phone number of the municipality"),
-        widget=with_options(TextArea, rows=8),
+        render_kw={'rows': 8},
         fieldset=_("General")
     )
     contact_url = URLField(
         label=_("Contact Page"),
         description=_("URL pointing to a contact page"),
         fieldset=_("General"),
-        widget=with_options(TextInput, class_='internal-url')
+        render_kw={'class_': 'internal-url'}
     )
     opening_hours = TextAreaField(
         label=_("Opening Hours"),
         description=_("The opening hours of the municipality"),
-        widget=with_options(TextArea, rows=8),
+        render_kw={'rows': 8},
         fieldset=_("General")
     )
     opening_hours_url = URLField(
         label=_("Opening Hours Page"),
         description=_("URL pointing to an opening hours page"),
         fieldset=_("General"),
-        widget=with_options(TextInput, class_='internal-url')
+        render_kw={'class_': 'internal-url'}
     )
     facebook_url = URLField(
         label=_("Facebook"),
@@ -66,32 +65,32 @@ class SettingsForm(Form):
     )
     homepage_image_1 = StringField(
         label=_("Homepage Image #1"),
-        widget=with_options(TextInput, class_='image-url'),
+        render_kw={'class_': 'image-url'},
         fieldset=_("Homepage")
     )
     homepage_image_2 = StringField(
         label=_("Homepage Image #2"),
-        widget=with_options(TextInput, class_='image-url'),
+        render_kw={'class_': 'image-url'},
         fieldset=_("Homepage")
     )
     homepage_image_3 = StringField(
         label=_("Homepage Image #3"),
-        widget=with_options(TextInput, class_='image-url'),
+        render_kw={'class_': 'image-url'},
         fieldset=_("Homepage")
     )
     homepage_image_4 = StringField(
         label=_("Homepage Image #4"),
-        widget=with_options(TextInput, class_='image-url'),
+        render_kw={'class_': 'image-url'},
         fieldset=_("Homepage")
     )
     homepage_image_5 = StringField(
         label=_("Homepage Image #5"),
-        widget=with_options(TextInput, class_='image-url'),
+        render_kw={'class_': 'image-url'},
         fieldset=_("Homepage")
     )
     homepage_image_6 = StringField(
         label=_("Homepage Image #6"),
-        widget=with_options(TextInput, class_='image-url'),
+        render_kw={'class_': 'image-url'},
         fieldset=_("Homepage")
     )
     online_counter_label = StringField(
@@ -112,7 +111,7 @@ class SettingsForm(Form):
     analytics_code = TextAreaField(
         label=_("Analytics Code"),
         description=_("JavaScript for web statistics support"),
-        widget=with_options(TextArea, rows=10),
+        render_kw={'rows': 10},
         fieldset=_("Advanced")
     )
 

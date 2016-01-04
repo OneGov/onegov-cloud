@@ -2,15 +2,14 @@ import sedate
 
 from datetime import datetime, timedelta
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
-from onegov.form import Form, with_options
-from onegov.form.fields import MultiCheckboxField, MultiCheckboxWidget
+from onegov.form import Form
+from onegov.form.fields import MultiCheckboxField
 from onegov.form.parser.core import FieldDependency
 from onegov.town import _
 from wtforms.fields import RadioField
 from wtforms.fields.html5 import DateField, IntegerField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
 from wtforms_components import If, TimeField
-from wtforms_components.widgets import TimeInput
 
 
 WEEKDAYS = (
@@ -104,11 +103,10 @@ class AllocationForm(Form, AllocationFormHelpers):
     except_for = MultiCheckboxField(
         label=_("Except for"),
         choices=WEEKDAYS,
-        widget=with_options(
-            MultiCheckboxWidget,
-            prefix_label=False,
-            class_='oneline-checkboxes'
-        ),
+        render_kw={
+            'prefix_label': False,
+            'class_': 'oneline-checkboxes'
+        },
         fieldset=("Date")
     )
 
@@ -260,7 +258,7 @@ class RoomAllocationForm(AllocationForm):
         label=_("Each starting at"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, InputRequired())],
-        widget=with_options(TimeInput, **as_whole_day_dependency.html_data),
+        render_kw=as_whole_day_dependency.html_data,
         fieldset=_("Date")
     )
 
@@ -268,7 +266,7 @@ class RoomAllocationForm(AllocationForm):
         label=_("Each ending at"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, InputRequired())],
-        widget=with_options(TimeInput, **as_whole_day_dependency.html_data),
+        render_kw=as_whole_day_dependency.html_data,
         fieldset=_("Date")
     )
 
@@ -323,7 +321,7 @@ class RoomAllocationEditForm(AllocationEditForm):
         label=_("From"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TimeInput, **as_whole_day_dependency.html_data),
+        render_kw=as_whole_day_dependency.html_data,
         fieldset=_("Date")
     )
 
@@ -331,7 +329,7 @@ class RoomAllocationEditForm(AllocationEditForm):
         label=_("Until"),
         description=_("HH:MM"),
         validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        widget=with_options(TimeInput, **as_whole_day_dependency.html_data),
+        render_kw=as_whole_day_dependency.html_data,
         fieldset=_("Date")
     )
 
