@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+1.2.0 (2016-01-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a status mail sent to all users daily at 08:30.
   [href]
 
