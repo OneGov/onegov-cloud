@@ -1,8 +1,7 @@
 from onegov.election_day import _
-from onegov.form import Form, with_options
+from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.parser.core import FieldDependency
-from onegov.form.widgets import UploadWidget
 from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
 from wtforms import RadioField
 from wtforms.validators import DataRequired, InputRequired
@@ -26,9 +25,9 @@ class UploadForm(Form):
     ], validators=[InputRequired()], default='simple')
 
     # XXX make this easier with onegov.form
-    complex_vote_depencdency = FieldDependency('type', 'complex')
+    complex_vote_dependency = FieldDependency('type', 'complex')
     complex_vote_validators = [If(
-        complex_vote_depencdency.fulfilled,
+        complex_vote_dependency.fulfilled,
         Chain((
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
@@ -44,23 +43,17 @@ class UploadForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        widget=with_options(UploadWidget, force_simple=True)
+        render_kw={'force_simple': True}
     )
 
     counter_proposal = UploadField(
         label=_("Counter-Proposal"),
         validators=complex_vote_validators,
-        widget=with_options(
-            UploadWidget, force_simple=True,
-            **complex_vote_depencdency.html_data
-        )
+        render_kw=dict(force_simple=True, **complex_vote_dependency.html_data)
     )
 
     tie_breaker = UploadField(
         label=_("Tie-Breaker"),
         validators=complex_vote_validators,
-        widget=with_options(
-            UploadWidget, force_simple=True,
-            **complex_vote_depencdency.html_data
-        )
+        render_kw=dict(force_simple=True, **complex_vote_dependency.html_data)
     )
