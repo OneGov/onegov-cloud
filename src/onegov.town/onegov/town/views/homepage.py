@@ -53,7 +53,7 @@ def view_town(self, request):
                 number=ix + 1,
                 links=[
                     Link(
-                        year, news_url + '?' + year,
+                        year, news_url + '?year=' + year,
                         classes=('tile-sub-link',)
                     ) for year in years
                 ]
