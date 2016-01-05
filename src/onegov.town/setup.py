@@ -38,7 +38,7 @@ setup(
         'isodate',
         'rjsmin',
         'lxml',
-        'onegov.core>=0.12.3',
+        'onegov.core>=0.13.1',
         'onegov.event>=0.0.5',
         'onegov.form>=0.6.7',
         'onegov.foundation>=0.0.4',

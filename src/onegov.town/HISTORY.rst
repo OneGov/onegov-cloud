@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes cronjobs not working with more than one process.
+  [href]
+
 1.2.1 (2016-01-04)
 ~~~~~~~~~~~~~~~~~~~
 

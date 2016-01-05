@@ -67,7 +67,11 @@ def test_ticket_statistics(town_app, smtp, handlers):
     register_echo_handler(handlers)
 
     client = Client(town_app)
-    url = get_cronjob_url(get_cronjob_by_name(town_app, 'ticket_statistics'))
+
+    job = get_cronjob_by_name(town_app, 'ticket_statistics')
+    job.app = town_app
+
+    url = get_cronjob_url(job)
 
     tz = ensure_timezone('Europe/Zurich')
 
