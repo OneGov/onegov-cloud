@@ -41,12 +41,12 @@ import pycurl
 from contextlib import suppress
 from datetime import datetime, time, timedelta
 from onegov.core import Framework, log
-from onegov.core.crypto import random_token
 from onegov.core.locking import lock, AlreadyLockedError
 from onegov.core.security import Public
 from sedate import ensure_timezone, replace_timezone
 from threading import Thread
 from time import sleep
+from urllib.parse import quote_plus, unquote_plus
 
 
 # the number of seconds the cronjob thread waits between polls, 45 was chosen
@@ -61,10 +61,6 @@ class Job(object):
     """ A single cron job. """
 
     def __init__(self, function, hour, minute, timezone):
-        # the id is used to call the job as an anonymous user using an url
-        # therefore it needs to be unguessable
-        self.id = random_token()
-
         # the name is used to make sure the job is only run by one process
         # at a time in multi process environment. It needs to be unqiue
         # for each process but the same in all processes.
@@ -75,12 +71,29 @@ class Job(object):
         self.minute = minute
         self.timezone = ensure_timezone(timezone)
 
+    @property
+    def id(self):
+        """ Internal id signed by the application. Used to access the job
+        through an url which must be unguessable, but the same over many
+        processes.
+
+        The signature is only possible if ``self.app`` is present, which
+        can only be set after the instance has already been created.
+
+        See :meth:`as_request_call`.
+
+        """
+
+        assert self.app
+        return quote_plus(self.app.sign(self.name))
+
     def as_request_call(self, request):
         """ Returns a new job which does the same as the old job, but it does
         so by calling an url which will execute the original job.
 
         """
 
+        self.app = request.app
         url = request.link(self)
 
         def execute():
@@ -200,7 +213,10 @@ class ApplicationBoundCronjobs(Thread):
 @Framework.path(model=Job, path='/cronjobs/{id}')
 def get_job(app, id):
     """ The internal path to the cronjob. The id can't be guessed. """
-    return getattr(app.registry, 'cronjobs', {}).get(id)
+    name = app.unsign(unquote_plus(id))
+
+    if name:
+        return getattr(app.registry, 'cronjobs', {}).get(name)
 
 
 @Framework.view(model=Job, permission=Public)
@@ -217,4 +233,4 @@ def register_cronjob(registry, function, hour, minute, timezone):
         registry.cronjob_threads = {}
 
     job = Job(function, hour, minute, timezone)
-    registry.cronjobs[job.id] = job
+    registry.cronjobs[job.name] = job

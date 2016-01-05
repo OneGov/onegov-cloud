@@ -17,7 +17,6 @@ from webtest import TestApp as Client
 def test_is_scheduled_at():
     job = cronjobs.Job(lambda: None, hour=8, minute=0, timezone='CET')
 
-    assert len(job.id) == 64
     assert job.hour == 8
     assert job.minute == 0
     assert job.timezone == ensure_timezone('CET')
