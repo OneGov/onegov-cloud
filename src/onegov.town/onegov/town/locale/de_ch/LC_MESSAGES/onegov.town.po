@@ -1297,7 +1297,7 @@ msgid "Password changed."
 msgstr "Passwort geändert."
 
 msgid "Wrong username or password reset link not valid any more."
-msgstr "Ungültiger Addresse oder abgelaufener Link."
+msgstr "Ungültige Addresse oder abgelaufener Link."
 
 msgid "Password reset"
 msgstr "Passwort zurücksetzen"
@@ -1378,23 +1378,3 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
-
-#~ msgid "This is the daily OneGov Cloud status e-mail."
-#~ msgstr "Dies ist das tägliche Status E-Mail der OneGov Cloud."
-
-#~ msgid ""
-#~ "If you don't want to receive this e-mail you may deactivate it in your "
-#~ "user profile"
-#~ msgstr "Sie können dieses jederzeit über das Benutzerprofil deaktivieren."
-
-#~ msgid "There are currently ${currently_open} tickets open"
-#~ msgstr "Zur Zeit sind ${currently_open} Tickets offen"
-
-#~ msgid "There is currently ${currently_open} ticket open"
-#~ msgstr "Zur Zeit ist ${currently_open} Ticket offen"
-
-#~ msgid "and ${currently_pending} tickets are pending."
-#~ msgstr "und ${currently_pending} Tickets sind in Bearbeitung."
-
-#~ msgid "and ${currently_pending} ticket is pending."
-#~ msgstr "und ${currently_pending} Ticket ist in Bearbeitung."
