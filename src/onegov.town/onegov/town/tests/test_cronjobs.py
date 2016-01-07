@@ -165,7 +165,7 @@ def test_ticket_statistics(town_app, smtp, handlers):
     assert len(smtp.outbox) == 1
     message = get_mail(smtp.outbox, 0)
 
-    assert message['subject'] == 'Govikon Webseiten-Status'
+    assert message['subject'] == 'Govikon OneGov Cloud Status'
     txt = message['text']
     assert "Folgendes ist während des Wochenendes auf der Govikon" in txt
     assert "6 Tickets wurden eröffnet." in txt

@@ -267,7 +267,7 @@ def test_reset_password(town_app):
     reset_page.form['email'] = 'someone_else@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert "Ungültiger Addresse oder abgelaufener Link" in reset_page.text
+    assert "Ungültige Addresse oder abgelaufener Link" in reset_page.text
     assert token in reset_page.text
 
     reset_page.form['email'] = 'admin@example.org'
@@ -285,7 +285,7 @@ def test_reset_password(town_app):
     reset_page.form['email'] = 'admin@example.org'
     reset_page.form['password'] = 'new_password'
     reset_page = reset_page.form.submit()
-    assert "Ungültiger Addresse oder abgelaufener Link" in reset_page.text
+    assert "Ungültige Addresse oder abgelaufener Link" in reset_page.text
 
     login_page.form['username'] = 'admin@example.org'
     login_page.form['password'] = 'hunter2'

@@ -56,9 +56,11 @@ def send_daily_ticket_statistics(request):
     args['closed'] = query.count()
 
     # render the email
-    args['title'] = request.translate(_("${town} Website Status", mapping={
-        'town': request.app.town.name
-    }))
+    args['title'] = request.translate(
+        _("${town} OneGov Cloud Status", mapping={
+            'town': request.app.town.name
+        })
+    )
     args['layout'] = DefaultMailLayout(object(), request)
     args['is_monday'] = today.weekday() == MON
     args['town'] = request.app.town.name
