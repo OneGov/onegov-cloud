@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes daily e-mail sometimes being sent twice.
+  [href]
+
 1.2.2 (2016-01-05)
 ~~~~~~~~~~~~~~~~~~~
 
