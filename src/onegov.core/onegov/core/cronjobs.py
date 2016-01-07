@@ -176,6 +176,7 @@ class ApplicationBoundCronjobs(Thread):
 
     def run(self):
         session = self.session_manager.session()
+        previous_check = datetime.min
 
         # the lock ensures that only one thread per application id is
         # in charge of running the scheduled jobs. If another thread already
@@ -183,6 +184,18 @@ class ApplicationBoundCronjobs(Thread):
         with suppress(AlreadyLockedError):
             with lock(session, 'cronjobs-thread', self.application_id):
                 while not sleep(CRONJOB_POLL_RESOLUTION):
+
+                    # make sure we only run the jobs once a minute (we poll
+                    # for it more often than that because we are not
+                    # guaranteed to run in precise intervals)
+                    this_check = datetime.utcnow()
+
+                    if this_check.date() == previous_check.date():
+                        if this_check.hour == previous_check.hour:
+                            if this_check.minute == previous_check.minute:
+                                continue
+
+                    previous_check = this_check
                     self.run_scheduled_jobs()
 
         # we need to close the session again or it will stay open forever

@@ -82,7 +82,7 @@ def test_non_5_minutes_cronjobs():
 
 def test_cronjobs_integration(postgres_dsn):
     config = setup()
-    result = None
+    result = 0
     cronjobs.CRONJOB_POLL_RESOLUTION = 1
 
     class App(Framework):
@@ -99,7 +99,7 @@ def test_cronjobs_integration(postgres_dsn):
     @App.cronjob(hour=8, minute=0, timezone='UTC')
     def run_test_cronjob(request):
         nonlocal result
-        result = True
+        result += 1
 
     scan_morepath_modules(App, config)
     config.commit()
@@ -118,12 +118,12 @@ def test_cronjobs_integration(postgres_dsn):
 
         with freeze_time(replace_timezone(datetime(2016, 1, 1, 8, 0), 'UTC')):
             requests.get(server.url)
-            sleep(1.5)
+            sleep(2.5)
 
     finally:
         server.stop()
 
-    assert result is True
+    assert result == 1
 
 
 def test_disable_cronjobs():
