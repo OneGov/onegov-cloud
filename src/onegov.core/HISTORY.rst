@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.13.2 (2016-01-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Stops cronjobs sometimes running twice in one minute.
   [href]
