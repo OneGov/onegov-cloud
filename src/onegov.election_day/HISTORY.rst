@@ -7,7 +7,7 @@ Unreleased
 - Adds a 5 minute cache for all anonymous pages.
   [href]
 
-- Adds italian, french and romansh locale.
+- Adds complete french / italian / romansh support.
   [href]
 
 0.3.0 (2015-12-10)
