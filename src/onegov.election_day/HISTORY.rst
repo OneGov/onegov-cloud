@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.0 (2016-01-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a 5 minute cache for all anonymous pages.
   [href]
 
