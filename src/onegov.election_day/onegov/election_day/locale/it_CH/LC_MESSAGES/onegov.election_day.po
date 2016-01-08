@@ -1,386 +1,390 @@
-#
-# Italian translations for PACKAGE package
-# Traduzioni italiane per il pacchetto PACKAGE.
-# This file is distributed under the same license as the PACKAGE package.
-# Denis Krienbühl <EMAIL@ADDRESS>, 2015.
+# This file was generated from Vote-Maps_de_IT.xlsx
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-12-15 11:06+0100\n"
-"PO-Revision-Date: 2015-12-14 16:03+0100\n"
-"Last-Translator: Denis Krienbühl <EMAIL@ADDRESS>\n"
-"Language-Team: Italian\n"
-"Language: it_CH\n"
-"MIME-Version: 1.0\n"
+"PO-Revision-Date: 2016-01-08 10:00+0100\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Lingua 3.12\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: xls-to-po 1.0\n"
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Language: it_CH\n"
+"X-Generator: Poedit 1.7.6\n"
 
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 msgid "Proposal"
-msgstr ""
+msgstr "Iniziativa"
 
 msgid "Counter-Proposal"
-msgstr ""
+msgstr "Controprogetto"
 
 msgid "Tie-Breaker"
-msgstr ""
+msgstr "Domanda eventuale"
 
 msgid "Simple Vote"
-msgstr ""
+msgstr "Progetto semplice"
 
 msgid "Vote with Counter-Proposal"
-msgstr ""
+msgstr "Progetto con controprogetto"
 
 msgid "Vote (German)"
-msgstr ""
+msgstr "Votazione (tedesco)"
 
 msgid "Vote (French)"
-msgstr ""
+msgstr "Votazione (francese)"
 
 msgid "Vote (Italian)"
-msgstr ""
+msgstr "Votazione (italiano)"
 
 msgid "Vote (Romansh)"
-msgstr ""
+msgstr "Votazione (romancio)"
 
 msgid "Shortcode"
-msgstr ""
+msgstr "Abbreviazione"
 
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 msgid "A vote with this title exists already"
-msgstr ""
+msgstr "Esiste già una votazione con questo titolo"
 
 msgid "Federal Vote"
-msgstr ""
+msgstr "Votazione federale"
 
 msgid "Cantonal Vote"
-msgstr ""
+msgstr "Votazione cantonale"
 
 msgid "Elections &amp; Votes"
-msgstr ""
+msgstr "Elezioni &amp; votazioni"
 
 msgid "There are no votes defined yet."
-msgstr ""
+msgstr "Non sono ancora state inserite votazioni."
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
+"Il modulo contiene errori. Controlli per favore i campi evidenziati in rosso."
 
 msgid "Back to the latest elections &amp; votes"
-msgstr ""
+msgstr "Ritorna alle elezioni &amp; votazioni attuali"
 
 msgid "Login"
-msgstr ""
+msgstr "Login"
 
 msgid "You are logged in:"
-msgstr ""
+msgstr "Login effettuato:"
 
 msgid "Manage"
-msgstr ""
+msgstr "Amministrare"
 
 msgid "Logout"
-msgstr ""
+msgstr "Logout"
 
 msgid "Accepted"
-msgstr ""
+msgstr "Accolto"
 
 msgid "Rejected"
-msgstr ""
+msgstr "Respinto"
 
 msgid "Counter Proposal"
-msgstr ""
+msgstr "Controprogetto"
 
 msgid "${counted} of ${total}"
-msgstr ""
+msgstr "${counted} di ${total}"
 
 msgid "Archived Votes"
-msgstr ""
+msgstr "Archivio votazioni"
 
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
 msgid "Submit"
-msgstr ""
+msgstr "Invia"
 
 msgid "Federal Votes on ${date}"
-msgstr ""
+msgstr "Votazioni federali del ${date}"
 
 msgid "Cantonal Votes on ${date}"
-msgstr ""
+msgstr "Votazioni cantonali del ${date}"
 
 msgid "Vote"
-msgstr ""
+msgstr "Progetto"
 
 msgid "Result"
-msgstr ""
+msgstr "Risultato"
 
 msgid "Yes %"
-msgstr ""
+msgstr "Sì %"
 
 msgid "No %"
-msgstr ""
+msgstr "NO %"
 
 msgid "Reported"
-msgstr ""
+msgstr "Comunicati"
 
 msgid "Votes"
-msgstr ""
+msgstr "Votazioni"
 
 msgid "New Vote"
-msgstr ""
+msgstr "Nuova votazione"
 
 msgid "No votes yet."
-msgstr ""
+msgstr "Ancora nessun oggetto in votazione rilevato."
 
 msgid "Actions"
-msgstr ""
+msgstr "Azioni"
 
 msgid "Federal"
-msgstr ""
+msgstr "Nazionale"
 
 msgid "Cantonal"
-msgstr ""
+msgstr "Cantonale"
 
 msgid "View"
-msgstr ""
+msgstr "Mostrare"
 
 msgid "Edit"
-msgstr ""
+msgstr "Elabora"
 
 msgid "Upload Results"
-msgstr ""
+msgstr "Caricare risultati"
 
 msgid "Delete"
-msgstr ""
+msgstr "Cancellare"
 
 msgid "Elections &amp; Votes: Open Data"
-msgstr ""
+msgstr "Elezioni &amp; votazioni: Open Data"
 
 msgid "Format"
-msgstr ""
+msgstr "Formato"
 
 msgid ""
-"The raw data used to display the results of votes is available in the "
-"following formats:"
+"The raw data used to display the results of votes is available in the following "
+"formats:"
 msgstr ""
+"I dati grezzi utilizzati per indicare i risultati sono disponibili nei formati "
+"seguenti:"
 
 msgid "The following fields are included in all formats:"
-msgstr ""
+msgstr "I seguenti campi sono contenuti in tutti i formati:"
 
 msgid "Title of the vote."
-msgstr ""
+msgstr "Titolo della votazione."
 
 msgid "The date of the vote (an ISO 8601 date string)."
-msgstr ""
+msgstr "Data della votazione (una stringa ISO 8601)."
 
 msgid "Internal shortcode (defines the ordering of votes on the same day)."
 msgstr ""
+"Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno)."
 
 msgid "\"federation\" for federal, \"canton\" for cantonal votes."
-msgstr ""
+msgstr "\"federation\" per votazioni federali, \"canton\" per votazioni cantonali"
 
 msgid ""
-"\"proposal\" (Vorschlag), \"counter-proposal\" (Gegenvorschlag) or \"tie-"
-"breaker\" (Stichfrage)."
+"\"proposal\" (Vorschlag), \"counter-proposal\" (Gegenvorschlag) or \"tie-breaker"
+"\" (Stichfrage)."
 msgstr ""
+"\"proposal\" (progetto), \"counter-proposal\" (controprogetto) or \"tie-breaker"
+"\" (domanda eventuale)."
 
 msgid ""
-"The designation of the result. May be the district, the town's name divided "
-"by a slash, the city's name and the city's district divided by a slash or "
-"simply the town's name. This depends entirely on the canton."
+"The designation of the result. May be the district, the town's name divided by "
+"a slash, the city's name and the city's district divided by a slash or simply "
+"the town's name. This depends entirely on the canton."
 msgstr ""
+"Da dove viene il risultato. Si può trattare del distretto e del comune, "
+"separati da una barra, del nome della città e del nome del circolo, anch'essi "
+"separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal "
+"rispettivo Cantone."
 
 msgid "The id of the municipality/locale. Better known as \"BFS Nummer\""
-msgstr ""
+msgstr "ID del comune/dell'ubicazione. Meglio noto come \"numero UST\"."
 
 msgid ""
-"True if the result was counted, False if the result not known yet (the "
-"voting counts are not final yet)."
+"True if the result was counted, False if the result not known yet (the voting "
+"counts are not final yet)."
 msgstr ""
+"Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora "
+"noto (i valori non sono ancora corretti)."
 
 msgid "The number of yes votes."
-msgstr ""
+msgstr "Numero di voti favorevoli"
 
 msgid "The number of no votes."
-msgstr ""
+msgstr "Numero di voti contrari"
 
 msgid "The number of invalid votes."
-msgstr ""
+msgstr "Numero di voti nulli"
 
 msgid "The number of empty votes."
-msgstr ""
+msgstr "Numero di voti in bianco"
 
 msgid "The number of people elegible to vote."
-msgstr ""
+msgstr "Numero di aventi diritto di voto"
 
 msgid "Please use the following format:"
-msgstr ""
+msgstr "Utilizzi per favore il formato seguente:"
 
 msgid "Format Description"
-msgstr ""
+msgstr "Descrizione del formato"
 
 msgid "Your results were uploaded successfully."
-msgstr ""
+msgstr "I Suoi risultati sono stati caricati correttamente."
 
 msgid "Click here to see the updated results page."
-msgstr ""
+msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
 
 msgid "Your results could not be uploaded."
-msgstr ""
+msgstr "I Suoi risultati non hanno potuto essere caricati."
 
 msgid "No errors found in proposal"
-msgstr ""
+msgstr "Nessun errore nel progetto"
 
 msgid "Errors found in proposal"
-msgstr ""
+msgstr "Errori nel progetto"
 
 msgid "Line"
-msgstr ""
+msgstr "Riga"
 
 msgid "No errors found in counter proposal"
-msgstr ""
+msgstr "Nessun errore nel controprogetto"
 
 msgid "Errors found in counter proposal"
-msgstr ""
+msgstr "Errori nel controprogetto"
 
 msgid "No errors found in tie-breaker"
-msgstr ""
+msgstr "Nessun errore nella domanda eventuale"
 
 msgid "Errors found in tie-breaker"
-msgstr ""
+msgstr "Errori nella domanda eventuale"
 
 msgid "Not yet counted."
-msgstr ""
+msgstr "Non ancora conteggiato."
 
 msgid "Yeas"
-msgstr ""
+msgstr "Voti favorevoli"
 
 msgid "Nays"
-msgstr ""
+msgstr "Voti contrari"
 
 msgid "No results yet"
-msgstr ""
+msgstr "Ancora nessun risultato"
 
 msgid "Results"
-msgstr ""
+msgstr "Risultati"
 
 msgid "Counted municipalities"
-msgstr ""
+msgstr "Comuni che hanno concluso lo spoglio"
 
 msgid "Last change"
-msgstr ""
+msgstr "Ultima modifica il"
 
 msgid "Elegible Voters"
-msgstr ""
+msgstr "Aventi diritto di voto"
 
 msgid "Cast Ballots"
-msgstr ""
+msgstr "Schede rientrate"
 
 msgid "Turnout"
-msgstr ""
+msgstr "Partecipazione al voto"
 
 msgid "Yay"
-msgstr ""
+msgstr "SÌ"
 
 msgid "Nay"
-msgstr ""
+msgstr "NO"
 
 msgid "Electoral District"
-msgstr ""
+msgstr "Circondario elettorale"
 
 msgid "Empty"
-msgstr ""
+msgstr "Bianche"
 
 msgid "Invalid"
-msgstr ""
+msgstr "Nulle"
 
 msgid "Total"
-msgstr ""
+msgstr "Totale"
 
 msgid "Wrong username or password"
-msgstr ""
+msgstr "Nome utente sconosciuto o password errata"
 
-#, python-format
 msgid "Do you really want to delete \"${vote}\"?"
-msgstr ""
+msgstr "Desidera davvero cancellare la votazione \"${vote}\"?"
 
 msgid "Delete vote"
-msgstr ""
+msgstr "Cancellare votazione"
 
 msgid "Upload results"
-msgstr ""
+msgstr "Caricare risultati"
 
 msgid "Missing municipality"
-msgstr ""
+msgstr "Località mancante"
 
-#, python-format
 msgid "${group} was found twice"
-msgstr ""
+msgstr "${group} figura due volte"
 
 msgid "No data found"
-msgstr ""
+msgstr "Nessun dato trovato"
 
-#, python-format
 msgid "The year ${year} is not yet supported"
-msgstr ""
+msgstr "L'anno ${year} non viene ancora supportato"
 
 msgid "Invalid municipality id"
-msgstr ""
+msgstr "Numero UST non valido"
 
-#, python-format
 msgid "municipality id ${id} was found twice"
-msgstr ""
+msgstr "Il numero UST ${id} figura due volte"
 
-#, python-format
 msgid "municipality id ${id} is unknown"
-msgstr ""
+msgstr "Il numero UST ${id} è sconosciuto"
 
 msgid "Could not read yeas"
-msgstr ""
+msgstr "Impossibile leggere 'SÌ'"
 
 msgid "Could not read nays"
-msgstr ""
+msgstr "Impossibile leggere 'NO'"
 
 msgid "Could not read the elegible voters"
-msgstr ""
+msgstr "Impossibile leggere 'Aventi diritto di voto'"
 
 msgid "Could not read the empty votes"
-msgstr ""
+msgstr "Impossibile leggere 'Schede bianche'"
 
 msgid "Could not read the invalid votes"
-msgstr ""
+msgstr "Impossibile leggere 'Schede nulle'"
 
 msgid "No elegible voters"
-msgstr ""
+msgstr "Nessun avente diritto di voto"
 
 msgid "More cast votes than elegible voters"
-msgstr ""
+msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
 
-#, python-format
 msgid "Missing columns: '${cols}'"
-msgstr ""
+msgstr "Colonne mancanti: ${cols}"
 
 msgid ""
-"Could not find the expected columns, make sure all required columns exist "
-"and that there are no extra columns."
+"Could not find the expected columns, make sure all required columns exist and "
+"that there are no extra columns."
 msgstr ""
+"Le colonne necessarie non sono state trovate. Verifichi per favore che le "
+"colonne esistano e che non vi siano colonne supplementari."
 
 msgid "Some column names appear twice."
-msgstr ""
+msgstr "Alcuni nomi di colonna figurano due volte."
 
 msgid "Not a valid csv/xls/xlsx file."
-msgstr ""
+msgstr "Nessun file CSV/XLS/XLSX valido."
 
 msgid "The csv/xls/xlsx file is empty."
-msgstr ""
+msgstr "Il file CSV/XLS/XLSX è vuoto."
 
 msgid "The file contains an empty line."
-msgstr ""
+msgstr "Il file contiene una riga vuota."
 
 msgid "This ballot has fewer results than the others"
-msgstr ""
+msgstr "Questo progetto contiene meno risultati rispetto agli altri."
