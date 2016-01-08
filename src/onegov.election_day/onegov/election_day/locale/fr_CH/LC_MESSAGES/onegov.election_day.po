@@ -94,7 +94,7 @@ msgid "Counter Proposal"
 msgstr "Contre-proposition"
 
 msgid "${counted} of ${total}"
-msgstr "${comptés} de ${total}"
+msgstr "${counted} de ${total}"
 
 msgid "Archived Votes"
 msgstr "Votes archivés"
