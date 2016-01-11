@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.0 (2016-01-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Require elasticsearch 2.1.1 or newer.
   [href]
 
