@@ -33,7 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'certifi',
-        'elasticsearch',
+        'elasticsearch<=2.1.0',
         'elasticsearch-dsl',
         'onegov.core>=0.4.0',
         'webtest'

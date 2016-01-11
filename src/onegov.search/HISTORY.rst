@@ -4,6 +4,17 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Pin elasticsearch to 2.1 for now.
+
+  With 2.2 it's no longer possible to support elasticsearch 1.0 and 2.0 with
+  2.x. So we have to support either or.
+
+  Currently we support Elasticsearch 1.x. Soon we'll upgrade to 2.x and use
+  that exclusively.
+
+  This release is therefore the last release that supports both 1.x and 2.x
+  of elasticsearch.
+
 0.1.2 (2015-12-22)
 ~~~~~~~~~~~~~~~~~~~
 
