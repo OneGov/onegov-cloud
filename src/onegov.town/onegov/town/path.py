@@ -170,8 +170,10 @@ def get_resources(app):
 def get_resource(app, name, date=None, highlights=tuple()):
 
     resource = ResourceCollection(app.libres_context).by_name(name)
-    resource.date = date
-    resource.highlights = highlights
+
+    if resource:
+        resource.date = date
+        resource.highlights = highlights
 
     return resource
 

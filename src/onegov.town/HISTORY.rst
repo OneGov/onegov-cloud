@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Stops non-existing ressource paths from triggering an exceptions.
+  [href]
+
 1.2.3 (2016-01-07)
 ~~~~~~~~~~~~~~~~~~~
 
