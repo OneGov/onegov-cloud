@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Require elasticsearch 2.1.1 or newer.
+  [href]
+
 0.2.0 (2016-01-11)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -17,6 +20,7 @@ Unreleased
 
   This release is therefore the last release that supports both 1.x and 2.x
   of elasticsearch.
+  [href]
 
 0.1.2 (2015-12-22)
 ~~~~~~~~~~~~~~~~~~~
