@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.0 (2016-01-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Pin elasticsearch to 2.1 for now.
 
   With 2.2 it's no longer possible to support elasticsearch 1.0 and 2.0 with
