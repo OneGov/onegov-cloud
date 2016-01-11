@@ -22,9 +22,9 @@ if 'rm' not in locales._locales:
         timeframes = {
             'now': 'en quest mument',
             'seconds': 'secundas',
-            'minute': 'ina minute',
+            'minute': 'ina minuta',
             'minutes': '{0} minutas',
-            'hour': 'ina ura',
+            'hour': 'in\'ura',
             'hours': '{0} ura',
             'day': 'in di',
             'days': '{0} dis',
@@ -40,8 +40,8 @@ if 'rm' not in locales._locales:
         ]
 
         month_abbreviations = [
-            '', 'sch', 'fav', 'mar', 'avr', 'mat', 'zer', 'fan', 'avu', 'set',
-            'oct', 'nov', 'dec'
+            '', 'schan', 'fav', 'mars', 'avr', 'matg', 'zer', 'fan', 'avu',
+            'set', 'oct', 'nov', 'dec'
         ]
 
         day_names = [
@@ -50,7 +50,7 @@ if 'rm' not in locales._locales:
         ]
 
         day_abbreviations = [
-            '', 'gl', 'ma', 'me', 'gi', 've', 'so', 'du'
+            '', 'gli', 'ma', 'me', 'gie', 've', 'so', 'du'
         ]
 
         def _ordinal_number(self, n):
