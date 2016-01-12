@@ -43,6 +43,9 @@ class Handler(object):
         if self.ticket.title != self.title:
             self.ticket.title = self.title
 
+        if self.ticket.subtitle != self.subtitle:
+            self.ticket.subtitle = self.subtitle
+
         if self.ticket.group != self.group:
             self.ticket.group = self.group
 

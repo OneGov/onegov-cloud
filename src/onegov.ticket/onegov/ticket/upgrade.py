@@ -43,3 +43,15 @@ def add_snapshot_json_column_to_ticket(context):
 
     context.session.flush()
     context.operations.alter_column('tickets', 'snapshot', nullable=False)
+
+
+@upgrade_task('Add subtitle to ticket')
+def add_subtitle_to_ticket(context):
+
+    context.operations.add_column(
+        'tickets', Column('subtitle', Text, nullable=True))
+
+    for ticket in context.session.query(Ticket).all():
+        ticket.subtitle = ticket.handler.subtitle
+
+    context.session.flush()

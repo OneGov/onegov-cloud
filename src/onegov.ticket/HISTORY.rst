@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds subtitles to tickets and handlers.
+  [href]
+
 0.1.1 (2015-12-16)
 ~~~~~~~~~~~~~~~~~~~
 

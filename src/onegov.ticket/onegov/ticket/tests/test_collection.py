@@ -120,6 +120,10 @@ def test_open_ticket(session, handlers):
             return self.data.get('title')
 
         @property
+        def subtitle(self):
+            return self.data.get('subtitle')
+
+        @property
         def group(self):
             return self.data.get('group')
 
@@ -135,6 +139,7 @@ def test_open_ticket(session, handlers):
         handler_id='1',
         handler_code='ECO',
         title="Title",
+        subtitle="Subtitle",
         group="Group",
         summary="Summary",
         links=[("Link", '#')],
@@ -148,6 +153,7 @@ def test_open_ticket(session, handlers):
     assert ticket.handler_code == 'ECO'
     assert ticket.handler_data == {
         'title': "Title",
+        'subtitle': "Subtitle",
         'group': "Group",
         'summary': "Summary",
         'links': [("Link", '#')],
@@ -180,6 +186,10 @@ def test_snapshot_ticket(session, handlers):
         @property
         def title(self):
             return 'Foo'
+
+        @property
+        def subtitle(self):
+            return '0xdeadbeef'
 
         @property
         def group(self):
@@ -224,6 +234,10 @@ def test_handle_extra_options(session, handlers):
         @property
         def title(self):
             return 'Foo'
+
+        @property
+        def subtitle(self):
+            return '0xdeadbeef'
 
         @property
         def group(self):
