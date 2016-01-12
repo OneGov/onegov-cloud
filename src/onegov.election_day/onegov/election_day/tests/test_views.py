@@ -456,6 +456,10 @@ def test_pages_cache(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH')
 
+    # make sure codes != 200 are not cached
+    anonymous = Client(election_day_app)
+    anonymous.get('/vote/0xdeadbeef', status=404)
+
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
     login.form['password'] = 'hunter2'
@@ -467,8 +471,8 @@ def test_pages_cache(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    anonymous = Client(election_day_app)
     assert '0xdeadbeef' in anonymous.get('/')
+    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef')
 
     edit = client.get('/vote/0xdeadbeef/edit')
     edit.form['vote_de'] = '0xdeadc0de'

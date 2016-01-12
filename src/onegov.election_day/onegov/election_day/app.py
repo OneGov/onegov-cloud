@@ -190,6 +190,10 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         # pages_cache is bound to it)
         key = ':'.join((request.locale, request.path_info))
 
-        return app.pages_cache.get_or_create(key, lambda: handler(request))
+        return app.pages_cache.get_or_create(
+            key,
+            creator=lambda: handler(request),
+            should_cache_fn=lambda response: response.status_code == 200
+        )
 
     return micro_cache_anonymous_pages_tween
