@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.1 (2016-01-12)
+~~~~~~~~~~~~~~~~~~~
+
 - No longer caches responses with a status code other than 200.
   [href]
 
