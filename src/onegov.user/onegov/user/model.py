@@ -70,3 +70,32 @@ class User(Base, TimestampMixin):
 
         """
         return verify_password(password, self.password_hash)
+
+    @property
+    def initials(self):
+        """ Takes the username and returns initials which are at most two
+        characters wide.
+
+        Examples:
+
+        admin => A
+        nathan.drake@example.org => ND
+
+        """
+
+        username = self.username.split('@')[0]
+        return ''.join(p[0] for p in username.split('.')[:2]).upper()
+
+    @property
+    def title(self):
+        """ Takes the username and returns a more readable version.
+
+        Examples:
+
+        admin => Admin
+        nathan.drake@example.org => Nathan Drake
+
+        """
+
+        username = self.username.split('@')[0]
+        return ' '.join(p.capitalize() for p in username.split('.')[:2])

@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds an initials property to the user.
+  [href]
+
+- Adds a title property to the user.
+  [href]
+
 0.3.1 (2015-12-16)
 ~~~~~~~~~~~~~~~~~~~
 
