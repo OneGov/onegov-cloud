@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+1.3.0 (2016-01-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds more information about tickets to the tickets overview.
   [href]
 
