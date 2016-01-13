@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.4.0 (2016-01-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an initials property to the user.
   [href]
 
