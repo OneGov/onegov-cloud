@@ -37,5 +37,6 @@ def handle_user_profile(self, request, form):
         'title': _("User Profile"),
         'form': form,
         'username': user.username,
+        'initials': user.initials,
         'role': user.role
     }

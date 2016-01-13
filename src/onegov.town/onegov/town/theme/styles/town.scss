@@ -1350,8 +1350,15 @@ $all-ticket-icon: '\f055';
     td {
         vertical-align: top;
 
+        &.ticket-date,
+        &.ticket-state,
         &.ticket-user {
+            color: $monsoon;
             text-align: right;
+        }
+
+        &.ticket-user > div {
+            display: inline-block;
         }
 
         // forces the ticket-title and group to break on newlines
@@ -1359,6 +1366,10 @@ $all-ticket-icon: '\f055';
         &.ticket-date,
         &.ticket-action {
             white-space: nowrap;
+        }
+
+        &.ticket-group div:first-child {
+            font-weight: bold;
         }
     }
 
@@ -1413,23 +1424,11 @@ $all-ticket-icon: '\f055';
     color: $monsoon;
 }
 
-.ticket-row-state-pending td:last-child::after {
-    @include icon($pending-ticket-icon);
-    color: $monsoon;
-    padding-left: .5ex;
-}
-
-.ticket-row-state-closed td:last-child::after {
-    @include icon($closed-ticket-icon);
-    color: $monsoon;
-    padding-left: .5ex;
-}
-
 tr.ticket:hover {
     background-color: $yellow-pastel;
 }
 
-.ticket-action {
+.ticket-button {
     @include button(
         $padding: $button-tny,
         $bg: $success-color
@@ -1904,6 +1903,7 @@ tr.ticket:hover {
             &:hover {
                 text-decoration: none;
             }
+
             &::before {
                 @include icon($disabled-icon);
                 color: $monsoon;
@@ -2134,4 +2134,36 @@ ul.search-results {
 
 .button.secondary.postfix {
     border-left: 0;
+}
+
+/*
+    User Initials
+*/
+.user-initials-small,
+.user-initials-medium,
+.user-initials-large {
+    background-color: $gainsboro;
+    border-radius: 50px;
+    text-align: center;
+}
+
+.user-initials-small {
+    font-size: .7rem;
+    height: 1.4rem;
+    line-height: 1.4rem;
+    width: 1.4rem;
+}
+
+.user-initials-medium {
+    font-size: 1rem;
+    height: 2rem;
+    line-height: 2rem;
+    width: 2rem;
+}
+
+.user-initials-large {
+    font-size: 1.3rem;
+    height: 2.6rem;
+    line-height: 2.6rem;
+    width: 2.6rem;
 }

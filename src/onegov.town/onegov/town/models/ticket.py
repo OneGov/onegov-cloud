@@ -55,6 +55,10 @@ class FormSubmissionHandler(Handler):
         return self.submission.title
 
     @property
+    def subtitle(self):
+        return None
+
+    @property
     def group(self):
         return self.submission.form.title
 
@@ -148,6 +152,16 @@ class ReservationHandler(Handler):
             )
 
         return ', '.join(parts)
+
+    @property
+    def subtitle(self):
+        if self.submission:
+            return ', '.join(
+                p for p in (self.email, self.submission.title) if p)
+        elif self.reservations:
+            return self.email
+        else:
+            return None
 
     @property
     def group(self):
@@ -272,6 +286,18 @@ class EventSubmissionHandler(Handler):
     @property
     def title(self):
         return self.event.title
+
+    @property
+    def subtitle(self):
+        if self.deleted:
+            return None
+
+        parts = (
+            self.event.meta.get('submitter_email'),
+            '{:%d.%m.%Y %H:%M}'.format(self.event.start)
+        )
+
+        return ', '.join(p for p in parts if p)
 
     @property
     def extra_data(self):

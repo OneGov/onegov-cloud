@@ -42,26 +42,31 @@
                                 ${ticket.number}
                             </a>
                         </td>
-                        <td class="ticket-group">
-                            ${translate(ticket.group)}
-                        </td>
-                        <td class="ticket-title">
-                            ${ticket.title}
+                        <td class="ticket-group" colspan="2">
+                            <div>${translate(ticket.group)}</div>
+                            <div>${ticket.title}</div>
+                            <div>${ticket.subtitle}</div>
                         </td>
                         <td class="ticket-date">
                             ${layout.format_date(ticket.created, 'relative')}
                         </td>
-                        <td class="ticket-user">
-                            <tal:block condition="ticket.state == 'open'">
-                                <a class="ticket-action ticket-accept" href="${request.link(ticket, 'accept')}" i18n:translate>
-                                    Accept
-                                </a>
+                        <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
+                            <a class="ticket-accept ticket-button" href="${request.link(ticket, 'accept')}" i18n:translate>
+                                Accept
+                            </a>
+                        </td>
+                        <td class="ticket-state" tal:condition="ticket.state != 'open'">
+                            <tal:block condition="ticket.state == 'pending'" i18n:translate>
+                                Pending
                             </tal:block>
-                            <tal:block condition="ticket.state != 'open'">
-                                <tal:block condition="ticket.user_id">
-                                    ${ticket.user.username}
-                                </tal:block>
+                            <tal:block condition="ticket.state == 'closed'" i18n:translate>
+                                Closed
                             </tal:block>
+                        </td>
+                        <td class="ticket-user" tal:condition="ticket.state != 'open'">
+                            <div class="user-initials-small" title="${ticket.user.title}" style="background-color: ${layout.get_user_color(ticket.user.username)}">
+                                ${ticket.user.initials}
+                            </div>
                         </td>
                     </tr>
                 </tal:block>

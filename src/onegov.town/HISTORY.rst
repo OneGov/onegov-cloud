@@ -4,6 +4,12 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds more information about tickets to the tickets overview.
+  [href]
+
+- Adds an identicon to each user which is displayed in the tickets overview.
+  [href]
+
 - Stops non-existing ressource paths from triggering an exceptions.
   [href]
 

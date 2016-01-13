@@ -45,9 +45,9 @@
                                 <tal:block case="'tickets'">
                                     <a href="${request.link(result)}">${result.number}</a>
                                     <ul>
-                                        <li>${result.title}</li>
                                         <li>${translate(result.group)}</li>
-                                        <li>${layout.format_date(result.created, 'relative')}</li>
+                                        <li tal:content="structure result.title"></li>
+                                        <li tal:content="structure result.subtitle"></li>
                                     </ul>
                                 </tal:block>
 

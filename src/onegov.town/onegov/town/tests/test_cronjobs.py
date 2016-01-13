@@ -37,6 +37,10 @@ def register_echo_handler(handlers):
             return self.data.get('title')
 
         @property
+        def subtitle(self):
+            return self.data.get('subtitle')
+
+        @property
         def group(self):
             return self.data.get('group')
 

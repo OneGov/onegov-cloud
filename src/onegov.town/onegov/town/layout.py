@@ -10,6 +10,7 @@ from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
 from onegov.town import _
+from onegov.town import utils
 from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import (
     FileCollection,
@@ -243,6 +244,9 @@ class Layout(ChameleonLayout):
         move = implementation.for_url_template(self.model)
 
         return self.csrf_protected_url(self.request.link(move))
+
+    def get_user_color(self, username):
+        return utils.get_user_color(username)
 
 
 class DefaultMailLayout(Layout):
@@ -631,21 +635,21 @@ class TicketLayout(DefaultLayout):
                 links.append(Link(
                     text=_("Accept ticket"),
                     url=self.request.link(self.model, 'accept'),
-                    classes=('ticket-action', 'ticket-accept'),
+                    classes=('ticket-button', 'ticket-accept'),
                 ))
 
             elif self.model.state == 'pending':
                 links.append(Link(
                     text=_("Close ticket"),
                     url=self.request.link(self.model, 'close'),
-                    classes=('ticket-action', 'ticket-close'),
+                    classes=('ticket-button', 'ticket-close'),
                 ))
 
             elif self.model.state == 'closed':
                 links.append(Link(
                     text=_("Reopen ticket"),
                     url=self.request.link(self.model, 'reopen'),
-                    classes=('ticket-action', 'ticket-reopen'),
+                    classes=('ticket-button', 'ticket-reopen'),
                 ))
 
             return links
