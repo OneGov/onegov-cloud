@@ -1229,6 +1229,7 @@ $person-email-icon: '\f003';
         @include circle;
 
         height: 5rem; // enough to show three lines of text
+        text-align: center;
         width: 5rem;
 
         .fa-user {
@@ -1236,8 +1237,17 @@ $person-email-icon: '\f003';
         }
     }
 
-    ul > li {
-        font-size: .875rem;
+    > a {
+        float: left;
+        margin-right: 1em;
+    }
+
+    ul {
+        float: left;
+
+        > li {
+            font-size: .875rem;
+        }
     }
 
     .person-card-title {

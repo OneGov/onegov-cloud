@@ -13,6 +13,9 @@ Unreleased
 - Stops non-existing ressource paths from triggering an exceptions.
   [href]
 
+- Fixes person list looking unorganized.
+  [href]
+
 1.2.3 (2016-01-07)
 ~~~~~~~~~~~~~~~~~~~
 
