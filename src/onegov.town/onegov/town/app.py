@@ -34,6 +34,34 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
 
     serve_static_files = True
 
+    def is_allowed_application_id(self, application_id):
+        """ Stops onegov.server from ever passing the request to the town
+        application, if the schema does not exist. This way we can host
+        onegov.town in a way that allows all requests to *.onegovcloud.ch.
+
+        If the schema for ``newyork.onegovcloud.ch`` exists, the request is
+        handled. If the schema does not exist, the request is not handled.
+
+        Here we basically decide if a town exists or not.
+
+        """
+        schema = self.namespace + '-' + application_id
+
+        if schema in self.known_schemas:
+            return True
+
+        # block invalid schemas from ever being checked
+        if not self.session_manager.is_valid_schema(schema):
+            return False
+
+        # if the schema exists, remember it
+        if self.session_manager.is_schema_found_on_database(schema):
+            self.known_schemas.add(schema)
+
+            return True
+
+        return False
+
     @property
     def town(self):
         """ Returns the cached version of the town. Since the town rarely
@@ -44,8 +72,14 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
         unless you use :meth:`update_town` or use the ORM directly.
 
         """
-        return self.session().merge(
-            self.cache.get_or_create('town', self.load_town), load=False)
+        town = self.cache.get_or_create(
+            'town',
+            creator=self.load_town,
+            should_cache_fn=lambda town: town is not None
+        )
+
+        if town is not None:
+            return self.session().merge(town, load=False)
 
     def load_town(self):
         """ Loads the town from the SQL database. """
@@ -130,12 +164,13 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
 
         if self.has_database_connection:
             schema_prefix = self.namespace + '-'
-            town_schemas = [
+
+            self.known_schemas = set(
                 s for s in self.session_manager.list_schemas()
                 if s.startswith(schema_prefix)
-            ]
+            )
 
-            for schema in town_schemas:
+            for schema in self.known_schemas:
                 self.session_manager.set_current_schema(schema)
 
                 session = self.session()

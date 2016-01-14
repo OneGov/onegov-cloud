@@ -4,6 +4,11 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Make sure a town exists before answering any requests for it.
+
+  This paves the way for the upcoming onboarding application.
+  [href]
+
 1.3.0 (2016-01-13)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -38,3 +38,13 @@ def test_send_email(smtp):
     assert mail['Subject'] == 'Test'
     assert mail['Sender'] == 'Gemeinde Govikon <mails@govikon.ch>'
     assert mail['From'] == 'Gemeinde Govikon <mails@govikon.ch>'
+
+
+def test_allowed_application_id(town_app):
+    # little bobby tables!
+    assert not town_app.is_allowed_application_id(
+        "Robert'); DROP TABLE Students; --"
+    )
+    assert not town_app.is_allowed_application_id('foo')
+    town_app.session_manager.ensure_schema_exists(town_app.namespace + '-foo')
+    assert town_app.is_allowed_application_id('foo')
