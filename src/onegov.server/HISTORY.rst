@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.2.0 (2016-01-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Gives applications the abiilty to decide which application ids to handle.
   [href]
 
