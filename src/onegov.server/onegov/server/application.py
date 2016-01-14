@@ -119,6 +119,18 @@ class Application(object):
 
         return hostname in self.allowed_hosts
 
+    def is_allowed_application_id(self, application_id):
+        """ Called at least once per request with the given application id.
+
+        If True is returned, the request with the given application_id is
+        allowed. If False is returned, the request is denied.
+
+        By default, all application ids are allowed.
+
+        """
+
+        return True
+
     def alias(self, application_id, alias):
         """ Adds an alias under which this application is available on the
         server.

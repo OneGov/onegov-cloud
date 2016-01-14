@@ -137,6 +137,10 @@ class Server(object):
         environ['SCRIPT_NAME'] = base_path
 
         application.set_application_base_path(base_path)
+
+        if not application.is_allowed_application_id(application_id):
+            return HTTPNotFound()(environ, start_response)
+
         application.set_application_id(
             application.namespace + '/' + application_id)
 

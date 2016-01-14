@@ -167,6 +167,35 @@ def test_invalid_host_request():
     assert response.body == b'hello'
 
 
+def test_not_allowed_application_id():
+
+    class HelloApplication(Application):
+
+        def is_allowed_application_id(self, application_id):
+            return application_id == 'foobar'
+
+        def __call__(self, environ, start_response):
+            response = Response()
+            response.text = 'hello'
+
+            return response(environ, start_response)
+
+    server = Server(Config({
+        'applications': [
+            {
+                'path': '/sites/*',
+                'application': HelloApplication,
+                'namespace': 'sites'
+            }
+        ]
+    }))
+
+    c = Client(server)
+
+    assert c.get('/sites/abc', expect_errors=True).status_code == 404
+    assert c.get('/sites/foobar', expect_errors=False).status_code == 200
+
+
 def test_aliases():
 
     class EchoApplication(Application):
