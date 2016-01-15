@@ -4,5 +4,9 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
         <h1>${title}</h1>
+
+        <ul tal:condition="bullets|nothing" class="bullets fa-ul">
+            <li tal:repeat="bullet bullets"><i class="fa fa-li fa-check"></i>${bullet}</li>
+        </ul>
     </tal:block>
 </div>
