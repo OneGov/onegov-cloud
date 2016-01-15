@@ -1,17 +1,19 @@
+import morepath
+
 from onegov.core.security import Public
 from onegov.onboarding import OnboardingApp
 from onegov.onboarding.layout import DefaultLayout
-from onegov.onboarding.models import Assistant, Step
+from onegov.onboarding.models import Assistant, DefaultAssistant
+
+
+@OnboardingApp.view(model=DefaultAssistant, permission=Public)
+def view_default_assistant(self, request):
+    return morepath.redirect(request.link(self.assistant))
 
 
 @OnboardingApp.html(model=Assistant, template='step.pt', permission=Public)
 def view_assistant(self, request):
-    return view_step(self.steps[0], request)
-
-
-@OnboardingApp.html(model=Step, template='step.pt', permission=Public)
-def view_step(self, request):
-    response = self.handle_view(request)
+    response = self.current_step.handle_view(request)
 
     if isinstance(response, dict):
         assert 'layout' not in response
