@@ -1,0 +1,2 @@
+msgid "OneGov Town Onboarding Assistant"
+msgstr "OneGov Town Onboarding Assistent"
