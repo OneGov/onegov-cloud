@@ -23,6 +23,13 @@ metal:define-macro="layout">
 <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 <body>
+    <div class="header">
+        <div class="row">
+            <div class="columns small-12">
+                <img src="${layout.logo_path}" alt="OneGov Cloud Logo" i18n:attributes="alt">
+            </div>
+        </div>
+    </div>
     <div class="content">
         <div class="row">
             <div class="columns small-12">

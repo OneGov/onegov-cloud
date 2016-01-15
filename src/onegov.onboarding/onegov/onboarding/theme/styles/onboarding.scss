@@ -1,0 +1,13 @@
+/*
+    the default layout's header
+*/
+.header {
+    background-color: $white-smoke;
+    border-bottom: 1px solid $gainsboro;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+
+    img {
+        max-height: 2.5rem;
+    }
+}

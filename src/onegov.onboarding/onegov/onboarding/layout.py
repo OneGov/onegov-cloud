@@ -12,6 +12,12 @@ class Layout(ChameleonLayout):
 
         return self.request.link(static_file)
 
+    @cached_property
+    def logo_path(self):
+        static_file = StaticFile.from_application(self.app, 'logo.svg')
+
+        return self.request.link(static_file)
+
 
 class DefaultLayout(Layout):
     pass
