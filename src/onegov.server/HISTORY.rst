@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.0 (2016-01-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Replaces dashes with underscores in namespaces and application ids.
 
   This change ensures that combined application_ids can be used more readily
