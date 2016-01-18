@@ -22,7 +22,7 @@
 
         <div class="product" tal:condition="product|nothing">
             <dl>
-                <tal:block repeat="(label, value) product['info'].items()">
+                <tal:block repeat="(label, value) product['info']">
                     <dt>${label}</dt>
                     <dd>${value}</dd>
                 </tal:block>

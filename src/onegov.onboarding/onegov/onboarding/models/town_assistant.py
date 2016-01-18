@@ -95,7 +95,7 @@ class TownAssistant(Assistant):
     def add_town(self, app, name, user, color):
         config = app.onboarding['onegov.town']
 
-        subdomain = utils.normalize_for_subdomain(name)
+        subdomain = utils.normalize_for_url(name)
         domain = '{}.{}'.format(subdomain, config['domain'])
 
         new_schema = '{}-{}'.format(
@@ -128,11 +128,11 @@ class TownAssistant(Assistant):
             app.session_manager.set_current_schema(current_schema)
 
         return {
-            'info': {
-                _("Name"): name,
-                _("Domain"): domain,
-                _("Username"): user,
-                _("Password"): password
-            },
+            'info': [
+                (_("Name"), name),
+                (_("Domain"), domain),
+                (_("Username"), user),
+                (_("Password"), password),
+            ],
             'url': 'https://{}'.format(domain)
         }
