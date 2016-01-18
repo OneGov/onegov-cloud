@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Stops the form directive from chocking up if no form is returned.
+  [href]
+
 0.13.2 (2016-01-07)
 ~~~~~~~~~~~~~~~~~~~
 

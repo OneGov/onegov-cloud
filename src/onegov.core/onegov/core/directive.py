@@ -18,6 +18,9 @@ class HtmlHandleFormDirective(HtmlDirective):
     The form is either a class or a function. If it's a function, it is
     expected to return a form class when given an instance of the model.
 
+    The form may also be None, which is useful under special circumstances.
+    Generally you don't want that though.
+
     Example:
 
     .. code-block:: python
@@ -77,11 +80,15 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
     def handle_form(self, request):
 
         if isfunction(form_class):
-            form = request.get_form(form_class(self, request))
+            _class = form_class(self, request)
         else:
-            form = request.get_form(form_class)
+            _class = form_class
 
-        form.action = request.link(self, name=view_name)
+        if _class:
+            form = request.get_form(_class)
+            form.action = request.link(self, name=view_name)
+        else:
+            form = None
 
         return obj(self, request, form)
 
