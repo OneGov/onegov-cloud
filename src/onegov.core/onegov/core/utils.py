@@ -23,7 +23,7 @@ from webob import static
 
 
 # http://stackoverflow.com/a/13500078
-_unwanted_characters = re.compile(r'[\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
+_unwanted_url_chars = re.compile(r'[\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
 _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
 _uuid = re.compile(
@@ -47,9 +47,15 @@ def normalize_for_url(text):
     See https://pypi.python.org/pypi/Unidecode
 
     """
-    clean = _unwanted_characters.sub('-', unidecode(text).strip(' ').lower())
+
+    # German is our main language, so we are extra considerate about it
+    # (unidecode turns ü into u)
+    text = text.replace("ü", "ue")
+    text = text.replace("ä", "ae")
+    text = text.replace("ö", "oe")
+    clean = _unwanted_url_chars.sub('-', unidecode(text).strip(' ').lower())
     clean = _double_dash.sub('-', clean)
-    clean = clean.rstrip('-')
+    clean = clean.strip('-')
 
     return clean
 

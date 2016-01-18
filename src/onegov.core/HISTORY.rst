@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Slightly improves normalize_for_url for German.
+  [href]
+
 0.13.3 (2016-01-18)
 ~~~~~~~~~~~~~~~~~~~
 
