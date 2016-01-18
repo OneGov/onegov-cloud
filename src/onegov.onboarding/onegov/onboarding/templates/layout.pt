@@ -26,7 +26,12 @@ metal:define-macro="layout">
     <div class="header">
         <div class="row">
             <div class="columns small-12">
-                <img src="${layout.logo_path}" alt="OneGov Cloud Logo" i18n:attributes="alt">
+                <h1><div metal:define-slot="title"></div></h1>
+            </div>
+        </div>
+        <div class="row">
+            <div class="columns small-12">
+                <div metal:define-slot="below-header"></div>
             </div>
         </div>
     </div>

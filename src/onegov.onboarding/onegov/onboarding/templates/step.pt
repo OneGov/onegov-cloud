@@ -2,9 +2,12 @@
     <tal:block metal:fill-slot="title">
         ${title}
     </tal:block>
+    <tal:block metal:fill-slot="below-header" tal:define="(start, end) layout.model.progress">
+        <div class="progress">
+            <span class="meter" style="width: ${start / end * 100}%;"></span>
+        </div>
+    </tal:block>
     <tal:block metal:fill-slot="content">
-        <h1>${title}</h1>
-
         <ul tal:condition="bullets|nothing" class="bullets fa-ul">
             <li tal:repeat="bullet bullets"><i class="fa fa-li fa-check"></i>${bullet}</li>
         </ul>

@@ -26,6 +26,18 @@ class Assistant(object):
     def current_step(self):
         return self.steps[self.current_step_number - 1]
 
+    @property
+    def progress(self):
+        return self.current_step_number, len(self.steps)
+
+    @property
+    def is_first_step(self):
+        return self.current_step_number == 1
+
+    @property
+    def is_last_step(self):
+        return self.current_step_number == len(self.steps)
+
     @classmethod
     def step(cls, fn):
         fn.is_step = True

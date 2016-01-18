@@ -8,9 +8,21 @@ class TownAssistant(Assistant):
     @Assistant.step
     def first_step(self, request):
         return {
-            'title': _("The Online Counter for Towns."),
+            'title': _("Online Counter for Towns Demo"),
             'bullets': (
-                _("Start using the online counter for your town now."),
+                _("Start using the online counter for your town immediately."),
+                _("Setup takes less than one minute."),
+                _("Free with no commitment."),
+                _("Try before you buy.")
+            )
+        }
+
+    @Assistant.step
+    def second_step(self, request):
+        return {
+            'title': _("Online Counter for Towns Demo"),
+            'bullets': (
+                _("Start using the online counter for your town immediately."),
                 _("Setup takes less than one minute."),
                 _("Free with no commitment."),
                 _("Try before you buy.")

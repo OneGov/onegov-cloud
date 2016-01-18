@@ -2,12 +2,18 @@
     the default layout's header
 */
 .header {
-    background-color: $white-smoke;
-    border-bottom: 1px solid $gainsboro;
-    margin-bottom: 1.5rem;
-    padding: 1rem 0;
+    // background-color: $white-smoke;
+    // border-bottom: 1px solid $gainsboro;
+
+    padding: 1rem 0 0;
 
     img {
+        margin-bottom: 1rem;
         max-height: 2.5rem;
+    }
+
+    .progress {
+        height: 10px;
+        padding: 0;
     }
 }
