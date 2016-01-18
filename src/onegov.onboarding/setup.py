@@ -33,7 +33,9 @@ setup(
     platforms='any',
     install_requires=[
         'onegov.core>=0.4.0',
-        'onegov.foundation'
+        'onegov.foundation',
+        'onegov.libres',
+        'onegov.town'
     ],
     extras_require=dict(
         test=[

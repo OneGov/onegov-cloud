@@ -1,10 +1,16 @@
 from onegov.core import Framework, utils
+from onegov.libres import LibresIntegration
 from onegov.onboarding.theme import OnboardingTheme
 
 
-class OnboardingApp(Framework):
+class OnboardingApp(Framework, LibresIntegration):
 
     serve_static_files = True
+
+    def configure_onboarding(self, **cfg):
+        self.onboarding = cfg['onboarding']
+        assert 'onegov.town' in self.onboarding
+        assert 'namespace' in self.onboarding['onegov.town']
 
 
 @OnboardingApp.template_directory()
