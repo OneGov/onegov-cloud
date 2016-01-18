@@ -230,3 +230,27 @@ def test_aliases():
 
     response = c.get('/sites/blog')
     assert response.body == b'aliases/main'
+
+
+def test_application_id_dashes():
+
+    class HelloApplication(Application):
+
+        def __call__(self, environ, start_response):
+            response = Response()
+            response.text = self.application_id
+
+            return response(environ, start_response)
+
+    server = Server(Config({
+        'applications': [
+            {
+                'path': '/foo-bar/*',
+                'application': HelloApplication,
+                'namespace': 'foo-bar'
+            }
+        ]
+    }))
+
+    c = Client(server)
+    assert c.get('/foo-bar/bar-foo').text == 'foo_bar/bar_foo'

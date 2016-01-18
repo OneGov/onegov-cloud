@@ -97,7 +97,8 @@ class ApplicationConfig(object):
 
     :namespace:
         Each application has a namespace that must be unique. It is used
-        make the application_id unique.
+        make the application_id unique. Dashes in the namespace are replaced
+        by underscores.
 
     :configuration:
         A dictionary that is passed to the application once it is initialized.
@@ -122,7 +123,7 @@ class ApplicationConfig(object):
 
     @property
     def namespace(self):
-        return self._cfg['namespace']
+        return self._cfg['namespace'].replace('-', '_')
 
     @property
     def application_class(self):

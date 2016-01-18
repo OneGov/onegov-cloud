@@ -133,6 +133,10 @@ class Server(object):
         if not application_id:
             return HTTPNotFound()(environ, start_response)
 
+        # dashes are not allowed in application ids and are automatically
+        # replaced by underscores
+        application_id = application_id.replace('-', '_')
+
         environ['PATH_INFO'] = environ['PATH_INFO'][len(base_path):]
         environ['SCRIPT_NAME'] = base_path
 

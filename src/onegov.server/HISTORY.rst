@@ -4,6 +4,19 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Replaces dashes with underscores in namespaces and application ids.
+
+  This change ensures that combined application_ids can be used more readily
+  to create database schemas (only the '/' needs to be replaced).
+
+  It also makes it easier to route a subdomin directly to an application_id.
+  Before there was a mismatch between the subdomain (with dashes) and the
+  application_id (may or may not have dashes). Now the subdomain with dashes
+  is transformed into an application_id without dashes - the new canonical
+  form.
+
+  [href]
+
 0.2.0 (2016-01-14)
 ~~~~~~~~~~~~~~~~~~~
 
