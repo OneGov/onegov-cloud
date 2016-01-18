@@ -11,7 +11,7 @@ class Assistant(object):
         methods = (fn for fn in methods if inspect.ismethod(fn))
         methods = (fn for fn in methods if hasattr(fn, 'is_step'))
 
-        self.steps = [Step(fn, fn.order) for fn in methods]
+        self.steps = [Step(fn, fn.order, fn.form) for fn in methods]
         self.steps.sort()
 
         if current_step_number < 1:
@@ -38,26 +38,45 @@ class Assistant(object):
     def is_last_step(self):
         return self.current_step_number == len(self.steps)
 
-    @classmethod
-    def step(cls, fn):
-        fn.is_step = True
-        fn.order = time.process_time()
+    def for_next_step(self):
+        assert not self.is_last_step
+        return self.__class__(self.current_step_number + 1)
 
-        return fn
+    def for_prev_step(self):
+        assert not self.is_last_step
+        return self.__class__(self.current_step_number - 1)
+
+    def for_first_step(self):
+        return self.__class__(1)
+
+    @classmethod
+    def step(cls, form=None):
+        def decorator(fn):
+            fn.is_step = True
+            fn.order = time.process_time()
+            fn.form = form
+
+            return fn
+
+        return decorator
 
 
 class Step(object):
     """ Describes a step in an assistant. """
 
-    def __init__(self, view_handler, order):
+    def __init__(self, view_handler, order, form):
         self.view_handler = view_handler
         self.order = order
+        self.form = form
 
     def __lt__(self, other):
         return self.order < other.order
 
-    def handle_view(self, request):
-        return self.view_handler(request)
+    def handle_view(self, request, form):
+        if form is None:
+            return self.view_handler(request)
+        else:
+            return self.view_handler(request, form)
 
 
 class DefaultAssistant(object):
