@@ -37,8 +37,7 @@ class TownAssistant(Assistant):
             'bullets': (
                 _("Start using the online counter for your town immediately."),
                 _("Setup takes less than one minute."),
-                _("Free with no commitment."),
-                _("Try before you buy.")
+                _("Free with no commitment.")
             )
         }
 
@@ -141,8 +140,6 @@ class TownAssistant(Assistant):
 
         return {
             'info': [
-                (_("Name"), name),
-                (_("Domain"), self.get_domain(name)),
                 (_("Username"), user),
                 (_("Password"), password),
             ],

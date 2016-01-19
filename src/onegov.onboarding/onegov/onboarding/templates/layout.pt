@@ -42,5 +42,20 @@ metal:define-macro="layout">
             </div>
         </div>
     </div>
+    <div class="footer">
+        <div class="row">
+            <div class="columns small-12">
+                <h2 i18n:translate>Contact</h2>
+                <ul>
+                    <li>OneGov.ch</li>
+                    <li>Unter der Egg 5</li>
+                    <li>CH-6004 Luzern</li>
+                    <li></li>
+                    <li>+41 41 511 22 50</li>
+                    <li>onegov@seantis.ch</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

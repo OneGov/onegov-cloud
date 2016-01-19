@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-01-13 13:27+0100\n"
+"POT-Creation-Date: 2016-01-19 11:28+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -42,22 +42,15 @@ msgstr "Die Einrichtung dauert weniger als eine Minute."
 msgid "Free with no commitment."
 msgstr "Gratis und unverbindlich."
 
-msgid "Try before you buy."
-msgstr "Jetzt ausprobieren."
-
 msgid ""
 "This town exists already and can't be created. Is it your town but you did "
 "not create it? Please contact us."
-msgstr "Diese Gemeinde existiert bereits und kann nicht bereitgestellt werden. Ist dies Ihre Gemeinde? Dann nehmen Sie bitte Kontakt mit uns auf."
+msgstr ""
+"Diese Gemeinde existiert bereits und kann nicht bereitgestellt werden. Ist "
+"dies Ihre Gemeinde? Dann nehmen Sie bitte Kontakt mit uns auf."
 
 msgid "Success! Have a look at your new website!"
 msgstr "Wir hatten Erfolg! Sehen Sie sich jetzt Ihre neue Webseite an!"
-
-msgid "Name"
-msgstr "Name"
-
-msgid "Domain"
-msgstr "Domäne"
 
 msgid "Username"
 msgstr "Benutzername"
@@ -70,6 +63,21 @@ msgstr "Zurück"
 
 msgid "Submit"
 msgstr "Absenden"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Admin User"
+msgstr "Admin Benutzer"
+
+msgid "Color"
+msgstr "Farbe"
+
+msgid "Domain"
+msgstr "Domäne"
+
+msgid "Address"
+msgstr "Adresse"
 
 msgid "Launch"
 msgstr "Start"

@@ -42,9 +42,11 @@
                     <dt>${label}</dt>
                     <dd>${value}</dd>
                 </tal:block>
-            </dl>
 
-            <a href="${product['url']}">${product['url']}</a>
+                <dt i18n:translate>Address</dt>
+                <dd><a target="_blank" href="${product['url']}">${product['url']}</a></dd>
+
+            </dl>
         </div>
 
         <div class="row form" tal:condition="form|nothing">
