@@ -28,9 +28,9 @@ class TownAssistant(Assistant):
 
             return morepath.redirect(request.link(self.for_next_step()))
 
-        form.name.data = request.browser_session.get('name', '')
-        form.user.data = request.browser_session.get('user', '')
-        form.color.data = request.browser_session.get('color', '')
+        form.name.data = request.browser_session.get('name', form.name.data)
+        form.user.data = request.browser_session.get('user', form.user.data)
+        form.color.data = request.browser_session.get('color', form.color.data)
 
         return {
             'title': _("Online Counter for Towns Demo"),

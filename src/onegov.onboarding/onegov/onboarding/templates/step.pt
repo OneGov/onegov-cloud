@@ -12,7 +12,7 @@
             <li tal:repeat="bullet bullets"><i class="fa fa-li fa-check"></i>${bullet}</li>
         </ul>
 
-        <div class="alert-box error" data-alert tal:condition="error|nothing">
+        <div class="alert-box alert" data-alert tal:condition="error|nothing">
             ${error}
         </div>
 
