@@ -17,19 +17,19 @@ def test_assistant():
         def third_step(self, request):
             return {'step': 3}
 
-    foo = FooAssistant(current_step_number=1)
+    foo = FooAssistant(None, current_step_number=1)
     assert foo.current_step.handle_view(None, None) == {'step': 1}
     assert foo.progress == (1, 3)
     assert foo.is_first_step == True
     assert foo.is_last_step == False
 
-    foo = FooAssistant(current_step_number=2)
+    foo = FooAssistant(None, current_step_number=2)
     assert foo.current_step.handle_view(None, None) == {'step': 2}
     assert foo.progress == (2, 3)
     assert foo.is_first_step == False
     assert foo.is_last_step == False
 
-    foo = FooAssistant(current_step_number=3)
+    foo = FooAssistant(None, current_step_number=3)
     assert foo.current_step.handle_view(None, None) == {'step': 3}
     assert foo.progress == (3, 3)
     assert foo.is_first_step == False

@@ -5,7 +5,9 @@ import time
 class Assistant(object):
     """ Describes an assistant guiding a user through onboarding. """
 
-    def __init__(self, current_step_number=1):
+    def __init__(self, app, current_step_number=1):
+
+        self.app = app
 
         methods = (fn[1] for fn in inspect.getmembers(self))
         methods = (fn for fn in methods if inspect.ismethod(fn))
@@ -40,14 +42,14 @@ class Assistant(object):
 
     def for_next_step(self):
         assert not self.is_last_step
-        return self.__class__(self.current_step_number + 1)
+        return self.__class__(self.app, self.current_step_number + 1)
 
     def for_prev_step(self):
-        assert not self.is_last_step
-        return self.__class__(self.current_step_number - 1)
+        assert not self.is_first_step
+        return self.__class__(self.app, self.current_step_number - 1)
 
     def for_first_step(self):
-        return self.__class__(1)
+        return self.__class__(self.app, 1)
 
     @classmethod
     def step(cls, form=None):

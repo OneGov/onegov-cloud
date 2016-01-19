@@ -1,3 +1,3 @@
-from onegov.onboarding.forms.town import TownForm, TownSettingsForm
+from onegov.onboarding.forms.town import FinishForm, TownForm
 
-__all__ = ['TownForm', 'TownSettingsForm']
+__all__ = ['FinishForm', 'TownForm']

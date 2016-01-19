@@ -12,12 +12,28 @@
             <li tal:repeat="bullet bullets"><i class="fa fa-li fa-check"></i>${bullet}</li>
         </ul>
 
-        <div class="row form" tal:condition="form|nothing">
-            <div class="columns small-12 medium-6 end">
-                <tal:block condition="form|nothing">
-                    <div metal:use-macro="layout.macros['form']" />
-                </tal:block>
-            </div>
+        <div class="alert-box error" data-alert tal:condition="error|nothing">
+            ${error}
+        </div>
+
+        <div class="message" tal:condition="message|nothing">
+            ${message}
+        </div>
+
+        <div class="preview" tal:condition="preview|nothing">
+            <dl>
+                <dt i18n:translate>Name</dt>
+                <dd>${preview['name']}</dd>
+
+                <dt i18n:translate>Admin User</dt>
+                <dd>${preview['user']}</dd>
+
+                <dt i18n:translate>Color</dt>
+                <dd>${preview['color']}</dd>
+
+                <dt i18n:translate>Domain</dt>
+                <dd>${preview['domain']}</dd>
+            </dl>
         </div>
 
         <div class="product" tal:condition="product|nothing">
@@ -27,6 +43,16 @@
                     <dd>${value}</dd>
                 </tal:block>
             </dl>
+
+            <a href="${product['url']}">${product['url']}</a>
+        </div>
+
+        <div class="row form" tal:condition="form|nothing">
+            <div class="columns small-12 medium-6 end">
+                <tal:block condition="form|nothing">
+                    <div metal:use-macro="layout.macros['form']" />
+                </tal:block>
+            </div>
         </div>
 
     </tal:block>

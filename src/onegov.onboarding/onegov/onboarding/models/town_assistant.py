@@ -6,7 +6,7 @@ from onegov.core import utils
 from onegov.core.crypto import random_password
 from onegov.onboarding import _
 from onegov.onboarding.errors import AlreadyExistsError
-from onegov.onboarding.forms import TownForm, TownSettingsForm
+from onegov.onboarding.forms import FinishForm, TownForm
 from onegov.onboarding.models.assistant import Assistant
 from onegov.town.initial_content import add_initial_content
 from onegov.town.models import Town
@@ -24,31 +24,14 @@ class TownAssistant(Assistant):
         if form.submitted(request):
             request.browser_session['name'] = form.data['name']
             request.browser_session['user'] = form.data['user']
-
-            return morepath.redirect(request.link(self.for_next_step()))
-
-        return {
-            'title': _("Online Counter for Towns Demo"),
-            'bullets': (
-                _("Start using the online counter for your town immediately."),
-                _("Setup takes less than one minute."),
-                _("Free with no commitment."),
-                _("Try before you buy.")
-            )
-        }
-
-    @Assistant.step(form=TownSettingsForm)
-    def second_step(self, request, form):
-
-        for key in ('name', 'user'):
-            if not request.browser_session.has(key):
-                return morepath.redirect(request.link(self.for_prev_step()))
-
-        if form.submitted(request):
             request.browser_session['color'] = form.data['color'].get_hex()
 
             return morepath.redirect(request.link(self.for_next_step()))
 
+        form.name.data = request.browser_session.get('name', '')
+        form.user.data = request.browser_session.get('user', '')
+        form.color.data = request.browser_session.get('color', '')
+
         return {
             'title': _("Online Counter for Towns Demo"),
             'bullets': (
@@ -59,80 +42,109 @@ class TownAssistant(Assistant):
             )
         }
 
-    @Assistant.step(form=None)
-    def last_step(self, request):
+    @Assistant.step(form=FinishForm)
+    def last_step(self, request, form):
 
         for key in ('name', 'user', 'color'):
             if not request.browser_session.has(key):
-                return morepath.redirect(request.link(self.for_first_step()))
+                return morepath.redirect(request.link(self.for_prev_step()))
 
         name = request.browser_session['name']
         user = request.browser_session['user']
         color = request.browser_session['color']
 
-        try:
-            product = self.add_town(request.app, name, user, color)
-            error = None
-        except AlreadyExistsError:
-            product = None
-            error = _(
-                "This town exists already and can't be created. Is it your "
-                "town but you did not create it? Please contact us."
-            )
+        if form.submitted(request):
+            try:
+                product = self.add_town(name, user, color)
+                error = None
+            except AlreadyExistsError:
+                product = None
+                error = _(
+                    "This town exists already and can't be created. Is it "
+                    "your town but you did not create it? Please contact us."
+                )
+            finally:
+                del request.browser_session['name']
+                del request.browser_session['user']
+                del request.browser_session['color']
+
+            if error:
+                return {
+                    'title': _("Online Counter for Towns Demo"),
+                    'error': error,
+                    'form': None
+                }
+            else:
+                return {
+                    'title': _("Online Counter for Towns Demo"),
+                    'product': product,
+                    'message': _('Success! Have a look at your new website!'),
+                    'form': None
+                }
 
         return {
             'title': _("Online Counter for Towns Demo"),
-            'bullets': (
-                _("Start using the online counter for your town immediately."),
-                _("Setup takes less than one minute."),
-                _("Free with no commitment."),
-                _("Try before you buy.")
+            'message': _(
+                "We are ready to launch! Click continue once you're ready."
             ),
-            'product': product,
-            'error': error
+            'preview': {
+                'name': name,
+                'user': user,
+                'domain': self.get_domain(name),
+                'color': color
+            },
+            'cancel': request.link(self.for_prev_step())
         }
 
-    def add_town(self, app, name, user, color):
-        config = app.onboarding['onegov.town']
+    @property
+    def config(self):
+        return self.app.onboarding['onegov.town']
 
-        subdomain = utils.normalize_for_url(name)
-        domain = '{}.{}'.format(subdomain, config['domain'])
+    def get_subdomain(self, name):
+        return utils.normalize_for_url(name)
 
-        new_schema = '{}-{}'.format(
-            config['namespace'], subdomain.replace('-', '_'))
+    def get_domain(self, name):
+        return '{}.{}'.format(self.get_subdomain(name), self.config['domain'])
 
-        current_schema = app.session_manager.current_schema
+    def get_schema(self, name):
+        return '{}-{}'.format(
+            self.config['namespace'],
+            self.get_subdomain(name).replace('-', '_')
+        )
+
+    def add_town(self, name, user, color):
+        current_schema = self.app.session_manager.current_schema
         password = random_password(16)
 
         try:
-            app.session_manager.set_current_schema(new_schema)
+            self.app.session_manager.set_current_schema(self.get_schema(name))
 
-            if app.session_manager.session().query(Town).first():
+            if self.app.session_manager.session().query(Town).first():
                 raise AlreadyExistsError
 
             add_initial_content(
                 libres_registry=create_default_registry(),
-                session_manager=app.session_manager,
+                session_manager=self.app.session_manager,
                 town_name=name
             )
 
-            town = app.session_manager.session().query(Town).first()
+            town = self.app.session_manager.session().query(Town).first()
             town.theme_options['primary-color'] = color
 
-            users = UserCollection(app.session_manager.session())
+            users = UserCollection(self.app.session_manager.session())
             assert not users.query().first()
 
             users.add(user, password, 'admin')
 
         finally:
-            app.session_manager.set_current_schema(current_schema)
+            self.app.session_manager.set_current_schema(current_schema)
 
         return {
             'info': [
                 (_("Name"), name),
-                (_("Domain"), domain),
+                (_("Domain"), self.get_domain(name)),
                 (_("Username"), user),
                 (_("Password"), password),
             ],
-            'url': 'https://{}'.format(domain)
+            'url': 'https://{}'.format(self.get_domain(name))
         }

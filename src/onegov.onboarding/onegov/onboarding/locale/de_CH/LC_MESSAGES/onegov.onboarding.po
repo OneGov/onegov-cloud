@@ -1,2 +1,78 @@
-msgid "OneGov Town Onboarding Assistant"
-msgstr "OneGov Town Onboarding Assistent"
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE 1.0\n"
+"POT-Creation-Date: 2016-01-13 13:27+0100\n"
+"PO-Revision-Date: 2015-10-15 09:42+0200\n"
+"Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
+"Language-Team: German\n"
+"Language: de_CH\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Lingua 3.12\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Town Name"
+msgstr "Gemeinde"
+
+msgid "The name of your town (real or fictitious)"
+msgstr "Der Name Ihrer Gemeinde (real oder fiktiv)"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Your e-mail address"
+msgstr "Ihre E-Mail Adresse"
+
+msgid "Primary Color"
+msgstr "Grundfarbe"
+
+msgid "Online Counter for Towns Demo"
+msgstr "Demo Online Schalter für Gemeinden"
+
+msgid "We are ready to launch! Click continue once you're ready."
+msgstr "Wir sind bereit zum Start! Klicken Sie 'Start' sobald Sie bereit sind."
+
+msgid "Start using the online counter for your town immediately."
+msgstr "Nutzen Sie den Online Schalter für Gemeinden sofort."
+
+msgid "Setup takes less than one minute."
+msgstr "Die Einrichtung dauert weniger als eine Minute."
+
+msgid "Free with no commitment."
+msgstr "Gratis und unverbindlich."
+
+msgid "Try before you buy."
+msgstr "Jetzt ausprobieren."
+
+msgid ""
+"This town exists already and can't be created. Is it your town but you did "
+"not create it? Please contact us."
+msgstr "Diese Gemeinde existiert bereits und kann nicht bereitgestellt werden. Ist dies Ihre Gemeinde? Dann nehmen Sie bitte Kontakt mit uns auf."
+
+msgid "Success! Have a look at your new website!"
+msgstr "Wir hatten Erfolg! Sehen Sie sich jetzt Ihre neue Webseite an!"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Domain"
+msgstr "Domäne"
+
+msgid "Username"
+msgstr "Benutzername"
+
+msgid "Password"
+msgstr "Passwort"
+
+msgid "Back"
+msgstr "Zurück"
+
+msgid "Submit"
+msgstr "Absenden"
+
+msgid "Launch"
+msgstr "Start"
+
+msgid "Continue"
+msgstr "Weiter"

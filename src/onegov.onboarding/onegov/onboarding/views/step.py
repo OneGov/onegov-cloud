@@ -26,10 +26,12 @@ def view_assistant(self, request, form):
     if isinstance(response, dict):
         assert 'layout' not in response
         response['layout'] = DefaultLayout(self, request)
-        response['form'] = form
+
+        if 'form' not in response:
+            response['form'] = form
 
         if self.is_last_step:
-            response['button_text'] = _("Finish")
+            response['button_text'] = _("Launch")
         else:
             response['button_text'] = _("Continue")
 

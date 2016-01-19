@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from onegov.foundation import BaseTheme
 from onegov.core.utils import module_path
 
@@ -17,7 +18,25 @@ class OnboardingTheme(BaseTheme):
 
     @property
     def default_options(self):
-        return {}
+        return OrderedDict((
+            ('primary-color', '#005FC1'),
+
+            # base colors
+            ('gray', '#e0e3e5'),
+            ('black', '#0f0f0f'),
+            ('blue', '#2575ed'),
+            ('red', '#de2c3b'),
+            ('yellow', '#ffc800'),
+            ('orange', '#ffb100'),
+            ('green', '#2c9f42'),
+            ('white', '#fff'),
+
+            # zurb overrides
+            ('alert-color', '$red'),
+            ('success-color', '$green'),
+            ('warning-color', '$yellow'),
+            ('info-color', '$blue'),
+        ))
 
     @property
     def extra_search_paths(self):

@@ -21,11 +21,11 @@ class TownForm(Form):
         validators=[validators.InputRequired(), validators.Email()]
     )
 
-
-class TownSettingsForm(Form):
-    """ Settings for the new town. """
-
     color = ColorField(
         label=_("Primary Color"),
         validators=[validators.InputRequired()]
     )
+
+
+class FinishForm(Form):
+    pass
