@@ -22,7 +22,7 @@ metal:define-macro="layout">
 <link rel="stylesheet" type="text/css" href="${request.theme_link}">
 <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
-<body>
+<body data-source-town-names="${layout.town_names_path}">
     <div id="inner-body">
         <div class="header">
             <div class="row">

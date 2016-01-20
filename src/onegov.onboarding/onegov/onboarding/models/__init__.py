@@ -5,4 +5,9 @@ from onegov.onboarding.models.assistant import (
 )
 from onegov.onboarding.models.town_assistant import TownAssistant
 
-__all__ = ['Assistant', 'DefaultAssistant', 'Step', 'TownAssistant']
+__all__ = [
+    'Assistant',
+    'DefaultAssistant',
+    'Step',
+    'TownAssistant'
+]

@@ -22,6 +22,11 @@ class Layout(ChameleonLayout):
 
         return self.request.link(static_file)
 
+    @cached_property
+    def town_names_path(self):
+        static_file = StaticFile.from_application(self.app, 'towns.json')
+        return self.request.link(static_file)
+
 
 class DefaultLayout(Layout):
     pass

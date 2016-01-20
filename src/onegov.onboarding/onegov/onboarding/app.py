@@ -21,7 +21,7 @@ class OnboardingApp(Framework, LibresIntegration):
     @cached_property
     def webassets_bundles(self):
 
-        jsminifier = 'rjsmin'
+        jsminifier = None
 
         common = Bundle(
             'js/modernizr.js',
@@ -31,6 +31,7 @@ class OnboardingApp(Framework, LibresIntegration):
             'js/foundation.js',
             'js/underscore.js',
             'js/colorpicker.js',
+            'js/awesomeplete.js',
             'js/common.js',
             filters=jsminifier,
             output='bundles/common.bundle.js'

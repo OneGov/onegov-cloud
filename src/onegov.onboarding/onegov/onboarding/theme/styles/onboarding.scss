@@ -140,3 +140,78 @@ body {
     height: 48px;
     width: 48px;
 }
+
+/*
+    awesomeplete
+*/
+[hidden] { display: none; }
+
+.visually-hidden {
+    clip: rect(0, 0, 0, 0);
+    position: absolute;
+}
+
+.awesomplete {
+    position: relative;
+
+    > input {
+        display: block;
+    }
+
+    > ul {
+        background: $white;
+        border: 1px solid rgba(0, 0, 0, .3);
+        box-shadow: .05em .2em .6em rgba(0, 0, 0, .2);
+        box-sizing: border-box;
+        left: 0;
+        list-style: none;
+        margin: -8px 0 0;
+        min-width: 100%;
+        padding: 0;
+        position: absolute;
+        text-shadow: none;
+        z-index: 1;
+
+        > li {
+            color: $body-font-color;
+            cursor: pointer;
+            padding: .2em .5em;
+            position: relative;
+        }
+
+        > li:hover,
+        > li[aria-selected="true"] {
+            background-color: $primary-color;
+            color: $white;
+
+            * {
+                color: $white;
+            }
+        }
+    }
+
+    > ul[hidden],
+    > ul:empty {
+        display: none;
+    }
+
+    > ul:before {
+        background: $white;
+        border: inherit;
+        border-bottom: 0;
+        border-right: 0;
+        content: '';
+        height: 0;
+        left: 1em;
+        padding: .4em;
+        position: absolute;
+        top: -.43em;
+        transform: rotate(45deg);
+        width: 0;
+    }
+
+    mark {
+        background: none;
+        font-weight: bold;
+    }
+}

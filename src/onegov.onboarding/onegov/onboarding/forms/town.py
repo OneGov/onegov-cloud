@@ -12,7 +12,11 @@ class TownForm(Form):
         label=_("Town Name"),
         description=_("The name of your town (real or fictitious)"),
         validators=[validators.InputRequired()],
-        render_kw={'autofocus': ''}
+        render_kw={
+            'autofocus': '',
+            'class_': 'autocomplete',
+            'data-source': 'town-names'
+        }
     )
 
     user = EmailField(
