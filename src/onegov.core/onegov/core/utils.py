@@ -23,7 +23,7 @@ from webob import static
 
 
 # http://stackoverflow.com/a/13500078
-_unwanted_url_chars = re.compile(r'[\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
+_unwanted_url_chars = re.compile(r'[\.\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
 _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
 _uuid = re.compile(

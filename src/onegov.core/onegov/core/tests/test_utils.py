@@ -18,6 +18,7 @@ def test_normalize_for_url():
     assert utils.normalize_for_url('far <away>') == 'far-away'
     assert utils.normalize_for_url('far (away)') == 'far-away'
     assert utils.normalize_for_url('--ok--') == 'ok'
+    assert utils.normalize_for_url('a...b..c.d') == 'a-b-c-d'
 
 
 def test_lchop():

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Exclude dots from normalized urls.
+  [href]
+
 0.14.0 (2016-01-20)
 ~~~~~~~~~~~~~~~~~~~
 
