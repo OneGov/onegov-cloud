@@ -29,7 +29,7 @@
                 <dd>${preview['user']}</dd>
 
                 <dt i18n:translate>Color</dt>
-                <dd>${preview['color']}</dd>
+                <dd class="color-preview" style="background-color: ${preview['color']};"></dd>
 
                 <dt i18n:translate>Domain</dt>
                 <dd>${preview['domain']}</dd>

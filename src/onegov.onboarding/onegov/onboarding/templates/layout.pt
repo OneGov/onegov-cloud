@@ -23,36 +23,53 @@ metal:define-macro="layout">
 <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 <body>
-    <div class="header">
-        <div class="row">
-            <div class="columns small-12">
-                <h1><div metal:define-slot="title"></div></h1>
+    <div id="inner-body">
+        <div class="header">
+            <div class="row">
+                <div class="columns small-12">
+                    <h1><div metal:define-slot="title"></div></h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="columns small-12">
+                    <div metal:define-slot="below-header"></div>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="columns small-12">
-                <div metal:define-slot="below-header"></div>
+        <div class="content">
+            <div class="row">
+                <div class="columns small-12">
+                    <div metal:define-slot="content"></div>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="content">
-        <div class="row">
-            <div class="columns small-12">
-                <div metal:define-slot="content"></div>
-            </div>
-        </div>
+
+        <div class="push"></div>
     </div>
     <div class="footer">
         <div class="row">
-            <div class="columns small-12">
+            <div class="columns small-12 medium-4">
                 <h2 i18n:translate>Contact</h2>
                 <ul>
                     <li>OneGov.ch</li>
                     <li>Unter der Egg 5</li>
                     <li>CH-6004 Luzern</li>
-                    <li></li>
+                    <li class="empty"></li>
                     <li>+41 41 511 22 50</li>
-                    <li>onegov@seantis.ch</li>
+                    <li><a href="mailto:onegov@seantis.ch">onegov@seantis.ch</a></li>
+                </ul>
+            </div>
+            <div class="columns small-12 medium-4">
+                <h2 i18n:translate>Open Source</h2>
+                <ul>
+                    <li><a href="https://github.com/OneGov">https://github.com/OneGov</a></li>
+                </ul>
+            </div>
+            <div class="columns small-12 medium-4">
+                <h2 i18n:translate>About Us</h2>
+                <ul>
+                    <li><a href="http://www.onegov.ch/">Verein OneGov</a></li>
+                    <li><a href="http://www.twitter.com/OneGovBox">@OneGovBox</a></li>
                 </ul>
             </div>
         </div>

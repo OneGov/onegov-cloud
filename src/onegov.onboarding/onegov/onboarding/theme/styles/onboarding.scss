@@ -20,6 +20,69 @@
 }
 
 /*
+    get rid of the jump that is introduced when switching from a site with
+    scrollbar to a site without (or vice versa)
+
+    (100vw includes the scrollbar, 100% does not)
+*/
+html {
+    @media not print {
+        margin-left: calc(100vw - 100%);
+    }
+}
+
+/*
+    footer pinned to the bottom
+*/
+$footer-height: 185px;
+
+html,
+body {
+    height: 100%;
+}
+
+#inner-body {
+    margin: 0 auto -$footer-height;
+
+    @media not print {
+      min-height: 100%;
+    }
+}
+
+.footer,
+.push {
+    height: $footer-height;
+}
+
+/*
+    footer content
+*/
+.footer > div {
+    background-color: $white-smoke;
+    padding: 1em 0;
+
+    h2 {
+        font-size: .8rem;
+        font-weight: bold;
+    }
+
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+
+        li {
+            font-size: .8rem;
+            line-height: 1.5;
+        }
+
+        .empty {
+            height: .875rem;
+        }
+    }
+}
+
+/*
     top assistant messages
 */
 .message {
@@ -32,7 +95,6 @@
     color picker
 */
 .colorPicker-picker {
-    border: 1px solid $iron;
     cursor: pointer;
     height: 48px;
     line-height: 48px;
@@ -58,7 +120,8 @@
     }
 
     input {
-        border: 1px solid #ccc;
+        border: 1px solid $input-border-color;
+        box-shadow: $input-box-shadow;
         margin-top: 1em;
     }
 }
@@ -68,4 +131,12 @@
     float: left;
     height: 32px;
     width: 32px;
+}
+
+/*
+    color preview
+*/
+.color-preview {
+    height: 48px;
+    width: 48px;
 }
