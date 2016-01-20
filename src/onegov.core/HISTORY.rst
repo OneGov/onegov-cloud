@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.14.0 (2016-01-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Caches the result of po file compiles.
   [href]
