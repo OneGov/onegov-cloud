@@ -36,6 +36,12 @@
             </dl>
         </div>
 
+        <div class="setup" tal:condition="setup|nothing">
+            <ul>
+                <li tal:repeat="step setup">${step}</li>
+            </ul>
+        </div>
+
         <div class="product" tal:condition="product|nothing">
             <dl>
                 <tal:block repeat="(label, value) product['info']">
@@ -45,7 +51,6 @@
 
                 <dt i18n:translate>Address</dt>
                 <dd><a target="_blank" href="${product['url']}">${product['url']}</a></dd>
-
             </dl>
         </div>
 

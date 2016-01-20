@@ -19,8 +19,53 @@
     }
 }
 
+/*
+    top assistant messages
+*/
 .message {
     font-size: 1.3em;
     font-weight: bold;
     padding: .5em 0 1em;
+}
+
+/*
+    color picker
+*/
+.colorPicker-picker {
+    border: 1px solid $iron;
+    cursor: pointer;
+    height: 48px;
+    line-height: 48px;
+    margin-bottom: 2em;
+    width: 48px;
+}
+
+.colorPicker-palette {
+    background-color: $white;
+    border: 1px solid $gainsboro;
+    padding: 10px 10px 0;
+    position: absolute;
+    width: 278px;
+    z-index: 9999;
+}
+
+.colorPicker_hexWrap {
+    float: left;
+    width: 100%;
+
+    label {
+        display: none;
+    }
+
+    input {
+        border: 1px solid #ccc;
+        margin-top: 1em;
+    }
+}
+
+.colorPicker-swatch {
+    cursor: pointer;
+    float: left;
+    height: 32px;
+    width: 32px;
 }

@@ -5,6 +5,10 @@ from onegov.core.static import StaticFile
 
 class Layout(ChameleonLayout):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request.include('common')
+
     @cached_property
     def font_awesome_path(self):
         static_file = StaticFile.from_application(

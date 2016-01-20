@@ -1,6 +1,8 @@
+from cached_property import cached_property
 from onegov.core import Framework, utils
 from onegov.libres import LibresIntegration
 from onegov.onboarding.theme import OnboardingTheme
+from webassets import Bundle
 
 
 class OnboardingApp(Framework, LibresIntegration):
@@ -11,6 +13,32 @@ class OnboardingApp(Framework, LibresIntegration):
         self.onboarding = cfg['onboarding']
         assert 'onegov.town' in self.onboarding
         assert 'namespace' in self.onboarding['onegov.town']
+
+    @cached_property
+    def webassets_path(self):
+        return utils.module_path('onegov.onboarding', 'assets')
+
+    @cached_property
+    def webassets_bundles(self):
+
+        jsminifier = 'rjsmin'
+
+        common = Bundle(
+            'js/modernizr.js',
+            'js/jquery.js',
+            'js/placeholder.js',
+            'js/fastclick.js',
+            'js/foundation.js',
+            'js/underscore.js',
+            'js/colorpicker.js',
+            'js/common.js',
+            filters=jsminifier,
+            output='bundles/common.bundle.js'
+        )
+
+        return {
+            'common': common
+        }
 
 
 @OnboardingApp.template_directory()
