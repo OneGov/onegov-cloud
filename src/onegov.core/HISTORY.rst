@@ -2,7 +2,7 @@ Changelog
 ---------
 
 - Caches the result of po file compiles.
-  [hrefe]
+  [href]
 
 0.13.4 (2016-01-18)
 ~~~~~~~~~~~~~~~~~~~
