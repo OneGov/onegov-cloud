@@ -1,8 +1,9 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
+- Caches the result of po file compiles.
+  [hrefe]
+
 0.13.4 (2016-01-18)
 ~~~~~~~~~~~~~~~~~~~
 

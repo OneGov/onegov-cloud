@@ -40,6 +40,7 @@ import os.path
 import polib
 import re
 
+from functools import lru_cache
 from io import BytesIO
 from onegov.core import Framework, log
 from onegov.core.utils import pairwise
@@ -116,6 +117,17 @@ def pofiles(localedir):
             yield path, pofile
 
 
+@lru_cache(maxsize=16)
+def compile_translation(pofile_path):
+    log.info("Compiling pofile {}".format(pofile_path))
+
+    mofile = BytesIO()
+    mofile.write(polib.pofile(pofile_path).to_binary())
+    mofile.seek(0)
+
+    return gettext.GNUTranslations(mofile)
+
+
 def get_translations(localedirs):
     """ Takes the given gettext locale directories and loads the po files
     found. The first found po file is assumed to be the main
@@ -147,18 +159,12 @@ def get_translations(localedirs):
                 de_CH, en_GB, de, fr - note the case!
             """
 
-            log.info("Compiling pofile {}".format(pofile_path))
-
-            mofile = BytesIO()
-            mofile.write(polib.pofile(pofile_path).to_binary())
-            mofile.seek(0)
+            translation = compile_translation(pofile_path)
 
             if language not in result:
-                result[language] = gettext.GNUTranslations(mofile)
+                result[language] = translation
             else:
-                result[language] = merge(
-                    (result[language], gettext.GNUTranslations(mofile))
-                )
+                result[language] = merge((result[language], translation))
 
     return result
 
