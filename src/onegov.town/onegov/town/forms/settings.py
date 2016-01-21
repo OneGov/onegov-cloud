@@ -123,14 +123,17 @@ class SettingsForm(Form):
     def theme_options(self):
         options = {
             'primary-color': self.primary_color.data.get_hex(),
-            'footer-height': self.footer_height.data,
-            'tile-image-1': '"{}"'.format(self.homepage_image_1.data),
-            'tile-image-2': '"{}"'.format(self.homepage_image_2.data),
-            'tile-image-3': '"{}"'.format(self.homepage_image_3.data),
-            'tile-image-4': '"{}"'.format(self.homepage_image_4.data),
-            'tile-image-5': '"{}"'.format(self.homepage_image_5.data),
-            'tile-image-6': '"{}"'.format(self.homepage_image_6.data),
+            'footer-height': self.footer_height.data
         }
+
+        # set the images only if provided
+        for i in range(1, 7):
+            image = getattr(self, 'homepage_image_{}'.format(i)).data
+
+            if not image:
+                continue
+
+            options['tile-image-{}'.format(i)] = '"{}"'.format(image)
 
         # override the options using the default vaules if no value was given
         for key in options:

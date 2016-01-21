@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Fixes minor annoyances in the settings form.
+  [href]
+
 - Adds support for bright primary colors.
   [href]
 

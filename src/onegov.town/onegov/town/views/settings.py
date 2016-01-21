@@ -45,7 +45,7 @@ def handle_settings(self, request, form):
             }
 
         request.success(_("Your changes were saved"))
-    else:
+    elif request.method == 'GET':
         form.name.data = self.name
         form.logo_url.data = self.logo_url
         form.theme_options = self.theme_options
