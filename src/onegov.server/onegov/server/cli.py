@@ -288,6 +288,9 @@ class WsgiServer(FileSystemEventHandler):
         if event.src_path.endswith('pyc'):
             return
 
+        if event.src_path.endswith('scss'):
+            return
+
         if '/.git' in event.src_path:
             return
 
