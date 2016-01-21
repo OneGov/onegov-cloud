@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Moves the builtin forms update to the dedicated update step.
+  [href]
+
 - Fixes minor annoyances in the settings form.
   [href]
 

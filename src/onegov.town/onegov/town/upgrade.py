@@ -8,11 +8,16 @@ from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
 from onegov.page import PageCollection
 from onegov.town import TownApp
-from onegov.town.initial_content import add_resources
+from onegov.town.initial_content import add_builtin_forms, add_resources
 from onegov.town.models.extensions import ContactExtension
 
 
-@upgrade_task('Add initial libres resources', always_run=False)
+@upgrade_task('Update builtin forms')
+def update_builtin_forms(context, always_run=True):
+    add_builtin_forms(context.session)
+
+
+@upgrade_task('Add initial libres resources')
 def add_initial_libres_resources(context):
     if isinstance(context.app, TownApp):
         add_resources(context.app.libres_context)
