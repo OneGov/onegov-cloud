@@ -93,6 +93,12 @@ class TownTheme(BaseTheme):
         return options
 
     @property
+    def pre_imports(self):
+        return [
+            'foundation-mods'
+        ]
+
+    @property
     def post_imports(self):
         return [
             'town'
