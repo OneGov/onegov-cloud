@@ -4,7 +4,7 @@ $(document).ready(function() {
         Color picker prefilled with a set of colors well suited for onegov.
     */
     $('#color').colorPicker({
-        pickerDefault: '005BA1',
+        pickerDefault: '005ba1',
         colors: [
             'a900f2',
             '9400d3',
@@ -12,12 +12,12 @@ $(document).ready(function() {
             '690096',
             '540077',
             '3e0059',
-            '5062c2',
-            '3f51b5',
-            '37479e',
-            '2f3d88',
-            '273371',
-            '1f285a',
+            '007ede',
+            '006cc0',
+            '005ba1',
+            '004a82',
+            '003864',
+            '002745',
             '1f1fff',
             '0000ff',
             '0000e0',
