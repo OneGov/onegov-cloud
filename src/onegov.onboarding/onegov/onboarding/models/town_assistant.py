@@ -77,7 +77,11 @@ class TownAssistant(Assistant):
                 return {
                     'title': _("Online Counter for Towns Demo"),
                     'product': product,
-                    'message': _('Success! Have a look at your new website!'),
+                    'message': _("Success! Have a look at your new website!"),
+                    'warning': _(
+                        "Please write down your username and password "
+                        "before you continue. "
+                    ),
                     'form': None
                 }
 

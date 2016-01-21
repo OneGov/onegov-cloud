@@ -20,6 +20,10 @@
             ${message}
         </div>
 
+        <div class="panel callout warning" tal:condition="warning|nothing">
+            ${warning}
+        </div>
+
         <div class="preview" tal:condition="preview|nothing">
             <dl>
                 <dt i18n:translate>Name</dt>

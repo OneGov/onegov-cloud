@@ -91,6 +91,11 @@ body {
     padding: .5em 0 1em;
 }
 
+.panel.warning {
+    background-color: $yellow-light;
+    border-color: $yellow;
+}
+
 /*
     color picker
 */

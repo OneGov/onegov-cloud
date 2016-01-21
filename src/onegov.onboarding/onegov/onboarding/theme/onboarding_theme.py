@@ -30,12 +30,25 @@ class OnboardingTheme(BaseTheme):
             ('orange', '#ffb100'),
             ('green', '#2c9f42'),
             ('white', '#fff'),
-
+            ('gray-dark', '#b3b6b7'),
+            ('black-dark', '#000'),
+            ('blue-dark', '#1a52a5'),
+            ('red-dark', '#b2232f'),
+            ('yellow-dark', '#cca000'),
+            ('orange-dark', '#d59200'),
+            ('green-dark', '#237f35'),
+            ('gray-light', '#f0f1f2'),
+            ('black-light', '#363738'),
+            ('blue-light', '#92baf6'),
+            ('red-light', '#ef969d'),
+            ('yellow-light', '#ffe480'),
+            ('green-light', '#96cfa1'),
             # zurb overrides
             ('alert-color', '$red'),
             ('success-color', '$green'),
             ('warning-color', '$yellow'),
             ('info-color', '$blue'),
+
         ))
 
     @property
