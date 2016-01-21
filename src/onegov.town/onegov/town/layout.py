@@ -53,6 +53,10 @@ class Layout(ChameleonLayout):
         return self.request.app.town
 
     @cached_property
+    def svg(self):
+        return self.template_loader['svg.pt']
+
+    @cached_property
     def font_awesome_path(self):
         static_file = StaticFile.from_application(
             self.app, 'font-awesome/css/font-awesome.min.css')

@@ -109,6 +109,17 @@ body {
 }
 
 /*
+    Default Coat of Arms
+*/
+#coat-of-arms-left {
+    fill: lighten($primary-color, 20%);
+}
+
+#coat-of-arms-right {
+    fill: $primary-color;
+}
+
+/*
     Rounded corners for panels.
 */
 .panel {
@@ -494,7 +505,7 @@ input[type=color] {
     }
 
     .tile-link:hover h2 {
-        color: $primary-color;
+        color: $anchor-font-color;
     }
 
     .tile-link:hover .tile-image {

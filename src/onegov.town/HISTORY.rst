@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a generic coat of arms for newly created towns.
+  [href]
+
 - Moves the builtin forms update to the dedicated update step.
   [href]
 
