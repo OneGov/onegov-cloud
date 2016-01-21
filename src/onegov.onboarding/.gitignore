@@ -54,3 +54,4 @@ target/
 
 # Webassets
 .webassets-cache
+bundles
