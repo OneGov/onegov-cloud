@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds a news article which is added upon town generation.
+  [href]
+
 - Adds a generic coat of arms for newly created towns.
   [href]
 

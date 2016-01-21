@@ -1,5 +1,7 @@
 import codecs
+import mistune
 import os
+import textwrap
 
 from datetime import datetime, timedelta
 from onegov.core.utils import module_path
@@ -29,12 +31,15 @@ def add_initial_content(libres_registry, session_manager, town_name,
     # can only be called if no town is defined yet
     assert not session.query(Town).first()
 
-    session.add(Town(name=town_name))
+    session.add(Town(name=town_name, meta={
+        'reply_to': 'service@onegovcloud.ch'
+    }))
 
     add_root_pages(session)
     add_builtin_forms(session, form_definitions)
     add_resources(libres_context)
     add_events(session)
+    add_welcome_page(session)
 
     session.flush()
 
@@ -77,6 +82,100 @@ def add_root_pages(session):
         name='aktuelles',
         type='news',
         meta={'trait': 'news'}
+    )
+
+
+def add_welcome_page(session):
+
+    # for now only in German, translating through gettext is not the right way
+    # here, because it splits the text into fragments which results in an
+    # incoherent text
+    title = "Willkommen bei OneGov"
+
+    lead = """
+        Ihre neuer Online Schalter für Gemeinde kann ab sofort genutzt werden.
+        Um erste Schritte, mehr Informationen und eine kurze Übersicht zu
+        erhalten klicken Sie einfach auf den Titel dieser Nachricht.
+    """.replace('\n', '').strip('').replace('  ', ' ')
+
+    text = textwrap.dedent("""\
+        ## Erste Schritte
+
+        Die folgenden Vorschläge helfen Ihnen sich in der OneGov Cloud zurecht
+        zu finden. Falls Sie das lieber auf eigene Faust tun können Sie diese
+        Schritte gerne überspringen.
+
+        **Melden Sie sich an**
+
+        Sie können sich ab sofort mit Ihrer E-Mail Adresse anmelden. Sie haben
+        das Passwort vergessen? Kein Problem,
+        [setzen Sie es zurück](/request-password).
+
+        **Passen Sie das Aussehen Ihren Bedürfnissen an**
+
+        OneGov Cloud lässt sich nach Ihrem Gusto einrichten. Sie können ein
+        eigenes Logo, eigene Bilder für die Startseite und andere Anpassungen
+        in den [Einstellungen](/einstellungen) vornehmen.
+
+        **Stellen Sie Ihre Gemeinde vor**
+
+        Klicken Sie auf **Leben & Wohnen** in der Navigation und klicken Sie
+        anschliessend auf **Hinzufügen > Thema** gleich unterhalb der
+        Hauptnavigation. Sie sehen **Hinzufügen** nicht? Dann müssen Sie sich
+        erst noch anmelden.
+
+        **Füllen Sie ein Formluar aus**
+
+        Im [Online-Schalter](/formulare) gibt es eine ganze Reihe von
+        Formularen die Bürger ausfüllen können. Füllen Sie ein Formular aus
+        und ein Ticket wird geöffnet.
+
+        In den [Tickets](/tickets/ALL/pending?page=0) können Sie das Ticket
+        anschliessend bearbeiten. Übrigens: Sie können jederzeit eigene
+        Formulare hinzufügen. Die mitgelieferten Formulare sind lediglich
+        Vorschläge.
+
+        ## Über Ihre OneGov Cloud Instanz
+
+        Es gibt noch viel mehr zu entdecken - wir möchten an dieser Stelle
+        nicht schon alles verraten.
+
+        Ihre OneGov Cloud Instanz läuft auf einer Testumgebung, welche
+        frühestens nach zwei Wochen verfällt. Sie können OneGov Cloud also
+        in aller Ruhe testen.
+
+        Zwar ist die Cloud für alle Personen zugänglich, wir stellen aber
+        sicher dass sie nicht von Suchmaschinen gefunden wird. Wir
+        möchten ja nicht das Ihre Bürger auf der falschen Seite landen.
+
+        Sollten Sie Fragen haben, können Sie sich jederzeit an uns wenden:
+
+        OneGov Cloud<br>
+        Fabian Reinhard<br>
+        Unter der Egg 5<br>
+        6004 Luzern<br>
+        Tel. +41 41 511 22 50<br>
+        [fabian.reinhard@seantis.ch](fabian.reinhard@seantis.ch)
+
+        ## Wie weiter
+
+        Falls wir Sie überzeugen können melden Sie sich bei uns und wir
+        können Ihre Testumgebung in eine Liveumgebung überführen. Wir
+        würden uns sehr freuen!
+    """)
+
+    pages = PageCollection(session)
+    pages.add(
+        parent=pages.by_path('aktuelles'),
+        title=title,
+        type='news',
+        meta={
+            'trait': 'page'
+        },
+        content={
+            'lead': lead,
+            'text': mistune.markdown(text)
+        }
     )
 
 
