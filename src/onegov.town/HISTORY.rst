@@ -1,9 +1,6 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
-
 - Adds a news article which is added upon town generation.
   [href]
 
