@@ -43,6 +43,7 @@ setup(
             'coverage',
             'onegov.testing',
             'pytest',
+            'webtest'
         ],
     ),
     entry_points={

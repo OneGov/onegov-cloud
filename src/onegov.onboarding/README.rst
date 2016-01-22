@@ -34,8 +34,8 @@ Build Status
 Coverage
 --------
 
-.. image:: https://coveralls.io/repos/OneGov/onegov.onboarding/badge.png?branch=master
-  :target: https://coveralls.io/r/OneGov/onegov.onboarding?branch=master
+.. image:: https://codecov.io/github/OneGov/onegov.onboarding/coverage.svg?branch=master
+  :target: https://codecov.io/github/OneGov/onegov.onboarding?branch=master
   :alt: Project Coverage
 
 Latest PyPI Release

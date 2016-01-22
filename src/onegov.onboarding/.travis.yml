@@ -5,11 +5,11 @@ env:
     - TOXENV=pep8
 install:
     - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - if [ "$TOXENV" = 'py34' ]; then pip install codecov; fi
 script:
     - tox -e $TOXENV
 after_success:
-    - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
+    - if [ "$TOXENV" = 'py34' ]; then codecov; fi
 #
 # Activate this after the repository has been added to travis.
 # If enabled, travis will automatically upload eggs to pypi every time
@@ -23,13 +23,12 @@ after_success:
 # Then replace 'encrypted...' below with the new encryption string (no need to
 # copy the quotes).
 #
-# deploy:
-#     provider: pypi
-#     distributions: "sdist bdist_wheel"
-#     user: seantis
-#     password:
-#       secure: encrypted...
-#     on:
-#         tags: true
-#         condition: $TOXENV = py34
-#
+deploy:
+    provider: pypi
+    distributions: "sdist bdist_wheel"
+    user: seantis
+    password:
+      secure: "jBTg9034cXbx9zkNW/W3fBmve+zoBHVuUbyUNKh7zwV+cl0vnzJtWNyJ/Zr+7SwBTbZIOasudz/vmIEk6lRUOGmyWHRjJzpxVAKuZflmdoNMLKvFqcb685ZagqTqyEKvRtCo53uQHNjdDdCER56zk4E4IeflZ93NBBnOJPEwTDyuJ4/aTpT1+v1+wJv7iTAxBhYIB1pPY5qrRpudDpvkK7pYhCFlyl+HXgfeDScOfj6wvtiGn8jNHlJnsMfCsQWXeXJq6W/Z9gKDBPRbHBdZ36yZpECpzoWiu0LsKyjPhj4wStYDoV8lq+wcAPhrTqxTTSHgzBlJ6yaDfYLMUcm0aYLn3Bq9DcLJq48hpMXX0zzIhZxtyQ8e27P8E0ZVt/uKmyx+RaZJhNCNKtTNNgiUVgF91gShTHwN374IiPl3gGWh8BwJJWAZYIlN3C1vD5DcURkU3DyaMyz6fBGwFAOHdKSIdMEaXSabkcJyvBQ6Umkk106d9oXlJ/iGwGzBtEWFH9gTaKi8glUSVq1HzrXZvUeC7eAjsWXW29oHshorSTFYY51jYpTDldjls4lIcYXK8m5YyBqXgcOcaswvzvBYQb0T4QO0zgoqdNYYZhONDpcOYM9a5TuB2y3ILlrLH4SdOtl1UjOkHLyPZlsgjw0h91lBQEeXyFdKS8DI2lPmOXA="
+    on:
+        tags: true
+        condition: $TOXENV = py34
