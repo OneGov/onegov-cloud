@@ -3,32 +3,35 @@ python: "3.4"
 env:
     - TOXENV=py34
     - TOXENV=pep8
+
 install:
-    - pip install tox
+    - pip install tox==1.9.2
     - if [ "$TOXENV" = 'py34' ]; then pip install codecov; fi
+
 script:
     - tox -e $TOXENV
+
 after_success:
     - if [ "$TOXENV" = 'py34' ]; then codecov; fi
-#
-# Activate this after the repository has been added to travis.
-# If enabled, travis will automatically upload eggs to pypi every time
-# a tagged commit is encountered.
-#
-# To add the pypi password use this:
-#
-# gem install travis
-# travis encrypt --repo seantis/onegov.onboarding
-#
-# Then replace 'encrypted...' below with the new encryption string (no need to
-# copy the quotes).
-#
+    - 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\.]+)$/\1==${TRAVIS_TAG}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
+    - if [ "$TOXENV" = 'py34' ]; then cat requirements.txt; fi
+
 deploy:
-    provider: pypi
+
+  - provider: releases
+    api_key:
+        secure: "h8QWWYCaW6K94+ZmrgyY7lHruUJWNqFgcYccOQcYPJKc8AI3eHDRnBybBxGeFt5cdMYwaUITgN1ZWq9HHDJzCKJnyi5bVUhjH6VUzf04hqEfD1t9j0nyKPljAFzrbFW0pYsQdLmb4D21WQH9JItBqtUEvZ0+r5O+VL29nXgLKZAVeIB+AOxtN667wHH1RjLgbKRjiF71AjxYR94mjelGSyrzqbWoB4sKkuYHM9E/MTDj4nw/moxyEfm0Ev0XjOcM4YO1me93ORx17khhtedb+OvonksnPCKaHEBGwylEpLFeggOsFArSiTe0u27HX0WEQ12/ojPBc7zTJtzHFaFyHpOb2JRE+dRv6+XFqHISnOL6HyIqSNA+MUrrBdrgVJEnAjxmlw8M/LbTUX6gTWua97N7fZb+tvJszMjIuUNsaYSniTGOVlCUSY8gQ0yc6K6qDHvkj68qSvCW6E/MParFFEUuipRSIdsJ3dkDZg9wQBtowwzwTuLquh7IfGTp9Fbz7otb3ZUNJcAFUzAxujuNjUTXyIluH4uOhzRI0LJydP7sH6cywSkGT6sCcBakk1MwqEA23w9KDzRipWUYBem/GMjohMw8BDTfo0uyRKAQdetyP9wyYNbiPYl600OPFRMloVejY7CWpwpEUehD2G9hsnjFubL67VCjGxXGo0wqgPg="
+    file: requirements.txt
+    skip_cleanup: true
+    on:
+        tags: true
+        condition: $TOXENV = py34
+
+  - provider: pypi
     distributions: "sdist bdist_wheel"
     user: seantis
     password:
-      secure: "jBTg9034cXbx9zkNW/W3fBmve+zoBHVuUbyUNKh7zwV+cl0vnzJtWNyJ/Zr+7SwBTbZIOasudz/vmIEk6lRUOGmyWHRjJzpxVAKuZflmdoNMLKvFqcb685ZagqTqyEKvRtCo53uQHNjdDdCER56zk4E4IeflZ93NBBnOJPEwTDyuJ4/aTpT1+v1+wJv7iTAxBhYIB1pPY5qrRpudDpvkK7pYhCFlyl+HXgfeDScOfj6wvtiGn8jNHlJnsMfCsQWXeXJq6W/Z9gKDBPRbHBdZ36yZpECpzoWiu0LsKyjPhj4wStYDoV8lq+wcAPhrTqxTTSHgzBlJ6yaDfYLMUcm0aYLn3Bq9DcLJq48hpMXX0zzIhZxtyQ8e27P8E0ZVt/uKmyx+RaZJhNCNKtTNNgiUVgF91gShTHwN374IiPl3gGWh8BwJJWAZYIlN3C1vD5DcURkU3DyaMyz6fBGwFAOHdKSIdMEaXSabkcJyvBQ6Umkk106d9oXlJ/iGwGzBtEWFH9gTaKi8glUSVq1HzrXZvUeC7eAjsWXW29oHshorSTFYY51jYpTDldjls4lIcYXK8m5YyBqXgcOcaswvzvBYQb0T4QO0zgoqdNYYZhONDpcOYM9a5TuB2y3ILlrLH4SdOtl1UjOkHLyPZlsgjw0h91lBQEeXyFdKS8DI2lPmOXA="
+        secure: "jBTg9034cXbx9zkNW/W3fBmve+zoBHVuUbyUNKh7zwV+cl0vnzJtWNyJ/Zr+7SwBTbZIOasudz/vmIEk6lRUOGmyWHRjJzpxVAKuZflmdoNMLKvFqcb685ZagqTqyEKvRtCo53uQHNjdDdCER56zk4E4IeflZ93NBBnOJPEwTDyuJ4/aTpT1+v1+wJv7iTAxBhYIB1pPY5qrRpudDpvkK7pYhCFlyl+HXgfeDScOfj6wvtiGn8jNHlJnsMfCsQWXeXJq6W/Z9gKDBPRbHBdZ36yZpECpzoWiu0LsKyjPhj4wStYDoV8lq+wcAPhrTqxTTSHgzBlJ6yaDfYLMUcm0aYLn3Bq9DcLJq48hpMXX0zzIhZxtyQ8e27P8E0ZVt/uKmyx+RaZJhNCNKtTNNgiUVgF91gShTHwN374IiPl3gGWh8BwJJWAZYIlN3C1vD5DcURkU3DyaMyz6fBGwFAOHdKSIdMEaXSabkcJyvBQ6Umkk106d9oXlJ/iGwGzBtEWFH9gTaKi8glUSVq1HzrXZvUeC7eAjsWXW29oHshorSTFYY51jYpTDldjls4lIcYXK8m5YyBqXgcOcaswvzvBYQb0T4QO0zgoqdNYYZhONDpcOYM9a5TuB2y3ILlrLH4SdOtl1UjOkHLyPZlsgjw0h91lBQEeXyFdKS8DI2lPmOXA="
     on:
         tags: true
         condition: $TOXENV = py34
