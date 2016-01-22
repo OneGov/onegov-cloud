@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.0 (2016-01-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a news article which is added upon town generation.
   [href]
 
