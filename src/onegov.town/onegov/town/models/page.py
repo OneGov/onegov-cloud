@@ -179,6 +179,6 @@ class AtoZPages(AtoZ):
             return [topic for topic in topics if topic.trait == 'page']
         else:
             return [
-                topic for topic in topics if topic.trait == 'page'
-                and not topic.is_hidden_from_public
+                topic for topic in topics if topic.trait == 'page' and
+                not topic.is_hidden_from_public
             ]
