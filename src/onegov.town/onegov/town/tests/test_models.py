@@ -98,7 +98,8 @@ def test_sitecollection(town_app):
     }
 
     assert {o.name for o in objects['news']} == {
-        'aktuelles'
+        'aktuelles',
+        'willkommen-bei-onegov'
     }
 
     paths = (p for p in os.listdir(module_path('onegov.town', 'forms')))

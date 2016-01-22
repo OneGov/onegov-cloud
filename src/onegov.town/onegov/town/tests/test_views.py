@@ -441,7 +441,7 @@ def test_news(town_app):
     login_page.form['password'] = 'hunter2'
     page = login_page.form.submit().follow()
 
-    assert len(page.pyquery('.latest-news')) == 0
+    assert len(page.pyquery('.latest-news')) == 1
 
     page = page.click('Aktuelles', index=1)
     assert str(datetime.utcnow().year) not in page.text
