@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Stops build requirements.txt from ending up with a git url.
+  [href]
+
 1.4.0 (2016-01-22)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -13,7 +13,7 @@ script:
 
 after_success:
 - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
-- 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\.]+)-v([0-9\.]+)$/\1==\2/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
+- 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\.]+)$/\1==${TRAVIS_TAG}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
 - if [ "$TOXENV" = 'py34' ]; then cat requirements.txt; fi
 
 deploy:
@@ -25,7 +25,7 @@ deploy:
     skip_cleanup: true
     on:
       tags: true
-      condition: $TOXENV = py34
+      condition: $TOXENV = py34 && grep -q -v 'github.com' requirements.txt
 
   - provider: pypi
     distributions: "sdist bdist_wheel"
@@ -34,4 +34,4 @@ deploy:
       secure: TfCasvV0u5OHsD1uO74Tn7IqkVM271WzmRuI61uIAY9AyC+IBRfso/Ch8o+D7dw12BVCeWX6g89Vb1Z+FcsxRr7aeBbPZj9zg8duo/oyov6GpJivB8qbAIKGuKy5OmQTAjGE9DxncY0/XB3GtJDqzxiEu8t5rEKG6usOmGBV/G0=
     on:
       tags: true
-      condition: $TOXENV = py34
+      condition: $TOXENV = py34 && grep -q -v 'github.com' requirements.txt
