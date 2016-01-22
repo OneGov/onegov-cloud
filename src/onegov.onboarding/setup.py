@@ -43,6 +43,7 @@ setup(
             'coverage',
             'onegov.testing',
             'pytest',
+            'pyquery',
             'webtest'
         ],
     ),
