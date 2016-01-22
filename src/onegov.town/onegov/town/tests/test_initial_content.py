@@ -18,7 +18,8 @@ def test_initial_content(town_app):
         'bildung-gesellschaft': 'Bildung & Gesellschaft',
         'gewerbe-tourismus': 'Gewerbe & Tourismus',
         'politik-verwaltung': 'Politik & Verwaltung',
-        'aktuelles': 'Aktuelles'
+        'aktuelles': 'Aktuelles',
+        'willkommen-bei-onegov': 'Willkommen bei OneGov'
     }
 
     forms = FormCollection(town_app.session()).definitions.query().all()
