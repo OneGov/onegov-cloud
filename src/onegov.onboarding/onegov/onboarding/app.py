@@ -1,6 +1,8 @@
 from cached_property import cached_property
+from hipchat import HipChat
 from onegov.core import Framework, utils
 from onegov.libres import LibresIntegration
+from onegov.onboarding import log
 from onegov.onboarding.theme import OnboardingTheme
 from webassets import Bundle
 
@@ -13,6 +15,21 @@ class OnboardingApp(Framework, LibresIntegration):
         self.onboarding = cfg['onboarding']
         assert 'onegov.town' in self.onboarding
         assert 'namespace' in self.onboarding['onegov.town']
+
+    def notify_hipchat(self, message):
+        if 'hipchat' in self.onboarding:
+            try:
+                hipchat = HipChat(token=self.onboarding['hipchat']['token'])
+                hipchat.message_room(
+                    room_id=self.onboarding['hipchat']['room_id'],
+                    message_from='Onboarding',
+                    message=message,
+                    message_format='html',
+                    color='green',
+                    notify=True
+                )
+            except Exception:
+                log.exception("Error during Hipchat message")
 
     @cached_property
     def webassets_path(self):

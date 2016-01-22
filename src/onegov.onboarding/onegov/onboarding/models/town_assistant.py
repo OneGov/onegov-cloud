@@ -62,6 +62,13 @@ class TownAssistant(Assistant):
                     "This town exists already and can't be created. Is it "
                     "your town but you did not create it? Please contact us."
                 )
+            else:
+                self.app.notify_hipchat(
+                    (
+                        'A new OneGov Cloud instance was started by {}: '
+                        '<a href="{}">{}</a>'
+                    ).format(user, product['url'], name)
+                )
             finally:
                 del request.browser_session['name']
                 del request.browser_session['user']
