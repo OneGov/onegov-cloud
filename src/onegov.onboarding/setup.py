@@ -33,7 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'cached_property',
-        'onegov.core>=0.4.0',
+        'onegov.core',
         'onegov.foundation',
         'onegov.libres',
         'onegov.town'
