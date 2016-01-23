@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.1 (2016-01-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Stops build artifact 'requirements.txt' from ending up with a git url.
   [href]
 
