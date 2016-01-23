@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.1 (2016-01-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Includes the requirements.txt build artifact on the Github Releases page.
   [href]
 
