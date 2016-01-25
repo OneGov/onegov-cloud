@@ -124,13 +124,13 @@ def add_welcome_page(session):
         Hauptnavigation. Sie sehen **Hinzufügen** nicht? Dann müssen Sie sich
         erst noch anmelden.
 
-        **Füllen Sie ein Formluar aus**
+        **Füllen Sie ein Formular aus**
 
         Im [Online-Schalter](/formulare) gibt es eine ganze Reihe von
         Formularen die Bürger ausfüllen können. Füllen Sie ein Formular aus
         und ein Ticket wird geöffnet.
 
-        In den [Tickets](/tickets/ALL/pending?page=0) können Sie das Ticket
+        In den [Tickets](/tickets/ALL/open?page=0) können Sie das Ticket
         anschliessend bearbeiten. Übrigens: Sie können jederzeit eigene
         Formulare hinzufügen. Die mitgelieferten Formulare sind lediglich
         Vorschläge.
@@ -160,7 +160,7 @@ def add_welcome_page(session):
         ## Wie weiter
 
         Falls wir Sie überzeugen können melden Sie sich bei uns und wir
-        können Ihre Testumgebung in eine Liveumgebung überführen. Wir
+        können Ihre Testumgebung in eine produktive Umgebung überführen. Wir
         würden uns sehr freuen!
     """)
 

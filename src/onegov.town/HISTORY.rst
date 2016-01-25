@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes the ticket url and some typos in the initial news entry.
+  [href]
+
 1.4.1 (2016-01-23)
 ~~~~~~~~~~~~~~~~~~~
 
