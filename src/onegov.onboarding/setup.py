@@ -4,7 +4,7 @@ name = 'onegov.onboarding'
 description = (
     'Onboarding for OneGov Cloud applications.'
 )
-version = '0.1.1'
+version = '0.1.2'
 
 
 def get_long_description():
