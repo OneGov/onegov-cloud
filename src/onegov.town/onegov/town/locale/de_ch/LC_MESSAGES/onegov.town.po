@@ -835,7 +835,7 @@ msgstr ""
 msgid ""
 "This site contains no lead. Leads are used for lists and search results."
 msgstr ""
-"Diese Seite hat keine Einleitungen. Die Einleitung ist wichtig für die Suche "
+"Diese Seite hat keine Einleitung. Die Einleitung ist wichtig für die Suche "
 "und Auflistungen."
 
 msgid "Open"
