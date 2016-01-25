@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.3 (2016-01-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes html tags being escaped in the initial news entry.
   [href]
 
