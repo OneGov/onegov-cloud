@@ -150,11 +150,11 @@ def add_welcome_page(session):
 
         Sollten Sie Fragen haben, können Sie sich jederzeit an uns wenden:
 
-        OneGov Cloud<br>
-        Fabian Reinhard<br>
-        Unter der Egg 5<br>
-        6004 Luzern<br>
-        Tel. +41 41 511 22 50<br>
+        OneGov Cloud <br>
+        Fabian Reinhard <br>
+        Unter der Egg 5 <br>
+        6004 Luzern <br>
+        Tel. +41 41 511 22 50 <br>
         [fabian.reinhard@seantis.ch](fabian.reinhard@seantis.ch)
 
         ## Wie weiter
@@ -174,7 +174,7 @@ def add_welcome_page(session):
         },
         content={
             'lead': lead,
-            'text': mistune.markdown(text)
+            'text': mistune.markdown(text, escape=False)
         }
     )
 
