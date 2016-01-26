@@ -90,4 +90,17 @@ def handle_unsubscribe(self, request):
     request.success(
         _("You have been successfully unsubscribed from all regular emails.")
     )
-    return morepath.redirect(request.link(self))
+
+    # until morepath 0.12 is released, we need this workaround, because
+    # request.after used by the browser session doesn't work with redirects
+    # in morepath < 0.12
+    response = morepath.redirect(request.link(self))
+    response.set_cookie(
+        'session_id',
+        request.cookies['session_id'],
+        secure=request.app.identity_secure,
+        httponly=True
+    )
+    # ...
+
+    return response

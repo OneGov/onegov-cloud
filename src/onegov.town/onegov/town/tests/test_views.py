@@ -2306,8 +2306,8 @@ def test_unsubscribe_link(town_app):
         'user': 'editor@example.org'
     }, salt='unsubscribe')
 
-    page = client.get('/unsubscribe?token={}'.format(token)).follow()
-    print(page.text)
+    client.get('/unsubscribe?token={}'.format(token))
+    page = client.get('/')
     assert "abgemeldet" in page
 
     user = UserCollection(town_app.session()).by_username('editor@example.org')
