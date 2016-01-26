@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Include the town name in the demo events.
+  [href]
+
 1.4.3 (2016-01-25)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -38,7 +38,7 @@ def add_initial_content(libres_registry, session_manager, town_name,
     add_root_pages(session)
     add_builtin_forms(session, form_definitions)
     add_resources(libres_context)
-    add_events(session)
+    add_events(session, town_name)
     add_welcome_page(session)
 
     session.flush()
@@ -242,14 +242,14 @@ def add_resources(libres_context):
     )
 
 
-def add_events(session):
+def add_events(session, town_name):
     start = as_datetime(datetime.today().date())
     while start.weekday() != 6:
         start = start + timedelta(days=1)
 
     events = EventCollection(session)
     event = events.add(
-        title="150 Jahre Govikon",
+        title="150 Jahre {}".format(town_name),
         start=start + timedelta(hours=11, minutes=0),
         end=start + timedelta(hours=22, minutes=0),
         timezone="Europe/Zurich",
