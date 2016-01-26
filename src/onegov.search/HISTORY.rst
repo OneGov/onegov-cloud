@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+0.3.1 (2016-01-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Keep elasticsearch-dsl below 0.0.9 until there's a release that supports
   elasticsearch 2.0.0.
   [href]
