@@ -276,6 +276,15 @@ class DefaultMailLayout(Layout):
 
         return linkify(', '.join(lines))
 
+    def unsubscribe_link(self, username):
+        return '{}?token={}'.format(
+            self.request.link(self.town, name='unsubscribe'),
+            self.request.new_url_safe_token(
+                data={'user': username},
+                salt='unsubscribe'
+            )
+        )
+
 
 class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """

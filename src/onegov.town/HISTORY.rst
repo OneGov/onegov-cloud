@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an unsubscribe link to regular e-mails.
+  [href]
+
 - Improves wording of initial news.
   [href]
 

@@ -9,10 +9,12 @@ from datetime import datetime, date, timedelta
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
 from lxml.html import document_fromstring
+from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
 from onegov.libres import ResourceCollection
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
+from onegov.user import UserCollection
 from webtest import (
     TestApp as BaseApp,
     TestResponse as BaseResponse,
@@ -2291,3 +2293,37 @@ def test_pages_on_homepage(es_town_app):
     )
 
     assert '0xdeadbeef' not in client.get('/')
+
+
+def test_unsubscribe_link(town_app):
+
+    client = Client(town_app)
+
+    user = UserCollection(town_app.session()).by_username('editor@example.org')
+    assert user.data is None
+
+    token = town_app.request_class.new_url_safe_token(Bunch(app=town_app), {
+        'user': 'editor@example.org'
+    }, salt='unsubscribe')
+
+    page = client.get('/unsubscribe?token={}'.format(token)).follow()
+    assert "von allen regelmässigen E-Mails abgemeldet." in page
+
+    user = UserCollection(town_app.session()).by_username('editor@example.org')
+    assert user.data['daily_ticket_statistics'] == False
+
+    token = town_app.request_class.new_url_safe_token(Bunch(app=town_app), {
+        'user': 'unknown@example.org'
+    }, salt='unsubscribe')
+
+    page = client.get(
+        '/unsubscribe?token={}'.format(token), expect_errors=True)
+    assert page.status_code == 403
+
+    token = town_app.request_class.new_url_safe_token(Bunch(app=town_app), {
+        'user': 'editor@example.org'
+    }, salt='foobar')
+
+    page = client.get(
+        '/unsubscribe?token={}'.format(token), expect_errors=True)
+    assert page.status_code == 403

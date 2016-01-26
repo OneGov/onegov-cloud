@@ -31,6 +31,15 @@
         <p i18n:translate>The OneGov Cloud Team</p>
     </tal:block>
     <tal:block metal:fill-slot="above-footer">
-        <p i18n:translate>This is the daily OneGov Cloud status e-mail. If you don't want to receive this e-mail you may deactivate it in your user profile</p>
+        <p>
+            <span i18n:translate>
+                This is the daily OneGov Cloud status e-mail. If you don't want to receive this e-mail you may deactivate it by clicking on
+            </span>
+            <strong tal:define="link layout.unsubscribe_link(username)">
+                <a href="${link}" i18n:translate>unsubscribe</a>.
+            </strong>
+            <span i18n:translate>
+                Or by changing the settings in your user profile.
+            </span>
     </tal:block>
 </div>

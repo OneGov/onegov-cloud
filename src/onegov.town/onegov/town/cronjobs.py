@@ -64,7 +64,6 @@ def send_daily_ticket_statistics(request):
     args['layout'] = DefaultMailLayout(object(), request)
     args['is_monday'] = today.weekday() == MON
     args['town'] = request.app.town.name
-    content = render_template('mail_daily_ticket_statistics.pt', request, args)
 
     # send one e-mail per user
     users = UserCollection(request.app.session()).query()
@@ -75,6 +74,11 @@ def send_daily_ticket_statistics(request):
 
         if user.data and not user.data.get('daily_ticket_statistics'):
             continue
+
+        args['username'] = user.username
+        content = render_template(
+            'mail_daily_ticket_statistics.pt', request, args
+        )
 
         request.app.send_email(
             subject=args['title'],
