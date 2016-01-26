@@ -64,4 +64,16 @@ $(document).ready(function() {
                 new Awesomplete(input[0], {list: data, maxItems: 5});
             });
     });
+
+    /*
+        Prevent double clicks on submit forms
+    */
+    var prevent_double_click = function() {
+        this.disabled = true;
+        this.form.submit();
+    };
+    $('input[type="submit"]').each(function() {
+        $(this).click(prevent_double_click);
+    });
+
 });

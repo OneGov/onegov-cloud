@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Prevents double clicks on submit buttons.
+  [href]
+
 - Adds a welcome e-mail.
   [href]
 
