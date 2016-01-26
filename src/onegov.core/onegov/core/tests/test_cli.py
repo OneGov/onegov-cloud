@@ -7,6 +7,8 @@ from email.header import decode_header
 from email.utils import parseaddr
 from onegov.core import Framework
 from onegov.core.cli import cli
+from smtplib import SMTPSenderRefused
+from unittest.mock import patch
 
 
 def test_sendmail(smtp, temporary_directory):
@@ -178,3 +180,59 @@ def test_sendmail_unicode(smtp, temporary_directory):
         'Content-Transfer-Encoding: base64\n\n'
         '8J+RjQ==\n'
     )
+
+
+def test_sender_refused(smtp, temporary_directory):
+
+    cfg = {
+        'applications': [
+            {
+                'path': '/foobar/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'foobar',
+                'configuration': {
+                    'mail_use_directory': True,
+                    'mail_directory': os.path.join(
+                        temporary_directory, 'mails')
+                }
+            }
+        ]
+    }
+
+    os.makedirs(os.path.join(temporary_directory, 'mails'))
+    os.makedirs(os.path.join(temporary_directory, 'mails', 'new'))
+    os.makedirs(os.path.join(temporary_directory, 'mails', 'cur'))
+    os.makedirs(os.path.join(temporary_directory, 'mails', 'tmp'))
+
+    with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
+        f.write(yaml.dump(cfg))
+
+    app = Framework()
+    app.mail_sender = 'noreply@example.org'
+    app.mail_use_directory = True
+    app.mail_directory = os.path.join(temporary_directory, 'mails')
+
+    app.send_email(
+        reply_to='Gövikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mäil",
+        content="👍"
+    )
+
+    transaction.commit()
+
+    def raise_error(*args, **kwargs):
+        raise SMTPSenderRefused(code='000', msg='foo', sender='bar')
+
+    with patch('smtplib.SMTP.sendmail', side_effect=raise_error):
+
+        result = CliRunner().invoke(cli, [
+            '--config', os.path.join(temporary_directory, 'onegov.yml'),
+            'sendmail',
+            '--hostname', smtp.address[0],
+            '--port', smtp.address[1]
+        ])
+
+    assert len(smtp.outbox) == 0
+    assert 'Could not send e-mail to recipient@example.org' in result.output
+    assert result.exit_code == 1

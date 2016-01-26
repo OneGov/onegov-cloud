@@ -9,6 +9,7 @@ import mailbox
 import os
 import platform
 import subprocess
+import sys
 
 from mailthon.middleware import TLS, Auth
 from morepath import setup
@@ -18,6 +19,7 @@ from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
 from onegov.core.utils import scan_morepath_modules
 from onegov.server.config import Config
 from onegov.server.core import Server
+from smtplib import SMTPSenderRefused
 from uuid import uuid4
 from webtest import TestApp as Client
 
@@ -64,6 +66,7 @@ def sendmail(ctx, hostname, port, force_tls, username, password):
 
     """
     context = ctx.obj
+    success = True
 
     for appcfg in context.appconfigs:
 
@@ -94,11 +97,23 @@ def sendmail(ctx, hostname, port, force_tls, username, password):
 
                 msg = email.message_from_string(msg_str)
 
-                connection.sendmail(msg['From'], msg['To'], msg_str)
-                status, message = connection.noop()
-
-                if status == 250:
+                try:
+                    connection.sendmail(msg['From'], msg['To'], msg_str)
+                    status, message = connection.noop()
+                except SMTPSenderRefused:
+                    success = False
+                    print(
+                        "Could not send e-mail to {} - sender refused".format(
+                            msg['To']
+                        )
+                    )
                     maildir.remove(filename)
+                else:
+                    if status == 250:
+                        maildir.remove(filename)
+
+        if not success:
+            sys.exit(1)
 
 
 @cli.command()
