@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.15.1 (2016-01-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes undeliverable e-mails from the maildir queue.
   [href]
