@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves wording of initial news.
+  [href]
+
 - Include the town name in the demo events.
   [href]
 

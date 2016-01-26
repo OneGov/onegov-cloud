@@ -102,7 +102,7 @@ def add_welcome_page(session):
         ## Erste Schritte
 
         Die folgenden Vorschläge helfen Ihnen sich in der OneGov Cloud zurecht
-        zu finden. Falls Sie das lieber auf eigene Faust tun können Sie diese
+        zu finden. Falls Sie das lieber auf eigene Faust tun, können Sie diese
         Schritte gerne überspringen.
 
         **Melden Sie sich an**
@@ -113,13 +113,13 @@ def add_welcome_page(session):
 
         **Passen Sie das Aussehen Ihren Bedürfnissen an**
 
-        OneGov Cloud lässt sich nach Ihrem Gusto einrichten. Sie können ein
-        eigenes Logo, eigene Bilder für die Startseite und andere Anpassungen
-        in den [Einstellungen](/einstellungen) vornehmen.
+        OneGov Cloud lässt sich nach Ihrem Gusto einrichten. Sie können das
+        Logo, die Bilder auf der Startseite und mehr in den
+        [Einstellungen](/einstellungen) ändern.
 
         **Stellen Sie Ihre Gemeinde vor**
 
-        Klicken Sie auf **Leben & Wohnen** in der Navigation und klicken Sie
+        Klicken Sie auf **Leben & Wohnen** in der Navigation und
         anschliessend auf **Hinzufügen > Thema** gleich unterhalb der
         Hauptnavigation. Sie sehen **Hinzufügen** nicht? Dann müssen Sie sich
         erst noch anmelden.
