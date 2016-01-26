@@ -4,9 +4,11 @@ import re
 from libres.context.registry import create_default_registry
 from onegov.core import utils
 from onegov.core.crypto import random_password
+from onegov.core.templates import render_template
 from onegov.onboarding import _
 from onegov.onboarding.errors import AlreadyExistsError
 from onegov.onboarding.forms import FinishForm, TownForm
+from onegov.onboarding.layout import MailLayout
 from onegov.onboarding.models.assistant import Assistant
 from onegov.town.initial_content import add_initial_content
 from onegov.town.models import Town
@@ -54,7 +56,7 @@ class TownAssistant(Assistant):
 
         if form.submitted(request):
             try:
-                product = self.add_town(name, user, color)
+                product = self.add_town(name, user, color, request)
                 error = None
             except AlreadyExistsError:
                 product = None
@@ -122,7 +124,7 @@ class TownAssistant(Assistant):
             self.get_subdomain(name).replace('-', '_')
         )
 
-    def add_town(self, name, user, color):
+    def add_town(self, name, user, color, request):
         current_schema = self.app.session_manager.current_schema
         password = random_password(16)
 
@@ -145,6 +147,22 @@ class TownAssistant(Assistant):
             assert not users.query().first()
 
             users.add(user, password, 'admin')
+
+            title = request.translate(_("Welcome to OneGov Cloud"))
+            welcome_mail = render_template('mail_welcome.pt', request, {
+                'url': 'https://{}'.format(self.get_domain(name)),
+                'mail': user,
+                'layout': MailLayout(self, request),
+                'title': title,
+                'town': name
+            })
+
+            self.app.send_email(
+                subject=title,
+                receivers=(user, ),
+                content=welcome_mail,
+                reply_to='onegov@seantis.ch'
+            )
 
         finally:
             self.app.session_manager.set_current_schema(current_schema)

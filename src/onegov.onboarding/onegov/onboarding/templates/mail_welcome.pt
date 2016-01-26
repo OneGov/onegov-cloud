@@ -1,0 +1,24 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.onboarding">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Hello!</p>
+        <p>
+            <span i18n:translate>You have just launched a new OneGov Cloud for</span>
+            <strong>${town}.</strong>
+            <span i18n:translate>Welcome! We are happy to have you.</span>
+        </p>
+
+        <p i18n:translate>For your reference, this is how you can reach your new instance:</p>
+        <p><a href="${url}">${url}</a></p>
+
+        <p i18n:translate>You can login with your e-mail address:</p>
+        <p><a href="${url}/request-password">${mail}</a></p>
+
+        <p i18n:translate>If you have any questions do not hesitate to contact us.</p>
+        <p i18n:translate>We hope you enjoy your demo!</p>
+        <p i18n:translate>With best wishes from Lucerne,</p>
+        <p i18n:translate>Your OneGov Cloud Team</p>
+    </tal:block>
+</div>

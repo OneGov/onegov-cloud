@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a welcome e-mail.
+  [href]
+
 0.1.2 (2016-01-25)
 ~~~~~~~~~~~~~~~~~~~
 

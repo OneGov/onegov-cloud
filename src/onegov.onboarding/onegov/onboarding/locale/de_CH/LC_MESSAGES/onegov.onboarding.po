@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-01-21 14:48+0100\n"
+"POT-Creation-Date: 2016-01-26 13:14+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -42,6 +42,9 @@ msgstr "Die Einrichtung dauert weniger als eine Minute."
 msgid "Free with no commitment."
 msgstr "Gratis und unverbindlich."
 
+msgid "Welcome to OneGov Cloud"
+msgstr "Willkommen bei der OneGov Cloud"
+
 msgid ""
 "This town exists already and can't be created. Is it your town but you did "
 "not create it? Please contact us."
@@ -53,7 +56,9 @@ msgid "Success! Have a look at your new website!"
 msgstr "Wir hatten Erfolg! Sehen Sie sich jetzt Ihre neue Webseite an!"
 
 msgid "Please write down your username and password before you continue. "
-msgstr "Bitte notieren Sie sich Ihren Benutzernamen und Ihr Passwort bevor sie weiterfahren."
+msgstr ""
+"Bitte notieren Sie sich Ihren Benutzernamen und Ihr Passwort bevor sie "
+"weiterfahren."
 
 msgid "Username"
 msgstr "Benutzername"
@@ -76,6 +81,33 @@ msgstr "Zurück"
 msgid "Submit"
 msgstr "Absenden"
 
+msgid "Hello!"
+msgstr "Grüezi"
+
+msgid "You have just launched a new OneGov Cloud for"
+msgstr "Sie haben soeben eine OneGov Cloud Instanz aktiviert für"
+
+msgid "Welcome! We are happy to have you."
+msgstr "Willkommen! Wir freuen uns, dass Sie OneGov Cloud ausprobieren."
+
+msgid "For your reference, this is how you can reach your new instance:"
+msgstr "So können Sie Ihre neue Instanz erreichen:"
+
+msgid "You can login with your e-mail address:"
+msgstr "Zur Anmeldung verwenden Sie Ihre E-Mail Adresse:"
+
+msgid "If you have any questions do not hesitate to contact us."
+msgstr "Bei Fragen können Sie uns gerne jederzeit kontaktieren."
+
+msgid "We hope you enjoy your demo!"
+msgstr "Wir hoffen Sie haben Spass mit Ihrer Demo!"
+
+msgid "With best wishes from Lucerne,"
+msgstr "Beste Grüsse aus Luzern,"
+
+msgid "Your OneGov Cloud Team"
+msgstr "Ihr OneGov Cloud Team"
+
 msgid "Name"
 msgstr "Name"
 
@@ -96,3 +128,10 @@ msgstr "Start"
 
 msgid "Continue"
 msgstr "Weiter"
+
+#~ msgid ""
+#~ "If you forgot your password you can always get a new one with your e-mail "
+#~ "address:"
+#~ msgstr ""
+#~ "Sollten Sie das Passwort vergessen können Sie mit Ihrer E-Mail Adresse "
+#~ "ein neues anfordern:"

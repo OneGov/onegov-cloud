@@ -9,7 +9,7 @@ from uuid import uuid4
 
 
 @pytest.yield_fixture(scope="function")
-def onboarding_app(postgres_dsn, temporary_directory):
+def onboarding_app(postgres_dsn, temporary_directory, smtp):
 
     config = setup()
     scan_morepath_modules(onegov.onboarding.OnboardingApp, config)
@@ -31,8 +31,16 @@ def onboarding_app(postgres_dsn, temporary_directory):
                 'namespace': 'town_' + uuid4().hex,
                 'domain': 'example.org'
             }
-        }
+        },
     )
     app.set_application_id(app.namespace + '/' + 'test')
+
+    app.mail_host, app.mail_port = smtp.address
+    app.mail_sender = 'mails@govikon.ch'
+    app.mail_force_tls = False
+    app.mail_username = None
+    app.mail_password = None
+    app.mail_use_directory = False
+    app.smtp = smtp
 
     yield app

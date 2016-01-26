@@ -59,7 +59,7 @@ def test_town_valid_values(onboarding_app):
     assert "'grüen' is not a recognized color" in a
 
 
-def test_town_create(onboarding_app, temporary_directory):
+def test_town_create(onboarding_app, temporary_directory, smtp):
     c = Client(onboarding_app)
     a = c.get('/for-towns/1')
 
@@ -77,6 +77,7 @@ def test_town_create(onboarding_app, temporary_directory):
 
     assert 'https://new-york.example.org' in a
     assert 'admin@example.org' in a
+    assert len(smtp.outbox) == 1
 
     username = 'admin@example.org'
     password = a.pyquery('.product dd:nth-child(4)').text()

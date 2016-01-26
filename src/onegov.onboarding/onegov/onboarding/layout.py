@@ -30,3 +30,14 @@ class Layout(ChameleonLayout):
 
 class DefaultLayout(Layout):
     pass
+
+
+class MailLayout(Layout):
+
+    @cached_property
+    def base(self):
+        return self.template_loader['mail_layout.pt']
+
+    @cached_property
+    def macros(self):
+        raise NotImplementedError
