@@ -179,4 +179,5 @@ def test_ticket_statistics(town_app, smtp, handlers):
     assert "2 Tickets sind in Bearbeitung" in txt
     assert "Wir wünschen Ihnen eine schöne Woche!" in txt
     assert "Das OneGov Cloud Team" in txt
-    assert "über das Benutzerprofil abbestellen" in txt
+    assert "/unsubscribe?token=" in txt
+    assert "abbestellen" in txt

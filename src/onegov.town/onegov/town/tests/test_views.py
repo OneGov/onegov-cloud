@@ -2307,7 +2307,8 @@ def test_unsubscribe_link(town_app):
     }, salt='unsubscribe')
 
     page = client.get('/unsubscribe?token={}'.format(token)).follow()
-    assert "von allen regelmässigen E-Mails abgemeldet." in page
+    print(page.text)
+    assert "abgemeldet" in page
 
     user = UserCollection(town_app.session()).by_username('editor@example.org')
     assert user.data['daily_ticket_statistics'] == False
