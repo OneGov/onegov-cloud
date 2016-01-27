@@ -33,10 +33,10 @@ setup(
     platforms='any',
     install_requires=[
         'cached_property',
-        'onegov.core',
+        'onegov.core>=0.15.2',
         'onegov.foundation',
         'onegov.libres',
-        'onegov.town>=1.4.3',
+        'onegov.town>=1.4.5',
         'python-simple-hipchat',
     ],
     extras_require=dict(
