@@ -7,7 +7,7 @@ from email.header import decode_header
 from email.utils import parseaddr
 from onegov.core import Framework
 from onegov.core.cli import cli
-from smtplib import SMTPSenderRefused
+from smtplib import SMTPRecipientsRefused
 from unittest.mock import patch
 
 
@@ -222,7 +222,7 @@ def test_sender_refused(smtp, temporary_directory):
     transaction.commit()
 
     def raise_error(*args, **kwargs):
-        raise SMTPSenderRefused(code='000', msg='foo', sender='bar')
+        raise SMTPRecipientsRefused(recipients={'foo': 'bar'})
 
     with patch('smtplib.SMTP.sendmail', side_effect=raise_error):
 
@@ -234,5 +234,5 @@ def test_sender_refused(smtp, temporary_directory):
         ])
 
     assert len(smtp.outbox) == 0
-    assert 'Could not send e-mail to recipient@example.org' in result.output
+    assert "Could not send e-mail: {'foo': 'bar'}" in result.output
     assert result.exit_code == 1

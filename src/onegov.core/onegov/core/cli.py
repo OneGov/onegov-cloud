@@ -19,7 +19,7 @@ from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
 from onegov.core.utils import scan_morepath_modules
 from onegov.server.config import Config
 from onegov.server.core import Server
-from smtplib import SMTPSenderRefused
+from smtplib import SMTPRecipientsRefused
 from uuid import uuid4
 from webtest import TestApp as Client
 
@@ -100,13 +100,9 @@ def sendmail(ctx, hostname, port, force_tls, username, password):
                 try:
                     connection.sendmail(msg['From'], msg['To'], msg_str)
                     status, message = connection.noop()
-                except SMTPSenderRefused:
+                except SMTPRecipientsRefused as e:
                     success = False
-                    print(
-                        "Could not send e-mail to {} - sender refused".format(
-                            msg['To']
-                        )
-                    )
+                    print("Could not send e-mail: {}".format(e.recipients))
                     maildir.remove(filename)
                 else:
                     if status == 250:
