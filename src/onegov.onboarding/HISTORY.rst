@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.3 (2016-01-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Prevents double clicks on submit buttons.
   [href]
 
