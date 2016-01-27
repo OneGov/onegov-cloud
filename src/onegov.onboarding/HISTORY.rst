@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.4 (2016-01-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Uses the latest onegov.core and onegov.town release.
   [href]
 
