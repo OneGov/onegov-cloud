@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.5 (2016-01-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes wrong login link in welcome e-mail.
   [href]
 
