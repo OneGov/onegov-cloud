@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.6 (2016-01-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Sets the initial user as the default reply to address.
   [href]
 
