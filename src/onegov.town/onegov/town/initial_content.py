@@ -14,7 +14,7 @@ from sedate import as_datetime
 
 
 def add_initial_content(libres_registry, session_manager, town_name,
-                        form_definitions=None):
+                        form_definitions=None, reply_to=None):
     """ Adds the initial content for the given town on the given session.
     All content that comes with a new town is added here.
 
@@ -31,9 +31,14 @@ def add_initial_content(libres_registry, session_manager, town_name,
     # can only be called if no town is defined yet
     assert not session.query(Town).first()
 
-    session.add(Town(name=town_name, meta={
-        'reply_to': 'service@onegovcloud.ch'
-    }))
+    if reply_to:
+        meta = {
+            'reply_to': reply_to
+        }
+    else:
+        meta = {}
+
+    session.add(Town(name=town_name, meta=meta))
 
     add_root_pages(session)
     add_builtin_forms(session, form_definitions)

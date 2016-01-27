@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define a custom reply to address when creating a town.
+  [href]
+
 1.4.5 (2016-01-27)
 ~~~~~~~~~~~~~~~~~~~
 
