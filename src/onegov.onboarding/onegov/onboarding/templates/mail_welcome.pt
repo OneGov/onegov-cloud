@@ -14,7 +14,7 @@
         <p><a href="${url}">${url}</a></p>
 
         <p i18n:translate>You can login with your e-mail address:</p>
-        <p><a href="${url}/request-password">${mail}</a></p>
+        <p><a href="${url}/auth/login">${mail}</a></p>
 
         <p i18n:translate>If you have any questions do not hesitate to contact us.</p>
         <p i18n:translate>We hope you enjoy your demo!</p>
