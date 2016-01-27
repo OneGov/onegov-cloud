@@ -137,7 +137,8 @@ class TownAssistant(Assistant):
             add_initial_content(
                 libres_registry=create_default_registry(),
                 session_manager=self.app.session_manager,
-                town_name=name
+                town_name=name,
+                reply_to=user
             )
 
             town = self.app.session_manager.session().query(Town).first()
