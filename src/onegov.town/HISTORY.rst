@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.4 (2016-01-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an unsubscribe link to regular e-mails.
   [href]
 
