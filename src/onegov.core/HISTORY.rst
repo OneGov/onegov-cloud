@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.15.2 (2016-01-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes wrong exception being caught for undelivarable e-mails.
   [href]
