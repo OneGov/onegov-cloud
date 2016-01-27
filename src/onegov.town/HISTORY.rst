@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.4.5 (2016-01-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Uses the latest onegov.core release.
   [href]
 
