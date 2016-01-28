@@ -1,6 +1,9 @@
 from onegov.core.orm.session_manager import SessionManager
+from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import TranslationHybrid
+
+MISSING = object()
 
 
 #: The base for all OneGov Core ORM Models
@@ -22,6 +25,24 @@ class ModelBase(object):
 
     def __setstate__(self, state):
         self.__dict__ = state
+
+    @classmethod
+    def get_polymorphic_class(cls, identity_value, default=MISSING):
+        """ Returns the polymorphic class if it exists, given the value
+        of the polymorphic identity.
+
+        Asserts that the identity is actually found, unless a default is
+        provided.
+
+        """
+        mapper = inspect(cls).polymorphic_map.get(identity_value)
+
+        if default is MISSING:
+            assert mapper, "No such polymorphic_identity: {}".format(
+                identity_value
+            )
+
+        return mapper and mapper.class_ or default
 
 Base = declarative_base(cls=ModelBase)
 

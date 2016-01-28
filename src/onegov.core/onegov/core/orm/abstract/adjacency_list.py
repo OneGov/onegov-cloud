@@ -3,7 +3,7 @@ from itertools import chain
 from lazy_object_proxy import Proxy
 from onegov.core.orm import Base
 from onegov.core.utils import normalize_for_url, increment_name, is_sorted
-from sqlalchemy import Column, ForeignKey, Integer, Text, inspect
+from sqlalchemy import Column, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (
@@ -365,16 +365,15 @@ class AdjacencyListCollection(object):
 
         return name
 
-    def add(self, parent, title, name=None, **kwargs):
+    def add(self, parent, title, name=None, type=None, **kwargs):
         """ Adds a page to the given parent. """
 
         name = name or self.get_unique_child_name(title, parent)
 
-        # look up the right class depending on the type
-        page_mapper = inspect(self.__listclass__).polymorphic_map.get(
-            kwargs.get('type'))
-
-        page_class = page_mapper and page_mapper.class_ or self.__listclass__
+        if type is not None:
+            page_class = self.__listclass__.get_polymorphic_class(type)
+        else:
+            page_class = self.__listclass__
 
         page = page_class(parent=parent, title=title, name=name, **kwargs)
 

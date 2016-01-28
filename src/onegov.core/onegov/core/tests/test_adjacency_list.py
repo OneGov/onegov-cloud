@@ -135,7 +135,7 @@ def test_polymorphic(session):
     with pytest.raises(AssertionError) as assertion_info:
         member = family.add(parent=eve, title='Don', type='other')
 
-    assert "No such polymorphic_identity" in str(assertion_info.value)
+    assert "No such polymorphic_identity: other" in str(assertion_info.value)
 
     assert isinstance(family.by_path('/eve'), FamilyMember)
     assert isinstance(family.by_path('/eve/lara'), DeadFamilyMember)

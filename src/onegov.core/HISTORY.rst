@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a method to lookup the polymorphic class of any polymorphic identity.
+  [href]
+
 0.15.2 (2016-01-27)
 ~~~~~~~~~~~~~~~~~~~
 

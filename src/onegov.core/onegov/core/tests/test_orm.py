@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime
 from morepath import setup
 from onegov.core.framework import Framework
-from onegov.core.orm import SessionManager, translation_hybrid
+from onegov.core.orm import ModelBase, SessionManager, translation_hybrid
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
@@ -1056,3 +1056,52 @@ def test_orm_signals(postgres_dsn):
     # .. since those objects are never loaded, the body is not present
     assert not deleted[0][0].body
     assert not deleted[1][0].body
+
+
+def test_get_polymorphic_class():
+    Base = declarative_base(cls=ModelBase)
+
+    class Plain(Base):
+        __tablename__ = 'plain'
+        id = Column(Integer, primary_key=True)
+
+    class Base(Base):
+        __tablename__ = 'polymorphic'
+
+        id = Column(Integer, primary_key=True)
+        type = Column(Text)
+
+        __mapper_args__ = {
+            'polymorphic_on': 'type'
+        }
+
+    class ChildA(Base):
+        __mapper_args__ = {'polymorphic_identity': 'A'}
+
+    class ChildB(Base):
+        __mapper_args__ = {'polymorphic_identity': 'B'}
+
+    assert Plain.get_polymorphic_class('A', None) is None
+    assert Plain.get_polymorphic_class('B', None) is None
+    assert Plain.get_polymorphic_class('C', None) is None
+
+    assert Plain.get_polymorphic_class('A', 1) == 1
+    assert Plain.get_polymorphic_class('B', 2) == 2
+    assert Plain.get_polymorphic_class('C', 3) == 3
+
+    assert Base.get_polymorphic_class('A') is ChildA
+    assert ChildA.get_polymorphic_class('A') is ChildA
+    assert ChildB.get_polymorphic_class('A') is ChildA
+
+    assert Base.get_polymorphic_class('B') is ChildB
+    assert ChildA.get_polymorphic_class('B') is ChildB
+    assert ChildB.get_polymorphic_class('B') is ChildB
+
+    assert Base.get_polymorphic_class('C', None) is None
+    assert ChildA.get_polymorphic_class('C', None) is None
+    assert ChildB.get_polymorphic_class('C', None) is None
+
+    with pytest.raises(AssertionError) as assertion_info:
+        Base.get_polymorphic_class('C')
+
+    assert "No such polymorphic_identity: C" in str(assertion_info.value)
