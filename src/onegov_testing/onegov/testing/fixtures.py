@@ -24,6 +24,17 @@ class HTTPExecutor(HTTPExecutorBase):
             pass
 
 
+@pytest.fixture(scope='session', autouse=True)
+def treat_sqlalchemy_warnings_as_errors():
+    """ All onegov models treat SQLAlchemy warnings as errors, because usually
+    SQLAlchemy warnings are errors waiting to happen.
+
+    """
+    import warnings
+    from sqlalchemy.exc import SAWarning
+    warnings.simplefilter("error", SAWarning)
+
+
 @pytest.yield_fixture(scope="session")
 def postgres():
     """ Starts a postgres server using `testing.postgresql \
