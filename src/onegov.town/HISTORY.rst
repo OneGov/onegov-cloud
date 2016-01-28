@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with latest onegov.core release.
+  [herf]
+
 1.4.6 (2016-01-27)
 ~~~~~~~~~~~~~~~~~~~
 

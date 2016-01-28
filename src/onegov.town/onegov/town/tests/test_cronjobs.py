@@ -3,7 +3,7 @@ import transaction
 from base64 import b64decode
 from datetime import datetime
 from freezegun import freeze_time
-from onegov.ticket import Handler, TicketCollection
+from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from webtest import TestApp as Client
 from sedate import ensure_timezone
@@ -20,6 +20,10 @@ def get_cronjob_url(cronjob):
 
 
 def register_echo_handler(handlers):
+
+    class EchoTicket(Ticket):
+        __mapper_args__ = {'polymorphic_identity': 'ECO'}
+        es_type_name = 'eco_tickets'
 
     @handlers.registered_handler('ECO')
     class EchoHandler(Handler):
