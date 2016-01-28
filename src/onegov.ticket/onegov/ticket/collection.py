@@ -126,7 +126,7 @@ class TicketCollection(TicketCollectionPagination):
     def open_ticket(self, handler_code, handler_id, **handler_data):
         """ Opens a new ticket using the given handler. """
 
-        ticket = Ticket()
+        ticket = Ticket.get_polymorphic_class(handler_code, default=Ticket)()
         ticket.number = self.issue_unique_ticket_number(handler_code)
 
         # add it to the session before invoking the handler, who expects

@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core>=0.4.11',
+        'onegov.core>=0.16.0',
         'onegov.search',
         'onegov.user'
     ],

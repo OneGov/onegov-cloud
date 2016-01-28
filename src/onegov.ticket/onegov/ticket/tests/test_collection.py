@@ -2,6 +2,101 @@ from unittest.mock import Mock
 from onegov.ticket import Handler, Ticket, TicketCollection
 
 
+class EchoHandler(Handler):
+
+    @property
+    def deleted(self):
+        return False
+
+    @property
+    def email(self):
+        return self.data.get('email')
+
+    @property
+    def title(self):
+        return self.data.get('title')
+
+    @property
+    def subtitle(self):
+        return self.data.get('subtitle')
+
+    @property
+    def group(self):
+        return self.data.get('group')
+
+    def get_summary(self, request):
+        return self.data.get('summary')
+
+    def get_links(self, request):
+        return self.data.get('links')
+
+
+class LimitingHandler(Handler):
+
+    @property
+    def deleted(self):
+        return False
+
+    @property
+    def title(self):
+        return 'Foo'
+
+    @property
+    def subtitle(self):
+        return '0xdeadbeef'
+
+    @property
+    def group(self):
+        return 'Bar'
+
+    @property
+    def handler_id(self):
+        return 1
+
+    @property
+    def handler_data(self):
+        return {}
+
+    @property
+    def email(self):
+        return 'foo@bar.com'
+
+    def get_summary(self, request):
+        return 'foobar'
+
+    @classmethod
+    def handle_extra_parameters(cls, session, query, extra_parameters):
+        if 'limit' in extra_parameters:
+            return query.limit(extra_parameters['limit'])
+        else:
+            return query
+
+
+class ABCTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'ABC'}
+    es_type_name = 'abc_tickets'
+
+
+class FooTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'FOO'}
+    es_type_name = 'foo_tickets'
+
+
+class BarTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'BAR'}
+    es_type_name = 'bar_tickets'
+
+
+class EcoTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'ECO'}
+    es_type_name = 'bar_tickets'
+
+
+class LtdTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'LTD'}
+    es_type_name = 'ltd_tickets'
+
+
 def test_random_number():
 
     collection = TicketCollection(session=object())
@@ -19,8 +114,9 @@ def test_random_ticket_number():
     assert collection.random_ticket_number('XXX') == 'XXX-9999-9999'
 
 
-def test_issue_unique_ticket_number(session):
+def test_issue_unique_ticket_number(session, handlers):
 
+    handlers.register('ABC', EchoHandler)
     collection = TicketCollection(session)
 
     collection.random_number = Mock(return_value=10000000)
@@ -104,34 +200,7 @@ def test_handler_subset(session):
 
 def test_open_ticket(session, handlers):
 
-    @handlers.registered_handler('ECO')
-    class EchoHandler(Handler):
-
-        @property
-        def deleted(self):
-            return False
-
-        @property
-        def email(self):
-            return self.data.get('email')
-
-        @property
-        def title(self):
-            return self.data.get('title')
-
-        @property
-        def subtitle(self):
-            return self.data.get('subtitle')
-
-        @property
-        def group(self):
-            return self.data.get('group')
-
-        def get_summary(self, request):
-            return self.data.get('summary')
-
-        def get_links(self, request):
-            return self.data.get('links')
+    handlers.register('ECO', EchoHandler)
 
     collection = TicketCollection(session)
 
@@ -224,46 +293,7 @@ def test_snapshot_ticket(session, handlers):
 
 def test_handle_extra_options(session, handlers):
 
-    @handlers.registered_handler('LTD')
-    class LimitingHandler(Handler):
-
-        @property
-        def deleted(self):
-            return False
-
-        @property
-        def title(self):
-            return 'Foo'
-
-        @property
-        def subtitle(self):
-            return '0xdeadbeef'
-
-        @property
-        def group(self):
-            return 'Bar'
-
-        @property
-        def handler_id(self):
-            return 1
-
-        @property
-        def handler_data(self):
-            return {}
-
-        @property
-        def email(self):
-            return 'foo@bar.com'
-
-        def get_summary(self, request):
-            return 'foobar'
-
-        @classmethod
-        def handle_extra_parameters(cls, session, query, extra_parameters):
-            if 'limit' in extra_parameters:
-                return query.limit(extra_parameters['limit'])
-            else:
-                return query
+    handlers.register('LTD', LimitingHandler)
 
     collection = TicketCollection(session)
     collection.handlers = handlers
