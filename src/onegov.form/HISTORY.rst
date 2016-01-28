@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.4 (2016-01-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Uses the latest onegov.core release to get rid of some code.
   [href]
 
