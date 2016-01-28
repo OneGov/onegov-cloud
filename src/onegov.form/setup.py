@@ -35,7 +35,7 @@ setup(
         'colour>=0.0.4',
         'humanize',
         'jsonpickle',
-        'onegov.core>=0.4.4',
+        'onegov.core>=0.16.0',
         'onegov.search',
         'pyparsing',
         'pyyaml',

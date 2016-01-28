@@ -10,7 +10,7 @@ from onegov.form.models import (
     FormSubmissionFile
 )
 from sedate import replace_timezone, utcnow
-from sqlalchemy import inspect, func, not_, exc
+from sqlalchemy import func, not_, exc
 from uuid import uuid4
 
 
@@ -74,9 +74,7 @@ class FormDefinitionCollection(object):
         """ Add the given form to the database. """
 
         # look up the right class depending on the type
-        _mapper = inspect(FormDefinition).polymorphic_map.get(type)
-        form = (_mapper and _mapper.class_ or FormDefinition)()
-
+        form = FormDefinition.get_polymorphic_class(type, FormDefinition)()
         form.name = name or normalize_for_url(title)
         form.title = title
         form.definition = definition
@@ -153,9 +151,10 @@ class FormSubmissionCollection(object):
             form.validate()
 
         # look up the right class depending on the type
-        _mapper = inspect(FormSubmission).polymorphic_map.get(state)
-
-        submission = (_mapper and _mapper.class_ or FormSubmission)()
+        submission_class = FormSubmission.get_polymorphic_class(
+            state, FormSubmission
+        )
+        submission = submission_class()
         submission.id = id or uuid4()
         submission.name = name
         submission.state = state
