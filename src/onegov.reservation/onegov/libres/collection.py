@@ -1,6 +1,5 @@
 from onegov.core.utils import normalize_for_url
 from onegov.libres.models import Resource
-from sqlalchemy import inspect
 from uuid import uuid4
 
 
@@ -25,10 +24,10 @@ class ResourceCollection(object):
     def add(self, title, timezone, type=None, name=None, meta={}, content={},
             definition=None):
 
-        # look up the right class depending on the type
-        _mapper = inspect(Resource).polymorphic_map.get(type)
-        resource = (_mapper and _mapper.class_ or Resource)()
-
+        # look up the right class depending on the type (we need to do
+        # this a bit akwardly here, because Resource does not use the
+        # ModelBase as declarative base)
+        resource = Resource.get_polymorphic_class(type, Resource)()
         resource.id == uuid4()
         resource.name = name or normalize_for_url(title)
         resource.title = title

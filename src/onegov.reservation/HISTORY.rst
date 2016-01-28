@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Uses the latest onegov.core release to get rid of some code.
+  [href]
+
 0.1.0 (2015-10-12)
 ~~~~~~~~~~~~~~~~~~~
 

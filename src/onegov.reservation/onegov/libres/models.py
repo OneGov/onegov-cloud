@@ -1,6 +1,7 @@
 from libres import new_scheduler
 from libres.db.models import Allocation
 from libres.db.models.base import ORMBase
+from onegov.core.orm import ModelBase
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.form import parse_form
@@ -9,7 +10,7 @@ from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
-class Resource(ORMBase, ContentMixin, TimestampMixin):
+class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     """ A resource holds a single calendar with allocations and reservations.
 
     Note that this resource is not defined on the onegov.core declarative base.
@@ -22,6 +23,9 @@ class Resource(ORMBase, ContentMixin, TimestampMixin):
     If we ever want to link to other models (say link a reservation to a user),
     then we have to switch to a unified base. Ideally we would find a way
     to merge these bases somehow.
+
+    Also note that we *do* use the ModelBase class as a mixin to at least share
+    the same methods as all the usual onegov.core.orm models.
 
     """
 
