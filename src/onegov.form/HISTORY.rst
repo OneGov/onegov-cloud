@@ -1,9 +1,6 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
-
 - Uses the latest onegov.core release to get rid of some code.
   [href]
 
