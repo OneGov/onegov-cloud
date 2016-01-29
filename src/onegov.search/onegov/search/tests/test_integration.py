@@ -1,4 +1,3 @@
-import json
 import transaction
 
 from morepath import setup
@@ -235,26 +234,26 @@ def test_orm_integration(es_url, postgres_dsn):
     client.get('/new?id=2&title=About&body=We are a company')
     client.get('/new?id=3&title=Terms&body=Stuff we pay lawyers for')
 
-    documents = json.loads(client.get('/').text)
+    documents = client.get('/').json
     assert documents['hits']['total'] == 3
 
-    documents = json.loads(client.get('/?q=stuff').text)
+    documents = client.get('/?q=stuff').json
     assert documents['hits']['total'] == 2
 
-    documents = json.loads(client.get('/?q=company').text)
+    documents = client.get('/?q=company').json
     assert documents['hits']['total'] == 1
 
     client.get('/delete?id=3')
 
-    documents = json.loads(client.get('/?q=stuff').text)
+    documents = client.get('/?q=stuff').json
     assert documents['hits']['total'] == 1
 
     client.get('/update?id=2&title=About&body=We are a business')
 
-    documents = json.loads(client.get('/?q=company').text)
+    documents = client.get('/?q=company').json
     assert documents['hits']['total'] == 0
 
-    documents = json.loads(client.get('/?q=business').text)
+    documents = client.get('/?q=business').json
     assert documents['hits']['total'] == 1
 
 
