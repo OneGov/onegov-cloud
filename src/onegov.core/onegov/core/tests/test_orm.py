@@ -1,4 +1,3 @@
-import json
 import morepath
 import pytest
 import pickle
@@ -273,10 +272,10 @@ def test_orm_scenario(postgres_dsn):
     # let's try to add some documents to new york
     app.set_application_id('municipalities/new-york')
 
-    assert json.loads(c.get('/documents').text) == {}
+    assert c.get('/documents').json == {}
     c.post('/documents/add', {'title': 'Welcome to the big apple!'})
 
-    assert json.loads(c.get('/documents').text) == {
+    assert c.get('/documents').json == {
         '1': "Welcome to the big apple!"
     }
 
@@ -284,17 +283,17 @@ def test_orm_scenario(postgres_dsn):
     # should exist
     app.set_application_id('municipalities/chicago')
 
-    assert json.loads(c.get('/documents').text) == {}
+    assert c.get('/documents').json == {}
     c.post('/documents/add', {'title': 'Welcome to the windy city!'})
 
-    assert json.loads(c.get('/documents').text) == {
+    assert c.get('/documents').json == {
         '1': "Welcome to the windy city!"
     }
 
     # finally, let's see if the transaction is rolled back if there's an
     # error during the course of the request
     c.get('/documents/error', expect_errors=True)
-    assert json.loads(c.get('/documents').text) == {
+    assert c.get('/documents').json == {
         '1': "Welcome to the windy city!"
     }
 
