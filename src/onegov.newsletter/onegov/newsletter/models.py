@@ -1,7 +1,6 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.core.orm.types import UTCDateTime
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import (
     column,
@@ -56,9 +55,6 @@ class Newsletter(Base, ContentMixin, TimestampMixin):
 
     #: the name of the newsletter, derived from the title
     name = Column(Text, nullable=False, primary_key=True)
-
-    #: the point in time the newsletter was first sent
-    sent = Column(UTCDateTime, nullable=True)
 
     #: the title of the newsletter
     title = Column(Text, nullable=False)
