@@ -21,7 +21,7 @@ def handle_newsletters(self, request, form):
 
     # newsletters which were not sent yet are private
     if not request.is_logged_in:
-        query = query.filter(Newsletter.sent == True)
+        query = query.filter(Newsletter.sent != None)
 
     return {
         'form': form,
