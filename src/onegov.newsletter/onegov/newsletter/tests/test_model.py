@@ -22,6 +22,13 @@ def test_newsletter_date(session):
     assert newsletter.date.hour == 14
 
 
+def test_recipients_unconfirmed(session):
+    session.add(Recipient(address='info@example.org'))
+    transaction.commit()
+
+    assert session.query(Recipient).first().confirmed is False
+
+
 def test_recipients_unique_per_group(session):
 
     for group in (None, 'foo', 'bar'):

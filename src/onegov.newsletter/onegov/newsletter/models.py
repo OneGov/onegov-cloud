@@ -100,6 +100,11 @@ class Recipient(Base, TimestampMixin):
         secondary=newsletter_recipients,
         back_populates='recipients')
 
+    #: when recipients are added, they are unconfirmed. At this point they get
+    #: one e-mail with a confirmation link. If they ignore said e-mail they
+    #: should not get another one.
+    confirmed = Column(Boolean, nullable=False, default=False)
+
     @declared_attr
     def __table_args__(cls):
         return (
