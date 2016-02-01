@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.7 (2016-02-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Fix missing default color on Chrome/Firefox.
   [href]
 
