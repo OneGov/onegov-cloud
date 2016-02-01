@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-02-01 14:09+0100\n"
+"POT-Creation-Date: 2016-02-01 16:49+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -71,9 +71,6 @@ msgstr "Jeden ${days} bis zum ${end}."
 msgid "Events"
 msgstr "Veranstaltungen"
 
-msgid "Newsletter"
-msgstr "Newsletter"
-
 msgid "Logout"
 msgstr "Logout"
 
@@ -96,6 +93,12 @@ msgid "This is a builtin-form. Builtin-forms can't be deleted."
 msgstr ""
 "Dies ist ein vordefiniertes Formular. Vordefinierte Formulare können nicht "
 "gelöscht werden."
+
+msgid "Newsletter"
+msgstr "Newsletter"
+
+msgid "New"
+msgstr "Neu"
 
 msgid "Settings"
 msgstr "Einstellungen"
@@ -152,6 +155,9 @@ msgid "To remove this event, go to the ticket and reject it."
 msgstr ""
 "Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie zu "
 "entfernen."
+
+msgid "Delete newsletter"
+msgstr "Newsletter löschen"
 
 msgid "Accept ticket"
 msgstr "Ticket annehmen"
@@ -422,6 +428,15 @@ msgstr "Text"
 msgid "Definition"
 msgstr "Definition"
 
+msgid "Used in the overview and the e-mail subject"
+msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
+
+msgid "Editorial"
+msgstr "Editorial"
+
+msgid "A few words about this edition of the newsletter"
+msgstr "Ein paar Worte zu dieser Ausgabe des Newsletters"
+
 msgid "URL"
 msgstr "URL"
 
@@ -579,7 +594,7 @@ msgid "Advanced"
 msgstr "Erweitert"
 
 msgid "E-Mail Address"
-msgstr ""
+msgstr "E-Mail Adresse"
 
 msgid "Send me a daily e-mail with information about the website's state."
 msgstr "Ich möchte ein tägliches Status E-Mail erhalten."
@@ -1009,6 +1024,9 @@ msgstr "Ihr Ticket wurde wieder geöffnet"
 msgid "No newsletters yet."
 msgstr "Es wurden noch keine Newsletter versendet"
 
+msgid "Not yet sent."
+msgstr "Noch nicht gesendet."
+
 msgid ""
 "Sorry, the page you are looking for could not be found. Try checking the URL "
 "for errors or use the search box on the top."
@@ -1252,14 +1270,20 @@ msgstr "Themen"
 msgid "Catalog A-Z"
 msgstr "Katalog A-Z"
 
+msgid "New Newsletter"
+msgstr "Neuer Newsletter"
+
+msgid "Edit Newsletter"
+msgstr "Newsletter Bearbeiten"
+
+msgid "Added a new newsletter"
+msgstr "Ein neuer Newsletter wurde hinzugefügt"
+
 msgid "New person"
 msgstr "Neue Person"
 
 msgid "Added a new person"
 msgstr "Eine neue Person wurde hinzugefügt"
-
-msgid "New"
-msgstr "Neu"
 
 #, python-format
 msgid "New reservation for ${title}"

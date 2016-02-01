@@ -10,7 +10,8 @@
         <ul>
             <li tal:repeat="newsletter newsletters">
                 <div><strong><a href="${request.link(newsletter)}">${newsletter.title}</a></strong></div>
-                <div>${layout.format_date(newsletter.created, 'relative')}</div>
+                <div tal:condition="newsletter.sent">${layout.format_date(newsletter.sent, 'relative')}</div>
+                <div tal:condition="not:newsletter.sent" i18n:translate>Not yet sent.</div>
             </li>
         </ul>
     </tal:block>
