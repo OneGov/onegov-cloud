@@ -26,13 +26,18 @@ def test_recipients_unique_per_group(session):
         transaction.abort()
 
 
-def test_valid_name(session):
+def test_valid_name():
     with pytest.raises(AssertionError):
         Newsletter(
             title="Normalization Works",
             name="Or does it?",
             content="<h1>Normalization Works</h1>"
         )
+
+
+def test_recipients_valid_email():
+    with pytest.raises(AssertionError):
+        Recipient(address="no-email")
 
 
 def test_newsletter_recipients_cascade(session):

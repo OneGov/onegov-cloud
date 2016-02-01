@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'onegov.core>=0.4.0',
         'sedate'
+        'validate_email',
     ],
     extras_require=dict(
         test=[

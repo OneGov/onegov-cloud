@@ -14,6 +14,7 @@ from sqlalchemy import (
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates, relationship
 from uuid import uuid4
+from validate_email import validate_email
 
 # Newsletters and recipients are joined in a many to many relationship
 newsletter_recipients = Table(
@@ -45,6 +46,9 @@ class Newsletter(Base, ContentMixin, TimestampMixin):
     def es_language(self):
         return 'de'  # XXX add to database in the future
 
+    #: the name of the newsletter, derived from the title
+    name = Column(Text, nullable=False, primary_key=True)
+
     @validates('name')
     def validate_name(self, key, name):
         assert normalize_for_url(name) == name, (
@@ -52,9 +56,6 @@ class Newsletter(Base, ContentMixin, TimestampMixin):
         )
 
         return name
-
-    #: the name of the newsletter, derived from the title
-    name = Column(Text, nullable=False, primary_key=True)
 
     #: the title of the newsletter
     title = Column(Text, nullable=False)
@@ -95,6 +96,11 @@ class Recipient(Base, TimestampMixin):
 
     #: the email address of the recipient, unique per group
     address = Column(Text, nullable=False)
+
+    @validates('address')
+    def validate_address(self, key, address):
+        assert validate_email(address)
+        return address
 
     #: the recipient group, a freely choosable string - may be null
     group = Column(Text, nullable=True)
