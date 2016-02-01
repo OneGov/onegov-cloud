@@ -3,6 +3,7 @@ from onegov.ballot import Ballot, Vote
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.security import Public
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
 
@@ -37,7 +38,9 @@ def view_vote_as_xlsx(self, request):
         content_type=(
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         ),
-        content_disposition='inline; filename={}.xlsx'.format(self.title)
+        content_disposition='inline; filename={}.xlsx'.format(
+            normalize_for_url(self.title)
+        )
     )
 
 
