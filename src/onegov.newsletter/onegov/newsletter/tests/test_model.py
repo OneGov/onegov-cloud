@@ -1,25 +1,9 @@
 import pytest
 import transaction
 
-from freezegun import freeze_time
 from onegov.newsletter import Newsletter, Recipient
 from onegov.newsletter.models import newsletter_recipients
 from sqlalchemy.exc import IntegrityError
-
-
-def test_newsletter_date(session):
-    with freeze_time('2016-01-29 14:00'):
-        newsletter = Newsletter(
-            title="The weekly gossip",
-            content="<h1>The weekly gossip"
-        )
-        session.add(newsletter)
-        session.flush()
-
-    assert newsletter.date.year == 2016
-    assert newsletter.date.month == 1
-    assert newsletter.date.day == 29
-    assert newsletter.date.hour == 14
 
 
 def test_recipients_unconfirmed(session):
@@ -42,11 +26,21 @@ def test_recipients_unique_per_group(session):
         transaction.abort()
 
 
+def test_valid_name(session):
+    with pytest.raises(AssertionError):
+        Newsletter(
+            title="Normalization Works",
+            name="Or does it?",
+            content="<h1>Normalization Works</h1>"
+        )
+
+
 def test_newsletter_recipients_cascade(session):
 
     # is the relationship reflected correctly?
     newsletter = Newsletter(
         title="10 things you didn't know",
+        name="10-things-you-didnt-know",
         content="<h1>10 things you didn't know</h1>",
         recipients=[
             Recipient(address='info@example.org')
@@ -74,6 +68,7 @@ def test_newsletter_recipients_cascade(session):
     # is the delete cascaded if the recipient is deleted?
     recipient.newsletters.append(Newsletter(
         title="How Bitcoin is so 90s",
+        name="how-bitcoin-is-so-90s",
         content="<h1>How Bitcoin is so 90s</h1>"
     ))
     transaction.commit()

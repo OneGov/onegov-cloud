@@ -2,7 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.orm.types import UTCDateTime
-from sedate import utcnow
+from onegov.core.utils import normalize_for_url
 from sqlalchemy import (
     column,
     Boolean,
@@ -13,13 +13,13 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import validates, relationship
 from uuid import uuid4
 
 # Newsletters and recipients are joined in a many to many relationship
 newsletter_recipients = Table(
     'newsletter_recipients', Base.metadata,
-    Column('newsletter_id', UTCDateTime, ForeignKey('newsletters.date')),
+    Column('newsletter_id', Text, ForeignKey('newsletters.name')),
     Column('recipient_id', UUID, ForeignKey('recipients.id'))
 )
 
@@ -46,10 +46,19 @@ class Newsletter(Base, ContentMixin, TimestampMixin):
     def es_language(self):
         return 'de'  # XXX add to database in the future
 
-    #: the date of the newsletter is its id, because we want to use the
-    #: date of the newsletter in the url (and we don't need to sends thousands)
-    #: of newsletters a second
-    date = Column(UTCDateTime, default=utcnow, primary_key=True)
+    @validates('name')
+    def validate_name(self, key, name):
+        assert normalize_for_url(name) == name, (
+            "The given name was not normalized"
+        )
+
+        return name
+
+    #: the name of the newsletter, derived from the title
+    name = Column(Text, nullable=False, primary_key=True)
+
+    #: the point in time the newsletter was first sent
+    sent = Column(UTCDateTime, nullable=True)
 
     #: the title of the newsletter
     title = Column(Text, nullable=False)
