@@ -81,21 +81,44 @@ def test_simple_csv_file():
 ])
 def test_convert_to_csv(excel_file):
     with open(excel_file, 'rb') as f:
+        convert_xls_to_csv(f, None)
+        convert_xls_to_csv(f, '')
+        with pytest.raises(IOError):
+            convert_xls_to_csv(f, 'Sheet 3')
+
         csv = CSVFile(convert_xls_to_csv(f), ['ID', 'Namä', 'Date'])
 
         assert list(csv.headers.keys()) == ['ID', 'Namä', 'Date']
-        list(csv.lines) == [
-            csv.rowtype(
-                rownumber=1,
-                id='1',
-                nama='Döner',
-                date='2015-12-31'
-            ),
+        assert list(csv.lines) == [
             csv.rowtype(
                 rownumber=2,
+                id='1',
+                nama='Döner',
+                date='31.12.2015'
+            ),
+            csv.rowtype(
+                rownumber=3,
                 id='2',
-                nama='"Cola"',
-                date='2015-12-31 12:00'
+                nama='“Cola”',
+                date='31.12.2014 12:00'
+            )
+        ]
+
+        csv = CSVFile(convert_xls_to_csv(f, 'Sheet 2'), ['ID', 'Namä', 'Date'])
+
+        assert list(csv.headers.keys()) == ['ID', 'Namä', 'Date']
+        assert list(csv.lines) == [
+            csv.rowtype(
+                rownumber=2,
+                id='1',
+                nama='Döner',
+                date='31.12.2015'
+            ),
+            csv.rowtype(
+                rownumber=3,
+                id='3',
+                nama='“Cola”',
+                date='31.12.2014 12:00'
             )
         ]
 

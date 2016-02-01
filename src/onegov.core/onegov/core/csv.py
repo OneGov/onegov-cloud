@@ -143,9 +143,9 @@ def normalize_header(header):
     return header
 
 
-def convert_xls_to_csv(xls):
-    """ Takes an XLS/XLSX file and returns a csv file using the first
-    worksheet found.
+def convert_xls_to_csv(xls, sheet_name=None):
+    """ Takes an XLS/XLSX file and returns a csv file using the given worksheet
+    name or the first worksheet found.
 
     """
 
@@ -159,7 +159,15 @@ def convert_xls_to_csv(xls):
             "be sure to open the file in binary mode!"
         )
 
-    sheet = excel.sheet_by_index(0)
+    if sheet_name:
+        try:
+            sheet = excel.sheet_by_name(sheet_name)
+        except xlrd.XLRDError:
+            raise IOError(
+                "Could not find the given sheet in this excel file!"
+            )
+    else:
+        sheet = excel.sheet_by_index(0)
 
     # XXX we want the output to be bytes encoded, which is not possible using
     # python's csv module. I'm sure there's a clever way of doing this by
