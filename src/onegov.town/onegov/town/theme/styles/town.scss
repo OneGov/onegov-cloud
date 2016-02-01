@@ -617,6 +617,7 @@ $new-daypass-icon: '\f145';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
 $new-news-icon: '\f1ea';
+$new-newsletter-icon: '\f003';
 $new-page-icon: '\f0f6';
 $new-person-icon: '\f007';
 $new-reservation-icon: '\f271';
@@ -663,6 +664,7 @@ $disabled-icon: '\f05e';
     .new-form:before { @include icon($new-form-icon); }
     .new-link:before { @include icon($new-link-icon); }
     .new-news:before { @include icon($new-news-icon); }
+    .new-newsletter:before { @include icon($new-newsletter-icon); }
     .new-page:before { @include icon($new-page-icon); }
     .new-person:before { @include icon($new-person-icon); }
     .new-reservation:before { @include icon($new-reservation-icon); }

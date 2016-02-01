@@ -22,6 +22,7 @@ from onegov.town.models import (
     Thumbnail
 )
 from onegov.town.models.extensions import PersonLinkExtension
+from onegov.newsletter import NewsletterCollection
 from onegov.user import Auth
 from purl import URL
 from sqlalchemy import desc
@@ -51,6 +52,16 @@ class Layout(ChameleonLayout):
     def town(self):
         """ An alias for self.request.app.town. """
         return self.request.app.town
+
+    @property
+    def view_name(self):
+        """ Returns the view name of the current view, or None if it is the
+        default view.
+
+        Note: This relies on morepath internals and is experimental in nature!
+
+        """
+        return self.request.unconsumed and self.request.unconsumed[-1] or None
 
     @cached_property
     def svg(self):
@@ -940,8 +951,38 @@ class EventLayout(EventBaseLayout):
 class NewsletterLayout(DefaultLayout):
 
     @cached_property
+    def collection(self):
+        return NewsletterCollection(self.app.session())
+
+    @cached_property
     def breadcrumbs(self):
-        return [
-            Link(_("Homepage"), self.homepage_url),
-            Link(_("Newsletter"), '#')
-        ]
+        if self.view_name == 'neu':
+            return [
+                Link(_("Homepage"), self.homepage_url),
+                Link(_("Newsletter"), self.request.link(self.collection)),
+                Link(_("New"), '#')
+            ]
+        else:
+            return [
+                Link(_("Homepage"), self.homepage_url),
+                Link(_("Newsletter"), '#')
+            ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Newsletter"),
+                            url=self.request.link(
+                                NewsletterCollection(self.app.session()),
+                                name='neu'
+                            ),
+                            classes=('new-newsletter', )
+                        ),
+                    ]
+                ),
+            ]
