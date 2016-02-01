@@ -2330,9 +2330,41 @@ def test_unsubscribe_link(town_app):
     assert page.status_code == 403
 
 
-def test_newsletters_view(town_app):
+def test_newsletters_crud(town_app):
 
     client = Client(town_app)
-    newsletter = client.get('/').click('Newsletter')
 
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    newsletter = client.get('/').click('Newsletter')
     assert 'Es wurden noch keine Newsletter versendet' in newsletter
+
+    new = newsletter.click('Newsletter')
+    new.form['title'] = "Our town is AWESOME"
+    new.form['editorial'] = "Like many of you, I just love our town..."
+    newsletter = new.form.submit().follow()
+
+    assert newsletter.pyquery('h1').text() == "Our town is AWESOME"
+    assert "Like many of you" in newsletter
+
+    edit = newsletter.click("Bearbeiten")
+    edit.form['title'] = "I can't even"
+    newsletter = edit.form.submit().follow()
+
+    assert newsletter.pyquery('h1').text() == "I can't even"
+
+    newsletters = client.get('/newsletters')
+    assert "I can't even" in newsletters
+    assert "Noch nicht gesendet." in newsletters
+
+    # not sent, therefore not visible to the public
+    assert "noch keine Newsletter" in Client(town_app).get('/newsletters')
+
+    delete_link = newsletter.pyquery('a.delete-link').attr('ic-delete-from')
+    client.delete(delete_link)
+
+    newsletters = client.get('/newsletters')
+    assert "noch keine Newsletter" in newsletters

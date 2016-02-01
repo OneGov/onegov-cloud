@@ -40,7 +40,7 @@ def handle_new_newsletter(self, request, form):
         form.update_model(newsletter, request)
 
         request.success(_("Added a new newsletter"))
-        return morepath.redirect(request.link(self))
+        return morepath.redirect(request.link(newsletter))
 
     return {
         'form': form,
