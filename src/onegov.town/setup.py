@@ -44,6 +44,7 @@ setup(
         'onegov.form>=0.6.7',
         'onegov.foundation>=0.0.4',
         'onegov.libres>=0.0.4',
+        'onegov.newsletter',
         'onegov.page>=0.1.0',
         'onegov.people>=0.0.2',
         'onegov.shared',

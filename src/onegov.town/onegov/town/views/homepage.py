@@ -5,6 +5,7 @@ from onegov.event import OccurrenceCollection
 from onegov.core.security import Public
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
+from onegov.newsletter import NewsletterCollection
 from onegov.people import PersonCollection
 from onegov.town import _
 from onegov.town.app import TownApp
@@ -24,6 +25,7 @@ def view_town(self, request):
     Tile = namedtuple('Tile', ['page', 'links', 'number'])
 
     news_query = layout.root_pages[-1].news_query
+    classes = ('tile-sub-link', )
 
     tiles = []
     homepage_pages = request.app.homepage_pages
@@ -39,24 +41,28 @@ def view_town(self, request):
                 page=Link(page.title, request.link(page)),
                 number=ix + 1,
                 links=[
-                    Link(
-                        c.title, request.link(c),
-                        classes=('tile-sub-link',), model=c
-                    ) for c in children
+                    Link(c.title, request.link(c), classes=classes, model=c)
+                    for c in children
                 ]
             ))
         elif page.type == 'news':
             news_url = request.link(page)
             years = (str(year) for year in page.years)
+
+            links = [
+                Link(year, news_url + '?year=' + year, classes=classes)
+                for year in years
+            ]
+
+            links.append(Link(
+                _("Newsletter"), request.link(NewsletterCollection(session)),
+                classes=classes
+            ))
+
             tiles.append(Tile(
                 page=Link(page.title, news_url),
                 number=ix + 1,
-                links=[
-                    Link(
-                        year, news_url + '?year=' + year,
-                        classes=('tile-sub-link',)
-                    ) for year in years
-                ]
+                links=links
             ))
         else:
             raise NotImplementedError

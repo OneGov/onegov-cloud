@@ -73,7 +73,7 @@
     </ul>
 </metal:bottom_links>
 
-<metal:search define-macro="form">
+<metal:form define-macro="form">
     <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" method="POST" enctype="multipart/form-data">
         <tal:block repeat="fieldset form.fieldsets">
             <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
@@ -97,7 +97,7 @@
             <input type="submit" value="${button_text}" class="button">
         </tal:block>
     </form>
-</metal:search>
+</metal:form>
 
 <metal:fields define-macro="fields">
     <tal:block repeat="field fields">

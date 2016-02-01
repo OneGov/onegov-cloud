@@ -935,3 +935,13 @@ class EventLayout(EventBaseLayout):
                 )
 
             return [edit_link, delete_link]
+
+
+class NewsletterLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Newsletter"), '#')
+        ]

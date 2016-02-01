@@ -2328,3 +2328,11 @@ def test_unsubscribe_link(town_app):
     page = client.get(
         '/unsubscribe?token={}'.format(token), expect_errors=True)
     assert page.status_code == 403
+
+
+def test_newsletters_view(town_app):
+
+    client = Client(town_app)
+    newsletter = client.get('/').click('Newsletter')
+
+    assert 'Es wurden noch keine Newsletter versendet' in newsletter
