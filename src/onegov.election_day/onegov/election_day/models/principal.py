@@ -4,6 +4,7 @@ import yaml
 from cached_property import cached_property
 from onegov.core import utils
 from pathlib import Path
+from urllib.parse import urlsplit
 
 
 cantons = {
@@ -30,6 +31,10 @@ class Principal(object):
     @classmethod
     def from_yaml(cls, yaml_source):
         return cls(**yaml.load(yaml_source))
+
+    @cached_property
+    def base_domain(self):
+        return urlsplit(self.base).hostname
 
     @cached_property
     def municipalities(self):

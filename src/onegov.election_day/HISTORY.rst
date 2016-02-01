@@ -7,6 +7,9 @@ Unreleased
 - Normalizes the title used as filename in XLSX exports.
   [msom]
 
+- Shows the domain name of the base url instead of the principal name.
+  [msom]
+
 0.4.1 (2016-01-12)
 ~~~~~~~~~~~~~~~~~~~
 

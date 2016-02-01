@@ -28,7 +28,7 @@ metal:define-macro="layout">
 <body>
     <div class="row header">
         <div class="small-12 medium-4 columns text-left">
-            <a href="${layout.principal.base}" class="back-to-base" tal:condition="show_base_link and layout.principal.base|nothing">${layout.principal.name}</a>
+            <a href="${layout.principal.base}" class="back-to-base" tal:condition="show_base_link and layout.principal.base|nothing">${layout.principal.base_domain}</a>
         </div>
         <div class="small-12 medium-8 columns">
             <a href="${layout.homepage_link}" title="Back to the latest elections &amp; votes" i18n:attributes="title">
