@@ -1,6 +1,6 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import JSON, UUID
+from onegov.core.orm.types import JSON, UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import (
     column,
@@ -67,8 +67,8 @@ class Newsletter(Base, TimestampMixin):
     #: metadata associated with the newsletter, freely usable for anything
     meta = Column(JSON, nullable=False, default=dict)
 
-    #: true if the newsletter has been sent at least once
-    sent = Column(Boolean, nullable=False, default=False)
+    #: null if not sent yet, otherwise the date this newsletter was first sent
+    sent = Column(UTCDateTime, nullable=True)
 
     #: the recipients of this newsletter, meant in part as a tracking feature
     #: to answer the question "who got which newsletters?" - for this to work
