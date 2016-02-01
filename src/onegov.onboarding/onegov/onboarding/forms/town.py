@@ -29,7 +29,8 @@ class TownForm(Form):
 
     color = ColorField(
         label=_("Primary Color"),
-        validators=[validators.InputRequired()]
+        validators=[validators.InputRequired()],
+        default='#005ba1'
     )
 
 
