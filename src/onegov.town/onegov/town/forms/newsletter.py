@@ -15,9 +15,10 @@ class NewsletterForm(Form):
         description=_("A few words about this edition of the newsletter"),
         render_kw={'rows': 6})
 
-    def update_model(self, model):
+    def update_model(self, model, request):
         model.title = self.title.data
         model.meta['editorial'] = self.editorial.data
+        model.content = self.get_content(request)
 
     def apply_model(self, model):
         self.title.data = model.title

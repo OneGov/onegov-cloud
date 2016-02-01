@@ -3,8 +3,8 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <p tal:condition="not:newsletters" i18n:translate>
-            No newsletters yet.
+        <p class="page-lead">
+            ${newsletter.meta.editorial}
         </p>
     </tal:block>
 </div>

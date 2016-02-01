@@ -955,22 +955,36 @@ class NewsletterLayout(DefaultLayout):
         return NewsletterCollection(self.app.session())
 
     @cached_property
+    def is_collection(self):
+        return isinstance(self.model, NewsletterCollection)
+
+    @cached_property
     def breadcrumbs(self):
-        if self.view_name == 'neu':
+
+        if self.is_collection and self.view_name == 'neu':
             return [
                 Link(_("Homepage"), self.homepage_url),
                 Link(_("Newsletter"), self.request.link(self.collection)),
                 Link(_("New"), '#')
             ]
-        else:
+        elif self.is_collection:
             return [
                 Link(_("Homepage"), self.homepage_url),
                 Link(_("Newsletter"), '#')
             ]
+        else:
+            return [
+                Link(_("Homepage"), self.homepage_url),
+                Link(_("Newsletter"), self.request.link(self.collection)),
+                Link(self.model.title, '#')
+            ]
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if not self.request.is_logged_in:
+            return
+
+        if self.is_collection:
             return [
                 LinkGroup(
                     title=_("Add"),
@@ -985,4 +999,22 @@ class NewsletterLayout(DefaultLayout):
                         ),
                     ]
                 ),
+            ]
+        else:
+            return [
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, 'bearbeiten'),
+                    classes=('edit-link', )
+                ),
+                DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model),
+                    confirm=_(
+                        'Do you really want to delete "{}"?'.format(
+                            self.model.title
+                        )),
+                    yes_button_text=_("Delete newsletter"),
+                    redirect_after=self.request.link(self.collection)
+                )
             ]

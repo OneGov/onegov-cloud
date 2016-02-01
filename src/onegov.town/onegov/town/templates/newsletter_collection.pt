@@ -1,0 +1,17 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <p tal:condition="not:newsletters" i18n:translate>
+            No newsletters yet.
+        </p>
+
+        <ul>
+            <li tal:repeat="newsletter newsletters">
+                <div><strong><a href="${request.link(newsletter)}">${newsletter.title}</a></strong></div>
+                <div>${layout.format_date(newsletter.created, 'relative')}</div>
+            </li>
+        </ul>
+    </tal:block>
+</div>

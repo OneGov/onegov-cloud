@@ -17,7 +17,7 @@ from onegov.form import (
 )
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
-from onegov.newsletter import NewsletterCollection
+from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.town.app import TownApp
 from onegov.town.converters import extended_date_converter
 from onegov.town.models import (
@@ -301,6 +301,11 @@ def get_a_to_z(request):
     return AtoZPages(request)
 
 
-@TownApp.path(model=NewsletterCollection, path='/newsletter')
+@TownApp.path(model=NewsletterCollection, path='/newsletters')
 def get_newsletters(app):
     return NewsletterCollection(app.session())
+
+
+@TownApp.path(model=Newsletter, path='/newsletter/{name}')
+def get_newsletter(app, name):
+    return get_newsletters(app).by_name(name)
