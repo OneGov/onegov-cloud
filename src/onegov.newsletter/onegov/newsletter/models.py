@@ -1,6 +1,6 @@
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID
+from onegov.core.orm.mixins import TimestampMixin
+from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import (
     column,
@@ -24,7 +24,7 @@ newsletter_recipients = Table(
 )
 
 
-class Newsletter(Base, ContentMixin, TimestampMixin):
+class Newsletter(Base, TimestampMixin):
     """ Represents a newsletter before and after it is sent.
 
     A newsletter basically consists of a title/subject, a content and a
@@ -63,6 +63,9 @@ class Newsletter(Base, ContentMixin, TimestampMixin):
     #: the content of the newsletter in html, this is not just the partial
     #: content, but the actual, fully rendered html content.
     content = Column(Text, nullable=False)
+
+    #: metadata associated with the newsletter, freely usable for anything
+    meta = Column(JSON, nullable=False, default=dict)
 
     #: true if the newsletter has been sent at least once
     sent = Column(Boolean, nullable=False, default=False)
