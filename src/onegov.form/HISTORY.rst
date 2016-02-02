@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.5 (2016-02-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Marks fields which contain labels as such, so the field rendering code can
   avoid generating nested labels.
 
