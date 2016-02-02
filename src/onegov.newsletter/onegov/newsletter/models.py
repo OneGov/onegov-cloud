@@ -2,6 +2,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UTCDateTime, UUID
 from onegov.core.utils import normalize_for_url
+from onegov.search import ORMSearchable
 from sqlalchemy import (
     column,
     Boolean,
@@ -24,7 +25,7 @@ newsletter_recipients = Table(
 )
 
 
-class Newsletter(Base, ContentMixin, TimestampMixin):
+class Newsletter(Base, ContentMixin, TimestampMixin, ORMSearchable):
     """ Represents a newsletter before and after it is sent.
 
     A newsletter basically consists of a title/subject, a content and a
@@ -35,16 +36,17 @@ class Newsletter(Base, ContentMixin, TimestampMixin):
 
     __tablename__ = 'newsletters'
 
-    es_public = True
+    es_id = 'name'
+    es_language = 'de'  # XXX add to database in the future
     es_properties = {
         'title': {'type': 'localized'},
-        'editorial': {'type': 'localized'},
+        'lead': {'type': 'localized'},
         'html': {'type': 'localized_html'}
     }
 
     @property
-    def es_language(self):
-        return 'de'  # XXX add to database in the future
+    def es_public(self):
+        return self.sent is not None
 
     #: the name of the newsletter, derived from the title
     name = Column(Text, nullable=False, primary_key=True)
@@ -76,6 +78,19 @@ class Newsletter(Base, ContentMixin, TimestampMixin):
         'Recipient',
         secondary=newsletter_recipients,
         back_populates='newsletters')
+
+    @property
+    def lead(self):
+        """ The lead is actually the editorial (and it's optional).
+
+        We have this property because it's a commonly used part of the
+        newsletter (though not a necessary one). And we name it 'lead' here
+        to be compatible with other code which uses the editorial just like
+        it was a lead.
+
+        """
+
+        return self.meta.get('editorial', '')
 
 
 class Recipient(Base, TimestampMixin):
