@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Allows to optionally pick the sheet when converting excel files to CSV.
+  [msom]
+
 0.16.1 (2016-02-02)
 ~~~~~~~~~~~~~~~~~~~
 
