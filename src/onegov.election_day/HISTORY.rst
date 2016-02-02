@@ -13,6 +13,9 @@ Unreleased
 - Adds analytics tracking code.
   [msom]
 
+- Allows the select a sheet when importing XLSX files.
+  [msom]
+
 0.4.1 (2016-01-12)
 ~~~~~~~~~~~~~~~~~~~
 

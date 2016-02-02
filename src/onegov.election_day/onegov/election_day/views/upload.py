@@ -47,7 +47,10 @@ def import_file(principal, vote, ballot_type, file, mimetype):
     if mimetype == 'text/plain':
         csvfile = file
     else:
-        csvfile = convert_xls_to_csv(file)
+        try:
+            csvfile = convert_xls_to_csv(file, 'Resultate')
+        except IOError:
+            csvfile = convert_xls_to_csv(file)
 
     if vote.date.year not in principal.municipalities:
         return {'status': 'error', 'errors': [
