@@ -10,6 +10,7 @@ from wtforms import FileField, SelectMultipleField, widgets
 class MultiCheckboxField(SelectMultipleField):
 
     widget = MultiCheckboxWidget()
+    contains_labels = True
 
     def __init__(self, *args, **kwargs):
         kwargs['option_widget'] = widgets.CheckboxInput()
