@@ -108,25 +108,33 @@
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:block>
             <tal:block condition="input_type != 'hidden'">
-                <label tal:attributes="class field.errors and 'error' or None">
-                    <!-- render the label after the field if it's a boolean field -->
-                    <tal:block condition="field.type == 'BooleanField'">
-                        ${field(placeholder=request.translate(field.description))}
-                        <span class="label-text">${field.label.text}</span>
-                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                    </tal:block>
-                    <tal:block condition="field.type != 'BooleanField'">
-                        <span class="label-text">${field.label.text}</span>
-                        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
-                        ${field(placeholder=request.translate(field.description))}
-                    </tal:block>
+                <label tal:attributes="class field.errors and 'error' or None" tal:condition="not:field.contains_labels|nothing">
+                    <metal:block use-macro="layout.macros['field']" />
                 </label>
+
+                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
+                    <metal:block use-macro="layout.macros['field']" />
+                </div>
                 <small class="error" tal:repeat="error field.errors">${error}</small>
             </tal:block>
         </tal:block>
     </div></div>
     </tal:block>
 </metal:fields>
+
+<metal:single_field define-macro="field">
+     <!-- render the label after the field if it's a boolean field -->
+    <tal:block condition="field.type == 'BooleanField'">
+        ${field(placeholder=request.translate(field.description))}
+        <span class="label-text">${field.label.text}</span>
+        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+    </tal:block>
+    <tal:block condition="field.type != 'BooleanField'">
+        <span class="label-text">${field.label.text}</span>
+        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+        ${field(placeholder=request.translate(field.description))}
+    </tal:block>
+</metal:single_field>
 
 <metal:dropzone define-macro="dropzone" i18n:domain="onegov.town">
     <form action="${upload_url}"

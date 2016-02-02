@@ -195,7 +195,8 @@ table {
     form style customizations
 */
 form {
-    label > ul {
+    label > ul,
+    .group-label > ul {
         list-style: none;
 
         margin: 0;
@@ -207,10 +208,15 @@ form {
         }
     }
 
+    .group-label {
+        color: $form-label-font-color;
+        font-size: $form-label-font-size;
+    }
+
     // fix text wrapping to a seaprate new line in a label following a checkbox
     input[type="checkbox"] + label {
+        max-width: 90%;
         vertical-align: text-top;
-        width: 90%;
     }
 
     .redactor-editor {
