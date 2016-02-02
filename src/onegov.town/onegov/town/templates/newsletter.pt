@@ -12,7 +12,11 @@
 
         <tal:block condition="occurrences">
             <h2 i18n:translate>Events</h2>
-            <metal:occurrences use-macro="layout.macros['occurrences']" />
+            <div class="row">
+                <div class="columns small-12 medium-8 end">
+                    <metal:occurrences use-macro="layout.macros['occurrences']" />
+                </div>
+            </div>
         </tal:block>
     </tal:block>
 </div>
