@@ -71,6 +71,11 @@ def reindex(ctx):
                         app.es_orm_events.index(app.schema, obj)
                         app.es_indexer.process()
 
+            @request.after
+            def cleanup(response):
+                session.invalidate()
+                session.bind.dispose()
+
         config.commit()
 
         # get all applications by looking at the existing schemas

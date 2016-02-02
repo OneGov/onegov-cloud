@@ -1,8 +1,8 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
+- Fixes connection pool exhaustion occuring when reindexing many tennants.
+  [href]
 
 0.3.1 (2016-01-26)
 ~~~~~~~~~~~~~~~~~~~
