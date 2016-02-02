@@ -13,12 +13,13 @@ class NewsletterCollection(object):
     def by_name(self, name):
         return self.query().filter(Newsletter.name == name).first()
 
-    def add(self, title, content, meta=None):
+    def add(self, title, html, meta=None, content=None):
         newsletter = Newsletter(
             name=normalize_for_url(title),
             title=title,
-            content=content,
-            meta=meta or {}
+            html=html,
+            meta=meta or {},
+            content=content or {}
         )
 
         self.session.add(newsletter)

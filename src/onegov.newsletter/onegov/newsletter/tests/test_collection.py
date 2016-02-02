@@ -8,13 +8,13 @@ def test_newsletter_collection(session):
 
     assert n.name == "my-newsletter"
     assert n.title == "My Newsletter"
-    assert n.content == "<h1>My Newsletter</h1>"
+    assert n.html == "<h1>My Newsletter</h1>"
 
     n = newsletters.by_name('my-newsletter')
 
     assert n.name == "my-newsletter"
     assert n.title == "My Newsletter"
-    assert n.content == "<h1>My Newsletter</h1>"
+    assert n.html == "<h1>My Newsletter</h1>"
 
     newsletters.delete(n)
 

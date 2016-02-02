@@ -31,7 +31,7 @@ def test_valid_name():
         Newsletter(
             title="Normalization Works",
             name="Or does it?",
-            content="<h1>Normalization Works</h1>"
+            html="<h1>Normalization Works</h1>"
         )
 
 
@@ -46,7 +46,7 @@ def test_newsletter_recipients_cascade(session):
     newsletter = Newsletter(
         title="10 things you didn't know",
         name="10-things-you-didnt-know",
-        content="<h1>10 things you didn't know</h1>",
+        html="<h1>10 things you didn't know</h1>",
         recipients=[
             Recipient(address='info@example.org')
         ]
@@ -74,7 +74,7 @@ def test_newsletter_recipients_cascade(session):
     recipient.newsletters.append(Newsletter(
         title="How Bitcoin is so 90s",
         name="how-bitcoin-is-so-90s",
-        content="<h1>How Bitcoin is so 90s</h1>"
+        html="<h1>How Bitcoin is so 90s</h1>"
     ))
     transaction.commit()
 
