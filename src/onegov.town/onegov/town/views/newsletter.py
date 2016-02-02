@@ -7,8 +7,21 @@ from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.town import _, TownApp
 from onegov.town.forms import NewsletterForm, SignupForm
 from onegov.town.layout import NewsletterLayout
+from onegov.town.models import News
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
+
+
+def get_newsletter_form(model, request):
+    query = request.app.session().query(News)
+    query = query.filter(News.parent != None)
+    query = query.order_by(desc(News.created))
+    query = query.options(undefer('created'))
+
+    form = NewsletterForm
+    form = form.with_news(request, query.all(), default=None)
+
+    return form
 
 
 @TownApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
@@ -32,11 +45,11 @@ def handle_newsletters(self, request, form):
 
 
 @TownApp.form(model=NewsletterCollection, name='neu', template='form.pt',
-              permission=Public, form=NewsletterForm)
+              permission=Public, form=get_newsletter_form)
 def handle_new_newsletter(self, request, form):
 
     if form.submitted(request):
-        newsletter = self.add(title=form.title.data, content='')
+        newsletter = self.add(title=form.title.data, html='')
         form.update_model(newsletter, request)
 
         request.success(_("Added a new newsletter"))
@@ -52,15 +65,28 @@ def handle_new_newsletter(self, request, form):
 @TownApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
 def view_newsletter(self, request):
 
+    news_ids = self.content.get('news')
+
+    if not news_ids:
+        news = None
+    else:
+        query = request.app.session().query(News)
+        query = query.order_by(desc(News.created))
+        query = query.options(undefer('created'))
+        query = query.filter(News.id.in_(news_ids))
+
+        news = request.exclude_invisible(query.all())
+
     return {
         'layout': NewsletterLayout(self, request),
         'newsletter': self,
+        'news': news,
         'title': self.title,
     }
 
 
 @TownApp.form(model=Newsletter, template='form.pt', name='bearbeiten',
-              permission=Private, form=NewsletterForm)
+              permission=Private, form=get_newsletter_form)
 def edit_newsletter(self, request, form):
 
     if form.submitted(request):

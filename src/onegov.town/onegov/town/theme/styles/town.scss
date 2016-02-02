@@ -2190,3 +2190,16 @@ ul.search-results {
     line-height: 2.6rem;
     width: 2.6rem;
 }
+
+/*
+    Newsletter
+*/
+
+.newsletter-editorial {
+    display: block;
+    font-size: $h5-font-size;
+    font-weight: 300;
+    margin-bottom: 1rem;
+    max-width: $max-line-width;
+    white-space: pre-line;
+}

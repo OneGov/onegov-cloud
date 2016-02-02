@@ -3,8 +3,9 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <p class="page-lead">
-            ${newsletter.meta.editorial}
-        </p>
+        <p class="newsletter-editorial" tal:content="newsletter.meta.editorial" />
+
+        <h2 i18n:translate>Latest news</h2>
+        <metal:newslist use-macro="layout.macros['newslist']" />
     </tal:block>
 </div>
