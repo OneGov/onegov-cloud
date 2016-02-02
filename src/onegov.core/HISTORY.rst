@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.16.1 (2016-02-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes connection pool exhaustion occuring when upgrading many tennants.
   [href]
