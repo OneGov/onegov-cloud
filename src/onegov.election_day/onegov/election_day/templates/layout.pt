@@ -76,6 +76,6 @@ metal:define-macro="layout">
             </div>
         </div>
     </footer>
-
+    <tal:block tal:content="structure layout.principal.analytics|nothing" />
 </body>
 </html>

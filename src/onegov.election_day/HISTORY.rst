@@ -10,6 +10,9 @@ Unreleased
 - Shows the domain name of the base url instead of the principal name.
   [msom]
 
+- Adds analytics tracking code.
+  [msom]
+
 0.4.1 (2016-01-12)
 ~~~~~~~~~~~~~~~~~~~
 

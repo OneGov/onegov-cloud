@@ -19,7 +19,7 @@ class Principal(object):
 
     """
 
-    def __init__(self, name, logo, canton, color, base=None):
+    def __init__(self, name, logo, canton, color, base=None, analytics=None):
         assert canton in cantons
 
         self.name = name
@@ -27,6 +27,7 @@ class Principal(object):
         self.canton = canton
         self.color = color
         self.base = base
+        self.analytics = analytics
 
     @classmethod
     def from_yaml(cls, yaml_source):

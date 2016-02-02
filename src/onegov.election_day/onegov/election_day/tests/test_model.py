@@ -13,6 +13,28 @@ def test_load_principal():
     """))
 
     assert principal.name == 'Foobar'
+    assert principal.name == 'Foobar'
+    assert principal.logo is None
+    assert principal.canton == 'zg'
+    assert principal.color == '#000'
+    assert principal.base is None
+    assert principal.analytics is None
+
+    principal = Principal.from_yaml(textwrap.dedent("""
+        name: Foobar
+        logo:
+        canton: zg
+        color: '#000'
+        base: 'http://www.zg.ch'
+        analytics: "<script type=\\"text/javascript\\"></script>"
+    """))
+
+    assert principal.name == 'Foobar'
+    assert principal.logo is None
+    assert principal.canton == 'zg'
+    assert principal.color == '#000'
+    assert principal.base == 'http://www.zg.ch'
+    assert principal.analytics == '<script type="text/javascript"></script>'
 
 
 def test_municipalities():
