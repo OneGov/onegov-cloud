@@ -56,6 +56,23 @@ def extract_href(link):
     return result and result.group(1) or None
 
 
+def select_checkbox(page, groupname, label, form=None, checked=True):
+    """ Selects one of many checkboxes by fuzzy searching the label next to
+    it. Webtest is not good enough in this regard.
+
+    Selects the checkbox from the form returned by page.form, or the given
+    form if passed. In any case, the form needs to be part of the page.
+
+    """
+
+    elements = page.pyquery('input[name="{}"]'.format(groupname))
+    form = form or page.form
+
+    for ix, el in enumerate(elements):
+        if label in el.label.text_content():
+            form.get(groupname, index=ix).value = checked
+
+
 def test_view_permissions():
     utils.assert_explicit_permissions(onegov.town)
 
@@ -2345,16 +2362,36 @@ def test_newsletters_crud(town_app):
     new = newsletter.click('Newsletter')
     new.form['title'] = "Our town is AWESOME"
     new.form['editorial'] = "Like many of you, I just love our town..."
+
+    select_checkbox(new, "news", "Willkommen bei OneGov")
+    select_checkbox(new, "occurrences", "150 Jahre Govikon")
+    select_checkbox(new, "occurrences", "MuKi Turnen")
+
     newsletter = new.form.submit().follow()
 
     assert newsletter.pyquery('h1').text() == "Our town is AWESOME"
     assert "Like many of you" in newsletter
+    assert "Willkommen bei OneGov" in newsletter
+    assert "Ihre neuer Online Schalter" in newsletter
+    assert "MuKi Turnen" in newsletter
+    assert "Turnhalle" in newsletter
+    assert "150 Jahre Govikon" in newsletter
+    assert "Sportanlage" in newsletter
 
     edit = newsletter.click("Bearbeiten")
     edit.form['title'] = "I can't even"
+    select_checkbox(edit, "occurrences", "150 Jahre Govikon", checked=False)
+
     newsletter = edit.form.submit().follow()
 
     assert newsletter.pyquery('h1').text() == "I can't even"
+    assert "Like many of you" in newsletter
+    assert "Willkommen bei OneGov" in newsletter
+    assert "Ihre neuer Online Schalter" in newsletter
+    assert "MuKi Turnen" in newsletter
+    assert "Turnhalle" in newsletter
+    assert "150 Jahre Govikon" not in newsletter
+    assert "Sportanlage" not in newsletter
 
     newsletters = client.get('/newsletters')
     assert "I can't even" in newsletters
