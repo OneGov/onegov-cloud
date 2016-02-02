@@ -5,7 +5,14 @@
     <tal:block metal:fill-slot="content">
         <p class="newsletter-editorial" tal:content="newsletter.meta.editorial" />
 
-        <h2 i18n:translate>Latest news</h2>
-        <metal:newslist use-macro="layout.macros['newslist']" />
+        <tal:block condition="news">
+            <h2 i18n:translate>Latest news</h2>
+            <metal:newslist use-macro="layout.macros['newslist']" />
+        </tal:block>
+
+        <tal:block condition="occurrences">
+            <h2 i18n:translate>Events</h2>
+            <metal:occurrences use-macro="layout.macros['occurrences']" />
+        </tal:block>
     </tal:block>
 </div>

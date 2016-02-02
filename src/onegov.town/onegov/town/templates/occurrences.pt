@@ -7,36 +7,8 @@
 
             <div class="large-8 medium-8 columns">
                 <div class="row">
-                    <div class="large-12 columns" tal:define="global lastdaydate 0">
-                        <tal:block repeat="occurrence occurrences">
-                            <div class="row">
-                                <div class="occurrence">
-                                    <div class="large-3 columns">
-                                        <tal:block tal:condition="layout.format_date(occurrence.localized_start, 'date') == lastdaydate">
-                                            <div class="show-for-large-up occurrences-day-date"></div>
-                                        </tal:block>
-                                        <tal:block tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
-                                            <h2 class="occurrences-day-date active">
-                                                <span>${layout.format_date(occurrence.localized_start, 'weekday_long')}</span>
-                                                <span class="day">${occurrence.localized_start.day}</span>
-                                                <span class="dot">.</span>
-                                                <span>${layout.format_date(occurrence.localized_start, 'month_long')}</span>
-                                            </h2>
-                                        </tal:block>
-                                    </div>
-                                    <div class="large-9 medium-12 small-12 columns">
-                                        <div class="occurrence-date show-for-large-up">${layout.format_date(occurrence.localized_start, 'date')}</div>
-                                        <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
-                                        <div>${occurrence.location}</div>
-                                        <div>${layout.format_date(occurrence.localized_start, 'time')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
-                                        <div><span tal:repeat="tag occurrence.tags" class="occurrence-tag" i18n:translate="">${tag}</span></div>
-                                    </div>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </div>
-                            <tal:block tal:define="global lastdaydate python: layout.format_date(occurrence.localized_start, 'date')" />
-                        </tal:block>
-                        <div tal:condition="not occurrences" i18n:translate="">No events found.</div>
+                    <div class="large-12 columns">
+                        <div metal:use-macro="layout.macros['occurrences']" />
                     </div>
                 </div>
 

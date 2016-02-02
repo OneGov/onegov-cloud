@@ -3,6 +3,7 @@
 import morepath
 
 from onegov.core.security import Public, Private
+from onegov.event import Occurrence, OccurrenceCollection
 from onegov.newsletter import Newsletter, NewsletterCollection
 from onegov.town import _, TownApp
 from onegov.town.forms import NewsletterForm, SignupForm
@@ -13,13 +14,26 @@ from sqlalchemy.orm import undefer
 
 
 def get_newsletter_form(model, request):
+
+    form = NewsletterForm
+
     query = request.app.session().query(News)
     query = query.filter(News.parent != None)
     query = query.order_by(desc(News.created))
     query = query.options(undefer('created'))
+    form = form.with_news(request, query.all())
 
-    form = NewsletterForm
-    form = form.with_news(request, query.all(), default=None)
+    query = OccurrenceCollection(request.app.session()).query(outdated=False)
+    subquery = query.with_entities(Occurrence.id)
+    subquery = subquery.order_by(None)
+    subquery = subquery.order_by(
+        Occurrence.event_id,
+        Occurrence.start
+    )
+    subquery = subquery.distinct(Occurrence.event_id).subquery()
+    query.filter(Occurrence.id.in_(subquery))
+
+    form = form.with_occurrences(request, query.all())
 
     return form
 
@@ -40,25 +54,7 @@ def handle_newsletters(self, request, form):
         'form': form,
         'layout': NewsletterLayout(self, request),
         'newsletters': query.all(),
-        'title': _("Newsletter"),
-    }
-
-
-@TownApp.form(model=NewsletterCollection, name='neu', template='form.pt',
-              permission=Public, form=get_newsletter_form)
-def handle_new_newsletter(self, request, form):
-
-    if form.submitted(request):
-        newsletter = self.add(title=form.title.data, html='')
-        form.update_model(newsletter, request)
-
-        request.success(_("Added a new newsletter"))
-        return morepath.redirect(request.link(newsletter))
-
-    return {
-        'form': form,
-        'layout': NewsletterLayout(self, request),
-        'title': _("New Newsletter"),
+        'title': _("Newsletter")
     }
 
 
@@ -77,11 +73,42 @@ def view_newsletter(self, request):
 
         news = request.exclude_invisible(query.all())
 
+    occurrence_ids = self.content.get('occurrences')
+
+    if not occurrence_ids:
+        occurrences = None
+    else:
+        query = request.app.session().query(Occurrence)
+        query = query.order_by(Occurrence.start, Occurrence.title)
+        query = query.filter(Occurrence.id.in_(occurrence_ids))
+
+        occurrences = query.all()
+
     return {
         'layout': NewsletterLayout(self, request),
         'newsletter': self,
         'news': news,
+        'occurrences': occurrences,
         'title': self.title,
+    }
+
+
+@TownApp.form(model=NewsletterCollection, name='neu', template='form.pt',
+              permission=Public, form=get_newsletter_form)
+def handle_new_newsletter(self, request, form):
+
+    if form.submitted(request):
+        newsletter = self.add(title=form.title.data, html='')
+        form.update_model(newsletter, request)
+
+        request.success(_("Added a new newsletter"))
+        return morepath.redirect(request.link(newsletter))
+
+    return {
+        'form': form,
+        'layout': NewsletterLayout(self, request),
+        'title': _("New Newsletter"),
+        'size': 'large'
     }
 
 
@@ -101,7 +128,8 @@ def edit_newsletter(self, request, form):
     return {
         'layout': NewsletterLayout(self, request),
         'form': form,
-        'title': _("Edit Newsletter")
+        'title': _("Edit Newsletter"),
+        'size': 'large'
     }
 
 

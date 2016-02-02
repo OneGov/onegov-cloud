@@ -1,3 +1,4 @@
+from onegov.core.layout import Layout
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.town import _
@@ -29,11 +30,17 @@ class NewsletterForm(Form):
         return ''
 
     @classmethod
-    def with_news(cls, request, news, default):
+    def with_news(cls, request, news):
 
-        choices = [
-            (str(item.id), item.title) for item in news
-        ]
+        layout = Layout(None, request)
+
+        choices = tuple((
+            str(item.id),
+            '<div class="title">{}</div><div class="date">{}</div>'.format(
+                item.title,
+                layout.format_date(item.created, 'relative')
+            )
+        ) for item in news)
 
         class NewsletterWithNewsForm(cls):
 
@@ -41,8 +48,10 @@ class NewsletterForm(Form):
                 label=_("Latest news"),
                 choices=choices,
                 render_kw={
-                    'prefix_label': False
-                }
+                    'prefix_label': False,
+                    'class_': 'recommended'
+                },
+                fieldset=_("Selected News / Events")
             )
 
             def update_model(self, model, request):
@@ -51,6 +60,40 @@ class NewsletterForm(Form):
 
             def apply_model(self, model):
                 super().apply_model(model)
-                self.news.data = model.content['news']
+                self.news.data = model.content.get('news')
 
         return NewsletterWithNewsForm
+
+    @classmethod
+    def with_occurrences(cls, request, occurrences):
+
+        choices = tuple(
+            (
+                str(item.id),
+                '<div class="title">{}</div><div class="date">{}</div>'.format(
+                    item.title, item.localized_start.strftime('%d.%m.%Y %H:%M')
+                )
+            ) for item in occurrences
+        )
+
+        class NewsletterWithOccurrencesForm(cls):
+
+            occurrences = MultiCheckboxField(
+                label=_("Events"),
+                choices=choices,
+                render_kw={
+                    'prefix_label': False,
+                    'class_': 'recommended'
+                },
+                fieldset=_("Selected News / Events")
+            )
+
+            def update_model(self, model, request):
+                super().update_model(model, request)
+                model.content['occurrences'] = self.occurrences.data
+
+            def apply_model(self, model):
+                super().apply_model(model)
+                self.occurrences.data = model.content.get('occurrences')
+
+        return NewsletterWithOccurrencesForm

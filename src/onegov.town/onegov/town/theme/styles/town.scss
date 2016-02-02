@@ -207,6 +207,12 @@ form {
         }
     }
 
+    // fix text wrapping to a seaprate new line in a label following a checkbox
+    input[type="checkbox"] + label {
+        vertical-align: text-top;
+        width: 90%;
+    }
+
     .redactor-editor {
         @include form-element;
         cursor: text;
@@ -2202,4 +2208,10 @@ ul.search-results {
     margin-bottom: 1rem;
     max-width: $max-line-width;
     white-space: pre-line;
+}
+
+.recommended {
+    .date {
+        color: $jumbo;
+    }
 }

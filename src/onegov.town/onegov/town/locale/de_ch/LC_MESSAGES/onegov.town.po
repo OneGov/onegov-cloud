@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-02-01 16:49+0100\n"
+"POT-Creation-Date: 2016-02-02 14:29+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -437,6 +437,12 @@ msgstr "Editorial"
 msgid "A few words about this edition of the newsletter"
 msgstr "Ein paar Worte zu dieser Ausgabe des Newsletters"
 
+msgid "Latest news"
+msgstr "Aktuelles"
+
+msgid "Selected News / Events"
+msgstr "Ausgewählte Nachrichten und Veranstaltungen"
+
 msgid "URL"
 msgstr "URL"
 
@@ -787,9 +793,6 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
-
-msgid "Latest news"
-msgstr "Aktuelles"
 
 msgid "All news"
 msgstr "Alle Nachrichten"
