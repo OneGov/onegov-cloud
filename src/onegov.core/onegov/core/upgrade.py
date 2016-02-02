@@ -395,5 +395,8 @@ class UpgradeRunner(object):
                     upgrade.commit()
                 else:
                     upgrade.abort()
+            finally:
+                context.session.invalidate()
+                context.engine.dispose()
 
         return executed
