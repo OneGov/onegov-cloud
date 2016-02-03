@@ -17,7 +17,12 @@ from onegov.form import (
 )
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
-from onegov.newsletter import Newsletter, NewsletterCollection
+from onegov.newsletter import (
+    Newsletter,
+    NewsletterCollection,
+    Subscription,
+    RecipientCollection,
+)
 from onegov.town.app import TownApp
 from onegov.town.converters import extended_date_converter
 from onegov.town.models import (
@@ -309,3 +314,9 @@ def get_newsletters(app):
 @TownApp.path(model=Newsletter, path='/newsletter/{name}')
 def get_newsletter(app, name):
     return get_newsletters(app).by_name(name)
+
+
+@TownApp.path(model=Subscription, path='/abonnement/{recipient_id}/{token}')
+def get_subscription(app, recipient_id, token):
+    recipient = RecipientCollection(app.session()).by_id(recipient_id)
+    return recipient and Subscription(recipient, token)

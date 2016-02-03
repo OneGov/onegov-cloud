@@ -3,13 +3,14 @@
 import morepath
 
 from onegov.core.security import Public, Private
+from onegov.core.templates import render_template
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.newsletter import Newsletter
 from onegov.newsletter import NewsletterCollection
 from onegov.newsletter import RecipientCollection
 from onegov.town import _, TownApp
 from onegov.town.forms import NewsletterForm, SignupForm
-from onegov.town.layout import NewsletterLayout
+from onegov.town.layout import DefaultMailLayout, NewsletterLayout
 from onegov.town.models import News
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
@@ -53,9 +54,26 @@ def handle_newsletters(self, request, form):
         # or not is private
 
         if not recipient:
-            pass
-            # recipient = recipients.add(address=form.address.data)
-            # send_mail(recipient.token)
+            recipient = recipients.add(address=form.address.data)
+
+            title = request.translate(
+                _("Welcome to the ${town} Newsletter", mapping={
+                    'town': request.app.town.name
+                })
+            )
+
+            confirm_mail = render_template('mail_confirm.pt', request, {
+                'layout': DefaultMailLayout(self, request),
+                'newsletters': self,
+                'subscription': recipient.subscription,
+                'title': title
+            })
+
+            request.app.send_email(
+                subject=title,
+                receivers=(recipient.address, ),
+                content=confirm_mail
+            )
 
         request.success(_((
             "Success! We have sent a confirmation link to "
