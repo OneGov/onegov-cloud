@@ -51,8 +51,12 @@ class RecipientCollection(object):
 
         return query.first()
 
-    def add(self, address, group=None):
-        recipient = Recipient(address=address, group=group)
+    def add(self, address, group=None, confirmed=False):
+        recipient = Recipient(
+            address=address,
+            group=group,
+            confirmed=confirmed
+        )
         self.session.add(recipient)
         self.session.flush()
 

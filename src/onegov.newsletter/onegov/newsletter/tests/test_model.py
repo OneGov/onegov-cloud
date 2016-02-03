@@ -40,6 +40,27 @@ def test_recipients_valid_email():
         Recipient(address="no-email")
 
 
+def test_recipient_confirm(session):
+    recipient = Recipient(address="info@example.org")
+    session.add(recipient)
+    session.flush()
+
+    assert len(recipient.token) >= 64
+
+    assert not recipient.confirmed
+    assert not recipient.confirm(token='asdf')
+    assert not recipient.confirmed
+
+    assert recipient.confirm(recipient.token)
+    assert recipient.confirmed
+
+    assert not recipient.unsubscribe(token='asdf')
+    assert recipient.confirmed
+
+    assert recipient.unsubscribe(token=recipient.token)
+    assert session.query(Recipient).count() == 0
+
+
 def test_newsletter_recipients_cascade(session):
 
     # is the relationship reflected correctly?

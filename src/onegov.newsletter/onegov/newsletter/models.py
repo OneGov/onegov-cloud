@@ -1,3 +1,4 @@
+from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UTCDateTime, UUID
@@ -13,7 +14,7 @@ from sqlalchemy import (
     Text,
 )
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import validates, relationship
+from sqlalchemy.orm import object_session, validates, relationship
 from uuid import uuid4
 from validate_email import validate_email
 
@@ -116,6 +117,9 @@ class Recipient(Base, TimestampMixin):
         secondary=newsletter_recipients,
         back_populates='recipients')
 
+    #: this token is used for confirm and unsubscribe
+    token = Column(Text, nullable=False, default=random_token)
+
     #: when recipients are added, they are unconfirmed. At this point they get
     #: one e-mail with a confirmation link. If they ignore said e-mail they
     #: should not get another one.
@@ -133,3 +137,20 @@ class Recipient(Base, TimestampMixin):
                 unique=True, postgresql_where=column('group') == None
             ),
         )
+
+    def confirm(self, token):
+        if self.token != token:
+            return False
+
+        self.confirmed = True
+        return True
+
+    def unsubscribe(self, token):
+        if self.token != token:
+            return False
+
+        session = object_session(self)
+        session.delete(self)
+        session.flush()
+
+        return True
