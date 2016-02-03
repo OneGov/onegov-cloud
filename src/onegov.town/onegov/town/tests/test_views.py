@@ -2361,7 +2361,7 @@ def test_newsletters_crud(town_app):
 
     new = newsletter.click('Newsletter')
     new.form['title'] = "Our town is AWESOME"
-    new.form['editorial'] = "Like many of you, I just love our town..."
+    new.form['lead'] = "Like many of you, I just love our town..."
 
     select_checkbox(new, "news", "Willkommen bei OneGov")
     select_checkbox(new, "occurrences", "150 Jahre Govikon")

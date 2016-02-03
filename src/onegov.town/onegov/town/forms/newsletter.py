@@ -12,19 +12,19 @@ class NewsletterForm(Form):
         description=_("Used in the overview and the e-mail subject"),
         validators=[validators.InputRequired()])
 
-    editorial = TextAreaField(
+    lead = TextAreaField(
         label=_("Editorial"),
         description=_("A few words about this edition of the newsletter"),
         render_kw={'rows': 6})
 
     def update_model(self, model, request):
         model.title = self.title.data
-        model.meta['editorial'] = self.editorial.data
+        model.lead = self.lead.data
         model.html = self.get_html(request)
 
     def apply_model(self, model):
         self.title.data = model.title
-        self.editorial.data = model.meta.get('editorial', '')
+        self.lead.data = model.lead
 
     def get_html(self, request):
         return ''
