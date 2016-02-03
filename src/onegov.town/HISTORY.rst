@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Maching titles now get a slight boost in the search results. This ensures
+  that maching titles in search results are shown further up.
+  [href]
+
 - Adds compatibility with latest onegov.core release.
   [herf]
 

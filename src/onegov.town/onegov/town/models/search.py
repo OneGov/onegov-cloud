@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from onegov.core.collection import Pagination
+from elasticsearch_dsl.query import MultiMatch, MatchPhrase
 
 
 class Search(Pagination):
@@ -45,12 +46,17 @@ class Search(Pagination):
             request=self.request,
             explain=self.explain
         )
-        search = search.query('multi_match', query=self.query, fields=[
+
+        # make sure the title matches with a higher priority, otherwise the
+        # "get lucky" functionality is not so lucky after all
+        match_title = MatchPhrase(title={"query": self.query, "boost": 3})
+        match_rest = MultiMatch(query=self.query, fields=[
             'title', 'lead', 'text', 'email', 'function', 'number',
             'ticket_email', 'ticket_data', 'description', 'location',
             'group'
         ], fuzziness='AUTO')
 
+        search = search.query(match_title | match_rest)
         search = search[self.offset:self.offset + self.batch_size]
 
         return search.execute()
