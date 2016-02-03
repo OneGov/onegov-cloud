@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for query explanations.
+  [href]
+
 0.3.2 (2016-02-02)
 ~~~~~~~~~~~~~~~~~~~
 

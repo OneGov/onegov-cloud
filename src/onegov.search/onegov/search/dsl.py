@@ -37,6 +37,10 @@ class Search(BaseSearch):
                         mapping.model, self.session
                     )
 
+    @property
+    def explain(self):
+        return self._extra.get('explain', False)
+
     def _clone(self):
         search = super()._clone()
         search.session = self.session
@@ -45,7 +49,7 @@ class Search(BaseSearch):
         return search
 
     def execute(self):
-        response = Response.bind(self.session, self.mappings)
+        response = Response.bind(self.session, self.mappings, self.explain)
         return super().execute(response_class=response)
 
 
@@ -56,13 +60,14 @@ class Response(BaseResponse):
     """
 
     @classmethod
-    def bind(cls, session, mappings):
+    def bind(cls, session, mappings, explain):
 
         class BoundResponse(cls):
             pass
 
         BoundResponse.session = session
         BoundResponse.mappings = mappings
+        BoundResponse.explain = explain
 
         return BoundResponse
 
@@ -113,9 +118,48 @@ class Response(BaseResponse):
         for type in types:
             for result in self.query(type).all():
                 object_id = str(getattr(result, result.es_id))
-                results[positions[(type, object_id)]] = result
+                ix = positions[(type, object_id)]
+
+                if self.explain:
+
+                    ex = self.hits[ix].meta.explanation
+
+                    result.explanation = {
+                        'raw': ex.__dict__,
+                        'score': self.hits[ix].meta.score,
+                        'term-frequency': explanation_value(
+                            ex, 'termFreq'
+                        ),
+                        'inverse-document-frequency': explanation_value(
+                            ex, 'idf'
+                        ),
+                        'field-norm': explanation_value(
+                            ex, 'fieldNorm'
+                        )
+                    }
+
+                results[ix] = result
 
         return results
+
+
+def explanation_value(explanation, text):
+    """ Gets the value from the explanation for descriptions starting with
+    the given text.
+
+    """
+
+    if explanation.description.startswith(text):
+        return {
+            'description': explanation.description,
+            'value': explanation.value
+        }
+
+    for detail in getattr(explanation, 'details', []):
+        result = explanation_value(detail, text)
+
+        if result:
+            return result
 
 
 class Result(BaseResult):

@@ -109,7 +109,8 @@ class ElasticsearchApp(morepath.App):
             self.session_manager.on_delete.connect(
                 self.es_orm_events.on_delete)
 
-    def es_search(self, languages='*', types='*', include_private=False):
+    def es_search(self, languages='*', types='*', include_private=False,
+                  explain=False):
         """ Returns a search scoped to the current application, with the
         given languages, types and private documents excluded by default.
 
@@ -119,7 +120,8 @@ class ElasticsearchApp(morepath.App):
             session=self.session(),
             mappings=self.es_mappings,
             using=self.es_client,
-            index=self.es_indices(languages, types)
+            index=self.es_indices(languages, types),
+            extra=dict(explain=explain)
         )
 
         if not include_private:
@@ -138,7 +140,7 @@ class ElasticsearchApp(morepath.App):
             types=types
         )
 
-    def es_search_by_request(self, request, types='*'):
+    def es_search_by_request(self, request, types='*', explain=False):
         """ Takes the current :class:`~onegov.core.request.CoreRequest` and
         returns an elastic search scoped to the current application, the
         requests language and it's access rights.
@@ -148,7 +150,8 @@ class ElasticsearchApp(morepath.App):
         return self.es_search(
             languages=[request.locale.split('_')[0]],
             types=types,
-            include_private=request.is_logged_in
+            include_private=request.is_logged_in,
+            explain=explain
         )
 
     def es_suggestions(self, query, languages='*', types='*',
