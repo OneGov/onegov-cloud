@@ -4,7 +4,9 @@ import morepath
 
 from onegov.core.security import Public, Private
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.newsletter import Newsletter, NewsletterCollection
+from onegov.newsletter import Newsletter
+from onegov.newsletter import NewsletterCollection
+from onegov.newsletter import RecipientCollection
 from onegov.town import _, TownApp
 from onegov.town.forms import NewsletterForm, SignupForm
 from onegov.town.layout import NewsletterLayout
@@ -42,6 +44,24 @@ def get_newsletter_form(model, request):
               permission=Public, form=SignupForm)
 def handle_newsletters(self, request, form):
 
+    if form.submitted(request):
+        recipients = RecipientCollection(request.app.session())
+        recipient = recipients.by_address(form.address.data)
+
+        # do not show a specific error message if the user already signed up,
+        # just pretend like everything worked correctly - if someone signed up
+        # or not is private
+
+        if not recipient:
+            pass
+            # recipient = recipients.add(address=form.address.data)
+            # send_mail(recipient.token)
+
+        request.success(_((
+            "Success! We have sent a confirmation link to "
+            "${address}, if we didn't send you one already."
+        ), mapping={'address': form.address.data}))
+
     query = self.query()
     query = query.options(undefer(Newsletter.created))
     query = query.order_by(desc(Newsletter.created))
@@ -54,7 +74,7 @@ def handle_newsletters(self, request, form):
         'form': form,
         'layout': NewsletterLayout(self, request),
         'newsletters': query.all(),
-        'title': _("Newsletter")
+        'title': _("Newsletter"),
     }
 
 

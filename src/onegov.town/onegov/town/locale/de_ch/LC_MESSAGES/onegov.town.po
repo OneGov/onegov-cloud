@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-02-02 14:29+0100\n"
+"POT-Creation-Date: 2016-02-03 15:13+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -907,6 +907,9 @@ msgstr "Wiederholungen"
 msgid "All dates"
 msgstr "Alle Termine"
 
+msgid "No events found."
+msgstr "Keine Veranstaltungen gefunden."
+
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
@@ -1024,6 +1027,16 @@ msgstr ""
 msgid "Your ticket has been reopened"
 msgstr "Ihr Ticket wurde wieder geöffnet"
 
+msgid "Sign up to our newsletter to always stay up to date:"
+msgstr ""
+"Abonnieren Sie unseren Newsletter um immer auf dem Laufenden zu bleiben:"
+
+msgid "Signup"
+msgstr "Abonnieren"
+
+msgid "Archive"
+msgstr "Archiv"
+
 msgid "No newsletters yet."
 msgstr "Es wurden noch keine Newsletter versendet"
 
@@ -1046,9 +1059,6 @@ msgstr "Alle Termine exportieren"
 
 msgid "All occurrences of this event"
 msgstr "Alle Termine dieser Veranstaltung"
-
-msgid "No events found."
-msgstr "Keine Veranstaltungen gefunden."
 
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
@@ -1278,6 +1288,14 @@ msgstr "Neuer Newsletter"
 
 msgid "Edit Newsletter"
 msgstr "Newsletter Bearbeiten"
+
+#, python-format
+msgid ""
+"Success! We have sent a confirmation link to ${address}, if we didn't send "
+"you one already."
+msgstr ""
+"Erfolg! Wir senden eine E-Mail zur Bestätigung Ihres Abonnements an "
+"${address}, sofern Sie noch nicht angemeldet sind."
 
 msgid "Added a new newsletter"
 msgstr "Ein neuer Newsletter wurde hinzugefügt"
