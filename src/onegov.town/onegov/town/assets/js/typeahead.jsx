@@ -132,30 +132,27 @@ var TypeAhead = function(form) {
     $(subject).on('keydown', function(event) {
         // enter
         if (event.keyCode == 13) {
-            if (typeahead !== null) {
-                if (typeahead.enter()) {
-                    event.preventDefault();
-                }
+            if (typeahead !== null && typeahead.enter()) {
+                event.preventDefault();
             }
-            return;
         }
         // arrow up
-        if (event.keyCode == 38) {
-            if (typeahead !== null) typeahead.up();
-            event.preventDefault();
-            return;
+        else if (event.keyCode == 38) {
+            if (typeahead !== null && typeahead.up()) {
+                event.preventDefault();
+            }
         }
         // arrow down
-        if (event.keyCode == 40) {
-            if (typeahead !== null) typeahead.down();
-            event.preventDefault();
-            return;
+        else if (event.keyCode == 40) {
+            if (typeahead !== null && typeahead.down()) {
+                event.preventDefault();
+            }
         }
         // arrow right
-        if (event.keyCode == 39) {
-            if (typeahead !== null) typeahead.right();
-            event.preventDefault();
-            return;
+        else if (event.keyCode == 39) {
+           if (typeahead !== null && typeahead.right()) {
+                event.preventDefault();
+            }
         }
     });
 

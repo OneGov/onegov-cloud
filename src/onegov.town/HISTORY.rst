@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Stops search box from consuming arrow key presses too eagerly.
+  [href]
+
 - Maching titles now get a slight boost in the search results. This ensures
   that maching titles in search results are shown further up.
   [href]
