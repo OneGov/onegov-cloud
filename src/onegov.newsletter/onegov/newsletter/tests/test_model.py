@@ -1,7 +1,7 @@
 import pytest
 import transaction
 
-from onegov.newsletter import Newsletter, Recipient
+from onegov.newsletter import Newsletter, Recipient, Subscription
 from onegov.newsletter.models import newsletter_recipients
 from sqlalchemy.exc import IntegrityError
 
@@ -40,7 +40,7 @@ def test_recipients_valid_email():
         Recipient(address="no-email")
 
 
-def test_recipient_confirm(session):
+def test_recipient_subscription(session):
     recipient = Recipient(address="info@example.org")
     session.add(recipient)
     session.flush()
@@ -48,16 +48,16 @@ def test_recipient_confirm(session):
     assert len(recipient.token) >= 64
 
     assert not recipient.confirmed
-    assert not recipient.confirm(token='asdf')
+    assert not Subscription(recipient, 'asdf').confirm()
     assert not recipient.confirmed
 
-    assert recipient.confirm(recipient.token)
+    assert recipient.subscription.confirm()
     assert recipient.confirmed
 
-    assert not recipient.unsubscribe(token='asdf')
+    assert not Subscription(recipient, 'asdf').unsubscribe()
     assert recipient.confirmed
 
-    assert recipient.unsubscribe(token=recipient.token)
+    assert recipient.subscription.unsubscribe()
     assert session.query(Recipient).count() == 0
 
 

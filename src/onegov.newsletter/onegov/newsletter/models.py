@@ -138,19 +138,35 @@ class Recipient(Base, TimestampMixin):
             ),
         )
 
-    def confirm(self, token):
-        if self.token != token:
+    @property
+    def subscription(self):
+        return Subscription(self, self.token)
+
+
+class Subscription(object):
+    """ Adds subscription management to a recipient. """
+
+    def __init__(self, recipient, token):
+        self.recipient = recipient
+        self.token = token
+
+    @property
+    def recipient_id(self):
+        return self.recipient.id
+
+    def confirm(self):
+        if self.recipient.token != self.token:
             return False
 
-        self.confirmed = True
+        self.recipient.confirmed = True
         return True
 
-    def unsubscribe(self, token):
-        if self.token != token:
+    def unsubscribe(self):
+        if self.recipient.token != self.token:
             return False
 
-        session = object_session(self)
-        session.delete(self)
+        session = object_session(self.recipient)
+        session.delete(self.recipient)
         session.flush()
 
         return True

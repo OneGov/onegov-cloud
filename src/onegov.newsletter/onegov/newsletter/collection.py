@@ -1,4 +1,4 @@
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import normalize_for_url, is_uuid
 from onegov.newsletter import Newsletter, Recipient
 
 
@@ -42,7 +42,8 @@ class RecipientCollection(object):
         return self.session.query(Recipient)
 
     def by_id(self, id):
-        return self.query().filter(Recipient.id == id).first()
+        if is_uuid(id):
+            return self.query().filter(Recipient.id == id).first()
 
     def by_address(self, address, group=None):
         query = self.query()
