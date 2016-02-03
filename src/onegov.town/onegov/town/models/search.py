@@ -18,6 +18,10 @@ class Search(Pagination):
 
         return search.execute().hits.total
 
+    @cached_property
+    def explain(self):
+        return self.request.is_logged_in and 'explain' in self.request.params
+
     @property
     def q(self):
         return self.query
@@ -37,12 +41,16 @@ class Search(Pagination):
 
     @cached_property
     def batch(self):
-        search = self.request.app.es_search_by_request(self.request)
+        search = self.request.app.es_search_by_request(
+            request=self.request,
+            explain=self.explain
+        )
         search = search.query('multi_match', query=self.query, fields=[
             'title', 'lead', 'text', 'email', 'function', 'number',
             'ticket_email', 'ticket_data', 'description', 'location',
             'group'
         ], fuzziness='AUTO')
+
         search = search[self.offset:self.offset + self.batch_size]
 
         return search.execute()

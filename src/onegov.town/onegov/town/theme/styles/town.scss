@@ -2020,6 +2020,15 @@ ul.search-results {
     }
 }
 
+.result-explanation li {
+    background-color: $white-smoke;
+    border-radius: 5px;
+    color: $steel;
+    display: inline-block;
+    font-size: .8rem;
+    padding: 0 3px;
+}
+
 /*
     Search result typeahead
 */
