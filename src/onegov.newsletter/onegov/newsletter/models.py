@@ -62,6 +62,9 @@ class Newsletter(Base, ContentMixin, TimestampMixin, ORMSearchable):
     #: the title of the newsletter
     title = Column(Text, nullable=False)
 
+    #: the optional lead or editorial of the newsletter
+    lead = Column(Text, nullable=True)
+
     #: the content of the newsletter in html, this is not just the partial
     #: content, but the actual, fully rendered html content.
     html = Column(Text, nullable=False)
@@ -78,19 +81,6 @@ class Newsletter(Base, ContentMixin, TimestampMixin, ORMSearchable):
         'Recipient',
         secondary=newsletter_recipients,
         back_populates='newsletters')
-
-    @property
-    def lead(self):
-        """ The lead is actually the editorial (and it's optional).
-
-        We have this property because it's a commonly used part of the
-        newsletter (though not a necessary one). And we name it 'lead' here
-        to be compatible with other code which uses the editorial just like
-        it was a lead.
-
-        """
-
-        return self.meta.get('editorial', '')
 
 
 class Recipient(Base, TimestampMixin):
