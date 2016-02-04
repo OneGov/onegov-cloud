@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-02-04 11:17+0100\n"
+"POT-Creation-Date: 2016-02-04 14:59+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -445,6 +445,12 @@ msgstr "Aktuelles"
 
 msgid "Selected News / Events"
 msgstr "Ausgewählte Nachrichten und Veranstaltungen"
+
+msgid "Recipients"
+msgstr "Empfänger"
+
+msgid "Please select at least one recipient"
+msgstr "Bitte wählen Sie mindestens einen Empfänger"
 
 msgid "URL"
 msgstr "URL"
@@ -1019,6 +1025,17 @@ msgstr "Ticket Status abfragen"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
+msgid ""
+"You are receiving this e-mail because you signed up for the ${town} "
+"newsletter."
+msgstr "Sie erhalten Diese E-Mail weil Sie sich für den ${town} Newsletter angemeldet haben."
+
+msgid "Click here to view web version."
+msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
+
+msgid "Click here to unsubscribe."
+msgstr "Clicken Sie hier um sich abzumelden."
+
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
 
@@ -1139,6 +1156,24 @@ msgstr ""
 
 msgid "Your search returned no results."
 msgstr "Zu Ihrer Suche wurde nichts gefunden"
+
+msgid "This newsletter has not been sent yet."
+msgstr "Dieser Newsletter wurde noch nicht gesendet."
+
+msgid "First sent ${time_ago}."
+msgstr "Zum ersten mal gesendet ${time_ago}."
+
+msgid "This newsletter was sent to ${n} subscribers."
+msgstr "Dieser Newsletter wurde an ${n} Abonnenten gesendet."
+
+msgid "All subscribers have already received this newsletter."
+msgstr "Dieser Newsletter wurde bereits von allen Abonnenten empfangen."
+
+msgid "Send Now"
+msgstr "Jetzt senden"
+
+msgid "The newsletter was already sent to the following addresses:"
+msgstr "Der Newsletter wurde bereits an die folgenden Empfänger gesendet:"
 
 msgid "Show"
 msgstr "Anzeigen"
@@ -1330,6 +1365,10 @@ msgstr ""
 
 msgid "Added a new newsletter"
 msgstr "Ein neuer Newsletter wurde hinzugefügt"
+
+#, python-format
+msgid "Sent \"${title}\" to ${n} recipients"
+msgstr "\"${title}\" wurde an ${n} Empfänger gesendet"
 
 #, python-format
 msgid "Welcome to the ${town} Newsletter"

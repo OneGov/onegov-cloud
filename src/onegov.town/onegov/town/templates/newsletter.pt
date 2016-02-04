@@ -3,7 +3,7 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <p class="newsletter-lead" tal:content="newsletter.lead" />
+        <p tal:condition="newsletter.lead" class="newsletter-lead" tal:content="newsletter.lead" />
 
         <tal:block condition="news">
             <h2 i18n:translate>Latest news</h2>

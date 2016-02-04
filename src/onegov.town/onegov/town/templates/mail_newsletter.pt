@@ -1,0 +1,22 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <h1>${title}</h1>
+        <p tal:condition="newsletter.lead">${newsletter.lead}</p>
+    </tal:block>
+    <tal:block metal:fill-slot="above-footer">
+        <p>
+            <span i18n:translate>
+                You are receiving this e-mail because you signed up for the <span tal:replace='layout.town.name' i18n:name='town' /> newsletter.
+            </span>
+
+            <p>
+                <a href="${request.link(newsletter)}" i18n:translate>Click here to view web version.</a>
+            </p>
+            <p>
+                <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+            </p>
+    </tal:block>
+</div>

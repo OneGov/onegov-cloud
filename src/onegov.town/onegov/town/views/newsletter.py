@@ -5,13 +5,17 @@ import morepath
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.event import Occurrence, OccurrenceCollection
-from onegov.newsletter import Newsletter
-from onegov.newsletter import NewsletterCollection
-from onegov.newsletter import RecipientCollection
+from onegov.newsletter import (
+    Newsletter,
+    NewsletterCollection,
+    Recipient,
+    RecipientCollection
+)
 from onegov.town import _, TownApp
-from onegov.town.forms import NewsletterForm, SignupForm
+from onegov.town.forms import NewsletterForm, NewsletterSendForm, SignupForm
 from onegov.town.layout import DefaultMailLayout, NewsletterLayout
 from onegov.town.models import News
+from sedate import utcnow
 from sqlalchemy import desc
 from sqlalchemy.orm import undefer
 
@@ -39,6 +43,13 @@ def get_newsletter_form(model, request):
     form = form.with_occurrences(request, query.all())
 
     return form
+
+
+def get_newsletter_send_form(model, request):
+    query = RecipientCollection(request.app.session()).query()
+    query = query.order_by(Recipient.address)
+
+    return NewsletterSendForm.for_newsletter(model, query.all())
 
 
 @TownApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
@@ -177,3 +188,53 @@ def delete_page(self, request):
 
     NewsletterCollection(request.app.session()).delete(self)
     request.success("The newsletter was deleted")
+
+
+@TownApp.form(model=Newsletter, template='send_newsletter.pt', name='senden',
+              permission=Private, form=get_newsletter_send_form)
+def handle_send_newsletter(self, request, form):
+
+    if form.submitted(request):
+        query = RecipientCollection(request.app.session()).query()
+        query = query.filter(Recipient.id.in_(form.recipients.data))
+        recipients = query.all()
+
+        for recipient in recipients:
+
+            # one mail per recipient (each has a specific unsubscribe link)
+            mail = render_template(
+                'mail_newsletter.pt', request, {
+                    'layout': DefaultMailLayout(self, request),
+                    'newsletter': self,
+                    'title': self.title,
+                    'unsubscribe': request.link(
+                        recipient.subscription,
+                        'unsubscribe'
+                    )
+                }
+            )
+
+            request.app.send_email(
+                subject=self.title,
+                receivers=(recipient.address, ),
+                content=mail
+            )
+
+            self.recipients.append(recipient)
+
+        if not self.sent:
+            self.sent = utcnow()
+
+        request.success(_('Sent "${title}" to ${n} recipients', mapping={
+            'title': self.title,
+            'n': len(recipients)
+        }))
+        return morepath.redirect(request.link(self))
+
+    return {
+        'layout': NewsletterLayout(self, request),
+        'form': form,
+        'title': self.title,
+        'newsletter': self,
+        'previous_recipients': self.recipients
+    }

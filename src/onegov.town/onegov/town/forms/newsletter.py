@@ -97,3 +97,34 @@ class NewsletterForm(Form):
                 self.occurrences.data = model.content.get('occurrences')
 
         return NewsletterWithOccurrencesForm
+
+
+class NewsletterSendForm(Form):
+
+    @classmethod
+    def for_newsletter(cls, newsletter, recipients):
+        choices = tuple(
+            (
+                (recipient.id.hex, recipient.address)
+                for recipient in recipients
+                if recipient not in newsletter.recipients
+            )
+        )
+
+        class NewsletterSendFormWithRecipients(cls):
+
+            recipients = MultiCheckboxField(
+                label=_("Recipients"),
+                choices=choices,
+                render_kw={
+                    'prefix_label': False
+                },
+            )
+
+            def validate_recipients(self, field):
+                if len(field.data) == 0:
+                    raise validators.ValidationError(
+                        _("Please select at least one recipient")
+                    )
+
+        return NewsletterSendFormWithRecipients

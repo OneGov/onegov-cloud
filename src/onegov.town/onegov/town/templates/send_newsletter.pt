@@ -1,0 +1,60 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="small-12 columns">
+                <ul class="fa-ul">
+                    <li tal:condition="not:newsletter.sent">
+                        <i class="fa-li fa fa-times"></i>
+                        <span i18n:translate>
+                            This newsletter has not been sent yet.
+                        </span>
+                    </li>
+                    <li tal:condition="newsletter.sent">
+                        <i class="fa-li fa fa-check"></i>
+                        <span i18n:translate>
+                            First sent
+                            <span tal:replace='layout.format_date(newsletter.sent, "relative")' i18n:name='time_ago' />.
+                        </span>
+                    </li>
+                    <li tal:condition="newsletter.recipients">
+                        <i class="fa-li fa fa-check"></i>
+                        <span i18n:translate>
+                            This newsletter was sent to <span tal:replace='len(newsletter.recipients)' i18n:name='n' /> subscribers.
+                        </span>
+                    </li>
+
+                    <li tal:condition="not:form.recipients.choices">
+                        <i class="fa-li fa fa-check"></i>
+                        <span i18n:translate>
+                            All subscribers have already received this newsletter.
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="row" tal:condition="form.recipients.choices">
+            <div class="small-12 medium-8 large-6 columns">
+                <h2 i18n:translate>Send Now</h2>
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div>
+        <div class="row" tal:condition="previous_recipients">
+            <div class="small-12 medium-8 large-6 columns">
+                <h2 i18n:translate>Recipients</h2>
+                <div class="previous-recipients">
+                    <p i18n:translate>
+                        The newsletter was already sent to the following addresses:
+                    </p>
+                    <ul>
+                        <li tal:repeat="recipient previous_recipients">
+                            ${recipient.address}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </tal:block>
+</div>

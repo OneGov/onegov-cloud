@@ -2232,3 +2232,21 @@ ul.search-results {
         color: $jumbo;
     }
 }
+
+.previous-recipients {
+    background-color: $white-smoke;
+    padding: 1em;
+
+    * {
+        color: $form-label-font-color;
+        font-size: $form-label-font-size;
+    }
+
+    p {
+        margin-bottom: .5em;
+    }
+
+    ul {
+        margin-bottom: 0;
+    }
+}
