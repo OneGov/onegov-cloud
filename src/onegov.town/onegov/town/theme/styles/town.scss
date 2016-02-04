@@ -624,7 +624,11 @@ $accept-link-icon: '\f00c';
 $cleanup-link-icon: '\f0d0';
 $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f014';
+$disabled-icon: '\f05e';
 $edit-link-icon: '\f040';
+$file-link-icon: '\f0c6';
+$image-link-icon: '\f03e';
+$internal-link-icon: '\f0c1';
 $new-daypass-icon: '\f145';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
@@ -635,10 +639,7 @@ $new-person-icon: '\f007';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $paste-link-icon: '\f0ea';
-$file-link-icon: '\f0c6';
-$image-link-icon: '\f03e';
-$internal-link-icon: '\f0c1';
-$disabled-icon: '\f05e';
+$send-link-icon: '\f1d9';
 
 .edit-bar,
 .popup {
@@ -672,6 +673,9 @@ $disabled-icon: '\f05e';
     .copy-link:before { @include icon($copy-link-icon); }
     .delete-link:before { @include icon($delete-link-icon); }
     .edit-link:before { @include icon($edit-link-icon); }
+    .file-url:before { @include icon($file-link-icon); }
+    .image-url:before { @include icon($image-link-icon); }
+    .internal-url:before { @include icon($internal-link-icon); }
     .new-daypass:before { @include icon($new-daypass-icon); }
     .new-form:before { @include icon($new-form-icon); }
     .new-link:before { @include icon($new-link-icon); }
@@ -682,9 +686,7 @@ $disabled-icon: '\f05e';
     .new-reservation:before { @include icon($new-reservation-icon); }
     .new-room:before { @include icon($new-room-icon); }
     .paste-link:before { @include icon($paste-link-icon); }
-    .file-url:before { @include icon($file-link-icon); }
-    .image-url:before { @include icon($image-link-icon); }
-    .internal-url:before { @include icon($internal-link-icon); }
+    .send-link:before { @include icon($send-link-icon); }
 }
 
 /*

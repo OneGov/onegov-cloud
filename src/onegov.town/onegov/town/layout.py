@@ -1003,6 +1003,11 @@ class NewsletterLayout(DefaultLayout):
         else:
             return [
                 Link(
+                    text=_("Send"),
+                    url=self.request.link(self.model, 'senden'),
+                    classes=('send-link', )
+                ),
+                Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, 'bearbeiten'),
                     classes=('edit-link', )
