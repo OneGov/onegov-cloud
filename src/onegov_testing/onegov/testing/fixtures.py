@@ -210,8 +210,8 @@ def es_client(es_url):
     yield Elasticsearch(es_url)
 
 
-@pytest.yield_fixture(scope="function")
-def smtp():
+@pytest.yield_fixture(scope="session")
+def smtp_server():
     # replacement for smtpserver fixture, which also works on Python 3.5
     # see https://bitbucket.org/pytest-dev/pytest-localserver
     # /issues/13/broken-on-python-35
@@ -230,3 +230,9 @@ def smtp():
     server.start()
     yield server
     server.stop()
+
+
+@pytest.yield_fixture(scope="function")
+def smtp(smtp_server):
+    yield smtp_server
+    del smtp_server.outbox[:]
