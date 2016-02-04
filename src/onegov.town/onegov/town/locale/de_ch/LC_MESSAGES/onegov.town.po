@@ -1161,7 +1161,7 @@ msgid "This newsletter has not been sent yet."
 msgstr "Dieser Newsletter wurde noch nicht gesendet."
 
 msgid "First sent ${time_ago}."
-msgstr "Zum ersten mal gesendet ${time_ago}."
+msgstr "Zum ersten Mal gesendet ${time_ago}."
 
 msgid "This newsletter was sent to ${n} subscribers."
 msgstr "Dieser Newsletter wurde an ${n} Abonnenten gesendet."

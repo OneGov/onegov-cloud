@@ -52,6 +52,34 @@ def get_newsletter_send_form(model, request):
     return NewsletterSendForm.for_newsletter(model, query.all())
 
 
+def news_by_newsletter(newsletter, request):
+    news_ids = newsletter.content.get('news')
+
+    if not news_ids:
+        return None
+
+    query = request.app.session().query(News)
+    query = query.order_by(desc(News.created))
+    query = query.options(undefer('created'))
+    query = query.options(undefer('content'))
+    query = query.filter(News.id.in_(news_ids))
+
+    return request.exclude_invisible(query.all())
+
+
+def occurrences_by_newsletter(newsletter, request):
+    occurrence_ids = newsletter.content.get('occurrences')
+
+    if not occurrence_ids:
+        return None
+
+    query = request.app.session().query(Occurrence)
+    query = query.order_by(Occurrence.start, Occurrence.title)
+    query = query.filter(Occurrence.id.in_(occurrence_ids))
+
+    return query.all()
+
+
 @TownApp.form(model=NewsletterCollection, template='newsletter_collection.pt',
               permission=Public, form=SignupForm)
 def handle_newsletters(self, request, form):
@@ -110,34 +138,11 @@ def handle_newsletters(self, request, form):
 @TownApp.html(model=Newsletter, template='newsletter.pt', permission=Public)
 def view_newsletter(self, request):
 
-    news_ids = self.content.get('news')
-
-    if not news_ids:
-        news = None
-    else:
-        query = request.app.session().query(News)
-        query = query.order_by(desc(News.created))
-        query = query.options(undefer('created'))
-        query = query.filter(News.id.in_(news_ids))
-
-        news = request.exclude_invisible(query.all())
-
-    occurrence_ids = self.content.get('occurrences')
-
-    if not occurrence_ids:
-        occurrences = None
-    else:
-        query = request.app.session().query(Occurrence)
-        query = query.order_by(Occurrence.start, Occurrence.title)
-        query = query.filter(Occurrence.id.in_(occurrence_ids))
-
-        occurrences = query.all()
-
     return {
         'layout': NewsletterLayout(self, request),
         'newsletter': self,
-        'news': news,
-        'occurrences': occurrences,
+        'news': news_by_newsletter(self, request),
+        'occurrences': occurrences_by_newsletter(self, request),
         'title': self.title,
     }
 
@@ -197,7 +202,9 @@ def handle_send_newsletter(self, request, form):
     if form.submitted(request):
         query = RecipientCollection(request.app.session()).query()
         query = query.filter(Recipient.id.in_(form.recipients.data))
-        recipients = query.all()
+        recipients = (r for r in query.all() if r not in self.recipients)
+
+        sent_mails = 0
 
         for recipient in recipients:
 
@@ -210,7 +217,9 @@ def handle_send_newsletter(self, request, form):
                     'unsubscribe': request.link(
                         recipient.subscription,
                         'unsubscribe'
-                    )
+                    ),
+                    'news': news_by_newsletter(self, request),
+                    'occurrences': occurrences_by_newsletter(self, request),
                 }
             )
 
@@ -221,13 +230,14 @@ def handle_send_newsletter(self, request, form):
             )
 
             self.recipients.append(recipient)
+            sent_mails += 1
 
         if not self.sent:
             self.sent = utcnow()
 
         request.success(_('Sent "${title}" to ${n} recipients', mapping={
             'title': self.title,
-            'n': len(recipients)
+            'n': sent_mails
         }))
         return morepath.redirect(request.link(self))
 

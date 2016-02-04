@@ -116,6 +116,7 @@ class NewsletterSendForm(Form):
             recipients = MultiCheckboxField(
                 label=_("Recipients"),
                 choices=choices,
+                default=tuple(c[0] for c in choices),
                 render_kw={
                     'prefix_label': False
                 },
