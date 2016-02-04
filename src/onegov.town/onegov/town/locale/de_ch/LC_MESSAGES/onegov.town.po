@@ -1439,7 +1439,7 @@ msgstr ""
 
 #, python-format
 msgid "${address} successfully unsubscribed"
-msgstr "${address} wurde erfolreich abgemeldet"
+msgstr "${address} wurde erfolgreich abgemeldet"
 
 #, python-format
 msgid "${address} could not be unsubscribed, wrong token"

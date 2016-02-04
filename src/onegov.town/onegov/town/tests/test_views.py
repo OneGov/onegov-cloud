@@ -2405,3 +2405,56 @@ def test_newsletters_crud(town_app):
 
     newsletters = client.get('/newsletters')
     assert "noch keine Newsletter" in newsletters
+
+
+def test_newsletter_signup(town_app):
+
+    client = Client(town_app)
+
+    page = client.get('/newsletters')
+    page.form['address'] = 'asdf'
+    page = page.form.submit()
+
+    assert 'Ungültig' in page
+
+    page.form['address'] = 'info@example.org'
+    page.form.submit()
+
+    assert len(town_app.smtp.outbox) == 1
+
+    # make sure double submissions don't result in multiple e-mails
+    page.form.submit()
+    assert len(town_app.smtp.outbox) == 1
+
+    message = town_app.smtp.outbox[0]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('utf-8')
+
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+
+    # try an illegal token first
+    illegal = confirm.split('/confirm')[0] + 'x/confirm'
+    assert "falsches Token" in client.get(illegal).follow()
+
+    # make sure double calls work
+    assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
+    assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
+
+    # subscribing still works the same, but there's still no email sent
+    page.form.submit()
+    assert len(town_app.smtp.outbox) == 1
+
+    # unsubscribing does not result in an e-mail either
+    assert "falsches Token" in client.get(
+        illegal.replace('/confirm', '/unsubscribe')
+    ).follow()
+    assert "erfolgreich abgemeldet" in client.get(
+        confirm.replace('/confirm', '/unsubscribe')
+    ).follow()
+
+    # no e-mail is sent when unsubscribing
+    assert len(town_app.smtp.outbox) == 1
+
+    # however, we can now signup again
+    page.form.submit()
+    assert len(town_app.smtp.outbox) == 2

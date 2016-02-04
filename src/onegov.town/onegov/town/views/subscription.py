@@ -30,10 +30,19 @@ def view_confirm(self, request):
 # use an english name for this view, so robots know what we use it for
 @TownApp.view(model=Subscription, name='unsubscribe', permission=Public)
 def view_unsubscribe(self, request):
+
+    address = self.recipient.address
+
     if self.unsubscribe():
-        request.success(_("${address} successfully unsubscribed"))
+        request.success(_(
+            "${address} successfully unsubscribed",
+            mapping={'address': address}
+        ))
     else:
-        request.alert(_("${address} could not be unsubscribed, wrong token"))
+        request.alert(_(
+            "${address} could not be unsubscribed, wrong token",
+            mapping={'address': address}
+        ))
 
     return morepath.redirect(
         request.link(NewsletterCollection(request.app.session()))
