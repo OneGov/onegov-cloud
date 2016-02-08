@@ -128,11 +128,18 @@ def handle_newsletters(self, request, form):
     if not request.is_logged_in:
         query = query.filter(Newsletter.sent != None)
 
+    # the recipients count is only shown to logged in users
+    if request.is_logged_in:
+        recipients_count = RecipientCollection(self.session).query().count()
+    else:
+        recipients_count = 0
+
     return {
         'form': form,
         'layout': NewsletterLayout(self, request),
         'newsletters': query.all(),
         'title': _("Newsletter"),
+        'recipients_count': recipients_count
     }
 
 
