@@ -11,7 +11,8 @@ from wtforms_components import If, Chain
 ALLOWED_MIME_TYPES = {
     'application/excel',
     'application/vnd.ms-excel',
-    'text/plain'
+    'text/plain',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 }
 
 MAX_FILE_SIZE = 5 * 1024 * 1024

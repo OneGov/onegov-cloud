@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for open office spreadsheets.
+  [href]
+
 0.5.2 (2016-02-08)
 ~~~~~~~~~~~~~~~~~~~
 
