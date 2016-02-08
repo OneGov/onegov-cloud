@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.17.0 (2016-02-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to limit the number of emails to be processed in one go.
   [href]
