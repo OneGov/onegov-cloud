@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.2 (2016-02-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes import not working because of an outdated onegov.core dependency.
   [href]
 
