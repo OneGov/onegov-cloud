@@ -103,6 +103,119 @@ def test_sendmail(smtp, temporary_directory):
     )
 
 
+def test_sendmail_limit(smtp, temporary_directory):
+
+    cfg = {
+        'applications': [
+            {
+                'path': '/foobar/*',
+                'application': 'onegov.core.Framework',
+                'namespace': 'foobar',
+                'configuration': {
+                    'mail_use_directory': True,
+                    'mail_directory': os.path.join(
+                        temporary_directory, 'mails')
+                }
+            }
+        ]
+    }
+
+    os.makedirs(os.path.join(temporary_directory, 'mails'))
+    os.makedirs(os.path.join(temporary_directory, 'mails', 'new'))
+    os.makedirs(os.path.join(temporary_directory, 'mails', 'cur'))
+    os.makedirs(os.path.join(temporary_directory, 'mails', 'tmp'))
+
+    with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
+        f.write(yaml.dump(cfg))
+
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
+    ])
+
+    assert result.exit_code == 0
+    assert len(smtp.outbox) == 0
+
+    app = Framework()
+    app.mail_sender = 'noreply@example.org'
+    app.mail_use_directory = True
+    app.mail_directory = os.path.join(temporary_directory, 'mails')
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test"
+    )
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test"
+    )
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test"
+    )
+
+    transaction.commit()
+
+    assert len(smtp.outbox) == 0
+
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1],
+        '--limit', 1
+    ])
+
+    assert result.exit_code == 0
+    assert len(smtp.outbox) == 1
+
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1],
+        '--limit', 2
+    ])
+
+    assert len(smtp.outbox) == 3
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test"
+    )
+
+    app.send_email(
+        reply_to='Govikon <info@example.org>',
+        receivers=['recipient@example.org'],
+        subject="Test E-Mail",
+        content="This e-mail is just a test"
+    )
+
+    transaction.commit()
+
+    result = runner.invoke(cli, [
+        '--config', os.path.join(temporary_directory, 'onegov.yml'),
+        'sendmail',
+        '--hostname', smtp.address[0],
+        '--port', smtp.address[1]
+    ])
+
+    assert len(smtp.outbox) == 5
+
+
 def test_sendmail_unicode(smtp, temporary_directory):
 
     cfg = {

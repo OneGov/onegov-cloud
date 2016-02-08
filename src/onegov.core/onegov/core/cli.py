@@ -59,8 +59,10 @@ def cli(ctx, config, namespace):
               help="Force a TLS connection")
 @click.option('--username', help="The username to authenticate", default=None)
 @click.option('--password', help="The password to authenticate", default=None)
+@click.option('--limit', default=None,
+              help="Max number of mails to send before exiting")
 @click.pass_context
-def sendmail(ctx, hostname, port, force_tls, username, password):
+def sendmail(ctx, hostname, port, force_tls, username, password, limit):
     """ Iterates over all applications and processes the maildir for each
     application that uses maildir e-mail delivery.
 
@@ -91,7 +93,11 @@ def sendmail(ctx, hostname, port, force_tls, username, password):
 
         with postman.connection() as connection:
 
-            for filename in maildir.keys():
+            for n, filename in enumerate(maildir.keys(), start=1):
+
+                if limit and n > limit:
+                    break
+
                 msg_str = maildir.get_file(filename).read()
                 msg_str = msg_str.decode('utf-8')
 

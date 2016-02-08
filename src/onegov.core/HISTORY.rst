@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to limit the number of emails to be processed in one go.
+  [href]
+
 - Allows to optionally pick the sheet when converting excel files to CSV.
   [msom]
 
