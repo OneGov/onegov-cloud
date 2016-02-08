@@ -1034,7 +1034,7 @@ msgid "Click here to view web version."
 msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
 
 msgid "Click here to unsubscribe."
-msgstr "Clicken Sie hier um sich abzumelden."
+msgstr "Klicken Sie hier um sich abzumelden."
 
 msgid "Click the following link to set a new password:"
 msgstr "Klicken Sie auf den folgenden Link, um ein neues Passwort zu setzen:"
