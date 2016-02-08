@@ -1,9 +1,6 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
-
 - Normalizes the title used as filename in XLSX exports.
   [msom]
 
