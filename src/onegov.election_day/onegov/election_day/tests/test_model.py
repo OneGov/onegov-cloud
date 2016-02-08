@@ -18,6 +18,7 @@ def test_load_principal():
     assert principal.canton == 'zg'
     assert principal.color == '#000'
     assert principal.base is None
+    assert principal.base_domain is None
     assert principal.analytics is None
 
     principal = Principal.from_yaml(textwrap.dedent("""
@@ -34,6 +35,7 @@ def test_load_principal():
     assert principal.canton == 'zg'
     assert principal.color == '#000'
     assert principal.base == 'http://www.zg.ch'
+    assert principal.base_domain == 'zg.ch'
     assert principal.analytics == '<script type="text/javascript"></script>'
 
 

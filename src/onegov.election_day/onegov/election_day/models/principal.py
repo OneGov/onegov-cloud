@@ -35,7 +35,8 @@ class Principal(object):
 
     @cached_property
     def base_domain(self):
-        return urlsplit(self.base).hostname
+        if self.base:
+            return urlsplit(self.base).hostname.replace('www.', '')
 
     @cached_property
     def municipalities(self):

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes the 'www.' from the base domain.
+  [href]
+
 0.5.0 (2016-02-08)
 ~~~~~~~~~~~~~~~~~~~
 
