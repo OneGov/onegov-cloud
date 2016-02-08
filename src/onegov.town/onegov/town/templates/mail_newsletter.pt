@@ -4,7 +4,7 @@
     </tal:block>
     <tal:block metal:fill-slot="body">
         <h1>${title}</h1>
-        <p tal:condition="newsletter.lead">${newsletter.lead}</p>
+        <p tal:condition="lead" tal:content="structure lead"></p>
 
         <tal:block condition="news">
             <h2 i18n:translate>Latest news</h2>

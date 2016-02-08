@@ -4,6 +4,7 @@ import morepath
 
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
+from onegov.core.utils import linkify
 from onegov.event import Occurrence, OccurrenceCollection
 from onegov.newsletter import (
     Newsletter,
@@ -144,6 +145,7 @@ def view_newsletter(self, request):
         'news': news_by_newsletter(self, request),
         'occurrences': occurrences_by_newsletter(self, request),
         'title': self.title,
+        'lead': linkify(self.lead),
     }
 
 
@@ -212,6 +214,7 @@ def handle_send_newsletter(self, request, form):
             mail = render_template(
                 'mail_newsletter.pt', request, {
                     'layout': DefaultMailLayout(self, request),
+                    'lead': linkify(self.lead).replace('\n', '<br>'),
                     'newsletter': self,
                     'title': self.title,
                     'unsubscribe': request.link(
