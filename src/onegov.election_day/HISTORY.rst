@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to indicate lines which should be ignored.
+  [href]
+
 - Adds support for open office spreadsheets.
   [href]
 

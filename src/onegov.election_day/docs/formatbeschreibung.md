@@ -10,7 +10,7 @@ Dieses Dokument beschreibt das Format dieser CSV/Excel Dateien.
 
 ### Dateiformat
 
-Als Dateiformat werden CSV, XLS oder XLSX Dateien akzeptiert. Bei Excel Dateien ist zu beachten, dass nur das erste Arbeitsblatt berücksichtigt wird. Auch dürfen keine Formeln oder andersweitige Formatierungen im Arbeitsblatt enthalten sein.
+Als Dateiformat werden CSV, XLS oder XLSX Dateien akzeptiert. Bei Excel Dateien wird entweder das erste Arbeitsblatt, oder sofern vorhanden das Arbeitsblatt mit dem Namen "Resultate" verwendet.
 
 Die Dateien bestehen unabhängig vom verwendeten Dateiformat aus einer Kopfzeile und einer beliebigen Anzahl von Resultatzeilen. Die Kopfzeile enthält die Namen der Spalten und ist *zwingend erforderlich*.
 
@@ -36,10 +36,12 @@ Der Name der Gemeinde.
 **Ja Stimmen**
 
 Die Anzahl Ja Stimmen zu der Abstimmung.
+Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 **Nein Stimmen**
 
 Die Anzahl Nein Stimmen der Abstimmung.
+Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 **Stimmberechtigte**
 
@@ -48,10 +50,12 @@ Die Anzahl Stimmberechtigter.
 **Leere Stimmzettel**
 
 Die Anzahl leer eingelegter Stimmzettel.
+Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 **Ungültige Stimmzettel**
 
 Die Anzahl ungültiger Stimmzettel.
+Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 ### Vorlage
 

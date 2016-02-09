@@ -421,6 +421,63 @@ def test_upload_missing_town(election_day_app):
         upload.form.submit()
 
 
+def test_upload_unknown_result(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-vote')
+    new.form['vote_de'] = 'Bacon, yea or nay?'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # when uploading a proposal, a counter-proposal and a tie-breaker we
+    # want the process to stop completely if any of these three files has
+    # an error
+
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'simple'
+
+    proposal = '\n'.join((
+        ','.join(COLUMNS),
+        ',1711,Zug,3821,7405,16516,80,1',
+        ',1706,Oberägeri,unbekannt,7405,16516,80,1',
+    ))
+
+    upload.form['proposal'] = Upload(
+        'data.csv', proposal.encode('utf-8'), 'text/plain'
+    )
+
+    r = upload.form.submit().click("Hier klicken")
+
+    assert "Abgelehnt" in r.pyquery('tr[data-municipality-id="1711"]').text()
+    assert "Noch nicht ausgezählt" in r.pyquery(
+        'tr[data-municipality-id="1706"]').text()
+
+    # adding unknown results should override existing results
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'simple'
+
+    proposal = '\n'.join((
+        ','.join(COLUMNS),
+        ',1711,Zug,unbekannt,7405,16516,80,1',
+    ))
+
+    upload.form['proposal'] = Upload(
+        'data.csv', proposal.encode('utf-8'), 'text/plain'
+    )
+
+    r = upload.form.submit().click("Hier klicken")
+
+    assert "Noch nicht ausgezählt" in r.pyquery(
+        'tr[data-municipality-id="1711"]').text()
+
+
 def test_i18n(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()

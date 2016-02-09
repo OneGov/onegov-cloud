@@ -115,7 +115,32 @@ def import_file(principal, vote, ballot_type, file, mimetype):
     added_municipality_ids = set()
     added_groups = set()
 
+    # if we have the value "unknown" or "unbekannt" in any of the following
+    # colums, we ignore the whole line
+    significant_columns = (
+        'ja_stimmen',
+        'nein_stimmen',
+        'ungultige_stimmzettel',
+        'leere_stimmzettel'
+    )
+
+    skip_indicators = ('unknown', 'unbekannt')
+
+    def skip_line(line):
+        for column in significant_columns:
+            if str(getattr(line, column, '')).lower() in skip_indicators:
+                return True
+
+        return False
+
+    skipped = 0
+
     for line in csv.lines:
+
+        if skip_line(line):
+            skipped += 1
+            continue
+
         line_errors = []
 
         # the name of the municipality
@@ -215,7 +240,7 @@ def import_file(principal, vote, ballot_type, file, mimetype):
                 )
             )
 
-    if not errors and not ballot_results:
+    if not errors and not ballot_results and not skipped:
         errors.append(FileImportError(_("No data found")))
 
     if not errors:

@@ -119,7 +119,7 @@
                                 <th i18n:translate="" class="right-aligned">No %</th>
                             </thead>
                             <tbody>
-                                <tr tal:repeat="result ballot.results">
+                                <tr tal:repeat="result ballot.results" data-municipality-id="${result.municipality_id}">
                                     <tal:block condition="not: result.counted">
                                         <td >${result.group}</td>
                                         <td class="answer" colspan="7" i18n:translate>Not yet counted.</td>
