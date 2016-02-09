@@ -1,4 +1,7 @@
+import pytest
+
 from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.newsletter.errors import AlreadyExistsError
 
 
 def test_newsletter_collection(session):
@@ -45,3 +48,14 @@ def test_recipient_collection(session):
     recipients.delete(r)
 
     assert recipients.by_address('info@example.org') is None
+
+
+def test_newsletter_already_exists(session):
+
+    newsletters = NewsletterCollection(session)
+    newsletters.add("My Newsletter", "<h1>My Newsletter</h1>")
+
+    with pytest.raises(AlreadyExistsError) as e:
+        newsletters.add("My Newsletter", "<h1>My Newsletter</h1>")
+
+    assert e.value.args == ('my-newsletter', )

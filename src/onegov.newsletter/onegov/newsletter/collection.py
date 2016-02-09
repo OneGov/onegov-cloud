@@ -1,5 +1,6 @@
 from onegov.core.utils import normalize_for_url, is_uuid
 from onegov.newsletter import Newsletter, Recipient
+from onegov.newsletter.errors import AlreadyExistsError
 
 
 class NewsletterCollection(object):
@@ -14,6 +15,12 @@ class NewsletterCollection(object):
         return self.query().filter(Newsletter.name == name).first()
 
     def add(self, title, html, lead=None, meta=None, content=None):
+
+        name = normalize_for_url(title)
+
+        if self.by_name(name):
+            raise AlreadyExistsError(name)
+
         newsletter = Newsletter(
             name=normalize_for_url(title),
             title=title,
