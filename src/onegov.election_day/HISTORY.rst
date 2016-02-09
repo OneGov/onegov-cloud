@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.3 (2016-02-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Ignores invalid years in the url instead of throwing an error.
   [href]
 
