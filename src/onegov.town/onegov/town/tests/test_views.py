@@ -12,6 +12,7 @@ from lxml.html import document_fromstring
 from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
 from onegov.libres import ResourceCollection
+from onegov.newsletter import RecipientCollection
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
@@ -2458,3 +2459,94 @@ def test_newsletter_signup(town_app):
     # however, we can now signup again
     page.form.submit()
     assert len(town_app.smtp.outbox) == 2
+
+
+def test_newsletter_send(town_app):
+    client = Client(town_app)
+    anon = Client(town_app)
+
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    # add a newsletter
+    new = client.get('/').click('Newsletter').click('Newsletter')
+    new.form['title'] = "Our town is AWESOME"
+    new.form['lead'] = "Like many of you, I just love our town..."
+
+    select_checkbox(new, "news", "Willkommen bei OneGov")
+    select_checkbox(new, "occurrences", "150 Jahre Govikon")
+    select_checkbox(new, "occurrences", "MuKi Turnen")
+
+    newsletter = new.form.submit().follow()
+
+    # add some recipients the quick wqy
+    recipients = RecipientCollection(town_app.session())
+    recipients.add('one@example.org', confirmed=True)
+    recipients.add('two@example.org', confirmed=True)
+
+    transaction.commit()
+
+    # send the newsletter to one recipient
+    send = newsletter.click('Senden')
+    assert "Dieser Newsletter wurde noch nicht gesendet." in send
+    assert "one@example.org" in send
+    assert "two@example.org" in send
+
+    len(send.pyquery('input[name="recipients"]')) == 2
+
+    select_checkbox(send, 'recipients', 'one@example.org', checked=True)
+    select_checkbox(send, 'recipients', 'two@example.org', checked=False)
+
+    newsletter = send.form.submit().follow()
+
+    assert '"Our town is AWESOME" wurde an 1 Empfänger gesendet' in newsletter
+
+    page = anon.get('/newsletters')
+    assert "gerade eben" in page
+
+    # the send form should now look different
+    send = newsletter.click('Senden')
+
+    assert "Zum ersten Mal gesendet gerade eben." in send
+    assert "Dieser Newsletter wurde an 1 Abonnenten gesendet." in send
+
+    assert len(send.pyquery('input[name="recipients"]')) == 1
+    assert len(send.pyquery('.previous-recipients li')) == 1
+
+    # send to the other mail adress
+    send = send.form.submit().follow().click("Senden")
+    assert "von allen Abonnenten empfangen" in send
+
+    # make sure the mail was sent correctly
+    assert len(town_app.smtp.outbox) == 2
+
+    message = town_app.smtp.outbox[0]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('utf-8')
+
+    assert "Our town is AWESOME" in message
+    assert "Like many of you" in message
+
+    web = re.search(r'Web-Version anzuzeigen.\]\(([^\)]+)', message).group(1)
+    assert web.endswith('/newsletter/our-town-is-awesome')
+
+    # make sure the unconfirm link is different for each mail
+    unconfirm_1 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+
+    message = town_app.smtp.outbox[1]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('utf-8')
+
+    unconfirm_2 = re.search(r'abzumelden.\]\(([^\)]+)', message).group(1)
+
+    assert unconfirm_1 and unconfirm_2
+    assert unconfirm_1 != unconfirm_2
+
+    # make sure the unconfirm link actually works
+    anon.get(unconfirm_1)
+    assert recipients.query().count() == 1
+
+    anon.get(unconfirm_2)
+    assert recipients.query().count() == 0
