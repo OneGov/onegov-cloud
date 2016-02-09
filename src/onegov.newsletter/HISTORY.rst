@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.0 (2016-02-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Raises a more useful exception if a newsletter name conflicts with another.
   [href]
 
