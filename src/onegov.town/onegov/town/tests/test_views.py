@@ -2485,14 +2485,18 @@ def test_newsletter_send(town_app):
     recipients = RecipientCollection(town_app.session())
     recipients.add('one@example.org', confirmed=True)
     recipients.add('two@example.org', confirmed=True)
+    recipients.add('xxx@example.org', confirmed=False)
 
     transaction.commit()
+
+    assert "2 Abonnenten registriert" in client.get('/newsletters')
 
     # send the newsletter to one recipient
     send = newsletter.click('Senden')
     assert "Dieser Newsletter wurde noch nicht gesendet." in send
     assert "one@example.org" in send
     assert "two@example.org" in send
+    assert "xxx@example.org" not in send
 
     len(send.pyquery('input[name="recipients"]')) == 2
 
@@ -2511,6 +2515,9 @@ def test_newsletter_send(town_app):
 
     assert "Zum ersten Mal gesendet gerade eben." in send
     assert "Dieser Newsletter wurde an 1 Abonnenten gesendet." in send
+    assert "one@example.org" in send
+    assert "two@example.org" in send
+    assert "xxx@example.org" not in send
 
     assert len(send.pyquery('input[name="recipients"]')) == 1
     assert len(send.pyquery('.previous-recipients li')) == 1
@@ -2546,7 +2553,7 @@ def test_newsletter_send(town_app):
 
     # make sure the unconfirm link actually works
     anon.get(unconfirm_1)
-    assert recipients.query().count() == 1
+    assert recipients.query().count() == 2
 
     anon.get(unconfirm_2)
-    assert recipients.query().count() == 0
+    assert recipients.query().count() == 1

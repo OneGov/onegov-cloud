@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Stops including unconfirmed subscriptions in the newsletter views.
+  [href]
+
 1.5.0 (2016-02-09)
 ~~~~~~~~~~~~~~~~~~~
 

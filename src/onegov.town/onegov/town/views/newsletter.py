@@ -131,7 +131,9 @@ def handle_newsletters(self, request, form):
 
     # the recipients count is only shown to logged in users
     if request.is_logged_in:
-        recipients_count = RecipientCollection(self.session).query().count()
+        recipients_count = RecipientCollection(self.session).query()\
+            .filter(Recipient.confirmed == True)\
+            .count()
     else:
         recipients_count = 0
 
