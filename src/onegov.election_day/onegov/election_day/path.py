@@ -31,7 +31,7 @@ def get_ballot(app, id):
 
 
 @ElectionDayApp.path(model=VoteCollection, path='/votes/{year}')
-def get_votes(app, year):
+def get_votes(app, year=0):
     return VoteCollection(app.session(), year)
 
 

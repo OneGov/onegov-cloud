@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ignores invalid years in the url instead of throwing an error.
+  [href]
+
 - Adds the ability to indicate lines which should be ignored.
   [href]
 
