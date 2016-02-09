@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.5.0 (2016-02-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to send newsletters to subscribers.
   [href]
 
