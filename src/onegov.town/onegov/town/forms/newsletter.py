@@ -107,8 +107,8 @@ class NewsletterSendForm(Form):
             (
                 (recipient.id.hex, recipient.address)
                 for recipient in recipients
-                if recipient.confirmed
-                and recipient not in newsletter.recipients
+                if recipient.confirmed and
+                recipient not in newsletter.recipients
             )
         )
 
