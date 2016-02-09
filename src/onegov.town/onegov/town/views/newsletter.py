@@ -12,6 +12,7 @@ from onegov.newsletter import (
     Recipient,
     RecipientCollection
 )
+from onegov.newsletter.errors import AlreadyExistsError
 from onegov.town import _, TownApp
 from onegov.town.forms import NewsletterForm, NewsletterSendForm, SignupForm
 from onegov.town.layout import DefaultMailLayout, NewsletterLayout
@@ -161,11 +162,15 @@ def view_newsletter(self, request):
 def handle_new_newsletter(self, request, form):
 
     if form.submitted(request):
-        newsletter = self.add(title=form.title.data, html='')
-        form.update_model(newsletter, request)
+        try:
+            newsletter = self.add(title=form.title.data, html='')
+        except AlreadyExistsError:
+            request.alert(_("A newsletter with this name already exists"))
+        else:
+            form.update_model(newsletter, request)
 
-        request.success(_("Added a new newsletter"))
-        return morepath.redirect(request.link(newsletter))
+            request.success(_("Added a new newsletter"))
+            return morepath.redirect(request.link(newsletter))
 
     return {
         'form': form,
