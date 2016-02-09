@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Includes the latest onegov.town and onegov.core releases.
+  [href]
+
 0.1.7 (2016-02-01)
 ~~~~~~~~~~~~~~~~~~~
 
