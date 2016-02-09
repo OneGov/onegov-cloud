@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to send newsletters to subscribers.
+  [href]
+
 - Stops search box from consuming arrow key presses too eagerly.
   [href]
 
