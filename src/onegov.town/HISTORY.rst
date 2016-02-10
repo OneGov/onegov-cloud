@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Sort forms definitions correctly, even if the title changes.
+  [href]
+
 1.5.2 (2016-02-10)
 ~~~~~~~~~~~~~~~~~~~
 
