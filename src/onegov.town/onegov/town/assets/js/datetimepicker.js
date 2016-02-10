@@ -70,7 +70,7 @@ if (!Modernizr.inputtypes.date) {
 
         var visible = false;
 
-        input.closest('.columns').append(grid);
+        grid.insertBefore(input);
         input.detach().appendTo(grid.find('.' + large_column));
         button.appendTo(grid.find('.' + small_column));
 

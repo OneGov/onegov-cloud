@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes date errors showing up before the input field.
+  [href]
+
 - Adds missing translation of subscription e-mail.
   [href]
 
