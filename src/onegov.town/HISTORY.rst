@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.5.2 (2016-02-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes date errors showing up before the input field.
   [href]
 
