@@ -1374,7 +1374,7 @@ msgstr "\"${title}\" wurde an ${n} Empfänger gesendet"
 
 #, python-format
 msgid "Welcome to the ${town} Newsletter"
-msgstr ""
+msgstr "Willkommen beim ${town} Newsletter"
 
 msgid "Added a new newsletter"
 msgstr "Ein neuer Newsletter wurde hinzugefügt"

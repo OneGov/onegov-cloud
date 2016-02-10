@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds missing translation of subscription e-mail.
+  [href]
+
 1.5.1 (2016-02-09)
 ~~~~~~~~~~~~~~~~~~~
 
