@@ -46,6 +46,7 @@ Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausge
 **Stimmberechtigte**
 
 Die Anzahl Stimmberechtigter.
+Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 **Leere Stimmzettel**
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds "stimmberechtigte" to the columns which may be contain "unbekannt".
+  [href]
+
 0.5.3 (2016-02-09)
 ~~~~~~~~~~~~~~~~~~~
 

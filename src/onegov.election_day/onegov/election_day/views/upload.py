@@ -119,9 +119,10 @@ def import_file(principal, vote, ballot_type, file, mimetype):
     # colums, we ignore the whole line
     significant_columns = (
         'ja_stimmen',
+        'leere_stimmzettel',
         'nein_stimmen',
+        'stimmberechtigte',
         'ungultige_stimmzettel',
-        'leere_stimmzettel'
     )
 
     skip_indicators = ('unknown', 'unbekannt')
