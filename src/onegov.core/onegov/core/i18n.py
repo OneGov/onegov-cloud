@@ -203,14 +203,24 @@ def get_translation_bound_meta(meta_class, translate):
 
     class TranslationBoundMeta(meta_class):
 
-        def get_translations(self, form):
-            default = super().get_translations(form)
-            add_fallback_to_tail(default, translate)
+        # instruct wtforms not to cache translations, there's very little
+        # performance gain and it leads to some state not being cleared when
+        # the request has been handled
+        cache_translations = False
 
-            # Cache for reuse in render_field. I'm not sure this is perfectly
-            # sane, as WTForms does use it's own caching mechanism with
-            # translations bound to the current locales. For now it seems
-            # fine, but we don't do different locales yet.
+        def get_translations(self, form):
+
+            try:
+                default = super().get_translations(form)
+                add_fallback_to_tail(translation=default, fallback=translate)
+            except FileNotFoundError:
+                # if there are no locales, the file not found error
+                # can safely be ignored as there are no translations if there
+                # are no locales (a wtforms bug)
+                assert not getattr(self, 'locales', None)
+                default = translate
+
+            # Cache for reuse in render_field.
             self._translations = default
 
             return default

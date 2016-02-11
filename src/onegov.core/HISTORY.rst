@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes certain form translations being stuck on the first request's locale.
+  [href]
+
 0.17.0 (2016-02-08)
 ~~~~~~~~~~~~~~~~~~~
 
