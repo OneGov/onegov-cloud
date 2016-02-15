@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds municipality maps for 2016.
+  [href]
+
 - Adds "stimmberechtigte" to the columns which may be contain "unbekannt".
   [href]
 
