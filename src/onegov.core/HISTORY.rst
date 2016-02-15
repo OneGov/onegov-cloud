@@ -4,6 +4,9 @@ Changelog
 - Improves CSV handling.
   [msom]
 
+- Ensures that the sendmail limit is an integer.
+  [href]
+
 0.17.1 (2016-02-11)
 ~~~~~~~~~~~~~~~~~~~
 

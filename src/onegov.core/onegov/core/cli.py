@@ -59,7 +59,7 @@ def cli(ctx, config, namespace):
               help="Force a TLS connection")
 @click.option('--username', help="The username to authenticate", default=None)
 @click.option('--password', help="The password to authenticate", default=None)
-@click.option('--limit', default=None,
+@click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
 @click.pass_context
 def sendmail(ctx, hostname, port, force_tls, username, password, limit):
