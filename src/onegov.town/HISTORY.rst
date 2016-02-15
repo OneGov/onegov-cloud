@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Depend on latest onegov.core release which fixes an issue with email sending.
+  [href]
+
 1.5.3 (2016-02-10)
 ~~~~~~~~~~~~~~~~~~~
 
