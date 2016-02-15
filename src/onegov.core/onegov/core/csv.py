@@ -8,6 +8,7 @@ import xlrd
 
 from collections import namedtuple, OrderedDict
 from csv import DictWriter, Sniffer, QUOTE_ALL
+from csv import Error as CsvError
 from csv import reader as csv_reader
 from csv import writer as csv_writer
 from editdistance import eval as distance
@@ -33,8 +34,12 @@ class CSVFile(object):
         self.csvfile = codecs.getreader(encoding)(csvfile)
 
         # find out the dialect
-        self.csvfile.seek(0)
-        self.dialect = sniff_dialect(self.csvfile.read(1024))
+        try:
+            self.csvfile.seek(0)
+            self.dialect = sniff_dialect(self.csvfile.read(1024))
+        except (CsvError, errors.InvalidFormatError):
+            self.csvfile.seek(0)
+            self.dialect = sniff_dialect(self.csvfile.read())
 
         # match the headers
         self.csvfile.seek(0)
@@ -58,7 +63,12 @@ class CSVFile(object):
         )
 
     def as_valid_identifier(self, value):
-        return normalize_header(value).replace('-', '_').replace(' ', '_')
+        result = normalize_header(value)
+        for invalid in '- .':
+            result = result.replace(invalid, '_')
+        while result and result[0] in '_0123456789':
+            result = result[1:]
+        return result
 
     @property
     def lines(self):
@@ -282,7 +292,7 @@ def parse_header(csv, dialect=None):
         return []
 
     headers = next(csv_reader(csv.splitlines(), dialect=dialect))
-    headers = [normalize_header(h) for h in headers]
+    headers = [normalize_header(h) for h in headers if h]
 
     return headers
 
