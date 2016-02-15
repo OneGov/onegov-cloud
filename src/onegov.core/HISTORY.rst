@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.17.2 (2016-02-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves CSV handling.
   [msom]
