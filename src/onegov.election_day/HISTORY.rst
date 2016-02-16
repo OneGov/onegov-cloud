@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.0 (2016-02-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds municipality maps for 2016.
   [href]
 
