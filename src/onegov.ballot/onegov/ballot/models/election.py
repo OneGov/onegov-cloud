@@ -334,8 +334,8 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
     def accounted_votes(self):
         """ Number of accounted votes """
         return (
-            self.election.number_of_mandates * self.accounted_ballots
-            - self.blank_votes - self.invalid_votes
+            self.election.number_of_mandates * self.accounted_ballots -
+            self.blank_votes - self.invalid_votes
         )
 
     @property
