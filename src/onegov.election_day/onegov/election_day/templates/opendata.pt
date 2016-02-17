@@ -20,7 +20,76 @@
                 <li>XLSX</li>
             </ul>
 
-            <h3>Fields</h3>
+            <h3>Fields (Elections)</h3>
+
+            <p i18n:translate>The following fields are included in all formats:</p>
+
+            <dl>
+                <dt>election_title</dt>
+                <dd i18n:translate>Title of the election.</dd>
+
+                <dt>election_date</dt>
+                <dd i18n:translate>The date of the election (an ISO 8601 date string).</dd>
+
+                <dt>election_type</dt>
+                <dd i18n:translate>"proporz" for proportional, "majorz" for majority system.</dd>
+
+                <dt>election_mandates</dt>
+                <dd i18n:translate>The number of mandates.</dd>
+
+                <dt>municipality_name</dt>
+                <dd i18n:translate>The name of the municipality.</dd>
+
+                <dt>municipality_bfs_number</dt>
+                <dd i18n:translate>The id of the municipality/locale ("BFS Nummer").</dd>
+
+                <dt>municipality_elegible_voters</dt>
+                <dd i18n:translate>The number of people elegible to vote for this municipality.</dd>
+
+                <dt>municipality_received_ballots</dt>
+                <dd i18n:translate>The number of received ballots for this municipality.</dd>
+
+                <dt>municipality_blank_ballots</dt>
+                <dd i18n:translate>The number of blank ballots for this municipality.</dd>
+
+                <dt>municipality_invalid_ballots</dt>
+                <dd i18n:translate>The number of invalid ballots for this municipality.</dd>
+
+                <dt>municipality_unaccounted_ballots</dt>
+                <dd i18n:translate>The number of unaccounted ballots for this municipality.</dd>
+
+                <dt>municipality_accounted_ballots</dt>
+                <dd i18n:translate>The nubmer of accounted ballots for this municipality.</dd>
+
+                <dt>municipality_blank_votes</dt>
+                <dd i18n:translate>The number of blank votes for this municipality.</dd>
+
+                <dt>municipality_invalid_votes</dt>
+                <dd i18n:translate>The number of invalid votes for this municipality. Is zero for elections based on proportional representation.</dd>
+
+                <dt>municipality_accounted_votes</dt>
+                <dd i18n:translate>The number of accounted votes for this municipality.</dd>
+
+                <dt>list_name</dt>
+                <dd i18n:translate>The name of the list this candidate appears on. Only relevant for elections based on proportional representation.</dd>
+
+                <dt>list_votes</dt>
+                <dd i18n:translate>The number of votes this list has got. Only relevant for elections based on proportional representation.</dd>
+
+                <dt>candidate_family_name</dt>
+                <dd i18n:translate>The family name of the candidate.</dd>
+
+                <dt>candidate_first_name</dt>
+                <dd i18n:translate>The first name of the candiate.</dd>
+
+                <dt>candidate_elected</dt>
+                <dd i18n:translate>True if the candidate has been elected.</dd>
+
+                <dt>candidate_votes</dt>
+                <dd i18n:translate>The number of votes this candidate got.</dd>
+            </dl>
+
+            <h3>Fields (Votes)</h3>
 
             <p i18n:translate>The following fields are included in all formats:</p>
 

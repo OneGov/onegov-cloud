@@ -110,18 +110,31 @@ class ElectionDayApp(Framework):
             output='bundles/jquery.datetimepicker.bundle.css'
         )
 
+        d3 = Bundle(
+            'js/d3.js'
+        )
+
         ballot_map = Bundle(
-            'js/d3.js',
+            d3,
             'js/d3tip.js',
             'js/topojson.js',
             'js/ballot-map.js',
+            'js/bar-chart.js',
             filters=jsminifier,
             output='bundles/d3.bundle.js'
+        )
+
+        bar_chart = Bundle(
+            d3,
+            'js/bar-chart.js',
+            filters=jsminifier,
+            output='bundles/bar_chart.bundle.js'
         )
 
         return {
             'common': common,
             'ballot_map': ballot_map,
+            'bar_chart': bar_chart,
             'form_js': form_js,
             'form_css': form_css,
         }

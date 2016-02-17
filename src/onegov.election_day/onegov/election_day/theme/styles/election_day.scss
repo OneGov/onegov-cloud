@@ -298,6 +298,32 @@ table {
 }
 
 /*
+    Bar Chart
+*/
+.bar-chart {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+
+    text {
+        font: 14px sans-serif;
+        text-anchor: end;
+
+        &.value {
+            fill: $white;
+            font: 12px sans-serif;
+        }
+    }
+
+    .bar {
+        fill: $iron;
+
+        &.active {
+            fill: $accepted-color;
+        }
+    }
+}
+
+/*
     Voting Factoids
 */
 .factoids {

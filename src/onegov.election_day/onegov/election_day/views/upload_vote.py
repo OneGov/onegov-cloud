@@ -14,21 +14,14 @@ from onegov.core.errors import (
 from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.forms import UploadForm
+from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layout import ManageLayout
 from onegov.election_day.models import Manage
+from onegov.election_day.utils import FileImportError
 from sqlalchemy.orm import object_session
 
 
 BALLOT_TYPES = {'proposal', 'counter-proposal', 'tie-breaker'}
-
-
-class FileImportError(object):
-    __slots__ = ['line', 'error']
-
-    def __init__(self, error, line=None):
-        self.error = error
-        self.line = line
 
 
 def import_file(principal, vote, ballot_type, file, mimetype):
@@ -278,27 +271,27 @@ def import_file(principal, vote, ballot_type, file, mimetype):
 
 def get_form_class(vote, request):
     if not vote.ballots:
-        return UploadForm
+        return UploadVoteForm
 
-    class LimitedUploadForm(UploadForm):
+    class LimitedUploadVoteForm(UploadVoteForm):
         pass
 
     if len(vote.ballots) == 1:
-        LimitedUploadForm.type.kwargs['default'] = 'simple'
-        LimitedUploadForm.type.kwargs['choices'] = [
+        LimitedUploadVoteForm.type.kwargs['default'] = 'simple'
+        LimitedUploadVoteForm.type.kwargs['choices'] = [
             ('simple', _("Simple Vote"))
         ]
     else:
-        LimitedUploadForm.type.kwargs['default'] = 'complex'
-        LimitedUploadForm.type.kwargs['choices'] = [
+        LimitedUploadVoteForm.type.kwargs['default'] = 'complex'
+        LimitedUploadVoteForm.type.kwargs['choices'] = [
             ('complex', _("Vote with Counter-Proposal"))
         ]
 
-    return LimitedUploadForm
+    return LimitedUploadVoteForm
 
 
-@ElectionDayApp.form(model=Vote, name='upload', template='upload.pt',
-                     permission=Private, form=UploadForm)
+@ElectionDayApp.form(model=Vote, name='upload', template='upload_vote.pt',
+                     permission=Private, form=UploadVoteForm)
 def view_upload(self, request, form):
 
     results = {}

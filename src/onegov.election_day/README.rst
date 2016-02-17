@@ -5,7 +5,7 @@ OneGov ballot results website used on election day.
 
 Run the Tests
 -------------
-    
+
 Install tox and run it::
 
     pip install tox
@@ -27,7 +27,7 @@ Onegov Election Day uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/OneGov/onegov.election_day.png
+.. image:: https://travis-ci.org/OneGov/onegov.election_day.png?branch=master
   :target: https://travis-ci.org/OneGov/onegov.election_day
   :alt: Build Status
 

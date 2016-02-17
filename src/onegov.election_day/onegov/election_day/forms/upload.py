@@ -15,10 +15,23 @@ ALLOWED_MIME_TYPES = {
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 }
 
-MAX_FILE_SIZE = 5 * 1024 * 1024
+MAX_FILE_SIZE = 10 * 1024 * 1024
 
 
-class UploadForm(Form):
+class UploadElectionForm(Form):
+
+    results = UploadField(
+        label=_("Results"),
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw={'force_simple': True}
+    )
+
+
+class UploadVoteForm(Form):
 
     type = RadioField(_("Type"), choices=[
         ('simple', _("Simple Vote")),

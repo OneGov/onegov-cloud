@@ -1,7 +1,9 @@
 from onegov.core.i18n import SiteLocale
-from onegov.ballot import Ballot, BallotCollection, Vote, VoteCollection
+from onegov.ballot import Election, ElectionCollection
+from onegov.ballot import Ballot, BallotCollection
+from onegov.ballot import Vote, VoteCollection
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.models import Manage, Principal
+from onegov.election_day.models import Archive, Manage, Principal
 from onegov.user import Auth
 
 
@@ -20,6 +22,11 @@ def get_manage(app):
     return Manage(app.session())
 
 
+@ElectionDayApp.path(model=Election, path='/election/{id}')
+def get_election(app, id):
+    return ElectionCollection(app.session()).by_id(id)
+
+
 @ElectionDayApp.path(model=Vote, path='/vote/{id}')
 def get_vote(app, id):
     return VoteCollection(app.session()).by_id(id)
@@ -30,9 +37,9 @@ def get_ballot(app, id):
     return BallotCollection(app.session()).by_id(id)
 
 
-@ElectionDayApp.path(model=VoteCollection, path='/votes/{year}')
-def get_votes(app, year=0):
-    return VoteCollection(app.session(), year)
+@ElectionDayApp.path(model=Archive, path='/archive/{year}')
+def get_archive_by_year(app, year):
+    return Archive(app.session(), year)
 
 
 @ElectionDayApp.path(model=SiteLocale, path='/locale/{locale}')

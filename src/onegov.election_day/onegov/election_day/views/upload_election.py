@@ -1,0 +1,75 @@
+""" The upload view. """
+import transaction
+
+from onegov.ballot import Election
+from onegov.core.security import Private
+from onegov.election_day import _
+from onegov.election_day import ElectionDayApp
+from onegov.election_day.forms import UploadElectionForm
+from onegov.election_day.layout import ManageLayout
+from onegov.election_day.models import Manage
+from onegov.election_day.utils.import_sesam_file import (
+    import_file as import_sesam_file
+)
+from onegov.election_day.utils.import_wabsti_file import (
+    import_file as import_wabsti_file
+)
+from onegov.election_day.utils import FileImportError
+
+
+@ElectionDayApp.form(model=Election, name='upload',
+                     template='upload_election.pt', permission=Private,
+                     form=UploadElectionForm)
+def view_upload(self, request, form):
+
+    result = {}
+
+    if form.submitted(request):
+        principal = request.app.principal
+        if self.date.year not in principal.municipalities:
+            result = {
+                'status': 'error',
+                'errors': [
+                    FileImportError(
+                        _(
+                            "The year ${year} is not yet supported",
+                            mapping={'year': self.date.year}
+                        )
+                    )
+                ]
+            }
+        else:
+            municipalities = principal.municipalities[self.date.year]
+            result = import_sesam_file(
+                municipalities,
+                self,
+                form.results.raw_data[0].file,
+                form.results.data['mimetype']
+            )
+            if result['errors']:
+                if "Missing columns" in result['errors'][0].error:
+                    result = import_wabsti_file(
+                        municipalities,
+                        self,
+                        form.results.raw_data[0].file,
+                        form.results.data['mimetype']
+                    )
+
+    if result:
+        status = result['status']
+    else:
+        status = 'open'
+
+    if status == 'error':
+        transaction.abort()
+
+    return {
+        'layout': ManageLayout(self, request),
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'form': form,
+        'cancel': request.link(Manage(request.app.session())),
+        'results': result,
+        'status': status,
+        'election': self
+    }

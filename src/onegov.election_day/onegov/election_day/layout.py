@@ -1,11 +1,10 @@
 from babel import Locale
 from cached_property import cached_property
 from datetime import datetime
-from onegov.ballot import VoteCollection
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
-from onegov.election_day.models import Manage
+from onegov.election_day.models import Archive, Manage
 from onegov.user import Auth
 
 
@@ -61,8 +60,8 @@ class Layout(ChameleonLayout):
                 Auth.from_request(self.request), name='logout')
 
     @cached_property
-    def vote_collection(self):
-        return VoteCollection(self.request.app.session())
+    def archive(self):
+        return Archive(self.request.app.session())
 
     @cached_property
     def locales(self):

@@ -1,0 +1,187 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="before-content">
+        <tal:block condition="not: election.counted">
+            <h1>
+                <small i18n:translate>Not yet counted.</small>
+                ${election.title}
+            </h1>
+
+            <hr />
+        </tal:block>
+        <tal:block tal:condition="election.counted">
+            <h1>${election.title}</h1>
+
+            <div class="download-results">
+                <a data-dropdown="download-dropdown" data-options="align:left" aria-controls="download-dropdown" aria-expanded="false" alt="Download raw results as JSON, CSV or XLS"><i class="fa fa-download"></i></a>
+                <ul id="download-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                    <li><a href="${request.link(election, 'json')}">JSON</a></li>
+                    <li><a href="${request.link(election, 'csv')}">CSV</a></li>
+                    <li><a href="${request.link(election, 'xlsx')}">XLSX</a></li>
+                    <li><a href="${layout.opendata_link}"><em i18n:translate>Format Description</em></a></li>
+                </ul>
+            </div>
+
+            <hr />
+        </tal:block>
+    </tal:block>
+    <tal:block metal:fill-slot="content" tal:define="majorz election.type=='majorz'">
+
+        <h2 tal:condition="not:election.results" i18n:translate>No results yet</h2>
+
+        <tal:block tal:condition="election.results">
+
+            <h2 i18n:translate>Results</h2>
+            <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+                <li>
+                    <span i18n:translate="">Counted municipalities</span>
+                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" /></strong>
+                </li>
+                <li tal:condition="not: election.counted">
+                    <span i18n:translate="">Last change</span>
+                    <strong>${layout.format_date(election.last_result_change, 'relative')}</strong>
+                </li>
+                <li tal:condition="election.counted">
+                    <span i18n:translate="">Elegible Voters</span>
+                    <strong>${layout.format_number(election.elegible_voters)}</strong>
+                </li>
+                <li tal:condition="election.counted">
+                    <span i18n:translate="">Received Ballots</span>
+                    <strong>${layout.format_number(election.received_ballots)}</strong>
+                </li>
+                <li tal:condition="election.counted">
+                    <span i18n:translate="">Turnout</span>
+                    <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
+                </li>
+            </ul>
+
+            <div class="row" tal:condition="majorz">
+                <div class="small-12 small-centered medium-12 large-10 columns">
+                    <div class="bar-chart" data-dataurl="${request.link(election, name='candidates')}"></div>
+                </div>
+            </div>
+
+            <tal:block tal:condition="not: majorz">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div>
+                            <table class="ballot-results stackable">
+                                <thead>
+                                    <th i18n:translate="">List</th>
+                                    <th i18n:translate="single_votes" class="right-aligned">Votes</th>
+                                    <th i18n:translate="" class="right-aligned">Mandates</th>
+                                </thead>
+                                <tbody>
+                                    <tr tal:repeat="result lists">
+                                        <td>${result[0]}</td>
+                                        <td class="right-aligned">${layout.format_number(result[1])}</td>
+                                        <td class="answer accepted right-aligned" tal:condition="result[2] > 0">${layout.format_number(result[2])}</td>
+                                        <td class="answer rejected right-aligned" tal:condition="result[2] <= 0">${layout.format_number(result[2])}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </tal:block>
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <div>
+                        <table class="ballot-results stackable">
+                            <thead>
+                                <th i18n:translate="">Candidate</th>
+                                <th i18n:translate="single_votes" class="right-aligned">Votes</th>
+                                <th i18n:translate="" class="right-aligned" tal:condition="not: majorz">List</th>
+                                <th i18n:translate="" class="right-aligned">Elected</th>
+                            </thead>
+                            <tbody>
+                                <tr tal:repeat="result candidates_sorted">
+                                    <td>${result[0]}</td>
+                                    <td class="right-aligned">${layout.format_number(result[1])}</td>
+                                    <td class="right-aligned" tal:condition="not: majorz">${result[3]}</td>
+                                    <td class="answer accepted right-aligned" tal:condition="result[2] == True" i18n:translate="">Yes</td>
+                                    <td class="answer rejected right-aligned" tal:condition="result[2] == False" i18n:translate="">No</td>
+                                    <td class="answer right-aligned" tal:condition="result[2] == None" i18n:translate=""></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <tal:block tal:condition="majorz">
+                <h2 i18n:translate>Details Electoral Districts</h2>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div>
+                            <table class="ballot-results stackable">
+                                <thead>
+                                    <th i18n:translate="">Electoral District</th>
+                                    <th tal:repeat="candidate candidates" class="right-aligned">${candidate[0]}</th>
+                                </thead>
+                                <tbody>
+                                    <tr tal:repeat="result election.results">
+                                        <td>${result.group}</td>
+                                        <td tal:repeat="candidate result.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
+                                    </tr>
+
+                                    <tr class="total">
+                                        <td i18n:translate>Total</td>
+                                        <td tal:repeat="candidate candidates" class="right-aligned">${layout.format_number(candidate[1])}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </tal:block>
+
+            <h2 i18n:translate>Election statistics</h2>
+            <div class="row">
+                <div class="small-12 columns">
+                    <div>
+                        <table class="ballot-results stackable">
+                            <thead>
+                                <th i18n:translate="">Electoral District</th>
+                                <th i18n:translate="" class="right-aligned">Elegible Voters</th>
+                                <th i18n:translate="" class="right-aligned">Received Ballots</th>
+                                <th i18n:translate="" class="right-aligned">Accounted Ballots</th>
+                                <th i18n:translate="" class="right-aligned">Blank Ballots</th>
+                                <th i18n:translate="" class="right-aligned">Invalid Ballots</th>
+                                <th i18n:translate="" class="right-aligned">Accounted Votes</th>
+                                <th i18n:translate="" class="right-aligned" tal:condition="election.counted">Turnout</th>
+                            </thead>
+                            <tbody>
+                                <tr tal:repeat="result election.results">
+                                    <td>${result.group}</td>
+                                    <td class="right-aligned">${layout.format_number(result.elegible_voters)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.received_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.accounted_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.blank_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.invalid_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.accounted_votes)}</td>
+                                    <td class="right-aligned" tal:condition="election.counted">${'{0:.2f}'.format(result.turnout)} %</td>
+                                </tr>
+
+                                <tr class="total">
+                                    <td i18n:translate>Total</td>
+                                    <td class="right-aligned">${layout.format_number(election.elegible_voters)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.blank_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.invalid_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.accounted_votes)}</td>
+                                    <td class="right-aligned" tal:condition="election.counted">${'{0:.2f}'.format(election.turnout)} %</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['archive']" />
+
+    </tal:block>
+</div>

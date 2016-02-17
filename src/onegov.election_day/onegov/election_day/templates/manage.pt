@@ -3,6 +3,57 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
+        <div class="row manage-elections">
+            <div class="small-12 columns">
+                <div class="row">
+                    <div class="small-12 medium-6 columns">
+                        <h1 i18n:translate>Elections</h1>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <ul class="top-actions text-right">
+                            <li><a class="action-new" href="${new_election}" i18n:translate>New Election</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p tal:condition="not:elections" i18n:translate>
+                    No elections yet.
+                </p>
+
+                <table class="elections" tal:condition="elections">
+                    <thead>
+                        <tr>
+                            <th i18n:translate>Election</th>
+                            <th i18n:translate>Shortcode</th>
+                            <th i18n:translate>Date</th>
+                            <th i18n:translate>Type</th>
+                            <th i18n:translate>System</th>
+                            <th i18n:translate>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr tal:repeat="election elections">
+                        <td>${election.title}</td>
+                        <td><span class="shortcode" tal:condition="election.shortcode">${election.shortcode}</span></td>
+                        <td>${layout.format_date(election.date, 'date')}</td>
+                        <td tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
+                        <td tal:condition="election.domain == 'canton'" i18n:translate>Cantonal</td>
+                        <td tal:condition="election.type == 'majorz'" i18n:translate>Majority system</td>
+                        <td tal:condition="election.type == 'proporz'" i18n:translate>Election based on proportional representation</td>
+                        <td>
+                            <ul class="actions">
+                                <li><a i18n:translate class="action-view" href="${request.link(election)}">View</a></li>
+                                <li><a i18n:translate class="action-edit" href="${request.link(election, 'edit')}">Edit</a></li>
+                                <li><a i18n:translate class="action-upload" href="${request.link(election, 'upload')}">Upload Results</a></li>
+                                <li><a i18n:translate class="action-delete" href="${request.link(election, 'delete')}">Delete</a></li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+
         <div class="row manage-votes">
             <div class="small-12 columns">
                 <div class="row">
@@ -47,6 +98,7 @@
                         </td>
                     </tr>
                 </table>
+
             </div>
         </div>
     </tal:block>
