@@ -5,7 +5,7 @@ Models ballot results for OneGov.
 
 Run the Tests
 -------------
-    
+
 Install tox and run it::
 
     pip install tox
@@ -27,7 +27,7 @@ Onegov Ballot uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/OneGov/onegov.ballot.png
+.. image:: https://travis-ci.org/OneGov/onegov.ballot.png?branch=master
   :target: https://travis-ci.org/OneGov/onegov.ballot
   :alt: Build Status
 
