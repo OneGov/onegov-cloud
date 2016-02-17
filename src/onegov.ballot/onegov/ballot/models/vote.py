@@ -1,23 +1,11 @@
-""" OneGov Ballot models the aggregated results of Swiss ballots.
-It takes hints from the CH-0155 Standard.
-
-See:
-
-`eCH-0155: Datenstandard politische Rechte \
-<http://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0155>`_
-
-As of this writing onegov.ballot only aims to implement votes, not elections.
-Though it will do so in the future.
-
-"""
 from collections import OrderedDict
+from onegov.ballot.models.common import DomainOfInfluenceMixin
 from onegov.core.orm import Base, translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE, UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
 from sqlalchemy import select, func, case, desc
-from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, relationship, object_session
 from sqlalchemy_utils import observes
@@ -73,7 +61,7 @@ class DerivedBallotsCount(object):
             if self.elegible_voters else 0
 
 
-class Vote(Base, TimestampMixin, DerivedBallotsCount):
+class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
@@ -97,18 +85,6 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount):
 
     #: identifies the date of the vote
     date = Column(Date, nullable=False)
-
-    #: defines the scope of the vote - eCH-0115 calls this the domain of
-    #: influence. Unlike eCH-0115 we refrain from putting this in a separate
-    #: model. We also only include domains we currently support.
-    domain = Column(
-        Enum(
-            'federation',
-            'canton',
-            name='domain_of_influence'
-        ),
-        nullable=False
-    )
 
     #: a vote contains n ballots
     ballots = relationship(
@@ -525,33 +501,3 @@ class BallotResult(Base, TimestampMixin,
 
     #: the ballot this result belongs to
     ballot_id = Column(UUID, ForeignKey(Ballot.id), nullable=False)
-
-
-@listens_for(Vote, 'mapper_configured')
-@listens_for(Ballot, 'mapper_configured')
-def add_summarized_properties(mapper, cls):
-    """ Takes the following attributes and adds them as hybrid_properties
-    to the ballot. This results in a Ballot class that has all the following
-    properties which will return the sum of the underlying results if called.
-
-    E.g. this will return all the yeas of the joined ballot results::
-
-        ballot.yeas
-
-    """
-
-    attributes = cls.summarized_properties
-
-    def new_hybrid_property(attribute):
-        @hybrid_property
-        def sum_result(self):
-            return self.aggregate_results(attribute)
-
-        @sum_result.expression
-        def sum_result(cls):
-            return cls.aggregate_results_expression(cls, attribute)
-
-        return sum_result
-
-    for attribute in attributes:
-        setattr(cls, attribute, new_hybrid_property(attribute))

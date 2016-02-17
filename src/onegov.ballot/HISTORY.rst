@@ -4,6 +4,9 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
+- Adds models for elections.
+  [msom]
+
 0.3.0 (2015-12-15)
 ~~~~~~~~~~~~~~~~~~~
 
