@@ -72,10 +72,10 @@
                                 </thead>
                                 <tbody>
                                     <tr tal:repeat="result lists">
-                                        <td>${result[0]}</td>
-                                        <td class="right-aligned">${layout.format_number(result[1])}</td>
-                                        <td class="answer accepted right-aligned" tal:condition="result[2] > 0">${layout.format_number(result[2])}</td>
-                                        <td class="answer rejected right-aligned" tal:condition="result[2] <= 0">${layout.format_number(result[2])}</td>
+                                        <td>${result[1]}</td>
+                                        <td class="right-aligned">${layout.format_number(result[2])}</td>
+                                        <td class="answer accepted right-aligned" tal:condition="result[3] > 0">${layout.format_number(result[3])}</td>
+                                        <td class="answer rejected right-aligned" tal:condition="result[3] <= 0">${layout.format_number(result[3])}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -96,12 +96,12 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="result candidates_sorted">
-                                    <td>${result[0]}</td>
-                                    <td class="right-aligned">${layout.format_number(result[1])}</td>
-                                    <td class="right-aligned" tal:condition="not: majorz">${result[3]}</td>
-                                    <td class="answer accepted right-aligned" tal:condition="result[2] == True" i18n:translate="">Yes</td>
-                                    <td class="answer rejected right-aligned" tal:condition="result[2] == False" i18n:translate="">No</td>
-                                    <td class="answer right-aligned" tal:condition="result[2] == None" i18n:translate=""></td>
+                                    <td>${result[1]} ${result[2]}</td>
+                                    <td class="right-aligned">${layout.format_number(result[5])}</td>
+                                    <td class="right-aligned" tal:condition="not: majorz">${result[4]}</td>
+                                    <td class="answer accepted right-aligned" tal:condition="result[3] == True" i18n:translate="">Yes</td>
+                                    <td class="answer rejected right-aligned" tal:condition="result[3] == False" i18n:translate="">No</td>
+                                    <td class="answer right-aligned" tal:condition="result[3] == None" i18n:translate=""></td>
                                 </tr>
                             </tbody>
                         </table>

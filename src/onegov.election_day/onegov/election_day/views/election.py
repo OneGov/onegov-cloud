@@ -19,7 +19,7 @@ def view_vote(self, request):
     )
     candidates = self.candidate_results
     candidates_sorted = sorted(
-        candidates, key=lambda x: (x[2], x[1]), reverse=True
+        candidates, key=lambda x: (x[3], x[5]), reverse=True
     )
 
     return {

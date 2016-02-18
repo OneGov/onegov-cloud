@@ -125,16 +125,16 @@ def parse_proporz(line, values, errors):
     except ValueError:
         errors.append(_("Invalid list id"))
 
-    # party name
-    values['list_party'] = line.parteibezeichnung
+    # list name
+    values['list_name'] = line.parteibezeichnung
 
-    # party: mandates
+    # list: mandates
     values['list_nr_of_mandates'] = int(line.anzahl_sitze_liste or 0)
 
     # votes: invalid
     values['invalid_votes'] = 0
 
-    # votes: party
+    # votes: list
     values['list_votes'] = (
         int(line.kandidatenstimmen_unveranderte_wahlzettel or 0) +
         int(line.kandidatenstimmen_veranderte_wahlzettel or 0) +
@@ -249,7 +249,7 @@ def import_file(municipalities, election, file, mimetype):
             if not majorz and mid and lid and (mid, lid) in lists:
                 existing = lists[(mid, lid)]
                 differs = (
-                    existing.party != values['list_party'] or
+                    existing.name != values['list_name'] or
                     existing.number_of_mandates != values[
                         'list_nr_of_mandates'
                     ] or
@@ -287,10 +287,10 @@ def import_file(municipalities, election, file, mimetype):
         if not majorz and mid and lid and (mid, lid) not in lists:
             lists[(mid, lid)] = ListResult(
                 list_id=values['list_id'],
-                party=values['list_party'],
+                name=values['list_name'],
                 votes=values['list_votes'],
                 number_of_mandates=values['list_nr_of_mandates'],
-                group=values['list_party']
+                group=values['list_id']
             )
 
         # pass the errors
@@ -325,11 +325,9 @@ def import_file(municipalities, election, file, mimetype):
                     family_name=values['family_name'],
                     first_name=values['first_name'],
                     votes=values['candidate_votes'],
-                    list=values['list_party'] if not majorz else None,
-                    group='{} {}'.format(
-                        values['family_name'],
-                        values['first_name']
-                    ),
+                    list_id=values['list_id'] if not majorz else None,
+                    list_name=values['list_name'] if not majorz else None,
+                    group=values['candidate_id'],
                 )
             )
 
