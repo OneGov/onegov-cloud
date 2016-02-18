@@ -3,7 +3,7 @@ from freezegun import freeze_time
 from onegov.ballot import Ballot, BallotResult, Vote
 
 
-def test_create_all_models(session):
+def test_vote_create_all_models(session):
     vote = Vote(
         title="Universal Healthcare",
         domain='federation',
@@ -269,7 +269,7 @@ def test_ballot_answer_nobody_wins(session):
     assert vote.answer == 'rejected'
 
 
-def test_progress(session):
+def test_vote_progress(session):
     vote = Vote(
         title="Abstimmung",
         domain='federation',
@@ -295,7 +295,7 @@ def test_progress(session):
     assert vote.proposal.progress == (2, 3)
 
 
-def test_turnout(session):
+def test_vote_turnout(session):
     vote = Vote(
         title="Abstimmung",
         domain='federation',
@@ -323,7 +323,7 @@ def test_turnout(session):
     assert vote.proposal.turnout == 10
 
 
-def test_percentage_by_municipality(session):
+def test_vote_percentage_by_municipality(session):
     vote = Vote(
         title="Abstimmung",
         domain='federation',
@@ -510,7 +510,7 @@ def test_vote_last_result_change(session):
     assert vote.last_result_change.isoformat() == '2015-01-01T14:00:00+00:00'
 
 
-def test_export(session):
+def test_vote_export(session):
     vote = Vote(
         title="Is this a test?",
         shortcode="FOO",

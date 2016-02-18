@@ -3,8 +3,10 @@ from onegov.ballot.models.common import DomainOfInfluenceMixin
 from onegov.core.orm import Base, translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE, UUID
+from onegov.core.utils import normalize_for_url
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
 from sqlalchemy import select, func, desc
+from sqlalchemy_utils import observes
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, relationship, object_session
 from uuid import uuid4
@@ -41,11 +43,16 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
     ]
 
     #: identifies the result, may be used in the url
-    id = Column(UUID, primary_key=True, default=uuid4)
+    id = Column(Text, primary_key=True)
 
     #: title of the election
     title_translations = Column(HSTORE, nullable=False)
     title = translation_hybrid(title_translations)
+
+    @observes('title_translations')
+    def title_observer(self, translations):
+        if not self.id:
+            self.id = normalize_for_url(self.title)
 
     #: shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
@@ -64,7 +71,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
     )
 
     #: the number of mandates
-    number_of_mandates = Column(Integer, nullable=True)
+    number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
     #: Total number of municipalities
     total_municipalities = Column(Integer, nullable=True)
@@ -90,6 +97,10 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
     @property
     def list_results(self):
+        """ Returns a tuple (list id, list name, cumulated votes) for each
+        list.
+
+        """
         session = object_session(self)
 
         result_ids = session.query(ElectionResult)
@@ -98,15 +109,19 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         result_ids = result_ids.subquery()
 
         results = session.query(
-            ListResult.group,
+            ListResult.list_id,
+            ListResult.name,
             func.sum(ListResult.votes),
             ListResult.number_of_mandates
         )
         results = results.group_by(
-            ListResult.group,
+            ListResult.list_id,
+            ListResult.name,
             ListResult.number_of_mandates
         )
-        results = results.order_by(ListResult.group)
+        results = results.order_by(
+            ListResult.name
+        )
         results = results.filter(
             ListResult.election_result_id.in_(result_ids)
         )
@@ -115,6 +130,10 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
     @property
     def candidate_results(self):
+        """ Returns a tuple (candidate id, family name, first name, elected,
+        list name, cumulated votes) for each candidate.
+
+        """
         session = object_session(self)
 
         result_ids = session.query(ElectionResult)
@@ -123,17 +142,24 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         result_ids = result_ids.subquery()
 
         results = session.query(
-            CandidateResult.group,
-            func.sum(CandidateResult.votes),
+            CandidateResult.candidate_id,
+            CandidateResult.family_name,
+            CandidateResult.first_name,
             CandidateResult.elected,
-            CandidateResult.list
+            CandidateResult.list_name,
+            func.sum(CandidateResult.votes),
         )
         results = results.group_by(
-            CandidateResult.group,
+            CandidateResult.candidate_id,
+            CandidateResult.family_name,
+            CandidateResult.first_name,
             CandidateResult.elected,
-            CandidateResult.list
+            CandidateResult.list_name
         )
-        results = results.order_by(CandidateResult.group)
+        results = results.order_by(
+            CandidateResult.family_name,
+            CandidateResult.first_name
+        )
         results = results.filter(
             CandidateResult.election_result_id.in_(result_ids)
         )
@@ -151,7 +177,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
         """
         expr = select([func.sum(getattr(ElectionResult, attribute))])
-        expr = expr.where(ElectionResult.ballot_id == cls.id)
+        expr = expr.where(ElectionResult.election_id == cls.id)
         expr = expr.label(attribute)
 
         return expr
@@ -250,10 +276,8 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         rows = []
 
         for r in self.results:
-            lists = dict(((l.party, l) for l in r.lists))
+            lists = dict(((l.list_id, l) for l in r.lists))
             for c in r.candidates:
-                # have the dict ordered so it works directly with onegov.core's
-                # :func:`onegov.core.csv.convert_list_of_dicts_to_csv`
                 row = OrderedDict()
 
                 row['election_title'] = self.title.strip()
@@ -273,8 +297,11 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
                 row['municipality_invalid_votes'] = r.invalid_votes
                 row['municipality_accounted_votes'] = r.accounted_votes
 
-                row['list_name'] = lists[c.list].party if c.list else None
-                row['list_votes'] = lists[c.list].votes if c.list else None
+                row['list_name'] = None
+                row['list_votes'] = None
+                if c.list_id:
+                    row['list_name'] = lists[c.list_id].name
+                    row['list_votes'] = lists[c.list_id].votes
 
                 row['candidate_family_name'] = c.family_name
                 row['candidate_first_name'] = c.first_name
@@ -290,11 +317,11 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
 
     __tablename__ = 'election_results'
 
-    #: identifies the result, may be used in the url
+    #: identifies the result
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: the election this result belongs to
-    election_id = Column(UUID, ForeignKey(Election.id), nullable=False)
+    election_id = Column(Text, ForeignKey(Election.id), nullable=False)
 
     #: groups the result in whatever structure makes sense
     group = Column(Text, nullable=False)
@@ -314,16 +341,6 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
     #: number of invalid ballots
     invalid_ballots = Column(Integer, nullable=False, default=lambda: 0)
 
-    @property
-    def unaccounted_ballots(self):
-        """ Number of unaccounted ballots """
-        return self.blank_ballots + self.invalid_ballots
-
-    @property
-    def accounted_ballots(self):
-        """ Number of accounted ballots """
-        return self.received_ballots - self.unaccounted_ballots
-
     #: number of blank votes
     blank_votes = Column(Integer, nullable=False, default=lambda: 0)
 
@@ -337,11 +354,6 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
             self.election.number_of_mandates * self.accounted_ballots -
             self.blank_votes - self.invalid_votes
         )
-
-    @property
-    def turnout(self):
-        return self.received_ballots / self.elegible_voters * 100\
-            if self.elegible_voters else 0
 
     #: an election result may contain n list results
     lists = relationship(
@@ -373,17 +385,17 @@ class ListResult(Base, TimestampMixin):
         UUID, ForeignKey(ElectionResult.id), nullable=False
     )
 
-    #: groups the candidate in whatever structure makes sense
+    #: groups the list in whatever structure makes sense
     group = Column(Text, nullable=False)
 
-    # number of mandates todo:
+    # number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: the identification of the list todo:
-    list_id = Column(Text, nullable=True)
+    #: the identification of the list
+    list_id = Column(Text, nullable=False)
 
-    #: the party this list belongs to todo:
-    party = Column(Text, nullable=True)
+    #: the name of the list
+    name = Column(Text, nullable=False)
 
     # votes
     votes = Column(Integer, nullable=False, default=lambda: 0)
@@ -396,28 +408,31 @@ class CandidateResult(Base, TimestampMixin):
     #: identifies the candidate, maybe used in the url
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: True if the candidate is elected (election-wide property)
-    elected = Column(Boolean, nullable=True)
-
     #: the election result this result belongs to
     election_result_id = Column(
         UUID, ForeignKey(ElectionResult.id), nullable=False
     )
 
+    #: True if the candidate is elected (election-wide property)
+    elected = Column(Boolean, nullable=False)
+
     #: groups the candidate in whatever structure makes sense
     group = Column(Text, nullable=False)
 
     #: the identification of the candidate
-    candidate_id = Column(Text, nullable=True)
+    candidate_id = Column(Text, nullable=False)
 
     #: the identification of the list
-    list = Column(Text, nullable=True)
+    list_id = Column(Text, nullable=True)
+
+    #: the name of the list (for convenience)
+    list_name = Column(Text, nullable=True)
 
     #: the family name
     family_name = Column(Text, nullable=False)
 
     #: the first name
-    first_name = Column(Text, nullable=True)
+    first_name = Column(Text, nullable=False)
 
     # votes
     votes = Column(Integer, nullable=False, default=lambda: 0)
