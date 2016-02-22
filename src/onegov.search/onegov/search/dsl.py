@@ -37,6 +37,10 @@ class Search(BaseSearch):
                         mapping.model, self.session
                     )
 
+        # bind responses to the orm
+        self._response_class = Response.bind(
+            self.session, self.mappings, self.explain)
+
     @property
     def explain(self):
         return self._extra.get('explain', False)
@@ -47,10 +51,6 @@ class Search(BaseSearch):
         search.mappings = self.mappings
 
         return search
-
-    def execute(self):
-        response = Response.bind(self.session, self.mappings, self.explain)
-        return super().execute(response_class=response)
 
 
 class Response(BaseResponse):

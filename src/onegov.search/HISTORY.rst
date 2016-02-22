@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Migrates to latest elasticsearch-dsl release.
+  [href]
+
 0.4.0 (2016-02-03)
 ~~~~~~~~~~~~~~~~~~~
 
