@@ -233,7 +233,9 @@ def test_election_results(session):
 
     assert election.list_results == []
     assert election.candidate_results == []
+    assert election.list_connection_results == []
 
+    # Add two municipalities
     election_result_1 = ElectionResult(
         group='group',
         municipality_id=1,
@@ -261,7 +263,9 @@ def test_election_results(session):
 
     assert election.list_results == []
     assert election.candidate_results == []
+    assert election.list_connection_results == []
 
+    # Add 4 candidates to the first municipality
     election_result_1.candidates.append(
         CandidateResult(
             elected=True,
@@ -292,7 +296,7 @@ def test_election_results(session):
             group='group',
             candidate_id='3',
             list_id='3',
-            list_name='Partey',
+            list_name='Partey A',
             family_name='Flanders',
             first_name='Ned',
             votes=20
@@ -304,13 +308,14 @@ def test_election_results(session):
             group='group',
             candidate_id='4',
             list_id='3',
-            list_name='Partey',
+            list_name='Partey A',
             family_name='Lovejoy',
             first_name='Tim',
             votes=1
         )
     )
 
+    # Add 2 candidates to the second municipality
     election_result_2.candidates.append(
         CandidateResult(
             elected=True,
@@ -328,8 +333,8 @@ def test_election_results(session):
             elected=False,
             group='group',
             candidate_id='5',
-            list_id='3',
-            list_name='Partey',
+            list_id='4',
+            list_name='Partey B',
             family_name='Smithers',
             first_name='Waylon',
             votes=5
@@ -342,63 +347,89 @@ def test_election_results(session):
     assert sorted(election.candidate_results) == [
         ('1', 'Quimby', 'Joe', True, 'Quimby Again!', 540),
         ('2', 'Nahasapeemapetilon', 'Apu', False, 'Kwik-E-Major', 111),
-        ('3', 'Flanders', 'Ned', False, 'Partey', 20),
-        ('4', 'Lovejoy', 'Tim', False, 'Partey', 1),
-        ('5', 'Smithers', 'Waylon', False, 'Partey', 5)
+        ('3', 'Flanders', 'Ned', False, 'Partey A', 20),
+        ('4', 'Lovejoy', 'Tim', False, 'Partey A', 1),
+        ('5', 'Smithers', 'Waylon', False, 'Partey B', 5)
     ]
+    assert election.list_connection_results == []
 
-    election_result_1.lists.append(
-        ListResult(
-            group='group',
-            number_of_mandates=1,
-            list_id='1',
-            name='Quimparty',
-            votes=520
-        )
+    # Add 3 lists to the first municipality
+    list_1_1 = ListResult(
+        group='group',
+        number_of_mandates=1,
+        list_id='1',
+        name='Quimparty',
+        votes=520
     )
-    election_result_1.lists.append(
-        ListResult(
-            group='group',
-            number_of_mandates=0,
-            list_id='2',
-            name='Kwik-E-Major',
-            votes=111
-        )
+    list_1_2 = ListResult(
+        group='group',
+        number_of_mandates=0,
+        list_id='2',
+        name='Kwik-E-Major',
+        votes=111
     )
-    election_result_1.lists.append(
-        ListResult(
-            group='group',
-            number_of_mandates=0,
-            list_id='3',
-            name='Partey',
-            votes=21
-        )
+    list_1_3 = ListResult(
+        group='group',
+        number_of_mandates=0,
+        list_id='3',
+        name='Partey A',
+        votes=21
     )
-    election_result_2.lists.append(
-        ListResult(
-            group='group',
-            number_of_mandates=1,
-            list_id='1',
-            name='Quimparty',
-            votes=20
-        )
+    election_result_1.lists.append(list_1_1)
+    election_result_1.lists.append(list_1_2)
+    election_result_1.lists.append(list_1_3)
+
+    # Add 2 lists to the second municipality
+    list_2_1 = ListResult(
+        group='group',
+        number_of_mandates=1,
+        list_id='1',
+        name='Quimparty',
+        votes=20
     )
-    election_result_2.lists.append(
-        ListResult(
-            group='group',
-            number_of_mandates=0,
-            list_id='3',
-            name='Partey',
-            votes=5
-        )
+    list_2_2 = ListResult(
+        group='group',
+        number_of_mandates=0,
+        list_id='4',
+        name='Partey B',
+        votes=5
     )
+    election_result_2.lists.append(list_2_1)
+    election_result_2.lists.append(list_2_2)
 
     session.flush()
 
     assert sorted(election.list_results) == [
         ('1', 'Quimparty', 540, 1),
         ('2', 'Kwik-E-Major', 111, 0),
-        ('3', 'Partey', 26, 0)
+        ('3', 'Partey A', 21, 0),
+        ('4', 'Partey B', 5, 0)
+    ]
+    assert election.list_connection_results == [
+        (None, None, '1', 'Quimparty', 540),
+        (None, None, '2', 'Kwik-E-Major', 111),
+        (None, None, '3', 'Partey A', 21),
+        (None, None, '4', 'Partey B', 5)
+    ]
+
+    # Add list connections
+    list_1_1.list_connection_id = 'A'
+    list_2_1.list_connection_id = 'A'
+
+    list_1_2.list_connection_id = 'B'
+    list_1_3.list_connection_id = 'B'
+    list_2_2.list_connection_id = 'B'
+
+    list_1_3.list_subconnection_id = 'B.1'
+    list_2_2.list_subconnection_id = 'B.1'
+
+    session.flush()
+
+    assert election.list_connection_results == [
+        ('A', None, '1', 'Quimparty', 540),
+        ('B', 'B.1', '3', 'Partey A', 21),
+        ('B', 'B.1', '4', 'Partey B', 5),
+        ('B', None, '2', 'Kwik-E-Major', 111)
     ]
 
 
@@ -492,6 +523,10 @@ def test_election_export(session):
             'municipality_accounted_votes': 285,
             'list_name': 'Quimparty',
             'list_votes': 520,
+            'list_connection_description': None,
+            'list_connection_id': None,
+            'list_subconnection_description': None,
+            'list_subconnection_id': None,
             'candidate_family_name': 'Quimby',
             'candidate_first_name': 'Joe',
             'candidate_elected': True,
@@ -515,6 +550,10 @@ def test_election_export(session):
             'municipality_accounted_votes': 285,
             'list_name': 'Kwik-E-Major',
             'list_votes': 111,
+            'list_connection_description': None,
+            'list_connection_id': None,
+            'list_subconnection_description': None,
+            'list_subconnection_id': None,
             'candidate_family_name': 'Nahasapeemapetilon',
             'candidate_first_name': 'Apu',
             'candidate_elected': False,

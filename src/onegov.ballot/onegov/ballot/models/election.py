@@ -96,6 +96,39 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
     )
 
     @property
+    def list_connection_results(self):
+        session = object_session(self)
+
+        result_ids = session.query(ElectionResult)
+        result_ids = result_ids.with_entities(ElectionResult.id)
+        result_ids = result_ids.filter(ElectionResult.election_id == self.id)
+        result_ids = result_ids.subquery()
+
+        results = session.query(
+            ListResult.list_connection_id,
+            ListResult.list_subconnection_id,
+            ListResult.list_id,
+            ListResult.name,
+            func.sum(ListResult.votes),
+        )
+        results = results.group_by(
+            ListResult.list_connection_id,
+            ListResult.list_subconnection_id,
+            ListResult.list_id,
+            ListResult.name,
+        )
+        results = results.order_by(
+            ListResult.list_connection_id,
+            ListResult.list_subconnection_id,
+            ListResult.list_id
+        )
+        results = results.filter(
+            ListResult.election_result_id.in_(result_ids)
+        )
+
+        return results.all()
+
+    @property
     def list_results(self):
         """ Returns a tuple (list id, list name, cumulated votes) for each
         list.
@@ -302,6 +335,14 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
                 if c.list_id:
                     row['list_name'] = lists[c.list_id].name
                     row['list_votes'] = lists[c.list_id].votes
+                    row['list_connection_description'] = \
+                        lists[c.list_id].list_connection_description
+                    row['list_connection_id'] = \
+                        lists[c.list_id].list_connection_id
+                    row['list_subconnection_description'] = \
+                        lists[c.list_id].list_subconnection_description
+                    row['list_subconnection_id'] = \
+                        lists[c.list_id].list_subconnection_id
 
                 row['candidate_family_name'] = c.family_name
                 row['candidate_first_name'] = c.first_name
@@ -314,6 +355,9 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
 
 class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
+    """ The result of an election for a municipality.
+
+    """
 
     __tablename__ = 'election_results'
 
@@ -375,6 +419,14 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
 
 
 class ListResult(Base, TimestampMixin):
+    """ The result of an election for a list in  a municipality.
+
+    There are some properties (list id, number of mandates, list name, list and
+    sublist connections) which stay the same for a whole election and could be
+    therefore stored globally.
+
+    """
+
     __tablename__ = 'list_results'
 
     #: identifies the candidate, maybe used in the url
@@ -397,11 +449,30 @@ class ListResult(Base, TimestampMixin):
     #: the name of the list
     name = Column(Text, nullable=False)
 
+    #: the id of the list connection
+    list_connection_id = Column(Text, nullable=True)
+
+    #: the description of the list connection
+    list_connection_description = Column(Text, nullable=True)
+
+    #: the id of the sublist connection
+    list_subconnection_id = Column(Text, nullable=True)
+
+    #: the description of the sublist connection
+    list_subconnection_description = Column(Text, nullable=True)
+
     # votes
     votes = Column(Integer, nullable=False, default=lambda: 0)
 
 
 class CandidateResult(Base, TimestampMixin):
+    """ The result of an election for a candidate in  a municipality.
+
+    There are some properties (elected, candidate id, list id, list name,
+    family name, first name) which stay the same for a whole election and
+    could be therefore stored globally or as a reference.
+
+    """
 
     __tablename__ = 'candiate_results'
 
