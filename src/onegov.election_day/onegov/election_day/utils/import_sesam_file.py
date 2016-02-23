@@ -118,6 +118,9 @@ def parse_majorz(line, values, errors):
 
 
 def parse_proporz(line, values, errors):
+    # votes: invalid
+    values['invalid_votes'] = 0
+
     # the id of the list
     values['list_id'] = None
     try:
@@ -125,16 +128,13 @@ def parse_proporz(line, values, errors):
     except ValueError:
         errors.append(_("Invalid list id"))
 
-    # list name
+    # name of the list
     values['list_name'] = line.parteibezeichnung
 
-    # list: mandates
+    # number of mandates the list got
     values['list_nr_of_mandates'] = int(line.anzahl_sitze_liste or 0)
 
-    # votes: invalid
-    values['invalid_votes'] = 0
-
-    # votes: list
+    # number of votes the list got
     values['list_votes'] = (
         int(line.kandidatenstimmen_unveranderte_wahlzettel or 0) +
         int(line.kandidatenstimmen_veranderte_wahlzettel or 0) +
@@ -142,7 +142,13 @@ def parse_proporz(line, values, errors):
         int(line.zusatzstimmen_veranderte_wahlzettel or 0)
     )
 
-    # votes: candidate
+    # list connections
+    values['list_connection_nr'] = line.hlv_nr
+    values['list_connection_description'] = line.hlv_bezeichnung
+    values['list_subconnection_nr'] = line.ulv_nr
+    values['list_subconnection_description'] = line.ulv_bezeichnung
+
+    # number of the votes the candidate got
     values['candidate_votes'] = int(line.stimmen_total_aus_wahlzettel or 0)
 
 
@@ -253,6 +259,18 @@ def import_file(municipalities, election, file, mimetype):
                     existing.number_of_mandates != values[
                         'list_nr_of_mandates'
                     ] or
+                    existing.list_connection_id != values[
+                        'list_connection_nr'
+                    ] or
+                    existing.list_connection_description != values[
+                        'list_connection_description'
+                    ] or
+                    existing.list_subconnection_id != values[
+                        'list_subconnection_nr'
+                    ] or
+                    existing.list_subconnection_description != values[
+                        'list_subconnection_description'
+                    ] or
                     existing.votes != values['list_votes']
                 )
                 if differs:
@@ -290,6 +308,14 @@ def import_file(municipalities, election, file, mimetype):
                 name=values['list_name'],
                 votes=values['list_votes'],
                 number_of_mandates=values['list_nr_of_mandates'],
+                list_connection_id=values['list_connection_nr'],
+                list_connection_description=values[
+                    'list_connection_description'
+                ],
+                list_subconnection_id=values['list_subconnection_nr'],
+                list_subconnection_description=values[
+                    'list_subconnection_description'
+                ],
                 group=values['list_id']
             )
 

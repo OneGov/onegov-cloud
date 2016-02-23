@@ -61,6 +61,7 @@
             </div>
 
             <tal:block tal:condition="not: majorz">
+                <h3 i18n:translate>Lists</h3>
                 <div class="row">
                     <div class="small-12 columns">
                         <div>
@@ -84,6 +85,46 @@
                 </div>
             </tal:block>
 
+            <tal:block tal:condition="not: majorz">
+                <h3 i18n:translate>List connections</h3>
+                <tal:block tal:repeat="list connections">
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <div>
+                                <table class="ballot-results">
+                                    <thead>
+                                        <th><span i18n:translate>List connection</span> ${connections[list]['name']}</th>
+                                        <th i18n:translate="single_votes" class="right-aligned">Votes</th>
+                                    </thead>
+                                    <tbody>
+                                        <tal:block tal:repeat="sublist connections[list]['sublists']">
+                                            <tr tal:condition="connections[list]['sublists'][sublist]['name']">
+                                                <th><span i18n:translate>Sublist connection</span> ${connections[list]['sublists'][sublist]['name']}</th>
+                                                <th></th>
+                                            </tr>
+                                            <tr tal:repeat="item connections[list]['sublists'][sublist]['items']">
+                                                <td>${item[0]}</td>
+                                                <td class="right-aligned">${layout.format_number(item[1])}</td>
+                                            </tr>
+                                            <tr class="subtotal" tal:condition="connections[list]['sublists'][sublist]['name']">
+                                                <td i18n:translate>Subtotal</td>
+                                                <td class="right-aligned">${layout.format_number(connections[list]['sublists'][sublist]['total'])}</td>
+                                            </tr>
+                                        </tal:block>
+                                        <tr class="total">
+                                            <td i18n:translate>Total</td>
+                                            <td class="right-aligned">${layout.format_number(connections[list]['total'])}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </tal:block>
+            </tal:block>
+
+            <h3 i18n:translate>Candidates</h3>
             <div class="row">
                 <div class="small-12 columns">
                     <div>
@@ -110,14 +151,14 @@
             </div>
 
             <tal:block tal:condition="majorz">
-                <h2 i18n:translate>Details Electoral Districts</h2>
+                <h3 i18n:translate>Electoral Districts</h3>
                 <div class="row">
                     <div class="small-12 columns">
                         <div>
                             <table class="ballot-results stackable">
                                 <thead>
                                     <th i18n:translate="">Electoral District</th>
-                                    <th tal:repeat="candidate candidates" class="right-aligned">${candidate[0]}</th>
+                                    <th tal:repeat="candidate candidates" class="right-aligned">${candidate[1]} ${candidate[2]}</th>
                                 </thead>
                                 <tbody>
                                     <tr tal:repeat="result election.results">
@@ -127,7 +168,7 @@
 
                                     <tr class="total">
                                         <td i18n:translate>Total</td>
-                                        <td tal:repeat="candidate candidates" class="right-aligned">${layout.format_number(candidate[1])}</td>
+                                        <td tal:repeat="candidate candidates" class="right-aligned">${layout.format_number(candidate[5])}</td>
                                     </tr>
                                 </tbody>
                             </table>
