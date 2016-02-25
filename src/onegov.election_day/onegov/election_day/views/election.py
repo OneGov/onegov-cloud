@@ -1,11 +1,21 @@
 from morepath.request import Response
-from onegov.ballot import Election
+from onegov.ballot import (
+    Candidate,
+    CandidateResult,
+    Election,
+    ElectionResult,
+    List,
+    ListConnection
+)
 from onegov.core.csv import convert_list_of_dicts_to_csv
 from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.security import Public
+from onegov.core.utils import groupbylist
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
+from sqlalchemy import desc
+from sqlalchemy.orm import object_session
 
 
 @ElectionDayApp.html(model=Election, template='election.pt', permission=Public)
@@ -14,21 +24,67 @@ def view_election(self, request):
     layout = DefaultLayout(self, request)
     request.include('bar_chart')
 
-    lists = sorted(self.lists, key=lambda x: x.name)
-    lists.sort(key=lambda x: (x.number_of_mandates, x.votes), reverse=True)
+    majorz = self.type == 'majorz'
+    session = object_session(self)
 
-    connections = self.list_connections.filter_by(parent_id=None)
+    # Candidates: Overview
+    candidates = session.query(
+        Candidate.family_name,
+        Candidate.first_name,
+        Candidate.elected,
+        Candidate.votes,
+        List.name,
+    )
+    candidates = candidates.outerjoin(List)
+    candidates = candidates.order_by(
+        desc(Candidate.elected),
+        desc(Candidate.votes),
+        Candidate.family_name,
+        Candidate.first_name
+    )
+    candidates = candidates.filter(Candidate.election_id == self.id)
 
-    candidates = sorted(self.candidates, key=lambda x: (x.family_name))
-    candidates.sort(key=lambda x: (x.elected, x.votes), reverse=True)
+    # Candidates: Electoral results
+    electoral = []
+    if majorz:
+        electoral = session.query(ElectionResult.group, CandidateResult.votes)
+        electoral = electoral.outerjoin(CandidateResult, Candidate)
+        electoral = electoral.order_by(
+            ElectionResult.group,
+            Candidate.candidate_id
+        )
+        electoral = electoral.filter(ElectionResult.election_id == self.id)
+        electoral = groupbylist(electoral, key=lambda x: x[0])
+
+    # List results
+    lists = []
+    if not majorz:
+        lists = session.query(
+            List.name,
+            List.votes,
+            List.number_of_mandates,
+        )
+        lists = lists.order_by(
+            desc(List.number_of_mandates),
+            desc(List.votes),
+            List.name,
+        )
+        lists = lists.filter(List.election_id == self.id)
+
+    # List connections
+    connections = []
+    if not majorz:
+        connections = self.list_connections.filter_by(parent_id=None)
 
     return {
         'election': self,
         'layout': layout,
+        'majorz': majorz,
         'has_results': True if self.results.first() else False,
+        'candidates': candidates,
+        'electoral': electoral,
         'lists': lists,
         'connections': connections,
-        'candidates': candidates,
     }
 
 
