@@ -1,5 +1,3 @@
-from collections import OrderedDict
-from itertools import groupby
 from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.csv import convert_list_of_dicts_to_csv
@@ -11,58 +9,41 @@ from onegov.election_day.layout import DefaultLayout
 
 
 @ElectionDayApp.html(model=Election, template='election.pt', permission=Public)
-def view_vote(self, request):
+def view_election(self, request):
 
     layout = DefaultLayout(self, request)
     request.include('bar_chart')
 
-    lists = sorted(
-        self.list_results, key=lambda x: (x[2], x[1]), reverse=True
-    )
+    lists = sorted(self.lists, key=lambda x: x.name)
+    lists.sort(key=lambda x: (x.number_of_mandates, x.votes), reverse=True)
 
-    connections = OrderedDict()
-    for group in groupby(self.list_connection_results, key=lambda x: x[0]):
-        gid = group[0]
-        connections[gid] = {'total': 0, 'sublists': OrderedDict()}
-        for subgroup in groupby(group[1], key=lambda x: x[1]):
-            sid = subgroup[0]
-            connections[gid]['sublists'][sid] = {'total': 0, 'items': []}
-            for item in subgroup[1]:
-                connections[gid]['name'] = item[0]
-                connections[gid]['total'] += item[4]
-                connections[gid]['sublists'][sid]['name'] = item[1]
-                connections[gid]['sublists'][sid]['total'] += item[4]
-                connections[gid]['sublists'][sid]['items'].append((
-                    item[3], item[4]
-                ))
+    connections = self.list_connections.filter_by(parent_id=None)
 
-    candidates = self.candidate_results
-    candidates_sorted = sorted(
-        candidates, key=lambda x: (x[3], x[5]), reverse=True
-    )
+    candidates = sorted(self.candidates, key=lambda x: (x.family_name))
+    candidates.sort(key=lambda x: (x.elected, x.votes), reverse=True)
 
     return {
         'election': self,
         'layout': layout,
+        'has_results': True if self.results.first() else False,
         'lists': lists,
         'connections': connections,
         'candidates': candidates,
-        'candidates_sorted': candidates_sorted
     }
 
 
 @ElectionDayApp.json(model=Election, name='json', permission=Public)
-def view_vote_as_json(self, request):
+def view_election_as_json(self, request):
     return self.export()
 
 
 @ElectionDayApp.view(model=Election, name='csv', permission=Public)
-def view_vote_as_csv(self, request):
+def view_election_as_csv(self, request):
     return convert_list_of_dicts_to_csv(self.export())
 
 
 @ElectionDayApp.view(model=Election, name='xlsx', permission=Public)
-def view_vote_as_xlsx(self, request):
+def view_election_as_xlsx(self, request):
     return Response(
         convert_list_of_dicts_to_xlsx(self.export()),
         content_type=(
@@ -76,14 +57,11 @@ def view_vote_as_xlsx(self, request):
 
 @ElectionDayApp.json(model=Election, permission=Public, name='candidates')
 def view_election_candidates(self, request):
-    return [
-        dict((
-            ('text', '{} {}'.format(result[1], result[2])),
-            ('value', result[5]),
-            ('class', 'active' if result[3] else 'inactive')
-        ))
-        for result in sorted(
-            self.candidate_results, key=lambda x: (x[2], x[5]), reverse=True
-        )
-        if result[5] > self.accounted_votes / 100
-    ]
+    result = [{
+        'text': '{} {}'.format(c.family_name, c.first_name),
+        'value': c.votes,
+        'class': 'active' if c.elected else 'inactive'
+    } for c in self.candidates if c.votes > self.accounted_votes / 100]
+    result.sort(key=lambda x: x['value'], reverse=True)
+    result.sort(key=lambda x: x['class'])
+    return result

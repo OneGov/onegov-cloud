@@ -26,9 +26,9 @@
     </tal:block>
     <tal:block metal:fill-slot="content" tal:define="majorz election.type=='majorz'">
 
-        <h2 tal:condition="not:election.results" i18n:translate>No results yet</h2>
+        <h2 tal:condition="not: has_results" i18n:translate>No results yet</h2>
 
-        <tal:block tal:condition="election.results">
+        <tal:block tal:condition="has_results">
 
             <h2 i18n:translate>Results</h2>
             <ul class="small-block-grid-1 medium-block-grid-4 factoids">
@@ -54,12 +54,6 @@
                 </li>
             </ul>
 
-            <div class="row" tal:condition="majorz">
-                <div class="small-12 small-centered medium-12 large-10 columns">
-                    <div class="bar-chart" data-dataurl="${request.link(election, name='candidates')}"></div>
-                </div>
-            </div>
-
             <tal:block tal:condition="not: majorz">
                 <h3 i18n:translate>Lists</h3>
                 <div class="row">
@@ -72,11 +66,11 @@
                                     <th i18n:translate="" class="right-aligned">Mandates</th>
                                 </thead>
                                 <tbody>
-                                    <tr tal:repeat="result lists">
-                                        <td>${result[1]}</td>
-                                        <td class="right-aligned">${layout.format_number(result[2])}</td>
-                                        <td class="answer accepted right-aligned" tal:condition="result[3] > 0">${layout.format_number(result[3])}</td>
-                                        <td class="answer rejected right-aligned" tal:condition="result[3] <= 0">${layout.format_number(result[3])}</td>
+                                    <tr tal:repeat="list lists">
+                                        <td>${list.name}</td>
+                                        <td class="right-aligned">${layout.format_number(list.votes)}</td>
+                                        <td class="answer accepted right-aligned" tal:condition="list.number_of_mandates > 0">${layout.format_number(list.number_of_mandates)}</td>
+                                        <td class="answer rejected right-aligned" tal:condition="list.number_of_mandates <= 0">${layout.format_number(list.number_of_mandates)}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -87,42 +81,52 @@
 
             <tal:block tal:condition="not: majorz">
                 <h3 i18n:translate>List connections</h3>
-                <tal:block tal:repeat="list connections">
+                <tal:block tal:repeat="connection connections">
                     <div class="row">
                         <div class="small-12 columns">
                             <div>
                                 <table class="ballot-results">
                                     <thead>
-                                        <th><span i18n:translate>List connection</span> ${connections[list]['name']}</th>
+                                        <th><span i18n:translate>List connection</span> ${connection.connection_id}</th>
                                         <th i18n:translate="single_votes" class="right-aligned">Votes</th>
                                     </thead>
                                     <tbody>
-                                        <tal:block tal:repeat="sublist connections[list]['sublists']">
-                                            <tr tal:condition="connections[list]['sublists'][sublist]['name']">
-                                                <th><span i18n:translate>Sublist connection</span> ${connections[list]['sublists'][sublist]['name']}</th>
+                                        <tr tal:repeat="list connection.lists">
+                                            <td>${list.name}</td>
+                                            <td class="right-aligned">${layout.format_number(list.votes)}</td>
+                                        </tr>
+                                        <tal:block tal:repeat="subconnection connection.children">
+                                            <tr>
+                                                <th><span i18n:translate>Sublist connection</span> ${subconnection.connection_id}</th>
                                                 <th></th>
                                             </tr>
-                                            <tr tal:repeat="item connections[list]['sublists'][sublist]['items']">
-                                                <td>${item[0]}</td>
-                                                <td class="right-aligned">${layout.format_number(item[1])}</td>
+                                            <tr tal:repeat="list subconnection.lists">
+                                                <td>${list.name}</td>
+                                                <td class="right-aligned">${layout.format_number(list.votes)}</td>
                                             </tr>
-                                            <tr class="subtotal" tal:condition="connections[list]['sublists'][sublist]['name']">
+                                            <tr class="subtotal">
                                                 <td i18n:translate>Subtotal</td>
-                                                <td class="right-aligned">${layout.format_number(connections[list]['sublists'][sublist]['total'])}</td>
+                                                <td class="right-aligned">${layout.format_number(subconnection.votes)}</td>
                                             </tr>
                                         </tal:block>
                                         <tr class="total">
                                             <td i18n:translate>Total</td>
-                                            <td class="right-aligned">${layout.format_number(connections[list]['total'])}</td>
+                                            <td class="right-aligned">${layout.format_number(connection.votes)}</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
-
                 </tal:block>
+
             </tal:block>
+
+            <div class="row" tal:condition="majorz">
+                <div class="small-12 small-centered medium-12 large-10 columns">
+                    <div class="bar-chart" data-dataurl="${request.link(election, name='candidates')}"></div>
+                </div>
+            </div>
 
             <h3 i18n:translate>Candidates</h3>
             <div class="row">
@@ -136,13 +140,13 @@
                                 <th i18n:translate="" class="right-aligned">Elected</th>
                             </thead>
                             <tbody>
-                                <tr tal:repeat="result candidates_sorted">
-                                    <td>${result[1]} ${result[2]}</td>
-                                    <td class="right-aligned">${layout.format_number(result[5])}</td>
-                                    <td class="right-aligned" tal:condition="not: majorz">${result[4]}</td>
-                                    <td class="answer accepted right-aligned" tal:condition="result[3] == True" i18n:translate="">Yes</td>
-                                    <td class="answer rejected right-aligned" tal:condition="result[3] == False" i18n:translate="">No</td>
-                                    <td class="answer right-aligned" tal:condition="result[3] == None" i18n:translate=""></td>
+                                <tr tal:repeat="candidate candidates">
+                                    <td>${candidate.family_name} ${candidate.first_name}</td>
+                                    <td class="right-aligned">${layout.format_number(candidate.votes)}</td>
+                                    <td class="right-aligned" tal:condition="not: majorz">${candidate.list.name}</td>
+                                    <td class="answer accepted right-aligned" tal:condition="candidate.elected == True" i18n:translate="">Yes</td>
+                                    <td class="answer rejected right-aligned" tal:condition="candidate.elected == False" i18n:translate="">No</td>
+                                    <td class="answer right-aligned" tal:condition="candidate.elected == None" i18n:translate=""></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -158,17 +162,17 @@
                             <table class="ballot-results stackable">
                                 <thead>
                                     <th i18n:translate="">Electoral District</th>
-                                    <th tal:repeat="candidate candidates" class="right-aligned">${candidate[1]} ${candidate[2]}</th>
+                                    <th tal:repeat="candidate election.candidates" class="right-aligned">${candidate.family_name} ${candidate.first_name}</th>
                                 </thead>
                                 <tbody>
                                     <tr tal:repeat="result election.results">
                                         <td>${result.group}</td>
-                                        <td tal:repeat="candidate result.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
+                                        <td tal:repeat="candidate result.candidate_results" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                                     </tr>
 
                                     <tr class="total">
                                         <td i18n:translate>Total</td>
-                                        <td tal:repeat="candidate candidates" class="right-aligned">${layout.format_number(candidate[5])}</td>
+                                        <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -219,7 +223,6 @@
                     </div>
                 </div>
             </div>
-
         </tal:block>
 
         <div metal:use-macro="layout.macros['archive']" />
