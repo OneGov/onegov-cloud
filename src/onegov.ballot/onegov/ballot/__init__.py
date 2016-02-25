@@ -1,9 +1,12 @@
 from onegov.ballot.models import (
     Ballot,
     BallotResult,
+    Candidate,
     CandidateResult,
     Election,
     ElectionResult,
+    List,
+    ListConnection,
     ListResult,
     Vote
 )
@@ -14,10 +17,13 @@ __all__ = [
     'Ballot',
     'BallotCollection',
     'BallotResult',
+    'Candidate',
     'CandidateResult',
     'Election',
     'ElectionCollection',
     'ElectionResult',
+    'List',
+    'ListConnection',
     'ListResult',
     'Vote',
     'VoteCollection'

@@ -7,9 +7,12 @@ See:
 <http://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0155>`_
 """
 from onegov.ballot.models.election import (
+    Candidate,
     CandidateResult,
     Election,
     ElectionResult,
+    List,
+    ListConnection,
     ListResult
 )
 from onegov.ballot.models.vote import Ballot, BallotResult, Vote
@@ -19,17 +22,23 @@ from sqlalchemy.ext.hybrid import hybrid_property
 __all__ = [
     'Ballot',
     'BallotResult',
+    'Candidate',
     'CandidateResult',
     'Election',
     'ElectionResult',
+    'List',
+    'ListConnection',
     'ListResult',
     'Vote',
 ]
 
 
-@listens_for(Vote, 'mapper_configured')
 @listens_for(Ballot, 'mapper_configured')
+@listens_for(Candidate, 'mapper_configured')
 @listens_for(Election, 'mapper_configured')
+@listens_for(List, 'mapper_configured')
+@listens_for(ListConnection, 'mapper_configured')
+@listens_for(Vote, 'mapper_configured')
 def add_summarized_properties(mapper, cls):
     """ Takes the following attributes and adds them as hybrid_properties
     to the ballot. This results in a Ballot class that has all the following
@@ -44,6 +53,7 @@ def add_summarized_properties(mapper, cls):
     attributes = cls.summarized_properties
 
     def new_hybrid_property(attribute):
+
         @hybrid_property
         def sum_result(self):
             return self.aggregate_results(attribute)

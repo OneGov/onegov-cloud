@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE, UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
-from sqlalchemy import select, func, desc
+from sqlalchemy import select, func, desc, or_
 from sqlalchemy_utils import observes
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, relationship, object_session
@@ -26,6 +26,17 @@ class DerivedBallotsCount(object):
     def turnout(self):
         return self.received_ballots / self.elegible_voters * 100\
             if self.elegible_voters else 0
+
+
+class DerivedVotesCount(object):
+
+    summarized_properties = [
+        'votes'
+    ]
+
+    def aggregate_results(self, attribute):
+        """ Gets the sum of the given attribute from the results. """
+        return sum(getattr(result, attribute) for result in self.results)
 
 
 class Election(Base, TimestampMixin, DerivedBallotsCount,
@@ -86,118 +97,39 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
         return False
 
+    #: an election contains n list connections
+    list_connections = relationship(
+        "ListConnection",
+        cascade="all, delete-orphan",
+        backref=backref("election"),
+        lazy="dynamic",
+        order_by="ListConnection.connection_id"
+    )
+
+    #: an election contains n lists
+    lists = relationship(
+        "List",
+        cascade="all, delete-orphan",
+        backref=backref("election"),
+        lazy="dynamic",
+    )
+
+    #: an election contains n candidates
+    candidates = relationship(
+        "Candidate",
+        cascade="all, delete-orphan",
+        backref=backref("election"),
+        lazy="dynamic",
+    )
+
     #: an election contains n results (one for each municipality)
     results = relationship(
         "ElectionResult",
         cascade="all, delete-orphan",
         backref=backref("election"),
-        lazy='joined',
+        lazy="dynamic",
         order_by="ElectionResult.group",
     )
-
-    @property
-    def list_connection_results(self):
-        session = object_session(self)
-
-        result_ids = session.query(ElectionResult)
-        result_ids = result_ids.with_entities(ElectionResult.id)
-        result_ids = result_ids.filter(ElectionResult.election_id == self.id)
-        result_ids = result_ids.subquery()
-
-        results = session.query(
-            ListResult.list_connection_id,
-            ListResult.list_subconnection_id,
-            ListResult.list_id,
-            ListResult.name,
-            func.sum(ListResult.votes),
-        )
-        results = results.group_by(
-            ListResult.list_connection_id,
-            ListResult.list_subconnection_id,
-            ListResult.list_id,
-            ListResult.name,
-        )
-        results = results.order_by(
-            ListResult.list_connection_id,
-            ListResult.list_subconnection_id,
-            ListResult.list_id
-        )
-        results = results.filter(
-            ListResult.election_result_id.in_(result_ids)
-        )
-
-        return results.all()
-
-    @property
-    def list_results(self):
-        """ Returns a tuple (list id, list name, cumulated votes) for each
-        list.
-
-        """
-        session = object_session(self)
-
-        result_ids = session.query(ElectionResult)
-        result_ids = result_ids.with_entities(ElectionResult.id)
-        result_ids = result_ids.filter(ElectionResult.election_id == self.id)
-        result_ids = result_ids.subquery()
-
-        results = session.query(
-            ListResult.list_id,
-            ListResult.name,
-            func.sum(ListResult.votes),
-            ListResult.number_of_mandates
-        )
-        results = results.group_by(
-            ListResult.list_id,
-            ListResult.name,
-            ListResult.number_of_mandates
-        )
-        results = results.order_by(
-            ListResult.name
-        )
-        results = results.filter(
-            ListResult.election_result_id.in_(result_ids)
-        )
-
-        return results.all()
-
-    @property
-    def candidate_results(self):
-        """ Returns a tuple (candidate id, family name, first name, elected,
-        list name, cumulated votes) for each candidate.
-
-        """
-        session = object_session(self)
-
-        result_ids = session.query(ElectionResult)
-        result_ids = result_ids.with_entities(ElectionResult.id)
-        result_ids = result_ids.filter(ElectionResult.election_id == self.id)
-        result_ids = result_ids.subquery()
-
-        results = session.query(
-            CandidateResult.candidate_id,
-            CandidateResult.family_name,
-            CandidateResult.first_name,
-            CandidateResult.elected,
-            CandidateResult.list_name,
-            func.sum(CandidateResult.votes),
-        )
-        results = results.group_by(
-            CandidateResult.candidate_id,
-            CandidateResult.family_name,
-            CandidateResult.first_name,
-            CandidateResult.elected,
-            CandidateResult.list_name
-        )
-        results = results.order_by(
-            CandidateResult.family_name,
-            CandidateResult.first_name
-        )
-        results = results.filter(
-            CandidateResult.election_result_id.in_(result_ids)
-        )
-
-        return results.all()
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
@@ -212,7 +144,6 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         expr = select([func.sum(getattr(ElectionResult, attribute))])
         expr = expr.where(ElectionResult.election_id == cls.id)
         expr = expr.label(attribute)
-
         return expr
 
     @property
@@ -309,8 +240,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         rows = []
 
         for r in self.results:
-            lists = dict(((l.list_id, l) for l in r.lists))
-            for c in r.candidates:
+            for c in r.candidate_results:
                 row = OrderedDict()
 
                 row['election_title'] = self.title.strip()
@@ -332,32 +262,191 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
                 row['list_name'] = None
                 row['list_votes'] = None
-                if c.list_id:
-                    row['list_name'] = lists[c.list_id].name
-                    row['list_votes'] = lists[c.list_id].votes
-                    row['list_connection_description'] = \
-                        lists[c.list_id].list_connection_description
-                    row['list_connection_id'] = \
-                        lists[c.list_id].list_connection_id
-                    row['list_subconnection_description'] = \
-                        lists[c.list_id].list_subconnection_description
-                    row['list_subconnection_id'] = \
-                        lists[c.list_id].list_subconnection_id
+                row['list_connection'] = None
+                row['list_connection_parent'] = None
 
-                row['candidate_family_name'] = c.family_name
-                row['candidate_first_name'] = c.first_name
-                row['candidate_elected'] = c.elected
-                row['candidate_votes'] = c.votes
+                list = c.candidate.list
+                list_c = list.connection if list else None
+                list_p = list_c.parent if list_c else None
+                if list:
+                    row['list_name'] = list.name
+                    row['list_votes'] = list.votes
+                if list_c:
+                    row['list_connection'] = list_c.connection_id
+                if list_p:
+                    row['list_connection_parent'] = list_p.connection_id
+
+                row['candidate_family_name'] = c.candidate.family_name
+                row['candidate_first_name'] = c.candidate.first_name
+                row['candidate_elected'] = c.candidate.elected
+                row['candidate_votes'] = c.candidate.votes
 
                 rows.append(row)
 
         return rows
 
 
-class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
-    """ The result of an election for a municipality.
+class ListConnection(Base, TimestampMixin, DerivedVotesCount):
 
-    """
+    __tablename__ = 'list_connections'
+
+    #: the internal id of the list
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: the external id of the list
+    connection_id = Column(Text, nullable=False)
+
+    #: the election this result belongs to
+    election_id = Column(Text, ForeignKey(Election.id), nullable=True)
+
+    #: the id of the parent
+    parent_id = Column(UUID, ForeignKey('list_connections.id'), nullable=True)
+
+    #: a list contains n candidates
+    lists = relationship(
+        "List",
+        cascade="all, delete-orphan",
+        backref=backref("connection"),
+        lazy="dynamic",
+        order_by="List.list_id"
+    )
+
+    #: a list connection contains n sub-connection
+    children = relationship(
+        "ListConnection",
+        cascade="all, delete-orphan",
+        backref=backref("parent", remote_side='ListConnection.id'),
+        lazy="dynamic",
+        order_by="ListConnection.connection_id"
+    )
+
+    def aggregate_results(self, attribute):
+        """ Gets the sum of the given attribute from the results. """
+        return (
+            sum(getattr(list, attribute) for list in self.lists) +
+            sum(getattr(list, attribute) for list in self.children)
+        )
+
+    @staticmethod
+    def aggregate_results_expression(cls, attribute):
+        """ Gets the sum of the given attribute from the results,
+        as SQL expression.
+
+        """
+        # todo: does not work as expected
+        ids = select([ListConnection.id])
+        ids = ids.where(
+            or_(
+                ListConnection.parent_id == cls.id,
+                ListConnection.id == cls.id
+            )
+        )
+
+        expr = select([func.sum(getattr(List, attribute))])
+        expr = expr.where(List.connection_id.in_(ids))
+        expr = expr.label(attribute)
+        return expr
+
+
+class List(Base, TimestampMixin, DerivedVotesCount):
+    """ A list used in an election. """
+
+    __tablename__ = 'lists'
+
+    #: the internal id of the list
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: the external id of the list
+    list_id = Column(Text, nullable=False)
+
+    # number of mandates
+    number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
+
+    #: the name of the list
+    name = Column(Text, nullable=False)
+
+    #: the election this result belongs to
+    election_id = Column(Text, ForeignKey(Election.id), nullable=False)
+
+    #: the list connection id
+    connection_id = Column(UUID, ForeignKey(ListConnection.id), nullable=True)
+
+    #: a list contains n candidates
+    candidates = relationship(
+        "Candidate",
+        cascade="all, delete-orphan",
+        backref=backref("list"),
+        lazy="dynamic",
+    )
+
+    #: a list contains n results
+    results = relationship(
+        "ListResult",
+        cascade="all, delete-orphan",
+        backref=backref("list"),
+        lazy="dynamic",
+    )
+
+    @staticmethod
+    def aggregate_results_expression(cls, attribute):
+        """ Gets the sum of the given attribute from the results,
+        as SQL expression.
+
+        """
+        expr = select([func.sum(getattr(ListResult, attribute))])
+        expr = expr.where(ListResult.list_id == cls.id)
+        expr = expr.label(attribute)
+        return expr
+
+
+class Candidate(Base, TimestampMixin, DerivedVotesCount):
+    """ A candidate for an election. """
+
+    __tablename__ = 'candiates'
+
+    #: the internal id of the candidate
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: the external id of the candidate
+    candidate_id = Column(Text, nullable=False)
+
+    #: the family name
+    family_name = Column(Text, nullable=False)
+
+    #: the first name
+    first_name = Column(Text, nullable=False)
+
+    #: True if the candidate is elected
+    elected = Column(Boolean, nullable=False)
+
+    #: the election this candidate belongs to
+    election_id = Column(Text, ForeignKey(Election.id), nullable=False)
+
+    #: the identification of the list
+    list_id = Column(UUID, ForeignKey(List.id), nullable=True)
+
+    #: a candidate contains n results
+    results = relationship(
+        "CandidateResult",
+        cascade="all, delete-orphan",
+        backref=backref("candidate"),
+        lazy="dynamic",
+    )
+
+    @staticmethod
+    def aggregate_results_expression(cls, attribute):
+        """ Gets the sum of the given attribute from the results,
+        as SQL expression.
+
+        """
+        expr = select([func.sum(getattr(CandidateResult, attribute))])
+        expr = expr.where(CandidateResult.candidate_id == cls.id)
+        expr = expr.label(attribute)
+        return expr
+
+
+class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
+    """ The result of an election for a municipality. """
 
     __tablename__ = 'election_results'
 
@@ -400,69 +489,40 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
         )
 
     #: an election result may contain n list results
-    lists = relationship(
+    list_results = relationship(
         "ListResult",
         cascade="all, delete-orphan",
         backref=backref("election_result"),
-        lazy='dynamic',
-        order_by="ListResult.group",
+        lazy="dynamic",
     )
 
     #: an election result contains n candidate results
-    candidates = relationship(
+    candidate_results = relationship(
         "CandidateResult",
         cascade="all, delete-orphan",
         backref=backref("election_result"),
-        lazy='dynamic',
-        order_by="CandidateResult.group",
+        lazy="dynamic",
     )
 
 
 class ListResult(Base, TimestampMixin):
-    """ The result of an election for a list in  a municipality.
-
-    There are some properties (list id, number of mandates, list name, list and
-    sublist connections) which stay the same for a whole election and could be
-    therefore stored globally.
-
-    """
+    """ The result of an election for a list in  a municipality. """
 
     __tablename__ = 'list_results'
 
-    #: identifies the candidate, maybe used in the url
+    #: identifies the list
     id = Column(UUID, primary_key=True, default=uuid4)
+
+    # votes
+    votes = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the election result this result belongs to
     election_result_id = Column(
         UUID, ForeignKey(ElectionResult.id), nullable=False
     )
 
-    #: groups the list in whatever structure makes sense
-    group = Column(Text, nullable=False)
-
-    # number of mandates
-    number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
-
-    #: the identification of the list
-    list_id = Column(Text, nullable=False)
-
-    #: the name of the list
-    name = Column(Text, nullable=False)
-
-    #: the id of the list connection
-    list_connection_id = Column(Text, nullable=True)
-
-    #: the description of the list connection
-    list_connection_description = Column(Text, nullable=True)
-
-    #: the id of the sublist connection
-    list_subconnection_id = Column(Text, nullable=True)
-
-    #: the description of the sublist connection
-    list_subconnection_description = Column(Text, nullable=True)
-
-    # votes
-    votes = Column(Integer, nullable=False, default=lambda: 0)
+    #: the list this result belongs to
+    list_id = Column(UUID, ForeignKey(List.id), nullable=False)
 
 
 class CandidateResult(Base, TimestampMixin):
@@ -476,34 +536,16 @@ class CandidateResult(Base, TimestampMixin):
 
     __tablename__ = 'candiate_results'
 
-    #: identifies the candidate, maybe used in the url
+    #: identifies the candidate result
     id = Column(UUID, primary_key=True, default=uuid4)
+
+    # votes
+    votes = Column(Integer, nullable=False, default=lambda: 0)
 
     #: the election result this result belongs to
     election_result_id = Column(
         UUID, ForeignKey(ElectionResult.id), nullable=False
     )
 
-    #: True if the candidate is elected (election-wide property)
-    elected = Column(Boolean, nullable=False)
-
-    #: groups the candidate in whatever structure makes sense
-    group = Column(Text, nullable=False)
-
-    #: the identification of the candidate
-    candidate_id = Column(Text, nullable=False)
-
-    #: the identification of the list
-    list_id = Column(Text, nullable=True)
-
-    #: the name of the list (for convenience)
-    list_name = Column(Text, nullable=True)
-
-    #: the family name
-    family_name = Column(Text, nullable=False)
-
-    #: the first name
-    first_name = Column(Text, nullable=False)
-
-    # votes
-    votes = Column(Integer, nullable=False, default=lambda: 0)
+    #: the canidate this result belongs to
+    candidate_id = Column(UUID, ForeignKey(Candidate.id), nullable=False)
