@@ -172,6 +172,8 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         '/ballot/.*',
         '/vote/.*',
         '/votes/.*',
+        '/election/.*',
+        '/elections/.*',
     )
 
     cache_paths = re.compile(r'^({})$'.format('|'.join(cache_paths)))
