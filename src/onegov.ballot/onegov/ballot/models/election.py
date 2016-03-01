@@ -120,6 +120,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         cascade="all, delete-orphan",
         backref=backref("election"),
         lazy="dynamic",
+        order_by="Candidate.candidate_id",
     )
 
     #: an election contains n results (one for each municipality)
