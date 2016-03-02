@@ -54,7 +54,7 @@ def view_election(self, request):
             Candidate.candidate_id
         )
         electoral = electoral.filter(ElectionResult.election_id == self.id)
-        electoral = groupbylist(electoral, key=lambda x: x[0])
+        electoral = groupbylist(electoral, lambda x: x[0])
 
     # List results
     lists = []
@@ -74,7 +74,60 @@ def view_election(self, request):
     # List connections
     connections = []
     if not majorz:
-        connections = self.list_connections.filter_by(parent_id=None)
+        parents = session.query(
+            ListConnection.id,
+            ListConnection.connection_id,
+            ListConnection.votes
+        )
+        parents = parents.filter(
+            ListConnection.election_id == self.id,
+            ListConnection.parent_id == None
+        )
+        parents = parents.order_by(ListConnection.connection_id)
+
+        children = session.query(
+            ListConnection.parent_id,
+            ListConnection.connection_id,
+            ListConnection.votes,
+            ListConnection.id
+        )
+        children = children.filter(
+            ListConnection.election_id == self.id,
+            ListConnection.parent_id != None
+        )
+        children = children.order_by(
+            ListConnection.parent_id,
+            ListConnection.connection_id
+        )
+        children = dict(groupbylist(children, lambda x: str(x[0])))
+
+        sublists = session.query(
+            List.connection_id,
+            List.name,
+            List.votes,
+        )
+        sublists = sublists.filter(
+            List.connection_id != None,
+            List.election_id == self.id
+        )
+        sublists = sublists.order_by(List.connection_id)
+        sublists = dict(groupbylist(sublists, lambda x: str(x[0])))
+
+        for parent in parents:
+            id = str(parent[0])
+            subconnections = [(
+                child[1],
+                child[2],
+                [(l[1], l[2]) for l in sublists.get(str(child[3]), [])]
+            ) for child in children.get(id, [])]
+            connection = [
+                parent[1],
+                parent[2] or 0,
+                [(list[1], list[2]) for list in sublists.get(id, [])],
+                subconnections
+            ]
+            connection[1] += sum([c[1] for c in connection[3]])
+            connections.append(connection)
 
     return {
         'election': self,

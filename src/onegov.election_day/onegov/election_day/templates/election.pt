@@ -87,31 +87,31 @@
                             <div>
                                 <table class="ballot-results">
                                     <thead>
-                                        <th><span i18n:translate>List connection</span> ${connection.connection_id}</th>
+                                        <th><span i18n:translate>List connection</span> ${connection[0]}</th>
                                         <th i18n:translate="single_votes" class="right-aligned">Votes</th>
                                     </thead>
                                     <tbody>
-                                        <tr tal:repeat="list connection.lists">
-                                            <td>${list.name}</td>
-                                            <td class="right-aligned">${layout.format_number(list.votes)}</td>
+                                        <tr tal:repeat="list connection[2]">
+                                            <td>${list[0]}</td>
+                                            <td class="right-aligned">${layout.format_number(list[1])}</td>
                                         </tr>
-                                        <tal:block tal:repeat="subconnection connection.children">
+                                        <tal:block tal:repeat="subconnection connection[3]">
                                             <tr>
-                                                <th><span i18n:translate>Sublist connection</span> ${subconnection.connection_id}</th>
+                                                <th><span i18n:translate>Sublist connection</span> ${subconnection[0]}</th>
                                                 <th></th>
                                             </tr>
-                                            <tr tal:repeat="list subconnection.lists">
-                                                <td>${list.name}</td>
-                                                <td class="right-aligned">${layout.format_number(list.votes)}</td>
+                                            <tr tal:repeat="list subconnection[2]">
+                                                <td>${list[0]}</td>
+                                                <td class="right-aligned">${layout.format_number(int(list[1]))}</td>
                                             </tr>
                                             <tr class="subtotal">
                                                 <td i18n:translate>Subtotal</td>
-                                                <td class="right-aligned">${layout.format_number(subconnection.votes)}</td>
+                                                <td class="right-aligned">${layout.format_number(int(subconnection[1]))}</td>
                                             </tr>
                                         </tal:block>
                                         <tr class="total">
                                             <td i18n:translate>Total</td>
-                                            <td class="right-aligned">${layout.format_number(connection.votes)}</td>
+                                            <td class="right-aligned">${layout.format_number(int(connection[1]))}</td>
                                         </tr>
                                     </tbody>
                                 </table>
