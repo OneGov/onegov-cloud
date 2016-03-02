@@ -5,7 +5,7 @@ from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE, UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
-from sqlalchemy import select, func, desc, or_
+from sqlalchemy import select, func, desc
 from sqlalchemy_utils import observes
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import backref, relationship, object_session
