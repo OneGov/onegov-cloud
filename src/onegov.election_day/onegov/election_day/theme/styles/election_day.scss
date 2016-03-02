@@ -307,15 +307,23 @@ table {
     text {
         font: 14px sans-serif;
         text-anchor: end;
+    }
 
-        &.value {
+    .label text {
+        font: 12px sans-serif;
+
+        &.left {
             fill: $white;
-            font: 12px sans-serif;
+        }
+
+        &.right {
+            fill: $aluminum;
+            text-anchor: start;
         }
     }
 
     .bar {
-        fill: $iron;
+        fill: $aluminum;
 
         &.active {
             fill: $accepted-color;

@@ -54,6 +54,12 @@
                 </li>
             </ul>
 
+            <div class="row" tal:condition="not: majorz">
+                <div class="small-12 small-centered medium-12 large-10 columns">
+                    <div class="bar-chart" data-dataurl="${request.link(election, name='lists')}"></div>
+                </div>
+            </div>
+
             <tal:block tal:condition="not: majorz">
                 <h3 i18n:translate>Lists</h3>
                 <div class="row">

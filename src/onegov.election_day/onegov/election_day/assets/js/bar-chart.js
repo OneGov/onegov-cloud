@@ -1,3 +1,18 @@
+var update_labels = function(line) {
+    line.each(function() {
+        var box_width = this.childNodes[1].getBBox().width;
+        var label_left =this.childNodes[2].childNodes[0];
+        var label_right =this.childNodes[2].childNodes[1];
+        if ((box_width-10) < label_left.getBBox().width) {
+            label_left.setAttribute('visibility', 'hidden');
+            label_right.setAttribute('visibility', 'visible');
+        } else {
+            label_left.setAttribute('visibility', 'visible');
+            label_right.setAttribute('visibility', 'hidden');
+        }
+    });
+};
+
 var init_bar_chart = function(el) {
 
     var dataurl = $(el).data('dataurl');
@@ -5,6 +20,7 @@ var init_bar_chart = function(el) {
     var svg = d3.select(el).append('svg').attr('width', width);
     var offset = width * 0.25;
     var scale = d3.scale.linear();
+    var line = null;
     var bar = null;
     var label = null;
 
@@ -22,7 +38,7 @@ var init_bar_chart = function(el) {
 
         var name = line.append('text')
             .attr('y', 24 / 2)
-            .attr('dy', '4px')
+            .attr('dy', '4')
             .attr('class', 'name')
             .text(function(d) { return d.text; });
 
@@ -43,12 +59,22 @@ var init_bar_chart = function(el) {
                 return 'bar ' + d.class;
             });
 
-        label = line.append('text')
-            .attr('x', function(d) { return offset + scale(d.value) - 3; })
-            .attr('y', 24 / 2)
-            .attr('dy', '4px')
-            .attr('class', 'value')
+        label = line.append('g')
+            .attr('transform', function(d) {
+              return 'translate(' + (offset + scale(d.value)) + ',16)';
+            })
+            .attr('class', 'label');
+
+        label.append('text')
+            .attr('dx', -3)
+            .attr('class', 'left')
             .text(function(d) { return d.value; });
+        label.append('text')
+            .attr('dx', 8)
+            .attr('class', 'right')
+            .text(function(d) { return d.value; });
+
+        update_labels(line);
     });
 
     d3.select(window).on('resize', function() {
@@ -59,7 +85,10 @@ var init_bar_chart = function(el) {
 
             svg.attr('width', width);
             bar.attr('width', function(d) { return scale(d.value); });
-            label.attr('x', function(d) { return offset + scale(d.value) - 3; });
+            label.attr('transform', function(d) {
+              return 'translate(' + (offset + scale(d.value)) + ',16)';
+          });
+          update_labels(line);
         }
     });
 

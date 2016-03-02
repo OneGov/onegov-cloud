@@ -37,6 +37,7 @@ def view_election(self, request):
     )
     candidates = candidates.outerjoin(List)
     candidates = candidates.order_by(
+        List.name,
         desc(Candidate.elected),
         desc(Candidate.votes),
         Candidate.family_name,
@@ -62,12 +63,12 @@ def view_election(self, request):
         lists = session.query(
             List.name,
             List.votes,
-            List.number_of_mandates,
+            List.number_of_mandates
         )
         lists = lists.order_by(
             desc(List.number_of_mandates),
             desc(List.votes),
-            List.name,
+            List.name
         )
         lists = lists.filter(List.election_id == self.id)
 
@@ -104,7 +105,7 @@ def view_election(self, request):
         sublists = session.query(
             List.connection_id,
             List.name,
-            List.votes,
+            List.votes
         )
         sublists = sublists.filter(
             List.connection_id != None,
@@ -166,11 +167,51 @@ def view_election_as_xlsx(self, request):
 
 @ElectionDayApp.json(model=Election, permission=Public, name='candidates')
 def view_election_candidates(self, request):
-    result = [{
-        'text': '{} {}'.format(c.family_name, c.first_name),
-        'value': c.votes,
-        'class': 'active' if c.elected else 'inactive'
-    } for c in self.candidates if c.votes > self.accounted_votes / 100]
-    result.sort(key=lambda x: x['value'], reverse=True)
-    result.sort(key=lambda x: x['class'])
-    return result
+    session = object_session(self)
+
+    candidates = session.query(
+        Candidate.family_name,
+        Candidate.first_name,
+        Candidate.elected,
+        Candidate.votes
+    )
+    candidates = candidates.order_by(
+        desc(Candidate.elected),
+        desc(Candidate.votes),
+        Candidate.family_name,
+        Candidate.first_name
+    )
+    candidates = candidates.filter(Candidate.election_id == self.id)
+
+    return [{
+        'text': '{} {}'.format(candidate[0], candidate[1]),
+        'value': candidate[3],
+        'class': 'active' if candidate[2] else 'inactive'
+    } for candidate in candidates]
+
+
+@ElectionDayApp.json(model=Election, permission=Public, name='lists')
+def view_election_lists(self, request):
+    if self.type == 'majorz':
+        return []
+
+    session = object_session(self)
+
+    lists = session.query(
+        List.name,
+        List.votes,
+        List.number_of_mandates
+    )
+    lists = lists.order_by(
+        desc(List.number_of_mandates),
+        desc(List.votes),
+        List.name
+    )
+    lists = lists.filter(List.election_id == self.id)
+
+    return [{
+        'text': list[0],
+        'value': list[1],
+        'secondary': list[2],
+        'class': 'active' if list[2] > 0 else 'inactive'
+    } for list in lists]
