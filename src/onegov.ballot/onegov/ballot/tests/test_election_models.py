@@ -218,10 +218,6 @@ def test_derived_properties(session):
     session.add(election)
     session.flush()
 
-    assert election.unaccounted_ballots == 28
-    assert election.accounted_ballots == 172
-    assert election.unaccounted_ballots == 28
-    assert int(election.turnout) == 66
     assert election.results[0].unaccounted_ballots == 7
     assert election.results[0].accounted_ballots == 43
     assert election.results[0].turnout == 50.0
