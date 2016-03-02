@@ -28,17 +28,6 @@ class DerivedBallotsCount(object):
             if self.elegible_voters else 0
 
 
-class DerivedVotesCount(object):
-
-    summarized_properties = [
-        'votes'
-    ]
-
-    def aggregate_results(self, attribute):
-        """ Gets the sum of the given attribute from the results. """
-        return sum(getattr(result, attribute) for result in self.results)
-
-
 class Election(Base, TimestampMixin, DerivedBallotsCount,
                DomainOfInfluenceMixin):
 
@@ -287,9 +276,11 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         return rows
 
 
-class ListConnection(Base, TimestampMixin, DerivedVotesCount):
+class ListConnection(Base, TimestampMixin):
 
     __tablename__ = 'list_connections'
+
+    summarized_properties = ['votes']
 
     #: the internal id of the list
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -321,12 +312,14 @@ class ListConnection(Base, TimestampMixin, DerivedVotesCount):
         order_by="ListConnection.connection_id"
     )
 
+    @property
+    def total_votes(self):
+        """ Returns the total number of votes. """
+        return self.votes + sum(child.total_votes for child in self.children)
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
-        return (
-            sum(getattr(list, attribute) for list in self.lists) +
-            sum(getattr(list, attribute) for list in self.children)
-        )
+        return sum(getattr(list, attribute) for list in self.lists)
 
     @staticmethod
     def aggregate_results_expression(cls, attribute):
@@ -334,25 +327,18 @@ class ListConnection(Base, TimestampMixin, DerivedVotesCount):
         as SQL expression.
 
         """
-        # todo: does not work as expected
-        ids = select([ListConnection.id])
-        ids = ids.where(
-            or_(
-                ListConnection.parent_id == cls.id,
-                ListConnection.id == cls.id
-            )
-        )
-
         expr = select([func.sum(getattr(List, attribute))])
-        expr = expr.where(List.connection_id.in_(ids))
+        expr = expr.where(List.connection_id == cls.id)
         expr = expr.label(attribute)
         return expr
 
 
-class List(Base, TimestampMixin, DerivedVotesCount):
+class List(Base, TimestampMixin):
     """ A list used in an election. """
 
     __tablename__ = 'lists'
+
+    summarized_properties = ['votes']
 
     #: the internal id of the list
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -388,6 +374,10 @@ class List(Base, TimestampMixin, DerivedVotesCount):
         lazy="dynamic",
     )
 
+    def aggregate_results(self, attribute):
+        """ Gets the sum of the given attribute from the results. """
+        return sum(getattr(result, attribute) for result in self.results)
+
     @staticmethod
     def aggregate_results_expression(cls, attribute):
         """ Gets the sum of the given attribute from the results,
@@ -400,10 +390,12 @@ class List(Base, TimestampMixin, DerivedVotesCount):
         return expr
 
 
-class Candidate(Base, TimestampMixin, DerivedVotesCount):
+class Candidate(Base, TimestampMixin):
     """ A candidate for an election. """
 
     __tablename__ = 'candiates'
+
+    summarized_properties = ['votes']
 
     #: the internal id of the candidate
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -433,6 +425,10 @@ class Candidate(Base, TimestampMixin, DerivedVotesCount):
         backref=backref("candidate"),
         lazy="dynamic",
     )
+
+    def aggregate_results(self, attribute):
+        """ Gets the sum of the given attribute from the results. """
+        return sum(getattr(result, attribute) for result in self.results)
 
     @staticmethod
     def aggregate_results_expression(cls, attribute):

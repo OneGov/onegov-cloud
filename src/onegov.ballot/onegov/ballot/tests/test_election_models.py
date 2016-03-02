@@ -503,10 +503,18 @@ def test_election_results(session):
 
     session.flush()
 
-    assert sorted((l.votes for l in election.lists)) == [5, 21, 111, 540]
-    assert sorted((c.votes for c in election.candidates)) == [
-        1, 5, 20, 111, 540
-    ]
+    expected = [5, 21, 111, 540]
+    assert sorted((l.votes for l in election.lists)) == expected
+    votes = session.query(List.votes, List.name)
+    votes = votes.order_by(List.votes)
+    assert [vote[0] for vote in votes] == expected
+
+    expected = [1, 5, 20, 111, 540]
+    assert sorted((c.votes for c in election.candidates)) == expected
+    votes = session.query(Candidate.votes, Candidate.family_name)
+    votes = votes.order_by(Candidate.votes)
+    assert [vote[0] for vote in votes] == expected
+
     assert sorted((c.votes for c in election.list_connections)) == []
 
     # Add list connections
@@ -537,7 +545,13 @@ def test_election_results(session):
 
     session.flush()
 
-    assert sorted((c.votes for c in election.list_connections)) == [137, 540]
+    assert sorted((c.votes for c in election.list_connections)) == [111, 540]
+    assert sorted((c.total_votes for c in election.list_connections)) == [
+        137, 540
+    ]
+    votes = session.query(ListConnection.votes, ListConnection.connection_id)
+    votes = votes.order_by(ListConnection.votes)
+    assert [int(vote[0]) for vote in votes] == [26, 111, 540]
 
 
 def test_election_export(session):
