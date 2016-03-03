@@ -677,14 +677,14 @@ def test_election_export(session):
             'municipality_blank_votes': 80,
             'municipality_invalid_votes': 120,
             'municipality_accounted_votes': 285,
-            'list_name': 'Quimby Again!',
-            'list_votes': 520,
-            'list_connection': None,
-            'list_connection_parent': None,
-            'candidate_family_name': 'Quimby',
-            'candidate_first_name': 'Joe',
-            'candidate_elected': True,
-            'candidate_votes': 520
+            'list_name': 'Kwik-E-Major',
+            'list_votes': 111,
+            'list_connection': 'A.1',
+            'list_connection_parent': 'A',
+            'candidate_family_name': 'Nahasapeemapetilon',
+            'candidate_first_name': 'Apu',
+            'candidate_elected': False,
+            'candidate_votes': 111
         },
         {
             'election_title': 'Election',
@@ -702,13 +702,13 @@ def test_election_export(session):
             'municipality_blank_votes': 80,
             'municipality_invalid_votes': 120,
             'municipality_accounted_votes': 285,
-            'list_name': 'Kwik-E-Major',
-            'list_votes': 111,
-            'list_connection': 'A.1',
-            'list_connection_parent': 'A',
-            'candidate_family_name': 'Nahasapeemapetilon',
-            'candidate_first_name': 'Apu',
-            'candidate_elected': False,
-            'candidate_votes': 111
+            'list_name': 'Quimby Again!',
+            'list_votes': 520,
+            'list_connection': None,
+            'list_connection_parent': None,
+            'candidate_family_name': 'Quimby',
+            'candidate_first_name': 'Joe',
+            'candidate_elected': True,
+            'candidate_votes': 520
         }
     ]

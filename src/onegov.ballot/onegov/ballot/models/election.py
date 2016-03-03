@@ -8,7 +8,7 @@ from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
 from sqlalchemy import select, func, desc
 from sqlalchemy_utils import observes
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import backref, relationship, object_session
+from sqlalchemy.orm import aliased, backref, relationship, object_session
 from uuid import uuid4
 
 
@@ -227,51 +227,84 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             The number of votes this candidate got.
         """
 
+        session = object_session(self)
+
+        ids = session.query(ElectionResult.id)
+        ids = ids.filter(ElectionResult.election_id == self.id)
+
+        SubListConnection = aliased(ListConnection)
+        results = session.query(
+            CandidateResult.votes,
+            Election.title,
+            Election.date,
+            Election.type,
+            Election.number_of_mandates,
+            ElectionResult.group,
+            ElectionResult.municipality_id,
+            ElectionResult.elegible_voters,
+            ElectionResult.received_ballots,
+            ElectionResult.blank_ballots,
+            ElectionResult.invalid_ballots,
+            ElectionResult.unaccounted_ballots,
+            ElectionResult.accounted_ballots,
+            ElectionResult.blank_votes,
+            ElectionResult.invalid_votes,
+            ElectionResult.accounted_votes,
+            List.name,
+            List.votes,
+            SubListConnection.connection_id,
+            ListConnection.connection_id,
+            Candidate.family_name,
+            Candidate.first_name,
+            Candidate.elected,
+        )
+        results = results.outerjoin(CandidateResult.candidate)
+        results = results.outerjoin(CandidateResult.election_result)
+        results = results.outerjoin(Candidate.list)
+        results = results.outerjoin(SubListConnection, List.connection)
+        results = results.outerjoin(SubListConnection.parent)
+        results = results.outerjoin(Candidate.election)
+        results = results.filter(CandidateResult.election_result_id.in_(ids))
+        results = results.order_by(
+            ElectionResult.group,
+            List.name,
+            Candidate.family_name,
+            Candidate.first_name
+        )
+
         rows = []
+        for result in results:
+            row = OrderedDict()
 
-        for r in self.results:
-            for c in r.candidate_results:
-                row = OrderedDict()
+            row['election_title'] = result[1].strip()
+            row['election_date'] = result[2].isoformat()
+            row['election_type'] = result[3]
+            row['election_mandates'] = result[4]
 
-                row['election_title'] = self.title.strip()
-                row['election_date'] = self.date.isoformat()
-                row['election_type'] = self.type
-                row['election_mandates'] = self.number_of_mandates
+            row['municipality_name'] = result[5]
+            row['municipality_bfs_number'] = result[6]
+            row['municipality_elegible_voters'] = result[7]
+            row['municipality_received_ballots'] = result[8]
+            row['municipality_blank_ballots'] = result[9]
+            row['municipality_invalid_ballots'] = result[10]
+            row['municipality_unaccounted_ballots'] = result[11]
+            row['municipality_accounted_ballots'] = result[12]
+            row['municipality_blank_votes'] = result[13]
+            row['municipality_invalid_votes'] = result[14]
+            row['municipality_accounted_votes'] = result[15]
 
-                row['municipality_name'] = r.group
-                row['municipality_bfs_number'] = r.municipality_id
-                row['municipality_elegible_voters'] = r.elegible_voters
-                row['municipality_received_ballots'] = r.received_ballots
-                row['municipality_blank_ballots'] = r.blank_ballots
-                row['municipality_invalid_ballots'] = r.invalid_ballots
-                row['municipality_unaccounted_ballots'] = r.unaccounted_ballots
-                row['municipality_accounted_ballots'] = r.accounted_ballots
-                row['municipality_blank_votes'] = r.blank_votes
-                row['municipality_invalid_votes'] = r.invalid_votes
-                row['municipality_accounted_votes'] = r.accounted_votes
+            row['list_name'] = result[16]
+            row['list_votes'] = result[17]
 
-                row['list_name'] = None
-                row['list_votes'] = None
-                row['list_connection'] = None
-                row['list_connection_parent'] = None
+            row['list_connection'] = result[18]
+            row['list_connection_parent'] = result[19]
 
-                list = c.candidate.list
-                list_c = list.connection if list else None
-                list_p = list_c.parent if list_c else None
-                if list:
-                    row['list_name'] = list.name
-                    row['list_votes'] = list.votes
-                if list_c:
-                    row['list_connection'] = list_c.connection_id
-                if list_p:
-                    row['list_connection_parent'] = list_p.connection_id
+            row['candidate_family_name'] = result[20]
+            row['candidate_first_name'] = result[21]
+            row['candidate_elected'] = result[22]
+            row['candidate_votes'] = result[0]
 
-                row['candidate_family_name'] = c.candidate.family_name
-                row['candidate_first_name'] = c.candidate.first_name
-                row['candidate_elected'] = c.candidate.elected
-                row['candidate_votes'] = c.candidate.votes
-
-                rows.append(row)
+            rows.append(row)
 
         return rows
 
@@ -477,12 +510,26 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
     #: number of invalid votes
     invalid_votes = Column(Integer, nullable=False, default=lambda: 0)
 
-    @property
+    @hybrid_property
     def accounted_votes(self):
         """ Number of accounted votes """
         return (
             self.election.number_of_mandates * self.accounted_ballots -
             self.blank_votes - self.invalid_votes
+        )
+
+    @accounted_votes.expression
+    def accounted_votes(cls):
+        """ Number of accounted votes """
+        # A bit of a hack :|
+        number_of_mandates = select(
+            [Election.number_of_mandates],
+            whereclause="elections.id = election_results.election_id"
+        )
+        return (
+            number_of_mandates * (
+                cls.received_ballots - cls.blank_ballots - cls.invalid_ballots
+            ) - cls.blank_votes - cls.invalid_votes
         )
 
     #: an election result may contain n list results
