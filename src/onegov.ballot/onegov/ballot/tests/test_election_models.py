@@ -524,6 +524,8 @@ def test_election_results(session):
 
     assert sorted((c.votes for c in election.list_connections)) == []
 
+    assert election.number_of_mandates == election.allocated_mandates
+
     # Add list connections
     connection_1 = ListConnection(
         id=uuid4(),

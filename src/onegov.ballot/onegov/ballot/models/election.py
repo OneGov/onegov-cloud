@@ -73,6 +73,18 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
     #: the number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
+    @property
+    def allocated_mandates(self):
+        results = object_session(self).query(
+            func.count(
+                func.nullif(Candidate.elected, False)
+            )
+        )
+        results = results.filter(Candidate.election_id == self.id)
+
+        mandates = results.first()
+        return mandates and mandates[0] or 0
+
     #: Total number of municipalities
     total_municipalities = Column(Integer, nullable=True)
 
