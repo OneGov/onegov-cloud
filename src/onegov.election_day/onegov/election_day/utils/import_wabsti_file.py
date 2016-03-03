@@ -1,157 +1,288 @@
-from onegov.ballot import CandidateResult, ElectionResult
+from onegov.ballot import (
+    Candidate,
+    CandidateResult,
+    ElectionResult,
+    List,
+    ListConnection,
+    ListResult
+)
 from onegov.election_day import _
 from onegov.election_day.utils import FileImportError, load_csv
 from sqlalchemy.orm import object_session
+from uuid import uuid4
 
 
-def import_file(municipalities, election, file, mimetype):
-    csv, error = load_csv(file, mimetype, expected_headers=[
-        'AnzMandate',
-        'BFS',
-        'StimmBer',
-        'StimmAbgegeben',
-        'StimmLeer',
-        'StimmUngueltig',
-        'StimmGueltig',
-    ])
+HEADERS_COMMON = [
+    # Municipality
+    'AnzMandate',
+    'BFS',
+    'StimmBer',
+    'StimmAbgegeben',
+    'StimmLeer',
+    'StimmUngueltig',
+    'StimmGueltig',
+]
 
-    if error:
-        return {'status': 'error', 'errors': [error]}
+HEADERS_MAJORZ = [
+]
 
-    errors = []
-    results = {}
-    added_muncipalities = []
+HEADERS_PROPORZ = [
+]
 
-    # This format has one municipality per line and every candidate as row
-    for line in csv.lines:
-        line_errors = []
-        candidates = []
 
-        # the id of the municipality
-        municipality_id = None
-        try:
-            municipality_id = int(line.bfs or 0)
-        except ValueError:
-            line_errors.append(_("Invalid municipality id"))
-        else:
-            if municipality_id not in municipalities:
-                line_errors.append(
-                    _(
-                        "municipality id ${id} is unknown",
-                        mapping={'id': municipality_id}
-                    )
-                )
-            if municipality_id in added_muncipalities:
-                line_errors.append(
-                    _(
-                        "municipality id ${id} found twice",
-                        mapping={'id': municipality_id}
-                    )
-                )
-                added_muncipalities.append(municipality_id)
-
-        # the number of mandates
-        number_of_mandates = int(line.anzmandate or 0)
-        if not number_of_mandates:
-            line_errors.append(_("No number of mandates"))
-
+def parse_election(line, errors):
+    try:
+        mandates = int(line.anzmandate or 0)
         # todo: we are missing this informations
-        # counted municipalities
-        # numbers = line.anzahl_gemeinden.split(' von ')
-        # if not len(numbers) == 2:
-        #     line_errors.append(_("Invalid number of counted municipalities"))
-        # else:
-        #     counted = int(numbers[0])
-        #     total = int(numbers[1])
+        counted = 0
+        total = 1
+    except ValueError:
+        errors.append(_("Invalid election values"))
+    else:
+        return mandates, counted, total
 
-        # number of elegible voters
+
+def parse_election_result(line, errors, municipalities):
+    try:
+        municipality_id = int(line.bfs or 0)
         elegible_voters = int(line.stimmber or 0)
-        if not elegible_voters:
-            line_errors.append(_("No elegible voters"))
-
-        # number of received ballots
         received_ballots = int(line.stimmabgegeben or 0)
-
-        # number of blank ballots
         blank_ballots = int(line.stimmleer or 0)
-
-        # number of invalid ballots
         invalid_ballots = int(line.stimmungueltig or 0)
 
-        # now let's do some sanity checks
-        try:
-            if received_ballots > elegible_voters:
-                line_errors.append(
-                    _("More received ballots than elegible voters")
-                )
-            if blank_ballots > elegible_voters:
-                line_errors.append(
-                    _("More blank ballots than elegible voters")
-                )
-            if invalid_ballots > elegible_voters:
-                line_errors.append(
-                    _("More invalid ballots than elegible voters")
-                )
-
-        except UnboundLocalError:
-            pass
-
+        blank_votes = None
+        invalid_votes = None
         count = 0
         while True:
             count += 1
             try:
-                # the id of the candidate
-                candidate_id = getattr(line, 'kandid_{}'.format(count))
+                name = getattr(line, 'kandname_{}'.format(count))
+                votes = int(getattr(line, 'stimmen_{}'.format(count)) or 0)
             except AttributeError:
                 break
-            except ValueError:
-                line_errors.append(_("Invalid candidate id"))
+            except:
+                raise
             else:
-                # the family name
-                family_name = getattr(line, 'kandname_{}'.format(count))
-
-                # the first name
-                first_name = getattr(line, 'kandvorname_{}'.format(count))
-
-                # votes
-                votes = int(getattr(line, 'stimmen_{}'.format(count)) or 0)
-
-                # todo: we are missing this information
-                # elected = False
-
-                if family_name == 'Vereinzelte':
-                    continue
-
-                elif family_name == 'Leere Zeilen':
-                    # number of blank votes
+                if name == 'Leere Zeilen':
                     blank_votes = votes
-                    continue
-
-                elif family_name == 'Ungültige Stimmen':
-                    # number of invalid votes
+                elif name == 'Ungültige Stimmen':
                     invalid_votes = votes
-                    continue
 
-                elif not family_name or not first_name:
-                    line_errors.append(
-                        _(
-                            "Missing name(s) for candidate ${id}",
-                            mapping={'id': candidate_id}
-                        )
-                    )
+        if not elegible_voters or blank_votes is None or invalid_votes is None:
+            raise ValueError()
 
-                candidates.append(
-                    CandidateResult(
-                        # elected=elected,
-                        candidate_id=candidate_id,
-                        family_name=family_name,
-                        first_name=first_name,
-                        votes=votes,
-                        group='{} {}'.format(family_name, first_name),
-                    )
+    except ValueError:
+        errors.append(_("Invalid muncipality values"))
+    else:
+        if municipality_id not in municipalities:
+            errors.append(_(
+                "municipality id ${id} is unknown",
+                mapping={'id': municipality_id}
+            ))
+        else:
+            return ElectionResult(
+                id=uuid4(),
+                group=municipalities[municipality_id]['name'],
+                municipality_id=municipality_id,
+                elegible_voters=elegible_voters,
+                received_ballots=received_ballots,
+                blank_ballots=blank_ballots,
+                invalid_ballots=invalid_ballots,
+                blank_votes=blank_votes,
+                invalid_votes=invalid_votes,
+            )
+
+# def parse_list(line, errors):
+#     try:
+#         id = int(line.listen_nr or 0)
+#         name = line.parteibezeichnung
+#         mandates = int(line.anzahl_sitze_liste or 0)
+#     except ValueError:
+#         errors.append(_("Invalid list values"))
+#     else:
+#         return List(
+#             id=uuid4(),
+#             list_id=id,
+#             number_of_mandates=mandates,
+#             name=name,
+#         )
+#
+#
+# def parse_list_result(line, errors):
+#     try:
+#         votes = (
+#             int(line.kandidatenstimmen_unveranderte_wahlzettel or 0) +
+#             int(line.kandidatenstimmen_veranderte_wahlzettel or 0) +
+#             int(line.zusatzstimmen_unveranderte_wahlzettel or 0) +
+#             int(line.zusatzstimmen_veranderte_wahlzettel or 0)
+#         )
+#     except ValueError:
+#         errors.append(_("Invalid list results"))
+#     else:
+#         return ListResult(
+#             id=uuid4(),
+#             votes=votes
+#         )
+
+
+def parse_candidates(line, errors):
+    results = []
+    index = 0
+    while True:
+        index += 1
+        try:
+            id = getattr(line, 'kandid_{}'.format(index))
+            family_name = getattr(line, 'kandname_{}'.format(index))
+            first_name = getattr(line, 'kandvorname_{}'.format(index))
+            elected = False  # todo: we are missing this information
+            votes = int(getattr(line, 'stimmen_{}'.format(index)) or 0)
+        except AttributeError:
+            break
+        except ValueError:
+            errors.append(_("Invalid candidate values"))
+            break
+        else:
+            skip = ('Vereinzelte',  'Leere Zeilen', 'Ungültige Stimmen')
+            if family_name in skip:
+                continue
+            results.append((
+                Candidate(
+                    id=uuid4(),
+                    candidate_id=id,
+                    family_name=family_name,
+                    first_name=first_name,
+                    elected=elected
+                ),
+                CandidateResult(
+                    id=uuid4(),
+                    votes=votes,
                 )
+            ))
+    return results
 
-        # pass the errors
+
+# def parse_candidate(line, index, errors):
+#     try:
+#         id = getattr(line, 'kandid_{}'.format(index))
+#         family_name = getattr(line, 'kandname_{}'.format(index))
+#         first_name = getattr(line, 'kandvorname_{}'.format(index))
+#         # todo: we are missing this information
+#         elected = False
+#     except AttributeError:
+#         return None
+#     except ValueError:
+#         errors.append(_("Invalid candidate values"))
+#     else:
+#         return Candidate(
+#             id=uuid4(),
+#             candidate_id=id,
+#             family_name=family_name,
+#             first_name=first_name,
+#             elected=elected
+#         )
+#
+#
+# def parse_candidate_result(line, index, errors):
+#     try:
+#         votes = int(getattr(line, 'stimmen_{}'.format(index)) or 0)
+#     except AttributeError:
+#         return None
+#     except ValueError:
+#         errors.append(_("Invalid candidate results"))
+#     else:
+#         return CandidateResult(
+#             id=uuid4(),
+#             votes=votes,
+#         )
+
+
+# def parse_connection(line, errors):
+#     try:
+#         connection_id = line.hlv_nr
+#         subconnection_id = line.ulv_nr
+#     except ValueError:
+#         errors.append(_("Invalid list connection values"))
+#     else:
+#         connection = ListConnection(
+#             id=uuid4(),
+#             connection_id=connection_id,
+#         ) if connection_id else None
+#         subconnection = ListConnection(
+#             id=uuid4(),
+#             connection_id=subconnection_id,
+#         ) if subconnection_id else None
+#         return connection, subconnection
+
+def import_file(municipalities, election, file, mimetype):
+    majorz = True
+    csv, error = load_csv(
+        file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_MAJORZ
+    )
+    # majorz = False
+    # csv, error = load_csv(
+    #     file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_PROPORZ
+    # )
+    # if error and "Missing columns" in error.error:
+    #     majorz = True
+    #     csv, error = load_csv(
+    #         file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_MAJORZ
+    #     )
+    # type_matches = (
+    #     (majorz and election.type == 'majorz') or
+    #     (not majorz and election.type == 'proporz')
+    # )
+    # if not type_matches:
+    #     error = FileImportError(_(
+    #         "The type of the file does not match the type of the election."
+    #     ))
+    # if error:
+    #     return {'status': 'error', 'errors': [error]}
+
+    errors = []
+
+    candidates = {}
+    lists = {}
+    list_results = {}
+    connections = {}
+    subconnections = {}
+    results = []
+
+    # This format has one municipality per line and every candidate as row
+    mandates = 0
+    counted = 0
+    total = 0
+    for line in csv.lines:
+        line_errors = []
+
+        # Parse the line
+        mandates, counted, total = parse_election(line, line_errors)
+        result = parse_election_result(line, line_errors, municipalities)
+        for candidate, candidate_result in parse_candidates(line, line_errors):
+            # proporz: might be that the list value is wrong at this time?
+            candidate = candidates.setdefault(
+                candidate.candidate_id, candidate
+            )
+            candidate_result.candidate_id = candidate.id
+            result.candidate_results.append(candidate_result)
+        # while True:
+        #     index += 1
+        #     candidate = parse_candidate(line, index, line_errors)
+        #     candidate_result = parse_candidate_result(line, index, line_errors)
+        #     if not candidate or not candidate_result:
+        #         break
+        #     # proporz: might be that the list value is wrong at this time?
+        #     candidate = candidates.setdefault(
+        #         candidate.candidate_id, candidate
+        #     )
+        #     candidate_result.candidate_id = candidate.id
+        #     result.candidate_results.append(candidate_result)
+
+        # if not majorz:
+        #     list = parse_list(line, line_errors)
+        #     list_result = parse_list_result(line, line_errors)
+        #     connection, subconnection = parse_connection(line, line_errors)
+
+        # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
                 FileImportError(error=err, line=line.rownumber)
@@ -159,21 +290,30 @@ def import_file(municipalities, election, file, mimetype):
             )
             continue
 
-        # all went well (only keep doing this as long as there are no errors)
-        if not errors:
-            if municipality_id not in results:
-                results[municipality_id] = ElectionResult(
-                    municipality_id=municipality_id,
-                    elegible_voters=elegible_voters,
-                    received_ballots=received_ballots,
-                    blank_ballots=blank_ballots,
-                    invalid_ballots=invalid_ballots,
-                    blank_votes=blank_votes,
-                    invalid_votes=invalid_votes,
-                    group=municipalities[municipality_id]['name']
-                )
-            for candidate in candidates:
-                results[municipality_id].candidates.append(candidate)
+        results.append(result)
+        # if not majorz:
+        #     list = lists.setdefault(list.list_id, list)
+        #
+        #     if connection:
+        #         connection = connections.setdefault(
+        #             connection.connection_id, connection
+        #         )
+        #         list.connection_id = connection.id
+        #         if subconnection:
+        #             subconnection = subconnections.setdefault(
+        #                 subconnection.connection_id, subconnection
+        #             )
+        #             subconnection.parent_id = connection.id
+        #             list.connection_id = subconnection.id
+        #
+        #     list_results.setdefault(result.municipality_id, {})
+        #     list_result = list_results[result.municipality_id].setdefault(
+        #         list.list_id, list_result
+        #     )
+        #     list_result.list_id = list.id
+
+        # if not majorz:
+        #     candidate.list_id = list.id
 
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
@@ -182,13 +322,35 @@ def import_file(municipalities, election, file, mimetype):
         return {'status': 'error', 'errors': errors}
 
     if results:
-        election.number_of_mandates = number_of_mandates
-        # election.counted_municipalities = counted
-        # election.total_municipalities = total
+        election.number_of_mandates = mandates
+        election.counted_municipalities = counted
+        election.total_municipalities = total
+
         session = object_session(election)
+
+        for connection in election.list_connections:
+            session.delete(connection)
+        for connection in connections.values():
+            election.list_connections.append(connection)
+        for connection in subconnections.values():
+            election.list_connections.append(connection)
+
+        for list in election.lists:
+            session.delete(list)
+        for list in lists.values():
+            election.lists.append(list)
+
+        for candidate in election.candidates:
+            session.delete(candidate)
+        for candidate in candidates.values():
+            election.candidates.append(candidate)
+
         for result in election.results:
             session.delete(result)
         for result in results:
-            election.results.append(results[result])
+            id = result.municipality_id
+            for list_result in list_results.get(id, {}).values():
+                result.list_results.append(list_result)
+            election.results.append(result)
 
     return {'status': 'ok', 'errors': errors}
