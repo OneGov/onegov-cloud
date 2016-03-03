@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-02-23 09:47+0100\n"
+"POT-Creation-Date: 2016-03-03 15:56+0100\n"
 "PO-Revision-Date: 2016-01-08 10:07+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -37,6 +37,9 @@ msgstr "Scursanida"
 msgid "Date"
 msgstr "Data"
 
+msgid "Mandates"
+msgstr ""
+
 msgid "An election with this title exists already"
 msgstr ""
 
@@ -55,6 +58,12 @@ msgstr ""
 msgid "Results"
 msgstr "Resultats"
 
+msgid "Elected Candidates"
+msgstr ""
+
+msgid "Election statistics"
+msgstr ""
+
 msgid "Proposal"
 msgstr "Iniziativa"
 
@@ -63,6 +72,12 @@ msgstr "Cuntraproposta"
 
 msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
+
+msgid "SESAM"
+msgstr ""
+
+msgid "Wabsti"
+msgstr ""
 
 msgid "Simple Vote"
 msgstr "Project da votaziun simpel"
@@ -128,9 +143,6 @@ msgstr ""
 msgid "single_votes"
 msgstr ""
 
-msgid "Mandates"
-msgstr ""
-
 msgid "List connections"
 msgstr ""
 
@@ -166,9 +178,6 @@ msgstr ""
 
 msgid "Electoral District"
 msgstr "Circul electoral"
-
-msgid "Election statistics"
-msgstr ""
 
 msgid "Accounted Ballots"
 msgstr ""
@@ -518,61 +527,41 @@ msgstr "La datoteca CSV/XLS/XLSX è vida."
 msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
 
-msgid "No number of mandates"
+msgid "Invalid election values"
 msgstr ""
 
-msgid "Invalid number of counted municipalities"
+msgid "Invalid muncipality values"
 msgstr ""
-
-msgid "No elegible voters"
-msgstr "Naginas persunas cun dretg da votar"
-
-msgid "The type of the file does not match the type of the election."
-msgstr ""
-
-msgid "Invalid municipality id"
-msgstr "Numer UST nunvalaivel"
-
-msgid "Invalid candidate id"
-msgstr ""
-
-msgid "Invalid list id"
-msgstr ""
-
-msgid "No data found"
-msgstr "Chattà naginas datas"
 
 #, python-format
 msgid "municipality id ${id} is unknown"
 msgstr "Il numer UST ${id} n'è betg enconuschent"
 
-msgid "More received ballots than elegible voters"
+msgid "Invalid list values"
 msgstr ""
 
-msgid "More blank ballots than elegible voters"
+msgid "Invalid list results"
 msgstr ""
 
-#, python-format
-msgid "Missing name(s) for candidate ${id}"
+msgid "Invalid candidate values"
 msgstr ""
 
-msgid "More invalid ballots than elegible voters"
+msgid "Invalid candidate results"
 msgstr ""
 
-#, python-format
-msgid "candidate id {$cid} for municipality id ${mid} was found twice"
+msgid "Invalid list connection values"
 msgstr ""
 
-#, python-format
-msgid "Conflicting values for municipality id ${id}"
+msgid "No data found"
+msgstr "Chattà naginas datas"
+
+msgid "Unkown candidate"
 msgstr ""
 
-#, python-format
-msgid "Conflicting values for municipality id ${id} and list id {lid}"
+msgid "Invalid values"
 msgstr ""
 
-#, python-format
-msgid "municipality id ${id} found twice"
+msgid "Unkown municipality"
 msgstr ""
 
 msgid "Wrong username or password"
@@ -605,6 +594,9 @@ msgstr "Lieu che manca"
 msgid "${group} was found twice"
 msgstr "${group} è avant maun duas giadas"
 
+msgid "Invalid municipality id"
+msgstr "Numer UST nunvalaivel"
+
 #, python-format
 msgid "municipality id ${id} was found twice"
 msgstr "Il numer UST ${id} vegn duvrà duas giadas"
@@ -623,6 +615,9 @@ msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar vids'"
 
 msgid "Could not read the invalid votes"
 msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar nunvalaivels'"
+
+msgid "No elegible voters"
+msgstr "Naginas persunas cun dretg da votar"
 
 msgid "More cast votes than elegible voters"
 msgstr "Dapli vuschs entradas che persunas cun dretg da votar."

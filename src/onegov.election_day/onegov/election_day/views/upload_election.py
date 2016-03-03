@@ -8,13 +8,11 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.forms import UploadElectionForm
 from onegov.election_day.layout import ManageLayout
 from onegov.election_day.models import Manage
-from onegov.election_day.utils.import_sesam_file import (
-    import_file as import_sesam_file
+from onegov.election_day.utils import (
+    FileImportError,
+    import_sesam_file,
+    import_wabsti_file
 )
-from onegov.election_day.utils.import_wabsti_file import (
-    import_file as import_wabsti_file
-)
-from onegov.election_day.utils import FileImportError
 
 
 @ElectionDayApp.form(model=Election, name='upload',
@@ -40,20 +38,28 @@ def view_upload(self, request, form):
             }
         else:
             municipalities = principal.municipalities[self.date.year]
-            result = import_sesam_file(
-                municipalities,
-                self,
-                form.results.raw_data[0].file,
-                form.results.data['mimetype']
-            )
-            if result['errors']:
-                if "Missing columns" in result['errors'][0].error:
-                    result = import_wabsti_file(
-                        municipalities,
-                        self,
-                        form.results.raw_data[0].file,
-                        form.results.data['mimetype']
-                    )
+            if form.type.data == 'sesam':
+                result = import_sesam_file(
+                    municipalities,
+                    self,
+                    form.results.raw_data[0].file,
+                    form.results.data['mimetype']
+                )
+            else:
+                stats = len(form.statistics.data)
+                elected = len(form.elected.data)
+                result = import_wabsti_file(
+                    municipalities,
+                    self,
+                    form.results.raw_data[0].file,
+                    form.results.data['mimetype'],
+                    form.elected.raw_data[0].file if elected else None,
+                    form.elected.data['mimetype'] if elected else None,
+                    form.statistics.raw_data[0].file if stats else None,
+                    form.statistics.data['mimetype'] if stats else None
+                )
+                if form.complete.data:
+                    self.total_municipalities = self.counted_municipalities
 
     if result:
         status = result['status']

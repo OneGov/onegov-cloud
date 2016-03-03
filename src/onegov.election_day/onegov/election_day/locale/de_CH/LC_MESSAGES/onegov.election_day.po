@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-02-23 09:47+0100\n"
+"POT-Creation-Date: 2016-03-03 15:56+0100\n"
 "PO-Revision-Date: 2015-10-14 17:17+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -36,6 +36,9 @@ msgstr "Kürzel"
 msgid "Date"
 msgstr "Datum"
 
+msgid "Mandates"
+msgstr "Sitze"
+
 msgid "An election with this title exists already"
 msgstr "Eine Wahl mit diesem Titel existiert bereits"
 
@@ -54,6 +57,12 @@ msgstr "Kantonale Wahl"
 msgid "Results"
 msgstr "Resultate"
 
+msgid "Elected Candidates"
+msgstr ""
+
+msgid "Election statistics"
+msgstr "Wahlstatistik"
+
 msgid "Proposal"
 msgstr "Initiative"
 
@@ -62,6 +71,12 @@ msgstr "Gegenentwurf"
 
 msgid "Tie-Breaker"
 msgstr "Stichfrage"
+
+msgid "SESAM"
+msgstr ""
+
+msgid "Wabsti"
+msgstr ""
 
 msgid "Simple Vote"
 msgstr "Einfache Vorlage"
@@ -127,9 +142,6 @@ msgstr "Liste"
 msgid "single_votes"
 msgstr "Stimmen"
 
-msgid "Mandates"
-msgstr "Sitze"
-
 msgid "List connections"
 msgstr "Listenverbindungen"
 
@@ -165,9 +177,6 @@ msgstr "Wahlkreise"
 
 msgid "Electoral District"
 msgstr "Wahlkreis"
-
-msgid "Election statistics"
-msgstr "Wahlstatistik"
 
 msgid "Accounted Ballots"
 msgstr "Gültige Wahlzettel"
@@ -517,62 +526,42 @@ msgstr "Die CSV/XLS/XLSX Date ist leer."
 msgid "The file contains an empty line."
 msgstr "Die Datei enthält eine leere Zeile."
 
-msgid "No number of mandates"
-msgstr "Keine Anzahl der Mandate"
+msgid "Invalid election values"
+msgstr ""
 
-msgid "Invalid number of counted municipalities"
-msgstr "Ungültige Anzahl ausgezählter Gemeinden"
-
-msgid "No elegible voters"
-msgstr "Keine Stimmberechtigten"
-
-msgid "The type of the file does not match the type of the election."
-msgstr "Der Typ der Abstimmung und der Datei stimmen nicht überein."
-
-msgid "Invalid municipality id"
-msgstr "Ungültige BFS Nummer"
-
-msgid "Invalid candidate id"
-msgstr "Ungültige Kandidatennummer"
-
-msgid "Invalid list id"
-msgstr "Ungülitge Listennummer"
-
-msgid "No data found"
-msgstr "Keine Daten gefunden"
+msgid "Invalid muncipality values"
+msgstr ""
 
 #, python-format
 msgid "municipality id ${id} is unknown"
 msgstr "BFS Nummer ${id} ist unbekannt"
 
-msgid "More received ballots than elegible voters"
-msgstr "Mehr abgegeben Wahlzettel als Stimmberechtigte"
+msgid "Invalid list values"
+msgstr ""
 
-msgid "More blank ballots than elegible voters"
-msgstr "Mehr leere Wahlzettel als Stimmberechtigte"
+msgid "Invalid list results"
+msgstr ""
 
-#, python-format
-msgid "Missing name(s) for candidate ${id}"
-msgstr "Kandidat ${id} hat keinen Namen"
+msgid "Invalid candidate values"
+msgstr ""
 
-msgid "More invalid ballots than elegible voters"
-msgstr "Mehr ungültige Wahlzettel als Stimmberechtigte"
+msgid "Invalid candidate results"
+msgstr ""
 
-#, python-format
-msgid "candidate id {$cid} for municipality id ${mid} was found twice"
-msgstr "Kandidat {$cid} doppelt für Gemeinde ${mid}"
+msgid "Invalid list connection values"
+msgstr ""
 
-#, python-format
-msgid "Conflicting values for municipality id ${id}"
-msgstr "Widersprechende Werte für die Gemeinde ${id}"
+msgid "No data found"
+msgstr "Keine Daten gefunden"
 
-#, python-format
-msgid "Conflicting values for municipality id ${id} and list id {lid}"
-msgstr "Widersprechende Werte für die Gemeinde ${id} und Liste ${lid}"
+msgid "Unkown candidate"
+msgstr ""
 
-#, python-format
-msgid "municipality id ${id} found twice"
-msgstr "Doppelte Gemeinde ${id}"
+msgid "Invalid values"
+msgstr ""
+
+msgid "Unkown municipality"
+msgstr ""
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
@@ -602,6 +591,9 @@ msgstr "Fehlender Ort"
 msgid "${group} was found twice"
 msgstr "${group} kommt zweimal vor"
 
+msgid "Invalid municipality id"
+msgstr "Ungültige BFS Nummer"
+
 #, python-format
 msgid "municipality id ${id} was found twice"
 msgstr "BFS Nummer ${id} kommt zweimal vor"
@@ -621,11 +613,53 @@ msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
 msgid "Could not read the invalid votes"
 msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
 
+msgid "No elegible voters"
+msgstr "Keine Stimmberechtigten"
+
 msgid "More cast votes than elegible voters"
 msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
+
+#~ msgid "No number of mandates"
+#~ msgstr "Keine Anzahl der Mandate"
+
+#~ msgid "Invalid number of counted municipalities"
+#~ msgstr "Ungültige Anzahl ausgezählter Gemeinden"
+
+#~ msgid "The type of the file does not match the type of the election."
+#~ msgstr "Der Typ der Abstimmung und der Datei stimmen nicht überein."
+
+#~ msgid "Invalid candidate id"
+#~ msgstr "Ungültige Kandidatennummer"
+
+#~ msgid "Invalid list id"
+#~ msgstr "Ungülitge Listennummer"
+
+#~ msgid "More received ballots than elegible voters"
+#~ msgstr "Mehr abgegeben Wahlzettel als Stimmberechtigte"
+
+#~ msgid "More blank ballots than elegible voters"
+#~ msgstr "Mehr leere Wahlzettel als Stimmberechtigte"
+
+#~ msgid "Missing name(s) for candidate ${id}"
+#~ msgstr "Kandidat ${id} hat keinen Namen"
+
+#~ msgid "More invalid ballots than elegible voters"
+#~ msgstr "Mehr ungültige Wahlzettel als Stimmberechtigte"
+
+#~ msgid "candidate id {$cid} for municipality id ${mid} was found twice"
+#~ msgstr "Kandidat {$cid} doppelt für Gemeinde ${mid}"
+
+#~ msgid "Conflicting values for municipality id ${id}"
+#~ msgstr "Widersprechende Werte für die Gemeinde ${id}"
+
+#~ msgid "Conflicting values for municipality id ${id} and list id {lid}"
+#~ msgstr "Widersprechende Werte für die Gemeinde ${id} und Liste ${lid}"
+
+#~ msgid "municipality id ${id} found twice"
+#~ msgstr "Doppelte Gemeinde ${id}"
 
 #~ msgid "Details Electoral Districts"
 #~ msgstr "Details Wahlkreise"

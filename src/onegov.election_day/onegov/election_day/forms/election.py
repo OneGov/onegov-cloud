@@ -3,9 +3,9 @@ from onegov.ballot import ElectionCollection
 from onegov.core import utils
 from onegov.election_day import _
 from onegov.form import Form
-from wtforms import RadioField, StringField
+from wtforms import IntegerField, RadioField, StringField
 from wtforms.fields.html5 import DateField
-from wtforms.validators import InputRequired, ValidationError
+from wtforms.validators import NumberRange, InputRequired, ValidationError
 
 
 class ElectionForm(Form):
@@ -26,6 +26,11 @@ class ElectionForm(Form):
         label=_("Date"),
         validators=[InputRequired()],
         default=date.today
+    )
+
+    mandates = IntegerField(
+        label=_("Mandates"),
+        validators=[InputRequired(), NumberRange(min=1)]
     )
 
     election_type = RadioField(_("System"), choices=[
@@ -51,6 +56,7 @@ class ElectionForm(Form):
         model.domain = self.domain.data
         model.type = self.election_type.data
         model.shortcode = self.shortcode.data
+        model.number_of_mandates = self.mandates.data
 
         model.title_translations = {}
         model.title_translations['de_CH'] = self.election_de.data
@@ -74,3 +80,4 @@ class ElectionForm(Form):
         self.domain.data = model.domain
         self.shortcode.data = model.shortcode
         self.election_type.data = model.type
+        self.mandates.data = model.number_of_mandates

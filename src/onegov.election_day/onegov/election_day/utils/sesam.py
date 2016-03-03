@@ -7,7 +7,7 @@ from onegov.ballot import (
     ListResult
 )
 from onegov.election_day import _
-from onegov.election_day.utils import FileImportError, load_csv
+from onegov.election_day.utils.csv import FileImportError, load_csv
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -25,6 +25,7 @@ HEADERS_COMMON = [
     'Kandidaten-Nr',
     'Name',
     'Vorname',
+    # Election
     'Anzahl Gemeinden',
 ]
 
@@ -200,7 +201,7 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_file(municipalities, election, file, mimetype):
+def import_sesam_file(municipalities, election, file, mimetype):
     """ Tries to import the given file (sesam format).
 
     :return: A dictionary containing the status and a list of errors if any.
@@ -210,23 +211,15 @@ def import_file(municipalities, election, file, mimetype):
         {'status': 'error': 'errors': ['x on line y is z']}
 
     """
-    majorz = False
-    csv, error = load_csv(
-        file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_PROPORZ
-    )
-    if error and "Missing columns" in error.error:
-        majorz = True
+    majorz = election.type == 'majorz'
+    if majorz:
         csv, error = load_csv(
             file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_MAJORZ
         )
-    type_matches = (
-        (majorz and election.type == 'majorz') or
-        (not majorz and election.type == 'proporz')
-    )
-    if not type_matches:
-        error = FileImportError(_(
-            "The type of the file does not match the type of the election."
-        ))
+    else:
+        csv, error = load_csv(
+            file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_PROPORZ
+        )
     if error:
         return {'status': 'error', 'errors': [error]}
 
