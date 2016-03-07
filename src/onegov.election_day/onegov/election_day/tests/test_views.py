@@ -57,6 +57,7 @@ def test_view_manage(election_day_app):
     login.form.submit()
 
     manage = client.get('/manage')
+    assert "Noch keine Wahlen erfasst" in manage
     assert "Noch keine Abstimmungen erfasst" in manage
 
     new = manage.click('Neue Abstimmung')
@@ -80,8 +81,31 @@ def test_view_manage(election_day_app):
     manage = delete.form.submit().follow()
     assert "Noch keine Abstimmungen erfasst" in manage
 
+    new = manage.click('Neue Wahl')
+    new.form['election_de'] = 'Elect a new president'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form['mandates'] = 1
+    manage = new.form.submit().follow()
 
-def test_upload_all_or_nothing(election_day_app):
+    assert "Elect a new president" in manage
+    edit = manage.click('Bearbeiten')
+    edit.form['election_de'] = 'Elect a new federal councillor'
+    manage = edit.form.submit().follow()
+
+    assert "Elect a new federal councillor" in manage
+
+    delete = manage.click("Löschen")
+    assert "Wahl löschen" in delete
+    assert "Elect a new federal councillor" in delete
+    assert "Bearbeiten" in delete.click("Abbrechen")
+
+    manage = delete.form.submit().follow()
+    assert "Noch keine Wahlen erfasst" in manage
+
+
+def test_upload_vote_all_or_nothing(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -134,7 +158,7 @@ def test_upload_all_or_nothing(election_day_app):
     assert not vote.ballots
 
 
-def test_upload_success(election_day_app):
+def test_upload_vote_success(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -198,7 +222,7 @@ def test_upload_success(election_day_app):
     assert '<dd class="rejected" >62.79%</dd>' in results
 
 
-def test_upload_validation(election_day_app):
+def test_upload_vote_validation(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -368,7 +392,7 @@ def test_upload_validation(election_day_app):
     assert "Keine Stimmberechtigten" in upload
 
 
-def test_upload_missing_town(election_day_app):
+def test_upload_vote_missing_town(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -421,7 +445,7 @@ def test_upload_missing_town(election_day_app):
         upload.form.submit()
 
 
-def test_upload_unknown_result(election_day_app):
+def test_upload_vote_unknown_result(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -508,6 +532,29 @@ def test_i18n(election_day_app):
     homepage = homepage.click('Rumantsch').follow()
     assert "Qux" in homepage
 
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Tick'
+    new.form['election_fr'] = 'Trick'
+    new.form['election_it'] = 'Track'
+    new.form['election_rm'] = 'Quack'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    homepage = client.get('/')
+    assert "Quack" in homepage
+
+    homepage = homepage.click('Français').follow()
+    assert "Trick" in homepage
+
+    homepage = homepage.click('Italiano').follow()
+    assert "Track" in homepage
+
+    homepage = homepage.click('Deutsch').follow()
+    assert "Tick" in homepage
+
 
 def test_pages_cache(election_day_app):
     client = Client(election_day_app)
@@ -516,6 +563,7 @@ def test_pages_cache(election_day_app):
     # make sure codes != 200 are not cached
     anonymous = Client(election_day_app)
     anonymous.get('/vote/0xdeadbeef', status=404)
+    anonymous.get('/election/0xdeafbeef', status=404)
 
     login = client.get('/auth/login')
     login.form['username'] = 'admin@example.org'
@@ -540,3 +588,16 @@ def test_pages_cache(election_day_app):
     assert '0xdeadc0de' in anonymous.get('/', headers=[
         ('Cache-Control', 'no-cache')
     ])
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = '0xdeafbeef'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    assert '0xdeafbeef' not in anonymous.get('/')
+    assert '0xdeafbeef' in anonymous.get(
+        '/', headers=[('Cache-Control', 'no-cache')]
+    )
