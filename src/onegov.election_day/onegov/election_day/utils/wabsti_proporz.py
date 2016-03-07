@@ -153,7 +153,6 @@ def import_wabsti_file_proporz(municipalities, election, file, mimetype,
     if error:
         errors.append(error)
     else:
-        mandates = 0
         for line in csv.lines:
             line_errors = []
 
