@@ -65,16 +65,37 @@
                 <dd i18n:translate>The number of blank votes for this municipality.</dd>
 
                 <dt>municipality_invalid_votes</dt>
-                <dd i18n:translate>The number of invalid votes for this municipality. Is zero for elections based on proportional representation.</dd>
+                <dd i18n:translate>
+                    The number of invalid votes for this municipality.
+                    Zero for elections based on proportional representation.
+                </dd>
 
                 <dt>municipality_accounted_votes</dt>
                 <dd i18n:translate>The number of accounted votes for this municipality.</dd>
 
                 <dt>list_name</dt>
-                <dd i18n:translate>The name of the list this candidate appears on. Only relevant for elections based on proportional representation.</dd>
+                <dd i18n:translate>
+                    The name of the list this candidate appears on.
+                    Only relevant forelections based on proportional representation.
+                </dd>
 
                 <dt>list_votes</dt>
-                <dd i18n:translate>The number of votes this list has got. Only relevant for elections based on proportional representation.</dd>
+                <dd i18n:translate>
+                    The number of votes this list has got.
+                    Only relevant for elections based on proportional representation.
+                </dd>
+
+                <dt>list_connection</dt>
+                <dd i18n:translate>
+                    The ID of the list connection this list is connected to.
+                    Only relevant for elections based on proportional representation.
+                </dd>
+
+                <dt>list_connection_parent</dt>
+                <dd i18n:translate>
+                    The ID of the parent list connection this list is connected to.
+                    Only relevant for elections based on proportional representation.
+                </dd>
 
                 <dt>candidate_family_name</dt>
                 <dd i18n:translate>The family name of the candidate.</dd>

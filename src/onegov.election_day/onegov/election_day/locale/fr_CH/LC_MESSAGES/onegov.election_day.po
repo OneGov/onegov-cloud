@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-03-03 15:56+0100\n"
+"POT-Creation-Date: 2016-03-07 10:28+0100\n"
 "PO-Revision-Date: 2015-12-24 11:39+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -360,21 +360,31 @@ msgid "The number of blank votes for this municipality."
 msgstr ""
 
 msgid ""
-"The number of invalid votes for this municipality. Is zero for elections "
-"based on proportional representation."
+"The number of invalid votes for this municipality. Zero for elections based "
+"on proportional representation."
 msgstr ""
 
 msgid "The number of accounted votes for this municipality."
 msgstr ""
 
 msgid ""
-"The name of the list this candidate appears on. Only relevant for elections "
+"The name of the list this candidate appears on. Only relevant forelections "
 "based on proportional representation."
 msgstr ""
 
 msgid ""
 "The number of votes this list has got. Only relevant for elections based on "
 "proportional representation."
+msgstr ""
+
+msgid ""
+"The ID of the list connection this list is connected to. Only relevant for "
+"elections based on proportional representation."
+msgstr ""
+
+msgid ""
+"The ID of the parent list connection this list is connected to. Only "
+"relevant for elections based on proportional representation."
 msgstr ""
 
 msgid "The family name of the candidate."

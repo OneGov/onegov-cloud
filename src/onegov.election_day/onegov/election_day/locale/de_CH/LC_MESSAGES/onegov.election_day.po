@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-03-03 15:56+0100\n"
+"POT-Creation-Date: 2016-03-07 10:28+0100\n"
 "PO-Revision-Date: 2015-10-14 17:17+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -58,7 +58,7 @@ msgid "Results"
 msgstr "Resultate"
 
 msgid "Elected Candidates"
-msgstr ""
+msgstr "Gewählte Kandidaten"
 
 msgid "Election statistics"
 msgstr "Wahlstatistik"
@@ -73,10 +73,10 @@ msgid "Tie-Breaker"
 msgstr "Stichfrage"
 
 msgid "SESAM"
-msgstr ""
+msgstr "SESAM"
 
 msgid "Wabsti"
-msgstr ""
+msgstr "Wabsti"
 
 msgid "Simple Vote"
 msgstr "Einfache Vorlage"
@@ -322,70 +322,85 @@ msgid "Title of the election."
 msgstr "Titel der Wahl"
 
 msgid "The date of the election (an ISO 8601 date string)."
-msgstr ""
+msgstr "Das Datum der Wahl (ein ISO 8601 String)"
 
 msgid "\"proporz\" for proportional, \"majorz\" for majority system."
-msgstr ""
+msgstr "\"proporz\" falls Proporzwahl, \"majorz\" falls Majorzwahl"
 
 msgid "The number of mandates."
-msgstr ""
+msgstr "Die Anzahl der Sitze."
 
 msgid "The name of the municipality."
-msgstr ""
+msgstr "Der Name der Gemeinde/des Standorts"
 
 msgid "The id of the municipality/locale (\"BFS Nummer\")."
-msgstr ""
+msgstr "Die ID der Gemeinde/des Standorts. Besser bekannt als \"BFS Nummer\"."
 
 msgid "The number of people elegible to vote for this municipality."
-msgstr ""
+msgstr "Die Anzahl Stimmberechtigter der Gemeinde/des Standorts."
 
 msgid "The number of received ballots for this municipality."
-msgstr ""
+msgstr "Die Anzahl abgegebener Stimmzettel der Gemeinde/des Standorts."
 
 msgid "The number of blank ballots for this municipality."
-msgstr ""
+msgstr "Die Anzahl leerer Stimmzettel der Gemeinde/des Standorts."
 
 msgid "The number of invalid ballots for this municipality."
-msgstr ""
+msgstr "Die Anzahl ungültiger Stimmzettel der Gemeinde/des Standorts."
 
 msgid "The number of unaccounted ballots for this municipality."
 msgstr ""
+"Die Anzahl der ungültigen oder leeren Stimmzettel der Gemeinde/des Standorts."
 
 msgid "The nubmer of accounted ballots for this municipality."
-msgstr ""
+msgstr "Die Anzahl gültiger Stimmzettel der Gemeinde/des Standorts."
 
 msgid "The number of blank votes for this municipality."
-msgstr ""
+msgstr "Die Anzahl leerer Stimmen der Gemeinde/des Standorts."
 
 msgid ""
-"The number of invalid votes for this municipality. Is zero for elections "
-"based on proportional representation."
+"The number of invalid votes for this municipality. Zero for elections based "
+"on proportional representation."
 msgstr ""
+"Die Anzahl ungültiger Stimmen der Gemeinde/des Standorts. Null falls "
+"Proporzwahl."
 
 msgid "The number of accounted votes for this municipality."
-msgstr ""
+msgstr "Die Anzahl gültiger Stimmen der Gemeinde/des Standorts."
 
 msgid ""
-"The name of the list this candidate appears on. Only relevant for elections "
+"The name of the list this candidate appears on. Only relevant forelections "
 "based on proportional representation."
-msgstr ""
+msgstr "Der Name der Liste des Kandidaten. Nur bei Proporzwahlen."
 
 msgid ""
 "The number of votes this list has got. Only relevant for elections based on "
 "proportional representation."
+msgstr "Die Anzahl der Listenstimmen. Nur bei Proporzwahlen."
+
+msgid ""
+"The ID of the list connection this list is connected to. Only relevant for "
+"elections based on proportional representation."
+msgstr "Die ID der Listenverbindung. Nur bei Proporzwahlen."
+
+msgid ""
+"The ID of the parent list connection this list is connected to. Only "
+"relevant for elections based on proportional representation."
 msgstr ""
+"Die ID der übergeorndeten Listenverbidnung. Nur bei Proporzwahlen und falls "
+"es sich um eine Unterlistenverbindung handelt."
 
 msgid "The family name of the candidate."
-msgstr ""
+msgstr "Der Nachnahme des Kandidate.n"
 
 msgid "The first name of the candiate."
-msgstr ""
+msgstr "Der Vorname des Kandidaten."
 
 msgid "True if the candidate has been elected."
-msgstr ""
+msgstr "True, falls der Kandidate gewählt wurde."
 
 msgid "The number of votes this candidate got."
-msgstr ""
+msgstr "Die Anzahl Kandidatenstimmen der Gemeinde/des Standorts."
 
 msgid "Title of the vote."
 msgstr "Titel der Abstimmung."
@@ -527,41 +542,41 @@ msgid "The file contains an empty line."
 msgstr "Die Datei enthält eine leere Zeile."
 
 msgid "Invalid election values"
-msgstr ""
+msgstr "Ungültige Wahldaten"
 
 msgid "Invalid muncipality values"
-msgstr ""
+msgstr "Ungültige Gemeindedaten"
 
 #, python-format
 msgid "municipality id ${id} is unknown"
 msgstr "BFS Nummer ${id} ist unbekannt"
 
 msgid "Invalid list values"
-msgstr ""
+msgstr "Ungültige Listendaten"
 
 msgid "Invalid list results"
-msgstr ""
+msgstr "Ungültige Listenresultate"
 
 msgid "Invalid candidate values"
-msgstr ""
+msgstr "Ungültige Kandidatendaten"
 
 msgid "Invalid candidate results"
-msgstr ""
+msgstr "Ungültige Kandidatenresultate"
 
 msgid "Invalid list connection values"
-msgstr ""
+msgstr "Ungültige Listenverbindungsdaten"
 
 msgid "No data found"
 msgstr "Keine Daten gefunden"
 
 msgid "Unkown candidate"
-msgstr ""
+msgstr "Unbekannter Kandidat"
 
 msgid "Invalid values"
-msgstr ""
+msgstr "Ungültige Werte"
 
 msgid "Unkown municipality"
-msgstr ""
+msgstr "Unbekannte Gemeinde"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
@@ -621,45 +636,3 @@ msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
-
-#~ msgid "No number of mandates"
-#~ msgstr "Keine Anzahl der Mandate"
-
-#~ msgid "Invalid number of counted municipalities"
-#~ msgstr "Ungültige Anzahl ausgezählter Gemeinden"
-
-#~ msgid "The type of the file does not match the type of the election."
-#~ msgstr "Der Typ der Abstimmung und der Datei stimmen nicht überein."
-
-#~ msgid "Invalid candidate id"
-#~ msgstr "Ungültige Kandidatennummer"
-
-#~ msgid "Invalid list id"
-#~ msgstr "Ungülitge Listennummer"
-
-#~ msgid "More received ballots than elegible voters"
-#~ msgstr "Mehr abgegeben Wahlzettel als Stimmberechtigte"
-
-#~ msgid "More blank ballots than elegible voters"
-#~ msgstr "Mehr leere Wahlzettel als Stimmberechtigte"
-
-#~ msgid "Missing name(s) for candidate ${id}"
-#~ msgstr "Kandidat ${id} hat keinen Namen"
-
-#~ msgid "More invalid ballots than elegible voters"
-#~ msgstr "Mehr ungültige Wahlzettel als Stimmberechtigte"
-
-#~ msgid "candidate id {$cid} for municipality id ${mid} was found twice"
-#~ msgstr "Kandidat {$cid} doppelt für Gemeinde ${mid}"
-
-#~ msgid "Conflicting values for municipality id ${id}"
-#~ msgstr "Widersprechende Werte für die Gemeinde ${id}"
-
-#~ msgid "Conflicting values for municipality id ${id} and list id {lid}"
-#~ msgstr "Widersprechende Werte für die Gemeinde ${id} und Liste ${lid}"
-
-#~ msgid "municipality id ${id} found twice"
-#~ msgstr "Doppelte Gemeinde ${id}"
-
-#~ msgid "Details Electoral Districts"
-#~ msgstr "Details Wahlkreise"
