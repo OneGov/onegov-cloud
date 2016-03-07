@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.0 (2016-03-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds models for elections.
   [msom]
