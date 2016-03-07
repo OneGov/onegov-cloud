@@ -515,7 +515,7 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
     #: groups the result in whatever structure makes sense
     group = Column(Text, nullable=False)
 
-    # : municipality id (BFS Nummer).
+    #: municipality id (BFS Nummer).
     municipality_id = Column(Integer, nullable=False)
 
     #: number of elegible voters
