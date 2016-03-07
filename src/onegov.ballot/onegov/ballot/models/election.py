@@ -16,14 +16,17 @@ class DerivedBallotsCount(object):
 
     @hybrid_property
     def unaccounted_ballots(self):
+        """ Number of unaccounted ballots, """
         return self.blank_ballots + self.invalid_ballots
 
     @hybrid_property
     def accounted_ballots(self):
+        """ Number of accounted ballots. """
         return self.received_ballots - self.unaccounted_ballots
 
     @hybrid_property
     def turnout(self):
+        """ Turnout of the election. """
         return self.received_ballots / self.elegible_voters * 100\
             if self.elegible_voters else 0
 
@@ -42,10 +45,10 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         'accounted_votes'
     ]
 
-    #: identifies the result, may be used in the url
+    #: Identifies the result, may be used in the url
     id = Column(Text, primary_key=True)
 
-    #: title of the election
+    #: Title of the election
     title_translations = Column(HSTORE, nullable=False)
     title = translation_hybrid(title_translations)
 
@@ -54,13 +57,13 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         if not self.id:
             self.id = normalize_for_url(self.title)
 
-    #: shortcode for cantons that use it
+    #: Shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
 
-    #: identifies the date of the vote
+    #: Identifies the date of the vote
     date = Column(Date, nullable=False)
 
-    #: the type of the election
+    #: Type of the election
     type = Column(
         Enum(
             'proporz',
@@ -70,11 +73,12 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         nullable=False
     )
 
-    #: the number of mandates
+    #: Number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
     @property
     def allocated_mandates(self):
+        """ Number of already allocated mandates/elected candidates. """
         results = object_session(self).query(
             func.count(
                 func.nullif(Candidate.elected, False)
@@ -88,17 +92,18 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
     #: Total number of municipalities
     total_municipalities = Column(Integer, nullable=True)
 
-    #: number counted of municipalities
+    #: Number of already counted municipalities
     counted_municipalities = Column(Integer, nullable=True)
 
     @property
     def counted(self):
+        """ Checks if there are results for all municipalities. """
         if self.total_municipalities and self.counted_municipalities:
             return self.total_municipalities == self.counted_municipalities
 
         return False
 
-    #: an election contains n list connections
+    #: An election contains n list connections
     list_connections = relationship(
         "ListConnection",
         cascade="all, delete-orphan",
@@ -107,7 +112,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         order_by="ListConnection.connection_id"
     )
 
-    #: an election contains n lists
+    #: An election contains n lists
     lists = relationship(
         "List",
         cascade="all, delete-orphan",
@@ -115,7 +120,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         lazy="dynamic",
     )
 
-    #: an election contains n candidates
+    #: An election contains n candidates
     candidates = relationship(
         "Candidate",
         cascade="all, delete-orphan",
@@ -124,7 +129,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         order_by="Candidate.candidate_id",
     )
 
-    #: an election contains n results (one for each municipality)
+    #: An election contains n results, one for each municipality
     results = relationship(
         "ElectionResult",
         cascade="all, delete-orphan",
@@ -226,6 +231,14 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             The number of votes this list has got. Only relevant for
             elections based on proportional representation.
 
+        * ``list_connection``:
+            The ID of the list connection this list is connected to. Only
+            relevant for elections based on proportional representation.
+
+        * ``list_connection_parent``:
+            The ID of the parent list conneciton this list is connected to.
+            Only relevant for elections based on proportional representation.
+
         * ``candidate_family_name``:
             The family name of the candidate.
 
@@ -237,6 +250,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
         * ``candidate_votes``:
             The number of votes this candidate got.
+
         """
 
         session = object_session(self)
@@ -327,16 +341,16 @@ class ListConnection(Base, TimestampMixin):
 
     summarized_properties = ['votes']
 
-    #: the internal id of the list
+    #: internal id of the list
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the external id of the list
+    #: external id of the list
     connection_id = Column(Text, nullable=False)
 
     #: the election this result belongs to
     election_id = Column(Text, ForeignKey(Election.id), nullable=True)
 
-    #: the id of the parent
+    #: ID of the parent
     parent_id = Column(UUID, ForeignKey('list_connections.id'), nullable=True)
 
     #: a list contains n candidates
@@ -385,16 +399,16 @@ class List(Base, TimestampMixin):
 
     summarized_properties = ['votes']
 
-    #: the internal id of the list
+    #: internal id of the list
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: the external id of the list
+    #: external id of the list
     list_id = Column(Text, nullable=False)
 
     # number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: the name of the list
+    #: name of the list
     name = Column(Text, nullable=False)
 
     #: the election this result belongs to
@@ -460,7 +474,7 @@ class Candidate(Base, TimestampMixin):
     #: the election this candidate belongs to
     election_id = Column(Text, ForeignKey(Election.id), nullable=False)
 
-    #: the identification of the list
+    #: the list this candidate belongs to
     list_id = Column(UUID, ForeignKey(List.id), nullable=True)
 
     #: a candidate contains n results
@@ -501,7 +515,7 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
     #: groups the result in whatever structure makes sense
     group = Column(Text, nullable=False)
 
-    # : The municipality id (BFS Nummer).
+    # : municipality id (BFS Nummer).
     municipality_id = Column(Integer, nullable=False)
 
     #: number of elegible voters
