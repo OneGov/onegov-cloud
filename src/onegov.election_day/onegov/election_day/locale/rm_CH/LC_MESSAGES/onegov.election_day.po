@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-03-07 10:28+0100\n"
+"POT-Creation-Date: 2016-03-07 10:33+0100\n"
 "PO-Revision-Date: 2016-01-08 10:07+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -317,6 +317,9 @@ msgstr ""
 "Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan "
 "a disposiziun en ils suandants formats:"
 
+msgid "Fields (Elections)"
+msgstr ""
+
 msgid "The following fields are included in all formats:"
 msgstr "Ils suandants champs èn disponibels en tut ils formats:"
 
@@ -397,6 +400,9 @@ msgid "True if the candidate has been elected."
 msgstr ""
 
 msgid "The number of votes this candidate got."
+msgstr ""
+
+msgid "Fields (Votes)"
 msgstr ""
 
 msgid "Title of the vote."

@@ -20,7 +20,7 @@
                 <li>XLSX</li>
             </ul>
 
-            <h3>Fields (Elections)</h3>
+            <h3 i18n:translate>Fields (Elections)</h3>
 
             <p i18n:translate>The following fields are included in all formats:</p>
 
@@ -110,7 +110,7 @@
                 <dd i18n:translate>The number of votes this candidate got.</dd>
             </dl>
 
-            <h3>Fields (Votes)</h3>
+            <h3 i18n:translate>Fields (Votes)</h3>
 
             <p i18n:translate>The following fields are included in all formats:</p>
 
