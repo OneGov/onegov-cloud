@@ -1,5 +1,5 @@
 from onegov.ballot.models import Ballot, Election, Vote
-from sqlalchemy import cast, desc, extract, Integer
+from sqlalchemy import cast, desc, distinct, extract, Integer
 
 
 class ElectionCollection(object):
@@ -29,13 +29,12 @@ class ElectionCollection(object):
     def get_years(self):
         """ Returns a list of years for which there are elections. """
 
-        query = self.query()
-        query = query.with_entities(
-            cast(extract('year', Election.date), Integer)
-        )
-        query = query.order_by(desc(Election.date))
+        year = cast(extract('year', Election.date), Integer)
+        query = self.session.query
+        query = query(distinct(year))
+        query = query.order_by(desc(year))
 
-        return list(reversed(sorted((set(r[0] for r in query.all())))))
+        return list(r[0] for r in query.all())
 
     def by_date(self, date):
         """ Returns the elections on the given date. """
@@ -97,11 +96,12 @@ class VoteCollection(object):
     def get_years(self):
         """ Returns a list of years for which there are votes. """
 
-        query = self.query()
-        query = query.with_entities(cast(extract('year', Vote.date), Integer))
-        query = query.order_by(desc(Vote.date))
+        year = cast(extract('year', Vote.date), Integer)
+        query = self.session.query
+        query = query(distinct(year))
+        query = query.order_by(desc(year))
 
-        return list(reversed(sorted((set(r[0] for r in query.all())))))
+        return list(r[0] for r in query.all())
 
     def by_date(self, date):
         """ Returns the votes on the given date. """
