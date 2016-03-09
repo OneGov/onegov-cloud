@@ -55,3 +55,42 @@ def election_day_app(postgres_dsn, temporary_directory, election_day_password):
     transaction.commit()
 
     yield app
+
+
+@pytest.yield_fixture(scope="function")
+def election_day_app_2(postgres_dsn, temporary_directory,
+                       election_day_password):
+    config = setup()
+    scan_morepath_modules(onegov.election_day.ElectionDayApp, config)
+    config.commit()
+
+    app = onegov.election_day.ElectionDayApp()
+    app.namespace = 'test_' + uuid4().hex
+    app.configure_application(
+        dsn=postgres_dsn,
+        filestorage='fs.osfs.OSFS',
+        filestorage_options={
+            'root_path': os.path.join(temporary_directory, 'file-storage'),
+            'create': True
+        },
+        identity_secure=False,
+        disable_memcached=True
+    )
+    app.set_application_id(app.namespace + '/' + 'test')
+
+    app.filestorage.setcontents('principal.yml', textwrap.dedent("""
+        name: Kanton Govikon
+        logo: logo.jpg
+        canton: gr
+        color: '#000'
+    """))
+
+    app.session().add(User(
+        username='admin@example.org',
+        password_hash=election_day_password,
+        role='admin'
+    ))
+
+    transaction.commit()
+
+    yield app

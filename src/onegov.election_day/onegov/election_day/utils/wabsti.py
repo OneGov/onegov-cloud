@@ -105,7 +105,7 @@ def parse_candidates(line, errors):
             errors.append(_("Invalid candidate values"))
             break
         else:
-            skip = ('Vereinzelte',  'Leere Zeilen', 'Ungültige Stimmen')
+            skip = ('Vereinzelte', 'Leere Zeilen', 'Ungültige Stimmen')
             if family_name in skip:
                 continue
             results.append((

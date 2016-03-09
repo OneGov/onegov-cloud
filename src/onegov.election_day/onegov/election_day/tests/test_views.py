@@ -1,7 +1,10 @@
 import onegov.election_day
+import pytest
+import tarfile
 
 from datetime import date
 from onegov.ballot import VoteCollection
+from onegov.core.utils import module_path
 from onegov.testing import utils
 from webtest import TestApp as Client
 from webtest.forms import Upload
@@ -601,3 +604,124 @@ def test_pages_cache(election_day_app):
     assert '0xdeafbeef' in anonymous.get(
         '/', headers=[('Cache-Control', 'no-cache')]
     )
+
+
+def test_opendata(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+    assert "Open Data" in client.get('/opendata')
+
+
+def test_view_archive(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-vote')
+    new.form['vote_de'] = "Abstimmung 1. Januar 2013"
+    new.form['date'] = date(2013, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = "Wahl 1. Januar 2013"
+    new.form['date'] = date(2013, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    assert "archive/2013" in client.get('/')
+
+    archive = client.get('/archive/2013')
+
+    assert "Abstimmung 1. Januar 2013" in archive
+    assert "Wahl 1. Januar 2013" in archive
+
+
+@pytest.mark.parametrize("csv_file", [
+    module_path('onegov.election_day', 'tests/fixtures/sesam_majorz.tar.gz'),
+])
+def test_upload_election_sesam_majorz(election_day_app_2, csv_file):
+    client = Client(election_day_app_2)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    with tarfile.open(csv_file, 'r|gz') as f:
+        csv = f.extractfile(f.next()).read()
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    results = client.get('/election/election')
+    assert all((expected in results for expected in (
+        # totals
+        "125 von 125", "2 von 2", "137'126", "55'291", "40.32 %",
+        "48'778", "5'365", "1'148", "84'046",
+        # canidates
+        "39'608", "35'926"
+    )))
+
+
+@pytest.mark.parametrize("csv_file", [
+    module_path('onegov.election_day', 'tests/fixtures/sesam_proporz.tar.gz'),
+])
+def test_upload_election_sesam_proporz(election_day_app_2, csv_file):
+    client = Client(election_day_app_2)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    with tarfile.open(csv_file, 'r|gz') as f:
+        csv = f.extractfile(f.next()).read()
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    results = client.get('/election/election')
+    assert all((expected in results for expected in (
+        # totals
+        "125 von 125", "5 von 5", "137'126", "63'053", "45.98 %", "145",
+        "2'314", "60'594", "300'743",
+        # lists
+        "20'610", "33'950", "41'167", "23'673",
+        # list connectinos
+        "39'890", "52'992", "76'665",
+        # candidates
+        "1'788", "1'038", "520"
+    )))
