@@ -135,6 +135,7 @@ table {
 
     thead {
         background: none;
+
     }
 
     th {
@@ -175,6 +176,20 @@ table {
             width: 12.5%;
         }
     }
+
+    &.collapsible {
+        &.collapsed {
+            tr.sticky {
+                background-color: $white;
+            }
+        }
+
+        thead {
+            cursor: pointer;
+        }
+
+    }
+
 }
 
 /*
