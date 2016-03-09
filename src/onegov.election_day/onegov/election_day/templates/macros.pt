@@ -53,8 +53,8 @@
         <div class="columns small-12 small-centered">
             <h2 i18n:translate>Archive</h2>
             <ul>
-                <li tal:repeat="year years">
-                    <a href="${request.link(layout.archive.for_year(year))}">${year}</a>
+                <li tal:repeat="date years">
+                    <a href="${request.link(layout.archive.for_date(date))}">${date}</a>
                 </li>
             </ul>
         </div>
@@ -129,24 +129,24 @@
                 <tal:block condition="type == 'election'">
                     <tal:block condition="domain == 'federation'">
                         <h2 i18n:translate="">
-                            Federal Elections on <span tal:replace="layout.format_date(date, 'date_long')" i18n:name='date' />
+                            Federal Elections on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
                         </h2>
                     </tal:block>
                     <tal:block condition="domain == 'canton'">
                         <h2 i18n:translate="">
-                            Cantonal Elections on <span tal:replace="layout.format_date(date, 'date_long')" i18n:name='date' />
+                            Cantonal Elections on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
                         </h2>
                     </tal:block>
                 </tal:block>
                 <tal:block condition="type == 'vote'">
                     <tal:block condition="domain == 'federation'">
                         <h2 i18n:translate="">
-                            Federal Votes on <span tal:replace="layout.format_date(date, 'date_long')" i18n:name='date' />
+                            Federal Votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
                         </h2>
                     </tal:block>
                     <tal:block condition="domain == 'canton'">
                         <h2 i18n:translate="">
-                            Cantonal Votes on <span tal:replace="layout.format_date(date, 'date_long')" i18n:name='date' />
+                            Cantonal Votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
                         </h2>
                     </tal:block>
                 </tal:block>

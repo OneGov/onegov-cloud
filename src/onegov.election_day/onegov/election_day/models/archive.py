@@ -1,3 +1,5 @@
+from time import mktime, strptime
+from datetime import date
 from onegov.ballot import ElectionCollection, VoteCollection
 from onegov.core.utils import groupbylist
 
@@ -5,12 +7,12 @@ from onegov.core.utils import groupbylist
 class Archive(object):
     """ Provides methods for votes/elections. """
 
-    def __init__(self, session, year=None):
+    def __init__(self, session, date=None):
         self.session = session
-        self.year = year
+        self.date = date
 
-    def for_year(self, year):
-        return self.__class__(self.session, year)
+    def for_date(self, date):
+        return self.__class__(self.session, date)
 
     def get_years(self):
         years = ElectionCollection(self.session).get_years() or []
@@ -32,8 +34,13 @@ class Archive(object):
 
         return self.group_items(items, reverse=True)
 
-    def by_year(self):
-        items = ElectionCollection(self.session).by_year(self.year) or []
-        items.extend(VoteCollection(self.session).by_year(self.year) or [])
+    def by_date(self):
+        try:
+            _date = date.fromtimestamp(mktime(strptime(self.date, '%Y-%m-%d')))
+            items = ElectionCollection(self.session).by_date(_date) or []
+            items.extend(VoteCollection(self.session).by_date(_date) or [])
+        except (TypeError, ValueError):
+            items = ElectionCollection(self.session).by_year(self.date) or []
+            items.extend(VoteCollection(self.session).by_year(self.date) or [])
 
         return self.group_items(items)

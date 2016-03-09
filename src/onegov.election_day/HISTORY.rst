@@ -4,6 +4,9 @@ Changelog
 - Adds elections.
   [msom]
 
+- Access to all elections and votes of an election day.
+  [msom]
+
 0.6.0 (2016-02-16)
 ~~~~~~~~~~~~~~~~~~~
 

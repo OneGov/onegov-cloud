@@ -37,9 +37,9 @@ def get_ballot(app, id):
     return BallotCollection(app.session()).by_id(id)
 
 
-@ElectionDayApp.path(model=Archive, path='/archive/{year}')
-def get_archive_by_year(app, year):
-    return Archive(app.session(), year)
+@ElectionDayApp.path(model=Archive, path='/archive/{date}')
+def get_archive_by_year(app, date):
+    return Archive(app.session(), date)
 
 
 @ElectionDayApp.path(model=SiteLocale, path='/locale/{locale}')

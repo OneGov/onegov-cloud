@@ -638,9 +638,15 @@ def test_view_archive(election_day_app):
     assert "archive/2013" in client.get('/')
 
     archive = client.get('/archive/2013')
-
     assert "Abstimmung 1. Januar 2013" in archive
     assert "Wahl 1. Januar 2013" in archive
+
+    archive = client.get('/archive/2013-01-01')
+    assert "Abstimmung 1. Januar 2013" in archive
+    assert "Wahl 1. Januar 2013" in archive
+
+    archive = client.get('/archive/2013-02-02')
+    assert "noch keine Wahlen oder Abstimmungen" in archive
 
 
 @pytest.mark.parametrize("csv_file", [

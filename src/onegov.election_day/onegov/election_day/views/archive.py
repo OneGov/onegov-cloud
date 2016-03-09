@@ -4,11 +4,10 @@ from onegov.election_day.layout import DefaultLayout
 from onegov.election_day.models import Archive
 
 
-@ElectionDayApp.html(model=Archive, template='homepage.pt',
-                     permission=Public)
+@ElectionDayApp.html(model=Archive, template='homepage.pt', permission=Public)
 def view_archive(self, request):
     return {
         'layout': DefaultLayout(self, request),
-        'year': self.year,
-        'archive_items': self.by_year()
+        'date': self.date,
+        'archive_items': self.by_date()
     }
