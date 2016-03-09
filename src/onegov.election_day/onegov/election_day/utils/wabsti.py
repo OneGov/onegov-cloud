@@ -142,13 +142,13 @@ def import_wabsti_file_majorz(municipalities, election, file, mimetype,
             # Parse the line
             mandates = parse_election(line, line_errors)
             result = parse_election_result(line, line_errors, municipalities)
-            for candidate, candidate_result in parse_candidates(line,
-                                                                line_errors):
-                candidate = candidates.setdefault(
-                    candidate.candidate_id, candidate
-                )
-                candidate_result.candidate_id = candidate.id
-                result.candidate_results.append(candidate_result)
+            if result:
+                for candidate, c_result in parse_candidates(line, line_errors):
+                    candidate = candidates.setdefault(
+                        candidate.candidate_id, candidate
+                    )
+                    c_result.candidate_id = candidate.id
+                    result.candidate_results.append(c_result)
 
             # Pass the errors and continue to next line
             if line_errors:
