@@ -1,0 +1,1530 @@
+{
+    "301": {
+        "district": "Seeland",
+        "name": "Aarberg"
+    },
+    "302": {
+        "district": "Seeland",
+        "name": "Bargen (BE)"
+    },
+    "303": {
+        "district": "Seeland",
+        "name": "Grossaffoltern"
+    },
+    "304": {
+        "district": "Seeland",
+        "name": "Kallnach"
+    },
+    "305": {
+        "district": "Seeland",
+        "name": "Kappelen"
+    },
+    "306": {
+        "district": "Seeland",
+        "name": "Lyss"
+    },
+    "307": {
+        "district": "Bern-Mittelland",
+        "name": "Meikirch"
+    },
+    "308": {
+        "district": "Seeland",
+        "name": "Niederried bei Kallnach"
+    },
+    "309": {
+        "district": "Seeland",
+        "name": "Radelfingen"
+    },
+    "310": {
+        "district": "Seeland",
+        "name": "Rapperswil (BE)"
+    },
+    "311": {
+        "district": "Seeland",
+        "name": "Sch\u00fcpfen"
+    },
+    "312": {
+        "district": "Seeland",
+        "name": "Seedorf (BE)"
+    },
+    "321": {
+        "district": "Oberaargau",
+        "name": "Aarwangen"
+    },
+    "322": {
+        "district": "Oberaargau",
+        "name": "Auswil"
+    },
+    "323": {
+        "district": "Oberaargau",
+        "name": "Bannwil"
+    },
+    "324": {
+        "district": "Oberaargau",
+        "name": "Bleienbach"
+    },
+    "325": {
+        "district": "Oberaargau",
+        "name": "Busswil bei Melchnau"
+    },
+    "326": {
+        "district": "Oberaargau",
+        "name": "Gondiswil"
+    },
+    "329": {
+        "district": "Oberaargau",
+        "name": "Langenthal"
+    },
+    "331": {
+        "district": "Oberaargau",
+        "name": "Lotzwil"
+    },
+    "332": {
+        "district": "Oberaargau",
+        "name": "Madiswil"
+    },
+    "333": {
+        "district": "Oberaargau",
+        "name": "Melchnau"
+    },
+    "334": {
+        "district": "Oberaargau",
+        "name": "Obersteckholz"
+    },
+    "335": {
+        "district": "Oberaargau",
+        "name": "Oeschenbach"
+    },
+    "336": {
+        "district": "Oberaargau",
+        "name": "Reisiswil"
+    },
+    "337": {
+        "district": "Oberaargau",
+        "name": "Roggwil (BE)"
+    },
+    "338": {
+        "district": "Oberaargau",
+        "name": "Rohrbach"
+    },
+    "339": {
+        "district": "Oberaargau",
+        "name": "Rohrbachgraben"
+    },
+    "340": {
+        "district": "Oberaargau",
+        "name": "R\u00fctschelen"
+    },
+    "341": {
+        "district": "Oberaargau",
+        "name": "Schwarzh\u00e4usern"
+    },
+    "342": {
+        "district": "Oberaargau",
+        "name": "Thunstetten"
+    },
+    "344": {
+        "district": "Oberaargau",
+        "name": "Ursenbach"
+    },
+    "345": {
+        "district": "Oberaargau",
+        "name": "Wynau"
+    },
+    "351": {
+        "district": "Bern-Mittelland",
+        "name": "Bern"
+    },
+    "352": {
+        "district": "Bern-Mittelland",
+        "name": "Bolligen"
+    },
+    "353": {
+        "district": "Bern-Mittelland",
+        "name": "Bremgarten bei Bern"
+    },
+    "354": {
+        "district": "Bern-Mittelland",
+        "name": "Kirchlindach"
+    },
+    "355": {
+        "district": "Bern-Mittelland",
+        "name": "K\u00f6niz"
+    },
+    "356": {
+        "district": "Bern-Mittelland",
+        "name": "Muri bei Bern"
+    },
+    "357": {
+        "district": "Bern-Mittelland",
+        "name": "Oberbalm"
+    },
+    "358": {
+        "district": "Bern-Mittelland",
+        "name": "Stettlen"
+    },
+    "359": {
+        "district": "Bern-Mittelland",
+        "name": "Vechigen"
+    },
+    "360": {
+        "district": "Bern-Mittelland",
+        "name": "Wohlen bei Bern"
+    },
+    "361": {
+        "district": "Bern-Mittelland",
+        "name": "Zollikofen"
+    },
+    "362": {
+        "district": "Bern-Mittelland",
+        "name": "Ittigen"
+    },
+    "363": {
+        "district": "Bern-Mittelland",
+        "name": "Ostermundigen"
+    },
+    "371": {
+        "district": "Biel/Bienne",
+        "name": "Biel/Bienne"
+    },
+    "372": {
+        "district": "Biel/Bienne",
+        "name": "Evilard"
+    },
+    "381": {
+        "district": "Seeland",
+        "name": "Arch"
+    },
+    "382": {
+        "district": "Seeland",
+        "name": "B\u00fcetigen"
+    },
+    "383": {
+        "district": "Seeland",
+        "name": "B\u00fcren an der Aare"
+    },
+    "385": {
+        "district": "Seeland",
+        "name": "Diessbach bei B\u00fcren"
+    },
+    "386": {
+        "district": "Seeland",
+        "name": "Dotzigen"
+    },
+    "387": {
+        "district": "Biel/Bienne",
+        "name": "Lengnau (BE)"
+    },
+    "388": {
+        "district": "Seeland",
+        "name": "Leuzigen"
+    },
+    "389": {
+        "district": "Seeland",
+        "name": "Meienried"
+    },
+    "390": {
+        "district": "Biel/Bienne",
+        "name": "Meinisberg"
+    },
+    "391": {
+        "district": "Seeland",
+        "name": "Oberwil bei B\u00fcren"
+    },
+    "392": {
+        "district": "Biel/Bienne",
+        "name": "Pieterlen"
+    },
+    "393": {
+        "district": "Seeland",
+        "name": "R\u00fcti bei B\u00fcren"
+    },
+    "394": {
+        "district": "Seeland",
+        "name": "Wengi"
+    },
+    "401": {
+        "district": "Emmental",
+        "name": "Aefligen"
+    },
+    "402": {
+        "district": "Emmental",
+        "name": "Alchenstorf"
+    },
+    "403": {
+        "district": "Bern-Mittelland",
+        "name": "B\u00e4riswil"
+    },
+    "404": {
+        "district": "Emmental",
+        "name": "Burgdorf"
+    },
+    "405": {
+        "district": "Emmental",
+        "name": "Ersigen"
+    },
+    "406": {
+        "district": "Emmental",
+        "name": "Hasle bei Burgdorf"
+    },
+    "407": {
+        "district": "Emmental",
+        "name": "Heimiswil"
+    },
+    "408": {
+        "district": "Emmental",
+        "name": "Hellsau"
+    },
+    "409": {
+        "district": "Emmental",
+        "name": "Hindelbank"
+    },
+    "410": {
+        "district": "Emmental",
+        "name": "H\u00f6chstetten"
+    },
+    "411": {
+        "district": "Emmental",
+        "name": "Kernenried"
+    },
+    "412": {
+        "district": "Emmental",
+        "name": "Kirchberg (BE)"
+    },
+    "413": {
+        "district": "Emmental",
+        "name": "Koppigen"
+    },
+    "414": {
+        "district": "Emmental",
+        "name": "Krauchthal"
+    },
+    "415": {
+        "district": "Emmental",
+        "name": "Lyssach"
+    },
+    "416": {
+        "district": "Emmental",
+        "name": "M\u00f6tschwil"
+    },
+    "417": {
+        "district": "Emmental",
+        "name": "Nieder\u00f6sch"
+    },
+    "418": {
+        "district": "Emmental",
+        "name": "Oberburg"
+    },
+    "419": {
+        "district": "Emmental",
+        "name": "Ober\u00f6sch"
+    },
+    "420": {
+        "district": "Emmental",
+        "name": "R\u00fcdtligen-Alchenfl\u00fch"
+    },
+    "421": {
+        "district": "Emmental",
+        "name": "Rumendingen"
+    },
+    "422": {
+        "district": "Emmental",
+        "name": "R\u00fcti bei Lyssach"
+    },
+    "423": {
+        "district": "Emmental",
+        "name": "Willadingen"
+    },
+    "424": {
+        "district": "Emmental",
+        "name": "Wynigen"
+    },
+    "431": {
+        "district": "Jura bernois",
+        "name": "Corg\u00e9mont"
+    },
+    "432": {
+        "district": "Jura bernois",
+        "name": "Cormoret"
+    },
+    "433": {
+        "district": "Jura bernois",
+        "name": "Cort\u00e9bert"
+    },
+    "434": {
+        "district": "Jura bernois",
+        "name": "Courtelary"
+    },
+    "435": {
+        "district": "Jura bernois",
+        "name": "La Ferri\u00e8re"
+    },
+    "436": {
+        "district": "Jura bernois",
+        "name": "La Heutte"
+    },
+    "437": {
+        "district": "Jura bernois",
+        "name": "Mont-Tramelan"
+    },
+    "438": {
+        "district": "Jura bernois",
+        "name": "Orvin"
+    },
+    "439": {
+        "district": "Jura bernois",
+        "name": "P\u00e9ry"
+    },
+    "440": {
+        "district": "Jura bernois",
+        "name": "Plagne"
+    },
+    "441": {
+        "district": "Jura bernois",
+        "name": "Renan (BE)"
+    },
+    "442": {
+        "district": "Jura bernois",
+        "name": "Romont (BE)"
+    },
+    "443": {
+        "district": "Jura bernois",
+        "name": "Saint-Imier"
+    },
+    "444": {
+        "district": "Jura bernois",
+        "name": "Sonceboz-Sombeval"
+    },
+    "445": {
+        "district": "Jura bernois",
+        "name": "Sonvilier"
+    },
+    "446": {
+        "district": "Jura bernois",
+        "name": "Tramelan"
+    },
+    "447": {
+        "district": "Jura bernois",
+        "name": "Vauffelin"
+    },
+    "448": {
+        "district": "Jura bernois",
+        "name": "Villeret"
+    },
+    "491": {
+        "district": "Seeland",
+        "name": "Br\u00fcttelen"
+    },
+    "492": {
+        "district": "Seeland",
+        "name": "Erlach"
+    },
+    "493": {
+        "district": "Seeland",
+        "name": "Finsterhennen"
+    },
+    "494": {
+        "district": "Seeland",
+        "name": "Gals"
+    },
+    "495": {
+        "district": "Seeland",
+        "name": "Gampelen"
+    },
+    "496": {
+        "district": "Seeland",
+        "name": "Ins"
+    },
+    "497": {
+        "district": "Seeland",
+        "name": "L\u00fcscherz"
+    },
+    "498": {
+        "district": "Seeland",
+        "name": "M\u00fcntschemier"
+    },
+    "499": {
+        "district": "Seeland",
+        "name": "Siselen"
+    },
+    "500": {
+        "district": "Seeland",
+        "name": "Treiten"
+    },
+    "501": {
+        "district": "Seeland",
+        "name": "Tschugg"
+    },
+    "502": {
+        "district": "Seeland",
+        "name": "Vinelz"
+    },
+    "532": {
+        "district": "Seeland",
+        "name": "Bangerten"
+    },
+    "533": {
+        "district": "Emmental",
+        "name": "B\u00e4tterkinden"
+    },
+    "534": {
+        "district": "Bern-Mittelland",
+        "name": "B\u00fcren zum Hof"
+    },
+    "535": {
+        "district": "Bern-Mittelland",
+        "name": "Deisswil bei M\u00fcnchenbuchsee"
+    },
+    "536": {
+        "district": "Bern-Mittelland",
+        "name": "Diemerswil"
+    },
+    "537": {
+        "district": "Bern-Mittelland",
+        "name": "Etzelkofen"
+    },
+    "538": {
+        "district": "Bern-Mittelland",
+        "name": "Fraubrunnen"
+    },
+    "539": {
+        "district": "Bern-Mittelland",
+        "name": "Grafenried"
+    },
+    "540": {
+        "district": "Bern-Mittelland",
+        "name": "Jegenstorf"
+    },
+    "541": {
+        "district": "Bern-Mittelland",
+        "name": "Iffwil"
+    },
+    "542": {
+        "district": "Bern-Mittelland",
+        "name": "Limpach"
+    },
+    "543": {
+        "district": "Bern-Mittelland",
+        "name": "Mattstetten"
+    },
+    "544": {
+        "district": "Bern-Mittelland",
+        "name": "Moosseedorf"
+    },
+    "545": {
+        "district": "Bern-Mittelland",
+        "name": "M\u00fclchi"
+    },
+    "546": {
+        "district": "Bern-Mittelland",
+        "name": "M\u00fcnchenbuchsee"
+    },
+    "547": {
+        "district": "Bern-Mittelland",
+        "name": "M\u00fcnchringen"
+    },
+    "548": {
+        "district": "Seeland",
+        "name": "Ruppoldsried"
+    },
+    "549": {
+        "district": "Bern-Mittelland",
+        "name": "Schalunen"
+    },
+    "550": {
+        "district": "Bern-Mittelland",
+        "name": "Scheunen"
+    },
+    "551": {
+        "district": "Bern-Mittelland",
+        "name": "Urtenen-Sch\u00f6nb\u00fchl"
+    },
+    "552": {
+        "district": "Emmental",
+        "name": "Utzenstorf"
+    },
+    "553": {
+        "district": "Bern-Mittelland",
+        "name": "Wiggiswil"
+    },
+    "554": {
+        "district": "Emmental",
+        "name": "Wiler bei Utzenstorf"
+    },
+    "555": {
+        "district": "Bern-Mittelland",
+        "name": "Zauggenried"
+    },
+    "556": {
+        "district": "Emmental",
+        "name": "Zielebach"
+    },
+    "557": {
+        "district": "Bern-Mittelland",
+        "name": "Zuzwil (BE)"
+    },
+    "561": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Adelboden"
+    },
+    "562": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Aeschi bei Spiez"
+    },
+    "563": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Frutigen"
+    },
+    "564": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Kandergrund"
+    },
+    "565": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Kandersteg"
+    },
+    "566": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Krattigen"
+    },
+    "567": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Reichenbach im Kandertal"
+    },
+    "571": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Beatenberg"
+    },
+    "572": {
+        "district": "Interlaken-Oberhasli",
+        "name": "B\u00f6nigen"
+    },
+    "573": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Brienz (BE)"
+    },
+    "574": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Brienzwiler"
+    },
+    "575": {
+        "district": "Interlaken-Oberhasli",
+        "name": "D\u00e4rligen"
+    },
+    "576": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Grindelwald"
+    },
+    "577": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Gsteigwiler"
+    },
+    "578": {
+        "district": "Interlaken-Oberhasli",
+        "name": "G\u00fcndlischwand"
+    },
+    "579": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Habkern"
+    },
+    "580": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Hofstetten bei Brienz"
+    },
+    "581": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Interlaken"
+    },
+    "582": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Iseltwald"
+    },
+    "584": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Lauterbrunnen"
+    },
+    "585": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Leissigen"
+    },
+    "586": {
+        "district": "Interlaken-Oberhasli",
+        "name": "L\u00fctschental"
+    },
+    "587": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Matten bei Interlaken"
+    },
+    "588": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Niederried bei Interlaken"
+    },
+    "589": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Oberried am Brienzersee"
+    },
+    "590": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Ringgenberg (BE)"
+    },
+    "591": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Saxeten"
+    },
+    "592": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Schwanden bei Brienz"
+    },
+    "593": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Unterseen"
+    },
+    "594": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Wilderswil"
+    },
+    "602": {
+        "district": "Bern-Mittelland",
+        "name": "Arni (BE)"
+    },
+    "603": {
+        "district": "Bern-Mittelland",
+        "name": "Biglen"
+    },
+    "604": {
+        "district": "Bern-Mittelland",
+        "name": "Bleiken bei Oberdiessbach"
+    },
+    "605": {
+        "district": "Bern-Mittelland",
+        "name": "Bowil"
+    },
+    "606": {
+        "district": "Bern-Mittelland",
+        "name": "Brenzikofen"
+    },
+    "607": {
+        "district": "Bern-Mittelland",
+        "name": "Freimettigen"
+    },
+    "608": {
+        "district": "Bern-Mittelland",
+        "name": "Grossh\u00f6chstetten"
+    },
+    "609": {
+        "district": "Bern-Mittelland",
+        "name": "H\u00e4utligen"
+    },
+    "610": {
+        "district": "Bern-Mittelland",
+        "name": "Herbligen"
+    },
+    "611": {
+        "district": "Bern-Mittelland",
+        "name": "Kiesen"
+    },
+    "612": {
+        "district": "Bern-Mittelland",
+        "name": "Konolfingen"
+    },
+    "613": {
+        "district": "Bern-Mittelland",
+        "name": "Landiswil"
+    },
+    "614": {
+        "district": "Bern-Mittelland",
+        "name": "Linden"
+    },
+    "615": {
+        "district": "Bern-Mittelland",
+        "name": "Mirchel"
+    },
+    "616": {
+        "district": "Bern-Mittelland",
+        "name": "M\u00fcnsingen"
+    },
+    "617": {
+        "district": "Bern-Mittelland",
+        "name": "Niederh\u00fcnigen"
+    },
+    "619": {
+        "district": "Bern-Mittelland",
+        "name": "Oberdiessbach"
+    },
+    "620": {
+        "district": "Bern-Mittelland",
+        "name": "Oberthal"
+    },
+    "622": {
+        "district": "Bern-Mittelland",
+        "name": "Oppligen"
+    },
+    "623": {
+        "district": "Bern-Mittelland",
+        "name": "Rubigen"
+    },
+    "624": {
+        "district": "Bern-Mittelland",
+        "name": "Schlosswil"
+    },
+    "625": {
+        "district": "Bern-Mittelland",
+        "name": "T\u00e4gertschi"
+    },
+    "626": {
+        "district": "Bern-Mittelland",
+        "name": "Walkringen"
+    },
+    "627": {
+        "district": "Bern-Mittelland",
+        "name": "Worb"
+    },
+    "628": {
+        "district": "Bern-Mittelland",
+        "name": "Z\u00e4ziwil"
+    },
+    "629": {
+        "district": "Bern-Mittelland",
+        "name": "Oberh\u00fcnigen"
+    },
+    "630": {
+        "district": "Bern-Mittelland",
+        "name": "Allmendingen"
+    },
+    "631": {
+        "district": "Bern-Mittelland",
+        "name": "Trimstein"
+    },
+    "632": {
+        "district": "Bern-Mittelland",
+        "name": "Wichtrach"
+    },
+    "661": {
+        "district": "Bern-Mittelland",
+        "name": "Clavaleyres"
+    },
+    "662": {
+        "district": "Bern-Mittelland",
+        "name": "Ferenbalm"
+    },
+    "663": {
+        "district": "Bern-Mittelland",
+        "name": "Frauenkappelen"
+    },
+    "664": {
+        "district": "Bern-Mittelland",
+        "name": "Golaten"
+    },
+    "665": {
+        "district": "Bern-Mittelland",
+        "name": "Gurbr\u00fc"
+    },
+    "666": {
+        "district": "Bern-Mittelland",
+        "name": "Kriechenwil"
+    },
+    "667": {
+        "district": "Bern-Mittelland",
+        "name": "Laupen"
+    },
+    "668": {
+        "district": "Bern-Mittelland",
+        "name": "M\u00fchleberg"
+    },
+    "669": {
+        "district": "Bern-Mittelland",
+        "name": "M\u00fcnchenwiler"
+    },
+    "670": {
+        "district": "Bern-Mittelland",
+        "name": "Neuenegg"
+    },
+    "671": {
+        "district": "Bern-Mittelland",
+        "name": "Wileroltigen"
+    },
+    "681": {
+        "district": "Jura bernois",
+        "name": "Belprahon"
+    },
+    "682": {
+        "district": "Jura bernois",
+        "name": "B\u00e9vilard"
+    },
+    "683": {
+        "district": "Jura bernois",
+        "name": "Champoz"
+    },
+    "684": {
+        "district": "Jura bernois",
+        "name": "Ch\u00e2telat"
+    },
+    "687": {
+        "district": "Jura bernois",
+        "name": "Corcelles (BE)"
+    },
+    "690": {
+        "district": "Jura bernois",
+        "name": "Court"
+    },
+    "691": {
+        "district": "Jura bernois",
+        "name": "Cr\u00e9mines"
+    },
+    "692": {
+        "district": "Jura bernois",
+        "name": "Eschert"
+    },
+    "694": {
+        "district": "Jura bernois",
+        "name": "Grandval"
+    },
+    "696": {
+        "district": "Jura bernois",
+        "name": "Loveresse"
+    },
+    "697": {
+        "district": "Jura bernois",
+        "name": "Malleray"
+    },
+    "699": {
+        "district": "Jura bernois",
+        "name": "Monible"
+    },
+    "700": {
+        "district": "Jura bernois",
+        "name": "Moutier"
+    },
+    "701": {
+        "district": "Jura bernois",
+        "name": "Perrefitte"
+    },
+    "702": {
+        "district": "Jura bernois",
+        "name": "Pontenet"
+    },
+    "703": {
+        "district": "Jura bernois",
+        "name": "Reconvilier"
+    },
+    "704": {
+        "district": "Jura bernois",
+        "name": "Roches (BE)"
+    },
+    "706": {
+        "district": "Jura bernois",
+        "name": "Saicourt"
+    },
+    "707": {
+        "district": "Jura bernois",
+        "name": "Saules (BE)"
+    },
+    "708": {
+        "district": "Jura bernois",
+        "name": "Schelten"
+    },
+    "709": {
+        "district": "Jura bernois",
+        "name": "Seehof"
+    },
+    "710": {
+        "district": "Jura bernois",
+        "name": "Sornetan"
+    },
+    "711": {
+        "district": "Jura bernois",
+        "name": "Sorvilier"
+    },
+    "712": {
+        "district": "Jura bernois",
+        "name": "Souboz"
+    },
+    "713": {
+        "district": "Jura bernois",
+        "name": "Tavannes"
+    },
+    "715": {
+        "district": "Jura bernois",
+        "name": "Reb\u00e9velier"
+    },
+    "721": {
+        "district": "Jura bernois",
+        "name": "Diesse"
+    },
+    "722": {
+        "district": "Jura bernois",
+        "name": "Lamboing"
+    },
+    "723": {
+        "district": "Jura bernois",
+        "name": "La Neuveville"
+    },
+    "724": {
+        "district": "Jura bernois",
+        "name": "Nods"
+    },
+    "725": {
+        "district": "Jura bernois",
+        "name": "Pr\u00eales"
+    },
+    "731": {
+        "district": "Biel/Bienne",
+        "name": "Aegerten"
+    },
+    "732": {
+        "district": "Biel/Bienne",
+        "name": "Bellmund"
+    },
+    "733": {
+        "district": "Biel/Bienne",
+        "name": "Br\u00fcgg"
+    },
+    "734": {
+        "district": "Seeland",
+        "name": "B\u00fchl"
+    },
+    "735": {
+        "district": "Seeland",
+        "name": "Epsach"
+    },
+    "736": {
+        "district": "Seeland",
+        "name": "Hagneck"
+    },
+    "737": {
+        "district": "Seeland",
+        "name": "Hermrigen"
+    },
+    "738": {
+        "district": "Seeland",
+        "name": "Jens"
+    },
+    "739": {
+        "district": "Biel/Bienne",
+        "name": "Ipsach"
+    },
+    "740": {
+        "district": "Biel/Bienne",
+        "name": "Ligerz"
+    },
+    "741": {
+        "district": "Seeland",
+        "name": "Merzligen"
+    },
+    "742": {
+        "district": "Biel/Bienne",
+        "name": "M\u00f6rigen"
+    },
+    "743": {
+        "district": "Biel/Bienne",
+        "name": "Nidau"
+    },
+    "744": {
+        "district": "Biel/Bienne",
+        "name": "Orpund"
+    },
+    "745": {
+        "district": "Biel/Bienne",
+        "name": "Port"
+    },
+    "746": {
+        "district": "Biel/Bienne",
+        "name": "Safnern"
+    },
+    "747": {
+        "district": "Biel/Bienne",
+        "name": "Scheuren"
+    },
+    "748": {
+        "district": "Biel/Bienne",
+        "name": "Schwadernau"
+    },
+    "749": {
+        "district": "Seeland",
+        "name": "Studen (BE)"
+    },
+    "750": {
+        "district": "Biel/Bienne",
+        "name": "Sutz-Lattrigen"
+    },
+    "751": {
+        "district": "Seeland",
+        "name": "T\u00e4uffelen"
+    },
+    "754": {
+        "district": "Seeland",
+        "name": "Walperswil"
+    },
+    "755": {
+        "district": "Seeland",
+        "name": "Worben"
+    },
+    "756": {
+        "district": "Biel/Bienne",
+        "name": "Twann-T\u00fcscherz"
+    },
+    "761": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "D\u00e4rstetten"
+    },
+    "762": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Diemtigen"
+    },
+    "763": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Erlenbach im Simmental"
+    },
+    "764": {
+        "district": "Thun",
+        "name": "Niederstocken"
+    },
+    "765": {
+        "district": "Thun",
+        "name": "Oberstocken"
+    },
+    "766": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Oberwil im Simmental"
+    },
+    "767": {
+        "district": "Thun",
+        "name": "Reutigen"
+    },
+    "768": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Spiez"
+    },
+    "769": {
+        "district": "Frutigen-Niedersimmental",
+        "name": "Wimmis"
+    },
+    "781": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Gadmen"
+    },
+    "782": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Guttannen"
+    },
+    "783": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Hasliberg"
+    },
+    "784": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Innertkirchen"
+    },
+    "785": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Meiringen"
+    },
+    "786": {
+        "district": "Interlaken-Oberhasli",
+        "name": "Schattenhalb"
+    },
+    "791": {
+        "district": "Obersimmental-Saanen",
+        "name": "Boltigen"
+    },
+    "792": {
+        "district": "Obersimmental-Saanen",
+        "name": "Lenk"
+    },
+    "793": {
+        "district": "Obersimmental-Saanen",
+        "name": "St. Stephan"
+    },
+    "794": {
+        "district": "Obersimmental-Saanen",
+        "name": "Zweisimmen"
+    },
+    "841": {
+        "district": "Obersimmental-Saanen",
+        "name": "Gsteig"
+    },
+    "842": {
+        "district": "Obersimmental-Saanen",
+        "name": "Lauenen"
+    },
+    "843": {
+        "district": "Obersimmental-Saanen",
+        "name": "Saanen"
+    },
+    "852": {
+        "district": "Bern-Mittelland",
+        "name": "Guggisberg"
+    },
+    "853": {
+        "district": "Bern-Mittelland",
+        "name": "R\u00fcschegg"
+    },
+    "855": {
+        "district": "Bern-Mittelland",
+        "name": "Schwarzenburg"
+    },
+    "861": {
+        "district": "Bern-Mittelland",
+        "name": "Belp"
+    },
+    "863": {
+        "district": "Thun",
+        "name": "Burgistein"
+    },
+    "865": {
+        "district": "Bern-Mittelland",
+        "name": "Gelterfingen"
+    },
+    "866": {
+        "district": "Bern-Mittelland",
+        "name": "Gerzensee"
+    },
+    "867": {
+        "district": "Thun",
+        "name": "Gurzelen"
+    },
+    "868": {
+        "district": "Bern-Mittelland",
+        "name": "Jaberg"
+    },
+    "869": {
+        "district": "Bern-Mittelland",
+        "name": "Kaufdorf"
+    },
+    "870": {
+        "district": "Bern-Mittelland",
+        "name": "Kehrsatz"
+    },
+    "871": {
+        "district": "Thun",
+        "name": "Kienersr\u00fcti"
+    },
+    "872": {
+        "district": "Bern-Mittelland",
+        "name": "Kirchdorf (BE)"
+    },
+    "873": {
+        "district": "Bern-Mittelland",
+        "name": "Kirchenthurnen"
+    },
+    "874": {
+        "district": "Bern-Mittelland",
+        "name": "Lohnstorf"
+    },
+    "875": {
+        "district": "Bern-Mittelland",
+        "name": "M\u00fchledorf (BE)"
+    },
+    "876": {
+        "district": "Bern-Mittelland",
+        "name": "M\u00fchlethurnen"
+    },
+    "877": {
+        "district": "Bern-Mittelland",
+        "name": "Niedermuhlern"
+    },
+    "878": {
+        "district": "Bern-Mittelland",
+        "name": "Noflen"
+    },
+    "879": {
+        "district": "Bern-Mittelland",
+        "name": "Riggisberg"
+    },
+    "880": {
+        "district": "Bern-Mittelland",
+        "name": "R\u00fceggisberg"
+    },
+    "881": {
+        "district": "Bern-Mittelland",
+        "name": "R\u00fcmligen"
+    },
+    "883": {
+        "district": "Thun",
+        "name": "Seftigen"
+    },
+    "884": {
+        "district": "Bern-Mittelland",
+        "name": "Toffen"
+    },
+    "885": {
+        "district": "Thun",
+        "name": "Uttigen"
+    },
+    "886": {
+        "district": "Thun",
+        "name": "Wattenwil"
+    },
+    "888": {
+        "district": "Bern-Mittelland",
+        "name": "Wald (BE)"
+    },
+    "901": {
+        "district": "Emmental",
+        "name": "Eggiwil"
+    },
+    "902": {
+        "district": "Emmental",
+        "name": "Langnau im Emmental"
+    },
+    "903": {
+        "district": "Emmental",
+        "name": "Lauperswil"
+    },
+    "904": {
+        "district": "Emmental",
+        "name": "R\u00f6thenbach im Emmental"
+    },
+    "905": {
+        "district": "Emmental",
+        "name": "R\u00fcderswil"
+    },
+    "906": {
+        "district": "Emmental",
+        "name": "Schangnau"
+    },
+    "907": {
+        "district": "Emmental",
+        "name": "Signau"
+    },
+    "908": {
+        "district": "Emmental",
+        "name": "Trub"
+    },
+    "909": {
+        "district": "Emmental",
+        "name": "Trubschachen"
+    },
+    "921": {
+        "district": "Thun",
+        "name": "Amsoldingen"
+    },
+    "922": {
+        "district": "Thun",
+        "name": "Blumenstein"
+    },
+    "923": {
+        "district": "Thun",
+        "name": "Buchholterberg"
+    },
+    "924": {
+        "district": "Thun",
+        "name": "Eriz"
+    },
+    "925": {
+        "district": "Thun",
+        "name": "Fahrni"
+    },
+    "927": {
+        "district": "Thun",
+        "name": "Heiligenschwendi"
+    },
+    "928": {
+        "district": "Thun",
+        "name": "Heimberg"
+    },
+    "929": {
+        "district": "Thun",
+        "name": "Hilterfingen"
+    },
+    "930": {
+        "district": "Thun",
+        "name": "H\u00f6fen"
+    },
+    "931": {
+        "district": "Thun",
+        "name": "Homberg"
+    },
+    "932": {
+        "district": "Thun",
+        "name": "Horrenbach-Buchen"
+    },
+    "934": {
+        "district": "Thun",
+        "name": "Oberhofen am Thunersee"
+    },
+    "935": {
+        "district": "Thun",
+        "name": "Oberlangenegg"
+    },
+    "936": {
+        "district": "Thun",
+        "name": "Pohlern"
+    },
+    "937": {
+        "district": "Thun",
+        "name": "Schwendibach"
+    },
+    "938": {
+        "district": "Thun",
+        "name": "Sigriswil"
+    },
+    "939": {
+        "district": "Thun",
+        "name": "Steffisburg"
+    },
+    "940": {
+        "district": "Thun",
+        "name": "Teuffenthal (BE)"
+    },
+    "941": {
+        "district": "Thun",
+        "name": "Thierachern"
+    },
+    "942": {
+        "district": "Thun",
+        "name": "Thun"
+    },
+    "943": {
+        "district": "Thun",
+        "name": "Uebeschi"
+    },
+    "944": {
+        "district": "Thun",
+        "name": "Uetendorf"
+    },
+    "945": {
+        "district": "Thun",
+        "name": "Unterlangenegg"
+    },
+    "946": {
+        "district": "Thun",
+        "name": "Wachseldorn"
+    },
+    "947": {
+        "district": "Thun",
+        "name": "Zwieselberg"
+    },
+    "948": {
+        "district": "Thun",
+        "name": "Forst-L\u00e4ngenb\u00fchl"
+    },
+    "951": {
+        "district": "Emmental",
+        "name": "Affoltern im Emmental"
+    },
+    "952": {
+        "district": "Emmental",
+        "name": "D\u00fcrrenroth"
+    },
+    "953": {
+        "district": "Oberaargau",
+        "name": "Eriswil"
+    },
+    "954": {
+        "district": "Oberaargau",
+        "name": "Huttwil"
+    },
+    "955": {
+        "district": "Emmental",
+        "name": "L\u00fctzelfl\u00fch"
+    },
+    "956": {
+        "district": "Emmental",
+        "name": "R\u00fcegsau"
+    },
+    "957": {
+        "district": "Emmental",
+        "name": "Sumiswald"
+    },
+    "958": {
+        "district": "Emmental",
+        "name": "Trachselwald"
+    },
+    "959": {
+        "district": "Oberaargau",
+        "name": "Walterswil (BE)"
+    },
+    "960": {
+        "district": "Oberaargau",
+        "name": "Wyssachen"
+    },
+    "971": {
+        "district": "Oberaargau",
+        "name": "Attiswil"
+    },
+    "972": {
+        "district": "Oberaargau",
+        "name": "Berken"
+    },
+    "973": {
+        "district": "Oberaargau",
+        "name": "Bettenhausen"
+    },
+    "975": {
+        "district": "Oberaargau",
+        "name": "Farnern"
+    },
+    "976": {
+        "district": "Oberaargau",
+        "name": "Graben"
+    },
+    "977": {
+        "district": "Oberaargau",
+        "name": "Heimenhausen"
+    },
+    "978": {
+        "district": "Oberaargau",
+        "name": "Hermiswil"
+    },
+    "979": {
+        "district": "Oberaargau",
+        "name": "Herzogenbuchsee"
+    },
+    "980": {
+        "district": "Oberaargau",
+        "name": "Inkwil"
+    },
+    "981": {
+        "district": "Oberaargau",
+        "name": "Niederbipp"
+    },
+    "982": {
+        "district": "Oberaargau",
+        "name": "Nieder\u00f6nz"
+    },
+    "983": {
+        "district": "Oberaargau",
+        "name": "Oberbipp"
+    },
+    "985": {
+        "district": "Oberaargau",
+        "name": "Ochlenberg"
+    },
+    "987": {
+        "district": "Oberaargau",
+        "name": "Rumisberg"
+    },
+    "988": {
+        "district": "Oberaargau",
+        "name": "Seeberg"
+    },
+    "989": {
+        "district": "Oberaargau",
+        "name": "Th\u00f6rigen"
+    },
+    "990": {
+        "district": "Oberaargau",
+        "name": "Walliswil bei Niederbipp"
+    },
+    "991": {
+        "district": "Oberaargau",
+        "name": "Walliswil bei Wangen"
+    },
+    "992": {
+        "district": "Oberaargau",
+        "name": "Wangen an der Aare"
+    },
+    "993": {
+        "district": "Oberaargau",
+        "name": "Wangenried"
+    },
+    "995": {
+        "district": "Oberaargau",
+        "name": "Wiedlisbach"
+    },
+    "996": {
+        "district": "Oberaargau",
+        "name": "Wolfisberg"
+    }
+}

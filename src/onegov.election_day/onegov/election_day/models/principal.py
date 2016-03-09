@@ -52,3 +52,13 @@ class Principal(object):
                 result[year] = {int(k): v for k, v in yaml.load(f).items()}
 
         return result
+
+    def year_available(self, year, map_required=True):
+        if year not in self.municipalities:
+            return False
+
+        if map_required:
+            path = utils.module_path(onegov.election_day, 'static/mapdata')
+            return Path('{}/{}'.format(path, year)).is_dir()
+
+        return True

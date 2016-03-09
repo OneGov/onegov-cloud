@@ -45,7 +45,7 @@ def import_file(principal, vote, ballot_type, file, mimetype):
         except IOError:
             csvfile = convert_xls_to_csv(file)
 
-    if vote.date.year not in principal.municipalities:
+    if not principal.year_available(vote.date.year):
         return {'status': 'error', 'errors': [
             FileImportError(_("The year ${year} is not yet supported",
                 mapping={'year': vote.date.year}

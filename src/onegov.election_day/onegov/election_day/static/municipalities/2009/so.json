@@ -1,0 +1,502 @@
+{
+    "2401": {
+        "district": "G\u00e4u",
+        "name": "Egerkingen"
+    },
+    "2402": {
+        "district": "G\u00e4u",
+        "name": "H\u00e4rkingen"
+    },
+    "2403": {
+        "district": "G\u00e4u",
+        "name": "Kestenholz"
+    },
+    "2404": {
+        "district": "G\u00e4u",
+        "name": "Neuendorf"
+    },
+    "2405": {
+        "district": "G\u00e4u",
+        "name": "Niederbuchsiten"
+    },
+    "2406": {
+        "district": "G\u00e4u",
+        "name": "Oberbuchsiten"
+    },
+    "2407": {
+        "district": "G\u00e4u",
+        "name": "Oensingen"
+    },
+    "2408": {
+        "district": "G\u00e4u",
+        "name": "Wolfwil"
+    },
+    "2421": {
+        "district": "Thal",
+        "name": "Aedermannsdorf"
+    },
+    "2422": {
+        "district": "Thal",
+        "name": "Balsthal"
+    },
+    "2423": {
+        "district": "Thal",
+        "name": "G\u00e4nsbrunnen"
+    },
+    "2424": {
+        "district": "Thal",
+        "name": "Herbetswil"
+    },
+    "2425": {
+        "district": "Thal",
+        "name": "Holderbank (SO)"
+    },
+    "2426": {
+        "district": "Thal",
+        "name": "Laupersdorf"
+    },
+    "2427": {
+        "district": "Thal",
+        "name": "Matzendorf"
+    },
+    "2428": {
+        "district": "Thal",
+        "name": "M\u00fcmliswil-Ramiswil"
+    },
+    "2429": {
+        "district": "Thal",
+        "name": "Welschenrohr"
+    },
+    "2441": {
+        "district": "Bucheggberg",
+        "name": "Aetigkofen"
+    },
+    "2442": {
+        "district": "Bucheggberg",
+        "name": "Aetingen"
+    },
+    "2443": {
+        "district": "Bucheggberg",
+        "name": "Balm bei Messen"
+    },
+    "2444": {
+        "district": "Bucheggberg",
+        "name": "Bibern (SO)"
+    },
+    "2445": {
+        "district": "Bucheggberg",
+        "name": "Biezwil"
+    },
+    "2446": {
+        "district": "Bucheggberg",
+        "name": "Br\u00fcgglen"
+    },
+    "2447": {
+        "district": "Bucheggberg",
+        "name": "Brunnenthal"
+    },
+    "2449": {
+        "district": "Bucheggberg",
+        "name": "Gossliwil"
+    },
+    "2450": {
+        "district": "Bucheggberg",
+        "name": "Hessigkofen"
+    },
+    "2452": {
+        "district": "Bucheggberg",
+        "name": "K\u00fcttigkofen"
+    },
+    "2453": {
+        "district": "Bucheggberg",
+        "name": "Kyburg-Buchegg"
+    },
+    "2454": {
+        "district": "Bucheggberg",
+        "name": "L\u00fcsslingen"
+    },
+    "2455": {
+        "district": "Bucheggberg",
+        "name": "L\u00fcterkofen-Ichertswil"
+    },
+    "2456": {
+        "district": "Bucheggberg",
+        "name": "L\u00fcterswil-G\u00e4chliwil"
+    },
+    "2457": {
+        "district": "Bucheggberg",
+        "name": "Messen"
+    },
+    "2458": {
+        "district": "Bucheggberg",
+        "name": "M\u00fchledorf (SO)"
+    },
+    "2459": {
+        "district": "Bucheggberg",
+        "name": "Nennigkofen"
+    },
+    "2460": {
+        "district": "Bucheggberg",
+        "name": "Oberramsern"
+    },
+    "2461": {
+        "district": "Bucheggberg",
+        "name": "Schnottwil"
+    },
+    "2462": {
+        "district": "Bucheggberg",
+        "name": "Tscheppach"
+    },
+    "2463": {
+        "district": "Bucheggberg",
+        "name": "Unterramsern"
+    },
+    "2471": {
+        "district": "Dorneck",
+        "name": "B\u00e4ttwil"
+    },
+    "2472": {
+        "district": "Dorneck",
+        "name": "B\u00fcren (SO)"
+    },
+    "2473": {
+        "district": "Dorneck",
+        "name": "Dornach"
+    },
+    "2474": {
+        "district": "Dorneck",
+        "name": "Gempen"
+    },
+    "2475": {
+        "district": "Dorneck",
+        "name": "Hochwald"
+    },
+    "2476": {
+        "district": "Dorneck",
+        "name": "Hofstetten-Fl\u00fch"
+    },
+    "2477": {
+        "district": "Dorneck",
+        "name": "Metzerlen-Mariastein"
+    },
+    "2478": {
+        "district": "Dorneck",
+        "name": "Nuglar-St. Pantaleon"
+    },
+    "2479": {
+        "district": "Dorneck",
+        "name": "Rodersdorf"
+    },
+    "2480": {
+        "district": "Dorneck",
+        "name": "Seewen"
+    },
+    "2481": {
+        "district": "Dorneck",
+        "name": "Witterswil"
+    },
+    "2491": {
+        "district": "G\u00f6sgen",
+        "name": "Hauenstein-Ifenthal"
+    },
+    "2492": {
+        "district": "G\u00f6sgen",
+        "name": "Kienberg"
+    },
+    "2493": {
+        "district": "G\u00f6sgen",
+        "name": "Lostorf"
+    },
+    "2495": {
+        "district": "G\u00f6sgen",
+        "name": "Niederg\u00f6sgen"
+    },
+    "2497": {
+        "district": "G\u00f6sgen",
+        "name": "Oberg\u00f6sgen"
+    },
+    "2498": {
+        "district": "G\u00f6sgen",
+        "name": "Rohr (SO)"
+    },
+    "2499": {
+        "district": "G\u00f6sgen",
+        "name": "St\u00fcsslingen"
+    },
+    "2500": {
+        "district": "G\u00f6sgen",
+        "name": "Trimbach"
+    },
+    "2501": {
+        "district": "G\u00f6sgen",
+        "name": "Winznau"
+    },
+    "2502": {
+        "district": "G\u00f6sgen",
+        "name": "Wisen (SO)"
+    },
+    "2503": {
+        "district": "G\u00f6sgen",
+        "name": "Erlinsbach (SO)"
+    },
+    "2511": {
+        "district": "Wasseramt",
+        "name": "Aeschi (SO)"
+    },
+    "2513": {
+        "district": "Wasseramt",
+        "name": "Biberist"
+    },
+    "2514": {
+        "district": "Wasseramt",
+        "name": "Bolken"
+    },
+    "2516": {
+        "district": "Wasseramt",
+        "name": "Deitingen"
+    },
+    "2517": {
+        "district": "Wasseramt",
+        "name": "Derendingen"
+    },
+    "2518": {
+        "district": "Wasseramt",
+        "name": "Etziken"
+    },
+    "2519": {
+        "district": "Wasseramt",
+        "name": "Gerlafingen"
+    },
+    "2520": {
+        "district": "Wasseramt",
+        "name": "Halten"
+    },
+    "2521": {
+        "district": "Wasseramt",
+        "name": "Heinrichswil-Winistorf"
+    },
+    "2522": {
+        "district": "Wasseramt",
+        "name": "Hersiwil"
+    },
+    "2523": {
+        "district": "Wasseramt",
+        "name": "Horriwil"
+    },
+    "2524": {
+        "district": "Wasseramt",
+        "name": "H\u00fcniken"
+    },
+    "2525": {
+        "district": "Wasseramt",
+        "name": "Kriegstetten"
+    },
+    "2526": {
+        "district": "Wasseramt",
+        "name": "Lohn-Ammannsegg"
+    },
+    "2527": {
+        "district": "Wasseramt",
+        "name": "Luterbach"
+    },
+    "2528": {
+        "district": "Wasseramt",
+        "name": "Obergerlafingen"
+    },
+    "2529": {
+        "district": "Wasseramt",
+        "name": "Oekingen"
+    },
+    "2530": {
+        "district": "Wasseramt",
+        "name": "Recherswil"
+    },
+    "2531": {
+        "district": "Wasseramt",
+        "name": "Steinhof"
+    },
+    "2532": {
+        "district": "Wasseramt",
+        "name": "Subingen"
+    },
+    "2534": {
+        "district": "Wasseramt",
+        "name": "Zuchwil"
+    },
+    "2541": {
+        "district": "Lebern",
+        "name": "Balm bei G\u00fcnsberg"
+    },
+    "2542": {
+        "district": "Lebern",
+        "name": "Bellach"
+    },
+    "2543": {
+        "district": "Lebern",
+        "name": "Bettlach"
+    },
+    "2544": {
+        "district": "Lebern",
+        "name": "Feldbrunnen-St. Niklaus"
+    },
+    "2545": {
+        "district": "Lebern",
+        "name": "Flumenthal"
+    },
+    "2546": {
+        "district": "Lebern",
+        "name": "Grenchen"
+    },
+    "2547": {
+        "district": "Lebern",
+        "name": "G\u00fcnsberg"
+    },
+    "2548": {
+        "district": "Lebern",
+        "name": "Hubersdorf"
+    },
+    "2549": {
+        "district": "Lebern",
+        "name": "Kammersrohr"
+    },
+    "2550": {
+        "district": "Lebern",
+        "name": "Langendorf"
+    },
+    "2551": {
+        "district": "Lebern",
+        "name": "Lommiswil"
+    },
+    "2552": {
+        "district": "Lebern",
+        "name": "Niederwil (SO)"
+    },
+    "2553": {
+        "district": "Lebern",
+        "name": "Oberdorf (SO)"
+    },
+    "2554": {
+        "district": "Lebern",
+        "name": "Riedholz"
+    },
+    "2555": {
+        "district": "Lebern",
+        "name": "R\u00fcttenen"
+    },
+    "2556": {
+        "district": "Lebern",
+        "name": "Selzach"
+    },
+    "2571": {
+        "district": "Olten",
+        "name": "Boningen"
+    },
+    "2572": {
+        "district": "Olten",
+        "name": "D\u00e4niken"
+    },
+    "2573": {
+        "district": "Olten",
+        "name": "Dulliken"
+    },
+    "2574": {
+        "district": "Olten",
+        "name": "Eppenberg-W\u00f6schnau"
+    },
+    "2575": {
+        "district": "Olten",
+        "name": "Fulenbach"
+    },
+    "2576": {
+        "district": "Olten",
+        "name": "Gretzenbach"
+    },
+    "2578": {
+        "district": "Olten",
+        "name": "Gunzgen"
+    },
+    "2579": {
+        "district": "Olten",
+        "name": "H\u00e4gendorf"
+    },
+    "2580": {
+        "district": "Olten",
+        "name": "Kappel (SO)"
+    },
+    "2581": {
+        "district": "Olten",
+        "name": "Olten"
+    },
+    "2582": {
+        "district": "Olten",
+        "name": "Rickenbach (SO)"
+    },
+    "2583": {
+        "district": "Olten",
+        "name": "Sch\u00f6nenwerd"
+    },
+    "2584": {
+        "district": "Olten",
+        "name": "Starrkirch-Wil"
+    },
+    "2585": {
+        "district": "Olten",
+        "name": "Walterswil (SO)"
+    },
+    "2586": {
+        "district": "Olten",
+        "name": "Wangen bei Olten"
+    },
+    "2601": {
+        "district": "Solothurn",
+        "name": "Solothurn"
+    },
+    "2611": {
+        "district": "Thierstein",
+        "name": "B\u00e4rschwil"
+    },
+    "2612": {
+        "district": "Thierstein",
+        "name": "Beinwil (SO)"
+    },
+    "2613": {
+        "district": "Thierstein",
+        "name": "Breitenbach"
+    },
+    "2614": {
+        "district": "Thierstein",
+        "name": "B\u00fcsserach"
+    },
+    "2615": {
+        "district": "Thierstein",
+        "name": "Erschwil"
+    },
+    "2616": {
+        "district": "Thierstein",
+        "name": "Fehren"
+    },
+    "2617": {
+        "district": "Thierstein",
+        "name": "Grindel"
+    },
+    "2618": {
+        "district": "Thierstein",
+        "name": "Himmelried"
+    },
+    "2619": {
+        "district": "Thierstein",
+        "name": "Kleinl\u00fctzel"
+    },
+    "2620": {
+        "district": "Thierstein",
+        "name": "Meltingen"
+    },
+    "2621": {
+        "district": "Thierstein",
+        "name": "Nunningen"
+    },
+    "2622": {
+        "district": "Thierstein",
+        "name": "Zullwil"
+    }
+}

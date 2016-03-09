@@ -59,17 +59,32 @@ def test_municipalities():
     }
 
     assert principal.municipalities == {
+        2009: municipalities,
+        2010: municipalities,
+        2011: municipalities,
+        2012: municipalities,
         2013: municipalities,
         2014: municipalities,
         2015: municipalities,
         2016: municipalities,
     }
 
+    for year in range(2009, 2013):
+        assert not principal.year_available(year)
+    for year in range(2013, 2017):
+        assert principal.year_available(year)
+    for year in range(2009, 2017):
+        assert principal.year_available(year, False)
+
     for canton in cantons:
         principal = Principal(
             name=canton, canton=canton, logo=None, color=None
         )
 
+        assert principal.municipalities[2009]
+        assert principal.municipalities[2010]
+        assert principal.municipalities[2011]
+        assert principal.municipalities[2012]
         assert principal.municipalities[2013]
         assert principal.municipalities[2014]
         assert principal.municipalities[2015]

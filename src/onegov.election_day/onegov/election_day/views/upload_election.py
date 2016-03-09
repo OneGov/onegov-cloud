@@ -24,7 +24,7 @@ def view_upload(self, request, form):
 
     if form.submitted(request):
         principal = request.app.principal
-        if self.date.year not in principal.municipalities:
+        if not principal.year_available(self.date.year, False):
             result = {
                 'status': 'error',
                 'errors': [
