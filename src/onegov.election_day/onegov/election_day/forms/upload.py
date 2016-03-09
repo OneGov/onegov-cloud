@@ -61,6 +61,12 @@ class UploadElectionForm(Form):
         render_kw=dict(force_simple=True, **wabsti_dependency.html_data)
     )
 
+    def apply_model(self, model):
+        if model.type == 'majorz':
+            self.statistics.render_kw['data-depends-on'] = 'type/none'
+        else:
+            self.statistics.render_kw['data-depends-on'] = 'type/wabsti'
+
 
 class UploadVoteForm(Form):
 

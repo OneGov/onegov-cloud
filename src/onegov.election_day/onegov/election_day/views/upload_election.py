@@ -61,6 +61,8 @@ def view_upload(self, request, form):
                 if form.complete.data:
                     self.total_municipalities = self.counted_municipalities
 
+    form.apply_model(self)
+
     if result:
         status = result['status']
     else:
