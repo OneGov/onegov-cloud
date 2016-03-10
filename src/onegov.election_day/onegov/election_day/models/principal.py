@@ -53,7 +53,7 @@ class Principal(object):
 
         return result
 
-    def year_available(self, year, map_required=True):
+    def is_year_available(self, year, map_required=True):
         if year not in self.municipalities:
             return False
 
