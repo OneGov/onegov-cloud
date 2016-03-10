@@ -187,7 +187,7 @@ def view_election_candidates(self, request):
         'text': '{} {}'.format(candidate[0], candidate[1]),
         'value': candidate[3],
         'class': 'active' if candidate[2] else 'inactive'
-    } for candidate in candidates]
+    } for candidate in candidates.all()]
 
 
 @ElectionDayApp.json(model=Election, permission=Public, name='lists')
@@ -214,4 +214,4 @@ def view_election_lists(self, request):
         'value': list[1],
         'secondary': list[2],
         'class': 'active' if list[2] > 0 else 'inactive'
-    } for list in lists]
+    } for list in lists.all()]
