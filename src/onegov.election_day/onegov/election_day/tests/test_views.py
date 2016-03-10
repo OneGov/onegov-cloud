@@ -4,6 +4,7 @@ import tarfile
 
 from datetime import date
 from onegov.ballot import VoteCollection
+from onegov.core.csv import convert_xls_to_csv
 from onegov.core.utils import module_path
 from onegov.testing import utils
 from webtest import TestApp as Client
@@ -874,3 +875,151 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
         # candidates
         "3'240", "10'174", "17'034"
     )))
+
+
+def test_view_election_candidates(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    csv = (
+        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
+        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,"
+        "Ungueltige Stimmen,Kandidaten-Nr,Gewaehlt,Name,Vorname,Stimmen,"
+        "Anzahl Gemeinden\n"
+    )
+    csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 1\n"
+    csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 1\n"
+    csv = csv.encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    candidates = client.get('/election/election/candidates')
+    assert all((expected in candidates for expected in (
+        "Engler Stefan", "20", "Schmid Martin", "18"
+    )))
+
+
+def test_view_election_lists(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    csv = (
+        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
+        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Listen-Nr,"
+        "Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,Anzahl Sitze Liste,"
+        "Unveränderte Wahlzettel Liste,Veränderte Wahlzettel Liste,"
+        "Kandidatenstimmen unveränderte Wahlzettel,"
+        "Zusatzstimmen unveränderte Wahlzettel,"
+        "Kandidatenstimmen veränderte Wahlzettel,"
+        "Zusatzstimmen veränderte Wahlzettel,Kandidaten-Nr,Gewählt,Name,"
+        "Vorname,Stimmen unveränderte Wahlzettel,"
+        "Stimmen veränderte Wahlzettel,Stimmen Total aus Wahlzettel,"
+        "01 FDP,02 CVP, Anzahl Gemeinden\n"
+    )
+    csv += (
+        "5,3503,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
+        "nicht gewählt,Casanova,Angela,0,0,0,0,0,1 von 1\n"
+    )
+    csv += (
+        "5,3503,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
+        "nicht gewählt,Caluori,Corina,1,0,1,0,0,1 von 1\n"
+    )
+    csv = csv.encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    lists = client.get('/election/election/lists')
+    assert all((expected in lists for expected in ("FDP", "8", "CVP", "5")))
+
+
+def test_view_election_export(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    csv = (
+        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
+        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Listen-Nr,"
+        "Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,Anzahl Sitze Liste,"
+        "Unveränderte Wahlzettel Liste,Veränderte Wahlzettel Liste,"
+        "Kandidatenstimmen unveränderte Wahlzettel,"
+        "Zusatzstimmen unveränderte Wahlzettel,"
+        "Kandidatenstimmen veränderte Wahlzettel,"
+        "Zusatzstimmen veränderte Wahlzettel,Kandidaten-Nr,Gewählt,Name,"
+        "Vorname,Stimmen unveränderte Wahlzettel,"
+        "Stimmen veränderte Wahlzettel,Stimmen Total aus Wahlzettel,"
+        "01 FDP,02 CVP, Anzahl Gemeinden\n"
+    )
+    csv += (
+        "5,3503,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
+        "nicht gewählt,Casanova,Angela,0,0,0,0,0,1 von 1\n"
+    )
+    csv += (
+        "5,3503,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
+        "nicht gewählt,Caluori,Corina,1,0,1,0,0,1 von 1\n"
+    )
+    csv = csv.encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    export = client.get('/election/election/json')
+    assert all((expected in export for expected in ("FDP", "Caluori", "56")))
+
+    export = client.get('/election/election/csv')
+    assert all((expected in export for expected in ("FDP", "Caluori", "56")))
+
+    export = client.get('/election/election/xlsx')
+    assert export.status == '200 OK'

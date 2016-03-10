@@ -40,12 +40,9 @@ HEADERS_PROPORZ = [
     # List
     'Listen-Nr',
     'Partei-ID',
-    'Parteikurzbezeichnung',
     'Parteibezeichnung',
     'HLV-Nr',
-    'HLV-Bezeichnung',
     'ULV-Nr',
-    'ULV-Bezeichnung',
     'Anzahl Sitze Liste',
     'Unveränderte Wahlzettel Liste',
     'Veränderte Wahlzettel Liste',
