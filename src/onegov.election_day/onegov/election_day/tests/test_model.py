@@ -74,7 +74,7 @@ def test_municipalities():
     for year in range(2013, 2017):
         assert principal.is_year_available(year)
     for year in range(2009, 2017):
-        assert principal.is_year_available(year, False)
+        assert principal.is_year_available(year, map_required=False)
 
     for canton in cantons:
         principal = Principal(
