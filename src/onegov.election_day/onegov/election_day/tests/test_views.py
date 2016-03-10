@@ -4,7 +4,6 @@ import tarfile
 
 from datetime import date
 from onegov.ballot import VoteCollection
-from onegov.core.csv import convert_xls_to_csv
 from onegov.core.utils import module_path
 from onegov.testing import utils
 from webtest import TestApp as Client
