@@ -649,10 +649,10 @@ def test_view_archive(election_day_app):
     assert "noch keine Wahlen oder Abstimmungen" in archive
 
 
-@pytest.mark.parametrize("csv_file", [
+@pytest.mark.parametrize("tar_file", [
     module_path('onegov.election_day', 'tests/fixtures/sesam_majorz.tar.gz'),
 ])
-def test_upload_election_sesam_majorz(election_day_app_gr, csv_file):
+def test_upload_election_sesam_majorz(election_day_app_gr, tar_file):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -669,7 +669,7 @@ def test_upload_election_sesam_majorz(election_day_app_gr, csv_file):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    with tarfile.open(csv_file, 'r|gz') as f:
+    with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
     upload = client.get('/election/election/upload')
@@ -689,10 +689,10 @@ def test_upload_election_sesam_majorz(election_day_app_gr, csv_file):
     )))
 
 
-@pytest.mark.parametrize("csv_file", [
+@pytest.mark.parametrize("tar_file", [
     module_path('onegov.election_day', 'tests/fixtures/sesam_proporz.tar.gz'),
 ])
-def test_upload_election_sesam_proporz(election_day_app_gr, csv_file):
+def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
@@ -709,7 +709,7 @@ def test_upload_election_sesam_proporz(election_day_app_gr, csv_file):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    with tarfile.open(csv_file, 'r|gz') as f:
+    with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
     upload = client.get('/election/election/upload')
@@ -733,10 +733,10 @@ def test_upload_election_sesam_proporz(election_day_app_gr, csv_file):
     )))
 
 
-@pytest.mark.parametrize("csv_file", [
+@pytest.mark.parametrize("tar_file", [
     module_path('onegov.election_day', 'tests/fixtures/wabsti_majorz.tar.gz'),
 ])
-def test_upload_election_wabsti_majorz(election_day_app_sg, csv_file):
+def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     client = Client(election_day_app_sg)
     client.get('/locale/de_CH').follow()
 
@@ -753,7 +753,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, csv_file):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    with tarfile.open(csv_file, 'r|gz') as f:
+    with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
 
     upload = client.get('/election/election/upload')
@@ -784,7 +784,93 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, csv_file):
     results = client.get('/election/election')
     assert all((expected in results for expected in (
         # totals
-        "304'850", "47.79 %", "85 von 85", "144'529", "942", "223", "145'694",
+        "1 von 1", "304'850", "47.79 %", "85 von 85", "144'529", "942", "223",
+        "145'694",
         # candidates
         "53'308", "36'282", "54'616",
+    )))
+
+
+@pytest.mark.parametrize("tar_file", [
+    module_path('onegov.election_day', 'tests/fixtures/wabsti_proporz.tar.gz'),
+])
+def test_upload_election_wabsti_proporz(election_day_app, tar_file):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 3
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    with tarfile.open(tar_file, 'r|gz') as f:
+        csv = f.extractfile(f.next()).read()
+        stats = f.extractfile(f.next()).read()
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'wabsti'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    results = client.get('/election/election')
+    assert all((expected in results for expected in (
+        # lists
+        "30'532", "4'178", "807",
+        # candidates
+        "3'240", "10'174", "17'034"
+    )))
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'wabsti'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['statistics'] = Upload('stats.csv', stats, 'text/plain')
+    upload.form['complete'] = True
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    results = client.get('/election/election')
+
+    assert all((expected in results for expected in (
+        # totals
+        "11 von 11", "74'803", "40'200", "53.74 %", "39'067", "118", "1'015",
+        "116'689",
+        # lists
+        "30'532", "4'178", "807",
+        # candidates
+        "3'240", "10'174", "17'034"
+    )))
+
+    elected = "ID,Name,Vorname\n401,Pfister,Gerhard\n"
+    elected = elected + "601,Pezzatti,Bruno\n1501,Aeschi,Thomas\n"
+    elected = elected.encode('utf-8')
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'wabsti'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['statistics'] = Upload('stats.csv', stats, 'text/plain')
+    upload.form['elected'] = Upload('elected.csv', elected, 'text/plain')
+    upload.form['complete'] = True
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    results = client.get('/election/election')
+    assert all((expected in results for expected in (
+        # totals
+        "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %", "39'067",
+        "118", "1'015", "116'689",
+        # lists
+        "30'532", "4'178", "807",
+        # candidates
+        "3'240", "10'174", "17'034"
     )))
