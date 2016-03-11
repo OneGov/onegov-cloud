@@ -178,9 +178,24 @@ table {
     }
 
     &.collapsible {
+        thead:first-child th:first-child::before {
+            color: $base;
+            content: '\f056';
+            font-family: 'FontAwesome';
+            margin-right: .75ex;
+        }
+
         &.collapsed {
+            thead:first-child th:first-child::before {
+                content: '\f055';
+            }
+
             tr.sticky {
                 background-color: $white;
+            }
+
+            tr.total {
+                background-color: $snow;
             }
         }
 
