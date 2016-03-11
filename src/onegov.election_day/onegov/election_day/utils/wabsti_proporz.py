@@ -26,10 +26,14 @@ HEADERS = [
     'Liste_ParteistimmenTotal',
 ]
 
+HEADERS_CONNECTIONS = [
+    'Liste',
+    'LV',
+    'LUV',
+]
+
 HEADERS_RESULT = [
     'ID',
-    'Name',
-    'Vorname',
 ]
 
 HEADERS_STATS = [
@@ -119,8 +123,9 @@ def parse_candidate_result(line, errors):
 
 def parse_connection(line, errors):
     try:
-        connection_id = line.hlv_nr
-        subconnection_id = line.ulv_nr
+        id = int(line.liste or 0)
+        connection_id = line.lv
+        subconnection_id = line.luv
     except ValueError:
         errors.append(_("Invalid list connection values"))
     else:
@@ -132,10 +137,12 @@ def parse_connection(line, errors):
             id=uuid4(),
             connection_id=subconnection_id,
         ) if subconnection_id else None
-        return connection, subconnection
+        return id, connection, subconnection
 
 
 def import_wabsti_file_proporz(municipalities, election, file, mimetype,
+                               connections_file=None,
+                               connections_mimetype=None,
                                elected_file=None, elected_mimetype=None,
                                statistics_file=None, statistics_mimetype=None):
     errors = []
@@ -162,7 +169,6 @@ def import_wabsti_file_proporz(municipalities, election, file, mimetype,
             candidate_result = parse_candidate_result(line, line_errors)
             list = parse_list(line, line_errors)
             list_result = parse_list_result(line, line_errors)
-            # connection, subconnection = parse_connection(line, line_errors)
 
             # Pass the errors and continue to next line
             if line_errors:
@@ -177,18 +183,6 @@ def import_wabsti_file_proporz(municipalities, election, file, mimetype,
 
             list = lists.setdefault(list.list_id, list)
 
-            # if connection:
-            #     connection = connections.setdefault(
-            #         connection.connection_id, connection
-            #     )
-            #     list.connection_id = connection.id
-            #     if subconnection:
-            #         subconnection = subconnections.setdefault(
-            #             subconnection.connection_id, subconnection
-            #         )
-            #         subconnection.parent_id = connection.id
-            #         list.connection_id = subconnection.id
-
             list_results.setdefault(result.municipality_id, {})
             list_result = list_results[result.municipality_id].setdefault(
                 list.list_id, list_result
@@ -202,6 +196,43 @@ def import_wabsti_file_proporz(municipalities, election, file, mimetype,
 
             candidate.list_id = list.id
 
+    # The list connections has one list per line
+    if connections_file and connections_mimetype:
+        csv, error = load_csv(
+            connections_file, connections_mimetype,
+            expected_headers=HEADERS_CONNECTIONS
+        )
+        if error:
+            errors.append(error)
+        else:
+            indexes = dict([(item.id, key) for key, item in lists.items()])
+            for line in csv.lines:
+                line_errors = []
+                id, connection, subconnection = parse_connection(line,
+                                                                 line_errors)
+
+                if id not in lists:
+                    continue
+
+                if line_errors:
+                    errors.extend(
+                        FileImportError(error=err, line=line.rownumber)
+                        for err in line_errors
+                    )
+                    continue
+
+                if connection:
+                    connection = connections.setdefault(
+                        connection.connection_id, connection
+                    )
+                    lists[id].connection_id = connection.id
+                    if subconnection:
+                        subconnection = subconnections.setdefault(
+                            subconnection.connection_id, subconnection
+                        )
+                        subconnection.parent_id = connection.id
+                        lists[id].connection_id = subconnection.id
+
     # The results file has one elected candidate per line
     if elected_file and elected_mimetype:
         csv, error = load_csv(
@@ -212,23 +243,28 @@ def import_wabsti_file_proporz(municipalities, election, file, mimetype,
         else:
             indexes = dict([(item.id, key) for key, item in lists.items()])
             for line in csv.lines:
-                line_errors = []
-
-                id = int(line.id or 0)
-                if id in candidates and \
-                        candidates[id].family_name == line.name and \
-                        candidates[id].first_name == line.vorname:
-                    candidates[id].elected = True
-                    index = indexes[candidates[id].list_id]
-                    lists[index].number_of_mandates = 1 + \
-                        lists[index].number_of_mandates
-                else:
+                try:
+                    id = int(line.id or 0)
+                except ValueError:
                     errors.append(
                         FileImportError(
-                            error=_("Unkown candidate"),
+                            error=_("Invalid values"),
                             line=line.rownumber
                         )
                     )
+                else:
+                    if id in candidates:
+                        candidates[id].elected = True
+                        index = indexes[candidates[id].list_id]
+                        lists[index].number_of_mandates = 1 + \
+                            lists[index].number_of_mandates
+                    else:
+                        errors.append(
+                            FileImportError(
+                                error=_("Unkown candidate"),
+                                line=line.rownumber
+                            )
+                        )
 
     # The stats file has one muncipality per line
     if statistics_file and statistics_mimetype:
@@ -240,7 +276,6 @@ def import_wabsti_file_proporz(municipalities, election, file, mimetype,
             errors.append(error)
         else:
             for line in csv.lines:
-                line_errors = []
                 try:
                     id = int(line.einheit_bfs or 0)
                     elegible_voters = int(line.stimbertotal or 0)
@@ -249,7 +284,12 @@ def import_wabsti_file_proporz(municipalities, election, file, mimetype,
                     invalid_ballots = int(line.wzungueltig or 0)
                     blank_votes = int(line.stmwzveraendertleeramtlleer or 0)
                 except ValueError:
-                    errors.append(_("Invalid values"))
+                    errors.append(
+                        FileImportError(
+                            error=_("Invalid values"),
+                            line=line.rownumber
+                        )
+                    )
                 else:
                     if id in results:
                         results[id].elegible_voters = elegible_voters

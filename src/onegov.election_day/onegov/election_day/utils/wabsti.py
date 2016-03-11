@@ -215,6 +215,7 @@ def import_wabsti_file_majorz(municipalities, election, file, mimetype,
 
 
 def import_wabsti_file(municipalities, election, file, mimetype,
+                       connections_file=None, connections_mimetype=None,
                        elected_file=None, elected_mimetype=None,
                        statistics_file=None, statistics_mimetype=None):
     """ Tries to import the given file (wabsti format).
@@ -235,6 +236,7 @@ def import_wabsti_file(municipalities, election, file, mimetype,
     else:
         return import_wabsti_file_proporz(
             municipalities, election, file, mimetype,
+            connections_file, connections_mimetype,
             elected_file, elected_mimetype,
             statistics_file, statistics_mimetype
         )

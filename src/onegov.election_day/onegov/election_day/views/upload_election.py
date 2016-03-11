@@ -46,6 +46,7 @@ def view_upload(self, request, form):
                     form.results.data['mimetype']
                 )
             else:
+                connections = len(form.connections.data)
                 stats = len(form.statistics.data)
                 elected = len(form.elected.data)
                 result = import_wabsti_file(
@@ -53,6 +54,8 @@ def view_upload(self, request, form):
                     self,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype'],
+                    form.connections.raw_data[0].file if connections else None,
+                    form.connections.data['mimetype'] if connections else None,
                     form.elected.raw_data[0].file if elected else None,
                     form.elected.data['mimetype'] if elected else None,
                     form.statistics.raw_data[0].file if stats else None,

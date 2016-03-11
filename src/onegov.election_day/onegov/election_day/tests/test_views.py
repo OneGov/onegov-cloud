@@ -813,6 +813,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
 
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
+        connections = f.extractfile(f.next()).read()
         stats = f.extractfile(f.next()).read()
 
     upload = client.get('/election/election/upload')
@@ -833,6 +834,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     upload = client.get('/election/election/upload')
     upload.form['type'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['connections'] = Upload('cons.csv', connections, 'text/plain')
     upload.form['statistics'] = Upload('stats.csv', stats, 'text/plain')
     upload.form['complete'] = True
     upload = upload.form.submit()
@@ -847,6 +849,8 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
         "116'689",
         # lists
         "30'532", "4'178", "807",
+        # connections
+        "25'528", "20'584", "35'543",
         # candidates
         "3'240", "10'174", "17'034"
     )))

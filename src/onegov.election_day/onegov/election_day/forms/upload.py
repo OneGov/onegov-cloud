@@ -45,6 +45,12 @@ class UploadElectionForm(Form):
         render_kw={'force_simple': True}
     )
 
+    connections = UploadField(
+        label=_("List connections"),
+        validators=wabsti_validators,
+        render_kw=dict(force_simple=True, **wabsti_dependency.html_data)
+    )
+
     elected = UploadField(
         label=_("Elected Candidates"),
         validators=wabsti_validators,
@@ -63,8 +69,10 @@ class UploadElectionForm(Form):
 
     def apply_model(self, model):
         if model.type == 'majorz':
+            self.connections.render_kw['data-depends-on'] = 'type/none'
             self.statistics.render_kw['data-depends-on'] = 'type/none'
         else:
+            self.connections.render_kw['data-depends-on'] = 'type/wabsti'
             self.statistics.render_kw['data-depends-on'] = 'type/wabsti'
 
 
