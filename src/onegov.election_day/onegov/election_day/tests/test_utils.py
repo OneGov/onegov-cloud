@@ -1,5 +1,5 @@
-from io import StringIO, BytesIO
-from onegov.election_day.utils.csv import FileImportError, load_csv
+from io import BytesIO
+from onegov.election_day.utils.csv import load_csv
 
 
 def test_load_csv():
