@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes the upload widget in forms having an unintended design.
+  [href]
+
 1.5.4 (2016-02-15)
 ~~~~~~~~~~~~~~~~~~~
 
