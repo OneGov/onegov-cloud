@@ -1,12 +1,15 @@
 language: python
 python: "3.4"
 env:
-    - TOXENV=py34
-    - TOXENV=pep8
+    - TOXENV=py34 ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.2.0.tar.gz
+    - TOXENV=pep8 ES_URL=no
+
 
 install:
     - pip install tox==1.9.2
     - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - if [ "$ES_URL" != 'no' ]; mkdir /tmp/elasticsearch; fi
+    - if [ "$ES_URL" != 'no' ]; wget -O - "$ES_URL" | tar xz --directory=/tmp/elasticsearch --strip-components=1; fi
 
 script:
     - tox -e $TOXENV
