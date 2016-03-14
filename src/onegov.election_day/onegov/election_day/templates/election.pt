@@ -29,32 +29,54 @@
         <tal:block tal:condition="has_results">
 
             <h2 i18n:translate>Results</h2>
-            <ul class="small-block-grid-1 medium-block-grid-5 factoids">
-                <li>
-                    <span i18n:translate="">Counted municipalities</span>
-                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" /></strong>
-                </li>
-                <li>
-                    <span i18n:translate="">Mandates</span>
-                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
-                </li>
-                <li tal:condition="not: election.counted">
-                    <span i18n:translate="">Last change</span>
-                    <strong>${layout.format_date(election.last_result_change, 'relative')}</strong>
-                </li>
-                <li tal:condition="election.counted">
-                    <span i18n:translate="">Elegible Voters</span>
-                    <strong>${layout.format_number(election.elegible_voters)}</strong>
-                </li>
-                <li tal:condition="election.counted">
-                    <span i18n:translate="">Received Ballots</span>
-                    <strong>${layout.format_number(election.received_ballots)}</strong>
-                </li>
-                <li tal:condition="election.counted">
-                    <span i18n:translate="">Turnout</span>
-                    <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
-                </li>
-            </ul>
+            <tal:block tal:condition="not: election.counted">
+                <ul class="small-block-grid-1 medium-block-grid-3 factoids">
+                    <li>
+                        <span i18n:translate="">Counted municipalities</span>
+                        <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" /></strong>
+                    </li>
+                    <li>
+                        <span i18n:translate="">Mandates</span>
+                        <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
+                    </li>
+                    <li>
+                        <span i18n:translate="">Last change</span>
+                        <strong>${layout.format_date(election.last_result_change, 'relative')}</strong>
+                    </li>
+                </ul>
+            </tal:block>
+            <tal:block tal:condition="election.counted">
+                <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+                    <li>
+                        <span i18n:translate="">Counted municipalities</span>
+                        <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" /></strong>
+                    </li>
+                    <li>
+                        <span i18n:translate="">Mandates</span>
+                        <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
+                    </li>
+                    <li>
+                        <span i18n:translate="">Elegible Voters</span>
+                        <strong>${layout.format_number(election.elegible_voters)}</strong>
+                    </li>
+                    <li>
+                        <span i18n:translate="">Turnout</span>
+                        <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
+                    </li>
+
+                </ul>
+                <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+                    <li>
+                        <span i18n:translate="">Received Ballots</span>
+                        <strong>${layout.format_number(election.received_ballots)}</strong>
+                    </li>
+                    <li tal:condition="majorz">
+                        <span i18n:translate="">Absolute majority</span>
+                        <strong tal:condition="election.absolute_majority">${layout.format_number(election.absolute_majority or 0)}</strong>
+                    </li>
+                </ul>
+            </tal:block>
+
 
             <div class="row" tal:condition="not: majorz">
                 <div class="small-12 small-centered medium-12 large-10 columns">
@@ -202,10 +224,10 @@
                                         <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                                     </tr>
                                     <tr class="more">
-                                        <td colspan="2" i18n:translate>Show details...</td>
+                                        <td colspan="3" i18n:translate>Show details...</td>
                                     </tr>
                                     <tr class="less">
-                                        <td colspan="2" i18n:translate>Hide details...</td>
+                                        <td colspan="3" i18n:translate>Hide details...</td>
                                     </tr>
                                 </tbody>
                             </table>

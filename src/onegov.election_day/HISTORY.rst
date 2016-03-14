@@ -4,6 +4,9 @@ Changelog
  - Displays visual hints for collapsible tables.
    [msom]
 
+- Adds absolute majority for majorz elections.
+  [msom]
+
 0.7.0 (2016-03-11)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-03-14 10:29+0100\n"
+"POT-Creation-Date: 2016-03-14 12:08+0100\n"
 "PO-Revision-Date: 2015-10-14 17:17+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -66,6 +66,12 @@ msgstr "Gewählte Kandidaten"
 msgid "Election statistics"
 msgstr "Wahlstatistik"
 
+msgid "Complete"
+msgstr "Komplett ausgezählt"
+
+msgid "Absolute majority"
+msgstr "Absolutes Mehr"
+
 msgid "Proposal"
 msgstr "Initiative"
 
@@ -129,11 +135,11 @@ msgstr "Letzte Änderung"
 msgid "Elegible Voters"
 msgstr "Stimmberechtigte"
 
-msgid "Received Ballots"
-msgstr "Abgegebene Wahlzettel"
-
 msgid "Turnout"
 msgstr "Wahlbeteiligung"
+
+msgid "Received Ballots"
+msgstr "Abgegebene Wahlzettel"
 
 msgid "Lists"
 msgstr "Listen"

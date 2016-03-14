@@ -183,11 +183,18 @@ def view_election_candidates(self, request):
     )
     candidates = candidates.filter(Candidate.election_id == self.id)
 
-    return [{
-        'text': '{} {}'.format(candidate[0], candidate[1]),
-        'value': candidate[3],
-        'class': 'active' if candidate[2] else 'inactive'
-    } for candidate in candidates.all()]
+    majority = 0
+    if self.type == 'majorz' and self.absolute_majority is not None:
+        majority = self.absolute_majority
+
+    return {
+        'results': [{
+            'text': '{} {}'.format(candidate[0], candidate[1]),
+            'value': candidate[3],
+            'class': 'active' if candidate[2] else 'inactive'
+        } for candidate in candidates.all()],
+        'majority': majority
+    }
 
 
 @ElectionDayApp.json(model=Election, permission=Public, name='lists')
@@ -209,9 +216,12 @@ def view_election_lists(self, request):
     )
     lists = lists.filter(List.election_id == self.id)
 
-    return [{
-        'text': list[0],
-        'value': list[1],
-        'secondary': list[2],
-        'class': 'active' if list[2] > 0 else 'inactive'
-    } for list in lists.all()]
+    return {
+        'results': [{
+            'text': list[0],
+            'value': list[1],
+            'secondary': list[2],
+            'class': 'active' if list[2] > 0 else 'inactive'
+        } for list in lists.all()],
+        'majority': None
+    }

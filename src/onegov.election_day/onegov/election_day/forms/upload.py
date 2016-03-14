@@ -3,8 +3,10 @@ from onegov.form import Form
 from onegov.form.fields import UploadField
 from onegov.form.parser.core import FieldDependency
 from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
-from wtforms import BooleanField, RadioField
-from wtforms.validators import DataRequired, InputRequired
+from wtforms import BooleanField, IntegerField, RadioField
+from wtforms.validators import (
+    DataRequired, InputRequired, NumberRange, Optional
+)
 from wtforms_components import If, Chain
 
 
@@ -64,16 +66,27 @@ class UploadElectionForm(Form):
     )
 
     complete = BooleanField(
-        render_kw=dict(force_simple=True, **wabsti_dependency.html_data)
+        label=_("Complete"),
+        render_kw=dict(**wabsti_dependency.html_data)
+    )
+
+    majority = IntegerField(
+        label=_("Absolute majority"),
+        validators=[
+            Optional(),
+            NumberRange(min=1)
+        ]
     )
 
     def apply_model(self, model):
         if model.type == 'majorz':
             self.connections.render_kw['data-depends-on'] = 'type/none'
             self.statistics.render_kw['data-depends-on'] = 'type/none'
+            self.majority.render_kw = None
         else:
             self.connections.render_kw['data-depends-on'] = 'type/wabsti'
             self.statistics.render_kw['data-depends-on'] = 'type/wabsti'
+            self.majority.render_kw = {'data-depends-on': 'type/none'}
 
 
 class UploadVoteForm(Form):

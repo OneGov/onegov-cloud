@@ -63,6 +63,8 @@ def view_upload(self, request, form):
                 )
                 if form.complete.data:
                     self.total_municipalities = self.counted_municipalities
+            if self.type == 'majorz':
+                self.absolute_majority = form.majority.data
 
     form.apply_model(self)
 

@@ -23,13 +23,15 @@ var init_bar_chart = function(el) {
     var line = null;
     var bar = null;
     var label = null;
+    var majority = null;
+    var majority_line = null;
 
     $.ajax({ url: dataurl }).done(function(data) {
 
-        svg.attr('height', 24 * data.length);
+        svg.attr('height', 24 * data.results.length);
 
         line = svg.selectAll('g')
-            .data(data)
+            .data(data.results)
             .enter().append('g')
             .attr('class', 'line')
             .attr('transform', function(d, i) {
@@ -48,7 +50,7 @@ var init_bar_chart = function(el) {
 
         name.attr('x', offset);
 
-        scale.domain([0, d3.max(data, function(d) { return d.value; })])
+        scale.domain([0, d3.max(data.results, function(d) { return d.value; })])
              .range([0, width - offset]);
 
         bar = line.append('rect')
@@ -75,6 +77,19 @@ var init_bar_chart = function(el) {
             .text(function(d) { return d.value; });
 
         update_labels(line);
+
+        if (data.majority) {
+            majority = data.majority;
+            majority_line = svg.append("line")
+                .attr("x1", offset + 5 + scale(majority))
+                .attr("x2", offset + 5 + scale(majority))
+                .attr("y1", 0)
+                .attr("y2", 24 * data.results.length)
+                .attr("stroke-width", 3)
+                .attr("stroke", "black")
+                .style("stroke-dasharray", ("4, 4"));
+        }
+
     });
 
     d3.select(window).on('resize', function() {
@@ -87,12 +102,15 @@ var init_bar_chart = function(el) {
             bar.attr('width', function(d) { return scale(d.value); });
             label.attr('transform', function(d) {
               return 'translate(' + (offset + scale(d.value)) + ',16)';
-          });
-          update_labels(line);
+            });
+            update_labels(line);
+
+            if (majority_line) {
+                majority_line.attr("x1", offset + 5 + scale(majority));
+                majority_line.attr("x2", offset + 5 + scale(majority));
+            }
         }
     });
-
-
 };
 
 (function($) {
