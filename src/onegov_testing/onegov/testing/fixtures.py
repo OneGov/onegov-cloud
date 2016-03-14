@@ -7,9 +7,11 @@ import tempfile
 import transaction
 
 from elasticsearch import Elasticsearch
+from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
 from onegov.core.orm import Base, SessionManager
 from pathlib import Path
+from _pytest.monkeypatch import monkeypatch
 from sqlalchemy import create_engine
 from testing.postgresql import Postgresql
 from uuid import uuid4
@@ -24,6 +26,13 @@ class HTTPExecutor(HTTPExecutorBase):
             pass
 
 
+@pytest.yield_fixture(scope='session')
+def monkeysession(request):
+    mp = monkeypatch()
+    yield mp
+    mp.undo()
+
+
 @pytest.fixture(scope='session', autouse=True)
 def treat_sqlalchemy_warnings_as_errors():
     """ All onegov models treat SQLAlchemy warnings as errors, because usually
@@ -33,6 +42,41 @@ def treat_sqlalchemy_warnings_as_errors():
     import warnings
     from sqlalchemy.exc import SAWarning
     warnings.simplefilter("error", SAWarning)
+
+
+@pytest.fixture(scope='session', autouse=True)
+def cache_password_hashing(monkeysession):
+    """ Monkey-patch the password hashing/verification functions during tests
+    for a big speed increase (we login with the same password over and over
+    again).
+
+    Changes to the auth are delicate, so we make sure this is only done during
+    testing by having it here, instead of support some mechanism like this
+    in onegov.core itself.
+
+    So this dangerous code is not only inexistant in the core, it is also not
+    present on the server because onegov.testing is strictly a testing
+    dependency and finally it is only run when invoked through pytest.
+
+    """
+
+    from passlib.hash import bcrypt_sha256
+
+    verify = bcrypt_sha256.verify
+    encrypt = bcrypt_sha256.encrypt
+
+    @lru_cache(maxsize=32)
+    def cached_verify(password, hash):
+        return verify(password, hash)
+
+    @lru_cache(maxsize=32)
+    def cached_encrypt(password):
+        return encrypt(password)
+
+    monkeysession.setattr(
+        'onegov.core.crypto.password.bcrypt_sha256.encrypt', cached_encrypt)
+    monkeysession.setattr(
+        'onegov.core.crypto.password.bcrypt_sha256.verify', cached_verify)
 
 
 @pytest.yield_fixture(scope="session")
