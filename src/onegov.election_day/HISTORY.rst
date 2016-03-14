@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.7.1 (2016-03-14)
+~~~~~~~~~~~~~~~~~~~
 
  - Displays visual hints for collapsible tables.
    [msom]
