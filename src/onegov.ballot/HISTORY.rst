@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.1 (2016-03-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds absolute majority for majorz elections.
   [msom]

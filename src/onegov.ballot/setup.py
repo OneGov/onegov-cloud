@@ -4,7 +4,7 @@ name = 'onegov.ballot'
 description = (
     'Models ballot results for OneGov.'
 )
-version = '0.4.0'
+version = '0.4.1'
 
 
 def get_long_description():
@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core>=0.4.0',
+        'onegov.core>=0.4.1',
         'sqlalchemy',
         'sqlalchemy_utils'
     ],
