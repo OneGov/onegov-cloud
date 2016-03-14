@@ -5,10 +5,10 @@ $(document).foundation();
 $('.stackable').stacktable();
 
 // collapse tables whising to be collapsible
-$('.collapsible.collapsed tbody tr:not(.total):not(.sticky)').hide();
-$('.collapsible thead').click(function() {
-    $(this).parent().toggleClass('collapsed');
-    $(this).parent().children('tbody').children('tr:not(.total):not(.sticky)').toggle();
+$('.collapsible.collapsed tbody tr:not(.total):not(.sticky):not(.more)').hide();
+$('.collapsible .more, .collapsible .less').click(function() {
+    $(this).parents('table').toggleClass('collapsed');
+    $(this).parents('table').children('tbody').children('tr:not(.total):not(.sticky)').toggle();
 });
 
 // force all dropdowns to be rendered in the direction specified in the
