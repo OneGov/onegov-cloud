@@ -649,7 +649,7 @@ def translate_to_yaml(text):
                 identifier=line.split('=')[0].strip(),
                 definition=line.split('=')[1].strip()
             )
-            expect_nested = indent and True or False
+            expect_nested = len(indent) > 4
             actual_fields += 1
             continue
 

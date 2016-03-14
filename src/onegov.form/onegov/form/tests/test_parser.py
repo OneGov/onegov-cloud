@@ -399,3 +399,13 @@ def test_invalid_syntax():
     with pytest.raises(errors.InvalidFormSyntax) as e:
         parse_form('# Personalien')
     assert e.value.line == 1
+
+    with pytest.raises(errors.InvalidFormSyntax) as e:
+        parse_form('\n'.join((
+            "Ort * = ___",
+            "(x) 6. Klasse",
+            "(x) 7. Klasse",
+            "(x) 8. Klasse",
+            "(x) 9. Klasse",
+        )))
+    assert e.value.line == 2
