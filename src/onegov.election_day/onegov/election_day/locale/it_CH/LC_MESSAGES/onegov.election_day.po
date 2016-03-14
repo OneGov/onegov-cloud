@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-03-07 10:33+0100\n"
+"POT-Creation-Date: 2016-03-14 10:29+0100\n"
 "PO-Revision-Date: 2016-01-08 10:00+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -57,6 +57,9 @@ msgstr ""
 
 msgid "Results"
 msgstr "Risultati"
+
+msgid "List connections"
+msgstr ""
 
 msgid "Elected Candidates"
 msgstr ""
@@ -143,7 +146,10 @@ msgstr ""
 msgid "single_votes"
 msgstr ""
 
-msgid "List connections"
+msgid "Show all..."
+msgstr ""
+
+msgid "Show less..."
 msgstr ""
 
 msgid "List connection"
@@ -153,6 +159,12 @@ msgid "Sublist connection"
 msgstr ""
 
 msgid "Subtotal"
+msgstr ""
+
+msgid "Show details..."
+msgstr ""
+
+msgid "Hide details..."
 msgstr ""
 
 msgid "Total"
@@ -171,6 +183,9 @@ msgid "Yes"
 msgstr ""
 
 msgid "No"
+msgstr ""
+
+msgid "Show elected only..."
 msgstr ""
 
 msgid "Electoral Districts"

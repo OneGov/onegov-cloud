@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-03-07 10:33+0100\n"
+"POT-Creation-Date: 2016-03-14 10:29+0100\n"
 "PO-Revision-Date: 2015-10-14 17:17+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -56,6 +56,9 @@ msgstr "Kantonale Wahl"
 
 msgid "Results"
 msgstr "Resultate"
+
+msgid "List connections"
+msgstr "Listenverbindungen"
 
 msgid "Elected Candidates"
 msgstr "Gewählte Kandidaten"
@@ -142,8 +145,11 @@ msgstr "Liste"
 msgid "single_votes"
 msgstr "Stimmen"
 
-msgid "List connections"
-msgstr "Listenverbindungen"
+msgid "Show all..."
+msgstr "Zeige alle..."
+
+msgid "Show less..."
+msgstr "Zeige weniger..."
 
 msgid "List connection"
 msgstr "Listenverbindung"
@@ -153,6 +159,12 @@ msgstr "Unterlistenverbindung"
 
 msgid "Subtotal"
 msgstr "Zwischensumme"
+
+msgid "Show details..."
+msgstr "Zeige Details..."
+
+msgid "Hide details..."
+msgstr "Verstecke Details..."
 
 msgid "Total"
 msgstr "Total"
@@ -171,6 +183,9 @@ msgstr "Ja"
 
 msgid "No"
 msgstr "Nein"
+
+msgid "Show elected only..."
+msgstr "Zeige nur gewählte Kandidaten"
 
 msgid "Electoral Districts"
 msgstr "Wahlkreise"
