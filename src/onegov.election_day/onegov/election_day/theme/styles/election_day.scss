@@ -182,21 +182,23 @@ table {
         .more {
             td {
                 background-color: $white;
-                color: $aluminum;
+                color: $primary-color;
                 cursor: pointer;
             }
 
             .st-head-row {
                 border: 0;
-                color: $aluminum;
+                color: $primary-color;
+                cursor: pointer;
                 font-size: .875rem;
+                font-weight: normal;
             }
         }
 
         .less td:first-child,
         .less .st-head-row {
             &::before {
-                color: $base;
+                color: $primary-color;
                 content: '\f056';
                 font-family: 'FontAwesome';
                 margin-right: .75ex;
@@ -206,7 +208,7 @@ table {
         .more td:first-child,
         .more .st-head-row {
             &::before {
-                color: $base;
+                color: $primary-color;
                 content: '\f055';
                 font-family: 'FontAwesome';
                 margin-right: .75ex;
