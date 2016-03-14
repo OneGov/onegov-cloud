@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.ballot import Vote
 from onegov.core.orm.types import HSTORE
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Integer, Text
 
 
 @upgrade_task('Rename yays to yeas', always_run=True)
@@ -44,4 +44,12 @@ def enable_translation_of_vote_title(context):
 
     context.operations.alter_column(
         'votes', 'title_translations', nullable=False
+    )
+
+
+@upgrade_task('Add absolute majority column')
+def add_absolute_majority_column(context):
+    context.operations.add_column(
+        'elections',
+        Column('absolute_majority', Integer())
     )

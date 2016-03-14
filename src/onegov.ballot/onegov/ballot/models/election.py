@@ -89,6 +89,9 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         mandates = results.first()
         return mandates and mandates[0] or 0
 
+    #: Absolute majority (majorz elections only)
+    absolute_majority = Column(Integer, nullable=True, default=lambda: 0)
+
     #: Total number of municipalities
     total_municipalities = Column(Integer, nullable=True)
 
