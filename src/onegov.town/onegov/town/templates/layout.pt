@@ -25,6 +25,10 @@
 </head>
 
 <body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}">
+
+    <!--! Skip navigation link for screenreaders -->
+    <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
+
     <div id="inner-body">
       <div class="row header">
         <div class="small-12 medium-8 columns">
@@ -102,8 +106,10 @@
         <div class="small-12 medium-9 large-9 columns">
           <div class="row">
               <div class="small-12 columns">
+                <section role="main" id="content">
                   <h1 class="main-title"><div metal:define-slot="title"></div></h1>
                   <div metal:define-slot="content"></div>
+                </section>
               </div>
           </div>
         </div>
@@ -112,8 +118,10 @@
         <div class="small-12 columns">
           <div class="row">
               <div class="small-12 columns">
+                <section role="main" id="content">
                   <h1 class="main-title"><div metal:define-slot="title"></div></h1>
                   <div metal:define-slot="content"></div>
+                </section>
               </div>
           </div>
         </div>
