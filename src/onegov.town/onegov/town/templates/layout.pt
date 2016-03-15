@@ -32,7 +32,7 @@
     <div id="inner-body">
       <div class="row header">
         <div class="small-12 medium-8 columns">
-          <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing">
+          <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing" title="Back to the homepage" i18n:attributes="title">
             <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
             <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
           </a>
