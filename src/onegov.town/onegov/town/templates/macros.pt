@@ -56,13 +56,15 @@
 </metal:editbar>
 
 <metal:breadcrumbs define-macro="breadcrumbs">
-    <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
-        <tal:block repeat="link layout.breadcrumbs">
-            <li tal:attributes="class repeat.link.end and 'current' or ''"
-                tal:content="structure link(request)">
-            </li>
-        </tal:block>
-    </ul>
+    <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
+        <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
+            <tal:block repeat="link layout.breadcrumbs">
+                <li tal:attributes="class repeat.link.end and 'current' or ''"
+                    tal:content="structure link(request)">
+                </li>
+            </tal:block>
+        </ul>
+    </nav>
 </metal:breadcrumbs>
 
 <metal:bottom_links define-macro="bottom-links">
