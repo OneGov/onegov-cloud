@@ -13,6 +13,9 @@ Changelog
 - Sorts lists by list id.
    [msom]
 
+- Removes table collapsing for most tables.
+   [msom]
+
 0.7.1 (2016-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

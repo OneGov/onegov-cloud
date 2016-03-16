@@ -29,6 +29,7 @@
         <tal:block tal:condition="has_results">
 
             <h2 i18n:translate>Results</h2>
+
             <tal:block tal:condition="not: election.counted">
                 <ul class="small-block-grid-1 medium-block-grid-3 factoids">
                     <li>
@@ -77,7 +78,6 @@
                 </ul>
             </tal:block>
 
-
             <div class="row" tal:condition="not: majorz">
                 <div class="small-12 small-centered medium-12 large-10 columns">
                     <div class="bar-chart" data-dataurl="${request.link(election, name='lists')}"></div>
@@ -90,7 +90,7 @@
                     <div class="row">
                         <div class="small-12 columns">
                             <div>
-                                <table class="ballot-results collapsible collapsed">
+                                <table class="ballot-results">
                                     <thead>
                                         <th><span i18n:translate>List connection</span> ${connection[0]}</th>
                                         <th i18n:translate="single_votes" class="right-aligned">Votes</th>
@@ -114,12 +114,6 @@
                                                 <td class="right-aligned">${layout.format_number(int(subconnection[1]))}</td>
                                             </tr>
                                         </tal:block>
-                                        <tr class="more">
-                                            <td colspan="2" i18n:translate>Show details...</td>
-                                        </tr>
-                                        <tr class="less">
-                                            <td colspan="2" i18n:translate>Hide details...</td>
-                                        </tr>
                                         <tr class="total">
                                             <td i18n:translate>Total</td>
                                             <td class="right-aligned">${layout.format_number(int(connection[1]))}</td>
@@ -178,7 +172,7 @@
                 <div class="row">
                     <div class="small-12 columns">
                         <div>
-                            <table class="ballot-results stackable collapsible collapsed">
+                            <table class="ballot-results stackable">
                                 <thead>
                                     <th i18n:translate="">Electoral District</th>
                                     <th tal:repeat="candidate election.candidates" class="right-aligned">${candidate.family_name} ${candidate.first_name}</th>
@@ -192,12 +186,6 @@
                                         <td i18n:translate>Total</td>
                                         <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                                     </tr>
-                                    <tr class="more">
-                                        <td colspan="3" i18n:translate>Show details...</td>
-                                    </tr>
-                                    <tr class="less">
-                                        <td colspan="3" i18n:translate>Hide details...</td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -205,11 +193,11 @@
                 </div>
             </tal:block>
 
-            <h2 i18n:translate>Election statistics</h2>
+            <h3 i18n:translate>Election statistics</h3>
             <div class="row">
                 <div class="small-12 columns">
                     <div>
-                        <table class="ballot-results stackable collapsible collapsed">
+                        <table class="ballot-results stackable">
                             <thead>
                                 <th i18n:translate="">Electoral District</th>
                                 <th i18n:translate="" class="right-aligned">Elegible Voters</th>
@@ -240,12 +228,6 @@
                                     <td class="right-aligned">${layout.format_number(election.invalid_ballots)}</td>
                                     <td class="right-aligned">${layout.format_number(election.accounted_votes)}</td>
                                     <td class="right-aligned" tal:condition="election.counted">${'{0:.2f}'.format(election.turnout)} %</td>
-                                </tr>
-                                <tr class="more">
-                                    <td colspan="8" i18n:translate>Show details...</td>
-                                </tr>
-                                <tr class="less">
-                                    <td colspan="8" i18n:translate>Hide details...</td>
                                 </tr>
                             </tbody>
                         </table>
