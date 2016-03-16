@@ -60,7 +60,7 @@ if (!Modernizr.inputtypes.date) {
         }
 
         // inject a button with which to launch the datetime picker
-        var button = $('<a href="#" class="button secondary postfix datetimepicker"><i class="fa fa-calendar"></i></a>');
+        var button = $('<a href="#" role="presentation" tabindex="-1" class="button secondary postfix datetimepicker"><i class="fa fa-calendar"></i></a>');
         var grid = $([
             '<div class="row collapse">',
             '<div class="' + large_column + ' columns"></div>',
