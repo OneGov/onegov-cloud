@@ -724,9 +724,8 @@ def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
         # totals
         "125 von 125", "5 von 5", "137'126", "63'053", "45.98 %", "145",
         "2'314", "60'594", "300'743",
-        # lists
-        "20'610", "33'950", "41'167", "23'673",
         # list connectinos
+        "20'610", "33'950", "41'167", "23'673",
         "39'890", "52'992", "76'665",
         # candidates
         "1'788", "1'038", "520"
@@ -825,8 +824,6 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
 
     results = client.get('/election/election')
     assert all((expected in results for expected in (
-        # lists
-        "30'532", "4'178", "807",
         # candidates
         "3'240", "10'174", "17'034"
     )))
@@ -847,9 +844,8 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
         # totals
         "11 von 11", "74'803", "40'200", "53.74 %", "39'067", "118", "1'015",
         "116'689",
-        # lists
-        "30'532", "4'178", "807",
         # connections
+        "30'532", "4'178", "807",
         "25'528", "20'584", "35'543",
         # candidates
         "3'240", "10'174", "17'034"
@@ -861,6 +857,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     upload = client.get('/election/election/upload')
     upload.form['type'] = 'wabsti'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['connections'] = Upload('cons.csv', connections, 'text/plain')
     upload.form['statistics'] = Upload('stats.csv', stats, 'text/plain')
     upload.form['elected'] = Upload('elected.csv', elected, 'text/plain')
     upload.form['complete'] = True
@@ -873,7 +870,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
         # totals
         "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %", "39'067",
         "118", "1'015", "116'689",
-        # lists
+        # connections
         "30'532", "4'178", "807",
         # candidates
         "3'240", "10'174", "17'034"

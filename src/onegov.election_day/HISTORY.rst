@@ -1,7 +1,10 @@
 Changelog
 ---------
 
- - Hide candidates list for marjorz elections.
+ - Hide candidates list for majroz elections.
+   [msom]
+
+ - Hide lists for proporz elections.
    [msom]
 
 0.7.1 (2016-03-14)
