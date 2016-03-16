@@ -1,13 +1,16 @@
 Changelog
 ---------
 
- - Hides candidates list for majorz elections.
+- Hides candidates list for majorz elections.
    [msom]
 
- - Hides lists for proporz elections.
+- Hides lists for proporz elections.
    [msom]
 
- - Removes color from list bar charts.
+- Removes color from list bar charts.
+   [msom]
+
+- Sorts lists by list id.
    [msom]
 
 0.7.1 (2016-03-14)

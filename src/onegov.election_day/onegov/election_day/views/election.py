@@ -35,10 +35,11 @@ def view_election(self, request):
         Candidate.elected,
         Candidate.votes,
         List.name,
+        List.list_id
     )
     candidates = candidates.outerjoin(List)
     candidates = candidates.order_by(
-        List.name,
+        List.list_id,
         desc(Candidate.elected),
         desc(Candidate.votes),
         Candidate.family_name,
