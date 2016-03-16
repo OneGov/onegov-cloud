@@ -202,22 +202,22 @@ def test_startpage(town_app):
 
     links = client.get('/').pyquery('.homepage-tiles a')
 
-    assert links[0].find('h2').text == 'Bildung & Gesellschaft'
+    assert links[0].find('h3').text == 'Bildung & Gesellschaft'
     assert links[0].attrib.get('href').endswith('/themen/bildung-gesellschaft')
 
-    assert links[1].find('h2').text == 'Gewerbe & Tourismus'
+    assert links[1].find('h3').text == 'Gewerbe & Tourismus'
     assert links[1].attrib.get('href').endswith('/themen/gewerbe-tourismus')
 
-    assert links[2].find('h2').text == 'Kultur & Freizeit'
+    assert links[2].find('h3').text == 'Kultur & Freizeit'
     assert links[2].attrib.get('href').endswith('/themen/kultur-freizeit')
 
-    assert links[3].find('h2').text == 'Leben & Wohnen'
+    assert links[3].find('h3').text == 'Leben & Wohnen'
     assert links[3].attrib.get('href').endswith('/themen/leben-wohnen')
 
-    assert links[4].find('h2').text == 'Politik & Verwaltung'
+    assert links[4].find('h3').text == 'Politik & Verwaltung'
     assert links[4].attrib.get('href').endswith('/themen/politik-verwaltung')
 
-    assert links[5].find('h2').text == 'Aktuelles'
+    assert links[5].find('h3').text == 'Aktuelles'
     assert links[5].attrib.get('href').endswith('/aktuelles')
 
 
