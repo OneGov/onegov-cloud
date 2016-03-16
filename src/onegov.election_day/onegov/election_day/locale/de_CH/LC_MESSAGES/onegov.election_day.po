@@ -61,7 +61,7 @@ msgid "List connections"
 msgstr "Listenverbindungen"
 
 msgid "Elected Candidates"
-msgstr "Gewählte Kandidaten"
+msgstr "Gewählte Kandidierende"
 
 msgid "Election statistics"
 msgstr "Wahlstatistik"
@@ -176,10 +176,10 @@ msgid "Total"
 msgstr "Total"
 
 msgid "Candidates"
-msgstr "Kandidaten"
+msgstr "Kandidierende"
 
 msgid "Candidate"
-msgstr "Kandidat"
+msgstr "Kandidierende"
 
 msgid "Elected"
 msgstr "Gewählt"
@@ -395,7 +395,7 @@ msgstr "Die Anzahl gültiger Stimmen der Gemeinde/des Standorts."
 msgid ""
 "The name of the list this candidate appears on. Only relevant forelections "
 "based on proportional representation."
-msgstr "Der Name der Liste des Kandidaten. Nur bei Proporzwahlen."
+msgstr "Der Name der Liste des Kandidierenden. Nur bei Proporzwahlen."
 
 msgid ""
 "The number of votes this list has got. Only relevant for elections based on "
@@ -415,16 +415,16 @@ msgstr ""
 "es sich um eine Unterlistenverbindung handelt."
 
 msgid "The family name of the candidate."
-msgstr "Der Nachnahme des Kandidate.n"
+msgstr "Der Nachnahme des Kandidierenden."
 
 msgid "The first name of the candiate."
 msgstr "Der Vorname des Kandidaten."
 
 msgid "True if the candidate has been elected."
-msgstr "True, falls der Kandidate gewählt wurde."
+msgstr "True, falls der Kandidierenden gewählt wurde."
 
 msgid "The number of votes this candidate got."
-msgstr "Die Anzahl Kandidatenstimmen der Gemeinde/des Standorts."
+msgstr "Die Anzahl Kandidierendenstimmen der Gemeinde/des Standorts."
 
 msgid "Fields (Votes)"
 msgstr "Felder (Abstimmungen)"
@@ -585,10 +585,10 @@ msgid "Invalid list results"
 msgstr "Ungültige Listenresultate"
 
 msgid "Invalid candidate values"
-msgstr "Ungültige Kandidatendaten"
+msgstr "Ungültige Kandidierendendaten"
 
 msgid "Invalid candidate results"
-msgstr "Ungültige Kandidatenresultate"
+msgstr "Ungültige Kandidierendenresultate"
 
 msgid "Invalid list connection values"
 msgstr "Ungültige Listenverbindungsdaten"
@@ -597,7 +597,7 @@ msgid "No data found"
 msgstr "Keine Daten gefunden"
 
 msgid "Unkown candidate"
-msgstr "Unbekannter Kandidat"
+msgstr "Unbekannter Kandidierender"
 
 msgid "Invalid values"
 msgstr "Ungültige Werte"
