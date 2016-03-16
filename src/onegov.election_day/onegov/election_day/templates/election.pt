@@ -176,39 +176,39 @@
                 </div>
             </div>
 
-            <h3 i18n:translate>Candidates</h3>
-            <div class="row">
-                <div class="small-12 columns">
-                    <div>
-                        <table class="ballot-results stackable collapsible collapsed">
-                            <thead>
-                                <th i18n:translate="">Candidate</th>
-                                <th i18n:translate="single_votes" class="right-aligned">Votes</th>
-                                <th i18n:translate="" class="right-aligned" tal:condition="not: majorz">List</th>
-                                <th i18n:translate="" class="right-aligned">Elected</th>
-                            </thead>
-                            <tbody>
-                                <tr tal:repeat="candidate candidates" tal:attributes="class 'sticky' if candidate[2] > 0 else ''">
-                                    <td>${candidate[0]} ${candidate[1]}</td>
-                                    <td class="right-aligned">${layout.format_number(candidate[3])}</td>
-                                    <td class="right-aligned" tal:condition="not: majorz">${candidate[4]}</td>
-                                    <td class="answer accepted right-aligned" tal:condition="candidate[2] == True" i18n:translate="">Yes</td>
-                                    <td class="answer rejected right-aligned" tal:condition="candidate[2] == False" i18n:translate="">No</td>
-                                    <td class="answer right-aligned" tal:condition="candidate[2] == None" i18n:translate=""></td>
-                                </tr>
-                                <tr class="more">
-                                    <td tal:condition="not: majorz" colspan="4" i18n:translate>Show all...</td>
-                                    <td tal:condition="majorz" colspan="3" i18n:translate>Show all...</td>
-                                </tr>
-                                <tr class="less">
-                                    <td tal:condition="not: majorz" colspan="4" i18n:translate>Show elected only...</td>
-                                    <td tal:condition="majorz" colspan="3" i18n:translate>Show elected only...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <tal:block tal:condition="not: majorz">
+                <h3 i18n:translate>Candidates</h3>
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div>
+                            <table class="ballot-results stackable collapsible collapsed">
+                                <thead>
+                                    <th i18n:translate="">Candidate</th>
+                                    <th i18n:translate="single_votes" class="right-aligned">Votes</th>
+                                    <th i18n:translate="" class="right-aligned">List</th>
+                                    <th i18n:translate="" class="right-aligned">Elected</th>
+                                </thead>
+                                <tbody>
+                                    <tr tal:repeat="candidate candidates" tal:attributes="class 'sticky' if candidate[2] > 0 else ''">
+                                        <td>${candidate[0]} ${candidate[1]}</td>
+                                        <td class="right-aligned">${layout.format_number(candidate[3])}</td>
+                                        <td class="right-aligned">${candidate[4]}</td>
+                                        <td class="answer accepted right-aligned" tal:condition="candidate[2] == True" i18n:translate="">Yes</td>
+                                        <td class="answer rejected right-aligned" tal:condition="candidate[2] == False" i18n:translate="">No</td>
+                                        <td class="answer right-aligned" tal:condition="candidate[2] == None" i18n:translate=""></td>
+                                    </tr>
+                                    <tr class="more">
+                                        <td colspan="4" i18n:translate>Show all...</td>
+                                    </tr>
+                                    <tr class="less">
+                                        <td colspan="4" i18n:translate>Show elected only...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </tal:block>
 
             <tal:block tal:condition="majorz">
                 <h3 i18n:translate>Electoral Districts</h3>

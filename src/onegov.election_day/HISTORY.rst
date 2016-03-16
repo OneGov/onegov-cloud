@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+ - Hide candidates list for marjorz elections.
+   [msom]
+
 0.7.1 (2016-03-14)
 ~~~~~~~~~~~~~~~~~~~
 
