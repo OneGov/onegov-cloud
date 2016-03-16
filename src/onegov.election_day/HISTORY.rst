@@ -19,6 +19,9 @@ Changelog
 - Adds a totals row at the top for tables with totals.
   [msom]
 
+- Folds results to sections.
+  [msom]
+
 0.7.1 (2016-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

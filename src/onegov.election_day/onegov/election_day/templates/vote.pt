@@ -104,67 +104,67 @@
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="small-12 columns">
-                    <div>
-                        <table class="ballot-results stackable">
-                            <thead>
-                                <th i18n:translate="">Electoral District</th>
-                                <th i18n:translate="">Result</th>
-                                <th i18n:translate="" class="right-aligned">Yeas</th>
-                                <th i18n:translate="" class="right-aligned">Nays</th>
-                                <th i18n:translate="" class="right-aligned">Empty</th>
-                                <th i18n:translate="" class="right-aligned">Invalid</th>
-                                <th i18n:translate="" class="right-aligned">Yes %</th>
-                                <th i18n:translate="" class="right-aligned">No %</th>
-                            </thead>
-                            <tbody>
-                                <tr class="total">
-                                    <td i18n:translate>Total</td>
-                                    <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
-                                    <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
-                                    <td class="answer rejected" tal:condition="counted and not ballot.accepted" i18n:translate="">Rejected</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.invalid)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
-                                </tr>
 
-                                <tr tal:repeat="result ballot.results" data-municipality-id="${result.municipality_id}">
-                                    <tal:block condition="not: result.counted">
-                                        <td >${result.group}</td>
-                                        <td class="answer" colspan="7" i18n:translate>Not yet counted.</td>
-                                    </tal:block>
-                                    <tal:block condition="result.counted">
-                                        <td>${result.group}</td>
-                                        <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
-                                        <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
-                                        <td class="right-aligned">${layout.format_number(result.yeas)}</td>
-                                        <td class="right-aligned">${layout.format_number(result.nays)}</td>
-                                        <td class="right-aligned">${layout.format_number(result.empty)}</td>
-                                        <td class="right-aligned">${layout.format_number(result.invalid)}</td>
-                                        <td class="right-aligned">${layout.format_number(result.yeas_percentage)}</td>
-                                        <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
-                                    </tal:block>
-                                </tr>
+            <div class="foldable folded">
+                <h3 class="foldable-title" i18n:translate>Electoral Districts</h3>
+                <div class="foldable-panel">
+                    <table class="ballot-results stackable">
+                        <thead>
+                            <th i18n:translate="">Electoral District</th>
+                            <th i18n:translate="">Result</th>
+                            <th i18n:translate="" class="right-aligned">Yeas</th>
+                            <th i18n:translate="" class="right-aligned">Nays</th>
+                            <th i18n:translate="" class="right-aligned">Empty</th>
+                            <th i18n:translate="" class="right-aligned">Invalid</th>
+                            <th i18n:translate="" class="right-aligned">Yes %</th>
+                            <th i18n:translate="" class="right-aligned">No %</th>
+                        </thead>
+                        <tbody>
+                            <tr class="total">
+                                <td i18n:translate>Total</td>
+                                <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
+                                <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
+                                <td class="answer rejected" tal:condition="counted and not ballot.accepted" i18n:translate="">Rejected</td>
+                                <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.invalid)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
+                            </tr>
 
-                                <tr class="total">
-                                    <td i18n:translate>Total</td>
-                                    <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
-                                    <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
-                                    <td class="answer rejected" tal:condition="counted and not ballot.accepted" i18n:translate="">Rejected</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.invalid)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
-                                    <td class="right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                            <tr tal:repeat="result ballot.results" data-municipality-id="${result.municipality_id}">
+                                <tal:block condition="not: result.counted">
+                                    <td >${result.group}</td>
+                                    <td class="answer" colspan="7" i18n:translate>Not yet counted.</td>
+                                </tal:block>
+                                <tal:block condition="result.counted">
+                                    <td>${result.group}</td>
+                                    <td class="answer accepted" tal:condition="result.accepted" i18n:translate="">Accepted</td>
+                                    <td class="answer rejected" tal:condition="not: result.accepted" i18n:translate="">Rejected</td>
+                                    <td class="right-aligned">${layout.format_number(result.yeas)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.nays)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.empty)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.invalid)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.yeas_percentage)}</td>
+                                    <td class="right-aligned">${layout.format_number(result.nays_percentage)}</td>
+                                </tal:block>
+                            </tr>
+
+                            <tr class="total">
+                                <td i18n:translate>Total</td>
+                                <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
+                                <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
+                                <td class="answer rejected" tal:condition="counted and not ballot.accepted" i18n:translate="">Rejected</td>
+                                <td class="right-aligned">${layout.format_number(ballot.yeas)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.nays)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.empty)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.invalid)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.yeas_percentage)}</td>
+                                <td class="right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </tal:block>
