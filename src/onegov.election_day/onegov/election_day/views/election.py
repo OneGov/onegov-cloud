@@ -189,24 +189,15 @@ def view_election_lists(self, request):
 
     session = object_session(self)
 
-    lists = session.query(
-        List.name,
-        List.votes,
-        List.number_of_mandates
-    )
-    lists = lists.order_by(
-        desc(List.number_of_mandates),
-        desc(List.votes),
-        List.name
-    )
+    lists = session.query(List.name, List.votes)
+    lists = lists.order_by(desc(List.votes))
     lists = lists.filter(List.election_id == self.id)
 
     return {
         'results': [{
             'text': list[0],
             'value': list[1],
-            'secondary': list[2],
-            'class': 'active' if list[2] > 0 else 'inactive'
+            'class': 'inactive'
         } for list in lists.all()],
         'majority': None
     }

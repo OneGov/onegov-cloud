@@ -1,16 +1,19 @@
 Changelog
 ---------
 
- - Hide candidates list for majroz elections.
+ - Hides candidates list for majorz elections.
    [msom]
 
- - Hide lists for proporz elections.
+ - Hides lists for proporz elections.
+   [msom]
+
+ - Removes color from list bar charts.
    [msom]
 
 0.7.1 (2016-03-14)
 ~~~~~~~~~~~~~~~~~~~
 
- - Displays visual hints for collapsible tables.
+- Displays visual hints for collapsible tables.
    [msom]
 
 - Adds absolute majority for majorz elections.
