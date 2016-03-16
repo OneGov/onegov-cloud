@@ -32,7 +32,7 @@
     <div id="inner-body">
       <div class="row header">
         <div class="small-12 medium-8 columns">
-          <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing" title="Back to the homepage" i18n:attributes="title">
+          <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
             <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
             <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
           </a>
@@ -59,13 +59,15 @@
               <div class="clearfix"></div>
             </tal:block>
           </tal:block>
+
+          <!--! The town's site search -->
           <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
             <div class="row collapse">
                 <div class="columns small-10">
                     <input data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" />
                 </div>
                 <div class="columns small-2">
-                    <button type="submit" class="button postfix" alt="Search" i18n:attributes="alt">
+                    <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
                       <i class="fa fa-search" data-typeahead-spinner></i>
                     </button>
                 </div>
@@ -75,6 +77,7 @@
               </div>
             </div>
           </form>
+
         </div>
       </div>
       <div class="row">
