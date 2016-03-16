@@ -115,6 +115,12 @@
                 </div>
             </tal:block>
 
+            <div class="row" tal:condition="not: majorz">
+                <div class="small-12 small-centered medium-12 large-10 columns">
+                    <div class="sankey-chart" data-dataurl="${request.link(election, name='connections')}"></div>
+                </div>
+            </div>
+
             <tal:block tal:condition="not: majorz">
                 <h3 i18n:translate tal:condition="connections">List connections</h3>
                 <tal:block tal:repeat="connection connections">

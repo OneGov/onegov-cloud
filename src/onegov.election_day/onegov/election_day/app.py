@@ -131,12 +131,21 @@ class ElectionDayApp(Framework):
             output='bundles/bar_chart.bundle.js'
         )
 
+        sankey_chart = Bundle(
+            d3,
+            'js/sankey.js',
+            'js/sankey-chart.js',
+            filters=jsminifier,
+            output='bundles/sankey_chart.bundle.js'
+        )
+
         return {
             'common': common,
             'ballot_map': ballot_map,
             'bar_chart': bar_chart,
             'form_js': form_js,
             'form_css': form_css,
+            'sankey_chart': sankey_chart
         }
 
 

@@ -23,6 +23,7 @@ def view_election(self, request):
 
     layout = DefaultLayout(self, request)
     request.include('bar_chart')
+    request.include('sankey_chart')
 
     majorz = self.type == 'majorz'
     session = object_session(self)
@@ -200,7 +201,7 @@ def view_election_candidates(self, request):
 @ElectionDayApp.json(model=Election, permission=Public, name='lists')
 def view_election_lists(self, request):
     if self.type == 'majorz':
-        return []
+        return {}
 
     session = object_session(self)
 
@@ -224,4 +225,63 @@ def view_election_lists(self, request):
             'class': 'active' if list[2] > 0 else 'inactive'
         } for list in lists.all()],
         'majority': None
+    }
+
+
+@ElectionDayApp.json(model=Election, permission=Public, name='connections')
+def view_election_connections(self, request):
+    if self.type == 'majorz':
+        return {}
+
+    nodes = []
+    links = []
+    for list in self.lists:
+        nodes.append(list.name)
+        source_id = len(nodes) - 1
+        if list.connection:
+            if list.connection.parent:
+                connection_name = 'ULV {}'.format(
+                    list.connection.connection_id
+                )
+            else:
+                connection_name = 'LV {}'.format(
+                    list.connection.connection_id
+                )
+            try:
+                target_id = nodes.index(connection_name)
+            except ValueError:
+                nodes.append(connection_name)
+                target_id = len(nodes) - 1
+            links.append((source_id, target_id, list.votes))
+
+    for connection in self.list_connections:
+        if connection.parent:
+            source_name = 'ULV {}'.format(
+                connection.connection_id
+            )
+            target_name = 'LV {}'.format(
+                connection.parent.connection_id
+            )
+            try:
+                source_id = nodes.index(source_name)
+            except ValueError:
+                nodes.append(source_name)
+                source_id = len(nodes) - 1
+            try:
+                target_id = nodes.index(target_name)
+            except ValueError:
+                nodes.append(target_name)
+                target_id = len(nodes) - 1
+
+            links.append((source_id, target_id, connection.votes))
+
+    return {
+        'nodes': [{
+            'name': node,
+        } for node in nodes],
+        'links': [{
+            'source': link[0],
+            'target': link[1],
+            'value': link[2],
+        } for link in links]
     }
