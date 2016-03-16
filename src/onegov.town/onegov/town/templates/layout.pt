@@ -64,7 +64,8 @@
           <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
             <div class="row collapse">
                 <div class="columns small-10">
-                    <input data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" />
+                    <label for="search" class="show-for-sr" i18n:translate>Search</label>
+                    <input id="search" data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" />
                 </div>
                 <div class="columns small-2">
                     <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
