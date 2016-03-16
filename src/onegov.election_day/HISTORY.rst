@@ -22,6 +22,9 @@ Changelog
 - Folds results to sections.
   [msom]
 
+- Makes title font sizes smaller for mobile devices.
+  [msom]
+
 0.7.1 (2016-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

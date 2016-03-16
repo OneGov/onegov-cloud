@@ -19,7 +19,9 @@ class ElectionDayTheme(BaseTheme):
     def default_options(self):
         return {
             'header-line-height': '1.3',
-            'subheader-line-height': '1.3'
+            'subheader-line-height': '1.3',
+            'h1-font-reduction': 'rem-calc(15)',
+            'h2-font-reduction': 'rem-calc(12)',
         }
 
     @property
