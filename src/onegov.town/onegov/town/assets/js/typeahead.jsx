@@ -36,9 +36,11 @@ var TypeaheadList = React.createClass({
         return (
             <ul>
                 {results.map(function(result) {
-                    return <li key={result} className={active == result ? 'active' : ''}>
-                        <a href={target + "?q=" + result}>{result}</a>
-                    </li>;
+                    return (
+                        <li key={result} className={active === result ? 'active' : ''}>
+                            <a href={target + '?q=' + result}>{result}</a>
+                        </li>
+                    );
                 })}
             </ul>
         );
@@ -61,19 +63,17 @@ var TypeaheadList = React.createClass({
     },
     up: function() {
         var ix = this.props.results.indexOf(this.state.active);
-        if (ix == -1 || ix === 0) {
+        if (ix === -1 || ix === 0) {
             this.setState({active: null});
-        }
-        else if (ix >= 1) {
-            this.setState({active: this.props.results[ix -1]});
+        } else if (ix >= 1) {
+            this.setState({active: this.props.results[ix - 1]});
         }
     },
     down: function() {
         var ix = this.props.results.indexOf(this.state.active);
-        if (ix == -1) {
+        if (ix === -1) {
             ix = 0;
-        }
-        else if (ix < (this.props.results.length - 1)) {
+        } else if (ix < (this.props.results.length - 1)) {
             ix += 1;
         }
 
@@ -90,8 +90,9 @@ var TypeAhead = function(form) {
     var typeahead = null;
 
     var update_typeahead = function(results) {
+        var el = $('<div>');
+
         if (typeahead === null) {
-            var el = $("<div>");
             container.append(el);
 
             typeahead = React.render(
@@ -120,10 +121,11 @@ var TypeAhead = function(form) {
     }, 100);
 
     $(document).on('keydown', function(event) {
-        if (event.ctrlKey || event.metaKey || event.altKey) return;
+        if (event.ctrlKey || event.metaKey || event.altKey) {
+            return;
+        }
 
         if (event.keyCode >= 48 && $(':focus').is('a') || !$(':focus').length) {
-            console.log(event);
             $(subject).val('');
             $(subject)[0].focus();
         }
@@ -131,26 +133,26 @@ var TypeAhead = function(form) {
 
     $(subject).on('keydown', function(event) {
         // enter
-        if (event.keyCode == 13) {
+        if (event.keyCode === 13) {
             if (typeahead !== null && typeahead.enter()) {
                 event.preventDefault();
             }
         }
         // arrow up
-        else if (event.keyCode == 38) {
+        else if (event.keyCode === 38) {
             if (typeahead !== null && typeahead.up()) {
                 event.preventDefault();
             }
         }
         // arrow down
-        else if (event.keyCode == 40) {
+        else if (event.keyCode === 40) {
             if (typeahead !== null && typeahead.down()) {
                 event.preventDefault();
             }
         }
         // arrow right
-        else if (event.keyCode == 39) {
-           if (typeahead !== null && typeahead.right()) {
+        else if (event.keyCode === 39) {
+            if (typeahead !== null && typeahead.right()) {
                 event.preventDefault();
             }
         }
@@ -158,7 +160,7 @@ var TypeAhead = function(form) {
 
     $(subject).on('keyup', function(event) {
         // actual characters or backspace
-        if (event.keyCode >= 48 || event.keyCode == 8) {
+        if (event.keyCode >= 48 || event.keyCode === 8) {
             spinner.attr('class', 'fa fa-refresh fa-spin');
             update_suggestions($(this).val());
             event.preventDefault();
@@ -166,13 +168,11 @@ var TypeAhead = function(form) {
     });
 };
 
-
 jQuery.fn.typeahead = function() {
     return this.each(function() {
         TypeAhead($(this));
     });
 };
-
 
 $(document).ready(function() {
     $('form[data-typeahead="on"]').typeahead();
