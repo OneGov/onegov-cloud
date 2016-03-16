@@ -482,7 +482,7 @@ input[type=color] {
     overflow: hidden;
     text-overflow: ellipsis;
 
-    h2 {
+    h3 {
         font-size: 1rem;
         margin-bottom: 0;
     }
@@ -1091,13 +1091,15 @@ div#redactor-droparea {
 .newslist .news-list-item {
     margin-bottom: .5rem;
 
-    a h2 {
+    a h2,
+    a h3 {
         color: $side-nav-link-color;
         font-size: $h3-font-size - $h3-font-reduction;
         margin-bottom: .5rem;
     }
 
-    a:hover h2 {
+    a:hover h2,
+    a:hover h3 {
         color: $side-nav-link-color-hover;
     }
 
