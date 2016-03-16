@@ -325,24 +325,26 @@
 </metal:person_card>
 
 <metal:sidebar define-macro="sidebar" i18n:domain="onegov.town">
-    <ul class="side-nav" data-sortable data-sortable-url="${layout.sortable_url_template}">
-        <tal:block repeat="link layout.sidebar_links">
-            <li tal:define="is_group hasattr(link, 'links')" class="${is_group and 'active' or ''}" data-sortable-id="${request.is_logged_in and link.model.id}">
-                <tal:block condition="not:is_group" replace="structure link(request)" />
-                <tal:block condition="is_group">
-                    <a href="#" class="group-title">${link.title}
-                        <metal:block use-macro="layout.macros['hidden_from_public_hint']" tal:define="item link"/>
-                    </a>
-                    <ul class="children" tal:condition="link.links"
-                        data-sortable data-sortable-url="${layout.sortable_url_template}">
-                        <li tal:repeat="child link.links" data-sortable-id="${request.is_logged_in and child.model.id}">
-                            <tal:block replace="structure child(request)" />
-                        </li>
-                    </ul>
-                </tal:block>
-            </li>
-        </tal:block>
-    </ul>
+    <nav role="navigation">
+        <ul class="side-nav" data-sortable data-sortable-url="${layout.sortable_url_template}">
+            <tal:block repeat="link layout.sidebar_links">
+                <li tal:define="is_group hasattr(link, 'links')" class="${is_group and 'active' or ''}" data-sortable-id="${request.is_logged_in and link.model.id}">
+                    <tal:block condition="not:is_group" replace="structure link(request)" />
+                    <tal:block condition="is_group">
+                        <a href="#" class="group-title">${link.title}
+                            <metal:block use-macro="layout.macros['hidden_from_public_hint']" tal:define="item link"/>
+                        </a>
+                        <ul class="children" tal:condition="link.links"
+                            data-sortable data-sortable-url="${layout.sortable_url_template}">
+                            <li tal:repeat="child link.links" data-sortable-id="${request.is_logged_in and child.model.id}">
+                                <tal:block replace="structure child(request)" />
+                            </li>
+                        </ul>
+                    </tal:block>
+                </li>
+            </tal:block>
+        </ul>
+    </nav>
 </metal:sidebar>
 
 <metal:ticket_status define-macro="ticket_status" i18n:domain="onegov.town">
