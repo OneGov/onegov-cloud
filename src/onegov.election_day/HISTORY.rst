@@ -2,19 +2,22 @@ Changelog
 ---------
 
 - Hides candidates list for majorz elections.
-   [msom]
+  [msom]
 
 - Hides lists for proporz elections.
-   [msom]
+  [msom]
 
 - Removes color from list bar charts.
-   [msom]
+  [msom]
 
 - Sorts lists by list id.
-   [msom]
+  [msom]
 
 - Removes table collapsing for most tables.
-   [msom]
+  [msom]
+
+- Adds a totals row at the top for tables with totals.
+  [msom]
 
 0.7.1 (2016-03-14)
 ~~~~~~~~~~~~~~~~~~~

@@ -178,6 +178,10 @@
                                     <th tal:repeat="candidate election.candidates" class="right-aligned">${candidate.family_name} ${candidate.first_name}</th>
                                 </thead>
                                 <tbody>
+                                    <tr class="total">
+                                        <td i18n:translate>Total</td>
+                                        <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
+                                    </tr>
                                     <tr tal:repeat="result electoral">
                                         <td>${result[0]}</td>
                                         <td tal:repeat="candidate result[1]" class="right-aligned">${layout.format_number(candidate[1])}</td>
@@ -209,6 +213,16 @@
                                 <th i18n:translate="" class="right-aligned" tal:condition="election.counted">Turnout</th>
                             </thead>
                             <tbody>
+                                <tr class="total">
+                                    <td i18n:translate>Total</td>
+                                    <td class="right-aligned">${layout.format_number(election.elegible_voters)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.blank_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.invalid_ballots)}</td>
+                                    <td class="right-aligned">${layout.format_number(election.accounted_votes)}</td>
+                                    <td class="right-aligned" tal:condition="election.counted">${'{0:.2f}'.format(election.turnout)} %</td>
+                                </tr>
                                 <tr tal:repeat="result election.results">
                                     <td>${result.group}</td>
                                     <td class="right-aligned">${layout.format_number(result.elegible_voters)}</td>
