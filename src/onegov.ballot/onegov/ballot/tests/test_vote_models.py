@@ -602,3 +602,26 @@ def test_vote_export(session):
             'elegible_voters': 0
         }
     ]
+
+
+def test_vote_meta_data(session):
+    vote = Vote(
+        title="Is this a test?",
+        shortcode="FOO",
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    assert not vote.meta
+
+    session.add(vote)
+    session.flush()
+
+    assert not vote.meta
+
+    vote.meta['a'] = 1
+    assert vote.meta['a'] == 1
+
+    session.flush()
+    vote.meta['b'] = 2
+    assert vote.meta['a'] == 1
+    assert vote.meta['b'] == 2

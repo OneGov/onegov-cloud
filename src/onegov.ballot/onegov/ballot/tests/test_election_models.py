@@ -714,3 +714,27 @@ def test_election_export(session):
             'candidate_votes': 520
         }
     ]
+
+
+def test_election_meta_data(session):
+    election = Election(
+        title='Election',
+        domain='federation',
+        type='majorz',
+        date=date(2015, 6, 14),
+        number_of_mandates=1
+    )
+    assert not election.meta
+
+    session.add(election)
+    session.flush()
+
+    assert not election.meta
+
+    election.meta['a'] = 1
+    assert election.meta['a'] == 1
+
+    session.flush()
+    election.meta['b'] = 2
+    assert election.meta['a'] == 1
+    assert election.meta['b'] == 2
