@@ -415,6 +415,11 @@ def test_ballot_results_aggregation(session):
     assert round(ballot.yeas_percentage, 2) == 89.38
     assert round(ballot.nays_percentage, 2) == 10.62
 
+    assert int(session.query(Vote.yeas).one()[0]) == 309 + 507
+    assert int(session.query(Vote.nays).one()[0]) == 69 + 28
+    assert int(session.query(Vote.empty).one()[0]) == 14 + 5
+    assert int(session.query(Vote.invalid).one()[0]) == 5 + 0
+
     session.query(Ballot.yeas).first() == (309 + 507, )
     session.query(Ballot.nays).first() == (69 + 28, )
     session.query(Ballot.empty).first() == (14 + 5, )
