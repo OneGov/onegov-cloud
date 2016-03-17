@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.4.2 (2016-03-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds meta columns for elections and votes.
   [msom]
