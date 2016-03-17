@@ -1,5 +1,8 @@
 from datetime import date
-from onegov.ballot import Election, ElectionCollection, Vote, VoteCollection
+from onegov.ballot import (
+    Ballot, BallotCollection, Election, ElectionCollection, Vote,
+    VoteCollection
+)
 
 
 def test_elections_by_date(session):
@@ -38,6 +41,28 @@ def test_elections_by_date(session):
         'second',
         'last'
     ]
+
+
+def test_elections_by_id(session):
+    session.add(Election(
+        title="first",
+        domain='federation',
+        type='majorz',
+        date=date(2015, 6, 14)
+    ))
+    session.add(Election(
+        title="second",
+        domain='federation',
+        type='majorz',
+        date=date(2015, 6, 14)
+    ))
+
+    session.flush()
+
+    collection = ElectionCollection(session)
+
+    assert collection.by_id('first').title == "first"
+    assert collection.by_id('second').title == "second"
 
 
 def test_elections_get_latest(session):
@@ -113,6 +138,11 @@ def test_elections_by_years(session):
     assert len(elections.by_year(2013)) == 0
 
 
+def test_elections_for_years(session):
+    elections = ElectionCollection(session, year=2015)
+    assert elections.for_year(2016).year == 2016
+
+
 def test_elections_shortcode_order(session):
     session.add(Election(
         title="A",
@@ -168,6 +198,26 @@ def test_votes_by_date(session):
         'second',
         'last'
     ]
+
+
+def test_votes_by_id(session):
+    session.add(Vote(
+        title="first",
+        domain='federation',
+        date=date(2015, 6, 14)
+    ))
+    session.add(Vote(
+        title="second",
+        domain='federation',
+        date=date(2015, 6, 14)
+    ))
+
+    session.flush()
+
+    collection = VoteCollection(session)
+
+    assert collection.by_id('first').title == "first"
+    assert collection.by_id('second').title == "second"
 
 
 def test_votes_get_latest(session):
@@ -236,6 +286,11 @@ def test_votes_by_years(session):
     assert len(votes.by_year(2013)) == 0
 
 
+def test_votes_for_years(session):
+    votes = VoteCollection(session, year=2015)
+    assert votes.for_year(2016).year == 2016
+
+
 def test_votes_shortcode_order(session):
     session.add(Vote(
         title="A",
@@ -255,3 +310,21 @@ def test_votes_shortcode_order(session):
     votes = VoteCollection(session, year=2015).by_year()
     assert votes[0].title == "Z"
     assert votes[1].title == "A"
+
+
+def test_ballot_collection(session):
+    vote = Vote(
+        title="A",
+        shortcode="Z",
+        domain='federation',
+        date=date(2015, 6, 14)
+    )
+    vote.ballots.append(Ballot(type='proposal'))
+
+    session.add(vote)
+    session.flush()
+
+    collection = BallotCollection(session)
+
+    assert collection.query().count() == 1
+    assert collection.by_id(vote.ballots[0].id) == vote.ballots[0]
