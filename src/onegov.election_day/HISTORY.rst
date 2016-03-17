@@ -25,6 +25,9 @@ Changelog
 - Makes title font sizes smaller for mobile devices.
   [msom]
 
+- Adds related links.
+  [msom]
+
 0.7.1 (2016-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-03-16 10:13+0100\n"
+"POT-Creation-Date: 2016-03-17 09:30+0100\n"
 "PO-Revision-Date: 2016-01-08 10:07+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -12,12 +12,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 1.7.6\n"
-
-msgid "System"
-msgstr ""
-
-msgid "Type"
-msgstr "Gener"
 
 msgid "Election (German)"
 msgstr ""
@@ -38,6 +32,15 @@ msgid "Date"
 msgstr "Data"
 
 msgid "Mandates"
+msgstr ""
+
+msgid "System"
+msgstr ""
+
+msgid "Type"
+msgstr "Gener"
+
+msgid "Related link"
 msgstr ""
 
 msgid "An election with this title exists already"
@@ -142,26 +145,14 @@ msgstr "Participaziun a las elecziuns"
 msgid "Received Ballots"
 msgstr ""
 
-msgid "List connection"
-msgstr ""
-
-#. Default: Votes
-msgid "single_votes"
-msgstr ""
-
-msgid "Sublist connection"
-msgstr ""
-
-msgid "Subtotal"
-msgstr ""
-
-msgid "Total"
-msgstr "Total"
-
 msgid "Candidates"
 msgstr ""
 
 msgid "Candidate"
+msgstr ""
+
+#. Default: Votes
+msgid "single_votes"
 msgstr ""
 
 msgid "List"
@@ -181,6 +172,18 @@ msgstr ""
 
 msgid "Elected candidates only"
 msgstr ""
+
+msgid "List connection"
+msgstr ""
+
+msgid "Sublist connection"
+msgstr ""
+
+msgid "Subtotal"
+msgstr ""
+
+msgid "Total"
+msgstr "Total"
 
 msgid "Electoral Districts"
 msgstr ""

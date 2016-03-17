@@ -4,19 +4,27 @@ from onegov.core import utils
 from onegov.election_day import _
 from onegov.form import Form
 from wtforms import IntegerField, RadioField, StringField
-from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import DateField, URLField
 from wtforms.validators import NumberRange, InputRequired, ValidationError
 
 
 class ElectionForm(Form):
+
     election_de = StringField(
         label=_("Election (German)"),
-        validators=[InputRequired()]
+        validators=[
+            InputRequired()
+        ]
     )
-
-    election_fr = StringField(label=_("Election (French)"))
-    election_it = StringField(label=_("Election (Italian)"))
-    election_rm = StringField(label=_("Election (Romansh)"))
+    election_fr = StringField(
+        label=_("Election (French)")
+    )
+    election_it = StringField(
+        label=_("Election (Italian)")
+    )
+    election_rm = StringField(
+        label=_("Election (Romansh)")
+    )
 
     shortcode = StringField(
         label=_("Shortcode")
@@ -24,24 +32,45 @@ class ElectionForm(Form):
 
     date = DateField(
         label=_("Date"),
-        validators=[InputRequired()],
+        validators=[
+            InputRequired()
+        ],
         default=date.today
     )
 
     mandates = IntegerField(
         label=_("Mandates"),
-        validators=[InputRequired(), NumberRange(min=1)]
+        validators=[
+            InputRequired(),
+            NumberRange(min=1)
+        ]
     )
 
-    election_type = RadioField(_("System"), choices=[
-        ('proporz', _("Election based on proportional representation")),
-        ('majorz', _("Majority system")),
-    ], validators=[InputRequired()])
+    election_type = RadioField(
+        label=_("System"),
+        choices=[
+            ('proporz', _("Election based on proportional representation")),
+            ('majorz', _("Majority system")),
+        ],
+        validators=[
+            InputRequired()
+        ]
+    )
 
-    domain = RadioField(_("Type"), choices=[
-        ('federation', _("Federal Election")),
-        ('canton', _("Cantonal Election")),
-    ], validators=[InputRequired()])
+    domain = RadioField(
+        label=_("Type"),
+        choices=[
+            ('federation', _("Federal Election")),
+            ('canton', _("Cantonal Election")),
+        ],
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    related_link = URLField(
+        label=_("Related link")
+    )
 
     def validate_vote(self, field):
         elections = ElectionCollection(self.request.app.session())
@@ -70,6 +99,10 @@ class ElectionForm(Form):
         if self.election_rm.data:
             model.title_translations['rm_CH'] = self.election_rm.data
 
+        if not model.meta:
+            model.meta = {}
+        model.meta['related_link'] = self.related_link.data
+
     def apply_model(self, model):
         self.election_de.data = model.title_translations['de_CH']
         self.election_fr.data = model.title_translations.get('fr_CH')
@@ -81,3 +114,6 @@ class ElectionForm(Form):
         self.shortcode.data = model.shortcode
         self.election_type.data = model.type
         self.mandates.data = model.number_of_mandates
+
+        meta_data = model.meta or {}
+        self.related_link.data = meta_data.get('related_link', '')

@@ -205,4 +205,15 @@
     </tal:block>
 </metal:fields>
 
+<metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
+    <div class="row" tal:condition="meta.get('related_link', '')|nothing">
+        <div class="columns small-12">
+            <h3 i18n:translate>Related link</h3>
+            <p tal:define="link meta.get('related_link', '')">
+                <a href="${link}">${link}</a>
+            </p>
+        </div>
+    </div>
+</metal:related_link>
+
 </body>

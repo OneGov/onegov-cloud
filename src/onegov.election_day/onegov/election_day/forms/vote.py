@@ -4,19 +4,26 @@ from onegov.core import utils
 from onegov.election_day import _
 from onegov.form import Form
 from wtforms import RadioField, StringField
-from wtforms.fields.html5 import DateField
+from wtforms.fields.html5 import DateField, URLField
 from wtforms.validators import InputRequired, ValidationError
 
 
 class VoteForm(Form):
     vote_de = StringField(
         label=_("Vote (German)"),
-        validators=[InputRequired()]
+        validators=[
+            InputRequired()
+        ]
     )
-
-    vote_fr = StringField(label=_("Vote (French)"))
-    vote_it = StringField(label=_("Vote (Italian)"))
-    vote_rm = StringField(label=_("Vote (Romansh)"))
+    vote_fr = StringField(
+        label=_("Vote (French)")
+    )
+    vote_it = StringField(
+        label=_("Vote (Italian)")
+    )
+    vote_rm = StringField(
+        label=_("Vote (Romansh)")
+    )
 
     shortcode = StringField(
         label=_("Shortcode")
@@ -28,10 +35,20 @@ class VoteForm(Form):
         default=date.today
     )
 
-    domain = RadioField(_("Type"), choices=[
-        ('federation', _("Federal Vote")),
-        ('canton', _("Cantonal Vote")),
-    ], validators=[InputRequired()])
+    domain = RadioField(
+        label=_("Type"),
+        choices=[
+            ('federation', _("Federal Vote")),
+            ('canton', _("Cantonal Vote")),
+        ],
+        validators=[
+            InputRequired()
+        ]
+    )
+
+    related_link = URLField(
+        label=_("Related link")
+    )
 
     def validate_vote(self, field):
         votes = VoteCollection(self.request.app.session())
@@ -56,6 +73,10 @@ class VoteForm(Form):
         if self.vote_rm.data:
             model.title_translations['rm_CH'] = self.vote_rm.data
 
+        if not model.meta:
+            model.meta = {}
+        model.meta['related_link'] = self.related_link.data
+
     def apply_model(self, model):
         self.vote_de.data = model.title_translations['de_CH']
         self.vote_fr.data = model.title_translations.get('fr_CH')
@@ -65,3 +86,6 @@ class VoteForm(Form):
         self.date.data = model.date
         self.domain.data = model.domain
         self.shortcode.data = model.shortcode
+
+        meta_data = model.meta or {}
+        self.related_link.data = meta_data.get('related_link', '')
