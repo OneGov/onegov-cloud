@@ -153,6 +153,18 @@ def test_election_id_generation(session):
 
     assert election.id == 'legislative-election'
 
+    election = Election(
+        title='Legislative Election',
+        domain='federation',
+        type='majorz',
+        date=date(2015, 6, 14),
+    )
+
+    session.add(election)
+    session.flush()
+
+    assert election.id == 'legislative-election-1'
+
 
 def test_election_summarized_properties(session):
     election = Election(

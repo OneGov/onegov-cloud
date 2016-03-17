@@ -48,6 +48,17 @@ def test_vote_id_generation(session):
 
     assert vote.id == 'universal-healthcare'
 
+    vote = Vote(
+        title="Universal Healthcare",
+        domain='federation',
+        date=date(2015, 6, 14),
+    )
+
+    session.add(vote)
+    session.flush()
+
+    assert vote.id == 'universal-healthcare-1'
+
 
 def test_ballot_answer_simple(session):
     vote = Vote(

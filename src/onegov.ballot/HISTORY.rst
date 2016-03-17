@@ -7,6 +7,9 @@ Unreleased
 - Adds meta columns for elections and votes.
   [msom]
 
+- Allows duplicate election and vote titles.
+  [msom]
+
 0.4.1 (2016-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

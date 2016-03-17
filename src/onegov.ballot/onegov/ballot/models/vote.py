@@ -3,7 +3,7 @@ from onegov.ballot.models.common import DomainOfInfluenceMixin, MetaMixin
 from onegov.core.orm import Base, translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE, UUID
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import normalize_for_url, increment_name
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
 from sqlalchemy import select, func, case, desc
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -113,7 +113,11 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     @observes('title_translations')
     def title_observer(self, translations):
         if not self.id:
-            self.id = normalize_for_url(self.title)
+            id = normalize_for_url(self.title) or "vote"
+            session = object_session(self)
+            while session.query(Vote.id).filter(Vote.id == id).first():
+                id = increment_name(id)
+            self.id = id
 
     @property
     def counted(self):

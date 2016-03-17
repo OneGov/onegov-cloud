@@ -3,7 +3,7 @@ from onegov.ballot.models.common import DomainOfInfluenceMixin, MetaMixin
 from onegov.core.orm import Base, translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE, UUID
-from onegov.core.utils import normalize_for_url
+from onegov.core.utils import normalize_for_url, increment_name
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
 from sqlalchemy import select, func, desc
 from sqlalchemy_utils import observes
@@ -55,7 +55,11 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
     @observes('title_translations')
     def title_observer(self, translations):
         if not self.id:
-            self.id = normalize_for_url(self.title)
+            id = normalize_for_url(self.title) or "election"
+            session = object_session(self)
+            while session.query(Election.id).filter(Election.id == id).first():
+                id = increment_name(id)
+            self.id = id
 
     #: Shortcode for cantons that use it
     shortcode = Column(Text, nullable=True)
