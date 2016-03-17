@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Changes the look and feel of the formcode field to be more like other fields.
+  [href]
+
+- Various accessibility improvements.
+  [href]
+
 - Fixes the upload widget in forms having an unintended design.
   [href]
 

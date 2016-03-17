@@ -1,12 +1,9 @@
-$(function () {
-    $('textarea[data-editor]').each(function () {
+$(function() {
+    $('textarea[data-editor]').each(function() {
         var textarea = $(this);
 
         var mode = textarea.data('editor');
         var readonly = textarea.is('[readonly]');
-
-        var height = textarea.height();
-        var width = textarea.width();
         textarea.css('display', 'none');
 
         var outside = $('<div class="code-editor-wrapper">');
@@ -18,14 +15,28 @@ $(function () {
         outside.insertBefore(textarea);
 
         var editor = ace.edit(inside[0]);
+        editor.setOptions({
+            minLines: 10,
+            maxLines: 50
+        });
         editor.setHighlightActiveLine(false);
         editor.setDisplayIndentGuides(true);
         editor.setFontSize('12px');
-        editor.renderer.setPadding(0);
+        editor.renderer.setPadding(10);
         editor.renderer.setShowGutter(false);
+        editor.renderer.setScrollMargin(10, 10, 10, 10);
         editor.getSession().setValue(textarea.val());
         editor.getSession().setMode("ace/mode/" + mode);
         editor.setTheme("ace/theme/tomorrow");
+
+        editor.on("focus", function() {
+            inside.toggleClass('focused', true);
+            outside.toggleClass('focused', true);
+        });
+        editor.on("blur", function() {
+            inside.toggleClass('focused', false);
+            outside.toggleClass('focused', false);
+        });
 
         var highlighted_line = null;
 
@@ -34,7 +45,7 @@ $(function () {
             var line = textarea.data('highlight-line');
 
             highlighted_line = editor.getSession().addMarker(
-                new Range(line-1, 0, line-1, 100000), "ace-syntax-error", "fullLine", false
+                new Range(line - 1, 0, line - 1, 100000), "ace-syntax-error", "fullLine", false
             );
         }
 
@@ -43,7 +54,7 @@ $(function () {
             inside.addClass('read-only');
             editor.setReadOnly(true);
             editor.setDisplayIndentGuides(false);
-            editor.renderer.$cursorLayer.element.style.opacity=0;
+            editor.renderer.$cursorLayer.element.style.opacity = 0;
             editor.getSession().setMode("ace/mode/text");
         }
 

@@ -312,28 +312,30 @@ form {
         work right with custom styling (it'll look like it's working, but
         all the cursor measurements are off and the editing is werid).
     */
-    $code-editor-height: 600px;
 
     .code-editor-wrapper {
         @include form-element;
-        height: $code-editor-height;
+        height: auto;
         margin-bottom: 1em;
+        padding: 0;
+
+        // focused is a class because the wrapper doesn't get ':focus'
+        &.focused {
+            border-color: $input-focus-border-color;
+        }
     }
 
     .error .code-editor-wrapper {
         margin-bottom: 0;
+        padding: 0;
     }
 
-    .read-only {
-        background-color: $input-disabled-bg;
-        color: $steel;
-        cursor: $input-disabled-cursor;
-    }
-
-    .code-editor,
-    .ace_scroller,
-    .ace_content {
-        height: $code-editor-height - 15px;
+    .code-editor {
+        &.read-only {
+            background-color: $input-disabled-bg;
+            color: $steel;
+            cursor: $input-disabled-cursor;    
+        }
     }
 
     .ace_content {
