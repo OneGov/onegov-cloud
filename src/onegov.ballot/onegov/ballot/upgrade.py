@@ -3,7 +3,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.ballot import Vote
-from onegov.core.orm.types import HSTORE
+from onegov.core.orm.types import HSTORE, JSON
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Column, Integer, Text
 
@@ -53,3 +53,9 @@ def add_absolute_majority_column(context):
         'elections',
         Column('absolute_majority', Integer())
     )
+
+
+@upgrade_task('Add meta data')
+def add_meta_data_columns(context):
+    context.operations.add_column('elections', Column('meta', JSON()))
+    context.operations.add_column('votes', Column('meta', JSON()))

@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from onegov.ballot.models.common import DomainOfInfluenceMixin
+from onegov.ballot.models.common import DomainOfInfluenceMixin, MetaMixin
 from onegov.core.orm import Base, translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import HSTORE, UUID
@@ -61,7 +61,8 @@ class DerivedBallotsCount(object):
             if self.elegible_voters else 0
 
 
-class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin):
+class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
+           MetaMixin):
     """ A vote describes the issue being voted on. For example,
     "Vote for Net Neutrality" or "Vote for Basic Income".
 
