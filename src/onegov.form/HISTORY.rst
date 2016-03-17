@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.6 (2016-03-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes unexpected indentation detection not working correctly.
   [href]
 
