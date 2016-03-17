@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes the footer height discrepancy between Gecko and Webkit.
+  [href]
+
 - Improves the print styles with a focus on printing tickets.
   [href]
 

@@ -108,6 +108,21 @@ body {
     height: auto;
 }
 
+// we need to use exact pixel measurements for the footer or we end up with
+// incosistent results across browsers, which might mean the difference between
+// showing a scrollbar and not showing one
+footer {
+
+    h2 {
+        margin-bottom: 13px;
+    }
+
+    * {
+        font-size: 13px;
+        line-height: 19px;
+    }
+}
+
 /*
     Default Coat of Arms
 */
