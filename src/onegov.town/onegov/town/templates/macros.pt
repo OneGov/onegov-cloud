@@ -242,7 +242,7 @@
         <tal:block define="fields fieldset.non_empty_fields" condition="fields">
             <h2 tal:condition="fieldset.is_visible">${fieldset.label}</h2>
             <div class="field-display" tal:repeat="field fields.values()">
-                <tal:block define="rendered layout.render_field(field)" condition="rendered">
+                <div class="field-display-block" tal:define="rendered layout.render_field(field)" tal:condition="rendered">
                     <div class="field-display-label">${field.label.text}</div>
                     <div class="field-display-data" tal:define="downloadable request.is_logged_in and field.type == 'UploadField'">
                         <tal:block condition="downloadable">
@@ -254,7 +254,8 @@
                             <tal:block replace="structure layout.render_field(field)" />
                         </tal:block>
                     </div>
-                </tal:block>
+                </div>
+                <div class="clearfix"></div>
             </div>
         </tal:block>
     </div>
@@ -363,8 +364,10 @@
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.town">
     <div class="page-content-panel" tal:condition="ticket">
         <div class="field-display ticket-status-page">
-            <div class="field-display-label" i18n:translate="">Ticket Number</div>
-            <div class="field-display-data ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
+            <div class="field-display-block">
+                <div class="field-display-label" i18n:translate="">Ticket Number</div>
+                <div class="field-display-data ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
+            </div>
         </div>
     </div>
 </metal:ticket_callout>
@@ -403,20 +406,24 @@
         <div tal:repeat="reservation reservations">
             <tal:block define="start reservation.display_start(); end reservation.display_end()">
                 <div class="field-display">
-                    <div class="field-display-label" i18n:translate>Date</div>
-                    <div class="field-display-data">
-                        ${layout.format_date(start, 'date')}
-                        <!-- simple whole day check: -->
-                        <tal:block condition="start.time() != end.time()">
-                            ${layout.format_date(start, 'time')} -
-                            ${layout.format_date(end, 'time')}
-                        </tal:block>
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Date</div>
+                        <div class="field-display-data">
+                            ${layout.format_date(start, 'date')}
+                            <!-- simple whole day check: -->
+                            <tal:block condition="start.time() != end.time()">
+                                ${layout.format_date(start, 'time')} -
+                                ${layout.format_date(end, 'time')}
+                            </tal:block>
+                        </div>
                     </div>
                 </div>
 
                 <div class="field-display">
-                    <div class="field-display-label" i18n:translate>Quota</div>
-                    <div class="field-display-data">${reservation.quota}</div>
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>Quota</div>
+                        <div class="field-display-data">${reservation.quota}</div>
+                    </div>
                 </div>
             </tal:block>
         </div>

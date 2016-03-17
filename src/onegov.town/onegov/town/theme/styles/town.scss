@@ -334,7 +334,7 @@ form {
         &.read-only {
             background-color: $input-disabled-bg;
             color: $steel;
-            cursor: $input-disabled-cursor;    
+            cursor: $input-disabled-cursor;
         }
     }
 
@@ -2168,6 +2168,77 @@ ul.search-results {
 
     body {
         font-size: 12px !important;
+    }
+
+    // tickets status panel
+    .page-content-panel {
+        margin-bottom: .5rem;
+
+        .field-display-block {
+            float: left;
+            margin-right: 1.5rem;
+        }
+    }
+
+    .field-display-block * {
+        background-color: transparent;
+        color: $body-font-color;
+        font-size: 12px;
+        margin: 0 !important;
+        padding: 0;
+    }
+
+    .ticket-summary {
+        * {
+            font-size: 12px;
+        }
+
+        ul {
+            margin-bottom: 0;
+        }
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        @include hairline;
+        font-size: 1.2rem;
+        margin-bottom: .25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+        margin-bottom: .15rem;
+    }
+
+    h4,
+    h5,
+    h6 {
+        font-size: 1rem;
+    }
+
+    .header {
+        max-height: 50px;
+    }
+
+    .logo {
+        max-height: 40px;
+
+        img,
+        svg {
+            max-height: 45px;
+            width: auto;
+        }
+    }
+
+    ul.breadcrumbs {
+        padding: 0 0 .25rem 1rem;
+
+        * {
+            font-size: 9px;
+        }
     }
 }
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the print styles with a focus on printing tickets.
+  [href]
+
 - Changes the look and feel of the formcode field to be more like other fields.
   [href]
 
