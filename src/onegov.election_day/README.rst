@@ -40,8 +40,8 @@ Coverage
 
 Latests PyPI Release
 --------------------
-.. image:: https://pypip.in/v/onegov.election_day/badge.png
-  :target: https://crate.io/packages/onegov.election_day
+.. image:: https://img.shields.io/pypi/v/onegov.election_day.svg
+  :target: https://pypi.python.org/pypi/onegov.election_day
   :alt: Latest PyPI Release
 
 License
