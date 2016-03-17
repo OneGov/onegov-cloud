@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-03-17 09:30+0100\n"
+"POT-Creation-Date: 2016-03-17 11:13+0100\n"
 "PO-Revision-Date: 2015-12-24 11:39+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -14,16 +14,16 @@ msgstr ""
 "X-Generator: Poedit 1.7.6\n"
 
 msgid "Election (German)"
-msgstr ""
+msgstr "Election (allemand)"
 
 msgid "Election (French)"
-msgstr ""
+msgstr "Election (français)"
 
 msgid "Election (Italian)"
-msgstr ""
+msgstr "Election (italien)"
 
 msgid "Election (Romansh)"
-msgstr ""
+msgstr "Election (roumain)"
 
 msgid "Shortcode"
 msgstr "Shortcode"
@@ -32,16 +32,16 @@ msgid "Date"
 msgstr "Date"
 
 msgid "Mandates"
-msgstr ""
+msgstr "Mandats"
 
 msgid "System"
-msgstr ""
+msgstr "Système"
 
 msgid "Type"
 msgstr "Type"
 
 msgid "Related link"
-msgstr ""
+msgstr "Informations complémentaires"
 
 msgid "An election with this title exists already"
 msgstr ""
@@ -53,10 +53,10 @@ msgid "Majority system"
 msgstr "Système majoritaire"
 
 msgid "Federal Election"
-msgstr ""
+msgstr "Election fédéral"
 
 msgid "Cantonal Election"
-msgstr ""
+msgstr "Election cantonal"
 
 msgid "Results"
 msgstr "Résultats"

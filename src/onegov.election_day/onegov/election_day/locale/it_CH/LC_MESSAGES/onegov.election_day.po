@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-03-17 09:30+0100\n"
+"POT-Creation-Date: 2016-03-17 11:13+0100\n"
 "PO-Revision-Date: 2016-01-08 10:00+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -14,16 +14,16 @@ msgstr ""
 "X-Generator: Poedit 1.7.6\n"
 
 msgid "Election (German)"
-msgstr ""
+msgstr "Elezione (tedesco)"
 
 msgid "Election (French)"
-msgstr ""
+msgstr "Elezione (francese)"
 
 msgid "Election (Italian)"
-msgstr ""
+msgstr "Elezione (italiano)"
 
 msgid "Election (Romansh)"
-msgstr ""
+msgstr "Elezione (romancio)"
 
 msgid "Shortcode"
 msgstr "Abbreviazione"
@@ -32,19 +32,19 @@ msgid "Date"
 msgstr "Data"
 
 msgid "Mandates"
-msgstr ""
+msgstr "Mandati"
 
 msgid "System"
-msgstr ""
+msgstr "Sistema"
 
 msgid "Type"
 msgstr "Tipo"
 
 msgid "Related link"
-msgstr ""
+msgstr "Ulteriori informazioni"
 
 msgid "An election with this title exists already"
-msgstr ""
+msgstr "Esiste già una elezione con questo titolo"
 
 msgid "Election based on proportional representation"
 msgstr "Sistema proporzionale"
@@ -53,28 +53,28 @@ msgid "Majority system"
 msgstr "Sistema maggioritario"
 
 msgid "Federal Election"
-msgstr ""
+msgstr "Elezione federale"
 
 msgid "Cantonal Election"
-msgstr ""
+msgstr "Elezione cantonale"
 
 msgid "Results"
 msgstr "Risultati"
 
 msgid "List connections"
-msgstr ""
+msgstr "Congiunzioni di liste"
 
 msgid "Elected Candidates"
-msgstr ""
+msgstr "Candidati eletti"
 
 msgid "Election statistics"
-msgstr ""
+msgstr "Statistiche elettorali"
 
 msgid "Complete"
-msgstr ""
+msgstr "Completato"
 
 msgid "Absolute majority"
-msgstr ""
+msgstr "Maggioranza assoluta"
 
 msgid "Proposal"
 msgstr "Iniziativa"
@@ -86,10 +86,10 @@ msgid "Tie-Breaker"
 msgstr "Domanda eventuale"
 
 msgid "SESAM"
-msgstr ""
+msgstr "SESAM"
 
 msgid "Wabsti"
-msgstr ""
+msgstr "Wabsti"
 
 msgid "Simple Vote"
 msgstr "Progetto semplice"
@@ -146,17 +146,17 @@ msgid "Received Ballots"
 msgstr ""
 
 msgid "Candidates"
-msgstr ""
+msgstr "Candidati"
 
 msgid "Candidate"
-msgstr ""
+msgstr "Candidato"
 
 #. Default: Votes
 msgid "single_votes"
 msgstr ""
 
 msgid "List"
-msgstr ""
+msgstr "Lista"
 
 msgid "Elected"
 msgstr ""
