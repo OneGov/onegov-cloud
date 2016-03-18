@@ -245,6 +245,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             'js/jquery.datetimepicker.js',
             'js/datetimepicker.js',
             'js/jquery.popupoverlay.js',
+            'js/videoframe.js',
             'js/common.js',
             filters=jsminifier,
             output='bundles/common.bundle.js'

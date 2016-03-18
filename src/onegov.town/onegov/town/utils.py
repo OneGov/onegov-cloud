@@ -11,9 +11,25 @@ from onegov.town import _
 from onegov.town.elements import DeleteLink, Link
 
 
-def mark_images(html):
-    """ Takes the given html and marks every paragraph with an 'has-img'
-    class, if the paragraph contains an img element.
+def add_class_to_node(node, classname):
+    """ Adds the given classname to the given lxml node's class list. """
+
+    if 'class' in node.attrib:
+        node.attrib['class'] += ' ' + classname
+    else:
+        node.attrib['class'] = classname
+
+
+def annotate_html(html):
+    """ Takes the given html and annotates the following elements for some
+    advanced styling:
+
+        * Every paragraph containing an img element will be marked with the
+          `has-img` class.
+
+        * If a link is found which points to a youtube or a vimeo video, the
+          link itself as well as the surrounding paragraph is marked
+          with the `has-video` class
 
     """
 
@@ -33,10 +49,26 @@ def mark_images(html):
             return html
 
         for paragraph in element.xpath('//p[img]'):
-            if 'class' in paragraph.attrib:
-                paragraph.attrib['class'] += ' has-img'
-            else:
-                paragraph.attrib['class'] = 'has-img'
+            add_class_to_node(paragraph, 'has-img')
+
+        condition = ' or '.join(
+            'starts-with(@href, "{}")'.format(url) for url in {
+                'https://www.youtube.com',
+                'https://www.vimeo.com'
+            }
+        )
+
+        for a in element.xpath('//a[{}]'.format(condition)):
+            add_class_to_node(a, 'has-video')
+
+            # find the closest paragraph in the ancestrage, but don't look far
+            parent = a.getparent()
+
+            for i in range(0, 3):
+                if parent.tag == 'p':
+                    add_class_to_node(parent, 'has-video')
+                    break
+                parent = parent.getparent()
 
     return ''.join(tostring(e).decode('utf-8') for e in fragments)
 

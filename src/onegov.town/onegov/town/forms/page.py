@@ -1,7 +1,7 @@
 from onegov.core.utils import sanitize_html
 from onegov.form import Form
 from onegov.town import _
-from onegov.town.utils import mark_images
+from onegov.town.utils import annotate_html
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 
@@ -44,7 +44,7 @@ class PageForm(PageBaseForm):
     text = TextAreaField(
         label=_("Text"),
         render_kw={'class_': 'editor'},
-        filters=[sanitize_html, mark_images])
+        filters=[sanitize_html, annotate_html])
 
     def update_model(self, model):
         """ Stores the form values on the page. """

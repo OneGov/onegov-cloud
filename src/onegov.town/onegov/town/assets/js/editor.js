@@ -17,6 +17,7 @@ $(function() {
             definedLinks: form.data('sitecollection-url'),
             plugins: ['bufferbuttons', 'filemanager', 'imagemanager', 'definedlinks'],
             lang: 'de',
+            convertVideoLinks: false,
             formattingAdd: [
                 {
                     tag: 'h2',
