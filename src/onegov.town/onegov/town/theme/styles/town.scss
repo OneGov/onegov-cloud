@@ -904,7 +904,8 @@ div#redactor-droparea {
         max-width: $max-line-width;
     }
 
-    .has-img {
+    .has-img,
+    .has-video {
         max-width: none;
 
         // image subtitles
@@ -915,6 +916,31 @@ div#redactor-droparea {
             font-size: .875rem;
             padding: .25em .75em;
         }
+    }
+
+    .has-video,
+    .video-thumbnail {
+        background-color: $gray-pastel;
+        cursor: pointer;
+        display: block;
+        min-height: 300px;
+        position: relative;
+        text-align: center;
+        width: 100%;
+    }
+
+    .has-video:hover .video-button {
+        text-shadow: 0 0 5px $primary-color;
+    }
+
+    .video-button {
+        color: $white;
+        font-size: 4rem;
+        left: 50%;
+        position: absolute;
+        text-shadow: 0 0 2px $gray-pastel;
+        top: 50%;
+        transform: translate(-50%, -50%);
     }
 }
 
