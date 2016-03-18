@@ -25,21 +25,13 @@ var getVideoId = function(url) {
     return null;
 };
 
-var getVideoThumbnail = function(host, id) {
-    if (host.match(/youtube\.com/gi)) {
-        return "https://img.youtube.com/vi/" + id + "/maxresdefault.jpg";
-    }
-
-    if (host.match(/vimeo\.com/gi)) {
-        return "https://i.vimecodn.com/video/" + id + "_1280jpg";
-    }
-
-    return null;
-};
-
 var getVideoUrl = function(host, id) {
     if (host.match(/youtube\.com/gi)) {
-        return "https://www.youtube.com/embed/" + id + '?modestbranding=1&showinfo=0';
+        var origin = window.location.protocol +
+        '//' + window.location.host +
+        (window.location.port && (':' + window.location.port));
+
+        return "https://www.youtube.com/embed/" + id + '?modestbranding=1&showinfo=0&origin=' + origin;
     }
 
     if (host.match(/vimeo\.com/gi)) {
@@ -53,9 +45,7 @@ var getVideoInfo = function(link) {
     var info = getVideoId(link.attr('href'));
 
     if (info) {
-        info.thumbnail = getVideoThumbnail(info.host, info.id);
         info.url = getVideoUrl(info.host, info.id);
-
         return info;
     }
 
