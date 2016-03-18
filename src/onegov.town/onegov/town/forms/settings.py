@@ -121,8 +121,13 @@ class SettingsForm(Form):
 
     @property
     def theme_options(self):
+        try:
+            primary_color = self.primary_color.data.get_hex()
+        except AttributeError:
+            primary_color = user_options['primary-color']
+
         options = {
-            'primary-color': self.primary_color.data.get_hex(),
+            'primary-color': primary_color,
             'footer-height': self.footer_height.data
         }
 

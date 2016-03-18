@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Stops raising an exception if no color was selected in the settings.
+  [href]
+
 - Automatically embeds youtube and vimeo links.
   [href]
 
