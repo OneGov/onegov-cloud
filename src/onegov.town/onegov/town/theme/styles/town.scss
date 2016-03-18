@@ -923,10 +923,18 @@ div#redactor-droparea {
         background-color: $gray-pastel;
         cursor: pointer;
         display: block;
-        min-height: 300px;
+        min-height: 360px;
         position: relative;
         text-align: center;
         width: 100%;
+
+        @media #{$medium-only} {
+            min-height: 300px;
+        }
+
+        @media #{$small-only} {
+            min-height: 200px;
+        }
     }
 
     .has-video:hover .video-button {
@@ -941,6 +949,20 @@ div#redactor-droparea {
         text-shadow: 0 0 2px $gray-pastel;
         top: 50%;
         transform: translate(-50%, -50%);
+    }
+
+    .video-wrapper {
+        height: 0;
+        padding-bottom: 56.25%; /* 16:9 */
+        position: relative;
+
+        iframe {
+            height: 100%;        
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+        }
     }
 }
 

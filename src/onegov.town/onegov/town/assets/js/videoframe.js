@@ -39,7 +39,7 @@ var getVideoThumbnail = function(host, id) {
 
 var getVideoUrl = function(host, id) {
     if (host.match(/youtube\.com/gi)) {
-        return "https://www.youtube.com/embed/" + id + '?autoplay=1';
+        return "https://www.youtube.com/embed/" + id + '?modestbranding=1&showinfo=0';
     }
 
     if (host.match(/vimeo\.com/gi)) {
@@ -55,8 +55,6 @@ var getVideoInfo = function(link) {
     if (info) {
         info.thumbnail = getVideoThumbnail(info.host, info.id);
         info.url = getVideoUrl(info.host, info.id);
-        info.width = 640;
-        info.height = 360;
 
         return info;
     }
@@ -66,36 +64,18 @@ var getVideoInfo = function(link) {
 
 var VideoFrame = function(link) {
     var info = getVideoInfo(link);
+    var parent = link.parent();
+
+    var wrapper = $('<div class="video-wrapper" />');
 
     var iframe = $('<iframe class="video-frame" src="' + info.url + '">')
         .attr('frameborder', '0')
-        .attr('allowfullscreen', true)
-        .attr('width', info.width)
-        .attr('height', info.height);
-
-    var thumb = $('<img class="video-thumbnail" />')
-        .on('error', function() {
-            $(this).removeAttr('src');
-        })
         .on('load', function() {
-            $(this).parent().css('height', $(this).height());
+            parent.css('min-height', '0');
+            parent.find('br').remove();
         });
 
-    var button = $('<i class="video-button fa fa-play"></i>');
-
-    button.click(function() {
-        button.remove();
-        thumb.replaceWith(iframe);
-    });
-
-    thumb.click(function() {
-        button.remove();
-        thumb.replaceWith(iframe);
-    });
-
-    link.replaceWith(thumb);
-    thumb.after(button);
-    thumb.attr('src', info.thumbnail);
+    link.replaceWith(wrapper.append(iframe));
 };
 
 jQuery.fn.videoframe = function() {
