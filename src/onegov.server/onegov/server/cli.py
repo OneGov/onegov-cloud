@@ -11,7 +11,10 @@ Example::
     onegov-server --config-file test.yml
 
 The onegov-server will load 'onegov.yml' by default and it will restart
-when any file in the current folder or any of its subfolders changes.
+when any file in the current folder or any file somewhere inside './src'
+changes.
+
+Changes to omlette directories require a manual restart.
 
 A onegov.yml file looks like this:
 
@@ -90,7 +93,10 @@ def run(config_file, port):
         onegov-server --config-file test.yml
 
     The onegov-server will load 'onegov.yml' by default and it will restart
-    when any file in the current folder or any of its subfolders changes.
+    when any file in the current folder or any file somewhere inside './src'
+    changes.
+
+    Changes to omlette directories require a manual restart.
 
     """
     # <- the docs are currently duplicated somewhat at the top of the module
@@ -104,7 +110,8 @@ def run(config_file, port):
     server.start()
 
     observer = Observer()
-    observer.schedule(server, '.', recursive=True)
+    observer.schedule(server, 'src', recursive=True)
+    observer.schedule(server, '.', recursive=False)
     observer.start()
 
     while True:

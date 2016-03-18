@@ -1,8 +1,13 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
+- The development server no longer watches all subdirectories.
+
+  It just watches the current directory (without recursion) and the src
+  directory (with recursion). This makes the detection quite a bit faster at
+  the cost of having to manually restart when something inside another folder
+  changes (e.g in the parts/omelette folder).
+  [href]
 
 0.3.0 (2016-01-18)
 ~~~~~~~~~~~~~~~~~~~
