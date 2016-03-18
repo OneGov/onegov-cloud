@@ -1,15 +1,19 @@
 """ The onegov town collection of images uploaded to the site. """
+from csv import writer
 from datetime import date
+from io import StringIO
 from morepath.request import Response
 from onegov.core.security import Public
 from onegov.core.utils import linkify
-from onegov.event import Occurrence, OccurrenceCollection
+from onegov.event import Event, Occurrence, OccurrenceCollection
 from onegov.ticket import TicketCollection
 from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import OccurrenceLayout, OccurrencesLayout
 from sedate import as_datetime, replace_timezone
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import JSON
 
 
 @TownApp.html(model=OccurrenceCollection, template='occurrences.pt',
@@ -74,4 +78,49 @@ def ical_export_occurence(self, request):
         self.as_ical(url=request.link(self)),
         content_type='text/calendar',
         content_disposition='inline; filename=calendar.ics'
+    )
+
+
+@TownApp.view(model=OccurrenceCollection, name='csv', permission=Public)
+def csv_export_occurences(self, request):
+    """ Returns all occurrence as csv. """
+
+    session = request.app.session()
+
+    # requires postgres >= 9.3
+    events = session.query(
+        Occurrence.title,
+        Occurrence.location,
+        func.array_to_string(func.akeys(Occurrence._tags), ','),
+        func.to_char(Occurrence.start, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+        func.to_char(Occurrence.end, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+        Occurrence.timezone,
+        func.json_extract_path_text(
+            func.cast(Event.content, JSON), 'description'
+        )
+    )
+    events = events.outerjoin(Event)
+    events = events.filter(
+        Occurrence.start >= replace_timezone(as_datetime(date.today()), 'UTC')
+    )
+    events = events.order_by(Occurrence.start)
+
+    output = StringIO()
+    csv_writer = writer(output)
+    csv_writer.writerow((
+        'title',
+        'location',
+        'tags',
+        'start',
+        'end',
+        'timezone',
+        'description'
+    ))
+    writer(output).writerows(events)
+    output.seek(0)
+
+    return Response(
+        output.read(),
+        content_type='text/csv',
+        content_disposition='inline; filename=events.csv'
     )
