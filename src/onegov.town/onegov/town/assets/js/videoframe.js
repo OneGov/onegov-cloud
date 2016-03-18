@@ -7,7 +7,7 @@
 
 var expressions = [
     /https?:\/\/(www\.youtube\.com)\/watch\?v=([^&]+)/i,
-    /https?:\/\/(www\.vimeo\.com)\/([0-9]+)/i
+    /https?:\/\/([w]{0,3}\.?vimeo\.com).*?\/([0-9]+)/i
 ];
 
 var getVideoId = function(url) {
@@ -25,6 +25,20 @@ var getVideoId = function(url) {
     return null;
 };
 
+var rgb2hex = function(rgb) {
+    if (rgb.search("rgb") === -1) {
+        return rgb;
+    } else {
+        match = rgb.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))?\)$/);
+
+        function hex(x) {
+            return ("0" + parseInt(x, 10).toString(16)).slice(-2);
+        }
+
+        return "#" + hex(match[1]) + hex(match[2]) + hex(match[3]);
+    }
+};
+
 var getVideoUrl = function(host, id) {
     if (host.match(/youtube\.com/gi)) {
         var origin = window.location.protocol +
@@ -35,7 +49,8 @@ var getVideoUrl = function(host, id) {
     }
 
     if (host.match(/vimeo\.com/gi)) {
-        return "https://player.vimeo.com/video/" + id;
+        var color = rgb2hex($('a:first').css('color')).replace('#', '');
+        return "https://player.vimeo.com/video/" + id + '?badge=0&byline=0&portrait=0&title=0&color=' + color;
     }
 
     return null;
