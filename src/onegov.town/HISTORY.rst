@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Automatically embeds youtube and vimeo links.
+  [href]
+
+- Adds CSV export view for occurrences.
+  [msom]
+
 - Removes the footer height discrepancy between Gecko and Webkit.
   [href]
 
@@ -15,9 +21,6 @@ Changelog
 
 - Fixes the upload widget in forms having an unintended design.
   [href]
-
-- Adds CSV export view for occurrences.
-  [msom]
 
 1.5.4 (2016-02-15)
 ~~~~~~~~~~~~~~~~~~~
