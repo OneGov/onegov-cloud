@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.7.2 (2016-03-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Hides candidates list for majorz elections.
   [msom]
