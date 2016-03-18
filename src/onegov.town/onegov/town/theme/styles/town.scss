@@ -918,8 +918,7 @@ div#redactor-droparea {
         }
     }
 
-    .has-video,
-    .video-thumbnail {
+    .has-video {
         background-color: $gray-pastel;
         cursor: pointer;
         display: block;
@@ -935,20 +934,6 @@ div#redactor-droparea {
         @media #{$small-only} {
             min-height: 200px;
         }
-    }
-
-    .has-video:hover .video-button {
-        text-shadow: 0 0 5px $primary-color;
-    }
-
-    .video-button {
-        color: $white;
-        font-size: 4rem;
-        left: 50%;
-        position: absolute;
-        text-shadow: 0 0 2px $gray-pastel;
-        top: 50%;
-        transform: translate(-50%, -50%);
     }
 
     .video-wrapper {
