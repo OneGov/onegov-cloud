@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Limit search fuzziness to avoid slow search queries.
+  [href]
+
 - Stops raising an exception if no color was selected in the settings.
   [href]
 
