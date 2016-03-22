@@ -1,6 +1,14 @@
 Changelog
 ---------
 
+- Uses a simpler analyzer for autocompletion.
+
+  This change leads to the autocompletion working more literally. That is if
+  we enter 'A1', we will find 'A1' and 'A11' but not 'A'. Before, all numbers
+  were stripped from the autocompletion which is not what we want because
+  we use autocompletion quite lierally (search for FRM-1234-5678 for example).
+  [href]
+
 0.5.0 (2016-02-22)
 ~~~~~~~~~~~~~~~~~~~
 

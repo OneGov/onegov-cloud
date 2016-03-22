@@ -194,6 +194,7 @@ def test_mapping_for_language():
             'type': 'string'
         },
         'es_suggestion': {
+            'analyzer': 'autocomplete',
             'context': {
                 'es_public_categories': {
                     'path': 'es_public_categories',
@@ -221,6 +222,7 @@ def test_mapping_for_language():
             'type': 'string'
         },
         'es_suggestion': {
+            'analyzer': 'autocomplete',
             'context': {
                 'es_public_categories': {
                     'path': 'es_public_categories',
@@ -260,6 +262,7 @@ def test_mapping_for_language():
             'type': 'string'
         },
         'es_suggestion': {
+            'analyzer': 'autocomplete',
             'context': {
                 'es_public_categories': {
                     'path': 'es_public_categories',
@@ -297,6 +300,7 @@ def test_mapping_for_language():
             'type': 'string'
         },
         'es_suggestion': {
+            'analyzer': 'autocomplete',
             'context': {
                 'es_public_categories': {
                     'path': 'es_public_categories',

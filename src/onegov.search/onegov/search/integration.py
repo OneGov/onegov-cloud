@@ -173,8 +173,8 @@ class ElasticsearchApp(morepath.App):
                     'text': query,
                     'completion': {
                         'field': 'es_suggestion',
-                        "context": {
-                            "es_public_categories": context
+                        'context': {
+                            'es_public_categories': context
                         }
                     },
                 }

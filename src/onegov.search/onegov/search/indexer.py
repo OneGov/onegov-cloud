@@ -60,6 +60,12 @@ ANALYSIS_CONFIG = {
                 "german_normalization",
                 "german_stemmer"
             ]
+        },
+        "autocomplete": {
+            "type": "custom",
+            "char_filter": ["html_strip"],
+            "tokenizer": "standard",
+            "filter": ["lowercase"]
         }
     }
 }
@@ -209,12 +215,13 @@ class TypeMapping(object):
             'include_in_all': False
         }
         mapping['es_suggestion'] = {
+            'analyzer': 'autocomplete',
             'type': 'completion',
             'payloads': True,
-            "context": {
-                "es_public_categories": {
-                    "type": "category",
-                    "path": "es_public_categories"
+            'context': {
+                'es_public_categories': {
+                    'type': 'category',
+                    'path': 'es_public_categories'
                 }
             }
         }
