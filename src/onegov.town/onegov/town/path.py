@@ -316,6 +316,11 @@ def get_newsletter(app, name):
     return get_newsletters(app).by_name(name)
 
 
+@TownApp.path(model=RecipientCollection, path='/abonnenten')
+def get_newsletter_recipients(app):
+    return RecipientCollection(app.session())
+
+
 @TownApp.path(model=Subscription, path='/abonnement/{recipient_id}/{token}')
 def get_subscription(app, recipient_id, token):
     recipient = RecipientCollection(app.session()).by_id(recipient_id)

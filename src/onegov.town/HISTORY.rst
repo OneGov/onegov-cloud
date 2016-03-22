@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives admins the ability to manage subscriptions.
+  [href]
+
 - Limit search fuzziness to avoid slow search queries.
   [href]
 

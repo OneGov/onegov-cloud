@@ -2,6 +2,8 @@
 
 import morepath
 
+from collections import OrderedDict
+from itertools import groupby
 from onegov.core.security import Public, Private
 from onegov.core.templates import render_template
 from onegov.core.utils import linkify
@@ -15,7 +17,11 @@ from onegov.newsletter import (
 from onegov.newsletter.errors import AlreadyExistsError
 from onegov.town import _, TownApp
 from onegov.town.forms import NewsletterForm, NewsletterSendForm, SignupForm
-from onegov.town.layout import DefaultMailLayout, NewsletterLayout
+from onegov.town.layout import (
+    DefaultMailLayout,
+    NewsletterLayout,
+    RecipientLayout
+)
 from onegov.town.models import News
 from sedate import utcnow
 from sqlalchemy import desc
@@ -156,6 +162,28 @@ def view_newsletter(self, request):
         'occurrences': occurrences_by_newsletter(self, request),
         'title': self.title,
         'lead': linkify(self.lead),
+    }
+
+
+@TownApp.html(model=RecipientCollection, template='recipients.pt',
+              permission=Private)
+def view_subscribers(self, request):
+
+    # i18n:attributes translations do not support variables, so we need
+    # to do this ourselves
+    warning = request.translate(_("Do you really want to unsubscribe \"{}\"?"))
+
+    recipients = self.query().order_by(Recipient.address).all()
+    by_letter = OrderedDict()
+
+    for key, values in groupby(recipients, key=lambda r: r.address[0].upper()):
+        by_letter[key] = list(values)
+
+    return {
+        'layout': RecipientLayout(self, request),
+        'title': _("Subscribers"),
+        'by_letter': by_letter,
+        'warning': warning,
     }
 
 

@@ -2461,6 +2461,36 @@ def test_newsletter_signup(town_app):
     assert len(town_app.smtp.outbox) == 2
 
 
+def test_newsletter_subscribers_management(town_app):
+
+    client = Client(town_app)
+
+    page = client.get('/newsletters')
+    page.form['address'] = 'info@example.org'
+    page.form.submit()
+
+    assert len(town_app.smtp.outbox) == 1
+
+    message = town_app.smtp.outbox[0]
+    message = message.get_payload(0).get_payload(decode=True)
+    message = message.decode('utf-8')
+
+    confirm = re.search(r'Anmeldung bestätigen\]\(([^\)]+)', message).group(1)
+    assert "info@example.org wurde erfolgreich" in client.get(confirm).follow()
+
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'editor@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    subscribers = client.get('/abonnenten')
+    assert "info@example.org" in subscribers
+
+    unsubscribe = subscribers.pyquery('a[ic-get-from]').attr('ic-get-from')
+    result = client.get(unsubscribe).follow()
+    assert "info@example.org wurde erfolgreich abgemeldet" in result
+
+
 def test_newsletter_send(town_app):
     client = Client(town_app)
     anon = Client(town_app)

@@ -22,7 +22,7 @@ from onegov.town.models import (
     Thumbnail
 )
 from onegov.town.models.extensions import PersonLinkExtension
-from onegov.newsletter import NewsletterCollection
+from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.user import Auth
 from purl import URL
 from sqlalchemy import desc
@@ -955,6 +955,10 @@ class NewsletterLayout(DefaultLayout):
         return NewsletterCollection(self.app.session())
 
     @cached_property
+    def recipients(self):
+        return RecipientCollection(self.app.session())
+
+    @cached_property
     def is_collection(self):
         return isinstance(self.model, NewsletterCollection)
 
@@ -986,6 +990,11 @@ class NewsletterLayout(DefaultLayout):
 
         if self.is_collection:
             return [
+                Link(
+                    text=_("Subscribers"),
+                    url=self.request.link(self.recipients),
+                    classes=('manage-subscribers', )
+                ),
                 LinkGroup(
                     title=_("Add"),
                     links=[
@@ -1023,3 +1032,16 @@ class NewsletterLayout(DefaultLayout):
                     redirect_after=self.request.link(self.collection)
                 )
             ]
+
+
+class RecipientLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Newsletter"), self.request.link(
+                NewsletterCollection(self.app.session())
+            )),
+            Link(_("Subscribers"), '#')
+        ]

@@ -647,6 +647,7 @@ $edit-link-icon: '\f040';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $internal-link-icon: '\f0c1';
+$manage-subscribers: '\f0c0';
 $new-daypass-icon: '\f145';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
@@ -694,6 +695,7 @@ $send-link-icon: '\f1d9';
     .file-url:before { @include icon($file-link-icon); }
     .image-url:before { @include icon($image-link-icon); }
     .internal-url:before { @include icon($internal-link-icon); }
+    .manage-subscribers:before { @include icon($manage-subscribers); }
     .new-daypass:before { @include icon($new-daypass-icon); }
     .new-form:before { @include icon($new-form-icon); }
     .new-link:before { @include icon($new-link-icon); }
@@ -2373,4 +2375,8 @@ ul.search-results {
     ul {
         margin-bottom: 0;
     }
+}
+
+.subscribers li:hover span {
+    background-color: $yellow-pastel;
 }

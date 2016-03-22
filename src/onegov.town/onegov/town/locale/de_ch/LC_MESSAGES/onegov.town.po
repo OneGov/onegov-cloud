@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-03-16 15:27+0100\n"
+"POT-Creation-Date: 2016-03-22 14:59+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -71,6 +71,12 @@ msgstr "Jeden ${days} bis zum ${end}."
 msgid "Events"
 msgstr "Veranstaltungen"
 
+msgid "Newsletter"
+msgstr "Newsletter"
+
+msgid "Subscribers"
+msgstr "Abonnenten"
+
 msgid "Logout"
 msgstr "Logout"
 
@@ -93,9 +99,6 @@ msgid "This is a builtin-form. Builtin-forms can't be deleted."
 msgstr ""
 "Dies ist ein vordefiniertes Formular. Vordefinierte Formulare können nicht "
 "gelöscht werden."
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "New"
 msgstr "Neu"
@@ -1012,11 +1015,11 @@ msgid ""
 "This is the daily OneGov Cloud status e-mail. If you don't want to receive "
 "this e-mail you may deactivate it by clicking on"
 msgstr ""
-"Dies ist das tägliche Status E-Mail der OneGov Cloud. Sie können dieses "
+"Dies ist das tägliche Status E-Mail der OneGov Cloud. Sie können sich "
 "jederzeit über den folgenden Link"
 
 msgid "unsubscribe"
-msgstr "abbestellen"
+msgstr "abmelden"
 
 msgid "Or by changing the settings in your user profile."
 msgstr ""
@@ -1136,6 +1139,15 @@ msgstr "Einen eigenen Eintrag für den Veranstaltungskalender erfassen"
 
 msgid "No people added yet."
 msgstr "Es wurden noch keine Personen hinzugefügt."
+
+msgid ""
+"Subscribers may always unsubscribe themselves through a link shown at the "
+"bottom of the newsletter. If you unsubscribe them here, they will not be "
+"notified."
+msgstr "Abonnenten können sich jederzeit selber über den Link am Fuss des Newsletter abmelden. Hier abgemeldete Personen werden nicht benachrichtigt."
+
+msgid "Unsubscribe"
+msgstr "Abmelden"
 
 msgid "Timespan"
 msgstr "Zeitraum"
@@ -1365,6 +1377,10 @@ msgstr "Themen"
 
 msgid "Catalog A-Z"
 msgstr "Katalog A-Z"
+
+#, python-format
+msgid "Do you really want to unsubscribe \"{}\"?"
+msgstr "Möchten Sie \"{}\" wirklich abmelden?"
 
 msgid "New Newsletter"
 msgstr "Neuer Newsletter"
