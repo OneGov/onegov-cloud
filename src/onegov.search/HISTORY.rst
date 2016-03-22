@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.0 (2016-03-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Uses a simpler analyzer for autocompletion.
 
   This change leads to the autocompletion working more literally. That is if
