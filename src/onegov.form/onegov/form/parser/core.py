@@ -249,6 +249,7 @@ import yaml
 
 from onegov.core.utils import Bunch
 from onegov.form.core import (
+    FieldDependency,
     Form,
     with_options
 )
@@ -687,24 +688,6 @@ def translate_to_yaml(text):
 
     if not actual_fields:
         raise errors.InvalidFormSyntax(line=ix + 1)
-
-
-class FieldDependency(object):
-    """ Defines a dependency to a field. The given field must have the given
-    choice for this dependency to be fulfilled.
-
-    """
-
-    def __init__(self, field_id, choice):
-        self.field_id = field_id
-        self.choice = choice
-
-    def fulfilled(self, form, field):
-        return getattr(form, self.field_id).data == self.choice
-
-    @property
-    def html_data(self):
-        return {'data-depends-on': '/'.join((self.field_id, self.choice))}
 
 
 class WTFormsClassBuilder(object):

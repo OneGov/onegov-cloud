@@ -6,12 +6,16 @@ from itertools import groupby
 from operator import itemgetter
 from wtforms import Form as BaseForm
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired, DataRequired
+from wtforms.validators import InputRequired, DataRequired, Optional
+from wtforms_components import If, Chain
 
 
 class Form(BaseForm):
     """ Extends wtforms.Form with useful methods and integrations needed in
     OneGov applications.
+
+    Fieldsets
+    ---------
 
     This form supports fieldsets (which WTForms doesn't recognize). To put
     fields into a fieldset, add a fieldset attribute to the field during
@@ -44,9 +48,68 @@ class Form(BaseForm):
     This ensures that all fields are in either a visible or an invisible
     fieldset (see :meth:`Fieldset.is_visible`).
 
+    Dependencies
+    ------------
+
+    This form also supports dependencies. So field b may depend on field a, if
+    field a has a certain value, field b is shown on the form (with some
+    javascript) and its validators are actually executed. If field a does
+    not have the required value, field b is hidden with javascript and its
+    validators are not executed.
+
+    The validators which are skipped are only the validators passed with the
+    field, the validators on the field itself are still invoked (we can't
+    skip them). However, only if the optional field is not empty. That is we
+    prevent invalid values no matter what, but we allow for empty values if
+    the dependent field does not have the required value.
+
+    This sounds a lot more complicated than it is::
+
+        class MyForm(Form):
+
+            option = RadioField('Option', choices=[
+                ('yes', 'Yes'),
+                ('no', 'No'),
+            ])
+            only_if_no = StringField(
+                label='Only Shown When No',
+                validators=[InputRequired()],
+                depends_on=('option', 'no')
+            )
+
     """
 
     def __init__(self, *args, **kwargs):
+
+        # preprocessors are generators which yield control to give the
+        # constructor the chance to call the parent constructor. Their
+        # purpose is to handle custom attributes passed to the fields,
+        # removing them in the process (so wtforms doesn't trip up).
+        preprocessors = [
+            self.process_fieldset(),
+            self.process_depends_on()
+        ]
+
+        for processor in preprocessors:
+            next(processor)
+
+        super().__init__(*args, **kwargs)
+
+        for processor in preprocessors:
+            next(processor, None)
+
+    def process_fieldset(self):
+        """ Processes the fieldset parameter on the fields, which puts
+        fields into fieldsets.
+
+        In the process the fields are altered so that wtforms recognizes them
+        again (that is, attributes only known to us are removed).
+
+        See :class:`Form` for more information.
+
+        """
+
+        self.fieldsets = []
 
         # consume the fieldset attribute of all unbound fields, as WTForms
         # doesn't know it -> move it to the field which is a *class* attribute
@@ -60,10 +123,8 @@ class Form(BaseForm):
             for field_id, field in self._unbound_fields
         ]
 
-        super().__init__(*args, **kwargs)
-
-        # use the consumed fieldset attribute to build fieldsets
-        self.fieldsets = []
+        # yield control to the constructor so it can call the parent
+        yield
 
         # wtforms' constructor might add more fields not available as
         # unbound fields (like the csrf token)
@@ -79,6 +140,41 @@ class Form(BaseForm):
                 label=label,
                 fields=(self._fields[f[1]] for f in fields)
             ))
+
+    def process_depends_on(self):
+        """ Processes the depends_on parameter on the fields, which adds the
+        ability to have fields depend on values of other fields.
+
+        In the process the fields are altered so that wtforms recognizes them
+        again (that is, attributes only known to us are removed).
+
+        See :class:`Form` for more information.
+
+        """
+
+        for field_id, field in self._unbound_fields:
+
+            if 'depends_on' not in field.kwargs:
+                continue
+
+            field.depends_on = FieldDependency(*field.kwargs.pop('depends_on'))
+
+            if 'validators' in field.kwargs:
+                field.kwargs['validators'] = (
+                    If(
+                        field.depends_on.fulfilled,
+                        Chain(field.kwargs['validators'])
+                    ),
+                    If(
+                        field.depends_on.unfulfilled,
+                        Optional()
+                    ),
+                )
+
+            field.kwargs['render_kw'] = field.kwargs.get('render_kw', {})
+            field.kwargs['render_kw'].update(field.depends_on.html_data)
+
+        yield
 
     def submitted(self, request):
         """ Returns true if the given request is a successful post request. """
@@ -238,3 +334,24 @@ def with_options(widget, **render_options):
                 return widget.__call__(*args, **render_options)
 
         return Widget()
+
+
+class FieldDependency(object):
+    """ Defines a dependency to a field. The given field must have the given
+    choice for this dependency to be fulfilled.
+
+    """
+
+    def __init__(self, field_id, choice):
+        self.field_id = field_id
+        self.choice = choice
+
+    def fulfilled(self, form, field):
+        return getattr(form, self.field_id).data == self.choice
+
+    def unfulfilled(self, form, field):
+        return not self.fulfilled(form, field)
+
+    @property
+    def html_data(self):
+        return {'data-depends-on': '/'.join((self.field_id, self.choice))}

@@ -1,7 +1,9 @@
 from onegov.form import Form, with_options
-from wtforms import StringField, TextAreaField, validators
+from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
+from wtforms.validators import InputRequired
 from wtforms.widgets import TextArea
+from wtforms_components import TimeField
 
 
 class DummyPostData(dict):
@@ -76,3 +78,57 @@ def test_match_fields():
     assert form.match_fields(include_classes=(EmailField, )) == ['email']
     assert form.match_fields(exclude_classes=(TextAreaField, ))\
         == ['name', 'email']
+
+
+def test_dependent_field():
+
+    class TestForm(Form):
+        switch = RadioField(
+            label="Switch",
+            choices=[
+                ('on', "On"),
+                ('off', "Off")
+            ]
+        )
+
+        optional = TimeField(
+            label="Optional",
+            validators=[InputRequired()],
+            depends_on=('switch', 'on')
+        )
+
+    request = DummyRequest({'switch': 'off'})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    request = DummyRequest({'switch': 'off', 'optional': ''})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    # even though the second field is optional, it still needs to be valid
+    # if there's a value (it may be empty) - we can never accept invalid values
+    # as this presents a possible security risk (we could accessing something
+    # that a validator filters out for security reasons).
+    request = DummyRequest({'switch': 'off', 'optional': 'asdf'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'off', 'optional': '12:00'})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    request = DummyRequest({'switch': 'on'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'on', 'optional': ''})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'on', 'optional': 'asdf'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'on', 'optional': '12:00'})
+    form = TestForm(request.POST)
+    assert form.validate()

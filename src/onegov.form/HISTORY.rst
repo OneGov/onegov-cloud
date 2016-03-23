@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Makes it simpler to add a dependent field through Python code.
+  [href]
+
 - Adds a field representing coordinates (lat/lon).
   [href]
 
