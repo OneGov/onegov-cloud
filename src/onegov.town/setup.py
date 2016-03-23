@@ -41,7 +41,7 @@ setup(
         'mistune',
         'onegov.core>=0.17.2',
         'onegov.event>=0.0.5',
-        'onegov.form>=0.6.7',
+        'onegov.form>=0.9.0',
         'onegov.foundation>=0.0.4',
         'onegov.libres>=0.0.4',
         'onegov.newsletter>=0.1.0',

@@ -4,12 +4,11 @@ from datetime import datetime, timedelta
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
-from onegov.form.parser.core import FieldDependency
 from onegov.town import _
 from wtforms.fields import RadioField
 from wtforms.fields.html5 import DateField, IntegerField
 from wtforms.validators import DataRequired, NumberRange, InputRequired
-from wtforms_components import If, TimeField
+from wtforms_components import TimeField
 
 
 WEEKDAYS = (
@@ -252,22 +251,20 @@ class RoomAllocationForm(AllocationForm):
         fieldset=_("Date")
     )
 
-    as_whole_day_dependency = FieldDependency('as_whole_day', 'no')
-
     start_time = TimeField(
         label=_("Each starting at"),
         description=_("HH:MM"),
-        validators=[If(as_whole_day_dependency.fulfilled, InputRequired())],
-        render_kw=as_whole_day_dependency.html_data,
-        fieldset=_("Date")
+        validators=[InputRequired()],
+        fieldset=_("Date"),
+        depends_on=('as_whole_day', 'no')
     )
 
     end_time = TimeField(
         label=_("Each ending at"),
         description=_("HH:MM"),
-        validators=[If(as_whole_day_dependency.fulfilled, InputRequired())],
-        render_kw=as_whole_day_dependency.html_data,
-        fieldset=_("Date")
+        validators=[InputRequired()],
+        fieldset=_("Date"),
+        depends_on=('as_whole_day', 'no')
     )
 
     is_partly_available = RadioField(
@@ -315,22 +312,20 @@ class RoomAllocationEditForm(AllocationEditForm):
         fieldset=_("Date")
     )
 
-    as_whole_day_dependency = FieldDependency('as_whole_day', 'no')
-
     start_time = TimeField(
         label=_("From"),
         description=_("HH:MM"),
-        validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        render_kw=as_whole_day_dependency.html_data,
-        fieldset=_("Date")
+        validators=[DataRequired()],
+        fieldset=_("Date"),
+        depends_on=('as_whole_day', 'no')
     )
 
     end_time = TimeField(
         label=_("Until"),
         description=_("HH:MM"),
-        validators=[If(as_whole_day_dependency.fulfilled, DataRequired())],
-        render_kw=as_whole_day_dependency.html_data,
-        fieldset=_("Date")
+        validators=[DataRequired()],
+        fieldset=_("Date"),
+        depends_on=('as_whole_day', 'no')
     )
 
     data = None
