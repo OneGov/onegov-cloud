@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.9.0 (2016-03-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Makes it simpler to add a dependent field through Python code.
   [href]
 
