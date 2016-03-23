@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a field representing coordinates (lat/lon).
+  [href]
+
 0.8.6 (2016-03-17)
 ~~~~~~~~~~~~~~~~~~~
 

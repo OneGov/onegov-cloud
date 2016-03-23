@@ -3,8 +3,12 @@ import gzip
 import magic
 
 from io import BytesIO
-from onegov.form.widgets import MultiCheckboxWidget, UploadWidget
-from wtforms import FileField, SelectMultipleField, widgets
+from onegov.form.widgets import (
+    CoordinateWidget,
+    MultiCheckboxWidget,
+    UploadWidget
+)
+from wtforms import FileField, SelectMultipleField, StringField, widgets
 
 
 class MultiCheckboxField(SelectMultipleField):
@@ -15,6 +19,75 @@ class MultiCheckboxField(SelectMultipleField):
     def __init__(self, *args, **kwargs):
         kwargs['option_widget'] = widgets.CheckboxInput()
         super().__init__(*args, **kwargs)
+
+
+class CoordinateField(StringField):
+    """ Represents a single coordinate in the form lat/lon.
+
+    In the browser and during transit the coordinate is stored as a string
+    on a simple input field. For example::
+
+        8.30576869173879/47.05183585
+
+    For verification: This coordinate points to the Seantis office in Lucerne.
+
+    For convenience, the coordinate is accessible with the :class:`Coordinate`
+    class however, which offers named attributes and float values.
+
+    """
+
+    widget = CoordinateWidget()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.data = getattr(self, 'data', Coordinate())
+
+    def _value(self):
+        return self.data.as_text()
+
+    def process_formdata(self, valuelist):
+        self.data = Coordinate.from_text(valuelist and valuelist[0] or None)
+
+
+class Coordinate(object):
+    """ Represents a single coordinate as string internally and as float
+    through a public interface. Used by :class: `CoordinateField`.
+
+    """
+
+    def __init__(self, lat=None, lon=None):
+        self.lat = lat
+        self.lon = lon
+
+    def __bool__(self):
+        return (self.lat and self.lon) and True or False
+
+    @property
+    def lat(self):
+        return self._lat
+
+    @property
+    def lon(self):
+        return self._lon
+
+    @lat.setter
+    def lat(self, value):
+        self._lat = float(value) if value else None
+
+    @lon.setter
+    def lon(self, value):
+        self._lon = float(value) if value else None
+
+    @classmethod
+    def from_text(cls, text):
+        lat, lon = [float(p) for p in text.split('/')]
+        return cls(lat=lat, lon=lon)
+
+    def as_text(self):
+        if self:
+            return '/'.join(str(p) for p in (self.lat, self.lon))
+        else:
+            return ''
 
 
 class UploadField(FileField):

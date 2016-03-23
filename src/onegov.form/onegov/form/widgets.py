@@ -2,7 +2,7 @@ import humanize
 
 from cgi import escape
 from onegov.form import _
-from wtforms.widgets import ListWidget, FileInput
+from wtforms.widgets import ListWidget, FileInput, TextInput
 from wtforms.widgets.core import HTMLString
 
 
@@ -12,6 +12,20 @@ class MultiCheckboxWidget(ListWidget):
     def __init__(self, *args, **kwargs):
         kwargs['prefix_label'] = False
         super().__init__(*args, **kwargs)
+
+
+class CoordinateWidget(TextInput):
+    """ Widget containing the coordinates for the
+    :class:`onegov.form.fields.CoordinateField` class.
+
+    Basically a text input with a class. Meant to be enhanced on the browser
+    using javascript.
+
+    """
+
+    def __call__(self, field, **kwargs):
+        kwargs['class_'] = (kwargs.get('class_', '') + ' coordinate').strip()
+        return super().__call__(field, **kwargs)
 
 
 class UploadWidget(FileInput):
