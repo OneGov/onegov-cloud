@@ -1,13 +1,11 @@
 from onegov.election_day import _
 from onegov.form import Form
 from onegov.form.fields import UploadField
-from onegov.form.parser.core import FieldDependency
 from onegov.form.validators import WhitelistedMimeType, FileSizeLimit
 from wtforms import BooleanField, IntegerField, RadioField
 from wtforms.validators import (
     DataRequired, InputRequired, NumberRange, Optional
 )
-from wtforms_components import If, Chain
 
 
 ALLOWED_MIME_TYPES = {
@@ -27,16 +25,6 @@ class UploadElectionForm(Form):
         ('wabsti', _("Wabsti")),
     ], validators=[InputRequired()], default='sesam')
 
-    # XXX make this easier with onegov.form
-    wabsti_dependency = FieldDependency('type', 'wabsti')
-    wabsti_validators = [If(
-        wabsti_dependency.fulfilled,
-        Chain((
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ))
-    )]
-
     results = UploadField(
         label=_("Results"),
         validators=[
@@ -49,25 +37,38 @@ class UploadElectionForm(Form):
 
     connections = UploadField(
         label=_("List connections"),
-        validators=wabsti_validators,
-        render_kw=dict(force_simple=True, **wabsti_dependency.html_data)
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('type', 'wabsti'),
+        render_kw=dict(force_simple=True)
     )
 
     elected = UploadField(
         label=_("Elected Candidates"),
-        validators=wabsti_validators,
-        render_kw=dict(force_simple=True, **wabsti_dependency.html_data)
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('type', 'wabsti'),
+        render_kw=dict(force_simple=True)
     )
 
     statistics = UploadField(
         label=_("Election statistics"),
-        validators=wabsti_validators,
-        render_kw=dict(force_simple=True, **wabsti_dependency.html_data)
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('type', 'wabsti'),
+        render_kw=dict(force_simple=True)
     )
 
     complete = BooleanField(
         label=_("Complete"),
-        render_kw=dict(**wabsti_dependency.html_data)
+        depends_on=('type', 'wabsti'),
+        render_kw=dict(force_simple=True)
     )
 
     majority = IntegerField(
@@ -96,18 +97,6 @@ class UploadVoteForm(Form):
         ('complex', _("Vote with Counter-Proposal")),
     ], validators=[InputRequired()], default='simple')
 
-    # XXX make this easier with onegov.form
-    complex_vote_dependency = FieldDependency('type', 'complex')
-    complex_vote_validators = [If(
-        complex_vote_dependency.fulfilled,
-        Chain((
-            DataRequired(),
-            WhitelistedMimeType(ALLOWED_MIME_TYPES),
-            FileSizeLimit(MAX_FILE_SIZE)
-        ))
-    )]
-    complex_vote_validators[0].field_flags = ('required', )
-
     proposal = UploadField(
         label=_("Proposal"),
         validators=[
@@ -120,12 +109,22 @@ class UploadVoteForm(Form):
 
     counter_proposal = UploadField(
         label=_("Counter-Proposal"),
-        validators=complex_vote_validators,
-        render_kw=dict(force_simple=True, **complex_vote_dependency.html_data)
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('type', 'complex'),
+        render_kw=dict(force_simple=True)
     )
 
     tie_breaker = UploadField(
         label=_("Tie-Breaker"),
-        validators=complex_vote_validators,
-        render_kw=dict(force_simple=True, **complex_vote_dependency.html_data)
+        validators=[
+            DataRequired(),
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        depends_on=('type', 'complex'),
+        render_kw=dict(force_simple=True)
     )

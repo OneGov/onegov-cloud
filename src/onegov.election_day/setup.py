@@ -37,7 +37,7 @@ setup(
         'cssmin',
         'onegov.core>=0.17.2',
         'onegov.ballot>=0.4.2',
-        'onegov.form',
+        'onegov.form>=0.9.0',
         'onegov.foundation>=0.0.4',
         'onegov.shared',
         'onegov.user',
