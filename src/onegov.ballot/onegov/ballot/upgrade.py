@@ -49,13 +49,17 @@ def enable_translation_of_vote_title(context):
 
 @upgrade_task('Add absolute majority column')
 def add_absolute_majority_column(context):
-    context.operations.add_column(
-        'elections',
-        Column('absolute_majority', Integer())
-    )
+    if not context.has_column('elections', 'absolute_majority'):
+        context.operations.add_column(
+            'elections',
+            Column('absolute_majority', Integer())
+        )
 
 
 @upgrade_task('Add meta data')
 def add_meta_data_columns(context):
-    context.operations.add_column('elections', Column('meta', JSON()))
-    context.operations.add_column('votes', Column('meta', JSON()))
+    if not context.has_column('elections', 'meta'):
+        context.operations.add_column('elections', Column('meta', JSON()))
+
+    if not context.has_column('votes', 'meta'):
+        context.operations.add_column('votes', Column('meta', JSON()))
