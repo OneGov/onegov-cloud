@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.18.0 (2016-03-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds helper methods for accessing meta/content dicts through properties.
   [href]
