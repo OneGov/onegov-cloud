@@ -11,7 +11,9 @@ from morepath import setup
 from onegov.core.framework import Framework
 from onegov.core.orm import ModelBase, SessionManager, translation_hybrid
 from onegov.core.orm.abstract import AdjacencyList
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin
+from onegov.core.orm.mixins import (
+    meta_property, content_property, ContentMixin, TimestampMixin
+)
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
@@ -1104,3 +1106,43 @@ def test_get_polymorphic_class():
         Base.get_polymorphic_class('C')
 
     assert "No such polymorphic_identity: C" in str(assertion_info.value)
+
+
+def test_content_properties():
+
+    class Content(object):
+        meta = {}
+        content = {}
+
+        type = meta_property('type')
+        name = content_property('name')
+
+        @name.setter
+        def name(self, value):
+            self.content['name'] = value
+            self.content['name2'] = value
+
+        @name.deleter
+        def name(self):
+            del self.content['name']
+            del self.content['name2']
+
+    content = Content()
+    assert content.type is None
+    assert content.name is None
+
+    content.type = 'page'
+    assert content.type == 'page'
+    assert content.meta['type'] == 'page'
+    del content.type
+    assert content.type is None
+
+    content.name = 'foobar'
+    assert content.name == 'foobar'
+    assert content.content['name'] == 'foobar'
+    assert content.content['name2'] == 'foobar'
+
+    del content.name
+
+    assert content.name is None
+    assert content.content == {}
