@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves wtform's populate_obj by adding include and exclude filters to it.
+  [href]
+
 - Moves map related code (like the coordinates field) to onegov.gis.
   [href]
 
