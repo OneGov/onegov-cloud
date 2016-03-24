@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds the ability to merge multiple forms together while keeping the field
+  order predictable.
+  [href]
+
 0.9.0 (2016-03-23)
 ~~~~~~~~~~~~~~~~~~~
 

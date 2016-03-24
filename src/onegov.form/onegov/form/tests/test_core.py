@@ -1,4 +1,4 @@
-from onegov.form import Form, with_options
+from onegov.form import Form, merge_forms, with_options
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired
@@ -132,3 +132,52 @@ def test_dependent_field():
     request = DummyRequest({'switch': 'on', 'optional': '12:00'})
     form = TestForm(request.POST)
     assert form.validate()
+
+
+def test_merge_forms():
+
+    class Name(Form):
+        form = 'Name'
+        name = StringField("Name")
+
+        def is_valid_name(self):
+            return True
+
+    class Location(Form):
+        form = 'Location'
+        lat = StringField("Lat")
+        lon = StringField("Lat")
+
+        def is_valid_coordinate(self):
+            return True
+
+    class User(Form):
+        form = 'User'
+        name = StringField("User")
+
+        def is_valid_user(self):
+            return True
+
+    full = merge_forms(Name, Location, User)()
+    assert list(full._fields.keys()) == ['name', 'lat', 'lon']
+    assert full.name.label.text == "Name"
+    assert full.form == 'Name'
+    assert full.is_valid_name()
+    assert full.is_valid_coordinate()
+    assert full.is_valid_user()
+
+    full = merge_forms(User, Location, Name)()
+    assert list(full._fields.keys()) == ['name', 'lat', 'lon']
+    assert full.name.label.text == "User"
+    assert full.form == 'User'
+    assert full.is_valid_name()
+    assert full.is_valid_coordinate()
+    assert full.is_valid_user()
+
+    full = merge_forms(Location, User, Name)()
+    assert list(full._fields.keys()) == ['lat', 'lon', 'name']
+    assert full.name.label.text == "User"
+    assert full.form == 'Location'
+    assert full.is_valid_name()
+    assert full.is_valid_coordinate()
+    assert full.is_valid_user()

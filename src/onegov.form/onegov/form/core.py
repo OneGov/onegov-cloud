@@ -3,6 +3,7 @@ import weakref
 
 from collections import OrderedDict
 from itertools import groupby
+from onegov.form import utils
 from operator import itemgetter
 from wtforms import Form as BaseForm
 from wtforms.fields.html5 import EmailField
@@ -355,3 +356,43 @@ class FieldDependency(object):
     @property
     def html_data(self):
         return {'data-depends-on': '/'.join((self.field_id, self.choice))}
+
+
+def merge_forms(*forms):
+    """ Takes a list of forms and merges them.
+
+    In doing so, a new class is created which inherits from all the forms in
+    the default method resolution order. So the first class will override
+    fields in the second class and so on.
+
+    So this method is basically the same as:
+
+        class Merged(*forms):
+            pass
+
+    With *one crucial difference*, the order of the fields is as follows:
+
+    First, the fields from the first form are rendered, then the fields
+    from the second form and so on. This is not the case if you merge the
+    forms by simple class inheritance, as each form has it's own internal
+    field order, which when merged leads to unexpected results.
+
+    """
+
+    class MergedForm(*forms):
+        pass
+
+    processed = set()
+    fields_in_order = (
+        name for cls in forms for name, field
+        in utils.get_fields_from_class(cls)
+    )
+
+    for counter, name in enumerate(fields_in_order, start=1):
+        if name in processed:
+            continue
+
+        getattr(MergedForm, name).creation_counter = counter
+        processed.add(name)
+
+    return MergedForm

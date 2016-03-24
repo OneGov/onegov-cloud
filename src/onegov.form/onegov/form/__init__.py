@@ -10,7 +10,7 @@ from onegov.form.collection import (
     FormSubmissionCollection,
     FormDefinitionCollection
 )
-from onegov.form.core import FieldDependency, Form, with_options
+from onegov.form.core import FieldDependency, Form, merge_forms, with_options
 from onegov.form.display import render_field
 from onegov.form.models import (
     FormDefinition,
@@ -22,17 +22,18 @@ from onegov.form.models import (
 from onegov.form.parser.core import parse_form
 
 __all__ = [
+    'CompleteFormSubmission',
     'FieldDependency',
     'Form',
     'FormCollection',
-    'FormDefinitionCollection',
-    'FormSubmissionCollection',
     'FormDefinition',
+    'FormDefinitionCollection',
     'FormSubmission',
+    'FormSubmissionCollection',
     'FormSubmissionFile',
-    'PendingFormSubmission',
-    'CompleteFormSubmission',
+    'merge_forms',
     'parse_form',
+    'PendingFormSubmission',
     'render_field',
     'with_options'
 ]
