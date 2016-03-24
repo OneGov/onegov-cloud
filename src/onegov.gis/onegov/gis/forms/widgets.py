@@ -1,15 +1,15 @@
 from wtforms.widgets import TextInput
 
 
-class MapPointWidget(TextInput):
-    """ Widget containing the point for the
-    :class:`onegov.gis.forms.fields.MapPointField` class.
+class CoordinatesWidget(TextInput):
+    """ Widget holding and showing the data behind the
+    :class:`onegov.gis.forms.fields.CoordinatesField` class.
 
-    Basically a text input with a class. Meant to be enhanced on the browser
+    Basically a textfield that stores json. Meant to be enhanced on the browser
     using javascript.
 
     """
 
     def __call__(self, field, **kwargs):
-        kwargs['class_'] = (kwargs.get('class_', '') + ' map-point').strip()
+        kwargs['class_'] = (kwargs.get('class_', '') + ' coordinates').strip()
         return super().__call__(field, **kwargs)

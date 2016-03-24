@@ -1,5 +1,4 @@
-from onegov.gis.forms.fields import MapPointField
-from onegov.gis.forms.forms import MapPointForm
-from onegov.gis.forms.widgets import MapPointWidget
+from onegov.gis.forms.fields import CoordinatesField
+from onegov.gis.forms.widgets import CoordinatesWidget
 
-__all__ = ['MapPointWidget', 'MapPointForm', 'MapPointField']
+__all__ = ['CoordinatesField', 'CoordinatesWidget']
