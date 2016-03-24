@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.0 (2016-03-24)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves wtform's populate_obj by adding include and exclude filters to it.
   [href]
 
