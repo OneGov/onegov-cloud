@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves map related code (like the coordinates field) to onegov.gis.
+  [href]
+
 - Adds the ability to merge multiple forms together while keeping the field
   order predictable.
   [href]
