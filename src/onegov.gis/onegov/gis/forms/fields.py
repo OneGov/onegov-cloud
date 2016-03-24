@@ -28,9 +28,6 @@ class MapPointField(StringField):
     def _value(self):
         return self.data.as_text()
 
-    def populate_obj(self, obj, name):
-        import pdb; pdb.set_trace()
-
     def process_data(self, value):
         self.data = value or Point()
 
