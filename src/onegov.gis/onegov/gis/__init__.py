@@ -5,7 +5,7 @@ log.addHandler(logging.NullHandler())  # noqa
 from translationstring import TranslationStringFactory
 _ = TranslationStringFactory('onegov.gis')  # noqa
 
-from onegov.gis.forms import CoordinateForm
-from onegov.gis.models import CoordinateMixin
+from onegov.gis.forms import MapPointForm
+from onegov.gis.models import MapPointMixin
 
-__all__ = ['CoordinateForm', 'CoordinateMixin']
+__all__ = ['MapPointForm', 'MapPointMixin']

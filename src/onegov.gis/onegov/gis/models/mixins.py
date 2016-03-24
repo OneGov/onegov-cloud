@@ -1,6 +1,6 @@
-class CoordinateMixin(object):
+class MapPointMixin(object):
     """ Extends any class that has a content dictionary field with a single
-    lat/lon coordinate.
+    lat/lon point.
 
     """
 

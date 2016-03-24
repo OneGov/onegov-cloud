@@ -1,3 +1,4 @@
-from onegov.gis.models.mixins import CoordinateMixin
+from onegov.gis.models.point import Point
+from onegov.gis.models.mixins import MapPointMixin
 
-__all__ = ['CoordinateMixin']
+__all__ = ['MapPointMixin', 'Point']

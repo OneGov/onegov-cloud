@@ -1,13 +1,13 @@
 from onegov.form import Form
-from onegov.form.fields import CoordinateField
 from onegov.gis import _
+from onegov.gis.forms.fields import MapPointField
 from wtforms import RadioField
 from wtforms.validators import InputRequired
 
 
-class CoordinateForm(Form):
+class MapPointForm(Form):
 
-    coordinate_enabled = RadioField(
+    map_point_enabled = RadioField(
         label=_("Show on map"),
         fieldset=_("Map"),
         choices=[
@@ -18,7 +18,7 @@ class CoordinateForm(Form):
         default='no'
     )
 
-    coordinate = CoordinateField(
+    map_point = MapPointField(
         label=_("Coordinate"),
         fieldset=_("Map"),
         validators=[InputRequired()],
