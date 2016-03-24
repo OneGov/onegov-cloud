@@ -190,7 +190,7 @@ class CoreRequest(IncludeRequest):
             meta['locales'] = self.app.locales
 
         if csrf_support:
-            meta['csrf'] = True,
+            meta['csrf'] = True
             meta['csrf_context'] = self.browser_session
             meta['csrf_class'] = SessionCSRF
             meta['csrf_secret'] = self.app.csrf_secret.encode('utf-8')
