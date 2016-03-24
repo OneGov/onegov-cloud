@@ -3,12 +3,8 @@ import gzip
 import magic
 
 from io import BytesIO
-from onegov.form.widgets import (
-    CoordinateWidget,
-    MultiCheckboxWidget,
-    UploadWidget
-)
-from wtforms import FileField, SelectMultipleField, StringField, widgets
+from onegov.form.widgets import MultiCheckboxWidget, UploadWidget
+from wtforms import FileField, SelectMultipleField, widgets
 
 
 class MultiCheckboxField(SelectMultipleField):

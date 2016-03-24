@@ -268,6 +268,23 @@ class Form(BaseForm):
 
         return {k: v for k, v in self.data.items() if k not in exclude}
 
+    def populate_obj(self, obj, exclude=None, include=None):
+        """ A reimplementation of wtforms populate_obj function with the addage
+        of optional include/exclude filters.
+
+        If neither exclude nor include is passed, the function works like it
+        does in wtforms. Otherwise fields are considered which are included
+        but not excluded.
+
+        """
+
+        include = include or set(self._fields.keys())
+        exclude = exclude or set()
+
+        for name, field in self._fields.items():
+            if name in include and name not in exclude:
+                field.populate_obj(obj, name)
+
 
 class Fieldset(object):
     """ Defines a fieldset with a list of fields. """
