@@ -1,5 +1,5 @@
 from io import StringIO
-from onegov.core.jsx import JsxFilter
+from onegov.core.filters import JsxFilter
 
 
 def test_jsx_filter():
