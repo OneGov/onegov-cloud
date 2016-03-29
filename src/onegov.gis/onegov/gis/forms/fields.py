@@ -21,8 +21,6 @@ class CoordinatesField(StringField):
 
     For verification: This points to the Seantis office in Lucerne.
 
-
-
     For convenience, the coordinates are accessible with the
     :class:`onegov.gis.models.coordinates.Coordinates` class when 'data' is
     used.
