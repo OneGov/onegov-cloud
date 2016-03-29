@@ -12,6 +12,7 @@ from collections import defaultdict
 from contextlib import contextmanager
 from onegov.core import Framework
 from onegov.core import utils
+from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
 from onegov.page import PageCollection
 from onegov.search import ElasticsearchApp
@@ -22,7 +23,7 @@ from onegov.town.theme import TownTheme
 from webassets import Bundle
 
 
-class TownApp(Framework, LibresIntegration, ElasticsearchApp):
+class TownApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp):
     """ The town application. Include this in your onegov.yml to serve it
     with onegov-server.
 
@@ -231,6 +232,19 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             output='bundles/code_editor.bundle.js'
         )
 
+        leaflet = Bundle(
+            utils.module_path('onegov.gis', 'assets/js/mapbox-gl.js'),
+            utils.module_path('onegov.gis', 'assets/js/mapbox-integration.js'),
+            filters=jsminifier,
+            output='bundles/leaflet.bundle.js'
+        )
+
+        leaflet_css = Bundle(
+            utils.module_path('onegov.gis', 'assets/css/mapbox-gl.css'),
+            filters='datauri',
+            output='bundles/leaflet.bundle.css'
+        )
+
         common = Bundle(
             'js/modernizr.js',
             'js/jquery.js',
@@ -242,6 +256,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
             asset('js/form_dependencies.js'),
             confirm,
             typeahead,
+            leaflet,
             'js/jquery.datetimepicker.js',
             'js/datetimepicker.js',
             'js/jquery.popupoverlay.js',
@@ -253,6 +268,7 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp):
 
         common_css = Bundle(
             'css/jquery.datetimepicker.css',
+            leaflet_css,
             filters='cssmin',
             output='bundles/common.bundle.css',
         )

@@ -43,6 +43,7 @@ setup(
         'onegov.event>=0.0.5',
         'onegov.form>=0.9.0',
         'onegov.foundation>=0.0.4',
+        'onegov.gis',
         'onegov.libres>=0.0.4',
         'onegov.newsletter>=0.1.0',
         'onegov.page>=0.1.0',

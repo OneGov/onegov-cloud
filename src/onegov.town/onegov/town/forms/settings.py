@@ -2,6 +2,7 @@ from onegov.form import Form
 from wtforms import HiddenField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms_components import ColorField
+from onegov.gis import CoordinatesField
 from onegov.town import _
 from onegov.town.theme import user_options
 
@@ -107,6 +108,11 @@ class SettingsForm(Form):
         label=_("SBB Daypass Label"),
         description=_("Generalabonnement for Towns"),
         fieldset=_("Homepage")
+    )
+    coordinates = CoordinatesField(
+        label=_("Town Coordiantes"),
+        description=_("The town's center. Influences the default map view"),
+        fieldset=_("Maps")
     )
     analytics_code = TextAreaField(
         label=_("Analytics Code"),
