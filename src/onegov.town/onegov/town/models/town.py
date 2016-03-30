@@ -45,6 +45,7 @@ class Town(Base, TimestampMixin):
     online_counter_label = meta_property('online_counter_label')
     reservations_label = meta_property('reservations_label')
     daypass_label = meta_property('daypass_label')
+    default_map_view = meta_property('default_map_view')
 
     @contact.setter
     def contact(self, value):

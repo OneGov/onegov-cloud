@@ -109,9 +109,11 @@ class SettingsForm(Form):
         description=_("Generalabonnement for Towns"),
         fieldset=_("Homepage")
     )
-    coordinates = CoordinatesField(
-        label=_("Town Coordiantes"),
-        description=_("The town's center. Influences the default map view"),
+    default_map_view = CoordinatesField(
+        label=_("The default map view. This should show the whole town"),
+        render_kw={
+            'data-map-type': 'crosshair'
+        },
         fieldset=_("Maps")
     )
     analytics_code = TextAreaField(
