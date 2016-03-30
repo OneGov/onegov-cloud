@@ -35,8 +35,16 @@ var MapboxInput = function(input) {
     var lon = coordinates.lon || 8.3054817;
     var zoom = coordinates.zoom || 5;
 
-    var el = $('<div class="map-wrapper">')
-        .insertBefore(input.hide());
+    input.hide();
+
+    var wrapper = $('<div class="map-wrapper">')
+        .insertAfter(input.closest('label'));
+
+    var el = $('<div class="map">')
+        .appendTo(wrapper);
+
+    var overlay = $('<div class="map-overlay">')
+        .appendTo(wrapper);
 
     // the height depends on the width using the golden ratio
     el.css('height', input.data('map-height') || $(el).width() / 1.618 + 'px');
@@ -48,17 +56,28 @@ var MapboxInput = function(input) {
         zoom: zoom
     });
 
-    // hide the improve map link, it's not translated, looks ugly and doesn't
-    // *have* to be included (unlike the copyright labels)
-    map.on('load', function(e) {
-        $(e.target._container).find('.mapbox-improve-map').remove();
+    map.addControl(new mapboxgl.Navigation());
+
+    map.on('load', function() {
+        var container = $(map._container);
+
+        container.find('mapbox-control-container').on('click', function(e) {
+            e.preventDefault();
+        });
+
+        // buttons inside the map lead to form-submit if not prevented form it
+        container.find('button').on('click', function(e) {
+            e.preventDefault();
+        });
     });
 
     switch (input.data('map-type')) {
         case 'crosshair':
             asCrosshairMap(map, input);
             break;
-
+        case 'point':
+            asPointMap(map, input);
+            break;
         default:
             break;
     }

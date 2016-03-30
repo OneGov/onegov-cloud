@@ -1,0 +1,23 @@
+/*
+    hide the improve map link, it's not translated, looks ugly and
+    doesn't *have* to be included (unlike the copyright labels)
+*/
+.mapbox-improve-map {
+    display: none;
+}
+
+/*
+    the button margin is inherited from whatever theme we use, so we need
+    to override this in any case
+*/
+.map .mapboxgl-ctrl-icon {
+    margin: 0;
+}
+
+
+/*
+    we don't want this control
+*/
+.map .mapboxgl-ctrl-compass {
+    display: none;
+}
