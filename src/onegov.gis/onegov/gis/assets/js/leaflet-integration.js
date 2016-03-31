@@ -72,6 +72,10 @@ var MapboxInput = function(input) {
 
     new L.Control.Zoom({position: 'topright'}).addTo(map);
 
+    // remove leaflet link - we don't advertise other open source projects
+    // we depend on as visibly either
+    map.attributionControl.setPrefix('');
+
     map.on('load', function() {
         var container = $(map._container);
 
