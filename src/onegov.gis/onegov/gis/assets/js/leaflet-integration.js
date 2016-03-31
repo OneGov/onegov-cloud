@@ -89,8 +89,8 @@ function asCrosshairMap(map, input) {
     });
 }
 
-function asPointMap(map, input) {
-    // a map that provides a single point which can be added or removed
+function asMarkerMap(map, input) {
+    // a map that provides a single marker which can be added, moved or removed
     // from the map
 
     var marker;
@@ -220,8 +220,8 @@ var MapboxInput = function(input) {
         case 'crosshair':
             asCrosshairMap(map, input);
             break;
-        case 'point':
-            asPointMap(map, input);
+        case 'marker':
+            asMarkerMap(map, input);
             break;
         default:
             break;
