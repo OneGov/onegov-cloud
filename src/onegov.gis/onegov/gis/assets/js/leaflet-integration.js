@@ -105,9 +105,16 @@ function asPointMap(map, input) {
         position = position || map.getCenter();
         zoom = zoom || map.getZoom();
 
-        marker = L.marker(position, {icon: icon});
+        marker = L.marker(position, {icon: icon, draggable: true});
         marker.addTo(map);
         map.setZoom(zoom);
+
+        marker.on('dragend', function() {
+            setCoordinates(
+                input,
+                mapToCoordinates(marker.getLatLng(), map.getZoom())
+            );
+        });
 
         setCoordinates(input, mapToCoordinates(position, map.getZoom()));
     }
