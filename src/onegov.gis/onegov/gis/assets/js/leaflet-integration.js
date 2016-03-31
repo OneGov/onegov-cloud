@@ -98,7 +98,7 @@ function asMarkerMap(map, input) {
     var icon = L.VectorMarkers.icon({
         prefix: 'fa',
         icon: 'fa-circle',
-        markerColor: input.data('marker-color') || '#2D5594'
+        markerColor: input.data('marker-color') || $('body').data('default-marker-color') || '#006fba'
     });
 
     function addMarker(position, zoom) {
