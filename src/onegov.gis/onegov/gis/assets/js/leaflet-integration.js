@@ -62,9 +62,15 @@ var MapboxInput = function(input) {
     // the height depends on the width using the golden ratio
     el.css('height', input.data('map-height') || $(el).width() / 1.618 + 'px');
 
-    var map = L.map(el[0])
+    var options = {
+        zoomControl: false
+    };
+
+    var map = L.map(el[0], options)
         .addLayer(getTiles())
         .setView([lat, lon], zoom);
+
+    new L.Control.Zoom({position: 'topright'}).addTo(map);
 
     map.on('load', function() {
         var container = $(map._container);
