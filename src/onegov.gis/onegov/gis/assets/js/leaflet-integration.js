@@ -1,3 +1,59 @@
+/*
+    Leaflet Vector Marker (ish)
+
+    This is not actually leaflet-vector marker anymore, it's the same idea and
+    some of the code, but it's much smaller and does way less.
+*/
+L.VectorMarkers = {};
+L.VectorMarkers.version = "1.1.0";
+L.VectorMarkers.Icon = L.Icon.extend({
+    options: {
+        className: "vector-marker",
+        prefix: "fa",
+        icon: "fa-circle",
+        markerColor: "blue",
+        strokeColor: "white",
+        iconColor: "white",
+        popupAnchor: [1, -27],
+        size: [30, 39],
+        svg: '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="30px" height="39px" viewBox="0 0 30 39" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><path d="M15,3 C8.37136723,3 3,8.37130729 3,14.9998721 C3,17.6408328 3.85563905,20.0808246 5.30116496,22.0628596 L15,34.5826752 L24.698835,22.0628596 C26.1443609,20.0808246 27,17.6408328 27,14.9998721 C27,8.37130729 21.6286328,3 15,3 L15,3 Z" id="marker" stroke="{{stroke-color}}" stroke-width="3" fill="{{color}}"></path></g></svg>'
+    },
+    initialize: function(options) {
+        return L.Util.setOptions(this, options);
+    },
+    createIcon: function(oldIcon) {
+        var div = (oldIcon && oldIcon.tagName === "DIV" ? oldIcon : document.createElement("div"));
+        div.innerHTML = this.options.svg
+            .replace('{{color}}', this.options.markerColor)
+            .replace('{{stroke-color}}', this.options.strokeColor);
+        div.classList.add(this.options.className);
+
+        if (this.options.icon) {
+            div.appendChild(this.createInnerIcon());
+        }
+
+        var size = L.point(this.options.size);
+
+        div.style.marginLeft = (-size.x / 2) + 'px';
+        div.style.marginTop = (-size.y) + 'px';
+
+        return div;
+    },
+    createInnerIcon: function() {
+        var i = document.createElement('i');
+
+        i.classList.add(this.options.prefix);
+        i.classList.add(this.options.icon);
+        i.style.color = this.options.iconColor;
+
+        return i;
+    }
+});
+
+L.VectorMarkers.icon = function(options) {
+    return new L.VectorMarkers.Icon(options);
+};
+
 function getCoordinates(input) {
     return JSON.parse(window.atob(input.attr('value')));
 }
@@ -27,6 +83,41 @@ function asCrosshairMap(map, input) {
             e.target.getCenter(), e.target.getZoom()
         ));
     });
+}
+
+function asPointMap(map) {
+    // a map that provides a single point which can be added or removed
+    // from the map
+
+    var pointButton = L.easyButton({
+        position: 'topright',
+        states: [{
+            stateName: 'add-point',
+            icon:      'fa-map-marker',
+            title:     'Add marker',
+            onClick: function(btn) {
+                var icon = L.VectorMarkers.icon({
+                    prefix: 'fa',
+                    icon: window.prompt("icon"),
+                    markerColor: window.prompt("color")
+                });
+
+                var marker = L.marker(map.getCenter(), {icon: icon});
+                marker.bindPopup("<b>Hello world!</b><br>I am a popup.");
+                marker.addTo(map);
+                btn.state('remove-point');
+            }
+        }, {
+            stateName: 'remove-point',
+            icon:      'fa-trash',
+            title:     'Remove marker',
+            onClick: function(btn) {
+                btn.state('add-point');
+            }
+        }]
+    });
+
+    pointButton.addTo(map);
 }
 
 function getMapboxToken() {
@@ -88,6 +179,9 @@ var MapboxInput = function(input) {
     switch (input.data('map-type')) {
         case 'crosshair':
             asCrosshairMap(map, input);
+            break;
+        case 'point':
+            asPointMap(map, input);
             break;
         default:
             break;

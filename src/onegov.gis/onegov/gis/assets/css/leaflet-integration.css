@@ -4,3 +4,39 @@
 .leaflet-tile-container img {
     box-shadow: 0 0 1px rgba(0, 0, 0, 0.05);
 }
+
+/*
+    Fix leaflet button styles
+*/
+.leaflet-bar button {
+    margin: 0;
+    padding: 0;
+}
+
+/*
+    Leaflet marker styles
+*/
+.vector-marker {
+    width: 30px;
+    height: 39px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: block;
+    text-align: center;
+    -webkit-filter: drop-shadow(1px 0px 2px #999);
+    filter: drop-shadow(1px 0px 2px #999);
+}
+
+.vector-marker i {
+    position: relative;
+    top: 7px;
+    width: 100%;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    display: inline-block;
+    font-size: 14px;
+    z-index: 1000;
+}
