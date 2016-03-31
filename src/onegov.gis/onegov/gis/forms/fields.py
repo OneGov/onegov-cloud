@@ -25,6 +25,9 @@ class CoordinatesField(StringField):
     :class:`onegov.gis.models.coordinates.Coordinates` class when 'data' is
     used.
 
+    Note that this field doesn't work with the ``InputRequired`` validator.
+    Instead the ``DataRequired`` validator has to be chosen.
+
     """
 
     widget = CoordinatesWidget()
