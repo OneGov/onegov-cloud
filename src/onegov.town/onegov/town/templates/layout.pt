@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 
-<body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}">
+<body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}" data-default-marker-color="${layout.primary_color}">
 
     <!--! Skip navigation link for screenreaders -->
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>

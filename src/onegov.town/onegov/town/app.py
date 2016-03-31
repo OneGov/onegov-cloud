@@ -236,6 +236,8 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp):
             utils.module_path(
                 'onegov.gis', 'assets/js/leaflet.js'),
             utils.module_path(
+                'onegov.gis', 'assets/js/leaflet-easybutton.js'),
+            utils.module_path(
                 'onegov.gis', 'assets/js/leaflet-integration.js'),
             filters=jsminifier,
             output='bundles/leaflet.bundle.js'
@@ -244,6 +246,8 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp):
         leaflet_css = Bundle(
             utils.module_path(
                 'onegov.gis', 'assets/css/leaflet.css'),
+            utils.module_path(
+                'onegov.gis', 'assets/css/leaflet-easybutton.css'),
             utils.module_path(
                 'onegov.gis', 'assets/css/leaflet-integration.css'),
             filters='datauri',

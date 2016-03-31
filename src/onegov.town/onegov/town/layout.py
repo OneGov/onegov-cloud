@@ -22,6 +22,7 @@ from onegov.town.models import (
     Thumbnail
 )
 from onegov.town.models.extensions import PersonLinkExtension
+from onegov.town.theme.town_theme import user_options
 from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.user import Auth
 from purl import URL
@@ -62,6 +63,11 @@ class Layout(ChameleonLayout):
 
         """
         return self.request.unconsumed and self.request.unconsumed[-1] or None
+
+    @property
+    def primary_color(self):
+        return self.town.theme_options.get(
+            'primary-color', user_options['primary-color'])
 
     @cached_property
     def svg(self):
