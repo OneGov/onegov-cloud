@@ -54,6 +54,10 @@ L.VectorMarkers.icon = function(options) {
     return new L.VectorMarkers.Icon(options);
 };
 
+/*
+    Leaflet Map Input (setting of coordinates in forms)
+*/
+
 function getCoordinates(input) {
     return JSON.parse(window.atob(input.attr('value')));
 }
@@ -85,9 +89,33 @@ function asCrosshairMap(map, input) {
     });
 }
 
-function asPointMap(map) {
+function asPointMap(map, input) {
     // a map that provides a single point which can be added or removed
     // from the map
+
+    var marker;
+    var coordinates = getCoordinates(input);
+    var icon = L.VectorMarkers.icon({
+        prefix: 'fa',
+        icon: 'fa-circle',
+        markerColor: input.data('marker-color') || '#2D5594'
+    });
+
+    function addMarker(position, zoom) {
+        position = position || map.getCenter();
+        zoom = zoom || map.getZoom();
+
+        marker = L.marker(position, {icon: icon});
+        marker.addTo(map);
+        map.setZoom(zoom);
+
+        setCoordinates(input, mapToCoordinates(position, map.getZoom()));
+    }
+
+    function removeMarker() {
+        map.removeLayer(marker);
+        setCoordinates(input, {'lat': null, 'lon': null, zoom: null});
+    }
 
     var pointButton = L.easyButton({
         position: 'topright',
@@ -96,15 +124,7 @@ function asPointMap(map) {
             icon:      'fa-map-marker',
             title:     'Add marker',
             onClick: function(btn) {
-                var icon = L.VectorMarkers.icon({
-                    prefix: 'fa',
-                    icon: window.prompt("icon"),
-                    markerColor: window.prompt("color")
-                });
-
-                var marker = L.marker(map.getCenter(), {icon: icon});
-                marker.bindPopup("<b>Hello world!</b><br>I am a popup.");
-                marker.addTo(map);
+                addMarker();
                 btn.state('remove-point');
             }
         }, {
@@ -112,12 +132,25 @@ function asPointMap(map) {
             icon:      'fa-trash',
             title:     'Remove marker',
             onClick: function(btn) {
+                removeMarker();
                 btn.state('add-point');
             }
         }]
     });
 
     pointButton.addTo(map);
+
+    if (coordinates.lat && coordinates.lon) {
+        addMarker(coordinatesToMap(coordinates), coordinates.zoom);
+        pointButton.state('remove-point');
+    }
+
+    map.on('zoomend', function() {
+        var c = getCoordinates(input);
+        c.zoom = map.getZoom();
+
+        setCoordinates(input, c);
+    });
 }
 
 function getMapboxToken() {
