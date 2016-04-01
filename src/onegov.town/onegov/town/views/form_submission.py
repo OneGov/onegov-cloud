@@ -45,7 +45,8 @@ def handle_defined_form(self, request, form):
         'lead': self.meta.get('lead'),
         'text': self.content.get('text'),
         'people': self.people,
-        'contact': self.contact_html
+        'contact': self.contact_html,
+        'coordinates': self.coordinates
     }
 
 

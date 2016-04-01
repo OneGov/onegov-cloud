@@ -29,6 +29,6 @@
         </div>
 
         <tal:block metal:use-macro="layout.macros.page_content"
-         tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html" />
+         tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html; coordinates page.coordinates" />
     </tal:block>
 </div>

@@ -206,20 +206,20 @@
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.town">
     <div class="row">
-        <tal:block condition="not: people or contact">
+        <tal:block condition="not: people or contact or coordinates">
             <div class="small-12 columns">
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
                 <div metal:define-slot="after-text"></div>
             </div>
         </tal:block>
-        <tal:block condition="people or contact">
+        <tal:block condition="people or contact or coordinates">
             <div class="small-12 medium-8 columns">
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
                 <div metal:define-slot="after-text"></div>
             </div>
-            <div class="small-12 medium-4 columns" tal:condition="people or contact">
+            <div class="small-12 medium-4 columns" tal:condition="people or contact or coordinates">
                 <div class="page-content-panel contact-panel" tal:condition="contact">
                     <tal:block content="structure contact" />
                 </div>
@@ -231,6 +231,10 @@
                             <small>${person.context_specific_function}</small>
                         </li>
                     </ul>
+                </div>
+                <div class="page-content-panel coordinates-panel" tal:condition="coordinates">
+                    <h2 i18n:translate>Map</h2>
+                    <div class="marker-map" data-map-height="400px" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}" />
                 </div>
             </div>
         </tal:block>
