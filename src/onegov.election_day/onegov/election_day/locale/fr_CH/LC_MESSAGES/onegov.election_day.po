@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: 2016-03-17 11:13+0100\n"
-"PO-Revision-Date: 2015-12-24 11:39+0100\n"
+"PO-Revision-Date: 2016-04-01 16:51+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -44,7 +44,7 @@ msgid "Related link"
 msgstr "Informations complémentaires"
 
 msgid "An election with this title exists already"
-msgstr ""
+msgstr "Une élection avec ce titre existe déjà"
 
 msgid "Election based on proportional representation"
 msgstr "Système proportionnel"
@@ -62,19 +62,19 @@ msgid "Results"
 msgstr "Résultats"
 
 msgid "List connections"
-msgstr ""
+msgstr "Connexions de listes"
 
 msgid "Elected Candidates"
-msgstr ""
+msgstr "Candidats élus"
 
 msgid "Election statistics"
-msgstr ""
+msgstr "Statistiques des élections"
 
 msgid "Complete"
-msgstr ""
+msgstr "Terminé"
 
 msgid "Absolute majority"
-msgstr ""
+msgstr "Majorité absolue"
 
 msgid "Proposal"
 msgstr "Proposition"
@@ -86,10 +86,10 @@ msgid "Tie-Breaker"
 msgstr "Jeu décisif"
 
 msgid "SESAM"
-msgstr ""
+msgstr "SESAM"
 
 msgid "Wabsti"
-msgstr ""
+msgstr "Wabsti"
 
 msgid "Simple Vote"
 msgstr "Vote simple"
@@ -143,65 +143,65 @@ msgid "Turnout"
 msgstr "Participation"
 
 msgid "Received Ballots"
-msgstr ""
+msgstr "Votes reçus"
 
 msgid "Candidates"
-msgstr ""
+msgstr "Candidats"
 
 msgid "Candidate"
-msgstr ""
+msgstr "Candidat"
 
 #. Default: Votes
 msgid "single_votes"
-msgstr ""
+msgstr "Votes"
 
 msgid "List"
-msgstr ""
+msgstr "Liste"
 
 msgid "Elected"
-msgstr ""
+msgstr "Élus"
 
 msgid "Yes"
-msgstr ""
+msgstr "Oui"
 
 msgid "No"
-msgstr ""
+msgstr "Non"
 
 msgid "All candidates"
-msgstr ""
+msgstr "Tous les candidats"
 
 msgid "Elected candidates only"
-msgstr ""
+msgstr "Candidats élus seulement"
 
 msgid "List connection"
-msgstr ""
+msgstr "Connexion de listes"
 
 msgid "Sublist connection"
-msgstr ""
+msgstr "Connexion de sous-listes"
 
 msgid "Subtotal"
-msgstr ""
+msgstr "Sous-total"
 
 msgid "Total"
 msgstr "Total"
 
 msgid "Electoral Districts"
-msgstr ""
+msgstr "Circonscriptions électorales"
 
 msgid "Electoral District"
 msgstr "District électoral"
 
 msgid "Accounted Ballots"
-msgstr ""
+msgstr "Bulletins de vote comptabilisés"
 
 msgid "Blank Ballots"
-msgstr ""
+msgstr "Bulletins de vote vierges"
 
 msgid "Invalid Ballots"
-msgstr ""
+msgstr "Bulletins de vote non valides"
 
 msgid "Accounted Votes"
-msgstr ""
+msgstr "Votes comptés"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -330,92 +330,106 @@ msgstr ""
 "disponibles dans les formats suivants:"
 
 msgid "Fields (Elections)"
-msgstr ""
+msgstr "Champs (Elections)"
 
 msgid "The following fields are included in all formats:"
 msgstr "Les champs suivants sont inclus dans tous les formats"
 
 msgid "Title of the election."
-msgstr ""
+msgstr "Titre de l'élection."
 
 msgid "The date of the election (an ISO 8601 date string)."
-msgstr ""
+msgstr "La date de l'élection (an ISO 8601 date string)."
 
 msgid "\"proporz\" for proportional, \"majorz\" for majority system."
 msgstr ""
+"\"proporz\" pour proportionnelle, \"majorz\" pour le système majoritaire."
 
 msgid "The number of mandates."
-msgstr ""
+msgstr "Nombre de mandats."
 
 msgid "The name of the municipality."
-msgstr ""
+msgstr "Le nom de la municipalité."
 
 msgid "The id of the municipality/locale (\"BFS Nummer\")."
-msgstr ""
+msgstr "L'identifiant de la municipalité / locale (\"BFS Nummer\")."
 
 msgid "The number of people elegible to vote for this municipality."
-msgstr ""
+msgstr "Le nombre de personnes éligible à voter pour cette municipalité."
 
 msgid "The number of received ballots for this municipality."
-msgstr ""
+msgstr "Le nombre de bulletins de vote reçus pour cette municipalité."
 
 msgid "The number of blank ballots for this municipality."
-msgstr ""
+msgstr "Le nombre de bulletins blancs pour cette municipalité."
 
 msgid "The number of invalid ballots for this municipality."
-msgstr ""
+msgstr "Le nombre de bulletins nuls pour cette municipalité."
 
 msgid "The number of unaccounted ballots for this municipality."
 msgstr ""
+"Le nombre de bulletins de vote non comptabilisés pour cette municipalité."
 
 msgid "The nubmer of accounted ballots for this municipality."
-msgstr ""
+msgstr "Le nombre de bulletins de votes comptabilisés pour cette municipalité."
 
 msgid "The number of blank votes for this municipality."
-msgstr ""
+msgstr "Le nombre de votes en blanc pour cette municipalité."
 
 msgid ""
 "The number of invalid votes for this municipality. Zero for elections based "
 "on proportional representation."
 msgstr ""
+"Le nombre de votes valides pour cette municipalité. Zéro pour les élections "
+"sur la base de la représentation proportionnelle."
 
 msgid "The number of accounted votes for this municipality."
-msgstr ""
+msgstr "Le nombre de votes comptabilisés pour cette municipalité."
 
 msgid ""
 "The name of the list this candidate appears on. Only relevant forelections "
 "based on proportional representation."
 msgstr ""
+"Le nom de la liste sur laquelle ce candidat apparaît. Uniquement valable "
+"pour les élections sur la base de la représentation proportionnelle."
 
 msgid ""
 "The number of votes this list has got. Only relevant for elections based on "
 "proportional representation."
 msgstr ""
+"Le nombre de votes que cette liste a obtenu. Uniquement valable pour les "
+"élections sur la base de la représentation proportionnelle."
 
 msgid ""
 "The ID of the list connection this list is connected to. Only relevant for "
 "elections based on proportional representation."
 msgstr ""
+"L'Identifiant de la connexion de la liste à laquelle cette liste est "
+"connectée. Uniquement valable pour les élections sur la base de la "
+"représentation proportionnelle."
 
 msgid ""
 "The ID of the parent list connection this list is connected to. Only "
 "relevant for elections based on proportional representation."
 msgstr ""
+"L'Identifiant de la connexion de liste parent à laquelle cette liste est "
+"connectée. Uniquement valable pour les élections sur la base de la "
+"représentation proportionnelle."
 
 msgid "The family name of the candidate."
-msgstr ""
+msgstr "Le nom de famille du candidat."
 
 msgid "The first name of the candiate."
-msgstr ""
+msgstr "Le prénom du candidat."
 
 msgid "True if the candidate has been elected."
-msgstr ""
+msgstr "Vrai si le candidat a été élu."
 
 msgid "The number of votes this candidate got."
-msgstr ""
+msgstr "Le nombre de voix que ce candidat a obtenu."
 
 msgid "Fields (Votes)"
-msgstr ""
+msgstr "Champs (Votes)"
 
 msgid "Title of the vote."
 msgstr "Nom du vote:"
@@ -553,51 +567,51 @@ msgid "The file contains an empty line."
 msgstr "Le fichier contient une ligne vide."
 
 msgid "Invalid election values"
-msgstr ""
+msgstr "Valeurs des élections non valides"
 
 msgid "Invalid muncipality values"
-msgstr ""
+msgstr "Valeurs de la municipalité non valides"
 
 #, python-format
 msgid "municipality id ${id} is unknown"
 msgstr "référence de municipalité ${id} inconnue"
 
 msgid "Invalid list values"
-msgstr ""
+msgstr "Valeurs de la liste non valides"
 
 msgid "Invalid list results"
-msgstr ""
+msgstr "Résultats de la liste non valides"
 
 msgid "Invalid candidate values"
-msgstr ""
+msgstr "Valeurs des candidats non valides"
 
 msgid "Invalid candidate results"
-msgstr ""
+msgstr "Résultats des candidats non valides"
 
 msgid "Invalid list connection values"
-msgstr ""
+msgstr "Valeurs de connexion de liste non valides"
 
 msgid "No data found"
 msgstr "Pas de données trouvées"
 
 msgid "Unkown candidate"
-msgstr ""
+msgstr "Candidat inconnu"
 
 msgid "Invalid values"
-msgstr ""
+msgstr "Valeurs non valides"
 
 msgid "Unkown municipality"
-msgstr ""
+msgstr "Commune inconnue"
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
 
 #, python-format
 msgid "Do you really want to delete \"${election}\"?"
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer \"$ {election}\"?"
 
 msgid "Delete election"
-msgstr ""
+msgstr "Supprimer l'élection"
 
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
