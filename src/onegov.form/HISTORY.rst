@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.1 (2016-04-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Properly include lead/text as properties.
 
   They were basically there already and other code counted on this being so.
