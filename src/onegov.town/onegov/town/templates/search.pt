@@ -66,7 +66,9 @@
 
                                 <tal:block case="default">
                                     <a href="${request.link(result)}">${result.title}</a>
-                                    ${result.lead[:160]}<tal:block condition="len(result.lead) > 160">…</tal:block>
+                                    <tal:block condition="result.lead">
+                                        ${result.lead[:160]}<tal:block condition="len(result.lead) > 160">…</tal:block>
+                                    </tal:block>
                                 </tal:block>
 
                             </tal:block>

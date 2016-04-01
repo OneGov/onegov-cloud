@@ -23,16 +23,6 @@ class LinkForm(PageBaseForm):
         render_kw={'class_': 'image-url file-url internal-url'}
     )
 
-    def update_model(self, model):
-        """ Stores the form values on the page. """
-        model.title = self.title.data
-        model.content = {'url': self.url.data}
-
-    def apply_model(self, model):
-        """ Stores the page values on the form. """
-        self.title.data = model.title
-        self.url.data = model.content.get('url')
-
 
 class PageForm(PageBaseForm):
     """ Defines the form for pages with the 'page' trait. """
@@ -45,17 +35,3 @@ class PageForm(PageBaseForm):
         label=_("Text"),
         render_kw={'class_': 'editor'},
         filters=[sanitize_html, annotate_html])
-
-    def update_model(self, model):
-        """ Stores the form values on the page. """
-        model.title = self.title.data
-        model.content = {
-            'lead': self.lead.data,
-            'text': self.text.data
-        }
-
-    def apply_model(self, model):
-        """ Stores the page values on the form. """
-        self.title.data = model.title
-        self.lead.data = model.content.get('lead', '')
-        self.text.data = model.content.get('text', '')

@@ -21,21 +21,6 @@ class FormDefinitionBaseForm(Form):
         render_kw={'class_': 'editor'},
         filters=[sanitize_html, annotate_html])
 
-    def update_model(self, model):
-        model.title = self.title.data
-
-        if model.type == 'custom':
-            model.definition = self.definition.data
-
-        model.meta['lead'] = self.lead.data
-        model.content['text'] = self.text.data
-
-    def apply_model(self, model):
-        self.title.data = model.title
-        self.definition.data = model.definition
-        self.lead.data = model.meta.get('lead', '')
-        self.text.data = model.content.get('text', '')
-
 
 class BuiltinDefinitionForm(FormDefinitionBaseForm):
     """ Form to edit builtin forms. """

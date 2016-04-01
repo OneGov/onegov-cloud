@@ -48,14 +48,15 @@ def handle_new_page(self, request, form, src=None):
             type=self.page.type,
             meta={'trait': self.trait}
         )
-        form.update_model(page)
+        form.populate_obj(page)
+
         request.app.update_homepage_pages()
 
         request.success(page.trait_messages[page.trait]['new_page_added'])
         return morepath.redirect(request.link(page))
 
     if src:
-        form.apply_model(src)
+        form.process(obj=src)
 
     site_title = self.page.trait_messages[self.trait]['new_page_title']
 
@@ -69,13 +70,14 @@ def handle_new_page(self, request, form, src=None):
 
 def handle_edit_page(self, request, form):
     if form.submitted(request):
-        form.update_model(self.page)
+        form.populate_obj(self.page)
+
         request.success(_("Your changes were saved"))
         request.app.update_homepage_pages()
 
         return morepath.redirect(request.link(self.page))
     elif not request.POST:
-        form.apply_model(self.page)
+        form.process(obj=self.page)
 
     site_title = self.page.trait_messages[self.trait]['edit_page_title']
 

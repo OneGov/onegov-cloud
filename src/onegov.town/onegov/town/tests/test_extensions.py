@@ -12,12 +12,7 @@ def test_hidden_from_public_extension():
         meta = {}
 
     class TopicForm(Form):
-
-        def update_model(self, model):
-            pass
-
-        def apply_model(self, model):
-            pass
+        pass
 
     topic = Topic()
     assert not topic.is_hidden_from_public
@@ -29,14 +24,14 @@ def test_hidden_from_public_extension():
     assert not form.is_hidden_from_public.data
 
     form.is_hidden_from_public.data = True
-    form.update_model(topic)
+    form.populate_obj(topic)
 
     assert topic.is_hidden_from_public
 
     form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
-    form.apply_model(topic)
+    form.process(obj=topic)
 
     assert form.is_hidden_from_public.data
 
@@ -59,12 +54,7 @@ def test_person_link_extension():
             ]
 
     class TopicForm(Form):
-
-        def update_model(self, model):
-            pass
-
-        def apply_model(self, model):
-            pass
+        pass
 
     topic = Topic()
     assert topic.people is None
@@ -127,12 +117,7 @@ def test_person_link_extension_order():
             ]
 
     class TopicForm(Form):
-
-        def update_model(self, model):
-            pass
-
-        def apply_model(self, model):
-            pass
+        pass
 
     topic = Topic()
     form_class = topic.with_content_extensions(TopicForm, request=object())
@@ -211,12 +196,7 @@ def test_person_link_move_function():
             ]
 
     class TopicForm(Form):
-
-        def update_model(self, model):
-            pass
-
-        def apply_model(self, model):
-            pass
+        pass
 
     topic = Topic()
     form_class = topic.with_content_extensions(TopicForm, request=object())
@@ -253,12 +233,7 @@ def test_contact_extension():
         content = {}
 
     class TopicForm(Form):
-
-        def update_model(self, model):
-            pass
-
-        def apply_model(self, model):
-            pass
+        pass
 
     topic = Topic()
     assert topic.contact is None
@@ -267,15 +242,15 @@ def test_contact_extension():
     form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
-    assert 'contact_address' in form._fields
+    assert 'contact' in form._fields
 
-    form.contact_address.data = (
+    form.contact.data = (
         "Steve Jobs\n"
         "steve@apple.com\n"
         "https://www.apple.com"
     )
 
-    form.update_model(topic)
+    form.populate_obj(topic)
 
     assert topic.contact == (
         "Steve Jobs\n"
@@ -295,9 +270,9 @@ def test_contact_extension():
     form_class = topic.with_content_extensions(TopicForm, request=object())
     form = form_class()
 
-    form.apply_model(topic)
+    form.process(obj=topic)
 
-    assert form.contact_address.data == (
+    assert form.contact.data == (
         "Steve Jobs\n"
         "steve@apple.com\n"
         "https://www.apple.com"

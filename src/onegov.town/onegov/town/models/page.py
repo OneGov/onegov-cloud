@@ -1,4 +1,5 @@
 from onegov.core import utils
+from onegov.core.orm.mixins import content_property
 from onegov.page import Page
 from onegov.search import ORMSearchable
 from onegov.town.forms import LinkForm, PageForm
@@ -23,13 +24,9 @@ class SearchablePage(ORMSearchable):
         'text': {'type': 'localized_html'}
     }
 
-    @property
-    def lead(self):
-        return self.content.get('lead', '')
-
-    @property
-    def text(self):
-        return self.content.get('text', '')
+    lead = content_property('lead')
+    text = content_property('text')
+    url = content_property('url')
 
     @property
     def es_public(self):

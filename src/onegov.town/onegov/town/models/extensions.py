@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from onegov.core.utils import linkify
+from onegov.core.orm.mixins import meta_property, content_property
 from onegov.form.parser.core import WTFormsClassBuilder, FieldDependency
 from onegov.people import Person, PersonCollection
 from onegov.town import _
@@ -32,12 +33,6 @@ class ContentExtension(object):
 
         """
 
-        # the content is injected/updated using the following methods - this
-        # is currently a best practice in the code, but not really something
-        # we enforce using base classes or something like it.
-        assert hasattr(form_class, 'update_model')
-        assert hasattr(form_class, 'apply_model')
-
         for extension in extensions or self.content_extensions:
             form_class = extension.extend_form(self, form_class, request)
 
@@ -59,26 +54,12 @@ class HiddenFromPublicExtension(ContentExtension):
 
     """
 
-    @property
-    def is_hidden_from_public(self):
-        return self.meta.get('is_hidden_from_public', False)
-
-    @is_hidden_from_public.setter
-    def is_hidden_from_public(self, is_hidden):
-        self.meta['is_hidden_from_public'] = is_hidden
+    is_hidden_from_public = meta_property('is_hidden_from_public')
 
     def extend_form(self, form_class, request):
 
         class HiddenPageForm(form_class):
             is_hidden_from_public = BooleanField(_("Hide from the public"))
-
-            def update_model(self, model):
-                super().update_model(model)
-                model.is_hidden_from_public = self.is_hidden_from_public.data
-
-            def apply_model(self, model):
-                super().apply_model(model)
-                self.is_hidden_from_public.data = model.is_hidden_from_public
 
         return HiddenPageForm
 
@@ -89,16 +70,7 @@ class VisibleOnHomepageExtension(ContentExtension):
 
     """
 
-    @property
-    def is_visible_on_homepage(self):
-        return self.meta.get('is_visible_on_homepage', False)
-
-    @is_visible_on_homepage.setter
-    def is_visible_on_homepage(self, is_visible):
-        if is_visible:
-            self.meta['is_visible_on_homepage'] = True
-        elif 'is_visible_on_homepage' in self.meta:
-            del self.meta['is_visible_on_homepage']
+    is_visible_on_homepage = meta_property('is_visible_on_homepage')
 
     def extend_form(self, form_class, request):
 
@@ -109,14 +81,6 @@ class VisibleOnHomepageExtension(ContentExtension):
         class VisibleOnHomepageForm(form_class):
             is_visible_on_homepage = BooleanField(_("Visible on homepage"))
 
-            def update_model(self, model):
-                super().update_model(model)
-                model.is_visible_on_homepage = self.is_visible_on_homepage.data
-
-            def apply_model(self, model):
-                super().apply_model(model)
-                self.is_visible_on_homepage.data = model.is_visible_on_homepage
-
         return VisibleOnHomepageForm
 
 
@@ -126,9 +90,7 @@ class ContactExtension(ContentExtension):
 
     """
 
-    @property
-    def contact(self):
-        return self.content.get('contact')
+    contact = content_property('contact')
 
     @contact.setter
     def contact(self, value):
@@ -147,23 +109,12 @@ class ContactExtension(ContentExtension):
 
     def extend_form(self, form_class, request):
 
-        assert hasattr(form_class, 'update_model')
-        assert hasattr(form_class, 'apply_model')
-
         class ContactPageForm(form_class):
-            contact_address = TextAreaField(
+            contact = TextAreaField(
                 label=_("Address"),
                 fieldset=_("Contact"),
                 render_kw={'rows': 5}
             )
-
-            def update_model(self, model):
-                super().update_model(model)
-                model.contact = self.contact_address.data
-
-            def apply_model(self, model):
-                super().apply_model(model)
-                self.contact_address.data = model.content.get('contact', '')
 
         return ContactPageForm
 
@@ -302,10 +253,24 @@ class PersonLinkExtension(ContentExtension):
 
                 return existing_people == sorted_existing_people
 
+            def populate_obj(self, obj, *args, **kwargs):
+                # XXX this no longer be necessary once the person links
+                # have been turned into a field, see #74
+                super().populate_obj(obj, *args, **kwargs)
+                self.update_model(obj)
+
+            def process(self, *args, **kwargs):
+                # XXX this no longer be necessary once the person links
+                # have been turned into a field, see #74
+                super().process(*args, **kwargs)
+
+                obj = kwargs.get('obj')
+
+                if obj:
+                    self.apply_model(obj)
+
             def update_model(self, model):
                 previous_people = model.content.get('people', [])
-
-                super().update_model(model)
 
                 if self.is_ordered_people(previous_people):
                     # if the people are ordered a-z, we take the ordering from
@@ -337,8 +302,6 @@ class PersonLinkExtension(ContentExtension):
                     model.content['people'] = old_people + new_people
 
             def apply_model(self, model):
-                super().apply_model(model)
-
                 fields = self.get_people_fields(with_function=False)
                 people = dict(model.content.get('people', []))
 

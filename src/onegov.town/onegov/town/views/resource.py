@@ -74,7 +74,7 @@ def handle_new_resource(self, request, form, type):
         resource = self.add(
             title=form.title.data, type=type, timezone='Europe/Zurich'
         )
-        form.update_model(resource)
+        form.populate_obj(resource)
 
         request.success(RESOURCE_TYPES[type]['success'])
         return morepath.redirect(request.link(resource))
@@ -96,13 +96,13 @@ def handle_new_resource(self, request, form, type):
               permission=Private, form=get_resource_form)
 def handle_edit_resource(self, request, form):
     if form.submitted(request):
-        form.update_model(self)
+        form.populate_obj(self)
 
         request.success(_("Your changes were saved"))
         return morepath.redirect(request.link(self))
 
     elif not request.POST:
-        form.apply_model(self)
+        form.process(obj=self)
 
     layout = ResourceLayout(self, request)
     layout.include_editor()

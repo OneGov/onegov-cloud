@@ -31,9 +31,11 @@ def handle_new_definition(self, request, form):
     if form.submitted(request):
 
         model = Bunch(
-            title=None, definition=None, type='custom', meta={}, content={}
+            title=None, lead=None, text=None, definition=None, type='custom',
+            meta={}, content={}
         )
-        form.update_model(model)
+
+        form.populate_obj(model)
 
         if self.definitions.by_name(normalize_for_url(model.title)):
             request.alert(_("A form with this name already exists"))
@@ -71,19 +73,15 @@ def handle_new_definition(self, request, form):
 def handle_edit_definition(self, request, form):
 
     if form.submitted(request):
-        self.title = form.title.data
+        form.populate_obj(self, exclude={'definition'})
 
         if self.type == 'custom':
             self.definition = form.definition.data
 
-        form.update_model(self)
-
         request.success(_("Your changes were saved"))
         return morepath.redirect(request.link(self))
     elif not request.POST:
-        form.title.data = self.title
-        form.definition.data = self.definition
-        form.apply_model(self)
+        form.process(obj=self)
 
     collection = FormCollection(request.app.session())
 
