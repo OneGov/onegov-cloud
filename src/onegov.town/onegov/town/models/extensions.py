@@ -2,6 +2,7 @@ from collections import OrderedDict
 from onegov.core.utils import linkify
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.form.parser.core import WTFormsClassBuilder, FieldDependency
+from onegov.gis import CoordinatesField
 from onegov.people import Person, PersonCollection
 from onegov.town import _
 from sqlalchemy.orm import object_session
@@ -62,6 +63,47 @@ class HiddenFromPublicExtension(ContentExtension):
             is_hidden_from_public = BooleanField(_("Hide from the public"))
 
         return HiddenPageForm
+
+
+class CoordinatesExtension(ContentExtension):
+    """ Extends any class that has a data dictionary field with the ability
+    to add coordinates to it.
+
+    """
+
+    coordinates = content_property('coordinates')
+
+    @property
+    def has_coordinates(self):
+        if self.coordinates:
+            return self.coordinates.get('lat') and self.coordinates.get('lon')
+        else:
+            return False
+
+    @property
+    def lat(self):
+        return self.coordinates.get('lat')
+
+    @property
+    def lon(self):
+        return self.coordinates.get('lon')
+
+    @property
+    def zoom(self):
+        return self.coordinates.get('zoom')
+
+    def extend_form(self, form_class, request):
+
+        class CoordinatesForm(form_class):
+            coordinates = CoordinatesField(
+                label=_("Coordinates"),
+                fieldset=_("Map"),
+                render_kw={
+                    'data-map-type': 'marker'
+                }
+            )
+
+        return CoordinatesForm
 
 
 class VisibleOnHomepageExtension(ContentExtension):

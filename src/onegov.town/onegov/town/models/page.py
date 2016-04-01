@@ -8,6 +8,7 @@ from onegov.town.models.traitinfo import TraitInfo
 from onegov.town.models.extensions import (
     ContactExtension,
     HiddenFromPublicExtension,
+    CoordinatesExtension,
     PersonLinkExtension,
     VisibleOnHomepageExtension,
 )
@@ -48,7 +49,8 @@ class SearchablePage(ORMSearchable):
 
 
 class Topic(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
-            VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension):
+            VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension,
+            CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'topic'}
 
     es_type_name = 'topics'
@@ -99,7 +101,8 @@ class Topic(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
 
 
 class News(Page, TraitInfo, SearchablePage,
-           HiddenFromPublicExtension, ContactExtension, PersonLinkExtension):
+           HiddenFromPublicExtension, ContactExtension, PersonLinkExtension,
+           CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
     es_type_name = 'news'

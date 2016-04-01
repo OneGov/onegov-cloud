@@ -5,7 +5,8 @@ from onegov.form.models import FormSubmission
 from onegov.town.models.extensions import (
     HiddenFromPublicExtension,
     ContactExtension,
-    PersonLinkExtension
+    PersonLinkExtension,
+    CoordinatesExtension
 )
 from onegov.search import ORMSearchable
 
@@ -65,14 +66,16 @@ class SearchableResource(ORMSearchable):
 
 
 class DaypassResource(Resource, HiddenFromPublicExtension, SearchableResource,
-                      ContactExtension, PersonLinkExtension, SharedMethods):
+                      ContactExtension, PersonLinkExtension,
+                      CoordinatesExtension, SharedMethods):
     __mapper_args__ = {'polymorphic_identity': 'daypass'}
 
     es_type_name = 'daypasses'
 
 
 class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
-                   ContactExtension, PersonLinkExtension, SharedMethods):
+                   ContactExtension, PersonLinkExtension,
+                   CoordinatesExtension, SharedMethods):
     __mapper_args__ = {'polymorphic_identity': 'room'}
 
     es_type_name = 'rooms'
