@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+- Properly include lead/text as properties.
+
+  They were basically there already and other code counted on this being so.
+  [href]
+
 0.10.0 (2016-03-24)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -2,6 +2,7 @@ from hashlib import md5
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
+from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import JSON, UUID
 from onegov.form.display import render_field
 from onegov.form.parser import parse_form
@@ -43,14 +44,6 @@ class SearchableDefinition(ORMSearchable):
     def es_language(self):
         return 'de'  # XXX add to database in the future
 
-    @property
-    def lead(self):
-        return self.meta.get('lead', '')
-
-    @property
-    def text(self):
-        return self.content.get('text', '')
-
 
 class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
     """ Defines a form stored in the database. """
@@ -77,6 +70,12 @@ class FormDefinition(Base, ContentMixin, TimestampMixin, SearchableDefinition):
 
     #: link between forms and submissions
     submissions = relationship('FormSubmission', backref='form')
+
+    #: lead text describing the form
+    lead = meta_property('lead')
+
+    #: content associated with the form
+    text = content_property('text')
 
     __mapper_args__ = {
         "polymorphic_on": 'type'
