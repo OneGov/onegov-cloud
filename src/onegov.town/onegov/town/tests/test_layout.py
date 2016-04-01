@@ -1,10 +1,10 @@
+import morepath
 import onegov.core
 import onegov.town
 import more.transaction
 import more.webassets
 
 from datetime import datetime
-from morepath import setup
 from onegov.page import Page
 from onegov.town import TownApp
 from onegov.town.elements import Link
@@ -148,13 +148,11 @@ def test_page_layout_breadcrumbs(session):
 
 
 def test_template_layout():
-    config = setup()
 
     class Mock(object):
         pass
 
     class App(TownApp):
-        testing_config = config
         theme_options = {}
 
         town = Mock()
@@ -180,15 +178,19 @@ def test_template_layout():
         layout.font_awesome_path = ''
         return {'layout': layout}
 
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.scan(onegov.town)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+    morepath.scan(onegov.town)
+    morepath.commit([App])
 
     app = App()
     app.namespace = 'tests'
-    app.configure_application(dsn=None, filestorage='fs.memoryfs.MemoryFS')
+    app.configure_application(
+        dsn=None,
+        filestorage='fs.memoryfs.MemoryFS',
+        enable_elasticsearch=False
+    )
     app.set_application_id('tests/foo')
 
     client = Client(app)

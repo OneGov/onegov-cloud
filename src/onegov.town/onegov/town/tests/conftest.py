@@ -1,3 +1,4 @@
+import morepath
 import onegov.core
 import onegov.town
 import pytest
@@ -5,7 +6,6 @@ import tempfile
 import transaction
 import shutil
 
-from morepath import setup
 from onegov.core.crypto import hash_password
 from onegov.core.utils import Bunch, scan_morepath_modules
 from onegov.town.initial_content import (
@@ -60,9 +60,8 @@ def es_town_app(postgres_dsn, filestorage, town_password, smtp,
 def new_town_app(postgres_dsn, filestorage, town_password, smtp,
                  form_definitions, es_url=None):
 
-    config = setup()
-    scan_morepath_modules(onegov.town.TownApp, config)
-    config.commit()
+    scan_morepath_modules(onegov.town.TownApp)
+    morepath.commit([onegov.town.TownApp])
 
     app = onegov.town.TownApp()
     app.namespace = 'test_' + uuid4().hex
@@ -88,7 +87,7 @@ def new_town_app(postgres_dsn, filestorage, town_password, smtp,
 
     # cronjobs leave lingering sessions open, in real life this is not a
     # problem, but in testing it leads to connection pool exhaustion
-    app.registry.settings.cronjobs = Bunch(enabled=False)
+    app.settings.cronjobs = Bunch(enabled=False)
 
     session = app.session()
 

@@ -10,7 +10,7 @@ from sedate import ensure_timezone
 
 
 def get_cronjob_by_name(app, name):
-    for cronjob in app.registry.cronjobs.values():
+    for cronjob in app.config.cronjob_registry.cronjobs.values():
         if name in cronjob.name:
             return cronjob
 
