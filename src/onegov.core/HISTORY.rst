@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.18.1 (2016-04-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a custom datauri filter to work aorund an issue with webassets.
   [href]
