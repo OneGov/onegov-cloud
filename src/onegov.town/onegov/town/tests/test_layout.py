@@ -159,6 +159,7 @@ def test_template_layout():
 
         town = Mock()
         town.name = 'Govikon'
+        town.theme_options = theme_options
 
         # disable LibresIntegration for this test
         def configure_libres(self, **cfg):
