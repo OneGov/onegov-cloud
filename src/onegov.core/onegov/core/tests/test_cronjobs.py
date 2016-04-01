@@ -1,9 +1,9 @@
+import morepath
 import pytest
 import requests
 
 from datetime import datetime
 from freezegun import freeze_time
-from morepath import setup
 from morepath.error import ConflictError
 from onegov.core import cronjobs, Framework
 from onegov.core.utils import scan_morepath_modules
@@ -45,10 +45,9 @@ def test_is_scheduled_at():
 
 
 def test_overlapping_cronjobs():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.cronjob(hour=8, minute=0, timezone='UTC')
     def first_job(request):
@@ -58,35 +57,34 @@ def test_overlapping_cronjobs():
     def second_job(request):
         pass
 
-    scan_morepath_modules(App, config)
+    scan_morepath_modules(App)
 
     with pytest.raises(ConflictError):
-        config.commit()
+        morepath.commit([App])
 
 
 def test_non_5_minutes_cronjobs():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.cronjob(hour=8, minute=1, timezone='UTC')
     def first_job(request):
         pass
 
-    scan_morepath_modules(App, config)
+    scan_morepath_modules(App)
 
     with pytest.raises(AssertionError):
-        config.commit()
+        morepath.commit([App])
 
 
 def test_cronjobs_integration(postgres_dsn):
-    config = setup()
+
     result = 0
     cronjobs.CRONJOB_POLL_RESOLUTION = 1
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='')
     class Root(object):
@@ -101,8 +99,8 @@ def test_cronjobs_integration(postgres_dsn):
         nonlocal result
         result += 1
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit([App])
 
     app = App()
     app.configure_application(dsn=postgres_dsn, base=declarative_base())
@@ -127,10 +125,9 @@ def test_cronjobs_integration(postgres_dsn):
 
 
 def test_disable_cronjobs():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='')
     class Root(object):
@@ -148,8 +145,8 @@ def test_disable_cronjobs():
     def cronjobs_enabled():
         return False
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit([App])
 
     app = App()
     app.configure_application()
@@ -159,4 +156,4 @@ def test_disable_cronjobs():
     client = Client(app)
     client.get('/')
 
-    assert not app.registry.cronjob_threads
+    assert not app.config.cronjob_registry.cronjob_threads

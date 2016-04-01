@@ -434,11 +434,11 @@ def morepath_modules(cls):
         yield module
 
 
-def scan_morepath_modules(cls, config):
+def scan_morepath_modules(cls):
     """ Tries to scann all the morepath modules required for the given
     application class. This is not guaranteed to stay reliable as there is
     no sure way to discover all modules required by the application class.
 
     """
     for module in sorted(morepath_modules(cls)):
-        config.scan(import_module(module))
+        morepath.scan(import_module(module))

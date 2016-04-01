@@ -6,13 +6,13 @@ updates.
 import click
 import email
 import mailbox
+import morepath
 import os
 import platform
 import subprocess
 import sys
 
 from mailthon.middleware import TLS, Auth
-from morepath import setup
 from onegov.core.mail import Postman
 from onegov.core.orm import Base, SessionManager
 from onegov.core.upgrade import UpgradeRunner, get_tasks, get_upgrade_modules
@@ -302,10 +302,9 @@ def upgrade(ctx, dry_run):
 
         # have a custom update application so we can get a proper execution
         # context with a request and a session
-        config = setup()
 
         class UpdateApplication(appcfg.application_class):
-            testing_config = config
+            pass
 
         @UpdateApplication.path(model=UpgradeRunner, path=update_path)
         def get_upgrade_runner():
@@ -323,8 +322,8 @@ def upgrade(ctx, dry_run):
             else:
                 print("no pending upgrade tasks found")
 
-        scan_morepath_modules(appcfg.application_class, config)
-        config.commit()
+        scan_morepath_modules(appcfg.application_class)
+        morepath.commit([UpdateApplication])
 
         # get all applications by looking at the existing schemas
         mgr = SessionManager(appcfg.configuration['dsn'], base=Base)

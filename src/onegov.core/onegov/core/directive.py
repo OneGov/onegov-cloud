@@ -1,14 +1,15 @@
 from datetime import datetime
+from dectate import Action
 from inspect import isfunction
-from morepath import generic
-from morepath.directive import Directive, HtmlDirective, register_view
+from morepath.directive import HtmlAction
 from onegov.core.cronjobs import register_cronjob
 from onegov.core.framework import Framework
+from onegov.core.utils import Bunch
 from sedate import to_timezone, replace_timezone
 
 
 @Framework.directive('form')
-class HtmlHandleFormDirective(HtmlDirective):
+class HtmlHandleFormAction(HtmlAction):
     """ Register Form view.
 
     Basically wraps the Morepath's ``html`` directive, registering both
@@ -37,15 +38,13 @@ class HtmlHandleFormDirective(HtmlDirective):
             return {}  # template variables
 
     """
-    def __init__(self, app, model, form, render=None, template=None,
+    def __init__(self, model, form, render=None, template=None,
                  permission=None, internal=False, **predicates):
         self.form = form
-        super().__init__(app, model, render, template, permission, internal,
+        super().__init__(model, render, template, permission, internal,
                          **predicates)
 
-    def perform(self, registry, obj):
-        registry.install_predicates(generic.view)
-        registry.register_dispatch(generic.view)
+    def perform(self, obj, view_registry):
 
         keys = self.key_dict()
 
@@ -55,18 +54,21 @@ class HtmlHandleFormDirective(HtmlDirective):
         if 'request_method' not in keys:
 
             keys['request_method'] = 'GET'
-            register_view(registry, keys, wrapped,
-                          self.render, self.template,
-                          self.permission, self.internal)
+            view_registry.register_view(
+                keys, wrapped,
+                self.render, self.template,
+                self.permission, self.internal)
 
             keys['request_method'] = 'POST'
-            register_view(registry, keys, wrapped,
-                          self.render, self.template,
-                          self.permission, self.internal)
+            view_registry.register_view(
+                keys, wrapped,
+                self.render, self.template,
+                self.permission, self.internal)
         else:
-            register_view(registry, keys, wrapped,
-                          self.render, self.template,
-                          self.permission, self.internal)
+            view_registry.register_view(
+                keys, wrapped,
+                self.render, self.template,
+                self.permission, self.internal)
 
 
 def wrap_with_generic_form_handler(obj, form_class, view_name):
@@ -96,17 +98,19 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
 
 
 @Framework.directive('cronjob')
-class CronjobDirective(Directive):
+class CronjobAction(Action):
     """ Register a cronjob."""
 
-    def __init__(self, app, hour, minute, timezone):
-        super().__init__(app)
+    config = {
+        'cronjob_registry': Bunch
+    }
 
+    def __init__(self, hour, minute, timezone):
         self.hour = hour
         self.minute = minute
         self.timezone = timezone
 
-    def identifier(self, registry):
+    def identifier(self, cronjob_registry):
         # return a key to the hour/minute on a fixed day, this way it's
         # impossible to have two cronjobs running at the exact same time.
         return to_timezone(
@@ -116,5 +120,6 @@ class CronjobDirective(Directive):
             ), 'UTC'
         )
 
-    def perform(self, registry, func):
-        register_cronjob(registry, func, self.hour, self.minute, self.timezone)
+    def perform(self, func, cronjob_registry):
+        register_cronjob(
+            cronjob_registry, func, self.hour, self.minute, self.timezone)

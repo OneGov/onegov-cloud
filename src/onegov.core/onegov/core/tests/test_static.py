@@ -1,7 +1,7 @@
+import morepath
 import os.path
 import time
 
-from morepath import setup
 from onegov.core import Framework
 from onegov.core.static import StaticFile
 from webtest import TestApp as Client
@@ -9,14 +9,11 @@ from webtest import TestApp as Client
 
 def test_static_file(temporary_directory):
 
-    config = setup()
-
     class App(Framework):
-        testing_config = config
         serve_static_files = True
         static_files = temporary_directory
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     app.configure_application()
@@ -35,20 +32,18 @@ def test_static_file(temporary_directory):
 
 
 def test_static_file_app(temporary_directory):
-    config = setup()
 
     class App(Framework):
-        testing_config = config
         serve_static_files = True
         static_files = temporary_directory
 
     import onegov.core
     import more.transaction
     import more.webassets
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+    morepath.commit([App])
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')
@@ -74,10 +69,7 @@ def test_static_file_app(temporary_directory):
 
 
 def test_root_file_app(temporary_directory):
-    config = setup()
-
     class App(Framework):
-        testing_config = config
         serve_static_files = True
         static_files = temporary_directory
 
@@ -91,10 +83,10 @@ def test_root_file_app(temporary_directory):
     import onegov.core
     import more.transaction
     import more.webassets
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+    morepath.commit([App])
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')

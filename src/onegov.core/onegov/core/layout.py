@@ -160,7 +160,8 @@ class ChameleonLayout(Layout):
     @cached_property
     def template_loader(self):
         """ Returns the chameleon template loader. """
-        return self.app.registry._template_loaders['.pt']
+        registry = self.app.config.template_engine_registry
+        return registry._template_loaders['.pt']
 
     @cached_property
     def base(self):

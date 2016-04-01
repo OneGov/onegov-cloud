@@ -7,7 +7,6 @@ import transaction
 import uuid
 
 from datetime import datetime
-from morepath import setup
 from onegov.core.framework import Framework
 from onegov.core.orm import ModelBase, SessionManager, translation_hybrid
 from onegov.core.orm.abstract import AdjacencyList
@@ -203,10 +202,9 @@ def test_orm_scenario(postgres_dsn):
     # test a somewhat complete ORM scenario in which create and read data
     # for different applications
     Base = declarative_base()
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -260,10 +258,10 @@ def test_orm_scenario(postgres_dsn):
     import onegov.core
     import more.transaction
     import more.webassets
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+    morepath.commit([App])
 
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base)
@@ -304,10 +302,9 @@ def test_orm_scenario(postgres_dsn):
 
 def test_i18n_with_request(postgres_dsn):
     Base = declarative_base()
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -334,8 +331,8 @@ def test_i18n_with_request(postgres_dsn):
     def get_i18n_default_locale():
         return 'de_CH'
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit([App])
 
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base)
@@ -684,10 +681,9 @@ def test_serialization_failure(postgres_dsn):
 def test_application_retries(postgres_dsn, number_of_retries):
 
     Base = declarative_base()
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/foo/{id}/{uid}')
     class Document(object):
@@ -744,10 +740,10 @@ def test_application_retries(postgres_dsn, number_of_retries):
     import onegov.core
     import more.transaction
     import more.webassets
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+    morepath.commit([App])
 
     app = App()
     app.configure_application(

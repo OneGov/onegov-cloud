@@ -1,4 +1,5 @@
-from morepath import setup
+import morepath
+
 from onegov.core import Framework
 from onegov.core.theme import get_filename
 from webtest import TestApp as Client
@@ -29,10 +30,8 @@ def test_get_filename():
 
 
 def test_theme_application(temporary_directory):
-    config = setup()
 
     class App(Framework):
-        testing_config = config
         theme_options = {
             'color': 'red'
         }
@@ -52,10 +51,10 @@ def test_theme_application(temporary_directory):
     import onegov.core
     import more.transaction
     import more.webassets
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+    morepath.commit([App])
 
     app = App()
     app.configure_application(

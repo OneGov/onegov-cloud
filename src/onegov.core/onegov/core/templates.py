@@ -84,7 +84,8 @@ def render_template(template, request, content):
 
     """
 
-    template = request.app.registry._template_loaders['.pt'][template]
+    registry = request.app.config.template_engine_registry
+    template = registry._template_loaders['.pt'][template]
 
     variables = get_default_vars(request)
     variables.update(content)

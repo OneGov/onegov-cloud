@@ -125,7 +125,7 @@ class CoreRequest(IncludeRequest):
         or if it is outdated.
 
         """
-        theme = self.app.registry.settings.core.theme
+        theme = self.app.settings.core.theme
         assert theme is not None, "Do not call if no theme is used"
 
         filename = self.app.modules.theme.compile(
@@ -221,14 +221,15 @@ class CoreRequest(IncludeRequest):
     @cached_property
     def default_locale(self):
         """ Returns the default locale. """
-        return self.app.registry.settings.i18n.default_locale
+        return self.app.settings.i18n.default_locale
 
     @cached_property
     def locale(self):
         """ Returns the current locale of this request. """
-        settings = self.app.registry.settings
+        settings = self.app.settings
 
         locale = settings.i18n.locale_negotiator(self.app.locales, self)
+
         return locale or settings.i18n.default_locale
 
     @cached_property
@@ -245,6 +246,7 @@ class CoreRequest(IncludeRequest):
             special).
 
         """
+
         if not self.app.locales:
             return None
 

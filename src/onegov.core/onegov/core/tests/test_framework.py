@@ -1,4 +1,5 @@
 import json
+import morepath
 import os
 import transaction
 import pytest
@@ -8,7 +9,6 @@ from datetime import datetime, timedelta
 from email.header import decode_header
 from email.utils import parseaddr
 from freezegun import freeze_time
-from morepath import setup
 from onegov.core import Framework
 from onegov.core.upgrade import UpgradeState
 from onegov.server import Config, Server
@@ -46,10 +46,9 @@ def test_configure():
 
 
 def test_virtual_host_request():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -67,7 +66,7 @@ def test_virtual_host_request():
     def view_blog(self, request):
         return request.link(self) + ' - blog'
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     app.configure_application()
@@ -125,10 +124,9 @@ def test_registered_upgrade_tasks(postgres_dsn):
 
 
 def test_browser_session_request():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -153,7 +151,7 @@ def test_browser_session_request():
         else:
             return 'logged out'
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     app.application_id = 'test'
@@ -185,10 +183,9 @@ def test_browser_session_request():
 
 
 def test_browser_session_dirty():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -204,7 +201,7 @@ def test_browser_session_dirty():
         request.browser_session['foo'] = 'bar'
         return ''
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     app.application_id = 'test'
@@ -231,10 +228,9 @@ def test_browser_session_dirty():
 
 
 def test_request_messages():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -257,7 +253,7 @@ def test_request_messages():
     def view_root(self, request):
         return json.dumps(list(request.consume_messages()))
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     app.application_id = 'test'
@@ -293,18 +289,16 @@ def test_request_messages():
 
 
 def test_fix_webassets_url():
-    config = setup()
 
     import onegov.core
     import more.transaction
     import more.webassets
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -314,7 +308,7 @@ def test_fix_webassets_url():
     def view_root(self, request):
         return '/' + request.app.webassets_url + '/jquery.js'
 
-    config.commit()
+    morepath.commit([App])
 
     class TestServer(Server):
 
@@ -388,10 +382,8 @@ def test_csrf():
     class MyForm(Form):
         name = StringField('Name')
 
-    config = setup()
-
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -409,7 +401,7 @@ def test_csrf():
         else:
             return 'fail'
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     app.application_id = 'test'
@@ -649,10 +641,9 @@ def test_send_email_unicode(smtp):
 
 
 def test_object_by_path():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -663,7 +654,7 @@ def test_object_by_path():
         def __init__(self, absorb):
             self.absorb = absorb
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     assert isinstance(app.object_by_path('/'), Root)
@@ -681,18 +672,17 @@ def test_object_by_path():
 
 
 def test_send_email_transaction(smtp):
-    config = setup()
 
     import more.transaction
     import more.webassets
     import onegov.core
 
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -717,7 +707,7 @@ def test_send_email_transaction(smtp):
             content="This e-mäil is just a test"
         )
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     app.application_id = 'test'

@@ -1,8 +1,8 @@
+import morepath
 import os
 import os.path
 import polib
 
-from morepath import setup
 from onegov.core import Framework
 from onegov.core.templates import render_macro
 from translationstring import TranslationStringFactory
@@ -51,10 +51,8 @@ def test_chameleon_with_translation(temporary_directory):
 
     _ = TranslationStringFactory('onegov.test')
 
-    config = setup()
-
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.template_directory()
     def get_template_directory():
@@ -80,7 +78,8 @@ def test_chameleon_with_translation(temporary_directory):
 
     @App.view(model=Root, name='macro')
     def view_root_macro(self, request):
-        template = request.app.registry._template_loaders['.pt']['index.pt']
+        registry = request.app.config.template_engine_registry
+        template = registry._template_loaders['.pt']['index.pt']
         template.macros['testmacro']
 
         return render_macro(template.macros['testmacro'], request, {})
@@ -88,10 +87,10 @@ def test_chameleon_with_translation(temporary_directory):
     import onegov.core
     import more.transaction
     import more.webassets
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+    morepath.commit([App])
 
     client = Client(App())
     assert '<b>Willkommen</b>' in client.get('/').text

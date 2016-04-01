@@ -1,6 +1,7 @@
+import morepath
+
 from onegov.core import cache
 from onegov.core import Framework
-from morepath import setup
 from webtest import TestApp as Client
 
 
@@ -8,10 +9,9 @@ CALL_COUNT = 0
 
 
 def test_cache_connections():
-    config = setup()
 
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path(path='/')
     class Root(object):
@@ -27,7 +27,7 @@ def test_cache_connections():
 
         return call_count()
 
-    config.commit()
+    morepath.commit([App])
 
     app = App()
     app.namespace = 'towns'

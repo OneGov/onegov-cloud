@@ -8,14 +8,15 @@ from webtest import TestApp as Client
 
 def spawn_basic_permissions_app():
 
-    config = morepath.setup()
-
     class App(Framework):
-        testing_config = config
+        pass
 
-    @App.path(path='')
     class Root(object):
         pass
+
+    @App.path(path='', model=Root)
+    def get_root():
+        return Root()
 
     @App.path(path='/hidden')
     class HiddenFromPublic(object):
@@ -60,8 +61,8 @@ def spawn_basic_permissions_app():
             morepath.forget_identity(response, request)
 
     # the scan is required (happens automatically if using onegov.server)
-    config.scan(onegov.core.security)
-    config.commit()
+    morepath.scan(onegov.core.security)
+    morepath.commit([App])
 
     app = App()
     app.namespace = 'test'

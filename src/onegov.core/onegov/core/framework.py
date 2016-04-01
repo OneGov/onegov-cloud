@@ -409,6 +409,10 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         return self.get_cache(self.application_id + ':x', expiration_time=3600)
 
     @property
+    def settings(self):
+        return self.config.setting_registry
+
+    @property
     def application_id_hash(self):
         """ The application_id as hash, use this if the applicaiton_id can
         be read by the user -> this obfuscates things slightly.
@@ -661,11 +665,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         """ Returns all available translations keyed by langauge. """
 
         try:
-            if not self.registry.settings.i18n.localedirs:
+            if not self.settings.i18n.localedirs:
                 return {}
 
             return self.modules.i18n.get_translations(
-                self.registry.settings.i18n.localedirs
+                self.settings.i18n.localedirs
             )
         except AttributeError:
             return {}
@@ -811,12 +815,12 @@ def current_language_tween_factory(app, handler):
 def spawn_cronjob_thread_tween_factory(app, handler):
 
     from onegov.core.cronjobs import ApplicationBoundCronjobs
-    registry = app.registry
+    registry = app.config.cronjob_registry
 
     if not hasattr(registry, 'cronjobs'):
         return handler
 
-    if not registry.settings.cronjobs.enabled:
+    if not app.settings.cronjobs.enabled:
         return handler
 
     assert app.has_database_connection, """

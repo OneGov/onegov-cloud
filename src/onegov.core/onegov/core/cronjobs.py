@@ -229,7 +229,7 @@ def get_job(app, id):
     name = app.unsign(unquote_plus(id))
 
     if name:
-        return getattr(app.registry, 'cronjobs', {}).get(name)
+        return getattr(app.config.cronjob_registry, 'cronjobs', {}).get(name)
 
 
 @Framework.view(model=Job, permission=Public)

@@ -1,7 +1,6 @@
 import morepath
 import os.path
 
-from morepath import setup
 from onegov.core import Framework
 from webtest import TestApp as Client
 
@@ -42,10 +41,8 @@ def test_independence(temporary_directory):
 
 def test_filestorage(temporary_directory):
 
-    config = setup()
-
     class App(Framework):
-        testing_config = config
+        pass
 
     @App.path('/')
     class Model(object):
@@ -77,10 +74,10 @@ def test_filestorage(temporary_directory):
     import onegov.core
     import more.transaction
     import more.webassets
-    config.scan(more.transaction)
-    config.scan(more.webassets)
-    config.scan(onegov.core)
-    config.commit()
+    morepath.scan(more.transaction)
+    morepath.scan(more.webassets)
+    morepath.scan(onegov.core)
+    morepath.commit([App])
 
     app = App()
     app.configure_application(
