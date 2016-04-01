@@ -170,34 +170,20 @@ function getTiles() {
     url += '?access_token=' + getMapboxToken();
 
     return L.tileLayer(url, {
-        attribution: '© <a href="https://www.mapbox.com/map-feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        attribution: '<ul><li><a href="https://www.mapbox.com/map-feedback/">© Mapbox</a></li><li><a href="http://www.openstreetmap.org/copyright">© OpenStreetMap</a></li></ul>'
     });
 }
 
-var MapboxInput = function(input) {
-    var coordinates = getCoordinates(input);
+function spawnDefaultMap(element, lat, lon, zoom) {
 
-    // the default is seantis hq - as good a place as any
-    var lat = coordinates.lat || 47.0517251;
-    var lon = coordinates.lon || 8.3054817;
-    var zoom = coordinates.zoom || 5;
-
-    input.hide();
-
-    var wrapper = $('<div class="map-wrapper">')
-        .insertAfter(input.closest('label'));
-
-    var el = $('<div class="map">')
-        .appendTo(wrapper);
-
-    // the height depends on the width using the golden ratio
-    el.css('height', input.data('map-height') || $(el).width() / 1.618 + 'px');
+    // the height is calculated form the width using the golden ratio
+    element.css('height', $(element).data('map-height') || $(element).width() / 1.618 + 'px');
 
     var options = {
         zoomControl: false
     };
 
-    var map = L.map(el[0], options)
+    var map = L.map(element[0], options)
         .addLayer(getTiles())
         .setView([lat, lon], zoom);
 
@@ -216,6 +202,27 @@ var MapboxInput = function(input) {
         });
     });
 
+    return map;
+}
+
+var MapboxInput = function(input) {
+    var coordinates = getCoordinates(input);
+
+    // the default is seantis hq - as good a place as any
+    var lat = coordinates.lat || 47.0517251;
+    var lon = coordinates.lon || 8.3054817;
+    var zoom = coordinates.zoom || 5;
+
+    input.hide();
+
+    var wrapper = $('<div class="map-wrapper">')
+        .insertAfter(input.closest('label'));
+
+    var el = $('<div class="map">')
+        .appendTo(wrapper);
+
+    var map = spawnDefaultMap(el, lat, lon, zoom);
+
     switch (input.data('map-type')) {
         case 'crosshair':
             asCrosshairMap(map, input);
@@ -228,12 +235,36 @@ var MapboxInput = function(input) {
     }
 };
 
+var MapboxMarkerMap = function(target) {
+    var lat = target.data('lat');
+    var lon = target.data('lon');
+    var zoom = target.data('zoom');
+
+    var map = spawnDefaultMap(target, lat, lon, zoom);
+
+    var icon = L.VectorMarkers.icon({
+        prefix: 'fa',
+        icon: 'fa-circle',
+        markerColor: target.data('marker-color') || $('body').data('default-marker-color') || '#006fba'
+    });
+
+    var marker = L.marker({'lat': lat, 'lng': lon}, {icon: icon, draggable: false});
+    marker.addTo(map);
+};
+
 jQuery.fn.mapboxInput = function() {
     return this.each(function() {
         MapboxInput($(this));
     });
 };
 
+jQuery.fn.mapboxMarkerMap = function() {
+    return this.each(function() {
+        MapboxMarkerMap($(this));
+    });
+};
+
 $(document).ready(function() {
     $('input.coordinates').mapboxInput();
+    $('.marker-map').mapboxMarkerMap();
 });
