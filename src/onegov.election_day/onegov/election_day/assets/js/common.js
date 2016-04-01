@@ -14,7 +14,6 @@ $('.collapsible .more, .collapsible .less').click(function() {
 // fold sections whising to be foldable
 $('.foldable.folded .foldable-panel').hide();
 $('.foldable .foldable-title').click(function() {
-    console.log('test');
     $(this).parents('.foldable').toggleClass('folded');
     $(this).parents('.foldable').find('.foldable-panel').toggle();
 });
