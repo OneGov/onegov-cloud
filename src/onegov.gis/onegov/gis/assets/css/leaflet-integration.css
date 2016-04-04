@@ -45,6 +45,10 @@
     Make sure the attribution is always rendered as one line
 */
 
+.leaflet-control-attribution ul {
+    list-style: none;
+}
+
 .leaflet-control-attribution ul li {
     float: left;
     font-size: 10px;
