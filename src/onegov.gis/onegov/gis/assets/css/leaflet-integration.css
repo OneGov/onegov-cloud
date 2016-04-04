@@ -51,7 +51,7 @@
 
 .leaflet-control-attribution ul li {
     float: left;
-    font-size: 10px;
+    font-size: 10px !important;
     font-weight: normal;
     padding: 0;
     position: relative;
@@ -70,4 +70,35 @@
 
 .leaflet-control-attribution ul li a:hover {
     color: #2D5594;
+}
+
+/*
+    Map button context menu
+*/
+
+.easy-button-container {
+    background-color: white;
+}
+
+button.open-active {
+    float: right;
+}
+
+.map-context-menu {
+    float: left;
+    text-align: right;
+    padding: 0;
+}
+
+.map-context-menu li a,
+.map-context-menu li a:hover {
+    font-size: 16px !important;
+    font-weight: normal !important;
+    text-align: left;
+}
+
+.map-context-menu li a {
+    text-overflow: normal !important;
+    width: auto !important;
+    padding: 0 5px;
 }

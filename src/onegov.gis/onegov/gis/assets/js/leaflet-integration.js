@@ -160,6 +160,48 @@ function asMarkerMap(map, input) {
     });
 }
 
+function asThumbnailMap(map) {
+    // a map that acts as a thumbnail, offering no interaction, instead
+    // linking to better maps (like google maps, osm and so on)
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    map.scrollWheelZoom.disable();
+    map.boxZoom.disable();
+    map.keyboard.disable();
+    map._container.style.cursor = 'default';
+
+    if (map.tap) {
+        map.tap.disable();
+    }
+
+    L.easyButton({
+        position: 'topright',
+        states: [{
+            stateName: 'closed',
+            icon: 'fa-external-link-square',
+            onClick: function(btn) {
+                var menu = $('<ul class="map-context-menu">');
+                var point = map.getCenter();
+
+                $('<li><a href="http://maps.google.com/?q=' + [point.lat, point.lng].join(',') + '" target="_blank">Google Maps</a></li>').appendTo(menu);
+                $('<li><a href="http://maps.apple.com/?q=' + [point.lat, point.lng].join(',') + '" target="_blank">Apple Maps</a></li>').appendTo(menu);
+
+                menu.insertAfter($(btn.button));
+                btn.state('open');
+            }
+        }, {
+            stateName: 'open',
+            icon: 'fa-external-link-square',
+            onClick: function(btn) {
+                $(btn.button).parent().find('.map-context-menu').remove();
+                btn.state('closed');
+            }
+        }]
+    }).addTo(map);
+
+}
+
 function getMapboxToken() {
     return $('body').data('mapbox-token') || false;
 }
@@ -174,7 +216,7 @@ function getTiles() {
     });
 }
 
-function spawnDefaultMap(element, lat, lon, zoom) {
+function spawnDefaultMap(element, lat, lon, zoom, includeZoomControls) {
 
     // the height is calculated form the width using the golden ratio
     element.css('height', $(element).data('map-height') || $(element).width() / 1.618 + 'px');
@@ -187,7 +229,9 @@ function spawnDefaultMap(element, lat, lon, zoom) {
         .addLayer(getTiles())
         .setView([lat, lon], zoom);
 
-    new L.Control.Zoom({position: 'topright'}).addTo(map);
+    if (typeof includeZoomControls === 'undefined' || includeZoomControls) {
+        new L.Control.Zoom({position: 'topright'}).addTo(map);
+    }
 
     // remove leaflet link - we don't advertise other open source projects
     // we depend on as visibly either
@@ -239,8 +283,9 @@ var MapboxMarkerMap = function(target) {
     var lat = target.data('lat');
     var lon = target.data('lon');
     var zoom = target.data('zoom');
+    var includeZoomControls = target.data('map-type') !== 'thumbnail';
 
-    var map = spawnDefaultMap(target, lat, lon, zoom);
+    var map = spawnDefaultMap(target, lat, lon, zoom, includeZoomControls);
 
     var icon = L.VectorMarkers.icon({
         prefix: 'fa',
@@ -250,6 +295,14 @@ var MapboxMarkerMap = function(target) {
 
     var marker = L.marker({'lat': lat, 'lng': lon}, {icon: icon, draggable: false});
     marker.addTo(map);
+
+    switch (target.data('map-type')) {
+        case 'thumbnail':
+            asThumbnailMap(map, target);
+            break;
+        default:
+            break;
+    }
 };
 
 jQuery.fn.mapboxInput = function() {
