@@ -94,13 +94,19 @@ class CoordinatesExtension(ContentExtension):
 
     def extend_form(self, form_class, request):
 
+        render_kw = {'data-map-type': 'marker'}
+        default = request.app.town.default_map_view
+
+        if default:
+            render_kw['data-map-default-lat'] = default['lat']
+            render_kw['data-map-default-lon'] = default['lon']
+            render_kw['data-map-default-zoom'] = default['zoom']
+
         class CoordinatesForm(form_class):
             coordinates = CoordinatesField(
                 label=_("Coordinates"),
                 fieldset=_("Map"),
-                render_kw={
-                    'data-map-type': 'marker'
-                }
+                render_kw=render_kw
             )
 
         return CoordinatesForm
