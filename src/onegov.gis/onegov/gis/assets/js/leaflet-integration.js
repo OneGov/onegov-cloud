@@ -277,8 +277,13 @@ var MapboxInput = function(input) {
         }
     });
 
-    var wrapper = $('<div class="map-wrapper">')
-        .insertAfter(input.closest('label'));
+    var label = input.closest('label');
+
+    var wrapper = $('<div class="map-wrapper">').insertAfter(label);
+
+    if (input.attr('placeholder')) {
+        $('<div class="placeholder">' + input.attr('placeholder') + '</div>').appendTo(label);
+    }
 
     var el = $('<div class="map">')
         .appendTo(wrapper);
