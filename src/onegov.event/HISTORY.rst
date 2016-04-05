@@ -1,8 +1,9 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
+- Adds onegov.gis coordinates to events.
+  [href]
+
 0.2.0 (2015-11-12)
 ~~~~~~~~~~~~~~~~~~~
 

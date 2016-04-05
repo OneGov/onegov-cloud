@@ -3,8 +3,12 @@ import icalendar
 from datetime import datetime
 from dateutil import rrule
 from onegov.core.orm import Base
-from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID, UTCDateTime
+from onegov.core.orm.mixins import (
+    content_property,
+    ContentMixin,
+    TimestampMixin
+)
+from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.search import ORMSearchable
 from sedate import standardize_date, to_timezone
 from sqlalchemy import Column, Enum, ForeignKey, Text, String
@@ -67,6 +71,28 @@ class OccurrenceMixin(object):
 
         return to_timezone(self.end, self.timezone)
 
+    #: The coordinates of the event
+    coordinates = Column(JSON, nullable=True)
+
+    @property
+    def has_coordinates(self):
+        if self.coordinates:
+            return self.coordinates.get('lat') and self.coordinates.get('lon')
+        else:
+            return False
+
+    @property
+    def lat(self):
+        return self.coordinates and self.coordinates.get('lat')
+
+    @property
+    def lon(self):
+        return self.coordinates and self.coordinates.get('lon')
+
+    @property
+    def zoom(self):
+        return self.coordinates and self.coordinates.get('zoom')
+
     def as_ical(self, description=None, rrule=None, url=None):
         """ Returns the occurrence as iCalendar string. """
 
@@ -119,10 +145,8 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         default='initiated'
     )
 
-    @property
-    def description(self):
-        """ Description of the event """
-        return self.content.get('description', '')
+    #: description of the event
+    description = content_property('description')
 
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
@@ -213,7 +237,8 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
                     tags=self.tags,
                     start=start,
                     end=end,
-                    timezone=self.timezone
+                    timezone=self.timezone,
+                    coordinates=self.coordinates,
                 )
             )
 
