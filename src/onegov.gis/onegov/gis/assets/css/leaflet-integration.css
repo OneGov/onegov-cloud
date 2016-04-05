@@ -103,3 +103,17 @@ button.open-active {
     text-overflow: normal !important;
     width: auto !important;
 }
+
+/*
+    Disable mouse pointer on non-clickable markers (which is currently all)
+*/
+
+.marker-undefined {
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+    cursor: grab;
+}
+
+.marker-thumbnail {
+    cursor: auto;
+}

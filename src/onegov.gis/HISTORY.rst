@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Changes the mouse pointer to default on unclickable markers.
+  [href]
+
 - Fixes form submit not working with enter key in map enabled forms.
   [href]
 

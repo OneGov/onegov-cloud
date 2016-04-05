@@ -9,6 +9,7 @@ L.VectorMarkers.version = "1.1.0";
 L.VectorMarkers.Icon = L.Icon.extend({
     options: {
         className: "vector-marker",
+        extraClasses: [],
         prefix: "fa",
         icon: "fa-circle",
         markerColor: "blue",
@@ -27,6 +28,10 @@ L.VectorMarkers.Icon = L.Icon.extend({
             .replace('{{color}}', this.options.markerColor)
             .replace('{{stroke-color}}', this.options.strokeColor);
         div.classList.add(this.options.className);
+
+        for (var i = 0; i < this.options.extraClasses.length; i++) {
+            div.classList.add(this.options.extraClasses[i]);
+        }
 
         if (this.options.icon) {
             div.appendChild(this.createInnerIcon());
@@ -298,14 +303,21 @@ var MapboxMarkerMap = function(target) {
     var includeZoomControls = target.data('map-type') !== 'thumbnail';
 
     var map = spawnDefaultMap(target, lat, lon, zoom, includeZoomControls);
+    addExternalLinkButton(map);
 
+    /* for now we do not support clicking the marker, so we use marker-noclick
+    as a way to disable the pointer cursor */
     var icon = L.VectorMarkers.icon({
         prefix: 'fa',
         icon: 'fa-circle',
+        extraClasses: ['marker-' + target.data('map-type')],
         markerColor: target.data('marker-color') || $('body').data('default-marker-color') || '#006fba'
     });
 
-    var marker = L.marker({'lat': lat, 'lng': lon}, {icon: icon, draggable: false});
+    var marker = L.marker({'lat': lat, 'lng': lon}, {
+        icon: icon,
+        draggable: false
+    });
     marker.addTo(map);
 
     switch (target.data('map-type')) {
