@@ -260,6 +260,17 @@ var MapboxInput = function(input) {
 
     input.hide();
 
+    // the map introduces buttons which would override the default button used
+    // when pressing enter on a form, therefore we're adding a hack to prevent
+    // this from happening
+    var form = $(input.closest('form'));
+    form.find('input').keypress(function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            form.find('input[type="submit"]:last').click();
+        }
+    });
+
     var wrapper = $('<div class="map-wrapper">')
         .insertAfter(input.closest('label'));
 

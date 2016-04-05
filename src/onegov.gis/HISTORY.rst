@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes form submit not working with enter key in map enabled forms.
+  [href]
+
 - Acquires the default view parameters from the body.
   [href]
 
