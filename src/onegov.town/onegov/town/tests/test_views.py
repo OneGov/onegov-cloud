@@ -1,3 +1,4 @@
+import json
 import onegov.core
 import onegov.town
 import pytest
@@ -5,6 +6,7 @@ import re
 import textwrap
 import transaction
 
+from base64 import b64decode, b64encode
 from datetime import datetime, date, timedelta
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
@@ -72,6 +74,14 @@ def select_checkbox(page, groupname, label, form=None, checked=True):
     for ix, el in enumerate(elements):
         if label in el.label.text_content():
             form.get(groupname, index=ix).value = checked
+
+
+def encode_map_value(dictionary):
+    return b64encode(json.dumps(dictionary).encode('utf-8'))
+
+
+def decode_map_value(value):
+    return json.loads(b64decode(value).decode('utf-8'))
 
 
 def test_view_permissions():
@@ -2587,3 +2597,60 @@ def test_newsletter_send(town_app):
 
     anon.get(unconfirm_2)
     assert recipients.query().count() == 1
+
+
+def test_map_default_view(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    settings = client.get('/einstellungen')
+
+    assert decode_map_value(settings.form['default_map_view'].value) == {
+        'lat': None, 'lon': None, 'zoom': None
+    }
+
+    settings.form['default_map_view'] = encode_map_value({
+        'lat': 47, 'lon': 8, 'zoom': 12
+    })
+    settings = settings.form.submit()
+
+    assert decode_map_value(settings.form['default_map_view'].value) == {
+        'lat': 47, 'lon': 8, 'zoom': 12
+    }
+
+    edit = client.get('/editor/edit/page/1')
+    assert 'data-map-default-lat="47"' in edit
+    assert 'data-map-default-lon="8"' in edit
+    assert 'data-map-default-zoom="12"' in edit
+
+
+def test_map_set_marker(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    edit = client.get('/editor/edit/page/1')
+    assert decode_map_value(edit.form['coordinates'].value) == {
+        'lat': None, 'lon': None, 'zoom': None
+    }
+    page = edit.form.submit().follow()
+
+    assert 'marker-map' not in page
+
+    edit = client.get('/editor/edit/page/1')
+    edit.form['coordinates'] = encode_map_value({
+        'lat': 47, 'lon': 8, 'zoom': 12
+    })
+    page = edit.form.submit().follow()
+
+    assert 'marker-map' in page
+    assert 'data-lat="47"' in page
+    assert 'data-lon="8"' in page
+    assert 'data-zoom="12"' in page
