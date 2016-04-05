@@ -86,14 +86,16 @@ button.open-active {
     float: right;
 }
 
-.map-context-menu {
+.leaflet-container .leaflet-control-container .map-context-menu {
     float: left;
-    text-align: right;
+    list-style: none;
+    margin: 0;
     padding: 0;
+    text-align: right;
 }
 
-.map-context-menu li a,
-.map-context-menu li a:hover {
+.leaflet-container .leaflet-control-container .map-context-menu li a,
+.leaflet-container .leaflet-control-container .map-context-menu li a:hover {
     font-size: 16px !important;
     font-weight: normal !important;
     padding: 0 5px;
