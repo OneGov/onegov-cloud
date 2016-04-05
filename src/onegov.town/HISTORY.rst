@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.6.0 (2016-04-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to add coordinates to pages, forms, resources and events.
   [href]
 
