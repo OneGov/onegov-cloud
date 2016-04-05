@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2016-04-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Changes the mouse pointer to default on unclickable markers.
   [href]
 
