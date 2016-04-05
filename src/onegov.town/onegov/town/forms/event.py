@@ -136,19 +136,25 @@ class EventForm(Form):
 
         return result
 
-    def update_model(self, model):
-        """ Stores the form values on the page. """
+    def populate_obj(self, model):
+        """ Stores the form values on the model. """
+
+        super().populate_obj(model, exclude={
+            'start_date',
+            'start_time',
+            'end_date',
+            'end_time',
+            'weekly',
+            'email',
+        })
 
         # clear the recurrence to avoid updating all occurrences too much
         model.recurrence = ''
 
-        model.title = self.title.data
-        model.content = {
-            'description': self.description.data
-        }
-        model.location = self.location.data
-        model.tags = self.tags.data
+        model.meta = model.meta or {}
+        model.meta['submitter_email'] = self.email.data
         model.timezone = 'Europe/Zurich'
+
         model.start = replace_timezone(
             datetime(
                 self.start_date.data.year,
@@ -162,6 +168,7 @@ class EventForm(Form):
         end_date = self.start_date.data
         if self.end_time.data <= self.start_time.data:
             end_date += timedelta(days=1)
+
         model.end = replace_timezone(
             datetime(
                 end_date.year,
@@ -172,6 +179,7 @@ class EventForm(Form):
             ),
             model.timezone
         )
+
         if self.weekly.data and self.end_date.data:
             until_date = to_timezone(
                 replace_timezone(
@@ -190,27 +198,28 @@ class EventForm(Form):
                     until_date.strftime('%Y%m%dT%H%M%SZ')
                 )
             )
-        model.meta = model.meta or {}
-        model.meta['submitter_email'] = self.email.data
 
-    def apply_model(self, model):
+    def process(self, *args, **kwargs):
         """ Stores the page values on the form. """
 
-        self.title.data = model.title
-        self.description.data = model.description
-        self.location.data = model.location
-        self.tags.data = model.tags
-        self.start_time.data = model.localized_start.time()
-        self.end_time.data = model.localized_end.time()
-        self.start_date.data = model.localized_start.date()
-        if model.recurrence:
-            last_occurrence = model.occurrence_dates(localize=True)[-1]
-            self.end_date.data = last_occurrence.date()
+        super().process(*args, **kwargs)
 
-            rule = rrule.rrulestr(model.recurrence)
-            if rule._freq == rrule.WEEKLY:
-                self.weekly.data = [
-                    WEEKDAYS[day][0] for day in rule._byweekday
-                ]
-        if model.meta:
-            self.email.data = model.meta.get('submitter_email')
+        if 'obj' in kwargs:
+            model = kwargs['obj']
+
+            self.start_time.data = model.localized_start.time()
+            self.end_time.data = model.localized_end.time()
+            self.start_date.data = model.localized_start.date()
+
+            if model.recurrence:
+                last_occurrence = model.occurrence_dates(localize=True)[-1]
+                self.end_date.data = last_occurrence.date()
+
+                rule = rrule.rrulestr(model.recurrence)
+                if rule._freq == rrule.WEEKLY:
+                    self.weekly.data = [
+                        WEEKDAYS[day][0] for day in rule._byweekday
+                    ]
+
+            if model.meta:
+                self.email.data = model.meta.get('submitter_email')

@@ -311,9 +311,9 @@ def test_event_form_update_apply():
     assert form.validate()
 
     event = Event()
-    form.update_model(event)
+    form.populate_obj(event)
     form = EventForm()
-    form.apply_model(event)
+    form.process(obj=event)
     assert form.data['description'] == 'Rendez-vous automnal des médecines.'
     assert form.data['email'] == 'info@example.org'
     assert form.data['end_date'] == None
@@ -337,7 +337,7 @@ def test_event_form_update_after_midnight():
     assert form.validate()
 
     event = Event()
-    form.update_model(event)
+    form.populate_obj(event)
     assert event.end.day == 17
 
 
@@ -388,7 +388,7 @@ def test_event_form_create_rrule():
 
     def occurrences(form):
         event = Event()
-        form.update_model(event)
+        form.populate_obj(event)
         return [occurrence.date() for occurrence in event.occurrence_dates()]
 
     form = EventForm(data={

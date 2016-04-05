@@ -103,9 +103,9 @@ def handle_new_event(self, request, form):
 
     if form.submitted(request):
         model = Event()
-        form.update_model(model)
-        meta = model.meta
-        meta.update({'session_id': get_session_id(request)})
+        form.populate_obj(model)
+
+        model.meta.update({'session_id': get_session_id(request)})
 
         event = EventCollection(self.session).add(
             title=model.title,
@@ -116,7 +116,7 @@ def handle_new_event(self, request, form):
             tags=model.tags,
             location=model.location,
             content=model.content,
-            meta=meta
+            meta=model.meta
         )
 
         return morepath.redirect(request.link(event))
@@ -201,7 +201,7 @@ def handle_edit_event(self, request, form):
     assert_anonymous_access_only_temporary(request, self)
 
     if form.submitted(request):
-        form.update_model(self)
+        form.populate_obj(self)
 
         request.success(_("Your changes were saved"))
 
@@ -210,7 +210,7 @@ def handle_edit_event(self, request, form):
 
         return morepath.redirect(request.link(self))
 
-    form.apply_model(self)
+    form.process(obj=self)
 
     if 'return-to' in request.GET:
         action = URL(form.action)
