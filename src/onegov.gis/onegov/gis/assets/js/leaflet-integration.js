@@ -253,9 +253,10 @@ var MapboxInput = function(input) {
     var coordinates = getCoordinates(input);
 
     // the default is seantis hq - as good a place as any
-    var lat = parseFloat(coordinates.lat || input.data('map-default-lat') || 47.0517251);
-    var lon = parseFloat(coordinates.lon || input.data('map-default-lon') || 8.3054817);
-    var zoom = parseInt(coordinates.zoom || input.data('map-default-zoom') || 5, 10);
+    var body = $('body');
+    var lat = parseFloat(coordinates.lat || body.data('default-lat') || 47.0517251);
+    var lon = parseFloat(coordinates.lon || body.data('default-lon') || 8.3054817);
+    var zoom = parseInt(coordinates.zoom || body.data('default-zoom') || 5, 10);
 
     input.hide();
 
