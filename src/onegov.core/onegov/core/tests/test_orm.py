@@ -1142,3 +1142,8 @@ def test_content_properties():
 
     assert content.name is None
     assert content.content == {}
+
+    content.meta = None
+    assert content.type is None
+    content.type = 'Foobar'
+    assert content.type == 'Foobar'

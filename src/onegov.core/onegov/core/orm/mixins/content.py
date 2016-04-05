@@ -22,60 +22,59 @@ class ContentMixin(object):
         return deferred(Column(JSON, nullable=False, default=dict))
 
 
-def meta_property(name):
-    """ Helper to create accessors bound to the meta attribute defined by
-    :class:`ContentMixin`.
+def dictionary_based_property_factory(attribute):
 
-    Usage::
+    def dictionary_based_property(name):
+        """ Enables access of dictionaries through properties.
 
-        class Model(ContentMixin):
-            content = meta_property('content')
+        Usage::
 
-    This will add a content getter, setter and deleter bound, which all proxy
-    to meta['content'].
+            meta_property = dictionary_based_property_factory('meta')
 
-    Since this is just a thin wrapper around python's property we can also
-    override the setter::
+            class Model(ContentMixin):
+                content = meta_property('content')
 
-        class Model(ContentMixin):
-            content = meta_property('content')
+        This will add a content getter, setter and deleter bound, which all
+        proxy to meta['content'].
 
-            @content.setter
-            def set_content(self, value):
-                self.meta['content'] = value
-                self.meta['content_html'] = to_html(value)
+        Since this is just a thin wrapper around python's property we can also
+        override the setter::
 
-            @content.deleter
-            def del_content(self):
-                del self.meta['content']
-                del self.meta['content_html']
+            class Model(ContentMixin):
+                content = meta_property('content')
 
-    """
+                @content.setter
+                def set_content(self, value):
+                    self.meta['content'] = value
+                    self.meta['content_html'] = to_html(value)
 
-    def get_meta(self):
-        return self.meta.get(name)
+                @content.deleter
+                def del_content(self):
+                    del self.meta['content']
+                    del self.meta['content_html']
 
-    def set_meta(self, value):
-        self.meta[name] = value
+        meta_property and content_property, to access the
+        :class:`ContentMixin`'s dictionaries are defined in this file.
 
-    def del_meta(self):
-        del self.meta[name]
+        """
 
-    return property(get_meta, set_meta, del_meta)
+        def getter(self):
+            dictionary = getattr(self, attribute, None)
+            return dictionary.get(name) if dictionary is not None else None
+
+        def setter(self, value):
+            if getattr(self, attribute) is None:
+                setattr(self, attribute, {})
+
+            getattr(self, attribute)[name] = value
+
+        def deleter(self):
+            del getattr(self, attribute)[name]
+
+        return property(getter, setter, deleter)
+
+    return dictionary_based_property
 
 
-def content_property(name):
-    """ Same as :func:`meta_property`, but targeting the content dictionary.
-
-    """
-
-    def get_content(self):
-        return self.content.get(name)
-
-    def set_content(self, value):
-        self.content[name] = value
-
-    def del_content(self):
-        del self.content[name]
-
-    return property(get_content, set_content, del_content)
+meta_property = dictionary_based_property_factory('meta')
+content_property = dictionary_based_property_factory('content')
