@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2016-04-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds onegov.gis coordinates to events.
   [href]
 
