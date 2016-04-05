@@ -2623,9 +2623,9 @@ def test_map_default_view(town_app):
     }
 
     edit = client.get('/editor/edit/page/1')
-    assert 'data-map-default-lat="47"' in edit
-    assert 'data-map-default-lon="8"' in edit
-    assert 'data-map-default-zoom="12"' in edit
+    assert 'data-default-lat="47"' in edit
+    assert 'data-default-lon="8"' in edit
+    assert 'data-default-zoom="12"' in edit
 
 
 def test_map_set_marker(town_app):

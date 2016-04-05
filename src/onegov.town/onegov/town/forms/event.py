@@ -3,6 +3,7 @@ from dateutil import rrule
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.town import _
+from onegov.gis import CoordinatesField
 from sedate import replace_timezone, to_timezone
 from wtforms import StringField, TextAreaField, validators
 from wtforms_components import TimeField
@@ -65,6 +66,12 @@ class EventForm(Form):
     location = StringField(
         label=_("Location"),
         description=_("Castle garden")
+    )
+
+    coordinates = CoordinatesField(
+        label=_("Coordinates"),
+        description=_("The marker can be moved by dragging it with the mouse"),
+        render_kw={'data-map-type': 'marker'}
     )
 
     tags = MultiCheckboxField(

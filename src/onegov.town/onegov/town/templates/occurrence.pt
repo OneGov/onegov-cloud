@@ -17,6 +17,10 @@
                 <div class="occurrence-description">
                     <p tal:content="structure description"></p>
                 </div>
+
+                <div class="occurrence-map" tal:condition="occurrence.has_coordinates">
+                    <div class="marker-map" data-lat="${occurrence.lat}" data-lon="${occurrence.lon}" data-zoom="${occurrence.zoom}"></div>
+                </div>
             </div>
 
             <div class="large-4 medium-4 columns">

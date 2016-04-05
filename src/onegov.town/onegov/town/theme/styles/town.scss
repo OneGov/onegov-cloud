@@ -252,6 +252,16 @@ form {
         font-weight: bold;
     }
 
+    .placeholder {
+        color: $monsoon;
+        font-size: .8rem;
+        margin-bottom: .4rem;
+    }
+
+    .map-wrapper {
+        margin-bottom: 1rem;
+    }
+
     fieldset {
         border: 0;
         border-top: 1px solid $table-border-color;

@@ -20,6 +20,7 @@ from onegov.shared import asset
 from onegov.ticket import TicketCollection
 from onegov.town.models import Town, Topic
 from onegov.town.theme import TownTheme
+from sqlalchemy.orm.attributes import flag_modified
 from webassets import Bundle
 
 
@@ -98,6 +99,10 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp):
 
         town = session.merge(self.town)
         yield town
+
+        # nested entries in the meta json field are not detected as modified
+        flag_modified(town, 'meta')
+
         session.flush()
 
         self.cache.delete('town')

@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 
-<body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}" data-default-marker-color="${layout.primary_color}">
+<body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}">
 
     <!--! Skip navigation link for screenreaders -->
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>

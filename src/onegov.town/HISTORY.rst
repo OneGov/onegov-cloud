@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to add coordinates to pages, forms, resources and events.
+  [href]
+
 - Gives admins the ability to manage subscriptions.
   [href]
 

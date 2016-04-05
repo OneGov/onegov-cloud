@@ -116,6 +116,7 @@ def handle_new_event(self, request, form):
             tags=model.tags,
             location=model.location,
             content=model.content,
+            coordinates=model.coordinates,
             meta=model.meta
         )
 

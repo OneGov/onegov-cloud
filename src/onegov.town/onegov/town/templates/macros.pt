@@ -452,6 +452,10 @@
         <dd tal:content="structure event.description.replace('\n', '<br>')" />
         <dt i18n:translate="">Location</dt>
         <dd>${event.location}</dd>
+        <dt i18n:translate="" tal:condition="event.has_coordinates">Karte</dt>
+        <dd tal:condition="event.has_coordinates">
+            <div class="marker-map" data-map-type="thumbnail" data-lat="${event.lat}" data-lon="${event.lon}" data-zoom="${event.zoom}"></div>
+        </dd>
         <dt i18n:translate="">Tags</dt>
         <dd>
             <ul>

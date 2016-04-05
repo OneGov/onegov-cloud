@@ -70,6 +70,10 @@ class Layout(ChameleonLayout):
             'primary-color', user_options['primary-color'])
 
     @cached_property
+    def default_map_view(self):
+        return self.town.default_map_view or None
+
+    @cached_property
     def svg(self):
         return self.template_loader['svg.pt']
 
