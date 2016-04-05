@@ -179,7 +179,9 @@ function asThumbnailMap(map) {
     if (map.tap) {
         map.tap.disable();
     }
+}
 
+function addExternalLinkButton(map) {
     L.easyButton({
         position: 'topright',
         states: [{
@@ -204,7 +206,6 @@ function asThumbnailMap(map) {
             }
         }]
     }).addTo(map);
-
 }
 
 function getMapboxToken() {
