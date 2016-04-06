@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Depends on the latest onegov.town and onegov.core releases.
+  [href]
+
 0.2.1 (2016-02-15)
 ~~~~~~~~~~~~~~~~~~~
 
