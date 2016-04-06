@@ -56,6 +56,12 @@ $max-line-width: 67ex;
 html {
     @media not print {
         margin-left: calc(100vw - 100%);
+
+        /* override the redactor style set on the body, which leads to
+           jumpy modal dialogs
+        */
+        overflow: auto !important;
+        padding-right: 0 !important;
     }
 }
 
@@ -862,6 +868,13 @@ div#redactor-droparea {
 #redactor-file-manager-box > ul {
     margin: 0 !important;
     max-height: 450px !important;
+}
+
+/*
+    the redactor dropdown is a bit off
+*/
+.redactor-dropdown {
+    margin-left: -15px;
 }
 
 /*

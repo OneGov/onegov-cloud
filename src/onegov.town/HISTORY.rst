@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix modal redactor dialogs being "jumpy" (moving the background when opened).
+  [href]
+
 - Adds compatibility with Morepath 0.13.
   [href]
 
