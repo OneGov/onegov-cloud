@@ -13,7 +13,7 @@ def test_static_file(temporary_directory):
         serve_static_files = True
         static_files = temporary_directory
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.configure_application()
@@ -43,7 +43,7 @@ def test_static_file_app(temporary_directory):
     morepath.scan(more.transaction)
     morepath.scan(more.webassets)
     morepath.scan(onegov.core)
-    morepath.commit([App])
+    morepath.commit(App)
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')
@@ -86,7 +86,7 @@ def test_root_file_app(temporary_directory):
     morepath.scan(more.transaction)
     morepath.scan(more.webassets)
     morepath.scan(onegov.core)
-    morepath.commit([App])
+    morepath.commit(App)
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')

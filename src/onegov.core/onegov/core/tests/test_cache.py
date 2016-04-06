@@ -27,7 +27,7 @@ def test_cache_connections():
 
         return call_count()
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.namespace = 'towns'

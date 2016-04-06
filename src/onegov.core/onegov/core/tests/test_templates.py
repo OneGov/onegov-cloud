@@ -90,7 +90,7 @@ def test_chameleon_with_translation(temporary_directory):
     morepath.scan(more.transaction)
     morepath.scan(more.webassets)
     morepath.scan(onegov.core)
-    morepath.commit([App])
+    morepath.commit(App)
 
     client = Client(App())
     assert '<b>Willkommen</b>' in client.get('/').text

@@ -41,7 +41,7 @@ def test_form_directive():
     def handle_blocked_three(self, request, form):
         pass
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.application_id = 'test'

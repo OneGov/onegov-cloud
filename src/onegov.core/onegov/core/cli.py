@@ -323,7 +323,7 @@ def upgrade(ctx, dry_run):
                 print("no pending upgrade tasks found")
 
         scan_morepath_modules(appcfg.application_class)
-        morepath.commit([UpdateApplication])
+        morepath.commit(UpdateApplication)
 
         # get all applications by looking at the existing schemas
         mgr = SessionManager(appcfg.configuration['dsn'], base=Base)

@@ -54,7 +54,7 @@ def test_theme_application(temporary_directory):
     morepath.scan(more.transaction)
     morepath.scan(more.webassets)
     morepath.scan(onegov.core)
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.configure_application(

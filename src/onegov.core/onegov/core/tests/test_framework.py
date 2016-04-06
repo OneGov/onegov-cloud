@@ -66,7 +66,7 @@ def test_virtual_host_request():
     def view_blog(self, request):
         return request.link(self) + ' - blog'
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.configure_application()
@@ -151,7 +151,7 @@ def test_browser_session_request():
         else:
             return 'logged out'
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.application_id = 'test'
@@ -201,7 +201,7 @@ def test_browser_session_dirty():
         request.browser_session['foo'] = 'bar'
         return ''
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.application_id = 'test'
@@ -253,7 +253,7 @@ def test_request_messages():
     def view_root(self, request):
         return json.dumps(list(request.consume_messages()))
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.application_id = 'test'
@@ -308,7 +308,7 @@ def test_fix_webassets_url():
     def view_root(self, request):
         return '/' + request.app.webassets_url + '/jquery.js'
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     class TestServer(Server):
 
@@ -401,7 +401,7 @@ def test_csrf():
         else:
             return 'fail'
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.application_id = 'test'
@@ -654,7 +654,7 @@ def test_object_by_path():
         def __init__(self, absorb):
             self.absorb = absorb
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     assert isinstance(app.object_by_path('/'), Root)
@@ -707,7 +707,7 @@ def test_send_email_transaction(smtp):
             content="This e-mäil is just a test"
         )
 
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.application_id = 'test'

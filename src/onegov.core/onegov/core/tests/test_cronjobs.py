@@ -60,7 +60,7 @@ def test_overlapping_cronjobs():
     scan_morepath_modules(App)
 
     with pytest.raises(ConflictError):
-        morepath.commit([App])
+        morepath.commit(App)
 
 
 def test_non_5_minutes_cronjobs():
@@ -75,7 +75,7 @@ def test_non_5_minutes_cronjobs():
     scan_morepath_modules(App)
 
     with pytest.raises(AssertionError):
-        morepath.commit([App])
+        morepath.commit(App)
 
 
 def test_cronjobs_integration(postgres_dsn):
@@ -100,7 +100,7 @@ def test_cronjobs_integration(postgres_dsn):
         result += 1
 
     scan_morepath_modules(App)
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.configure_application(dsn=postgres_dsn, base=declarative_base())
@@ -146,7 +146,7 @@ def test_disable_cronjobs():
         return False
 
     scan_morepath_modules(App)
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.configure_application()
