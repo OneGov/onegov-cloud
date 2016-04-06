@@ -4,7 +4,7 @@ name = 'onegov.libres'
 description = (
     'Libres integration for OneGov Cloud.'
 )
-version = '0.1.1'
+version = '0.1.2'
 
 
 def get_long_description():
@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'libres>=0.1.1',
+        'libres>=0.1.2',
         'onegov.core>=0.16.0',
         'onegov.form'
     ],
