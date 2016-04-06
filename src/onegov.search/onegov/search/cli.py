@@ -1,8 +1,8 @@
 """ Provides commands related to the onegov.search. """
 
 import click
+import morepath
 
-from morepath import setup
 from onegov.core.cli import Context
 from onegov.core.orm import Base, SessionManager
 from onegov.search.utils import searchable_sqlalchemy_models
@@ -38,10 +38,8 @@ def reindex(ctx):
 
         # have a custom update application so we can get a proper execution
         # context with a request and a session
-        config = setup()
-
         class ReindexApplication(appcfg.application_class):
-            testing_config = config
+            pass
 
         @ReindexApplication.path(path=reindex_path)
         class Reindex(object):
@@ -76,7 +74,7 @@ def reindex(ctx):
                 session.invalidate()
                 session.bind.dispose()
 
-        config.commit()
+        morepath.commit(ReindexApplication)
 
         # get all applications by looking at the existing schemas
         mgr = SessionManager(appcfg.configuration['dsn'], base=Base)

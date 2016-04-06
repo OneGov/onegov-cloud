@@ -1,6 +1,6 @@
+import morepath
 import transaction
 
-from morepath import setup
 from onegov.core import Framework
 from onegov.search import ElasticsearchApp, ORMSearchable
 from onegov.core.utils import scan_morepath_modules
@@ -26,10 +26,9 @@ def test_app_integration(es_url):
 
 
 def test_search_query(es_url, postgres_dsn):
-    config = setup()
 
     class App(Framework, ElasticsearchApp):
-        testing_config = config
+        pass
 
     Base = declarative_base()
 
@@ -59,8 +58,8 @@ def test_search_query(es_url, postgres_dsn):
         def es_language(self):
             return self.language
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit(App)
 
     app = App()
     app.configure_application(
@@ -142,10 +141,9 @@ def test_search_query(es_url, postgres_dsn):
 
 
 def test_orm_integration(es_url, postgres_dsn):
-    config = setup()
 
     class App(Framework, ElasticsearchApp):
-        testing_config = config
+        pass
 
     Base = declarative_base()
 
@@ -216,8 +214,8 @@ def test_orm_integration(es_url, postgres_dsn):
         query = query.filter(Document.id == request.params.get('id'))
         query.delete('fetch')
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit(App)
 
     app = App()
     app.configure_application(
@@ -258,10 +256,9 @@ def test_orm_integration(es_url, postgres_dsn):
 
 
 def test_alternate_id_property(es_url, postgres_dsn):
-    config = setup()
 
     class App(Framework, ElasticsearchApp):
-        testing_config = config
+        pass
 
     Base = declarative_base()
 
@@ -282,8 +279,8 @@ def test_alternate_id_property(es_url, postgres_dsn):
         es_language = 'en'
         es_public = True
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit(App)
 
     app = App()
     app.configure_application(
@@ -321,10 +318,9 @@ def test_alternate_id_property(es_url, postgres_dsn):
 
 
 def test_orm_polymorphic(es_url, postgres_dsn):
-    config = setup()
 
     class App(Framework, ElasticsearchApp):
-        testing_config = config
+        pass
 
     Base = declarative_base()
 
@@ -361,8 +357,8 @@ def test_orm_polymorphic(es_url, postgres_dsn):
         __mapper_args__ = {'polymorphic_identity': 'breaking'}
         es_type_name = 'breaking'
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit()
 
     app = App()
     app.configure_application(
@@ -408,10 +404,9 @@ def test_orm_polymorphic(es_url, postgres_dsn):
 
 
 def test_suggestions(es_url, postgres_dsn):
-    config = setup()
 
     class App(Framework, ElasticsearchApp):
-        testing_config = config
+        pass
 
     Base = declarative_base()
 
@@ -456,8 +451,8 @@ def test_suggestions(es_url, postgres_dsn):
                 ' '.join((self.last_name, self.first_name))
             ]
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit()
 
     app = App()
     app.configure_application(
