@@ -1,6 +1,6 @@
+import morepath
 import onegov.onboarding
 
-from morepath import setup
 from onegov.core.utils import Bunch, scan_morepath_modules
 from onegov.testing import utils
 from onegov.town import TownApp
@@ -82,9 +82,8 @@ def test_town_create(onboarding_app, temporary_directory, smtp):
     username = 'admin@example.org'
     password = a.pyquery('.product dd:nth-child(4)').text()
 
-    config = setup()
-    scan_morepath_modules(onegov.town.TownApp, config)
-    config.commit()
+    scan_morepath_modules(onegov.town.TownApp)
+    morepath.commit(onegov.town.TownApp)
 
     town = TownApp()
     town.namespace = onboarding_app.onboarding['onegov.town']['namespace']
@@ -100,7 +99,7 @@ def test_town_create(onboarding_app, temporary_directory, smtp):
         enable_elasticsearch=False
     )
     town.set_application_id(town.namespace + '/' + 'new_york')
-    town.registry.settings.cronjobs = Bunch(enabled=False)
+    town.settings.cronjobs = Bunch(enabled=False)
 
     c = Client(town)
     p = c.get('/')
