@@ -1851,6 +1851,10 @@ tr.ticket:hover {
     }
 }
 
+.occurrence-map {
+    margin-bottom: 2rem;
+}
+
 .occurrence-tag {
     @include label(
         $bg: $secondary-color,

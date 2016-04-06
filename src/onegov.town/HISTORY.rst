@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a proper margin to the map in the event view.
+  [href]
+
 1.6.0 (2016-04-05)
 ~~~~~~~~~~~~~~~~~~~
 
