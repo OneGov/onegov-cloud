@@ -1,20 +1,21 @@
+import morepath
+
 from datetime import datetime
 from libres import new_scheduler
-from morepath import setup
 from onegov.core.framework import Framework
+from onegov.core.utils import scan_morepath_modules
 from onegov.libres import LibresIntegration, ResourceCollection
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
-from webtest import TestApp as Client
 from uuid import uuid4
+from webtest import TestApp as Client
 
 
 def test_setup_database(postgres_dsn):
     Base = declarative_base()
-    config = setup()
 
     class App(Framework, LibresIntegration):
-        testing_config = config
+        pass
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -30,10 +31,8 @@ def test_setup_database(postgres_dsn):
 
     # this is required for the transactions to actually work, usually this
     # would be onegov.server's job
-    import more.transaction
-    config.scan(more.transaction)
-
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit(App)
 
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base)
@@ -106,10 +105,9 @@ def test_libres_context(postgres_dsn):
 
 def test_transaction_integration(postgres_dsn):
     Base = declarative_base()
-    config = setup()
 
     class App(Framework, LibresIntegration):
-        testing_config = config
+        pass
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -135,10 +133,8 @@ def test_transaction_integration(postgres_dsn):
 
     # this is required for the transactions to actually work, usually this
     # would be onegov.server's job
-    import more.transaction
-    config.scan(more.transaction)
-
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit(App)
 
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base)
