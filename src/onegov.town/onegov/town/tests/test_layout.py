@@ -182,7 +182,7 @@ def test_template_layout():
     morepath.scan(more.webassets)
     morepath.scan(onegov.core)
     morepath.scan(onegov.town)
-    morepath.commit([App])
+    morepath.commit(App)
 
     app = App()
     app.namespace = 'tests'

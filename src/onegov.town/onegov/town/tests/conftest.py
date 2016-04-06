@@ -61,7 +61,7 @@ def new_town_app(postgres_dsn, filestorage, town_password, smtp,
                  form_definitions, es_url=None):
 
     scan_morepath_modules(onegov.town.TownApp)
-    morepath.commit([onegov.town.TownApp])
+    morepath.commit(onegov.town.TownApp)
 
     app = onegov.town.TownApp()
     app.namespace = 'test_' + uuid4().hex
