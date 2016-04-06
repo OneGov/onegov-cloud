@@ -1,3 +1,4 @@
+import morepath
 import onegov.core
 import onegov.election_day
 import os.path
@@ -5,7 +6,6 @@ import pytest
 import textwrap
 import transaction
 
-from morepath import setup
 from onegov.core.crypto import hash_password
 from onegov.core.utils import scan_morepath_modules
 from onegov.user import User
@@ -20,9 +20,9 @@ def election_day_password():
 
 def create_app(postgres_dsn, temporary_directory, election_day_password,
                canton):
-    config = setup()
-    scan_morepath_modules(onegov.election_day.ElectionDayApp, config)
-    config.commit()
+
+    scan_morepath_modules(onegov.election_day.ElectionDayApp)
+    morepath.commit(onegov.election_day.ElectionDayApp)
 
     app = onegov.election_day.ElectionDayApp()
     app.namespace = 'test_' + uuid4().hex
