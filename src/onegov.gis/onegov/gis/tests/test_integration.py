@@ -1,6 +1,6 @@
+import morepath
 import pytest
 
-from morepath import setup
 from onegov.core import Framework
 from onegov.core.utils import scan_morepath_modules
 from onegov.gis import MapboxApp
@@ -12,6 +12,7 @@ def test_no_secret_keys(es_url):
     class App(Framework, MapboxApp):
         pass
 
+    morepath.commit(App)
     app = App()
 
     with pytest.raises(AssertionError):
@@ -20,10 +21,8 @@ def test_no_secret_keys(es_url):
 
 def test_mapbox_token_tween(es_url):
 
-    config = setup()
-
     class App(Framework, MapboxApp):
-        testing_config = config
+        pass
 
     @App.path(path='')
     class Root(object):
@@ -33,8 +32,8 @@ def test_mapbox_token_tween(es_url):
     def view_root(self, request):
         return '<body></body>'
 
-    scan_morepath_modules(App, config)
-    config.commit()
+    scan_morepath_modules(App)
+    morepath.commit(App)
 
     app = App()
 
