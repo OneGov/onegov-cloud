@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2016-04-08)
+~~~~~~~~~~~~~~~~~~~
+
 - Moves to new more.webassets.
   [href]
 
