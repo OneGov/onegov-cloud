@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'more.webassets>=0.3.0',
         'onegov.core>=0.4.0',
         'onegov.form',
     ],

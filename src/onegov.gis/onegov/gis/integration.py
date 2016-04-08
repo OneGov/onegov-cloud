@@ -1,7 +1,7 @@
-import morepath
+from more.webassets import WebassetsApp
 
 
-class MapboxApp(morepath.App):
+class MapboxApp(WebassetsApp):
     """ Provides mapbox integration
     :class:`onegov.core.framework.Framework` based applications.
 
@@ -31,6 +31,26 @@ class MapboxApp(morepath.App):
             Only public mapbox tokens are allowed!
         """
         self.mapbox_token = cfg.get('mapbox_token', None)
+
+
+@WebassetsApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@WebassetsApp.webasset_path()
+def get_css_path():
+    return 'assets/css'
+
+
+@WebassetsApp.webasset('leaflet', filters={'css': 'datauri'})
+def get_leaflet_asset():
+    yield 'leaflet.css'
+    yield 'leaflet-easybutton.css'
+    yield 'leaflet-integration.css'
+    yield 'leaflet.js'
+    yield 'leaflet-easybutton.js'
+    yield 'leaflet-integration.js'
 
 
 @MapboxApp.tween_factory()
