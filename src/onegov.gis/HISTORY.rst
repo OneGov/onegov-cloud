@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.1 (2016-04-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a simple geocoding button to the leaflet map.
   [href]
 
