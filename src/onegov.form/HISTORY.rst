@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.10.2 (2016-04-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Stops escaping strings in the submission title (that's the frontends job).
   [href]
 
