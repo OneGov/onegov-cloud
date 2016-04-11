@@ -7,7 +7,6 @@ use different templating languages.
 
 """
 
-from cached_property import cached_property
 from collections import defaultdict
 from contextlib import contextmanager
 from onegov.core import Framework
@@ -16,12 +15,10 @@ from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
 from onegov.page import PageCollection
 from onegov.search import ElasticsearchApp
-from onegov.shared import asset
 from onegov.ticket import TicketCollection
 from onegov.town.models import Town, Topic
 from onegov.town.theme import TownTheme
 from sqlalchemy.orm.attributes import flag_modified
-from webassets import Bundle
 
 
 class TownApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp):
@@ -176,176 +173,6 @@ class TownApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp):
     def theme_options(self):
         return self.town.theme_options or {}
 
-    @cached_property
-    def webassets_path(self):
-        return utils.module_path('onegov.town', 'assets')
-
-    @cached_property
-    def webassets_bundles(self):
-
-        jsminifier = 'rjsmin'
-
-        confirm = Bundle(
-            'js/confirm.jsx',
-            filters='jsx',
-            output='bundles/confirm.bundle.js'
-        )
-
-        dropzone = Bundle(
-            'js/dropzone.js',
-            filters=jsminifier,
-            output='bundles/dropzone.bundle.js'
-        )
-
-        typeahead = Bundle(
-            'js/typeahead.jsx',
-            filters='jsx',
-            output='bundles/typeahead.bundle.js'
-        )
-
-        # do NOT minify the redactor, or the copyright notice goes away, which
-        # is something we are not allowed to do per our license
-        # ->
-        redactor = Bundle(
-            'js/redactor.min.js',
-            output='bundles/redactor.bundle.js'
-        )
-        redactor_theme = Bundle(
-            'css/redactor.css',
-            output='bundles/redactor.bundle.css'
-        )
-        # <-
-
-        editor = Bundle(
-            'js/bufferbuttons.js',
-            'js/definedlinks.js',
-            'js/filemanager.js',
-            'js/imagemanager.js',
-            'js/redactor.de.js',
-            'js/input_with_button.js',
-            'js/editor.js',
-            filters=jsminifier,
-            output='bundles/editor.bundle.js'
-        )
-
-        code_editor = Bundle(
-            'js/ace.js',
-            'js/ace-mode-form.js',
-            'js/ace-theme-tomorrow.js',
-            'js/code_editor.js',
-            filters=jsminifier,
-            output='bundles/code_editor.bundle.js'
-        )
-
-        leaflet = Bundle(
-            utils.module_path(
-                'onegov.gis', 'assets/js/leaflet.js'),
-            utils.module_path(
-                'onegov.gis', 'assets/js/leaflet-easybutton.js'),
-            utils.module_path(
-                'onegov.gis', 'assets/js/leaflet-integration.js'),
-            filters=jsminifier,
-            output='bundles/leaflet.bundle.js'
-        )
-
-        leaflet_css = Bundle(
-            utils.module_path(
-                'onegov.gis', 'assets/css/leaflet.css'),
-            utils.module_path(
-                'onegov.gis', 'assets/css/leaflet-easybutton.css'),
-            utils.module_path(
-                'onegov.gis', 'assets/css/leaflet-integration.css'),
-            filters='datauri',
-            output='bundles/leaflet.bundle.css'
-        )
-
-        common = Bundle(
-            'js/modernizr.js',
-            'js/jquery.js',
-            'js/fastclick.js',
-            'js/foundation.js',
-            'js/intercooler.js',
-            'js/underscore.js',
-            'js/react.js',
-            asset('js/form_dependencies.js'),
-            confirm,
-            typeahead,
-            leaflet,
-            'js/jquery.datetimepicker.js',
-            'js/datetimepicker.js',
-            'js/jquery.popupoverlay.js',
-            'js/videoframe.js',
-            'js/common.js',
-            filters=jsminifier,
-            output='bundles/common.bundle.js'
-        )
-
-        common_css = Bundle(
-            'css/jquery.datetimepicker.css',
-            leaflet_css,
-            filters='cssmin',
-            output='bundles/common.bundle.css',
-        )
-
-        fullcalendar = Bundle(
-            'js/moment.js',
-            'js/moment.de.js',
-            'js/fullcalendar.js',
-            'js/fullcalendar.de.js',
-            'js/fullcalendar_custom.js',
-            filters=jsminifier,
-            output='bundles/fullcalendar.bundle.js'
-        )
-
-        fullcalendar_css = Bundle(
-            'css/fullcalendar.css',
-            filters='cssmin',
-            output='bundles/fullcalendar.bundle.css'
-        )
-
-        check_password = Bundle(
-            'js/zxcvbn.js',
-            'js/check_password.js',
-            filters=jsminifier,
-            output='bundles/check_password.bundle.js'
-        )
-
-        check_contrast = Bundle(
-            'js/check_contrast.js',
-            filters=jsminifier,
-            output='bundles/check_contrast.bundle.js'
-        )
-
-        events = Bundle(
-            'js/url.js',
-            'js/events.js',
-            filters=jsminifier,
-            output='bundles/events.bundle.js'
-        )
-
-        sortable = Bundle(
-            'js/sortable.js',
-            'js/sortable_custom.js',
-            filters=jsminifier,
-            output='bundles/sortable.bundle.js'
-        )
-
-        return {
-            'common': common,
-            'common_css': common_css,
-            'dropzone': dropzone,
-            'redactor': redactor,
-            'redactor_theme': redactor_theme,
-            'editor': editor,
-            'code_editor': code_editor,
-            'check_password': check_password,
-            'check_contrast': check_contrast,
-            'fullcalendar': fullcalendar,
-            'fullcalendar_css': fullcalendar_css,
-            'events': events,
-            'sortable': sortable
-        }
-
 
 @TownApp.template_directory()
 def get_template_directory():
@@ -369,3 +196,108 @@ def get_i18n_localedirs():
 @TownApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de_CH'
+
+
+@TownApp.webasset_path()
+def get_shared_assets_path():
+    return utils.module_path('onegov.shared', 'assets/js')
+
+
+@TownApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@TownApp.webasset_path()
+def get_css_path():
+    return 'assets/css'
+
+
+@TownApp.webasset_output()
+def get_webasset_output():
+    return 'assets/bundles'
+
+
+@TownApp.webasset('sortable')
+def get_sortable_asset():
+    yield 'sortable.js'
+    yield 'sortable_custom.js'
+
+
+@TownApp.webasset('events')
+def get_events_asset():
+    yield 'url.js'
+    yield 'events.js'
+
+
+@TownApp.webasset('fullcalendar')
+def get_fullcalendar_asset():
+    yield 'fullcalendar.css'
+    yield 'moment.js'
+    yield 'moment.de.js'
+    yield 'fullcalendar.js'
+    yield 'fullcalendar.de.js'
+    yield 'fullcalendar_custom.js'
+
+
+@TownApp.webasset('check_contrast')
+def get_check_contrast_asset():
+    yield 'check_contrast.js'
+
+
+@TownApp.webasset('check_password')
+def get_check_password_asset():
+    yield 'zxcvbn.js'
+    yield 'check_password.js'
+
+
+@TownApp.webasset('code_editor')
+def get_code_editor_asset():
+    yield 'ace.js'
+    yield 'ace-mode-form.js'
+    yield 'ace-theme-tomorrow.js'
+    yield 'code_editor.js'
+
+
+@TownApp.webasset('editor')
+def get_editor_asset():
+    yield 'bufferbuttons.js'
+    yield 'definedlinks.js'
+    yield 'filemanager.js'
+    yield 'imagemanager.js'
+    yield 'redactor.de.js'
+    yield 'input_with_button.js'
+    yield 'editor.js'
+
+
+# do NOT minify the redactor, or the copyright notice goes away, which
+# is something we are not allowed to do per our license
+@TownApp.webasset('redactor', filters={'js': None})
+def get_redactor_asset():
+    yield 'redactor.min.js'
+    yield 'redactor.css'
+
+
+@TownApp.webasset('dropzone')
+def get_dropzone_asset():
+    yield 'dropzone.js'
+
+
+@TownApp.webasset('common')
+def get_common_asset():
+    yield 'jquery.datetimepicker.css'
+    yield 'modernizr.js'
+    yield 'jquery.js'
+    yield 'fastclick.js'
+    yield 'foundation.js'
+    yield 'intercooler.js'
+    yield 'underscore.js'
+    yield 'react.js'
+    yield 'form_dependencies.js'
+    yield 'confirm.jsx'
+    yield 'typeahead.jsx'
+    yield 'leaflet'
+    yield 'jquery.datetimepicker.js'
+    yield 'jquery.popupoverlay.js'
+    yield 'videoframe.js'
+    yield 'common.js'

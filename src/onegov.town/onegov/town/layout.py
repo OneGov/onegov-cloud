@@ -231,7 +231,6 @@ class Layout(ChameleonLayout):
 
     def include_editor(self):
         self.request.include('redactor')
-        self.request.include('redactor_theme')
         self.request.include('editor')
 
     def include_code_editor(self):
@@ -315,7 +314,6 @@ class DefaultLayout(Layout):
 
         # always include the common js files
         self.request.include('common')
-        self.request.include('common_css')
 
         if self.request.is_logged_in:
             self.request.include('sortable')
@@ -732,7 +730,6 @@ class ResourceLayout(DefaultLayout):
         super().__init__(model, request)
 
         self.request.include('fullcalendar')
-        self.request.include('fullcalendar_css')
 
     @cached_property
     def collection(self):
