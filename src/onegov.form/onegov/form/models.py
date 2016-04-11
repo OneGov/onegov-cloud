@@ -1,3 +1,5 @@
+import html
+
 from hashlib import md5
 from onegov.core.orm.types import UTCDateTime
 from onegov.core.orm import Base
@@ -176,7 +178,8 @@ class FormSubmission(Base, TimestampMixin):
 
             if title_fields:
                 self.title = ', '.join(
-                    render_field(form._fields[id]) for id in title_fields
+                    html.unescape(render_field(form._fields[id]))
+                    for id in title_fields
                 )
 
             email_fields = form.match_fields(

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Stops escaping strings in the submission title (that's the frontends job).
+  [href]
+
 0.10.1 (2016-04-01)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -84,7 +87,7 @@ Changelog
 
 - Adds the ability to force the UploadWidget to show no special options.
   [href]
-  
+
 
 0.7.2 (2015-10-05)
 ~~~~~~~~~~~~~~~~~~~
