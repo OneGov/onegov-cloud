@@ -50,7 +50,7 @@ setup(
         'mailthon>=0.1.1',
         'morepath>0.12',
         'more.transaction>=0.5',
-        'more.webassets',
+        'more.webassets>=0.3.1',
         'networkx',
         'onegov.server>=0.0.3',
         'passlib',

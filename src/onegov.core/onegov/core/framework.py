@@ -458,15 +458,6 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         return obj
 
     @cached_property
-    def webassets_url(self):
-        """ The webassets url needs to be unique so we can fix it before
-        returning the generated html. See :func:`fix_webassets_url_factory`.
-
-        """
-
-        return '7da9c72a3b5f9e060b898ef7cd714b8a'  # do *not* change this hash!
-
-    @cached_property
     def session(self):
         """ Alias for self.session_manager.session. """
         return self.session_manager.session
@@ -705,6 +696,25 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             return None
 
 
+@Framework.webasset_url()
+def get_webasset_url():
+    """ The webassets url needs to be unique so we can fix it before
+        returning the generated html. See :func:`fix_webassets_url_factory`.
+
+    """
+    return '7da9c72a3b5f9e060b898ef7cd714b8a'  # do *not* change this hash!
+
+
+@Framework.webasset_filter('js')
+def get_js_filter():
+    return 'rjsmin'
+
+
+@Framework.webasset_filter('jsx')
+def get_jsx_filter():
+    return 'jsx'
+
+
 @Framework.tween_factory(over=webassets_injector_tween)
 def fix_webassets_url_factory(app, handler):
     def fix_webassets_url(request):
@@ -735,7 +745,7 @@ def fix_webassets_url_factory(app, handler):
         if response.content_type.lower() not in CONTENT_TYPES:
             return response
 
-        original_url = '/' + request.app.webassets_url
+        original_url = '/' + request.app.config.webasset_registry.url
         adjusted_url = request.transform(request.script_name + original_url)
 
         response.body = response.body.replace(

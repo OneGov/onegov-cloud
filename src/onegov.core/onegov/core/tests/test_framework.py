@@ -306,7 +306,7 @@ def test_fix_webassets_url():
 
     @App.html(model=Root)
     def view_root(self, request):
-        return '/' + request.app.webassets_url + '/jquery.js'
+        return '/' + request.app.config.webasset_registry.url + '/jquery.js'
 
     morepath.commit(App)
 

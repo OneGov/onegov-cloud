@@ -1,9 +1,14 @@
 Changelog
 ---------
+
+- Switch to new more.webassets release.
+  [href]
+
 0.19.0 (2016-04-06)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds Morepath 0.13 compatibility.
+  [href]
 
 0.18.2 (2016-04-05)
 ~~~~~~~~~~~~~~~~~~~
