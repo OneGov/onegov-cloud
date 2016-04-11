@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.2 (2016-04-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes a display issue on IE.
   [href]
 

@@ -4,7 +4,7 @@ name = 'onegov.gis'
 description = (
     'GIS related models and tools for OneGov'
 )
-version = '0.3.1'
+version = '0.3.2'
 
 
 def get_long_description():
@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'more.webassets>=0.3.1',
+        'more.webassets>=0.3.2',
         'onegov.core>=0.4.0',
         'onegov.form',
     ],
