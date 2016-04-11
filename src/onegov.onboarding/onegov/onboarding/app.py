@@ -1,10 +1,8 @@
-from cached_property import cached_property
 from hipchat import HipChat
 from onegov.core import Framework, utils
 from onegov.libres import LibresIntegration
 from onegov.onboarding import log
 from onegov.onboarding.theme import OnboardingTheme
-from webassets import Bundle
 
 
 class OnboardingApp(Framework, LibresIntegration):
@@ -31,33 +29,6 @@ class OnboardingApp(Framework, LibresIntegration):
             except Exception:
                 log.exception("Error during Hipchat message")
 
-    @cached_property
-    def webassets_path(self):
-        return utils.module_path('onegov.onboarding', 'assets')
-
-    @cached_property
-    def webassets_bundles(self):
-
-        jsminifier = None
-
-        common = Bundle(
-            'js/modernizr.js',
-            'js/jquery.js',
-            'js/placeholder.js',
-            'js/fastclick.js',
-            'js/foundation.js',
-            'js/underscore.js',
-            'js/colorpicker.js',
-            'js/awesomeplete.js',
-            'js/common.js',
-            filters=jsminifier,
-            output='bundles/common.bundle.js'
-        )
-
-        return {
-            'common': common
-        }
-
 
 @OnboardingApp.template_directory()
 def get_template_directory():
@@ -81,3 +52,26 @@ def get_i18n_localedirs():
 @OnboardingApp.setting(section='i18n', name='default_locale')
 def get_i18n_default_locale():
     return 'de_CH'
+
+
+@OnboardingApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@OnboardingApp.webasset_output()
+def get_webasset_output():
+    return 'assets/bundles'
+
+
+@OnboardingApp.webasset('common')
+def get_common_asset():
+    yield 'modernizr.js'
+    yield 'jquery.js'
+    yield 'placeholder.js'
+    yield 'fastclick.js'
+    yield 'foundation.js'
+    yield 'underscore.js'
+    yield 'colorpicker.js'
+    yield 'awesomeplete.js'
+    yield 'common.js'
