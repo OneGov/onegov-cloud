@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improve legibility for ticket badges with numbers > 99.
+  [href]
+
 - Fix modal redactor dialogs being "jumpy" (moving the background when opened).
   [href]
 
