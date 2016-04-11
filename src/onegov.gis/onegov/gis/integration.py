@@ -47,9 +47,11 @@ def get_css_path():
 def get_leaflet_asset():
     yield 'leaflet.css'
     yield 'leaflet-easybutton.css'
+    yield 'leaflet-control-geocoder.css'
     yield 'leaflet-integration.css'
     yield 'leaflet.js'
     yield 'leaflet-easybutton.js'
+    yield 'leaflet-control-geocoder.js'
     yield 'leaflet-integration.js'
 
 

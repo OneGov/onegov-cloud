@@ -208,6 +208,14 @@ function addExternalLinkButton(map) {
     }).addTo(map);
 }
 
+function addGeocoder(map) {
+    L.Control.geocoder({
+        position: 'topright',
+        placeholder: '',
+        errorMessage: '',
+    }).addTo(map);
+}
+
 function getMapboxToken() {
     return $('body').data('mapbox-token') || false;
 }
@@ -300,6 +308,8 @@ var MapboxInput = function(input) {
         default:
             break;
     }
+
+    addGeocoder(map);
 };
 
 var MapboxMarkerMap = function(target) {

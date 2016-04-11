@@ -117,3 +117,74 @@ button.open-active {
 .marker-thumbnail {
     cursor: auto;
 }
+
+/* 
+    Leaflet geocoder fixes
+*/
+
+.leaflet-control-geocoder-expanded {
+    width: 200px;
+}
+
+.leaflet-control-geocoder-icon {
+    float: right;
+    height: 24px;
+    background: none;
+    margin: 0;
+    padding: 0;
+}
+
+.leaflet-control-geocoder-icon::before {
+    font-family: "FontAwesome";
+    content: "\f002";
+    margin-left: 4px;
+}
+
+.leaflet-control-geocoder .leaflet-control-geocoder-form {
+    width: 174px;
+}
+
+.leaflet-control-geocoder .leaflet-control-geocoder-form input {
+    box-shadow: none;
+    font-size: 12px;
+    height: 26px;
+    margin: 0;
+    width: 100%;
+}
+
+.leaflet-control-geocoder .leaflet-control-geocoder-form input:focus {
+    box-shadow: none;
+    background: none;
+}
+
+.leaflet-control-geocoder ul {
+    width: 100%;
+}
+
+.leaflet-control-geocoder li {
+    border-color: #efefef;
+    display: none;
+    font-size: 12px;
+    margin: 0;
+}
+
+.leaflet-control-geocoder li:nth-child(1),
+.leaflet-control-geocoder li:nth-child(2),
+.leaflet-control-geocoder li:nth-child(3) {
+    display: block;
+}
+
+.leaflet-control-geocoder-form-no-error {
+    height: 1px;
+    background-color: #ccc;
+    width: 100%;
+    content: " ";
+    display: block;
+}
+
+.leaflet-control-geocoder-error {
+    background-color: red;
+    margin: 0;
+    padding: 0;
+    height: 5px;
+}
