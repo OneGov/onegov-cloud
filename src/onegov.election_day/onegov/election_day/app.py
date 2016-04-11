@@ -1,13 +1,10 @@
 import re
 
-from cached_property import cached_property
 from onegov.core import Framework, utils
 from onegov.core.framework import transaction_tween_factory
 from onegov.core.filestorage import FilestorageFile
-from onegov.shared import asset
 from onegov.election_day.theme import ElectionDayTheme
 from onegov.election_day.models import Principal
-from webassets import Bundle
 
 
 class ElectionDayApp(Framework):
@@ -74,79 +71,6 @@ class ElectionDayApp(Framework):
     def pages_cache(self):
         """ A one minute cache for pages. """
         return self.get_cache(self.application_id + ':5m', expiration_time=300)
-
-    @cached_property
-    def webassets_path(self):
-        return utils.module_path('onegov.election_day', 'assets')
-
-    @cached_property
-    def webassets_bundles(self):
-
-        jsminifier = 'rjsmin'
-
-        common = Bundle(
-            'js/modernizr.js',
-            'js/jquery.js',
-            'js/fastclick.js',
-            'js/foundation.js',
-            'js/underscore.js',
-            'js/stackable.js',
-            'js/common.js',
-            filters=jsminifier,
-            output='bundles/common.bundle.js'
-        )
-
-        form_js = Bundle(
-            'js/jquery.datetimepicker.js',
-            'js/datetimepicker.js',
-            asset('js/form_dependencies.js'),
-            filters=jsminifier,
-            output='bundles/jquery.datetimepicker.bundle.js'
-        )
-
-        form_css = Bundle(
-            'css/jquery.datetimepicker.css',
-            filters='cssmin',
-            output='bundles/jquery.datetimepicker.bundle.css'
-        )
-
-        d3 = Bundle(
-            'js/d3.js'
-        )
-
-        ballot_map = Bundle(
-            d3,
-            'js/d3tip.js',
-            'js/topojson.js',
-            'js/ballot-map.js',
-            'js/bar-chart.js',
-            filters=jsminifier,
-            output='bundles/d3.bundle.js'
-        )
-
-        bar_chart = Bundle(
-            d3,
-            'js/bar-chart.js',
-            filters=jsminifier,
-            output='bundles/bar_chart.bundle.js'
-        )
-
-        sankey_chart = Bundle(
-            d3,
-            'js/sankey.js',
-            'js/sankey-chart.js',
-            filters=jsminifier,
-            output='bundles/sankey_chart.bundle.js'
-        )
-
-        return {
-            'common': common,
-            'ballot_map': ballot_map,
-            'bar_chart': bar_chart,
-            'form_js': form_js,
-            'form_css': form_css,
-            'sankey_chart': sankey_chart
-        }
 
 
 @ElectionDayApp.template_directory()
@@ -221,3 +145,56 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         )
 
     return micro_cache_anonymous_pages_tween
+
+
+@ElectionDayApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@ElectionDayApp.webasset_path()
+def get_css_path():
+    return 'assets/css'
+
+
+@ElectionDayApp.webasset_output()
+def get_webasset_output():
+    return 'assets/bundles'
+
+
+@ElectionDayApp.webasset('d3')
+def get_d3_asset():
+    yield 'd3.js'
+
+
+@ElectionDayApp.webasset('form')
+def get_form_asset():
+    yield 'jquery.datetimepicker.css'
+    yield 'jquery.datetimepicker.js'
+    yield 'datetimepicker.js'
+
+
+@ElectionDayApp.webasset('bar_chart')
+def get_bar_chart_asset():
+    yield 'd3'
+    yield 'bar-chart.js'
+
+
+@ElectionDayApp.webasset('ballot_map')
+def get_ballot_map_asset():
+    yield 'd3'
+    yield 'd3tip.js'
+    yield 'topojson.js'
+    yield 'ballot-map.js'
+    yield 'bar-chart.js'
+
+
+@ElectionDayApp.webasset('common')
+def get_common_asset():
+    yield 'modernizr.js'
+    yield 'jquery.js'
+    yield 'fastclick.js'
+    yield 'foundation.js'
+    yield 'underscore.js'
+    yield 'stackable.js'
+    yield 'common.js'
