@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.20.0 (2016-04-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Switch to new more.webassets release.
   [href]
