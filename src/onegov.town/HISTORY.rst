@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds full history and url sharing support to the calendar.
+  [href]
+
 - Improve legibility for ticket badges with numbers > 99.
   [href]
 

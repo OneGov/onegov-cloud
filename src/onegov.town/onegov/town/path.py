@@ -173,13 +173,14 @@ def get_resources(app):
 
 @TownApp.path(model=Resource, path='/ressource/{name}',
               converters=dict(date=date, highlights=[int]))
-def get_resource(app, name, date=None, highlights=tuple()):
+def get_resource(app, name, date=None, highlights=tuple(), view='agendaWeek'):
 
     resource = ResourceCollection(app.libres_context).by_name(name)
 
     if resource:
         resource.date = date
         resource.highlights = highlights
+        resource.view = view
 
     return resource
 

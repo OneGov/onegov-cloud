@@ -6,16 +6,21 @@ var new_select_handler = function(baseurl) {
         if (view.name === "month") {
             url.query.end = end.subtract(1, 'days').toISOString();
             url.query.whole_day = 'yes';
+            url.query.view = view.name;
         } else {
             url.query.end = end.toISOString();
             url.query.whole_day = 'no';
+            url.query.view = view.name;
         }
         window.location.href = url.toString();
     };
 };
 
 var edit_handler = function(event) {
-    location.href = event.editurl + '?start=' + event.start.toISOString() + '&end=' + event.end.toISOString();
+    var url = newUrl(event.editurl);
+    url.query.start = event.start.toISOString();
+    url.query.end = event.end.toISOString();
+    location.href = url.toString();
 };
 
 var spawn_popup = function(event, element) {
@@ -211,6 +216,49 @@ var event_after_render = function(event, element, view) {
 };
 
 var setup_calendar = function(calendar) {
+    var availableViews = calendar.data('available-views').split(',');
+    var defaultView = calendar.data('default-view');
+    var isPopping = false;
+    var isFirst = true;
+
+    if (!_.contains(availableViews, defaultView)) {
+        defaultView = availableViews[0];
+    }
+
+    var onViewChange = function() {};
+
+    if (window.history) {
+        onViewChange = function(view) {
+            if (isPopping) {
+                return;
+            }
+
+            var url = new Url(window.location.href);
+            url.query.view = view.name;
+            url.query.date = view.intervalStart.format('YYYYMMDD');
+
+            if (isFirst) {
+                window.history.replaceState({
+                    'view': view.name,
+                    'date': view.intervalStart
+                }, view.title, url.toString());
+                isFirst = false;
+            } else {
+                window.history.pushState({
+                    'view': view.name,
+                    'date': view.intervalStart
+                }, view.title, url.toString());
+            }
+        };
+
+        window.onpopstate = function(event) {
+            isPopping = true;
+            calendar.fullCalendar('changeView', event.state.view);
+            calendar.fullCalendar('gotoDate', event.state.date);
+            isPopping = false;
+        };
+    }
+
     calendar.fullCalendar({
         events: calendar.data('feed'),
         header: {
@@ -223,7 +271,7 @@ var setup_calendar = function(calendar) {
         maxTime: calendar.data('max-time'),
         selectable: calendar.data('selectable'),
         select: new_select_handler(calendar.data('select-url')),
-        defaultView: calendar.data('default-view'),
+        defaultView: defaultView,
         eventAfterRender: event_after_render,
         editable: calendar.data('editable'),
         eventDrop: edit_handler,
@@ -234,6 +282,7 @@ var setup_calendar = function(calendar) {
         eventResizeStart: function(event) {
             event.is_changing = true;
         },
+        viewRender: onViewChange,
         highlights: calendar.data('highlights')
     });
 

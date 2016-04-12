@@ -15,6 +15,7 @@
         <tal:block condition="resource.type == 'daypass'">
             <div class="calendar"
                 data-feed="${feed}"
+                data-available-views="month"
                 data-header-left="title"
                 data-header-right="today prev,next"
                 data-selectable="${request.is_logged_in and 'true' or 'false'}"
@@ -27,6 +28,7 @@
         <tal:block condition="resource.type == 'room'">
             <div class="calendar"
                 data-feed="${feed}"
+                data-available-views="month,agendaWeek,agendaDay"
                 data-header-left="month,agendaWeek,agendaDay"
                 data-header-center="title"
                 data-header-right="today prev,next"
@@ -34,7 +36,7 @@
                 data-max-time="22:00:00"
                 data-selectable="${request.is_logged_in and 'true' or 'false'}"
                 data-select-url="${request.link(resource, name='neue-einteilung')}"
-                data-default-view="agendaWeek"
+                data-default-view="${resource.view}"
                 data-goto-date="${resource.date and resource.date.isoformat() or ''}"
                 data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
                 data-editable="${request.is_logged_in and 'true' or 'false'}"></div>
