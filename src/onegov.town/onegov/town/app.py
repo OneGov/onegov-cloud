@@ -232,6 +232,7 @@ def get_events_asset():
 
 @TownApp.webasset('fullcalendar')
 def get_fullcalendar_asset():
+    yield 'url.js'
     yield 'fullcalendar.css'
     yield 'moment.js'
     yield 'moment.de.js'

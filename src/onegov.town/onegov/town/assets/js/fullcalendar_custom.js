@@ -1,13 +1,16 @@
-var new_select_handler = function(url) {
+var new_select_handler = function(baseurl) {
     return function(start, end, _jsevent, view) {
-        var params = '';
+        var url = new Url(baseurl);
+        url.query.start = start.toISOString();
 
         if (view.name === "month") {
-            params = '?start=' + start.toISOString() + '&end=' + end.subtract(1, 'days').toISOString() + '&whole_day=yes';
+            url.query.end = end.subtract(1, 'days').toISOString();
+            url.query.whole_day = 'yes';
         } else {
-            params = '?start=' + start.toISOString() + '&end=' + end.toISOString() + '&whole_day=no';
+            url.query.end = end.toISOString();
+            url.query.whole_day = 'no';
         }
-        location.href = url.split('?')[0] + params;
+        window.location.href = url.toString();
     };
 };
 
