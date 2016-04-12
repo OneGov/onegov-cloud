@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a view attribute to the resource.
+  [href]
+
 0.1.2 (2016-04-06)
 ~~~~~~~~~~~~~~~~~~~
 

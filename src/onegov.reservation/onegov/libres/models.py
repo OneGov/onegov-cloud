@@ -68,6 +68,9 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: a list of allocations ids to highlight in the view (if not None)
     highlights = None
 
+    #: the view to open in the calendar (fullCalendar view name)
+    view = 'month'
+
     def highlight_allocations(self, allocations):
         """ The allocation to jump to in the view. """
         self.highlights = [a.id for a in allocations]
