@@ -329,7 +329,7 @@ msgstr ""
 "formati seguenti:"
 
 msgid "Fields (Elections)"
-msgstr ""
+msgstr "Campi (Elezioni)"
 
 msgid "The following fields are included in all formats:"
 msgstr "I seguenti campi sono contenuti in tutti i formati:"
