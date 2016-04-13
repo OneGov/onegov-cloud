@@ -237,17 +237,20 @@ var setup_calendar = function(calendar) {
             url.query.view = view.name;
             url.query.date = view.intervalStart.format('YYYYMMDD');
 
-            if (isFirst) {
-                window.history.replaceState({
+            var state = [
+                {
                     'view': view.name,
                     'date': view.intervalStart
-                }, view.title, url.toString());
+                },
+                document.title + ' ' + view.title,
+                url.toString()
+            ];
+
+            if (isFirst) {
+                window.history.replaceState.apply(window.history, state);
                 isFirst = false;
             } else {
-                window.history.pushState({
-                    'view': view.name,
-                    'date': view.intervalStart
-                }, view.title, url.toString());
+                window.history.pushState.apply(window.history, state);
             }
         };
 
