@@ -7,6 +7,13 @@ from wtforms.validators import Email, InputRequired
 from wtforms_components import TimeField
 
 
+# include all fields used below so we can filter them out
+# when we merge this form with the custom form definition
+RESERVED_FIELDS = [
+    'start', 'end', 'email', 'quota'
+]
+
+
 class ReservationForm(Form):
 
     def apply_model(self, reservation):
@@ -38,7 +45,8 @@ class ReservationForm(Form):
     def for_allocation(cls, allocation):
 
         class AdaptedReservationForm(cls):
-            pass
+            # update me when adding new fields!
+            reserved_fields = RESERVED_FIELDS
 
         form_class = AdaptedReservationForm
         form_class.allocation = allocation

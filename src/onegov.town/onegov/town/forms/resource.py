@@ -2,6 +2,7 @@ from onegov.core.utils import sanitize_html
 from onegov.form import Form
 from onegov.form.validators import ValidFormDefinition
 from onegov.town import _
+from onegov.town.forms.reservation import RESERVED_FIELDS
 from onegov.town.utils import annotate_html
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import DateField
@@ -30,7 +31,10 @@ class ResourceForm(Form):
         label=_("Extra Fields Definition"),
         validators=[
             validators.Optional(),
-            ValidFormDefinition(require_email_field=False)
+            ValidFormDefinition(
+                require_email_field=False,
+                reserved_fields=RESERVED_FIELDS
+            )
         ],
         render_kw={'rows': 32, 'data-editor': 'form'}
     )

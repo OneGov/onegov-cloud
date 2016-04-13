@@ -1186,6 +1186,29 @@ def test_resources(town_app):
     assert client.delete('/ressource/meeting-room').status_code == 200
 
 
+def test_reserved_resources_fields(town_app):
+    client = Client(town_app)
+
+    login_page = client.get('/auth/login')
+    login_page.form.set('username', 'admin@example.org')
+    login_page.form.set('password', 'hunter2')
+    login_page.form.submit()
+
+    room = client.get('/ressourcen').click('Raum')
+    room.form['title'] = 'Meeting Room'
+    room.form['definition'] = "Start *= ___"
+    room = room.form.submit()
+
+    assert "'Start' ist ein reservierter Name" in room
+
+    # fieldsets act as a namespace for field names
+    room.form['definition'] = "# Title\nStart *= ___"
+    room = room.form.submit().follow()
+
+    assert "calendar" in room
+    assert "Meeting Room" in room
+
+
 def test_clipboard(town_app):
     client = Client(town_app)
 
@@ -1465,11 +1488,9 @@ def test_reserve_allocation(town_app):
     reserve = client.get(reserve_url)
     reserve.form['email'] = 'info@example.org'
     reserve.form['quota'] = 4
+    reserve.form['note'] = 'Foobar'
 
-    details = reserve.form.submit().follow()
-    details.form['note'] = 'Foobar'
-
-    ticket = details.form.submit().follow().click('Abschliessen').follow()
+    ticket = reserve.form.submit().follow().click('Abschliessen').follow()
 
     assert 'RSV-' in ticket.text
     assert len(town_app.smtp.outbox) == 1
@@ -1732,12 +1753,10 @@ def test_reserve_confirmation_with_definition(town_app):
     reserve.form['email'] = "info@example.org"
     reserve.form['start'] = "10:30"
     reserve.form['end'] = "12:00"
+    reserve.form['vorname'] = "Thomas"
+    reserve.form['nachname'] = "Anderson"
 
-    details = reserve.form.submit().follow()
-    details.form['vorname'] = "Thomas"
-    details.form['nachname'] = "Anderson"
-
-    confirmation = details.form.submit().follow()
+    confirmation = reserve.form.submit().follow()
     assert "10:30" in confirmation
     assert "12:00" in confirmation
     assert "Thomas" in confirmation
@@ -1746,12 +1765,10 @@ def test_reserve_confirmation_with_definition(town_app):
     # edit the reservation
     reserve = confirmation.click("Bearbeiten")
     reserve.form['end'] = "11:00"
+    reserve.form['vorname'] = "Elliot"
+    reserve.form['nachname'] = "Alderson"
 
-    details = reserve.form.submit().follow()
-    details.form['vorname'] = "Elliot"
-    details.form['nachname'] = "Alderson"
-
-    confirmation = details.form.submit().follow()
+    confirmation = reserve.form.submit().follow()
     assert "10:30" in confirmation
     assert "11:00" in confirmation
     assert "Elliot" in confirmation

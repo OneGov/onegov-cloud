@@ -3,7 +3,7 @@ import morepath
 from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
-from onegov.form import FormCollection
+from onegov.form import FormCollection, merge_forms
 from onegov.libres import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town import TownApp, _, utils
@@ -19,13 +19,23 @@ from webob import exc
 
 def get_reservation_form_class(model, request):
     if isinstance(model, Allocation):
-        return ReservationForm.for_allocation(model)
+        allocation = model
 
-    if isinstance(model, Reservation):
+    elif isinstance(model, Reservation):
         allocation = model._target_allocations().first()
-        return ReservationForm.for_allocation(allocation)
 
-    raise NotImplementedError
+    else:
+        raise NotImplementedError
+
+    allocation_form = ReservationForm.for_allocation(allocation)
+    resource = ResourceCollection(request.app.libres_context).by_id(
+        allocation.resource
+    )
+
+    if resource.form_class:
+        return merge_forms(allocation_form, resource.form_class)
+    else:
+        return allocation_form
 
 
 def get_libres_session_id(request):
@@ -77,26 +87,19 @@ def handle_reserve_allocation(self, request, form):
             # though it's possible for a token to have multiple reservations,
             # it is not something that can happen here -> therefore one!
             reservation = scheduler.reservations_by_token(token).one()
-            confirm_link = request.link(reservation, 'bestaetigung')
 
-            if not resource.definition:
-                return morepath.redirect(confirm_link)
+            if resource.definition:
+                forms = FormCollection(request.app.session())
+                submission = forms.submissions.add_external(
+                    form=resource.form_class(),
+                    state='pending',
+                    id=reservation.token
+                )
+                forms.submissions.update(
+                    submission, form, exclude=form.reserved_fields
+                )
 
-            # if extra form data is required, this is the first step.
-            # together with the unconfirmed, session-bound reservation,
-            # we create a new external submission without any data in it.
-            # the user is then redirected to the reservation data edit form
-            # where the reservation is finalized and a ticket is opened.
-            forms = FormCollection(request.app.session())
-            submission = forms.submissions.add_external(
-                form=resource.form_class(),
-                state='pending',
-                id=reservation.token
-            )
-
-            return morepath.redirect(
-                get_submission_link(request, submission, confirm_link)
-            )
+            return morepath.redirect(request.link(reservation, 'bestaetigung'))
 
     layout = ReservationLayout(resource, request)
     layout.breadcrumbs.append(Link(_("Reserve"), '#'))
@@ -124,6 +127,9 @@ def handle_edit_reservation(self, request, form):
     collection = ResourceCollection(request.app.libres_context)
     resource = collection.by_id(self.resource)
 
+    forms = FormCollection(request.app.session())
+    submission = forms.submissions.by_id(self.token)
+
     if form.submitted(request):
         scheduler = resource.get_scheduler(request.app.libres_context)
         try:
@@ -137,16 +143,15 @@ def handle_edit_reservation(self, request, form):
         except LibresError as e:
             utils.show_libres_error(e, request)
         else:
-            forms = FormCollection(request.app.session())
-            submission = forms.submissions.by_id(self.token)
-            confirm_link = request.link(self, 'bestaetigung')
-
-            if submission is None:
-                return morepath.redirect(confirm_link)
-            else:
-                return morepath.redirect(
-                    get_submission_link(request, submission, confirm_link)
+            if submission:
+                forms.submissions.update(
+                    submission, form, exclude=form.reserved_fields
                 )
+
+            return morepath.redirect(request.link(self, 'bestaetigung'))
+
+    if submission:
+        form.process(data=submission.data)
 
     form.apply_model(self)
 

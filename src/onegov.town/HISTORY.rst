@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Merges the resevation forms into a single step.
+  [href]
+
 - Adds the ability to group resources in the overview.
   [href]
 
