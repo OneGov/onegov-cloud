@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to exclude certain fields from the submission update.
+  [href]
+
 0.10.2 (2016-04-11)
 ~~~~~~~~~~~~~~~~~~~
 

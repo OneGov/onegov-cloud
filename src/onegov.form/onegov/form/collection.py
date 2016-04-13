@@ -210,15 +210,19 @@ class FormSubmissionCollection(object):
 
         self.session.expunge(submission)
 
-    def update(self, submission, form):
+    def update(self, submission, form, exclude=None):
         """ Takes a submission and a form and updates the submission data
         as well as the files stored in a spearate table.
 
         """
         assert submission.id and submission.state
 
+        exclude = exclude or set()
+
         submission.definition = form._source
-        submission.data = form.data
+        submission.data = {
+            k: v for k, v in form.data.items() if k not in exclude
+        }
 
         # never include the csrf token
         if form.meta.csrf and form.meta.csrf_field_name in submission.data:
@@ -227,7 +231,7 @@ class FormSubmissionCollection(object):
         # move uploaded files to a separate table
         files = set(
             field_id for field_id, field in form._fields.items()
-            if isinstance(field, UploadField)
+            if isinstance(field, UploadField) and field_id not in exclude
         )
 
         files_to_remove = set(
