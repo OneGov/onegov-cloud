@@ -16,6 +16,11 @@ class ResourceForm(Form):
         description=_("Describes what this reservation resource is about"),
         render_kw={'rows': 4})
 
+    group = StringField(
+        label=_("Group"),
+        description=_("Used to group the resource in the overview")
+    )
+
     text = TextAreaField(
         label=_("Text"),
         render_kw={'class_': 'editor'},
@@ -29,24 +34,6 @@ class ResourceForm(Form):
         ],
         render_kw={'rows': 32, 'data-editor': 'form'}
     )
-
-    def update_model(self, model):
-        """ Stores the form values on the page. """
-        model.title = self.title.data
-        model.meta = {
-            'lead': self.lead.data
-        }
-        model.content = {
-            'text': self.text.data
-        }
-        model.definition = self.definition.data
-
-    def apply_model(self, model):
-        """ Stores the page values on the form. """
-        self.title.data = model.title
-        self.lead.data = model.meta.get('lead', '')
-        self.text.data = model.content.get('text', '')
-        self.definition.data = model.definition or ""
 
 
 class ResourceCleanupForm(Form):

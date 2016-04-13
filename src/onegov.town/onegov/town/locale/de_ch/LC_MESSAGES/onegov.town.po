@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-04-05 14:55+0200\n"
+"POT-Creation-Date: 2016-04-13 13:58+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -508,6 +508,12 @@ msgstr "Neues Passwort"
 
 msgid "Describes what this reservation resource is about"
 msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
+
+msgid "Group"
+msgstr "Gruppe"
+
+msgid "Used to group the resource in the overview"
+msgstr "Dient zur Gruppierung in der Übersicht"
 
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
@@ -1239,9 +1245,6 @@ msgid ""
 msgstr ""
 "Der hinterlegte Datensatz wurde entfernt. Die folgenden Informationen sind "
 "eine Momentaufnahme, erstellt vor der Löschung."
-
-msgid "Group"
-msgstr "Gruppe"
 
 msgid "Owner"
 msgstr "Zuständig"

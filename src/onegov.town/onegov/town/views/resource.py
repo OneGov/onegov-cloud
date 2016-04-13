@@ -1,5 +1,7 @@
 import morepath
 
+from collections import OrderedDict
+from itertools import groupby
 from onegov.core.security import Public, Private
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
@@ -8,6 +10,7 @@ from onegov.town.elements import Link
 from onegov.town.forms import ResourceForm, ResourceCleanupForm
 from onegov.town.models.resource import DaypassResource, RoomResource
 from onegov.town.layout import ResourcesLayout, ResourceLayout
+from sqlalchemy.sql.expression import nullsfirst
 from webob import exc
 
 
@@ -46,12 +49,19 @@ def get_resource_form(self, request, type=None):
 @TownApp.html(model=ResourceCollection, template='resources.pt',
               permission=Public)
 def view_resources(self, request):
-    resources = self.query().order_by(Resource.title).all()
+    resources = self.query().order_by(nullsfirst(Resource.group)).all()
     resources = request.exclude_invisible(resources)
+    grouped = OrderedDict()
+
+    for group, items in groupby(resources, lambda r: r.group or _("General")):
+        grouped[group] = sorted(tuple(items), key=lambda r: r.title)
+
+    if len(grouped) == 1:
+        grouped = {None: tuple(grouped.values())[0]}
 
     return {
         'title': _("Reservations"),
-        'resources': resources,
+        'resources': grouped,
         'layout': ResourcesLayout(self, request)
     }
 

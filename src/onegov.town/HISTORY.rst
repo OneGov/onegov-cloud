@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to group resources in the overview.
+  [href]
+
 - Adds full history and url sharing support to the calendar.
   [href]
 
