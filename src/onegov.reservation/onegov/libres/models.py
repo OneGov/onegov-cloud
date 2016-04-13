@@ -46,6 +46,9 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     #: the custom form definition used when creating a reservation
     definition = Column(Text, nullable=True)
 
+    #: the group to which this resource belongs to (may be any kind of string)
+    group = Column(Text, nullable=True)
+
     #: the type of the resource, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.

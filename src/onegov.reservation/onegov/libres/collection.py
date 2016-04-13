@@ -22,7 +22,7 @@ class ResourceCollection(object):
         return self.session.query(Resource)
 
     def add(self, title, timezone, type=None, name=None, meta={}, content={},
-            definition=None):
+            definition=None, group=None):
 
         # look up the right class depending on the type (we need to do
         # this a bit akwardly here, because Resource does not use the
@@ -35,6 +35,7 @@ class ResourceCollection(object):
         resource.meta = meta
         resource.content = content
         resource.definition = definition
+        resource.group = group
 
         self.session.add(resource)
         self.session.flush()

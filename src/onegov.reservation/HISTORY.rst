@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a group column to the resource.
+  [href]
+
 - Adds a view attribute to the resource.
   [href]
 

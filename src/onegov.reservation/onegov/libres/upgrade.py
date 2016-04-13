@@ -29,3 +29,12 @@ def add_form_definition_field(context):
         context.operations.add_column(
             'resources', Column('definition', Text, nullable=True)
         )
+
+
+@upgrade_task('Add resource group field')
+def add_resource_group_field(context):
+
+    if run_upgrades(context):
+        context.operations.add_column(
+            'resources', Column('group', Text, nullable=True)
+        )
