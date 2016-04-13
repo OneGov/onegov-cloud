@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2016-04-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a group column to the resource.
   [href]
 
