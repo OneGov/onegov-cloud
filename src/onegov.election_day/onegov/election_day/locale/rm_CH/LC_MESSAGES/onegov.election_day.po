@@ -1,8 +1,7 @@
-# This file was generated from Vote-Maps_de_RM.xlsx
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-03-17 11:13+0100\n"
+"POT-Creation-Date: 2016-04-13 08:58+0200\n"
 "PO-Revision-Date: 2016-01-08 10:07+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -14,16 +13,16 @@ msgstr ""
 "X-Generator: Poedit 1.7.6\n"
 
 msgid "Election (German)"
-msgstr ""
+msgstr "Elecziun (tudestg)"
 
 msgid "Election (French)"
-msgstr ""
+msgstr "Elecziun (franzos)"
 
 msgid "Election (Italian)"
-msgstr ""
+msgstr "Elecziun (talian)"
 
 msgid "Election (Romansh)"
-msgstr ""
+msgstr "Elecziun (rumantsch)"
 
 msgid "Shortcode"
 msgstr "Scursanida"
@@ -32,19 +31,19 @@ msgid "Date"
 msgstr "Data"
 
 msgid "Mandates"
-msgstr ""
+msgstr "Sezs"
 
 msgid "System"
-msgstr ""
+msgstr "Sistem"
 
 msgid "Type"
 msgstr "Gener"
 
 msgid "Related link"
-msgstr ""
+msgstr "Ulteriuras infurmaziuns"
 
 msgid "An election with this title exists already"
-msgstr ""
+msgstr "In'elecziun cun quest titel exista gia"
 
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
@@ -53,28 +52,28 @@ msgid "Majority system"
 msgstr "Elecziun da maiorz"
 
 msgid "Federal Election"
-msgstr ""
+msgstr "Elecziun naziunala"
 
 msgid "Cantonal Election"
-msgstr ""
+msgstr "Elecziun chantunala"
 
 msgid "Results"
 msgstr "Resultats"
 
 msgid "List connections"
-msgstr ""
+msgstr "Colliaziuns da glistas"
 
 msgid "Elected Candidates"
-msgstr ""
+msgstr "Candidat(a)s elegid(a)s"
 
 msgid "Election statistics"
-msgstr ""
+msgstr "Statistica electorala"
 
 msgid "Complete"
-msgstr ""
+msgstr "Resultat eruì cumplettamain"
 
 msgid "Absolute majority"
-msgstr ""
+msgstr "Maioritad absoluta"
 
 msgid "Proposal"
 msgstr "Iniziativa"
@@ -86,10 +85,10 @@ msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
 
 msgid "SESAM"
-msgstr ""
+msgstr "SESAM"
 
 msgid "Wabsti"
-msgstr ""
+msgstr "Wabsti"
 
 msgid "Simple Vote"
 msgstr "Project da votaziun simpel"
@@ -143,65 +142,65 @@ msgid "Turnout"
 msgstr "Participaziun a las elecziuns"
 
 msgid "Received Ballots"
-msgstr ""
+msgstr "Cedels electorals consegnads"
 
 msgid "Candidates"
-msgstr ""
+msgstr "Candidatas e candidats"
 
 msgid "Candidate"
-msgstr ""
+msgstr "Persuna che candidescha"
 
 #. Default: Votes
 msgid "single_votes"
-msgstr ""
+msgstr "Vuschs"
 
 msgid "List"
-msgstr ""
+msgstr "Glista"
 
 msgid "Elected"
-msgstr ""
+msgstr "Elegida/elegì"
 
 msgid "Yes"
-msgstr ""
+msgstr "Gea"
 
 msgid "No"
-msgstr ""
+msgstr "Na"
 
 msgid "All candidates"
-msgstr ""
+msgstr "Tut las candidatas e candidats"
 
 msgid "Elected candidates only"
-msgstr ""
+msgstr "Mo candidat(a)s elegid(a)s"
 
 msgid "List connection"
-msgstr ""
+msgstr "Colliaziun da glistas"
 
 msgid "Sublist connection"
-msgstr ""
+msgstr "Sutcolliaziun da glistas"
 
 msgid "Subtotal"
-msgstr ""
+msgstr "Summa intermediara"
 
 msgid "Total"
 msgstr "Total"
 
 msgid "Electoral Districts"
-msgstr ""
+msgstr "Circuls electorals"
 
 msgid "Electoral District"
 msgstr "Circul electoral"
 
 msgid "Accounted Ballots"
-msgstr ""
+msgstr "Cedels valaivels"
 
 msgid "Blank Ballots"
-msgstr ""
+msgstr "Cedels electorals vids"
 
 msgid "Invalid Ballots"
-msgstr ""
+msgstr "Cedels electorals nunvalaivels"
 
 msgid "Accounted Votes"
-msgstr ""
+msgstr "Vuschs valaivlas"
 
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
@@ -330,92 +329,103 @@ msgstr ""
 "a disposiziun en ils suandants formats:"
 
 msgid "Fields (Elections)"
-msgstr ""
+msgstr "Champs (Elecziuns)"
 
 msgid "The following fields are included in all formats:"
 msgstr "Ils suandants champs èn disponibels en tut ils formats:"
 
 msgid "Title of the election."
-msgstr ""
+msgstr "Titel da l'elecziun"
 
 msgid "The date of the election (an ISO 8601 date string)."
-msgstr ""
+msgstr "La data da l'elecziun (sco segns ISO 8601)"
 
 msgid "\"proporz\" for proportional, \"majorz\" for majority system."
 msgstr ""
+"\"proporz\" en cas d'ina elecziun da proporz, \"majorz\" en cas d'ina "
+"elecziun da maiorz"
 
 msgid "The number of mandates."
-msgstr ""
+msgstr "Il dumber dals sezs."
 
 msgid "The name of the municipality."
-msgstr ""
+msgstr "Il num da la vischnanca/dal lieu"
 
 msgid "The id of the municipality/locale (\"BFS Nummer\")."
-msgstr ""
+msgstr "La ID da la vischnanca/dal lieu. Pli enconuschent sco \"numer UST\"."
 
 msgid "The number of people elegible to vote for this municipality."
-msgstr ""
+msgstr "Il dumber da las votantas e dals votants da la vischnanca/dal lieu."
 
 msgid "The number of received ballots for this municipality."
-msgstr ""
+msgstr "Il dumber dals cedels electorals consegnads da la vischnanca/dal lieu."
 
 msgid "The number of blank ballots for this municipality."
-msgstr ""
+msgstr "Il dumber dals cedels electorals vids da la vischnanca/dal lieu."
 
 msgid "The number of invalid ballots for this municipality."
 msgstr ""
+"Il dumber dals cedels electorals nunvalaivels da la vischnanca/dal lieu."
 
 msgid "The number of unaccounted ballots for this municipality."
 msgstr ""
+"Il dumber dals cedels electorals nunvalaivels u vids da la vischnanca/dal "
+"lieu."
 
 msgid "The nubmer of accounted ballots for this municipality."
-msgstr ""
+msgstr "Il dumber dals cedels electorals valaivels da la vischnanca/dal lieu."
 
 msgid "The number of blank votes for this municipality."
-msgstr ""
+msgstr "Il dumber da las vuschs vidas da la vischnanca/dal lieu."
 
 msgid ""
 "The number of invalid votes for this municipality. Zero for elections based "
 "on proportional representation."
 msgstr ""
+"Il dumber da las vuschs nunvalaivlas da la vischnanca/dal lieu. Nagins en "
+"cas d'ina elecziun da proporz."
 
 msgid "The number of accounted votes for this municipality."
-msgstr ""
+msgstr "Il dumber da las vuschs valaivlas da la vischnanca/dal lieu."
 
 msgid ""
 "The name of the list this candidate appears on. Only relevant forelections "
 "based on proportional representation."
 msgstr ""
+"Il num da la glista da la persuna che candidescha. Mo en cas d'elecziuns da "
+"proporz."
 
 msgid ""
 "The number of votes this list has got. Only relevant for elections based on "
 "proportional representation."
-msgstr ""
+msgstr "Il dumber da las vuschs da las glistas. Mo tar elecziuns da proporz."
 
 msgid ""
 "The ID of the list connection this list is connected to. Only relevant for "
 "elections based on proportional representation."
-msgstr ""
+msgstr "La ID da la colliaziun da glistas. Mo tar elecziuns da proporz."
 
 msgid ""
 "The ID of the parent list connection this list is connected to. Only "
 "relevant for elections based on proportional representation."
 msgstr ""
+"La ID da la colliaziun da glistas surordinada. Mo en cas d'elecziuns da "
+"proporz e sch'i sa tracta d'ina sutcolliaziun da glistas."
 
 msgid "The family name of the candidate."
-msgstr ""
+msgstr "Il num da famiglia da la persuna che candidescha."
 
 msgid "The first name of the candiate."
-msgstr ""
+msgstr "Il prenum da la persuna che candidescha."
 
 msgid "True if the candidate has been elected."
 msgstr ""
 
 msgid "The number of votes this candidate got."
-msgstr ""
+msgstr "Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu."
 
 msgid "Fields (Votes)"
-msgstr ""
+msgstr "Champs (votaziuns)"
 
 msgid "Title of the vote."
 msgstr "Titel da la votaziun."
@@ -556,41 +566,41 @@ msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
 
 msgid "Invalid election values"
-msgstr ""
+msgstr "Datas electoralas nunvalaivlas"
 
 msgid "Invalid muncipality values"
-msgstr ""
+msgstr "Datas nunvalaivlas da vischnancas"
 
 #, python-format
 msgid "municipality id ${id} is unknown"
 msgstr "Il numer UST ${id} n'è betg enconuschent"
 
 msgid "Invalid list values"
-msgstr ""
+msgstr "Datas da glista nunvalaivlas"
 
 msgid "Invalid list results"
-msgstr ""
+msgstr "Resultats da glistas nunvalaivels"
 
 msgid "Invalid candidate values"
-msgstr ""
+msgstr "Datas da candidat nunvalaivlas"
 
 msgid "Invalid candidate results"
-msgstr ""
+msgstr "Resultats da candidat nunvalaivels"
 
 msgid "Invalid list connection values"
-msgstr ""
+msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 
 msgid "No data found"
 msgstr "Chattà naginas datas"
 
 msgid "Unkown candidate"
-msgstr ""
+msgstr "Candidat(a) nunenconuschent(a)"
 
 msgid "Invalid values"
-msgstr ""
+msgstr "Valurs nunvalaivlas"
 
 msgid "Unkown municipality"
-msgstr ""
+msgstr "Vischnanca nunenconuschenta"
 
 msgid "Wrong username or password"
 msgstr ""
@@ -599,10 +609,10 @@ msgstr ""
 
 #, python-format
 msgid "Do you really want to delete \"${election}\"?"
-msgstr ""
+msgstr "Vulais Vus propi stizzar l'elecziun \"${election}\"?"
 
 msgid "Delete election"
-msgstr ""
+msgstr "Stizzar l'elecziun"
 
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
