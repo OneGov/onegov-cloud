@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-16 16:31+0100\n"
+"POT-Creation-Date: 2016-04-13 15:32+0200\n"
 "PO-Revision-Date: 2015-10-15 09:43+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -39,6 +39,11 @@ msgstr "Der Syntax in der {line}. Zeile ist ungültig."
 #, python-format
 msgid "The field '{label}' exists more than once."
 msgstr "Das Feld '{label}' kommt doppelt vor."
+
+#, python-format
+msgid "'{label}' is a reserved name. Please use a different name."
+msgstr ""
+"'{label}' ist ein reservierter Name. Bitte verwenden Sie einen anderen Namen."
 
 msgid "Uploaded file"
 msgstr "Hochgeladene Datei"

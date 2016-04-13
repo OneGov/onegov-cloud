@@ -112,9 +112,11 @@ class ValidFormDefinition(object):
     email = _("Define at least one required e-mail field ('E-Mail * = @@@')")
     syntax = _("The syntax on line {line} is not valid.")
     duplicate = _("The field '{label}' exists more than once.")
+    reserved = _("'{label}' is a reserved name. Please use a different name.")
 
-    def __init__(self, require_email_field=True):
+    def __init__(self, require_email_field=True, reserved_fields=None):
         self.require_email_field = require_email_field
+        self.reserved_fields = reserved_fields or set()
 
     def __call__(self, form, field):
         if field.data:
@@ -140,3 +142,13 @@ class ValidFormDefinition(object):
                 if self.require_email_field:
                     if not form.has_required_email_field:
                         raise ValidationError(field.gettext(self.email))
+
+                if self.reserved_fields:
+                    for formfield_id, formfield in form._fields.items():
+                        if formfield_id in self.reserved_fields:
+
+                            raise ValidationError(
+                                field.gettext(self.reserved).format(
+                                    label=formfield.label.text
+                                )
+                            )

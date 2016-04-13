@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to block reserved field names with the validator.
+  [href]
+
 - Adds the ability to exclude certain fields from the submission update.
   [href]
 
