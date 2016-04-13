@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.11.0 (2016-04-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to block reserved field names with the validator.
   [href]
 
