@@ -68,7 +68,7 @@ def parse_election_result(line, errors, municipalities):
             raise ValueError()
 
     except ValueError:
-        errors.append(_("Invalid muncipality values"))
+        errors.append(_("Invalid municipality values"))
     else:
         if municipality_id not in municipalities:
             errors.append(_(
@@ -178,7 +178,7 @@ def import_wabsti_file_majorz(municipalities, election, file, mimetype,
                 else:
                     errors.append(
                         FileImportError(
-                            error=_("Unkown candidate"),
+                            error=_("Unknown candidate"),
                             line=line.rownumber
                         )
                     )

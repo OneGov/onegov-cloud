@@ -354,7 +354,7 @@ msgstr "Il num da la vischnanca/dal lieu"
 msgid "The id of the municipality/locale (\"BFS Nummer\")."
 msgstr "La ID da la vischnanca/dal lieu. Pli enconuschent sco \"numer UST\"."
 
-msgid "The number of people elegible to vote for this municipality."
+msgid "The number of people eligible to vote for this municipality."
 msgstr "Il dumber da las votantas e dals votants da la vischnanca/dal lieu."
 
 msgid "The number of received ballots for this municipality."
@@ -372,7 +372,7 @@ msgstr ""
 "Il dumber dals cedels electorals nunvalaivels u vids da la vischnanca/dal "
 "lieu."
 
-msgid "The nubmer of accounted ballots for this municipality."
+msgid "The number of accounted ballots for this municipality."
 msgstr "Il dumber dals cedels electorals valaivels da la vischnanca/dal lieu."
 
 msgid "The number of blank votes for this municipality."
@@ -389,7 +389,7 @@ msgid "The number of accounted votes for this municipality."
 msgstr "Il dumber da las vuschs valaivlas da la vischnanca/dal lieu."
 
 msgid ""
-"The name of the list this candidate appears on. Only relevant forelections "
+"The name of the list this candidate appears on. Only relevant for elections "
 "based on proportional representation."
 msgstr ""
 "Il num da la glista da la persuna che candidescha. Mo en cas d'elecziuns da "
@@ -415,7 +415,7 @@ msgstr ""
 msgid "The family name of the candidate."
 msgstr "Il num da famiglia da la persuna che candidescha."
 
-msgid "The first name of the candiate."
+msgid "The first name of the candidate."
 msgstr "Il prenum da la persuna che candidescha."
 
 msgid "True if the candidate has been elected."
@@ -568,7 +568,7 @@ msgstr "La datoteca cuntegna ina lingia vida."
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
 
-msgid "Invalid muncipality values"
+msgid "Invalid municipality values"
 msgstr "Datas nunvalaivlas da vischnancas"
 
 #, python-format
@@ -593,13 +593,13 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 msgid "No data found"
 msgstr "Chattà naginas datas"
 
-msgid "Unkown candidate"
+msgid "Unknown candidate"
 msgstr "Candidat(a) nunenconuschent(a)"
 
 msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
 
-msgid "Unkown municipality"
+msgid "Unknown municipality"
 msgstr "Vischnanca nunenconuschenta"
 
 msgid "Wrong username or password"

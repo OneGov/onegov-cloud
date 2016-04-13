@@ -90,7 +90,7 @@ def parse_election_result(line, errors, municipalities):
         except AttributeError:
             invalid_votes = 0  # proporz
     except ValueError:
-        errors.append(_("Invalid muncipality values"))
+        errors.append(_("Invalid municipality values"))
     else:
         if municipality_id not in municipalities:
             errors.append(_(

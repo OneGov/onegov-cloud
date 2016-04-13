@@ -354,7 +354,7 @@ msgstr "Le nom de la municipalité."
 msgid "The id of the municipality/locale (\"BFS Nummer\")."
 msgstr "L'identifiant de la municipalité / locale (\"BFS Nummer\")."
 
-msgid "The number of people elegible to vote for this municipality."
+msgid "The number of people eligible to vote for this municipality."
 msgstr "Le nombre de personnes éligible à voter pour cette municipalité."
 
 msgid "The number of received ballots for this municipality."
@@ -370,7 +370,7 @@ msgid "The number of unaccounted ballots for this municipality."
 msgstr ""
 "Le nombre de bulletins de vote non comptabilisés pour cette municipalité."
 
-msgid "The nubmer of accounted ballots for this municipality."
+msgid "The number of accounted ballots for this municipality."
 msgstr "Le nombre de bulletins de votes comptabilisés pour cette municipalité."
 
 msgid "The number of blank votes for this municipality."
@@ -387,7 +387,7 @@ msgid "The number of accounted votes for this municipality."
 msgstr "Le nombre de votes comptabilisés pour cette municipalité."
 
 msgid ""
-"The name of the list this candidate appears on. Only relevant forelections "
+"The name of the list this candidate appears on. Only relevant for elections "
 "based on proportional representation."
 msgstr ""
 "Le nom de la liste sur laquelle ce candidat apparaît. Uniquement valable "
@@ -419,7 +419,7 @@ msgstr ""
 msgid "The family name of the candidate."
 msgstr "Le nom de famille du candidat."
 
-msgid "The first name of the candiate."
+msgid "The first name of the candidate."
 msgstr "Le prénom du candidat."
 
 msgid "True if the candidate has been elected."
@@ -569,7 +569,7 @@ msgstr "Le fichier contient une ligne vide."
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
 
-msgid "Invalid muncipality values"
+msgid "Invalid municipality values"
 msgstr "Valeurs de la municipalité non valides"
 
 #, python-format
@@ -594,13 +594,13 @@ msgstr "Valeurs de connexion de liste non valides"
 msgid "No data found"
 msgstr "Pas de données trouvées"
 
-msgid "Unkown candidate"
+msgid "Unknown candidate"
 msgstr "Candidat inconnu"
 
 msgid "Invalid values"
 msgstr "Valeurs non valides"
 
-msgid "Unkown municipality"
+msgid "Unknown municipality"
 msgstr "Commune inconnue"
 
 msgid "Wrong username or password"

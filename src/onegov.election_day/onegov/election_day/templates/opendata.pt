@@ -44,7 +44,7 @@
                 <dd i18n:translate>The id of the municipality/locale ("BFS Nummer").</dd>
 
                 <dt>municipality_elegible_voters</dt>
-                <dd i18n:translate>The number of people elegible to vote for this municipality.</dd>
+                <dd i18n:translate>The number of people eligible to vote for this municipality.</dd>
 
                 <dt>municipality_received_ballots</dt>
                 <dd i18n:translate>The number of received ballots for this municipality.</dd>
@@ -59,7 +59,7 @@
                 <dd i18n:translate>The number of unaccounted ballots for this municipality.</dd>
 
                 <dt>municipality_accounted_ballots</dt>
-                <dd i18n:translate>The nubmer of accounted ballots for this municipality.</dd>
+                <dd i18n:translate>The number of accounted ballots for this municipality.</dd>
 
                 <dt>municipality_blank_votes</dt>
                 <dd i18n:translate>The number of blank votes for this municipality.</dd>
@@ -76,7 +76,7 @@
                 <dt>list_name</dt>
                 <dd i18n:translate>
                     The name of the list this candidate appears on.
-                    Only relevant forelections based on proportional representation.
+                    Only relevant for elections based on proportional representation.
                 </dd>
 
                 <dt>list_votes</dt>
@@ -101,7 +101,7 @@
                 <dd i18n:translate>The family name of the candidate.</dd>
 
                 <dt>candidate_first_name</dt>
-                <dd i18n:translate>The first name of the candiate.</dd>
+                <dd i18n:translate>The first name of the candidate.</dd>
 
                 <dt>candidate_elected</dt>
                 <dd i18n:translate>True if the candidate has been elected.</dd>
