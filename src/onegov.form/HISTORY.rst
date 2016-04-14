@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ignores depends_on argument to fields if it is set to None.
+  [href]
+
 0.11.0 (2016-04-13)
 ~~~~~~~~~~~~~~~~~~~
 

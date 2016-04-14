@@ -158,7 +158,12 @@ class Form(BaseForm):
             if 'depends_on' not in field.kwargs:
                 continue
 
-            field.depends_on = FieldDependency(*field.kwargs.pop('depends_on'))
+            depends_on = field.kwargs.pop('depends_on')
+
+            if not depends_on:
+                continue
+
+            field.depends_on = FieldDependency(*depends_on)
 
             if 'validators' in field.kwargs:
                 field.kwargs['validators'] = (
