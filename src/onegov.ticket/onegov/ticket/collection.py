@@ -4,19 +4,20 @@ from collections import namedtuple
 from onegov.core.collection import Pagination
 from onegov.ticket import handlers as global_handlers
 from onegov.ticket.model import Ticket
-from sqlalchemy import desc, func
+from sqlalchemy import desc, distinct, func
 from sqlalchemy.orm import joinedload, undefer
 
 
 class TicketCollectionPagination(Pagination):
 
     def __init__(self, session, page=0, state='open', handler='ALL',
-                 extra_parameters=None):
+                 group=None, extra_parameters=None):
         self.session = session
         self.page = page
         self.state = state
         self.handler = handler
         self.handlers = global_handlers
+        self.group = group
 
         if self.handler != 'ALL':
             self.extra_parameters = extra_parameters or {}
@@ -35,6 +36,9 @@ class TicketCollectionPagination(Pagination):
         if self.state != 'all':
             query = query.filter(Ticket.state == self.state)
 
+        if self.group != None:
+            query = query.filter(Ticket.group == self.group)
+
         if self.handler != 'ALL':
             query = query.filter(Ticket.handler_code == self.handler)
 
@@ -52,17 +56,36 @@ class TicketCollectionPagination(Pagination):
 
     def page_by_index(self, index):
         return self.__class__(
-            self.session, index, self.state, self.handler,
+            self.session, index, self.state, self.handler, self.group,
             self.extra_parameters
         )
 
+    def available_groups(self, handler='*'):
+        query = self.query().with_entities(distinct(Ticket.group))
+        query = query.order_by(Ticket.group)
+
+        if handler != '*':
+            query = query.filter(Ticket.handler_code == handler)
+
+        return tuple(r[0] for r in query.all())
+
     def for_state(self, state):
         return self.__class__(
-            self.session, 0, state, self.handler, self.extra_parameters)
+            self.session, 0, state, self.handler, self.group,
+            self.extra_parameters
+        )
 
     def for_handler(self, handler):
         return self.__class__(
-            self.session, 0, self.state, handler, self.extra_parameters)
+            self.session, 0, self.state, handler, self.group,
+            self.extra_parameters
+        )
+
+    def for_group(self, group):
+        return self.__class__(
+            self.session, 0, self.state, self.handler, group,
+            self.extra_parameters
+        )
 
 
 TicketCount = namedtuple('TicketCount', ['open', 'pending', 'closed'])

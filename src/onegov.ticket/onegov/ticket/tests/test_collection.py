@@ -193,9 +193,9 @@ def test_handler_subset(session):
         state='open'
     ))
 
-    TicketCollection(session).subset().count() == 2
-    TicketCollection(session, handler='BAR').subset().count() == 1
-    TicketCollection(session, handler='FOO').subset().count() == 1
+    assert TicketCollection(session).subset().count() == 2
+    assert TicketCollection(session, handler='BAR').subset().count() == 1
+    assert TicketCollection(session, handler='FOO').subset().count() == 1
 
 
 def test_open_ticket(session, handlers):
@@ -312,3 +312,32 @@ def test_handle_extra_options(session, handlers):
 
     collection.extra_parameters = {'limit': 2}
     assert collection.subset().count() == 2
+
+
+def test_available_groups(session):
+    session.add(Ticket(
+        number='FOO-1000-0001',
+        title='test', group='one',
+        handler_code='FOO',
+        handler_id='1',
+        state='open'
+    ))
+
+    session.add(Ticket(
+        number='BAR-1000-0001',
+        title='test', group='two',
+        handler_code='BAR',
+        handler_id='2',
+        state='open'
+    ))
+
+    collection = TicketCollection(session)
+
+    assert collection.subset().count() == 2
+    assert collection.for_group('one').subset().count() == 1
+    assert collection.for_group('two').subset().count() == 1
+    assert collection.available_groups() == ('one', 'two')
+    assert collection.for_group('one').available_groups() == ('one', 'two')
+    assert collection.for_group('two').available_groups() == ('one', 'two')
+    assert collection.available_groups('FOO') == ('one', )
+    assert collection.available_groups('BAR') == ('two', )
