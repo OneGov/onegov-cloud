@@ -16,10 +16,11 @@ var new_select_handler = function(baseurl) {
     };
 };
 
-var edit_handler = function(event) {
-    var url = newUrl(event.editurl);
+var edit_handler = function(event, _delta, _revertFunc, _jsEvent, _ui, view) {
+    var url = new Url(event.editurl);
     url.query.start = event.start.toISOString();
     url.query.end = event.end.toISOString();
+    url.query.view = view.name;
     location.href = url.toString();
 };
 

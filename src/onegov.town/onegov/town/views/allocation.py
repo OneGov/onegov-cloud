@@ -15,6 +15,7 @@ from onegov.town.forms import (
     RoomAllocationForm,
     RoomAllocationEditForm
 )
+from purl import URL
 
 
 @TownApp.json(model=Resource, name='slots', permission=Public)
@@ -160,6 +161,17 @@ def handle_edit_allocation(self, request, form):
     resources = ResourceCollection(request.app.libres_context)
     resource = resources.by_id(self.resource)
 
+    # this is a bit of a hack to keep the current view when a user drags an
+    # allocation around, which opens this form and later leads back to the
+    # calendar - if the user does this on the day view we want to return to
+    # the same day view after the process
+    # therefore we set the view on the resource (where this is okay) and on
+    # the form action (where it's a bit of a hack), to ensure that the view
+    # parameter is around for the whole time
+    if 'view' in request.params:
+        resource.view = view = request.params['view']
+        form.action = URL(form.action).query_param('view', view).as_string()
+
     if form.submitted(request):
         scheduler = resource.get_scheduler(request.app.libres_context)
 
@@ -178,6 +190,7 @@ def handle_edit_allocation(self, request, form):
         else:
             request.success(_("Your changes were saved"))
             resource.highlight_allocations([self])
+
             return morepath.redirect(request.link(resource))
     elif not request.POST:
         form.apply_model(self)
