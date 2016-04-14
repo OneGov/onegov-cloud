@@ -22,14 +22,17 @@
                         </div>
                     </div>
 
-                    <div class="field-display-block" tal:condition="allocation.whole_day">
+                    <div class="field-display-block" tal:condition="allocation.whole_day and not allocation.partly_available">
                         <div class="field-display-label" i18n:translate>Timespan</div>
                         <div class="field-display-data" i18n:translate>The whole day</div>
                     </div>
 
-                    <div class="field-display-block" tal:condition="not:allocation.whole_day">
+                    <div class="field-display-block" tal:condition="not allocation.whole_day or allocation.partly_available">
                         <div class="field-display-label" i18n:translate>Timespan</div>
-                        <div class="field-display-data">
+                        <div class="field-display-data" i18n:translate tal:condition="is_whole_day_reservation">
+                            The whole day
+                        </div>
+                        <div class="field-display-data" tal:condition="not: is_whole_day_reservation">
                             ${layout.format_date(reservation.display_start(), 'time')} - ${layout.format_date(reservation.display_end(), 'time')}
                         </div>
                     </div>

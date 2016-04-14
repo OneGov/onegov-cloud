@@ -1,4 +1,5 @@
 import morepath
+import sedate
 
 from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
@@ -224,7 +225,12 @@ def confirm_reservation(self, request):
         'allocation': self._target_allocations().first(),
         'reservation': self,
         'finalize_link': request.link(self, 'abschluss'),
-        'edit_link': request.link(self, 'bearbeiten')
+        'edit_link': request.link(self, 'bearbeiten'),
+        'is_whole_day_reservation': sedate.is_whole_day(
+            self.display_start(),
+            self.display_end(),
+            self.timezone
+        )
     }
 
 
