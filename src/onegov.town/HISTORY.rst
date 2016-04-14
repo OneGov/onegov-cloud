@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter the tickets by group.
+  [href]
+
 - Improves full-day reservation form.
   [href]
 

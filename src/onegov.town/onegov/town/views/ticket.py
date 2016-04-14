@@ -174,11 +174,29 @@ def view_tickets(self, request):
         )
 
         for id, text in handlers:
+            groups = id != 'ALL' and tuple(get_groups(id))
+            parent = groups and len(groups) > 1
+            classes = parent and (id + '-link', 'is-parent') or (id + '-link',)
+
             yield Link(
                 text=text,
-                url=request.link(self.for_handler(id)),
-                active=self.handler == id,
-                classes=(id + '-link', )
+                url=request.link(self.for_handler(id).for_group(None)),
+                active=self.handler == id and self.group is None,
+                classes=classes
+            )
+
+            if parent:
+                yield from groups
+
+    def get_groups(handler):
+        base = self.for_handler(handler)
+
+        for group in self.available_groups(handler):
+            yield Link(
+                text=group,
+                url=request.link(base.for_group(group)),
+                active=self.handler == handler and self.group == group,
+                classes=(handler + '-sub-link', 'ticket-group-filter')
             )
 
     if self.state == 'open':

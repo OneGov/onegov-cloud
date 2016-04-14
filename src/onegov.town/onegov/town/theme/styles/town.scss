@@ -985,7 +985,7 @@ div#redactor-droparea {
         position: relative;
 
         iframe {
-            height: 100%;        
+            height: 100%;
             left: 0;
             position: absolute;
             top: 0;
@@ -1608,6 +1608,64 @@ tr.ticket:hover {
 
     &:hover::before {
         @include icon($reopen-ticket-icon-hover);
+        margin-right: 1ex;
+    }
+}
+
+/*
+    Tickets filter dropdown
+*/
+
+.ticket-filters button.tiny {
+    font-size: .8rem;
+    overflow: hidden;
+    padding: .5rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.f-dropdown {
+    border-radius: 3px;
+    max-height: 400px;
+    max-width: 250px;
+    overflow-x: none;
+    overflow-y: scroll;
+
+    a {
+        font-size: .875rem;
+        font-weight: bold;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        ::before {
+            font-weight: normal;
+        }
+
+        &.is-parent {
+            border-bottom: 1px solid $white-smoke;
+        }
+
+        &.ticket-group-filter {
+            font-weight: normal;
+            margin-left: 1.4rem;
+            padding-bottom: .3rem;
+            padding-top: .3rem;
+        }
+    }
+}
+
+button {
+    .ALL-sub-link::before { @include icon($all-handler-icon); }
+    .FRM-sub-link::before { @include icon($frm-handler-icon); }
+    .RSV-sub-link::before { @include icon($rsv-handler-icon); }
+    .EVN-sub-link::before { @include icon($evn-handler-icon); }
+
+    .ALL-sub-link::before,
+    .FRM-sub-link::before,
+    .RSV-sub-link::before,
+    .EVN-sub-link::before {
+        display: inline-block;
         margin-right: 1ex;
     }
 }

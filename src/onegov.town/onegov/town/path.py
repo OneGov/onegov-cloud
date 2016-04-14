@@ -155,13 +155,14 @@ def get_ticket(app, handler_code, id):
 
 
 @TownApp.path(model=TicketCollection, path='/tickets/{handler}/{state}')
-def get_tickets(app, handler='ALL', state='open', page=0,
+def get_tickets(app, handler='ALL', state='open', page=0, group=None,
                 extra_parameters=None):
     return TicketCollection(
         app.session(),
         handler=handler,
         state=state,
         page=page,
+        group=group,
         extra_parameters=extra_parameters
     )
 
