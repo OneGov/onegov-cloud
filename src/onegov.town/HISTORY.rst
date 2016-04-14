@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves full-day reservation form.
+  [href]
+
 - Enables hpyhenation in browsers that support it.
   [href]
 
