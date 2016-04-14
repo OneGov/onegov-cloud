@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2016-04-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to filter by and list the available groups.
   [href]
 
