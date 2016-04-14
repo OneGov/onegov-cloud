@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enables hpyhenation in browsers that support it.
+  [href]
+
 - Merges the resevation forms into a single step.
   [href]
 

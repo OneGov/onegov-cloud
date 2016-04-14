@@ -48,6 +48,24 @@
 $max-line-width: 67ex;
 
 /*
+    Hyphenation for browsers which support it.
+*/
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.page-text,
+.page-lead,
+.news-lead,
+.newsletter-lead {
+    @include prefix(hyphens, auto);
+}
+
+/*
     get rid of the jump that is introduced when switching from a site with
     scrollbar to a site without (or vice versa)
 
