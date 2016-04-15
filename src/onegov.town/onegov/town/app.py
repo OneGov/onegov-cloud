@@ -299,6 +299,7 @@ def get_common_asset():
     yield 'typeahead.jsx'
     yield 'leaflet'
     yield 'jquery.datetimepicker.js'
+    yield 'jquery.mousewheel.js'
     yield 'jquery.popupoverlay.js'
     yield 'videoframe.js'
     yield 'common.js'

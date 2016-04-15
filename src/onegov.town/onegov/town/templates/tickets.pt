@@ -26,7 +26,7 @@
                                         </tal:block>
                                     </tal:block>
                                 </button>
-                                <ul id="handlers" data-dropdown-content class="f-dropdown" aria-hidden="true">
+                                <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
                                     <li tal:repeat="link handlers"><tal:block replace="structure link(request)"></tal:block></li>
                                 </ul>
                             </div>

@@ -1616,19 +1616,23 @@ tr.ticket:hover {
     Tickets filter dropdown
 */
 
-.ticket-filters button.tiny {
+.ticket-filters button.dropdown.tiny {
     font-size: .8rem;
     overflow: hidden;
-    padding: .5rem;
+    padding: .5rem 2.25rem .5rem 1rem;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    &::after {
+        right: .9rem;
+    }
 }
 
 .f-dropdown {
     border-radius: 3px;
     max-height: 400px;
     max-width: 250px;
-    overflow-x: none;
+    overflow-x: hidden;
     overflow-y: scroll;
 
     a {
@@ -1643,7 +1647,7 @@ tr.ticket:hover {
         }
 
         &.is-parent {
-            border-bottom: 1px solid $white-smoke;
+            margin-bottom: -.2rem;
         }
 
         &.ticket-group-filter {

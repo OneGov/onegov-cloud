@@ -40,3 +40,19 @@ $('.page-text a[href*="/datei/"]').attr('target', '_blank');
 
 // Turn video links into clickable thumbnails
 $('.page-text a.has-video').videoframe();
+
+// Disable scroll on elements which wish it disabled
+$('.disable-scroll').on('mouseover', function() {
+    var el = $(this);
+    var height = el.height();
+    var scrollHeight = el.get(0).scrollHeight;
+
+    $(this).on('mousewheel', function(event) {
+        var block = this.scrollTop === scrollHeight - height && event.deltaY < 0 || this.scrollTop === 0 && event.deltaY > 0;
+        return !block;
+    });
+});
+
+$('.disable-scroll').on('mouseout', function() {
+    $(this).off('mousewheel');
+});
