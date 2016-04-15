@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows an error if an uploaded's filename is too long.
+  [href]
+
 - Adds the ability to filter the tickets by group.
   [href]
 

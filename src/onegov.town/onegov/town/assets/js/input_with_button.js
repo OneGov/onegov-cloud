@@ -15,6 +15,14 @@
     he wants to use an image, a file or an internal url.
 */
 
+
+/* also used in editor.js */
+function handleUploadError(json) {
+    /* eslint-disable no-undefined */
+    show_confirmation(json.message, undefined, "Ok");
+    /* eslint-enable no-undefined */
+}
+
 // takes the given input element and wraps it with a button
 // see http://foundation.zurb.com/sites/docs/v/5.5.3/components/forms.html#pre-postfix-labels-amp-actions
 //
@@ -135,7 +143,9 @@ var on_internal_link_button_click = function(input, type) {
         imageUpload: form.data('image-upload-url'),
         imageManagerJson: form.data('image-list-url'),
         definedLinks: form.data('sitecollection-url'),
-        lang: 'de'
+        lang: 'de',
+        fileUploadErrorCallback: handleUploadError,
+        imageUploadErrorCallback: handleUploadError
     });
 
     var redactor = virtual.data('redactor');

@@ -10,6 +10,7 @@ from onegov.town.app import TownApp
 from onegov.town.elements import Link
 from onegov.town.layout import DefaultLayout
 from onegov.town.models import FileCollection
+from webob import exc
 
 
 @TownApp.html(model=FileCollection, template='files.pt', permission=Private)
@@ -78,7 +79,18 @@ def view_upload_file(self, request):
 def view_upload_file_by_json(self, request):
     request.assert_valid_csrf_token()
 
-    file_ = handle_file_upload(self, request)
+    try:
+        file_ = handle_file_upload(self, request)
+    except exc.HTTPUnsupportedMediaType:
+        return {
+            'error': True,
+            'message': request.translate(_("This file type is not supported"))
+        }
+    except exc.HTTPRequestHeaderFieldsTooLarge:
+        return {
+            'error': True,
+            'message': request.translate(_("The file name is too long"))
+        }
 
     return {
         'filelink': request.link(file_),

@@ -4,7 +4,7 @@ import base64
 import magic
 
 from onegov.core.filestorage import FilestorageFile
-from webob.exc import HTTPUnsupportedMediaType
+from webob.exc import HTTPUnsupportedMediaType, HTTPRequestHeaderFieldsTooLarge
 from unidecode import unidecode
 
 
@@ -66,6 +66,12 @@ class FileCollection(object):
         See :func:`onegov.core.filestorage.random_filename`.
 
         """
+
+        if len(filename) > 255:
+            # it's a bit of a stretch to say that a filename which is too long
+            # indicates a header-fields-too-large error, but it's as close
+            # as we can get
+            raise HTTPRequestHeaderFieldsTooLarge("Filename is too long")
 
         file_data = file_.read()
 

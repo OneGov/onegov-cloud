@@ -27,7 +27,10 @@ $(function() {
                     tag: 'h3',
                     title: "Untertitel"
                 }
-            ]
+            ],
+            /* defined in input_with_button.js */
+            fileUploadErrorCallback: handleUploadError,
+            imageUploadErrorCallback: handleUploadError
         });
     });
 });
