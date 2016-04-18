@@ -1866,7 +1866,7 @@ button {
 
         // fix borders missing with zurb foundation
         tbody div.fc-content-skeleton td {
-            border-color: $gainsboro;
+            border-color: #ddd;
         }
     }
 
@@ -2487,49 +2487,4 @@ ul.search-results {
 
 .subscribers li:hover span {
     background-color: $yellow-pastel;
-}
-
-/*
-    Nicer tabs
-*/
-
-ul.tabs {
-    background-color: $silver;
-    border-bottom: 1px solid $gainsboro;
-    border-top: 1px solid $white;
-    box-shadow: inset 0 1px 0 $white;
-    margin-bottom: 1rem !important;
-    padding: 0;
-
-    li {
-        border-bottom: 1px solid $gainsboro;
-        padding: 0;
-        position: relative;
-        top: 1px;
-
-        a {
-            background-color: $white-smoke;
-        }
-    }
-
-    .active {
-        border: 1px solid $gainsboro;
-        border-bottom: 0;
-    }
-}
-
-@media #{$small-only} {
-    ul.tabs {
-        background-color: $white;
-
-        li {
-            border: 0;
-            display: block;
-            width: 100%;
-
-            &.active {
-                border: 1px solid $white-smoke;
-            }
-        }
-    }
 }
