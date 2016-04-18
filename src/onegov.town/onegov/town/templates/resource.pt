@@ -12,35 +12,15 @@
         <tal:block metal:use-macro="layout.macros.page_content"
              tal:define="lead resource.meta.get('lead');text None; people None; contact None; coordinates None;" />
 
-        <tal:block condition="resource.type == 'daypass'">
-            <div class="calendar"
-                data-feed="${feed}"
-                data-available-views="month"
-                data-header-left="title"
-                data-header-right="today prev,next"
-                data-selectable="${request.is_logged_in and 'true' or 'false'}"
-                data-select-url="${request.link(resource, name='neue-einteilung')}"
-                data-default-view="month"
-                data-goto-date="${resource.date and resource.date.isoformat() or ''}"
-                data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
-                data-editable="${request.is_logged_in and 'true' or 'false'}"></div>
-        </tal:block>
-        <tal:block condition="resource.type == 'room'">
-            <div class="calendar"
-                data-feed="${feed}"
-                data-available-views="month,agendaWeek,agendaDay"
-                data-header-left="month,agendaWeek,agendaDay"
-                data-header-center="title"
-                data-header-right="today prev,next"
-                data-min-time="07:00:00"
-                data-max-time="22:00:00"
-                data-selectable="${request.is_logged_in and 'true' or 'false'}"
-                data-select-url="${request.link(resource, name='neue-einteilung')}"
-                data-default-view="${resource.view}"
-                data-goto-date="${resource.date and resource.date.isoformat() or ''}"
-                data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
-                data-editable="${request.is_logged_in and 'true' or 'false'}"></div>
-        </tal:block>
+        <div class="calendar"
+            data-feed="${feed}"
+            data-type="${resource.type}"
+            data-editable="${request.is_logged_in and 'true' or 'false'}"
+            data-select-url="${request.link(resource, name='neue-einteilung')}"
+            data-view="${resource.view}"
+            data-date="${resource.date and resource.date.isoformat() or ''}"
+            data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
+        ></div>
 
         <div class="panel" i18n:translate tal:condition="not: request.is_logged_in">
             Click on any of the blocks in the calendar below to make a reservation.

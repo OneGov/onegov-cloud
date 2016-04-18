@@ -238,7 +238,8 @@ def get_fullcalendar_asset():
     yield 'moment.de.js'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
-    yield 'fullcalendar_custom.js'
+    yield 'reservationcalendar.js'
+    yield 'reservationcalendar_custom.js'
 
 
 @TownApp.webasset('check_contrast')
