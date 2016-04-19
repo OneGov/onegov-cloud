@@ -202,3 +202,7 @@ def handle_delete_allocation(self, request):
     resources = ResourceCollection(request.app.libres_context)
     scheduler = resources.scheduler_by_id(self.resource)
     scheduler.remove_allocation(id=self.id)
+
+    @request.after
+    def trigger_calendar_update(response):
+        response.headers.add('X-IC-Trigger', 'rc-allocations-changed')

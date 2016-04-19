@@ -64,6 +64,7 @@ var defaultOptions = {
 };
 
 rc.events = [
+    'rc-allocations-changed',
     'rc-reservation-error',
     'rc-reservations-changed'
 ];
@@ -177,6 +178,9 @@ rc.getFullcalendarOptions = function(options) {
     // reservation selection
     rc.setupReservationSelect(fcOptions);
 
+    // setup allocation refresh handling
+    fcOptions.afterSetup.push(rc.setupAllocationsRefetch);
+
     // switch to the correct date after the instance has been creted
     if (rcOptions.date) {
         fcOptions.afterSetup.push(function(calendar) {
@@ -216,6 +220,12 @@ rc.highlightEvents = function(event, element, view) {
     }
 };
 
+rc.setupAllocationsRefetch = function(calendar) {
+    $(window).on('rc-allocations-changed', function() {
+        calendar.fullCalendar('refetchEvents');
+    });
+};
+
 // popup handler implementation
 rc.spawnPopup = function(event, element) {
     $(element).addClass('has-popup');
@@ -235,20 +245,22 @@ rc.spawnPopup = function(event, element) {
             var links = popup.find('a');
 
             // hookup all links with intercool
-            Intercooler.processNodes(links);
+            links.each(function(_ix, link) {
+                Intercooler.processNodes($(link));
+            });
+
+            // close the popup after any click on a link
+            $(links).on('ic.success', function() {
+                popup.popup('hide');
+            });
+
+            $(links).on('click', function() {
+                popup.popup('hide');
+            });
 
             // hookup the confirmation dialog
             var confirm_links = popup.find('a.confirm');
             confirm_links.confirmation();
-
-            $(confirm_links).on('success.ic', function() {
-                $('.calendar').fullCalendar('refetchEvents');
-            });
-
-            // any link clicked will close the popup
-            links.click(function() {
-                popup.popup('hide');
-            });
 
             // pass all reservationcalendar links to the window
             _.each(rc.events, function(eventName) {
@@ -495,8 +507,6 @@ ReservationSelection = React.createClass({
                 $(window).trigger('rc-reservations-changed');
             }
         });
-
-        return false;
     },
     render: function() {
         var self = this;
@@ -511,7 +521,7 @@ ReservationSelection = React.createClass({
                     this.props.reservations.length > 0 &&
                         <ul>{
                             _.map(this.props.reservations, function(r, ix) {
-                                var boundClick = self.handleClick.bind(this, r);
+                                var boundClick = self.handleClick.bind(self, r);
                                 return (
                                     <li key={ix} className={r.className + " reservation"}>
                                         <span className="reservation-date">{r.date}</span>
