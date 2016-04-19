@@ -14,6 +14,7 @@
 
         <div class="calendar"
             data-feed="${feed}"
+            data-reservations="${request.link(resource, name='reservations')}"
             data-type="${resource.type}"
             data-editable="${request.is_logged_in and 'true' or 'false'}"
             data-select-url="${request.link(resource, name='neue-einteilung')}"

@@ -1,7 +1,9 @@
 var locales = {
     de: {
         "Reservations": "Reservationen",
-        "Select allocations on the right to reserve them": "Wählen Sie die gewünschten Daten rechts aus"
+        "Select allocations on the left to reserve them": "Wählen Sie die gewünschten Daten links aus",
+        "Reserve": "Reservieren",
+        "Remove": "Entfernen"
     }
 };
 

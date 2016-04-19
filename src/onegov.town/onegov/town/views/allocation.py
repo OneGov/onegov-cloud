@@ -1,9 +1,7 @@
 import morepath
 
-from itertools import groupby
 from libres.db.models import Allocation
 from libres.modules.errors import LibresError
-from operator import attrgetter
 from onegov.core.security import Public, Private
 from onegov.libres import Resource, ResourceCollection
 from onegov.town import TownApp, _, utils
@@ -33,7 +31,6 @@ def view_allocations_json(self, request):
         return []
 
     scheduler = self.get_scheduler(request.app.libres_context)
-    queries = scheduler.queries
 
     # get all allocations (including mirrors), for the availability calculation
     query = scheduler.allocations_in_range(start, end, masters_only=False)
@@ -41,24 +38,12 @@ def view_allocations_json(self, request):
 
     allocations = query.all()
 
-    # put only return the master allocations
-    events = []
-
-    for key, group in groupby(allocations, key=attrgetter('_start')):
-        grouped = tuple(group)
-        availability = queries.availability_by_allocations(grouped)
-
-        for allocation in grouped:
-            if allocation.is_master:
-                events.append(
-                    utils.AllocationEventInfo(
-                        allocation,
-                        availability,
-                        request
-                    )
-                )
-
-    return [e.as_dict() for e in events]
+    # but only return the master allocations
+    return [
+        e.as_dict() for e in utils.AllocationEventInfo.from_allocations(
+            request, scheduler, allocations
+        )
+    ]
 
 
 def get_new_allocation_form_class(resource, request):

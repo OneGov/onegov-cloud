@@ -79,6 +79,9 @@ class Link(HiddenElementMixin):
         if self.request_method == 'GET':
             a.attrib['href'] = self.url
 
+        if self.request_method == 'POST':
+            a.attrib['ic-post-to'] = self.url
+
         if self.request_method == 'DELETE':
             url = URL(self.url).query_param(
                 'csrf-token', request.new_csrf_token())

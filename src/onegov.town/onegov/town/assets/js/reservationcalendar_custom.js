@@ -9,7 +9,8 @@ var setupReservationCalendar = function(calendar) {
         editUrl: calendar.data('edit-url'),
         view: calendar.data('view'),
         date: calendar.data('date'),
-        highlights: calendar.data('highlights')
+        highlights: calendar.data('highlights'),
+        reservations: calendar.data('reservations')
     });
 };
 

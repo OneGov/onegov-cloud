@@ -4,11 +4,14 @@ import sedate
 from datetime import datetime, time
 from functools import lru_cache
 from isodate import parse_date, parse_datetime
+from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.html import fragments_fromstring, tostring
 from onegov.ticket import TicketCollection
 from onegov.town import _
 from onegov.town.elements import DeleteLink, Link
+from operator import attrgetter
+from uuid import uuid4
 
 
 def add_class_to_node(node, classname):
@@ -112,6 +115,28 @@ class AllocationEventInfo(object):
         self.request = request
         self.translate = request.translate
 
+    @classmethod
+    def from_allocations(cls, request, scheduler, allocations):
+        events = []
+
+        for key, group in groupby(allocations, key=attrgetter('_start')):
+            grouped = tuple(group)
+            availability = scheduler.queries.availability_by_allocations(
+                grouped
+            )
+
+            for allocation in grouped:
+                if allocation.is_master:
+                    events.append(
+                        cls(
+                            allocation,
+                            availability,
+                            request
+                        )
+                    )
+
+        return events
+
     @property
     def event_start(self):
         return self.allocation.display_start().isoformat()
@@ -185,9 +210,10 @@ class AllocationEventInfo(object):
             )
         else:
             yield Link(
-                _("Reserve"),
-                self.request.link(self.allocation, name='reservieren'),
-                classes=('new-reservation', )
+                _("Select"),
+                self.request.link(self.allocation, name='reserve'),
+                request_method='POST',
+                classes=('new-reservation', ),
             )
 
         if self.request.is_logged_in:
@@ -299,17 +325,20 @@ libres_error_messages = {
 }
 
 
+def get_libres_error(e, request):
+    assert type(e) in libres_error_messages, (
+        "Unknown libres error {}".format(type(e))
+    )
+
+    return request.translate(libres_error_messages.get(type(e)))
+
+
 def show_libres_error(e, request):
     """ Shows a human readable error message for the given libres exception,
     using request.alert.
 
     """
-
-    assert type(e) in libres_error_messages, (
-        "Unknown libres error {}".format(type(e))
-    )
-
-    request.alert(request.translate(libres_error_messages.get(type(e))))
+    request.alert(get_libres_error(e, request))
 
 
 def djb2_hash(text, size):
@@ -352,3 +381,10 @@ def get_user_color(username):
         int(round(g * 255)),
         int(round(b * 255))
     )
+
+
+def get_libres_session_id(request):
+    if not request.browser_session.has('libres_session_id'):
+        request.browser_session.libres_session_id = uuid4()
+
+    return request.browser_session.libres_session_id

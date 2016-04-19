@@ -1793,6 +1793,23 @@ button {
 
     .fc-toolbar {
         margin-bottom: 0;
+        width: 80%;
+
+        h2 {
+            clear: both;
+            display: block;
+            float: none;
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .fc-left {
+            float: none;
+
+            button {
+                margin-left: 0;
+            }
+        }
     }
 
     .calendar-occupied {
@@ -2470,25 +2487,47 @@ ul.search-results {
     Reservation calendar
 */
 .reservation-selection {
-    border: 1px solid $gainsboro;
-    border-right: 0;
-    float: left;
+    float: right;
+    padding: 0 0 0 20px;
     width: 20%;
-
-    h3 {
-        background-color: $white-smoke;
-        border-bottom: 1px solid $gainsboro;
-        font-size: .875rem;
-        font-weight: bold;
-        line-height: 18px;
-        margin: 0;
-        text-align: center;
-    }
 
     p {
         font-size: .875rem;
         padding: 1ex;
-        text-align: center;
+    }
+
+    ul {
+        font-size: .8rem;
+        list-style: none;
+        margin: 0;
+    }
+
+    li {
+        display: block;
+        margin: 10px 0;
+    }
+
+    .button {
+        border-radius: 3px;
+        display: block;
+        margin: 0;
+    }
+
+    .reservation-date {
+        display: block;
+        font-weight: bold;
+
+        &::before {
+            content: '\f274';
+            font-family: 'FontAwesome';
+            margin-right: 1ex;
+        }
+    }
+
+    a,
+    .reservation-time {
+        display: block;
+        margin-left: 1.4rem;
     }
 }
 

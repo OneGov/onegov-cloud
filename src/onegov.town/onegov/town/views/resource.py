@@ -2,14 +2,16 @@ import morepath
 
 from collections import OrderedDict
 from itertools import groupby
+from libres.db.models import Allocation, Reservation
 from onegov.core.security import Public, Private
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
 from onegov.town import TownApp, _
+from onegov.town import utils
 from onegov.town.elements import Link
 from onegov.town.forms import ResourceForm, ResourceCleanupForm
-from onegov.town.models.resource import DaypassResource, RoomResource
 from onegov.town.layout import ResourcesLayout, ResourceLayout
+from onegov.town.models.resource import DaypassResource, RoomResource
 from sqlalchemy.sql.expression import nullsfirst
 from webob import exc
 
@@ -175,3 +177,33 @@ def handle_cleanup_allocations(self, request, form):
         'title': _("Clean up"),
         'form': form
     }
+
+
+@TownApp.json(model=Resource, name='reservations', permission=Public)
+def get_reservations(self, request):
+    collection = ResourceCollection(request.app.libres_context)
+    resource = collection.by_id(self.id)
+
+    scheduler = resource.get_scheduler(request.app.libres_context)
+    session = utils.get_libres_session_id(request)
+
+    uuids = scheduler.queries.reservations_by_session(session)
+    uuids = uuids.with_entities(Reservation.target)
+    uuids = uuids.filter(Reservation.target_type == 'allocation')
+    uuids = uuids.subquery()
+
+    allocations = scheduler.managed_allocations()
+    allocations = allocations.filter(Allocation.group.in_(uuids))
+    allocations = allocations.all()
+
+    events = utils.AllocationEventInfo.from_allocations(
+        request, scheduler, allocations
+    )
+
+    return [
+        {
+            'date': '{:%d.%m.%Y}'.format(e.allocation.display_start()),
+            'time': e.event_time,
+            'className': e.event_class
+        } for e in events
+    ]

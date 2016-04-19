@@ -12,6 +12,11 @@ var defaultOptions = {
     feed: null,
 
     /*
+        Returns the reservations for the current resource.
+    */
+    reservations: null,
+
+    /*
         The type of the calendar. Either 'room' or 'daypass'
     */
     type: null,
@@ -58,6 +63,11 @@ var defaultOptions = {
     highlights: []
 };
 
+rc.events = [
+    'rc-reservation-error',
+    'rc-reservations-changed'
+];
+
 rc.getFullcalendarOptions = function(options) {
     var rcOptions = $.extend(true, defaultOptions, options);
 
@@ -73,7 +83,8 @@ rc.getFullcalendarOptions = function(options) {
         highlights: rcOptions.highlights,
         afterSetup: [],
         viewRenderers: [],
-        eventRenderers: []
+        eventRenderers: [],
+        reservations: rcOptions.reservations
     };
 
     // the reservation calendar type definition
@@ -83,16 +94,17 @@ rc.getFullcalendarOptions = function(options) {
         case 'daypass':
             views = ['month'];
             fcOptions.header = {
-                left: 'title',
-                right: 'today prev, next'
+                left: 'title today prev,next',
+                center: '',
+                right: ''
             };
             break;
         case 'room':
             views = ['month', 'agendaWeek', 'agendaDay'];
             fcOptions.header = {
-                left: views.join(','),
-                center: 'title',
-                right: 'today prev,next'
+                left: 'title today prev,next',
+                center: '',
+                right: views.join(',')
             };
             break;
         default:
@@ -220,11 +232,13 @@ rc.spawnPopup = function(event, element) {
         'type': 'tooltip',
         'onopen': function() {
             var popup = $(this);
+            var links = popup.find('a');
+
+            // hookup all links with intercool
+            Intercooler.processNodes(links);
 
             // hookup the confirmation dialog
             var confirm_links = popup.find('a.confirm');
-
-            Intercooler.processNodes(confirm_links);
             confirm_links.confirmation();
 
             $(confirm_links).on('success.ic', function() {
@@ -232,9 +246,17 @@ rc.spawnPopup = function(event, element) {
             });
 
             // any link clicked will close the popup
-            popup.find('a').click(function() {
+            links.click(function() {
                 popup.popup('hide');
             });
+
+            // pass all reservationcalendar links to the window
+            _.each(rc.events, function(eventName) {
+                links.on(eventName, _.debounce(function(data) {
+                    $(window).trigger(eventName, data);
+                }));
+            });
+
         },
         'onclose': function() {
             $(element).removeClass('has-popup');
@@ -276,6 +298,10 @@ rc.setupHistory = function(fcOptions) {
 
     fcOptions.afterSetup.push(function(calendar) {
         window.onpopstate = function(event) {
+            if (event.state === null) {
+                return;
+            }
+
             isPopping = true;
             calendar.fullCalendar('changeView', event.state.view);
             calendar.fullCalendar('gotoDate', event.state.date);
@@ -306,6 +332,18 @@ rc.setupReservationSelect = function(fcOptions) {
     fcOptions.viewRenderers.push(function() {
         rc.resizeReservationSelection(selection);
     });
+
+    $(window).on('rc-reservation-error', function() {
+        console.log('error');
+    });
+
+    $(window).on('rc-reservations-changed', function() {
+        $.getJSON(fcOptions.reservations, function(reservations) {
+            rc.renderReservationSelection(selection.get(0), reservations);
+        });
+    });
+
+    $(window).trigger('rc-reservations-changed');
 };
 
 // renders the occupied partitions on an event
@@ -456,8 +494,25 @@ ReservationSelection = React.createClass({
                 <h3>{locale("Reservations")}</h3>
                 {
                     this.props.reservations.length === 0 &&
-                        <p>{locale("Select allocations on the right to reserve them")}</p>
+                        <p>{locale("Select allocations on the left to reserve them")}</p>
                 }
+                {
+                    this.props.reservations.length > 0 &&
+                        <ul>{
+                            _.map(this.props.reservations, function(r, ix) {
+                                return (
+                                    <li key={ix} className={r.className + " reservation"}>
+                                        <span className="reservation-date">{r.date}</span>
+                                        <span className="reservation-time">{r.time}</span>
+                                        <a href="#">{locale('Remove')}</a>
+                                    </li>
+                                );
+                            })
+                        }</ul>
+                }
+                <a href="#" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button secondary'}>
+                    {locale("Reserve")}
+                </a>
             </div>
         );
     }

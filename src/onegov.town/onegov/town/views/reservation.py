@@ -1,3 +1,4 @@
+import json
 import morepath
 import sedate
 
@@ -14,7 +15,6 @@ from onegov.town.layout import ReservationLayout
 from onegov.town.mail import send_html_mail
 from sqlalchemy.orm.attributes import flag_modified
 from purl import URL
-from uuid import uuid4
 from webob import exc
 
 
@@ -37,13 +37,6 @@ def get_reservation_form_class(model, request):
         return merge_forms(allocation_form, resource.form_class)
     else:
         return allocation_form
-
-
-def get_libres_session_id(request):
-    if not request.browser_session.has('libres_session_id'):
-        request.browser_session.libres_session_id = uuid4()
-
-    return request.browser_session.libres_session_id
 
 
 def get_submission_link(request, submission, confirm_link):
@@ -76,7 +69,7 @@ def handle_reserve_allocation(self, request, form):
                 email=form.data['email'],
                 dates=(start, end),
                 quota=int(form.data.get('quota', 1)),
-                session_id=get_libres_session_id(request)
+                session_id=utils.get_libres_session_id(request)
             )
         except LibresError as e:
             utils.show_libres_error(e, request)
@@ -116,6 +109,45 @@ def handle_reserve_allocation(self, request, form):
         'allocation': self,
         'button_text': _("Continue")
     }
+
+
+@TownApp.json(model=Allocation, name='reserve', request_method='POST',
+              permission=Public)
+def reserve_allocation(self, request):
+
+    collection = ResourceCollection(request.app.libres_context)
+    resource = collection.by_id(self.resource)
+
+    scheduler = resource.get_scheduler(request.app.libres_context)
+
+    try:
+        scheduler.reserve(
+            email='0xdeadbeef@example.org',  # will be set later
+            dates=(self.start, self.end),
+            quota=request.params.get('quota', 1),
+            session_id=utils.get_libres_session_id(request)
+        )
+    except LibresError as e:
+        message = {
+            'message': utils.get_libres_error(e, request),
+            'success': False
+        }
+
+        @request.after
+        def trigger_calendar_update(response):
+            response.headers.add('X-IC-Trigger', 'rc-reservation-error')
+            response.headers.add('X-IC-Trigger-Data', json.dumps(message))
+
+        return message
+    else:
+
+        @request.after
+        def trigger_calendar_update(response):
+            response.headers.add('X-IC-Trigger', 'rc-reservations-changed')
+
+        return {
+            'success': True
+        }
 
 
 @TownApp.form(model=Reservation, name='bearbeiten', template='reservation.pt',
@@ -192,7 +224,7 @@ def assert_anonymous_access_only_temporary(self, request):
     if self.status == 'approved':
         raise exc.HTTPForbidden()
 
-    if self.session_id != get_libres_session_id(request):
+    if self.session_id != utils.get_libres_session_id(request):
         raise exc.HTTPForbidden()
 
 
@@ -244,7 +276,7 @@ def finalize_reservation(self, request):
     collection = ResourceCollection(request.app.libres_context)
     resource = collection.by_id(self.resource)
     scheduler = resource.get_scheduler(request.app.libres_context)
-    session_id = get_libres_session_id(request)
+    session_id = utils.get_libres_session_id(request)
 
     try:
         scheduler.queries.confirm_reservations_for_session(session_id)
