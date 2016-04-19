@@ -11,6 +11,7 @@ from onegov.ticket import TicketCollection
 from onegov.town import _
 from onegov.town.elements import DeleteLink, Link
 from operator import attrgetter
+from purl import URL
 from uuid import uuid4
 
 
@@ -103,6 +104,41 @@ def parse_fullcalendar_request(request, timezone):
         return start, end
     else:
         return None, None
+
+
+class ReservationInfo(object):
+
+    __slots__ = ['resource', 'reservation', 'request', 'translate']
+
+    def __init__(self, reservation, request):
+        self.reservation = reservation
+        self.request = request
+        self.translate = request.translate
+
+    @property
+    def date(self):
+        return '{:%d.%m.%Y}'.format(self.reservation.display_start())
+
+    @property
+    def time(self):
+        if sedate.is_whole_day(
+            self.reservation.start,
+            self.reservation.end,
+            self.reservation.timezone
+        ):
+            return self.translate(_("Whole day"))
+        else:
+            return '{:%H:%M} - {:%H:%M}'.format(
+                self.reservation.display_start(),
+                self.reservation.display_end()
+            )
+
+    @property
+    def delete_link(self):
+        url = self.request.link(self.reservation)
+        url = URL(url).query_param('csrf-token', self.request.new_csrf_token())
+
+        return url.as_string()
 
 
 class AllocationEventInfo(object):

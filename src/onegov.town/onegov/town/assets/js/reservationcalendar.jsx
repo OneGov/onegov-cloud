@@ -334,7 +334,6 @@ rc.setupReservationSelect = function(fcOptions) {
     });
 
     $(window).on('rc-reservation-error', function() {
-        console.log('error');
     });
 
     $(window).on('rc-reservations-changed', function() {
@@ -488,7 +487,19 @@ rc.sumPartitions = function(partitions) {
 };
 
 ReservationSelection = React.createClass({
+    handleClick: function(reservation) {
+        $.ajax({
+            url: reservation.delete,
+            type: 'DELETE',
+            success: function() {
+                $(window).trigger('rc-reservations-changed');
+            }
+        });
+
+        return false;
+    },
     render: function() {
+        var self = this;
         return (
             <div className="reservation-selection-inner">
                 <h3>{locale("Reservations")}</h3>
@@ -500,11 +511,12 @@ ReservationSelection = React.createClass({
                     this.props.reservations.length > 0 &&
                         <ul>{
                             _.map(this.props.reservations, function(r, ix) {
+                                var boundClick = self.handleClick.bind(this, r);
                                 return (
                                     <li key={ix} className={r.className + " reservation"}>
                                         <span className="reservation-date">{r.date}</span>
                                         <span className="reservation-time">{r.time}</span>
-                                        <a href="#">{locale('Remove')}</a>
+                                        <a className="delete" onClick={boundClick}>{locale('Remove')}</a>
                                     </li>
                                 );
                             })

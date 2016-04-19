@@ -150,6 +150,42 @@ def reserve_allocation(self, request):
         }
 
 
+@TownApp.json(model=Reservation, request_method='DELETE', permission=Public)
+def delete_reservation(self, request):
+
+    # this view is public, but only for a limited time
+    assert_anonymous_access_only_temporary(self, request)
+
+    collection = ResourceCollection(request.app.libres_context)
+    resource = collection.by_id(self.resource)
+
+    scheduler = resource.get_scheduler(request.app.libres_context)
+
+    try:
+        scheduler.remove_reservation(self.token, self.id)
+    except LibresError as e:
+        message = {
+            'message': utils.get_libres_error(e, request),
+            'success': False
+        }
+
+        @request.after
+        def trigger_calendar_update(response):
+            response.headers.add('X-IC-Trigger', 'rc-reservation-error')
+            response.headers.add('X-IC-Trigger-Data', json.dumps(message))
+
+        return message
+    else:
+
+        @request.after
+        def trigger_calendar_update(response):
+            response.headers.add('X-IC-Trigger', 'rc-reservations-changed')
+
+        return {
+            'success': True
+        }
+
+
 @TownApp.form(model=Reservation, name='bearbeiten', template='reservation.pt',
               permission=Public, form=get_reservation_form_class)
 def handle_edit_reservation(self, request, form):

@@ -2,7 +2,7 @@ import morepath
 
 from collections import OrderedDict
 from itertools import groupby
-from libres.db.models import Allocation, Reservation
+from libres.db.models import Reservation
 from onegov.core.security import Public, Private
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
@@ -187,23 +187,19 @@ def get_reservations(self, request):
     scheduler = resource.get_scheduler(request.app.libres_context)
     session = utils.get_libres_session_id(request)
 
-    uuids = scheduler.queries.reservations_by_session(session)
-    uuids = uuids.with_entities(Reservation.target)
-    uuids = uuids.filter(Reservation.target_type == 'allocation')
-    uuids = uuids.subquery()
+    reservations = scheduler.queries.reservations_by_session(session)
+    reservations = reservations.order_by(Reservation.start)
+    reservations = reservations.all()
 
-    allocations = scheduler.managed_allocations()
-    allocations = allocations.filter(Allocation.group.in_(uuids))
-    allocations = allocations.all()
-
-    events = utils.AllocationEventInfo.from_allocations(
-        request, scheduler, allocations
-    )
+    info = [
+        utils.ReservationInfo(reservation, request)
+        for reservation in reservations
+    ]
 
     return [
         {
-            'date': '{:%d.%m.%Y}'.format(e.allocation.display_start()),
-            'time': e.event_time,
-            'className': e.event_class
-        } for e in events
+            'date': i.date,
+            'time': i.time,
+            'delete': i.delete_link,
+        } for i in info
     ]
