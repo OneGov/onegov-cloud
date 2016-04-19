@@ -71,10 +71,10 @@ rc.getFullcalendarOptions = function(options) {
         selectable: rcOptions.editable,
         defaultView: rcOptions.view,
         highlights: rcOptions.highlights,
-        afterSetup: []
+        afterSetup: [],
+        viewRenderers: [],
+        eventRenderers: []
     };
-
-    var eventRenderers = [];
 
     // the reservation calendar type definition
     var views = [];
@@ -140,18 +140,30 @@ rc.getFullcalendarOptions = function(options) {
     }
 
     // after event rendering
-    eventRenderers.push(rc.renderPartitions);
-    eventRenderers.push(rc.highlightEvents);
-    eventRenderers.push(rc.setupEventPopups);
+    fcOptions.eventRenderers.push(rc.renderPartitions);
+    fcOptions.eventRenderers.push(rc.highlightEvents);
+    fcOptions.eventRenderers.push(rc.setupEventPopups);
 
     fcOptions.eventAfterRender = function(event, element, view) {
-        for (var i = 0; i < eventRenderers.length; i++) {
-            eventRenderers[i](event, element, view);
+        var renderers = view.calendar.options.eventRenderers;
+        for (var i = 0; i < renderers.length; i++) {
+            renderers[i](event, element, view);
+        }
+    };
+
+    // view change rendering
+    fcOptions.viewRender = function(view, element) {
+        var renderers = view.calendar.options.viewRenderers;
+        for (var i = 0; i < renderers.length; i++) {
+            renderers[i](view, element);
         }
     };
 
     // history handling
     rc.setupHistory(fcOptions);
+
+    // reservation selection
+    rc.setupReservationSelect(fcOptions);
 
     // switch to the correct date after the instance has been creted
     if (rcOptions.date) {
@@ -167,6 +179,7 @@ $.fn.reservationCalendar = function(options) {
     var fcOptions = rc.getFullcalendarOptions($.extend(true, defaultOptions, options));
 
     return this.map(function(_ix, element) {
+
         var calendar = $(element).fullCalendar(fcOptions);
 
         for (var i = 0; i < fcOptions.afterSetup.length; i++) {
@@ -235,7 +248,7 @@ rc.setupHistory = function(fcOptions) {
     var isPopping = false;
     var isFirst = true;
 
-    fcOptions.viewRender = function(view) {
+    fcOptions.viewRenderers.push(function(view) {
         if (isPopping) {
             return;
         }
@@ -259,7 +272,7 @@ rc.setupHistory = function(fcOptions) {
         } else {
             window.history.pushState.apply(window.history, state);
         }
-    };
+    });
 
     fcOptions.afterSetup.push(function(calendar) {
         window.onpopstate = function(event) {
@@ -268,6 +281,30 @@ rc.setupHistory = function(fcOptions) {
             calendar.fullCalendar('gotoDate', event.state.date);
             isPopping = false;
         };
+    });
+};
+
+// setup the reservation selection on the left
+rc.setupReservationSelect = function(fcOptions) {
+    var selection = null;
+
+    fcOptions.afterSetup.push(function(calendar) {
+        var view = $(calendar).find('.fc-view-container');
+
+        selection = $('<div class="reservation-selection"></div>')
+            .insertBefore(view);
+
+        calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
+        rc.resizeReservationSelection(selection);
+        rc.renderReservationSelection(selection.get(0), []);
+    });
+
+    fcOptions.windowResize = function() {
+        rc.resizeReservationSelection(selection);
+    };
+
+    fcOptions.viewRenderers.push(function() {
+        rc.resizeReservationSelection(selection);
     });
 };
 
@@ -410,4 +447,29 @@ rc.sumPartitions = function(partitions) {
     return _.reduce(partitions, function(running_total, p) {
         return running_total + p[0];
     }, 0);
+};
+
+ReservationSelection = React.createClass({
+    render: function() {
+        return (
+            <div className="reservation-selection-inner">
+                <h3>{locale("Reservations")}</h3>
+                {
+                    this.props.reservations.length === 0 &&
+                        <p>{locale("Select allocations on the right to reserve them")}</p>
+                }
+            </div>
+        );
+    }
+});
+
+rc.renderReservationSelection = function(element, reservations) {
+    React.render(<ReservationSelection reservations={reservations} />, element);
+};
+
+rc.resizeReservationSelection = function(selection) {
+    var element = $(selection);
+    var view = element.parent().find('.fc-view-container');
+
+    element.css('min-height', view.height());
 };

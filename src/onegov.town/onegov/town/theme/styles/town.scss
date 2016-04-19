@@ -2051,29 +2051,6 @@ button {
     }
 }
 
-
-/*
-    Fullcalendar Screen Flicker Prevention
-*/
-
-@media #{$small-only} {
-    .calendar {
-        min-height: $small-breakpoint * .5;
-    }
-}
-
-@media #{$medium-only} {
-    .calendar {
-        min-height: $medium-breakpoint * .5;
-    }
-}
-
-@media #{$large-up} {
-    .calendar {
-        min-height: $large-breakpoint * .5;
-    }
-}
-
 /*
     Popup Menu
 */
@@ -2487,4 +2464,35 @@ ul.search-results {
 
 .subscribers li:hover span {
     background-color: $yellow-pastel;
+}
+
+/*
+    Reservation calendar
+*/
+.reservation-selection {
+    border: 1px solid $gainsboro;
+    border-right: 0;
+    float: left;
+    width: 20%;
+
+    h3 {
+        background-color: $white-smoke;
+        border-bottom: 1px solid $gainsboro;
+        font-size: .875rem;
+        font-weight: bold;
+        line-height: 18px;
+        margin: 0;
+        text-align: center;
+    }
+
+    p {
+        font-size: .875rem;
+        padding: 1ex;
+        text-align: center;
+    }
+}
+
+.fc-view-container {
+    display: inline-block;
+    width: 80%;
 }

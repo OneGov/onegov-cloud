@@ -238,7 +238,7 @@ def get_fullcalendar_asset():
     yield 'moment.de.js'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
-    yield 'reservationcalendar.js'
+    yield 'reservationcalendar.jsx'
     yield 'reservationcalendar_custom.js'
 
 
@@ -288,6 +288,7 @@ def get_dropzone_asset():
 @TownApp.webasset('common')
 def get_common_asset():
     yield 'jquery.datetimepicker.css'
+    yield 'locale.js'
     yield 'modernizr.js'
     yield 'jquery.js'
     yield 'fastclick.js'
