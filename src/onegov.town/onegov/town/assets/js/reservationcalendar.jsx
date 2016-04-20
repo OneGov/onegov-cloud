@@ -232,13 +232,14 @@ rc.showActionsPopup = function(calendar, element, event) {
     rc.showPopup(calendar, element, $(event.actions.join('')));
 };
 
-rc.showPopup = function(calendar, element, content, options) {
-    $(element).addClass('has-popup');
+rc.showErrorPopup = function(calendar, message) {
+    rc.showPopup(calendar, calendar.find('.fc-view'), message, 'top', ['error']);
+};
 
-    var defaultPopupOptions = {
+rc.showPopup = function(calendar, element, content, position, extraClasses) {
+
+    var options = {
         autoopen: true,
-        horizontal: 'right',
-        offsetleft: -10,
         tooltipanchor: element,
         type: 'tooltip',
         onopen: function() {
@@ -249,13 +250,35 @@ rc.showPopup = function(calendar, element, content, options) {
         }
     };
 
-    $('<div class="popup" />').append(content).popup(
-        $.extend(true, defaultPopupOptions, options || {})
-    );
+    switch (position || 'right') {
+        case 'top':
+            options.horizontal = 'center';
+            options.vertical = 'top';
+            options.extraClasses = _.union(['top'], extraClasses || []);
+            options.offsettop = -13;
+            break;
+        case 'right':
+            options.horizontal = 'right';
+            options.vertical = 'middle';
+            options.extraClasses = _.union(['right'], extraClasses || []);
+            options.offsetleft = -10;
+            break;
+        default:
+            throw Error("Unknown position: " + position);
+    }
+
+    $('<div class="popup" />').append(content).popup(options);
 };
 
 rc.onPopupOpen = function(calendar) {
     var popup = $(this);
+
+    var extraClasses = popup.data('popupoptions').extraClasses;
+
+    _.each(extraClasses, function(className) {
+        popup.addClass(className);
+    });
+
     var links = popup.find('a');
 
     // hookup all links with intercool
@@ -339,7 +362,8 @@ rc.setupReservationSelect = function(fcOptions) {
 
         calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
 
-        calendar.on('rc-reservation-error', function() {
+        calendar.on('rc-reservation-error', function(_e, data) {
+            rc.showErrorPopup(calendar, data.message);
         });
 
         calendar.on('rc-reservations-changed', function() {

@@ -1807,6 +1807,7 @@ button {
             float: none;
 
             button {
+                margin-bottom: 15px;
                 margin-left: 0;
             }
         }
@@ -2105,32 +2106,72 @@ button {
         }
     }
 
-    // the arrow of the popup (which is currently shown right of the element)
-    // if other arrows are needed add classes for each direction
-    &:after,
-    &:before {
+    &::after,
+    &::before {
         border: solid transparent;
         content: ' ';
         height: 0;
         pointer-events: none;
         position: absolute;
-        right: 100%;
-        top: 50%;
         width: 0;
     }
 
-    &:after {
-        border-color: rgba(213, 213, 213, 0);
-        border-right-color: #fff;
-        border-width: 7px;
-        margin-top: -7px;
+    &.right {
+        &::after,
+        &::before {
+            right: 100%;
+            top: 50%;
+        }
+
+        &::after {
+            border-color: rgba(213, 213, 213, 0);
+            border-right-color: #fff;
+            border-width: 7px;
+            margin-top: -7px;
+        }
+
+        &::before {
+            border-color: rgba(245, 24, 172, 0);
+            border-right-color: $gainsboro;
+            border-width: 8px;
+            margin-top: -8px;
+        }
     }
 
-    &:before {
-        border-color: rgba(245, 24, 172, 0);
-        border-right-color: $gainsboro;
-        border-width: 8px;
-        margin-top: -8px;
+    &.top {
+        &::after,
+        &::before {
+            right: 50%;
+            top: 100%;
+        }
+
+        &::after {
+            border-color: rgba(213, 213, 213, 0);
+            border-top-color: #fff;
+            border-width: 7px;
+        }
+
+        &::before {
+            border-color: rgba(245, 24, 172, 0);
+            border-top-color: $gainsboro;
+            border-width: 8px;
+        }
+    }
+
+    &.error.top {
+        background-color: $alert-color;
+        border-color: $red-dark;
+        color: $white;
+        font-size: .8rem;
+        padding: 6px 14px 9px;
+
+        &::after {
+            border-top-color: $alert-color;
+        }
+
+        &::before {
+            border-top-color: $red-dark;
+        }
     }
 }
 
@@ -2488,7 +2529,7 @@ ul.search-results {
 */
 .reservation-selection {
     float: right;
-    padding: 0 0 0 20px;
+    padding: 0 0 0 15px;
     width: 20%;
 
     p {
