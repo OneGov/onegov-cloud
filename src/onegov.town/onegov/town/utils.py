@@ -242,21 +242,19 @@ class AllocationEventInfo(object):
             yield Link(
                 _("Unavailable"),
                 '#',
-                classes=('new-reservation', 'disabled')
+                classes=('disabled', )
             )
         else:
             yield Link(
                 _("Select"),
                 self.request.link(self.allocation, name='reserve'),
                 request_method='POST',
-                classes=('new-reservation', ),
             )
 
         if self.request.is_logged_in:
             yield Link(
                 _("Edit"),
                 self.request.link(self.allocation, name='bearbeiten'),
-                classes=('edit-link', )
             )
 
             yield Link(
@@ -269,7 +267,6 @@ class AllocationEventInfo(object):
                         'allocation_id': str(self.allocation.id)
                     }
                 )),
-                classes=('RSV-link', )
             )
 
             if self.availability == 100.0:

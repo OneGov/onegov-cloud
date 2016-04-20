@@ -229,7 +229,11 @@ rc.setupAllocationsRefetch = function(calendar) {
 
 // popup handler implementation
 rc.showActionsPopup = function(calendar, element, event) {
-    rc.showPopup(calendar, element, $(event.actions.join('')));
+    var wrapper = $('<div class="reservation-actions">');
+    $('<h3 />').text(locale('Reservation')).appendTo(wrapper);
+    $('<h3 />').text(locale('Allocation')).appendTo(wrapper);
+    $(event.actions.join('')).appendTo(wrapper);
+    rc.showPopup(calendar, element, wrapper);
 };
 
 rc.showErrorPopup = function(calendar, element, message) {

@@ -1,5 +1,7 @@
 var locales = {
     de: {
+        "Allocation": "Einteilung",
+        "Reservation": "Reservation",
         "Reservations": "Reservationen",
         "Select allocations on the left to reserve them": "Wählen Sie die gewünschten Daten links aus",
         "Reserve": "Reservieren",
