@@ -231,7 +231,7 @@ rc.setupAllocationsRefetch = function(calendar) {
 rc.showActionsPopup = function(calendar, element, event) {
     var wrapper = $('<div class="reservation-actions">');
 
-    $('<h3 />').text(locale('Reservation')).appendTo(wrapper);
+    $('<h3 />').text(locale('Add')).appendTo(wrapper);
     var reservation = $('<div class="reservation-form">').appendTo(wrapper);
 
     $('<h3 />').text(locale('Allocation')).appendTo(wrapper);

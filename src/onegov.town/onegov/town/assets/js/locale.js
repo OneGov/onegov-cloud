@@ -1,16 +1,17 @@
 var locales = {
     de: {
         "Allocation": "Einteilung",
-        "Reservation": "Reservation",
+        "Add": "Hinzufügen",
+        "Count": "Anzahl",
         "Dates": "Daten",
-        "Select allocations on the left to reserve them": "Wählen Sie die gewünschten Daten links aus",
-        "Reserve": "Reservieren",
-        "Remove": "Entfernen",
-        "Whole day": "Ganztägig",
-        "Yes": "Ja",
-        "No": "Nein",
         "From": "Von",
-        "Until": "Bis"
+        "No": "Nein",
+        "Remove": "Entfernen",
+        "Reserve": "Reservieren",
+        "Select allocations on the left to reserve them": "Wählen Sie die gewünschten Daten links aus",
+        "Until": "Bis",
+        "Whole day": "Ganztägig",
+        "Yes": "Ja"
     }
 };
 
