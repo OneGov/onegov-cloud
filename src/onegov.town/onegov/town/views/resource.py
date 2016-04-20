@@ -188,6 +188,7 @@ def get_reservations(self, request):
     session = utils.get_libres_session_id(request)
 
     reservations = scheduler.queries.reservations_by_session(session)
+    reservations = reservations.filter(Reservation.resource == self.id)
     reservations = reservations.order_by(Reservation.start)
     reservations = reservations.all()
 
