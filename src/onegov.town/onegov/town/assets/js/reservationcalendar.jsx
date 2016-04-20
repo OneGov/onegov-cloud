@@ -208,7 +208,6 @@ $.fn.reservationCalendar = function(options) {
 
 // handles clicks on events
 rc.setupEventPopups = function(event, element, view) {
-
     $(element).click(function() {
         var calendar = $(view.el.closest('.fc'));
         rc.showActionsPopup(calendar, element, event);
@@ -233,10 +232,10 @@ rc.showActionsPopup = function(calendar, element, event) {
     rc.showPopup(calendar, element, $(event.actions.join('')));
 };
 
-rc.showPopup = function(calendar, element, content) {
+rc.showPopup = function(calendar, element, content, options) {
     $(element).addClass('has-popup');
 
-    $('<div class="popup" />').append(content).popup({
+    var defaultPopupOptions = {
         autoopen: true,
         horizontal: 'right',
         offsetleft: -10,
@@ -248,7 +247,11 @@ rc.showPopup = function(calendar, element, content) {
         onclose: function() {
             $(element).removeClass('has-popup');
         }
-    });
+    };
+
+    $('<div class="popup" />').append(content).popup(
+        $.extend(true, defaultPopupOptions, options || {})
+    );
 };
 
 rc.onPopupOpen = function(calendar) {
