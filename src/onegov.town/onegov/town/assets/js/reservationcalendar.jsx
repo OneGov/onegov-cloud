@@ -209,7 +209,7 @@ $.fn.reservationCalendar = function(options) {
 // handles clicks on events
 rc.setupEventPopups = function(event, element, _view) {
     $(element).click(function() {
-        rc.spawnPopup(event, element);
+        rc.showActionsPopup(element, event);
     });
 };
 
@@ -227,53 +227,51 @@ rc.setupAllocationsRefetch = function(calendar) {
 };
 
 // popup handler implementation
-rc.spawnPopup = function(event, element) {
+rc.showActionsPopup = function(element, event) {
+    rc.showPopup(element, $(event.actions.join('')));
+};
+
+rc.showPopup = function(element, content) {
     $(element).addClass('has-popup');
 
-    var content = $('<div class="popup" />').append($(event.actions.join('')));
-
-    content.popup({
-        'autoopen': true,
-        'blur': true,
-        'horizontal': 'right',
-        'offsetleft': -10,
-        'tooltipanchor': element,
-        'transition': null,
-        'type': 'tooltip',
-        'onopen': function() {
-            var popup = $(this);
-            var links = popup.find('a');
-
-            // hookup all links with intercool
-            links.each(function(_ix, link) {
-                Intercooler.processNodes($(link));
-            });
-
-            // close the popup after any click on a link
-            $(links).on('ic.success', function() {
-                popup.popup('hide');
-            });
-
-            $(links).on('click', function() {
-                popup.popup('hide');
-            });
-
-            // hookup the confirmation dialog
-            var confirm_links = popup.find('a.confirm');
-            confirm_links.confirmation();
-
-            // pass all reservationcalendar links to the window
-            _.each(rc.events, function(eventName) {
-                links.on(eventName, _.debounce(function(data) {
-                    $(window).trigger(eventName, data);
-                }));
-            });
-
-        },
-        'onclose': function() {
+    $('<div class="popup" />').append(content).popup({
+        autoopen: true,
+        horizontal: 'right',
+        offsetleft: -10,
+        tooltipanchor: element,
+        type: 'tooltip',
+        onopen: rc.onPopupOpen,
+        onclose: function() {
             $(element).removeClass('has-popup');
-        },
-        'detach': true
+        }
+    });
+};
+
+rc.onPopupOpen = function() {
+    var popup = $(this);
+    var links = popup.find('a');
+
+    // hookup all links with intercool
+    links.each(function(_ix, link) {
+        Intercooler.processNodes($(link));
+    });
+
+    // close the popup after any click on a link
+    _.each(['ic.success', 'click'], function(eventName) {
+        $(links).on(eventName, _.debounce(function() {
+            popup.popup('hide');
+        }));
+    });
+
+    // hookup the confirmation dialog
+    var confirm_links = popup.find('a.confirm');
+    confirm_links.confirmation();
+
+    // pass all reservationcalendar events to the window
+    _.each(rc.events, function(eventName) {
+        links.on(eventName, _.debounce(function(data) {
+            $(window).trigger(eventName, data);
+        }));
     });
 };
 
