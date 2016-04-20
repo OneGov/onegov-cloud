@@ -276,8 +276,8 @@ rc.onPopupOpen = function(calendar) {
 
     // pass all reservationcalendar events to the window
     _.each(rc.events, function(eventName) {
-        links.on(eventName, _.debounce(function(data) {
-            $(calendar).trigger(eventName, data);
+        links.on(eventName, _.debounce(function(_e, data) {
+            $(calendar).trigger(eventName, [data, calendar]);
         }));
     });
 };
@@ -338,21 +338,18 @@ rc.setupReservationSelect = function(fcOptions) {
             .insertBefore(view);
 
         calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
-        rc.resizeReservationSelection(selection);
-        rc.renderReservationSelection(selection.get(0), calendar, []);
 
-        $(calendar).on('rc-reservation-error', function(_e, _data) {
-
+        calendar.on('rc-reservation-error', function() {
         });
 
-        $(calendar).on('rc-reservations-changed', function() {
+        calendar.on('rc-reservations-changed', function() {
             $.getJSON(fcOptions.reservations, function(reservations) {
                 rc.renderReservationSelection(selection.get(0), calendar, reservations);
             });
         });
 
-        $(calendar).trigger('rc-reservations-changed');
-
+        rc.resizeReservationSelection(selection);
+        calendar.trigger('rc-reservations-changed');
     });
 
     fcOptions.windowResize = function() {
