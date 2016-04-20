@@ -23,13 +23,6 @@
             data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
         ></div>
 
-        <div class="panel" i18n:translate tal:condition="not: request.is_logged_in">
-            Click on any of the blocks in the calendar below to make a reservation.
-        </div>
-        <div class="panel" i18n:translate tal:condition="request.is_logged_in">
-            Select a free time span in the calendar below to create an allocation.
-        </div>
-
         <tal:block
             define="
                 lead None; 
