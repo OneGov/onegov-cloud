@@ -2007,7 +2007,7 @@ button {
     .fc-button {
         @include button(
             $padding: $button-tny,
-            $bg: $primary-color
+            $bg: $smoke
         );
         background-image: none;
         box-shadow: none;
@@ -2017,8 +2017,8 @@ button {
 
         &.fc-state-active,
         &.fc-state-disabled {
-            background: $secondary-color;
-            color: $jet;
+            background: $charcoal;
+            color: $white;
             opacity: 1;
         }
     }

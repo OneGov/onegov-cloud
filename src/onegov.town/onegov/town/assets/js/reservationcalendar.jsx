@@ -554,7 +554,7 @@ ReservationSelection = React.createClass({
         var self = this;
         return (
             <div className="reservation-selection-inner">
-                <h3>{locale("Reservations")}</h3>
+                <h3>{locale("Dates")}</h3>
                 {
                     this.props.reservations.length === 0 &&
                         <p>{locale("Select allocations on the left to reserve them")}</p>
@@ -574,7 +574,7 @@ ReservationSelection = React.createClass({
                             })
                         }</ul>
                 }
-                <a href="#" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button secondary'}>
+                <a href="#" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
                     {locale("Reserve")}
                 </a>
             </div>
@@ -635,7 +635,7 @@ ReservationForm = React.createClass({
                     </div>
                 </div>
 
-                <button className="button secondary">{locale("Okay")}</button>
+                <button className="button">{locale("Okay")}</button>
             </form>
         );
     }
