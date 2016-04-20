@@ -23,6 +23,8 @@
             data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
         ></div>
 
+        <div class="clearfix"></div>
+
         <tal:block
             define="
                 lead None; 
