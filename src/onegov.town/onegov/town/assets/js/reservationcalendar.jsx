@@ -230,9 +230,15 @@ rc.setupAllocationsRefetch = function(calendar) {
 // popup handler implementation
 rc.showActionsPopup = function(calendar, element, event) {
     var wrapper = $('<div class="reservation-actions">');
+
     $('<h3 />').text(locale('Reservation')).appendTo(wrapper);
+    var reservation = $('<div class="reservation-form">').appendTo(wrapper);
+
     $('<h3 />').text(locale('Allocation')).appendTo(wrapper);
     $(event.actions.join('')).appendTo(wrapper);
+
+    ReservationForm.render(reservation.get(0));
+
     rc.showPopup(calendar, element, wrapper);
 };
 
@@ -260,7 +266,7 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
             options.vertical = 'top';
             options.extraClasses = _.union(['top'], extraClasses || []);
             options.offsettop = -5;
-            options.offsetleft = 15; // for some reason the popup's a bit off center
+            options.offsetleft = 20; // for some reason the popup's a bit off center
             break;
         case 'right':
             options.horizontal = 'right';
@@ -585,4 +591,56 @@ ReservationSelection.resize = function(selection) {
     var view = element.parent().find('.fc-view-container');
 
     element.css('min-height', view.height());
+};
+
+/*
+    Allows to fine-adjust the reservation before adding it.
+*/
+ReservationForm = React.createClass({
+    render: function() {
+        return (
+            <form>
+                <div className="field">
+                    <span className="label-text">{locale("Whole day")}</span>
+
+                    <input id="reserve-whole-day-yes"
+                        name="reserve-whole-day"
+                        type="radio"
+                        value="yes"
+                    />
+                    <label htmlFor="reserve-whole-day-yes">{locale("Yes")}</label>
+                    <input id="reserve-whole-day-no"
+                        name="reserve-whole-day"
+                        type="radio"
+                        value="no"
+                    />
+                    <label htmlFor="reserve-whole-day-no">{locale("No")}</label>
+                </div>
+
+                <div className="field split">
+                    <div>
+                        <label htmlFor="start">{locale("From")}</label>
+                        <input name="start" type="time" size="4"/>
+                    </div>
+                    <div>
+                        <label htmlFor="end">{locale("Until")}</label>
+                        <input name="end" type="time" size="4"/>
+                    </div>
+                </div>
+
+                <div className="field">
+                    <div>
+                        <label htmlFor="count">{locale("Count")}</label>
+                        <input name="count" type="number" size="4"/>
+                    </div>
+                </div>
+
+                <button className="button secondary">{locale("Okay")}</button>
+            </form>
+        );
+    }
+});
+
+ReservationForm.render = function(element) {
+    React.render(<ReservationForm />, element);
 };

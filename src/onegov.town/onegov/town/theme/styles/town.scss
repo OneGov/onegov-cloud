@@ -749,7 +749,70 @@ $send-link-icon: '\f1d9';
     h3 {
         font-size: .875rem;
         font-weight: bold;
-        margin: 0 0 4px;
+    }
+
+    form {
+        margin-bottom: .5rem;
+    }
+
+    input {
+        margin-bottom: 0;
+    }
+
+    input[type="time"],
+    input[type="text"] {
+        height: 2rem;
+    }
+
+    input[type="radio"] {
+        font-size: .875rem;
+    }
+
+    .label-text {
+        color: $form-label-font-color;
+        display: inline-block;
+        font-size: .875rem;
+        margin-right: 1rem;
+    }
+
+    label {
+        margin-right: .75rem;
+    }
+
+    button {
+        margin: 10px 0;
+        width: 100%;
+    }
+
+    .field {
+        margin-bottom: .25rem;
+
+        label:last-child {
+            margin-right: 0;
+        }
+    }
+
+    .split > div {
+        display: inline-block;
+        position: relative;
+        width: 50%;
+
+        &:first-child {
+            padding-right: 10px;
+
+            &::after {
+                color: $form-label-font-color;
+                content: '-';
+                font-size: .875rem;
+                position: absolute;
+                right: -4px;
+                top: 1.5rem;
+            }
+        }
+
+        &:last-child {
+            padding-left: 10px;
+        }
     }
 }
 
@@ -2084,10 +2147,10 @@ button {
 */
 .popup {
     background-color: #fff;
-    border: 1px solid $white-smoke;
+    border: 1px solid $gainsboro;
     border-radius: 5px;
-    box-shadow: 5px 5px 5px rgba(0, 0, 0, .3);
-    padding: 7px 10px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, .3);
+    padding: 9px 18px;
     position: relative;
 
     a {
