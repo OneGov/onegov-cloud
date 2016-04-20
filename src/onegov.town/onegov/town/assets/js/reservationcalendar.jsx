@@ -368,21 +368,20 @@ rc.setupReservationSelect = function(fcOptions) {
 
         calendar.on('rc-reservations-changed', function() {
             $.getJSON(fcOptions.reservations, function(reservations) {
-                rc.renderReservationSelection(selection.get(0), calendar, reservations);
+                ReservationSelection.render(selection.get(0), calendar, reservations);
             });
         });
 
-        rc.resizeReservationSelection(selection);
+        ReservationSelection.resize(selection);
         calendar.trigger('rc-reservations-changed');
     });
 
-    fcOptions.windowResize = function() {
-        rc.resizeReservationSelection(selection);
+    var resize = function() {
+        ReservationSelection.resize(selection);
     };
 
-    fcOptions.viewRenderers.push(function() {
-        rc.resizeReservationSelection(selection);
-    });
+    fcOptions.windowResize = resize;
+    fcOptions.viewRenderers.push(resize);
 };
 
 // renders the occupied partitions on an event
@@ -526,6 +525,9 @@ rc.sumPartitions = function(partitions) {
     }, 0);
 };
 
+/*
+    Shows the list of reservations to be confirmed.
+*/
 ReservationSelection = React.createClass({
     handleClick: function(reservation) {
         var calendar = $(this.props.calendar);
@@ -570,11 +572,11 @@ ReservationSelection = React.createClass({
     }
 });
 
-rc.renderReservationSelection = function(element, calendar, reservations) {
+ReservationSelection.render = function(element, calendar, reservations) {
     React.render(<ReservationSelection calendar={calendar} reservations={reservations} />, element);
 };
 
-rc.resizeReservationSelection = function(selection) {
+ReservationSelection.resize = function(selection) {
     var element = $(selection);
     var view = element.parent().find('.fc-view-container');
 
