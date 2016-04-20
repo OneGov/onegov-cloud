@@ -232,8 +232,8 @@ rc.showActionsPopup = function(calendar, element, event) {
     rc.showPopup(calendar, element, $(event.actions.join('')));
 };
 
-rc.showErrorPopup = function(calendar, message) {
-    rc.showPopup(calendar, calendar.find('.fc-view'), message, 'top', ['error']);
+rc.showErrorPopup = function(calendar, element, message) {
+    rc.showPopup(calendar, element, message, 'top', ['error']);
 };
 
 rc.showPopup = function(calendar, element, content, position, extraClasses) {
@@ -255,7 +255,8 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
             options.horizontal = 'center';
             options.vertical = 'top';
             options.extraClasses = _.union(['top'], extraClasses || []);
-            options.offsettop = -13;
+            options.offsettop = -5;
+            options.offsetleft = 15; // for some reason the popup's a bit off center
             break;
         case 'right':
             options.horizontal = 'right';
@@ -272,10 +273,9 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
 
 rc.onPopupOpen = function(calendar) {
     var popup = $(this);
+    var options = popup.data('popupoptions');
 
-    var extraClasses = popup.data('popupoptions').extraClasses;
-
-    _.each(extraClasses, function(className) {
+    _.each(options.extraClasses, function(className) {
         popup.addClass(className);
     });
 
@@ -300,7 +300,7 @@ rc.onPopupOpen = function(calendar) {
     // pass all reservationcalendar events to the window
     _.each(rc.events, function(eventName) {
         links.on(eventName, _.debounce(function(_e, data) {
-            $(calendar).trigger(eventName, [data, calendar]);
+            $(calendar).trigger(eventName, [data, calendar, options.tooltipanchor]);
         }));
     });
 };
@@ -362,8 +362,8 @@ rc.setupReservationSelect = function(fcOptions) {
 
         calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
 
-        calendar.on('rc-reservation-error', function(_e, data) {
-            rc.showErrorPopup(calendar, data.message);
+        calendar.on('rc-reservation-error', function(_e, data, _calendar, target) {
+            rc.showErrorPopup(calendar, target || calendar.find('.fc-view'), data.message);
         });
 
         calendar.on('rc-reservations-changed', function() {
