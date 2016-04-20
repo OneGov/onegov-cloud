@@ -207,9 +207,11 @@ $.fn.reservationCalendar = function(options) {
 };
 
 // handles clicks on events
-rc.setupEventPopups = function(event, element, _view) {
+rc.setupEventPopups = function(event, element, view) {
+
     $(element).click(function() {
-        rc.showActionsPopup(element, event);
+        var calendar = $(view.el.closest('.fc'));
+        rc.showActionsPopup(calendar, element, event);
     });
 };
 
@@ -227,11 +229,11 @@ rc.setupAllocationsRefetch = function(calendar) {
 };
 
 // popup handler implementation
-rc.showActionsPopup = function(element, event) {
-    rc.showPopup(element, $(event.actions.join('')));
+rc.showActionsPopup = function(calendar, element, event) {
+    rc.showPopup(calendar, element, $(event.actions.join('')));
 };
 
-rc.showPopup = function(element, content) {
+rc.showPopup = function(calendar, element, content) {
     $(element).addClass('has-popup');
 
     $('<div class="popup" />').append(content).popup({
@@ -240,14 +242,16 @@ rc.showPopup = function(element, content) {
         offsetleft: -10,
         tooltipanchor: element,
         type: 'tooltip',
-        onopen: rc.onPopupOpen,
+        onopen: function() {
+            rc.onPopupOpen.call(this, calendar);
+        },
         onclose: function() {
             $(element).removeClass('has-popup');
         }
     });
 };
 
-rc.onPopupOpen = function() {
+rc.onPopupOpen = function(calendar) {
     var popup = $(this);
     var links = popup.find('a');
 
@@ -270,7 +274,7 @@ rc.onPopupOpen = function() {
     // pass all reservationcalendar events to the window
     _.each(rc.events, function(eventName) {
         links.on(eventName, _.debounce(function(data) {
-            $(window).trigger(eventName, data);
+            $(calendar).trigger(eventName, data);
         }));
     });
 };
@@ -332,7 +336,20 @@ rc.setupReservationSelect = function(fcOptions) {
 
         calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
         rc.resizeReservationSelection(selection);
-        rc.renderReservationSelection(selection.get(0), []);
+        rc.renderReservationSelection(selection.get(0), calendar, []);
+
+        $(calendar).on('rc-reservation-error', function(_e, _data) {
+
+        });
+
+        $(calendar).on('rc-reservations-changed', function() {
+            $.getJSON(fcOptions.reservations, function(reservations) {
+                rc.renderReservationSelection(selection.get(0), calendar, reservations);
+            });
+        });
+
+        $(calendar).trigger('rc-reservations-changed');
+
     });
 
     fcOptions.windowResize = function() {
@@ -342,17 +359,6 @@ rc.setupReservationSelect = function(fcOptions) {
     fcOptions.viewRenderers.push(function() {
         rc.resizeReservationSelection(selection);
     });
-
-    $(window).on('rc-reservation-error', function() {
-    });
-
-    $(window).on('rc-reservations-changed', function() {
-        $.getJSON(fcOptions.reservations, function(reservations) {
-            rc.renderReservationSelection(selection.get(0), reservations);
-        });
-    });
-
-    $(window).trigger('rc-reservations-changed');
 };
 
 // renders the occupied partitions on an event
@@ -498,11 +504,13 @@ rc.sumPartitions = function(partitions) {
 
 ReservationSelection = React.createClass({
     handleClick: function(reservation) {
+        var calendar = $(this.props.calendar);
+
         $.ajax({
             url: reservation.delete,
             type: 'DELETE',
             success: function() {
-                $(window).trigger('rc-reservations-changed');
+                calendar.trigger('rc-reservations-changed');
             }
         });
     },
@@ -538,8 +546,8 @@ ReservationSelection = React.createClass({
     }
 });
 
-rc.renderReservationSelection = function(element, reservations) {
-    React.render(<ReservationSelection reservations={reservations} />, element);
+rc.renderReservationSelection = function(element, calendar, reservations) {
+    React.render(<ReservationSelection calendar={calendar} reservations={reservations} />, element);
 };
 
 rc.resizeReservationSelection = function(selection) {
