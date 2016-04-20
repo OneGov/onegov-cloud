@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-04-15 14:11+0200\n"
+"POT-Creation-Date: 2016-04-20 09:28+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -258,8 +258,8 @@ msgstr "${num}/${max} Verfügbar"
 msgid "Unavailable"
 msgstr "Besetzt"
 
-msgid "Reserve"
-msgstr "Reservieren"
+msgid "Select"
+msgstr "Auswählen"
 
 msgid "Available"
 msgstr "Verfügbar"
@@ -1461,6 +1461,9 @@ msgstr "Bestätigen Sie Ihre Reservation"
 
 msgid "The reservation was rejected"
 msgstr "Die Reservation wurde abgesagt"
+
+msgid "Reserve"
+msgstr "Reservieren"
 
 msgid "Edit Reservation"
 msgstr "Reservation bearbeiten"
