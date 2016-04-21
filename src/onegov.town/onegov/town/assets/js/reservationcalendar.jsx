@@ -69,6 +69,16 @@ rc.events = [
     'rc-reservations-changed'
 ];
 
+rc.passEventsToCalendar = function(calendar, target, source) {
+    var cal = $(calendar);
+
+    _.each(rc.events, function(eventName) {
+        target.on(eventName, _.debounce(function(_e, data) {
+            cal.trigger(eventName, [data, calendar, source]);
+        }));
+    });
+};
+
 rc.getFullcalendarOptions = function(options) {
     var rcOptions = $.extend(true, defaultOptions, options);
 
@@ -227,6 +237,26 @@ rc.setupAllocationsRefetch = function(calendar) {
     });
 };
 
+// sends requests through intercooler
+rc.request = function(calendar, url, attribute) {
+    var el = $('<a />')
+        .attr(attribute, url)
+        .css('display', 'none')
+        .appendTo(calendar);
+
+    Intercooler.processNodes(el);
+
+    el.click();
+};
+
+rc.delete = function(calendar, url) {
+    rc.request(calendar, url, 'ic-delete-from');
+};
+
+rc.post = function(calendar, url) {
+    rc.request(calendar, url, 'ic-post-to');
+};
+
 // popup handler implementation
 rc.showActionsPopup = function(calendar, element, event) {
     var wrapper = $('<div class="reservation-actions">');
@@ -237,7 +267,15 @@ rc.showActionsPopup = function(calendar, element, event) {
         $(event.actions.join('')).appendTo(wrapper);
     }
 
-    ReservationForm.render(reservation.get(0), event, function() {
+    ReservationForm.render(reservation.get(0), event, function(state) {
+        var url = new Url(event.reserveurl);
+        url.query.start = state.start;
+        url.query.end = state.end;
+        url.query.quota = state.quota;
+        url.query.whole_day = state.wholeDay && '1' || '0';
+
+        rc.post(calendar, url.toString());
+
         $(this).closest('.popup').popup('hide');
     });
 
@@ -311,12 +349,8 @@ rc.onPopupOpen = function(calendar) {
     var confirm_links = popup.find('a.confirm');
     confirm_links.confirmation();
 
-    // pass all reservationcalendar events to the window
-    _.each(rc.events, function(eventName) {
-        links.on(eventName, _.debounce(function(_e, data) {
-            $(calendar).trigger(eventName, [data, calendar, options.tooltipanchor]);
-        }));
-    });
+    // pass all reservationcalendar events to the calendar
+    rc.passEventsToCalendar(calendar, links, options.tooltipanchor);
 };
 
 // setup browser history handling
@@ -377,7 +411,18 @@ rc.setupReservationSelect = function(fcOptions) {
         calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
 
         calendar.on('rc-reservation-error', function(_e, data, _calendar, target) {
-            rc.showErrorPopup(calendar, target || calendar.find('.fc-view'), data.message);
+            var event = calendar.find('.has-popup');
+
+            if (!target) {
+                if (event.length !== 0) {
+                    target = event;
+                } else {
+                    target = calendar.find('.fc-view');
+                }
+            }
+
+            target = target || calendar.find('.has-popup') || calendar.find('.fc-view');
+            rc.showErrorPopup(calendar, target, data.message);
         });
 
         calendar.on('rc-reservations-changed', function() {
@@ -544,15 +589,7 @@ rc.sumPartitions = function(partitions) {
 */
 ReservationSelection = React.createClass({
     handleClick: function(reservation) {
-        var calendar = $(this.props.calendar);
-
-        $.ajax({
-            url: reservation.delete,
-            type: 'DELETE',
-            success: function() {
-                calendar.trigger('rc-reservations-changed');
-            }
-        });
+        rc.delete($(this.props.calendar), reservation.delete);
     },
     render: function() {
         var self = this;

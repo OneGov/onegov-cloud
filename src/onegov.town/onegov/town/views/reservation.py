@@ -2,6 +2,7 @@ import json
 import morepath
 import sedate
 
+from datetime import time
 from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
@@ -120,11 +121,30 @@ def reserve_allocation(self, request):
 
     scheduler = resource.get_scheduler(request.app.libres_context)
 
+    start = request.params.get('start') or '{:%H:%M}'.format(self.start)
+    end = request.params.get('end') or '{:%H:%M}'.format(self.end)
+    quota = int(request.params.get('quota', 1))
+    whole_day = request.params.get('whole_day') == '1'
+
+    if self.partly_available:
+        if self.whole_day and whole_day:
+            start = time(0, 0)
+            end = time(23, 59)
+        else:
+            start = time(*(int(n) for n in start.split(':')))
+            end = time(*(int(n) for n in end.split(':')))
+
+        start, end = sedate.get_date_range(
+            sedate.to_timezone(self.start, self.timezone), start, end
+        )
+    else:
+        start = self.start, self.end
+
     try:
         scheduler.reserve(
             email='0xdeadbeef@example.org',  # will be set later
-            dates=(self.start, self.end),
-            quota=request.params.get('quota', 1),
+            dates=(start, end),
+            quota=quota,
             session_id=utils.get_libres_session_id(request)
         )
     except LibresError as e:
