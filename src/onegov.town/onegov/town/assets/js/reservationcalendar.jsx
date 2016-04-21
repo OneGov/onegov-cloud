@@ -242,9 +242,16 @@ rc.request = function(calendar, url, attribute) {
     var el = $('<a />')
         .attr(attribute, url)
         .css('display', 'none')
-        .appendTo(calendar);
+        .appendTo($('body'));
 
     Intercooler.processNodes(el);
+
+    el.on('complete.ic', function() {
+        el.remove();
+    });
+
+    var source = $(calendar).find('.has-popup');
+    rc.passEventsToCalendar(calendar, el, source);
 
     el.click();
 };
@@ -339,7 +346,7 @@ rc.onPopupOpen = function(calendar) {
     });
 
     // close the popup after any click on a link
-    _.each(['ic.success', 'click'], function(eventName) {
+    _.each(['ic.success', 'mouseup'], function(eventName) {
         $(links).on(eventName, _.debounce(function() {
             popup.popup('hide');
         }));
