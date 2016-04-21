@@ -237,7 +237,9 @@ rc.showActionsPopup = function(calendar, element, event) {
         $(event.actions.join('')).appendTo(wrapper);
     }
 
-    ReservationForm.render(reservation.get(0), event);
+    ReservationForm.render(reservation.get(0), event, function() {
+        $(this).closest('.popup').popup('hide');
+    });
 
     rc.showPopup(calendar, element, wrapper);
 };
@@ -610,6 +612,10 @@ ReservationForm = React.createClass({
         state.wholeDay = e.target.value === 'yes';
         this.setState(state);
     },
+    handleButton: function(e) {
+        this.props.onSubmit.call(this.getDOMNode(), this.state);
+        e.preventDefault();
+    },
     render: function() {
         return (
             <form>
@@ -657,13 +663,13 @@ ReservationForm = React.createClass({
                     </div>
                 )}
 
-                <button className="button">{locale("Add")}</button>
+                <button className="button" onClick={this.handleButton}>{locale("Add")}</button>
             </form>
         );
     }
 });
 
-ReservationForm.render = function(element, event) {
+ReservationForm.render = function(element, event, onSubmit) {
     React.render(
         <ReservationForm
             partlyAvailable={event.partlyAvailable}
@@ -672,6 +678,7 @@ ReservationForm.render = function(element, event) {
             start={event.start}
             end={event.end}
             wholeDay={event.wholeDay}
+            onSubmit={onSubmit}
         />,
     element);
 };
