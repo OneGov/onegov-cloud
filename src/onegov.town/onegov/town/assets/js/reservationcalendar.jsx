@@ -607,16 +607,76 @@ ReservationForm = React.createClass({
             wholeDay: this.props.wholeDay
         };
     },
-    handleChangeWholeDay: function(e) {
-        var state = _.extend({}, this.state.selected);
-        state.wholeDay = e.target.value === 'yes';
+    handleInputChange: function(e) {
+        var state = _.extend({}, this.state);
+        var name = e.target.getAttribute('name');
+
+        switch (name) {
+            case 'reserve-whole-day':
+                state.wholeDay = e.target.value === 'yes';
+                break;
+            case 'start':
+                state.start = e.target.value;
+                break;
+            case 'end':
+                state.end = e.target.value;
+                break;
+            case 'count':
+                state.quota = parseInt(e.target.value, 10);
+                break;
+            default:
+                throw Error("Unknown input element: " + name);
+        }
+
         this.setState(state);
     },
     handleButton: function(e) {
         this.props.onSubmit.call(this.getDOMNode(), this.state);
         e.preventDefault();
     },
+    parseTime: function(date, time) {
+        if (!time.match(/^\d{2}:\d{2}$/)) {
+            return null;
+        }
+
+        var hour = parseInt(time.split(':')[0], 10);
+        var minute = parseInt(time.split(':')[1], 10);
+
+        date.hour(hour);
+        date.minute(minute);
+
+        return date;
+    },
+    isValidRange: function(start, end) {
+
+        // we use 'start' twice because we only care about the date, not the
+        // time (and the end might be on the next day at 00:00)
+        var startdate = this.parseTime(this.props.start.clone(), start);
+        var enddate = this.parseTime(this.props.start.clone(), end);
+
+        if (startdate === null || enddate === null) {
+            return false;
+        }
+
+        return this.props.start <= startdate && startdate < enddate && enddate <= this.props.end;
+    },
+    isValidQuota: function(quota) {
+        return quota > 0 && quota <= this.props.quotaLeft;
+    },
+    isValidState: function() {
+        if (this.props.partlyAvailable) {
+            if (this.props.wholeDay && this.state.wholeDay) {
+                return true;
+            } else {
+                return this.isValidRange(this.state.start, this.state.end);
+            }
+        } else {
+            return this.isValidQuota(this.state.quota);
+        }
+    },
     render: function() {
+        var buttonEnabled = this.isValidState();
+
         return (
             <form>
                 {this.props.partlyAvailable && this.props.wholeDay && (
@@ -628,7 +688,7 @@ ReservationForm = React.createClass({
                             type="radio"
                             value="yes"
                             checked={this.state.wholeDay}
-                            onChange={this.handleChangeWholeDay}
+                            onChange={this.handleInputChange}
                         />
                         <label htmlFor="reserve-whole-day-yes">{locale("Yes")}</label>
                         <input id="reserve-whole-day-no"
@@ -636,7 +696,7 @@ ReservationForm = React.createClass({
                             type="radio"
                             value="no"
                             checked={!this.state.wholeDay}
-                            onChange={this.handleChangeWholeDay}
+                            onChange={this.handleInputChange}
                         />
                         <label htmlFor="reserve-whole-day-no">{locale("No")}</label>
                     </div>
@@ -646,24 +706,35 @@ ReservationForm = React.createClass({
                     <div className="field split">
                         <div>
                             <label htmlFor="start">{locale("From")}</label>
-                            <input name="start" type="time" size="4" defaultValue={this.state.start}/>
+                            <input name="start" type="time" size="4"
+                                defaultValue={this.state.start}
+                                onChange={this.handleInputChange}
+                            />
                         </div>
                         <div>
                             <label htmlFor="end">{locale("Until")}</label>
-                            <input name="end" type="time" size="4" defaultValue={this.state.end}/>
+                            <input name="end" type="time" size="4"
+                                defaultValue={this.state.end}
+                                onChange={this.handleInputChange}
+                            />
                         </div>
                     </div>
                 )}
-                {!this.props.partlyAvailable && this.props.quota > 1 && (
+                {!this.props.partlyAvailable && (
                     <div className="field">
                         <div>
                             <label htmlFor="count">{locale("Count")}</label>
-                            <input name="count" type="number" size="4" defaultValue={this.state.quota}/>
+                            <input name="count" type="number" size="4"
+                                min="1"
+                                max={this.props.quotaLeft}
+                                defaultValue={this.state.quota}
+                                onChange={this.handleInputChange}
+                            />
                         </div>
                     </div>
                 )}
 
-                <button className="button" onClick={this.handleButton}>{locale("Add")}</button>
+                <button className="button" disabled={!buttonEnabled} onClick={this.handleButton}>{locale("Add")}</button>
             </form>
         );
     }
