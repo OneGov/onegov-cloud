@@ -246,20 +246,6 @@ class AllocationEventInfo(object):
 
     @property
     def event_actions(self):
-
-        if self.availability == 0:
-            yield Link(
-                _("Unavailable"),
-                '#',
-                classes=('disabled', )
-            )
-        else:
-            yield Link(
-                _("Select"),
-                self.request.link(self.allocation, name='reserve'),
-                request_method='POST',
-            )
-
         if self.request.is_logged_in:
             yield Link(
                 _("Edit"),

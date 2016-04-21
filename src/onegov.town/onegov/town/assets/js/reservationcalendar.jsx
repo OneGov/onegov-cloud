@@ -230,12 +230,12 @@ rc.setupAllocationsRefetch = function(calendar) {
 // popup handler implementation
 rc.showActionsPopup = function(calendar, element, event) {
     var wrapper = $('<div class="reservation-actions">');
-
-    $('<h3 />').text(locale('Add')).appendTo(wrapper);
     var reservation = $('<div class="reservation-form">').appendTo(wrapper);
 
-    $('<h3 />').text(locale('Allocation')).appendTo(wrapper);
-    $(event.actions.join('')).appendTo(wrapper);
+    if (event.actions.length > 0) {
+        $('<h3 />').text(locale('Allocation')).appendTo(wrapper);
+        $(event.actions.join('')).appendTo(wrapper);
+    }
 
     ReservationForm.render(reservation.get(0), event);
 
@@ -657,7 +657,7 @@ ReservationForm = React.createClass({
                     </div>
                 )}
 
-                <button className="button">{locale("Okay")}</button>
+                <button className="button">{locale("Add")}</button>
             </form>
         );
     }
