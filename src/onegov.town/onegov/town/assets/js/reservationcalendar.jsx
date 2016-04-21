@@ -250,6 +250,8 @@ rc.showErrorPopup = function(calendar, element, message) {
 
 rc.showPopup = function(calendar, element, content, position, extraClasses) {
 
+    $(element).addClass('has-popup');
+
     var options = {
         autoopen: true,
         tooltipanchor: element,
