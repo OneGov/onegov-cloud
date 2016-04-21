@@ -237,7 +237,7 @@ rc.showActionsPopup = function(calendar, element, event) {
     $('<h3 />').text(locale('Allocation')).appendTo(wrapper);
     $(event.actions.join('')).appendTo(wrapper);
 
-    ReservationForm.render(reservation.get(0));
+    ReservationForm.render(reservation.get(0), event);
 
     rc.showPopup(calendar, element, wrapper);
 };
@@ -597,43 +597,65 @@ ReservationSelection.resize = function(selection) {
     Allows to fine-adjust the reservation before adding it.
 */
 ReservationForm = React.createClass({
+    getInitialState: function() {
+        return {
+            start: !this.props.wholeDay && this.props.start.format('HH:mm') || "",
+            end: !this.props.wholeDay && this.props.end.format('HH:mm') || "",
+            quota: 1,
+            wholeDay: this.props.wholeDay
+        };
+    },
+    handleChangeWholeDay: function(e) {
+        var state = _.extend({}, this.state.selected);
+        state.wholeDay = e.target.value === 'yes';
+        this.setState(state);
+    },
     render: function() {
         return (
             <form>
-                <div className="field">
-                    <span className="label-text">{locale("Whole day")}</span>
+                {this.props.partlyAvailable && this.props.wholeDay && (
+                    <div className="field">
+                        <span className="label-text">{locale("Whole day")}</span>
 
-                    <input id="reserve-whole-day-yes"
-                        name="reserve-whole-day"
-                        type="radio"
-                        value="yes"
-                    />
-                    <label htmlFor="reserve-whole-day-yes">{locale("Yes")}</label>
-                    <input id="reserve-whole-day-no"
-                        name="reserve-whole-day"
-                        type="radio"
-                        value="no"
-                    />
-                    <label htmlFor="reserve-whole-day-no">{locale("No")}</label>
-                </div>
+                        <input id="reserve-whole-day-yes"
+                            name="reserve-whole-day"
+                            type="radio"
+                            value="yes"
+                            checked={this.state.wholeDay}
+                            onChange={this.handleChangeWholeDay}
+                        />
+                        <label htmlFor="reserve-whole-day-yes">{locale("Yes")}</label>
+                        <input id="reserve-whole-day-no"
+                            name="reserve-whole-day"
+                            type="radio"
+                            value="no"
+                            checked={!this.state.wholeDay}
+                            onChange={this.handleChangeWholeDay}
+                        />
+                        <label htmlFor="reserve-whole-day-no">{locale("No")}</label>
+                    </div>
+                )}
 
-                <div className="field split">
-                    <div>
-                        <label htmlFor="start">{locale("From")}</label>
-                        <input name="start" type="time" size="4"/>
+                {this.props.partlyAvailable && (!this.props.wholeDay || !this.state.wholeDay) && (
+                    <div className="field split">
+                        <div>
+                            <label htmlFor="start">{locale("From")}</label>
+                            <input name="start" type="time" size="4" defaultValue={this.state.start}/>
+                        </div>
+                        <div>
+                            <label htmlFor="end">{locale("Until")}</label>
+                            <input name="end" type="time" size="4" defaultValue={this.state.end}/>
+                        </div>
                     </div>
-                    <div>
-                        <label htmlFor="end">{locale("Until")}</label>
-                        <input name="end" type="time" size="4"/>
+                )}
+                {!this.props.partlyAvailable && this.props.quota > 1 && (
+                    <div className="field">
+                        <div>
+                            <label htmlFor="count">{locale("Count")}</label>
+                            <input name="count" type="number" size="4" defaultValue={this.state.quota}/>
+                        </div>
                     </div>
-                </div>
-
-                <div className="field">
-                    <div>
-                        <label htmlFor="count">{locale("Count")}</label>
-                        <input name="count" type="number" size="4"/>
-                    </div>
-                </div>
+                )}
 
                 <button className="button">{locale("Okay")}</button>
             </form>
@@ -641,6 +663,15 @@ ReservationForm = React.createClass({
     }
 });
 
-ReservationForm.render = function(element) {
-    React.render(<ReservationForm />, element);
+ReservationForm.render = function(element, event) {
+    React.render(
+        <ReservationForm
+            partlyAvailable={event.partlyAvailable}
+            quota={event.quota}
+            quotaLeft={event.quotaLeft}
+            start={event.start}
+            end={event.end}
+            wholeDay={event.wholeDay}
+        />,
+    element);
 };

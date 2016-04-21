@@ -199,14 +199,23 @@ class AllocationEventInfo(object):
             )
 
     @property
+    def quota(self):
+        return self.allocation.quota
+
+    @property
+    def quota_left(self):
+        return int(self.quota * self.availability / 100)
+
+    @property
     def event_title(self):
         if self.allocation.partly_available:
             available = self.translate(_("${percent}% Available", mapping={
                 'percent': int(self.availability)
             }))
         else:
-            quota = self.allocation.quota
-            quota_left = int(quota * self.availability / 100)
+
+            quota = self.quota
+            quota_left = self.quota_left
 
             if quota == 1:
                 if quota_left:
@@ -297,6 +306,10 @@ class AllocationEventInfo(object):
             'start': self.event_start,
             'end': self.event_end,
             'title': self.event_title,
+            'wholeDay': self.allocation.whole_day,
+            'partlyAvailable': self.allocation.partly_available,
+            'quota': self.allocation.quota,
+            'quotaLeft': self.allocation.quota_left,
             'className': self.event_class,
             'partitions': self.allocation.availability_partitions(),
             'actions': [
