@@ -218,9 +218,12 @@ $.fn.reservationCalendar = function(options) {
 
 // handles clicks on events
 rc.setupEventPopups = function(event, element, view) {
-    $(element).click(function() {
+    $(element).click(function(e) {
         var calendar = $(view.el.closest('.fc'));
+        rc.removeAllPopups();
         rc.showActionsPopup(calendar, element, event);
+        e.preventDefault();
+        return false;
     });
 };
 
@@ -295,7 +298,7 @@ rc.showErrorPopup = function(calendar, element, message) {
 
 rc.showPopup = function(calendar, element, content, position, extraClasses) {
 
-    $(element).addClass('has-popup');
+    $(element.closest('.fc-event')).addClass('has-popup');
 
     var options = {
         autoopen: true,
@@ -305,7 +308,7 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
             rc.onPopupOpen.call(this, calendar);
         },
         onclose: function() {
-            $(element).removeClass('has-popup');
+            $(element.closest('.fc-event')).removeClass('has-popup');
         }
     };
 
@@ -358,6 +361,10 @@ rc.onPopupOpen = function(calendar) {
 
     // pass all reservationcalendar events to the calendar
     rc.passEventsToCalendar(calendar, links, options.tooltipanchor);
+};
+
+rc.removeAllPopups = function() {
+    $('.popup').popup('hide').remove();
 };
 
 // setup browser history handling
@@ -457,9 +464,9 @@ rc.renderPartitions = function(event, element, calendar) {
         return;
     }
 
-    var free = _.template('<div style="height:<%= height %>%;"></div>');
-    var used = _.template('<div style="height:<%= height %>%;" class="calendar-occupied"></div>');
-    var partition_block = _.template('<div style="height:<%= height %>px;"><%= partitions %></div>');
+    var free = _.template('<div style="height:<%= height %>%;" class="partition-free"></div>');
+    var used = _.template('<div style="height:<%= height %>%;" class="partition-occupied"></div>');
+    var partition_block = _.template('<div style="height:<%= height %>px;" class="partitions"><%= partitions %></div>');
 
     // build the individual partitions
     var event_partitions = rc.adjustPartitions(
@@ -488,7 +495,25 @@ rc.renderPartitions = function(event, element, calendar) {
     }
 
     // render the whole block
-    var html = partition_block({height: height, partitions: partitions});
+    var html = $(partition_block({height: height, partitions: partitions}));
+    var offset = 0;
+    var duration = event.end - event.start;
+
+    html.children().each(function(ix, partition) {
+        var reserved = event.partitions[ix][1];
+        var percent = event.partitions[ix][0] / 100;
+
+        if (!reserved) {
+            var subevent = _.clone(event);
+
+            subevent.start = moment(event.start + duration * offset);
+            subevent.end = moment(event.start + duration * (offset + percent));
+            rc.setupEventPopups(subevent, partition, calendar);
+        }
+
+        offset += percent;
+    });
+
     $('.fc-bg', element).wrapInner(html);
 };
 
@@ -646,12 +671,26 @@ ReservationSelection.resize = function(selection) {
 */
 ReservationForm = React.createClass({
     getInitialState: function() {
-        return {
-            start: !this.props.wholeDay && this.props.start.format('HH:mm') || "",
-            end: !this.props.wholeDay && this.props.end.format('HH:mm') || "",
-            quota: 1,
-            wholeDay: this.props.wholeDay
+        var state = {
+            quota: 1
         };
+
+        // if the event is a 100% available and a full day, we pre-select
+        // the whole-day button and empty the times so the user has to enter
+        // a time when he switches
+        if (this.props.wholeDay && this.props.fullyAvailable) {
+            state.start = "";
+            state.end = "";
+            state.wholeDay = true;
+        } else {
+            state.start = this.props.start.format('HH:mm');
+            state.end = this.props.end.format('HH:mm');
+            state.wholeDay = false;
+        }
+
+        state.end = state.end === '00:00' && '24:00' || state.end;
+
+        return state;
     },
     handleInputChange: function(e) {
         var state = _.extend({}, this.state);
@@ -665,7 +704,7 @@ ReservationForm = React.createClass({
                 state.start = e.target.value;
                 break;
             case 'end':
-                state.end = e.target.value;
+                state.end = e.target.value === '00:00' && '24:00' || e.target.value;
                 break;
             case 'count':
                 state.quota = parseInt(e.target.value, 10);
@@ -787,6 +826,9 @@ ReservationForm = React.createClass({
 });
 
 ReservationForm.render = function(element, event, onSubmit) {
+
+    var fullyAvailable = event.partitions.length === 1 && event.partitions[0][1] === false;
+
     React.render(
         <ReservationForm
             partlyAvailable={event.partlyAvailable}
@@ -795,6 +837,7 @@ ReservationForm.render = function(element, event, onSubmit) {
             start={event.start}
             end={event.end}
             wholeDay={event.wholeDay}
+            fullyAvailable={fullyAvailable}
             onSubmit={onSubmit}
         />,
     element);
