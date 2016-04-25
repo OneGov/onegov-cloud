@@ -197,10 +197,4 @@ def get_reservations(self, request):
         for reservation in reservations
     ]
 
-    return [
-        {
-            'date': i.date,
-            'time': i.time,
-            'delete': i.delete_link,
-        } for i in info
-    ]
+    return [i.as_dict() for i in info]

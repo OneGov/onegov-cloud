@@ -151,6 +151,14 @@ class ReservationInfo(object):
 
         return url.as_string()
 
+    def as_dict(self):
+        return {
+            'date': self.date,
+            'time': self.time,
+            'delete': self.delete_link,
+            'quota': self.reservation.quota
+        }
+
 
 class AllocationEventInfo(object):
 

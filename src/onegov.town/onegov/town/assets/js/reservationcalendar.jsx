@@ -281,7 +281,7 @@ rc.showActionsPopup = function(calendar, element, event) {
         var url = new Url(event.reserveurl);
         url.query.start = state.start;
         url.query.end = state.end;
-        url.query.quota = state.quota * 2;
+        url.query.quota = state.quota;
         url.query.whole_day = state.wholeDay && '1' || '0';
 
         rc.post(calendar, url.toString());
@@ -640,8 +640,8 @@ ReservationSelection = React.createClass({
                             _.map(this.props.reservations, function(r, ix) {
                                 var boundClick = self.handleClick.bind(self, r);
                                 return (
-                                    <li key={ix} className={r.className + " reservation"}>
-                                        <span className="reservation-date">{r.date}</span>
+                                    <li key={ix} className="reservation">
+                                        <span className="reservation-date" data-quota={r.quota}>{r.date}</span>
                                         <span className="reservation-time">{r.time}</span>
                                         <a className="delete" onClick={boundClick}>{locale('Remove')}</a>
                                     </li>

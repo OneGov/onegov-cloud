@@ -2658,9 +2658,18 @@ ul.search-results {
         font-weight: bold;
 
         &::before {
-            content: '\f274';
-            font-family: 'FontAwesome';
+            background-color: transparentize($primary-color, .8);
+            border-radius: 50px;
+            color: $primary-color;
+            content: attr(data-quota);
+            display: inline-block;
+            font-size: 12px;
+            height: 15px;
+            line-height: 15px;
             margin-right: 1ex;
+            position: relative;
+            text-align: center;
+            width: 15px;
         }
     }
 
