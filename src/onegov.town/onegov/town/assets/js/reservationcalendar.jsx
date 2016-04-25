@@ -281,7 +281,7 @@ rc.showActionsPopup = function(calendar, element, event) {
         var url = new Url(event.reserveurl);
         url.query.start = state.start;
         url.query.end = state.end;
-        url.query.quota = state.quota;
+        url.query.quota = state.quota * 2;
         url.query.whole_day = state.wholeDay && '1' || '0';
 
         rc.post(calendar, url.toString());
@@ -309,7 +309,9 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
         },
         onclose: function() {
             $(element.closest('.fc-event')).removeClass('has-popup');
-        }
+        },
+        closebutton: true,
+        closebuttonmarkup: '<a href="#" class="close">×</a>'
     };
 
     switch (position || 'right') {

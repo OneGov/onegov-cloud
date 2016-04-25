@@ -2151,7 +2151,7 @@ button {
     border: 1px solid $gainsboro;
     border-radius: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, .3);
-    padding: 9px 18px;
+    padding: 15px 20px;
     position: relative;
 
     a {
@@ -2178,6 +2178,27 @@ button {
                 @include icon($disabled-icon);
                 color: $monsoon;
             }
+        }
+    }
+
+    .close {
+        border-radius: 50px;
+        color: $oil;
+        display: block;
+        font-size: 20px;
+        font-weight: bold;
+        height: 24px;
+        line-height: 17px;
+        opacity: .3;
+        position: absolute;
+        right: 0;
+        text-align: center;
+        top: 2px;
+        width: 24px;
+
+        &:hover {
+            opacity: .7;
+            text-decoration: none;
         }
     }
 
@@ -2238,7 +2259,11 @@ button {
         border-color: $red-dark;
         color: $white;
         font-size: .8rem;
-        padding: 6px 14px 9px;
+        padding: 4px 24px 5px 9px;
+
+        .close {
+            top: 4px;
+        }
 
         &::after {
             border-top-color: $alert-color;
