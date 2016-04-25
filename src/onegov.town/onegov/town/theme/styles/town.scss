@@ -259,6 +259,11 @@ form {
         vertical-align: text-top;
     }
 
+    input.invalid,
+    input.invalid:focus {
+        border-color: $alert-color;
+    }
+
     .redactor-editor {
         @include form-element;
         cursor: text;

@@ -735,18 +735,13 @@ ReservationForm = React.createClass({
 
         return date;
     },
-    isValidRange: function(start, end) {
-
-        // we use 'start' twice because we only care about the date, not the
-        // time (and the end might be on the next day at 00:00)
+    isValidStart: function(start) {
         var startdate = this.parseTime(this.props.start.clone(), start);
+        return startdate !== null && this.props.start <= startdate;
+    },
+    isValidEnd: function(end) {
         var enddate = this.parseTime(this.props.start.clone(), end);
-
-        if (startdate === null || enddate === null) {
-            return false;
-        }
-
-        return this.props.start <= startdate && startdate < enddate && enddate <= this.props.end;
+        return enddate !== null && enddate <= this.props.end;
     },
     isValidQuota: function(quota) {
         return quota > 0 && quota <= this.props.quotaLeft;
@@ -756,7 +751,7 @@ ReservationForm = React.createClass({
             if (this.props.wholeDay && this.state.wholeDay) {
                 return true;
             } else {
-                return this.isValidRange(this.state.start, this.state.end);
+                return this.isValidStart(this.state.start) && this.isValidEnd(this.state.end);
             }
         } else {
             return this.isValidQuota(this.state.quota);
@@ -797,6 +792,7 @@ ReservationForm = React.createClass({
                             <input name="start" type="time" size="4"
                                 defaultValue={this.state.start}
                                 onChange={this.handleInputChange}
+                                className={this.isValidStart(this.state.start) && 'valid' || 'invalid'}
                             />
                         </div>
                         <div>
@@ -804,6 +800,7 @@ ReservationForm = React.createClass({
                             <input name="end" type="time" size="4"
                                 defaultValue={this.state.end}
                                 onChange={this.handleInputChange}
+                                className={this.isValidEnd(this.state.end) && 'valid' || 'invalid'}
                             />
                         </div>
                     </div>
@@ -822,7 +819,7 @@ ReservationForm = React.createClass({
                     </div>
                 )}
 
-                <button className="button" disabled={!buttonEnabled} onClick={this.handleButton}>{locale("Add")}</button>
+                <button className={buttonEnabled && "button" || "button secondary"} disabled={!buttonEnabled} onClick={this.handleButton}>{locale("Add")}</button>
             </form>
         );
     }
