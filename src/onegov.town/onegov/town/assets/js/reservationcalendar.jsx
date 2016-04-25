@@ -95,7 +95,8 @@ rc.getFullcalendarOptions = function(options) {
         afterSetup: [],
         viewRenderers: [],
         eventRenderers: [],
-        reservations: rcOptions.reservations
+        reservations: rcOptions.reservations,
+        reservationform: rcOptions.reservationform
     };
 
     // the reservation calendar type definition
@@ -414,7 +415,7 @@ rc.setupHistory = function(fcOptions) {
     });
 };
 
-// setup the reservation selection on the left
+// setup the reservation selection on the right
 rc.setupReservationSelect = function(fcOptions) {
     var selection = null;
 
@@ -443,7 +444,7 @@ rc.setupReservationSelect = function(fcOptions) {
 
         calendar.on('rc-reservations-changed', function() {
             $.getJSON(fcOptions.reservations, function(reservations) {
-                ReservationSelection.render(selection.get(0), calendar, reservations);
+                ReservationSelection.render(selection.get(0), calendar, reservations, fcOptions.reservationform);
             });
         });
 
@@ -650,7 +651,7 @@ ReservationSelection = React.createClass({
                             })
                         }</ul>
                 }
-                <a href="#" className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
+                <a href={this.props.reservationform} className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
                     {locale("Reserve")}
                 </a>
             </div>
@@ -658,8 +659,8 @@ ReservationSelection = React.createClass({
     }
 });
 
-ReservationSelection.render = function(element, calendar, reservations) {
-    React.render(<ReservationSelection calendar={calendar} reservations={reservations} />, element);
+ReservationSelection.render = function(element, calendar, reservations, reservationform) {
+    React.render(<ReservationSelection calendar={calendar} reservations={reservations} reservationform={reservationform} />, element);
 };
 
 ReservationSelection.resize = function(selection) {

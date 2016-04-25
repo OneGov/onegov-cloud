@@ -2683,6 +2683,27 @@ ul.search-results {
         display: block;
         margin-left: 1.4rem;
     }
+
+    &.large {
+        float: none;
+        padding: 0;
+        width: 100%;
+
+        span {
+            font-size: 1rem;
+        }
+
+        .reservation-date::before {
+            font-size: 1rem;
+            height: 24px;
+            line-height: 24px;
+            width: 24px;
+        }
+
+        .reservation-time {
+            margin-left: 2.3rem;
+        }
+    }
 }
 
 .fc-view-container {

@@ -7,7 +7,7 @@ from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
 from onegov.form import FormCollection, merge_forms
-from onegov.libres import ResourceCollection
+from onegov.libres import Resource, ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.town import TownApp, _, utils
 from onegov.town.elements import Link
@@ -15,101 +15,38 @@ from onegov.town.forms import ReservationForm
 from onegov.town.layout import ReservationLayout
 from onegov.town.mail import send_html_mail
 from sqlalchemy.orm.attributes import flag_modified
-from purl import URL
 from webob import exc
 
 
-def get_reservation_form_class(model, request):
-    if isinstance(model, Allocation):
-        allocation = model
-
-    elif isinstance(model, Reservation):
-        allocation = model._target_allocations().first()
-
+def get_reservation_form_class(resource, request):
+    if resource.definition:
+        return merge_forms(ReservationForm, resource.form_class)
     else:
-        raise NotImplementedError
-
-    allocation_form = ReservationForm.for_allocation(allocation)
-    resource = ResourceCollection(request.app.libres_context).by_id(
-        allocation.resource
-    )
-
-    if resource.form_class:
-        return merge_forms(allocation_form, resource.form_class)
-    else:
-        return allocation_form
+        return ReservationForm
 
 
-def get_submission_link(request, submission, confirm_link):
-    url = URL(request.link(submission))
-    url = url.query_param('return-to', confirm_link)
-    url = url.query_param('title', request.translate(
-        _("Details about the reservation"))
-    )
-    url = url.query_param('edit', 1)
-    url = url.query_param('quiet', 1)
+def assert_anonymous_access_only_temporary(self, request):
+    """ Raises exceptions if the current user is anonymous and no longer
+    should be given access to the reservation models.
 
-    return url.as_string()
+    This could probably be done using morepath's security system, but it would
+    not be quite as straight-forward. This approach is, though we have
+    to manually add this function to all reservation views the anonymous user
+    should be able to access when creating a new reservatin, but not anymore
+    after that.
 
-
-@TownApp.form(model=Allocation, name='reservieren', template='reservation.pt',
-              permission=Public, form=get_reservation_form_class)
-def handle_reserve_allocation(self, request, form):
-    """ Creates a new reservation for the given allocation.
     """
+    if request.is_logged_in:
+        return
 
-    collection = ResourceCollection(request.app.libres_context)
-    resource = collection.by_id(self.resource)
+    if not self.session_id:
+        raise exc.HTTPForbidden()
 
-    if form.submitted(request):
-        start, end = form.get_date_range()
+    if self.status == 'approved':
+        raise exc.HTTPForbidden()
 
-        try:
-            scheduler = resource.get_scheduler(request.app.libres_context)
-            token = scheduler.reserve(
-                email=form.data['email'],
-                dates=(start, end),
-                quota=int(form.data.get('quota', 1)),
-                session_id=utils.get_libres_session_id(request)
-            )
-        except LibresError as e:
-            utils.show_libres_error(e, request)
-        else:
-            # while we re at it, remove all expired sessions
-            resource.remove_expired_reservation_sessions(
-                request.app.libres_context)
-
-            # though it's possible for a token to have multiple reservations,
-            # it is not something that can happen here -> therefore one!
-            reservation = scheduler.reservations_by_token(token).one()
-
-            if resource.definition:
-                forms = FormCollection(request.app.session())
-                submission = forms.submissions.add_external(
-                    form=resource.form_class(),
-                    state='pending',
-                    id=reservation.token
-                )
-                forms.submissions.update(
-                    submission, form, exclude=form.reserved_fields
-                )
-
-            return morepath.redirect(request.link(reservation, 'bestaetigung'))
-
-    layout = ReservationLayout(resource, request)
-    layout.breadcrumbs.append(Link(_("Reserve"), '#'))
-
-    title = _("New reservation for ${title}", mapping={
-        'title': resource.title,
-    })
-
-    return {
-        'layout': layout,
-        'title': title,
-        'form': form,
-        'allocation': self,
-        'button_text': _("Continue")
-    }
+    if self.session_id != utils.get_libres_session_id(request):
+        raise exc.HTTPForbidden()
 
 
 @TownApp.json(model=Allocation, name='reserve', request_method='POST',
@@ -206,82 +143,54 @@ def delete_reservation(self, request):
         }
 
 
-@TownApp.form(model=Reservation, name='bearbeiten', template='reservation.pt',
+@TownApp.form(model=Resource, name='formular', template='reservation_form.pt',
               permission=Public, form=get_reservation_form_class)
-def handle_edit_reservation(self, request, form):
+def handle_reservation_form(self, request, form):
+    """ Asks the user for the form data required to complete one or many
+    reservations on a resource.
 
-    # this view is public, but only for a limited time
-    assert_anonymous_access_only_temporary(self, request)
-
-    collection = ResourceCollection(request.app.libres_context)
-    resource = collection.by_id(self.resource)
-
-    forms = FormCollection(request.app.session())
-    submission = forms.submissions.by_id(self.token)
+    """
+    reservations = self.get_reservations(request)
 
     if form.submitted(request):
-        scheduler = resource.get_scheduler(request.app.libres_context)
-        try:
-            if self.email != form.email.data:
-                scheduler.change_email(self.token, form.email.data)
 
-            start, end = form.get_date_range()
-            scheduler.change_reservation(
-                self.token, self.id, start, end, quota=form.data.get('quota')
+        # update the e-mail data
+        for reservation in reservations:
+            reservation.email = form.email.data
+
+        # while we re at it, remove all expired sessions
+        self.remove_expired_reservation_sessions(request.app.libres_context)
+
+        if self.definition:
+            forms = FormCollection(request.app.session())
+            submission = forms.submissions.add_external(
+                form=self.form_class(),
+                state='pending',
+                id=reservation.token
             )
-        except LibresError as e:
-            utils.show_libres_error(e, request)
-        else:
-            if submission:
-                forms.submissions.update(
-                    submission, form, exclude=form.reserved_fields
-                )
+            forms.submissions.update(
+                submission, form, exclude=form.reserved_fields
+            )
 
-            return morepath.redirect(request.link(self, 'bestaetigung'))
+        return morepath.redirect(request.link(reservation, 'bestaetigung'))
 
-    if submission:
-        form.process(data=submission.data)
+    layout = ReservationLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Reserve"), '#'))
 
-    form.apply_model(self)
-
-    layout = ReservationLayout(resource, request)
-    layout.breadcrumbs.append(Link(_("Edit Reservation"), '#'))
-
-    title = _("Change reservation for ${title}", mapping={
-        'title': resource.title,
+    title = _("New dates for ${title}", mapping={
+        'title': self.title,
     })
 
     return {
         'layout': layout,
         'title': title,
         'form': form,
-        'allocation': self,
+        'reservations': [
+            utils.ReservationInfo(r, request) for r in reservations
+        ],
+        'resource': self,
         'button_text': _("Continue")
     }
-
-
-def assert_anonymous_access_only_temporary(self, request):
-    """ Raises exceptions if the current user is anonymous and no longer
-    should be given access to the reservation models.
-
-    This could probably be done using morepath's security system, but it would
-    not be quite as straight-forward. This approach is, though we have
-    to manually add this function to all reservation views the anonymous user
-    should be able to access when creating a new reservatin, but not anymore
-    after that.
-
-    """
-    if request.is_logged_in:
-        return
-
-    if not self.session_id:
-        raise exc.HTTPForbidden()
-
-    if self.status == 'approved':
-        raise exc.HTTPForbidden()
-
-    if self.session_id != utils.get_libres_session_id(request):
-        raise exc.HTTPForbidden()
 
 
 @TownApp.html(model=Reservation, name='bestaetigung', permission=Public,

@@ -2,7 +2,6 @@ import morepath
 
 from collections import OrderedDict
 from itertools import groupby
-from libres.db.models import Reservation
 from onegov.core.security import Public, Private
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
@@ -181,20 +180,7 @@ def handle_cleanup_allocations(self, request, form):
 
 @TownApp.json(model=Resource, name='reservations', permission=Public)
 def get_reservations(self, request):
-    collection = ResourceCollection(request.app.libres_context)
-    resource = collection.by_id(self.id)
-
-    scheduler = resource.get_scheduler(request.app.libres_context)
-    session = utils.get_libres_session_id(request)
-
-    reservations = scheduler.queries.reservations_by_session(session)
-    reservations = reservations.filter(Reservation.resource == self.id)
-    reservations = reservations.order_by(Reservation.start)
-    reservations = reservations.all()
-
-    info = [
-        utils.ReservationInfo(reservation, request)
-        for reservation in reservations
+    return [
+        utils.ReservationInfo(reservation, request).as_dict() for reservation
+        in self.get_reservations(request)
     ]
-
-    return [i.as_dict() for i in info]

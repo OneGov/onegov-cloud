@@ -10,7 +10,8 @@ var setupReservationCalendar = function(calendar) {
         view: calendar.data('view'),
         date: calendar.data('date'),
         highlights: calendar.data('highlights'),
-        reservations: calendar.data('reservations')
+        reservations: calendar.data('reservations'),
+        reservationform: calendar.data('reservationform')
     });
 };
 

@@ -9,6 +9,7 @@ from onegov.town.models.extensions import (
     CoordinatesExtension
 )
 from onegov.search import ORMSearchable
+from onegov.town import utils
 
 
 class SharedMethods(object):
@@ -46,6 +47,18 @@ class SharedMethods(object):
 
             query.delete('fetch')
             queries.remove_expired_reservation_sessions(expiration_date)
+
+    def get_reservations(self, request):
+        """ Returns the reservations associated with this resource. """
+
+        session = utils.get_libres_session_id(request)
+        scheduler = self.get_scheduler(request.app.libres_context)
+
+        res = scheduler.queries.reservations_by_session(session)
+        res = res.filter(Reservation.resource == self.id)
+        res = res.order_by(Reservation.start)
+
+        return res.all()
 
 
 class SearchableResource(ORMSearchable):
