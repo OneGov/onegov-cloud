@@ -16,6 +16,7 @@ from onegov.town.layout import ReservationLayout
 from onegov.town.mail import send_html_mail
 from sqlalchemy.orm.attributes import flag_modified
 from webob import exc
+from uuid import uuid4
 
 
 def get_reservation_form_class(resource, request):
@@ -166,13 +167,13 @@ def handle_reservation_form(self, request, form):
             submission = forms.submissions.add_external(
                 form=self.form_class(),
                 state='pending',
-                id=reservation.token
+                id=utils.get_libres_session_id(request)
             )
             forms.submissions.update(
                 submission, form, exclude=form.reserved_fields
             )
 
-        return morepath.redirect(request.link(reservation, 'bestaetigung'))
+        return morepath.redirect(request.link(self, 'bestaetigung'))
 
     layout = ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_("Reserve"), '#'))
@@ -193,63 +194,57 @@ def handle_reservation_form(self, request, form):
     }
 
 
-@TownApp.html(model=Reservation, name='bestaetigung', permission=Public,
+@TownApp.html(model=Resource, name='bestaetigung', permission=Public,
               template='reservation_confirmation.pt')
 def confirm_reservation(self, request):
-
-    # this view is public, but only for a limited time
-    assert_anonymous_access_only_temporary(self, request)
-
-    collection = ResourceCollection(request.app.libres_context)
-    resource = collection.by_id(self.resource)
+    reservations = self.get_reservations(request)
 
     forms = FormCollection(request.app.session())
-    submission = forms.submissions.by_id(self.token)
+    submission = forms.submissions.by_id(utils.get_libres_session_id(request))
 
     if submission:
         form = request.get_form(submission.form_class, data=submission.data)
     else:
         form = None
 
-    layout = ReservationLayout(resource, request)
+    layout = ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_("Confirm"), '#'))
 
     return {
         'title': _("Confirm your reservation"),
         'layout': layout,
         'form': form,
-        'resource': resource,
-        'allocation': self._target_allocations().first(),
-        'reservation': self,
+        'resource': self,
+        'reservations': [
+            utils.ReservationInfo(r, request) for r in reservations
+        ],
         'finalize_link': request.link(self, 'abschluss'),
-        'edit_link': request.link(self, 'bearbeiten'),
-        'is_whole_day_reservation': sedate.is_whole_day(
-            self.display_start(),
-            self.display_end(),
-            self.timezone
-        )
+        'edit_link': request.link(self, 'formular'),
     }
 
 
-@TownApp.html(model=Reservation, name='abschluss', permission=Public,
+@TownApp.html(model=Resource, name='abschluss', permission=Public,
               template='layout.pt')
 def finalize_reservation(self, request):
 
-    # this view is public, but only for a limited time
-    assert_anonymous_access_only_temporary(self, request)
-
-    collection = ResourceCollection(request.app.libres_context)
-    resource = collection.by_id(self.resource)
-    scheduler = resource.get_scheduler(request.app.libres_context)
-    session_id = utils.get_libres_session_id(request)
+    scheduler = self.get_scheduler(request.app.libres_context)
+    session = utils.get_libres_session_id(request)
+    reservations = self.get_reservations(request)
 
     try:
-        scheduler.queries.confirm_reservations_for_session(session_id)
-        scheduler.approve_reservations(self.token)
+        scheduler.queries.confirm_reservations_for_session(session)
+        shared_token = uuid4()
+
+        for token in {r.token for r in reservations}:
+            scheduler.approve_reservations(token)
+
+        for reservation in reservations:
+            reservation.token = shared_token
+
     except LibresError as e:
         utils.show_libres_error(e, request)
 
-        layout = ReservationLayout(resource, request)
+        layout = ReservationLayout(self, request)
         layout.breadcrumbs.append(Link(_("Error"), '#'))
 
         return {
@@ -258,21 +253,22 @@ def finalize_reservation(self, request):
         }
     else:
         forms = FormCollection(request.app.session())
-        submission = forms.submissions.by_id(self.token)
+        submission = forms.submissions.by_id(session)
 
         if submission:
+            submission.id = shared_token
             forms.submissions.complete_submission(submission)
 
         with forms.session.no_autoflush:
             ticket = TicketCollection(request.app.session()).open_ticket(
-                handler_code='RSV', handler_id=self.token.hex
+                handler_code='RSV', handler_id=shared_token
             )
 
         send_html_mail(
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("A ticket has been opened"),
-            receivers=(self.email, ),
+            receivers=(reservations[0].email, ),
             content={
                 'model': ticket
             }
