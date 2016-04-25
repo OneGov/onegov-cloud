@@ -48,7 +48,7 @@ class SharedMethods(object):
             query.delete('fetch')
             queries.remove_expired_reservation_sessions(expiration_date)
 
-    def get_reservations(self, request):
+    def get_reservations(self, request, status='pending'):
         """ Returns the reservations associated with this resource. """
 
         session = utils.get_libres_session_id(request)
@@ -56,6 +56,7 @@ class SharedMethods(object):
 
         res = scheduler.queries.reservations_by_session(session)
         res = res.filter(Reservation.resource == self.id)
+        res = res.filter(Reservation.status == status)
         res = res.order_by(Reservation.start)
 
         return res.all()

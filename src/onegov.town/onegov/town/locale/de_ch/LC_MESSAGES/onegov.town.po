@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-04-20 09:28+0200\n"
+"POT-Creation-Date: 2016-04-25 15:15+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -255,14 +255,11 @@ msgstr "${percent}% Verfügbar"
 msgid "${num}/${max} Available"
 msgstr "${num}/${max} Verfügbar"
 
-msgid "Unavailable"
-msgstr "Besetzt"
-
-msgid "Select"
-msgstr "Auswählen"
-
 msgid "Available"
 msgstr "Verfügbar"
+
+msgid "Unavailable"
+msgstr "Besetzt"
 
 msgid ""
 "This allocation can't be deleted because there are existing reservations "
@@ -496,9 +493,6 @@ msgstr "Notizen"
 
 msgid "Public extra information about this person"
 msgstr "Öffentliche Extra Informationen zu dieser Person"
-
-msgid "Quota"
-msgstr "Anzahl"
 
 msgid "Email Address"
 msgstr "E-Mail Adresse"
@@ -925,6 +919,9 @@ msgstr "Vorherige Seite"
 msgid "Next Page"
 msgstr "Nächste Seite"
 
+msgid "Quota"
+msgstr "Anzahl"
+
 msgid "State"
 msgstr "Status"
 
@@ -1181,15 +1178,11 @@ msgstr "Zeitraum"
 msgid "The whole day"
 msgstr "Den ganzen Tag"
 
-msgid "Click on any of the blocks in the calendar below to make a reservation."
-msgstr ""
-"Klicken Sie auf einen der Blöcke im Kalender um eine Reservation zu "
-"erstellen."
+msgid "No dates found, please select dates in the calendar first"
+msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
 
-msgid "Select a free time span in the calendar below to create an allocation."
-msgstr ""
-"Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu "
-"machen."
+msgid "Go to calendar"
+msgstr "Zum Kalender"
 
 msgid "Further Information"
 msgstr "Weitere Informationen"
@@ -1446,12 +1439,8 @@ msgid "Added a new person"
 msgstr "Eine neue Person wurde hinzugefügt"
 
 #, python-format
-msgid "New reservation for ${title}"
-msgstr "Neue Reservation für ${title}"
-
-#, python-format
-msgid "Change reservation for ${title}"
-msgstr "Reservation für ${title} ändern"
+msgid "New dates for ${title}"
+msgstr "Neue Termine für ${title}"
 
 msgid "Continue"
 msgstr "Weiter"
@@ -1464,9 +1453,6 @@ msgstr "Die Reservation wurde abgesagt"
 
 msgid "Reserve"
 msgstr "Reservieren"
-
-msgid "Edit Reservation"
-msgstr "Reservation bearbeiten"
 
 msgid "Confirm"
 msgstr "Bestätigen"
