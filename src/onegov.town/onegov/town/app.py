@@ -304,4 +304,5 @@ def get_common_asset():
     yield 'jquery.mousewheel.js'
     yield 'jquery.popupoverlay.js'
     yield 'videoframe.js'
+    yield 'datetimepicker.js'
     yield 'common.js'

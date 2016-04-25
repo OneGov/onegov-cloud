@@ -93,6 +93,7 @@ class AllocationForm(Form, AllocationFormHelpers):
         validators=[InputRequired()],
         fieldset=_("Date")
     )
+
     end = DateField(
         label=_("End"),
         validators=[InputRequired()],

@@ -25,7 +25,6 @@ var datetimepicker_i18n = {
     }
 };
 
-
 var convert_date = function(value, from_format, to_format) {
     if (value) {
         var as_date = Date.parseDate(value, from_format);
@@ -47,7 +46,7 @@ var get_locale = function() {
 
 // load the datetimepicker for date inputs if the browser does not support it
 if (!Modernizr.inputtypes.date) {
-    var locale = get_locale();
+    var _locale = get_locale();
 
     $('input[type=date]').each(function() {
         var input = $(this);
@@ -90,10 +89,10 @@ if (!Modernizr.inputtypes.date) {
             allowBlank: true,
             lazyInit: false,
             timepicker: false,
-            dayOfWeekStart: datetimepicker_i18n[locale].dayOfWeekStart,
-            format: datetimepicker_i18n[locale].format,
-            lang: datetimepicker_i18n[locale].lang,
-            onShow: function (current_time, $input) {
+            dayOfWeekStart: datetimepicker_i18n[_locale].dayOfWeekStart,
+            format: datetimepicker_i18n[_locale].format,
+            lang: datetimepicker_i18n[_locale].lang,
+            onShow: function(_current_time, $input) {
                 this.setOptions({
                     value: $input.val()
                 });
@@ -117,13 +116,13 @@ if (!Modernizr.inputtypes.date) {
         // clicking on the button
         input.unbind();
 
-        input.attr('placeholder', datetimepicker_i18n[locale].placeholder);
-        input.val(convert_date(input.val(), 'Y-m-d', datetimepicker_i18n[locale].format));
+        input.attr('placeholder', datetimepicker_i18n[_locale].placeholder);
+        input.val(convert_date(input.val(), 'Y-m-d', datetimepicker_i18n[_locale].format));
     });
 
-    $('form').submit(function(event) {
+    $('form').submit(function() {
         $(this).find('input[type=date]').each(function() {
-            $(this).val(convert_date($(this).val(), datetimepicker_i18n[locale].format, 'Y-m-d'));
+            $(this).val(convert_date($(this).val(), datetimepicker_i18n[_locale].format, 'Y-m-d'));
             return true;
         });
         return true;
