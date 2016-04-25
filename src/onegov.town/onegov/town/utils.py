@@ -128,7 +128,7 @@ class ReservationInfo(object):
 
     @property
     def date(self):
-        return '{:%d.%m.%Y}'.format(self.reservation.display_start())
+        return self.reservation.display_start().isoformat()
 
     @property
     def time(self):

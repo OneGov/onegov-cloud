@@ -20,3 +20,5 @@ var language = document.documentElement.getAttribute("lang").split('-')[0] || "e
 window.locale = function(text) {
     return locales[language] && locales[language][text] || text;
 };
+
+window.locale.language = language;

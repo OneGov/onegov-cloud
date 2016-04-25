@@ -639,9 +639,10 @@ ReservationSelection = React.createClass({
                         <ul>{
                             _.map(this.props.reservations, function(r, ix) {
                                 var boundClick = self.handleClick.bind(self, r);
+                                var date = moment(r.date).locale(window.locale.language);
                                 return (
                                     <li key={ix} className="reservation">
-                                        <span className="reservation-date" data-quota={r.quota}>{r.date}</span>
+                                        <span className="reservation-date" data-quota={r.quota}>{date.format('ddd LL')}</span>
                                         <span className="reservation-time">{r.time}</span>
                                         <a className="delete" onClick={boundClick}>{locale('Remove')}</a>
                                     </li>
