@@ -29,7 +29,7 @@
                     </div>
                 </div>
 
-                <div class="field-display">
+                <div tal:condition="reservations" class="field-display">
                     <div class="field-display-block">
                         <div class="field-display-label" i18n:translate>E-Mail</div>
                         <div class="field-display-data">${reservations[0].reservation.email}</div>

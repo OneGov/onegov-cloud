@@ -10,6 +10,7 @@ from onegov.town.models.extensions import (
 )
 from onegov.search import ORMSearchable
 from onegov.town import utils
+from uuid import uuid5
 
 
 class SharedMethods(object):
@@ -48,8 +49,11 @@ class SharedMethods(object):
             query.delete('fetch')
             queries.remove_expired_reservation_sessions(expiration_date)
 
-    def get_reservations(self, request, status='pending'):
-        """ Returns the reservations associated with this resource. """
+    def request_bound_reservations(self, request, status='pending'):
+        """ Returns the reservations associated with this resource and the
+        current user.
+
+        """
 
         session = utils.get_libres_session_id(request)
         scheduler = self.get_scheduler(request.app.libres_context)
@@ -59,7 +63,13 @@ class SharedMethods(object):
         res = res.filter(Reservation.status == status)
         res = res.order_by(Reservation.start)
 
-        return res.all()
+        return res
+
+    def request_bound_submission_id(self, request):
+        """ Returns the submission id for request and the current resouce. """
+        session = utils.get_libres_session_id(request)
+
+        return uuid5(self.id, session.hex)
 
 
 class SearchableResource(ORMSearchable):

@@ -151,29 +151,48 @@ def handle_reservation_form(self, request, form):
     reservations on a resource.
 
     """
-    reservations = self.get_reservations(request)
+    reservations = self.request_bound_reservations(request)
+    all_reservations = reservations.all()
+    forms = FormCollection(request.app.session())
+
+    session = utils.get_libres_session_id(request)
+    submission = forms.submissions.by_id(
+        self.request_bound_submission_id(request))
 
     if form.submitted(request):
 
         # update the e-mail data
-        for reservation in reservations:
-            reservation.email = form.email.data
+        reservations.order_by(False).update(
+            {Reservation.email: form.email.data}
+        )
 
         # while we re at it, remove all expired sessions
         self.remove_expired_reservation_sessions(request.app.libres_context)
 
-        if self.definition:
-            forms = FormCollection(request.app.session())
+        if self.definition and not submission:
             submission = forms.submissions.add_external(
                 form=self.form_class(),
                 state='pending',
-                id=utils.get_libres_session_id(request)
+                id=session
             )
+
+        if submission:
             forms.submissions.update(
                 submission, form, exclude=form.reserved_fields
             )
 
         return morepath.redirect(request.link(self, 'bestaetigung'))
+    else:
+        data = {}
+
+        if all_reservations[0].email != '0xdeadbeef@example.org':
+            data['email'] = all_reservations[0].email
+
+        submission = forms.submissions.by_id(session)
+        if submission:
+            data.update(submission.data)
+
+        form.process(data=data)
 
     layout = ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_("Reserve"), '#'))
@@ -187,7 +206,7 @@ def handle_reservation_form(self, request, form):
         'title': title,
         'form': form,
         'reservations': [
-            utils.ReservationInfo(r, request) for r in reservations
+            utils.ReservationInfo(r, request) for r in all_reservations
         ],
         'resource': self,
         'button_text': _("Continue")
@@ -197,7 +216,7 @@ def handle_reservation_form(self, request, form):
 @TownApp.html(model=Resource, name='bestaetigung', permission=Public,
               template='reservation_confirmation.pt')
 def confirm_reservation(self, request):
-    reservations = self.get_reservations(request)
+    reservations = self.request_bound_reservations(request).all()
 
     forms = FormCollection(request.app.session())
     submission = forms.submissions.by_id(utils.get_libres_session_id(request))
@@ -229,17 +248,17 @@ def finalize_reservation(self, request):
 
     scheduler = self.get_scheduler(request.app.libres_context)
     session = utils.get_libres_session_id(request)
-    reservations = self.get_reservations(request)
+    reservations = self.request_bound_reservations(request)
+    all_reservations = reservations.all()
 
     try:
         scheduler.queries.confirm_reservations_for_session(session)
         shared_token = uuid4()
 
-        for token in {r.token for r in reservations}:
+        for token in {r.token for r in all_reservations}:
             scheduler.approve_reservations(token)
 
-        for reservation in reservations:
-            reservation.token = shared_token
+        reservations.order_by(False).update({Reservation.token: shared_token})
 
     except LibresError as e:
         utils.show_libres_error(e, request)
@@ -268,7 +287,7 @@ def finalize_reservation(self, request):
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("A ticket has been opened"),
-            receivers=(reservations[0].email, ),
+            receivers=(all_reservations[0].email, ),
             content={
                 'model': ticket
             }
