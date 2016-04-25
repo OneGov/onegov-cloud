@@ -131,11 +131,8 @@ def reserve_allocation(self, request):
             start = time(0, 0)
             end = time(23, 59)
         else:
-            # TODO move time processing to sedate
-            end = end == '24:00' and '00:00' or end
-
-            start = time(*(int(n) for n in start.split(':')))
-            end = time(*(int(n) for n in end.split(':')))
+            start = sedate.parse_time(start)
+            end = sedate.parse_time(end)
 
         start, end = sedate.get_date_range(
             sedate.to_timezone(self.start, self.timezone), start, end

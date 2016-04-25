@@ -106,6 +106,17 @@ def parse_fullcalendar_request(request, timezone):
         return None, None
 
 
+def render_time_range(start, end):
+    start = '{:%H:%M}'.format(start)
+
+    if (end.time() == time(0, 0)):
+        end = '24:00'
+    else:
+        end = '{:%H:%M}'.format(end)
+
+    return ' - '.join((start, end))
+
+
 class ReservationInfo(object):
 
     __slots__ = ['resource', 'reservation', 'request', 'translate']
@@ -128,7 +139,7 @@ class ReservationInfo(object):
         ):
             return self.translate(_("Whole day"))
         else:
-            return '{:%H:%M} - {:%H:%M}'.format(
+            return render_time_range(
                 self.reservation.display_start(),
                 self.reservation.display_end()
             )
@@ -193,7 +204,7 @@ class AllocationEventInfo(object):
         if self.allocation.whole_day:
             return self.translate(_("Whole day"))
         else:
-            return '{:%H:%M} - {:%H:%M}'.format(
+            return render_time_range(
                 self.allocation.display_start(),
                 self.allocation.display_end()
             )
