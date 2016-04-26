@@ -142,7 +142,7 @@ class ReservationHandler(Handler):
 
         parts = []
 
-        for reservation in self.reservations:
+        for ix, reservation in enumerate(self.reservations):
             parts.append(
                 template.format(
                     start=reservation.display_start(),
@@ -150,6 +150,10 @@ class ReservationHandler(Handler):
                     quota=reservation.quota
                 )
             )
+
+            if ix == 4:
+                parts.append('…')
+                break
 
         return ', '.join(parts)
 
