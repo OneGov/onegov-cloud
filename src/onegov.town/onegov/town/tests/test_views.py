@@ -1196,13 +1196,13 @@ def test_reserved_resources_fields(town_app):
 
     room = client.get('/ressourcen').click('Raum')
     room.form['title'] = 'Meeting Room'
-    room.form['definition'] = "Start *= ___"
+    room.form['definition'] = "Email *= @@@"
     room = room.form.submit()
 
-    assert "'Start' ist ein reservierter Name" in room
+    assert "'Email' ist ein reservierter Name" in room
 
     # fieldsets act as a namespace for field names
-    room.form['definition'] = "# Title\nStart *= ___"
+    room.form['definition'] = "# Title\nEmail *= @@@"
     room = room.form.submit().follow()
 
     assert "calendar" in room
@@ -1326,7 +1326,7 @@ def test_allocations(town_app):
     assert slots.json[0]['title'] == "Ganztägig \nVerfügbar"
 
     # change the daypasses
-    edit = client.get(extract_href(slots.json[0]['actions'][1]))
+    edit = client.get(extract_href(slots.json[0]['actions'][0]))
     edit.form['daypasses'] = 2
     edit.form.submit()
 
@@ -1356,11 +1356,11 @@ def test_allocations(town_app):
         '?start=2015-08-04&end=2015-08-05'
     ))
 
-    edit = client.get(extract_href(slots.json[0]['actions'][1]))
+    edit = client.get(extract_href(slots.json[0]['actions'][0]))
     edit.form['date'] = '2015-08-06'
     edit.form.submit()
 
-    edit = client.get(extract_href(slots.json[1]['actions'][1]))
+    edit = client.get(extract_href(slots.json[1]['actions'][0]))
     edit.form['date'] = '2015-08-07'
     edit.form.submit()
 
@@ -1373,7 +1373,7 @@ def test_allocations(town_app):
     assert len(slots.json) == 2
 
     # delete an allocation
-    client.delete(extract_href(slots.json[0]['actions'][3]))
+    client.delete(extract_href(slots.json[0]['actions'][2]))
 
     # get the new slots
     slots = client.get((
@@ -1384,7 +1384,7 @@ def test_allocations(town_app):
     assert len(slots.json) == 1
 
     # delete an allocation
-    client.delete(extract_href(slots.json[0]['actions'][3]))
+    client.delete(extract_href(slots.json[0]['actions'][2]))
 
     # get the new slots
     slots = client.get((
@@ -1520,7 +1520,7 @@ def test_reserve_allocation(town_app):
     assert len(slots.json) == 1
 
     with pytest.raises(AffectedReservationError):
-        client.delete(extract_href(slots.json[0]['actions'][3]))
+        client.delete(extract_href(slots.json[0]['actions'][2]))
 
     # open the created ticket
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()

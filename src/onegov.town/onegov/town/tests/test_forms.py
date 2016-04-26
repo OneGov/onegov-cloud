@@ -2,13 +2,11 @@ import pytest
 
 from datetime import date, datetime, time, timedelta
 from dateutil.rrule import MO, WE
-from libres.db.models import Allocation
 from onegov.core.utils import Bunch
 from onegov.event import Event
 from onegov.town.forms import (
     DaypassAllocationForm,
     EventForm,
-    ReservationForm,
     RoomAllocationEditForm,
     RoomAllocationForm,
 )
@@ -213,56 +211,7 @@ def test_combine_datetime():
     assert helper.combine_datetime('date', 'time') is None
 
 
-def test_reservation_form_partly_available():
-    allocation = Allocation()
-
-    allocation.timezone = 'Europe/Zurich'
-    allocation.start = datetime(2015, 1, 1, 10)
-    allocation.end = datetime(2015, 1, 1, 16)
-
-    allocation.partly_available = True
-    form = ReservationForm.for_allocation(allocation)()
-    assert hasattr(form, 'start')
-    assert hasattr(form, 'end')
-    assert form.start.default == time(10, 00)
-    assert form.end.default == time(16, 00)
-
-    allocation.partly_available = False
-    form = ReservationForm.for_allocation(allocation)()
-    assert not hasattr(form, 'start')
-    assert not hasattr(form, 'end')
-
-
-def test_reservation_form_quota():
-    allocation = Allocation()
-
-    allocation.quota = 1
-    allocation.quota_limit = 1
-    form = ReservationForm.for_allocation(allocation)()
-    assert not hasattr(form, 'quota')
-
-    allocation.quota = 2
-    allocation.quota_limit = 1
-    form = ReservationForm.for_allocation(allocation)()
-    assert not hasattr(form, 'quota')
-
-    allocation.quota = 1
-    allocation.quota_limit = 2
-    form = ReservationForm.for_allocation(allocation)()
-    assert not hasattr(form, 'quota')
-
-    allocation.quota = 2
-    allocation.quota_limit = 2
-    form = ReservationForm.for_allocation(allocation)()
-    assert hasattr(form, 'quota')
-
-    allocation.quota = 2
-    allocation.quota_limit = 0
-    form = ReservationForm.for_allocation(allocation)()
-    assert hasattr(form, 'quota')
-
-
-def test_edit_room_alllocation_form():
+def test_edit_room_allocation_form():
 
     form = RoomAllocationEditForm()
     form.apply_dates(datetime(2015, 1, 1, 12, 0), datetime(2015, 1, 1, 18, 0))

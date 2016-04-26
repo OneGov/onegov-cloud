@@ -157,7 +157,7 @@ def handle_edit_allocation(self, request, form):
         new_start, new_end = form.dates
 
         try:
-            self.scheduler.move_allocation(
+            resource.scheduler.move_allocation(
                 master_id=self.id,
                 new_start=new_start,
                 new_end=new_end,
