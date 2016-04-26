@@ -340,6 +340,12 @@ def ensure_scheme(url, default='http'):
     if not url:
         return url
 
+    # purl (or to be precise urlparse) will parse empty host names ('abc.xyz')
+    # wrongly, assuming the abc.xyz is a path. by adding a double slash if
+    # there isn't one already, we can circumvent that problem
+    if '//' not in url:
+        url = '//' + url
+
     _url = URL(url)
 
     if _url.scheme():
