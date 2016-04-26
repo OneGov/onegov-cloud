@@ -1,9 +1,9 @@
-import morepath
 import os
 import os.path
 import polib
 
 from onegov.core import Framework
+from onegov.core import utils
 from onegov.core.templates import render_macro
 from translationstring import TranslationStringFactory
 from webtest import TestApp as Client
@@ -84,13 +84,7 @@ def test_chameleon_with_translation(temporary_directory):
 
         return render_macro(template.macros['testmacro'], request, {})
 
-    import onegov.core
-    import more.transaction
-    import more.webassets
-    morepath.scan(more.transaction)
-    morepath.scan(more.webassets)
-    morepath.scan(onegov.core)
-    morepath.commit(App)
+    utils.scan_morepath_modules(App)
 
     client = Client(App())
     assert '<b>Willkommen</b>' in client.get('/').text

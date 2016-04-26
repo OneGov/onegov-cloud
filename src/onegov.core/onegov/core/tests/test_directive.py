@@ -1,5 +1,3 @@
-import morepath
-
 from onegov.core import Framework
 from onegov.core.security import Secret
 from webtest import TestApp as Client
@@ -40,8 +38,6 @@ def test_form_directive():
               request_method='POST')
     def handle_blocked_three(self, request, form):
         pass
-
-    morepath.commit(App)
 
     app = App()
     app.application_id = 'test'

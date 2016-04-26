@@ -255,13 +255,7 @@ def test_orm_scenario(postgres_dsn):
 
     # this is required for the transactions to actually work, usually this
     # would be onegov.server's job
-    import onegov.core
-    import more.transaction
-    import more.webassets
-    morepath.scan(more.transaction)
-    morepath.scan(more.webassets)
-    morepath.scan(onegov.core)
-    morepath.commit(App)
+    scan_morepath_modules(App)
 
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base)
@@ -332,7 +326,6 @@ def test_i18n_with_request(postgres_dsn):
         return 'de_CH'
 
     scan_morepath_modules(App)
-    morepath.commit(App)
 
     app = App()
     app.configure_application(dsn=postgres_dsn, base=Base)
@@ -737,13 +730,7 @@ def test_application_retries(postgres_dsn, number_of_retries):
     def get_retry_attempts():
         return number_of_retries
 
-    import onegov.core
-    import more.transaction
-    import more.webassets
-    morepath.scan(more.transaction)
-    morepath.scan(more.webassets)
-    morepath.scan(onegov.core)
-    morepath.commit(App)
+    scan_morepath_modules(App)
 
     app = App()
     app.configure_application(

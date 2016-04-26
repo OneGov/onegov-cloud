@@ -62,7 +62,6 @@ def spawn_basic_permissions_app():
 
     # the scan is required (happens automatically if using onegov.server)
     morepath.scan(onegov.core.security)
-    morepath.commit(App)
 
     app = App()
     app.namespace = 'test'

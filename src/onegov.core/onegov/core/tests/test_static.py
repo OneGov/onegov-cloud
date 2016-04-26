@@ -1,8 +1,8 @@
-import morepath
 import os.path
 import time
 
 from onegov.core import Framework
+from onegov.core import utils
 from onegov.core.static import StaticFile
 from webtest import TestApp as Client
 
@@ -12,8 +12,6 @@ def test_static_file(temporary_directory):
     class App(Framework):
         serve_static_files = True
         static_files = temporary_directory
-
-    morepath.commit(App)
 
     app = App()
     app.configure_application()
@@ -37,13 +35,7 @@ def test_static_file_app(temporary_directory):
         serve_static_files = True
         static_files = temporary_directory
 
-    import onegov.core
-    import more.transaction
-    import more.webassets
-    morepath.scan(more.transaction)
-    morepath.scan(more.webassets)
-    morepath.scan(onegov.core)
-    morepath.commit(App)
+    utils.scan_morepath_modules(App)
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')
@@ -80,13 +72,7 @@ def test_root_file_app(temporary_directory):
     def get_favicon(app, absorb):
         return StaticFile.from_application(app, 'robots.txt')
 
-    import onegov.core
-    import more.transaction
-    import more.webassets
-    morepath.scan(more.transaction)
-    morepath.scan(more.webassets)
-    morepath.scan(onegov.core)
-    morepath.commit(App)
+    utils.scan_morepath_modules(App)
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')

@@ -6,7 +6,6 @@ updates.
 import click
 import email
 import mailbox
-import morepath
 import os
 import platform
 import subprocess
@@ -323,7 +322,7 @@ def upgrade(ctx, dry_run):
                 print("no pending upgrade tasks found")
 
         scan_morepath_modules(appcfg.application_class)
-        morepath.commit(UpdateApplication)
+        UpdateApplication.commit()
 
         # get all applications by looking at the existing schemas
         mgr = SessionManager(appcfg.configuration['dsn'], base=Base)

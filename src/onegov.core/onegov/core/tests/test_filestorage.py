@@ -2,6 +2,7 @@ import morepath
 import os.path
 
 from onegov.core import Framework
+from onegov.core import utils
 from webtest import TestApp as Client
 
 
@@ -71,13 +72,7 @@ def test_filestorage(temporary_directory):
     def view_csrf_token(self, request):
         return request.new_csrf_token()
 
-    import onegov.core
-    import more.transaction
-    import more.webassets
-    morepath.scan(more.transaction)
-    morepath.scan(more.webassets)
-    morepath.scan(onegov.core)
-    morepath.commit(App)
+    utils.scan_morepath_modules(App)
 
     app = App()
     app.configure_application(
