@@ -30,10 +30,8 @@ def view_allocations_json(self, request):
     if not (start and end):
         return []
 
-    scheduler = self.get_scheduler(request.app.libres_context)
-
     # get all allocations (including mirrors), for the availability calculation
-    query = scheduler.allocations_in_range(start, end, masters_only=False)
+    query = self.scheduler.allocations_in_range(start, end, masters_only=False)
     query = query.order_by(Allocation._start)
 
     allocations = query.all()
@@ -41,7 +39,7 @@ def view_allocations_json(self, request):
     # but only return the master allocations
     return [
         e.as_dict() for e in utils.AllocationEventInfo.from_allocations(
-            request, scheduler, allocations
+            request, self.scheduler, allocations
         )
     ]
 
@@ -85,10 +83,8 @@ def handle_new_allocation(self, request, form):
     """ Handles new allocations for differing form classes. """
 
     if form.submitted(request):
-        scheduler = self.get_scheduler(request.app.libres_context)
-
         try:
-            allocations = scheduler.allocate(
+            allocations = self.scheduler.allocate(
                 dates=form.dates,
                 whole_day=form.whole_day,
                 quota=form.quota,
@@ -158,12 +154,10 @@ def handle_edit_allocation(self, request, form):
         form.action = URL(form.action).query_param('view', view).as_string()
 
     if form.submitted(request):
-        scheduler = resource.get_scheduler(request.app.libres_context)
-
         new_start, new_end = form.dates
 
         try:
-            scheduler.move_allocation(
+            self.scheduler.move_allocation(
                 master_id=self.id,
                 new_start=new_start,
                 new_end=new_end,
@@ -199,9 +193,8 @@ def handle_delete_allocation(self, request):
     """
     request.assert_valid_csrf_token()
 
-    resources = ResourceCollection(request.app.libres_context)
-    scheduler = resources.scheduler_by_id(self.resource)
-    scheduler.remove_allocation(id=self.id)
+    resource = request.app.libres_resources.by_allocation(self)
+    resource.scheduler.remove_allocation(id=self.id)
 
     @request.after
     def trigger_calendar_update(response):

@@ -169,14 +169,14 @@ def get_tickets(app, handler='ALL', state='open', page=0, group=None,
 
 @TownApp.path(model=ResourceCollection, path='/ressourcen')
 def get_resources(app):
-    return ResourceCollection(app.libres_context)
+    return app.libres_resources
 
 
 @TownApp.path(model=Resource, path='/ressource/{name}',
               converters=dict(date=date, highlights=[int]))
 def get_resource(app, name, date=None, highlights=tuple(), view='agendaWeek'):
 
-    resource = ResourceCollection(app.libres_context).by_name(name)
+    resource = app.libres_resources.by_name(name)
 
     if resource:
         resource.date = date
@@ -188,11 +188,10 @@ def get_resource(app, name, date=None, highlights=tuple(), view='agendaWeek'):
 
 @TownApp.path(model=Allocation, path='/einteilung/{resource}/{id}')
 def get_allocation(app, resource, id):
-    scheduler = ResourceCollection(
-        app.libres_context).scheduler_by_id(resource)
+    resource = app.libres_resources.by_id(resource)
 
-    if scheduler:
-        allocation = scheduler.allocations_by_ids((id, )).first()
+    if resource:
+        allocation = resource.scheduler.allocations_by_ids((id, )).first()
 
         # always get the master, even if another id is requested
         return allocation and allocation.get_master()
@@ -200,11 +199,10 @@ def get_allocation(app, resource, id):
 
 @TownApp.path(model=Reservation, path='/reservation/{resource}/{id}')
 def get_reservation(app, resource, id):
-    scheduler = ResourceCollection(
-        app.libres_context).scheduler_by_id(resource)
+    resource = app.libres_resources.by_id(resource)
 
-    if scheduler:
-        query = scheduler.managed_reservations()
+    if resource:
+        query = resource.scheduler.managed_reservations()
         query = query.filter(Reservation.id == id)
 
         return query.first()

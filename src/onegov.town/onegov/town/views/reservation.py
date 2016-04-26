@@ -7,7 +7,7 @@ from libres.db.models import Allocation, Reservation
 from libres.modules.errors import LibresError
 from onegov.core.security import Public, Private
 from onegov.form import FormCollection, merge_forms
-from onegov.libres import Resource, ResourceCollection
+from onegov.libres import Resource
 from onegov.ticket import TicketCollection
 from onegov.town import TownApp, _, utils
 from onegov.town.elements import Link
@@ -54,10 +54,7 @@ def assert_anonymous_access_only_temporary(self, request):
               permission=Public)
 def reserve_allocation(self, request):
 
-    collection = ResourceCollection(request.app.libres_context)
-    resource = collection.by_id(self.resource)
-
-    scheduler = resource.get_scheduler(request.app.libres_context)
+    resource = request.app.libres_resources.by_allocation(self)
 
     start = request.params.get('start') or '{:%H:%M}'.format(self.start)
     end = request.params.get('end') or '{:%H:%M}'.format(self.end)
@@ -79,7 +76,7 @@ def reserve_allocation(self, request):
         start = self.start, self.end
 
     try:
-        scheduler.reserve(
+        resource.scheduler.reserve(
             email='0xdeadbeef@example.org',  # will be set later
             dates=(start, end),
             quota=quota,
@@ -114,13 +111,10 @@ def delete_reservation(self, request):
     # this view is public, but only for a limited time
     assert_anonymous_access_only_temporary(self, request)
 
-    collection = ResourceCollection(request.app.libres_context)
-    resource = collection.by_id(self.resource)
-
-    scheduler = resource.get_scheduler(request.app.libres_context)
+    resource = request.app.libres_resources.by_reservation(self)
 
     try:
-        scheduler.remove_reservation(self.token, self.id)
+        resource.scheduler.remove_reservation(self.token, self.id)
     except LibresError as e:
         message = {
             'message': utils.get_libres_error(e, request),
@@ -246,17 +240,16 @@ def confirm_reservation(self, request):
               template='layout.pt')
 def finalize_reservation(self, request):
 
-    scheduler = self.get_scheduler(request.app.libres_context)
     session = utils.get_libres_session_id(request)
     reservations = self.request_bound_reservations(request)
     all_reservations = reservations.all()
 
     try:
-        scheduler.queries.confirm_reservations_for_session(session)
+        self.scheduler.queries.confirm_reservations_for_session(session)
         shared_token = uuid4()
 
         for token in {r.token for r in all_reservations}:
-            scheduler.approve_reservations(token)
+            self.scheduler.approve_reservations(token)
 
         reservations.order_by(False).update({Reservation.token: shared_token})
 
@@ -302,10 +295,8 @@ def finalize_reservation(self, request):
 @TownApp.view(model=Reservation, name='annehmen', permission=Private)
 def accept_reservation(self, request):
     if not self.data or not self.data.get('accepted'):
-        collection = ResourceCollection(request.app.libres_context)
-        resource = collection.by_id(self.resource)
-        scheduler = resource.get_scheduler(request.app.libres_context)
-        reservations = scheduler.reservations_by_token(self.token)
+        resource = request.app.libres_resources.by_reservation(self)
+        reservations = resource.scheduler.reservations_by_token(self.token)
 
         send_html_mail(
             request=request,
@@ -335,10 +326,9 @@ def accept_reservation(self, request):
 
 @TownApp.view(model=Reservation, name='absagen', permission=Private)
 def reject_reservation(self, request):
-    collection = ResourceCollection(request.app.libres_context)
-    resource = collection.by_id(self.resource)
-    scheduler = resource.get_scheduler(request.app.libres_context)
-    reservations = scheduler.reservations_by_token(self.token.hex)
+    resource = request.app.libres_resources.by_reservation(self)
+    reservations = resource.scheduler.reservations_by_token(self.token.hex)
+
     forms = FormCollection(request.app.session())
     submission = forms.submissions.by_id(self.token.hex)
 
@@ -359,7 +349,7 @@ def reject_reservation(self, request):
     ticket = tickets.by_handler_id(self.token.hex)
     ticket.create_snapshot(request)
 
-    scheduler.remove_reservation(self.token.hex)
+    resource.scheduler.remove_reservation(self.token.hex)
 
     if submission:
         forms.submissions.delete(submission)
