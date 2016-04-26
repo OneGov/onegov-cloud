@@ -19,13 +19,6 @@ from webob import exc
 from uuid import uuid4
 
 
-def get_reservation_form_class(resource, request):
-    if resource.definition:
-        return merge_forms(ReservationForm, resource.form_class)
-    else:
-        return ReservationForm
-
-
 def assert_anonymous_access_only_temporary(self, request):
     """ Raises exceptions if the current user is anonymous and no longer
     should be given access to the reservation models.
@@ -53,9 +46,16 @@ def assert_anonymous_access_only_temporary(self, request):
 @TownApp.json(model=Allocation, name='reserve', request_method='POST',
               permission=Public)
 def reserve_allocation(self, request):
+    """ Adds a single reservation to the list of reservations bound to the
+    current browser session.
 
-    resource = request.app.libres_resources.by_allocation(self)
+    Does not actually reserve anything, just keeps a list of things to
+    reserve later. Though it will still check if the reservation is
+    feasable.
 
+    """
+
+    # the reservation is defined through query parameters
     start = request.params.get('start') or '{:%H:%M}'.format(self.start)
     end = request.params.get('end') or '{:%H:%M}'.format(self.end)
     quota = int(request.params.get('quota', 1))
@@ -74,6 +74,8 @@ def reserve_allocation(self, request):
         )
     else:
         start = self.start, self.end
+
+    resource = request.app.libres_resources.by_allocation(self)
 
     try:
         resource.scheduler.reserve(
@@ -138,6 +140,13 @@ def delete_reservation(self, request):
         }
 
 
+def get_reservation_form_class(resource, request):
+    if resource.definition:
+        return merge_forms(ReservationForm, resource.form_class)
+    else:
+        return ReservationForm
+
+
 @TownApp.form(model=Resource, name='formular', template='reservation_form.pt',
               permission=Public, form=get_reservation_form_class)
 def handle_reservation_form(self, request, form):
@@ -145,24 +154,26 @@ def handle_reservation_form(self, request, form):
     reservations on a resource.
 
     """
-    reservations = self.request_bound_reservations(request)
-    all_reservations = reservations.all()
-    forms = FormCollection(request.app.session())
-
     session = utils.get_libres_session_id(request)
-    submission = forms.submissions.by_id(
-        self.request_bound_submission_id(request))
+    reservations_query = self.request_bound_reservations(request)
+    reservations = reservations_query.all()
+
+    # the submission is bound to the resource and the request
+    forms = FormCollection(request.app.session())
+    submission_id = self.request_bound_submission_id(request)
+    submission = forms.submissions.by_id(submission_id)
 
     if form.submitted(request):
 
         # update the e-mail data
-        reservations.order_by(False).update(
+        reservations_query.order_by(False).update(
             {Reservation.email: form.email.data}
         )
 
         # while we re at it, remove all expired sessions
-        self.remove_expired_reservation_sessions(request.app.libres_context)
+        self.remove_expired_reservation_sessions()
 
+        # add the submission if it doesn't yet exist
         if self.definition and not submission:
             submission = forms.submissions.add_external(
                 form=self.form_class(),
@@ -170,6 +181,7 @@ def handle_reservation_form(self, request, form):
                 id=session
             )
 
+        # update the data on the submission
         if submission:
             forms.submissions.update(
                 submission, form, exclude=form.reserved_fields
@@ -179,8 +191,9 @@ def handle_reservation_form(self, request, form):
     else:
         data = {}
 
-        if all_reservations[0].email != '0xdeadbeef@example.org':
-            data['email'] = all_reservations[0].email
+        # the email is the same for all reservations
+        if reservations[0].email != '0xdeadbeef@example.org':
+            data['email'] = reservations[0].email
 
         submission = forms.submissions.by_id(session)
         if submission:
@@ -199,8 +212,8 @@ def handle_reservation_form(self, request, form):
         'layout': layout,
         'title': title,
         'form': form,
-        'reservations': [
-            utils.ReservationInfo(r, request) for r in all_reservations
+        'reservation_infos': [
+            utils.ReservationInfo(r, request) for r in reservations
         ],
         'resource': self,
         'button_text': _("Continue")
@@ -228,7 +241,7 @@ def confirm_reservation(self, request):
         'layout': layout,
         'form': form,
         'resource': self,
-        'reservations': [
+        'reservation_infos': [
             utils.ReservationInfo(r, request) for r in reservations
         ],
         'finalize_link': request.link(self, 'abschluss'),

@@ -141,7 +141,7 @@ def view_resource(self, request):
 @TownApp.view(model=Resource, request_method='DELETE', permission=Private)
 def handle_delete_resource(self, request):
 
-    if not self.deletable(request.app.libres_context):
+    if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 
     collection = ResourceCollection(request.app.libres_context)

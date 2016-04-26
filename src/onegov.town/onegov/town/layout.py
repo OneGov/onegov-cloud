@@ -746,7 +746,7 @@ class ResourceLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_logged_in:
-            if self.model.deletable(self.request.app.libres_context):
+            if self.model.deletable:
                 delete_link = DeleteLink(
                     text=_("Delete"),
                     url=self.request.link(self.model),

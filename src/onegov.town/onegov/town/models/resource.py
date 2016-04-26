@@ -18,21 +18,19 @@ class SharedMethods(object):
     lead = meta_property('lead')
     text = content_property('text')
 
-    def deletable(self, libres_context):
-        scheduler = self.get_scheduler(libres_context)
-
-        if scheduler.managed_reserved_slots().first():
+    @property
+    def deletable(self):
+        if self.scheduler.managed_reserved_slots().first():
             return False
 
-        if scheduler.managed_reservations().first():
+        if self.scheduler.managed_reservations().first():
             return False
 
         return True
 
-    def remove_expired_reservation_sessions(self, libres_context,
-                                            expiration_date=None):
-        session = libres_context.get_service('session_provider').session()
-        queries = self.get_scheduler(libres_context).queries
+    def remove_expired_reservation_sessions(self, expiration_date=None):
+        session = self.libres_context.get_service('session_provider').session()
+        queries = self.scheduler.queries
 
         expired_sessions = queries.find_expired_reservation_sessions(
             expiration_date)
