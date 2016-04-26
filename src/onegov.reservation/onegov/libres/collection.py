@@ -40,13 +40,13 @@ class ResourceCollection(object):
         self.session.add(resource)
         self.session.flush()
 
-        return resource
+        return self.bind(resource)
 
-    def scheduler_by_id(self, id):
-        resource = self.query().filter(Resource.id == id).first()
-
+    def bind(self, resource):
         if resource:
-            return resource.get_scheduler(self.libres_context)
+            resource.bind_to_libres_context(self.libres_context)
+
+        return resource
 
     def by_id(self, id, ensure_type=any_type):
         query = self.query().filter(Resource.id == id)
@@ -54,7 +54,7 @@ class ResourceCollection(object):
         if ensure_type is not any_type:
             query = query.filter(Resource.type == type)
 
-        return query.first()
+        return self.bind(query.first())
 
     def by_name(self, name, ensure_type=any_type):
         query = self.query().filter(Resource.name == name)
@@ -62,7 +62,13 @@ class ResourceCollection(object):
         if ensure_type is not any_type:
             query = query.filter(Resource.type == type)
 
-        return query.first()
+        return self.bind(query.first())
+
+    def by_allocation(self, allocation):
+        return self.by_id(allocation.resource)
+
+    def by_reservation(self, reservation):
+        return self.by_id(reservation.resource)
 
     def delete(self, resource, including_reservations=False):
         scheduler = resource.get_scheduler(self.libres_context)

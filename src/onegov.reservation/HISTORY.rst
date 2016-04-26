@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Simplifies access to the scheduler from the resource.
+  [href]
+
 0.2.0 (2016-04-13)
 ~~~~~~~~~~~~~~~~~~~
 

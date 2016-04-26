@@ -86,6 +86,14 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
         return new_scheduler(libres_context, self.id, self.timezone)
 
     @property
+    def scheduler(self):
+        assert hasattr(self, 'libres_context'), "not bound to libres context"
+        return self.get_scheduler(self.libres_context)
+
+    def bind_to_libres_context(self, libres_context):
+        self.libres_context = libres_context
+
+    @property
     def form_class(self):
         """ Parses the form definition and returns a form class. """
 

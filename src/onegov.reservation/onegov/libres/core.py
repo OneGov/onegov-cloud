@@ -1,5 +1,6 @@
 from libres.context.registry import create_default_registry
 from libres.db.models import ORMBase
+from onegov.libres.collection import ResourceCollection
 from uuid import UUID
 
 
@@ -64,3 +65,7 @@ class LibresIntegration(object):
         context.set_service('uuid_generator', lambda ctx: uuid_generator)
 
         return context
+
+    @property
+    def libres_resources(self):
+        return ResourceCollection(self.libres_context)
