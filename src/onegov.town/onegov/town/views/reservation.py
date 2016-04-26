@@ -16,7 +16,6 @@ from onegov.town.layout import ReservationLayout
 from onegov.town.mail import send_html_mail
 from sqlalchemy.orm.attributes import flag_modified
 from webob import exc
-from uuid import uuid4
 
 
 def assert_anonymous_access_only_temporary(self, request):
@@ -82,7 +81,8 @@ def reserve_allocation(self, request):
             email='0xdeadbeef@example.org',  # will be set later
             dates=(start, end),
             quota=quota,
-            session_id=utils.get_libres_session_id(request)
+            session_id=utils.get_libres_session_id(request),
+            single_token_per_session=True
         )
     except LibresError as e:
         message = {
@@ -154,14 +154,15 @@ def handle_reservation_form(self, request, form):
     reservations on a resource.
 
     """
-    session = utils.get_libres_session_id(request)
     reservations_query = self.request_bound_reservations(request)
     reservations = reservations_query.all()
 
-    # the submission is bound to the resource and the request
+    # all reservations share a single token
+    token = reservations[0].token
+
+    # the submission shares the reservation token
     forms = FormCollection(request.app.session())
-    submission_id = self.request_bound_submission_id(request)
-    submission = forms.submissions.by_id(submission_id)
+    submission = forms.submissions.by_id(token)
 
     if form.submitted(request):
 
@@ -178,7 +179,7 @@ def handle_reservation_form(self, request, form):
             submission = forms.submissions.add_external(
                 form=self.form_class(),
                 state='pending',
-                id=session
+                id=token
             )
 
         # update the data on the submission
@@ -195,7 +196,6 @@ def handle_reservation_form(self, request, form):
         if reservations[0].email != '0xdeadbeef@example.org':
             data['email'] = reservations[0].email
 
-        submission = forms.submissions.by_id(session)
         if submission:
             data.update(submission.data)
 
@@ -224,9 +224,10 @@ def handle_reservation_form(self, request, form):
               template='reservation_confirmation.pt')
 def confirm_reservation(self, request):
     reservations = self.request_bound_reservations(request).all()
+    token = reservations[0].token.hex
 
     forms = FormCollection(request.app.session())
-    submission = forms.submissions.by_id(utils.get_libres_session_id(request))
+    submission = forms.submissions.by_id(token)
 
     if submission:
         form = request.get_form(submission.form_class, data=submission.data)
@@ -254,17 +255,12 @@ def confirm_reservation(self, request):
 def finalize_reservation(self, request):
 
     session = utils.get_libres_session_id(request)
-    reservations = self.request_bound_reservations(request)
-    all_reservations = reservations.all()
+    reservations = self.request_bound_reservations(request).all()
+    token = reservations[0].token.hex
 
     try:
         self.scheduler.queries.confirm_reservations_for_session(session)
-        shared_token = uuid4()
-
-        for token in {r.token for r in all_reservations}:
-            self.scheduler.approve_reservations(token)
-
-        reservations.order_by(False).update({Reservation.token: shared_token})
+        self.scheduler.approve_reservations(token)
 
     except LibresError as e:
         utils.show_libres_error(e, request)
@@ -278,22 +274,21 @@ def finalize_reservation(self, request):
         }
     else:
         forms = FormCollection(request.app.session())
-        submission = forms.submissions.by_id(session)
+        submission = forms.submissions.by_id(token)
 
         if submission:
-            submission.id = shared_token
             forms.submissions.complete_submission(submission)
 
         with forms.session.no_autoflush:
             ticket = TicketCollection(request.app.session()).open_ticket(
-                handler_code='RSV', handler_id=shared_token
+                handler_code='RSV', handler_id=token
             )
 
         send_html_mail(
             request=request,
             template='mail_ticket_opened.pt',
             subject=_("A ticket has been opened"),
-            receivers=(all_reservations[0].email, ),
+            receivers=(reservations[0].email, ),
             content={
                 'model': ticket
             }
@@ -340,10 +335,11 @@ def accept_reservation(self, request):
 @TownApp.view(model=Reservation, name='absagen', permission=Private)
 def reject_reservation(self, request):
     resource = request.app.libres_resources.by_reservation(self)
-    reservations = resource.scheduler.reservations_by_token(self.token.hex)
+    token = self.token.hex
+    reservations = resource.scheduler.reservations_by_token(token)
 
     forms = FormCollection(request.app.session())
-    submission = forms.submissions.by_id(self.token.hex)
+    submission = forms.submissions.by_id(token)
 
     send_html_mail(
         request=request,
@@ -359,10 +355,10 @@ def reject_reservation(self, request):
 
     # create a snapshot of the ticket to keep the useful information
     tickets = TicketCollection(request.app.session())
-    ticket = tickets.by_handler_id(self.token.hex)
+    ticket = tickets.by_handler_id(token)
     ticket.create_snapshot(request)
 
-    resource.scheduler.remove_reservation(self.token.hex)
+    resource.scheduler.remove_reservation(token)
 
     if submission:
         forms.submissions.delete(submission)
