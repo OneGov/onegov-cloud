@@ -42,6 +42,12 @@ def assert_anonymous_access_only_temporary(self, request):
         raise exc.HTTPForbidden()
 
 
+def assert_access_only_if_there_are_reservations(reservations):
+    """ Raises an exception if no reservations are available. """
+    if not reservations:
+        raise exc.HTTPForbidden()
+
+
 @TownApp.json(model=Allocation, name='reserve', request_method='POST',
               permission=Public)
 def reserve_allocation(self, request):
@@ -156,6 +162,7 @@ def handle_reservation_form(self, request, form):
     """
     reservations_query = self.request_bound_reservations(request)
     reservations = reservations_query.all()
+    assert_access_only_if_there_are_reservations(reservations)
 
     # all reservations share a single token
     token = reservations[0].token
@@ -224,6 +231,8 @@ def handle_reservation_form(self, request, form):
               template='reservation_confirmation.pt')
 def confirm_reservation(self, request):
     reservations = self.request_bound_reservations(request).all()
+    assert_access_only_if_there_are_reservations(reservations)
+
     token = reservations[0].token.hex
 
     forms = FormCollection(request.app.session())
@@ -253,9 +262,10 @@ def confirm_reservation(self, request):
 @TownApp.html(model=Resource, name='abschluss', permission=Public,
               template='layout.pt')
 def finalize_reservation(self, request):
+    reservations = self.request_bound_reservations(request).all()
+    assert_access_only_if_there_are_reservations(reservations)
 
     session = utils.get_libres_session_id(request)
-    reservations = self.request_bound_reservations(request).all()
     token = reservations[0].token.hex
 
     try:
