@@ -330,6 +330,9 @@ libres_error_messages = {
     libres_errors.OverlappingAllocationError:
     _("A conflicting allocation exists for the requested time period."),
 
+    libres_errors.OverlappingReservationError:
+    _("A conflicting reservation exists for the requested time period."),
+
     libres_errors.AffectedReservationError:
     _("An existing reservation would be affected by the requested change."),
 
