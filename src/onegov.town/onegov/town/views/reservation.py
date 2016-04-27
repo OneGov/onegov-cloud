@@ -1,6 +1,7 @@
 import json
 import morepath
 import sedate
+import transaction
 
 from datetime import time
 from libres.db.models import Allocation, Reservation
@@ -14,6 +15,7 @@ from onegov.town.elements import Link
 from onegov.town.forms import ReservationForm
 from onegov.town.layout import ReservationLayout
 from onegov.town.mail import send_html_mail
+from purl import URL
 from sqlalchemy.orm.attributes import flag_modified
 from webob import exc
 
@@ -246,6 +248,12 @@ def confirm_reservation(self, request):
     layout = ReservationLayout(self, request)
     layout.breadcrumbs.append(Link(_("Confirm"), '#'))
 
+    failed_reservations = set(
+        int(failed) for failed
+        in request.params.get('failed_reservations', '').split(',')
+        if failed
+    )
+
     return {
         'title': _("Confirm your reservation"),
         'layout': layout,
@@ -254,6 +262,7 @@ def confirm_reservation(self, request):
         'reservation_infos': [
             utils.ReservationInfo(r, request) for r in reservations
         ],
+        'failed_reservations': failed_reservations,
         'finalize_link': request.link(self, 'abschluss'),
         'edit_link': request.link(self, 'formular'),
     }
@@ -273,15 +282,13 @@ def finalize_reservation(self, request):
         self.scheduler.approve_reservations(token)
 
     except LibresError as e:
+        transaction.abort()
         utils.show_libres_error(e, request)
 
-        layout = ReservationLayout(self, request)
-        layout.breadcrumbs.append(Link(_("Error"), '#'))
+        url = URL(request.link(self, name='bestaetigung'))
+        url = url.query_param('failed_reservations', e.reservation.id)
 
-        return {
-            'title': _("The reservation could not be completed"),
-            'layout': layout,
-        }
+        return morepath.redirect(url.as_string())
     else:
         forms = FormCollection(request.app.session())
         submission = forms.submissions.by_id(token)

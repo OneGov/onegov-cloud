@@ -1868,7 +1868,7 @@ def test_two_parallel_reservations(town_app):
     assert f1.click('Abschliessen').status_code == 302
     assert "Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.click(
         'Abschliessen'
-    )
+    ).follow()
 
 
 def test_cleanup_allocations(town_app):

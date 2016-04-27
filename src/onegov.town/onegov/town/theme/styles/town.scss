@@ -2658,6 +2658,15 @@ ul.search-results {
         margin: 0;
     }
 
+    .failed {
+        color: $alert-color;        
+
+        .reservation-date::before {
+            background-color: transparentize($alert-color, .8);
+            color: $alert-color;
+        }
+    }
+
     .reservation-date {
         display: block;
         font-weight: bold;

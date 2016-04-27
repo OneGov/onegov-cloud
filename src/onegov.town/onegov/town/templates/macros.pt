@@ -405,10 +405,10 @@
 </metal:pagination>
 
 <metal:reservations define-macro="reservation-infos" i18n:domain="onegov.town">
-    <div tal:condition="reservation_infos" class="reservation-selection large">
+    <div tal:condition="reservation_infos" tal:define="failed failed_reservations|set()" class="reservation-selection large">
         <div class="reservation-selection-inner">
             <ul>
-                <li class="reservation" tal:repeat="info reservation_infos">
+                <li class="${info.reservation.id in failed and 'reservation failed' or 'reservation'}" tal:repeat="info reservation_infos">
                     <span class="reservation-date" data-quota="${info.reservation.quota}">
                         ${layout.format_date(info.reservation.display_start(), 'weekday_long')},
                         ${layout.format_date(info.reservation.display_start(), 'date_long')}
