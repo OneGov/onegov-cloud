@@ -2710,3 +2710,16 @@ ul.search-results {
     display: inline-block;
     width: 80%;
 }
+
+
+/*
+    Reservations list in ticket summary
+*/
+.ticket-summary .reservations {
+    list-style: none;
+    margin: 0;
+
+    li {
+        margin-bottom: 1.5rem;
+    }
+}

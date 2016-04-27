@@ -13,21 +13,7 @@
                     </p>
                 </div>
 
-                <div tal:condition="reservation_infos" class="reservation-selection large">
-                    <div class="reservation-selection-inner">
-                        <ul>
-                            <li class="reservation" tal:repeat="info reservation_infos">
-                                <span class="reservation-date" data-quota="${info.reservation.quota}">
-                                    ${layout.format_date(info.reservation.display_start(), 'weekday_long')},
-                                    ${layout.format_date(info.reservation.display_start(), 'date_long')}
-                                </span>
-                                <span class="reservation-time">
-                                    ${info.time}
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <div metal:use-macro="layout.macros['reservation_infos']" />
 
                 <div tal:condition="reservation_infos" class="field-display">
                     <div class="field-display-block">

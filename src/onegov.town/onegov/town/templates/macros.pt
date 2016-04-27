@@ -404,33 +404,43 @@
     </ul>
 </metal:pagination>
 
-<metal:reservations define-macro="reservations" i18n:domain="onegov.town">
-    <div tal:condition="reservations" class="reservations">
-        <div tal:repeat="reservation reservations">
-            <tal:block define="start reservation.display_start(); end reservation.display_end()">
-                <div class="field-display">
-                    <div class="field-display-block">
-                        <div class="field-display-label" i18n:translate>Date</div>
-                        <div class="field-display-data">
-                            ${layout.format_date(start, 'date')}
-                            <!-- simple whole day check: -->
-                            <tal:block condition="start.time() != end.time()">
-                                ${layout.format_date(start, 'time')} -
-                                ${layout.format_date(end, 'time')}
-                            </tal:block>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="field-display">
-                    <div class="field-display-block">
-                        <div class="field-display-label" i18n:translate>Quota</div>
-                        <div class="field-display-data">${reservation.quota}</div>
-                    </div>
-                </div>
-            </tal:block>
+<metal:reservations define-macro="reservation-infos" i18n:domain="onegov.town">
+    <div tal:condition="reservation_infos" class="reservation-selection large">
+        <div class="reservation-selection-inner">
+            <ul>
+                <li class="reservation" tal:repeat="info reservation_infos">
+                    <span class="reservation-date" data-quota="${info.reservation.quota}">
+                        ${layout.format_date(info.reservation.display_start(), 'weekday_long')},
+                        ${layout.format_date(info.reservation.display_start(), 'date_long')}
+                    </span>
+                    <span class="reservation-time">
+                        ${info.time}
+                    </span>
+                </li>
+            </ul>
         </div>
     </div>
+</metal:reservations>
+
+<metal:reservations define-macro="reservations" i18n:domain="onegov.town">
+    <ul tal:condition="reservations" class="reservations">
+        <li tal:repeat="reservation reservations">
+            <tal:block define="start reservation.display_start(); end reservation.display_end()">
+                <strong>
+                    ${layout.format_date(start, 'date')}
+                    <!--! simple whole day check: -->
+                    <tal:block condition="start.time() != end.time()">
+                        ${layout.format_date(start, 'time')} -
+                        ${layout.format_date(end, 'time')}
+                    </tal:block>
+                </strong>
+                <br><span i18n:translate>Quota</span>
+                <strong>
+                    ${reservation.quota}
+                </strong>
+            </tal:block>
+        </li>
+    </ul>
 </metal:reservations>
 
 <metal:display_event define-macro="display_event" i18n:domain="onegov.town">
