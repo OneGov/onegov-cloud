@@ -1731,7 +1731,7 @@ def test_reserve_session_bound(town_app):
     assert client.get(finalize_url).follow().status_code == 200
 
 
-def test_two_parallel_reservations(town_app):
+def test_reserve_in_parallel(town_app):
 
     # prepate the required data
     resources = ResourceCollection(town_app.libres_context)
@@ -1767,6 +1767,46 @@ def test_two_parallel_reservations(town_app):
     assert "Der gewünschte Zeitraum ist nicht mehr verfügbar." in f2.click(
         'Abschliessen'
     ).follow()
+
+
+def test_reserve_session_separation(town_app):
+    c1 = Client(town_app)
+    c1.login_admin()
+
+    c2 = Client(town_app)
+    c2.login_admin()
+
+    reserve = []
+
+    # check both for separation by resource and by client
+    for room in ('meeting-room', 'gym'):
+        new = c1.get('/ressourcen').click('Raum')
+        new.form['title'] = room
+        new.form.submit()
+
+        resource = town_app.libres_resources.by_name(room)
+        allocations = resource.scheduler.allocate(
+            dates=(datetime(2016, 4, 28, 12, 0), datetime(2016, 4, 28, 13, 0)),
+            whole_day=False
+        )
+
+        reserve.append(bound_reserve(c1, allocations[0]))
+        reserve.append(bound_reserve(c2, allocations[0]))
+        transaction.commit()
+
+    c1_reserve_room, c2_reserve_room, c1_reserve_gym, c2_reserve_gym = reserve
+
+    assert c1_reserve_room().json == {'success': True}
+    assert c1_reserve_gym().json == {'success': True}
+    assert c2_reserve_room().json == {'success': True}
+    assert c2_reserve_gym().json == {'success': True}
+
+    for room in ('meeting-room', 'gym'):
+        result = c1.get('/ressource/{}/reservations'.format(room)).json
+        assert len(result) == 1
+
+        result = c2.get('/ressource/{}/reservations'.format(room)).json
+        assert len(result) == 1
 
 
 def test_cleanup_allocations(town_app):
