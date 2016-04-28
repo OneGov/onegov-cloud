@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-04-28 12:15+0200\n"
+"POT-Creation-Date: 2016-04-28 12:26+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1172,6 +1172,9 @@ msgstr "Keine Termine gefunden, bitte wählen Sie erst Termine im Kalender aus"
 msgid "Go to calendar"
 msgstr "Zum Kalender"
 
+msgid "Select a free time span in the calendar below to create an allocation."
+msgstr "Wählen Sie eine freie Zeitspanne im Kalender aus um eine Einteilung zu machen."
+
 msgid "Further Information"
 msgstr "Weitere Informationen"
 
@@ -1572,4 +1575,3 @@ msgstr "Alle Tickets"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
-

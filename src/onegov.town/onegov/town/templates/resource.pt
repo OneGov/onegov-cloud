@@ -26,6 +26,10 @@
 
         <div class="clearfix"></div>
 
+        <div class="panel" i18n:translate tal:condition="request.is_logged_in">
+            Select a free time span in the calendar below to create an allocation.
+        </div>
+
         <tal:block
             define="
                 lead None; 
