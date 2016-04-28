@@ -2280,6 +2280,17 @@ button {
     }
 }
 
+// on smartphones, the popup becomes a modal dialog
+@media #{$small-only} {
+    .popup {
+        bottom: 20%;
+        left: 5%;
+        position: fixed;
+        right: 5%;
+        top: 20%;
+    }
+}
+
 /*
     Search box
 */
@@ -2635,7 +2646,6 @@ ul.search-results {
 .reservation-selection {
     float: right;
     padding: 0 0 0 15px;
-    width: 20%;
 
     p {
         font-size: .875rem;
@@ -2659,7 +2669,7 @@ ul.search-results {
     }
 
     .failed {
-        color: $alert-color;        
+        color: $alert-color;
 
         .reservation-date::before {
             background-color: transparentize($alert-color, .8);
@@ -2715,9 +2725,50 @@ ul.search-results {
     }
 }
 
-.fc-view-container {
-    display: inline-block;
-    width: 80%;
+@media #{$medium-up} {
+    .reservation-selection {
+        float: right;
+        width: 20%;
+    }
+
+    .fc-view-container {
+        display: inline-block;
+        width: 80%;
+    }
+}
+
+@media #{$small-only} {
+    .reservation-selection {
+        float: none;
+        width: 100%;
+    }
+
+    .fc-view-container {
+        display: block;
+        width: 100%;
+    }
+
+    .fc .fc-toolbar {
+        button,
+        .fc-button-group {
+            display: inline-block;
+            font-size: .7rem;
+        }
+
+        .fc-right {
+            left: -7px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+    }
+
+    .fc-view {
+        margin-bottom: 1rem;
+    }
+
+    .fc-scroller {
+        overflow-y: auto;
+    }
 }
 
 

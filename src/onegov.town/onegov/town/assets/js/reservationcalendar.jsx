@@ -423,7 +423,7 @@ rc.setupReservationSelect = function(fcOptions) {
         var view = $(calendar).find('.fc-view-container');
 
         selection = $('<div class="reservation-selection"></div>')
-            .insertBefore(view);
+            .insertAfter(view);
 
         calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
 
@@ -633,7 +633,7 @@ ReservationSelection = React.createClass({
                 <h3>{locale("Dates")}</h3>
                 {
                     this.props.reservations.length === 0 &&
-                        <p>{locale("Select allocations on the left to reserve them")}</p>
+                        <p>{locale("Select allocations in the calendar to reserve them")}</p>
                 }
                 {
                     this.props.reservations.length > 0 &&

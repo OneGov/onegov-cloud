@@ -8,7 +8,7 @@ var locales = {
         "No": "Nein",
         "Remove": "Entfernen",
         "Reserve": "Reservieren",
-        "Select allocations on the left to reserve them": "Wählen Sie die gewünschten Termine links aus",
+        "Select allocations in the calendar to reserve them": "Wählen Sie die gewünschten Termine im Kalender aus",
         "Until": "Bis",
         "Whole day": "Ganztägig",
         "Yes": "Ja"
