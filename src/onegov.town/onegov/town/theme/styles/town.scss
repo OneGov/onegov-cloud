@@ -2771,7 +2771,6 @@ ul.search-results {
     }
 }
 
-
 /*
     Reservations list in ticket summary
 */
@@ -2782,4 +2781,16 @@ ul.search-results {
     li {
         margin-bottom: 1.5rem;
     }
+}
+
+/*
+    Resources view
+*/
+.resource-group {
+    @include label(
+        $bg: $secondary-color,
+        $radius: 4px
+    );
+    margin-bottom: 1rem;
+    font-size: 1rem;
 }
