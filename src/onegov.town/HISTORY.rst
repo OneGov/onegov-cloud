@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to create multiple reservations in one ticket.
+  [href]
+
 - Shows an error if an uploaded's filename is too long.
   [href]
 
