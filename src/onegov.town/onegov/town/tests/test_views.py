@@ -1886,6 +1886,53 @@ def test_reserve_multiple_allocations(town_app):
     assert resource.scheduler.managed_reserved_slots().count() == 0
 
 
+def test_reserve_failing_multiple(town_app):
+    c1 = Client(town_app)
+    c1.login_admin()
+
+    c2 = Client(town_app)
+    c2.login_admin()
+
+    resource = town_app.libres_resources.by_name('sbb-tageskarte')
+    thursday = resource.scheduler.allocate(
+        dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
+        whole_day=True
+    )[0]
+    friday = resource.scheduler.allocate(
+        dates=(datetime(2016, 4, 29), datetime(2016, 4, 29)),
+        whole_day=True
+    )[0]
+
+    c1_reserve_thursday = bound_reserve(c1, thursday)
+    c1_reserve_friday = bound_reserve(c1, friday)
+    c2_reserve_thursday = bound_reserve(c2, thursday)
+    c2_reserve_friday = bound_reserve(c2, friday)
+
+    transaction.commit()
+
+    assert c1_reserve_thursday().json == {'success': True}
+    assert c1_reserve_friday().json == {'success': True}
+    assert c2_reserve_thursday().json == {'success': True}
+    assert c2_reserve_friday().json == {'success': True}
+
+    # accept the first reservation session
+    formular = c1.get('/ressource/sbb-tageskarte/formular')
+    formular.form['email'] = "info@example.org"
+    formular.form.submit().follow().click("Abschliessen").follow()
+
+    ticket = c1.get('/tickets/ALL/open').click('Annehmen').follow()
+    ticket.click('Reservation annehmen')
+
+    # then try to accept the second one
+    formular = c2.get('/ressource/sbb-tageskarte/formular')
+    formular.form['email'] = "info@example.org"
+    confirmation = formular.form.submit().follow()
+    confirmation = confirmation.click("Abschliessen").follow()
+
+    assert 'failed_reservations' in confirmation.request.url
+    assert 'class="reservation failed"' in confirmation
+
+
 def test_cleanup_allocations(town_app):
 
     # prepate the required data
