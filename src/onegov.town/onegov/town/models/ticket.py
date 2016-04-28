@@ -108,6 +108,7 @@ class ReservationHandler(Handler):
         # try to be aware of it as much as possible
         query = self.session.query(Reservation)
         query = query.filter(Reservation.token == self.id)
+        query = query.order_by(Reservation.start)
 
         return query.all()
 

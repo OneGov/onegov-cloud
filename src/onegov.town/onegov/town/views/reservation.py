@@ -322,6 +322,7 @@ def accept_reservation(self, request):
     if not self.data or not self.data.get('accepted'):
         resource = request.app.libres_resources.by_reservation(self)
         reservations = resource.scheduler.reservations_by_token(self.token)
+        reservations = reservations.order_by(Reservation.start)
 
         send_html_mail(
             request=request,
@@ -354,6 +355,7 @@ def reject_reservation(self, request):
     resource = request.app.libres_resources.by_reservation(self)
     token = self.token.hex
     reservations = resource.scheduler.reservations_by_token(token)
+    reservations = reservations.order_by(Reservation.start)
 
     forms = FormCollection(request.app.session())
     submission = forms.submissions.by_id(token)
