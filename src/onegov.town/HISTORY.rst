@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes extra text in ticket closed e-mail.
+  [href]
+
 - Adds the ability to create multiple reservations in one ticket.
   [href]
 
