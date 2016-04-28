@@ -16,8 +16,8 @@
                         ${layout.format_date(start, 'date_long')}
                         <!-- simple whole day check: -->
                         <tal:block condition="start.time() != end.time()">
-                            ${layout.format_date(start, 'time')} -
-                            ${layout.format_date(end, 'time')}
+                        <br>
+                            ${layout.format_time_range(start, end)}
                         </tal:block>
                     </span>
                     <br>

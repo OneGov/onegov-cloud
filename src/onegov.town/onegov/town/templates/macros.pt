@@ -429,12 +429,12 @@
                 <strong>
                     ${layout.format_date(start, 'weekday_long')},
                     ${layout.format_date(start, 'date_long')}
-                    <!--! simple whole day check: -->
-                    <tal:block condition="start.time() != end.time()">
-                        ${layout.format_date(start, 'time')} -
-                        ${layout.format_date(end, 'time')}
-                    </tal:block>
                 </strong>
+                <!--! simple whole day check: -->
+                <span tal:condition="start.time() != end.time()">
+                    <br>
+                    ${layout.format_time_range(start, end)}
+                </span>
                 <br><span i18n:translate>Quota</span>
                 <span>
                     ${reservation.quota}

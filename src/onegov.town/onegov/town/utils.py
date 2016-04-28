@@ -443,3 +443,13 @@ def get_libres_session_id(request):
         request.browser_session.libres_session_id = uuid4()
 
     return request.browser_session.libres_session_id
+
+
+def format_time_range(start, end):
+    return correct_time_range('{:%H:%M} - {:%H:%M}'.format(start, end))
+
+
+def correct_time_range(string):
+    if string.endswith('00:00'):
+        return string[:-5] + '24:00'
+    return string

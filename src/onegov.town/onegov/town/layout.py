@@ -272,6 +272,9 @@ class Layout(ChameleonLayout):
     def get_user_color(self, username):
         return utils.get_user_color(username)
 
+    def format_time_range(self, start, end):
+        return utils.format_time_range(start, end)
+
 
 class DefaultMailLayout(Layout):
     """ A special layout for creating HTML E-Mails. """

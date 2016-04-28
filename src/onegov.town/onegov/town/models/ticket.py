@@ -9,6 +9,7 @@ from onegov.ticket import Ticket, Handler, handlers
 from onegov.town import _
 from onegov.town.elements import DeleteLink, Link
 from onegov.town.layout import DefaultLayout, EventLayout
+from onegov.town.utils import correct_time_range
 from purl import URL
 
 
@@ -145,10 +146,12 @@ class ReservationHandler(Handler):
 
         for ix, reservation in enumerate(self.reservations):
             parts.append(
-                template.format(
-                    start=reservation.display_start(),
-                    end=reservation.display_end(),
-                    quota=reservation.quota
+                correct_time_range(
+                    template.format(
+                        start=reservation.display_start(),
+                        end=reservation.display_end(),
+                        quota=reservation.quota
+                    )
                 )
             )
 
