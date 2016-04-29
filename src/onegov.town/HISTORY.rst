@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.7.0 (2016-04-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to create multiple reservations in one ticket.
   [href]
 
