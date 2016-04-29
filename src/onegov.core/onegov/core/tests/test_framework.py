@@ -11,6 +11,7 @@ from email.utils import parseaddr
 from freezegun import freeze_time
 from onegov.core import Framework
 from onegov.core.upgrade import UpgradeState
+from onegov.core.mail import convert_to_plaintext
 from onegov.server import Config, Server
 from webtest import TestApp as Client
 from wtforms import Form, StringField
@@ -626,6 +627,16 @@ def test_send_email_unicode(smtp):
         'Content-Transfer-Encoding: base64\n\n'
         '8J+RjQ==\n'
     )
+
+
+def test_convert_to_plaintext():
+    html = (
+        "<h1>Date</h1><p>6. April 1984</p>\n"
+        "<h1>Path</h1><p>/foo-bar</p>\n"
+    )
+
+    plaintext = convert_to_plaintext(html)
+    assert plaintext == "# Date\n\n6. April 1984\n\n# Path\n\n/foo-bar"
 
 
 def test_object_by_path():

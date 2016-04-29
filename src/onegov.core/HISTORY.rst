@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Removes escaping characters from plaintext e-mails.
+  [href]
+
 0.20.0 (2016-04-11)
 ~~~~~~~~~~~~~~~~~~~
 

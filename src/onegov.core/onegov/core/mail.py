@@ -10,6 +10,37 @@ from mailthon.envelope import Envelope as BaseEnvelope
 from mailthon.postman import Postman
 
 
+VALID_PLAINTEXT_CHARACTERS = re.compile(r"""
+    [
+        \d  # decimals
+        \w  # words
+        \n  # new lines
+
+        # emojis
+        \U00002600-\U000027BF
+        \U0001f300-\U0001f64F
+        \U0001f680-\U0001f6FF
+    ]+
+""", re.VERBOSE)
+
+
+def convert_to_plaintext(html):
+
+    # filter out duplicated lines and lines without any text
+    lines = html2text(html, '', bodywidth=0).splitlines()
+    lines = (l.strip() for l in lines)
+    lines = (l for l in lines if VALID_PLAINTEXT_CHARACTERS.search(l))
+
+    # use double newlines to get paragraphs
+    plaintext = '\n\n'.join(lines)
+
+    # in an attempt to create proper markdown html2text will escape
+    # dots. Since markdown is not something we care about here, we undo that
+    plaintext = plaintext.replace('\\.', '.')
+
+    return plaintext
+
+
 def email(sender=None, receivers=(), cc=(), bcc=(),
           subject=None, content=None, encoding='utf8',
           attachments=()):
@@ -29,26 +60,7 @@ def email(sender=None, receivers=(), cc=(), bcc=(),
     if content:
         # turn the html email into a plaintext representation
         # this leads to a lower spam rating
-        any_character = re.compile(r"""
-            [
-                \d  # decimals
-                \w  # words
-                \n  # new lines
-
-                # emojis
-                \U00002600-\U000027BF
-                \U0001f300-\U0001f64F
-                \U0001f680-\U0001f6FF
-            ]+
-        """, re.VERBOSE)
-
-        # filter out duplicated lines and lines without any text
-        lines = html2text(content, encoding, bodywidth=0).splitlines()
-        lines = (l.strip() for l in lines)
-        lines = (l for l in lines if any_character.search(l))
-
-        # use double newlines to get paragraphs
-        plaintext = '\n\n'.join(lines)
+        plaintext = convert_to_plaintext(content)
     else:
         plaintext = None
 
