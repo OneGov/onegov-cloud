@@ -12,7 +12,6 @@ from onegov.town import _
 from onegov.town.elements import DeleteLink, Link
 from operator import attrgetter
 from purl import URL
-from uuid import uuid4
 
 
 def add_class_to_node(node, classname):
