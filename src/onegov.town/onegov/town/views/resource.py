@@ -182,5 +182,5 @@ def handle_cleanup_allocations(self, request, form):
 def get_reservations(self, request):
     return [
         utils.ReservationInfo(reservation, request).as_dict() for reservation
-        in self.request_bound_reservations(request)
+        in self.bound_reservations(request)
     ]

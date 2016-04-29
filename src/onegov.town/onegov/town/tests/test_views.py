@@ -1814,6 +1814,28 @@ def test_reserve_session_separation(town_app):
         result = c2.get('/ressource/{}/reservations'.format(room)).json
         assert len(result) == 1
 
+    formular = c1.get('/ressource/meeting-room/formular')
+    formular.form['email'] = 'info@example.org'
+    formular.form.submit()
+
+    # make sure if we confirm one reservation, only one will be written
+    formular.form.submit().follow().click("Abschliessen").follow()
+
+    resource = town_app.libres_resources.by_name('meeting-room')
+    assert resource.scheduler.managed_reserved_slots().count() == 1
+
+    result = c1.get('/ressource/meeting-room/reservations'.format(room)).json
+    assert len(result) == 0
+
+    result = c1.get('/ressource/gym/reservations'.format(room)).json
+    assert len(result) == 1
+
+    result = c2.get('/ressource/meeting-room/reservations'.format(room)).json
+    assert len(result) == 1
+
+    result = c2.get('/ressource/gym/reservations'.format(room)).json
+    assert len(result) == 1
+
 
 def test_reserve_multiple_allocations(town_app):
     client = Client(town_app)

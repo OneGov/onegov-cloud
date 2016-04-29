@@ -9,8 +9,7 @@ from onegov.town.models.extensions import (
     CoordinatesExtension
 )
 from onegov.search import ORMSearchable
-from onegov.town import utils
-from uuid import uuid5
+from uuid import uuid4, uuid5
 
 
 class SharedMethods(object):
@@ -47,13 +46,10 @@ class SharedMethods(object):
             query.delete('fetch')
             queries.remove_expired_reservation_sessions(expiration_date)
 
-    def request_bound_reservations(self, request, status='pending'):
-        """ Returns the reservations associated with this resource and the
-        current user.
+    def bound_reservations(self, request, status='pending'):
+        """ The reservations associated with this resource and user. """
 
-        """
-
-        session = utils.get_libres_session_id(request)
+        session = self.bound_session_id(request)
         scheduler = self.get_scheduler(request.app.libres_context)
 
         res = scheduler.queries.reservations_by_session(session)
@@ -64,11 +60,12 @@ class SharedMethods(object):
 
         return res
 
-    def request_bound_submission_id(self, request):
-        """ Returns the submission id for request and the current resouce. """
-        session = utils.get_libres_session_id(request)
+    def bound_session_id(self, request):
+        """ The session id associated with this resource and user. """
+        if not request.browser_session.has('libres_session_id'):
+            request.browser_session.libres_session_id = uuid4()
 
-        return uuid5(self.id, session.hex)
+        return uuid5(self.id, request.browser_session.libres_session_id.hex)
 
 
 class SearchableResource(ORMSearchable):

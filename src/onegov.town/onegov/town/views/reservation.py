@@ -20,7 +20,7 @@ from sqlalchemy.orm.attributes import flag_modified
 from webob import exc
 
 
-def assert_anonymous_access_only_temporary(self, request):
+def assert_anonymous_access_only_temporary(resource, reservation, request):
     """ Raises exceptions if the current user is anonymous and no longer
     should be given access to the reservation models.
 
@@ -34,13 +34,13 @@ def assert_anonymous_access_only_temporary(self, request):
     if request.is_logged_in:
         return
 
-    if not self.session_id:
+    if not reservation.session_id:
         raise exc.HTTPForbidden()
 
-    if self.status == 'approved':
+    if reservation.status == 'approved':
         raise exc.HTTPForbidden()
 
-    if self.session_id != utils.get_libres_session_id(request):
+    if reservation.session_id != resource.bound_session_id(request):
         raise exc.HTTPForbidden()
 
 
@@ -89,7 +89,7 @@ def reserve_allocation(self, request):
             email='0xdeadbeef@example.org',  # will be set later
             dates=(start, end),
             quota=quota,
-            session_id=utils.get_libres_session_id(request),
+            session_id=resource.bound_session_id(request),
             single_token_per_session=True
         )
     except LibresError as e:
@@ -117,11 +117,10 @@ def reserve_allocation(self, request):
 
 @TownApp.json(model=Reservation, request_method='DELETE', permission=Public)
 def delete_reservation(self, request):
+    resource = request.app.libres_resources.by_reservation(self)
 
     # this view is public, but only for a limited time
-    assert_anonymous_access_only_temporary(self, request)
-
-    resource = request.app.libres_resources.by_reservation(self)
+    assert_anonymous_access_only_temporary(self, resource, request)
 
     try:
         resource.scheduler.remove_reservation(self.token, self.id)
@@ -162,7 +161,7 @@ def handle_reservation_form(self, request, form):
     reservations on a resource.
 
     """
-    reservations_query = self.request_bound_reservations(request)
+    reservations_query = self.bound_reservations(request)
     reservations = reservations_query.all()
     assert_access_only_if_there_are_reservations(reservations)
 
@@ -232,7 +231,7 @@ def handle_reservation_form(self, request, form):
 @TownApp.html(model=Resource, name='bestaetigung', permission=Public,
               template='reservation_confirmation.pt')
 def confirm_reservation(self, request):
-    reservations = self.request_bound_reservations(request).all()
+    reservations = self.bound_reservations(request).all()
     assert_access_only_if_there_are_reservations(reservations)
 
     token = reservations[0].token.hex
@@ -271,14 +270,14 @@ def confirm_reservation(self, request):
 @TownApp.html(model=Resource, name='abschluss', permission=Public,
               template='layout.pt')
 def finalize_reservation(self, request):
-    reservations = self.request_bound_reservations(request).all()
+    reservations = self.bound_reservations(request).all()
     assert_access_only_if_there_are_reservations(reservations)
 
-    session = utils.get_libres_session_id(request)
+    session_id = self.bound_session_id(request)
     token = reservations[0].token.hex
 
     try:
-        self.scheduler.queries.confirm_reservations_for_session(session)
+        self.scheduler.queries.confirm_reservations_for_session(session_id)
         self.scheduler.approve_reservations(token)
 
     except LibresError as e:

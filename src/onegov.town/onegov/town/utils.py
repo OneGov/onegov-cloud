@@ -438,13 +438,6 @@ def get_user_color(username):
     )
 
 
-def get_libres_session_id(request):
-    if not request.browser_session.has('libres_session_id'):
-        request.browser_session.libres_session_id = uuid4()
-
-    return request.browser_session.libres_session_id
-
-
 def format_time_range(start, end):
     return correct_time_range('{:%H:%M} - {:%H:%M}'.format(start, end))
 
