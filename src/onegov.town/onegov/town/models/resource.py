@@ -95,6 +95,9 @@ class DaypassResource(Resource, HiddenFromPublicExtension, SearchableResource,
 
     es_type_name = 'daypasses'
 
+    # the default view
+    view = 'month'
+
 
 class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
                    ContactExtension, PersonLinkExtension,
@@ -102,3 +105,6 @@ class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
     __mapper_args__ = {'polymorphic_identity': 'room'}
 
     es_type_name = 'rooms'
+
+    # the default view
+    view = 'agendaWeek'
