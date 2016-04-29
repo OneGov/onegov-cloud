@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.2 (2016-04-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes reindex command not working with Morepath 0.14.
   [href]
 
