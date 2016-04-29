@@ -74,6 +74,7 @@ def reindex(ctx):
                 session.invalidate()
                 session.bind.dispose()
 
+        morepath.autoscan()
         morepath.commit(ReindexApplication)
 
         # get all applications by looking at the existing schemas
