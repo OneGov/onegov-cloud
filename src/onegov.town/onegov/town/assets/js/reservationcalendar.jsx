@@ -443,7 +443,7 @@ rc.setupReservationSelect = function(fcOptions) {
         });
 
         calendar.on('rc-reservations-changed', function() {
-            $.getJSON(fcOptions.reservations, function(reservations) {
+            $.getJSON(fcOptions.reservations + '&ie-cache=' + parseInt(Math.random() * 10000000, 10), function(reservations) {
                 ReservationSelection.render(selection.get(0), calendar, reservations, fcOptions.reservationform);
             });
         });
