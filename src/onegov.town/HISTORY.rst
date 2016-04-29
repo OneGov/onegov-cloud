@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix onegov.search reindex not working.
+  [href]
+
 1.7.0 (2016-04-29)
 ~~~~~~~~~~~~~~~~~~~
 
