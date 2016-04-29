@@ -120,7 +120,7 @@ def delete_reservation(self, request):
     resource = request.app.libres_resources.by_reservation(self)
 
     # this view is public, but only for a limited time
-    assert_anonymous_access_only_temporary(self, resource, request)
+    assert_anonymous_access_only_temporary(resource, self, request)
 
     try:
         resource.scheduler.remove_reservation(self.token, self.id)

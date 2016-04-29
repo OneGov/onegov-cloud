@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes reservation delete not working correctly.
+  [href]
+
 1.7.1 (2016-04-29)
 ~~~~~~~~~~~~~~~~~~~
 
