@@ -299,7 +299,7 @@ rc.showErrorPopup = function(calendar, element, message) {
 
 rc.showPopup = function(calendar, element, content, position, extraClasses) {
 
-    $(element.closest('.fc-event')).addClass('has-popup');
+    $(element).closest('.fc-event').addClass('has-popup');
 
     var options = {
         autoopen: true,
@@ -309,7 +309,7 @@ rc.showPopup = function(calendar, element, content, position, extraClasses) {
             rc.onPopupOpen.call(this, calendar);
         },
         onclose: function() {
-            $(element.closest('.fc-event')).removeClass('has-popup');
+            $(element).closest('.fc-event').removeClass('has-popup');
         },
         closebutton: true,
         closebuttonmarkup: '<a href="#" class="close">×</a>'
