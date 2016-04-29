@@ -1,10 +1,13 @@
 Changelog
 ---------
 
-- Removes extra text in ticket closed e-mail.
+- Adds the ability to create multiple reservations in one ticket.
   [href]
 
-- Adds the ability to create multiple reservations in one ticket.
+- Adds the ability to deny selected dates from a reservation ticket.
+  [href]
+
+- Removes extra text in ticket closed e-mail.
   [href]
 
 - Shows an error if an uploaded's filename is too long.

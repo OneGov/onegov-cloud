@@ -69,6 +69,12 @@ class Client(SkipFirstForm, BaseApp):
         return self.get('/auth/logout')
 
 
+def get_message(app, index, payload=0):
+    message = app.smtp.outbox[index]
+    message = message.get_payload(payload).get_payload(decode=True)
+    return message.decode('iso-8859-1')
+
+
 def extract_href(link):
     """ Takes a link (<a href...>) and returns the href address. """
     result = re.search(r'(?:href|ic-delete-from)="([^"]+)', link)
@@ -1466,10 +1472,10 @@ def test_reserve_allocation(town_app):
     assert '4' in ticket
 
     # accept it
-    assert 'Reservation annehmen' in ticket
-    ticket = ticket.click('Reservation annehmen').follow()
+    assert 'Alle Reservationen annehmen' in ticket
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
 
-    assert 'Reservation annehmen' not in ticket
+    assert 'Alle Reservationen annehmen' not in ticket
     assert len(town_app.smtp.outbox) == 2
 
     message = town_app.smtp.outbox[1]
@@ -1477,7 +1483,7 @@ def test_reserve_allocation(town_app):
     message = message.decode('iso-8859-1')
 
     assert 'SBB-Tageskarte' in message
-    assert '28\. August 2015' in message
+    assert '28. August 2015' in message
     assert '4' in message
 
     # edit its details
@@ -1509,7 +1515,7 @@ def test_reserve_allocation(town_app):
     message = message.decode('iso-8859-1')
 
     assert 'SBB-Tageskarte' in message
-    assert '28\. August 2015' in message
+    assert '28. August 2015' in message
     assert '4' in message
 
     # close the ticket
@@ -1558,14 +1564,14 @@ def test_reserve_allocation_partially(town_app):
     assert "12:00" in ticket
 
     # accept it
-    ticket = ticket.click('Reservation annehmen').follow()
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
 
     message = town_app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
     assert "SBB-Tageskarte" in message
-    assert "28\. August 2015" in message
+    assert "28. August 2015" in message
     assert "10:00" in message
     assert "12:00" in message
 
@@ -1850,15 +1856,15 @@ def test_reserve_multiple_allocations(town_app):
     assert "29. April 2016" in ticket
 
     # accept it
-    ticket.click('Reservation annehmen')
+    ticket.click('Alle Reservationen annehmen')
 
     message = town_app.smtp.outbox[1]
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
     assert "SBB-Tageskarte" in message
-    assert "28\. April 2016" in message
-    assert "29\. April 2016" in message
+    assert "28. April 2016" in message
+    assert "29. April 2016" in message
 
     # make sure the reservations are no longer pending
     resource = town_app.libres_resources.by_name('sbb-tageskarte')
@@ -1876,14 +1882,95 @@ def test_reserve_multiple_allocations(town_app):
     message = message.decode('iso-8859-1')
 
     assert "SBB-Tageskarte" in message
-    assert "28\. April 2016" in message
-    assert "29\. April 2016" in message
+    assert "28. April 2016" in message
+    assert "29. April 2016" in message
 
     # make sure the reservations are now gone, together with the reserved slots
     reservations = resource.scheduler.managed_reservations()
     assert reservations.filter(Reservation.status == 'approved').count() == 0
     assert reservations.filter(Reservation.status == 'pending').count() == 0
     assert resource.scheduler.managed_reserved_slots().count() == 0
+
+
+def test_reserve_and_deny_multiple_dates(town_app):
+    client = Client(town_app)
+    client.login_admin()
+
+    resource = town_app.libres_resources.by_name('sbb-tageskarte')
+    wednesday = resource.scheduler.allocate(
+        dates=(datetime(2016, 4, 27), datetime(2016, 4, 27)),
+        whole_day=True
+    )[0]
+    thursday = resource.scheduler.allocate(
+        dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
+        whole_day=True
+    )[0]
+    friday = resource.scheduler.allocate(
+        dates=(datetime(2016, 4, 29), datetime(2016, 4, 29)),
+        whole_day=True
+    )[0]
+
+    reserve_wednesday = bound_reserve(client, wednesday)
+    reserve_thursday = bound_reserve(client, thursday)
+    reserve_friday = bound_reserve(client, friday)
+
+    transaction.commit()
+
+    assert reserve_wednesday().json == {'success': True}
+    assert reserve_thursday().json == {'success': True}
+    assert reserve_friday().json == {'success': True}
+
+    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular.form['email'] = "info@example.org"
+
+    confirmation = formular.form.submit().follow()
+    ticket = confirmation.click("Abschliessen").follow()
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    # the resource needs to be refetched after the commit
+    resource = town_app.libres_resources.by_name('sbb-tageskarte')
+    assert resource.scheduler.managed_reserved_slots().count() == 3
+
+    # deny the last reservation
+    client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
+    assert resource.scheduler.managed_reserved_slots().count() == 2
+
+    message = get_message(town_app, 1)
+    assert "abgesagt" in message
+    assert "29. April 2016" in message
+
+    # accept the others
+    ticket = ticket.click('Alle Reservationen annehmen').follow()
+    assert resource.scheduler.managed_reserved_slots().count() == 2
+
+    message = get_message(town_app, 2)
+    assert "angenommen" in message
+    assert "27. April 2016" in message
+    assert "28. April 2016" in message
+
+    # deny the reservations that were accepted one by one
+    client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
+    assert resource.scheduler.managed_reserved_slots().count() == 1
+
+    message = get_message(town_app, 3)
+    assert "abgesagt" in message
+    assert "27. April 2016" not in message
+    assert "28. April 2016" in message
+
+    ticket = client.get(ticket.request.url)
+    client.get(ticket.pyquery('a.delete-link')[-1].attrib['ic-get-from'])
+    assert resource.scheduler.managed_reserved_slots().count() == 0
+
+    message = get_message(town_app, 4)
+    assert "abgesagt" in message
+    assert "27. April 2016" in message
+    assert "28. April 2016" not in message
+
+    ticket = client.get(ticket.request.url)
+    assert "Der hinterlegte Datensatz wurde entfernt" in ticket
+    assert "27. April 2016" in message
+    assert "28. April 2016" not in message
+    assert "29. April 2016" not in message
 
 
 def test_reserve_failing_multiple(town_app):
@@ -1921,7 +2008,7 @@ def test_reserve_failing_multiple(town_app):
     formular.form.submit().follow().click("Abschliessen").follow()
 
     ticket = c1.get('/tickets/ALL/open').click('Annehmen').follow()
-    ticket.click('Reservation annehmen')
+    ticket.click('Alle Reservationen annehmen')
 
     # then try to accept the second one
     formular = c2.get('/ressource/sbb-tageskarte/formular')

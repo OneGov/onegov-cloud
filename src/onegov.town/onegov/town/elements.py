@@ -173,9 +173,10 @@ class Img(object):
 class LinkGroup(HiddenElementMixin):
     """ Represents a list of links. """
 
-    __slots__ = ['title', 'links', 'model']
+    __slots__ = ['title', 'links', 'model', 'right_side']
 
-    def __init__(self, title, links, model=None):
+    def __init__(self, title, links, model=None, right_side=True):
         self.title = title
         self.links = links
         self.model = model
+        self.right_side = right_side

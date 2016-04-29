@@ -7,7 +7,7 @@ from onegov.form import FormSubmissionCollection
 from onegov.libres import Resource
 from onegov.ticket import Ticket, Handler, handlers
 from onegov.town import _
-from onegov.town.elements import DeleteLink, Link
+from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.layout import DefaultLayout, EventLayout
 from onegov.town.utils import correct_time_range
 from purl import URL
@@ -135,6 +135,18 @@ class ReservationHandler(Handler):
 
     @property
     def title(self):
+        parts = []
+
+        for ix, reservation in enumerate(self.reservations):
+            parts.append(self.get_reservation_title(reservation))
+
+            if ix == 4:
+                parts.append('…')
+                break
+
+        return ', '.join(parts)
+
+    def get_reservation_title(self, reservation):
         if self.resource.type == 'daypass':
             template = '{start:%d.%m.%Y} ({quota})'
         elif self.resource.type == 'room':
@@ -142,24 +154,13 @@ class ReservationHandler(Handler):
         else:
             raise NotImplementedError
 
-        parts = []
-
-        for ix, reservation in enumerate(self.reservations):
-            parts.append(
-                correct_time_range(
-                    template.format(
-                        start=reservation.display_start(),
-                        end=reservation.display_end(),
-                        quota=reservation.quota
-                    )
-                )
+        return correct_time_range(
+            template.format(
+                start=reservation.display_start(),
+                end=reservation.display_end(),
+                quota=reservation.quota
             )
-
-            if ix == 4:
-                parts.append('…')
-                break
-
-        return ', '.join(parts)
+        )
 
     @property
     def subtitle(self):
@@ -223,35 +224,70 @@ class ReservationHandler(Handler):
 
         links = []
 
-        data = self.reservations[0].data or {}
+        accepted = tuple(
+            r.data and r.data.get('accepted') or False
+            for r in self.reservations
+        )
 
-        if not data.get('accepted'):
+        if not all(accepted):
             link = URL(request.link(self.reservations[0], 'annehmen'))
             link = link.query_param('return-to', request.url)
 
             links.append(
                 Link(
-                    text=_("Accept reservation"),
+                    text=_("Accept all reservations"),
                     url=link.as_string(),
                     classes=('accept-link', )
                 )
             )
 
-        link = URL(request.link(self.reservations[0], 'absagen'))
-        link = link.query_param('return-to', request.url)
-        links.append(
-            DeleteLink(
-                text=_("Reject reservation"),
-                url=link.as_string(),
-                confirm=_("Do you really want to reject this reservation?"),
-                extra_information=_(
-                    "Rejecting this reservation can't be undone."
-                ),
-                yes_button_text=_("Reject reservation"),
-                request_method='GET',
-                redirect_after=request.url
-            )
+        reject_all_link = URL(request.link(self.reservations[0], 'absagen'))
+        reject_all_link = reject_all_link.query_param('return-to', request.url)
+
+        reject = LinkGroup(
+            _("Reject reservations"),
+            [
+                DeleteLink(
+                    text=_("Reject all"),
+                    url=reject_all_link.as_string(),
+                    confirm=_(
+                        "Do you really want to reject all reservations?"
+                    ),
+                    extra_information=_(
+                        "Rejecting these reservations can't be undone."
+                    ),
+                    yes_button_text=_("Reject reservations"),
+                    request_method='GET',
+                    redirect_after=request.url
+                )
+            ],
+            right_side=False
         )
+
+        for reservation in self.reservations:
+            link = URL(request.link(reservation, 'absagen'))
+            link = link.query_param('reservation-id', reservation.id)
+            link = link.query_param('return-to', request.url)
+            title = self.get_reservation_title(reservation)
+            reject.links.append(
+                DeleteLink(
+                    text=_("Reject ${title}", mapping={'title': title}),
+                    url=link.as_string(),
+                    confirm=_(
+                        "Do you really want to reject this reservation?"
+                    ),
+                    extra_information=_(
+                        "Rejecting ${title} can't be undone.", mapping={
+                            'title': title
+                        }
+                    ),
+                    yes_button_text=_("Reject reservation"),
+                    request_method='GET',
+                    redirect_after=request.url
+                )
+            )
+
+        links.append(reject)
 
         if self.submission:
             link = URL(request.link(self.submission))

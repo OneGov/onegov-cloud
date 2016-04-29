@@ -327,7 +327,7 @@ def accept_reservation(self, request):
         send_html_mail(
             request=request,
             template='mail_reservation_accepted.pt',
-            subject=_("Your reservation was accepted"),
+            subject=_("Your reservations were accepted"),
             receivers=(self.email, ),
             content={
                 'model': self,
@@ -343,9 +343,9 @@ def accept_reservation(self, request):
             # libres does not automatically detect changes yet
             flag_modified(reservation, 'data')
 
-        request.success(_("The reservation was accepted"))
+        request.success(_("The reservations were accepted"))
     else:
-        request.warning(_("The reservation has already been accepted"))
+        request.warning(_("The reservations have already been accepted"))
 
     return morepath.redirect(request.params['return-to'])
 
@@ -354,8 +354,16 @@ def accept_reservation(self, request):
 def reject_reservation(self, request):
     resource = request.app.libres_resources.by_reservation(self)
     token = self.token.hex
-    reservations = resource.scheduler.reservations_by_token(token)
-    reservations = reservations.order_by(Reservation.start)
+    reservation_id = int(request.params.get('reservation-id', '0')) or None
+
+    all_reservations = resource.scheduler.reservations_by_token(token)
+    all_reservations = all_reservations.order_by(Reservation.start).all()
+
+    targeted = tuple(r for r in all_reservations if r.id == reservation_id)
+    targeted = targeted or all_reservations
+    excluded = tuple(r for r in all_reservations if r.id not in {
+        r.id for r in targeted
+    })
 
     forms = FormCollection(request.app.session())
     submission = forms.submissions.by_id(token)
@@ -363,26 +371,31 @@ def reject_reservation(self, request):
     send_html_mail(
         request=request,
         template='mail_reservation_rejected.pt',
-        subject=_("Your reservation was rejected"),
+        subject=_("The following reservations were rejected"),
         receivers=(self.email, ),
         content={
             'model': self,
             'resource': resource,
-            'reservations': reservations
+            'reservations': targeted
         }
     )
 
     # create a snapshot of the ticket to keep the useful information
-    tickets = TicketCollection(request.app.session())
-    ticket = tickets.by_handler_id(token)
-    ticket.create_snapshot(request)
+    if len(excluded) == 0:
+        tickets = TicketCollection(request.app.session())
+        ticket = tickets.by_handler_id(token)
+        ticket.create_snapshot(request)
 
-    resource.scheduler.remove_reservation(token)
+    for reservation in targeted:
+        resource.scheduler.remove_reservation(token, reservation.id)
 
-    if submission:
+    if len(excluded) == 0 and submission:
         forms.submissions.delete(submission)
 
-    request.success(_("The reservation was rejected"))
+    if len(targeted) > 1:
+        request.success(_("The reservations were rejected"))
+    else:
+        request.success(_("The reservation was rejected"))
 
     # return none on intercooler js requests
     if not request.headers.get('X-IC-Request'):

@@ -60,7 +60,7 @@ class SharedMethods(object):
         res = res.filter(Reservation.resource == self.id)
         res = res.filter(Reservation.status == status)
         res = res.order_by(False)  # clear existing order
-        res = res.order_by(Reservation.id)
+        res = res.order_by(Reservation.start)
 
         return res
 

@@ -705,9 +705,12 @@ $send-link-icon: '\f1d9';
     margin-top: -6px;
 
     button.tiny {
-        float: right;
         font-size: .8rem;
         margin-bottom: 0;
+
+        &.right-side {
+            float: right;
+        }
     }
 
     > a {
@@ -1710,7 +1713,7 @@ tr.ticket:hover {
 .f-dropdown {
     border-radius: 3px;
     max-height: 400px;
-    max-width: 250px;
+    max-width: 275px;
     overflow-x: hidden;
     overflow-y: scroll;
 
@@ -2791,6 +2794,6 @@ ul.search-results {
         $bg: $secondary-color,
         $radius: 4px
     );
-    margin-bottom: 1rem;
     font-size: 1rem;
+    margin-bottom: 1rem;
 }
