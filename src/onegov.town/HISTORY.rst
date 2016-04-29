@@ -7,22 +7,7 @@ Changelog
 - Adds the ability to deny selected dates from a reservation ticket.
   [href]
 
-- Removes extra text in ticket closed e-mail.
-  [href]
-
-- Shows an error if an uploaded's filename is too long.
-  [href]
-
 - Adds the ability to filter the tickets by group.
-  [href]
-
-- Improves full-day reservation form.
-  [href]
-
-- Enables hpyhenation in browsers that support it.
-  [href]
-
-- Merges the resevation forms into a single step.
   [href]
 
 - Adds the ability to group resources in the overview.
@@ -31,13 +16,25 @@ Changelog
 - Adds full history and url sharing support to the calendar.
   [href]
 
-- Limits search queries to 100 characters.
+- Merges the resevation forms into a single step.
+  [href]
+
+- Shows an error if an uploaded's filename is too long.
+  [href]
+
+- Removes extra text in ticket closed e-mail.
   [href]
 
 - Improve legibility for ticket badges with numbers > 99.
   [href]
 
+- Enables hpyhenation in browsers that support it.
+  [href]
+
 - Fix modal redactor dialogs being "jumpy" (moving the background when opened).
+  [href]
+
+- Limits search queries to 100 characters.
   [href]
 
 - Adds compatibility with Morepath 0.13.
