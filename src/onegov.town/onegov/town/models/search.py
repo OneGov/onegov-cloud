@@ -6,6 +6,7 @@ from elasticsearch_dsl.query import MultiMatch, MatchPhrase
 class Search(Pagination):
 
     results_per_page = 10
+    max_query_length = 100
 
     def __init__(self, request, query, page):
         self.request = request
@@ -47,10 +48,14 @@ class Search(Pagination):
             explain=self.explain
         )
 
+        # queries need to be cut at some point to make sure we're not
+        # pushing the elasticsearch cluster to the brink
+        query = self.query[:self.max_query_length]
+
         # make sure the title matches with a higher priority, otherwise the
         # "get lucky" functionality is not so lucky after all
-        match_title = MatchPhrase(title={"query": self.query, "boost": 3})
-        match_rest = MultiMatch(query=self.query, fields=[
+        match_title = MatchPhrase(title={"query": query, "boost": 3})
+        match_rest = MultiMatch(query=query, fields=[
             'title', 'lead', 'text', 'email', 'function', 'number',
             'ticket_email', 'ticket_data', 'description', 'location',
             'group'

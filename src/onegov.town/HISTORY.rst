@@ -31,6 +31,9 @@ Changelog
 - Adds full history and url sharing support to the calendar.
   [href]
 
+- Limits search queries to 100 characters.
+  [href]
+
 - Improve legibility for ticket badges with numbers > 99.
   [href]
 
