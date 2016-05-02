@@ -172,8 +172,8 @@ def handle_reservation_form(self, request, form):
     forms = FormCollection(request.app.session())
     submission = forms.submissions.by_id(token)
 
-    if form.submitted(request):
-
+    # update the data if the form is submitted (even if invalid)
+    if request.POST:
         # update the e-mail data
         reservations_query.order_by(False).update(
             {Reservation.email: form.email.data}
@@ -196,6 +196,8 @@ def handle_reservation_form(self, request, form):
                 submission, form, exclude=form.reserved_fields
             )
 
+    # go to the next step if the submitted data is valid
+    if form.submitted(request):
         return morepath.redirect(request.link(self, 'bestaetigung'))
     else:
         data = {}
