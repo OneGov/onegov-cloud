@@ -444,21 +444,13 @@ rc.setupReservationSelect = function(fcOptions) {
         });
 
         calendar.on('rc-reservations-changed', function() {
-            $.getJSON(fcOptions.reservations + '&ie-cache=' + parseInt(Math.random() * 10000000, 10), function(reservations) {
+            $.getJSON(fcOptions.reservations + '&ie-cache=' + (new Date()).getTime(), function(reservations) {
                 ReservationSelection.render(selection.get(0), calendar, reservations, fcOptions.reservationform);
             });
         });
 
-        ReservationSelection.resize(selection);
         calendar.trigger('rc-reservations-changed');
     });
-
-    var resize = function() {
-        ReservationSelection.resize(selection);
-    };
-
-    fcOptions.windowResize = resize;
-    fcOptions.viewRenderers.push(resize);
 };
 
 // renders the occupied partitions on an event
