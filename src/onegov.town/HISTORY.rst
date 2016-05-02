@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.7.3 (2016-05-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes incorrect reservation submissions not retaining their values.
   [href]
 
