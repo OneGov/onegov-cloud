@@ -424,6 +424,7 @@ rc.setupReservationSelect = function(fcOptions) {
 
         selection = $('<div class="reservation-selection"></div>')
             .insertAfter(view);
+        $('<div class="clearfix"></div>').insertAfter(selection);
 
         calendar.fullCalendar('option', 'aspectRatio', 1.1415926);
 
@@ -661,13 +662,6 @@ ReservationSelection = React.createClass({
 
 ReservationSelection.render = function(element, calendar, reservations, reservationform) {
     React.render(<ReservationSelection calendar={calendar} reservations={reservations} reservationform={reservationform} />, element);
-};
-
-ReservationSelection.resize = function(selection) {
-    var element = $(selection);
-    var view = element.parent().find('.fc-view-container');
-
-    element.css('min-height', view.height());
 };
 
 /*

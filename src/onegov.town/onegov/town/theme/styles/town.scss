@@ -2736,6 +2736,7 @@ ul.search-results {
 
     .fc-view-container {
         display: inline-block;
+        float: left;
         width: 80%;
     }
 }
@@ -2743,6 +2744,7 @@ ul.search-results {
 @media #{$small-only} {
     .reservation-selection {
         float: none;
+        padding: 0;
         width: 100%;
     }
 
