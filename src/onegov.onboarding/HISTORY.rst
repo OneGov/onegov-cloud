@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Depends on the latest onegov.core release.
+- Depends on the latest onegov.core and onegov.town release.
   [href]
 
 - Adds Morepath 0.13 compatibility.
