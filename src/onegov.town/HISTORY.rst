@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.7.4 (2016-05-05)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes search for public users returning irrelevant results.
   [href]
 
