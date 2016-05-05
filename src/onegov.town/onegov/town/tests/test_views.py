@@ -2424,8 +2424,7 @@ def test_delete_event(town_app):
 
 def test_basic_search(es_town_app):
     client = Client(es_town_app)
-
-    client.login_admin().follow()
+    client.login_admin()
 
     add_news = client.get('/aktuelles').click('Nachricht')
     add_news.form['title'] = "Now supporting fulltext search"
@@ -2459,6 +2458,40 @@ def test_basic_search(es_town_app):
 
     assert "Now supporting" not in Client(es_town_app).get('/suche?q=fulltext')
     assert "Now supporting" in client.get('/suche?q=fulltext')
+
+
+def test_view_search_is_limiting(es_town_app):
+    # ensures that the search doesn't just return all results
+    # a regression that occured for anonymous uses only
+
+    client = Client(es_town_app)
+    client.login_admin()
+
+    add_news = client.get('/aktuelles').click('Nachricht')
+    add_news.form['title'] = "Foobar"
+    add_news.form['lead'] = "Foobar"
+    add_news.form.submit()
+
+    add_news = client.get('/aktuelles').click('Nachricht')
+    add_news.form['title'] = "Deadbeef"
+    add_news.form['lead'] = "Deadbeef"
+    add_news.form.submit()
+
+    es_town_app.es_client.indices.refresh(index='_all')
+
+    root_page = client.get('/')
+    root_page.form['q'] = "Foobar"
+    search_page = root_page.form.submit()
+
+    assert "1 Resultat" in search_page
+
+    client.logout()
+
+    root_page = client.get('/')
+    root_page.form['q'] = "Foobar"
+    search_page = root_page.form.submit()
+
+    assert "1 Resultat" in search_page
 
 
 def test_basic_autocomplete(es_town_app):

@@ -62,6 +62,7 @@ class Search(Pagination):
         ], fuzziness='1')
 
         search = search.query(match_title | match_rest)
+        search.query.minimum_should_match = 1
         search = search[self.offset:self.offset + self.batch_size]
 
         return search.execute()
