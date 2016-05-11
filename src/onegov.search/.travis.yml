@@ -1,5 +1,7 @@
 language: python
 python: "3.4"
+cache: pip
+
 env:
     - TOXENV=py34 DEPLOY=no ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.0.2.tar.gz
     - TOXENV=py34 DEPLOY=no ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.1.2.tar.gz
