@@ -2034,6 +2034,44 @@ button {
 }
 
 /*
+    A box rendering the following structure as a calendar-like box:
+
+    <h2 class="calendar-day-box">
+        <span>Wednesday</span>
+        <span class="day">11</span>
+        <span>March</span>
+    </h2>
+*/
+.calendar-day-box {
+    padding: .5em 0;
+    width: 100%;
+
+    @media #{$small-up} {
+        font-weight: bold;
+    }
+
+    @media #{$large-up} {
+        background-color: $white-smoke;
+        font-weight: normal;
+
+        span {
+            display: block;
+            font-size: 1rem;
+            text-align: center;
+
+            &.dot {
+                display: none;
+            }
+
+            &.day {
+                font-size: 3rem;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+/*
     Events
 */
 
@@ -2063,32 +2101,6 @@ button {
 
     a {
         color: inherit;
-    }
-}
-
-.occurrences-day-date {
-    padding: .5em 0;
-    width: 100%;
-
-    &.active {
-        background-color: $white-smoke;
-    }
-
-    @media #{$large-up} {
-        span {
-            display: block;
-            font-size: 1rem;
-            text-align: center;
-
-            &.day {
-                font-size: 3rem;
-                font-weight: bold;
-            }
-
-            &.dot {
-                display: none;
-            }
-        }
     }
 }
 
