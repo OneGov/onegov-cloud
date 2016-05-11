@@ -191,6 +191,8 @@ class ReservationHandler(Handler):
 
             if handler_ids:
                 query = query.filter(Ticket.handler_id.in_(handler_ids))
+            else:
+                query = query.filter(False)
 
         return query
 
