@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes unreserved allocations showing associated tickets.
+  [href]
+
 1.7.4 (2016-05-05)
 ~~~~~~~~~~~~~~~~~~~
 
