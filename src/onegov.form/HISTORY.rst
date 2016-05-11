@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+- Exclude pyparsing 2.1.2 from the list of possible versions.
+
+  It doesn't work together with python 3.3 and 3.4.
+  [href]
+
 0.11.1 (2016-04-14)
 ~~~~~~~~~~~~~~~~~~~
 
