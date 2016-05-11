@@ -1,5 +1,7 @@
 language: python
 python: "3.4"
+cache: pip
+
 env:
     - TOXENV=py34
     - TOXENV=pep8
