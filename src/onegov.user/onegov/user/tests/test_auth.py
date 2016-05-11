@@ -128,10 +128,8 @@ def test_auth_logging(session, capturelog):
 
 def test_auth_integration(session):
 
-    config = morepath.setup()
-
     class App(morepath.App):
-        testing_config = config
+        pass
 
     @App.identity_policy()
     def get_identity_policy():
@@ -153,7 +151,7 @@ def test_auth_integration(session):
     def view_logout(self, request):
         return self.logout_to(request)
 
-    config.commit()
+    App.commit()
 
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
     transaction.commit()
