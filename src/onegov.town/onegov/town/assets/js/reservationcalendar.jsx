@@ -384,6 +384,13 @@ rc.setupHistory = function(fcOptions) {
         url.query.view = view.name;
         url.query.date = view.intervalStart.format('YYYYMMDD');
 
+        $('a.calendar-dependent').each(function(_ix, el) {
+            var dependentUrl = new Url($(el).attr('href'));
+            dependentUrl.query.view = url.query.view;
+            dependentUrl.query.date = url.query.date;
+            $(el).attr('href', dependentUrl.toString());
+        });
+
         var state = [
             {
                 'view': view.name,

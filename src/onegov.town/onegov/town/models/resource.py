@@ -95,6 +95,9 @@ class DaypassResource(Resource, HiddenFromPublicExtension, SearchableResource,
     # the default view
     view = 'month'
 
+    # show or hide quota numbers in reports
+    show_quota = True
+
 
 class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
                    ContactExtension, PersonLinkExtension,
@@ -105,3 +108,6 @@ class RoomResource(Resource, HiddenFromPublicExtension, SearchableResource,
 
     # the default view
     view = 'agendaWeek'
+
+    # show or hide quota numbers in reports
+    show_quota = False

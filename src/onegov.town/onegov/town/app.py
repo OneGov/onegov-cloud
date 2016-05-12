@@ -224,15 +224,8 @@ def get_sortable_asset():
     yield 'sortable_custom.js'
 
 
-@TownApp.webasset('events')
-def get_events_asset():
-    yield 'url.js'
-    yield 'events.js'
-
-
 @TownApp.webasset('fullcalendar')
 def get_fullcalendar_asset():
-    yield 'url.js'
     yield 'fullcalendar.css'
     yield 'moment.js'
     yield 'moment.de.js'
@@ -305,4 +298,6 @@ def get_common_asset():
     yield 'jquery.popupoverlay.js'
     yield 'videoframe.js'
     yield 'datetimepicker.js'
+    yield 'url.js'
+    yield 'date-range-selector.js'
     yield 'common.js'

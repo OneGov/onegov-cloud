@@ -1,3 +1,5 @@
+import sedate
+
 from cached_property import cached_property
 from dateutil import rrule
 from onegov.core.layout import ChameleonLayout
@@ -68,6 +70,9 @@ class Layout(ChameleonLayout):
     def primary_color(self):
         return self.town.theme_options.get(
             'primary-color', user_options['primary-color'])
+
+    def today(self):
+        return sedate.to_timezone(sedate.utcnow(), self.timezone).date()
 
     @cached_property
     def default_map_view(self):
@@ -780,6 +785,11 @@ class ResourceLayout(DefaultLayout):
                     url=self.request.link(self.model, 'cleanup'),
                     classes=('cleanup-link', )
                 ),
+                Link(
+                    text=_("Occupancy"),
+                    url=self.request.link(self.model, 'belegung'),
+                    classes=('occupancy-link', 'calendar-dependent')
+                )
             ]
 
 

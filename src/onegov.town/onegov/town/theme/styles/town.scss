@@ -698,6 +698,7 @@ $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $paste-link-icon: '\f0ea';
 $send-link-icon: '\f1d9';
+$occupancy-link-icon: '\f022';
 
 .edit-bar {
     background-color: $primary-color;
@@ -748,6 +749,7 @@ $send-link-icon: '\f1d9';
     .new-room:before { @include icon($new-room-icon); }
     .paste-link:before { @include icon($paste-link-icon); }
     .send-link:before { @include icon($send-link-icon); }
+    .occupancy-link::before { @include icon($occupancy-link-icon); }
 }
 
 /*
@@ -2104,7 +2106,7 @@ button {
     }
 }
 
-.occurrences-filter-result {
+.date-range-selector-result {
     margin-bottom: 1em;
 
     span:first-child {
@@ -2114,7 +2116,7 @@ button {
 }
 
 .occurrences-filter-tags,
-.occurrences-filter-date {
+.date-range-selector {
     margin-bottom: 1em;
 }
 
@@ -2463,109 +2465,6 @@ ul.search-results {
     }
 }
 
-
-/*
-    Print Styles
-*/
-@media print {
-    .alert-box,
-    .bottom-links,
-    .edit-bar,
-    .footer,
-    .occurrences-day-date,
-    .occurrences-filter-date,
-    .occurrences-filter-tags,
-    .occurrence-exports,
-    .page-links,
-    .searchbox,
-    .side-nav,
-    .ticket-count,
-    div.push,
-    .top-bar {
-        display: none;
-    }
-
-    .page-content-panel {
-        border: 1px solid $tuatara;
-        border-radius: 3px;
-    }
-
-    body {
-        font-size: 12px !important;
-    }
-
-    // tickets status panel
-    .page-content-panel {
-        margin-bottom: .5rem;
-
-        .field-display-block {
-            float: left;
-            margin-right: 1.5rem;
-        }
-    }
-
-    .field-display-block * {
-        background-color: transparent;
-        color: $body-font-color;
-        font-size: 12px;
-        margin: 0 !important;
-        padding: 0;
-    }
-
-    .ticket-summary {
-        * {
-            font-size: 12px;
-        }
-
-        ul {
-            margin-bottom: 0;
-        }
-    }
-
-    h1 {
-        font-size: 1.6rem;
-    }
-
-    h2 {
-        @include hairline;
-        font-size: 1.2rem;
-        margin-bottom: .25rem;
-    }
-
-    h3 {
-        font-size: 1.1rem;
-        margin-bottom: .15rem;
-    }
-
-    h4,
-    h5,
-    h6 {
-        font-size: 1rem;
-    }
-
-    .header {
-        max-height: 50px;
-    }
-
-    .logo {
-        max-height: 40px;
-
-        img,
-        svg {
-            max-height: 45px;
-            width: auto;
-        }
-    }
-
-    ul.breadcrumbs {
-        padding: 0 0 .25rem 1rem;
-
-        * {
-            font-size: 9px;
-        }
-    }
-}
-
 /*
     Datetime picker tweaks
 */
@@ -2810,4 +2709,149 @@ ul.search-results {
     );
     font-size: 1rem;
     margin-bottom: 1rem;
+}
+
+/*
+    Occupancy report
+*/
+.occupancy-block > .columns {
+    margin-bottom: 1rem;
+}
+
+.occupancy-entry {
+    list-style: none;
+    margin-left: 0;
+
+    .date,
+    .quota {
+        font-weight: bold;
+    }
+
+    .title {
+        margin-bottom: .5rem;
+    }
+}
+
+/*
+    Print Styles
+*/
+@media print {
+    .alert-box,
+    .bottom-links,
+    .date-range-selector,
+    .date-range-selector-result,
+    .edit-bar,
+    .footer,
+    .occurrence-exports,
+    .occurrences-day-date,
+    .occurrences-filter-tags,
+    .page-links,
+    .searchbox,
+    .side-nav,
+    .ticket-count,
+    div.push,
+    .top-bar {
+        display: none;
+    }
+
+    .page-content-panel {
+        border: 1px solid $tuatara;
+        border-radius: 3px;
+    }
+
+    body {
+        font-size: 12px !important;
+    }
+
+    // tickets status panel
+    .page-content-panel {
+        margin-bottom: .5rem;
+
+        .field-display-block {
+            float: left;
+            margin-right: 1.5rem;
+        }
+    }
+
+    .field-display-block * {
+        background-color: transparent;
+        color: $body-font-color;
+        font-size: 12px;
+        margin: 0 !important;
+        padding: 0;
+    }
+
+    .ticket-summary {
+        * {
+            font-size: 12px;
+        }
+
+        ul {
+            margin-bottom: 0;
+        }
+    }
+
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        @include hairline;
+        font-size: 1.2rem;
+        margin-bottom: .25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+        margin-bottom: .15rem;
+    }
+
+    h4,
+    h5,
+    h6 {
+        font-size: 1rem;
+    }
+
+    .header {
+        max-height: 50px;
+    }
+
+    .logo {
+        max-height: 40px;
+
+        img,
+        svg {
+            max-height: 45px;
+            width: auto;
+        }
+    }
+
+    ul.breadcrumbs {
+        padding: 0 0 .25rem 1rem;
+
+        * {
+            font-size: 9px;
+        }
+    }
+
+    .occupancy-block {
+        h2 {
+            font-weight: bold;
+        }
+
+        .occupancy-entry {
+            .date,
+            .quota {
+                font-weight: normal;
+            }
+        }
+
+        * {
+            font-size: 12px;
+        }
+
+        > .columns {
+            margin-bottom: 0;
+        }
+    }
 }

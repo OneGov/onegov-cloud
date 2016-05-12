@@ -1,17 +1,23 @@
 import morepath
+import sedate
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
+from datetime import datetime, timedelta
+from isodate import parse_date, ISO8601Error
 from itertools import groupby
+from libres.db.models import Reservation
+from onegov.core.orm.types import UUID
 from onegov.core.security import Public, Private
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
+from onegov.ticket import Ticket
 from onegov.town import TownApp, _
 from onegov.town import utils
 from onegov.town.elements import Link
 from onegov.town.forms import ResourceForm, ResourceCleanupForm
 from onegov.town.layout import ResourcesLayout, ResourceLayout
 from onegov.town.models.resource import DaypassResource, RoomResource
-from sqlalchemy.sql.expression import nullsfirst
+from sqlalchemy.sql.expression import cast, nullsfirst
 from webob import exc
 
 
@@ -184,3 +190,101 @@ def get_reservations(self, request):
         utils.ReservationInfo(reservation, request).as_dict() for reservation
         in self.bound_reservations(request)
     ]
+
+
+def get_date(text, default):
+    try:
+        date = parse_date(text)
+        return datetime(date.year, date.month, date.day, tzinfo=default.tzinfo)
+    except (ISO8601Error, TypeError):
+        return default
+
+
+def get_date_range(resource, params):
+    now = sedate.align_date_to_day(sedate.utcnow(), resource.timezone, 'down')
+    date = sedate.replace_timezone(
+        get_date(params.get('date'), now), resource.timezone)
+
+    if resource.view == 'month':
+        default_start, default_end = sedate.align_range_to_month(
+            date, date, resource.timezone)
+    elif resource.view == 'agendaWeek':
+        default_start, default_end = sedate.align_range_to_week(
+            date, date, resource.timezone)
+    elif resource.view == 'agendaDay':
+        default_start, default_end = sedate.align_range_to_day(
+            date, date, resource.timezone)
+
+    start = get_date(params.get('start'), default_start)
+    end = get_date(params.get('end'), default_end)
+
+    start = sedate.replace_timezone(
+        datetime(start.year, start.month, start.day), resource.timezone)
+
+    end = sedate.replace_timezone(
+        datetime(end.year, end.month, end.day), resource.timezone)
+
+    return sedate.align_range_to_day(start, end, resource.timezone)
+
+
+@TownApp.html(model=Resource, permission=Private, name='belegung',
+              template='resource_occupancy.pt')
+def view_occupancy(self, request):
+
+    # infer the default start/end date from the calendar view parameters
+    start, end = get_date_range(self, request.params)
+
+    query = self.scheduler.managed_reservations()
+    query = query.filter(start <= Reservation.start)
+    query = query.filter(Reservation.end <= end)
+
+    query = query.join(
+        Ticket, Reservation.token == cast(Ticket.handler_id, UUID))
+
+    query = query.order_by(Reservation.start)
+    query = query.order_by(Ticket.subtitle)
+    query = query.filter(Reservation.status == 'approved')
+    query = query.filter(Reservation.data != None)
+
+    query = query.with_entities(
+        Reservation.start, Reservation.end, Reservation.quota,
+        Ticket.subtitle, Ticket.id
+    )
+
+    def group_key(record):
+        return sedate.to_timezone(record[0], self.timezone).date()
+
+    occupancy = OrderedDict()
+    grouped = groupby(query.all(), group_key)
+    Entry = namedtuple('Entry', ('start', 'end', 'title', 'quota', 'url'))
+    count = 0
+
+    for date, records in grouped:
+        occupancy[date] = tuple(
+            Entry(
+                start=sedate.to_timezone(r[0], self.timezone),
+                end=sedate.to_timezone(
+                    r[1] + timedelta(microseconds=1), self.timezone),
+                quota=r[2],
+                title=r[3],
+                url=request.class_link(Ticket, {
+                    'handler_code': 'RSV',
+                    'id': r[4]
+                })
+            ) for r in records
+        )
+        count += len(occupancy[date])
+
+    layout = ResourceLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
+    layout.editbar_links = None
+
+    return {
+        'layout': layout,
+        'title': _("Occupancy"),
+        'occupancy': occupancy,
+        'resource': self,
+        'start': sedate.to_timezone(start, self.timezone).date(),
+        'end': sedate.to_timezone(end, self.timezone).date(),
+        'count': count,
+    }

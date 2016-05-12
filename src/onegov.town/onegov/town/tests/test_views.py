@@ -1775,6 +1775,42 @@ def test_reserve_in_parallel(town_app):
     ).follow()
 
 
+def test_occupancy_view(town_app):
+
+    # prepate the required data
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True
+    )
+
+    client = Client(town_app)
+    reserve = bound_reserve(client, allocations[0])
+    transaction.commit()
+
+    client.login_admin()
+
+    # create a reservation
+    assert reserve().json == {'success': True}
+    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular.form['email'] = 'info@example.org'
+    formular.form.submit().follow().click('Abschliessen')
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    # at this point, the reservation won't show up in the occupancy view
+    occupancy = client.get('/ressource/sbb-tageskarte/belegung?date=20150828')
+    assert len(occupancy.pyquery('.occupancy-block')) == 0
+
+    # ..until we accept it
+    ticket.click('Alle Reservationen annehmen')
+    occupancy = client.get('/ressource/sbb-tageskarte/belegung?date=20150828')
+    assert len(occupancy.pyquery('.occupancy-block')) == 1
+
+
 def test_reserve_session_separation(town_app):
     c1 = Client(town_app)
     c1.login_admin()
@@ -2102,7 +2138,7 @@ def test_view_occurrences(town_app):
 
     def total_events(query=''):
         page = client.get('/veranstaltungen/?{}'.format(query))
-        return int(page.pyquery('.occurrences-filter-result span')[0].text)
+        return int(page.pyquery('.date-range-selector-result span')[0].text)
 
     def dates(query=''):
         page = client.get('/veranstaltungen/?{}'.format(query))

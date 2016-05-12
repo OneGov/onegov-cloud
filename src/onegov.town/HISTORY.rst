@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an occupancy report to reservation resources.
+  [href]
+
 - Fixes unreserved allocations showing associated tickets.
   [href]
 

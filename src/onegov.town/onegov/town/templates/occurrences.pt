@@ -20,7 +20,7 @@
 
             <div class="large-4 medium-4 columns">
 
-                <div class="occurrences-filter-result">
+                <div class="date-range-selector-result">
                     <span>${number_of_occurrences}</span>
                     <span i18n:translate="">Events</span>
                 </div>
@@ -33,36 +33,13 @@
                     </tal:block>
                 </div>
 
-                <div class="occurrences-filter-date">
-                    <form action="" method="GET">
+                <metal:block use-macro="layout.macros['date-range-selector']">
+                    <tal:block metal:fill-slot="before-date-range">
                         <tal:block tal:repeat="tag active_tags">
                             <input type="hidden" name="tags" value="${tag}">
                         </tal:block>
-                        <div class="row">
-                            <div class="large-6 columns">
-                                <div class="row collapse">
-                                    <label i18n:translate="">From</label>
-                                    <input class="small" name="start" type="date" value="${start}" placeholder="${date_placeholder}">
-                                </div>
-                            </div>
-                            <div class="large-6 columns">
-                                <div class="row collapse">
-                                    <label i18n:translate="">To</label>
-                                    <input class="small" name="end" type="date" value="${end}" placeholder="${date_placeholder}">
-                                </div>
-                            </div>
-                        </div>
-                        <noscript>
-                            <div class="row occurrences-filter-date-submit">
-                                <div class="large-6 columns">
-                                    <div class="row collapse">
-                                        <input type="submit" value="Filter by date" class="button" i18n:attributes="value">
-                                    </div>
-                                </div>
-                            </div>
-                        </noscript>
-                    </form>
-                </div>
+                    </tal:block>
+                </metal:block>
 
                 <div class="occurrences-add-box">
                     <dl>

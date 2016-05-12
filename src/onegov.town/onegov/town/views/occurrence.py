@@ -21,9 +21,6 @@ from sqlalchemy.dialects.postgresql import JSON
 def view_occurrences(self, request):
     """ View all occurrences of all events. """
 
-    request.include('common')
-    request.include('events')
-
     layout = OccurrencesLayout(self, request)
 
     tags = (

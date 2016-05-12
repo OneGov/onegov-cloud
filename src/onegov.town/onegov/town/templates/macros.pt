@@ -503,11 +503,11 @@
     </div>
 </metal:atoz>
 
-<metal:calendar_day_box define-macro="calendar-day" i18n:domain="onegov.town">
+<metal:calendar_day define-macro="calendar-day" i18n:domain="onegov.town">
     <h2 class="calendar-day-box">
         <metal:block use-macro="layout.macros['calendar-day-content']" />
     </h2>
-</metal:calendar_day_box>
+</metal:calendar_day>
 
 <metal:calendar_day_box define-macro="calendar-day-content" i18n:domain="onegov.town">
     <span>${layout.format_date(date, 'weekday_long')}</span>
@@ -541,3 +541,35 @@
         <div tal:condition="not occurrences" i18n:translate="">No events found.</div>
     </tal:block>
 </metal:occurrences>
+
+<metal:date_range_selector define-macro="date-range-selector" i18n:domain="onegov.town">
+    <div class="date-range-selector">
+        <form action="" method="GET">
+            <div metal:define-slot="before-date-range"></div>
+
+            <div class="row date-range-selector">
+                <div class="large-6 columns">
+                    <div class="row collapse">
+                        <label i18n:translate="">From</label>
+                        <input class="small" name="start" type="date" value="${start}" placeholder="${layout.today().isoformat()}">
+                    </div>
+                </div>
+                <div class="large-6 columns">
+                    <div class="row collapse">
+                        <label i18n:translate="">To</label>
+                        <input class="small" name="end" type="date" value="${end}" placeholder="${layout.today().isoformat()}">
+                    </div>
+                </div>
+            </div>
+            <noscript>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <div class="row collapse">
+                            <input type="submit" value="Filter by date" class="button" i18n:attributes="value">
+                        </div>
+                    </div>
+                </div>
+            </noscript>
+        </form>
+    </div>
+</metal:date_range_selector>
