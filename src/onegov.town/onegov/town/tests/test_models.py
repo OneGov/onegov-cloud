@@ -2,6 +2,7 @@ import os
 import pytz
 
 from datetime import datetime, date
+from freezegun import freeze_time
 from io import BytesIO
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path, rchop
@@ -13,6 +14,7 @@ from onegov.town.models import (
     ImageCollection,
     SiteCollection
 )
+from onegov.town.models.resource import SharedMethods
 from unittest.mock import Mock, patch
 
 
@@ -270,3 +272,36 @@ def test_image_grouping(town_app):
         assert groups[2][1] == images[5:6]
         assert groups[3][0] == 'Older'
         assert groups[3][1] == images[6:]
+
+
+def test_calendar_date_range():
+    resource = SharedMethods()
+    utc = pytz.timezone('UTC')
+
+    resource.date = None
+    resource.timezone = utc
+
+    resource.view = 'month'
+    with freeze_time(datetime(2016, 5, 14, tzinfo=utc)):
+        assert resource.calendar_date_range == (
+            datetime(2016, 5, 1, tzinfo=utc),
+            datetime(2016, 5, 31, 23, 59, 59, 999999, tzinfo=utc)
+        )
+
+    resource.date = date(2016, 5, 14)
+    assert resource.calendar_date_range == (
+        datetime(2016, 5, 1, tzinfo=utc),
+        datetime(2016, 5, 31, 23, 59, 59, 999999, tzinfo=utc)
+    )
+
+    resource.view = 'agendaWeek'
+    assert resource.calendar_date_range == (
+        datetime(2016, 5, 9, tzinfo=utc),
+        datetime(2016, 5, 15, 23, 59, 59, 999999, tzinfo=utc)
+    )
+
+    resource.view = 'agendaDay'
+    assert resource.calendar_date_range == (
+        datetime(2016, 5, 14, tzinfo=utc),
+        datetime(2016, 5, 14, 23, 59, 59, 999999, tzinfo=utc)
+    )

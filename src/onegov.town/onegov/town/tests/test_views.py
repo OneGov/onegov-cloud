@@ -1811,6 +1811,56 @@ def test_occupancy_view(town_app):
     assert len(occupancy.pyquery('.occupancy-block')) == 1
 
 
+def test_reservation_export_view(town_app):
+
+    # prepate the required data
+    resources = ResourceCollection(town_app.libres_context)
+    resource = resources.by_name('sbb-tageskarte')
+    resource.definition = "Vorname *= ___\nNachname *= ___"
+
+    scheduler = resource.get_scheduler(town_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True
+    )
+
+    client = Client(town_app)
+    reserve = bound_reserve(client, allocations[0])
+    transaction.commit()
+
+    client.login_admin()
+
+    # create a reservation
+    assert reserve().json == {'success': True}
+    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular.form['email'] = 'info@example.org'
+    formular.form['vorname'] = 'Charlie'
+    formular.form['nachname'] = 'Carson'
+    formular.form.submit().follow().click('Abschliessen')
+
+    ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
+
+    # at this point, the reservation won't show up in the export
+    export = client.get('/ressource/sbb-tageskarte/export')
+    export.form['start'] = date(2015, 8, 28)
+    export.form['end'] = date(2015, 8, 28)
+    export.form['file_format'] = 'json'
+    assert not export.form.submit().json
+
+    # until we confirm the reservation
+    ticket.click('Alle Reservationen annehmen')
+    charlie = export.form.submit().json[0]
+
+    assert charlie['email'] == 'info@example.org'
+    assert charlie['title'] == 'info@example.org, Charlie, Carson'
+    assert charlie['start'] == '2015-08-28T00:00:00+02:00'
+    assert charlie['end'] == '2015-08-29T00:00:00+02:00'
+    assert charlie['ticket'].startswith('RSV-')
+    assert charlie['quota'] == 1
+    assert charlie['form'] == {'vorname': 'Charlie', 'nachname': 'Carson'}
+
+
 def test_reserve_session_separation(town_app):
     c1 = Client(town_app)
     c1.login_admin()
