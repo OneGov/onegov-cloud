@@ -683,6 +683,7 @@ $copy-link-icon: '\f0c5';
 $delete-link-icon: '\f014';
 $disabled-icon: '\f05e';
 $edit-link-icon: '\f040';
+$export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $internal-link-icon: '\f0c1';
@@ -734,6 +735,7 @@ $occupancy-link-icon: '\f022';
     .copy-link:before { @include icon($copy-link-icon); }
     .delete-link:before { @include icon($delete-link-icon); }
     .edit-link:before { @include icon($edit-link-icon); }
+    .export-link:before { @include icon($export-link-icon); }
     .file-url:before { @include icon($file-link-icon); }
     .image-url:before { @include icon($image-link-icon); }
     .internal-url:before { @include icon($internal-link-icon); }
@@ -2045,16 +2047,21 @@ button {
     </h2>
 */
 .calendar-day-box {
-    padding: .5em 0;
     width: 100%;
 
     @media #{$small-up} {
         font-weight: bold;
+        padding: 0;
+
+        span {
+            font-size: 1.3rem;
+        }
     }
 
     @media #{$large-up} {
         background-color: $white-smoke;
         font-weight: normal;
+        padding: .5em 0;
 
         span {
             display: block;
@@ -2715,7 +2722,9 @@ ul.search-results {
     Occupancy report
 */
 .occupancy-block > .columns {
-    margin-bottom: 1rem;
+    @media #{$large-only} {
+        margin-bottom: 1rem;
+    }
 }
 
 .occupancy-entry {

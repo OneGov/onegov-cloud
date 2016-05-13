@@ -4,7 +4,7 @@ from onegov.form.validators import ValidFormDefinition
 from onegov.town import _
 from onegov.town.forms.reservation import RESERVED_FIELDS
 from onegov.town.utils import annotate_html
-from wtforms import StringField, TextAreaField, validators
+from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import DateField
 
 
@@ -40,8 +40,8 @@ class ResourceForm(Form):
     )
 
 
-class ResourceCleanupForm(Form):
-    """ Defines the form to remove multiple allocations. """
+class DateRangeForm(Form):
+    """ A form providing a start/end date range. """
 
     start = DateField(
         label=_("Start"),
@@ -63,3 +63,24 @@ class ResourceCleanupForm(Form):
                 result = False
 
         return result
+
+
+class ResourceCleanupForm(DateRangeForm):
+    """ Defines the form to remove multiple allocations. """
+
+
+class ResourceExportForm(DateRangeForm):
+    """ Defines the form to export reservations. """
+
+    file_format = RadioField(
+        label=_("Format"),
+        choices=[
+            ('csv', _("CSV File")),
+            ('xlsx', _("Excel File")),
+            ('json', _("JSON File"))
+        ],
+        default='csv',
+        validators=[
+            validators.InputRequired()
+        ]
+    )

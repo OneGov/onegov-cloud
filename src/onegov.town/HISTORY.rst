@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Adds an occupancy report to reservation resources.
+- Adds the ability to export the reservations of a resource.
+  [href]
+
+- Adds an occupancy report on resource for reservations.
   [href]
 
 - Fixes unreserved allocations showing associated tickets.

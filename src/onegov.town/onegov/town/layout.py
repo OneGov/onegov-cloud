@@ -783,12 +783,17 @@ class ResourceLayout(DefaultLayout):
                 Link(
                     text=_("Clean up"),
                     url=self.request.link(self.model, 'cleanup'),
-                    classes=('cleanup-link', )
+                    classes=('cleanup-link', 'calendar-dependent')
                 ),
                 Link(
                     text=_("Occupancy"),
                     url=self.request.link(self.model, 'belegung'),
                     classes=('occupancy-link', 'calendar-dependent')
+                ),
+                Link(
+                    text=_("Export"),
+                    url=self.request.link(self.model, 'export'),
+                    classes=('export-link', 'calendar-dependent')
                 )
             ]
 

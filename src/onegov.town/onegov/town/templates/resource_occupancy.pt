@@ -16,10 +16,10 @@
             <div class="small-12 medium-8 columns">
                 <div class="row occupancy-block" tal:repeat="date occupancy">
                     <tal:block define="entries occupancy[date]">
-                        <div class="columns small-12 medium-3">
+                        <div class="columns small-12 medium-12 large-3">
                             <metal:block use-macro="layout.macros['calendar-day']" />
                         </div>
-                        <div class="columns small-12 medium-9">
+                        <div class="columns small-12 medium-12 large-9">
                             <ul class="occupancy-entry">
                                 <li tal:repeat="entry entries">
                                     <tal:block tal:define="whole_day entry.start.time() != entry.end.time()">

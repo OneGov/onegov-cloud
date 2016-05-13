@@ -1,3 +1,4 @@
+import json
 import morepath
 import sedate
 
@@ -6,18 +7,24 @@ from datetime import datetime, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby
 from libres.db.models import Reservation
-from onegov.core.orm.types import UUID
+from morepath.request import Response
+from onegov.core.csv import convert_list_of_dicts_to_csv
+from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.security import Public, Private
+from onegov.core.utils import normalize_for_url
+from onegov.form import FormSubmission
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
 from onegov.ticket import Ticket
 from onegov.town import TownApp, _
 from onegov.town import utils
 from onegov.town.elements import Link
-from onegov.town.forms import ResourceForm, ResourceCleanupForm
+from onegov.town.forms import (
+    ResourceForm, ResourceCleanupForm, ResourceExportForm
+)
 from onegov.town.layout import ResourcesLayout, ResourceLayout
 from onegov.town.models.resource import DaypassResource, RoomResource
-from sqlalchemy.sql.expression import cast, nullsfirst
+from sqlalchemy.sql.expression import nullsfirst
 from webob import exc
 
 
@@ -161,9 +168,7 @@ def handle_cleanup_allocations(self, request, form):
 
     if form.submitted(request):
         start, end = form.data['start'], form.data['end']
-
-        scheduler = self.get_scheduler(request.app.libres_context)
-        count = scheduler.remove_unused_allocations(start, end)
+        count = self.scheduler.remove_unused_allocations(start, end)
 
         request.success(
             _("Successfully removed ${count} unused allocations", mapping={
@@ -172,6 +177,9 @@ def handle_cleanup_allocations(self, request, form):
         )
 
         return morepath.redirect(request.link(self))
+
+    if request.method == 'GET':
+        form.start.data, form.end.data = get_date_range(self, request.params)
 
     layout = ResourceLayout(self, request)
     layout.breadcrumbs.append(Link(_("Clean up"), '#'))
@@ -201,19 +209,7 @@ def get_date(text, default):
 
 
 def get_date_range(resource, params):
-    now = sedate.align_date_to_day(sedate.utcnow(), resource.timezone, 'down')
-    date = sedate.replace_timezone(
-        get_date(params.get('date'), now), resource.timezone)
-
-    if resource.view == 'month':
-        default_start, default_end = sedate.align_range_to_month(
-            date, date, resource.timezone)
-    elif resource.view == 'agendaWeek':
-        default_start, default_end = sedate.align_range_to_week(
-            date, date, resource.timezone)
-    elif resource.view == 'agendaDay':
-        default_start, default_end = sedate.align_range_to_day(
-            date, date, resource.timezone)
+    default_start, default_end = resource.calendar_date_range
 
     start = get_date(params.get('start'), default_start)
     end = get_date(params.get('end'), default_end)
@@ -223,6 +219,9 @@ def get_date_range(resource, params):
 
     end = sedate.replace_timezone(
         datetime(end.year, end.month, end.day), resource.timezone)
+
+    if end < start:
+        start = end
 
     return sedate.align_range_to_day(start, end, resource.timezone)
 
@@ -234,18 +233,7 @@ def view_occupancy(self, request):
     # infer the default start/end date from the calendar view parameters
     start, end = get_date_range(self, request.params)
 
-    query = self.scheduler.managed_reservations()
-    query = query.filter(start <= Reservation.start)
-    query = query.filter(Reservation.end <= end)
-
-    query = query.join(
-        Ticket, Reservation.token == cast(Ticket.handler_id, UUID))
-
-    query = query.order_by(Reservation.start)
-    query = query.order_by(Ticket.subtitle)
-    query = query.filter(Reservation.status == 'approved')
-    query = query.filter(Reservation.data != None)
-
+    query = self.reservations_with_tickets_query(start, end)
     query = query.with_entities(
         Reservation.start, Reservation.end, Reservation.quota,
         Ticket.subtitle, Ticket.id
@@ -288,3 +276,122 @@ def view_occupancy(self, request):
         'end': sedate.to_timezone(end, self.timezone).date(),
         'count': count,
     }
+
+
+@TownApp.form(model=Resource, permission=Private, name='export',
+              template='resource_export.pt', form=ResourceExportForm)
+def view_export(self, request, form):
+
+    # XXX this could be turned into a redirect to a GET view, which would
+    # make it easier for scripts to get this data, but since we don't have
+    # a good API story anyway we don't have spend to much energy on it here
+    # - instead we should do this in a comprehensive fashion
+    if form.submitted(request):
+        file_format = form.data['file_format']
+
+        constant_fields, results = run_export(
+            resource=self,
+            request=request,
+            start=form.data['start'],
+            end=form.data['end'],
+            nested=file_format == 'json'
+        )
+
+        def field_order(field):
+            # known fields come first in a defined order (-x -> -1)
+            # unknown fields are ordered from a-z (second item in tuple)
+            if field in constant_fields:
+                return constant_fields.index(field) - len(constant_fields), ''
+            else:
+                return 0, field
+
+        if file_format == 'json':
+            return Response(
+                json.dumps(results),
+                content_type='application/json'
+            )
+        elif file_format == 'csv':
+            return Response(
+                convert_list_of_dicts_to_csv(results, key=field_order),
+                content_type='text/plain'
+            )
+        elif file_format == 'xlsx':
+            return Response(
+                convert_list_of_dicts_to_xlsx(results, key=field_order),
+                content_type=(
+                    'application/vnd.openxmlformats'
+                    '-officedocument.spreadsheetml.sheet'
+                ),
+                content_disposition='inline; filename={}.xlsx'.format(
+                    normalize_for_url(self.title)
+                )
+            )
+        else:
+            raise NotImplemented()
+
+    if request.method == 'GET':
+        form.start.data, form.end.data = get_date_range(self, request.params)
+
+    layout = ResourceLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
+    layout.editbar_links = None
+
+    return {
+        'layout': layout,
+        'title': _("Export"),
+        'form': form
+    }
+
+
+def run_export(resource, request, start, end, nested):
+    start = sedate.replace_timezone(
+        datetime(start.year, start.month, start.day),
+        resource.timezone
+    )
+    end = sedate.replace_timezone(
+        datetime(end.year, end.month, end.day),
+        resource.timezone
+    )
+
+    start, end = sedate.align_range_to_day(start, end, resource.timezone)
+
+    query = resource.reservations_with_tickets_query(start, end)
+    query = query.join(FormSubmission, Reservation.token == FormSubmission.id)
+    query = query.with_entities(
+        Reservation.start,
+        Reservation.end,
+        Reservation.quota,
+        Reservation.email,
+        Ticket.number,
+        Ticket.subtitle,
+        FormSubmission.data,
+    )
+
+    results = []
+
+    # update me: reused outside this function
+    constant_fields = ('start', 'end', 'quota', 'email', 'ticket', 'title')
+
+    for record in query.all():
+        result = OrderedDict()
+
+        start = sedate.to_timezone(record[0], resource.timezone)
+        end = sedate.to_timezone(record[1], resource.timezone)
+        end += timedelta(microseconds=1)
+
+        result['start'] = start.isoformat()
+        result['end'] = end.isoformat()
+        result['quota'] = record[2]
+        result['email'] = record[3]
+        result['ticket'] = record[4]
+        result['title'] = record[5]
+
+        if nested:
+            result['form'] = record[6]
+        else:
+            for key, value in record[6].items():
+                result['form_' + key] = value
+
+        results.append(result)
+
+    return constant_fields, results

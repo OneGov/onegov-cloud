@@ -1,14 +1,20 @@
+import sedate
+
+from datetime import datetime
 from libres.db.models import Reservation
 from onegov.core.orm.mixins import meta_property, content_property
+from onegov.core.orm.types import UUID
 from onegov.libres.models import Resource
 from onegov.form.models import FormSubmission
+from onegov.search import ORMSearchable
+from onegov.ticket import Ticket
 from onegov.town.models.extensions import (
     HiddenFromPublicExtension,
     ContactExtension,
     PersonLinkExtension,
     CoordinatesExtension
 )
-from onegov.search import ORMSearchable
+from sqlalchemy.sql.expression import cast
 from uuid import uuid4, uuid5
 
 
@@ -26,6 +32,23 @@ class SharedMethods(object):
             return False
 
         return True
+
+    @property
+    def calendar_date_range(self):
+        """ Returns the date range set by the fullcalendar specific params. """
+
+        if self.date:
+            date = datetime(self.date.year, self.date.month, self.date.day)
+            date = sedate.replace_timezone(date, self.timezone)
+        else:
+            date = sedate.to_timezone(sedate.utcnow(), self.timezone)
+
+        if self.view == 'month':
+            return sedate.align_range_to_month(date, date, self.timezone)
+        elif self.view == 'agendaWeek':
+            return sedate.align_range_to_week(date, date, self.timezone)
+        elif self.view == 'agendaDay':
+            return sedate.align_range_to_day(date, date, self.timezone)
 
     def remove_expired_reservation_sessions(self, expiration_date=None):
         session = self.libres_context.get_service('session_provider').session()
@@ -66,6 +89,25 @@ class SharedMethods(object):
             request.browser_session.libres_session_id = uuid4()
 
         return uuid5(self.id, request.browser_session.libres_session_id.hex)
+
+    def reservations_with_tickets_query(self, start, end):
+        """ Returns a query which joins this resource's reservations between
+        start and end with the tickets table.
+
+        """
+        query = self.scheduler.managed_reservations()
+        query = query.filter(start <= Reservation.start)
+        query = query.filter(Reservation.end <= end)
+
+        query = query.join(
+            Ticket, Reservation.token == cast(Ticket.handler_id, UUID))
+
+        query = query.order_by(Reservation.start)
+        query = query.order_by(Ticket.subtitle)
+        query = query.filter(Reservation.status == 'approved')
+        query = query.filter(Reservation.data != None)
+
+        return query
 
 
 class SearchableResource(ORMSearchable):
