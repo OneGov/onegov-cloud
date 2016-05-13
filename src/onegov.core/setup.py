@@ -53,6 +53,7 @@ setup(
         'more.webassets>=0.3.1',
         'networkx',
         'onegov.server>=0.0.3',
+        'ordered-set',
         'passlib',
         'polib',
         'python-magic',

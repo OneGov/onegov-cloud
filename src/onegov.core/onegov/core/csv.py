@@ -15,6 +15,7 @@ from editdistance import eval as distance
 from io import BytesIO, StringIO
 from itertools import permutations
 from onegov.core import errors
+from ordered_set import OrderedSet
 from unidecode import unidecode
 from xlsxwriter.workbook import Workbook
 
@@ -220,12 +221,44 @@ def convert_xls_to_csv(xls, sheet_name=None):
     return output
 
 
-def convert_list_of_dicts_to_csv(rows, fields=None):
+def get_keys_from_list_of_dicts(rows, key=None, reverse=False):
+    """ Returns all keys of a list of dicts in an ordered tuple.
+
+    If the list of dicts is irregular, the keys found in later rows are
+    added at the end of the list.
+
+    Note that the order of keys is otherwise defined by the order of the keys
+    of the dictionaries. So if ordered dictionaries are used, the order is
+    defined. If regular dictionaries are used, the order is undefined.
+
+    Alternatively, a key and a reverse flag may be provided which will be
+    used to order the fields. If the list of fields is specified, the key and
+    the reverse flag is ignored.
+
+    """
+    fields = OrderedSet()
+
+    for dictionary in rows:
+        fields.update(dictionary.keys())
+
+    if key:
+        fields = tuple(sorted(fields, key=key, reverse=reverse))
+    else:
+        fields = tuple(fields)
+
+    return fields
+
+
+def convert_list_of_dicts_to_csv(rows, fields=None, key=None, reverse=False):
     """ Takes a list of dictionaries and returns a csv.
 
     If no fields are provided, all fields are included in the order of the keys
     of the first dict. With regular dictionaries this is random. Use an ordered
     dict or provide a list of fields to have a fixed order.
+
+    Alternatively, a key and a reverse flag may be provided which will be
+    used to order the fields. If the list of fields is specified, the key and
+    the reverse flag is ignored.
 
     The function returns a string created in memory. Therefore this function
     is limited to small-ish datasets.
@@ -235,7 +268,7 @@ def convert_list_of_dicts_to_csv(rows, fields=None):
     if not rows:
         return ''
 
-    fields = fields or rows[0].keys()
+    fields = fields or get_keys_from_list_of_dicts(rows, key, reverse)
 
     output = StringIO()
     writer = DictWriter(output, fieldnames=fields)
@@ -243,13 +276,13 @@ def convert_list_of_dicts_to_csv(rows, fields=None):
     writer.writeheader()
 
     for row in rows:
-        writer.writerow({field: row[field] for field in fields})
+        writer.writerow({field: row.get(field, '') for field in fields})
 
     output.seek(0)
     return output.read()
 
 
-def convert_list_of_dicts_to_xlsx(rows, fields=None):
+def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
     """ Takes a list of dictionaries and returns a xlsx.
 
     This behaves the same way as :func:`convert_list_of_dicts_to_csv`.
@@ -260,14 +293,14 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None):
         workbook = Workbook(file.name, options={'constant_memory': True})
         worksheet = workbook.add_worksheet()
 
-        fields = fields or rows[0].keys()
+        fields = fields or get_keys_from_list_of_dicts(rows, key, reverse)
 
         # write the header
         worksheet.write_row(0, 0, fields)
 
         # write the rows
         for r, row in enumerate(rows, start=1):
-            worksheet.write_row(r, 0, (row[field] for field in fields))
+            worksheet.write_row(r, 0, (row.get(field, '') for field in fields))
 
         workbook.close()
 

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds support for transforming lists if *irregular* dicts to csv and xlsx.
+  [href]
+
 0.20.1 (2016-04-29)
 ~~~~~~~~~~~~~~~~~~~
 

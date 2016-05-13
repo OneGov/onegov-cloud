@@ -248,6 +248,21 @@ def test_convert_list_of_dicts_to_csv():
     assert dick == 'Cheney,Dick'
     assert donald == 'Rumsfeld,Donald'
 
+    # or by providing a key
+    csv = convert_list_of_dicts_to_csv(data, key=lambda f: f, reverse=True)
+    header, dick, donald = csv.splitlines()
+
+    assert header == 'last_name,first_name'
+    assert dick == 'Cheney,Dick'
+    assert donald == 'Rumsfeld,Donald'
+
+    csv = convert_list_of_dicts_to_csv(data, key=lambda f: f, reverse=False)
+    header, dick, donald = csv.splitlines()
+
+    assert header == 'first_name,last_name'
+    assert dick == 'Dick,Cheney'
+    assert donald == 'Donald,Rumsfeld'
+
 
 def test_convert_list_of_dicts_to_csv_escaping():
     data = [
@@ -288,3 +303,40 @@ def test_convert_list_of_dicts_to_xlsx():
         assert workbook.active.rows[1][1].value == 'Cheney'
         assert workbook.active.rows[2][0].value == 'Donald'
         assert workbook.active.rows[2][1].value == 'Rumsfeld'
+
+
+def test_convert_irregular_list_of_dicts_to_csv():
+    data = [
+        {
+            'name': 'Batman',
+            'role': 'Superhero',
+            'identity': 'Bruce Wayne'
+        },
+        {
+            'name': 'Joker',
+            'role': 'Supervillain',
+            'gang': 'Injustice League'
+        }
+    ]
+
+    # fields in random order
+    csv = convert_list_of_dicts_to_csv(data)
+    header, batman, joker = csv.splitlines()
+
+    for column in ('name', 'role', 'identity', 'gang'):
+        assert column in header
+
+    for value in ('Batman', 'Superhero', 'Bruce Wayne'):
+        assert value in batman
+
+    for value in ('Joker', 'Supervillain', 'Injustice League'):
+        assert value in joker
+
+    # fields in defined order
+    csv = convert_list_of_dicts_to_csv(
+        data, ('name', 'role', 'identity', 'gang'))
+
+    header, batman, joker = csv.splitlines()
+    assert header == 'name,role,identity,gang'
+    assert batman == 'Batman,Superhero,Bruce Wayne,'
+    assert joker == 'Joker,Supervillain,,Injustice League'
