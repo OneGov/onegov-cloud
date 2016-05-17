@@ -93,7 +93,7 @@ Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, 
 
 **ID**
 
-Die ID des Kandidaten.
+Die ID des Kandidaten (``kandid_xx``).
 
 **Name**
 
@@ -135,7 +135,7 @@ Da auch hier das Datenformat keine Informationen über die gewählten Kandidaten
 
 **ID**
 
-Die ID des Kandidaten.
+Die ID des Kandidaten (``Liste_KandID``).
 
 ## Format Spezifikation Abstimmungen
 
