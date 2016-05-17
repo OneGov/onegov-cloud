@@ -1,0 +1,5 @@
+Anzahl Sitze	Wahlkreis-Nr	Stimmberechtigte	Wahlzettel	Ungültige Wahlzettel	Leere Wahlzettel	Leere Stimmen	Listen-Nr	Partei-ID	Parteibezeichnung	HLV-Nr	ULV-Nr	Anzahl Sitze Liste	Unveränderte Wahlzettel Liste	Veränderte Wahlzettel Liste	Kandidatenstimmen unveränderte Wahlzettel	Zusatzstimmen unveränderte Wahlzettel	Kandidatenstimmen veränderte Wahlzettel	Zusatzstimmen veränderte Wahlzettel	Kandidaten-Nr	Gewählt	Name	Vorname	Stimmen unveränderte Wahlzettel	Stimmen veränderte Wahlzettel	Stimmen Total aus Wahlzettel	Anzahl Gemeinden
+5	3503	56	32	1	0	1	1	1	FDP.Die Liberalen GR Liste Wirtschaft	1	1	0	0	0	0	0	8	0	101	nicht gewählt	Muster	Sandra	0	0	0	1 von 2
+5	3503	56	32	1	0	1	2	2	CVP - die Jungen	1	2	0	1	0	5	0	0	0	201	nicht gewählt	Muster	Petra	1	0	1	1 von 2
+5	3503	56	32	1	0	1	4	3	SP Sozialdemokratische Partei	2	3	1	3	1	15	0	3	0	401	Gewählt	Muster	Hans	3	3	6	1 von 2
+5	3503	56	32	1	0	1	6	4	SP JungsozialistInnen (JUSO)	2	3	0	0	0	0	0	1	0	601	nicht gewählt	Muster	Ernst	0	1	1	1 von 2

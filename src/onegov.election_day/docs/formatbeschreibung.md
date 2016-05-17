@@ -14,43 +14,68 @@ Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von den Wa
 
 #### SESAM
 
-Das SESAM-Export-Format enthalten direkt alle benötigten Daten. Folgende Spalten werden ausgewertet und sollten vorhanden sein:
+##### Majorz-Wahl
 
-    'Anzahl Sitze'
-    'Wahlkreis-Nr'
-    'Stimmberechtigte'
-    'Wahlzettel'
-    'Ungültige Wahlzettel'
-    'Leere Wahlzettel'
-    'Leere Stimmen'
-    'Kandidaten-Nr'
-    'Name'
-    'Vorname'
-    'Anzahl Gemeinden'
+Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kandidat und Gemeinde eine Zeile. Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
-Für Majorz-Wahlen zusätzlich:
+* Anzahl Sitze
+* Wahlkreis-Nr
+* Stimmberechtigte
+* Wahlzettel
+* Ungültige Wahlzettel
+* Leere Wahlzettel
+* Leere Stimmen
+* Kandidaten-Nr
+* Gewaehlt
+* Name
+* Vorname
+* Anzahl Gemeinden
+* Ungueltige Stimmen
+* Stimmen
 
-    'Ungueltige Stimmen'
-    'Stimmen'
+Vorlage:
 
-Für Proporz-Wahlen hingegen zusätzlich:
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_majorz.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_majorz.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_majorz.xlsx]()
 
-    'Listen-Nr'
-    'Partei-ID'
-    'Parteibezeichnung'
-    'HLV-Nr'
-    'ULV-Nr'
-    'Anzahl Sitze Liste'
-    'Unveränderte Wahlzettel Liste'
-    'Veränderte Wahlzettel Liste'
-    'Kandidatenstimmen unveränderte Wahlzettel'
-    'Zusatzstimmen unveränderte Wahlzettel'
-    'Kandidatenstimmen veränderte Wahlzettel'
-    'Zusatzstimmen veränderte Wahlzettel'
-    'Gewählt'
-    'Stimmen unveränderte Wahlzettel'
-    'Stimmen veränderte Wahlzettel'
-    'Stimmen Total aus Wahlzettel'
+##### Proporz-Wahlen
+
+Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kandidat und Gemeinde eine Zeile. Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
+
+* Anzahl Sitze
+* Wahlkreis-Nr
+* Stimmberechtigte
+* Wahlzettel
+* Ungültige Wahlzettel
+* Leere Wahlzettel
+* Leere Stimmen
+* Listen-Nr
+* Partei-ID
+* Parteibezeichnung
+* HLV-Nr
+* ULV-Nr
+* Anzahl Sitze Liste
+* Unveränderte Wahlzettel Liste
+* Veränderte Wahlzettel Liste
+* Kandidatenstimmen unveränderte Wahlzettel
+* Zusatzstimmen unveränderte Wahlzettel
+* Kandidatenstimmen veränderte Wahlzettel
+* Zusatzstimmen veränderte Wahlzettel
+* Kandidaten-Nr
+* Gewählt
+* Name
+* Vorname
+* Stimmen unveränderte Wahlzettel
+* Stimmen veränderte Wahlzettel
+* Stimmen Total aus Wahlzettel
+* Anzahl Gemeinden
+
+Vorlage:
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_proporz.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_proporz.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_proporz.xlsx]()
+
 
 #### Wabsti (Majorz)
 
