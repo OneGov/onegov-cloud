@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.8.0 (2016-05-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to export the reservations of a resource.
   [href]
 
