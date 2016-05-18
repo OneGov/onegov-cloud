@@ -10,7 +10,7 @@ Dieses Dokument beschreibt das Format dieser CSV/Excel Dateien.
 
 ### Dateiformate
 
-Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von den Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" oder "Wahlen (SESAM)" generiert werden.
+Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von den Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" oder "Wahlen (SESAM)" generiert werden. Falls eine Tabelle von Hand erstellt werden soll, ist die einfachere Option das SESAM-Format nachzubilden.
 
 #### SESAM
 
@@ -39,7 +39,7 @@ Vorlage:
 * CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_majorz.csv]()
 * XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_majorz.xlsx]()
 
-##### Proporz-Wahlen
+##### Proporz-Wahl
 
 Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kandidat und Gemeinde eine Zeile. Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
@@ -77,65 +77,117 @@ Vorlage:
 * XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_proporz.xlsx]()
 
 
-#### Wabsti (Majorz)
+#### Wabsti
 
-Folgende Spalten werden ausgewertet und sollten vorhanden sein:
+##### Majorz-Wahl
 
-    'AnzMandate'
-    'BFS'
-    'StimmBer'
-    'StimmAbgegeben'
-    'StimmLeer'
-    'StimmUngueltig'
-    'StimmGueltig'
+Das Datenformat benötig zwei einzelne Tabellen: (1) Datenexport und (2) die Liste der gewählten Kandidaten.
+
+###### (1) Datenexport
+
+Im Datenexport gibt es für jede Gemeinde eine Zeile, Kandidaten sind in Spalten angeordnet. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
+
+* AnzMandate
+* BFS
+* StimmBer
+* StimmAbgegeben
+* StimmLeer
+* StimmUngueltig
+* StimmGueltig
+
+Sowie für jeden Kandidaten
+* KandID_``x``
+* KandName_``x``
+* KandVorname_``x``
+* Stimmen_``x``
+
+Zudem werden die leeren und ungültigen Stimmen auch als Kandidaten erfasst mittels der folgenden Kandidatennamen:
+* KandName_``x`` = 'Leere Zeilen'
+* KandName_``x`` = 'Ungültige Stimmen'
+
+Vorlage:
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_majorz_resultate.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_majorz_resultate.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_majorz_resultate.xlsx]()
+
+###### (2) Kandidatenresultate
 
 Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
 
-**ID**
+* ID : Die ID des Kandidaten (``KandID_x``).
+* Name : Der Familienname des Kandidaten.
+* Vorname : Der Vorname des Kandidaten.
 
-Die ID des Kandidaten (``kandid_xx``).
+Vorlage:
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_majorz_kandidaten.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_majorz_kandidaten.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_majorz_kandidaten.xlsx]()
 
-**Name**
 
-Der Familienname des Kandidaten.
+##### Proporz-Wahl
 
-**Vorname**
+Das Datenformat benötig vier einzelne Tabellen: (1) Der Datenexport der Resultate, (2) der Datenexport der Statistiken, (3) die Listenverbindungen und (4) die Liste der gewählten Kandidaten.
 
-Der Vorname des Kandidaten.
+###### (1) Datenexport der Resultate
 
-#### Wabsti (Proporz)
+Im Datenexport gibt es eine Zeile pro Kandidat und Gemeinde. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-Wabsti liefert die Daten in verschiedenen Dateien. Für die Resultate werden folgende Spalten ausgewertet und sollten vorhanden sein:
+* Einheit_BFS
+* Kand_Nachname
+* Kand_Vorname
+* Liste_KandID
+* Liste_ID
+* Liste_Code
+* Kand_StimmenTotal
+* Liste_ParteistimmenTotal
 
-    'Einheit_BFS'
-    'Liste_KandID'
-    'Kand_Nachname'
-    'Kand_Vorname'
-    'Liste_ID'
-    'Liste_Code'
-    'Kand_StimmenTotal'
-    'Liste_ParteistimmenTotal'
+Vorlage:
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_resultate.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_resultate.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_resultate.xlsx]()
+
+###### (2) Datenexport der Statistik
 
 Die Datei mit den Statistiken zu den einzelnen Gemeinden sollte folgende Spalten enthalten:
 
-    'Einheit_BFS'
-    'StimBerTotal'
-    'WZEingegangen'
-    'WZLeer'
-    'WZUngueltig'
-    'StmWZVeraendertLeerAmtlLeer'
+* Einheit_BFS
+* StimBerTotal
+* WZEingegangen
+* WZLeer
+* WZUngueltig
+* StmWZVeraendertLeerAmtlLeer
+
+Vorlage:
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_statistik.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_statistik.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_statistik.xlsx]()
+
+###### (3) Listenverbindungen
 
 Die Datei mit den Listenverbindungen sollte folgende Spalten enthalten:
 
-    'Liste'
-    'LV'
-    'LUV'
+* Liste
+* LV
+* LUV
 
-Da auch hier das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
+Vorlage:
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_listenverbindungen.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_listenverbindungen.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_listenverbindungen.xlsx]()
 
-**ID**
 
-Die ID des Kandidaten (``Liste_KandID``).
+###### (4) Kandidatenresultate
+
+Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
+
+* ID : Die ID des Kandidaten (``Liste_KandID``).
+* Name : Der Familienname des Kandidaten.
+* Vorname : Der Vorname des Kandidaten.
+
+Vorlage:
+* XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_kandidaten.xls]()
+* CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_kandidaten.csv]()
+* XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_kandidaten.xlsx]()
 
 ## Format Spezifikation Abstimmungen
 
