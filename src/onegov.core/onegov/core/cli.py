@@ -11,6 +11,7 @@ import platform
 import subprocess
 import sys
 
+from fnmatch import fnmatch
 from mailthon.middleware import TLS, Auth
 from onegov.core.mail import Postman
 from onegov.core.orm import Base, SessionManager
@@ -21,6 +22,239 @@ from onegov.server.core import Server
 from smtplib import SMTPRecipientsRefused
 from uuid import uuid4
 from webtest import TestApp as Client
+
+
+# missing selector
+MISSING = object()
+
+
+class GroupContext(object):
+    """ Provides access to application configs for group commands.
+
+    """
+
+    def __init__(self, selector, config):
+        if isinstance(config, dict):
+            self.config = Config(config)
+        else:
+            self.config = Config.from_yaml_file(config)
+        self.selector = selector
+
+    def unbound_session_manager(self, dsn):
+        """ Returns a session manager *not yet bound to a schema!*. """
+
+        return SessionManager(dsn=dsn, base=Base)
+
+    def available_schemas(self, appcfg):
+        mgr = self.unbound_session_manager(appcfg.configuration['dsn'])
+        return mgr.list_schemas(limit_to_namespace=appcfg.namespace)
+
+    @property
+    def appcfgs(self):
+        """ Returns the matching appconfigs.
+
+        Since there's only one appconfig per namespace, we ignore the path
+        part of the selector and only focus on the namespace:
+
+            /namespace/application_id
+
+        """
+        namespace = self.selector.lstrip('/').split('/')[0]
+
+        for appcfg in self.config.applications:
+            if namespace != '*' and namespace != appcfg.namespace:
+                continue
+
+            yield appcfg
+
+    @property
+    def available_selectors(self):
+        selectors = list(self.all_wildcard_paths)
+        selectors.extend(self.all_paths)
+
+        return sorted(selectors)
+
+    @property
+    def all_wildcard_paths(self):
+        for appcfg in self.config.applications:
+            if appcfg.path.endswith('*'):
+                yield appcfg.path
+
+    @property
+    def all_paths(self):
+        for appcfg in self.config.applications:
+            if not appcfg.path.endswith('*'):
+                yield appcfg.path
+            else:
+                for schema in self.available_schemas(appcfg):
+                    yield '/' + schema.replace('-', '/')
+
+    @property
+    def matching_paths(self):
+        assert self.selector is not MISSING
+
+        for path in self.all_paths:
+            if fnmatch(path, self.selector):
+                yield path
+
+
+#: Decorator to acquire the group context on a command:
+#:
+#:     @cli.command()
+#:     @pass_group_context()
+#:     def my_command(group_context):
+#:         pass
+#:
+pass_group_context = click.make_pass_decorator(GroupContext, ensure=True)
+
+
+def command_group():
+    """ Generates a click command group for individual modules.
+
+    Each individual module may have its own command group from which to run
+    commands to. Read `<http://click.pocoo.org/6/commands/>`_ to learn more
+    about command groups.
+
+    The returned command group will provide the individual commands with
+    an optional list of applications to operate on and it allows commands
+    to return a callback function which will be invoked with the app config
+    (if available), an application instance and a request.
+
+    That is to say, the command group automates setting up a proper request
+    context.
+
+    """
+
+    @click.group(invoke_without_command=True)
+    @click.argument('selector', default=MISSING)
+    @click.option(
+        '--config',
+        default='onegov.yml',
+        help="The onegov config file")
+    def command_group(selector, config):
+        context = click.get_current_context()
+        context.obj = group_context = GroupContext(selector, config)
+
+        click.secho("Given selector: {}".format(selector), fg='green')
+
+        # no selector was provided, print available
+        if selector is MISSING:
+            click.secho("Available selectors:")
+
+            for selector in context.obj.available_selectors:
+                click.secho(" - {}".format(selector))
+
+            abort("No selector provided, aborting.")
+
+        matching_paths = tuple(context.obj.matching_paths)
+
+        # no subcommand was provided, print selector matches
+        if context.invoked_subcommand is None:
+            click.secho("Paths matching the selector:")
+
+            for match in matching_paths:
+                click.secho(" - {}".format(match))
+
+            abort("No subcommand provided, aborting.")
+
+        subcommand = context.command.commands[context.invoked_subcommand]
+        settings = subcommand.context_settings
+
+        group_context.creates_path = settings.pop('creates_path', False)
+
+        # the subcommand requires a matching selector but we didn't get one
+        if not group_context.creates_path and not matching_paths:
+            click.secho("Available selectors:")
+
+            for selector in context.obj.available_selectors:
+                click.secho(" - {}".format(selector))
+
+            abort("Selector doesn't match any paths, aborting.")
+
+        # the subcommand requires a single match, but we have more than that
+        if group_context.creates_path and len(matching_paths) > 1:
+            click.secho("Paths matching the selector:")
+
+            for match in matching_paths:
+                click.secho(" - {}".format(match))
+
+            abort("The selector must match a single path, aborting.")
+
+        if group_context.creates_path:
+            if matching_paths:
+                abort("This selector may not reference an existing path")
+
+            if len(selector.lstrip('/').split('/')) != 2:
+                abort("This selector must reference a full path")
+
+            if '*' in selector:
+                abort("This selector may not contain a wildcard")
+
+    @command_group.resultcallback()
+    def process_results(processor, selector, config):
+
+        group_context = click.get_current_context().obj
+
+        for appcfg in group_context.appcfgs:
+            scan_morepath_modules(appcfg.application_class)
+
+        for appcfg in group_context.appcfgs:
+
+            view_path = uuid4().hex
+
+            class CliApplication(appcfg.application_class):
+
+                def is_allowed_application_id(self, application_id):
+
+                    if group_context.creates_path:
+                        return True
+
+                    return super().is_allowed_application_id(application_id)
+
+            @CliApplication.path(path=view_path)
+            class Model(object):
+                pass
+
+            @CliApplication.view(model=Model)
+            def run_command(self, request):
+                processor(request, request.app)
+
+            CliApplication.commit()
+
+            # run a custom server and send a fake request
+            server = Server(Config({
+                'applications': [
+                    {
+                        'path': appcfg.path,
+                        'application': CliApplication,
+                        'namespace': appcfg.namespace,
+                        'configuration': appcfg.configuration
+                    }
+                ]
+            }), configure_morepath=False)
+
+            client = Client(server)
+
+            # call the view for all paths
+            paths = list(group_context.matching_paths)
+
+            if group_context.creates_path:
+                paths.append(group_context.selector.rstrip('/'))
+
+            for path in paths:
+                client.get(path + '/' + view_path)
+
+    return command_group
+
+
+def abort(msg):
+    """ Prints the given error message and aborts the program with a return
+    code of 1.
+
+    """
+    click.secho(msg, fg='red')
+
+    sys.exit(1)
 
 
 class Context(object):

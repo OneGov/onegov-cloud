@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Introduces a simpler way to write cli commands.
+  [href]
+
 0.20.2 (2016-05-13)
 ~~~~~~~~~~~~~~~~~~~
 
