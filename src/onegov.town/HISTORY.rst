@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to remove towns through the cli.
+  [href]
+
 1.8.0 (2016-05-17)
 ~~~~~~~~~~~~~~~~~~~
 

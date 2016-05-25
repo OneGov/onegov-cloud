@@ -8,57 +8,78 @@ Example (adds a Town called ``Govikon`` to the ``towns-govikon`` schema)::
 """
 
 import click
-import sys
-import transaction
 
-from libres.db.models import ORMBase
-from libres.context.registry import create_default_registry
-from onegov.core.orm import Base, SessionManager
+from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.town.models import Town
 from onegov.town.initial_content import add_initial_content
+from sqlalchemy import create_engine
 
 
-@click.group()
-@click.option('--dsn', help="Postgresql connection string")
-@click.option('--schema', help="Schema to use")
-@click.pass_context
-def cli(ctx, dsn, schema):
-    ctx.obj = {}
+cli = command_group()
 
-    mgr = SessionManager(dsn, base=Base)
-    mgr.bases.append(ORMBase)
-    mgr.set_current_schema(schema)
 
-    ctx.obj['schema'] = schema
-    ctx.obj['session_manager'] = mgr
-    ctx.obj['session'] = mgr.session()
-    ctx.obj['libres_registry'] = create_default_registry()
+@cli.command(context_settings={'creates_path': True})
+@click.argument('name')
+@pass_group_context
+def add(group_context, name):
+    """ Adds a town with the given name to the database. For example:
+
+        onegov-town /onegov_town/newyork add "New York"
+
+    """
+
+    def add_town(request, app):
+
+        if app.session().query(Town).first():
+            abort("{} already contains a town".format(group_context.selector))
+
+        add_initial_content(app.libres_registry, app.session_manager, name)
+
+        click.echo("{} was created successfully".format(name))
+
+    return add_town
 
 
 @cli.command()
-@click.argument('name')
-@click.pass_context
-def add(ctx, name):
-    """ Adds a town with the given name to the database. """
+@pass_group_context
+def delete(group_context):
+    """ Deletes a single town matching the selector.
 
-    session = ctx.obj['session']
+    Selector matching multiple towns are disabled for saftey reasons.
 
-    if session.query(Town).first():
-        click.secho(
-            "The schema {} already contains a town".format(ctx.obj['schema']),
-            fg='red'
-        )
-        sys.exit(1)
+    """
 
-    add_initial_content(
-        ctx.obj['libres_registry'],
-        ctx.obj['session_manager'],
-        town_name=name
-    )
+    def delete_town(request, app):
 
-    transaction.commit()
+        town = app.town.name
+        confirmation = "Do you really want to DELETE {}?".format(town)
 
-    click.secho(
-        "{} was added to the {} schema".format(name, ctx.obj['schema']),
-        fg='green'
-    )
+        if not click.confirm(confirmation):
+            abort("Deletion process aborted")
+
+        if app.has_filestorage:
+            click.echo("Removing File Storage")
+
+            for item in app.filestorage.listdir():
+                if app.filestorage.isdir(item):
+                    app.filestorage.removedir(item, recursive=True, force=True)
+                else:
+                    app.filestorage.remove(item)
+
+        if app.has_database_connection:
+            click.echo("Dropping Database Schema")
+
+            assert app.session_manager.is_valid_schema(app.schema)
+
+            dsn = app.session_manager.dsn
+            app.session_manager.session().close_all()
+            app.session_manager.dispose()
+
+            engine = create_engine(dsn)
+            engine.execute('DROP SCHEMA "{}" CASCADE'.format(app.schema))
+            engine.raw_connection().invalidate()
+            engine.dispose()
+
+        click.echo("{} was deleted successfully".format(town))
+
+    return delete_town
