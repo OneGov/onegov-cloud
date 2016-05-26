@@ -203,7 +203,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             The id of the municipality/locale ("BFS Nummer").
 
         * ``municipality_elegible_voters``:
-            The number of people elegible to vote for this municipality.
+            The number of people eligible to vote for this municipality.
 
         * ``municipality_received_ballots``:
             The number of received ballots for this municipality.
@@ -218,7 +218,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             The number of unaccounted ballots for this municipality.
 
         * ``municipality_accounted_ballots``:
-            The nubmer of accounted ballots for this municipality.
+            The number of accounted ballots for this municipality.
 
         * ``municipality_blank_votes``:
             The number of blank votes for this municipality.
@@ -250,7 +250,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             The family name of the candidate.
 
         * ``candidate_first_name``:
-            The first name of the candiate.
+            The first name of the candidate.
 
         * ``candidate_elected``:
             True if the candidate has been elected.
