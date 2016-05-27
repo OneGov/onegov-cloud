@@ -5,6 +5,7 @@ updates.
 
 import click
 import email
+import inspect
 import mailbox
 import os
 import platform
@@ -24,21 +25,98 @@ from uuid import uuid4
 from webtest import TestApp as Client
 
 
-# missing selector
-MISSING = object()
+class GroupContextGuard(object):
+    """ Contains methods which abort the commandline program if any condition
+    is not met.
+
+    Used as a mixin in :class:`GroupContext`.
+
+    """
+    def validate_guard_conditions(self, click_context):
+        matches = tuple(self.matches)
+
+        for name, method in inspect.getmembers(self, inspect.ismethod):
+            if name.startswith('abort'):
+                method(click_context, matches)
+
+    def abort_if_no_selector(self, click_context, matches):
+        if not self.selector:
+            click.secho("Available selectors:")
+
+            for selector in self.available_selectors:
+                click.secho(" - {}".format(selector))
+
+            abort("No selector provided, aborting.")
+
+    def abort_if_no_subcommand(self, click_context, matches):
+        if click_context.invoked_subcommand is None:
+            click.secho("Paths matching the selector:")
+
+            for match in matches:
+                click.secho(" - {}".format(match))
+
+            abort("No subcommand provided, aborting.")
+
+    def abort_if_no_match(self, click_context, matches):
+        if self.matches_required and not matches:
+            click.secho("Available selectors:")
+
+            for selector in self.available_selectors:
+                click.secho(" - {}".format(selector))
+
+            abort("Selector doesn't match any paths, aborting.")
+
+    def abort_if_not_singular(self, click_context, matches):
+        if self.singular and len(matches) > 1:
+            click.secho("Paths matching the selector:")
+
+            for match in matches:
+                click.secho(" - {}".format(match))
+
+            abort("The selector must match a single path, aborting.")
+
+    def abort_if_no_create_path(self, click_context, matches):
+        if self.creates_path:
+            if len(matches) > 1:
+                abort("This selector may not reference an existing path")
+
+            if len(self.selector.lstrip('/').split('/')) != 2:
+                abort("This selector must reference a full path")
+
+            if '*' in self.selector:
+                abort("This selector may not contain a wildcard")
 
 
-class GroupContext(object):
+CONTEXT_SPECIFIC_SETTINGS = (
+    'default_selector',
+    'creates_path',
+    'singular',
+    'matches_required'
+)
+
+
+class GroupContext(GroupContextGuard):
     """ Provides access to application configs for group commands.
 
     """
 
-    def __init__(self, selector, config):
+    def __init__(self, selector, config, default_selector=None,
+                 creates_path=False, singular=False, matches_required=True):
+
         if isinstance(config, dict):
             self.config = Config(config)
         else:
             self.config = Config.from_yaml_file(config)
-        self.selector = selector
+
+        self.selector = selector or default_selector
+        self.creates_path = creates_path
+
+        if self.creates_path:
+            self.singular = True
+            self.matches_required = False
+        else:
+            self.singular = singular
+            self.matches_required = matches_required
 
     def unbound_session_manager(self, dsn):
         """ Returns a session manager *not yet bound to a schema!*. """
@@ -46,8 +124,23 @@ class GroupContext(object):
         return SessionManager(dsn=dsn, base=Base)
 
     def available_schemas(self, appcfg):
+        if 'dsn' not in appcfg.configuration:
+            return []
+
         mgr = self.unbound_session_manager(appcfg.configuration['dsn'])
         return mgr.list_schemas(limit_to_namespace=appcfg.namespace)
+
+    def match_to_path(self, match):
+        match = match.lstrip('/')
+
+        if '/' in match:
+            namespace, id = match.split('/')[:2]
+        else:
+            namespace, id = match, ''
+
+        for appcfg in self.config.applications:
+            if appcfg.namespace == namespace:
+                return appcfg.path.replace('*', id).rstrip('/')
 
     @property
     def appcfgs(self):
@@ -59,43 +152,78 @@ class GroupContext(object):
             /namespace/application_id
 
         """
-        namespace = self.selector.lstrip('/').split('/')[0]
+        namespace_selector = self.selector.lstrip('/').split('/')[0]
 
         for appcfg in self.config.applications:
-            if namespace != '*' and namespace != appcfg.namespace:
-                continue
-
-            yield appcfg
+            if fnmatch(appcfg.namespace, namespace_selector):
+                yield appcfg
 
     @property
     def available_selectors(self):
-        selectors = list(self.all_wildcard_paths)
-        selectors.extend(self.all_paths)
+        selectors = list(self.all_wildcard_selectors)
+        selectors.extend(self.all_specific_selectors)
 
         return sorted(selectors)
 
     @property
-    def all_wildcard_paths(self):
+    def all_wildcard_selectors(self):
         for appcfg in self.config.applications:
             if appcfg.path.endswith('*'):
-                yield appcfg.path
+                yield '/' + appcfg.namespace + '/*'
 
     @property
-    def all_paths(self):
+    def all_specific_selectors(self):
         for appcfg in self.config.applications:
             if not appcfg.path.endswith('*'):
-                yield appcfg.path
+                yield '/' + appcfg.namespace
             else:
                 for schema in self.available_schemas(appcfg):
                     yield '/' + schema.replace('-', '/')
 
     @property
-    def matching_paths(self):
-        assert self.selector is not MISSING
+    def matches(self):
+        """ Returns the specific selectors matching the context selector.
 
-        for path in self.all_paths:
-            if fnmatch(path, self.selector):
-                yield path
+        That is, a combination of namespace / application id is returned.
+        Since we only know an exhaustive list of application id's *if* we have
+        a database connection this is currently limited to applications with
+        one. Since we do not have any others yet that's fine.
+
+        However if we implement a database-less application in the future which
+        takes wildcard ids, we need some way to enumerate those ids.
+
+        See https://github.com/OneGov/onegov.core/issues/13
+        """
+        if self.selector:
+            for selector in self.all_specific_selectors:
+                if fnmatch(selector, self.selector):
+                    yield selector
+
+        if self.creates_path:
+            yield self.selector.rstrip('/')
+
+
+class Context(object):
+    pass
+
+
+def get_context_specific_settings(context):
+
+    if not context.invoked_subcommand:
+        return {}
+
+    # The context settings are stored on the command though they are actually
+    # click's settings, not ours. Upon inspection we need to transfer them
+    # here as a result.
+    subcommand = context.command.commands[context.invoked_subcommand]
+    if not hasattr(subcommand, 'onegov_settings'):
+        subcommand.onegov_settings = {
+            key: subcommand.context_settings.pop(key)
+            for key in CONTEXT_SPECIFIC_SETTINGS
+            if key in subcommand.context_settings
+        }
+
+    return subcommand.onegov_settings
 
 
 #: Decorator to acquire the group context on a command:
@@ -126,81 +254,36 @@ def command_group():
     """
 
     @click.group(invoke_without_command=True)
-    @click.argument('selector', default=MISSING)
     @click.option(
-        '--config',
-        default='onegov.yml',
+        '--select', default=None,
+        help="Selects the applications this command should be applied to")
+    @click.option(
+        '--config', default='onegov.yml',
         help="The onegov config file")
-    def command_group(selector, config):
+    def command_group(select, config):
         context = click.get_current_context()
-        context.obj = group_context = GroupContext(selector, config)
+        context.obj = group_context = GroupContext(
+            select, config, **get_context_specific_settings(context))
 
-        click.secho("Given selector: {}".format(selector), fg='green')
+        click.secho("Given selector: {}".format(
+            group_context.selector or 'None'
+        ), fg='green')
 
-        # no selector was provided, print available
-        if selector is MISSING:
-            click.secho("Available selectors:")
-
-            for selector in context.obj.available_selectors:
-                click.secho(" - {}".format(selector))
-
-            abort("No selector provided, aborting.")
-
-        matching_paths = tuple(context.obj.matching_paths)
-
-        # no subcommand was provided, print selector matches
-        if context.invoked_subcommand is None:
-            click.secho("Paths matching the selector:")
-
-            for match in matching_paths:
-                click.secho(" - {}".format(match))
-
-            abort("No subcommand provided, aborting.")
-
-        subcommand = context.command.commands[context.invoked_subcommand]
-        settings = subcommand.context_settings
-
-        group_context.creates_path = settings.pop('creates_path', False)
-
-        # the subcommand requires a matching selector but we didn't get one
-        if not group_context.creates_path and not matching_paths:
-            click.secho("Available selectors:")
-
-            for selector in context.obj.available_selectors:
-                click.secho(" - {}".format(selector))
-
-            abort("Selector doesn't match any paths, aborting.")
-
-        # the subcommand requires a single match, but we have more than that
-        if group_context.creates_path and len(matching_paths) > 1:
-            click.secho("Paths matching the selector:")
-
-            for match in matching_paths:
-                click.secho(" - {}".format(match))
-
-            abort("The selector must match a single path, aborting.")
-
-        if group_context.creates_path:
-            if matching_paths:
-                abort("This selector may not reference an existing path")
-
-            if len(selector.lstrip('/').split('/')) != 2:
-                abort("This selector must reference a full path")
-
-            if '*' in selector:
-                abort("This selector may not contain a wildcard")
+        group_context.validate_guard_conditions(context)
 
     @command_group.resultcallback()
-    def process_results(processor, selector, config):
+    def process_results(processor, select, config):
+
+        if not processor:
+            return
 
         group_context = click.get_current_context().obj
 
-        for appcfg in group_context.appcfgs:
-            scan_morepath_modules(appcfg.application_class)
+        # load all applications into the server
+        view_path = uuid4().hex
+        applications = []
 
         for appcfg in group_context.appcfgs:
-
-            view_path = uuid4().hex
 
             class CliApplication(appcfg.application_class):
 
@@ -219,30 +302,29 @@ def command_group():
             def run_command(self, request):
                 processor(request, request.app)
 
+            scan_morepath_modules(CliApplication)
             CliApplication.commit()
 
-            # run a custom server and send a fake request
-            server = Server(Config({
-                'applications': [
-                    {
-                        'path': appcfg.path,
-                        'application': CliApplication,
-                        'namespace': appcfg.namespace,
-                        'configuration': appcfg.configuration
-                    }
-                ]
-            }), configure_morepath=False)
+            applications.append({
+                'path': appcfg.path,
+                'application': CliApplication,
+                'namespace': appcfg.namespace,
+                'configuration': appcfg.configuration
+            })
 
-            client = Client(server)
+        server = Server(
+            Config({'applications': applications}),
+            configure_morepath=False
+        )
 
-            # call the view for all paths
-            paths = list(group_context.matching_paths)
+        # call the matching applications
+        client = Client(server)
 
-            if group_context.creates_path:
-                paths.append(group_context.selector.rstrip('/'))
+        matches = list(group_context.matches)
 
-            for path in paths:
-                client.get(path + '/' + view_path)
+        for match in matches:
+            path = group_context.match_to_path(match)
+            client.get(path + '/' + view_path)
 
     return command_group
 
@@ -257,35 +339,14 @@ def abort(msg):
     sys.exit(1)
 
 
-class Context(object):
-
-    def __init__(self, config, namespace):
-        self.config = config
-        self.namespace = namespace
-
-    @property
-    def appconfigs(self):
-        for appcfg in self.config.applications:
-            if self.namespace != '*' and self.namespace != appcfg.namespace:
-                continue
-
-            yield appcfg
+#: onegov.core's own command group
+cli = command_group()
 
 
-@click.group()
-@click.option('--config', default='onegov.yml', help="The config file to use")
-@click.option('--namespace',
-              default='*',
-              help=(
-                  "The namespace to run this command on (see onegov.yml). "
-                  "If no namespace is given, all namespaces are updated. "
-              ))
-@click.pass_context
-def cli(ctx, config, namespace):
-    ctx.obj = Context(Config.from_yaml_file(config), namespace)
-
-
-@cli.command()
+@cli.command(context_settings={
+    'matches_required': False,
+    'default_selector': '*'
+})
 @click.option('--hostname', help="The smtp host")
 @click.option('--port', help="The smtp port")
 @click.option('--force-tls', default=False, is_flag=True,
@@ -294,16 +355,16 @@ def cli(ctx, config, namespace):
 @click.option('--password', help="The password to authenticate", default=None)
 @click.option('--limit', default=25,
               help="Max number of mails to send before exiting")
-@click.pass_context
-def sendmail(ctx, hostname, port, force_tls, username, password, limit):
+@pass_group_context
+def sendmail(group_context,
+             hostname, port, force_tls, username, password, limit):
     """ Iterates over all applications and processes the maildir for each
     application that uses maildir e-mail delivery.
 
     """
-    context = ctx.obj
     success = True
 
-    for appcfg in context.appconfigs:
+    for appcfg in group_context.appcfgs:
 
         if not appcfg.configuration.get('mail_use_directory'):
             continue
@@ -360,8 +421,9 @@ def sendmail(ctx, hostname, port, force_tls, username, password, limit):
               help="Do not transfer the files")
 @click.option('--no-database', default=False, is_flag=True,
               help="Do not transfer the database")
-@click.pass_context
-def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
+@pass_group_context
+def transfer(group_context,
+             server, remote_config, confirm, no_filestorage, no_database):
     """ Transfers the database and all files from a server running a
     onegov-cloud application and installs them locally, overwriting the
     local data!
@@ -378,8 +440,6 @@ def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
     WARNING: This may delete local content!
 
     """
-
-    context = ctx.obj
 
     if confirm:
         click.confirm(
@@ -402,7 +462,7 @@ def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
     fetched = set()
 
     # filter out namespaces on demand
-    for appcfg in context.appconfigs:
+    for appcfg in group_context.appcfgs:
 
         if appcfg.configuration.get('disable_transfer'):
             print("Skipping {}, transfer disabled".format(appcfg.namespace))
@@ -517,85 +577,39 @@ def transfer(ctx, server, remote_config, confirm, no_filestorage, no_database):
                 subprocess.check_output(['rm', 'dump.sql'])
 
 
-@cli.command()
+@cli.command(context_settings={'default_selector': '*'})
 @click.option('--dry-run', default=False, is_flag=True,
               help="Do not write any changes into the database.")
-@click.pass_context
-def upgrade(ctx, dry_run):
+@pass_group_context
+def upgrade(group_context, dry_run):
     """ Upgrades all application instances of the given namespace(s). """
-
-    context = ctx.obj
-
-    update_path = '/' + uuid4().hex
 
     modules = list(get_upgrade_modules())
     tasks = get_tasks()
 
-    for appcfg in context.appconfigs:
+    def on_success(task):
+        print(click.style("* " + str(task.task_name), fg='green'))
 
-        # have a custom update application so we can get a proper execution
-        # context with a request and a session
+    def on_fail(task):
+        print(click.style("* " + str(task.task_name), fg='red'))
 
-        class UpdateApplication(appcfg.application_class):
-            pass
+    def run_upgrade(request, app):
+        title = "Running upgrade for {}".format(request.app.application_id)
+        print(click.style(title, underline=True))
 
-        @UpdateApplication.path(model=UpgradeRunner, path=update_path)
-        def get_upgrade_runner():
-            return upgrade_runner
+        upgrade_runner = UpgradeRunner(
+            modules=modules,
+            tasks=tasks,
+            commit=not dry_run,
+            on_task_success=on_success,
+            on_task_fail=on_fail
+        )
 
-        @UpdateApplication.view(model=UpgradeRunner)
-        def run_upgrade(self, request):
-            title = "Running upgrade for {}".format(request.app.application_id)
-            print(click.style(title, underline=True))
+        executed_tasks = upgrade_runner.run_upgrade(request)
 
-            executed_tasks = self.run_upgrade(request)
+        if executed_tasks:
+            print("executed {} upgrade tasks".format(executed_tasks))
+        else:
+            print("no pending upgrade tasks found")
 
-            if executed_tasks:
-                print("executed {} upgrade tasks".format(executed_tasks))
-            else:
-                print("no pending upgrade tasks found")
-
-        scan_morepath_modules(appcfg.application_class)
-        UpdateApplication.commit()
-
-        # get all applications by looking at the existing schemas
-        mgr = SessionManager(appcfg.configuration['dsn'], base=Base)
-        schemas = mgr.list_schemas(limit_to_namespace=appcfg.namespace)
-
-        # run a custom server and send a fake request
-        server = Server(Config({
-            'applications': [
-                {
-                    'path': appcfg.path,
-                    'application': UpdateApplication,
-                    'namespace': appcfg.namespace,
-                    'configuration': appcfg.configuration
-                }
-            ]
-        }), configure_morepath=False)
-
-        # build the path to the update view and call it
-        c = Client(server)
-
-        def on_success(task):
-            print(click.style("* " + str(task.task_name), fg='green'))
-
-        def on_fail(task):
-            print(click.style("* " + str(task.task_name), fg='red'))
-
-        for schema in schemas:
-            # we *need* a new upgrade runner for each schema
-            upgrade_runner = UpgradeRunner(
-                modules=modules,
-                tasks=tasks,
-                commit=not dry_run,
-                on_task_success=on_success,
-                on_task_fail=on_fail
-            )
-
-            if appcfg.is_static:
-                root = appcfg.path
-            else:
-                root = appcfg.path.replace('*', schema.split('-')[1])
-
-            c.get(root + update_path)
+    return run_upgrade

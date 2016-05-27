@@ -1,4 +1,5 @@
 import os.path
+import pytest
 import transaction
 import yaml
 
@@ -6,7 +7,7 @@ from click.testing import CliRunner
 from email.header import decode_header
 from email.utils import parseaddr
 from onegov.core import Framework
-from onegov.core.cli import cli, GroupContext, command_group
+from onegov.core.cli import cli, GroupContext
 from smtplib import SMTPRecipientsRefused
 from unittest.mock import patch
 
@@ -25,9 +26,9 @@ def test_group_context_without_schemas(postgres_dsn):
 
     assert len(tuple(ctx.appcfgs)) == 1
     assert list(ctx.available_selectors) == ['/onegov_test/*']
-    assert list(ctx.all_wildcard_paths) == ['/onegov_test/*']
-    assert list(ctx.all_paths) == []
-    assert list(ctx.matching_paths) == []
+    assert list(ctx.all_wildcard_selectors) == ['/onegov_test/*']
+    assert list(ctx.all_specific_selectors) == []
+    assert list(ctx.matches) == []
 
 
 def test_group_context_with_schemas(postgres_dsn):
@@ -53,116 +54,101 @@ def test_group_context_with_schemas(postgres_dsn):
         '/onegov_test/bar',
         '/onegov_test/foo'
     ]
-    assert list(ctx.all_wildcard_paths) == ['/onegov_test/*']
-    assert list(ctx.all_paths) == [
+    assert list(ctx.all_wildcard_selectors) == ['/onegov_test/*']
+    assert list(ctx.all_specific_selectors) == [
         '/onegov_test/foo',
         '/onegov_test/bar'
     ]
-    assert list(ctx.matching_paths) == [
+    assert list(ctx.matches) == [
         '/onegov_test/foo',
         '/onegov_test/bar'
     ]
 
     ctx.selector = '/onegov_test/foo'
-    assert list(ctx.matching_paths) == [
+    assert list(ctx.matches) == [
         '/onegov_test/foo',
     ]
 
     ctx.selector = '/onegov_test/b??'
-    assert list(ctx.matching_paths) == [
+    assert list(ctx.matches) == [
         '/onegov_test/bar',
     ]
 
 
-def create_command_fixture(temporary_directory, postgres_dsn):
-    cfg = {
-        'applications': [
-            {
-                'path': '/foobar/*',
-                'application': 'onegov.core.Framework',
-                'namespace': 'foobar',
-                'configuration': {
-                    'dsn': postgres_dsn
-                }
-            }
-        ]
-    }
-
-    with open(os.path.join(temporary_directory, 'onegov.yml'), 'w') as f:
-        f.write(yaml.dump(cfg))
-
-    cli = command_group()
-
-    @cli.command(context_settings={'creates_path': True})
-    def create():
-        nonlocal cli
-        cli.called = True
-
-        def perform(request, app):
-            cli.called_request = True
-
-        return perform
-
-    return cli
-
-
-def test_create_command_group_single_path(temporary_directory, postgres_dsn):
-    cli = create_command_fixture(temporary_directory, postgres_dsn)
-    cfg = os.path.join(temporary_directory, 'onegov.yml')
-
+@pytest.mark.parametrize('cli', [{'singular': True}], indirect=True)
+def test_create_command_group_single_path(cli, cli_config):
     runner = CliRunner()
     schemas = ['foobar-foo', 'foobar-bar']
 
     with patch.object(GroupContext, 'available_schemas', return_value=schemas):
-        result = runner.invoke(cli, ['--config', cfg, '/foobar/*', 'create'])
+        result = runner.invoke(cli, [
+            '--config', cli_config, '--select', '/foobar/*', 'create'
+        ])
         assert "The selector must match a single path" in result.output
 
 
-def test_create_command_group_existing_path(temporary_directory, postgres_dsn):
-    cli = create_command_fixture(temporary_directory, postgres_dsn)
-    cfg = os.path.join(temporary_directory, 'onegov.yml')
-
+@pytest.mark.parametrize('cli', [{'creates_path': True}], indirect=True)
+def test_create_command_group_existing_path(cli, cli_config):
     runner = CliRunner()
     schemas = ['foobar-foo']
 
     with patch.object(GroupContext, 'available_schemas', return_value=schemas):
-        result = runner.invoke(cli, ['--config', cfg, '/foobar/foo', 'create'])
+        result = runner.invoke(cli, [
+            '--config', cli_config, '--select', '/foobar/foo', 'create'
+        ])
         assert "may not reference an existing path" in result.output
 
 
-def test_create_command_full_path(temporary_directory, postgres_dsn):
-    cli = create_command_fixture(temporary_directory, postgres_dsn)
-    cfg = os.path.join(temporary_directory, 'onegov.yml')
+@pytest.mark.parametrize('cli', [{'creates_path': True}], indirect=True)
+def test_create_command_full_path(cli, cli_config):
+    runner = CliRunner()
+    schemas = ['foobar-foo']
+
+    with patch.object(GroupContext, 'available_schemas', return_value=schemas):
+        result = runner.invoke(cli, [
+            '--config', cli_config, '--select', '/foobar', 'create'
+        ])
+        assert "must reference a full path" in result.output
+
+
+@pytest.mark.parametrize('cli', [{'creates_path': True}], indirect=True)
+def test_create_command_wildcard(cli, cli_config):
+
+    runner = CliRunner()
+    schemas = []
+
+    with patch.object(GroupContext, 'available_schemas', return_value=schemas):
+        result = runner.invoke(cli, [
+            '--config', cli_config, '--select', '/foobar/*', 'create'
+        ])
+        assert "may not contain a wildcard" in result.output
+
+
+@pytest.mark.parametrize('cli', [{'creates_path': True}], indirect=True)
+def test_create_command_request_called(cli, cli_config):
+
+    runner = CliRunner()
+    schemas = []
+
+    with patch.object(GroupContext, 'available_schemas', return_value=schemas):
+        runner.invoke(cli, [
+            '--config', cli_config, '--select', '/foobar/foo', 'create'
+        ])
+
+        assert cli.called
+        assert cli.called_request
+
+
+@pytest.mark.parametrize('cli', [{'default_selector': '*'}], indirect=True)
+def test_create_command_default_selector(cli, cli_config):
 
     runner = CliRunner()
     schemas = ['foobar-foo']
 
     with patch.object(GroupContext, 'available_schemas', return_value=schemas):
-        result = runner.invoke(cli, ['--config', cfg, '/foobar', 'create'])
-        assert "must reference a full path" in result.output
-
-
-def test_create_command_wildcard(temporary_directory, postgres_dsn):
-    cli = create_command_fixture(temporary_directory, postgres_dsn)
-    cfg = os.path.join(temporary_directory, 'onegov.yml')
-
-    runner = CliRunner()
-    schemas = []
-
-    with patch.object(GroupContext, 'available_schemas', return_value=schemas):
-        result = runner.invoke(cli, ['--config', cfg, '/foobar/*', 'create'])
-        assert "may not contain a wildcard" in result.output
-
-
-def test_create_command_request_called(temporary_directory, postgres_dsn):
-    cli = create_command_fixture(temporary_directory, postgres_dsn)
-    cfg = os.path.join(temporary_directory, 'onegov.yml')
-
-    runner = CliRunner()
-    schemas = []
-
-    with patch.object(GroupContext, 'available_schemas', return_value=schemas):
-        runner.invoke(cli, ['--config', cfg, '/foobar/foo', 'create'])
+        runner.invoke(cli, [
+            '--config', cli_config, 'create'
+        ])
 
         assert cli.called
         assert cli.called_request
