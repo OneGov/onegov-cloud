@@ -36,158 +36,147 @@ This command will also ask for a password if none was provided with
 
 import click
 import sys
-import transaction
 
 from getpass import getpass
 from onegov.user import UserCollection
+from onegov.core.cli import command_group
 from onegov.core.crypto import random_password
-from onegov.core.orm import Base, SessionManager
 
-
-@click.group()
-@click.option('--dsn', help="Postgresql connection string")
-@click.option('--schema', help="Schema to use")
-@click.pass_context
-def cli(ctx, dsn, schema):
-    ctx.obj = {}
-
-    mgr = SessionManager(dsn, base=Base)
-    mgr.set_current_schema(schema)
-
-    ctx.obj['schema'] = schema
-    ctx.obj['session'] = mgr.session()
+cli = command_group()
 
 
 @cli.command()
 @click.argument('role')
 @click.argument('username')
-@click.option('--password', help="Password to give the user", default=None)
-@click.option('--yubikey',
-              help="The yubikey code to use for 2fa", default=None)
-@click.option('--no-prompt', help="If no questions should be asked",
-              default=False, is_flag=True)
-@click.pass_context
-def add(ctx, role, username, password, yubikey, no_prompt):
+@click.option('--password', default=None,
+              help="Password to give the user")
+@click.option('--yubikey', default=None,
+              help="The yubikey code to use for 2fa")
+@click.option('--no-prompt', default=False,
+              help="If no questions should be asked", is_flag=True)
+def add(role, username, password, yubikey, no_prompt):
     """ Adds a user with the given name to the database. """
 
-    session = ctx.obj['session']
-    users = UserCollection(session)
+    def add_user(request, app):
+        users = UserCollection(app.session())
 
-    if users.exists(username):
-        click.secho("The user {} already exists".format(username), fg='red')
-        sys.exit(1)
+        print("Adding {} to {}".format(username, app.town.name))
 
-    if not password:
-        password = random_password(16)
-        print()
-        print("Using the following random password:")
-        click.secho(password, fg='green')
-        print()
+        if users.exists(username):
+            click.secho("{} already exists".format(username), fg='red')
+            return
 
-    if not yubikey and not no_prompt:
-        yubikey = getpass(
-            "Optionally plug in your yubi-key and press the button: "
-        )
+        nonlocal password
+        if not password:
+            password = random_password(16)
+            print()
+            print("Using the following random password:")
+            click.secho(password, fg='green')
+            print()
 
-        yubikey = yubikey.strip()
+        nonlocal yubikey
+        if not yubikey and not no_prompt:
+            yubikey = getpass(
+                "Optionally plug in your yubi-key and press the button: "
+            )
 
-    if yubikey:
-        second_factor = {
-            'type': 'yubikey',
-            'data': yubikey[:12]
-        }
-    else:
-        second_factor = None
+            yubikey = yubikey.strip()
 
-    users.add(username, password, role, second_factor=second_factor)
+        if yubikey:
+            second_factor = {
+                'type': 'yubikey',
+                'data': yubikey[:12]
+            }
+        else:
+            second_factor = None
 
-    transaction.commit()
+        users.add(username, password, role, second_factor=second_factor)
+        click.secho("{} was added".format(username), fg='green')
 
-    click.secho("The user {} was added".format(username), fg='green')
+    return add_user
 
 
-@cli.command()
+@cli.command(context_settings={'singular': True})
 @click.argument('username')
-@click.pass_context
-def delete(ctx, username):
+def delete(username):
     """ Removes the given user from the database. """
 
-    session = ctx.obj['session']
-    users = UserCollection(session)
+    def delete_user(request, app):
+        users = UserCollection(app.session())
 
-    if not users.exists(username):
-        click.secho("The user {} does not exist".format(username), fg='red')
-        sys.exit(1)
+        if not users.exists(username):
+            click.secho("{} does not exist".format(username), fg='red')
+            return
 
-    users.delete(username)
-    transaction.commit()
+        users.delete(username)
+        click.secho("{} was deleted".format(username), fg='green')
 
-    click.secho("The user {} was deleted".format(username), fg='green')
+    return delete_user
 
 
-@cli.command()
+@cli.command(context_settings={'singular': True})
 @click.argument('username')
-@click.pass_context
-def exists(ctx, username):
+def exists(username):
     """ Returns 0 if the user exists, 1 if it doesn't. """
 
-    session = ctx.obj['session']
-    users = UserCollection(session)
+    def find_user(request, app):
+        users = UserCollection(app.session())
 
-    if not users.exists(username):
-        click.secho("The user {} does not exist".format(username), fg='red')
-        sys.exit(1)
-    else:
-        click.secho("The user {} exists".format(username), fg='green')
-        sys.exit(0)
+        if not users.exists(username):
+            click.secho("{} does not exist".format(username), fg='red')
+            sys.exit(1)
+        else:
+            click.secho("{} exists".format(username), fg='green')
+
+    return find_user
 
 
-@cli.command(name='change-password')
+@cli.command(name='change-password', context_settings={'singular': True})
 @click.argument('username')
 @click.option('--password', help="Password to use", default=None)
-@click.pass_context
-def change_password(ctx, username, password):
+def change_password(username, password):
     """ Changes the password of the given username. """
 
-    session = ctx.obj['session']
-    users = UserCollection(session)
+    def change(request, app):
+        users = UserCollection(app.session())
 
-    if not users.exists(username):
-        click.secho("The user {} does not exist".format(username), fg='red')
-        sys.exit(1)
+        if not users.exists(username):
+            click.secho("{} does not exist".format(username), fg='red')
+            sys.exit(1)
 
-    password = password or getpass("Enter password: ")
+        nonlocal password
+        password = password or getpass("Enter password: ")
 
-    user = users.by_username(username)
-    user.password = password
+        user = users.by_username(username)
+        user.password = password
 
-    transaction.commit()
+        click.secho("{}'s password was changed".format(username), fg='green')
 
-    click.secho("The password for {} was changed".format(username), fg='green')
+    return change
 
 
-@cli.command(name='change-yubikey')
+@cli.command(name='change-yubikey', context_settings={'singular': True})
 @click.argument('username')
 @click.option('--yubikey', help="Yubikey to use", default=None)
-@click.pass_context
-def change_yubikey(ctx, username, yubikey):
+def change_yubikey(username, yubikey):
     """ Changes the yubikey of the given username. """
 
-    session = ctx.obj['session']
-    users = UserCollection(session)
+    def change(request, app):
+        users = UserCollection(app.session())
 
-    if not users.exists(username):
-        click.secho("The user {} does not exist".format(username), fg='red')
-        sys.exit(1)
+        if not users.exists(username):
+            click.secho("{} does not exist".format(username), fg='red')
+            sys.exit(1)
 
-    yubikey = (yubikey or getpass("Enter yubikey: ")).strip()[:12]
+        nonlocal yubikey
+        yubikey = (yubikey or getpass("Enter yubikey: ")).strip()[:12]
 
-    user = users.by_username(username)
-    user.second_factor = {
-        'type': 'yubikey',
-        'data': yubikey
-    }
+        user = users.by_username(username)
+        user.second_factor = {
+            'type': 'yubikey',
+            'data': yubikey
+        }
 
-    transaction.commit()
+        click.secho("{}'s yubikey was changed".format(username), fg='green')
 
-    click.secho("The yubikey for {} was changed".format(username), fg='green')
+    return change

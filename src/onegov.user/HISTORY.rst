@@ -1,8 +1,7 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
+- Adds compatibility with onegov.core 0.21.0.
 
 0.4.0 (2016-01-13)
 ~~~~~~~~~~~~~~~~~~~
