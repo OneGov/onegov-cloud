@@ -27,21 +27,23 @@ def test_manage_towns(postgres_dsn, temporary_directory):
 
     runner = CliRunner()
     result = runner.invoke(cli, [
-        '--config', cfg_path, '/onegov_town/newyork', 'add', 'New York'
+        '--config', cfg_path, '--select', '/onegov_town/newyork',
+        'add', 'New York'
     ])
 
     assert result.exit_code == 0
     assert "New York was created successfully" in result.output
 
     result = runner.invoke(cli, [
-        '--config', cfg_path, '/onegov_town/newyork', 'add', 'New York'
+        '--config', cfg_path, '--select', '/onegov_town/newyork',
+        'add', 'New York'
     ])
 
     assert result.exit_code == 1
-    assert "/onegov_town/newyork already contains a town" in result.output
+    assert "may not reference an existing path" in result.output
 
     result = runner.invoke(cli, [
-        '--config', cfg_path, '/onegov_town/newyork', 'delete'
+        '--config', cfg_path, '--select', '/onegov_town/newyork', 'delete'
     ], input='y\n')
 
     assert result.exit_code == 0
