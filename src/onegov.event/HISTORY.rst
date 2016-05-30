@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes ical export test.
+  [msom]
+
 0.3.0 (2016-04-05)
 ~~~~~~~~~~~~~~~~~~~
 

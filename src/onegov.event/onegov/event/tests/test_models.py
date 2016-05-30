@@ -483,40 +483,42 @@ def test_as_ical():
         name='event',
         modified=tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich'),
     )
-    assert event.as_ical(url=url).decode() == (
-        'BEGIN:VCALENDAR\r\n'
-        'VERSION:2.0\r\n'
-        'PRODID:-//OneGov//onegov.event//\r\n'
-        'BEGIN:VEVENT\r\n'
-        'SUMMARY:Squirrel Park Visit\r\n'
-        'DTSTART;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T101500\r\n'
-        'DTEND;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T160000\r\n'
-        'DESCRIPTION:<em>Furry</em> things will happen!\r\n'
-        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z\r\n'
-        'LOCATION:Squirrel Park\r\n'
-        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=2\r\n'
-        'URL:https://example.org/my-event\r\n'
-        'END:VEVENT\r\n'
-        'END:VCALENDAR\r\n'
-    )
+    ical = event.as_ical(url=url).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T101500',
+        'DTEND;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T160000',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
+        'LOCATION:Squirrel Park',
+        'RRULE:FREQ=DAILY;COUNT=5;INTERVAL=2',
+        'URL:https://example.org/my-event',
+        'END:VEVENT',
+        'END:VCALENDAR',
+    ])
 
     event.submit()
     event.publish()
     occurrence = event.occurrences[0]
     occurrence.modified = tzdatetime(2008, 2, 7, 10, 15, 'Europe/Zurich')
 
-    assert event.occurrences[0].as_ical(url=url).decode() == (
-        'BEGIN:VCALENDAR\r\n'
-        'VERSION:2.0\r\n'
-        'PRODID:-//OneGov//onegov.event//\r\n'
-        'BEGIN:VEVENT\r\n'
-        'SUMMARY:Squirrel Park Visit\r\n'
-        'DTSTART;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T101500\r\n'
-        'DTEND;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T160000\r\n'
-        'DESCRIPTION:<em>Furry</em> things will happen!\r\n'
-        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z\r\n'
-        'LOCATION:Squirrel Park\r\n'
-        'URL:https://example.org/my-event\r\n'
-        'END:VEVENT\r\n'
-        'END:VCALENDAR\r\n'
-    )
+    ical = event.occurrences[0].as_ical(url=url).decode().strip().split('\r\n')
+    assert sorted(ical) == sorted([
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//OneGov//onegov.event//',
+        'BEGIN:VEVENT',
+        'SUMMARY:Squirrel Park Visit',
+        'DTSTART;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T101500',
+        'DTEND;TZID=Europe/Zurich;VALUE=DATE-TIME:20080207T160000',
+        'DESCRIPTION:<em>Furry</em> things will happen!',
+        'LAST-MODIFIED;VALUE=DATE-TIME:20080207T091500Z',
+        'LOCATION:Squirrel Park',
+        'URL:https://example.org/my-event',
+        'END:VEVENT',
+        'END:VCALENDAR',
+    ])
