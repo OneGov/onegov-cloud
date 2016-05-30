@@ -1,4 +1,10 @@
-""" Provides a framework for cli commands run against one ore more onegov
+"""
+.. _core-commands:
+
+Core Commands
+-------------
+
+Provides a framework for cli commands run against one ore more onegov
 cloud applications.
 
 OneGov cli commands are usually ran against a onegov.yml config file, which
@@ -25,29 +31,29 @@ That is, it consists of the namespace of the application and it's id.
 
 For example:
 
-    * /foo/bar
-    * /onegov_election_day/gr
-    * /onegov_town/govikon
+    * ``/foo/bar``
+    * ``/onegov_election_day/gr``
+    * ``/onegov_town/govikon``
 
 To select non-wildcard applications we can just omit the id:
 
-    * /foo
-    * /onegov_onboarding
+    * ``/foo``
+    * ``/onegov_onboarding``
 
 Finally, to select multiple applications we can use wildcards:
 
-    * /foo/*
-    * /onegov_election_day/*
-    * /*/g??
+    * ``/foo/*``
+    * ``/onegov_election_day/*``
+    * ``/*/g??``
 
 Execution
 ---------
 
-To run a supported command we provide a selector as an option:
+To run a supported command we provide a selector as an option::
 
     bin/onegov-core --select '/foo/*' subcommand
 
-To find out what kind of selectors are available, we can simply run:
+To find out what kind of selectors are available, we can simply run::
 
     bin/onegov-core
 
@@ -56,18 +62,18 @@ Which will print out a list of selector suggestions.
 Registering a Selector Based Command
 ------------------------------------
 
-To write a selector based command we first create a command group:
+To write a selector based command we first create a command group::
 
     from onegov.core.cli import command_group
     cli = command_group()
 
-Using that command group, we can register our own commands:
+Using that command group, we can register our own commands::
 
     @cli.command()
     def my_click_command():
         pass
 
-This command works like any other click command:
+This command works like any other click command::
 
     import click
 
@@ -77,12 +83,12 @@ This command works like any other click command:
         pass
 
 Each command has the ability to influence the way selectors work. For example,
-a command which creates the path that matches the selector we can use:
+a command which creates the path that matches the selector we can use::
 
     @cli.command(context_settings={'creates_path': True})
 
 By default we expect that a selector is passed. For commands which usually run
-against all applications we can provide a default selector:
+against all applications we can provide a default selector::
 
     @cli.command(context_settings={'default_selector': '*'})
 
@@ -94,12 +100,12 @@ called for each application with a request. This allows us to write commands
 which behave like they were written in a view.
 
 To do that we register a command which returns a function with the following
-signature:
+signature::
 
     def handle_command(request, app):
         pass
 
-For example:
+For example::
 
     @cli.command()
     def my_click_command():
@@ -123,7 +129,7 @@ setup something before receiving a request.
 
 To do this, we use the ``pass_group_context`` decorator.
 
-For example:
+For example::
 
     from onegov.core.cli import pass_group_context
 
@@ -145,8 +151,7 @@ Sometimes we want to write commands which only run against a single
 application. A good example is a command which returns 1/0 depending on the
 existence of something *in* an application.
 
-To do that, we use:
-
+To do that, we use::
 
     @cli.command(context_settings={'singular': True})
     def my_click_command():
@@ -248,7 +253,7 @@ class GroupContext(GroupContextGuard):
         Selects the applications which should be captured by a
         :func:`command_group`.
 
-        See :module:`onegov.core.cli.core` for more documentation about
+        See :ref:`core-commands` for more documentation about
         selectors.
 
     :param config:
@@ -329,7 +334,7 @@ class GroupContext(GroupContextGuard):
         """ Returns the matching appconfigs.
 
         Since there's only one appconfig per namespace, we ignore the path
-        part of the selector and only focus on the namespace:
+        part of the selector and only focus on the namespace::
 
             /namespace/application_id
 
@@ -419,7 +424,7 @@ def get_context_specific_settings(context):
     return subcommand.onegov_settings
 
 
-#: Decorator to acquire the group context on a command:
+#: Decorator to acquire the group context on a command::
 #:
 #:     @cli.command()
 #:     @pass_group_context()
