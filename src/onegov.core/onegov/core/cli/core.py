@@ -168,6 +168,7 @@ import sys
 
 from fnmatch import fnmatch
 from onegov.core.orm import Base, SessionManager
+from onegov.core.security import Public
 from onegov.core.utils import scan_morepath_modules
 from onegov.server.config import Config
 from onegov.server.core import Server
@@ -502,7 +503,7 @@ def command_group():
             class Model(object):
                 pass
 
-            @CliApplication.view(model=Model)
+            @CliApplication.view(model=Model, permission=Public)
             def run_command(self, request):
                 processor(request, request.app)
 
