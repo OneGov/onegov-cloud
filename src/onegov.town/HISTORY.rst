@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.8.1 (2016-05-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes empty reservation card leading to a view with insufficent permissions.
   [href]
 
