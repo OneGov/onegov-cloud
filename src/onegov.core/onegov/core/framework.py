@@ -576,7 +576,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         bound to this application.
 
         """
-        return morepath.security.Identity(
+        return morepath.authentication.Identity(
             userid, role=role, application_id=self.application_id_hash)
 
     @property

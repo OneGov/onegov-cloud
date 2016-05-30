@@ -9,7 +9,7 @@ from itsdangerous import (
     URLSafeTimedSerializer
 )
 from more.webassets.core import IncludeRequest
-from morepath.security import NO_IDENTITY
+from morepath.authentication import NO_IDENTITY
 from onegov.core import utils
 from onegov.core.crypto import random_token
 from webob.exc import HTTPForbidden
