@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.2 (2016-05-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Catches signature verifcation error responses to the yubico server.
   [href]
 
