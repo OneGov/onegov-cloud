@@ -1,6 +1,160 @@
 """ Provides a framework for cli commands run against one ore more onegov
 cloud applications.
 
+OneGov cli commands are usually ran against a onegov.yml config file, which
+may contain definitions for multiple applications. It may define multiple
+application with different applicaiton classes and it may contain wildcard
+applications which run the same application class, but contain multiple
+tennants for each application.
+
+To have a command run against one or many applications we use a selector to
+help select the applications we want to target in a command.
+
+In addition to selectors, onegov core cli commands provide a simple way to
+write a function that takes a request and an application. This function is
+then called for each application matching the selector, with a proper
+request and application context already setup (with the same characteristics
+as if called through an url in the browser).
+
+Selector
+--------
+
+A selector has the form <namespace>/<id>.
+
+That is, it consists of the namespace of the application and it's id.
+
+For example:
+
+    * /foo/bar
+    * /onegov_election_day/gr
+    * /onegov_town/govikon
+
+To select non-wildcard applications we can just omit the id:
+
+    * /foo
+    * /onegov_onboarding
+
+Finally, to select multiple applications we can use wildcards:
+
+    * /foo/*
+    * /onegov_election_day/*
+    * /*/g??
+
+Execution
+---------
+
+To run a supported command we provide a selector as an option:
+
+    bin/onegov-core --select '/foo/*' subcommand
+
+To find out what kind of selectors are available, we can simply run:
+
+    bin/onegov-core
+
+Which will print out a list of selector suggestions.
+
+Registering a Selector Based Command
+------------------------------------
+
+To write a selector based command we first create a command group:
+
+    from onegov.core.cli import command_group
+    cli = command_group()
+
+Using that command group, we can register our own commands:
+
+    @cli.command()
+    def my_click_command():
+        pass
+
+This command works like any other click command:
+
+    import click
+
+    @cli.command()
+    @click.option('--option')
+    def my_click_command(option):
+        pass
+
+Each command has the ability to influence the way selectors work. For example,
+a command which creates the path that matches the selector we can use:
+
+    @cli.command(context_settings={'creates_path': True})
+
+By default we expect that a selector is passed. For commands which usually run
+against all applications we can provide a default selector:
+
+    @cli.command(context_settings={'default_selector': '*'})
+
+Using the app/request context
+-----------------------------
+
+For a lot of commands the easiest approach is to have a function which is
+called for each application with a request. This allows us to write commands
+which behave like they were written in a view.
+
+To do that we register a command which returns a function with the following
+signature:
+
+    def handle_command(request, app):
+        pass
+
+For example:
+
+    @cli.command()
+    def my_click_command():
+
+        def handle_command(request, app):
+            pass
+
+        return handle_command
+
+Setup like this, ``handle_command`` will be called with a request for each
+application (and tennant). This function acts exactly like a view. Most
+importantly, it does *not* require transaction commits, because like with
+ordinary requests, the transaction is automatically committed if no error
+occurs.
+
+Using the app configurations directly
+-------------------------------------
+
+Sometimes we don't want to use the request/app context, or maybe we want to
+setup something before receiving a request.
+
+To do this, we use the ``pass_group_context`` decorator.
+
+For example:
+
+    from onegov.core.cli import pass_group_context
+
+    @cli.command()
+    @pass_group_context
+    def my_click_command(group_context):
+
+        for appcfg in group_context.appcfgs:
+            # do something
+
+This is independent of the app/request context. If we return a function, the
+function is going to be called with the request and the app. If we do not, the
+command ends as expected.
+
+Limiting Selectors to a Single Instance
+---------------------------------------
+
+Sometimes we want to write commands which only run against a single
+application. A good example is a command which returns 1/0 depending on the
+existence of something *in* an application.
+
+To do that, we use:
+
+
+    @cli.command(context_settings={'singular': True})
+    def my_click_command():
+        pass
+
+If a selector is passed which matches more than one application, the command
+is not executed.
+
 """
 
 import click
@@ -90,6 +244,33 @@ class GroupContextGuard(object):
 class GroupContext(GroupContextGuard):
     """ Provides access to application configs for group commands.
 
+    :param selector:
+        Selects the applications which should be captured by a
+        :func:`command_group`.
+
+        See :module:`onegov.core.cli.core` for more documentation about
+        selectors.
+
+    :param config:
+        The targeted onegov.yml file or an equivalent dictionary.
+
+    :param default_selector:
+        The selector used if none is provided. If not given, a selector
+        *has* to be provided.
+
+    :param creates_path:
+        True if the given selector doesn't exist yet, but will be created.
+        Commands which use this setting are expected to take a single path
+        (no wildcards) and to create it during their runtime.
+
+        Implies `singular` and `matches_required`.
+
+    :param singular:
+        True if the selector may not match multiple applications.
+
+    :param matches_required:
+        True if the selector *must* match at least one application.
+
     """
 
     def __init__(self, selector, config, default_selector=None,
@@ -116,6 +297,11 @@ class GroupContext(GroupContextGuard):
         return SessionManager(dsn=dsn, base=Base)
 
     def available_schemas(self, appcfg):
+        """ Returns all available schemas, if the application is database
+        bound.
+
+        """
+
         if 'dsn' not in appcfg.configuration:
             return []
 
@@ -123,6 +309,10 @@ class GroupContext(GroupContextGuard):
         return mgr.list_schemas(limit_to_namespace=appcfg.namespace)
 
     def match_to_path(self, match):
+        """ Takes the given match and returns the application path used in
+        http requests.
+
+        """
         match = match.lstrip('/')
 
         if '/' in match:
@@ -152,6 +342,13 @@ class GroupContext(GroupContextGuard):
 
     @property
     def available_selectors(self):
+        """ Generates a list of available selectors.
+
+        The list doesn't technically exhaust all options, but it returns
+        all selectors targeting a single application as well as all selectors
+        targeting a namespace by wildcard.
+
+        """
         selectors = list(self.all_wildcard_selectors)
         selectors.extend(self.all_specific_selectors)
 
@@ -159,12 +356,16 @@ class GroupContext(GroupContextGuard):
 
     @property
     def all_wildcard_selectors(self):
+        """ Returns all selectors targeting a namespace by wildcard. """
+
         for appcfg in self.config.applications:
             if appcfg.path.endswith('*'):
                 yield '/' + appcfg.namespace + '/*'
 
     @property
     def all_specific_selectors(self):
+        """ Returns all selectors targeting an application directly. """
+
         for appcfg in self.config.applications:
             if not appcfg.path.endswith('*'):
                 yield '/' + appcfg.namespace
@@ -196,13 +397,17 @@ class GroupContext(GroupContextGuard):
 
 
 def get_context_specific_settings(context):
+    """ Takes the given *click* context and extracts all context specific
+    settings from it.
+
+    """
 
     if not context.invoked_subcommand:
         return {}
 
     # The context settings are stored on the command though they are actually
     # click's settings, not ours. Upon inspection we need to transfer them
-    # here as a result.
+    # here as a result. It's basically a piggy back ride.
     subcommand = context.command.commands[context.invoked_subcommand]
     if not hasattr(subcommand, 'onegov_settings'):
         subcommand.onegov_settings = {
@@ -261,6 +466,12 @@ def command_group():
 
     @command_group.resultcallback()
     def process_results(processor, select, config):
+        """ Calls the function returned by the command once for each
+        application matching the selector.
+
+        Uses a proper request/application context for ease of use.
+
+        """
 
         if not processor:
             return
