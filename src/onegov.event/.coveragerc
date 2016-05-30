@@ -7,4 +7,3 @@ omit =
     */test*
     */test-views/*
     */distutils/__init__.py
-    *cli.py

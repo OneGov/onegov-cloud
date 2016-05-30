@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes cli commands.
+  [msom]
+
 - Fixes ical export test.
   [msom]
 

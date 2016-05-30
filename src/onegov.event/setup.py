@@ -51,9 +51,6 @@ setup(
         ],
     ),
     entry_points="""
-        [console_scripts]
-        onegov-event=onegov.event.cli:cli
-
         [onegov]
         upgrade=onegov.event.upgrade
     """,
