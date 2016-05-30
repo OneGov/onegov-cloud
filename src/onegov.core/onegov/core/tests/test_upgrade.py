@@ -123,8 +123,8 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
     session_manager.ensure_schema_exists("foo-bar")
     session_manager.ensure_schema_exists("foo-fah")
 
-    with patch('onegov.core.upgrade.get_upgrade_modules') as get_modules_1:
-        with patch('onegov.core.cli.get_upgrade_modules') as get_modules_2:
+    with patch('onegov.core.upgrade.get_upgrade_modules') as get_1:
+        with patch('onegov.core.cli.commands.get_upgrade_modules') as get_2:
 
             class Upgrades:
                 @staticmethod
@@ -132,7 +132,7 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
                 def run_upgrade(context):
                     pass
 
-            get_modules_1.return_value = get_modules_2.return_value = [
+            get_1.return_value = get_2.return_value = [
                 ('onegov.test', Upgrades)
             ]
 
@@ -156,7 +156,7 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
                 def run_upgrade(context):
                     pass
 
-            get_modules_1.return_value = get_modules_2.return_value = [
+            get_1.return_value = get_2.return_value = [
                 ('onegov.test', NewUpgrades)
             ]
 
