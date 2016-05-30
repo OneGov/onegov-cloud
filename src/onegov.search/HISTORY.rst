@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.3 (2016-05-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds compatibility with onegov.core 0.21.0.
   [href]
 
