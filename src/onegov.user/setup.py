@@ -33,7 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'click',
-        'onegov.core>=0.4.1',
+        'onegov.core>=0.4.2',
         'onegov.form',
         'sqlalchemy',
         'yubico-client'
@@ -43,8 +43,8 @@ setup(
             'coverage',
             'more.itsdangerous',
             'onegov.testing',
+            'pyyaml',
             'webtest',
-            'yaml'
         ],
     ),
     entry_points="""
