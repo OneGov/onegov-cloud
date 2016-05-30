@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.0 (2016-05-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Removes cli commands.
   [msom]
