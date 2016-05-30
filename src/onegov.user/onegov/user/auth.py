@@ -3,7 +3,10 @@ from onegov.core.utils import relative_url
 from onegov.user import log
 from onegov.user.collection import UserCollection
 from yubico_client import Yubico
-from yubico_client.yubico_exceptions import StatusCodeError
+from yubico_client.yubico_exceptions import (
+    StatusCodeError,
+    SignatureVerificationError
+)
 
 
 def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
@@ -41,6 +44,8 @@ def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
         if e.status_code != 'REPLAYED_OTP':
             raise e
 
+        return False
+    except SignatureVerificationError as e:
         return False
 
 
