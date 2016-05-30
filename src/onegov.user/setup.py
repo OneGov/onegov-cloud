@@ -43,7 +43,8 @@ setup(
             'coverage',
             'more.itsdangerous',
             'onegov.testing',
-            'webtest'
+            'webtest',
+            'yaml'
         ],
     ),
     entry_points="""

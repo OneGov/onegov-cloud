@@ -35,17 +35,16 @@ This command will also ask for a password if none was provided with
 """
 
 import click
-import sys
 
 from getpass import getpass
 from onegov.user import UserCollection
-from onegov.core.cli import command_group
+from onegov.core.cli import command_group, abort
 from onegov.core.crypto import random_password
 
 cli = command_group()
 
 
-@cli.command()
+@cli.command(context_settings={'singular': True})
 @click.argument('role')
 @click.argument('username')
 @click.option('--password', default=None,
@@ -60,11 +59,10 @@ def add(role, username, password, yubikey, no_prompt):
     def add_user(request, app):
         users = UserCollection(app.session())
 
-        print("Adding {} to {}".format(username, app.town.name))
+        print("Adding {} to {}".format(username, app.application_id))
 
         if users.exists(username):
-            click.secho("{} already exists".format(username), fg='red')
-            return
+            abort("{} already exists".format(username))
 
         nonlocal password
         if not password:
@@ -105,8 +103,7 @@ def delete(username):
         users = UserCollection(app.session())
 
         if not users.exists(username):
-            click.secho("{} does not exist".format(username), fg='red')
-            return
+            abort("{} does not exist".format(username))
 
         users.delete(username)
         click.secho("{} was deleted".format(username), fg='green')
@@ -123,8 +120,7 @@ def exists(username):
         users = UserCollection(app.session())
 
         if not users.exists(username):
-            click.secho("{} does not exist".format(username), fg='red')
-            sys.exit(1)
+            abort("{} does not exist".format(username))
         else:
             click.secho("{} exists".format(username), fg='green')
 
@@ -141,8 +137,7 @@ def change_password(username, password):
         users = UserCollection(app.session())
 
         if not users.exists(username):
-            click.secho("{} does not exist".format(username), fg='red')
-            sys.exit(1)
+            abort("{} does not exist".format(username))
 
         nonlocal password
         password = password or getpass("Enter password: ")
@@ -165,8 +160,7 @@ def change_yubikey(username, yubikey):
         users = UserCollection(app.session())
 
         if not users.exists(username):
-            click.secho("{} does not exist".format(username), fg='red')
-            sys.exit(1)
+            abort("{} does not exist".format(username))
 
         nonlocal yubikey
         yubikey = (yubikey or getpass("Enter yubikey: ")).strip()[:12]
