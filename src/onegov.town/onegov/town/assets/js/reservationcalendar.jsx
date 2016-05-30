@@ -626,8 +626,14 @@ ReservationSelection = React.createClass({
     handleClick: function(reservation) {
         rc.delete($(this.props.calendar), reservation.delete);
     },
+    handleSubmit: function() {
+        if (this.props.reservations.length) {
+            window.location = this.props.reservationform;
+        }
+    },
     render: function() {
         var self = this;
+
         return (
             <div className="reservation-selection-inner">
                 <h3>{locale("Dates")}</h3>
@@ -651,7 +657,7 @@ ReservationSelection = React.createClass({
                             })
                         }</ul>
                 }
-                <a href={this.props.reservationform} className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
+                <a onClick={self.handleSubmit} className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
                     {locale("Reserve")}
                 </a>
             </div>

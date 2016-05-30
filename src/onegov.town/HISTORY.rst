@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes empty reservation card leading to a view with insufficent permissions.
+  [href]
+
 - Adds the ability to remove towns through the cli.
   [href]
 
