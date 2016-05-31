@@ -507,6 +507,10 @@ def command_group():
             def run_command(self, request):
                 processor(request, request.app)
 
+            @CliApplication.setting(section='cronjobs', name='enabled')
+            def get_cronjobs_enabled():
+                return False
+
             scan_morepath_modules(CliApplication)
             CliApplication.commit()
 

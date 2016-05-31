@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Stops cronjobs from being activated during cli commands.
+  [href]
+
 0.21.0 (2016-05-30)
 ~~~~~~~~~~~~~~~~~~~
 
