@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to access csv files without any known headers.
+  [href]
+
 0.21.1 (2016-05-31)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -25,8 +25,43 @@ WHITESPACE = re.compile(r'\s+')
 
 
 class CSVFile(object):
+    """ Provides access to a csv file.
 
-    def __init__(self, csvfile, expected_headers):
+    :param csvfile:
+        The csv file to be accessed. Must be an open file (not a poth), opened
+        in binary mode. For example::
+
+        with open(path, 'rb') as f:
+            csv = CSVFile(f)
+
+    :param expected_headers:
+        The expected headers if known. Expected headers are headers which
+        *must* exist in the CSV file. There may be additional headers.
+
+        If the headers are slightly misspelled, a matching algorithm tries to
+        guess the correct header, without accidentally matching the wrong
+        headers.
+
+        See :func:`match_headers` for more information.
+
+        If the no expected_headers are passed, no checks are done, but the
+        headers are still available. Headers matching is useful if a user
+        provides the CSV and it might be wrong.
+
+        If it is impossible for misspellings to occurr, the expected headers
+        don't have to be specified.
+
+    Once the csv file is open, the records can be acceessed as follows::
+
+        with open(path, 'rb') as f:
+            csv = CSVFile(f)
+
+            for line in csv.lines:
+                csv.my_field  # access the column with the 'my_field' header
+
+    """
+
+    def __init__(self, csvfile, expected_headers=None):
         # prepare a reader which always returns utf-8
         encoding = detect_encoding(csvfile)
         if encoding is None:
@@ -44,9 +79,14 @@ class CSVFile(object):
 
         # match the headers
         self.csvfile.seek(0)
+
+        # if no expected headers expect, we just take what we can get
+        headers = parse_header(self.csvfile.readline(), self.dialect)
+        expected_headers = expected_headers or headers
+
         self.headers = OrderedDict(
             (h, c) for c, h in enumerate(match_headers(
-                headers=parse_header(self.csvfile.readline(), self.dialect),
+                headers=headers,
                 expected=expected_headers
             ))
         )
