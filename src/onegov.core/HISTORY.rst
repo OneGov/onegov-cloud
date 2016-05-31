@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Use a single connection during cli commands.
+  [href]
+
 - Adds the ability to configure the connection pool of the session manager.
   [href]
 

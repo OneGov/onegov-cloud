@@ -172,6 +172,7 @@ from onegov.core.security import Public
 from onegov.core.utils import scan_morepath_modules
 from onegov.server.config import Config
 from onegov.server.core import Server
+from sqlalchemy.pool import NullPool
 from uuid import uuid4
 from webtest import TestApp as Client
 
@@ -300,7 +301,9 @@ class GroupContext(GroupContextGuard):
     def unbound_session_manager(self, dsn):
         """ Returns a session manager *not yet bound to a schema!*. """
 
-        return SessionManager(dsn=dsn, base=Base)
+        return SessionManager(dsn=dsn, base=Base, pool_config={
+            'poolclass': NullPool
+        })
 
     def available_schemas(self, appcfg):
         """ Returns all available schemas, if the application is database
