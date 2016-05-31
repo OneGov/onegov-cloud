@@ -45,7 +45,7 @@ class SessionManager(object):
     _reserved_schemas = {'information_schema', 'public', 'extensions'}
 
     def __init__(self, dsn, base,
-                 engine_config={}, session_config={}, pool_config={}):
+                 engine_config=None, session_config=None, pool_config=None):
         """ Configures the data source name/dsn/database url and sets up the
         connection to the database.
 
@@ -158,6 +158,10 @@ class SessionManager(object):
 
         """
         assert 'postgres' in dsn, "Onegov only supports Postgres!"
+
+        engine_config = engine_config or {}
+        session_config = session_config or {}
+        pool_config = pool_config or {}
 
         self.dsn = dsn
         self.bases = [base]
