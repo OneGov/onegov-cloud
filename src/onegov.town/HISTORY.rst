@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Depend on onegov.core 0.20.1 that includes some bugfixes.
+  [href]
+
 1.8.1 (2016-05-30)
 ~~~~~~~~~~~~~~~~~~~
 
