@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer print the selector when running a command.
+  [href]
+
 - Use a single connection during cli commands.
   [href]
 

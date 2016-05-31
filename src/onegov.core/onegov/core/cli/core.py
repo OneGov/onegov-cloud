@@ -464,14 +464,9 @@ def command_group():
         help="The onegov config file")
     def command_group(select, config):
         context = click.get_current_context()
-        context.obj = group_context = GroupContext(
-            select, config, **get_context_specific_settings(context))
-
-        click.secho("Given selector: {}".format(
-            group_context.selector or 'None'
-        ), fg='green')
-
-        group_context.validate_guard_conditions(context)
+        context_settings = get_context_specific_settings(context)
+        context.obj = GroupContext(select, config, **context_settings)
+        context.obj.validate_guard_conditions(context)
 
     @command_group.resultcallback()
     def process_results(processor, select, config):
