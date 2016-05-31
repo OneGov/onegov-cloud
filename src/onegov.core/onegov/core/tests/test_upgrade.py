@@ -144,10 +144,10 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
             ], catch_exceptions=False)
 
             output = result.output.split('\n')
-            assert 'Running upgrade for foo/bar' in output[1]
-            assert 'no pending upgrade tasks found' in output[2]
-            assert 'Running upgrade for foo/fah' in output[3]
-            assert 'no pending upgrade tasks found' in output[4]
+            assert 'Running upgrade for foo/bar' in output[0]
+            assert 'no pending upgrade tasks found' in output[1]
+            assert 'Running upgrade for foo/fah' in output[2]
+            assert 'no pending upgrade tasks found' in output[3]
             assert result.exit_code == 0
 
             class NewUpgrades:
@@ -169,12 +169,12 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
             ], catch_exceptions=False)
 
             output = result.output.split('\n')
-            assert 'Running upgrade for foo/bar' in output[1]
-            assert 'Barfoo' in output[2]
-            assert 'executed 1 upgrade tasks' in output[3]
-            assert 'Running upgrade for foo/fah' in output[4]
-            assert 'Barfoo' in output[5]
-            assert 'executed 1 upgrade tasks' in output[6]
+            assert 'Running upgrade for foo/bar' in output[0]
+            assert 'Barfoo' in output[1]
+            assert 'executed 1 upgrade tasks' in output[2]
+            assert 'Running upgrade for foo/fah' in output[3]
+            assert 'Barfoo' in output[4]
+            assert 'executed 1 upgrade tasks' in output[5]
             assert result.exit_code == 0
 
             # we used dry-run above, so running it again yields the same result
@@ -185,12 +185,12 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
             ], catch_exceptions=False)
 
             output = result.output.split('\n')
-            assert 'Running upgrade for foo/bar' in output[1]
-            assert 'Barfoo' in output[2]
-            assert 'executed 1 upgrade tasks' in output[3]
-            assert 'Running upgrade for foo/fah' in output[4]
-            assert 'Barfoo' in output[5]
-            assert 'executed 1 upgrade tasks' in output[6]
+            assert 'Running upgrade for foo/bar' in output[0]
+            assert 'Barfoo' in output[1]
+            assert 'executed 1 upgrade tasks' in output[2]
+            assert 'Running upgrade for foo/fah' in output[3]
+            assert 'Barfoo' in output[4]
+            assert 'executed 1 upgrade tasks' in output[5]
             assert result.exit_code == 0
 
             # the task has now been completed and it won't be executed again
@@ -201,8 +201,8 @@ def test_upgrade_cli(postgres_dsn, session_manager, temporary_directory):
             ], catch_exceptions=False)
 
             output = result.output.split('\n')
-            assert 'Running upgrade for foo/bar' in output[1]
-            assert 'no pending upgrade tasks found' in output[2]
-            assert 'Running upgrade for foo/fah' in output[3]
-            assert 'no pending upgrade tasks found' in output[4]
+            assert 'Running upgrade for foo/bar' in output[0]
+            assert 'no pending upgrade tasks found' in output[1]
+            assert 'Running upgrade for foo/fah' in output[2]
+            assert 'no pending upgrade tasks found' in output[3]
             assert result.exit_code == 0
