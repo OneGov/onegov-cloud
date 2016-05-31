@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.21.1 (2016-05-31)
+~~~~~~~~~~~~~~~~~~~
 
 - No longer print the selector when running a command.
   [href]
