@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to configure the connection pool of the session manager.
+  [href]
+
 - Stops cronjobs from being activated during cli commands.
   [href]
 

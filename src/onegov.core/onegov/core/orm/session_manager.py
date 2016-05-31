@@ -44,7 +44,8 @@ class SessionManager(object):
     #   public schema.
     _reserved_schemas = {'information_schema', 'public', 'extensions'}
 
-    def __init__(self, dsn, base, engine_config={}, session_config={}):
+    def __init__(self, dsn, base,
+                 engine_config={}, session_config={}, pool_config={}):
         """ Configures the data source name/dsn/database url and sets up the
         connection to the database.
 
@@ -76,6 +77,10 @@ class SessionManager(object):
 
             See: `<http://docs.sqlalchemy.org/en/latest/orm/session_api.html\
             #sqlalchemy.orm.session.sessionmaker>`
+
+        :pool_config:
+            Custom pool configuration to be used in lieue of the default pool.
+            Only use under special circumstances.
 
         Note, to connect to another database you need to create a new
         SessionManager instance.
@@ -170,10 +175,17 @@ class SessionManager(object):
         self.required_extensions = {'hstore'}
         self.created_extensions = set()
 
-        self.engine = create_engine(
-            self.dsn, poolclass=QueuePool, pool_size=5, max_overflow=5,
-            isolation_level='SERIALIZABLE',
-            **engine_config)
+        # override the isolation level in any case, we cannot allow another
+        engine_config['isolation_level'] = 'SERIALIZABLE'
+
+        if pool_config:
+            engine_config.update(pool_config)
+        else:
+            engine_config['poolclass'] = QueuePool
+            engine_config['pool_size'] = 5
+            engine_config['max_overflow'] = 5
+
+        self.engine = create_engine(self.dsn, **engine_config)
         self.register_engine(self.engine)
 
         self.session_factory = scoped_session(
