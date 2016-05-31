@@ -31,8 +31,8 @@ class CSVFile(object):
         The csv file to be accessed. Must be an open file (not a poth), opened
         in binary mode. For example::
 
-        with open(path, 'rb') as f:
-            csv = CSVFile(f)
+            with open(path, 'rb') as f:
+                csv = CSVFile(f)
 
     :param expected_headers:
         The expected headers if known. Expected headers are headers which
@@ -51,6 +51,10 @@ class CSVFile(object):
         If it is impossible for misspellings to occurr, the expected headers
         don't have to be specified.
 
+    :param dialect:
+        The CSV dialect to expect. By default, the dialect will be guessed
+        using Python's heuristic.
+
     Once the csv file is open, the records can be acceessed as follows::
 
         with open(path, 'rb') as f:
@@ -61,7 +65,8 @@ class CSVFile(object):
 
     """
 
-    def __init__(self, csvfile, expected_headers=None):
+    def __init__(self, csvfile, expected_headers=None, dialect=None):
+
         # prepare a reader which always returns utf-8
         encoding = detect_encoding(csvfile)
         if encoding is None:
@@ -69,10 +74,10 @@ class CSVFile(object):
 
         self.csvfile = codecs.getreader(encoding)(csvfile)
 
-        # find out the dialect
+        # sniff the dialect if not already provided
         try:
             self.csvfile.seek(0)
-            self.dialect = sniff_dialect(self.csvfile.read(1024))
+            self.dialect = dialect or sniff_dialect(self.csvfile.read(1024))
         except (CsvError, errors.InvalidFormatError):
             self.csvfile.seek(0)
             self.dialect = sniff_dialect(self.csvfile.read())

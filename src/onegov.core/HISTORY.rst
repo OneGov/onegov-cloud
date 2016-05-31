@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to manually define the csv dialect.
+  [href]
+
 - Adds the ability to access csv files without any known headers.
   [href]
 
