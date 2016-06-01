@@ -695,6 +695,15 @@ ReservationForm = React.createClass({
 
         return state;
     },
+    componentDidMount: function() {
+        var node = $(this.getDOMNode());
+
+        // the timeout is set to 100ms because the popup will do its own focusing
+        // after 50ms (we could use it, but we want to focus AND select)
+        setTimeout(function() {
+            node.find('input:first').focus().select();
+        }, 100);
+    },
     handleInputChange: function(e) {
         var state = _.extend({}, this.state);
         var name = e.target.getAttribute('name');
@@ -719,7 +728,17 @@ ReservationForm = React.createClass({
         this.setState(state);
     },
     handleButton: function(e) {
-        this.props.onSubmit.call(this.getDOMNode(), this.state);
+        var node = this.getDOMNode();
+        var self = this;
+
+        $(node).find('input').each(function(_ix, el) {
+            $(el).blur();
+        });
+
+        setTimeout(function() {
+            self.props.onSubmit.call(node, self.state);
+        }, 0);
+
         e.preventDefault();
     },
     handleTimeInputFocus: function(e) {

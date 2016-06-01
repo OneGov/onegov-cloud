@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Always select the first field when opening a reservation popup.
+  [href]
+
 - Accepts a wider range of inputs when changing the reservation start/end.
   [href]
 
