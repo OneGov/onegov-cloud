@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Accepts a wider range of inputs when changing the reservation start/end.
+  [href]
+
 - Fixes calendar performance regression introduced in 1.7.0.
   [href]
 

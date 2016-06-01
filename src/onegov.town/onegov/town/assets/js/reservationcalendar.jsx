@@ -722,13 +722,57 @@ ReservationForm = React.createClass({
         this.props.onSubmit.call(this.getDOMNode(), this.state);
         e.preventDefault();
     },
+    handleTimeInputFocus: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.target.select();
+            e.preventDefault();
+        }
+    },
+    handleTimeInputMouseUp: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.preventDefault();
+        }
+    },
+    handleTimeInputBlur: function(e) {
+        if (!Modernizr.inputtypes.time) {
+            e.target.value = this.inferTime(e.target.value);
+            this.handleInputChange(e);
+        }
+    },
+    inferTime: function(time) {
+        time = time.replace(':', '');
+
+        if (time.match(/^\d{1}$/)) {
+            time = '0' + time + '00';
+        } else if (time.match(/^\d{2}$/)) {
+            time += '00';
+        } else if (time.match(/^\d{3}$/)) {
+            time += '0';
+        }
+
+        if (time.match(/^\d{4}$/)) {
+            time = time.slice(0, 2) + ':' + time.slice(2, 4);
+        }
+
+        return time;
+    },
     parseTime: function(date, time) {
-        if (!time.match(/^\d{2}:\d{2}$/)) {
+        time = this.inferTime(time);
+
+        if (!time.match(/^[0-2]{1}[0-9]{1}:?[0-5]{1}[0-9]{1}$/)) {
             return null;
         }
 
         var hour = parseInt(time.split(':')[0], 10);
         var minute = parseInt(time.split(':')[1], 10);
+
+        if (hour < 0 || 24 < hour) {
+            return null;
+        }
+
+        if (minute < 0 || 60 < minute) {
+            return null;
+        }
 
         date.hour(hour);
         date.minute(minute);
@@ -792,6 +836,9 @@ ReservationForm = React.createClass({
                             <input name="start" type="time" size="4"
                                 defaultValue={this.state.start}
                                 onChange={this.handleInputChange}
+                                onFocus={this.handleTimeInputFocus}
+                                onMouseUp={this.handleTimeInputMouseUp}
+                                onBlur={this.handleTimeInputBlur}
                                 className={this.isValidStart(this.state.start) && 'valid' || 'invalid'}
                             />
                         </div>
@@ -800,6 +847,9 @@ ReservationForm = React.createClass({
                             <input name="end" type="time" size="4"
                                 defaultValue={this.state.end}
                                 onChange={this.handleInputChange}
+                                onFocus={this.handleTimeInputFocus}
+                                onMouseUp={this.handleTimeInputMouseUp}
+                                onBlur={this.handleTimeInputBlur}
                                 className={this.isValidEnd(this.state.end) && 'valid' || 'invalid'}
                             />
                         </div>
