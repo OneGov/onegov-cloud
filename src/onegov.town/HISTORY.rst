@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes calendar performance regression introduced in 1.7.0.
+  [href]
+
 1.8.2 (2016-05-31)
 ~~~~~~~~~~~~~~~~~~~
 

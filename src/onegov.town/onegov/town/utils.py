@@ -313,7 +313,7 @@ class AllocationEventInfo(object):
             'wholeDay': self.allocation.whole_day,
             'partlyAvailable': self.allocation.partly_available,
             'quota': self.allocation.quota,
-            'quotaLeft': self.allocation.quota_left,
+            'quotaLeft': self.quota_left,
             'className': self.event_class,
             'partitions': self.allocation.availability_partitions(),
             'actions': [
