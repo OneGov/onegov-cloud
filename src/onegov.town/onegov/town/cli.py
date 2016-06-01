@@ -8,8 +8,13 @@ Example (adds a Town called ``Govikon`` to the ``towns-govikon`` schema)::
 """
 
 import click
+import isodate
+import shutil
 
+from collections import defaultdict
+from datetime import date, datetime
 from onegov.core.cli import command_group, pass_group_context, abort
+from onegov.town.formats import DigirezDB
 from onegov.town.models import Town
 from onegov.town.initial_content import add_initial_content
 from sqlalchemy import create_engine
@@ -83,3 +88,47 @@ def delete(group_context):
         click.echo("{} was deleted successfully".format(town))
 
     return delete_town
+
+
+@cli.command(name='import-digirez', context_settings={'singular': True})
+@click.argument('accessdb', type=click.Path(exists=True, resolve_path=True))
+@click.option('--min-date', default=None,
+              help="Min date in the form '2016-12-31'")
+def import_digirez(accessdb, min_date):
+    """ Imports a Digirez reservation database into onegov.town.
+
+    Example:
+
+        onegov-town --select '/towns/govikon' import-digirez room_booking.mdb
+
+    """
+
+    if not shutil.which('mdb-export'):
+        abort("Could not find 'mdb-export', please install mdbtools!")
+
+    min_date = min_date and isodate.parse_date(min_date) or date.today()
+    min_date = datetime(min_date.year, min_date.month, min_date.day)
+
+    db = DigirezDB(accessdb)
+    db.open()
+
+    floors = {int(floor.id): floor.floor_name for floor in db.records.floors}
+    resources = {
+        int(room.id): {
+            'title': room.room_name,
+            'group': floors[int(room.floor_id)]
+        } for room in db.records.room
+    }
+
+    relevant_bookings = (
+        b for b in db.records.room_booking
+        if isodate.parse_datetime(b.hour_end) > min_date
+    )
+
+    # group by room id in addition to the multi_id, as digirez supports
+    # reservations which span multiple rooms
+    reservations = defaultdict(list)
+
+    for booking in relevant_bookings:
+        group = '-'.join((booking.room_id, booking.multi_id))
+        reservations[group].append(booking)
