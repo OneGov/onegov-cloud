@@ -148,6 +148,11 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
 
 
 @ElectionDayApp.webasset_path()
+def get_shared_assets_path():
+    return utils.module_path('onegov.shared', 'assets/js')
+
+
+@ElectionDayApp.webasset_path()
 def get_js_path():
     return 'assets/js'
 
@@ -172,6 +177,7 @@ def get_form_asset():
     yield 'jquery.datetimepicker.css'
     yield 'jquery.datetimepicker.js'
     yield 'datetimepicker.js'
+    yield 'form_dependencies.js'
 
 
 @ElectionDayApp.webasset('bar_chart')

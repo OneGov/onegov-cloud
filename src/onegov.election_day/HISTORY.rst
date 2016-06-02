@@ -13,6 +13,9 @@ Changelog
 - Adds Romansh translations.
   [msom]
 
+- Fixes javascript for form dependencies.
+  [msom]
+
 0.7.2 (2016-03-18)
 ~~~~~~~~~~~~~~~~~~~
 
