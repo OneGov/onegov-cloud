@@ -1,5 +1,5 @@
 from io import BytesIO
-from onegov.election_day.utils.csv import load_csv
+from onegov.election_day.formats import load_csv
 
 
 def test_load_csv():

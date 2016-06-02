@@ -4,10 +4,7 @@ from onegov.ballot import (
     ElectionResult,
 )
 from onegov.election_day import _
-from onegov.election_day.utils.csv import FileImportError, load_csv
-from onegov.election_day.utils.wabsti_proporz import (
-    import_wabsti_file_proporz
-)
+from onegov.election_day.formats import FileImportError, load_csv
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -124,8 +121,8 @@ def parse_candidates(line, errors):
     return results
 
 
-def import_wabsti_file_majorz(municipalities, election, file, mimetype,
-                              elected_file=None, elected_mimetype=None):
+def import_file(municipalities, election, file, mimetype,
+                elected_file=None, elected_mimetype=None):
     errors = []
     candidates = {}
     results = []
@@ -212,31 +209,3 @@ def import_wabsti_file_majorz(municipalities, election, file, mimetype,
             election.results.append(result)
 
     return {'status': 'ok', 'errors': errors}
-
-
-def import_wabsti_file(municipalities, election, file, mimetype,
-                       connections_file=None, connections_mimetype=None,
-                       elected_file=None, elected_mimetype=None,
-                       statistics_file=None, statistics_mimetype=None):
-    """ Tries to import the given file (wabsti format).
-
-    :return: A dictionary containing the status and a list of errors if any.
-    For example::
-
-        {'status': 'ok', 'errors': []}
-        {'status': 'error': 'errors': ['x on line y is z']}
-
-    """
-
-    if election.type == 'majorz':
-        return import_wabsti_file_majorz(
-            municipalities, election, file, mimetype,
-            elected_file, elected_mimetype
-        )
-    else:
-        return import_wabsti_file_proporz(
-            municipalities, election, file, mimetype,
-            connections_file, connections_mimetype,
-            elected_file, elected_mimetype,
-            statistics_file, statistics_mimetype
-        )

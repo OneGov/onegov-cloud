@@ -7,7 +7,7 @@ from onegov.ballot import (
     ListResult
 )
 from onegov.election_day import _
-from onegov.election_day.utils.csv import FileImportError, load_csv
+from onegov.election_day.formats import FileImportError, load_csv
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -198,7 +198,7 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_sesam_file(municipalities, election, file, mimetype):
+def import_file(municipalities, election, file, mimetype):
     """ Tries to import the given file (sesam format).
 
     :return: A dictionary containing the status and a list of errors if any.

@@ -8,10 +8,12 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.forms import UploadElectionForm
 from onegov.election_day.layout import ManageLayout
 from onegov.election_day.models import Manage
-from onegov.election_day.utils import (
-    FileImportError,
-    import_sesam_file,
-    import_wabsti_file
+from onegov.election_day.formats import FileImportError
+from onegov.election_day.formats.election.wabsti import (
+    import_file as import_wabsti_file
+)
+from onegov.election_day.formats.election.sesam import (
+    import_file as import_sesam_file
 )
 
 

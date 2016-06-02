@@ -16,6 +16,9 @@ Changelog
 - Fixes javascript for form dependencies.
   [msom]
 
+- Cleanup file/directory structure.
+  [msom]
+
 0.7.2 (2016-03-18)
 ~~~~~~~~~~~~~~~~~~~
 

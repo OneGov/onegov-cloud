@@ -7,7 +7,7 @@ from onegov.ballot import (
     ListResult
 )
 from onegov.election_day import _
-from onegov.election_day.utils.csv import FileImportError, load_csv
+from onegov.election_day.formats import FileImportError, load_csv
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -140,11 +140,11 @@ def parse_connection(line, errors):
         return id, connection, subconnection
 
 
-def import_wabsti_file_proporz(municipalities, election, file, mimetype,
-                               connections_file=None,
-                               connections_mimetype=None,
-                               elected_file=None, elected_mimetype=None,
-                               statistics_file=None, statistics_mimetype=None):
+def import_file(municipalities, election, file, mimetype,
+                connections_file=None,
+                connections_mimetype=None,
+                elected_file=None, elected_mimetype=None,
+                statistics_file=None, statistics_mimetype=None):
     errors = []
     candidates = {}
     lists = {}
