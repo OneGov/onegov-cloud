@@ -10,10 +10,12 @@ Example (adds a Town called ``Govikon`` to the ``towns-govikon`` schema)::
 import click
 import isodate
 import shutil
+import textwrap
 
 from collections import defaultdict
 from datetime import date, datetime
 from onegov.core.cli import command_group, pass_group_context, abort
+from onegov.libres import ResourceCollection
 from onegov.town.formats import DigirezDB
 from onegov.town.models import Town
 from onegov.town.initial_content import add_initial_content
@@ -112,23 +114,61 @@ def import_digirez(accessdb, min_date):
     db = DigirezDB(accessdb)
     db.open()
 
-    floors = {int(floor.id): floor.floor_name for floor in db.records.floors}
-    resources = {
-        int(room.id): {
-            'title': room.room_name,
-            'group': floors[int(room.floor_id)]
-        } for room in db.records.room
-    }
+    # XXX this is currently specific to what Gemeinde Rüti has, we could put
+    # this into an external file however.
+    form_definition = textwrap.dedent("""
+        Name *= ___
+        Telefon *=___
+        Zweck *= ___
+        Einrichtungen =
+            [ ] Konzertbestuhlung
+            [ ] Bankettbestuhlung
+            [ ] Flipchart
+            [ ] Hellraumprojektor
+            [ ] Kinoleinwand (Saal)
+            [ ] Mobile Leinwand
+            [ ] Lautsprecheranlage
+            [ ] Podestelemente
+            [ ] Flügel (Saal)
+            [ ] Getränke
+            [ ] Küche (Saal)
+            [ ] Office (Keller)
+        Bemerkungen = ...
+    """)
 
-    relevant_bookings = (
-        b for b in db.records.room_booking
-        if isodate.parse_datetime(b.hour_end) > min_date
-    )
+    def run_import(request, app):
 
-    # group by room id in addition to the multi_id, as digirez supports
-    # reservations which span multiple rooms
-    reservations = defaultdict(list)
+        # create all resources first, fails if at least one exists already
+        resources = ResourceCollection(app.libres_context)
+        floors = {f.id: f.floor_name for f in db.records.floors}
+        resource_ids_by_room = {}
 
-    for booking in relevant_bookings:
-        group = '-'.join((booking.room_id, booking.multi_id))
-        reservations[group].append(booking)
+        for room in db.records.room:
+            resource = resources.add(
+                title=room.room_name,
+                timezone='Europe/Zurich',
+                type='room',
+                group=floors[room.floor_id],
+                definition=form_definition
+            )
+
+            resource_ids_by_room[room.id] = resource.id
+
+        # get a list of all relevant reservations
+        relevant_bookings = (
+            b for b in db.records.room_booking
+            if isodate.parse_datetime(b.hour_end) > min_date
+        )
+
+        # group by room id in addition to the multi_id, as digirez supports
+        # reservations which span multiple rooms
+        reservations = defaultdict(list)
+
+        for booking in relevant_bookings:
+            group = '-'.join((booking.room_id, booking.multi_id))
+            reservations[group].append(booking)
+
+        # create the reservations
+        pass
+
+    return run_import
