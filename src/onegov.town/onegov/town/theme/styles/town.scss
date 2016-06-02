@@ -1848,9 +1848,31 @@ button {
 /*
     Reservations Form
 */
-.reservation-form h2 {
-    font-size: $h3-font-size - $h3-font-reduction;
-    font-weight: bold;
+.reservation-form {
+    h2 {
+        font-size: $h3-font-size - $h3-font-reduction;
+        font-weight: bold;
+    }
+
+    input.highlighted {
+        background-color: $yellow-pastel;
+    }
+
+    .select-previous-time {
+        padding-bottom: 1px;
+        padding-top: 5px;
+        text-align: center;
+
+        &:hover {
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        i {
+            display: inline-block;
+            padding: .75ex;
+        }
+    }
 }
 
 /*

@@ -40,7 +40,7 @@
                         <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
                             ${group.title}
                         </button>
-                        <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown">
+                        <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                             <li tal:repeat="link group.links">
                                 <tal:block replace="structure link(request)" />
                             </li>

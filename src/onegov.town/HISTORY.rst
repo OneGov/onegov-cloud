@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a shortcut to create reservation n with the start/end of reservation n - 1.
+  [href]
+
 - Always select the first field when opening a reservation popup.
   [href]
 

@@ -15,6 +15,7 @@ from onegov.town.models.extensions import (
     CoordinatesExtension
 )
 from sqlalchemy.sql.expression import cast
+from sqlalchemy.orm import undefer
 from uuid import uuid4, uuid5
 
 
@@ -80,6 +81,9 @@ class SharedMethods(object):
         res = res.filter(Reservation.status == status)
         res = res.order_by(False)  # clear existing order
         res = res.order_by(Reservation.start)
+
+        # used by ReservationInfo
+        res = res.options(undefer(Reservation.created))
 
         return res
 

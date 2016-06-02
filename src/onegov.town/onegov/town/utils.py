@@ -155,7 +155,8 @@ class ReservationInfo(object):
             'date': self.date,
             'time': self.time,
             'delete': self.delete_link,
-            'quota': self.reservation.quota
+            'quota': self.reservation.quota,
+            'created': self.reservation.created.isoformat()
         }
 
 
