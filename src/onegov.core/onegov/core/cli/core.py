@@ -497,6 +497,10 @@ def command_group():
 
                     return super().is_allowed_application_id(application_id)
 
+                def configure_debug(self, **cfg):
+                    # disable debug options in cli (like query output)
+                    pass
+
             @CliApplication.path(path=view_path)
             class Model(object):
                 pass

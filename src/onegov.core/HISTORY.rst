@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Disable debug output when running cli commands.
+  [href]
+
 - Adds the ability to manually define the csv dialect.
   [href]
 
