@@ -13,7 +13,7 @@ import shutil
 import textwrap
 
 from collections import defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.libres import ResourceCollection
 from onegov.town.formats import DigirezDB
@@ -136,12 +136,18 @@ def import_digirez(accessdb, min_date):
         Bemerkungen = ...
     """)
 
+    floor_hours = {
+        'Amthaus': (8, 24),
+        'Löwen': (0, 24),
+        'Gemeinschaftszentrum': (8, 24)
+    }
+
     def run_import(request, app):
 
         # create all resources first, fails if at least one exists already
         resources = ResourceCollection(app.libres_context)
         floors = {f.id: f.floor_name for f in db.records.floors}
-        resource_ids_by_room = {}
+        resources_by_room = {}
 
         for room in db.records.room:
             resource = resources.add(
@@ -149,10 +155,11 @@ def import_digirez(accessdb, min_date):
                 timezone='Europe/Zurich',
                 type='room',
                 group=floors[room.floor_id],
-                definition=form_definition
+                definition=form_definition,
+                meta={'is_hidden_from_public': True}
             )
 
-            resource_ids_by_room[room.id] = resource.id
+            resources_by_room[room.id] = resource
 
         # get a list of all relevant reservations
         relevant_bookings = (
@@ -168,7 +175,51 @@ def import_digirez(accessdb, min_date):
             group = '-'.join((booking.room_id, booking.multi_id))
             reservations[group].append(booking)
 
-        # create the reservations
-        pass
+        # get the max_date per resource
+        max_dates = {}
+
+        for reservation_group in reservations:
+            resource_id = resources_by_room[reservation_group.split('-')[0]].id
+
+            if resource_id not in max_dates:
+                max_dates[resource_id] = min_date
+
+            for booking in reservations[reservation_group]:
+                date = isodate.parse_datetime(booking.hour_end)
+
+                if max_dates[resource_id] < date:
+                    max_dates[resource_id] = date
+
+        # create an allocation for all days between min/max date
+        for resource in resources_by_room.values():
+
+            # true if the resource does not have any bookings
+            if resource.id not in max_dates:
+                continue
+
+            start_hour, end_hour = floor_hours[resource.group]
+            days = (max_dates[resource.id].date() - min_date.date()).days
+
+            first_day_start = datetime(
+                min_date.year, min_date.month, min_date.day,
+                start_hour
+            )
+
+            first_day_end = datetime(
+                min_date.year, min_date.month, min_date.day,
+                end_hour - 1, 59, 59, 999999
+            )
+
+            whole_day = (start_hour, end_hour) == (0, 24)
+
+            for day in range(0, days + 1):
+                start = first_day_start + timedelta(days=day)
+                end = first_day_end + timedelta(days=day)
+
+                resource.scheduler.allocate(
+                    dates=(start, end),
+                    partly_available=True,
+                    whole_day=whole_day,
+                )
 
     return run_import
