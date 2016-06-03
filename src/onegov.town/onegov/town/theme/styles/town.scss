@@ -1861,7 +1861,6 @@ button {
     .select-previous-time {
         padding-bottom: 1px;
         padding-top: 5px;
-        text-align: center;
 
         &:hover {
             font-weight: bold;
@@ -1870,7 +1869,7 @@ button {
 
         i {
             display: inline-block;
-            padding: .75ex;
+            padding-right: .75ex;
         }
     }
 }
