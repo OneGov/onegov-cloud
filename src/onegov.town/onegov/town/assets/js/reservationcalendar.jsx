@@ -772,6 +772,9 @@ ReservationForm = React.createClass({
         $(inputs[0]).val(previousState.start);
         $(inputs[1]).val(previousState.end);
 
+        // deselect 'whole-day' if it exists
+        node.find('[name="reserve-whole-day"]').filter('[value="no"]').prop('checked', true);
+
         // briefly highlight the inputs
         inputs.addClass('highlighted');
         setTimeout(function() {
@@ -781,6 +784,7 @@ ReservationForm = React.createClass({
         var state = _.extend({}, this.state);
         state.start = previousState.start;
         state.end = previousState.end;
+        state.wholeDay = false;
 
         this.setState(state);
 
@@ -869,14 +873,13 @@ ReservationForm = React.createClass({
         var buttonEnabled = this.isValidState();
         var showWholeDay = this.props.partlyAvailable && this.props.wholeDay;
         var showTimeRange = this.props.partlyAvailable && (!this.props.wholeDay || !this.state.wholeDay);
-
-        var showPreviousTime = showTimeRange &&
-            !_.isEmpty(this.props.previousReservationState) &&
+        var hasPreviousTimeToOffer = !_.isEmpty(this.props.previousReservationState) &&
             (
                 this.props.previousReservationState.start !== this.state.start ||
                 this.props.previousReservationState.end !== this.state.end
             );
 
+        var showPreviousTime = (showTimeRange || showWholeDay) && hasPreviousTimeToOffer;
         var showQuota = !this.props.partlyAvailable;
 
         return (
@@ -933,8 +936,9 @@ ReservationForm = React.createClass({
 
                 {showPreviousTime && (
                     <a href="#" onClick={this.handleSetPreviousTime} className="select-previous-time internal">
+                        <i className="fa fa-chevron-circle-right" aria-hidden="true"></i>
                         <span>{this.props.previousReservationState.start}</span>
-                        <i className="fa fa-chevron-circle-up" aria-hidden="true"></i>
+                        <span>&nbsp;-&nbsp;</span>
                         <span>{this.props.previousReservationState.end}</span>
                     </a>
                 )}
