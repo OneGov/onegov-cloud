@@ -8,18 +8,25 @@ Example (adds a Town called ``Govikon`` to the ``towns-govikon`` schema)::
 """
 
 import click
+import html
 import isodate
+import re
 import shutil
 import textwrap
 
 from collections import defaultdict
 from datetime import date, datetime, timedelta
+from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.core.cli import command_group, pass_group_context, abort
+from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
+from onegov.ticket import TicketCollection
 from onegov.town.formats import DigirezDB
-from onegov.town.models import Town
 from onegov.town.initial_content import add_initial_content
+from onegov.town.models import Town
+from onegov.user import UserCollection, User
 from sqlalchemy import create_engine
+from uuid import uuid4
 
 
 cli = command_group()
@@ -96,7 +103,9 @@ def delete(group_context):
 @click.argument('accessdb', type=click.Path(exists=True, resolve_path=True))
 @click.option('--min-date', default=None,
               help="Min date in the form '2016-12-31'")
-def import_digirez(accessdb, min_date):
+@click.option('--ignore-booking-conflicts', default=False, is_flag=True,
+              help="Ignore booking conflicts (TESTING ONlY)")
+def import_digirez(accessdb, min_date, ignore_booking_conflicts):
     """ Imports a Digirez reservation database into onegov.town.
 
     Example:
@@ -118,7 +127,7 @@ def import_digirez(accessdb, min_date):
     # this into an external file however.
     form_definition = textwrap.dedent("""
         Name *= ___
-        Telefon *=___
+        Telefon =___
         Zweck *= ___
         Einrichtungen =
             [ ] Konzertbestuhlung
@@ -142,16 +151,93 @@ def import_digirez(accessdb, min_date):
         'Gemeinschaftszentrum': (8, 24)
     }
 
+    title_map = {
+        'Jugend- raum': 'Jugendraum',
+        'Spielgruppen- Raum': 'Spielgruppenraum',
+        'Vereins- raum': 'Vereinsraum'
+    }
+
+    def get_formdata(member, booking):
+
+        einrichtungen = []
+
+        if booking.kbest == '1':
+            einrichtungen.append('Konzertbestuhlung')
+
+        if booking.bbest == '1':
+            einrichtungen.append('Bankettbestuhlung')
+
+        if booking.flip == '1':
+            einrichtungen.append('Flipchart')
+
+        if booking.ohproj == '1':
+            einrichtungen.append('Hellraumprojektor')
+
+        if booking.klw == '1':
+            einrichtungen.append('Kinoleinwand (Saal)')
+
+        if booking.mlw == '1':
+            einrichtungen.append('Mobile Leinwand')
+
+        if booking.lspr == '1':
+            einrichtungen.append('Lautsprecheranlage')
+
+        if booking.pod == '1':
+            einrichtungen.append('Podestelemente')
+
+        if booking.flg == '1':
+            einrichtungen.append('Flügel (Saal)')
+
+        if booking.getr == '1':
+            einrichtungen.append('Getränke')
+
+        if booking.getr == '1':
+            einrichtungen.append('Küche (Saal)')
+
+        if booking.ofk == '1':
+            einrichtungen.append('Office (Keller)')
+
+        return {
+            'name': booking.anspname or ' '.join((
+                member.member_last_name,
+                member.member_first_name
+            )),
+            'telefon': booking.ansptel or member.member_phone,
+            'zweck': booking.title,
+            'bemerkungen': booking.description,
+            'einrichtungen': einrichtungen
+        }
+
+    def unescape_dictionary(d):
+        for key, value in d.items():
+            if isinstance(value, str):
+                d[key] = html.unescape(value)
+            if isinstance(value, dict):
+                d[key] = unescape_dictionary(value)
+            if isinstance(value, list):
+                d[key] = [html.unescape(v) for v in value]
+
+        return d
+
+    email_fixes = (
+        (re.compile(r'2da-capo-rueti.ch$'), '@da-capo.rueti.ch'),
+        (re.compile(r'@mzol$'), '@mzol.ch'),
+        (re.compile(r'^jo$'), 'info@rueti.ch'),
+        (re.compile(r'@pro-vitalis$'), '@pro-vitalis.ch')
+    )
+
     def run_import(request, app):
 
         # create all resources first, fails if at least one exists already
+        print("Creating resources")
+
         resources = ResourceCollection(app.libres_context)
         floors = {f.id: f.floor_name for f in db.records.floors}
         resources_by_room = {}
 
         for room in db.records.room:
             resource = resources.add(
-                title=room.room_name,
+                title=title_map.get(room.room_name, room.room_name),
                 timezone='Europe/Zurich',
                 type='room',
                 group=floors[room.floor_id],
@@ -161,7 +247,7 @@ def import_digirez(accessdb, min_date):
 
             resources_by_room[room.id] = resource
 
-        # get a list of all relevant reservations
+        # gather all information needed to create the allocations/reservations
         relevant_bookings = (
             b for b in db.records.room_booking
             if isodate.parse_datetime(b.hour_end) > min_date
@@ -190,7 +276,22 @@ def import_digirez(accessdb, min_date):
                 if max_dates[resource_id] < date:
                     max_dates[resource_id] = date
 
+        # get the user associated with the migration (the first admin)
+        users = UserCollection(app.session())
+        user = users.query().filter(User.role == 'admin').first()
+
+        if not user:
+            abort('No admin user found')
+
+        # get the member mails
+        members = {}
+
+        for member in db.records.members:
+            members[member.member_id] = member
+
         # create an allocation for all days between min/max date
+        print("Creating allocations")
+
         for resource in resources_by_room.values():
 
             # true if the resource does not have any bookings
@@ -221,5 +322,87 @@ def import_digirez(accessdb, min_date):
                     partly_available=True,
                     whole_day=whole_day,
                 )
+
+        # create the reservations
+        print("Creating reservations")
+
+        booking_conflicts = 0
+
+        for reservation_group, bookings in reservations.items():
+            resource = resources_by_room[reservation_group.split('-')[0]]
+            scheduler = resource.scheduler
+
+            session_id = uuid4()
+
+            for booking in bookings:
+                assert bookings[0].anspmail == booking.anspmail
+                assert bookings[0].member_id == booking.member_id
+                assert bookings[0].anspname == booking.anspname
+                assert bookings[0].ansptel == booking.ansptel
+                assert bookings[0].title == booking.title
+                assert bookings[0].description == booking.description
+
+                email = booking.anspmail
+                email = email or members[booking.member_id].member_email
+
+                for expression, replacement in email_fixes:
+                    email = expression.sub(replacement, email)
+
+                try:
+                    token = scheduler.reserve(
+                        email=email,
+                        dates=(
+                            isodate.parse_datetime(booking.hour_start),
+                            isodate.parse_datetime(booking.hour_end)
+                        ),
+                        session_id=session_id,
+                        single_token_per_session=True,
+                        data={'accepted': True}  # accepted through ticket
+                    )
+                    token = token.hex
+                except InvalidEmailAddress:
+                    abort("{} is an invalid e-mail address".format(email))
+                except AlreadyReservedError:
+                    booking_conflicts += 1
+
+                    print("Booking conflict in {} at {}".format(
+                        resource.title, booking.hour_start
+                    ))
+                    pass
+
+            forms = FormCollection(app.session())
+            form_data = get_formdata(members[booking.member_id], booking)
+            form_data = unescape_dictionary(form_data)
+            form = resource.form_class(data=form_data)
+
+            if not form.validate():
+                abort("{} failed the form check with {}".format(
+                    form_data, form.errors
+                ))
+
+            submission = forms.submissions.add_external(
+                form=form,
+                state='pending',
+                id=token
+            )
+
+            scheduler.queries.confirm_reservations_for_session(session_id)
+            scheduler.approve_reservations(token)
+
+            forms.submissions.complete_submission(submission)
+
+            with forms.session.no_autoflush:
+                ticket = TicketCollection(request.app.session()).open_ticket(
+                    handler_code='RSV', handler_id=token
+                )
+                ticket.accept_ticket(user)
+                ticket.close_ticket()
+
+        if not ignore_booking_conflicts and booking_conflicts:
+            abort("There were {} booking conflicts, aborting".format(
+                booking_conflicts
+            ))
+
+        app.update_ticket_count()
 
     return run_import
