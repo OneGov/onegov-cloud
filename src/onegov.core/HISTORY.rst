@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.21.2 (2016-06-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Disable debug output when running cli commands.
   [href]
