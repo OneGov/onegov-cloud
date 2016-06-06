@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.8.3 (2016-06-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a shortcut to create reservation n with the start/end of reservation n - 1.
   [href]
 

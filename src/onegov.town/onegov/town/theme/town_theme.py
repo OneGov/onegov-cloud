@@ -17,7 +17,7 @@ class TownTheme(BaseTheme):
 
     # don't touch this number, it's incremented using bumpversion, so every
     # release will automatically trigger a rebuild of the theme
-    version = '1.8.2'
+    version = '1.8.3'
 
     @property
     def default_options(self):
