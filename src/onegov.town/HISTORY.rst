@@ -13,6 +13,9 @@ Changelog
 - Fixes calendar performance regression introduced in 1.7.0.
   [href]
 
+- Adds the ability to import Digirez reservations using a cli script.
+  [href]
+
 1.8.2 (2016-05-31)
 ~~~~~~~~~~~~~~~~~~~
 
