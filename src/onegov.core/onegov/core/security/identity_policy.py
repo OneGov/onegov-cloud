@@ -1,4 +1,4 @@
-from morepath.security import Identity
+from morepath import Identity
 from onegov.core import Framework
 
 
