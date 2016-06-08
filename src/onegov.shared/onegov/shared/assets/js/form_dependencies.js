@@ -53,6 +53,10 @@ var get_dependency = function(input) {
 
     var name = data.split('/')[0];
     var value = data.substring(name.length + 1);
+    var invert = value.indexOf('!') === 0;
+    if (invert) {
+        value = value.substring(1);
+    }
 
     var hide_label = true;
 
@@ -60,7 +64,7 @@ var get_dependency = function(input) {
         hide_label = input.data('hide-label');
     }
 
-    return {'name': name, 'value': value, 'hide_label': hide_label};
+    return {'name': name, 'value': value, 'invert': invert, 'hide_label': hide_label};
 };
 
 /*
@@ -91,7 +95,8 @@ var setup_depends_on = function(form) {
     Evaluates the dependency and acts on the result.
 */
 var evaluate_dependency = function(form, input, dependency) {
-    if (_.contains(get_choices(form, dependency.name), dependency.value)) {
+    console.log(dependency.invert);
+    if (dependency.invert ^ _.contains(get_choices(form, dependency.name), dependency.value)) {
         input.show();
         input.closest('label').show().siblings('.error').show();
     } else {
