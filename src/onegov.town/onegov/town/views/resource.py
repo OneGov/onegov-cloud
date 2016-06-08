@@ -390,7 +390,10 @@ def run_export(resource, request, start, end, nested):
             result['form'] = record[6]
         else:
             for key, value in record[6].items():
-                result['form_' + key] = value
+                if isinstance(value, list):
+                    result['form_' + key] = ', '.join(value)
+                else:
+                    result['form_' + key] = value
 
         results.append(result)
 

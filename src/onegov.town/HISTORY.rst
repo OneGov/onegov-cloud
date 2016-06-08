@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes Excel export failing on certain resources.
+  [href]
+
 1.8.3 (2016-06-06)
 ~~~~~~~~~~~~~~~~~~~
 
