@@ -97,6 +97,12 @@ def test_dependent_field():
             depends_on=('switch', 'on')
         )
 
+        inverted = TimeField(
+            label="Inverted",
+            validators=[],
+            depends_on=('switch', '!on')
+        )
+
     request = DummyRequest({'switch': 'off'})
     form = TestForm(request.POST)
     assert form.validate()
@@ -132,6 +138,18 @@ def test_dependent_field():
     request = DummyRequest({'switch': 'on', 'optional': '12:00'})
     form = TestForm(request.POST)
     assert form.validate()
+
+    request = DummyRequest({'switch': 'on', 'inverted': '12:00'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'off', 'inverted': '12:00'})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    request = DummyRequest({'switch': 'off', 'inverted': 'asdf'})
+    form = TestForm(request.POST)
+    assert not form.validate()
 
 
 def test_merge_forms():

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to depend on not a specific field value.
+  [msom]
+
 0.11.2 (2016-05-11)
 ~~~~~~~~~~~~~~~~~~~
 

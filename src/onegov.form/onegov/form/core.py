@@ -367,17 +367,19 @@ class FieldDependency(object):
 
     def __init__(self, field_id, choice):
         self.field_id = field_id
-        self.choice = choice
+        self.raw_choice = choice
+        self.invert = choice.startswith('!')
+        self.choice = choice[1:] if self.invert else choice
 
     def fulfilled(self, form, field):
-        return getattr(form, self.field_id).data == self.choice
+        return (getattr(form, self.field_id).data == self.choice) ^ self.invert
 
     def unfulfilled(self, form, field):
         return not self.fulfilled(form, field)
 
     @property
     def html_data(self):
-        return {'data-depends-on': '/'.join((self.field_id, self.choice))}
+        return {'data-depends-on': '/'.join((self.field_id, self.raw_choice))}
 
 
 def merge_forms(*forms):
