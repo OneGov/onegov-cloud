@@ -196,6 +196,10 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         * ``election_mandates``:
             The number of mandates.
 
+        * ``election_absolute_majority``:
+            The absolute majority.  Only relevant for elections based on
+            majority system.
+
         * ``municipality_name``:
             The name of the municipality.
 
@@ -272,6 +276,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             Election.date,
             Election.type,
             Election.number_of_mandates,
+            Election.absolute_majority,
             ElectionResult.group,
             ElectionResult.municipality_id,
             ElectionResult.elegible_voters,
@@ -313,28 +318,29 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             row['election_date'] = result[2].isoformat()
             row['election_type'] = result[3]
             row['election_mandates'] = result[4]
+            row['election_absolute_majority'] = result[5]
 
-            row['municipality_name'] = result[5]
-            row['municipality_bfs_number'] = result[6]
-            row['municipality_elegible_voters'] = result[7]
-            row['municipality_received_ballots'] = result[8]
-            row['municipality_blank_ballots'] = result[9]
-            row['municipality_invalid_ballots'] = result[10]
-            row['municipality_unaccounted_ballots'] = result[11]
-            row['municipality_accounted_ballots'] = result[12]
-            row['municipality_blank_votes'] = result[13]
-            row['municipality_invalid_votes'] = result[14]
-            row['municipality_accounted_votes'] = result[15]
+            row['municipality_name'] = result[6]
+            row['municipality_bfs_number'] = result[7]
+            row['municipality_elegible_voters'] = result[8]
+            row['municipality_received_ballots'] = result[9]
+            row['municipality_blank_ballots'] = result[10]
+            row['municipality_invalid_ballots'] = result[11]
+            row['municipality_unaccounted_ballots'] = result[12]
+            row['municipality_accounted_ballots'] = result[13]
+            row['municipality_blank_votes'] = result[14]
+            row['municipality_invalid_votes'] = result[15]
+            row['municipality_accounted_votes'] = result[16]
 
-            row['list_name'] = result[16]
-            row['list_votes'] = result[17]
+            row['list_name'] = result[17]
+            row['list_votes'] = result[18]
 
-            row['list_connection'] = result[18]
-            row['list_connection_parent'] = result[19]
+            row['list_connection'] = result[19]
+            row['list_connection_parent'] = result[20]
 
-            row['candidate_family_name'] = result[20]
-            row['candidate_first_name'] = result[21]
-            row['candidate_elected'] = result[22]
+            row['candidate_family_name'] = result[21]
+            row['candidate_first_name'] = result[22]
+            row['candidate_elected'] = result[23]
             row['candidate_votes'] = result[0]
 
             rows.append(row)

@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Inlcudes absolute majority in the election export.
+  [msom]
+
 0.4.2 (2016-03-17)
 ~~~~~~~~~~~~~~~~~~~
 

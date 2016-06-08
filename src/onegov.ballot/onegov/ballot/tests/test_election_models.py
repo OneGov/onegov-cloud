@@ -581,7 +581,8 @@ def test_election_export(session):
         domain='federation',
         type='majorz',
         date=date(2015, 6, 14),
-        number_of_mandates=1
+        number_of_mandates=1,
+        absolute_majority=144
     )
 
     connection = ListConnection(
@@ -680,6 +681,7 @@ def test_election_export(session):
             'election_date': '2015-06-14',
             'election_type': 'majorz',
             'election_mandates': 1,
+            'election_absolute_majority': 144,
             'municipality_name': 'group',
             'municipality_bfs_number': 1,
             'municipality_elegible_voters': 1000,
@@ -705,6 +707,7 @@ def test_election_export(session):
             'election_date': '2015-06-14',
             'election_type': 'majorz',
             'election_mandates': 1,
+            'election_absolute_majority': 144,
             'municipality_name': 'group',
             'municipality_bfs_number': 1,
             'municipality_elegible_voters': 1000,
