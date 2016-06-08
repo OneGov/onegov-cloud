@@ -97,7 +97,7 @@ class Server(object):
         # morepath is only loaded if required by an application
         if morepath_applications:
             import morepath
-            morepath.autosetup()
+            morepath.autoscan()
 
     def __call__(self, environ, start_response):
         request = Request(environ)
