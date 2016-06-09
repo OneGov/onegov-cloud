@@ -19,6 +19,11 @@ Changelog
 - Cleanup file/directory structure.
   [msom]
 
+- Sorts the sublists by the ID of the list when displaying list connection
+  results of elections.
+  [msom]
+
+
 0.7.2 (2016-03-18)
 ~~~~~~~~~~~~~~~~~~~
 

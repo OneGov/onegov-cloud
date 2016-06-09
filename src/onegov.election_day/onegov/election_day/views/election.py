@@ -18,6 +18,13 @@ from sqlalchemy import desc
 from sqlalchemy.orm import object_session
 
 
+def to_int(value):
+    try:
+        return int(value)
+    except ValueError:
+        return value
+
+
 @ElectionDayApp.html(model=Election, template='election.pt', permission=Public)
 def view_election(self, request):
 
@@ -92,7 +99,8 @@ def view_election(self, request):
         sublists = session.query(
             List.connection_id,
             List.name,
-            List.votes
+            List.votes,
+            List.list_id
         )
         sublists = sublists.filter(
             List.connection_id != None,
@@ -106,8 +114,12 @@ def view_election(self, request):
             subconnections = [(
                 child[1],
                 child[2],
-                [(l[1], l[2]) for l in sublists.get(str(child[3]), [])]
+                [(l[1], l[2]) for l in sorted(
+                    sublists.get(str(child[3]), []),
+                    key=lambda x: to_int(x[3])
+                )]
             ) for child in children.get(id, [])]
+
             connection = [
                 parent[1],
                 parent[2] or 0,
