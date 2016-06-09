@@ -20,7 +20,7 @@ MAX_FILE_SIZE = 10 * 1024 * 1024
 
 class UploadElectionForm(Form):
 
-    type = RadioField(_("Format"), choices=[
+    file_format = RadioField(_("File format"), choices=[
         ('sesam', _("SESAM")),
         ('wabsti', _("Wabsti")),
         ('internal', _("OneGov Cloud")),
@@ -42,7 +42,7 @@ class UploadElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        depends_on=('type', 'wabsti'),
+        depends_on=('file_format', 'wabsti'),
         render_kw=dict(force_simple=True)
     )
 
@@ -52,7 +52,7 @@ class UploadElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        depends_on=('type', 'wabsti'),
+        depends_on=('file_format', 'wabsti'),
         render_kw=dict(force_simple=True)
     )
 
@@ -62,19 +62,19 @@ class UploadElectionForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        depends_on=('type', 'wabsti'),
+        depends_on=('file_format', 'wabsti'),
         render_kw=dict(force_simple=True)
     )
 
     complete = BooleanField(
         label=_("Complete"),
-        depends_on=('type', 'wabsti'),
+        depends_on=('file_format', 'wabsti'),
         render_kw=dict(force_simple=True)
     )
 
     majority = IntegerField(
         label=_("Absolute majority"),
-        depends_on=('type', '!internal'),
+        depends_on=('file_format', '!internal'),
         validators=[
             Optional(),
             NumberRange(min=1)
@@ -83,12 +83,13 @@ class UploadElectionForm(Form):
 
     def apply_model(self, model):
         if model.type == 'majorz':
-            self.connections.render_kw['data-depends-on'] = 'type/none'
-            self.statistics.render_kw['data-depends-on'] = 'type/none'
+            self.connections.render_kw['data-depends-on'] = 'file_format/none'
+            self.statistics.render_kw['data-depends-on'] = 'file_format/none'
         else:
-            self.connections.render_kw['data-depends-on'] = 'type/wabsti'
-            self.statistics.render_kw['data-depends-on'] = 'type/wabsti'
-            self.majority.render_kw = {'data-depends-on': 'type/none'}
+            self.connections.render_kw['data-depends-on'] = \
+                'file_format/wabsti'
+            self.statistics.render_kw['data-depends-on'] = 'file_format/wabsti'
+            self.majority.render_kw = {'data-depends-on': 'file_format/none'}
 
 
 class UploadVoteForm(Form):

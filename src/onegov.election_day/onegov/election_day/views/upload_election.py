@@ -43,14 +43,14 @@ def view_upload(self, request, form):
             }
         else:
             municipalities = principal.municipalities[self.date.year]
-            if form.type.data == 'internal':
+            if form.file_format.data == 'internal':
                 result = import_onegov_file(
                     municipalities,
                     self,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
-            elif form.type.data == 'sesam':
+            elif form.file_format.data == 'sesam':
                 result = import_sesam_file(
                     municipalities,
                     self,
