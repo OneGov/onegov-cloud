@@ -360,26 +360,47 @@ def with_options(widget, **render_options):
 
 
 class FieldDependency(object):
-    """ Defines a dependency to a field. The given field must have the given
+    """ Defines a dependency to a field. The given field(s) must have the given
     choice for this dependency to be fulfilled.
-
     """
 
-    def __init__(self, field_id, choice):
-        self.field_id = field_id
-        self.raw_choice = choice
-        self.invert = choice.startswith('!')
-        self.choice = choice[1:] if self.invert else choice
+    def __init__(self, *kwargs):
+        assert len(kwargs) and not len(kwargs) % 2
+
+        self.dependencies = []
+        for index in range(len(kwargs) // 2):
+            choice = kwargs[2 * index + 1]
+            invert = choice.startswith('!')
+            self.dependencies.append({
+                'field_id': kwargs[2 * index],
+                'raw_choice': choice,
+                'invert': invert,
+                'choice': choice[1:] if invert else choice,
+            })
 
     def fulfilled(self, form, field):
-        return (getattr(form, self.field_id).data == self.choice) ^ self.invert
+        result = True
+        for dependency in self.dependencies:
+            data = getattr(form, dependency['field_id']).data
+            choice = dependency['choice']
+            invert = dependency['invert']
+            result = result and ((data == choice) ^ invert)
+        return result
 
     def unfulfilled(self, form, field):
         return not self.fulfilled(form, field)
 
     @property
+    def field_id(self):
+        return self.dependencies[0]['field_id']
+
+    @property
     def html_data(self):
-        return {'data-depends-on': '/'.join((self.field_id, self.raw_choice))}
+        value = ';'.join((
+            '/'.join((dep['field_id'], dep['raw_choice']))
+            for dep in self.dependencies
+        ))
+        return {'data-depends-on': value}
 
 
 def merge_forms(*forms):

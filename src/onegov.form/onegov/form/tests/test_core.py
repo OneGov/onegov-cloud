@@ -97,10 +97,58 @@ def test_dependent_field():
             depends_on=('switch', 'on')
         )
 
-        inverted = TimeField(
-            label="Inverted",
-            validators=[],
-            depends_on=('switch', '!on')
+    request = DummyRequest({'switch': 'off'})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    request = DummyRequest({'switch': 'off', 'optional': ''})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    # even though the second field is optional, it still needs to be valid
+    # if there's a value (it may be empty) - we can never accept invalid values
+    # as this presents a possible security risk (we could accessing something
+    # that a validator filters out for security reasons).
+    request = DummyRequest({'switch': 'off', 'optional': 'asdf'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'off', 'optional': '12:00'})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    request = DummyRequest({'switch': 'on'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'on', 'optional': ''})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'on', 'optional': 'asdf'})
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest({'switch': 'on', 'optional': '12:00'})
+    form = TestForm(request.POST)
+    assert form.validate()
+
+
+def test_dependent_field_inverted():
+
+    class TestForm(Form):
+        switch = RadioField(
+            label="Switch",
+            choices=[
+                ('on', "On"),
+                ('off', "Off")
+            ]
+        )
+
+        optional = TimeField(
+            label="Optional",
+            validators=[InputRequired()],
+            depends_on=('switch', '!off')
         )
 
     request = DummyRequest({'switch': 'off'})
@@ -139,17 +187,102 @@ def test_dependent_field():
     form = TestForm(request.POST)
     assert form.validate()
 
-    request = DummyRequest({'switch': 'on', 'inverted': '12:00'})
-    form = TestForm(request.POST)
-    assert not form.validate()
 
-    request = DummyRequest({'switch': 'off', 'inverted': '12:00'})
+def test_dependent_field_multiple():
+
+    class TestForm(Form):
+        switch_1 = RadioField(
+            label="Switch",
+            choices=[
+                ('on', "On"),
+                ('off', "Off")
+            ]
+        )
+
+        switch_2 = RadioField(
+            label="Switch",
+            choices=[
+                ('on', "On"),
+                ('off', "Off")
+            ]
+        )
+
+        optional = TimeField(
+            label="Optional",
+            validators=[InputRequired()],
+            depends_on=('switch_1', 'on', 'switch_2', 'off')
+        )
+
+    # optional not present
+    request = DummyRequest({'switch_1': 'on', 'switch_2': 'on'})
+    form = TestForm(request.POST)
+    assert form.validate()
+    request = DummyRequest({'switch_1': 'off', 'switch_2': 'off'})
+    form = TestForm(request.POST)
+    assert form.validate()
+    request = DummyRequest({'switch_1': 'off', 'switch_2': 'on'})
     form = TestForm(request.POST)
     assert form.validate()
 
-    request = DummyRequest({'switch': 'off', 'inverted': 'asdf'})
+    # optional empty
+    request = DummyRequest(
+        {'switch_1': 'on', 'switch_2': 'on', 'optional': ''}
+    )
+    form = TestForm(request.POST)
+    assert form.validate()
+    request = DummyRequest(
+        {'switch_1': 'off', 'switch_2': 'off', 'optional': ''}
+    )
+    form = TestForm(request.POST)
+    assert form.validate()
+    request = DummyRequest(
+        {'switch_1': 'off', 'switch_2': 'on', 'optional': ''}
+    )
+    form = TestForm(request.POST)
+    assert form.validate()
+
+    # even though the second field is optional, it still needs to be valid
+    # if there's a value (it may be empty) - we can never accept invalid values
+    # as this presents a possible security risk (we could accessing something
+    # that a validator filters out for security reasons).
+    request = DummyRequest(
+        {'switch_1': 'on', 'switch_2': 'on', 'optional': 'asdf'}
+    )
     form = TestForm(request.POST)
     assert not form.validate()
+    request = DummyRequest(
+        {'switch_1': 'off', 'switch_2': 'off', 'optional': 'asdf'}
+    )
+    form = TestForm(request.POST)
+    assert not form.validate()
+    request = DummyRequest(
+        {'switch_1': 'off', 'switch_2': 'on', 'optional': 'asdf'}
+    )
+    form = TestForm(request.POST)
+    assert not form.validate()
+    request = DummyRequest(
+        {'switch_1': 'on', 'switch_2': 'off', 'optional': 'asdf'}
+    )
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    # dependency fullfilled
+    request = DummyRequest(
+        {'switch_1': 'on', 'switch_2': 'off'}
+    )
+    form = TestForm(request.POST)
+    assert not form.validate()
+    request = DummyRequest(
+        {'switch_1': 'on', 'switch_2': 'off', 'optional': ''}
+    )
+    form = TestForm(request.POST)
+    assert not form.validate()
+
+    request = DummyRequest(
+        {'switch_1': 'on', 'switch_2': 'off', 'optional': '12:00'}
+    )
+    form = TestForm(request.POST)
+    assert form.validate()
 
 
 def test_merge_forms():
