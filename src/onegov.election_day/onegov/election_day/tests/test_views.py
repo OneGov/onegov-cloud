@@ -494,6 +494,30 @@ def test_upload_vote_unknown_result(election_day_app):
         'tr[data-municipality-id="1711"]').text()
 
 
+def test_upload_vote_year_unavailable(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/new-vote')
+    new.form['vote_de'] = 'Bacon, yea or nay?'
+    new.form['date'] = date(2000, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'simple'
+
+    csv = '\n'.join((','.join(COLUMNS),))
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain'
+    )
+
+    results = upload.form.submit()
+    assert "Das Jahr 2000 wird noch nicht unterstützt" in results
+
+
 def test_i18n(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
@@ -1085,3 +1109,40 @@ def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
     second_export = client.get('/election/election/csv').text.encode('utf-8')
 
     assert export == second_export
+
+
+def test_upload_election_year_unavailable(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(1990, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    csv = (
+        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
+        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Listen-Nr,"
+        "Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,Anzahl Sitze Liste,"
+        "Unveränderte Wahlzettel Liste,Veränderte Wahlzettel Liste,"
+        "Kandidatenstimmen unveränderte Wahlzettel,"
+        "Zusatzstimmen unveränderte Wahlzettel,"
+        "Kandidatenstimmen veränderte Wahlzettel,"
+        "Zusatzstimmen veränderte Wahlzettel,Kandidaten-Nr,Gewählt,Name,"
+        "Vorname,Stimmen unveränderte Wahlzettel,"
+        "Stimmen veränderte Wahlzettel,Stimmen Total aus Wahlzettel,"
+        "01 FDP,02 CVP, Anzahl Gemeinden\n"
+    )
+    csv = csv.encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Das Jahr 1990 wird noch nicht unterstützt" in upload
