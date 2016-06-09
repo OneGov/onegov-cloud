@@ -95,7 +95,6 @@ var setup_depends_on = function(form) {
     Evaluates the dependency and acts on the result.
 */
 var evaluate_dependency = function(form, input, dependency) {
-    console.log(dependency.invert);
     if (dependency.invert ^ _.contains(get_choices(form, dependency.name), dependency.value)) {
         input.show();
         input.closest('label').show().siblings('.error').show();
