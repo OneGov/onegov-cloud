@@ -10,6 +10,7 @@ from sqlalchemy_utils import observes
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import aliased, backref, relationship, object_session
 from uuid import uuid4
+from itertools import groupby
 
 
 class DerivedBallotsCount(object):
@@ -200,6 +201,12 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             The absolute majority.  Only relevant for elections based on
             majority system.
 
+        * ``election_counted_municipalities``:
+            The number of already counted municipalities.
+
+        * ``election_total_municipalities``:
+            The total number of municipalities.
+
         * ``municipality_name``:
             The name of the municipality.
 
@@ -238,9 +245,17 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             The name of the list this candidate appears on. Only relevant for
             elections based on proportional representation.
 
-        * ``list_votes``:
-            The number of votes this list has got. Only relevant for
+        * ``list_id``:
+            The id of the list this candidate appears on. Only relevant for
             elections based on proportional representation.
+
+        * ``list_number_of_mandates``:
+            The number of mandates this list has got. Only relevant for
+            elections based on proportional representation.
+
+        * ``list_votes``:
+            The number of votes this list has got in this municipality.
+            Only relevant for elections based on proportional representation.
 
         * ``list_connection``:
             The ID of the list connection this list is connected to. Only
@@ -255,6 +270,9 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
         * ``candidate_first_name``:
             The first name of the candidate.
+
+        * ``candidate_id``:
+            The ID of the candidate.
 
         * ``candidate_elected``:
             True if the candidate has been elected.
@@ -277,6 +295,8 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             Election.type,
             Election.number_of_mandates,
             Election.absolute_majority,
+            Election.counted_municipalities,
+            Election.total_municipalities,
             ElectionResult.group,
             ElectionResult.municipality_id,
             ElectionResult.elegible_voters,
@@ -289,11 +309,13 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             ElectionResult.invalid_votes,
             ElectionResult.accounted_votes,
             List.name,
-            List.votes,
+            List.list_id,
+            List.number_of_mandates,
             SubListConnection.connection_id,
             ListConnection.connection_id,
             Candidate.family_name,
             Candidate.first_name,
+            Candidate.candidate_id,
             Candidate.elected,
         )
         results = results.outerjoin(CandidateResult.candidate)
@@ -310,6 +332,25 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             Candidate.first_name
         )
 
+        # We need to merge in the list results per municipality
+        list_results = session.query(
+            ListResult.votes,
+            ElectionResult.municipality_id,
+            List.list_id
+        )
+        list_results = list_results.outerjoin(ListResult.election_result)
+        list_results = list_results.outerjoin(ListResult.list)
+        list_results = list_results.filter(
+            ListResult.election_result_id.in_(ids)
+        )
+        list_results = list_results.order_by(
+            ElectionResult.municipality_id,
+            List.list_id
+        )
+        list_results_grouped = {}
+        for key, group in groupby(list_results, lambda x: x[1]):
+            list_results_grouped[key] = dict([(g[2], g[0]) for g in group])
+
         rows = []
         for result in results:
             row = OrderedDict()
@@ -319,28 +360,35 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             row['election_type'] = result[3]
             row['election_mandates'] = result[4]
             row['election_absolute_majority'] = result[5]
+            row['election_counted_municipalities'] = result[6]
+            row['election_total_municipalities'] = result[7]
 
-            row['municipality_name'] = result[6]
-            row['municipality_bfs_number'] = result[7]
-            row['municipality_elegible_voters'] = result[8]
-            row['municipality_received_ballots'] = result[9]
-            row['municipality_blank_ballots'] = result[10]
-            row['municipality_invalid_ballots'] = result[11]
-            row['municipality_unaccounted_ballots'] = result[12]
-            row['municipality_accounted_ballots'] = result[13]
-            row['municipality_blank_votes'] = result[14]
-            row['municipality_invalid_votes'] = result[15]
-            row['municipality_accounted_votes'] = result[16]
+            row['municipality_name'] = result[8]
+            row['municipality_bfs_number'] = result[9]
+            row['municipality_elegible_voters'] = result[10]
+            row['municipality_received_ballots'] = result[11]
+            row['municipality_blank_ballots'] = result[12]
+            row['municipality_invalid_ballots'] = result[13]
+            row['municipality_unaccounted_ballots'] = result[14]
+            row['municipality_accounted_ballots'] = result[15]
+            row['municipality_blank_votes'] = result[16]
+            row['municipality_invalid_votes'] = result[17]
+            row['municipality_accounted_votes'] = result[18]
 
-            row['list_name'] = result[17]
-            row['list_votes'] = result[18]
+            row['list_name'] = result[19]
+            row['list_id'] = result[20]
+            row['list_number_of_mandates'] = result[21]
+            row['list_votes'] = list_results_grouped.get(
+                row['municipality_bfs_number'], {}
+            ).get(row['list_id'], 0)
 
-            row['list_connection'] = result[19]
-            row['list_connection_parent'] = result[20]
+            row['list_connection'] = result[22]
+            row['list_connection_parent'] = result[23]
 
-            row['candidate_family_name'] = result[21]
-            row['candidate_first_name'] = result[22]
-            row['candidate_elected'] = result[23]
+            row['candidate_family_name'] = result[24]
+            row['candidate_first_name'] = result[25]
+            row['candidate_id'] = result[26]
+            row['candidate_elected'] = result[27]
             row['candidate_votes'] = result[0]
 
             rows.append(row)

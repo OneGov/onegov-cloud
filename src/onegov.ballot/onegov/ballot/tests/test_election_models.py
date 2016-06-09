@@ -582,7 +582,9 @@ def test_election_export(session):
         type='majorz',
         date=date(2015, 6, 14),
         number_of_mandates=1,
-        absolute_majority=144
+        absolute_majority=144,
+        counted_municipalities=1,
+        total_municipalities=2
     )
 
     connection = ListConnection(
@@ -682,6 +684,8 @@ def test_election_export(session):
             'election_type': 'majorz',
             'election_mandates': 1,
             'election_absolute_majority': 144,
+            'election_counted_municipalities': 1,
+            'election_total_municipalities': 2,
             'municipality_name': 'group',
             'municipality_bfs_number': 1,
             'municipality_elegible_voters': 1000,
@@ -694,11 +698,14 @@ def test_election_export(session):
             'municipality_invalid_votes': 120,
             'municipality_accounted_votes': 285,
             'list_name': 'Kwik-E-Major',
+            'list_id': '2',
+            'list_number_of_mandates': 0,
             'list_votes': 111,
             'list_connection': 'A.1',
             'list_connection_parent': 'A',
             'candidate_family_name': 'Nahasapeemapetilon',
             'candidate_first_name': 'Apu',
+            'candidate_id': '2',
             'candidate_elected': False,
             'candidate_votes': 111
         },
@@ -708,6 +715,8 @@ def test_election_export(session):
             'election_type': 'majorz',
             'election_mandates': 1,
             'election_absolute_majority': 144,
+            'election_counted_municipalities': 1,
+            'election_total_municipalities': 2,
             'municipality_name': 'group',
             'municipality_bfs_number': 1,
             'municipality_elegible_voters': 1000,
@@ -720,11 +729,14 @@ def test_election_export(session):
             'municipality_invalid_votes': 120,
             'municipality_accounted_votes': 285,
             'list_name': 'Quimby Again!',
+            'list_id': '1',
+            'list_number_of_mandates': 1,
             'list_votes': 520,
             'list_connection': None,
             'list_connection_parent': None,
             'candidate_family_name': 'Quimby',
             'candidate_first_name': 'Joe',
+            'candidate_id': '1',
             'candidate_elected': True,
             'candidate_votes': 520
         }
