@@ -48,23 +48,23 @@ var get_relevant_forms = function() {
     Takes a data-depends-on value and returns the name of the field and the
     expected value of it.
 */
-var get_dependency = function(input) {
-    var data = input.data('depends-on');
-
-    var name = data.split('/')[0];
-    var value = data.substring(name.length + 1);
-    var invert = value.indexOf('!') === 0;
-    if (invert) {
-        value = value.substring(1);
-    }
-
+var get_dependencies = function(input) {
     var hide_label = true;
-
     if (! _.isUndefined(input.data('hide-label'))) {
         hide_label = input.data('hide-label');
     }
 
-    return {'name': name, 'value': value, 'invert': invert, 'hide_label': hide_label};
+    var dependencies = input.data('depends-on').split(';');
+    return _.map(dependencies, function(dependency) {
+        var name = dependency.split('/')[0];
+        var value = dependency.substring(name.length + 1);
+        var invert = value.indexOf('!') === 0;
+        if (invert) {
+            value = value.substring(1);
+        }
+
+        return {'name': name, 'value': value, 'invert': invert, 'hide_label': hide_label};
+    });
 };
 
 /*
@@ -82,11 +82,13 @@ var setup_depends_on = function(form) {
     var inputs = form.find('*[data-depends-on]');
 
     _.each(_.map(inputs, $), function(input) {
-        var dependency = get_dependency(input);
-        evaluate_dependency(form, input, dependency);
+        var dependencies = get_dependencies(input);
+        evaluate_dependencies(form, input, dependencies);
 
-        get_dependency_target(form, dependency).on('click', function() {
-            evaluate_dependency(form, input, dependency);
+        _.each(dependencies, function(dependency) {
+            get_dependency_target(form, dependency).on('click', function() {
+                evaluate_dependencies(form, input, dependencies);
+            });
         });
     });
 };
@@ -94,13 +96,19 @@ var setup_depends_on = function(form) {
 /*
     Evaluates the dependency and acts on the result.
 */
-var evaluate_dependency = function(form, input, dependency) {
-    if (dependency.invert ^ _.contains(get_choices(form, dependency.name), dependency.value)) {
+var evaluate_dependencies = function(form, input, dependencies) {
+    var visible = true;
+    var hide_label = true;
+    _.each(dependencies, function(dependency) {
+        visible &= (dependency.invert ^ _.contains(get_choices(form, dependency.name), dependency.value));
+        hide_label &= dependency.hide_label;
+    });
+    if (visible) {
         input.show();
         input.closest('label').show().siblings('.error').show();
     } else {
         input.hide();
-        if (dependency.hide_label) {
+        if (hide_label) {
             input.closest('label').hide().siblings('.error').hide();
         }
     }
