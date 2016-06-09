@@ -10,7 +10,7 @@ Dieses Dokument beschreibt das Format dieser CSV/Excel Dateien.
 
 ### Dateiformate
 
-Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von den Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" oder "Wahlen (SESAM)" generiert werden. Falls eine Tabelle von Hand erstellt werden soll, ist die einfachere Option das SESAM-Format nachzubilden.
+Als Dateiformate werden CSV, XLS oder XLSX Dateien akzeptiert, welche von den Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)", "Wahlen (SESAM)" oder der Webapplikation selbst generiert werden. Falls eine Tabelle von Hand erstellt werden soll, ist das Nachbilden des eigene oder des SESAM-Formats einfacher.
 
 #### SESAM
 
@@ -188,6 +188,7 @@ Vorlage:
 * XLS Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_kandidaten.xls]()
 * CSV Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_kandidaten.csv]()
 * XLSX Vorlage: [https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_kandidaten.xlsx]()
+
 
 ## Format Spezifikation Abstimmungen
 
