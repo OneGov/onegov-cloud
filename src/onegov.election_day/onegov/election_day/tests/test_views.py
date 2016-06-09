@@ -22,6 +22,13 @@ COLUMNS = [
 ]
 
 
+def login(client):
+    login = client.get('/auth/login')
+    login.form['username'] = 'admin@example.org'
+    login.form['password'] = 'hunter2'
+    login.form.submit()
+
+
 def test_view_permissions():
     utils.assert_explicit_permissions(onegov.election_day)
 
@@ -54,10 +61,7 @@ def test_view_manage(election_day_app):
 
     assert client.get('/manage', expect_errors=True).status_code == 403
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     manage = client.get('/manage')
     assert "Noch keine Wahlen erfasst" in manage
@@ -112,10 +116,7 @@ def test_upload_vote_all_or_nothing(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
@@ -165,10 +166,7 @@ def test_upload_vote_success(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
@@ -229,10 +227,7 @@ def test_upload_vote_validation(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
@@ -399,10 +394,7 @@ def test_upload_vote_missing_town(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
@@ -452,10 +444,7 @@ def test_upload_vote_unknown_result(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
@@ -509,10 +498,7 @@ def test_i18n(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-vote')
     new.form['vote_de'] = 'Foo'
@@ -568,10 +554,7 @@ def test_pages_cache(election_day_app):
     anonymous.get('/vote/0xdeadbeef', status=404)
     anonymous.get('/election/0xdeafbeef', status=404)
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-vote')
     new.form['vote_de'] = '0xdeadbeef'
@@ -616,10 +599,7 @@ def test_view_archive(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
@@ -656,10 +636,7 @@ def test_upload_election_sesam_majorz(election_day_app_gr, tar_file):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-election')
     new.form['election_de'] = 'Election'
@@ -696,10 +673,7 @@ def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-election')
     new.form['election_de'] = 'Election'
@@ -739,10 +713,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
     client = Client(election_day_app_sg)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-election')
     new.form['election_de'] = 'Election'
@@ -797,10 +768,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-election')
     new.form['election_de'] = 'Election'
@@ -881,10 +849,7 @@ def test_view_election_candidates(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-election')
     new.form['election_de'] = 'Election'
@@ -921,10 +886,7 @@ def test_view_election_lists(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-election')
     new.form['election_de'] = 'Election'
@@ -972,10 +934,7 @@ def test_view_election_export(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
+    login(client)
 
     new = client.get('/manage/new-election')
     new.form['election_de'] = 'Election'
@@ -1023,3 +982,106 @@ def test_view_election_export(election_day_app_gr):
 
     export = client.get('/election/election/xlsx')
     assert export.status == '200 OK'
+
+
+@pytest.mark.parametrize("tar_file", [
+    module_path('onegov.election_day', 'tests/fixtures/sesam_majorz.tar.gz'),
+])
+def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    with tarfile.open(tar_file, 'r|gz') as f:
+        csv = f.extractfile(f.next()).read()
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    export = client.get('/election/election/csv').text.encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'internal'
+    upload.form['results'] = Upload('data.csv', export, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    second_export = client.get('/election/election/csv').text.encode('utf-8')
+
+    assert export == second_export
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['majority'] = '500'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    export = client.get('/election/election/csv').text.encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'internal'
+    upload.form['results'] = Upload('data.csv', export, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    second_export = client.get('/election/election/csv').text.encode('utf-8')
+
+    assert export == second_export
+
+
+@pytest.mark.parametrize("tar_file", [
+    module_path('onegov.election_day', 'tests/fixtures/sesam_proporz.tar.gz'),
+])
+def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    with tarfile.open(tar_file, 'r|gz') as f:
+        csv = f.extractfile(f.next()).read()
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    export = client.get('/election/election/csv').text.encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['type'] = 'internal'
+    upload.form['results'] = Upload('data.csv', export, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    second_export = client.get('/election/election/csv').text.encode('utf-8')
+
+    assert export == second_export

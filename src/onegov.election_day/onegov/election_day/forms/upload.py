@@ -20,9 +20,10 @@ MAX_FILE_SIZE = 10 * 1024 * 1024
 
 class UploadElectionForm(Form):
 
-    type = RadioField(_("Type"), choices=[
+    type = RadioField(_("Format"), choices=[
         ('sesam', _("SESAM")),
         ('wabsti', _("Wabsti")),
+        ('internal', _("OneGov Cloud")),
     ], validators=[InputRequired()], default='sesam')
 
     results = UploadField(
@@ -73,6 +74,7 @@ class UploadElectionForm(Form):
 
     majority = IntegerField(
         label=_("Absolute majority"),
+        depends_on=('type', '!internal'),
         validators=[
             Optional(),
             NumberRange(min=1)
@@ -83,7 +85,6 @@ class UploadElectionForm(Form):
         if model.type == 'majorz':
             self.connections.render_kw['data-depends-on'] = 'type/none'
             self.statistics.render_kw['data-depends-on'] = 'type/none'
-            self.majority.render_kw = None
         else:
             self.connections.render_kw['data-depends-on'] = 'type/wabsti'
             self.statistics.render_kw['data-depends-on'] = 'type/wabsti'

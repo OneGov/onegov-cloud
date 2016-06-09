@@ -23,6 +23,8 @@ Changelog
   results of elections.
   [msom]
 
+- Allows to import elections with the format used for the export.
+  [msom]
 
 0.7.2 (2016-03-18)
 ~~~~~~~~~~~~~~~~~~~

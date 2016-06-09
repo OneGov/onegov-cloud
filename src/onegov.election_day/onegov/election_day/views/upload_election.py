@@ -9,6 +9,9 @@ from onegov.election_day.forms import UploadElectionForm
 from onegov.election_day.layout import ManageLayout
 from onegov.election_day.models import Manage
 from onegov.election_day.formats import FileImportError
+from onegov.election_day.formats.election.onegov_ballot import (
+    import_file as import_onegov_file
+)
 from onegov.election_day.formats.election.wabsti import (
     import_file as import_wabsti_file
 )
@@ -40,13 +43,22 @@ def view_upload(self, request, form):
             }
         else:
             municipalities = principal.municipalities[self.date.year]
-            if form.type.data == 'sesam':
+            if form.type.data == 'internal':
+                result = import_onegov_file(
+                    municipalities,
+                    self,
+                    form.results.raw_data[0].file,
+                    form.results.data['mimetype']
+                )
+            elif form.type.data == 'sesam':
                 result = import_sesam_file(
                     municipalities,
                     self,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
+                if self.type == 'majorz':
+                    self.absolute_majority = form.majority.data
             else:
                 connections = len(form.connections.data)
                 stats = len(form.statistics.data)
@@ -63,10 +75,10 @@ def view_upload(self, request, form):
                     form.statistics.raw_data[0].file if stats else None,
                     form.statistics.data['mimetype'] if stats else None
                 )
+                if self.type == 'majorz':
+                    self.absolute_majority = form.majority.data
                 if form.complete.data:
                     self.total_municipalities = self.counted_municipalities
-            if self.type == 'majorz':
-                self.absolute_majority = form.majority.data
 
     form.apply_model(self)
 
