@@ -944,7 +944,7 @@ def test_view_election_lists(election_day_app_gr):
     csv = csv.encode('utf-8')
 
     upload = client.get('/election/election/upload')
-    upload.form['type'] = 'sesam'
+    upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
