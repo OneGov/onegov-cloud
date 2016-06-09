@@ -9,7 +9,12 @@ from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layout import ManageLayout
 from onegov.election_day.models import Manage
 from onegov.election_day.formats import FileImportError
-from onegov.election_day.formats.vote import import_file, BALLOT_TYPES
+from onegov.election_day.formats.vote import (
+    BALLOT_TYPES, import_file as import_default_file
+)
+from onegov.election_day.formats.vote.onegov_ballot import (
+    import_file as import_onegov_file
+)
 
 
 def get_form_class(vote, request):
@@ -49,21 +54,44 @@ def view_upload(self, request, form):
         form.type.data = 'simple'
 
     if form.submitted(request):
-        if form.data['type'] == 'simple':
-            ballot_types = ('proposal', )
+        principal = request.app.principal
+        if not principal.is_year_available(self.date.year):
+            results['proposal'] = {
+                'status': 'error',
+                'errors': [
+                    FileImportError(
+                        _(
+                            "The year ${year} is not yet supported",
+                            mapping={'year': self.date.year}
+                        )
+                    )
+                ]
+            }
         else:
-            ballot_types = BALLOT_TYPES
+            municipalities = principal.municipalities[self.date.year]
+            if form.file_format.data == 'internal':
+                results = import_onegov_file(
+                    municipalities,
+                    self,
+                    form.proposal.raw_data[0].file,
+                    form.proposal.data['mimetype']
+                )
+            else:
+                if form.data['type'] == 'simple':
+                    ballot_types = ('proposal', )
+                else:
+                    ballot_types = BALLOT_TYPES
 
-        for ballot_type in ballot_types:
-            field = getattr(form, ballot_type.replace('-', '_'))
+                for ballot_type in ballot_types:
+                    field = getattr(form, ballot_type.replace('-', '_'))
 
-            results[ballot_type] = import_file(
-                request.app.principal,
-                self,
-                ballot_type,
-                field.raw_data[0].file,
-                field.data['mimetype']
-            )
+                    results[ballot_type] = import_default_file(
+                        municipalities,
+                        self,
+                        ballot_type,
+                        field.raw_data[0].file,
+                        field.data['mimetype']
+                    )
 
     if results:
         if all(r['status'] == 'ok' for r in results.values()):

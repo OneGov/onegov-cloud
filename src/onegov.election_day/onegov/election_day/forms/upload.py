@@ -20,11 +20,18 @@ MAX_FILE_SIZE = 10 * 1024 * 1024
 
 class UploadElectionForm(Form):
 
-    file_format = RadioField(_("File format"), choices=[
-        ('sesam', _("SESAM")),
-        ('wabsti', _("Wabsti")),
-        ('internal', _("OneGov Cloud")),
-    ], validators=[InputRequired()], default='sesam')
+    file_format = RadioField(
+        _("File format"),
+        choices=[
+            ('sesam', _("SESAM")),
+            ('wabsti', _("Wabsti")),
+            ('internal', _("OneGov Cloud")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        default='sesam'
+    )
 
     results = UploadField(
         label=_("Results"),
@@ -94,10 +101,30 @@ class UploadElectionForm(Form):
 
 class UploadVoteForm(Form):
 
-    type = RadioField(_("Type"), choices=[
-        ('simple', _("Simple Vote")),
-        ('complex', _("Vote with Counter-Proposal")),
-    ], validators=[InputRequired()], default='simple')
+    file_format = RadioField(
+        _("File format"),
+        choices=[
+            ('default', _("Default")),
+            ('internal', _("OneGov Cloud")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        default='default'
+    )
+
+    type = RadioField(
+        _("Type"),
+        choices=[
+            ('simple', _("Simple Vote")),
+            ('complex', _("Vote with Counter-Proposal")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        depends_on=('file_format', '!internal'),
+        default='simple'
+    )
 
     proposal = UploadField(
         label=_("Proposal"),
@@ -116,7 +143,7 @@ class UploadVoteForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        depends_on=('type', 'complex'),
+        depends_on=('file_format', 'default', 'type', 'complex'),
         render_kw=dict(force_simple=True)
     )
 
@@ -127,6 +154,6 @@ class UploadVoteForm(Form):
             WhitelistedMimeType(ALLOWED_MIME_TYPES),
             FileSizeLimit(MAX_FILE_SIZE)
         ],
-        depends_on=('type', 'complex'),
+        depends_on=('file_format', 'default', 'type', 'complex'),
         render_kw=dict(force_simple=True)
     )
