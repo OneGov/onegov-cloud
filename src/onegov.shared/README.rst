@@ -5,7 +5,7 @@ Assets and other things shared between multiple onegov applications
 
 Run the Tests
 -------------
-    
+
 Install tox and run it::
 
     pip install tox
@@ -27,7 +27,7 @@ Onegov Shared uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/OneGov/onegov.shared.png
+.. image:: https://travis-ci.org/OneGov/onegov.shared.png?branch=master
   :target: https://travis-ci.org/OneGov/onegov.shared
   :alt: Build Status
 
@@ -40,8 +40,8 @@ Coverage
 
 Latests PyPI Release
 --------------------
-.. image:: https://pypip.in/v/onegov.shared/badge.png
-  :target: https://crate.io/packages/onegov.shared
+.. image:: https://img.shields.io/pypi/v/onegov.shared.svg
+  :target: https://pypi.python.org/pypi/onegov.shared
   :alt: Latest PyPI Release
 
 License
