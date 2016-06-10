@@ -362,6 +362,17 @@ def with_options(widget, **render_options):
 class FieldDependency(object):
     """ Defines a dependency to a field. The given field(s) must have the given
     choice for this dependency to be fulfilled.
+
+    It's possible to depend on NOT the given value by preceeding it with a '!':
+
+        FieldDependency('field_1', '!choice_1')
+
+    To depend on more than one field, add the field_id's and choices to the
+    constructor:
+
+        FieldDependency('field_1', 'choice_1')
+        FieldDependency('field_1', 'choice_1', 'field_2', 'choice_2')
+
     """
 
     def __init__(self, *kwargs):

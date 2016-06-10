@@ -1,10 +1,10 @@
 Changelog
 ---------
 
-- Adds the ability to depend on not a specific field value.
-  [msom]
+- Adds new options on how to dependen on a field value.
 
-- Adds the ability to depend on more then one fields (AND).
+  It's now possible to depend on NOT a specific field value and to depend on
+  more then one fields (AND).
   [msom]
 
 0.11.2 (2016-05-11)
