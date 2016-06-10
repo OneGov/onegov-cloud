@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.2.0 (2016-06-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Supports the new field dependency options of onegov.form.
   [msom]
