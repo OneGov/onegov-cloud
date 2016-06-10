@@ -12,7 +12,7 @@ not offer any UI to do that.
 
 Run the Tests
 -------------
-    
+
 Install tox and run it::
 
     pip install tox
@@ -34,7 +34,7 @@ Onegov Form uses `Semantic Versioning <http://semver.org/>`_
 Build Status
 ------------
 
-.. image:: https://travis-ci.org/OneGov/onegov.form.png
+.. image:: https://travis-ci.org/OneGov/onegov.form.png?branch=master
   :target: https://travis-ci.org/OneGov/onegov.form
   :alt: Build Status
 
@@ -47,8 +47,8 @@ Coverage
 
 Latests PyPI Release
 --------------------
-.. image:: https://pypip.in/v/onegov.form/badge.png
-  :target: https://crate.io/packages/onegov.form
+.. image:: https://img.shields.io/pypi/v/onegov.form.svg
+  :target: https://pypi.python.org/pypi/onegov.form
   :alt: Latest PyPI Release
 
 License
