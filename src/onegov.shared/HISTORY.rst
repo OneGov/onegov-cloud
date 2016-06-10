@@ -4,10 +4,7 @@ Changelog
 Unreleased
 ~~~~~~~~~~
 
-- Supports the new ability of onegov.form to depend on not a specific field value.
-  [msom]
-
-- Supports the new ability of onegov.form to depend on more than one fields.
+- Supports the new field dependency options of onegov.form.
   [msom]
 
 0.1.0 (2015-10-12)
