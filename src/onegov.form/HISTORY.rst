@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.12.0 (2016-06-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds new options on how to dependen on a field value.
 
