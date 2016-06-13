@@ -10,6 +10,7 @@ from onegov.core.orm.mixins import (
 )
 from onegov.core.orm.types import JSON, UUID, UTCDateTime
 from onegov.search import ORMSearchable
+from pytz import UTC
 from sedate import standardize_date, to_timezone
 from sqlalchemy import Column, Enum, ForeignKey, Text, String
 from sqlalchemy.dialects.postgresql import HSTORE
@@ -98,8 +99,8 @@ class OccurrenceMixin(object):
 
         event = icalendar.Event()
         event.add('summary', self.title)
-        event.add('dtstart', self.localized_start)
-        event.add('dtend', self.localized_end)
+        event.add('dtstart', to_timezone(self.start, UTC))
+        event.add('dtend', to_timezone(self.end, UTC))
         event.add('last-modified',
                   self.modified or self.created or datetime.utcnow())
         event['location'] = icalendar.vText(self.location)
