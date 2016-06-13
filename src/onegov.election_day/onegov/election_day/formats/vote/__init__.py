@@ -33,7 +33,7 @@ def import_file(municipalities, vote, ballot_type, file, mimetype):
 
     csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
     if error:
-        return {'proposal': {'status': 'error', 'errors': [error]}}
+        return {'status': 'error', 'errors': [error]}
 
     ballot = next((b for b in vote.ballots if b.type == ballot_type), None)
 
