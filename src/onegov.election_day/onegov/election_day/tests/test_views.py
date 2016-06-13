@@ -1203,3 +1203,80 @@ def test_upload_election_year_unavailable(election_day_app_gr):
     upload = upload.form.submit()
 
     assert "Das Jahr 1990 wird noch nicht unterstützt" in upload
+
+
+@pytest.mark.parametrize("tar_file", [
+    module_path('onegov.election_day', 'tests/fixtures/wabsti_vote.tar.gz'),
+])
+def test_upload_vote_wabsti(election_day_app_sg, tar_file):
+    client = Client(election_day_app_sg)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/new-vote')
+    new.form['vote_de'] = 'Bacon, yea or nay?'
+    new.form['date'] = date(2016, 6, 6)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    with tarfile.open(tar_file, 'r|gz') as f:
+        csv = f.extractfile(f.next()).read()
+
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'simple'
+    upload.form['file_format'] = 'wabsti'
+    upload.form['vote_number'] = '3'
+    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    results = upload.click("Hier klicken")
+
+    assert "37.27%" in results
+    assert "77 von 77" in results
+    assert "61.49 %" in results
+    assert "311'828" in results
+    assert "191'755" in results
+
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'simple'
+    upload.form['file_format'] = 'wabsti'
+    upload.form['vote_number'] = '4'
+    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    results = upload.click("Hier klicken")
+
+    assert "3 von 77" in results
+    assert "40.00" in results
+
+    new = client.get('/manage/new-vote')
+    new.form['vote_de'] = 'Complex vote'
+    new.form['date'] = date(2016, 6, 6)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    upload = client.get('/vote/complex-vote/upload')
+    upload.form['type'] = 'complex'
+    upload.form['file_format'] = 'wabsti'
+    upload.form['vote_number'] = '3'
+    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    results = upload.click("Hier klicken")
+
+    assert "Gegenentwurf" in results
+    assert "Stichfrage" in results
+    assert "answer rejected" in results
+    assert "37.27" in results
+    assert "62.73" in results
+    assert "53.00" in results
+    assert "47.00" in results
+    assert "45.96" in results
+    assert "54.04" in results

@@ -105,6 +105,7 @@ class UploadVoteForm(Form):
         _("File format"),
         choices=[
             ('default', _("Default")),
+            ('wabsti', _("Wabsti")),
             ('internal', _("OneGov Cloud")),
         ],
         validators=[
@@ -156,4 +157,13 @@ class UploadVoteForm(Form):
         ],
         depends_on=('file_format', 'default', 'type', 'complex'),
         render_kw=dict(force_simple=True)
+    )
+
+    vote_number = IntegerField(
+        label=_("Vote number"),
+        depends_on=('file_format', 'wabsti'),
+        validators=[
+            DataRequired(),
+            NumberRange(min=1)
+        ]
     )

@@ -29,6 +29,9 @@ Changelog
 - Allows to import votes with the format used for the export.
   [msom]
 
+- Allows to import votes from Wabsti.
+  [msom]
+
 0.7.2 (2016-03-18)
 ~~~~~~~~~~~~~~~~~~~
 

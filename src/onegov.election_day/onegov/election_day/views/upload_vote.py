@@ -15,6 +15,9 @@ from onegov.election_day.formats.vote import (
 from onegov.election_day.formats.vote.onegov_ballot import (
     import_file as import_onegov_file
 )
+from onegov.election_day.formats.vote.wabsti import (
+    import_file as import_wabsti_file
+)
 
 
 def get_form_class(vote, request):
@@ -75,6 +78,15 @@ def view_upload(self, request, form):
                     self,
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
+                )
+            elif form.file_format.data == 'wabsti':
+                results = import_wabsti_file(
+                    municipalities,
+                    self,
+                    form.proposal.raw_data[0].file,
+                    form.proposal.data['mimetype'],
+                    form.vote_number.data,
+                    form.data['type'] == 'complex'
                 )
             else:
                 if form.data['type'] == 'simple':
