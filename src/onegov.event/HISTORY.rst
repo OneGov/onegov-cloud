@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.4.1 (2016-06-13)
+~~~~~~~~~~~~~~~~~~~
 
 - Exports events to iCalendar in UTC.
   [msom]

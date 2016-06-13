@@ -4,7 +4,7 @@ name = 'onegov.event'
 description = (
     'Calendar of events for OneGov.'
 )
-version = '0.4.0'
+version = '0.4.1'
 
 
 def get_long_description():
@@ -35,7 +35,7 @@ setup(
         'bleach',
         'icalendar',
         'lxml',
-        'onegov.core>=0.4.0',
+        'onegov.core>=0.4.1',
         'onegov.gis',
         'onegov.search',
         'onegov.server',
