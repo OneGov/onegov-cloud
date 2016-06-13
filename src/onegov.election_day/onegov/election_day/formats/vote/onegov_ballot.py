@@ -6,11 +6,9 @@ from sqlalchemy.orm import object_session
 
 
 HEADERS = [
-    # 'domain',
     'type',
-    # 'group',
+    'group',
     'municipality_id',
-    'counted',
     'yeas',
     'nays',
     'invalid',
@@ -32,7 +30,7 @@ def import_file(municipalities, vote, file, mimetype):
     """
     csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
     if error:
-        return {'status': 'error', 'errors': [error]}
+        return {'proposal': {'status': 'error', 'errors': [error]}}
 
     ballot_results = {}
     errors = {}
