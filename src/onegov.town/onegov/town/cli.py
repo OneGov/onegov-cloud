@@ -331,6 +331,7 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
         for reservation_group, bookings in reservations.items():
             resource = resources_by_room[reservation_group.split('-')[0]]
             scheduler = resource.scheduler
+            found_conflict = False
 
             session_id = uuid4()
 
@@ -364,11 +365,15 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                     abort("{} is an invalid e-mail address".format(email))
                 except AlreadyReservedError:
                     booking_conflicts += 1
+                    found_conflict = True
 
                     print("Booking conflict in {} at {}".format(
                         resource.title, booking.hour_start
                     ))
                     pass
+
+            if found_conflict:
+                continue
 
             forms = FormCollection(app.session())
             form_data = get_formdata(members[booking.member_id], booking)
