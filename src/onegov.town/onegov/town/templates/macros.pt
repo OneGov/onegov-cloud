@@ -285,7 +285,7 @@
                 <a href="mailto:${person.email}">${person.email}</a>
             </li>
             <li tal:condition="person.phone" class="person-card-phone">
-                <a href="tel:${person.email}">${person.phone}</a>
+                <a href="tel:${person.phone}">${person.phone}</a>
             </li>
         </ul>
         <div class="clearfix"></div>

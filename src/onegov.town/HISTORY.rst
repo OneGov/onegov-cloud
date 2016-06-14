@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes telephone number on people records being unclickable.
+  [href]
+  
 1.8.4 (2016-06-08)
 ~~~~~~~~~~~~~~~~~~~
 
