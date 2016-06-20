@@ -34,7 +34,7 @@ setup(
     install_requires=[
         'onegov.core>=0.4.0',
         'csscompressor',
-        'pyscss',
+        'pyscss>=1.3.5',
     ],
     entry_points={
         'onegov': [

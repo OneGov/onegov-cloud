@@ -4,16 +4,6 @@ from collections import OrderedDict
 from csscompressor import compress
 from scss.compiler import Compiler
 
-from scss import __version__
-
-# monkey patch scss or it won't compile zurb correctly:
-# https://github.com/Kronuz/pyScss/issues/335
-if __version__ == '1.3.4':
-    from scss.extension.core import append, ns
-
-    ns._functions.maps[0][('append', 2)]\
-        = lambda lst, val, separator='space': append(lst, val, separator)
-
 
 class BaseTheme(object):
     """ Base class for Zurb Foundation based themes. Use this class to
