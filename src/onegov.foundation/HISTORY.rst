@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.1 (2016-06-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Removes the custom pyscss monkey patch, as the issues has been resolved.
   [href]
 
