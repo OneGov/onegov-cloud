@@ -125,3 +125,88 @@ def test_lead_time(session):
         assert ticket.lead_time == 30
         assert ticket.current_lead_time == 30
         assert ticket.last_state_change == utcnow()
+
+
+def test_legacy_lead_time(session):
+    """ Tests the lead_time/response_time for existing tickets, which cannot
+    be migrated as this information cannot be inferred.
+
+    """
+
+    user = User()
+
+    # test if the changes work for existing pending tickets (we don't need
+    # to check the open tickets, as there is no difference between an open
+    # ticket before/after the lead time introduction)
+    with freeze_time('2016-06-21') as frozen:
+        ticket = Ticket(state='pending', created=Ticket.timestamp(), user=user)
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change is None
+
+        ticket.close_ticket()
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change == utcnow()
+
+        frozen.tick(delta=timedelta(seconds=10))
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
+
+        ticket.reopen_ticket(user)
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change == utcnow()
+
+        frozen.tick(delta=timedelta(seconds=10))
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
+
+        ticket.close_ticket()
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change == utcnow()
+
+    # test if the changes work for existing closed tickets
+    with freeze_time('2016-06-21') as frozen:
+        ticket = Ticket(state='closed', created=Ticket.timestamp())
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change is None
+
+        ticket.reopen_ticket(user)
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change == utcnow()
+
+        frozen.tick(delta=timedelta(seconds=10))
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
+
+        ticket.close_ticket()
+
+        assert ticket.reaction_time is None
+        assert ticket.lead_time is None
+        assert ticket.current_lead_time is None
+        assert ticket.last_state_change == utcnow()

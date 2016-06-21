@@ -148,8 +148,15 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             return int((utcnow() - self.created).total_seconds())
 
         elif self.state == 'pending':
+
+            # tickets created before the introduction of lead time do not
+            # have the necessary information to be migrated
+            if not self.last_state_change or not self.reaction_time:
+                return None
+
             running_time = (utcnow() - self.last_state_change).total_seconds()
             accrued_lead_time = (self.lead_time or 0)
+
             return int(self.reaction_time + accrued_lead_time + running_time)
 
         else:
