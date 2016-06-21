@@ -2,10 +2,10 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
-from onegov.core.orm.types import JSON
+from onegov.core.orm.types import JSON, UTCDateTime
 from onegov.core.upgrade import upgrade_task
 from onegov.ticket import Ticket
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Integer, Text
 
 
 @upgrade_task('Add handler_id to ticket', always_run=True)
@@ -55,3 +55,16 @@ def add_subtitle_to_ticket(context):
         ticket.subtitle = ticket.handler.subtitle
 
     context.session.flush()
+
+
+@upgrade_task('Add lead time to ticket')
+def add_lead_time_to_ticket(context):
+
+    context.operations.add_column(
+        'tickets', Column('last_state_change', UTCDateTime, nullable=True))
+
+    context.operations.add_column(
+        'tickets', Column('reaction_time', Integer, nullable=True))
+
+    context.operations.add_column(
+        'tickets', Column('lead_time', Integer, nullable=True))
