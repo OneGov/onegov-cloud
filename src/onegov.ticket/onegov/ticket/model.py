@@ -6,7 +6,8 @@ from onegov.search import ORMSearchable
 from onegov.ticket import handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.user.model import User
-from sqlalchemy import Column, Enum, ForeignKey, Text
+from sedate import utcnow
+from sqlalchemy import Column, Enum, ForeignKey, Integer, Text
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import deferred, relationship
 from uuid import uuid4
@@ -53,6 +54,20 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: use this before deleting the model behind a ticket, lest your ticket
     #: becomes nothing more than a number.
     snapshot = deferred(Column(JSON, nullable=False, default=dict))
+
+    #: a timestamp recorded every time the state changes
+    last_state_change = Column(UTCDateTime, nullable=True)
+
+    #: the time in seconds between the ticket's creation and the time it
+    #: got accepted (changed from open to pending)
+    reaction_time = Column(Integer, nullable=True)
+
+    #: the time in seconds between the ticket's creation and it's closing -
+    #: may be a moving target, so use :attr:`current_lead_time` to get the
+    #: adjusted lead_time based on the current time.
+    #: ``lead_time`` itself is only accurate if the ticket is closed, so in
+    #: reports make sure to account for the ticket state.
+    lead_time = Column(Integer, nullable=True)
 
     # override the created attribute from the timestamp mixin - we don't want
     # it to be deferred by default because we usually need it
@@ -123,6 +138,21 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         return handlers.get(self.handler_code)(
             self, self.handler_id, self.handler_data)
 
+    @property
+    def current_lead_time(self):
+        if self.state == 'closed':
+            return self.lead_time
+
+        elif self.state == 'open':
+            return (utcnow() - self.created).total_seconds()
+
+        elif self.state == 'pending':
+            running_time = (utcnow() - self.last_state_change).total_seconds()
+            return self.lead_time + running_time
+
+        else:
+            raise NotImplementedError
+
     def accept_ticket(self, user):
 
         if self.state == 'pending' and self.user == user:
@@ -131,6 +161,8 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         if self.state != 'open':
             raise InvalidStateChange()
 
+        self.last_state_change = timestamp = self.timestamp()
+        self.reaction_time = (utcnow() - timestamp).total_seconds()
         self.state = 'pending'
         self.user = user
 
@@ -142,6 +174,9 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         if self.state != 'pending':
             raise InvalidStateChange()
 
+        running_time = (utcnow() - self.last_state_change).total_seconds()
+        self.last_state_change = self.timestamp()
+        self.lead_time = (self.lead_time or 0) + running_time
         self.state = 'closed'
 
     def reopen_ticket(self, user):
@@ -151,6 +186,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         if self.state != 'closed':
             raise InvalidStateChange()
 
+        self.last_state_change = self.timestamp()
         self.state = 'pending'
         self.user = user
 
