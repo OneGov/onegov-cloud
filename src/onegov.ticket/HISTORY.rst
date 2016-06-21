@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Keeps track of the reaction & process time of tickets.
+  [href]
+
 0.3.0 (2016-04-14)
 ~~~~~~~~~~~~~~~~~~~
 
