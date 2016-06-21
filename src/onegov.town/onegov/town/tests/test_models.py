@@ -104,7 +104,9 @@ def test_sitecollection(town_app):
         'willkommen-bei-onegov'
     }
 
-    paths = (p for p in os.listdir(module_path('onegov.town', 'forms')))
+    builtin_forms_path = module_path('onegov.town', 'forms/builtin')
+
+    paths = (p for p in os.listdir(builtin_forms_path))
     paths = (p for p in paths if p.endswith('.form'))
     paths = (os.path.basename(p) for p in paths)
     builtin_forms = set(rchop(p, '.form') for p in paths)

@@ -216,7 +216,7 @@ def builtin_form_definitions(path=None):
     in the given or the default path.
 
     """
-    path = path or module_path('onegov.town', 'forms')
+    path = path or module_path('onegov.town', 'forms/builtin')
 
     for filename in os.listdir(path):
         if filename.endswith('.form'):
