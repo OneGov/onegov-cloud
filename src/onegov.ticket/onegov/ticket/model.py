@@ -140,15 +140,17 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
 
     @property
     def current_lead_time(self):
+
         if self.state == 'closed':
             return self.lead_time
 
         elif self.state == 'open':
-            return (utcnow() - self.created).total_seconds()
+            return int((utcnow() - self.created).total_seconds())
 
         elif self.state == 'pending':
             running_time = (utcnow() - self.last_state_change).total_seconds()
-            return self.lead_time + running_time
+            accrued_lead_time = (self.lead_time or 0)
+            return int(self.reaction_time + accrued_lead_time + running_time)
 
         else:
             raise NotImplementedError
@@ -161,8 +163,8 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         if self.state != 'open':
             raise InvalidStateChange()
 
-        self.last_state_change = timestamp = self.timestamp()
-        self.reaction_time = (utcnow() - timestamp).total_seconds()
+        self.last_state_change = state_change = self.timestamp()
+        self.reaction_time = int((state_change - self.created).total_seconds())
         self.state = 'pending'
         self.user = user
 
@@ -174,9 +176,8 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         if self.state != 'pending':
             raise InvalidStateChange()
 
-        running_time = (utcnow() - self.last_state_change).total_seconds()
+        self.lead_time = self.current_lead_time
         self.last_state_change = self.timestamp()
-        self.lead_time = (self.lead_time or 0) + running_time
         self.state = 'closed'
 
     def reopen_ticket(self, user):
