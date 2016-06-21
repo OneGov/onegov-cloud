@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-06-21 17:03+0200\n"
+"POT-Creation-Date: 2016-06-21 15:11+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1268,8 +1268,11 @@ msgstr ""
 msgid "Owner"
 msgstr "Zuständig"
 
-msgid "Created"
-msgstr "Eingang"
+msgid "Reaction Time"
+msgstr "Reaktionszeit"
+
+msgid "Process Time"
+msgstr "Bearbeitungszeit"
 
 msgid ""
 "Your request will be processed shortly. To see the state of your process "

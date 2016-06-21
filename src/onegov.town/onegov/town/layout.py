@@ -1,6 +1,8 @@
+import babel.dates
 import sedate
 
 from cached_property import cached_property
+from datetime import timedelta
 from dateutil import rrule
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
@@ -279,6 +281,15 @@ class Layout(ChameleonLayout):
 
     def format_time_range(self, start, end):
         return utils.format_time_range(start, end)
+
+    def format_timedelta(self, delta):
+        return babel.dates.format_timedelta(
+            delta=delta,
+            locale=self.request.locale
+        )
+
+    def format_seconds(self, seconds):
+        return self.format_timedelta(timedelta(seconds=seconds))
 
 
 class DefaultMailLayout(Layout):

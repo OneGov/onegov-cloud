@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'babel',
         'click',
         'cssmin',
         'elasticsearch',
@@ -50,7 +51,7 @@ setup(
         'onegov.people>=0.0.2',
         'onegov.shared',
         'onegov.search>=0.6.2',
-        'onegov.ticket>=0.0.2',
+        'onegov.ticket>0.3.0',
         'onegov.user',
         'pillow',
         'purl',

@@ -49,17 +49,24 @@
                             </div>
                         </div>
 
-                        <div class="field-display-block">
-                            <div class="field-display-label" i18n:translate>Created</div>
-                            <div class="field-display-data ticket-date">
-                                 ${layout.format_date(ticket.created, 'relative')}
-                            </div>
-                        </div>
-
                         <div class="field-display-block" tal:define="submitter handler.email|ticket.snapshot.email|nothing" tal:condition="submitter">
                             <div class="field-display-label" i18n:translate>Submitter</div>
                             <div class="field-display-data ticket-submitter">
                                 <a href="mailto:${submitter}">${submitter}</a>
+                            </div>
+                        </div>
+
+                        <div class="field-display-block" tal:condition="ticket.reaction_time">
+                            <div class="field-display-label" i18n:translate>Reaction Time</div>
+                            <div class="field-display-data ticket-date">
+                                 ${layout.format_seconds(ticket.reaction_time)}
+                            </div>
+                        </div>
+
+                        <div class="field-display-block" tal:condition="ticket.process_time">
+                            <div class="field-display-label" i18n:translate>Process Time</div>
+                            <div class="field-display-data ticket-date">
+                                 ${layout.format_seconds(ticket.process_time)}
                             </div>
                         </div>
 
