@@ -57,14 +57,17 @@ def add_subtitle_to_ticket(context):
     context.session.flush()
 
 
-@upgrade_task('Add lead time to ticket')
-def add_lead_time_to_ticket(context):
+@upgrade_task('Add process time to ticket')
+def add_process_time_to_ticket(context):
 
-    context.operations.add_column(
-        'tickets', Column('last_state_change', UTCDateTime, nullable=True))
+    if not context.has_column('tickets', 'last_state_change'):
+        context.operations.add_column(
+            'tickets', Column('last_state_change', UTCDateTime, nullable=True))
 
-    context.operations.add_column(
-        'tickets', Column('reaction_time', Integer, nullable=True))
+    if not context.has_column('tickets', 'reaction_time'):
+        context.operations.add_column(
+            'tickets', Column('reaction_time', Integer, nullable=True))
 
-    context.operations.add_column(
-        'tickets', Column('lead_time', Integer, nullable=True))
+    if not context.has_column('tickets', 'process_time'):
+        context.operations.add_column(
+            'tickets', Column('process_time', Integer, nullable=True))

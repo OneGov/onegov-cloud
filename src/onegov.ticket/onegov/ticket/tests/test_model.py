@@ -63,7 +63,7 @@ def test_transitions(session):
         ticket.reopen_ticket(user)  # ..unless it's another user
 
 
-def test_lead_time(session):
+def test_process_time(session):
 
     user = User()
 
@@ -73,62 +73,62 @@ def test_lead_time(session):
         ticket = Ticket(state='open', created=Ticket.timestamp())
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is 0
+        assert ticket.process_time is None
+        assert ticket.current_process_time is 0
         assert ticket.last_state_change is None
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is 10
+        assert ticket.process_time is None
+        assert ticket.current_process_time is 10
         assert ticket.last_state_change is None
 
         ticket.accept_ticket(user)
 
         assert ticket.reaction_time == 10
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time == 10
+        assert ticket.process_time is None
+        assert ticket.current_process_time == 10
         assert ticket.last_state_change == utcnow()
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time == 10
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time == 20
+        assert ticket.process_time is None
+        assert ticket.current_process_time == 20
         assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
 
         ticket.close_ticket()
 
         assert ticket.reaction_time == 10
-        assert ticket.lead_time == 20
-        assert ticket.current_lead_time == 20
+        assert ticket.process_time == 20
+        assert ticket.current_process_time == 20
         assert ticket.last_state_change == utcnow()
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time == 10
-        assert ticket.lead_time == 20
-        assert ticket.current_lead_time == 20
+        assert ticket.process_time == 20
+        assert ticket.current_process_time == 20
         assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
 
         ticket.reopen_ticket(user)
 
         assert ticket.reaction_time == 10
-        assert ticket.lead_time == 20
-        assert ticket.current_lead_time == 30
+        assert ticket.process_time == 20
+        assert ticket.current_process_time == 30
         assert ticket.last_state_change == utcnow()
 
         ticket.close_ticket()
 
         assert ticket.reaction_time == 10
-        assert ticket.lead_time == 30
-        assert ticket.current_lead_time == 30
+        assert ticket.process_time == 30
+        assert ticket.current_process_time == 30
         assert ticket.last_state_change == utcnow()
 
 
-def test_legacy_lead_time(session):
-    """ Tests the lead_time/response_time for existing tickets, which cannot
+def test_legacy_process_time(session):
+    """ Tests the process_time/response_time for existing tickets, which cannot
     be migrated as this information cannot be inferred.
 
     """
@@ -142,43 +142,43 @@ def test_legacy_lead_time(session):
         ticket = Ticket(state='pending', created=Ticket.timestamp(), user=user)
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change is None
 
         ticket.close_ticket()
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow()
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
 
         ticket.reopen_ticket(user)
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow()
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
 
         ticket.close_ticket()
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow()
 
     # test if the changes work for existing closed tickets
@@ -186,27 +186,27 @@ def test_legacy_lead_time(session):
         ticket = Ticket(state='closed', created=Ticket.timestamp())
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change is None
 
         ticket.reopen_ticket(user)
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow()
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
 
         ticket.close_ticket()
 
         assert ticket.reaction_time is None
-        assert ticket.lead_time is None
-        assert ticket.current_lead_time is None
+        assert ticket.process_time is None
+        assert ticket.current_process_time is None
         assert ticket.last_state_change == utcnow()

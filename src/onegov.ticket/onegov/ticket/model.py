@@ -62,12 +62,12 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
     #: got accepted (changed from open to pending)
     reaction_time = Column(Integer, nullable=True)
 
-    #: the time in seconds between the ticket's creation and it's closing -
-    #: may be a moving target, so use :attr:`current_lead_time` to get the
-    #: adjusted lead_time based on the current time.
-    #: ``lead_time`` itself is only accurate if the ticket is closed, so in
+    #: the time in seconds a ticket was in the pending state -
+    #: may be a moving target, so use :attr:`current_process_time` to get the
+    #: adjusted process_time based on the current time.
+    #: ``process_time`` itself is only accurate if the ticket is closed, so in
     #: reports make sure to account for the ticket state.
-    lead_time = Column(Integer, nullable=True)
+    process_time = Column(Integer, nullable=True)
 
     # override the created attribute from the timestamp mixin - we don't want
     # it to be deferred by default because we usually need it
@@ -139,25 +139,26 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             self, self.handler_id, self.handler_data)
 
     @property
-    def current_lead_time(self):
+    def current_process_time(self):
 
         if self.state == 'closed':
-            return self.lead_time
+            return self.process_time
 
         elif self.state == 'open':
             return int((utcnow() - self.created).total_seconds())
 
         elif self.state == 'pending':
 
-            # tickets created before the introduction of lead time do not
+            # tickets created before the introduction of process time do not
             # have the necessary information to be migrated
             if not self.last_state_change or not self.reaction_time:
                 return None
 
             running_time = (utcnow() - self.last_state_change).total_seconds()
-            accrued_lead_time = (self.lead_time or 0)
+            accrued_process_time = (self.process_time or 0)
 
-            return int(self.reaction_time + accrued_lead_time + running_time)
+            return int(
+                self.reaction_time + accrued_process_time + running_time)
 
         else:
             raise NotImplementedError
@@ -183,7 +184,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
         if self.state != 'pending':
             raise InvalidStateChange()
 
-        self.lead_time = self.current_lead_time
+        self.process_time = self.current_process_time
         self.last_state_change = self.timestamp()
         self.state = 'closed'
 
