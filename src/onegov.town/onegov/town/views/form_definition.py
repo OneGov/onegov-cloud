@@ -5,7 +5,7 @@ from onegov.core.utils import Bunch, normalize_for_url
 from onegov.form import FormCollection, FormDefinition
 from onegov.town import _, TownApp
 from onegov.town.elements import Link
-from onegov.town.forms import BuiltinDefinitionForm, CustomDefinitionForm
+from onegov.town.forms import CustomDefinitionForm
 from onegov.town.layout import FormEditorLayout
 from onegov.town.models import CustomFormDefinition
 from webob import exc
@@ -17,7 +17,6 @@ def get_form_class(model, request):
         model = CustomFormDefinition()
 
     form_classes = {
-        'builtin': BuiltinDefinitionForm,
         'custom': CustomDefinitionForm
     }
 

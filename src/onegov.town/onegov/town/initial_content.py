@@ -203,7 +203,7 @@ def add_builtin_forms(session, definitions=None):
                 name=name,
                 title=title,
                 definition=definition,
-                type='builtin'
+                type='custom'
             )
 
         assert form.form_class().has_required_email_field, (

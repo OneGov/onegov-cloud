@@ -4,17 +4,12 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 from onegov.core.orm.abstract import sort_siblings
 from onegov.core.upgrade import upgrade_task
-from onegov.form import FormCollection
+from onegov.form import FormCollection, FormDefinition
 from onegov.libres import ResourceCollection
 from onegov.page import PageCollection
 from onegov.town import TownApp
-from onegov.town.initial_content import add_builtin_forms, add_resources
+from onegov.town.initial_content import add_resources
 from onegov.town.models.extensions import ContactExtension
-
-
-@upgrade_task('Update builtin forms')
-def update_builtin_forms(context, always_run=True):
-    add_builtin_forms(context.session)
 
 
 @upgrade_task('Add initial libres resources')
@@ -60,3 +55,12 @@ def change_contact_html(context):
 
         # forces a re-render of the contact html
         item.contact = item.contact
+
+
+@upgrade_task('Convert builtin forms into custom forms')
+def convert_builtin_forms(context):
+    forms = FormCollection(context.session)
+
+    query = forms.definitions.query()
+    query = query.filter(FormDefinition.type == 'builtin')
+    query.update({FormDefinition.type: 'custom'})

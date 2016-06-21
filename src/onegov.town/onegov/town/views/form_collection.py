@@ -1,4 +1,4 @@
-""" Lists the builtin and custom forms. """
+""" Lists the custom forms. """
 
 from onegov.core.security import Public
 from onegov.form import FormCollection

@@ -509,18 +509,7 @@ class FormSubmissionLayout(DefaultLayout):
             classes=('edit-link', )
         )
 
-        if self.form.type == 'builtin':
-            delete_link = DeleteLink(
-                text=_("Delete"),
-                url=self.request.link(self.form),
-                confirm=_("This form can't be deleted."),
-                extra_information=_(
-                    "This is a builtin-form. "
-                    "Builtin-forms can't be deleted."
-                )
-            )
-
-        elif self.form.has_submissions(with_state='complete'):
+        if self.form.has_submissions(with_state='complete'):
             delete_link = DeleteLink(
                 text=_("Delete"),
                 url=self.request.link(self.form),

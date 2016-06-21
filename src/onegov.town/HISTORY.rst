@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Builtin forms may now be deleted/edited just like custom forms.
+  [href]
+
 - Fixes telephone number on people records being unclickable.
   [href]
   

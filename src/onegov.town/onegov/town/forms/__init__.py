@@ -5,10 +5,7 @@ from onegov.town.forms.allocation import (
     RoomAllocationEditForm
 )
 from onegov.town.forms.event import EventForm
-from onegov.town.forms.form_definition import (
-    BuiltinDefinitionForm,
-    CustomDefinitionForm
-)
+from onegov.town.forms.form_definition import CustomDefinitionForm
 from onegov.town.forms.newsletter import NewsletterForm, NewsletterSendForm
 from onegov.town.forms.page import LinkForm, PageForm
 from onegov.town.forms.person import PersonForm
@@ -27,7 +24,6 @@ from onegov.town.forms.signup import SignupForm
 from onegov.town.forms.userprofile import UserProfileForm
 
 __all__ = [
-    'BuiltinDefinitionForm',
     'CustomDefinitionForm',
     'DaypassAllocationForm',
     'DaypassAllocationEditForm',

@@ -22,20 +22,6 @@ class FormDefinitionBaseForm(Form):
         filters=[sanitize_html, annotate_html])
 
 
-class BuiltinDefinitionForm(FormDefinitionBaseForm):
-    """ Form to edit builtin forms. """
-
-    definition = TextAreaField(
-        label=_("Definition"),
-        validators=[validators.InputRequired(), ValidFormDefinition()],
-        render_kw={
-            'rows': 24,
-            'readonly': 'readonly',
-            'data-editor': 'form'
-        }
-    )
-
-
 class CustomDefinitionForm(FormDefinitionBaseForm):
     """ Same as the default form definition form, but with the definition
     made read-only.
