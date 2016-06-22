@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Tickets now include a reaction and a process time.
+  [href]
+
 - Builtin forms may now be deleted/edited just like custom forms.
   [href]
 
