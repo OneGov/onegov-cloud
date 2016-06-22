@@ -59,6 +59,9 @@ HEADERS_PROPORZ = [
 
 
 def parse_election(line, errors):
+    mandates = 0
+    counted = 0
+    total = 0
     try:
         mandates = int(line.anzahl_sitze or 0)
         numbers = line.anzahl_gemeinden.split(' von ')
@@ -69,8 +72,7 @@ def parse_election(line, errors):
             total = int(numbers[1])
     except ValueError:
         errors.append(_("Invalid election values"))
-    else:
-        return mandates, counted, total
+    return mandates, counted, total
 
 
 def parse_election_result(line, errors, municipalities):

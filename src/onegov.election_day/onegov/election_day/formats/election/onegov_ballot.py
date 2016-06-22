@@ -38,6 +38,8 @@ HEADERS = [
 
 
 def parse_election(line, errors):
+    counted = 0
+    total = 0
     absolute_majority = None
     try:
         if line.election_absolute_majority:
@@ -46,8 +48,7 @@ def parse_election(line, errors):
         total = int(line.election_total_municipalites or 0)
     except ValueError:
         errors.append(_("Invalid election values"))
-    else:
-        return counted, total, absolute_majority
+    return counted, total, absolute_majority
 
 
 def parse_election_result(line, errors, municipalities):
