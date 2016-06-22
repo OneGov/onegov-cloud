@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.0 (2016-06-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Keeps track of the reaction & process time of tickets.
   [href]
 
