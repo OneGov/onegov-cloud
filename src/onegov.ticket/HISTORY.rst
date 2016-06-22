@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes reaction time from process time (should not be included).
+  [href]
+
 0.4.0 (2016-06-22)
 ~~~~~~~~~~~~~~~~~~~
 

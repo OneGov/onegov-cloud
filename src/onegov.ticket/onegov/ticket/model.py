@@ -157,8 +157,7 @@ class Ticket(Base, TimestampMixin, ORMSearchable):
             running_time = (utcnow() - self.last_state_change).total_seconds()
             accrued_process_time = (self.process_time or 0)
 
-            return int(
-                self.reaction_time + accrued_process_time + running_time)
+            return int(accrued_process_time + running_time)
 
         else:
             raise NotImplementedError

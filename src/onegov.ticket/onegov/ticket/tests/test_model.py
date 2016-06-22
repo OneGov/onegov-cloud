@@ -88,42 +88,49 @@ def test_process_time(session):
 
         assert ticket.reaction_time == 10
         assert ticket.process_time is None
-        assert ticket.current_process_time == 10
+        assert ticket.current_process_time == 0
         assert ticket.last_state_change == utcnow()
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time == 10
         assert ticket.process_time is None
-        assert ticket.current_process_time == 20
+        assert ticket.current_process_time == 10
         assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
 
         ticket.close_ticket()
 
         assert ticket.reaction_time == 10
-        assert ticket.process_time == 20
-        assert ticket.current_process_time == 20
+        assert ticket.process_time == 10
+        assert ticket.current_process_time == 10
         assert ticket.last_state_change == utcnow()
 
         frozen.tick(delta=timedelta(seconds=10))
 
         assert ticket.reaction_time == 10
-        assert ticket.process_time == 20
-        assert ticket.current_process_time == 20
+        assert ticket.process_time == 10
+        assert ticket.current_process_time == 10
         assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
 
         ticket.reopen_ticket(user)
 
         assert ticket.reaction_time == 10
-        assert ticket.process_time == 20
-        assert ticket.current_process_time == 30
+        assert ticket.process_time == 10
+        assert ticket.current_process_time == 10
         assert ticket.last_state_change == utcnow()
+
+        frozen.tick(delta=timedelta(seconds=10))
+
+        assert ticket.reaction_time == 10
+        assert ticket.process_time == 10
+        assert ticket.current_process_time == 20
+        assert ticket.last_state_change == utcnow() - timedelta(seconds=10)
 
         ticket.close_ticket()
 
         assert ticket.reaction_time == 10
-        assert ticket.process_time == 30
-        assert ticket.current_process_time == 30
+        assert ticket.process_time == 20
+        assert ticket.current_process_time == 20
         assert ticket.last_state_change == utcnow()
 
 
