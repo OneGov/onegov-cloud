@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.9.0 (2016-06-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Tickets now include a reaction and a process time.
   [href]
 
