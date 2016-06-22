@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Depend on latest onegov.ticket release which fixes a critical bug.
+  [href]
+
 1.9.0 (2016-06-22)
 ~~~~~~~~~~~~~~~~~~~
 

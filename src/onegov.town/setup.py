@@ -51,7 +51,7 @@ setup(
         'onegov.people>=0.0.2',
         'onegov.shared',
         'onegov.search>=0.6.2',
-        'onegov.ticket>0.3.0',
+        'onegov.ticket>=0.4.1',
         'onegov.user',
         'pillow',
         'purl',
