@@ -90,6 +90,13 @@
                 </div>
             </div>
 
+            <div class="row" tal:condition="not: majorz">
+                <div class="small-12 small-centered medium-12 large-10 columns">
+                    <div class="sankey-chart" data-dataurl="${request.link(election, name='connections')}"></div>
+                </div>
+            </div>
+
+
             <div class="foldable" tal:condition="not: majorz">
                 <h3 class="foldable-title" i18n:translate>Candidates</h3>
                 <div class="foldable-panel">
@@ -122,6 +129,7 @@
 
             <div class="foldable folded" tal:condition="not: majorz">
                 <h3 class="foldable-title" i18n:translate>List connections</h3>
+
                 <div class="foldable-panel">
                     <tal:block tal:repeat="connection connections">
                         <table class="ballot-results">

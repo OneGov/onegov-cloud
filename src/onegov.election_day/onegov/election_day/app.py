@@ -186,6 +186,13 @@ def get_bar_chart_asset():
     yield 'bar-chart.js'
 
 
+@ElectionDayApp.webasset('sankey_chart')
+def get_sankey_chart_asset():
+    yield 'd3'
+    yield 'sankey.js'
+    yield 'sankey-chart.js'
+
+
 @ElectionDayApp.webasset('ballot_map')
 def get_ballot_map_asset():
     yield 'd3'
