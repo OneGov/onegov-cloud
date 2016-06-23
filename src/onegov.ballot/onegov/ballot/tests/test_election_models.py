@@ -379,13 +379,13 @@ def test_election_results(session):
     list_2 = List(
         id=uuid4(),
         list_id='2',
-        number_of_mandates=0,
+        number_of_mandates=1,
         name='Kwik-E-Major',
     )
     list_3 = List(
         id=uuid4(),
         list_id='3',
-        number_of_mandates=0,
+        number_of_mandates=2,
         name='Partey A',
     )
     list_4 = List(
@@ -565,6 +565,13 @@ def test_election_results(session):
     list_4.connection_id = subconnection.id
 
     session.flush()
+
+    assert connection_1.number_of_mandates == 1
+    assert connection_2.number_of_mandates == 1
+    assert subconnection.number_of_mandates == 2
+    assert connection_1.total_number_of_mandates == 1
+    assert connection_2.total_number_of_mandates == 3
+    assert subconnection.total_number_of_mandates == 2
 
     assert sorted((c.votes for c in election.list_connections)) == [111, 540]
     assert sorted((c.total_votes for c in election.list_connections)) == [

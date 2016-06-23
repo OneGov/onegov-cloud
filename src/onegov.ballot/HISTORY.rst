@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds the number of allocated mandates to the list connection model.
+  [msom]
+
 0.5.0 (2016-06-10)
 ~~~~~~~~~~~~~~~~~~~
 

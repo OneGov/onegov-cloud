@@ -400,7 +400,7 @@ class ListConnection(Base, TimestampMixin):
 
     __tablename__ = 'list_connections'
 
-    summarized_properties = ['votes']
+    summarized_properties = ['votes', 'number_of_mandates']
 
     #: internal id of the list
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -414,7 +414,7 @@ class ListConnection(Base, TimestampMixin):
     #: ID of the parent
     parent_id = Column(UUID, ForeignKey('list_connections.id'), nullable=True)
 
-    #: a list contains n candidates
+    #: a list connection contains n lists
     lists = relationship(
         "List",
         cascade="all, delete-orphan",
@@ -436,6 +436,13 @@ class ListConnection(Base, TimestampMixin):
     def total_votes(self):
         """ Returns the total number of votes. """
         return self.votes + sum(child.total_votes for child in self.children)
+
+    @property
+    def total_number_of_mandates(self):
+        """ Returns the total number of mandates. """
+        return self.number_of_mandates + sum(
+            child.total_number_of_mandates for child in self.children
+        )
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
