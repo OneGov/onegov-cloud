@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from morepath.request import Response
 from onegov.ballot import (
     Candidate,
@@ -221,55 +222,51 @@ def view_election_connections(self, request):
     if self.type == 'majorz':
         return {}
 
-    nodes = []
+    nodes = OrderedDict()
     links = []
-    for list in self.lists:
-        nodes.append(list.name)
-        source_id = len(nodes) - 1
-        if list.connection:
-            if list.connection.parent:
-                connection_name = 'ULV {}'.format(
-                    list.connection.connection_id
-                )
-            else:
-                connection_name = 'LV {}'.format(
-                    list.connection.connection_id
-                )
-            try:
-                target_id = nodes.index(connection_name)
-            except ValueError:
-                nodes.append(connection_name)
-                target_id = len(nodes) - 1
-            links.append((source_id, target_id, list.votes))
 
+    def class_(x):
+        return 'active' if x > 0 else 'inactive'
+
+    # Add lists
+    for list_ in self.lists:
+        nodes[list_.id] = {
+            'name': list_.name,
+            'value_2': list_.number_of_mandates,
+            'class': class_(list_.number_of_mandates),
+        }
+        if list_.connection:
+            nodes.setdefault(list_.connection.id, {
+                'name': '',
+                'value_2': list_.connection.total_number_of_mandates,
+                'class': class_(list_.connection.total_number_of_mandates),
+            })
+            links.append({
+                'source': list(nodes.keys()).index(list_.id),
+                'target': list(nodes.keys()).index(list_.connection.id),
+                'value': list_.votes
+            })
+
+    # Add remaining connections
     for connection in self.list_connections:
         if connection.parent:
-            source_name = 'ULV {}'.format(
-                connection.connection_id
-            )
-            target_name = 'LV {}'.format(
-                connection.parent.connection_id
-            )
-            try:
-                source_id = nodes.index(source_name)
-            except ValueError:
-                nodes.append(source_name)
-                source_id = len(nodes) - 1
-            try:
-                target_id = nodes.index(target_name)
-            except ValueError:
-                nodes.append(target_name)
-                target_id = len(nodes) - 1
-
-            links.append((source_id, target_id, connection.votes))
+            nodes.setdefault(connection.id, {
+                'name': '',
+                'value_2': connection.total_number_of_mandates,
+                'class': class_(connection.total_number_of_mandates),
+            })
+            nodes.setdefault(connection.parent.id, {
+                'name': '',
+                'value_2': connection.parent.total_number_of_mandates,
+                'class': class_(connection.parent.total_number_of_mandates),
+            })
+            links.append({
+                'source': list(nodes.keys()).index(connection.id),
+                'target': list(nodes.keys()).index(connection.parent.id),
+                'value': connection.votes
+            })
 
     return {
-        'nodes': [{
-            'name': node,
-        } for node in nodes],
-        'links': [{
-            'source': link[0],
-            'target': link[1],
-            'value': link[2],
-        } for link in links]
+        'nodes': list(nodes.values()),
+        'links': links
     }

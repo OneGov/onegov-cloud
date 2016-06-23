@@ -382,6 +382,39 @@ table {
 }
 
 /*
+    Sankey Chart
+*/
+.sankey-chart {
+    margin-bottom: 2rem;
+    margin-top: 2rem;
+
+    text {
+        font: 14px sans-serif;
+        pointer-events: none;
+    }
+
+    .node rect {
+        cursor: move;
+        fill: $aluminum;
+        shape-rendering: crispEdges;
+
+        &.active {
+            fill: $accepted-color;
+        }
+    }
+
+    .link {
+      fill: none;
+      stroke: $black;
+      stroke-opacity: .2;
+
+      &:hover {
+        stroke-opacity: .4;
+      }
+    }
+}
+
+/*
     Voting Factoids
 */
 .factoids {

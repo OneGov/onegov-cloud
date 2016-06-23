@@ -12,7 +12,9 @@ $('.collapsible .more, .collapsible .less').click(function() {
 });
 
 // fold sections wishing to be foldable
-$('.foldable.folded .foldable-panel').hide();
+$( window ).load(function() {
+    $('.foldable.folded .foldable-panel').hide();
+});
 $('.foldable .foldable-title').click(function() {
     $(this).parents('.foldable').toggleClass('folded');
     $(this).parents('.foldable').find('.foldable-panel').toggle();
