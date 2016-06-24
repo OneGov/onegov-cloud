@@ -388,28 +388,16 @@ table {
     margin-bottom: 2rem;
     margin-top: 2rem;
 
-    text {
-        font: 14px sans-serif;
-        pointer-events: none;
-    }
-
     .node rect {
-        cursor: move;
-        fill: $aluminum;
-        shape-rendering: crispEdges;
-
+        fill: $aluminum !important;
         &.active {
-            fill: $accepted-color;
+            fill: $accepted-color !important;
         }
     }
 
     .link {
-      fill: none;
-      stroke: $black;
-      stroke-opacity: .2;
-
       &:hover {
-        stroke-opacity: .4;
+        stroke-opacity: .4 !important;
       }
     }
 }

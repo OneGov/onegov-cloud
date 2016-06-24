@@ -50,21 +50,21 @@ d3.sankey = function() {
     return sankey;
   };
 
-  sankey.link = function() {
-    var curvature = .5;
+  sankey.link = function(scale) {
+    var curvature = 0.5;
 
     function link(d) {
-      var x0 = d.source.x + d.source.dx,
-          x1 = d.target.x,
+      var x0 = scale(d.source.x) + d.source.dx,
+          x1 = scale(d.target.x),
           xi = d3.interpolateNumber(x0, x1),
           x2 = xi(curvature),
           x3 = xi(1 - curvature),
           y0 = d.source.y + d.sy + d.dy / 2,
           y1 = d.target.y + d.ty + d.dy / 2;
-      return "M" + x0 + "," + y0
-           + "C" + x2 + "," + y0
-           + " " + x3 + "," + y1
-           + " " + x1 + "," + y1;
+      return "M" + x0 + "," + y0 +
+             "C" + x2 + "," + y0 +
+             " " + x3 + "," + y1 +
+             " " + x1 + "," + y1;
     }
 
     link.curvature = function(_) {
@@ -165,7 +165,7 @@ d3.sankey = function() {
     initializeNodeDepth();
     resolveCollisions();
     for (var alpha = 1; iterations > 0; --iterations) {
-      relaxRightToLeft(alpha *= .99);
+      relaxRightToLeft(alpha *= 0.99);
       resolveCollisions();
       relaxLeftToRight(alpha);
       resolveCollisions();

@@ -12,12 +12,17 @@ $('.collapsible .more, .collapsible .less').click(function() {
 });
 
 // fold sections wishing to be foldable
-$( window ).load(function() {
-    $('.foldable.folded .foldable-panel').hide();
-});
+$('.foldable.folded .foldable-panel').hide();
 $('.foldable .foldable-title').click(function() {
     $(this).parents('.foldable').toggleClass('folded');
-    $(this).parents('.foldable').find('.foldable-panel').toggle();
+    var hide = $(this).parents('.foldable').hasClass('folded');
+    if (hide) {
+        $(this).parents('.foldable').find('.foldable-panel').hide();
+        $(this).parents('.foldable').find('.foldable-svg-panel').hide();
+    } else {
+        $(this).parents('.foldable').find('.foldable-panel').show();
+        $(this).parents('.foldable').find('.foldable-svg-panel').show();
+    }
 });
 
 // force all dropdowns to be rendered in the direction specified in the

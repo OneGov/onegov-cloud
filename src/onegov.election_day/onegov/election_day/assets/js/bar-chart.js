@@ -90,6 +90,12 @@ var init_bar_chart = function(el) {
                 .style("stroke-dasharray", ("4, 4"));
         }
 
+        if ($(el).is('.foldable.folded .foldable-svg-panel .bar-chart')) {
+            $(el).closest('.foldable-svg-panel').each(function() {
+                $(this).hide();
+            });
+        }
+
     });
 
     d3.select(window).on('resize', function() {

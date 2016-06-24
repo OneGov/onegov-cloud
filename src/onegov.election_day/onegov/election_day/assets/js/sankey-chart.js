@@ -1,17 +1,21 @@
 var init_sankey_chart = function(el) {
 
+    var offsetMargin = 6;
     var dataurl = $(el).data('dataurl');
     var width = $(el).width();
     var height = 600;
     var svg = d3.select(el).append('svg')
         .attr('width', width)
         .attr('height', height + 15);
+    var offset = width * 0.25;
+    var scale = d3.scale.linear();
     var sankey = d3.sankey()
-        .nodeWidth(20)
+        .nodeWidth(25)
         .nodePadding(15)
         .size([width, height]);
-
-    var path = sankey.link();
+    var node = null;
+    var link = null;
+    var path = null;
 
     $.ajax({ url: dataurl }).done(function(data) {
 
@@ -19,22 +23,10 @@ var init_sankey_chart = function(el) {
             .links(data.links)
             .layout(1);
 
-        var link = svg.append("g").selectAll(".link")
-            .data(data.links)
-            .enter().append("path")
-            .attr("class", "link")
-            .attr("d", path)
-            .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-            .sort(function(a, b) { return b.dy - a.dy; });
-
-        link.append("title")
-            .text(function(d) { return d.value; });
-
-        var node = svg.append("g").selectAll(".node")
+        node = svg.append("g").selectAll(".node")
             .data(data.nodes)
             .enter().append("g")
             .attr("class", "node")
-            .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
             .call(
                 d3.behavior.drag()
                     .origin(function(d) { return d; })
@@ -42,30 +34,85 @@ var init_sankey_chart = function(el) {
                     .on("drag", dragmove)
             );
 
-        node.append("rect")
+        var bar = node.append("rect")
             .attr("height", function(d) { return d.dy; })
-            .attr("width", sankey.nodeWidth())
             .attr("class", function(d) { return d.class; })
-            .append("title")
+            .attr("width", sankey.nodeWidth())
+            .style("cursor", "move")
+            .style("fill", "#999")
+            .style("shape-rendering", "crispEdges");
+        bar.append("title")
             .text(function(d) { return d.value_2; });
 
-        node.append("text")
-            .attr("x", -6)
+        node.filter(function(d) { return d.value_2 > 0; })
+            .append("text")
+            .text(function(d) { return d.value_2; })
+            .attr("x", 0)
             .attr("y", function(d) { return d.dy / 2; })
+            .attr("dx", ".5em")
+            .attr("dy", ".35em")
+            .style("font-size", "14px")
+            .style("font-family", "sans-serif")
+            .style("pointer-events", "none");
+
+        var name = node.filter(function(d) { return d.name; })
+            .append("text")
+            .text(function(d) { return d.name; })
+            .attr("x", 0)
+            .attr("y", function(d) { return d.dy / 2; })
+            .attr("dx", -offsetMargin)
             .attr("dy", ".35em")
             .attr("text-anchor", "end")
-            .attr("transform", null)
-            .text(function(d) { return d.name; })
-            .filter(function(d) { return d.x < width / 2; })
-            .attr("x", 6 + sankey.nodeWidth())
-            .attr("text-anchor", "start");
+            .style("font-size", "14px")
+            .style("font-family", "sans-serif")
+            .style("pointer-events", "none");
 
-      function dragmove(d) {
-        d3.select(this).attr("transform", "translate(" + d.x + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
-        sankey.relayout();
-        link.attr("d", path);
-      }
-  });
+        offset = d3.max(name[0], function(d) {return d.getBBox().width;});
+        scale.domain([0, width]).range([offset+offsetMargin, width-2*offsetMargin]);
+
+        node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
+        // bar.attr("width", sankey.nodeWidth() * (width-offset) / width);
+
+        path = sankey.link(scale);
+        link = svg.append("g").selectAll(".link")
+            .data(data.links)
+            .enter().append("path")
+            .attr("class", "link")
+            .attr("d", path)
+            .style("stroke", "#000")
+            .style("stroke-opacity", "0.2")
+            .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+            .style("fill", "none")
+            .sort(function(a, b) { return b.dy - a.dy; });
+
+        link.append("title")
+            .text(function(d) { return d.value; });
+
+        function dragmove(d) {
+            d3.select(this).attr("transform", "translate(" + scale(d.x) + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+            sankey.relayout();
+            link.attr("d", path);
+        }
+
+        if ($(el).is('.foldable.folded .foldable-svg-panel .sankey-chart')) {
+            $(el).closest('.foldable-svg-panel').each(function() {
+                $(this).hide();
+            });
+        }
+    });
+
+    d3.select(window).on('resize', function() {
+        if (node && link && path) {
+            // Resize
+            width = $(el).width();
+            scale.range([offset+offsetMargin, width-2*offsetMargin]);
+
+            svg.attr('width', width);
+            node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
+            path = sankey.link(scale);
+            link.attr("d", path);
+        }
+    });
 
 };
 
