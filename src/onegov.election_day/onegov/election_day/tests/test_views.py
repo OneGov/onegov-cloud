@@ -328,6 +328,63 @@ def test_view_election_lists(election_day_app_gr):
     assert all((expected in lists for expected in ("FDP", "8", "CVP", "5")))
 
 
+def test_view_election_connections(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    csv = (
+        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
+        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Listen-Nr,"
+        "Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,Anzahl Sitze Liste,"
+        "Unveränderte Wahlzettel Liste,Veränderte Wahlzettel Liste,"
+        "Kandidatenstimmen unveränderte Wahlzettel,"
+        "Zusatzstimmen unveränderte Wahlzettel,"
+        "Kandidatenstimmen veränderte Wahlzettel,"
+        "Zusatzstimmen veränderte Wahlzettel,Kandidaten-Nr,Gewählt,Name,"
+        "Vorname,Stimmen unveränderte Wahlzettel,"
+        "Stimmen veränderte Wahlzettel,Stimmen Total aus Wahlzettel,"
+        "01 FDP,02 CVP, Anzahl Gemeinden\n"
+    )
+    csv += (
+        "5,3503,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
+        "nicht gewählt,Casanova,Angela,0,0,0,0,0,1 von 1\n"
+    )
+    csv += (
+        "5,3503,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
+        "nicht gewählt,Caluori,Corina,1,0,1,0,0,1 von 1\n"
+    )
+    csv = csv.encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    data = client.get('/election/election/connections').json
+
+    nodes = [node['name'] for node in data['nodes']]
+    assert 'FDP' in nodes
+    assert 'CVP' in nodes
+
+    links = [
+        '{}:{}'.format(link['source'], link['value']) for link in data['links']
+    ]
+    assert '{}:8'.format(nodes.index('FDP')) in links
+    assert '{}:5'.format(nodes.index('CVP')) in links
+
+
 def test_view_election_export(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
