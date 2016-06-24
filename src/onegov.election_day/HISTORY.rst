@@ -1,35 +1,29 @@
 Changelog
 ---------
 
+- Adds diagrams to visualize list connections.
+  [msom]
+
+- Adds new import formats: Vote/Wabsti, Vote/Internal, Election/Internal.
+  [msom]
+
 - Adds compatibility with Morepath 0.13.
   [href]
 
 - Adds French translations.
   [freinhard]
 
-- Adds Italian translations.
-  [msom]
-
-- Adds Romansh translations.
+- Adds Romansh and Italian translations.
   [msom]
 
 - Fixes javascript for form dependencies.
   [msom]
 
-- Cleanup file/directory structure.
+- Cleans up file/directory structure.
   [msom]
 
 - Sorts the sublists by the ID of the list when displaying list connection
   results of elections.
-  [msom]
-
-- Allows to import elections with the format used for the export.
-  [msom]
-
-- Allows to import votes with the format used for the export.
-  [msom]
-
-- Allows to import votes from Wabsti.
   [msom]
 
 0.7.2 (2016-03-18)
