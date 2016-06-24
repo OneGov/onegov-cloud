@@ -9,7 +9,8 @@ var setupReservationCalendar = function(calendar) {
         editUrl: calendar.data('edit-url'),
         view: calendar.data('view'),
         date: calendar.data('date'),
-        highlights: calendar.data('highlights'),
+        highlights_min: calendar.data('highlights-min'),
+        highlights_max: calendar.data('highlights-max'),
         reservations: calendar.data('reservations'),
         reservationform: calendar.data('reservationform')
     });

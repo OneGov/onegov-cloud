@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes allocations spanning more than a year leading to a 502 on the sever.
+  [href]
+
 1.9.1 (2016-06-22)
 ~~~~~~~~~~~~~~~~~~~
 

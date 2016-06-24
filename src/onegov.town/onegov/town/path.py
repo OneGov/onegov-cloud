@@ -172,15 +172,17 @@ def get_resources(app):
     return app.libres_resources
 
 
-@TownApp.path(model=Resource, path='/ressource/{name}',
-              converters=dict(date=date, highlights=[int]))
-def get_resource(app, name, date=None, highlights=tuple(), view='agendaWeek'):
+@TownApp.path(model=Resource, path='/ressource/{name}', converters=dict(
+              date=date, highlights_min=int, highlights_max=int))
+def get_resource(app, name, date=None, view='agendaWeek',
+                 highlights_min=None, highlights_max=None):
 
     resource = app.libres_resources.by_name(name)
 
     if resource:
         resource.date = date
-        resource.highlights = highlights
+        resource.highlights_min = highlights_min
+        resource.highlights_max = highlights_max
         resource.view = view
 
     return resource

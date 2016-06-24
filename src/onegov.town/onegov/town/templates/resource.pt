@@ -23,7 +23,8 @@
             data-select-url="${request.link(resource, name='neue-einteilung')}"
             data-view="${resource.view}"
             data-date="${resource.date and resource.date.isoformat() or ''}"
-            data-highlights="[${resource.highlights and ','.join(str(h) for h in resource.highlights) or ''}]"
+            data-highlights-min="${resource.highlights_min or ''}"
+            data-highlights-max="${resource.highlights_max or ''}"
         ></div>
 
         <div class="clearfix"></div>

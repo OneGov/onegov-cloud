@@ -60,7 +60,8 @@ var defaultOptions = {
     /*
         The event ids to highlight for a short while
     */
-    highlights: []
+    highlights_min: null,
+    highlights_max: null
 };
 
 rc.events = [
@@ -91,7 +92,8 @@ rc.getFullcalendarOptions = function(options) {
         editable: rcOptions.editable,
         selectable: rcOptions.editable,
         defaultView: rcOptions.view,
-        highlights: rcOptions.highlights,
+        highlights_min: rcOptions.highlights_min,
+        highlights_max: rcOptions.highlights_max,
         afterSetup: [],
         viewRenderers: [],
         eventRenderers: [],
@@ -230,7 +232,14 @@ rc.setupEventPopups = function(event, element, view) {
 
 // highlight events implementation
 rc.highlightEvents = function(event, element, view) {
-    if (_.contains(view.calendar.options.highlights, event.id)) {
+    var min = view.calendar.options.highlights_min;
+    var max = view.calendar.options.highlights_max;
+
+    if (min === null || max === null) {
+        return;
+    }
+
+    if (min <= event.id && event.id <= max) {
         $(element).addClass('highlight');
     }
 };
