@@ -69,14 +69,24 @@ class Resource(ORMBase, ModelBase, ContentMixin, TimestampMixin):
     date = None
 
     #: a list of allocations ids to highlight in the view (if not None)
-    highlights = None
+    highlights_min = None
+    highlights_max = None
 
     #: the view to open in the calendar (fullCalendar view name)
     view = 'month'
 
     def highlight_allocations(self, allocations):
         """ The allocation to jump to in the view. """
-        self.highlights = [a.id for a in allocations]
+
+        # we can assume that allocation ids are created in a continuous
+        # number line. It's not necessarily guaranteed, but since it *is*
+        # only a highlighting feature we can check the highlights more
+        # effiecently if we follow this assumption.
+        highlights = [a.id for a in allocations]
+
+        self.highlights_min = min(highlights)
+        self.highlights_max = max(highlights)
+
         self.date = allocations[0].start.date()
 
     def get_scheduler(self, libres_context):

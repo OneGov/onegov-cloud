@@ -52,7 +52,8 @@ def test_resource_highlight_allocations(libres_context):
     resource = collection.add('Executive Lounge', 'Europe/Zurich')
 
     assert resource.date is None
-    assert resource.highlights is None
+    assert resource.highlights_min is None
+    assert resource.highlights_max is None
 
     scheduler = resource.get_scheduler(libres_context)
     dates = (datetime(2015, 8, 5, 12), datetime(2015, 8, 5, 18))
@@ -61,7 +62,8 @@ def test_resource_highlight_allocations(libres_context):
     resource.highlight_allocations(allocations)
 
     assert resource.date == date(2015, 8, 5)
-    assert resource.highlights == [allocations[0].id]
+    assert resource.highlights_min == allocations[0].id
+    assert resource.highlights_min == allocations[-1].id
 
 
 def test_resource_form_definition(libres_context):

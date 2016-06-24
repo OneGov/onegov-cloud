@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Change highlighting from a list to a simple range.
+  [href]
+
 0.2.1 (2016-04-27)
 ~~~~~~~~~~~~~~~~~~~
 
