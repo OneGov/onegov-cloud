@@ -28,7 +28,9 @@ var init_ballot_map = function(el) {
 
     var map = $(el);
     var path = d3.geo.path().projection(null);
-    var svg = d3.select(el).append('svg').attr('xmlns', "http://www.w3.org/2000/svg");
+    var svg = d3.select(el).append('svg')
+        .attr('xmlns', "http://www.w3.org/2000/svg")
+        .attr('version', '1.1');
 
     svg.append('defs')
        .append('pattern')
@@ -199,14 +201,17 @@ var init_ballot_map = function(el) {
                 });
             });
 
-            $(el).append(
-                $('<a>')
-                    .attr('class', 'svg-download')
-                    .attr('href-lang', 'image/svg+xml')
-                    .attr('href', 'data:image/svg+xml;utf8,' +  unescape($(el).find('svg')[0].outerHTML))
-                    .attr('download', 'map.svg')
-                    .text('Download')
-            );
+            var svgData = $(el).find('svg')[0].outerHTML;
+            if (svgData) {
+                $(el).append(
+                    $('<a>')
+                        .attr('class', 'svg-download')
+                        .attr('href-lang', 'image/svg+xml')
+                        .attr('href', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData))))
+                        .attr('download', 'map.svg')
+                        .text('Download')
+                );
+            }
         });
     });
 };

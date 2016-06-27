@@ -7,7 +7,8 @@ var init_sankey_chart = function(el) {
     var svg = d3.select(el).append('svg')
         .attr('width', width)
         .attr('height', height + 15)
-        .attr('xmlns', "http://www.w3.org/2000/svg");
+        .attr('xmlns', "http://www.w3.org/2000/svg")
+        .attr('version', '1.1');
     var offset = width * 0.25;
     var scale = d3.scale.linear();
     var sankey = d3.sankey()
@@ -42,7 +43,7 @@ var init_sankey_chart = function(el) {
             .style("fill", "#999")
             .style("shape-rendering", "crispEdges")
             .filter(function(d) { return d.value_2 > 0; })
-            .style("fill", "0571b0");
+            .style("fill", "#0571b0");
         bar.append("title")
             .text(function(d) { return d.value_2; });
 
@@ -81,10 +82,7 @@ var init_sankey_chart = function(el) {
             .enter().append("path")
             .attr("class", "link")
             .attr("d", path)
-            .style("stroke", "#000")
-            .style("stroke-opacity", "0.2")
-            .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-            .style("fill", "none")
+            .attr("style", function(d) { return "stroke: #000; stroke-opacity: 0.2; fill: none; stroke-width: " + Math.round(Math.max(1, d.dy)) + "px"; })
             .sort(function(a, b) { return b.dy - a.dy; });
 
         link.append("title")
@@ -96,14 +94,17 @@ var init_sankey_chart = function(el) {
             link.attr("d", path);
         }
 
-        $(el).append(
-            $('<a>')
+        var svgData = $(el).html();
+        if (svgData) {
+            $(el).append(
+                $('<a>')
                 .attr('class', 'svg-download')
                 .attr('href-lang', 'image/svg+xml')
-                .attr('href', 'data:image/svg+xml;utf8,' +  unescape($(el).find('svg')[0].outerHTML))
+                .attr('href', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData))))
                 .attr('download', data.title + '.svg')
                 .text('Download')
-        );
+            );
+        }
 
         if ($(el).is('.foldable.folded .foldable-svg-panel .sankey-chart')) {
             $(el).closest('.foldable-svg-panel').each(function() {

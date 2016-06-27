@@ -19,7 +19,8 @@ var init_bar_chart = function(el) {
     var width = $(el).width();
     var svg = d3.select(el).append('svg')
         .attr('width', width)
-        .attr('xmlns', "http://www.w3.org/2000/svg");
+        .attr('xmlns', "http://www.w3.org/2000/svg")
+        .attr('version', '1.1');
     var offset = width * 0.25;
     var scale = d3.scale.linear();
     var line = null;
@@ -105,14 +106,17 @@ var init_bar_chart = function(el) {
                 .style("stroke-dasharray", ("4, 4"));
         }
 
-        $(el).append(
-            $('<a>')
-                .attr('class', 'svg-download')
-                .attr('href-lang', 'image/svg+xml')
-                .attr('href', 'data:image/svg+xml;utf8,' +  unescape($(el).find('svg')[0].outerHTML))
-                .attr('download', data.title + '.svg')
-                .text('Download')
-        );
+        var svgData = $(el).html();
+        if (svgData) {
+            $(el).append(
+                $('<a>')
+                    .attr('class', 'svg-download')
+                    .attr('href-lang', 'image/svg+xml')
+                    .attr('href', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData))))
+                    .attr('download', data.title + '.svg')
+                    .text('Download')
+            );
+        }
 
         if ($(el).is('.foldable.folded .foldable-svg-panel .bar-chart')) {
             $(el).closest('.foldable-svg-panel').each(function() {
