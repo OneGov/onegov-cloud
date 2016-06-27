@@ -7,6 +7,9 @@ Changelog
 - Adds new import formats: Vote/Wabsti, Vote/Internal, Election/Internal.
   [msom]
 
+- Adds the ability to download the SVG images.
+  [msom]
+
 - Adds compatibility with Morepath 0.13.
   [href]
 

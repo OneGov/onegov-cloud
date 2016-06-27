@@ -271,12 +271,7 @@ table {
     Ballot Map
 */
 
-.border {
-    fill: none;
-}
-
 .municipality {
-    fill: transparent;  // the initial color of the municipalities
 
     .selected {
         stroke: $white;
@@ -289,12 +284,6 @@ table {
         stroke: $oil;
         stroke-width: 1px;
     }
-}
-
-.lake {
-    fill: $white;
-    stroke: $aluminum;
-    stroke-width: 1px;
 }
 
 /*
@@ -353,32 +342,6 @@ table {
 .bar-chart {
     margin-bottom: 2rem;
     margin-top: 2rem;
-
-    text {
-        font: 14px sans-serif;
-        text-anchor: end;
-    }
-
-    .label text {
-        font: 12px sans-serif;
-
-        &.left {
-            fill: $white;
-        }
-
-        &.right {
-            fill: $aluminum;
-            text-anchor: start;
-        }
-    }
-
-    .bar {
-        fill: $aluminum;
-
-        &.active {
-            fill: $accepted-color;
-        }
-    }
 }
 
 /*
@@ -388,18 +351,21 @@ table {
     margin-bottom: 2rem;
     margin-top: 2rem;
 
-    .node rect {
-        fill: $aluminum !important;
-        &.active {
-            fill: $accepted-color !important;
-        }
-    }
-
     .link {
       &:hover {
         stroke-opacity: .4 !important;
       }
     }
+}
+
+/*
+    SVG Downloads
+*/
+.svg-download {
+    display: block;
+    font-size: .8rem;
+    margin-top: 1em;
+    text-align: right;
 }
 
 /*

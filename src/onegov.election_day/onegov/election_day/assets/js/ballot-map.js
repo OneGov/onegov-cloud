@@ -28,7 +28,7 @@ var init_ballot_map = function(el) {
 
     var map = $(el);
     var path = d3.geo.path().projection(null);
-    var svg = d3.select(el).append('svg');
+    var svg = d3.select(el).append('svg').attr('xmlns', "http://www.w3.org/2000/svg");
 
     svg.append('defs')
        .append('pattern')
@@ -89,6 +89,7 @@ var init_ballot_map = function(el) {
         $.ajax({ url: dataurl }).done(function(data) {
             svg.append('g')
                 .attr('class', 'municipality')
+                .style('fill', 'transparent')
                 .selectAll('path')
                 .data(
                     topojson.feature(
@@ -124,6 +125,9 @@ var init_ballot_map = function(el) {
             if (mapdata.objects.lakes !== undefined) {
                 svg.append('g')
                     .attr('class', 'lake')
+                    .style('fill', '#FFF')
+                    .style('stroke', '#999')
+                    .style('stroke-width', '1px')
                     .selectAll('path')
                     .data(
                         topojson.feature(
@@ -141,6 +145,7 @@ var init_ballot_map = function(el) {
                 ))
                 .attr('class', 'border')
                 .style('stroke-width', '1px')
+                .style('fill', 'none')
                 .attr('d', path);
 
             var legend_values = [80, 70, 60, 50.001, 49.999, 40, 30, 20];
@@ -172,7 +177,7 @@ var init_ballot_map = function(el) {
             // browsers other than ie figure out a nice size by themselves
             if (is_ie()) {
                 svg.attr('width', 470);
-                svg.attr('height', 470 * (bbox.height/bbox.width));    
+                svg.attr('height', 470 * (bbox.height/bbox.width));
             }
 
             svg.call(tooltip);
@@ -193,14 +198,17 @@ var init_ballot_map = function(el) {
                     $(this).attr('class', $(this).attr('class').replace('selected', ''));
                 });
             });
+
+            $(el).append(
+                $('<a>')
+                    .attr('class', 'svg-download')
+                    .attr('href-lang', 'image/svg+xml')
+                    .attr('href', 'data:image/svg+xml;utf8,' +  unescape($(el).find('svg')[0].outerHTML))
+                    .attr('download', 'map.svg')
+                    .text('Download')
+            );
         });
     });
-    // d3.json(mapurl, function(error, mapdata) {
-    //     d3.json(dataurl, function(error, data) {
-
-            
-    //     });
-    // });
 };
 
 (function($) {

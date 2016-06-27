@@ -17,7 +17,9 @@ var init_bar_chart = function(el) {
 
     var dataurl = $(el).data('dataurl');
     var width = $(el).width();
-    var svg = d3.select(el).append('svg').attr('width', width);
+    var svg = d3.select(el).append('svg')
+        .attr('width', width)
+        .attr('xmlns', "http://www.w3.org/2000/svg");
     var offset = width * 0.25;
     var scale = d3.scale.linear();
     var line = null;
@@ -42,7 +44,10 @@ var init_bar_chart = function(el) {
             .attr('y', 24 / 2)
             .attr('dy', '4')
             .attr('class', 'name')
-            .text(function(d) { return d.text; });
+            .text(function(d) { return d.text; })
+            .style("font-size", "14px")
+            .style("font-family", "sans-serif")
+            .style("text-anchor", "end");
 
         offset = d3.max(name[0], function(d) {
             return d.getBBox().width;
@@ -59,7 +64,10 @@ var init_bar_chart = function(el) {
             .attr('height', 24 - 2)
             .attr('class', function(d) {
                 return 'bar ' + d.class;
-            });
+            })
+            .style("fill", "#999")
+            .filter(function(d) { return d.class == "active"; })
+            .style("fill", "#0571b0");
 
         label = line.append('g')
             .attr('transform', function(d) {
@@ -70,11 +78,18 @@ var init_bar_chart = function(el) {
         label.append('text')
             .attr('dx', -3)
             .attr('class', 'left')
-            .text(function(d) { return d.value; });
+            .text(function(d) { return d.value; })
+            .style("font-size", "12px")
+            .style("font-family", "sans-serif")
+            .style("text-anchor", "end")
+            .style("fill", "#FFF");
         label.append('text')
             .attr('dx', 8)
             .attr('class', 'right')
-            .text(function(d) { return d.value; });
+            .text(function(d) { return d.value; })
+            .style("font-size", "12px")
+            .style("font-family", "sans-serif")
+            .style("fill", "#999");
 
         update_labels(line);
 
@@ -89,6 +104,15 @@ var init_bar_chart = function(el) {
                 .attr("stroke", "black")
                 .style("stroke-dasharray", ("4, 4"));
         }
+
+        $(el).append(
+            $('<a>')
+                .attr('class', 'svg-download')
+                .attr('href-lang', 'image/svg+xml')
+                .attr('href', 'data:image/svg+xml;utf8,' +  unescape($(el).find('svg')[0].outerHTML))
+                .attr('download', data.title + '.svg')
+                .text('Download')
+        );
 
         if ($(el).is('.foldable.folded .foldable-svg-panel .bar-chart')) {
             $(el).closest('.foldable-svg-panel').each(function() {

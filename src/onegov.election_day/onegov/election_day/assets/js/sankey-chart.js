@@ -6,7 +6,8 @@ var init_sankey_chart = function(el) {
     var height = 600;
     var svg = d3.select(el).append('svg')
         .attr('width', width)
-        .attr('height', height + 15);
+        .attr('height', height + 15)
+        .attr('xmlns', "http://www.w3.org/2000/svg");
     var offset = width * 0.25;
     var scale = d3.scale.linear();
     var sankey = d3.sankey()
@@ -36,11 +37,12 @@ var init_sankey_chart = function(el) {
 
         var bar = node.append("rect")
             .attr("height", function(d) { return d.dy; })
-            .attr("class", function(d) { return d.class; })
             .attr("width", sankey.nodeWidth())
             .style("cursor", "move")
             .style("fill", "#999")
-            .style("shape-rendering", "crispEdges");
+            .style("shape-rendering", "crispEdges")
+            .filter(function(d) { return d.value_2 > 0; })
+            .style("fill", "0571b0");
         bar.append("title")
             .text(function(d) { return d.value_2; });
 
@@ -53,6 +55,7 @@ var init_sankey_chart = function(el) {
             .attr("dy", ".35em")
             .style("font-size", "14px")
             .style("font-family", "sans-serif")
+            .style("fill", "#fff")
             .style("pointer-events", "none");
 
         var name = node.filter(function(d) { return d.name; })
@@ -71,7 +74,6 @@ var init_sankey_chart = function(el) {
         scale.domain([0, width]).range([offset+offsetMargin, width-2*offsetMargin]);
 
         node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
-        // bar.attr("width", sankey.nodeWidth() * (width-offset) / width);
 
         path = sankey.link(scale);
         link = svg.append("g").selectAll(".link")
@@ -93,6 +95,15 @@ var init_sankey_chart = function(el) {
             sankey.relayout();
             link.attr("d", path);
         }
+
+        $(el).append(
+            $('<a>')
+                .attr('class', 'svg-download')
+                .attr('href-lang', 'image/svg+xml')
+                .attr('href', 'data:image/svg+xml;utf8,' +  unescape($(el).find('svg')[0].outerHTML))
+                .attr('download', data.title + '.svg')
+                .text('Download')
+        );
 
         if ($(el).is('.foldable.folded .foldable-svg-panel .sankey-chart')) {
             $(el).closest('.foldable-svg-panel').each(function() {

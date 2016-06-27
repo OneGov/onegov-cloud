@@ -192,7 +192,8 @@ def view_election_candidates(self, request):
             'value': candidate[3],
             'class': 'active' if candidate[2] else 'inactive'
         } for candidate in candidates.all()],
-        'majority': majority
+        'majority': majority,
+        'title': self.title
     }
 
 
@@ -213,7 +214,8 @@ def view_election_lists(self, request):
             'value': list[1],
             'class': 'inactive'
         } for list in lists.all()],
-        'majority': None
+        'majority': None,
+        'title': self.title
     }
 
 
@@ -225,21 +227,16 @@ def view_election_connections(self, request):
     nodes = OrderedDict()
     links = []
 
-    def class_(x):
-        return 'active' if x > 0 else 'inactive'
-
     # Add lists
     for list_ in self.lists:
         nodes[list_.id] = {
             'name': list_.name,
             'value_2': list_.number_of_mandates,
-            'class': class_(list_.number_of_mandates),
         }
         if list_.connection:
             nodes.setdefault(list_.connection.id, {
                 'name': '',
                 'value_2': list_.connection.total_number_of_mandates,
-                'class': class_(list_.connection.total_number_of_mandates),
             })
             links.append({
                 'source': list(nodes.keys()).index(list_.id),
@@ -253,12 +250,10 @@ def view_election_connections(self, request):
             nodes.setdefault(connection.id, {
                 'name': '',
                 'value_2': connection.total_number_of_mandates,
-                'class': class_(connection.total_number_of_mandates),
             })
             nodes.setdefault(connection.parent.id, {
                 'name': '',
                 'value_2': connection.parent.total_number_of_mandates,
-                'class': class_(connection.parent.total_number_of_mandates),
             })
             links.append({
                 'source': list(nodes.keys()).index(connection.id),
@@ -268,5 +263,6 @@ def view_election_connections(self, request):
 
     return {
         'nodes': list(nodes.values()),
-        'links': links
+        'links': links,
+        'title': self.title
     }
