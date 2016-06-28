@@ -2,8 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-03-17 11:13+0100\n"
-"PO-Revision-Date: 2016-04-01 16:51+0100\n"
+"POT-Creation-Date: 2016-06-28 10:45+0200\n"
+"PO-Revision-Date: 2016-06-28 10:55+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -11,7 +11,105 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 1.7.6\n"
+"X-Generator: Poedit 1.8.7\n"
+
+#, python-format
+msgid "Missing columns: '${cols}'"
+msgstr "Colonnes manquantes : '${cols}'"
+
+msgid ""
+"Could not find the expected columns, make sure all required columns exist "
+"and that there are no extra columns."
+msgstr ""
+"Impossible de trouver les colonnes requises, assurez-vous que toutes les "
+"colonnes requises existent et qu'il n'y en a pas en trop."
+
+msgid "Some column names appear twice."
+msgstr "Certains noms de colonnes sont en double."
+
+msgid "Not a valid csv/xls/xlsx file."
+msgstr "Fichier csv/xls/xlsx non valide."
+
+msgid "The csv/xls/xlsx file is empty."
+msgstr "Fichier csv/xls/xlsx vide."
+
+msgid "The file contains an empty line."
+msgstr "Le fichier contient une ligne vide."
+
+msgid "Invalid election values"
+msgstr "Valeurs des élections non valides"
+
+msgid "Invalid municipality values"
+msgstr "Valeurs de la municipalité non valides"
+
+#, python-format
+msgid "municipality id ${id} is unknown"
+msgstr "référence de municipalité ${id} inconnue"
+
+msgid "Invalid list values"
+msgstr "Valeurs de la liste non valides"
+
+msgid "Invalid list results"
+msgstr "Résultats de la liste non valides"
+
+msgid "Invalid candidate values"
+msgstr "Valeurs des candidats non valides"
+
+msgid "Invalid candidate results"
+msgstr "Résultats des candidats non valides"
+
+msgid "Invalid list connection values"
+msgstr "Valeurs de connexion de liste non valides"
+
+msgid "No data found"
+msgstr "Pas de données trouvées"
+
+msgid "Unknown candidate"
+msgstr "Candidat inconnu"
+
+msgid "Invalid values"
+msgstr "Valeurs non valides"
+
+msgid "Unknown municipality"
+msgstr "Commune inconnue"
+
+msgid "Missing municipality"
+msgstr "Municipalité manquante"
+
+#, python-format
+msgid "${group} was found twice"
+msgstr "${group} a été trouvé en double"
+
+msgid "Invalid municipality id"
+msgstr "Mauvaise référence de municipalité"
+
+#, python-format
+msgid "municipality id ${id} was found twice"
+msgstr "référence de municipalité ${id} trouvées deux fois"
+
+msgid "Could not read yeas"
+msgstr "Impossible de lire les oui"
+
+msgid "Could not read nays"
+msgstr "Impossible de lire les non"
+
+msgid "Could not read the elegible voters"
+msgstr "Impossible de connaître les électeurs valides"
+
+msgid "Could not read the empty votes"
+msgstr "Impossible de connaître les votes blancs"
+
+msgid "Could not read the invalid votes"
+msgstr "Impossible de connaître les votes invalides"
+
+msgid "No elegible voters"
+msgstr "Pas d'électeurs valides"
+
+msgid "More cast votes than elegible voters"
+msgstr "Plus de votes que d'électeurs"
+
+msgid "Invalid ballot type"
+msgstr ""
 
 msgid "Election (German)"
 msgstr "Election (allemand)"
@@ -58,6 +156,9 @@ msgstr "Election fédéral"
 msgid "Cantonal Election"
 msgstr "Election cantonal"
 
+msgid "File format"
+msgstr "Format de fichier"
+
 msgid "Results"
 msgstr "Résultats"
 
@@ -85,11 +186,20 @@ msgstr "Contre-proposition"
 msgid "Tie-Breaker"
 msgstr "Jeu décisif"
 
+msgid "Vote number"
+msgstr ""
+
 msgid "SESAM"
 msgstr "SESAM"
 
 msgid "Wabsti"
 msgstr "Wabsti"
+
+msgid "OneGov Cloud"
+msgstr "ONeGov Cloud"
+
+msgid "Default"
+msgstr "défaut"
 
 msgid "Simple Vote"
 msgstr "Vote simple"
@@ -543,66 +653,6 @@ msgstr "Vide"
 msgid "Invalid"
 msgstr "Invalide"
 
-#, python-format
-msgid "Missing columns: '${cols}'"
-msgstr "Colonnes manquantes : '${cols}'"
-
-msgid ""
-"Could not find the expected columns, make sure all required columns exist "
-"and that there are no extra columns."
-msgstr ""
-"Impossible de trouver les colonnes requises, assurez-vous que toutes les "
-"colonnes requises existent et qu'il n'y en a pas en trop."
-
-msgid "Some column names appear twice."
-msgstr "Certains noms de colonnes sont en double."
-
-msgid "Not a valid csv/xls/xlsx file."
-msgstr "Fichier csv/xls/xlsx non valide."
-
-msgid "The csv/xls/xlsx file is empty."
-msgstr "Fichier csv/xls/xlsx vide."
-
-msgid "The file contains an empty line."
-msgstr "Le fichier contient une ligne vide."
-
-msgid "Invalid election values"
-msgstr "Valeurs des élections non valides"
-
-msgid "Invalid municipality values"
-msgstr "Valeurs de la municipalité non valides"
-
-#, python-format
-msgid "municipality id ${id} is unknown"
-msgstr "référence de municipalité ${id} inconnue"
-
-msgid "Invalid list values"
-msgstr "Valeurs de la liste non valides"
-
-msgid "Invalid list results"
-msgstr "Résultats de la liste non valides"
-
-msgid "Invalid candidate values"
-msgstr "Valeurs des candidats non valides"
-
-msgid "Invalid candidate results"
-msgstr "Résultats des candidats non valides"
-
-msgid "Invalid list connection values"
-msgstr "Valeurs de connexion de liste non valides"
-
-msgid "No data found"
-msgstr "Pas de données trouvées"
-
-msgid "Unknown candidate"
-msgstr "Candidat inconnu"
-
-msgid "Invalid values"
-msgstr "Valeurs non valides"
-
-msgid "Unknown municipality"
-msgstr "Commune inconnue"
-
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
 
@@ -623,41 +673,6 @@ msgstr "Supprimer le vote"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'année ${year} n'est pas encore prise en charge"
-
-msgid "Missing municipality"
-msgstr "Municipalité manquante"
-
-#, python-format
-msgid "${group} was found twice"
-msgstr "${group} a été trouvé en double"
-
-msgid "Invalid municipality id"
-msgstr "Mauvaise référence de municipalité"
-
-#, python-format
-msgid "municipality id ${id} was found twice"
-msgstr "référence de municipalité ${id} trouvées deux fois"
-
-msgid "Could not read yeas"
-msgstr "Impossible de lire les oui"
-
-msgid "Could not read nays"
-msgstr "Impossible de lire les non"
-
-msgid "Could not read the elegible voters"
-msgstr "Impossible de connaître les électeurs valides"
-
-msgid "Could not read the empty votes"
-msgstr "Impossible de connaître les votes blancs"
-
-msgid "Could not read the invalid votes"
-msgstr "Impossible de connaître les votes invalides"
-
-msgid "No elegible voters"
-msgstr "Pas d'électeurs valides"
-
-msgid "More cast votes than elegible voters"
-msgstr "Plus de votes que d'électeurs"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Cet urne a moins de résultats que les autres."

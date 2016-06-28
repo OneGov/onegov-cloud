@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-04-13 08:58+0200\n"
+"POT-Creation-Date: 2016-06-28 10:45+0200\n"
 "PO-Revision-Date: 2016-01-08 10:07+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -11,6 +11,105 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 1.7.6\n"
+
+#, python-format
+msgid "Missing columns: '${cols}'"
+msgstr "Colonnas che mancan ${cols}:"
+
+msgid ""
+"Could not find the expected columns, make sure all required columns exist "
+"and that there are no extra columns."
+msgstr ""
+"Las colonnas necessarias n'èn betg vegnidas chattadas. Controllai per "
+"plaschair che las colonnas existian e che naginas colonnas supplementaras na "
+"sajan avant maun."
+
+msgid "Some column names appear twice."
+msgstr "In pèr nums da colonnas vegnan duvrads duas giadas."
+
+msgid "Not a valid csv/xls/xlsx file."
+msgstr "Nagina datoteca CSV/XLS/XLSX valaivla."
+
+msgid "The csv/xls/xlsx file is empty."
+msgstr "La datoteca CSV/XLS/XLSX è vida."
+
+msgid "The file contains an empty line."
+msgstr "La datoteca cuntegna ina lingia vida."
+
+msgid "Invalid election values"
+msgstr "Datas electoralas nunvalaivlas"
+
+msgid "Invalid municipality values"
+msgstr "Datas nunvalaivlas da vischnancas"
+
+#, python-format
+msgid "municipality id ${id} is unknown"
+msgstr "Il numer UST ${id} n'è betg enconuschent"
+
+msgid "Invalid list values"
+msgstr "Datas da glista nunvalaivlas"
+
+msgid "Invalid list results"
+msgstr "Resultats da glistas nunvalaivels"
+
+msgid "Invalid candidate values"
+msgstr "Datas da candidat nunvalaivlas"
+
+msgid "Invalid candidate results"
+msgstr "Resultats da candidat nunvalaivels"
+
+msgid "Invalid list connection values"
+msgstr "Datas nunvalaivlas da colliaziuns da glistas"
+
+msgid "No data found"
+msgstr "Chattà naginas datas"
+
+msgid "Unknown candidate"
+msgstr "Candidat(a) nunenconuschent(a)"
+
+msgid "Invalid values"
+msgstr "Valurs nunvalaivlas"
+
+msgid "Unknown municipality"
+msgstr "Vischnanca nunenconuschenta"
+
+msgid "Missing municipality"
+msgstr "Lieu che manca"
+
+#, python-format
+msgid "${group} was found twice"
+msgstr "${group} è avant maun duas giadas"
+
+msgid "Invalid municipality id"
+msgstr "Numer UST nunvalaivel"
+
+#, python-format
+msgid "municipality id ${id} was found twice"
+msgstr "Il numer UST ${id} vegn duvrà duas giadas"
+
+msgid "Could not read yeas"
+msgstr "I n'è betg stà pussaivel da leger las 'vuschs affirmativas'"
+
+msgid "Could not read nays"
+msgstr "I n'è betg stà pussaivel da leger las 'vuschs negativas'"
+
+msgid "Could not read the elegible voters"
+msgstr "I n'è betg stà pussaivel da leger las 'persunas cun dretg da votar'"
+
+msgid "Could not read the empty votes"
+msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar vids'"
+
+msgid "Could not read the invalid votes"
+msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar nunvalaivels'"
+
+msgid "No elegible voters"
+msgstr "Naginas persunas cun dretg da votar"
+
+msgid "More cast votes than elegible voters"
+msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
+
+msgid "Invalid ballot type"
+msgstr ""
 
 msgid "Election (German)"
 msgstr "Elecziun (tudestg)"
@@ -57,6 +156,9 @@ msgstr "Elecziun naziunala"
 msgid "Cantonal Election"
 msgstr "Elecziun chantunala"
 
+msgid "File format"
+msgstr ""
+
 msgid "Results"
 msgstr "Resultats"
 
@@ -84,11 +186,20 @@ msgstr "Cuntraproposta"
 msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
 
+msgid "Vote number"
+msgstr ""
+
 msgid "SESAM"
 msgstr "SESAM"
 
 msgid "Wabsti"
 msgstr "Wabsti"
+
+msgid "OneGov Cloud"
+msgstr ""
+
+msgid "Default"
+msgstr ""
 
 msgid "Simple Vote"
 msgstr "Project da votaziun simpel"
@@ -541,67 +652,6 @@ msgstr "Vid"
 msgid "Invalid"
 msgstr "Nunvalaivel"
 
-#, python-format
-msgid "Missing columns: '${cols}'"
-msgstr "Colonnas che mancan ${cols}:"
-
-msgid ""
-"Could not find the expected columns, make sure all required columns exist "
-"and that there are no extra columns."
-msgstr ""
-"Las colonnas necessarias n'èn betg vegnidas chattadas. Controllai per "
-"plaschair che las colonnas existian e che naginas colonnas supplementaras na "
-"sajan avant maun."
-
-msgid "Some column names appear twice."
-msgstr "In pèr nums da colonnas vegnan duvrads duas giadas."
-
-msgid "Not a valid csv/xls/xlsx file."
-msgstr "Nagina datoteca CSV/XLS/XLSX valaivla."
-
-msgid "The csv/xls/xlsx file is empty."
-msgstr "La datoteca CSV/XLS/XLSX è vida."
-
-msgid "The file contains an empty line."
-msgstr "La datoteca cuntegna ina lingia vida."
-
-msgid "Invalid election values"
-msgstr "Datas electoralas nunvalaivlas"
-
-msgid "Invalid municipality values"
-msgstr "Datas nunvalaivlas da vischnancas"
-
-#, python-format
-msgid "municipality id ${id} is unknown"
-msgstr "Il numer UST ${id} n'è betg enconuschent"
-
-msgid "Invalid list values"
-msgstr "Datas da glista nunvalaivlas"
-
-msgid "Invalid list results"
-msgstr "Resultats da glistas nunvalaivels"
-
-msgid "Invalid candidate values"
-msgstr "Datas da candidat nunvalaivlas"
-
-msgid "Invalid candidate results"
-msgstr "Resultats da candidat nunvalaivels"
-
-msgid "Invalid list connection values"
-msgstr "Datas nunvalaivlas da colliaziuns da glistas"
-
-msgid "No data found"
-msgstr "Chattà naginas datas"
-
-msgid "Unknown candidate"
-msgstr "Candidat(a) nunenconuschent(a)"
-
-msgid "Invalid values"
-msgstr "Valurs nunvalaivlas"
-
-msgid "Unknown municipality"
-msgstr "Vischnanca nunenconuschenta"
-
 msgid "Wrong username or password"
 msgstr ""
 "Il num da l'utilisadra u da l'utilisader n'è betg enconuschent u il pled-"
@@ -624,41 +674,6 @@ msgstr "Stizzar la votaziun"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
-
-msgid "Missing municipality"
-msgstr "Lieu che manca"
-
-#, python-format
-msgid "${group} was found twice"
-msgstr "${group} è avant maun duas giadas"
-
-msgid "Invalid municipality id"
-msgstr "Numer UST nunvalaivel"
-
-#, python-format
-msgid "municipality id ${id} was found twice"
-msgstr "Il numer UST ${id} vegn duvrà duas giadas"
-
-msgid "Could not read yeas"
-msgstr "I n'è betg stà pussaivel da leger las 'vuschs affirmativas'"
-
-msgid "Could not read nays"
-msgstr "I n'è betg stà pussaivel da leger las 'vuschs negativas'"
-
-msgid "Could not read the elegible voters"
-msgstr "I n'è betg stà pussaivel da leger las 'persunas cun dretg da votar'"
-
-msgid "Could not read the empty votes"
-msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar vids'"
-
-msgid "Could not read the invalid votes"
-msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar nunvalaivels'"
-
-msgid "No elegible voters"
-msgstr "Naginas persunas cun dretg da votar"
-
-msgid "More cast votes than elegible voters"
-msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
 
 msgid "This ballot has fewer results than the others"
 msgstr "Quest project ha main resultats ch'ils auters projects."

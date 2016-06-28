@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-03-17 11:13+0100\n"
-"PO-Revision-Date: 2015-10-14 17:17+0200\n"
+"POT-Creation-Date: 2016-06-28 10:45+0200\n"
+"PO-Revision-Date: 2016-06-28 10:54+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,6 +11,105 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.7\n"
+
+#, python-format
+msgid "Missing columns: '${cols}'"
+msgstr "Fehlende Spalten: ${cols}"
+
+msgid ""
+"Could not find the expected columns, make sure all required columns exist "
+"and that there are no extra columns."
+msgstr ""
+"Die benötigten Spalten wurden nicht gefunden. Bitte stellen Sie sicher dass "
+"die Spalten existieren und keine zusätzlichen Spalten vorhanden sind."
+
+msgid "Some column names appear twice."
+msgstr "Einige Spaltennamen erscheinen doppelt."
+
+msgid "Not a valid csv/xls/xlsx file."
+msgstr "Keine gültige CSV/XLS/XLSX Datei."
+
+msgid "The csv/xls/xlsx file is empty."
+msgstr "Die CSV/XLS/XLSX Date ist leer."
+
+msgid "The file contains an empty line."
+msgstr "Die Datei enthält eine leere Zeile."
+
+msgid "Invalid election values"
+msgstr "Ungültige Wahldaten"
+
+msgid "Invalid municipality values"
+msgstr "Ungültige Gemeindedaten"
+
+#, python-format
+msgid "municipality id ${id} is unknown"
+msgstr "BFS Nummer ${id} ist unbekannt"
+
+msgid "Invalid list values"
+msgstr "Ungültige Listendaten"
+
+msgid "Invalid list results"
+msgstr "Ungültige Listenresultate"
+
+msgid "Invalid candidate values"
+msgstr "Ungültige Kandidierendendaten"
+
+msgid "Invalid candidate results"
+msgstr "Ungültige Kandidierendenresultate"
+
+msgid "Invalid list connection values"
+msgstr "Ungültige Listenverbindungsdaten"
+
+msgid "No data found"
+msgstr "Keine Daten gefunden"
+
+msgid "Unknown candidate"
+msgstr "Unbekannter Kandidierender"
+
+msgid "Invalid values"
+msgstr "Ungültige Werte"
+
+msgid "Unknown municipality"
+msgstr "Unbekannte Gemeinde"
+
+msgid "Missing municipality"
+msgstr "Fehlender Ort"
+
+#, python-format
+msgid "${group} was found twice"
+msgstr "${group} kommt zweimal vor"
+
+msgid "Invalid municipality id"
+msgstr "Ungültige BFS Nummer"
+
+#, python-format
+msgid "municipality id ${id} was found twice"
+msgstr "BFS Nummer ${id} kommt zweimal vor"
+
+msgid "Could not read yeas"
+msgstr "Konnte 'Ja Stimmen' nicht lesen"
+
+msgid "Could not read nays"
+msgstr "Konnte 'Nein Stimmen' nicht lesen"
+
+msgid "Could not read the elegible voters"
+msgstr "Konnte 'Stimmberechtigte' nicht lesen"
+
+msgid "Could not read the empty votes"
+msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
+
+msgid "Could not read the invalid votes"
+msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
+
+msgid "No elegible voters"
+msgstr "Keine Stimmberechtigten"
+
+msgid "More cast votes than elegible voters"
+msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
+
+msgid "Invalid ballot type"
+msgstr "Ungültige Abstimmungsart"
 
 msgid "Election (German)"
 msgstr "Wahl (Deutsch)"
@@ -57,6 +156,9 @@ msgstr "Nationale Wahl"
 msgid "Cantonal Election"
 msgstr "Kantonale Wahl"
 
+msgid "File format"
+msgstr "Dateiformat"
+
 msgid "Results"
 msgstr "Resultate"
 
@@ -84,11 +186,20 @@ msgstr "Gegenentwurf"
 msgid "Tie-Breaker"
 msgstr "Stichfrage"
 
+msgid "Vote number"
+msgstr "Vorlagen-Nummer"
+
 msgid "SESAM"
 msgstr "SESAM"
 
 msgid "Wabsti"
 msgstr "Wabsti"
+
+msgid "OneGov Cloud"
+msgstr "OneGov Cloud"
+
+msgid "Default"
+msgstr "Standard"
 
 msgid "Simple Vote"
 msgstr "Einfache Vorlage"
@@ -536,66 +647,6 @@ msgstr "Leer"
 msgid "Invalid"
 msgstr "Ungültig"
 
-#, python-format
-msgid "Missing columns: '${cols}'"
-msgstr "Fehlende Spalten: ${cols}"
-
-msgid ""
-"Could not find the expected columns, make sure all required columns exist "
-"and that there are no extra columns."
-msgstr ""
-"Die benötigten Spalten wurden nicht gefunden. Bitte stellen Sie sicher dass "
-"die Spalten existieren und keine zusätzlichen Spalten vorhanden sind."
-
-msgid "Some column names appear twice."
-msgstr "Einige Spaltennamen erscheinen doppelt."
-
-msgid "Not a valid csv/xls/xlsx file."
-msgstr "Keine gültige CSV/XLS/XLSX Datei."
-
-msgid "The csv/xls/xlsx file is empty."
-msgstr "Die CSV/XLS/XLSX Date ist leer."
-
-msgid "The file contains an empty line."
-msgstr "Die Datei enthält eine leere Zeile."
-
-msgid "Invalid election values"
-msgstr "Ungültige Wahldaten"
-
-msgid "Invalid municipality values"
-msgstr "Ungültige Gemeindedaten"
-
-#, python-format
-msgid "municipality id ${id} is unknown"
-msgstr "BFS Nummer ${id} ist unbekannt"
-
-msgid "Invalid list values"
-msgstr "Ungültige Listendaten"
-
-msgid "Invalid list results"
-msgstr "Ungültige Listenresultate"
-
-msgid "Invalid candidate values"
-msgstr "Ungültige Kandidierendendaten"
-
-msgid "Invalid candidate results"
-msgstr "Ungültige Kandidierendenresultate"
-
-msgid "Invalid list connection values"
-msgstr "Ungültige Listenverbindungsdaten"
-
-msgid "No data found"
-msgstr "Keine Daten gefunden"
-
-msgid "Unknown candidate"
-msgstr "Unbekannter Kandidierender"
-
-msgid "Invalid values"
-msgstr "Ungültige Werte"
-
-msgid "Unknown municipality"
-msgstr "Unbekannte Gemeinde"
-
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
 
@@ -616,41 +667,6 @@ msgstr "Abstimmung löschen"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "Das Jahr ${year} wird noch nicht unterstützt"
-
-msgid "Missing municipality"
-msgstr "Fehlender Ort"
-
-#, python-format
-msgid "${group} was found twice"
-msgstr "${group} kommt zweimal vor"
-
-msgid "Invalid municipality id"
-msgstr "Ungültige BFS Nummer"
-
-#, python-format
-msgid "municipality id ${id} was found twice"
-msgstr "BFS Nummer ${id} kommt zweimal vor"
-
-msgid "Could not read yeas"
-msgstr "Konnte 'Ja Stimmen' nicht lesen"
-
-msgid "Could not read nays"
-msgstr "Konnte 'Nein Stimmen' nicht lesen"
-
-msgid "Could not read the elegible voters"
-msgstr "Konnte 'Stimmberechtigte' nicht lesen"
-
-msgid "Could not read the empty votes"
-msgstr "Konnte 'Leere Stimmzettel' nicht lesen"
-
-msgid "Could not read the invalid votes"
-msgstr "Konnte 'Ungültige Stimmzettel' nicht lesen"
-
-msgid "No elegible voters"
-msgstr "Keine Stimmberechtigten"
-
-msgid "More cast votes than elegible voters"
-msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
