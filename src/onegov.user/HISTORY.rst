@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.3 (2016-06-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to activate/deactivate users.
   [href]
 
