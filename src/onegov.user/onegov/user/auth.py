@@ -129,6 +129,9 @@ class Auth(object):
         if user is None:
             return fail()
 
+        if not user.active:
+            return fail()
+
         if not self.is_valid_second_factor(user, second_factor):
             return fail()
 

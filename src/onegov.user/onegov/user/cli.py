@@ -37,7 +37,7 @@ This command will also ask for a password if none was provided with
 import click
 
 from getpass import getpass
-from onegov.user import UserCollection
+from onegov.user import User, UserCollection
 from onegov.core.cli import command_group, abort
 from onegov.core.crypto import random_password
 
@@ -125,6 +125,72 @@ def exists(username):
             click.secho("{} exists".format(username), fg='green')
 
     return find_user
+
+
+@cli.command(context_settings={'singular': True})
+@click.argument('username')
+def activate(username):
+    """ Activates the given user. """
+
+    def activate_user(request, app):
+        user = UserCollection(app.session()).by_username(username)
+
+        if not user:
+            abort("{} does not exist".format(username))
+
+        user.active = True
+        click.secho("{} was activated".format(username), fg='green')
+
+    return activate_user
+
+
+@cli.command(context_settings={'singular': True})
+@click.argument('username')
+def deactivate(username):
+    """ Deactivates the given user. """
+
+    def deactivate_user(request, app):
+        user = UserCollection(app.session()).by_username(username)
+
+        if not user:
+            abort("{} does not exist".format(username))
+
+        user.active = False
+        click.secho("{} was deactivated".format(username), fg='green')
+
+    return deactivate_user
+
+
+@cli.command(context_settings={'singular': True})
+@click.option('--active-only', help="Only show active users", is_flag=True)
+@click.option('--inactive-only', help="Only show inactive users", is_flag=True)
+def list(active_only, inactive_only):
+    """ Lists all users. """
+
+    assert not all((active_only, inactive_only))
+
+    def list_users(request, app):
+
+        template = '{active} {username} [{role}]'
+
+        users = UserCollection(app.session()).query()
+        users = users.with_entities(User.username, User.role, User.active)
+        users = users.order_by(User.username, User.role)
+
+        for username, role, active in users.all():
+            if active_only and not active:
+                continue
+
+            if inactive_only and active:
+                continue
+
+            print(template.format(
+                active=active and '✔︎' or '✘',
+                username=username,
+                role=role
+            ))
+
+    return list_users
 
 
 @cli.command(name='change-password', context_settings={'singular': True})

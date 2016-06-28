@@ -20,19 +20,12 @@ class UserCollection(object):
         """ Returns a query using :class:`onegov.user.model.User`. """
         return self.session.query(User)
 
-    def add(self, username, password, role, data=None, second_factor=None):
+    def add(self, username, password, role,
+            data=None, second_factor=None, active=True):
         """ Add a user to the collection.
 
-            :username:
-                Must be a unique string and may not be empty.
-
-            :password:
-                Must be a non-empty string.
-
-            :role:
-                Must be a non-empty string. The meaning of roles is not defined
-                in `onegov.user` instead the role is usually defined by
-                :mod:`onegov.core.security.roles`.
+            The arguments given to this function are the attributes of the
+            :class:`~onegov.user.models.User` class with the same name.
         """
         assert username and password and role
 
@@ -41,7 +34,8 @@ class UserCollection(object):
             password=password,
             role=role,
             data=data,
-            second_factor=second_factor
+            second_factor=second_factor,
+            active=active
         )
 
         self.session.add(user)

@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds the ability to activate/deactivate users.
+  [href]
+
+- Adds the ability to list users through the cli.
+  [href]
+
 0.4.2 (2016-05-30)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -21,6 +21,20 @@ def test_auth_login(session):
     assert identity.application_id == 'my-app'
 
 
+def test_auth_login_inactive(session):
+    user = UserCollection(session).add(
+        'AzureDiamond', 'hunter2', 'irc-user', active=False)
+
+    auth = Auth(session=session, application_id='my-app')
+
+    assert not auth.login(username='AzureDiamond', password='hunter2')
+
+    user.active = True
+    transaction.commit()
+
+    assert auth.login(username='AzureDiamond', password='hunter2')
+
+
 def test_is_valid_yubikey_otp(session):
 
     assert not is_valid_yubikey(

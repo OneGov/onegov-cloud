@@ -2,7 +2,7 @@ from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
-from sqlalchemy import Column, Text
+from sqlalchemy import Boolean, Column, Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred
 from uuid import uuid4
@@ -50,6 +50,9 @@ class User(Base, TimestampMixin):
     #: Note that 'data' could also be a nested dictionary!
     #:
     second_factor = Column(JSON, nullable=True)
+
+    #: true if the user is active
+    active = Column(Boolean, nullable=False, default=True)
 
     @hybrid_property
     def password(self):
