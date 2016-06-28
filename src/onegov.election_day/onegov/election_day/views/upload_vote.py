@@ -131,6 +131,12 @@ def view_upload(self, request, form):
     if status == 'error':
         transaction.abort()
 
+    if status == 'success':
+        path_info = request.app._get_deferred_mounted_path(self).path
+        for locale in request.app.locales:
+            key = ':'.join((locale, path_info))
+            request.app.pages_cache.delete(key)
+
     return {
         'layout': ManageLayout(self, request),
         'title': self.title,

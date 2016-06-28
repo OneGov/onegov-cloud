@@ -29,6 +29,9 @@ Changelog
   results of elections.
   [msom]
 
+- Clears the cache after uploading results.
+  [msom]
+
 0.7.2 (2016-03-18)
 ~~~~~~~~~~~~~~~~~~~
 
