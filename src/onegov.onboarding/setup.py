@@ -35,7 +35,7 @@ setup(
         'cached_property',
         'onegov.core>=0.21.1',
         'onegov.foundation',
-        'onegov.libres<=0.2.1',  # fix me when onegov.town is updated!
+        'onegov.libres',
         'onegov.town>=1.9.1',
         'python-simple-hipchat',
     ],
