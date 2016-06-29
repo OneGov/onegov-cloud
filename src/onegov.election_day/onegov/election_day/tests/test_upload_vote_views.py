@@ -565,3 +565,60 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
     assert "47.00" in results
     assert "45.96" in results
     assert "54.04" in results
+
+
+def test_upload_vote_invalidate_cache(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/new-vote')
+    new.form['vote_de'] = 'Bacon, yea or nay?'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # when uploading a proposal, a counter-proposal and a tie-breaker we
+    # want the process to stop completely if any of these three files has
+    # an error
+
+    upload = client.get('/vote/bacon-yea-or-nay/upload')
+    upload.form['type'] = 'simple'
+
+    csv = '\n'.join((
+        ','.join(COLUMNS),
+        ',1711,Zug,3821,7405,16516,80,1',
+        ',1706,Oberägeri,811,1298,3560,18,',
+        ',1709,Unterägeri,1096,2083,5245,18,1',
+        ',1704,Menzingen,599,1171,2917,17,',
+        ',1701,Baar,3049,5111,13828,54,3',
+        ',1702,Cham,2190,3347,9687,60,',
+        ',1703,Hünenberg,1497,2089,5842,15,1',
+        ',1708,Steinhausen,1211,2350,5989,17,',
+        ',1707,Risch,1302,1779,6068,17,',
+        ',1710,Walchwil,651,743,2016,8,',
+        ',1705,Neuheim,307,522,1289,10,1',
+    ))
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain'
+    )
+
+    results = upload.form.submit()
+    assert 'Ihre Resultate wurden erfolgreich hochgeladen' in results
+
+    anonymous = Client(election_day_app)
+    anonymous.get('/locale/de_CH').follow()
+
+    assert "3'821" in anonymous.get('/vote/bacon-yea-or-nay/')
+
+    csv = csv.replace('3821,7405', '3221,8005')
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain'
+    )
+
+    results = upload.form.submit()
+    assert 'Ihre Resultate wurden erfolgreich hochgeladen' in results
+
+    assert "3'821" not in anonymous.get('/vote/bacon-yea-or-nay/')
+    assert "3'221" in anonymous.get('/vote/bacon-yea-or-nay/')

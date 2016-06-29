@@ -879,3 +879,63 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
     upload = upload.form.submit()
 
     assert "Fehlende Spalten: municipality_bfs_number" in upload
+
+
+def test_upload_election_invalidate_cache(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # Invalid data
+    csv = (
+        'election_title,election_date,election_type,election_mandates,'
+        'election_absolute_majority,election_counted_municipalities,'
+        'election_total_municipalities,municipality_name,'
+        'municipality_bfs_number,municipality_elegible_voters,'
+        'municipality_received_ballots,municipality_blank_ballots,'
+        'municipality_invalid_ballots,municipality_unaccounted_ballots,'
+        'municipality_accounted_ballots,municipality_blank_votes,'
+        'municipality_invalid_votes,municipality_accounted_votes,list_name,'
+        'list_id,list_number_of_mandates,list_votes,list_connection,'
+        'list_connection_parent,candidate_family_name,candidate_first_name,'
+        'candidate_id,candidate_elected,candidate_votes\r\n'
+        'Election,2015-03-02,proporz,1,0,1,1,Town,3503,1013,428,2,16,18,410,'
+        '13,0,2037,Party,1,0,1,5,1,Muster,Peter,1,False,40'
+    )
+
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain'
+    )
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    anonymous = Client(election_day_app_gr)
+    anonymous.get('/locale/de_CH').follow()
+
+    assert "1'013" in anonymous.get('/election/election')
+
+    csv = csv.replace('1013', '1015')
+
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain'
+    )
+    upload = upload.form.submit()
+
+    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+    assert "1'013" not in anonymous.get('/election/election')
+    assert "1'015" in anonymous.get('/election/election')

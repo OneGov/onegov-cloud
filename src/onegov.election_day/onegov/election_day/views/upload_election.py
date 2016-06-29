@@ -91,10 +91,7 @@ def view_upload(self, request, form):
         transaction.abort()
 
     if status == 'ok':
-        path_info = request.app._get_deferred_mounted_path(self).path
-        for locale in request.app.locales:
-            key = ':'.join((locale, path_info))
-            request.app.pages_cache.delete(key)
+        request.app.pages_cache.invalidate()
 
     return {
         'layout': ManageLayout(self, request),
