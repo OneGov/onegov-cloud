@@ -2,7 +2,7 @@
 
 ## Einleitung
 
-Am Abstimmungssonntag werden Resultate zu einzelnen Wahlen und Abstimmungen laufend publiziert. Bei der neuen "Wahlen & Abstimmungen" Webapplikation geschieht dies über ein Webinterface, das CSV oder Excel (XLS oder XLSX) Dateien mit provisorischen oder definitiven Resultaten entgegennimmt. Bei Excel Dateien wird entweder das erste Arbeitsblatt, oder sofern vorhanden das Arbeitsblatt mit dem Namen "Resultate" verwendet.
+Am Abstimmungssonntag werden Resultate zu einzelnen Wahlen und Abstimmungen laufend publiziert. Bei der neuen *Wahlen & Abstimmungen* Webapplikation geschieht dies über ein Webinterface, das CSV oder Excel (XLS/XLSX) Dateien mit provisorischen oder definitiven Resultaten entgegennimmt. Bei Excel Dateien wird entweder das erste Arbeitsblatt, oder, sofern vorhanden, das Arbeitsblatt mit dem Namen ``Resultate`` verwendet.
 
 Je nach Wahl / Abstimmung und Format werden eine unterschiedliche Anzahl Dateien benötigt. Jede dieser Dateien besteht unabhängig vom verwendeten Dateiformat aus einer Kopfzeile und einer beliebigen Anzahl von Resultatzeilen. Die Kopfzeile enthält die Namen der Spalten und ist *zwingend erforderlich*.
 
@@ -12,4 +12,4 @@ Dieses Dokument beschreibt das Format dieser CSV/Excel Dateien.
 
 [Format Spezifikation Wahlen](formatbeschreibung_wahlen.md)
 
-[Format Spezifikation Wahlen](formatbeschreibung_abstimmungen.md)
+[Format Spezifikation Abstimmungen](formatbeschreibung_abstimmungen.md)
