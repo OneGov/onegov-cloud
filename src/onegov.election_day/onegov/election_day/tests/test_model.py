@@ -6,6 +6,12 @@ from onegov.election_day.models import Archive, Principal
 from onegov.election_day.models.principal import cantons
 
 
+class DummyRequest(object):
+
+    def link(self, model, name=''):
+        return '{}/{}'.format(model.__class__.__name__, name).rstrip('/')
+
+
 def test_load_principal():
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Foobar
@@ -124,7 +130,14 @@ def test_archive(session):
     assert archive.latest() == archive.for_date('2016').by_date()
     assert archive.latest() == archive.for_date('2016-01-01').by_date()
 
+    request = DummyRequest()
+    latest_json = archive.latest_json(request)
+    assert latest_json == archive.for_date(2016).by_date_json(request)
+    assert latest_json == archive.for_date('2016').by_date_json(request)
+    assert latest_json == archive.for_date('2016-01-01').by_date_json(request)
+
     assert archive.for_date('2016-02-02').by_date() is None
+    assert archive.for_date('2016-02-02').by_date_json(request) == []
 
     for year in (2009, 2011, 2014, 2016):
         assert (
@@ -132,8 +145,31 @@ def test_archive(session):
             [session.query(Election).filter_by(date=date(year, 1, 1)).one()]
         ) in archive.for_date(year).by_date()
 
+        assert {
+            'data_url': 'Election/json',
+            'domain': 'federation',
+            'url': 'Election',
+            'title': {'de_CH': 'Election {}'.format(year)},
+            'type': 'election',
+            'date': '{}-01-01'.format(year),
+            'progress': {'total': 0, 'counted': 0}
+        } in archive.for_date(year).by_date_json(request)
+
     for year in (2007, 2011, 2015, 2016):
         assert (
             ('vote', 'federation', date(year, 1, 1)),
             [session.query(Vote).filter_by(date=date(year, 1, 1)).one()]
         ) in archive.for_date(year).by_date()
+
+        assert {
+            'answer': '',
+            'data_url': 'Vote/json',
+            'date': '{}-01-01'.format(year),
+            'domain': 'federation',
+            'nays_percentage': 100.0,
+            'progress': {'counted': 0.0, 'total': 0.0},
+            'title': {'de_CH': 'Vote {}'.format(year)},
+            'type': 'vote',
+            'url': 'Vote',
+            'yeas_percentage': 0.0
+        } in archive.for_date(year).by_date_json(request)

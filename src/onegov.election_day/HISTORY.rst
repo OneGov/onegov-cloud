@@ -19,6 +19,9 @@ Changelog
 - Adds Romansh and Italian translations.
   [msom]
 
+- Adds JSON views for results.
+  [msom]
+
 - Fixes javascript for form dependencies.
   [msom]
 

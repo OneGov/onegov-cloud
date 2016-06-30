@@ -15,6 +15,16 @@ def view_principal(self, request):
     }
 
 
+@ElectionDayApp.json(model=Principal, permission=Public, name='json')
+def view_principal_json(self, request):
+
+    return {
+        'canton': self.canton,
+        'name': self.name,
+        'results': Archive(request.app.session()).latest_json(request)
+    }
+
+
 @ElectionDayApp.html(model=Principal, template='opendata.pt', name='opendata',
                      permission=Public)
 def view_opendata(self, request):

@@ -11,3 +11,12 @@ def view_archive(self, request):
         'date': self.date,
         'archive_items': self.by_date()
     }
+
+
+@ElectionDayApp.json(model=Archive, permission=Public, name='json')
+def view_archive_json(self, request):
+    return {
+        'canton': request.app.principal.canton,
+        'name': request.app.principal.name,
+        'results': self.by_date_json(request)
+    }
