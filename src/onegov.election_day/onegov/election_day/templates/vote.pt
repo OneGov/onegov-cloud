@@ -22,7 +22,7 @@
                     <li><a href="${request.link(vote, 'json')}">JSON</a></li>
                     <li><a href="${request.link(vote, 'csv')}">CSV</a></li>
                     <li><a href="${request.link(vote, 'xlsx')}">XLSX</a></li>
-                    <li><a href="${layout.opendata_link}"><em i18n:translate>Format Description</em></a></li>
+                    <li><a href="${layout.opendata_link}#vote"><em i18n:translate>Format Description</em></a></li>
                 </ul>
             </div>
 

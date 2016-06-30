@@ -2,7 +2,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2016-06-28 10:45+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-06-30 15:56+0200\n"
 "PO-Revision-Date: 2016-06-28 10:57+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -320,6 +321,9 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Ritorna alle elezioni &amp; votazioni attuali"
 
+msgid "Open Data"
+msgstr ""
+
 msgid "Login"
 msgstr "Login"
 
@@ -428,8 +432,61 @@ msgstr "Ancora nessun oggetto in votazione rilevato."
 msgid "Elections &amp; Votes: Open Data"
 msgstr "Elezioni &amp; votazioni: Open Data"
 
-msgid "Format"
-msgstr "Formato"
+msgid "Contents"
+msgstr ""
+
+msgid "Summarized results"
+msgstr ""
+
+msgid "Election results"
+msgstr ""
+
+msgid "Vote results"
+msgstr ""
+
+msgid ""
+"The summarized results displayed at the home page (only the results of "
+"latest votes and elections) and the archive (browsable by year or date) is "
+"also available as JSON. The data contains some global informations and for "
+"every election and vote the following commong information:"
+msgstr ""
+
+msgid "${election} for elections, ${vote} for votes."
+msgstr ""
+
+msgid "An object containing the translated titles."
+msgstr ""
+
+msgid "The date (ISO 8601)."
+msgstr ""
+
+msgid "The domain of influence (federation, canton, ...)."
+msgstr ""
+
+msgid "A link to the detailed view."
+msgstr ""
+
+msgid "A link to the detailed JSON data, see below."
+msgstr ""
+
+msgid ""
+"An object containing the number already counted municipalities (${counted}) "
+"and the total number of municipalities (${total})."
+msgstr ""
+
+msgid "Vote results contain the following additional information:"
+msgstr ""
+
+msgid ""
+"The answer of the vote: ${accepted}, ${rejected}, ${proposal} or ${counter-"
+"proposal}."
+msgstr ""
+
+msgid "Yeas percentage."
+msgstr ""
+
+msgid "Nays percentage."
+msgstr ""
 
 msgid ""
 "The raw data used to display the results of votes is available in the "
@@ -437,9 +494,6 @@ msgid ""
 msgstr ""
 "I dati grezzi utilizzati per indicare i risultati sono disponibili nei "
 "formati seguenti:"
-
-msgid "Fields (Elections)"
-msgstr "Campi (Elezioni)"
 
 msgid "The following fields are included in all formats:"
 msgstr "I seguenti campi sono contenuti in tutti i formati:"
@@ -457,6 +511,16 @@ msgstr ""
 
 msgid "The number of mandates."
 msgstr "Numero di mandati."
+
+msgid ""
+"The absolute majority. Only relevant for elections based on majority system."
+msgstr ""
+
+msgid "The number of already counted municipalities."
+msgstr ""
+
+msgid "The total number of municipalities."
+msgstr ""
 
 msgid "The name of the municipality."
 msgstr "Nome del comune."
@@ -503,6 +567,16 @@ msgstr ""
 "elezioni basate sul sistema proporzionale."
 
 msgid ""
+"The id of the list this candidate appears on. Only relevant for elections "
+"based on proportional representation."
+msgstr ""
+
+msgid ""
+"The number of mandates this list has got. Only relevant for elections based "
+"on proportional representation."
+msgstr ""
+
+msgid ""
 "The number of votes this list has got. Only relevant for elections based on "
 "proportional representation."
 msgstr ""
@@ -529,14 +603,14 @@ msgstr "Cognome del candidato."
 msgid "The first name of the candidate."
 msgstr "Nome del candidato."
 
+msgid "The ID of the candidate."
+msgstr ""
+
 msgid "True if the candidate has been elected."
 msgstr "Vero se il candidato è stato eletto."
 
 msgid "The number of votes this candidate got."
 msgstr "Numero di voti ricevuti da questo candidato."
-
-msgid "Fields (Votes)"
-msgstr "Campi (voti)"
 
 msgid "Title of the vote."
 msgstr "Titolo della votazione."
@@ -674,3 +748,12 @@ msgstr "L'anno ${year} non viene ancora supportato"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Questo progetto contiene meno risultati rispetto agli altri."
+
+#~ msgid "Format"
+#~ msgstr "Formato"
+
+#~ msgid "Fields (Elections)"
+#~ msgstr "Campi (Elezioni)"
+
+#~ msgid "Fields (Votes)"
+#~ msgstr "Campi (voti)"

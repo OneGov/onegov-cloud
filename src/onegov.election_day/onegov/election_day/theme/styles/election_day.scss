@@ -668,3 +668,24 @@ form {
         }
     }
 }
+
+/*
+    Open Data
+*/
+.open-data {
+
+    ol,
+    ul,
+    dl,
+    dd {
+        margin-left: 2em;
+    }
+
+    dl.url {
+        margin-left: 0;
+    }
+
+    .toc-link {
+        display: block;
+    }
+}

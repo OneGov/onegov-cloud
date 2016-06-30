@@ -9,18 +9,87 @@
     </tal:block>
 
     <tal:block metal:fill-slot="content">
-        <div class="format">
-            <h2 i18n:translate>Format</h2>
+        <div class="open-data">
+
+            <h2 i18n:translate>Contents</h2>
+            <ol id="toc">
+                <li><a i18n:translate href="#summary">Summarized results</a></li>
+                <li><a i18n:translate href="#election">Election results</a></li>
+                <li><a i18n:translate href="#vote">Vote results</a></li>
+            </ol>
+
+            <h2 i18n:translate id="summary">Summarized results</h2>
+
+            <dl class="url">
+                <dt>URL (latest)</dt>
+                <dd><code>/json</code></dd>
+
+                <dt>URL (archive by year)</dt>
+                <dd><code>/archive/{year}/json</code></dd>
+
+                <dt>URL (archive by date)</dt>
+                <dd><code>/archive/{year}-{month}-{day}/json</code></dd>
+            </dl>
+
+            <p i18n:translate>
+                The summarized results displayed at the home page (only the results
+                of latest votes and elections) and the archive (browsable by year
+                or date) is also available as JSON. The data contains
+                some global informations and for every election and vote the
+                following commong information:
+            </p>
+
+            <dl>
+                <dt>type</dt>
+                <dd i18n:translate><code i18n:name='election'>election</code> for elections, <code i18n:name='vote'>vote</code> for votes.</dd>
+
+                <dt>title</dt>
+                <dd i18n:translate>An object containing the translated titles.</dd>
+
+                <dt>date</dt>
+                <dd i18n:translate>The date (ISO 8601).</dd>
+
+                <dt>domain</dt>
+                <dd i18n:translate>The domain of influence (federation, canton, ...).</dd>
+
+                <dt>url</dt>
+                <dd i18n:translate>A link to the detailed view.</dd>
+
+                <dt>data_url</dt>
+                <dd i18n:translate>A link to the detailed JSON data, see below.</dd>
+
+                <dt>progess</dt>
+                <dd i18n:translate>An object containing the number already counted municipalities (<code i18n:name='counted'>counted</code>) and the total number of municipalities (<code i18n:name='total'>total</code>).</dd>
+            </dl>
+
+            <p i18n:translate>Vote results contain the following additional information:</p>
+
+            <dl>
+                <dt>answer</dt>
+                <dd i18n:translate>The answer of the vote: <code  i18n:name='accepted'>accepted</code>, <code  i18n:name='rejected'>rejected</code>, <code  i18n:name='proposal'>proposal</code> or <code  i18n:name='counter-proposal'>counter-proposal</code>.</dd>
+
+                <dt>yeas_percentage</dt>
+                <dd i18n:translate>Yeas percentage.</dd>
+
+                <dt>nays_percentage</dt>
+                <dd i18n:translate>Nays percentage.</dd>
+
+            </dl>
+
+            <h2 i18n:translate id="election">Election results</h2>
+
+            <dl class="url">
+                <dt>URL</dt>
+                <dd><code>/election/{id}/{format}</code></dd>
+            </dl>
 
             <p i18n:translate>The raw data used to display the results of votes is available in the following formats:</p>
 
             <ul>
-                <li>JSON</li>
-                <li>CSV</li>
-                <li>XLSX</li>
+                <li>JSON (<code>/json</code>)</li>
+                <li>CSV (<code>/csv</code>)</li>
+                <li>XLSX (<code>/xlsx</code>)</li>
             </ul>
-
-            <h3 i18n:translate>Fields (Elections)</h3>
 
             <p i18n:translate>The following fields are included in all formats:</p>
 
@@ -36,6 +105,15 @@
 
                 <dt>election_mandates</dt>
                 <dd i18n:translate>The number of mandates.</dd>
+
+                <dt>election_absolute_majority</dt>
+                <dd i18n:translate>The absolute majority. Only relevant for elections based on majority system.</dd>
+
+                <dt>election_counted_municipalities</dt>
+                <dd i18n:translate>The number of already counted municipalities.</dd>
+
+                <dt>election_total_municipalities</dt>
+                <dd i18n:translate>The total number of municipalities.</dd>
 
                 <dt>municipality_name</dt>
                 <dd i18n:translate>The name of the municipality.</dd>
@@ -79,6 +157,18 @@
                     Only relevant for elections based on proportional representation.
                 </dd>
 
+                <dt>list_id</dt>
+                <dd i18n:translate>
+                    The id of the list this candidate appears on. Only relevant for
+                    elections based on proportional representation.
+                </dd>
+
+                <dt>list_number_of_mandates</dt>
+                <dd i18n:translate>
+                    The number of mandates this list has got. Only relevant for
+                    elections based on proportional representation.
+                </dd>
+
                 <dt>list_votes</dt>
                 <dd i18n:translate>
                     The number of votes this list has got.
@@ -103,6 +193,9 @@
                 <dt>candidate_first_name</dt>
                 <dd i18n:translate>The first name of the candidate.</dd>
 
+                <dt>candidate_id</dt>
+                <dd i18n:translate>The ID of the candidate.</dd>
+
                 <dt>candidate_elected</dt>
                 <dd i18n:translate>True if the candidate has been elected.</dd>
 
@@ -110,7 +203,20 @@
                 <dd i18n:translate>The number of votes this candidate got.</dd>
             </dl>
 
-            <h3 i18n:translate>Fields (Votes)</h3>
+            <h2 i18n:translate id="vote">Vote results</h2>
+
+            <dl class="url">
+                <dt>URL</dt>
+                <dd><code>/vote/{id}/{format}</code></dd>
+            </dl>
+
+            <p i18n:translate>The raw data used to display the results of votes is available in the following formats:</p>
+
+            <ul>
+                <li>JSON (<code>/json</code>)</li>
+                <li>CSV (<code>/csv</code>)</li>
+                <li>XLSX (<code>/xlsx</code>)</li>
+            </ul>
 
             <p i18n:translate>The following fields are included in all formats:</p>
 

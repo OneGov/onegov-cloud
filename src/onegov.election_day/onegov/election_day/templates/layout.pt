@@ -57,6 +57,7 @@ metal:define-macro="layout">
         <div class="row">
             <div class="small-4 columns">
                 &copy; ${layout.copyright_year} ${layout.app.principal.name}, <a href="https://onegovcloud.ch">OneGov Cloud</a>
+                <br><a href="${layout.opendata_link}" i18n:translate>Open Data</a>
             </div>
             <div class="small-4 columns text-center">
                 <ul class="locales">

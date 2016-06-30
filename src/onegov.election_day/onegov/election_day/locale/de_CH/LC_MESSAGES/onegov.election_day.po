@@ -1,8 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-06-28 10:45+0200\n"
-"PO-Revision-Date: 2016-06-28 10:54+0200\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-06-30 15:56+0200\n"
+"PO-Revision-Date: 2016-06-30 15:53+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -11,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 1.8.8\n"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -320,6 +321,9 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
 
+msgid "Open Data"
+msgstr "Open Data"
+
 msgid "Login"
 msgstr "Anmelden"
 
@@ -428,18 +432,75 @@ msgstr "Noch keine Abstimmungen erfasst."
 msgid "Elections &amp; Votes: Open Data"
 msgstr "Wahlen &amp; Abstimmungen: Open Data"
 
-msgid "Format"
-msgstr "Format"
+msgid "Contents"
+msgstr "Inhalt"
+
+msgid "Summarized results"
+msgstr "Ergebnisse"
+
+msgid "Election results"
+msgstr "Wahlresultate"
+
+msgid "Vote results"
+msgstr "Abstimmungsresultate"
+
+msgid ""
+"The summarized results displayed at the home page (only the results of "
+"latest votes and elections) and the archive (browsable by year or date) is "
+"also available as JSON. The data contains some global informations and for "
+"every election and vote the following commong information:"
+msgstr ""
+"Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im "
+"JSON Format verfügbar. Die Daten enthalten neben einigen globalen "
+"Informationen für jede Wahl / Abstimmung die folgenden Informationen:"
+
+msgid "${election} for elections, ${vote} for votes."
+msgstr "${election} für Wahlen, ${vote} für Abstimmungen."
+
+msgid "An object containing the translated titles."
+msgstr "Ein Objekt mit den übersetzten Titeln."
+
+msgid "The date (ISO 8601)."
+msgstr "Das Datum (ISO 8601)."
+
+msgid "The domain of influence (federation, canton, ...)."
+msgstr "Einflussbereich (Bund, Kanton, ...)."
+
+msgid "A link to the detailed view."
+msgstr "Ein Link zur Detailansicht."
+
+msgid "A link to the detailed JSON data, see below."
+msgstr "Ein Link zu den detaillierten Resultaten im JSON Format, siehe unten."
+
+msgid ""
+"An object containing the number already counted municipalities (${counted}) "
+"and the total number of municipalities (${total})."
+msgstr ""
+"Ein Objekt welches die Anzahl ausgezählter Gemeinden (${counted}) die "
+"Gesamtzahl an Gemeinden (${total}) enthält."
+
+msgid "Vote results contain the following additional information:"
+msgstr "Wahlresultate enthalten die folgenden zusätzlichen Informationen:"
+
+msgid ""
+"The answer of the vote: ${accepted}, ${rejected}, ${proposal} or ${counter-"
+"proposal}."
+msgstr ""
+"Das Abstimmungsresultat: Angenommen (${accepted}), abgelehnt (${rejected}), "
+"Initiative (${proposal}) oder Gegenvorschlag (${counter-proposal})."
+
+msgid "Yeas percentage."
+msgstr "Ja-Stimmen in Prozent."
+
+msgid "Nays percentage."
+msgstr "Nein-Stimmen in Prozent."
 
 msgid ""
 "The raw data used to display the results of votes is available in the "
 "following formats:"
 msgstr ""
-"Die Rohdaten die zur Anzeige der Resultate verwendet werden sind in den "
+"Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den "
 "folgenden Formaten verfügbar:"
-
-msgid "Fields (Elections)"
-msgstr "Felder (Wahlen)"
 
 msgid "The following fields are included in all formats:"
 msgstr "Die folgenden Felder sind in allen Formaten enthalten:"
@@ -455,6 +516,16 @@ msgstr "\"proporz\" falls Proporzwahl, \"majorz\" falls Majorzwahl"
 
 msgid "The number of mandates."
 msgstr "Die Anzahl der Sitze."
+
+msgid ""
+"The absolute majority. Only relevant for elections based on majority system."
+msgstr "Das absolute Mehr. Nur bei Majorzwahlen."
+
+msgid "The number of already counted municipalities."
+msgstr "Die Anzahl ausgezählter Gemeinden."
+
+msgid "The total number of municipalities."
+msgstr "Die Gesamtanzahl an Gemeinden."
 
 msgid "The name of the municipality."
 msgstr "Der Name der Gemeinde/des Standorts"
@@ -500,6 +571,18 @@ msgid ""
 msgstr "Der Name der Liste des Kandidierenden. Nur bei Proporzwahlen."
 
 msgid ""
+"The id of the list this candidate appears on. Only relevant for elections "
+"based on proportional representation."
+msgstr ""
+"Die ID der Liste, für welche der Kandidierende kandidiert. Nur bei "
+"Proporzwahlen."
+
+msgid ""
+"The number of mandates this list has got. Only relevant for elections based "
+"on proportional representation."
+msgstr "Die Anzahl Sitze der Liste. Nur bei Proporzwahlen."
+
+msgid ""
 "The number of votes this list has got. Only relevant for elections based on "
 "proportional representation."
 msgstr "Die Anzahl der Listenstimmen. Nur bei Proporzwahlen."
@@ -522,14 +605,14 @@ msgstr "Der Nachnahme des Kandidierenden."
 msgid "The first name of the candidate."
 msgstr "Der Vorname des Kandidaten."
 
+msgid "The ID of the candidate."
+msgstr "Die ID des Kandidierenden."
+
 msgid "True if the candidate has been elected."
 msgstr "True, falls der Kandidierenden gewählt wurde."
 
 msgid "The number of votes this candidate got."
 msgstr "Die Anzahl Kandidierendenstimmen der Gemeinde/des Standorts."
-
-msgid "Fields (Votes)"
-msgstr "Felder (Abstimmungen)"
 
 msgid "Title of the vote."
 msgstr "Titel der Abstimmung."
@@ -670,3 +753,18 @@ msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
+
+#~ msgid "<dynamic element> for elections, <dynamic element> for votes."
+#~ msgstr "<dynamic element> für Wahlen, <dynamic element> for Abstimmungen."
+
+#~ msgid "A link to the detailed view"
+#~ msgstr "Ein Link zur Detailansicht"
+
+#~ msgid "Format"
+#~ msgstr "Format"
+
+#~ msgid "Fields (Elections)"
+#~ msgstr "Felder (Wahlen)"
+
+#~ msgid "Fields (Votes)"
+#~ msgstr "Felder (Abstimmungen)"
