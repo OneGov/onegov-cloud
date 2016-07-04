@@ -489,16 +489,17 @@ def test_ballot_results_aggregation(session):
 
 
 def test_vote_last_result_change(session):
-    vote = Vote(
-        title="Abstimmung",
-        domain='federation',
-        date=date(2015, 6, 18)
-    )
+    with freeze_time("2014-01-01 12:00"):
+        vote = Vote(
+            title="Abstimmung",
+            domain='federation',
+            date=date(2015, 6, 18)
+        )
 
-    vote.ballots.append(Ballot(type='proposal'))
+        vote.ballots.append(Ballot(type='proposal'))
 
-    session.add(vote)
-    session.flush()
+        session.add(vote)
+        session.flush()
 
     # if only the proposal is accepted, the proposal wins
     with freeze_time("2015-01-01 12:00"):

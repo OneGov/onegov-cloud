@@ -278,15 +278,16 @@ def test_election_counted(session):
 
 
 def test_election_last_result_change(session):
-    election = Election(
-        title='Legislative Election',
-        domain='federation',
-        type='majorz',
-        date=date(2015, 6, 14),
-    )
+    with freeze_time("2014-01-01 12:00"):
+        election = Election(
+            title='Legislative Election',
+            domain='federation',
+            type='majorz',
+            date=date(2015, 6, 14),
+        )
 
-    session.add(election)
-    session.flush()
+        session.add(election)
+        session.flush()
 
     with freeze_time("2015-01-01 12:00"):
         election.results.append(ElectionResult(

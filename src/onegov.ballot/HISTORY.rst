@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Changes the behaviour of the last_result_change function to include the last
+  change of the election/vote, too.
+
 0.6.0 (2016-06-23)
 ~~~~~~~~~~~~~~~~~~~
 

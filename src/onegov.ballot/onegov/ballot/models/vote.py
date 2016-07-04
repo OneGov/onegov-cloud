@@ -227,10 +227,13 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
     @property
     def last_result_change(self):
-        """ Gets the latest created/modified date amongst the results of
-        this vote.
+        """ Gets the latest created/modified date of the vote or amongst the
+        results of this vote.
 
         """
+        last_changes = []
+        if self.last_change:
+            last_changes.append(self.last_change)
 
         session = object_session(self)
 
@@ -245,7 +248,13 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         results = results.filter(BallotResult.ballot_id.in_(ballot_ids))
 
         last_change = results.first()
-        return last_change and last_change[0] or None
+        if last_change:
+            last_changes.append(last_change[0])
+
+        if not last_changes:
+            return None
+
+        return max(last_changes)
 
     def export(self):
         """ Returns all date connected to this vote as list with dicts.
