@@ -181,7 +181,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         if last_change:
             last_changes.append(last_change[0])
 
-        if not last_changes:
+        if not len(last_changes):
             return None
 
         return max(last_changes)
