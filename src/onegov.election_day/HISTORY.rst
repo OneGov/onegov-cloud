@@ -22,6 +22,9 @@ Changelog
 - Adds JSON views for results.
   [msom]
 
+- Adds the 'Last-Modified' header to the most important views.
+  [msom]
+
 - Fixes javascript for form dependencies.
   [msom]
 

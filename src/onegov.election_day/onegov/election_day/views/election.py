@@ -130,6 +130,14 @@ def view_election(self, request):
             connection[1] += sum([c[1] for c in connection[3]])
             connections.append(connection)
 
+    @request.after
+    def add_last_modified(response):
+        if self.last_result_change:
+            response.headers.add(
+                'Last-Modified',
+                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
+
     return {
         'election': self,
         'layout': layout,
@@ -143,16 +151,43 @@ def view_election(self, request):
 
 @ElectionDayApp.json(model=Election, name='json', permission=Public)
 def view_election_as_json(self, request):
+
+    @request.after
+    def add_last_modified(response):
+        if self.last_result_change:
+            response.headers.add(
+                'Last-Modified',
+                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
+
     return self.export()
 
 
 @ElectionDayApp.view(model=Election, name='csv', permission=Public)
 def view_election_as_csv(self, request):
+
+    @request.after
+    def add_last_modified(response):
+        if self.last_result_change:
+            response.headers.add(
+                'Last-Modified',
+                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
+
     return convert_list_of_dicts_to_csv(self.export())
 
 
 @ElectionDayApp.view(model=Election, name='xlsx', permission=Public)
 def view_election_as_xlsx(self, request):
+
+    @request.after
+    def add_last_modified(response):
+        if self.last_result_change:
+            response.headers.add(
+                'Last-Modified',
+                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
+
     return Response(
         convert_list_of_dicts_to_xlsx(self.export()),
         content_type=(

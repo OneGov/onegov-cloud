@@ -14,6 +14,14 @@ def view_vote(self, request):
     layout = DefaultLayout(self, request)
     request.include('ballot_map')
 
+    @request.after
+    def add_last_modified(response):
+        if self.last_result_change:
+            response.headers.add(
+                'Last-Modified',
+                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
+
     return {
         'vote': self,
         'layout': layout,
@@ -23,16 +31,43 @@ def view_vote(self, request):
 
 @ElectionDayApp.json(model=Vote, name='json', permission=Public)
 def view_vote_as_json(self, request):
+
+    @request.after
+    def add_last_modified(response):
+        if self.last_result_change:
+            response.headers.add(
+                'Last-Modified',
+                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
+
     return self.export()
 
 
 @ElectionDayApp.view(model=Vote, name='csv', permission=Public)
 def view_vote_as_csv(self, request):
+
+    @request.after
+    def add_last_modified(response):
+        if self.last_result_change:
+            response.headers.add(
+                'Last-Modified',
+                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
+
     return convert_list_of_dicts_to_csv(self.export())
 
 
 @ElectionDayApp.view(model=Vote, name='xlsx', permission=Public)
 def view_vote_as_xlsx(self, request):
+
+    @request.after
+    def add_last_modified(response):
+        if self.last_result_change:
+            response.headers.add(
+                'Last-Modified',
+                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
+            )
+
     return Response(
         convert_list_of_dicts_to_xlsx(self.export()),
         content_type=(

@@ -97,7 +97,11 @@ def test_municipalities():
 
 
 def test_archive(session):
+    request = DummyRequest()
     archive = Archive(session)
+
+    def _json(items):
+        return archive.to_json(items, request)
 
     assert archive.for_date(2015).date == 2015
 
@@ -130,14 +134,15 @@ def test_archive(session):
     assert archive.latest() == archive.for_date('2016').by_date()
     assert archive.latest() == archive.for_date('2016-01-01').by_date()
 
-    request = DummyRequest()
-    latest_json = archive.latest_json(request)
-    assert latest_json == archive.for_date(2016).by_date_json(request)
-    assert latest_json == archive.for_date('2016').by_date_json(request)
-    assert latest_json == archive.for_date('2016-01-01').by_date_json(request)
+    latest_json = _json(archive.latest(group=False))
+    assert latest_json == _json(archive.for_date(2016).by_date(group=False))
+    assert latest_json == _json(archive.for_date('2016').by_date(group=False))
+    assert latest_json == _json(
+        archive.for_date('2016-01-01').by_date(group=False)
+    )
 
     assert archive.for_date('2016-02-02').by_date() is None
-    assert archive.for_date('2016-02-02').by_date_json(request) == []
+    assert _json(archive.for_date('2016-02-02').by_date(group=False)) == []
 
     for year in (2009, 2011, 2014, 2016):
         assert (
@@ -153,7 +158,7 @@ def test_archive(session):
             'type': 'election',
             'date': '{}-01-01'.format(year),
             'progress': {'total': 0, 'counted': 0}
-        } in archive.for_date(year).by_date_json(request)
+        } in _json(archive.for_date(year).by_date(group=False))
 
     for year in (2007, 2011, 2015, 2016):
         assert (
@@ -172,4 +177,4 @@ def test_archive(session):
             'type': 'vote',
             'url': 'Vote',
             'yeas_percentage': 0.0
-        } in archive.for_date(year).by_date_json(request)
+        } in _json(archive.for_date(year).by_date(group=False))

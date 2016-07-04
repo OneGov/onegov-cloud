@@ -19,18 +19,27 @@ class Archive(object):
         years.extend(VoteCollection(self.session).get_years() or [])
         return sorted(set(years), reverse=True)
 
-    def group_items(self, items, reverse=False):
-        if not items:
+    def group_items(self, ungrouped_items, reverse=False):
+        if not ungrouped_items:
             return None
 
         return groupbylist(
-            sorted(items, key=lambda i: i.date, reverse=reverse),
+            sorted(ungrouped_items, key=lambda i: i.date, reverse=reverse),
             lambda i: (i.__class__.__name__.lower(), i.domain, i.date)
         )
 
-    def to_json(self, items, request):
+    def last_modified(self, ungrouped_items):
+        dates = (item.last_result_change for item in ungrouped_items)
+        dates = list(filter(lambda x: x, dates))
+
+        if not len(dates):
+            return None
+
+        return max(dates)
+
+    def to_json(self, ungrouped_items, request):
         results = []
-        for item in items:
+        for item in ungrouped_items:
             values = {
                 'data_url': request.link(item, 'json'),
                 'date': item.date.isoformat(),
@@ -64,9 +73,6 @@ class Archive(object):
 
         return self.group_items(items, reverse=True) if group else items
 
-    def latest_json(self, request):
-        return self.to_json(self.latest(group=False), request)
-
     def by_date(self, group=True):
         try:
             _date = date.fromtimestamp(mktime(strptime(self.date, '%Y-%m-%d')))
@@ -77,6 +83,3 @@ class Archive(object):
             items.extend(VoteCollection(self.session).by_year(self.date) or [])
 
         return self.group_items(items) if group else items
-
-    def by_date_json(self, request):
-        return self.to_json(self.by_date(group=False), request)

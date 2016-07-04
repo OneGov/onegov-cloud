@@ -36,7 +36,7 @@ setup(
         'cached_property',
         'cssmin',
         'onegov.core>=0.20.0',
-        'onegov.ballot>=0.6.0',
+        'onegov.ballot>=0.6.1',
         'onegov.form>=0.12.0',
         'onegov.foundation>=0.0.4',
         'onegov.shared>=0.2.0',
@@ -47,6 +47,7 @@ setup(
     extras_require=dict(
         test=[
             'coverage',
+            'freezegun',
             'onegov.testing',
             'webtest',
             'pytest',

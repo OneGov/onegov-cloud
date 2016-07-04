@@ -1,6 +1,7 @@
 import onegov.election_day
 
 from datetime import date
+from freezegun import freeze_time
 from onegov.testing import utils
 from webtest import TestApp as Client
 from webtest.forms import Upload
@@ -325,6 +326,46 @@ def test_view_archive_json(election_day_app):
 
     archive = client.get('/archive/2013-02-02/json')
     assert archive.json['results'] == []
+
+
+def test_view_last_modified(election_day_app):
+    with freeze_time("2014-01-01 12:00"):
+        client = Client(election_day_app)
+        client.get('/locale/de_CH').follow()
+
+        login(client)
+
+        new = client.get('/manage/new-vote')
+        new.form['vote_de'] = "Vote"
+        new.form['date'] = date(2013, 1, 1)
+        new.form['domain'] = 'federation'
+        new.form.submit()
+
+        new = client.get('/manage/new-election')
+        new.form['election_de'] = "Election"
+        new.form['date'] = date(2013, 1, 1)
+        new.form['mandates'] = 1
+        new.form['election_type'] = 'majorz'
+        new.form['domain'] = 'federation'
+        new.form.submit()
+
+        client = Client(election_day_app)
+        client.get('/locale/de_CH').follow()
+
+        for path in (
+            '/json',
+            '/archive/2013',
+            '/election/election',
+            '/election/election/json',
+            '/election/election/csv',
+            '/election/election/xlsx',
+            '/vote/vote/',
+            '/vote/vote/json',
+            '/vote/vote/csv',
+            '/vote/vote/xlsx',
+        ):
+            assert client.get(path).headers.get('Last-Modified') == \
+                'Wed, 01 Jan 2014 12:00:00 GMT'
 
 
 def test_view_election_candidates(election_day_app_gr):
