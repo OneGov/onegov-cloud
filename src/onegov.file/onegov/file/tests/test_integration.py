@@ -6,6 +6,7 @@ from depot.manager import DepotManager
 from onegov.core import Framework
 from onegov.core.utils import scan_morepath_modules
 from onegov.file import DepotApp, FileCollection
+from onegov.testing.utils import create_image
 from webtest import TestApp as Client
 
 
@@ -86,3 +87,21 @@ def test_application_separation(app):
         .status_code == 404
     assert client.get('/storage/{}'.format(second_id))\
         .status_code == 200
+
+
+def test_serve_thumbnail(app):
+    ensure_correct_depot(app)
+
+    files = FileCollection(app.session())
+    files.add('avatar.png', create_image())
+    transaction.commit()
+
+    client = Client(app)
+
+    avatar = files.query().one()
+
+    image = client.get('/storage/{}'.format(avatar.id))
+    thumb = client.get('/storage/{}?variant=small'.format(avatar.))
+
+    assert image.content_type == 'image/png'
+    assert thumb.content_type == 'image/png'

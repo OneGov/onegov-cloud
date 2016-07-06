@@ -35,6 +35,7 @@ setup(
         'onegov.core>=0.4.0',
         'filedepot',
         'more.transaction',
+        'pillow',
         'python-magic'
     ],
     extras_require=dict(

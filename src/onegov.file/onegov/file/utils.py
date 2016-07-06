@@ -4,6 +4,7 @@ import os.path
 
 from depot.io.utils import FileIntent
 from io import IOBase
+from PIL import Image
 
 
 def path_from_fileobj(fileobj):
@@ -24,7 +25,7 @@ def content_type_from_fileobj(fileobj):
     """
 
     path = path_from_fileobj(fileobj)
-    content_type = mimetypes.guess_type(path)
+    content_type = mimetypes.guess_type(path)[0]
 
     if not content_type:
         content_type = magic.from_file(path, mime=True)
@@ -44,6 +45,38 @@ def as_fileintent(content, filename):
         assert isinstance(content, bytes), "Provide content in bytes."
         return FileIntent(content, filename, 'text/plain')
     else:
-        assert 'b' in content.mode, "Open file in binary mode."
+        if hasattr(content, 'mode'):
+            assert 'b' in content.mode, "Open file in binary mode."
+
         return FileIntent(
             content, filename, content_type_from_fileobj(content))
+
+
+def get_supported_image_mime_types():
+    """ Queries PIL for *all* locally supported mime types.
+
+    Adapted from:
+    https://github.com/python-pillow/Pillow/issues/1182#issuecomment-90572583
+
+    """
+
+    # Make sure all supported formats are registered.
+    Image.init()
+
+    # Not all PIL formats register a mime type, fill in the blanks ourselves.
+    supported_types = {
+        'image/bmp',
+        'image/x-bmp',
+        'image/x-MS-bmp',
+        'image/x-icon',
+        'image/x-ico',
+        'image/x-win-bitmap',
+        'image/x-pcx',
+        'image/x-portable-pixmap',
+        'image/x-tga'
+    }
+
+    for mime in Image.MIME.values():
+        supported_types.add(mime)
+
+    return supported_types

@@ -2,6 +2,7 @@ from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from sqlalchemy import Column, Text
 from uuid import uuid4
 
@@ -47,4 +48,46 @@ class File(Base, TimestampMixin):
 
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
-    reference = Column(UploadedFileField)
+    reference = Column(UploadedFileField(filters=[
+        OnlyIfImage(
+            # note, the thumbnail configuration should not be changed
+            # anywhere but here - for consistency.
+            WithThumbnailFilter(
+                name='small', size=(256, 256), format='png'
+            )
+        )
+    ]))
+
+    #: the virtual file id is a file id which may be overwritten - only used
+    #: internally for thumbnail linking
+
+    @property
+    def file_id(self):
+        """ The file_id of the contained reference.
+
+        If :attr:`virtual_file_id` is not None, it is returned instead.
+        """
+
+        return self.virtual_file_id or self.reference.file_id
+
+    def get_thumbnail(self, name):
+        """ Returns the thumbnail with the given name as a :class:`File`
+        instance - with the appropriate polymorphic type.
+
+        Note that the so created object is transient and should not be used
+        to make changes to the thumbnail, but to link to it using Morepath.
+
+        If the thumbnail does not exist, None is returned.
+
+        """
+
+        if name not in self.reference:
+            return None
+
+        if not name.startswith('thumbnail_'):
+            name = 'thumbnail_' + name
+
+        thumbnail = File.get_polymorphic_class(self.type, File)()
+        thumbnail.virtual_file_id = self.reference[name]['id']
+
+        return thumbnail

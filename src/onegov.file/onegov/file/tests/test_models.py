@@ -2,6 +2,7 @@ import transaction
 
 from onegov.file import File, FileSet
 from onegov.file.models.fileset import file_to_set_associations
+from onegov.testing.utils import create_image
 
 
 def test_store_file_from_string(session):
@@ -76,3 +77,15 @@ def test_associate_files_with_sets(session):
     assert len(readme.filesets) == 2
     assert len(textfiles.files) == 1
     assert len(documents.files) == 1
+
+
+def test_thumbnail_creation(session):
+    session.add(File(name='large.png', reference=create_image(1024, 1024)))
+    session.add(File(name='small.png', reference=create_image(32, 32)))
+
+    transaction.commit()
+
+    large, small = session.query(File).order_by(File.name).all()
+
+    assert 'thumbnail_small' in large.reference
+    assert 'thumbnail_small' in small.reference
