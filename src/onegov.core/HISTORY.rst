@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.21.3 (2016-07-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds compatibility with python-magic 0.4.12.
   [msom]
