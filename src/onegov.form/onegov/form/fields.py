@@ -59,7 +59,6 @@ class UploadField(FileField):
         file_data = fp.read()
 
         mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
-        mimetype_by_introspection = mimetype_by_introspection
 
         compressed_data = BytesIO()
         with gzip.GzipFile(fileobj=compressed_data, mode="wb") as f:
