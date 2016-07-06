@@ -28,6 +28,9 @@ Changelog
 - Adds pagination to management views.
   [msom]
 
+- Adds some basic print styles.
+  [msom]
+
 - Fixes javascript for form dependencies.
   [msom]
 

@@ -67,7 +67,7 @@ metal:define-macro="layout">
                     </li>
                 </ul>
             </div>
-            <div class="small-4 columns text-right">
+            <div class="small-4 columns text-right manage-links">
                 <a tal:condition="layout.login_link" href="${layout.login_link}" i18n:translate>Login</a>
                 <tal:block condition="layout.logout_link" >
                     <span i18n:translate>You are logged in: </span>

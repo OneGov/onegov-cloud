@@ -709,3 +709,30 @@ form {
         display: block;
     }
 }
+
+
+/*
+    Print
+*/
+
+@media print {
+    .download-results,
+    .manage-links,
+    .row.archive,
+    .row.header,
+    a.svg-download,
+    ul.locales {
+        display: none;
+    }
+
+    p,
+    td,
+    th {
+        font-size: 12px !important;
+    }
+
+    svg,
+    table {
+        max-width: 100%;
+    }
+}
