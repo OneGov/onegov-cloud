@@ -73,3 +73,17 @@ def test_fileset_integration(files, filesets):
     transaction.commit()
 
     assert files.query().count() == 0
+
+
+def test_replace_file(files):
+    files.add('readme.txt', content=b'RTFM')
+    transaction.commit()
+
+    readme = files.by_filename('readme.txt').first()
+    assert readme.reference.file.read() == b'RTFM'
+
+    files.replace(readme, b'README')
+    transaction.commit()
+
+    readme = files.by_filename('readme.txt').first()
+    assert readme.reference.file.read() == b'README'

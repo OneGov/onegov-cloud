@@ -1,5 +1,5 @@
-from io import IOBase
 from onegov.file.models import File, FileSet
+from onegov.file.utils import as_fileintent
 
 
 class FileCollection(object):
@@ -16,27 +16,24 @@ class FileCollection(object):
         in bytes or a file object.
 
         """
-        assert isinstance(content, bytes) or isinstance(content, IOBase), """
-            Content must be either a bytes string or a file-like object.
-        """
-
-        if hasattr(content, 'mode'):
-            assert 'b' in content.mode, "Open file in binary mode."
-        else:
-            assert isinstance(content, bytes), "Provide content in bytes."
-
         file = File.get_polymorphic_class(type, File)()
         file.name = filename
         file.type = type
-        file.reference = content
+        file.reference = as_fileintent(content, filename)
 
         self.session.add(file)
         self.session.flush()
 
         return file
 
+    def replace(self, file, content):
+        """ Replaces the content of the given file with the new content. """
+        file.reference = as_fileintent(content, file.name)
+        self.session.flush()
+
     def delete(self, file):
         self.session.delete(file)
+        self.session.flush()
 
     def by_id(self, file_id):
         """ Returns the file with the given id or None. """
