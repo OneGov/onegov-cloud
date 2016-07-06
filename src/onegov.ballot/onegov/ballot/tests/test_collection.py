@@ -166,6 +166,56 @@ def test_elections_shortcode_order(session):
     assert elections[1].title == "A"
 
 
+def test_election_collection_pagination(session):
+    elections = ElectionCollection(session)
+
+    assert elections.page_index == 0
+    assert elections.pages_count == 0
+    assert elections.batch == []
+
+    for year in range(2008, 2011):
+        for month in range(1, 13):
+            session.add(Election(
+                title="Election",
+                domain='federation',
+                type='majorz',
+                date=date(year, month, 1)
+            ))
+            session.flush()
+
+    assert elections.query().count() == 3 * 12
+
+    elections = ElectionCollection(session)
+    assert elections.subset_count == 3 * 12
+
+    elections = ElectionCollection(session, year='2007')
+    assert elections.subset_count == 0
+
+    elections = ElectionCollection(session, year='2008')
+    assert elections.subset_count == 12
+    assert all([e.date.year == 2008 for e in elections.batch])
+    assert all([e.date.month > 2 for e in elections.batch])
+    assert len(elections.next.batch) == 12 - elections.batch_size
+    assert all([e.date.year == 2008 for e in elections.next.batch])
+    assert all([e.date.month < 3 for e in elections.next.batch])
+
+    elections = ElectionCollection(session, year='2009')
+    assert elections.subset_count == 12
+    assert all([e.date.year == 2009 for e in elections.batch])
+    assert all([e.date.month > 2 for e in elections.batch])
+    assert len(elections.next.batch) == 12 - elections.batch_size
+    assert all([e.date.year == 2009 for e in elections.next.batch])
+    assert all([e.date.month < 3 for e in elections.next.batch])
+
+    elections = ElectionCollection(session, year='2010')
+    assert elections.subset_count == 12
+    assert all([e.date.year == 2010 for e in elections.batch])
+    assert all([e.date.month > 2 for e in elections.batch])
+    assert len(elections.next.batch) == 12 - elections.batch_size
+    assert all([e.date.year == 2010 for e in elections.next.batch])
+    assert all([e.date.month < 3 for e in elections.next.batch])
+
+
 def test_votes_by_date(session):
     session.add(Vote(
         title="first",
@@ -328,3 +378,52 @@ def test_ballot_collection(session):
 
     assert collection.query().count() == 1
     assert collection.by_id(vote.ballots[0].id) == vote.ballots[0]
+
+
+def test_vote_collection_pagination(session):
+    votes = VoteCollection(session)
+
+    assert votes.page_index == 0
+    assert votes.pages_count == 0
+    assert votes.batch == []
+
+    for year in range(2008, 2011):
+        for month in range(1, 13):
+            session.add(Vote(
+                title="Vote",
+                domain='federation',
+                date=date(year, month, 1)
+            ))
+            session.flush()
+
+    assert votes.query().count() == 3 * 12
+
+    votes = VoteCollection(session)
+    assert votes.subset_count == 3 * 12
+
+    votes = VoteCollection(session, year='2007')
+    assert votes.subset_count == 0
+
+    votes = VoteCollection(session, year='2008')
+    assert votes.subset_count == 12
+    assert all([e.date.year == 2008 for e in votes.batch])
+    assert all([e.date.month > 2 for e in votes.batch])
+    assert len(votes.next.batch) == 12 - votes.batch_size
+    assert all([e.date.year == 2008 for e in votes.next.batch])
+    assert all([e.date.month < 3 for e in votes.next.batch])
+
+    votes = VoteCollection(session, year='2009')
+    assert votes.subset_count == 12
+    assert all([e.date.year == 2009 for e in votes.batch])
+    assert all([e.date.month > 2 for e in votes.batch])
+    assert len(votes.next.batch) == 12 - votes.batch_size
+    assert all([e.date.year == 2009 for e in votes.next.batch])
+    assert all([e.date.month < 3 for e in votes.next.batch])
+
+    votes = VoteCollection(session, year='2010')
+    assert votes.subset_count == 12
+    assert all([e.date.year == 2010 for e in votes.batch])
+    assert all([e.date.month > 2 for e in votes.batch])
+    assert len(votes.next.batch) == 12 - votes.batch_size
+    assert all([e.date.year == 2010 for e in votes.next.batch])
+    assert all([e.date.month < 3 for e in votes.next.batch])

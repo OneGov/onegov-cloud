@@ -1,18 +1,41 @@
 from onegov.ballot.models import Ballot, Election, Vote
+from onegov.core.collection import Pagination
 from sqlalchemy import cast, desc, distinct, extract, Integer
 
 
-class ElectionCollection(object):
+class ElectionCollectionPagination(Pagination):
 
-    def __init__(self, session, year=None):
+    def __init__(self, session, page=0, year=None):
         self.session = session
+        self.page = page
         self.year = year
+
+    def __eq__(self, other):
+        return self.year == other.year and self.page == other.page
+
+    def subset(self):
+        query = self.query()
+        query = query.order_by(desc(Election.date))
+        if self.year:
+            query = query.filter(extract('year', Election.date) == self.year)
+
+        return query
+
+    @property
+    def page_index(self):
+        return self.page
+
+    def page_by_index(self, index):
+        return self.__class__(self.session, index, self.year)
+
+    def for_year(self, year):
+        return self.__class__(self.session, 0, year)
+
+
+class ElectionCollection(ElectionCollectionPagination):
 
     def query(self):
         return self.session.query(Election)
-
-    def for_year(self, year):
-        return self.__class__(self.session, year)
 
     def get_latest(self):
         """ Returns the elections with the latest date. """
@@ -69,17 +92,39 @@ class ElectionCollection(object):
         return query.first()
 
 
-class VoteCollection(object):
+class VoteCollectionPagination(Pagination):
 
-    def __init__(self, session, year=None):
+    def __init__(self, session, page=0, year=None):
         self.session = session
+        self.page = page
         self.year = year
+
+    def __eq__(self, other):
+        return self.year == other.year and self.page == other.page
+
+    def subset(self):
+        query = self.query()
+        query = query.order_by(desc(Vote.date))
+        if self.year:
+            query = query.filter(extract('year', Vote.date) == self.year)
+
+        return query
+
+    @property
+    def page_index(self):
+        return self.page
+
+    def page_by_index(self, index):
+        return self.__class__(self.session, index, self.year)
+
+    def for_year(self, year):
+        return self.__class__(self.session, 0, year)
+
+
+class VoteCollection(VoteCollectionPagination):
 
     def query(self):
         return self.session.query(Vote)
-
-    def for_year(self, year):
-        return self.__class__(self.session, year)
 
     def get_latest(self):
         """ Returns the votes with the latest date. """
