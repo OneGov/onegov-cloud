@@ -5,11 +5,11 @@ from PIL import Image
 from unittest.mock import patch
 
 
-def create_image():
+def create_image(width=50, height=50):
     """ Generates a test image and returns it's file handle. """
 
     im = BytesIO()
-    image = Image.new('RGBA', size=(50, 50), color=(155, 0, 0))
+    image = Image.new('RGBA', size=(width, height), color=(155, 0, 0))
     image.save(im, 'png')
     im.name = 'test.png'
     im.seek(0)
