@@ -163,6 +163,14 @@ def temporary_directory():
     shutil.rmtree(directory)
 
 
+@pytest.yield_fixture(scope="function")
+def temporary_path(temporary_directory):
+    """ Same as :func:`temporary_directory`, but providing a ``Path`` instead
+    of a string. """
+
+    yield Path(temporary_directory)
+
+
 @pytest.yield_fixture(scope="session")
 def es_process():
     binary = os.environ.get('ES_BINARY', None)
