@@ -427,6 +427,26 @@ footer {
 }
 
 /*
+    Manage navigation
+*/
+.tabs {
+    background-color: $snow;
+    border-bottom: 4px solid $gainsboro;
+
+    .tab-title > a {
+        background-color: transparent;
+    }
+}
+
+ul.breadcrumbs {
+    background: $white;
+    border: 0;
+    margin-bottom: 2em;
+    margin-top: 1em;
+    padding-left: 0;
+}
+
+/*
     Manage view actions
 */
 ul.actions {

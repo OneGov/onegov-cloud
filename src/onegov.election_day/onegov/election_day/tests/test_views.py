@@ -56,34 +56,15 @@ def test_view_manage(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
-    assert client.get('/manage', expect_errors=True).status_code == 403
+    assert client.get('/manage/elections',
+                      expect_errors=True).status_code == 403
+    assert client.get('/manage/votes', expect_errors=True).status_code == 403
 
     login(client)
 
-    manage = client.get('/manage')
+    manage = client.get('/manage/elections')
+
     assert "Noch keine Wahlen erfasst" in manage
-    assert "Noch keine Abstimmungen erfasst" in manage
-
-    new = manage.click('Neue Abstimmung')
-    new.form['vote_de'] = 'Vote for a better yesterday'
-    new.form['date'] = date(2016, 1, 1)
-    new.form['domain'] = 'federation'
-    manage = new.form.submit().follow()
-
-    assert "Vote for a better yesterday" in manage
-    edit = manage.click('Bearbeiten')
-    edit.form['vote_de'] = 'Vote for a better tomorrow'
-    manage = edit.form.submit().follow()
-
-    assert "Vote for a better tomorrow" in manage
-
-    delete = manage.click("Löschen")
-    assert "Abstimmung löschen" in delete
-    assert "Vote for a better tomorrow" in delete
-    assert "Bearbeiten" in delete.click("Abbrechen")
-
-    manage = delete.form.submit().follow()
-    assert "Noch keine Abstimmungen erfasst" in manage
 
     new = manage.click('Neue Wahl')
     new.form['election_de'] = 'Elect a new president'
@@ -108,6 +89,33 @@ def test_view_manage(election_day_app):
     manage = delete.form.submit().follow()
     assert "Noch keine Wahlen erfasst" in manage
 
+    manage = client.get('/manage/votes')
+
+    assert "Noch keine Abstimmungen erfasst" in manage
+
+    new = manage.click('Neue Abstimmung')
+    new.form['vote_de'] = 'Vote for a better yesterday'
+    new.form['date'] = date(2016, 1, 1)
+    new.form['domain'] = 'federation'
+    manage = new.form.submit().follow()
+
+    assert "Vote for a better yesterday" in manage
+    edit = manage.click('Bearbeiten')
+    edit.form['vote_de'] = 'Vote for a better tomorrow'
+    manage = edit.form.submit().follow()
+
+    assert "Vote for a better tomorrow" in manage
+
+    delete = manage.click("Löschen")
+    assert "Abstimmung löschen" in delete
+    assert "Vote for a better tomorrow" in delete
+    assert "Bearbeiten" in delete.click("Abbrechen")
+
+    manage = delete.form.submit().follow()
+    assert "Noch keine Abstimmungen erfasst" in manage
+
+
+
 
 def test_i18n(election_day_app):
     client = Client(election_day_app)
@@ -115,7 +123,7 @@ def test_i18n(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Foo'
     new.form['vote_fr'] = 'Bar'
     new.form['vote_it'] = 'Baz'
@@ -136,7 +144,7 @@ def test_i18n(election_day_app):
     homepage = homepage.click('Rumantsch').follow()
     assert "Qux" in homepage
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Tick'
     new.form['election_fr'] = 'Trick'
     new.form['election_it'] = 'Track'
@@ -171,7 +179,7 @@ def test_pages_cache(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = '0xdeadbeef'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
@@ -190,7 +198,7 @@ def test_pages_cache(election_day_app):
         ('Cache-Control', 'no-cache')
     ])
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = '0xdeafbeef'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -216,13 +224,13 @@ def test_view_latest(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
     new.form['date'] = date(2013, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
     new.form['date'] = date(2013, 1, 1)
     new.form['mandates'] = 1
@@ -243,13 +251,13 @@ def test_view_latest_json(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
     new.form['date'] = date(2013, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
     new.form['date'] = date(2013, 1, 1)
     new.form['mandates'] = 1
@@ -268,13 +276,13 @@ def test_view_archive(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
     new.form['date'] = date(2013, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
     new.form['date'] = date(2013, 1, 1)
     new.form['mandates'] = 1
@@ -302,13 +310,13 @@ def test_view_archive_json(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = "Abstimmung 1. Januar 2013"
     new.form['date'] = date(2013, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = "Wahl 1. Januar 2013"
     new.form['date'] = date(2013, 1, 1)
     new.form['mandates'] = 1
@@ -335,13 +343,13 @@ def test_view_last_modified(election_day_app):
 
         login(client)
 
-        new = client.get('/manage/new-vote')
+        new = client.get('/manage/votes/new-vote')
         new.form['vote_de'] = "Vote"
         new.form['date'] = date(2013, 1, 1)
         new.form['domain'] = 'federation'
         new.form.submit()
 
-        new = client.get('/manage/new-election')
+        new = client.get('/manage/elections/new-election')
         new.form['election_de'] = "Election"
         new.form['date'] = date(2013, 1, 1)
         new.form['mandates'] = 1
@@ -374,7 +382,7 @@ def test_view_election_candidates(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -411,7 +419,7 @@ def test_view_election_lists(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -459,7 +467,7 @@ def test_view_election_connections(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -516,7 +524,7 @@ def test_view_election_export(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1

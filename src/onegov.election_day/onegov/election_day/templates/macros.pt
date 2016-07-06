@@ -216,4 +216,51 @@
     </div>
 </metal:related_link>
 
+<metal:pagination define-macro="pagination" i18n:domain="onegov.election_day">
+    <ul class="pagination" role="menubar" aria-label="Pagination">
+        <tal:block repeat="page collection.pages">
+            <tal:block define="
+                previous current_page.previous;
+                next current_page.next;
+                is_current current_page == page;
+                is_visible abs(current_page.page-page.page) < 6;
+            ">
+                <tal:block condition="repeat.page.start and previous">
+                    <li class="arrow">
+                        <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
+                    </li>
+                </tal:block>
+
+                <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
+                    <a href="${request.link(page)}">${page.page + 1}</a>
+                </li>
+
+                <tal:block condition="repeat.page.end and next">
+                    <li class="arrow">
+                        <a href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
+                    </li>
+                </tal:block>
+            </tal:block>
+        </tal:block>
+    </ul>
+</metal:pagination>
+
+<metal:breadcrumbs define-macro="breadcrumbs">
+    <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
+        <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
+            <tal:block repeat="breadcrumb layout.breadcrumbs">
+                <li class="${breadcrumb[2]}"><a href="${breadcrumb[1]}">${breadcrumb[0]}</a></li>
+            </tal:block>
+        </ul>
+    </nav>
+</metal:breadcrumbs>
+
+<metal:manage_menu define-macro="manage_menu">
+    <ul class="tabs" tal:condition="layout.menu">
+        <tal:block repeat="item layout.menu">
+            <li class="tab-title"><a href="${item[1]}">${item[0]}</a></li>
+        </tal:block>
+    </ul>
+</metal:manage_menu>
+
 </body>

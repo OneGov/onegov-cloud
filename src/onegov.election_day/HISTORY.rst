@@ -25,6 +25,9 @@ Changelog
 - Adds the 'Last-Modified' header to the most important views.
   [msom]
 
+- Adds pagination to management views.
+  [msom]
+
 - Fixes javascript for form dependencies.
   [msom]
 

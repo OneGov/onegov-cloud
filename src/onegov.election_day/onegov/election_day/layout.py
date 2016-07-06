@@ -1,17 +1,19 @@
 from babel import Locale
 from cached_property import cached_property
 from datetime import datetime
+from onegov.ballot import ElectionCollection, VoteCollection
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
-from onegov.election_day.models import Archive, Manage
+from onegov.election_day import _
+from onegov.election_day.models import Archive
 from onegov.user import Auth
 
 
 class Layout(ChameleonLayout):
 
-    def __init__(self, request, model):
-        super().__init__(request, model)
+    def __init__(self, model, request):
+        super().__init__(model, request)
         self.request.include('common')
 
     @cached_property
@@ -43,7 +45,7 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def manage_link(self):
-        return self.request.link(Manage(self.app.session()))
+        return self.request.link(ElectionCollection(self.app.session()))
 
     @cached_property
     def login_link(self):
@@ -84,8 +86,59 @@ class DefaultLayout(Layout):
 
 
 class ManageLayout(DefaultLayout):
-    pass
 
-    def __init__(self, request, model):
-        super().__init__(request, model)
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(self.model)
+
+    @cached_property
+    def menu(self):
+        menu = []
+        session = self.request.app.session()
+
+        link = self.request.link(ElectionCollection(session))
+        class_ = 'active' if link == self.manage_model_link else ''
+        menu.append((_("Elections"), link, class_))
+
+        link = self.request.link(VoteCollection(session))
+        class_ = 'active' if link == self.manage_model_link else ''
+        menu.append((_("Votes"), link, class_))
+
+        return menu
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
         self.request.include('form')
+        self.breadcrumbs = [
+            (_("Manage"), super().manage_link, 'unavailable'),
+        ]
+
+
+class ManageElectionsLayout(ManageLayout):
+
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(
+            ElectionCollection(self.request.app.session())
+        )
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.breadcrumbs.append(
+            (_("Elections"), request.link(self.model), '')
+        )
+
+
+class ManageVotesLayout(ManageLayout):
+
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(
+            VoteCollection(self.request.app.session())
+        )
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.breadcrumbs.append(
+            (_("Votes"), request.link(self.model), ''),
+        )

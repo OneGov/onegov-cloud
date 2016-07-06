@@ -33,7 +33,7 @@ def test_upload_vote_all_or_nothing(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
@@ -83,7 +83,7 @@ def test_upload_vote_success(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
@@ -144,7 +144,7 @@ def test_upload_vote_validation(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
@@ -311,7 +311,7 @@ def test_upload_vote_missing_town(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
@@ -361,7 +361,7 @@ def test_upload_vote_unknown_result(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
@@ -415,7 +415,7 @@ def test_upload_vote_year_unavailable(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2000, 1, 1)
     new.form['domain'] = 'federation'
@@ -439,7 +439,7 @@ def test_upload_vote_roundtrip(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
@@ -499,7 +499,7 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2016, 6, 6)
     new.form['domain'] = 'federation'
@@ -539,7 +539,7 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
     assert "3 von 77" in results
     assert "40.00" in results
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Complex vote'
     new.form['date'] = date(2016, 6, 6)
     new.form['domain'] = 'federation'
@@ -573,7 +573,7 @@ def test_upload_vote_invalidate_cache(election_day_app):
 
     login(client)
 
-    new = client.get('/manage/new-vote')
+    new = client.get('/manage/votes/new-vote')
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'

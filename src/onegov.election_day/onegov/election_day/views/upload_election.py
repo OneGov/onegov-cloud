@@ -6,8 +6,7 @@ from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.forms import UploadElectionForm
-from onegov.election_day.layout import ManageLayout
-from onegov.election_day.models import Manage
+from onegov.election_day.layout import ManageElectionsLayout
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats.election.onegov_ballot import (
     import_file as import_onegov_file
@@ -93,12 +92,14 @@ def view_upload(self, request, form):
     if status == 'ok':
         request.app.pages_cache.invalidate()
 
+    layout = ManageElectionsLayout(self, request)
+
     return {
-        'layout': ManageLayout(self, request),
+        'layout': layout,
         'title': self.title,
         'shortcode': self.shortcode,
         'form': form,
-        'cancel': request.link(Manage(request.app.session())),
+        'cancel': layout.manage_model_link,
         'results': result,
         'status': status,
         'election': self

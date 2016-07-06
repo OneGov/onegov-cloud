@@ -3,7 +3,7 @@ from onegov.ballot import Election, ElectionCollection
 from onegov.ballot import Ballot, BallotCollection
 from onegov.ballot import Vote, VoteCollection
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.models import Archive, Manage, Principal
+from onegov.election_day.models import Archive, Principal
 from onegov.user import Auth
 
 
@@ -17,9 +17,14 @@ def get_principal(app):
     return app.principal
 
 
-@ElectionDayApp.path(model=Manage, path='/manage')
-def get_manage(app):
-    return Manage(app.session())
+@ElectionDayApp.path(model=ElectionCollection, path='/manage/elections')
+def get_manage_elections(app, page=0):
+    return ElectionCollection(app.session(), page=page)
+
+
+@ElectionDayApp.path(model=VoteCollection, path='/manage/votes')
+def get_manage_votes(app, page=0):
+    return VoteCollection(app.session(), page=page)
 
 
 @ElectionDayApp.path(model=Election, path='/election/{id}')

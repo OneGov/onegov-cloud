@@ -20,7 +20,7 @@ def test_upload_election_year_unavailable(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(1990, 1, 1)
     new.form['mandates'] = 1
@@ -60,7 +60,7 @@ def test_upload_election_sesam_majorz(election_day_app_gr, tar_file):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -113,7 +113,7 @@ def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -169,7 +169,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -335,7 +335,7 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2011, 1, 1)
     new.form['mandates'] = 1
@@ -405,7 +405,7 @@ def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -552,7 +552,7 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 3
@@ -658,7 +658,7 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -720,7 +720,7 @@ def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -771,7 +771,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1
@@ -887,7 +887,7 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
 
     login(client)
 
-    new = client.get('/manage/new-election')
+    new = client.get('/manage/elections/new-election')
     new.form['election_de'] = 'Election'
     new.form['date'] = date(2015, 1, 1)
     new.form['mandates'] = 1

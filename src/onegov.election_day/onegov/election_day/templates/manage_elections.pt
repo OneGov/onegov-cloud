@@ -3,6 +3,10 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['manage_menu']"></div>
+        <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+
         <div class="row manage-elections">
             <div class="small-12 columns">
                 <div class="row">
@@ -51,55 +55,12 @@
                     </tr>
                 </table>
 
-            </div>
-        </div>
-
-        <div class="row manage-votes">
-            <div class="small-12 columns">
-                <div class="row">
-                    <div class="small-12 medium-6 columns">
-                        <h1 i18n:translate>Votes</h1>
-                    </div>
-                    <div class="small-12 medium-6 columns">
-                        <ul class="top-actions text-right">
-                            <li><a class="action-new" href="${new_vote}" i18n:translate>New Vote</a></li>
-                        </ul>
-                    </div>
+                <div class="pagination-centered">
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
                 </div>
 
-                <p tal:condition="not:votes" i18n:translate>
-                    No votes yet.
-                </p>
-
-                <table class="votes" tal:condition="votes">
-                    <thead>
-                        <tr>
-                            <th i18n:translate>Vote</th>
-                            <th i18n:translate>Shortcode</th>
-                            <th i18n:translate>Date</th>
-                            <th i18n:translate>Type</th>
-                            <th i18n:translate>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <tr tal:repeat="vote votes">
-                        <td>${vote.title}</td>
-                        <td><span class="shortcode" tal:condition="vote.shortcode">${vote.shortcode}</span></td>
-                        <td>${layout.format_date(vote.date, 'date')}</td>
-                        <td tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
-                        <td tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
-                        <td>
-                            <ul class="actions">
-                                <li><a i18n:translate class="action-view" href="${request.link(vote)}">View</a></li>
-                                <li><a i18n:translate class="action-edit" href="${request.link(vote, 'edit')}">Edit</a></li>
-                                <li><a i18n:translate class="action-upload" href="${request.link(vote, 'upload')}">Upload Results</a></li>
-                                <li><a i18n:translate class="action-delete" href="${request.link(vote, 'delete')}">Delete</a></li>
-                            </ul>
-                        </td>
-                    </tr>
-                </table>
-
             </div>
         </div>
+
     </tal:block>
 </div>
