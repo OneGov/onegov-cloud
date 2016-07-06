@@ -115,8 +115,6 @@ def test_view_manage(election_day_app):
     assert "Noch keine Abstimmungen erfasst" in manage
 
 
-
-
 def test_i18n(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
