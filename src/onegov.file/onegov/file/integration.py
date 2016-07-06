@@ -67,7 +67,9 @@ def configure_depot_tween_factory(app, handler):
     def configure_depot_tween(request):
         if app.bound_storage_depot not in DepotManager._depots:
             path = app.bound_storage_path
-            path.mkdir(exist_ok=True)
+
+            if not path.exists():
+                path.mkdir()
 
             DepotManager.configure(app.bound_storage_depot, {
                 'depot.backend': app.depot_backend,
