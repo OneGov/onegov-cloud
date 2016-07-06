@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.7.0 (2016-07-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds pagination to collections.
   [msom]
