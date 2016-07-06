@@ -203,7 +203,6 @@ def render_file(file_path, request):
 
         if not content_type:
             content_type = magic.from_file(file_path, mime=True)
-            content_type = content_type.decode('utf-8')
 
         return content_type
 

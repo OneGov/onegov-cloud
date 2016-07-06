@@ -56,7 +56,7 @@ setup(
         'ordered-set',
         'passlib',
         'polib',
-        'python-magic',
+        'python-magic>=0.4.12',
         'python-memcached>=1.57',
         'psycopg2',
         'pylru',
