@@ -56,7 +56,7 @@ setup(
         'pillow',
         'purl',
         'python-dateutil',
-        'python-magic',
+        'python-magic>=0.4.12',
         'pytz',
         'sedate',
         'translationstring',

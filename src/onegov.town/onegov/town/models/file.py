@@ -76,7 +76,6 @@ class FileCollection(object):
         file_data = file_.read()
 
         mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
-        mimetype_by_introspection = mimetype_by_introspection.decode('utf-8')
 
         if mimetype_by_introspection not in self.allowed_mime:
             raise HTTPUnsupportedMediaType()

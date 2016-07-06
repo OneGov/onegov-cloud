@@ -4,6 +4,9 @@ Changelog
 - Fixes allocations spanning more than a year leading to a 502 on the sever.
   [href]
 
+- Adds compatibility with python-magic 0.4.12.
+  [msom]
+
 1.9.1 (2016-06-22)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -21,7 +24,7 @@ Changelog
 
 - Fixes telephone number on people records being unclickable.
   [href]
-  
+
 1.8.4 (2016-06-08)
 ~~~~~~~~~~~~~~~~~~~
 
