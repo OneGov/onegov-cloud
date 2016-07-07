@@ -47,7 +47,9 @@ class WithThumbnailFilter(FileFilter):
 
         Requires Pillow library
 
-    Note: This has been copied from Depot and adjusted for our use
+    Note: This has been copied from Depot and adjusted for our use. Changes
+    include a different storage format, no storage of the url and replacement
+    of thumbnails instead of recreation (if possible).
 
     """
 

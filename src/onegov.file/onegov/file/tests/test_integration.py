@@ -93,7 +93,7 @@ def test_serve_thumbnail(app):
     ensure_correct_depot(app)
 
     files = FileCollection(app.session())
-    files.add('avatar.png', create_image())
+    files.add('avatar.png', create_image(1024, 1024))
     transaction.commit()
 
     client = Client(app)
@@ -101,7 +101,18 @@ def test_serve_thumbnail(app):
     avatar = files.query().one()
 
     image = client.get('/storage/{}'.format(avatar.id))
-    thumb = client.get('/storage/{}?variant=small'.format(avatar.))
+    thumb = client.get('/storage/{}/thumbnail'.format(avatar.id))
 
     assert image.content_type == 'image/png'
     assert thumb.content_type == 'image/png'
+    assert thumb.content_length < image.content_length
+
+    # make sure the correct code is returned if there's no thumbnail
+    files.add('readme.txt', b'README')
+    transaction.commit()
+
+    readme = files.by_filename('readme.txt').one()
+    thumb = client.get(
+        '/storage/{}/thumbnail'.format(readme.id), expect_errors=True)
+
+    assert thumb.status_code == 404

@@ -1,7 +1,9 @@
 import pytest
 import transaction
 
+from depot.manager import DepotManager
 from onegov.file import FileCollection, FileSetCollection
+from onegov.testing.utils import create_image
 
 
 @pytest.fixture(scope='function')
@@ -82,8 +84,37 @@ def test_replace_file(files):
     readme = files.by_filename('readme.txt').first()
     assert readme.reference.file.read() == b'RTFM'
 
+    assert len(DepotManager.get().list()) == 1
+
     files.replace(readme, b'README')
     transaction.commit()
 
+    assert len(DepotManager.get().list()) == 1
+
     readme = files.by_filename('readme.txt').first()
     assert readme.reference.file.read() == b'README'
+
+
+def test_replace_image(files):
+    files.add('avatar.png', content=create_image())
+    transaction.commit()
+
+    avatar = files.by_filename('avatar.png').first()
+    assert 'thumbnail_small' in avatar.reference
+
+    thumbnail_info = avatar.reference['thumbnail_small']
+    transaction.commit()
+
+    assert len(DepotManager.get().list()) == 2
+
+    avatar = files.by_filename('avatar.png').first()
+    files.replace(avatar, content=create_image())
+    transaction.commit()
+
+    avatar = files.by_filename('avatar.png').first()
+    assert 'thumbnail_small' in avatar.reference
+
+    # XXX to be changed: https://github.com/amol-/depot/issues/32
+    assert avatar.reference['thumbnail_small'] != thumbnail_info
+
+    assert len(DepotManager.get().list()) == 2

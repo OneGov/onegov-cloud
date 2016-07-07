@@ -1,4 +1,5 @@
 import os.path
+import webob
 
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
@@ -51,8 +52,13 @@ class DepotApp(App):
             """
 
     @property
-    def bound_storage_depot(self):
+    def bound_depot_id(self):
         return self.schema
+
+    @property
+    def bound_depot(self):
+        assert DepotManager._default_depot == self.bound_depot_id
+        return DepotManager.get()
 
     @property
     def bound_storage_path(self):
@@ -65,13 +71,13 @@ def configure_depot_tween_factory(app, handler):
     assert app.has_database_connection, "This module requires a db backed app."
 
     def configure_depot_tween(request):
-        if app.bound_storage_depot not in DepotManager._depots:
+        if app.bound_depot_id not in DepotManager._depots:
             path = app.bound_storage_path
 
             if not path.exists():
                 path.mkdir()
 
-            DepotManager.configure(app.bound_storage_depot, {
+            DepotManager.configure(app.bound_depot_id, {
                 'depot.backend': app.depot_backend,
                 'depot.storage_path': str(path)
             })
@@ -83,12 +89,29 @@ def configure_depot_tween_factory(app, handler):
     return configure_depot_tween
 
 
+def render_depot_file(file, request):
+    return request.get_response(
+        FileServeApp(file, cache_max_age=3600 * 24 * 7))
+
+
 @DepotApp.path(model=File, path='/storage/{file_id}')
-def get_file(app, file_id):
+def get_file(app, file_id, thumbnail=None):
     return FileCollection(app.session()).by_id(file_id)
 
 
-@DepotApp.view(model=File, permission=Public)
+@DepotApp.view(model=File, render=render_depot_file, permission=Public)
 def view_file(self, request):
-    return request.get_response(
-        FileServeApp(self.reference.file, cache_max_age=3600 * 24 * 7))
+    return self.reference.file
+
+
+@DepotApp.view(model=File, name='thumbnail', render=render_depot_file,
+               permission=Public)
+def view_thumbnail(self, request):
+    # we currently only have one thumbnail, in the future we might make this
+    # a query parameter:
+    thumbnail_id = self.get_thumbnail_id(size='small')
+
+    if not thumbnail_id:
+        return webob.exc.HTTPNotFound()
+
+    return request.app.bound_depot.get(thumbnail_id)

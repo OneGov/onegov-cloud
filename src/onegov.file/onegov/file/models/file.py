@@ -58,9 +58,6 @@ class File(Base, TimestampMixin):
         )
     ]))
 
-    #: the virtual file id is a file id which may be overwritten - only used
-    #: internally for thumbnail linking
-
     @property
     def file_id(self):
         """ The file_id of the contained reference.
@@ -70,24 +67,15 @@ class File(Base, TimestampMixin):
 
         return self.virtual_file_id or self.reference.file_id
 
-    def get_thumbnail(self, name):
-        """ Returns the thumbnail with the given name as a :class:`File`
-        instance - with the appropriate polymorphic type.
-
-        Note that the so created object is transient and should not be used
-        to make changes to the thumbnail, but to link to it using Morepath.
-
-        If the thumbnail does not exist, None is returned.
+    def get_thumbnail_id(self, size):
+        """ Returns the thumbnail id with the given size (e.g. 'small').
 
         """
+        # make sure to always prefix the name with thumbnail_, otherwise this
+        # mechanism might be used to access other files created by filters
+        name = 'thumbnail_' + size
 
         if name not in self.reference:
             return None
 
-        if not name.startswith('thumbnail_'):
-            name = 'thumbnail_' + name
-
-        thumbnail = File.get_polymorphic_class(self.type, File)()
-        thumbnail.virtual_file_id = self.reference[name]['id']
-
-        return thumbnail
+        return self.reference[name]['id']

@@ -36,7 +36,8 @@ setup(
         'filedepot',
         'more.transaction',
         'pillow',
-        'python-magic'
+        'python-magic',
+        'webob'
     ],
     extras_require=dict(
         test=[
