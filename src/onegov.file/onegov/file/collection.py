@@ -59,10 +59,12 @@ class FileSetCollection(object):
     def query(self):
         return self.session.query(FileSet)
 
-    def add(self, title, type=None):
+    def add(self, title, meta=None, content=None, type=None):
         fileset = FileSet.get_polymorphic_class(type, FileSet)()
         fileset.title = title
         fileset.type = type
+        fileset.meta = meta
+        fileset.content = content
 
         self.session.add(fileset)
         self.session.flush()
