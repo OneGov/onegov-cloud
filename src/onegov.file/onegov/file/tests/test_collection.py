@@ -82,6 +82,7 @@ def test_replace_file(files):
     transaction.commit()
 
     readme = files.by_filename('readme.txt').first()
+    old_id = readme.reference.file.file_id
     assert readme.reference.file.read() == b'RTFM'
 
     assert len(DepotManager.get().list()) == 1
@@ -92,6 +93,7 @@ def test_replace_file(files):
     assert len(DepotManager.get().list()) == 1
 
     readme = files.by_filename('readme.txt').first()
+    assert readme.reference.file.file_id != old_id
     assert readme.reference.file.read() == b'README'
 
 
@@ -113,8 +115,6 @@ def test_replace_image(files):
 
     avatar = files.by_filename('avatar.png').first()
     assert 'thumbnail_small' in avatar.reference
-
-    # XXX to be changed: https://github.com/amol-/depot/issues/32
     assert avatar.reference['thumbnail_small'] != thumbnail_info
 
     assert len(DepotManager.get().list()) == 2

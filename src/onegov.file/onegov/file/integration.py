@@ -94,9 +94,9 @@ def render_depot_file(file, request):
         FileServeApp(file, cache_max_age=3600 * 24 * 7))
 
 
-@DepotApp.path(model=File, path='/storage/{file_id}')
-def get_file(app, file_id, thumbnail=None):
-    return FileCollection(app.session()).by_id(file_id)
+@DepotApp.path(model=File, path='/storage/{id}')
+def get_file(app, id, thumbnail=None):
+    return FileCollection(app.session()).by_id(id)
 
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public)
