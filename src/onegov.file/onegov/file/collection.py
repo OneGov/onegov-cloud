@@ -11,13 +11,14 @@ class FileCollection(object):
     def query(self):
         return self.session.query(File)
 
-    def add(self, filename, content, type=None):
+    def add(self, filename, content, note=None, type=None):
         """ Adds a file with the given filename. The content maybe either
         in bytes or a file object.
 
         """
         file = File.get_polymorphic_class(type, File)()
         file.name = filename
+        file.note = note
         file.type = type
         file.reference = as_fileintent(content, filename)
 

@@ -39,6 +39,9 @@ class File(Base, TimestampMixin):
     #: the name of the file, incl. extension (not used for public links)
     name = Column(Text, nullable=False)
 
+    #: a short note about the file (for captions, other information)
+    note = Column(Text, nullable=True)
+
     #: the type of the file, this can be used to create custom polymorphic
     #: subclasses. See `<http://docs.sqlalchemy.org/en/improve_toc/
     #: orm/extensions/declarative/inheritance.html>`_.
