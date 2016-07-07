@@ -1,6 +1,6 @@
 from depot.fields.interfaces import FileFilter
 from depot.io.utils import file_from_content
-from onegov.file.utils import get_supported_image_mime_types
+from onegov.file.utils import IMAGE_MIME_TYPES
 from PIL import Image
 from io import BytesIO
 
@@ -28,10 +28,8 @@ class OnlyIfImage(ConditionalFilter):
 
     """
 
-    mime_types = get_supported_image_mime_types()
-
     def meets_condition(self, uploaded_file):
-        return uploaded_file.content_type in self.mime_types
+        return uploaded_file.content_type in IMAGE_MIME_TYPES
 
 
 class WithThumbnailFilter(FileFilter):
@@ -62,7 +60,7 @@ class WithThumbnailFilter(FileFilter):
         content = file_from_content(uploaded_file.original_content)
 
         thumbnail = Image.open(content)
-        thumbnail.thumbnail(self.size, Image.BILINEAR)
+        thumbnail.thumbnail(self.size, Image.LANCZOS)
         thumbnail = thumbnail.convert('RGBA')
         thumbnail.format = self.format
 

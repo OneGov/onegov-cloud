@@ -80,3 +80,6 @@ def get_supported_image_mime_types():
         supported_types.add(mime)
 
     return supported_types
+
+
+IMAGE_MIME_TYPES = get_supported_image_mime_types()

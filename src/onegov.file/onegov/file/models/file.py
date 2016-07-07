@@ -2,6 +2,7 @@ from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.file.attachments import UploadedFileWithMaxImageSize
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from sqlalchemy import Column, Text
 from uuid import uuid4
@@ -48,15 +49,18 @@ class File(Base, TimestampMixin):
 
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
-    reference = Column(UploadedFileField(filters=[
-        OnlyIfImage(
-            # note, the thumbnail configuration should not be changed
-            # anywhere but here - for consistency.
-            WithThumbnailFilter(
-                name='small', size=(256, 256), format='png'
+    reference = Column(UploadedFileField(
+        upload_type=UploadedFileWithMaxImageSize,
+        filters=[
+            OnlyIfImage(
+                # note, the thumbnail configuration should not be changed
+                # anywhere but here - for consistency.
+                WithThumbnailFilter(
+                    name='small', size=(256, 256), format='png'
+                )
             )
-        )
-    ]))
+        ]
+    ))
 
     @property
     def file_id(self):

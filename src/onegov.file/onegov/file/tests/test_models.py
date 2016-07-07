@@ -3,6 +3,7 @@ import transaction
 from onegov.file import File, FileSet
 from onegov.file.models.fileset import file_to_set_associations
 from onegov.testing.utils import create_image
+from PIL import Image
 
 
 def test_store_file_from_string(session):
@@ -89,3 +90,15 @@ def test_thumbnail_creation(session):
 
     assert 'thumbnail_small' in large.reference
     assert 'thumbnail_small' in small.reference
+
+
+def test_max_iamge_size(session):
+    session.add(File(name='unchanged.png', reference=create_image(1024, 1024)))
+    session.add(File(name='limited.png', reference=create_image(1025, 1024)))
+
+    transaction.commit()
+
+    limited, unchanged = session.query(File).order_by(File.name).all()
+
+    assert Image.open(limited.reference.file).size == (1024, 1023)
+    assert Image.open(unchanged.reference.file).size == (1024, 1024)
