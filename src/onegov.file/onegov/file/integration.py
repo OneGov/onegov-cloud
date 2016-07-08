@@ -95,7 +95,7 @@ def render_depot_file(file, request):
 
 
 @DepotApp.path(model=File, path='/storage/{id}')
-def get_file(app, id, thumbnail=None):
+def get_file(app, id):
     return FileCollection(app.session()).by_id(id)
 
 
