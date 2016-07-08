@@ -2,6 +2,7 @@ import pytest
 import transaction
 
 from depot.manager import DepotManager
+from io import BytesIO
 from onegov.file import FileCollection, FileSetCollection
 from onegov.testing.utils import create_image
 
@@ -118,3 +119,34 @@ def test_replace_image(files):
     assert avatar.reference['thumbnail_small'] != thumbnail_info
 
     assert len(DepotManager.get().list()) == 2
+
+
+def test_store_file_from_path(files, temporary_path):
+
+    with (temporary_path / 'readme.txt').open('w') as f:
+        f.write('README\n======')
+
+    with (temporary_path / 'readme.txt').open('rb') as f:
+        files.add('readme.txt', content=f)
+
+    transaction.commit()
+
+    readme = files.query().first()
+
+    assert readme.reference.file.content_length == 13
+    assert readme.reference.file.content_type == 'text/plain'
+    assert readme.reference.file.read() == b'README\n======'
+    assert readme.reference.file.name == 'readme.txt'
+
+
+def test_store_file_from_bytes_io(files):
+
+    files.add('readme.txt', content=BytesIO(b'README\n======'))
+    transaction.commit()
+
+    readme = files.query().first()
+
+    assert readme.reference.file.content_length == 13
+    assert readme.reference.file.content_type == 'text/plain'
+    assert readme.reference.file.read() == b'README\n======'
+    assert readme.reference.file.name == 'readme.txt'

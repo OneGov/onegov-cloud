@@ -11,9 +11,8 @@ def path_from_fileobj(fileobj):
     if getattr(fileobj, 'filename', None) is not None:
         return fileobj.filename
     elif getattr(fileobj, 'name', None) is not None:
-        return os.path.basename(fileobj.name)
-    else:
-        raise NotImplementedError
+        if isinstance(fileobj.name, str):
+            return os.path.basename(fileobj.name)
 
 
 def content_type_from_fileobj(fileobj):
@@ -25,11 +24,14 @@ def content_type_from_fileobj(fileobj):
     """
 
     path = path_from_fileobj(fileobj)
-    content_type = mimetypes.guess_type(path)[0]
+    content_type = path and mimetypes.guess_type(path)[0] or None
 
     if not content_type:
-        content_type = magic.from_file(path, mime=True)
-        content_type = content_type.decode('utf-8')
+
+        if path:
+            content_type = magic.from_file(path, mime=True)
+        else:
+            content_type = magic.from_buffer(fileobj.read(1024), mime=True)
 
     return content_type
 
