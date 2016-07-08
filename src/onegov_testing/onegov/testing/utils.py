@@ -2,6 +2,7 @@ import onegov.core
 
 from io import BytesIO
 from PIL import Image
+from random import randint
 from unittest.mock import patch
 
 
@@ -9,7 +10,11 @@ def create_image(width=50, height=50):
     """ Generates a test image and returns it's file handle. """
 
     im = BytesIO()
-    image = Image.new('RGBA', size=(width, height), color=(155, 0, 0))
+    image = Image.new('RGBA', size=(width, height), color=(
+        randint(0, 255),
+        randint(0, 255),
+        randint(0, 255)
+    ))
     image.save(im, 'png')
     im.name = 'test.png'
     im.seek(0)
