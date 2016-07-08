@@ -84,4 +84,6 @@ def get_supported_image_mime_types():
     return supported_types
 
 
-IMAGE_MIME_TYPES = get_supported_image_mime_types()
+# we don't support *all* the image types PIL supports
+EXCLUDED_IMAGE_TYPES = {'application/pdf'}
+IMAGE_MIME_TYPES = get_supported_image_mime_types() - EXCLUDED_IMAGE_TYPES
