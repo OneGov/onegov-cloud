@@ -1,16 +1,23 @@
 import transaction
+import pytest
 
+from io import BytesIO
 from onegov.file import File, FileSet
 from onegov.file.models.fileset import file_to_set_associations
 from onegov.testing.utils import create_image
 from PIL import Image
 
 
-def test_store_file_from_string(session):
-    session.add(File(name='readme.txt', reference=b'README\n======'))
+class TestFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'test'}
+
+
+@pytest.mark.parametrize('cls', [File, TestFile])
+def test_store_file_from_string(session, cls):
+    session.add(cls(name='readme.txt', reference=b'README\n======'))
     transaction.commit()
 
-    readme = session.query(File).first()
+    readme = session.query(cls).first()
 
     assert readme.reference.file.content_length == 13
     assert readme.reference.file.content_type == 'application/octet-stream'
@@ -18,22 +25,39 @@ def test_store_file_from_string(session):
     assert readme.reference.file.name == 'unnamed'
 
 
-def test_store_file_from_path(session, temporary_path):
+@pytest.mark.parametrize('cls', [File, TestFile])
+def test_store_file_from_path(session, temporary_path, cls):
 
     with (temporary_path / 'readme.txt').open('w') as f:
         f.write('README\n======')
 
     with (temporary_path / 'readme.txt').open('rb') as f:
-        session.add(File(name='readme.txt', reference=f))
+        session.add(cls(name='readme.txt', reference=f))
 
     transaction.commit()
 
-    readme = session.query(File).first()
+    readme = session.query(cls).first()
 
     assert readme.reference.file.content_length == 13
     assert readme.reference.file.content_type == 'text/plain'
     assert readme.reference.file.read() == b'README\n======'
     assert readme.reference.file.name == 'readme.txt'
+
+
+@pytest.mark.parametrize('cls', [File, TestFile])
+def test_store_file_from_bytes_io(session, cls):
+
+    f = BytesIO(b'README\n======')
+    session.add(cls(name='readme.txt', reference=f))
+
+    transaction.commit()
+
+    readme = session.query(cls).first()
+
+    assert readme.reference.file.content_length == 13
+    assert readme.reference.file.content_type == 'application/octet-stream'
+    assert readme.reference.file.read() == b'README\n======'
+    assert readme.reference.file.name == 'unnamed'
 
 
 def test_associate_files_with_sets(session):
