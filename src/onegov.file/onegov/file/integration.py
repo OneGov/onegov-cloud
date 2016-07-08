@@ -5,7 +5,7 @@ from depot.manager import DepotManager
 from depot.middleware import FileServeApp
 from more.transaction.main import transaction_tween_factory
 from morepath import App
-from onegov.core.security import Public
+from onegov.core.security import Private, Public
 from onegov.file.collection import FileCollection
 from onegov.file.models import File
 from pathlib import Path
@@ -115,3 +115,23 @@ def view_thumbnail(self, request):
         return webob.exc.HTTPNotFound()
 
     return request.app.bound_depot.get(thumbnail_id)
+
+
+@DepotApp.view(model=File, request_method='DELETE', permission=Private)
+def delete_file(self, request):
+    """ Deletes the given file. By default the permission is
+    ``Private``. An application using the framework can override this though.
+
+    Since a DELETE can only be sent through AJAX it is protected by the
+    same-origin policy. That means that we don't need to use any CSRF
+    protection here.
+
+    That being said, browser bugs and future changes in the HTML standard
+    make it possible for this to happen one day. Therefore, a time-limited
+    token must be passed as query parameter to this function.
+
+    New tokens can be acquired through ``request.new_csrf_token``.
+
+    """
+    request.assert_valid_csrf_token()
+    FileCollection(request.app.session()).delete(self)
