@@ -5,17 +5,26 @@ from onegov.file.utils import as_fileintent
 class FileCollection(object):
     """ Manages files. """
 
-    def __init__(self, session):
+    def __init__(self, session, type='*'):
         self.session = session
+        self.type = type
 
     def query(self):
-        return self.session.query(File)
+        query = self.session.query(File)
 
-    def add(self, filename, content, note=None, type=None):
+        if self.type != '*':
+            query = query.filter(File.type == self.type)
+
+        return query
+
+    def add(self, filename, content, note=None):
         """ Adds a file with the given filename. The content maybe either
         in bytes or a file object.
 
         """
+
+        type = self.type != '*' and self.type or None
+
         file = File.get_polymorphic_class(type, File)()
         file.name = filename
         file.note = note
