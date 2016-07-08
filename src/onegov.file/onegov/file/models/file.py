@@ -63,7 +63,7 @@ class File(Base, TimestampMixin):
                 )
             )
         ]
-    ))
+    ), nullable=False)
 
     @property
     def file_id(self):
