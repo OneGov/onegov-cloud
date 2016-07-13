@@ -33,6 +33,8 @@ def content_type_from_fileobj(fileobj):
         else:
             content_type = magic.from_buffer(fileobj.read(1024), mime=True)
 
+        fileobj.seek(0)
+
     return content_type
 
 
