@@ -9,6 +9,7 @@ from tempfile import SpooledTemporaryFile
 
 class UploadedFileWithMaxImageSize(UploadedFile):
     max_size = 1024
+    quality = 90
 
     def limit_image_size(self, content):
         # Get a file object even if content was bytes
@@ -19,7 +20,9 @@ class UploadedFileWithMaxImageSize(UploadedFile):
             uploaded_image.thumbnail(
                 (self.max_size, self.max_size), Image.LANCZOS)
             content = SpooledTemporaryFile(INMEMORY_FILESIZE)
-            uploaded_image.save(content, uploaded_image.format)
+            uploaded_image.save(
+                content, uploaded_image.format, quality=self.quality
+            )
 
         content.seek(0)
 

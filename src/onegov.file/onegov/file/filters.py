@@ -51,6 +51,8 @@ class WithThumbnailFilter(FileFilter):
 
     """
 
+    quality = 90
+
     def __init__(self, name, size, format):
         self.name = name
         self.size = size
@@ -65,7 +67,7 @@ class WithThumbnailFilter(FileFilter):
         thumbnail.format = self.format
 
         output = BytesIO()
-        thumbnail.save(output, self.format)
+        thumbnail.save(output, self.format, quality=self.quality)
         output.seek(0)
 
         name = 'thumbnail_{}'.format(self.name)
