@@ -9,10 +9,19 @@ from sqlalchemy.orm import ColumnProperty, mapper
 def receive_before_configured():
 
     # XXX temporary fix for https://github.com/amol-/depot/issues/33
-    assert pkg_resources.get_distribution('filedepot').version == '0.3.0'
+    version = pkg_resources.get_distribution('filedepot').version
+    whitelisted = ('0.3.0', '0.3.1')
 
-    event.remove(
-        mapper, 'mapper_configured', _SQLAMutationTracker._mapper_configured)
+    assert version in whitelisted
+
+    # only apply the patch if the mutation tracker is online
+    original_handler = _SQLAMutationTracker._mapper_configured
+
+    if not event.contains(mapper, 'mapper_configured', original_handler):
+        return
+
+    # use a new, fixed mutation tracker
+    event.remove(mapper, 'mapper_configured', original_handler)
 
     @event.listens_for(mapper, 'mapper_configured')
     def patched_mapper_configured_handler(mapper, class_):
