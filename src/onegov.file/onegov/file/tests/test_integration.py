@@ -115,4 +115,4 @@ def test_serve_thumbnail(app):
     thumb = client.get(
         '/storage/{}/thumbnail'.format(readme.id), expect_errors=True)
 
-    assert thumb.status_code == 404
+    assert thumb.status_code == 302

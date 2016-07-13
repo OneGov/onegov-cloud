@@ -1,5 +1,5 @@
+import morepath
 import os.path
-import webob
 
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
@@ -112,7 +112,7 @@ def view_thumbnail(self, request):
     thumbnail_id = self.get_thumbnail_id(size='small')
 
     if not thumbnail_id:
-        return webob.exc.HTTPNotFound()
+        return morepath.redirect(request.link(self))
 
     return request.app.bound_depot.get(thumbnail_id)
 
