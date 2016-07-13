@@ -8,11 +8,11 @@ from onegov.testing.utils import create_image
 from PIL import Image
 
 
-class TestFile(File):
-    __mapper_args__ = {'polymorphic_identity': 'test'}
+class PolymorphicFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'polymorphic'}
 
 
-@pytest.mark.parametrize('cls', [File, TestFile])
+@pytest.mark.parametrize('cls', [File, PolymorphicFile])
 def test_store_file_from_string(session, cls):
     session.add(cls(name='readme.txt', reference=b'README\n======'))
     transaction.commit()
@@ -25,7 +25,7 @@ def test_store_file_from_string(session, cls):
     assert readme.reference.file.name == 'unnamed'
 
 
-@pytest.mark.parametrize('cls', [File, TestFile])
+@pytest.mark.parametrize('cls', [File, PolymorphicFile])
 def test_store_file_from_path(session, temporary_path, cls):
 
     with (temporary_path / 'readme.txt').open('w') as f:
@@ -44,7 +44,7 @@ def test_store_file_from_path(session, temporary_path, cls):
     assert readme.reference.file.name == 'readme.txt'
 
 
-@pytest.mark.parametrize('cls', [File, TestFile])
+@pytest.mark.parametrize('cls', [File, PolymorphicFile])
 def test_store_file_from_bytes_io(session, cls):
 
     f = BytesIO(b'README\n======')
