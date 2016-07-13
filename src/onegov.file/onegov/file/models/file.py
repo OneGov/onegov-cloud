@@ -1,11 +1,10 @@
 from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
+from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
 from onegov.file.attachments import UploadedFileWithMaxImageSize
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
 from sqlalchemy import Column, Text
-from uuid import uuid4
 
 
 class UploadedFileField(UploadedFileFieldBase):
@@ -34,7 +33,7 @@ class File(Base, TimestampMixin):
     __tablename__ = 'files'
 
     #: the unique, public id of the file
-    id = Column(UUID, nullable=False, primary_key=True, default=uuid4)
+    id = Column(Text, nullable=False, primary_key=True, default=random_token)
 
     #: the name of the file, incl. extension (not used for public links)
     name = Column(Text, nullable=False)

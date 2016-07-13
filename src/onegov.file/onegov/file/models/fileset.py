@@ -1,16 +1,15 @@
+from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
-from onegov.core.orm.types import UUID
 from sqlalchemy import Column, ForeignKey, Table, Text
 from sqlalchemy.orm import relationship
-from uuid import uuid4
 
 
 # many to many relationship between File and FileSets
 file_to_set_associations = Table(
     'file_to_set_associations', Base.metadata,
-    Column('file_id', UUID, ForeignKey('files.id')),
-    Column('fileset_id', UUID, ForeignKey('filesets.id'))
+    Column('file_id', Text, ForeignKey('files.id')),
+    Column('fileset_id', Text, ForeignKey('filesets.id'))
 )
 
 
@@ -30,7 +29,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     __tablename__ = 'filesets'
 
     #: the unique, public id of the fileset
-    id = Column(UUID, nullable=False, primary_key=True, default=uuid4)
+    id = Column(Text, nullable=False, primary_key=True, default=random_token)
 
     #: the title of the fileset (not usable in url)
     title = Column(Text, nullable=False)
