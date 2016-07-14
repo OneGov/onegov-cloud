@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves some code to onegov.core.
+  [href]
+
 0.6.3 (2016-05-30)
 ~~~~~~~~~~~~~~~~~~~
 

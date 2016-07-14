@@ -2,6 +2,8 @@ import hashlib
 import json
 import re
 
+from onegov.core.orm import find_models
+
 
 def searchable_sqlalchemy_models(base):
     """ Searches through the given SQLAlchemy base and returns the classes
@@ -9,14 +11,11 @@ def searchable_sqlalchemy_models(base):
     :class:`onegov.search.mixins.Searchable` interface.
 
     """
+
+    # XXX circular imports
     from onegov.search import Searchable
 
-    for class_ in base.__subclasses__():
-        if issubclass(class_, Searchable):
-            yield class_
-
-        for class_ in searchable_sqlalchemy_models(class_):
-            yield class_
+    yield from find_models(base, lambda cls: issubclass(cls, Searchable))
 
 
 _invalid_index_characters = re.compile(r'[\\/?"<>|\s,A-Z:]+')

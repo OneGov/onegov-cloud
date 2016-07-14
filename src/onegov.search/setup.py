@@ -35,7 +35,7 @@ setup(
         'certifi',
         'elasticsearch>=2.2.0,<3.0.0',
         'elasticsearch-dsl>=2.0.0,<3.0.0',
-        'onegov.core>=0.5.0',
+        'onegov.core>=0.22.0',
         'webtest'
     ],
     extras_require=dict(
