@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.22.0 (2016-07-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an utility function to search for orm models.
   [href]
