@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Explicitly prohibit unsynchronized bulk updates with a helpful assertion.
+  [href]
+
 - Exports the random token length constant.
   [href]
 

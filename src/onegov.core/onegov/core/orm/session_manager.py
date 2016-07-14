@@ -256,6 +256,14 @@ class SessionManager(object):
         @event.listens_for(session, 'after_bulk_update')
         def on_after_bulk_update(update_context):
             if self.on_update.receivers:
+                assert hasattr(update_context, 'matched_objects'), """
+                    Bulk queries which use synchronize_session=False or
+                    synchronize_session='fetch' cannot be supported because
+                    it is unclear what rows were affected. Manually update
+                    values instead (even though it's way slower). There's no
+                    better solution at the moment.
+                """
+
                 for obj in update_context.matched_objects:
                     self.on_update.send(self.current_schema, obj=obj)
 
