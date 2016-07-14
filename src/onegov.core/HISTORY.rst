@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an utility function to search for orm models.
+  [href]
+
 - Explicitly prohibit unsynchronized bulk updates with a helpful assertion.
   [href]
 

@@ -8,7 +8,9 @@ import uuid
 
 from datetime import datetime
 from onegov.core.framework import Framework
-from onegov.core.orm import ModelBase, SessionManager, translation_hybrid
+from onegov.core.orm import (
+    ModelBase, SessionManager, translation_hybrid, find_models
+)
 from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins import (
     meta_property, content_property, ContentMixin, TimestampMixin
@@ -1134,3 +1136,28 @@ def test_content_properties():
     assert content.type is None
     content.type = 'Foobar'
     assert content.type == 'Foobar'
+
+
+def test_find_models():
+
+    Base = declarative_base(cls=ModelBase)
+
+    class Mixin(object):
+        pass
+
+    class A(Base):
+        __tablename__ = 'plain'
+        id = Column(Integer, primary_key=True)
+
+    class B(Base, Mixin):
+        __tablename__ = 'polymorphic'
+        id = Column(Integer, primary_key=True)
+
+    results = list(find_models(Base, lambda cls: issubclass(cls, Mixin)))
+    assert results == [B]
+
+    results = list(find_models(Base, lambda cls: not issubclass(cls, Mixin)))
+    assert results == [A]
+
+    results = list(find_models(Base, lambda cls: True))
+    assert results == [A, B]

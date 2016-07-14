@@ -53,4 +53,25 @@ translation_hybrid = TranslationHybrid(
     default_locale=lambda obj: obj.session_manager.default_locale,
 )
 
-__all__ = ['Base', 'SessionManager', 'translation_hybrid']
+
+def find_models(base, is_match):
+    """ Finds the ORM models in the given ORM base class that match a filter.
+
+    The filter is called with each class in the instance and it is supposed
+    to return True if it matches.
+
+    For example, find all SQLAlchemy models that use
+    :class:`~onegov.core.orm.mixins.ContentMixin`::
+
+        from onegov.core.orm.mixins import ContentMixin
+        find_models(base, is_match=lambda cls: issubclass(cls, ContentMixin))
+
+    """
+    for cls in base.__subclasses__():
+        if is_match(cls):
+            yield cls
+
+        for cls in find_models(cls, is_match):
+            yield cls
+
+__all__ = ['Base', 'SessionManager', 'translation_hybrid', 'find_models']
