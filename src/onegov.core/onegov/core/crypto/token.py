@@ -2,6 +2,10 @@ import hashlib
 import os
 
 
+# for external reference, update if the hashing function ever changes
+RANDOM_TOKEN_LENGTH = 64
+
+
 def random_token(nbytes=512):
     """ Generates an unguessable token. Generates a random string with
     the given number of bytes (may not be lower than 512) and hashes

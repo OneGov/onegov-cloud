@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Exports the random token length constant.
+  [href]
+
 0.21.3 (2016-07-06)
 ~~~~~~~~~~~~~~~~~~~
 
