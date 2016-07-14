@@ -13,6 +13,7 @@ from pathlib import Path
 
 SUPPORTED_STORAGE_BACKENDS = (
     'depot.io.local.LocalFileStorage',
+    'depot.io.memory.MemoryFileStorage'
 )
 
 
@@ -29,6 +30,7 @@ class DepotApp(App):
         :depot_backend: The depot backend to use. Supported values:
 
             * depot.io.local.LocalFileStorage
+            * depot.io.memory.MemoryFileStorage
 
         :depot_storage_path: The storage path used by the local file storage.
 
@@ -64,6 +66,35 @@ class DepotApp(App):
     def bound_storage_path(self):
         return Path(self.depot_storage_path) / self.schema
 
+    def create_depot(self):
+        config = {
+            'depot.backend': self.depot_backend
+        }
+
+        if self.depot_backend.endswith('LocalFileStorage'):
+            path = self.bound_storage_path
+
+            if not path.exists():
+                path.mkdir()
+
+            config['depot.storage_path'] = str(path)
+
+        elif self.depot_backend.endswith('MemoryFileStorage'):
+            pass
+
+        else:
+            # implementing non-local file systems is going to be more
+            # invloved, because we do not generate external urls yet
+            raise NotImplementedError()
+
+        DepotManager.configure(self.bound_depot_id, config)
+
+    def bind_depot(self):
+        if self.bound_depot_id not in DepotManager._depots:
+            self.create_depot()
+
+        DepotManager.set_default(self.schema)
+
 
 @DepotApp.tween_factory(over=transaction_tween_factory)
 def configure_depot_tween_factory(app, handler):
@@ -71,19 +102,7 @@ def configure_depot_tween_factory(app, handler):
     assert app.has_database_connection, "This module requires a db backed app."
 
     def configure_depot_tween(request):
-        if app.bound_depot_id not in DepotManager._depots:
-            path = app.bound_storage_path
-
-            if not path.exists():
-                path.mkdir()
-
-            DepotManager.configure(app.bound_depot_id, {
-                'depot.backend': app.depot_backend,
-                'depot.storage_path': str(path)
-            })
-
-        DepotManager.set_default(app.schema)
-
+        app.bind_depot()
         return handler(request)
 
     return configure_depot_tween

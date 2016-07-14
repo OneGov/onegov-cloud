@@ -6,12 +6,15 @@ from depot.manager import DepotManager
 from onegov.core import Framework
 from onegov.core.utils import scan_morepath_modules
 from onegov.file import DepotApp, FileCollection
+from onegov.file.integration import SUPPORTED_STORAGE_BACKENDS
 from onegov.testing.utils import create_image
 from webtest import TestApp as Client
 
 
-@pytest.fixture(scope='function')
-def app(postgres_dsn, temporary_path):
+@pytest.fixture(scope='function', params=SUPPORTED_STORAGE_BACKENDS)
+def app(request, postgres_dsn, temporary_path):
+
+    backend = request.param
 
     class App(Framework, DepotApp):
         pass
@@ -22,7 +25,7 @@ def app(postgres_dsn, temporary_path):
     app = App()
     app.configure_application(
         dsn=postgres_dsn,
-        depot_backend='depot.io.local.LocalFileStorage',
+        depot_backend=backend,
         depot_storage_path=str(temporary_path)
     )
 
