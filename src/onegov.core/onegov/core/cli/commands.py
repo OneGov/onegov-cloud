@@ -137,6 +137,34 @@ def transfer(group_context,
     # storages may be shared between applications, so we need to keep track
     fetched = set()
 
+    def download_folder(remote, local):
+        tar_filename = '/tmp/{}.tar.gz'.format(uuid4().hex)
+
+        subprocess.check_output([
+            'ssh', server, '-C', "sudo tar czvf '{}' -C '{}' .".format(
+                tar_filename, remote
+            )
+        ])
+
+        subprocess.check_output([
+            'scp',
+            '{}:{}'.format(server, tar_filename),
+            '{}/transfer.tar.gz'.format(local)
+        ])
+
+        subprocess.check_output([
+            'tar', 'xzvf', '{}/transfer.tar.gz'.format(local),
+            '-C', local
+        ])
+
+        subprocess.check_output([
+            'ssh', server, '-C', "sudo rm '{}'".format(tar_filename)
+        ])
+
+        subprocess.check_output([
+            'rm', '{}/transfer.tar.gz'.format(local)
+        ])
+
     # filter out namespaces on demand
     for appcfg in group_context.appcfgs:
 
@@ -151,9 +179,8 @@ def transfer(group_context,
         remotecfg = remote_applications[appcfg.namespace]
 
         if not no_filestorage:
-            if remotecfg.configuration.get('filestorage') == 'fs.osfs.OSFS':
-                assert appcfg.configuration.get('filestorage')\
-                    == 'fs.osfs.OSFS'
+            if remotecfg.configuration.get('filestorage').endswith('OSFS'):
+                assert appcfg.configuration.get('filestorage').endswith('OSFS')
 
                 print("Fetching remote filestorage")
 
@@ -167,32 +194,28 @@ def transfer(group_context,
                 if ':'.join((remote_storage, local_storage)) in fetched:
                     continue
 
-                tar_filename = '/tmp/{}.tar.gz'.format(uuid4().hex)
+                download_folder(remote_storage, local_storage)
 
-                subprocess.check_output([
-                    'ssh', server, '-C', "sudo tar czvf '{}' -C '{}' .".format(
-                        tar_filename, remote_storage
-                    )
-                ])
+                fetched.add(':'.join((remote_storage, local_storage)))
 
-                subprocess.check_output([
-                    'scp',
-                    '{}:{}'.format(server, tar_filename),
-                    '{}/transfer.tar.gz'.format(local_storage)
-                ])
+            remote_backend = remotecfg.configuration.get('depot_backend')
+            local_backend = appcfg.configuration.get('depot_backend')
 
-                subprocess.check_output([
-                    'tar', 'xzvf', '{}/transfer.tar.gz'.format(local_storage),
-                    '-C', local_storage
-                ])
+            if remote_backend == 'depot.io.local.LocalFileStorage':
+                assert local_backend == remote_backend
 
-                subprocess.check_output([
-                    'ssh', server, '-C', "sudo rm '{}'".format(tar_filename)
-                ])
+                print("Fetching depot storage")
 
-                subprocess.check_output([
-                    'rm', '{}/transfer.tar.gz'.format(local_storage)
-                ])
+                local_depot = remotecfg.configuration['depot_storage_path']
+                remote_depot = appcfg.configuration['depot_storage_path']
+
+                remote_storage = os.path.join(remote_dir, remote_depot)
+                local_storage = os.path.join('.', local_depot)
+
+                if ':'.join((remote_storage, local_storage)) in fetched:
+                    continue
+
+                download_folder(remote_storage, local_storage)
 
                 fetched.add(':'.join((remote_storage, local_storage)))
 
