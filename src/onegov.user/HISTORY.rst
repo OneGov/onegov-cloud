@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with Morepath 0.15.
+  [href]
+
 0.4.3 (2016-06-28)
 ~~~~~~~~~~~~~~~~~~~
 

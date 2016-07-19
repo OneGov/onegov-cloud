@@ -161,7 +161,7 @@ class Auth(object):
             return None
 
         response = morepath.redirect(self.to)
-        morepath.remember_identity(response, request, identity)
+        request.app.remember_identity(response, request, identity)
 
         return response
 
@@ -174,6 +174,6 @@ class Auth(object):
         """
 
         response = morepath.redirect(self.to)
-        morepath.forget_identity(response, request)
+        request.app.forget_identity(response, request)
 
         return response
