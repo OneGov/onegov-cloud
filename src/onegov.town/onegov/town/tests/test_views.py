@@ -139,7 +139,7 @@ def bound_reserve(client, allocation):
 
 
 def test_view_permissions():
-    utils.assert_explicit_permissions(onegov.town)
+    utils.assert_explicit_permissions(onegov.town, onegov.town.TownApp)
 
 
 def test_view_form_alert(town_app):
