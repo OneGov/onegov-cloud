@@ -1,67 +1,16 @@
 import os
-import pytz
 
+from collections import OrderedDict
 from datetime import datetime, date
 from freezegun import freeze_time
-from io import BytesIO
 from onegov.core.request import CoreRequest
 from onegov.core.utils import module_path, rchop
 from onegov.page import PageCollection
-from onegov.testing import utils
-from onegov.town.models import (
-    Clipboard,
-    FileCollection,
-    ImageCollection,
-    SiteCollection
-)
+from onegov.testing.utils import create_image
+from onegov.town.models import Clipboard, SiteCollection, ImageFileCollection
+from onegov.town.models.file import GroupFilesByDateMixin
 from onegov.town.models.resource import SharedMethods
-from unittest.mock import Mock, patch
-
-
-def test_file_collection(town_app):
-
-    collection = FileCollection(town_app)
-    assert list(collection.files) == []
-    assert collection.get_file_by_filename('b.txt') is None
-
-    collection.store_file(BytesIO(b'test'), 'b.txt')
-    assert len(list(collection.files)) == 1
-    assert collection.get_file_by_filename('b.txt') is not None
-
-    collection.store_file(BytesIO(b'test'), 'a.txt')
-    assert len(list(collection.files)) == 2
-    assert collection.get_file_by_filename('a.txt') is not None
-    assert [f.filename for f in collection.files] == ['a.txt', 'b.txt']
-
-    collection.delete_file_by_filename('a.txt')
-    collection.delete_file_by_filename('b.txt')
-    assert len(list(collection.files)) == 0
-    assert collection.get_file_by_filename('a.txt') is None
-    assert collection.get_file_by_filename('b.txt') is None
-
-
-def test_image_collection(town_app):
-
-    collection = ImageCollection(town_app)
-    assert list(collection.files) == []
-    assert list(collection.thumbnails) == []
-
-    assert collection.get_file_by_filename('test.jpg') is None
-    collection.store_file(utils.create_image(), 'test.jpg')
-    assert collection.get_file_by_filename('test.jpg') is not None
-
-    assert len(list(collection.files)) == 1
-    assert len(list(collection.thumbnails)) == 0
-
-    assert collection.get_thumbnail_by_filename('test.jpg') is not None
-
-    assert len(list(collection.files)) == 1
-    assert len(list(collection.thumbnails)) == 1
-
-    collection.delete_file_by_filename('test.jpg')
-
-    assert len(list(collection.files)) == 0
-    assert len(list(collection.thumbnails)) == 0
+from pytz import utc
 
 
 def test_clipboard(town_app):
@@ -125,160 +74,155 @@ def test_news_years(town_app):
 
     assert news.years == [datetime.utcnow().year]
 
-    one.created = datetime(2016, 2, 1, tzinfo=pytz.utc)
-    two.created = datetime(2015, 2, 1, tzinfo=pytz.utc)
+    one.created = datetime(2016, 2, 1, tzinfo=utc)
+    two.created = datetime(2015, 2, 1, tzinfo=utc)
 
     assert news.years == [2016, 2015]
 
 
+def test_group_intervals():
+    mixin = GroupFilesByDateMixin()
+
+    intervals = list(mixin.get_date_intervals(datetime(2016, 1, 1)))
+
+    assert intervals[0].name == 'This month'
+    assert intervals[0].start.date() == date(2016, 1, 1)
+    assert intervals[0].end.date() == date(2016, 1, 31)
+
+    assert intervals[1].name == 'Last month'
+    assert intervals[1].start.date() == date(2015, 12, 1)
+    assert intervals[1].end.date() == date(2015, 12, 31)
+
+    assert intervals[2].name == 'Last year'
+    assert intervals[2].start.date() == date(2015, 1, 1)
+    assert intervals[2].end.date() == date(2015, 11, 30)
+
+    assert intervals[3].name == 'Older'
+    assert intervals[3].start.date() == date(2000, 1, 1)
+    assert intervals[3].end.date() == date(2014, 12, 31)
+
+    intervals = list(mixin.get_date_intervals(datetime(2016, 2, 1)))
+
+    assert intervals[0].name == 'This month'
+    assert intervals[0].start.date() == date(2016, 2, 1)
+    assert intervals[0].end.date() == date(2016, 2, 29)
+
+    assert intervals[1].name == 'Last month'
+    assert intervals[1].start.date() == date(2016, 1, 1)
+    assert intervals[1].end.date() == date(2016, 1, 31)
+
+    assert intervals[2].name == 'Last year'
+    assert intervals[2].start.date() == date(2015, 1, 1)
+    assert intervals[2].end.date() == date(2015, 12, 31)
+
+    assert intervals[3].name == 'Older'
+    assert intervals[3].start.date() == date(2000, 1, 1)
+    assert intervals[3].end.date() == date(2014, 12, 31)
+
+    intervals = list(mixin.get_date_intervals(datetime(2016, 3, 1)))
+
+    assert intervals[0].name == 'This month'
+    assert intervals[0].start.date() == date(2016, 3, 1)
+    assert intervals[0].end.date() == date(2016, 3, 31)
+
+    assert intervals[1].name == 'Last month'
+    assert intervals[1].start.date() == date(2016, 2, 1)
+    assert intervals[1].end.date() == date(2016, 2, 29)
+
+    assert intervals[2].name == 'This year'
+    assert intervals[2].start.date() == date(2016, 1, 1)
+    assert intervals[2].end.date() == date(2016, 1, 31)
+
+    assert intervals[3].name == 'Last year'
+    assert intervals[3].start.date() == date(2015, 1, 1)
+    assert intervals[3].end.date() == date(2015, 12, 31)
+
+    assert intervals[4].name == 'Older'
+    assert intervals[4].start.date() == date(2000, 1, 1)
+    assert intervals[4].end.date() == date(2014, 12, 31)
+
+
 def test_image_grouping(town_app):
 
-    class MockImage(object):
-        def __init__(self, mod_time):
-            self.info = {'modified_time': mod_time}
+    collection = ImageFileCollection(town_app.session())
 
-    with patch('onegov.town.models.ImageCollection.files') as files:
-        today = date(2008, 8, 8)
+    def grouped_by_date(today):
+        grouped = collection.grouped_by_date(today=today)
+        return OrderedDict((g, [i[1] for i in items]) for g, items in grouped)
 
-        images = [
-            MockImage(datetime(2008, 9, 1, 16, 00)),  # (next month)
-            MockImage(datetime(2008, 8, 3, 16, 00)),  # this month
-            MockImage(datetime(2008, 8, 2, 16, 00)),  # this month
-            MockImage(datetime(2008, 8, 1, 0, 00)),  # this month
-            MockImage(datetime(2008, 7, 1, 16, 00)),  # last month
-            MockImage(datetime(2008, 5, 1, 16, 00)),  # this year
-            MockImage(datetime(2008, 2, 4, 12, 00)),  # this year
-            MockImage(datetime(2007, 12, 1, 16, 00)),  # last year
-            MockImage(datetime(2007, 10, 2, 14, 00)),  # last year
-            MockImage(datetime(2005, 4, 1, 16, 00)),  # older
-            MockImage(datetime(2002, 6, 4, 16, 00)),  # older
-        ]
-        files.__get__ = Mock(return_value=images)
+    def delete(images):
+        for image in images:
+            collection.delete(image)
 
-        groups = ImageCollection(town_app).grouped_files(today=today)
-        assert groups[0][0] == 'This month'
-        assert groups[0][1] == images[0:4]
-        assert groups[1][0] == 'Last month'
-        assert groups[1][1] == images[4:5]
-        assert groups[2][0] == 'This year'
-        assert groups[2][1] == images[5:7]
-        assert groups[3][0] == 'Last year'
-        assert groups[3][1] == images[7:9]
-        assert groups[4][0] == 'Older'
-        assert groups[4][1] == images[9:]
+    # catches all intervals
+    images = [collection.add('x.png', create_image()) for r in range(0, 11)]
+    images[0].modified = datetime(2008, 9, 1, 16, 0, tzinfo=utc)   # next month
+    images[1].modified = datetime(2008, 8, 3, 16, 0, tzinfo=utc)   # this month
+    images[2].modified = datetime(2008, 8, 2, 16, 0, tzinfo=utc)   # this month
+    images[3].modified = datetime(2008, 8, 1, 0, 0, tzinfo=utc)    # this month
+    images[4].modified = datetime(2008, 7, 1, 16, 0, tzinfo=utc)   # last month
+    images[5].modified = datetime(2008, 5, 1, 16, 0, tzinfo=utc)   # this year
+    images[6].modified = datetime(2008, 2, 4, 12, 0, tzinfo=utc)   # this year
+    images[7].modified = datetime(2007, 12, 1, 16, 0, tzinfo=utc)  # last year
+    images[8].modified = datetime(2007, 10, 2, 14, 0, tzinfo=utc)  # last year
+    images[9].modified = datetime(2005, 4, 1, 16, 0, tzinfo=utc)   # older
+    images[10].modified = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
 
-    with patch('onegov.town.models.ImageCollection.files') as files:
-        today = date(2008, 8, 8)
+    grouped = grouped_by_date(datetime(2008, 8, 8))
 
-        images = [
-            MockImage(datetime(2008, 8, 3, 16, 00)),  # this month
-            MockImage(datetime(2008, 5, 1, 16, 00)),  # this year
-            MockImage(datetime(2002, 6, 4, 16, 00)),  # older
-        ]
-        files.__get__ = Mock(return_value=images)
+    assert grouped['This month'] == [img.id for img in images[1:4]]
+    assert grouped['Last month'] == [img.id for img in images[4:5]]
+    assert grouped['This year'] == [img.id for img in images[5:7]]
+    assert grouped['Last year'] == [img.id for img in images[7:9]]
+    assert grouped['Older'] == [img.id for img in images[9:]]
 
-        groups = ImageCollection(town_app).grouped_files(today=today)
-        assert groups[0][0] == 'This month'
-        assert groups[0][1] == images[0:1]
-        assert groups[1][0] == 'This year'
-        assert groups[1][1] == images[1:2]
-        assert groups[2][0] == 'Older'
-        assert groups[2][1] == images[2:]
+    delete(images)
 
-    with patch('onegov.town.models.ImageCollection.files') as files:
-        today = date(2008, 8, 8)
+    # only catch some intervals
+    images = [collection.add('x.png', create_image()) for r in range(0, 3)]
+    images[0].modified = datetime(2008, 8, 3, 16, 0, tzinfo=utc)  # this month
+    images[1].modified = datetime(2008, 5, 1, 16, 0, tzinfo=utc)  # this year
+    images[2].modified = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
 
-        images = [
-            MockImage(datetime(2008, 7, 1, 16, 00)),  # last month
-            MockImage(datetime(2002, 6, 4, 16, 00)),  # older
-        ]
-        files.__get__ = Mock(return_value=images)
+    grouped = grouped_by_date(datetime(2008, 8, 8))
+    assert grouped['This month'] == [img.id for img in images[0:1]]
+    assert grouped['This year'] == [img.id for img in images[1:2]]
+    assert grouped['Older'] == [img.id for img in images[2:]]
 
-        groups = ImageCollection(town_app).grouped_files(today=today)
-        assert groups[0][0] == 'Last month'
-        assert groups[0][1] == images[0:1]
-        assert groups[1][0] == 'Older'
-        assert groups[1][1] == images[1:]
+    delete(images)
 
-    with patch('onegov.town.models.ImageCollection.files') as files:
-        today = date(2008, 8, 8)
+    # catch a different set of intervals
+    images = [collection.add('x.png', create_image()) for r in range(0, 2)]
+    images[0].modified = datetime(2008, 7, 1, 16, 0, tzinfo=utc)  # last month
+    images[1].modified = datetime(2002, 6, 4, 16, 0, tzinfo=utc)  # older
 
-        images = [
-            MockImage(datetime(2008, 8, 1, 0, 00)),  # this month
-            MockImage(datetime(2008, 2, 4, 12, 00)),  # this year
-        ]
-        files.__get__ = Mock(return_value=images)
+    grouped = grouped_by_date(datetime(2008, 8, 8))
+    assert grouped['Last month'] == [img.id for img in images[0:1]]
+    assert grouped['Older'] == [img.id for img in images[1:]]
 
-        groups = ImageCollection(town_app).grouped_files(today=today)
-        assert groups[0][0] == 'This month'
-        assert groups[0][1] == images[0:1]
-        assert groups[1][0] == 'This year'
-        assert groups[1][1] == images[1:]
+    delete(images)
 
-    with patch('onegov.town.models.ImageCollection.files') as files:
-        today = date(2008, 8, 8)
+    # use a different date and catch a reduced set of intervals
+    images = [collection.add('x.png', create_image()) for r in range(0, 7)]
+    images[0].modified = datetime(2008, 1, 3, 16, 0, tzinfo=utc)   # this month
+    images[1].modified = datetime(2008, 1, 2, 16, 0, tzinfo=utc)   # this month
+    images[2].modified = datetime(2008, 1, 1, 0, 0, tzinfo=utc)    # this month
+    images[3].modified = datetime(2007, 12, 14, 16, 0, tzinfo=utc)  # lst month
+    images[4].modified = datetime(2007, 12, 12, 16, 0, tzinfo=utc)  # lst month
+    images[5].modified = datetime(2007, 10, 2, 14, 0, tzinfo=utc)  # last year
+    images[6].modified = datetime(2002, 6, 4, 16, 0, tzinfo=utc)   # older
 
-        images = [
-            MockImage(datetime(2008, 8, 1, 0, 00)),  # this month
-        ]
-        files.__get__ = Mock(return_value=images)
+    grouped = grouped_by_date(datetime(2008, 1, 8))
+    assert grouped['This month'] == [img.id for img in images[0:3]]
+    assert grouped['Last month'] == [img.id for img in images[3:5]]
+    assert grouped['Last year'] == [img.id for img in images[5:6]]
+    assert grouped['Older'] == [img.id for img in images[6:]]
 
-        groups = ImageCollection(town_app).grouped_files(today=today)
-        assert groups[0][0] == 'This month'
-        assert groups[0][1] == images[0:1]
-
-    with patch('onegov.town.models.ImageCollection.files') as files:
-        today = date(2008, 8, 8)
-
-        images = [
-            MockImage(datetime(2008, 7, 1, 0, 00)),  # last month
-        ]
-        files.__get__ = Mock(return_value=images)
-
-        groups = ImageCollection(town_app).grouped_files(today=today)
-        assert groups[0][0] == 'Last month'
-        assert groups[0][1] == images[0:1]
-
-    with patch('onegov.town.models.ImageCollection.files') as files:
-        today = date(2008, 8, 8)
-
-        images = [
-            MockImage(datetime(2002, 7, 1, 0, 00)),  # older
-        ]
-        files.__get__ = Mock(return_value=images)
-
-        groups = ImageCollection(town_app).grouped_files(today=today)
-        assert groups[0][0] == 'Older'
-        assert groups[0][1] == images[0:1]
-
-    with patch('onegov.town.models.ImageCollection.files') as files:
-        today = date(2008, 1, 8)
-
-        images = [
-            MockImage(datetime(2008, 1, 3, 16, 00)),  # this month/year
-            MockImage(datetime(2008, 1, 2, 16, 00)),  # this month/year
-            MockImage(datetime(2008, 1, 1, 0, 00)),  # this month/year
-            MockImage(datetime(2007, 12, 14, 16, 00)),  # last month/year
-            MockImage(datetime(2007, 12, 12, 16, 00)),  # last month/year
-            MockImage(datetime(2007, 10, 2, 14, 00)),  # last year
-            MockImage(datetime(2002, 6, 4, 16, 00)),  # older
-        ]
-        files.__get__ = Mock(return_value=images)
-
-        groups = ImageCollection(town_app).grouped_files(today=today)
-        assert groups[0][0] == 'This month'
-        assert groups[0][1] == images[0:3]
-        assert groups[1][0] == 'Last month'
-        assert groups[1][1] == images[3:5]
-        assert groups[2][0] == 'Last year'
-        assert groups[2][1] == images[5:6]
-        assert groups[3][0] == 'Older'
-        assert groups[3][1] == images[6:]
+    delete(images)
 
 
 def test_calendar_date_range():
     resource = SharedMethods()
-    utc = pytz.timezone('UTC')
 
     resource.date = None
     resource.timezone = utc

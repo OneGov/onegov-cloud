@@ -1,9 +1,19 @@
 from onegov.town.models.atoz import AtoZ
 from onegov.town.models.clipboard import Clipboard
 from onegov.town.models.editor import Editor
-from onegov.town.models.file import File, FileCollection
+from onegov.town.models.file import (
+    GeneralFile,
+    ImageFile,
+    GeneralFileCollection,
+    ImageFileCollection
+)
 from onegov.town.models.form import CustomFormDefinition
-from onegov.town.models.image import Image, ImageCollection, Thumbnail
+from onegov.town.models.legacy_file import (
+    LegacyFile,
+    LegacyImage,
+    LegacyFileCollection,
+    LegacyImageCollection
+)
 from onegov.town.models.page import AtoZPages, News, Topic
 from onegov.town.models.page_move import PageMove
 from onegov.town.models.person_move import (
@@ -26,11 +36,15 @@ __all__ = [
     'CustomFormDefinition',
     'DaypassResource',
     'Editor',
-    'File',
-    'FileCollection',
     'FormPersonMove',
-    'Image',
-    'ImageCollection',
+    'GeneralFile',
+    'GeneralFileCollection',
+    'ImageFile',
+    'ImageFileCollection',
+    'LegacyFile',
+    'LegacyFileCollection',
+    'LegacyImage',
+    'LegacyImageCollection',
     'News',
     'PageMove',
     'PagePersonMove',
@@ -38,7 +52,6 @@ __all__ = [
     'ResourcePersonMove',
     'Search',
     'SiteCollection',
-    'Thumbnail',
     'Topic',
     'Town',
     'TraitInfo'

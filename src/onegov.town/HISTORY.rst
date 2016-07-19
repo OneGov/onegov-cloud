@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Converts all existing images/files to onegov.file, which offers more
+  features, including transaction support for file operations.
+  [href]
+
 - Fixes allocations spanning more than a year leading to a 502 on the sever.
   [href]
 

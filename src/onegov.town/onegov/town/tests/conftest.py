@@ -72,12 +72,14 @@ def new_town_app(postgres_dsn, filestorage, town_password, smtp,
             'root_path': filestorage,
             'create': True
         },
+        depot_backend='depot.io.memory.MemoryFileStorage',
         identity_secure=False,
         disable_memcached=True,
         enable_elasticsearch=es_url and True or False,
         elasticsearch_hosts=[es_url]
     )
     app.set_application_id(app.namespace + '/' + 'test')
+    app.bind_depot()
     add_initial_content(
         app.libres_registry,
         app.session_manager,

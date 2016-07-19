@@ -14,7 +14,8 @@ def test_manage_towns(postgres_dsn, temporary_directory):
                 'application': 'onegov.town.TownApp',
                 'namespace': 'onegov_town',
                 'configuration': {
-                    'dsn': postgres_dsn
+                    'dsn': postgres_dsn,
+                    'depot_backend': 'depot.io.memory.MemoryFileStorage'
                 }
             }
         ]

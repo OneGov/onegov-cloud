@@ -6,6 +6,7 @@ from datetime import timedelta
 from dateutil import rrule
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
+from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.utils import linkify
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
@@ -17,13 +18,13 @@ from onegov.town import _
 from onegov.town import utils
 from onegov.town.elements import DeleteLink, Link, LinkGroup
 from onegov.town.models import (
-    FileCollection,
-    ImageCollection,
+    GeneralFileCollection,
+    ImageFile,
+    ImageFileCollection,
     PageMove,
     PersonMove,
     Search,
-    SiteCollection,
-    Thumbnail
+    SiteCollection
 )
 from onegov.town.models.extensions import PersonLinkExtension
 from onegov.town.theme.town_theme import user_options
@@ -148,36 +149,40 @@ class Layout(ChameleonLayout):
     @cached_property
     def file_upload_url(self):
         """ Returns the url to the file upload action. """
-        url = self.request.link(FileCollection(self.app), name='upload')
+        url = self.request.link(GeneralFileCollection(self.app), name='upload')
         return self.csrf_protected_url(url)
 
     @cached_property
     def file_upload_json_url(self):
         """ Adds the json url for file uploads. """
-        url = self.request.link(FileCollection(self.app), name='upload.json')
+        url = self.request.link(
+            GeneralFileCollection(self.app), name='upload.json'
+        )
         return self.csrf_protected_url(url)
 
     @cached_property
     def file_list_url(self):
         """ Adds the json url for file lists. """
-        return self.request.link(FileCollection(self.app), name='json')
+        return self.request.link(GeneralFileCollection(self.app), name='json')
 
     @cached_property
     def image_upload_url(self):
         """ Returns the url to the image upload action. """
-        url = self.request.link(ImageCollection(self.app), name='upload')
+        url = self.request.link(ImageFileCollection(self.app), name='upload')
         return self.csrf_protected_url(url)
 
     @cached_property
     def image_upload_json_url(self):
         """ Adds the json url for image uploads. """
-        url = self.request.link(ImageCollection(self.app), name='upload.json')
+        url = self.request.link(
+            ImageFileCollection(self.app), name='upload.json'
+        )
         return self.csrf_protected_url(url)
 
     @cached_property
     def image_list_url(self):
         """ Adds the json url for image lists. """
-        return self.request.link(ImageCollection(self.app), name='json')
+        return self.request.link(ImageFileCollection(self.app), name='json')
 
     @cached_property
     def sitecollection_url(self):
@@ -236,24 +241,31 @@ class Layout(ChameleonLayout):
             OccurrenceCollection(self.request.app.session())
         )
 
+    def thumbnail_url(self, url):
+        """ Takes the given url and returns the thumbnail url for it.
+
+        Uses some rough heuristic to determine if a url is actually served
+        by onegov.file or not. May possibly fail.
+
+        """
+        if '/storage/' not in url:
+            return url
+
+        image_id = url.split('/storage/')[-1]
+
+        # image file ids are generated from the random_token function
+        if len(image_id) == RANDOM_TOKEN_LENGTH:
+            return self.request.class_link(
+                ImageFile, {'id': image_id}, name='thumbnail')
+        else:
+            return url
+
     def include_editor(self):
         self.request.include('redactor')
         self.request.include('editor')
 
     def include_code_editor(self):
         self.request.include('code_editor')
-
-    def thumbnail_url(self, url):
-        """ Takes the given url and returns the thumbnail url for it, if it
-        exists. Otherwise returns the url as is.
-
-        """
-        thumbnail = Thumbnail.from_url(url)
-
-        if self.request.app.filestorage.exists(thumbnail.path):
-            return self.request.link(thumbnail)
-        else:
-            return url
 
     def render_field(self, field):
         """ Alias for ``onegov.form.render_field``. """
@@ -367,8 +379,12 @@ class DefaultLayout(Layout):
                 Link(_('User Profile'), request.link(
                     self.town, 'benutzerprofil'
                 )),
-                Link(_('Files'), request.link(FileCollection(self.app))),
-                Link(_('Images'), request.link(ImageCollection(self.app))),
+                Link(_('Files'), request.link(
+                    GeneralFileCollection(self.app)
+                )),
+                Link(_('Images'), request.link(
+                    ImageFileCollection(self.app)
+                )),
                 Link('OneGov Cloud', 'http://www.onegovcloud.ch'),
                 Link('Seantis GmbH', 'https://www.seantis.ch')
             ]
@@ -378,8 +394,12 @@ class DefaultLayout(Layout):
                 Link(_('User Profile'), request.link(
                     self.town, 'benutzerprofil'
                 )),
-                Link(_('Files'), request.link(FileCollection(self.app))),
-                Link(_('Images'), request.link(ImageCollection(self.app))),
+                Link(_('Files'), request.link(
+                    GeneralFileCollection(self.app)
+                )),
+                Link(_('Images'), request.link(
+                    ImageFileCollection(self.app)
+                )),
                 Link(_('Settings'), request.link(self.town, 'einstellungen')),
                 Link('OneGov Cloud', 'http://www.onegovcloud.ch'),
                 Link('Seantis GmbH', 'https://www.seantis.ch')

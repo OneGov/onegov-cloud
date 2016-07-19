@@ -9,8 +9,8 @@ use different templating languages.
 
 from collections import defaultdict
 from contextlib import contextmanager
-from onegov.core import Framework
-from onegov.core import utils
+from onegov.core import Framework, utils
+from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
 from onegov.page import PageCollection
@@ -21,7 +21,8 @@ from onegov.town.theme import TownTheme
 from sqlalchemy.orm.attributes import flag_modified
 
 
-class TownApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp):
+class TownApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
+              DepotApp):
     """ The town application. Include this in your onegov.yml to serve it
     with onegov-server.
 

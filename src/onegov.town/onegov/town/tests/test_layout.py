@@ -147,7 +147,7 @@ def test_page_layout_breadcrumbs(session):
     assert links[2].url == 'grandma/ma'
 
 
-def test_template_layout():
+def test_template_layout(postgres_dsn):
 
     class Mock(object):
         pass
@@ -187,9 +187,10 @@ def test_template_layout():
     app = App()
     app.namespace = 'tests'
     app.configure_application(
-        dsn=None,
+        dsn=postgres_dsn,
         filestorage='fs.memoryfs.MemoryFS',
-        enable_elasticsearch=False
+        enable_elasticsearch=False,
+        depot_backend='depot.io.memory.MemoryFileStorage'
     )
     app.set_application_id('tests/foo')
 

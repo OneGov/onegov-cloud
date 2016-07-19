@@ -2,14 +2,21 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+from base64 import b64decode
+from json import loads, dumps
+from onegov.core.orm import find_models
 from onegov.core.orm.abstract import sort_siblings
+from onegov.core.orm.mixins import ContentMixin
 from onegov.core.upgrade import upgrade_task
 from onegov.form import FormCollection, FormDefinition
 from onegov.libres import ResourceCollection
 from onegov.page import PageCollection
+from onegov.people import Person
 from onegov.town import TownApp
 from onegov.town.initial_content import add_resources
 from onegov.town.models.extensions import ContactExtension
+from onegov.town.models.file import GeneralFileCollection, ImageFileCollection
+from pytz import utc
 
 
 @upgrade_task('Add initial libres resources')
@@ -64,3 +71,86 @@ def convert_builtin_forms(context):
     query = forms.definitions.query()
     query = query.filter(FormDefinition.type == 'builtin')
     query.update({FormDefinition.type: 'custom'})
+
+
+@upgrade_task('Migrate images/files to onegov.file')
+def migrate_images_file_to_onegov_file(context):
+
+    request, app = context.request, context.app
+
+    mapping = {
+        'images': ImageFileCollection(context.app.session()),
+        'files': GeneralFileCollection(context.app.session())
+    }
+
+    for folder, collection in mapping.items():
+        if not app.filestorage.isdir(folder):
+            continue
+
+        storage = app.filestorage.opendir(folder)
+        rewrite = {}
+
+        for filename in storage.listdir(files_only=True):
+            if filename.endswith('.r'):
+                continue
+
+            if '-' in filename:
+                name = filename.split('-')[0].strip()
+                name = b64decode(name).decode('utf-8')
+            else:
+                name = filename
+
+            with storage.open(filename, mode='rb') as f:
+                new_file = collection.add(name, content=f)
+
+            with storage.open(filename + '.r', mode='w') as f:
+                f.write(new_file.id)
+
+            fileinfo = storage.getinfo(filename)
+            new_file.created = fileinfo['created_time'].replace(tzinfo=utc)
+            new_file.modified = fileinfo['modified_time'].replace(tzinfo=utc)
+
+            old_url = request.filestorage_link('/'.join((folder, filename)))
+            new_url = request.link(new_file)
+
+            # only work with the last two parts of the url, as the front with
+            # the domain may be different during the upgrade
+            old_url = '/'.join(old_url.split('/')[-2:])
+            new_url = '/'.join(new_url.split('/')[-2:])
+
+            # adjust the prefix of the paths which was different when the
+            # paths for it were still configured by onegov.town
+            old_url = old_url.replace('images/', 'bild/')
+            old_url = old_url.replace('files/', 'datei/')
+
+            rewrite[old_url] = new_url
+
+        # update all records with a meta/content mixin
+        def is_match(cls):
+            return issubclass(cls, ContentMixin)
+
+        for base in app.session_manager.bases:
+            for cls in find_models(base, is_match):
+                for item in app.session().query(cls).all():
+                    meta, content = dumps(item.meta), dumps(item.content)
+
+                    for old, new in rewrite.items():
+                        meta = meta.replace(old, new)
+                        content = content.replace(old, new)
+
+                    item.meta = loads(meta)
+                    item.content = loads(content)
+
+        # update the theme options
+        town = app.load_town()
+        theme_options = dumps(town.theme_options)
+
+        for old, new in rewrite.items():
+            theme_options = theme_options.replace(old, new)
+
+        town.theme_options = loads(theme_options)
+
+        # update the people images
+        for person in app.session().query(Person).all():
+            for old, new in rewrite.items():
+                person.picture_url = person.picture_url.replace(old, new)

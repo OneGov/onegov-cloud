@@ -1,126 +1,122 @@
-""" Contains the models describing the files. """
+""" Contains the models describing files and images. """
 
-import base64
-import magic
+from collections import namedtuple
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+from itertools import groupby
+from onegov.file import File, FileCollection
+from onegov.town import _
+from sedate import standardize_date, utcnow
+from sqlalchemy import desc
 
-from onegov.core.filestorage import FilestorageFile
-from webob.exc import HTTPUnsupportedMediaType, HTTPRequestHeaderFieldsTooLarge
-from unidecode import unidecode
+
+class GeneralFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'general'}
 
 
-class FileCollection(object):
-    """ Defines the collection of files uploaded to the site. Currently
-    this is done without any ORM backing (and therefore without any
-    special features like tagging, metadata and so on).
+class ImageFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'image'}
 
-    Instead it's simply a list of files in a directory.
 
-    This can be made more powerful (and complicated) once we have sufficent
-    time to do it.
+DateInterval = namedtuple('DateInterval', ('name', 'start', 'end'))
 
-    """
 
-    allowed_mime = {
-        'application/msword',
-        'application/pdf',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-'
-        'officedocument.wordprocessingml.document',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/zip',
-        'text/plain',
-    }
+class GroupFilesByDateMixin(object):
 
-    def __init__(self, app):
-        assert app.has_filestorage
+    def get_date_intervals(self, today):
+        today = standardize_date(today, 'UTC')
 
-        self.path_prefix = 'files/'
-        self.file_storage = app.filestorage.makeopendir('files')
+        month_end = today + relativedelta(day=31)
+        month_start = today - relativedelta(day=1)
 
-    def sortkey(self, item):
-        try:
-            filename = base64.urlsafe_b64decode(str(item[0].split('-')[0]))
-            filename = filename.decode("utf-8")
-        except ValueError:
-            filename = str(item[0])
+        yield DateInterval(
+            name=_("This month"),
+            start=month_start,
+            end=month_end)
 
-        return unidecode(filename.strip().upper())
+        last_month_end = month_start - relativedelta(microseconds=1)
+        last_month_start = month_start - relativedelta(months=1)
 
-    @property
-    def files(self):
-        """ Returns the :class:`~onegov.town.model.File` instances in this
-        collection.
+        yield DateInterval(
+            name=_("Last month"),
+            start=last_month_start,
+            end=last_month_end)
+
+        if month_start.month not in (1, 2):
+            this_year_end = last_month_start - relativedelta(microseconds=1)
+            this_year_start = this_year_end.replace(
+                month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+            yield DateInterval(
+                name=_("This year"),
+                start=this_year_start,
+                end=this_year_end)
+        else:
+            this_year_end = None
+            this_year_start = None
+
+        last_year_end = this_year_start or last_month_start
+        last_year_end -= relativedelta(microseconds=1)
+        last_year_start = last_year_end.replace(
+            month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+        yield DateInterval(
+            name=_("Last year"),
+            start=last_year_start,
+            end=last_year_end)
+
+        older_end = last_year_start - relativedelta(microseconds=1)
+        older_start = datetime(2000, 1, 1, tzinfo=today.tzinfo)
+
+        yield DateInterval(
+            name=_("Older"),
+            start=older_start,
+            end=older_end)
+
+    def query_intervals(self, intervals, before_filter=None):
+        base_query = self.query().order_by(desc(File.last_change))
+
+        if before_filter:
+            base_query = before_filter(base_query)
+
+        for interval in intervals:
+            query = base_query.filter(File.last_change >= interval.start)
+            query = query.filter(File.last_change <= interval.end)
+
+            for result in query.all():
+                yield interval.name, result.id
+
+    def grouped_by_date(self, today=None, id_only=True):
+        """ Returns all files grouped by natural language dates.
+
+        By default, only ids are returned, as this is enough to build the
+        necessary links, which is what you usually want from a file.
+
+        The given date is expected to be in UTC.
 
         """
-        files = self.file_storage.ilistdirinfo(files_only=True)
-        files = sorted(files, key=self.sortkey)
 
-        for filename, info in files:
-            yield File(filename, info)
+        intervals = tuple(self.get_date_intervals(today or utcnow()))
 
-    def store_file(self, file_, filename):
-        """ Stores an file (a file with a ``read()`` method) with the given
-        filename. Note that these files are public, so the filename *should*
-        be random.
+        def before_filter(query):
+            if id_only:
+                return query.with_entities(File.id)
 
-        See :func:`onegov.core.filestorage.random_filename`.
+            return query
 
-        """
-
-        if len(filename) > 255:
-            # it's a bit of a stretch to say that a filename which is too long
-            # indicates a header-fields-too-large error, but it's as close
-            # as we can get
-            raise HTTPRequestHeaderFieldsTooLarge("Filename is too long")
-
-        file_data = file_.read()
-
-        mimetype_by_introspection = magic.from_buffer(file_data, mime=True)
-
-        if mimetype_by_introspection not in self.allowed_mime:
-            raise HTTPUnsupportedMediaType()
-
-        self.file_storage.setcontents(filename, file_data)
-
-        return self.get_file_by_filename(filename)
-
-    def get_file_by_filename(self, filename):
-        """ Returns the :class:`~onegov.town.model.File` instance with the
-        given name, or None if not found.
-
-        """
-        if self.file_storage.exists(filename):
-            return File(filename)
-
-    def delete_file_by_filename(self, filename):
-        """ Deletes the file of the given filename. """
-
-        if self.file_storage.exists(filename):
-            self.file_storage.remove(filename)
+        return groupby(
+            self.query_intervals(intervals, before_filter),
+            key=lambda item: item[0]
+        )
 
 
-class File(FilestorageFile):
-    """ A filestorage file that points to an uploaded image or file. """
+class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
 
-    def __init__(self, filename, info=None):
-        self.filename = filename
-        self.info = info or {}
+    def __init__(self, session):
+        super().__init__(session, 'general')
 
-    @property
-    def date(self):
-        if 'modified_time' in self.info:
-            return self.info['modified_time'].date()
 
-    @property
-    def path(self):
-        return 'files/' + self.filename
+class ImageFileCollection(FileCollection, GroupFilesByDateMixin):
 
-    @property
-    def original_name(self):
-        if '-' in self.filename:
-            name = str(self.filename.split('-')[0])
-            return base64.urlsafe_b64decode(name).strip()
-
-    @classmethod
-    def from_url(cls, url):
-        return cls(url.split('/')[-1])
+    def __init__(self, session):
+        super().__init__(session, 'image')

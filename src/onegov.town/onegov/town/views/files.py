@@ -1,25 +1,34 @@
 """ The onegov town collection of files uploaded to the site. """
 
-import base64
 import morepath
 
-from onegov.core.filestorage import random_filename
-from onegov.core.security import Private
+from onegov.core.filestorage import view_filestorage_file
+from onegov.core.security import Private, Public
+from onegov.file import File, FileCollection
+from onegov.file.utils import IMAGE_MIME_TYPES
 from onegov.town import _
 from onegov.town.app import TownApp
-from onegov.town.elements import Link
+from onegov.town.elements import Img, Link
 from onegov.town.layout import DefaultLayout
-from onegov.town.models import FileCollection
+from onegov.town.models import (
+    GeneralFileCollection,
+    ImageFileCollection,
+    GeneralFile,
+    ImageFile,
+    LegacyFile,
+    LegacyImage
+)
 from webob import exc
 
 
-@TownApp.html(model=FileCollection, template='files.pt', permission=Private)
+@TownApp.html(model=GeneralFileCollection, template='files.pt',
+              permission=Private)
 def view_get_file_collection(self, request):
     request.include('dropzone')
 
     files = [
-        Link(text=file_.original_name, url=request.link(file_))
-        for file_ in self.files
+        Link(text=f.name, url=request.link(f))
+        for f in self.query().order_by(File.name).all()
     ]
 
     layout = DefaultLayout(self, request)
@@ -35,52 +44,96 @@ def view_get_file_collection(self, request):
     }
 
 
-@TownApp.json(model=FileCollection, permission=Private, name='json')
+@TownApp.html(model=ImageFileCollection, template='images.pt',
+              permission=Private)
+def view_get_image_collection(self, request):
+    request.include('dropzone')
+
+    images = view_get_image_collection_json(
+        self, request, produce_image=lambda id: Img(
+            src=request.class_link(File, {'id': id}, 'thumbnail'),
+            url=request.class_link(File, {'id': id})
+        )
+    )
+
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Images"), request.link(self))
+    ]
+
+    return {
+        'layout': layout,
+        'title': _('Images'),
+        'images': images,
+    }
+
+
+@TownApp.json(model=GeneralFileCollection, permission=Private, name='json')
 def view_get_file_collection_json(self, request):
     return [
         {
-            'link': request.link(file_),
-            'title': file_.original_name.decode('utf-8')
+            'link': request.class_link(File, {'id': id}),
+            'title': name
         }
-        for file_ in self.files
+        for id, name in self.query().with_entities(File.id, File.name).all()
+    ]
+
+
+@TownApp.json(model=ImageFileCollection, permission=Private, name='json')
+def view_get_image_collection_json(self, request, produce_image=None):
+
+    if not produce_image:
+        def produce_image(id):
+            return {
+                'thumb': request.class_link(File, {'id': id}, 'thumbnail'),
+                'image': request.class_link(File, {'id': id})
+            }
+
+    return [
+        {
+            'group': request.translate(group),
+            'images': tuple(produce_image(id) for group, id in items)
+        } for group, items in self.grouped_by_date()
     ]
 
 
 def handle_file_upload(self, request):
-    """ Stores the file given with the request and returns the url to the
-    resulting file.
+    """ Stores the file given with the request and returns the new file object.
 
     """
 
-    extension = request.params['file'].filename.split('.')[-1]
-    name = request.params['file'].filename.encode('utf-8')
-    # Pad with whitespace to avoid '=' padding in base64 encoded value.
-    if len(name) % 3 != 0:
-        name = name.ljust(len(name) + (3 - len(name) % 3))
-    name = base64.urlsafe_b64encode(name).decode('utf-8')
-
-    filename = '{}-{}.{}'.format(name, random_filename(), extension)
-
-    return self.store_file(request.params['file'].file, filename)
+    return self.add(
+        filename=request.params['file'].filename,
+        content=request.params['file'].file
+    )
 
 
-@TownApp.view(model=FileCollection, name='upload', request_method='POST',
-              permission=Private)
+@TownApp.view(model=FileCollection, name='upload',
+              request_method='POST', permission=Private)
 def view_upload_file(self, request):
     request.assert_valid_csrf_token()
 
-    handle_file_upload(self, request)
+    file = handle_file_upload(self, request)
+
+    if isinstance(self, GeneralFileCollection):
+        pass
+    elif isinstance(self, ImageFileCollection):
+        if file.reference.content_type not in IMAGE_MIME_TYPES:
+            raise exc.HTTPUnsupportedMediaType()
+    else:
+        raise NotImplementedError
 
     return morepath.redirect(request.link(self))
 
 
-@TownApp.json(model=FileCollection, name='upload.json', request_method='POST',
-              permission=Private)
+@TownApp.json(model=FileCollection, name='upload.json',
+              request_method='POST', permission=Private)
 def view_upload_file_by_json(self, request):
     request.assert_valid_csrf_token()
 
     try:
-        file_ = handle_file_upload(self, request)
+        f = handle_file_upload(self, request)
     except exc.HTTPUnsupportedMediaType:
         return {
             'error': True,
@@ -93,6 +146,31 @@ def view_upload_file_by_json(self, request):
         }
 
     return {
-        'filelink': request.link(file_),
-        'filename': file_.original_name.decode('utf-8'),
+        'filelink': request.link(f),
+        'filename': f.name,
     }
+
+
+@TownApp.view(model=LegacyFile, permission=Public)
+@TownApp.view(model=LegacyImage, permission=Public)
+def view_old_files_redirect(self, request):
+    """ Redirects to the migrated depot file if possible. As a result, old
+    image urls are preserved and will continue to function.
+
+    """
+
+    alternate_path = self.path + '.r'
+
+    if request.app.filestorage.isfile(alternate_path):
+        with request.app.filestorage.open(alternate_path, 'r') as f:
+            id = f.read()
+
+        if isinstance(self, LegacyFile):
+            file_class = GeneralFile
+        else:
+            file_class = ImageFile
+
+        return exc.HTTPMovedPermanently(
+            location=request.class_link(file_class, {'id': id}))
+
+    return view_filestorage_file(self, request)

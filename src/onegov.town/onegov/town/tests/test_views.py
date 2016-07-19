@@ -223,20 +223,6 @@ def test_view_images(town_app):
 
     assert "Noch keine Bilder hochgeladen" not in images_page
 
-    name = images_page.pyquery('img').attr('src').split('/')[-1]
-
-    # thumbnails are created on the fly
-    assert town_app.filestorage.exists('images/' + name)
-    assert not town_app.filestorage.exists('images/thumbnails' + name)
-    client.get('/thumbnails/' + name)
-    assert town_app.filestorage.exists('images/thumbnails/' + name)
-
-    # thumbnails are deleted with the image
-    delete_link = images_page.pyquery('a.delete').attr('ic-delete-from')
-    client.delete(delete_link)
-    assert not town_app.filestorage.exists('images/' + name)
-    assert not town_app.filestorage.exists('images/thumbnails/' + name)
-
 
 def test_startpage(town_app):
     client = Client(town_app)

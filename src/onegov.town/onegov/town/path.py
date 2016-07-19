@@ -29,18 +29,19 @@ from onegov.town.models import (
     AtoZPages,
     Clipboard,
     Editor,
-    File,
-    FileCollection,
     FormPersonMove,
-    Image,
-    ImageCollection,
+    GeneralFileCollection,
+    ImageFileCollection,
+    LegacyFile,
+    LegacyFileCollection,
+    LegacyImage,
+    LegacyImageCollection,
     News,
     PageMove,
     PagePersonMove,
     ResourcePersonMove,
     Search,
     SiteCollection,
-    Thumbnail,
     Topic,
     Town,
 )
@@ -72,29 +73,14 @@ def get_news(app, absorb):
     return PageCollection(app.session()).by_path(absorb, ensure_type='news')
 
 
-@TownApp.path(model=FileCollection, path='/dateien')
+@TownApp.path(model=GeneralFileCollection, path='/dateien')
 def get_files(app):
-    return FileCollection(app)
+    return GeneralFileCollection(app.session())
 
 
-@TownApp.path(model=File, path='/datei/{filename}')
-def get_file(app, filename):
-    return FileCollection(app).get_file_by_filename(filename)
-
-
-@TownApp.path(model=ImageCollection, path='/bilder')
+@TownApp.path(model=ImageFileCollection, path='/bilder')
 def get_images(app):
-    return ImageCollection(app)
-
-
-@TownApp.path(model=Image, path='/bild/{filename}')
-def get_image(app, filename):
-    return ImageCollection(app).get_file_by_filename(filename)
-
-
-@TownApp.path(model=Thumbnail, path='/thumbnails/{filename}')
-def get_thumbnail(app, filename):
-    return ImageCollection(app).get_thumbnail_by_filename(filename)
+    return ImageFileCollection(app.session())
 
 
 @TownApp.path(model=FormCollection, path='/formulare')
@@ -327,3 +313,13 @@ def get_newsletter_recipients(app):
 def get_subscription(app, recipient_id, token):
     recipient = RecipientCollection(app.session()).by_id(recipient_id)
     return recipient and Subscription(recipient, token)
+
+
+@TownApp.path(model=LegacyFile, path='/datei/{filename}')
+def get_file(app, filename):
+    return LegacyFileCollection(app).get_file_by_filename(filename)
+
+
+@TownApp.path(model=LegacyImage, path='/bild/{filename}')
+def get_image(app, filename):
+    return LegacyImageCollection(app).get_file_by_filename(filename)

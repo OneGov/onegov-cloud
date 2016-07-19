@@ -12,10 +12,10 @@
         <div class="row">
             <div class="small-12 columns">
                 <h2 i18n:translate="">All Images</h2>
-                <tal:block tal:condition="image_groups" tal:repeat="group image_groups">
-                    <h3 i18n:translate="">${group[0]}</h3>
+                <tal:block tal:repeat="group images">
+                    <h3 i18n:translate="">${group['group']}</h3>
                     <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
-                        <li tal:repeat="image group[1]" id="image-${repeat.image.index}" class="image-box">
+                        <li tal:repeat="image group['images']" id="image-${repeat.image.index}" class="image-box">
                             <a class="th" href="${image.url}" tal:condition="image">
                                 <img src="${image.src}" />
                             </a>
@@ -29,7 +29,7 @@
                         </li>
                     </ul>
                 </tal:block>
-                <tal:block condition="not:image_groups">
+                <tal:block condition="not:images">
                     <p i18n:translate="">No images uploaded yet</p>
                 </tal:block>
             </div>
