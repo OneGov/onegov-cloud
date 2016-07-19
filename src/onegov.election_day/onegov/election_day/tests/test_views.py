@@ -27,7 +27,8 @@ def login(client):
 
 
 def test_view_permissions():
-    utils.assert_explicit_permissions(onegov.election_day)
+    utils.assert_explicit_permissions(
+        onegov.election_day, onegov.election_day.ElectionDayApp)
 
 
 def test_view_login_logout(election_day_app):
