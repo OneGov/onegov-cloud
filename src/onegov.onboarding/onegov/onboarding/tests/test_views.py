@@ -8,7 +8,8 @@ from webtest import TestApp as Client
 
 
 def test_view_permissions():
-    utils.assert_explicit_permissions(onegov.onboarding)
+    utils.assert_explicit_permissions(
+        onegov.onboarding, onegov.onboarding.OnboardingApp)
 
 
 def test_default_assistant(onboarding_app):
