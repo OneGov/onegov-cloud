@@ -37,6 +37,8 @@ setup(
         'more.transaction',
         'pillow',
         'python-magic',
+        'sqlalchemy',
+        'sqlalchemy-utils',
         'webob'
     ],
     extras_require=dict(

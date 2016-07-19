@@ -116,7 +116,7 @@ def test_thumbnail_creation(session):
     assert 'thumbnail_small' in small.reference
 
 
-def test_max_iamge_size(session):
+def test_max_image_size(session):
     session.add(File(name='unchanged.png', reference=create_image(1024, 1024)))
     session.add(File(name='limited.png', reference=create_image(1025, 1024)))
 
@@ -126,3 +126,17 @@ def test_max_iamge_size(session):
 
     assert Image.open(limited.reference.file).size == (1024, 1023)
     assert Image.open(unchanged.reference.file).size == (1024, 1024)
+
+
+def test_checksum(session):
+    session.add(File(name='readme.txt', reference=b'README'))
+    transaction.commit()
+
+    readme = session.query(File).one()
+    assert readme.checksum == 'c47c7c7383225ab55ff591cb59c41e6b'
+
+    readme.reference = b'LIESMICH'
+    transaction.commit()
+
+    readme = session.query(File).one()
+    assert readme.checksum == 'c122d482328c0e832610dd2c8d65db8b'

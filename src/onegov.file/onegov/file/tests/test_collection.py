@@ -150,3 +150,25 @@ def test_store_file_from_bytes_io(files):
     assert readme.reference.file.content_type == 'text/plain'
     assert readme.reference.file.read() == b'README\n======'
     assert readme.reference.file.name == 'readme.txt'
+
+
+def test_handle_duplicates(files):
+
+    files.add('readme.txt', content=b'README')
+    files.add('liesmich.txt', content=b'LIESMICH')
+    transaction.commit()
+
+    assert files.by_content(b'README')
+    assert files.by_checksum(b'c47c7c7383225ab55ff591cb59c41e6b')
+
+    files.allow_duplicates = False
+
+    with pytest.raises(FileExistsError):
+        files.add('readme.txt', content=b'README')
+
+    with pytest.raises(FileExistsError):
+        files.replace('liesmich.txt', content=b'README')
+
+    files.allow_duplicates = True
+
+    files.add('readme.txt', content=b'README')

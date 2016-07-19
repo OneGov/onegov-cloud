@@ -2,9 +2,10 @@ from depot.fields.sqlalchemy import UploadedFileField as UploadedFileFieldBase
 from onegov.core.crypto import random_token
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.file.attachments import UploadedFileWithMaxImageSize
 from onegov.file.filters import OnlyIfImage, WithThumbnailFilter
+from onegov.file.attachments import ProcessedUploadedFile
 from sqlalchemy import Column, Text
+from sqlalchemy_utils import observes
 
 
 class UploadedFileField(UploadedFileFieldBase):
@@ -52,7 +53,7 @@ class File(Base, TimestampMixin):
     #: the reference to the actual file, uses depot to point to a file on
     #: the local file system or somewhere else (e.g. S3)
     reference = Column(UploadedFileField(
-        upload_type=UploadedFileWithMaxImageSize,
+        upload_type=ProcessedUploadedFile,
         filters=[
             OnlyIfImage(
                 # note, the thumbnail configuration should not be changed
@@ -63,6 +64,19 @@ class File(Base, TimestampMixin):
             )
         ]
     ), nullable=False)
+
+    #: the md5 checksum of the file *before* it was processed by us, that is
+    #: if the file was very large and we in turn made it smaller, it's the
+    #: checksum of the file before it was changed by us
+    #: this is useful to check if an uploaded file was already uploaded before
+    #:
+    #: note, this is not meant to be cryptographically secure - this is
+    #: strictly a check of file duplicates, not protection against tampering
+    checksum = Column(Text, nullable=True, index=True)
+
+    @observes('reference')
+    def reference_observer(self, reference):
+        self.checksum = self.reference.get('checksum')
 
     @property
     def file_id(self):

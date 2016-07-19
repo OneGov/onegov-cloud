@@ -3,7 +3,7 @@ import mimetypes
 import os.path
 
 from depot.io.utils import FileIntent
-from io import IOBase
+from io import IOBase, BytesIO
 from PIL import Image
 
 
@@ -43,14 +43,14 @@ def as_fileintent(content, filename):
         Content must be either a bytes string or a file-like object.
     """
 
-    is_string = isinstance(content, bytes)
-
-    if is_string:
-        assert isinstance(content, bytes), "Provide content in bytes."
-        return FileIntent(content, filename, 'text/plain')
+    if isinstance(content, bytes):
+        return FileIntent(BytesIO(content), filename, 'text/plain')
     else:
         if hasattr(content, 'mode'):
             assert 'b' in content.mode, "Open file in binary mode."
+
+        if hasattr(content, 'seek'):
+            content.seek(0)
 
         return FileIntent(
             content, filename, content_type_from_fileobj(content))

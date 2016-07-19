@@ -1,3 +1,5 @@
+import hashlib
+
 from depot.fields.upload import UploadedFile
 from depot.io import utils
 from depot.io.interfaces import FileStorage
@@ -7,33 +9,49 @@ from PIL import Image
 from tempfile import SpooledTemporaryFile
 
 
-class UploadedFileWithMaxImageSize(UploadedFile):
-    max_size = 1024
-    quality = 90
+IMAGE_MAX_SIZE = 1024
+IMAGE_QUALITY = 90
+CHECKSUM_FUNCTION = hashlib.md5
 
-    def limit_image_size(self, content):
-        # Get a file object even if content was bytes
-        content = utils.file_from_content(content)
 
-        uploaded_image = Image.open(content)
-        if max(uploaded_image.size) > self.max_size:
-            uploaded_image.thumbnail(
-                (self.max_size, self.max_size), Image.LANCZOS)
-            content = SpooledTemporaryFile(INMEMORY_FILESIZE)
-            uploaded_image.save(
-                content, uploaded_image.format, quality=self.quality
-            )
+def limit_image_size(file, content, content_type):
 
-        content.seek(0)
+    if content_type not in IMAGE_MIME_TYPES:
+        return None
 
-        return content
+    image = Image.open(content)
+
+    if max(image.size) > IMAGE_MAX_SIZE:
+        image.thumbnail((IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.LANCZOS)
+        content = SpooledTemporaryFile(INMEMORY_FILESIZE)
+        image.save(content, image.format, quality=IMAGE_QUALITY)
+
+    return content
+
+
+def calculate_checksum(content):
+    checksum = CHECKSUM_FUNCTION()
+
+    for chunk in iter(lambda: content.read(4096), b""):
+        checksum.update(chunk)
+
+    return checksum.hexdigest()
+
+
+def store_checksum(file, content, content_type):
+    file.checksum = calculate_checksum(content)
+
+
+class ProcessedUploadedFile(UploadedFile):
+
+    processors = (store_checksum, limit_image_size)
 
     def process_content(self, content, filename=None, content_type=None):
-        # As we are replacing the main file, we need to explicitly pass
-        # the filename and content_type, so get them from the old content.
         filename, content_type = FileStorage.fileinfo(content)[1:]
+        content = utils.file_from_content(content)
 
-        if content_type in IMAGE_MIME_TYPES:
-            content = self.limit_image_size(content)
+        for processor in self.processors:
+            content = processor(self, content, content_type) or content
+            content.seek(0)
 
         super().process_content(content, filename, content_type)
