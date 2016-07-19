@@ -51,14 +51,14 @@ def spawn_basic_permissions_app():
 
         @request.after
         def remember(response):
-            morepath.remember_identity(response, request, identity)
+            request.app.remember_identity(response, request, identity)
 
     @App.view(model=Root, name='logout', permission=Private)
     def logout(self, request):
 
         @request.after
         def forget(response):
-            morepath.forget_identity(response, request)
+            request.app.forget_identity(response, request)
 
     # the scan is required (happens automatically if using onegov.server)
     morepath.scan(onegov.core.security)

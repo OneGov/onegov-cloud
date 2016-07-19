@@ -62,7 +62,7 @@ def test_filestorage(temporary_directory):
 
         @request.after
         def remember_login(response):
-            morepath.remember_identity(response, request, morepath.Identity(
+            request.app.remember_identity(response, request, morepath.Identity(
                 userid=request.params.get('userid'),
                 role='admin',
                 application_id=request.app.application_id

@@ -708,7 +708,7 @@ def test_application_retries(postgres_dsn, number_of_retries):
                 application_id=request.app.application_id
             )
 
-            morepath.remember_identity(response, request, identity)
+            request.app.remember_identity(response, request, identity)
 
     @App.view(model=Document, permission=Private)
     def provoke_serialization_failure(self, request):
