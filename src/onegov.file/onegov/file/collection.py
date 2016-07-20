@@ -29,12 +29,12 @@ class FileCollection(object):
         self.allow_duplicates = allow_duplicates
 
     def query(self):
-        query = self.session.query(File)
-
         if self.type != '*':
-            query = query.filter(File.type == self.type)
+            model_class = File.get_polymorphic_class(self.type, File)
+        else:
+            model_class = File
 
-        return query
+        return self.session.query(model_class)
 
     def add(self, filename, content, note=None):
         """ Adds a file with the given filename. The content maybe either
@@ -108,13 +108,21 @@ class FileCollection(object):
 class FileSetCollection(object):
     """ Manages filesets. """
 
-    def __init__(self, session):
+    def __init__(self, session, type='*'):
         self.session = session
+        self.type = type
 
     def query(self):
-        return self.session.query(FileSet)
+        if self.type != '*':
+            model_class = FileSet.get_polymorphic_class(self.type, FileSet)
+        else:
+            model_class = FileSet
 
-    def add(self, title, meta=None, content=None, type=None):
+        return self.session.query(model_class)
+
+    def add(self, title, meta=None, content=None):
+        type = self.type != '*' and self.type or None
+
         fileset = FileSet.get_polymorphic_class(type, FileSet)()
         fileset.title = title
         fileset.type = type
