@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes query not filtering enough for typed collections.
+  [href]
+
 0.1.1 (2016-07-20)
 ~~~~~~~~~~~~~~~~~~~
 

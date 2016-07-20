@@ -31,10 +31,10 @@ class FileCollection(object):
     def query(self):
         if self.type != '*':
             model_class = File.get_polymorphic_class(self.type, File)
-        else:
-            model_class = File
+            query = self.session.query(model_class)
+            return query.filter(model_class.type == self.type)
 
-        return self.session.query(model_class)
+        return self.session.query(File)
 
     def add(self, filename, content, note=None):
         """ Adds a file with the given filename. The content maybe either
@@ -115,10 +115,10 @@ class FileSetCollection(object):
     def query(self):
         if self.type != '*':
             model_class = FileSet.get_polymorphic_class(self.type, FileSet)
-        else:
-            model_class = FileSet
+            query = self.session.query(model_class)
+            return query.filter(model_class.type == self.type)
 
-        return self.session.query(model_class)
+        return self.session.query(FileSet)
 
     def add(self, title, meta=None, content=None):
         type = self.type != '*' and self.type or None
