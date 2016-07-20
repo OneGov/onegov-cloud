@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.1 (2016-07-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes query not working correctly for typed collections.
   [href]
 
