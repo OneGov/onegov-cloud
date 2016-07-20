@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes polymorphic type attribute not working.
+  [href]
+
 0.1.2 (2016-07-20)
 ~~~~~~~~~~~~~~~~~~~
 

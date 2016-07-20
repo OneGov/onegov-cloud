@@ -47,3 +47,7 @@ class FileSet(Base, ContentMixin, TimestampMixin):
         secondary=file_to_set_associations,
         backref='filesets'
     )
+
+    __mapper_args__ = {
+        'polymorphic_on': 'type'
+    }

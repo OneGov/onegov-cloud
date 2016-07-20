@@ -74,6 +74,10 @@ class File(Base, TimestampMixin):
     #: strictly a check of file duplicates, not protection against tampering
     checksum = Column(Text, nullable=True, index=True)
 
+    __mapper_args__ = {
+        'polymorphic_on': 'type'
+    }
+
     @observes('reference')
     def reference_observer(self, reference):
         self.checksum = self.reference.get('checksum')
