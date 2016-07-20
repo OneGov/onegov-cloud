@@ -88,7 +88,7 @@ def migrate_images_file_to_onegov_file(context):
             continue
 
         storage = app.filestorage.opendir(folder)
-        rewrite = {}
+        rewrite = []
 
         for filename in storage.listdir(files_only=True):
             if filename.endswith('.r'):
@@ -101,7 +101,10 @@ def migrate_images_file_to_onegov_file(context):
                 name = filename
 
             with storage.open(filename, mode='rb') as f:
-                new_file = collection.add(name, content=f)
+                try:
+                    new_file = collection.add(name, content=f)
+                except FileExistsError as e:
+                    new_file = e.args[0]
 
             with storage.open(filename + '.r', mode='w') as f:
                 f.write(new_file.id)
@@ -123,7 +126,7 @@ def migrate_images_file_to_onegov_file(context):
             old_url = old_url.replace('images/', 'bild/')
             old_url = old_url.replace('files/', 'datei/')
 
-            rewrite[old_url] = new_url
+            rewrite.append((old_url, new_url))
 
         # update all records with a meta/content mixin
         def is_match(cls):
@@ -134,7 +137,7 @@ def migrate_images_file_to_onegov_file(context):
                 for item in app.session().query(cls).all():
                     meta, content = dumps(item.meta), dumps(item.content)
 
-                    for old, new in rewrite.items():
+                    for old, new in rewrite:
                         meta = meta.replace(old, new)
                         content = content.replace(old, new)
 
@@ -145,12 +148,12 @@ def migrate_images_file_to_onegov_file(context):
         town = app.load_town()
         theme_options = dumps(town.theme_options)
 
-        for old, new in rewrite.items():
+        for old, new in rewrite:
             theme_options = theme_options.replace(old, new)
 
         town.theme_options = loads(theme_options)
 
         # update the people images
         for person in app.session().query(Person).all():
-            for old, new in rewrite.items():
+            for old, new in rewrite:
                 person.picture_url = person.picture_url.replace(old, new)

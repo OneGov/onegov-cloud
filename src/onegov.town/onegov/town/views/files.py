@@ -18,6 +18,7 @@ from onegov.town.models import (
     LegacyFile,
     LegacyImage
 )
+from sedate import utcnow
 from webob import exc
 
 
@@ -114,15 +115,19 @@ def handle_file_upload(self, request):
 def view_upload_file(self, request):
     request.assert_valid_csrf_token()
 
-    file = handle_file_upload(self, request)
-
-    if isinstance(self, GeneralFileCollection):
-        pass
-    elif isinstance(self, ImageFileCollection):
-        if file.reference.content_type not in IMAGE_MIME_TYPES:
-            raise exc.HTTPUnsupportedMediaType()
+    try:
+        file = handle_file_upload(self, request)
+    except FileExistsError as e:
+        # mark existing files as modified to put them in front of the queue
+        e.args[0].modified = utcnow()
     else:
-        raise NotImplementedError
+        if isinstance(self, GeneralFileCollection):
+            pass
+        elif isinstance(self, ImageFileCollection):
+            if file.reference.content_type not in IMAGE_MIME_TYPES:
+                raise exc.HTTPUnsupportedMediaType()
+        else:
+            raise NotImplementedError
 
     return morepath.redirect(request.link(self))
 
@@ -134,6 +139,14 @@ def view_upload_file_by_json(self, request):
 
     try:
         f = handle_file_upload(self, request)
+    except FileExistsError as e:
+        # mark existing files as modified to put them in front of the queue
+        e.args[0].modified = utcnow()
+
+        return {
+            'filelink': request.link(e.args[0]),
+            'filename': e.args[0].name
+        }
     except exc.HTTPUnsupportedMediaType:
         return {
             'error': True,

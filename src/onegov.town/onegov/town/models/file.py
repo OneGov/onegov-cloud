@@ -113,10 +113,10 @@ class GroupFilesByDateMixin(object):
 class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
 
     def __init__(self, session):
-        super().__init__(session, 'general')
+        super().__init__(session, type='general', allow_duplicates=False)
 
 
 class ImageFileCollection(FileCollection, GroupFilesByDateMixin):
 
     def __init__(self, session):
-        super().__init__(session, 'image')
+        super().__init__(session, type='image', allow_duplicates=False)
