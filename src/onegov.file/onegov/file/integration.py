@@ -113,6 +113,12 @@ def render_depot_file(file, request):
         FileServeApp(file, cache_max_age=3600 * 24 * 7))
 
 
+def respond_with_alt_text(reference, request):
+    @request.after
+    def include_alt_text(response):
+        response.headers.add('X-File-Note', reference.note or '')
+
+
 @DepotApp.path(model=File, path='/storage/{id}')
 def get_file(app, id):
     return FileCollection(app.session()).by_id(id)
@@ -120,12 +126,15 @@ def get_file(app, id):
 
 @DepotApp.view(model=File, render=render_depot_file, permission=Public)
 def view_file(self, request):
+    respond_with_alt_text(self, request)
     return self.reference.file
 
 
 @DepotApp.view(model=File, name='thumbnail', render=render_depot_file,
                permission=Public)
 def view_thumbnail(self, request):
+    respond_with_alt_text(self, request)
+
     # we currently only have one thumbnail, in the future we might make this
     # a query parameter:
     thumbnail_id = self.get_thumbnail_id(size='small')
@@ -134,6 +143,18 @@ def view_thumbnail(self, request):
         return morepath.redirect(request.link(self))
 
     return request.app.bound_depot.get(thumbnail_id)
+
+
+@DepotApp.view(model=File, render=render_depot_file, permission=Public,
+               request_method='HEAD')
+def view_file_head(self, request):
+    return view_file(self, request)
+
+
+@DepotApp.view(model=File, name='thumbnail', render=render_depot_file,
+               permission=Public, request_method='HEAD')
+def view_thumbnail_head(self, request):
+    return view_thumbnail(self, request)
 
 
 @DepotApp.view(model=File, request_method='DELETE', permission=Private)

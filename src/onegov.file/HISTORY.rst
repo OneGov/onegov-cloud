@@ -1,6 +1,13 @@
 Changelog
 ---------
 
+- Adds HEAD request support for files.
+  [href
+
+- Return a custom X-File-Note header, when requesting an image. This header
+  contains the value of the note field of the requested file.
+  [href]
+
 0.1.4 (2016-07-26)
 ~~~~~~~~~~~~~~~~~~~
 

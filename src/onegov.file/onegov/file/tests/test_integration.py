@@ -119,3 +119,25 @@ def test_serve_thumbnail(app):
         '/storage/{}/thumbnail'.format(readme.id), expect_errors=True)
 
     assert thumb.status_code == 302
+
+
+def test_file_note_header(app):
+    ensure_correct_depot(app)
+
+    files = FileCollection(app.session())
+    fid = files.add('avatar.png', create_image(1024, 1024), note='Avatar').id
+    transaction.commit()
+
+    client = Client(app)
+
+    response = client.get('/storage/{}'.format(fid))
+    assert response.headers['X-File-Note'] == 'Avatar'
+
+    response = client.get('/storage/{}/thumbnail'.format(fid))
+    assert response.headers['X-File-Note'] == 'Avatar'
+
+    response = client.head('/storage/{}'.format(fid))
+    assert response.headers['X-File-Note'] == 'Avatar'
+
+    response = client.head('/storage/{}/thumbnail'.format(fid))
+    assert response.headers['X-File-Note'] == 'Avatar'
