@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Orders files in relationships by last change date.
+  [href]
+
 0.1.3 (2016-07-20)
 ~~~~~~~~~~~~~~~~~~~
 

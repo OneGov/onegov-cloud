@@ -45,7 +45,8 @@ class FileSet(Base, ContentMixin, TimestampMixin):
     files = relationship(
         'File',
         secondary=file_to_set_associations,
-        backref='filesets'
+        backref='filesets',
+        order_by='desc(File.last_change)'
     )
 
     __mapper_args__ = {
