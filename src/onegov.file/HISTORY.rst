@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2016-07-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to update the file note through an AJAX call.
   [href]
 
