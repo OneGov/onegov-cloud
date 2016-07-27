@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to update the file note through an AJAX call.
+  [href]
+
 - Adds HEAD request support for files.
   [href
 

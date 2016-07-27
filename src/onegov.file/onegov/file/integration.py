@@ -9,6 +9,7 @@ from onegov.core.security import Private, Public
 from onegov.file.collection import FileCollection
 from onegov.file.models import File
 from pathlib import Path
+from sqlalchemy.orm.attributes import flag_modified
 
 
 SUPPORTED_STORAGE_BACKENDS = (
@@ -155,6 +156,20 @@ def view_file_head(self, request):
                permission=Public, request_method='HEAD')
 def view_thumbnail_head(self, request):
     return view_thumbnail(self, request)
+
+
+@DepotApp.view(model=File, name='note', request_method='POST',
+               permission=Private)
+def handle_note_update(self, request):
+    request.assert_valid_csrf_token()
+    self.note = request.POST.get('note')
+
+    # when updating the alt text we offer the option not to update the
+    # modified date, which is helpful if the files are in modified order
+    # and the order should remain when the note is changed
+    if request.POST.get('keep-timestamp') in ('1', 'true', 'yes'):
+        self.modified = self.modified
+        flag_modified(self, 'modified')
 
 
 @DepotApp.view(model=File, request_method='DELETE', permission=Private)
