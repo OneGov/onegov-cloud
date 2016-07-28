@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.10.0 (2016-07-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Large image lists are now lazy loaded.
   [href]
 
