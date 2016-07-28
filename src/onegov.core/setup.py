@@ -52,7 +52,7 @@ setup(
         'more.transaction>=0.5',
         'more.webassets>=0.3.1',
         'networkx',
-        'onegov.server>=0.0.3',
+        'onegov.server>=0.3.1',
         'ordered-set',
         'passlib',
         'polib',
