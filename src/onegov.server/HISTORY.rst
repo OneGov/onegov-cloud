@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Support Morepath 0.15.
+  [href]
+
 - The development server no longer watches all subdirectories.
 
   It just watches the current directory (without recursion) and the src
