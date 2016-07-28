@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Depend on latest onegov.core/onegov.server releases which fix a bug.
+  [href]
+
 1.10.0 (2016-07-28)
 ~~~~~~~~~~~~~~~~~~~
 

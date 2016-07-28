@@ -40,7 +40,7 @@ setup(
         'rjsmin',
         'lxml',
         'mistune',
-        'onegov.core>=0.20.2',
+        'onegov.core>=0.22.1',
         'onegov.event>=0.0.5',
         'onegov.file',
         'onegov.form>=0.9.0',
