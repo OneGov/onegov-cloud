@@ -97,7 +97,8 @@ def test_town_create(onboarding_app, temporary_directory, smtp):
         },
         identity_secure=False,
         disable_memcached=True,
-        enable_elasticsearch=False
+        enable_elasticsearch=False,
+        depot_backend='depot.io.memory.MemoryFileStorage'
     )
     town.set_application_id(town.namespace + '/' + 'new_york')
     town.settings.cronjobs = Bunch(enabled=False)

@@ -25,12 +25,14 @@ def onboarding_app(postgres_dsn, temporary_directory, smtp):
         },
         identity_secure=False,
         disable_memcached=True,
+        depot_backend='depot.io.memory.MemoryFileStorage',
         onboarding={
             'onegov.town': {
                 'namespace': 'town_' + uuid4().hex,
                 'domain': 'example.org'
             }
         },
+
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
