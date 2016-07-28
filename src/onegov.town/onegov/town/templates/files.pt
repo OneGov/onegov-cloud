@@ -23,7 +23,7 @@
                            data-confirm="Do you really want to delete the file?"
                            data-confirm-yes="Delete File"
                            data-confirm-no="Cancel"
-                           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no">✗</a>
+                           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
                     </li>
                 </ul>
                 <tal:block condition="not:files">

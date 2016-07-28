@@ -4,18 +4,13 @@ from collections import namedtuple
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from itertools import groupby
-from onegov.file import File, FileCollection
+from onegov.core.orm.mixins import meta_property
+from onegov.file import File, FileSet, FileCollection, FileSetCollection
 from onegov.town import _
+from onegov.town.models.extensions import HiddenFromPublicExtension
+from onegov.search import ORMSearchable
 from sedate import standardize_date, utcnow
 from sqlalchemy import desc
-
-
-class GeneralFile(File):
-    __mapper_args__ = {'polymorphic_identity': 'general'}
-
-
-class ImageFile(File):
-    __mapper_args__ = {'polymorphic_identity': 'image'}
 
 
 DateInterval = namedtuple('DateInterval', ('name', 'start', 'end'))
@@ -73,7 +68,7 @@ class GroupFilesByDateMixin(object):
             start=older_start,
             end=older_end)
 
-    def query_intervals(self, intervals, before_filter=None):
+    def query_intervals(self, intervals, before_filter=None, process=None):
         base_query = self.query().order_by(desc(File.last_change))
 
         if before_filter:
@@ -84,7 +79,8 @@ class GroupFilesByDateMixin(object):
             query = query.filter(File.last_change <= interval.end)
 
             for result in query.all():
-                yield interval.name, result.id
+                if process is not None:
+                    yield interval.name, process(result)
 
     def grouped_by_date(self, today=None, id_only=True):
         """ Returns all files grouped by natural language dates.
@@ -104,10 +100,56 @@ class GroupFilesByDateMixin(object):
 
             return query
 
+        def process(result):
+            if id_only:
+                return result.id
+
+            return result
+
         return groupby(
-            self.query_intervals(intervals, before_filter),
+            self.query_intervals(intervals, before_filter, process),
             key=lambda item: item[0]
         )
+
+
+class GeneralFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'general'}
+
+
+class ImageFile(File):
+    __mapper_args__ = {'polymorphic_identity': 'image'}
+
+
+class ImageSet(FileSet, HiddenFromPublicExtension, ORMSearchable):
+    __mapper_args__ = {'polymorphic_identity': 'image'}
+
+    es_properties = {
+        'title': {'type': 'localized'},
+        'lead': {'type': 'localized'}
+    }
+
+    @property
+    def es_public(self):
+        return not self.is_hidden_from_public
+
+    @property
+    def es_language(self):
+        return 'de'  # xxx for now there's no other language
+
+    @property
+    def es_suggestions(self):
+        return {
+            "input": [self.title.lower()]
+        }
+
+    lead = meta_property('lead')
+    view = meta_property('view')
+
+
+class ImageSetCollection(FileSetCollection):
+
+    def __init__(self, session):
+        super().__init__(session, type='image')
 
 
 class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):

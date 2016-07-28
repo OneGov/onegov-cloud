@@ -3,9 +3,11 @@ from onegov.town.models.clipboard import Clipboard
 from onegov.town.models.editor import Editor
 from onegov.town.models.file import (
     GeneralFile,
-    ImageFile,
     GeneralFileCollection,
-    ImageFileCollection
+    ImageFile,
+    ImageFileCollection,
+    ImageSet,
+    ImageSetCollection,
 )
 from onegov.town.models.form import CustomFormDefinition
 from onegov.town.models.legacy_file import (
@@ -45,6 +47,8 @@ __all__ = [
     'LegacyFileCollection',
     'LegacyImage',
     'LegacyImageCollection',
+    'ImageSet',
+    'ImageSetCollection',
     'News',
     'PageMove',
     'PagePersonMove',

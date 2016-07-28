@@ -2,6 +2,9 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+import lxml
+import re
+
 from base64 import b64decode
 from json import loads, dumps
 from onegov.core.orm import find_models
@@ -15,7 +18,11 @@ from onegov.people import Person
 from onegov.town import TownApp
 from onegov.town.initial_content import add_resources
 from onegov.town.models.extensions import ContactExtension
-from onegov.town.models.file import GeneralFileCollection, ImageFileCollection
+from onegov.town.models.file import (
+    GeneralFileCollection,
+    ImageFile,
+    ImageFileCollection
+)
 from pytz import utc
 
 
@@ -157,3 +164,61 @@ def migrate_images_file_to_onegov_file(context):
         for person in app.session().query(Person).all():
             for old, new in rewrite:
                 person.picture_url = person.picture_url.replace(old, new)
+
+
+@upgrade_task('Migrate alt text',
+              requires='onegov.town:Migrate images/files to onegov.file')
+def migrate_alt_text(context):
+
+    app = context.app
+    url_expression = re.compile(r'^.*/storage/([a-z0-9]{64})/?.*$')
+
+    # find all possible alt texts and transfer them to onegov.file
+    def is_match(cls):
+        return issubclass(cls, ContentMixin)
+
+    items = []
+
+    for base in app.session_manager.bases:
+        for cls in find_models(base, is_match):
+            for item in app.session().query(cls).all():
+                if getattr(item, 'text', None):
+                    items.append(item)
+
+    alts = {}
+
+    for item in items:
+        html = lxml.html.fromstring(item.text)
+        for img in html.xpath('//img'):
+            src = (img.get('src') or '').strip()
+
+            if not src:
+                continue
+
+            # check if it's one of the internal images
+            match = url_expression.match(src)
+
+            if not match:
+                continue
+
+            # remember the alt text for each image
+            if img.get('alt'):
+                fid = match.group(1)
+                alts[fid] = img.get('alt')
+                img.set('alt', '')
+
+            # load the alt text lazily from now on (might be added later)
+            img.set('class', 'lazyload-alt')
+
+        item.text = lxml.html.tostring(html).decode('utf-8')
+
+    if not alts:
+        return
+
+    query = ImageFileCollection(app.session()).query()
+    query = query.filter(ImageFile.id.in_(alts.keys()))
+    files = {f.id: f for f in query.all()}
+
+    for fid in alts:
+        if fid in files:
+            files[fid].note = alts[fid]

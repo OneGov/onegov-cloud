@@ -154,9 +154,9 @@ class DeleteLink(Link):
 class Img(object):
     """ Represents an img element. """
 
-    __slots__ = ['src', 'alt', 'title', 'url']
+    __slots__ = ['src', 'alt', 'title', 'url', 'extra']
 
-    def __init__(self, src, alt=None, title=None, url=None):
+    def __init__(self, src, alt=None, title=None, url=None, extra=None):
         #: The src of the image
         self.src = src
 
@@ -168,6 +168,9 @@ class Img(object):
 
         #: The target of this image
         self.url = url
+
+        #: Extra parameters
+        self.extra = extra
 
 
 class LinkGroup(HiddenElementMixin):

@@ -32,6 +32,8 @@ from onegov.town.models import (
     FormPersonMove,
     GeneralFileCollection,
     ImageFileCollection,
+    ImageSet,
+    ImageSetCollection,
     LegacyFile,
     LegacyFileCollection,
     LegacyImage,
@@ -323,3 +325,13 @@ def get_file(app, filename):
 @TownApp.path(model=LegacyImage, path='/bild/{filename}')
 def get_image(app, filename):
     return LegacyImageCollection(app).get_file_by_filename(filename)
+
+
+@TownApp.path(model=ImageSetCollection, path='/fotoalben')
+def get_image_sets(app):
+    return ImageSetCollection(app.session())
+
+
+@TownApp.path(model=ImageSet, path='/fotoalbum/{id}')
+def get_image_set(app, id):
+    return ImageSetCollection(app.session()).by_id(id)

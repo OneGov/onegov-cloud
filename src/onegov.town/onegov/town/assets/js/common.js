@@ -29,12 +29,6 @@ $(document).foundation();
 // get the footer height and write it to the footer_height setting if possible
 $(document).find('#footer_height').val($('footer > div').height() + 'px');
 
-// Add image captions
-$('.page-text img[alt][alt!=""]').each(function() {
-    var caption = $("<span>").text($(this).attr('alt'));
-    $(this).after(caption);
-});
-
 // Make sure files open in another window
 $('.page-text a[href*="/datei/"]').attr('target', '_blank');
 
@@ -55,4 +49,12 @@ $('.disable-scroll').on('mouseover', function() {
 
 $('.disable-scroll').on('mouseout', function() {
     $(this).off('mousewheel');
+});
+
+// Toggle the selected state in image selection views when clicking the checkbox
+$('.image-select input[type="checkbox"]').on('click', function(e) {
+    var target = $(e.target);
+    var checked = target.is(':checked');
+
+    target.closest('.image-box').toggleClass('selected', checked);
 });

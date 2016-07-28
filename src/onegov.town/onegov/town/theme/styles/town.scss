@@ -13,6 +13,14 @@
             filter: gray;
     -webkit-filter: grayscale(100%);
 }
+
+@mixin reset-filter() {
+       -moz-filter: none;
+        -ms-filter: none;
+         -o-filter: none;
+            filter: none;
+    -webkit-filter: none;
+}
 // scss-lint:enable all
 
 @mixin hairline() {
@@ -695,11 +703,14 @@ $new-news-icon: '\f1ea';
 $new-newsletter-icon: '\f003';
 $new-page-icon: '\f0f6';
 $new-person-icon: '\f007';
+$new-photo-album: '\f03e';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
 $paste-link-icon: '\f0ea';
+$select-icon: '\f14a';
 $send-link-icon: '\f1d9';
 $occupancy-link-icon: '\f022';
+$upload-icon: '\f0ee';
 
 .edit-bar {
     background-color: $primary-color;
@@ -747,11 +758,14 @@ $occupancy-link-icon: '\f022';
     .new-newsletter:before { @include icon($new-newsletter-icon); }
     .new-page:before { @include icon($new-page-icon); }
     .new-person:before { @include icon($new-person-icon); }
+    .new-photo-album:before { @include icon($new-photo-album); }
     .new-reservation:before { @include icon($new-reservation-icon); }
     .new-room:before { @include icon($new-room-icon); }
     .paste-link:before { @include icon($paste-link-icon); }
+    .select:before { @include icon($select-icon); }
     .send-link:before { @include icon($send-link-icon); }
     .occupancy-link::before { @include icon($occupancy-link-icon); }
+    .upload::before { @include icon($upload-icon); }
 }
 
 /*
@@ -834,6 +848,19 @@ $occupancy-link-icon: '\f022';
 */
 .thumbnail {
     padding: .5em;
+}
+
+/*
+    imageset view
+*/
+.full-imageset {
+    > p {
+        margin-bottom: 2rem;
+    }
+
+    > p:first-child {
+        margin-top: .5rem;
+    }
 }
 
 /*
@@ -962,8 +989,22 @@ div#redactor-droparea {
 /*
     hide the "image position" options in the redactor
 */
-#redactor-modal-image-edit .redactor-image-position-option {
-    display: none;
+#redactor-modal-image-edit {
+    .redactor-image-position-option {
+        display: none;
+    }
+
+    /*
+        disable image alt text editor
+    */
+    :nth-child(1),
+    :nth-child(2) {
+        display: none;
+    }
+
+    :nth-child(3) {
+        margin-top: -10px !important;
+    }
 }
 
 /*
@@ -1009,6 +1050,31 @@ div#redactor-droparea {
 }
 
 /*
+    image subtitles
+*/
+.alt-text {
+    background-color: $vapor;
+    color: $monsoon;
+    display: block;
+    font-size: .875rem;
+    padding: .25em .75em;
+    transition: background .5s ease-in-out;
+}
+
+.alt-text-missing {
+    background-color: $yellow-pastel;
+    font-style: italic;
+}
+
+.alt-text-changed-success {
+    background-color: $green-light;
+}
+
+.alt-text-changed-error {
+    background-color: $red-light;
+}
+
+/*
     page text
 */
 
@@ -1036,15 +1102,6 @@ div#redactor-droparea {
     .has-img,
     .has-video {
         max-width: none;
-
-        // image subtitles
-        span {
-            background-color: $vapor;
-            color: $monsoon;
-            display: block;
-            font-size: .875rem;
-            padding: .25em .75em;
-        }
     }
 
     .has-video {
@@ -1719,7 +1776,7 @@ tr.ticket:hover {
     max-height: 400px;
     max-width: 275px;
     overflow-x: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 
     a {
         font-size: .875rem;
@@ -1929,10 +1986,10 @@ button {
     .partition-occupied {
         background: repeating-linear-gradient(
             45deg,
-            #666,
-            #666 10px,
-            #bbb 10px,
-            #bbb 20px
+            $steel,
+            $steel 10px,
+            $iron 10px,
+            $iron 20px
         );
     }
 
@@ -2003,7 +2060,7 @@ button {
 
         // fix borders missing with zurb foundation
         tbody div.fc-content-skeleton td {
-            border-color: #ddd;
+            border-color: $gainsboro;
         }
     }
 
@@ -2197,7 +2254,7 @@ button {
     Popup Menu
 */
 .popup {
-    background-color: #fff;
+    background-color: $white;
     border: 1px solid $gainsboro;
     border-radius: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, .3);
@@ -2271,7 +2328,7 @@ button {
 
         &::after {
             border-color: rgba(213, 213, 213, 0);
-            border-right-color: #fff;
+            border-right-color: $white;
             border-width: 7px;
             margin-top: -7px;
         }
@@ -2293,7 +2350,7 @@ button {
 
         &::after {
             border-color: rgba(213, 213, 213, 0);
-            border-top-color: #fff;
+            border-top-color: $white;
             border-width: 7px;
         }
 
@@ -2759,6 +2816,45 @@ ul.search-results {
 
     .title {
         margin-bottom: .5rem;
+    }
+}
+
+/*
+    Image select
+*/
+
+.image-select {
+    .image-box {
+        @include grayscale;
+
+        &:hover {
+            img {
+                border-radius: 1px;
+                box-shadow: 0 0 0 3px $gainsboro;
+            }
+        }
+
+        &.selected {
+            @include reset-filter();
+
+            img {
+                border-radius: 1px;
+                box-shadow: 0 0 0 3px $primary-color;
+            }
+        }
+
+        input[type="checkbox"] {
+            height: 100%;
+            left: 0;
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
     }
 }
 

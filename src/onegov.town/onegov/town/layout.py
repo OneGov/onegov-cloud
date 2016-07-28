@@ -21,6 +21,7 @@ from onegov.town.models import (
     GeneralFileCollection,
     ImageFile,
     ImageFileCollection,
+    ImageSetCollection,
     PageMove,
     PersonMove,
     Search,
@@ -1090,3 +1091,81 @@ class RecipientLayout(DefaultLayout):
             )),
             Link(_("Subscribers"), '#')
         ]
+
+
+class ImageSetCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Photo Albums"), self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                Link(
+                    text=_("Manage images"),
+                    url=self.request.link(ImageFileCollection(self.app)),
+                    classes=('upload', )
+                ),
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("Photo Album"),
+                            url=self.request.link(
+                                self.model,
+                                name='neu'
+                            ),
+                            classes=('new-photo-album', )
+                        )
+                    ]
+                ),
+            ]
+
+
+class ImageSetLayout(DefaultLayout):
+
+    @property
+    def collection(self):
+        return ImageSetCollection(self.request.app.session())
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Photo Albums"), self.request.link(self.collection)),
+            Link(self.model.title, self.request.link(self.model))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_logged_in:
+            return [
+                Link(
+                    text=_("Choose images"),
+                    url=self.request.link(self.model, 'auswahl'),
+                    classes=('select', )
+                ),
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(
+                        self.model,
+                        name='bearbeiten'
+                    ),
+                    classes=('edit-link', )
+                ),
+                DeleteLink(
+                    text=_("Delete"),
+                    url=self.request.link(self.model),
+                    confirm=_(
+                        'Do you really want to delete "{}"?'.format(
+                            self.model.title
+                        )),
+                    yes_button_text=_("Delete photo album"),
+                    redirect_after=self.request.link(self.collection)
+                )
+            ]

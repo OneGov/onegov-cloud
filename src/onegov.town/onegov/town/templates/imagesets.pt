@@ -1,0 +1,15 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <p tal:condition="not:imagesets" i18n:translate="">No photo albums defined yet.</p>
+
+        <ul tal:condition="imagesets">
+            <li tal:repeat="imageset imagesets">
+                <a class="list-title" tal:attributes="href request.link(imageset)">${imageset.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item imageset" />
+                <div class="list-lead">${imageset.meta.get('lead')}</div>
+            </li>
+        </ul>
+    </tal:block>
+</div>

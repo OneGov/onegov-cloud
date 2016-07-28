@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Large image lists are now lazy loaded.
+  [href]
+
+- Adds the ability to organize images in albums.
+  [href]
+
 - Converts all existing images/files to onegov.file, which offers more
   features, including transaction support for file operations.
   [href]

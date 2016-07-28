@@ -41,7 +41,7 @@ if (!RedactorPlugins) var RedactorPlugins = {};
 								var thumbtitle = '';
 								if (typeof val.title !== 'undefined') thumbtitle = val.title;
 
-								var img = $('<img src="' + val.thumb + '" rel="' + val.image + '" title="' + thumbtitle + '" style="max-width: 100px; max-height: 75px; cursor: pointer;" />');
+								var img = $('<img class="lazyload" data-src="' + val.thumb + '" rel="' + val.image + '" title="' + thumbtitle + '" style="max-width: 192px; max-height: 192px; cursor: pointer;" />');
 								$('#redactor-image-manager-box').append(img);
 								$(img).click($.proxy(this.imagemanager.insert, this));
 
@@ -58,7 +58,8 @@ if (!RedactorPlugins) var RedactorPlugins = {};
 			},
 			insert: function(e)
 			{
-				this.image.insert('<img src="' + $(e.target).attr('rel') + '" alt="' + $(e.target).attr('title') + '">');
+				var url = $(e.target).attr('rel');
+				this.image.insert('<img src="' + url + '">');
 			}
 		};
 	};

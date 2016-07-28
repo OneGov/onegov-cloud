@@ -11,7 +11,7 @@ from onegov.town import _
 from onegov.town.app import TownApp
 from onegov.town.elements import Link, LinkGroup
 from onegov.town.layout import DefaultLayout, EventBaseLayout
-from onegov.town.models import AtoZPages, Town
+from onegov.town.models import AtoZPages, Town, ImageSetCollection
 
 
 @TownApp.html(model=Town, template='homepage.pt', permission=Public)
@@ -143,10 +143,15 @@ def view_town(self, request):
                 subtitle=_("All contacts")
             ),
             Link(
+                text=_("Photo Albums"),
+                url=request.link(ImageSetCollection(session)),
+                subtitle=_("Impressions")
+            ),
+            Link(
                 text=_("Topics"),
                 url=request.link(AtoZPages(request)),
                 subtitle=_("Catalog A-Z")
-            ),
+            )
         ]
     )
 

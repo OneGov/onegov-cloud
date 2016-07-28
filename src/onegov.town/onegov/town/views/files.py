@@ -11,12 +11,13 @@ from onegov.town.app import TownApp
 from onegov.town.elements import Img, Link
 from onegov.town.layout import DefaultLayout
 from onegov.town.models import (
-    GeneralFileCollection,
-    ImageFileCollection,
     GeneralFile,
+    GeneralFileCollection,
     ImageFile,
+    ImageFileCollection,
+    ImageSetCollection,
     LegacyFile,
-    LegacyImage
+    LegacyImage,
 )
 from sedate import utcnow
 from webob import exc
@@ -48,25 +49,37 @@ def view_get_file_collection(self, request):
 @TownApp.html(model=ImageFileCollection, template='images.pt',
               permission=Private)
 def view_get_image_collection(self, request):
+    request.include('common')
     request.include('dropzone')
+    request.include('editalttext')
+
+    layout = DefaultLayout(self, request)
 
     images = view_get_image_collection_json(
-        self, request, produce_image=lambda id: Img(
-            src=request.class_link(File, {'id': id}, 'thumbnail'),
-            url=request.class_link(File, {'id': id})
+        self, request, produce_image=lambda image: Img(
+            src=request.class_link(File, {'id': image.id}, 'thumbnail'),
+            url=request.class_link(File, {'id': image.id}),
+            alt=(image.note or '').strip(),
+            extra=layout.csrf_protected_url(request.link(image, 'note'))
         )
     )
 
-    layout = DefaultLayout(self, request)
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),
         Link(_("Images"), request.link(self))
     ]
 
+    layout.editbar_links = [
+        Link(
+            text=_("Manage Photo Albums"),
+            url=request.class_link(ImageSetCollection),
+            classes=('new-photo-album', ))
+    ]
+
     return {
         'layout': layout,
         'title': _('Images'),
-        'images': images,
+        'images': images
     }
 
 
@@ -85,17 +98,19 @@ def view_get_file_collection_json(self, request):
 def view_get_image_collection_json(self, request, produce_image=None):
 
     if not produce_image:
-        def produce_image(id):
+        def produce_image(image):
             return {
-                'thumb': request.class_link(File, {'id': id}, 'thumbnail'),
-                'image': request.class_link(File, {'id': id})
+                'thumb': request.class_link(
+                    File, {'id': image.id}, 'thumbnail'),
+                'image': request.class_link(
+                    File, {'id': image.id})
             }
 
     return [
         {
             'group': request.translate(group),
-            'images': tuple(produce_image(id) for group, id in items)
-        } for group, items in self.grouped_by_date()
+            'images': tuple(produce_image(image) for group, image in items)
+        } for group, items in self.grouped_by_date(id_only=False)
     ]
 
 

@@ -16,6 +16,7 @@ def get_site_collection(self, request):
     groups = [
         ('topics', request.translate(_("Topics"))),
         ('news', request.translate(_("Latest news"))),
+        ('imagesets', request.translate(_("Photo Albums"))),
         ('forms', request.translate(_("Forms"))),
         ('resources', request.translate(_("Resources"))),
     ]

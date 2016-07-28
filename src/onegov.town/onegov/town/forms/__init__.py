@@ -6,6 +6,7 @@ from onegov.town.forms.allocation import (
 )
 from onegov.town.forms.event import EventForm
 from onegov.town.forms.form_definition import CustomDefinitionForm
+from onegov.town.forms.imageset import ImageSetForm
 from onegov.town.forms.newsletter import NewsletterForm, NewsletterSendForm
 from onegov.town.forms.page import LinkForm, PageForm
 from onegov.town.forms.person import PersonForm
@@ -28,6 +29,7 @@ __all__ = [
     'DaypassAllocationForm',
     'DaypassAllocationEditForm',
     'EventForm',
+    'ImageSetForm',
     'LinkForm',
     'NewsletterForm',
     'NewsletterSendForm',

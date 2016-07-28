@@ -79,6 +79,9 @@ class TownTheme(BaseTheme):
             ('header-line-height', '1.25'),
             ('sub-nav-padding', '.25rem'),
             ('table-border-style', 'none'),
+            ('thumb-border-width', '0'),
+            ('thumb-box-shadow', '0 0 0 2px rgba($black,.1)'),
+            ('thumb-box-shadow-hover', '0 0 0 2px rgba($black,.3)'),
 
             # custom
             ('tile-image-1', '"../static/homepage-images/tile-1-small.jpg"'),

@@ -1,6 +1,6 @@
 from onegov.form.models import FormDefinition
 from onegov.libres.models import Resource
-from onegov.town.models.page import News, Topic
+from onegov.town.models import News, Topic, ImageSet
 from sqlalchemy.orm import defer
 
 
@@ -35,9 +35,16 @@ class SiteCollection(object):
         resources = resources.options(defer(Resource.timezone))
         resources = resources.order_by(Resource.title)
 
+        # get the foto albums
+        imagesets = self.session.query(ImageSet)
+        imagesets = imagesets.options(defer(ImageSet.meta))
+        imagesets = imagesets.options(defer(ImageSet.content))
+        imagesets = imagesets.order_by(ImageSet.title)
+
         return {
             'topics': topics.all(),
             'news': news.all(),
             'forms': forms.all(),
             'resources': resources.all(),
+            'imagesets': imagesets.all(),
         }
