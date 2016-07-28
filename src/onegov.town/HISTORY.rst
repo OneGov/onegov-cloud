@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes image captions sometimes getting the wrong width.
+  [href]
+
 1.10.1 (2016-07-28)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -2,9 +2,9 @@
 var adjustCaption = function(image) {
     var caption = image.siblings('.alt-text').first();
 
-    setTimeout(function() {
+    $(image).load(function() {
         caption.css("maxWidth", image.width());
-    }, 25);
+    });
 };
 
 // append the alt text below the image in a span element
