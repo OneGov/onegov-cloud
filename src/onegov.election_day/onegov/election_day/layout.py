@@ -26,7 +26,11 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def opendata_link(self):
-        return self.request.link(self.principal, 'opendata')
+        lang = (self.request.locale or 'en')[:2]
+        return (
+            "https://github.com/OneGov/onegov.election_day"
+            "/blob/master/docs/open_data_{}.md"
+        ).format(lang)
 
     @cached_property
     def font_awesome_path(self):

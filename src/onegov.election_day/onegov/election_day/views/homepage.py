@@ -49,11 +49,3 @@ def view_principal_json(self, request):
         'name': self.name,
         'results': latest
     }
-
-
-@ElectionDayApp.html(model=Principal, template='opendata.pt', name='opendata',
-                     permission=Public)
-def view_opendata(self, request):
-    return {
-        'layout': DefaultLayout(self, request),
-    }

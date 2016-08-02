@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-30 15:56+0200\n"
+"POT-Creation-Date: 2016-08-02 15:37+0200\n"
 "PO-Revision-Date: 2016-06-30 15:53+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -13,6 +13,15 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.8\n"
+
+msgid "Elections"
+msgstr "Wahlen"
+
+msgid "Votes"
+msgstr "Abstimmungen"
+
+msgid "Manage"
+msgstr "Verwalten"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -330,9 +339,6 @@ msgstr "Anmelden"
 msgid "You are logged in:"
 msgstr "Sie sind angemeldet:"
 
-msgid "Manage"
-msgstr "Verwalten"
-
 msgid "Logout"
 msgstr "Abmelden"
 
@@ -390,8 +396,14 @@ msgstr "JA %"
 msgid "No %"
 msgstr "NEIN %"
 
-msgid "Elections"
-msgstr "Wahlen"
+msgid "Previous Page"
+msgstr ""
+
+msgid "Next Page"
+msgstr ""
+
+msgid "You are here"
+msgstr ""
 
 msgid "New Election"
 msgstr "Neue Wahl"
@@ -420,257 +432,11 @@ msgstr "Resultate Hochladen"
 msgid "Delete"
 msgstr "Löschen"
 
-msgid "Votes"
-msgstr "Abstimmungen"
-
 msgid "New Vote"
 msgstr "Neue Abstimmung"
 
 msgid "No votes yet."
 msgstr "Noch keine Abstimmungen erfasst."
-
-msgid "Elections &amp; Votes: Open Data"
-msgstr "Wahlen &amp; Abstimmungen: Open Data"
-
-msgid "Contents"
-msgstr "Inhalt"
-
-msgid "Summarized results"
-msgstr "Ergebnisse"
-
-msgid "Election results"
-msgstr "Wahlresultate"
-
-msgid "Vote results"
-msgstr "Abstimmungsresultate"
-
-msgid ""
-"The summarized results displayed at the home page (only the results of "
-"latest votes and elections) and the archive (browsable by year or date) is "
-"also available as JSON. The data contains some global informations and for "
-"every election and vote the following commong information:"
-msgstr ""
-"Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im "
-"JSON Format verfügbar. Die Daten enthalten neben einigen globalen "
-"Informationen für jede Wahl / Abstimmung die folgenden Informationen:"
-
-msgid "${election} for elections, ${vote} for votes."
-msgstr "${election} für Wahlen, ${vote} für Abstimmungen."
-
-msgid "An object containing the translated titles."
-msgstr "Ein Objekt mit den übersetzten Titeln."
-
-msgid "The date (ISO 8601)."
-msgstr "Das Datum (ISO 8601)."
-
-msgid "The domain of influence (federation, canton, ...)."
-msgstr "Einflussbereich (Bund, Kanton, ...)."
-
-msgid "A link to the detailed view."
-msgstr "Ein Link zur Detailansicht."
-
-msgid "A link to the detailed JSON data, see below."
-msgstr "Ein Link zu den detaillierten Resultaten im JSON Format, siehe unten."
-
-msgid ""
-"An object containing the number already counted municipalities (${counted}) "
-"and the total number of municipalities (${total})."
-msgstr ""
-"Ein Objekt welches die Anzahl ausgezählter Gemeinden (${counted}) die "
-"Gesamtzahl an Gemeinden (${total}) enthält."
-
-msgid "Vote results contain the following additional information:"
-msgstr "Wahlresultate enthalten die folgenden zusätzlichen Informationen:"
-
-msgid ""
-"The answer of the vote: ${accepted}, ${rejected}, ${proposal} or ${counter-"
-"proposal}."
-msgstr ""
-"Das Abstimmungsresultat: Angenommen (${accepted}), abgelehnt (${rejected}), "
-"Initiative (${proposal}) oder Gegenvorschlag (${counter-proposal})."
-
-msgid "Yeas percentage."
-msgstr "Ja-Stimmen in Prozent."
-
-msgid "Nays percentage."
-msgstr "Nein-Stimmen in Prozent."
-
-msgid ""
-"The raw data used to display the results of votes is available in the "
-"following formats:"
-msgstr ""
-"Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den "
-"folgenden Formaten verfügbar:"
-
-msgid "The following fields are included in all formats:"
-msgstr "Die folgenden Felder sind in allen Formaten enthalten:"
-
-msgid "Title of the election."
-msgstr "Titel der Wahl"
-
-msgid "The date of the election (an ISO 8601 date string)."
-msgstr "Das Datum der Wahl (ein ISO 8601 String)"
-
-msgid "\"proporz\" for proportional, \"majorz\" for majority system."
-msgstr "\"proporz\" falls Proporzwahl, \"majorz\" falls Majorzwahl"
-
-msgid "The number of mandates."
-msgstr "Die Anzahl der Sitze."
-
-msgid ""
-"The absolute majority. Only relevant for elections based on majority system."
-msgstr "Das absolute Mehr. Nur bei Majorzwahlen."
-
-msgid "The number of already counted municipalities."
-msgstr "Die Anzahl ausgezählter Gemeinden."
-
-msgid "The total number of municipalities."
-msgstr "Die Gesamtanzahl an Gemeinden."
-
-msgid "The name of the municipality."
-msgstr "Der Name der Gemeinde/des Standorts"
-
-msgid "The id of the municipality/locale (\"BFS Nummer\")."
-msgstr "Die ID der Gemeinde/des Standorts. Besser bekannt als \"BFS Nummer\"."
-
-msgid "The number of people eligible to vote for this municipality."
-msgstr "Die Anzahl Stimmberechtigter der Gemeinde/des Standorts."
-
-msgid "The number of received ballots for this municipality."
-msgstr "Die Anzahl abgegebener Stimmzettel der Gemeinde/des Standorts."
-
-msgid "The number of blank ballots for this municipality."
-msgstr "Die Anzahl leerer Stimmzettel der Gemeinde/des Standorts."
-
-msgid "The number of invalid ballots for this municipality."
-msgstr "Die Anzahl ungültiger Stimmzettel der Gemeinde/des Standorts."
-
-msgid "The number of unaccounted ballots for this municipality."
-msgstr ""
-"Die Anzahl der ungültigen oder leeren Stimmzettel der Gemeinde/des Standorts."
-
-msgid "The number of accounted ballots for this municipality."
-msgstr "Die Anzahl gültiger Stimmzettel der Gemeinde/des Standorts."
-
-msgid "The number of blank votes for this municipality."
-msgstr "Die Anzahl leerer Stimmen der Gemeinde/des Standorts."
-
-msgid ""
-"The number of invalid votes for this municipality. Zero for elections based "
-"on proportional representation."
-msgstr ""
-"Die Anzahl ungültiger Stimmen der Gemeinde/des Standorts. Null falls "
-"Proporzwahl."
-
-msgid "The number of accounted votes for this municipality."
-msgstr "Die Anzahl gültiger Stimmen der Gemeinde/des Standorts."
-
-msgid ""
-"The name of the list this candidate appears on. Only relevant for elections "
-"based on proportional representation."
-msgstr "Der Name der Liste des Kandidierenden. Nur bei Proporzwahlen."
-
-msgid ""
-"The id of the list this candidate appears on. Only relevant for elections "
-"based on proportional representation."
-msgstr ""
-"Die ID der Liste, für welche der Kandidierende kandidiert. Nur bei "
-"Proporzwahlen."
-
-msgid ""
-"The number of mandates this list has got. Only relevant for elections based "
-"on proportional representation."
-msgstr "Die Anzahl Sitze der Liste. Nur bei Proporzwahlen."
-
-msgid ""
-"The number of votes this list has got. Only relevant for elections based on "
-"proportional representation."
-msgstr "Die Anzahl der Listenstimmen. Nur bei Proporzwahlen."
-
-msgid ""
-"The ID of the list connection this list is connected to. Only relevant for "
-"elections based on proportional representation."
-msgstr "Die ID der Listenverbindung. Nur bei Proporzwahlen."
-
-msgid ""
-"The ID of the parent list connection this list is connected to. Only "
-"relevant for elections based on proportional representation."
-msgstr ""
-"Die ID der übergeorndeten Listenverbidnung. Nur bei Proporzwahlen und falls "
-"es sich um eine Unterlistenverbindung handelt."
-
-msgid "The family name of the candidate."
-msgstr "Der Nachnahme des Kandidierenden."
-
-msgid "The first name of the candidate."
-msgstr "Der Vorname des Kandidaten."
-
-msgid "The ID of the candidate."
-msgstr "Die ID des Kandidierenden."
-
-msgid "True if the candidate has been elected."
-msgstr "True, falls der Kandidierenden gewählt wurde."
-
-msgid "The number of votes this candidate got."
-msgstr "Die Anzahl Kandidierendenstimmen der Gemeinde/des Standorts."
-
-msgid "Title of the vote."
-msgstr "Titel der Abstimmung."
-
-msgid "The date of the vote (an ISO 8601 date string)."
-msgstr "Das Datum der Abstimmung (ein ISO 8601 String)."
-
-msgid "Internal shortcode (defines the ordering of votes on the same day)."
-msgstr ""
-"Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an "
-"einem Tag)."
-
-msgid "\"federation\" for federal, \"canton\" for cantonal votes."
-msgstr ""
-"\"federation\" für Nationale Abstimmungen, \"canton\" für Kantonale "
-"Abstimmungen"
-
-msgid ""
-"\"proposal\" (Vorschlag), \"counter-proposal\" (Gegenvorschlag) or \"tie-"
-"breaker\" (Stichfrage)."
-msgstr ""
-"\"proposal\" (Vorschlag), \"counter-proposal\" (Gegenvorschlag) or \"tie-"
-"breaker\" (Stichfrage)."
-
-msgid ""
-"The designation of the result. May be the district, the town's name divided "
-"by a slash, the city's name and the city's district divided by a slash or "
-"simply the town's name. This depends entirely on the canton."
-msgstr ""
-"Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt "
-"mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, "
-"ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde "
-"Name sein. All dies hängt vom jeweiligen Kanton ab."
-
-msgid "The id of the municipality/locale. Better known as \"BFS Nummer\""
-msgstr "Die ID der Gemeinde/des Standorts. Besser bekannt als \"BFS Nummer\"."
-
-msgid ""
-"True if the result was counted, False if the result not known yet (the "
-"voting counts are not final yet)."
-msgstr ""
-"Wahr wenn das Resultat ausgezählt wurde. Falsch wenn das Resultat noch nicht "
-"bekannt ist (die Werte sind noch nicht korrekt)."
-
-msgid "The number of yes votes."
-msgstr "Die Anzahl Ja Stimmen"
-
-msgid "The number of no votes."
-msgstr "Die Anzahl Nein Stimmen"
-
-msgid "The number of invalid votes."
-msgstr "Die Anzahl ungültiger Stimmen"
-
-msgid "The number of empty votes."
-msgstr "Die Anzahl leerer Stimmen"
-
-msgid "The number of people elegible to vote."
-msgstr "Die Anzahl Stimmberechtigter"
 
 msgid "Upload results"
 msgstr "Resultate hochladen"
@@ -753,18 +519,3 @@ msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
-
-#~ msgid "<dynamic element> for elections, <dynamic element> for votes."
-#~ msgstr "<dynamic element> für Wahlen, <dynamic element> for Abstimmungen."
-
-#~ msgid "A link to the detailed view"
-#~ msgstr "Ein Link zur Detailansicht"
-
-#~ msgid "Format"
-#~ msgstr "Format"
-
-#~ msgid "Fields (Elections)"
-#~ msgstr "Felder (Wahlen)"
-
-#~ msgid "Fields (Votes)"
-#~ msgstr "Felder (Abstimmungen)"

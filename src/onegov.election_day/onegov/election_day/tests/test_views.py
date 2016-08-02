@@ -211,12 +211,6 @@ def test_pages_cache(election_day_app):
     )
 
 
-def test_opendata(election_day_app):
-    client = Client(election_day_app)
-    client.get('/locale/de_CH').follow()
-    assert "Open Data" in client.get('/opendata')
-
-
 def test_view_latest(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()

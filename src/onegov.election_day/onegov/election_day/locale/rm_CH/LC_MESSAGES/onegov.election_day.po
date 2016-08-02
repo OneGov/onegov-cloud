@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-30 15:56+0200\n"
+"POT-Creation-Date: 2016-08-02 15:37+0200\n"
 "PO-Revision-Date: 2016-01-08 10:07+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -12,6 +12,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 1.7.6\n"
+
+msgid "Elections"
+msgstr "Elecziuns"
+
+msgid "Votes"
+msgstr "Votaziuns"
+
+msgid "Manage"
+msgstr "Administrar"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -331,9 +340,6 @@ msgstr "Annunziar"
 msgid "You are logged in:"
 msgstr "Vus essas annunziada/annunzià:"
 
-msgid "Manage"
-msgstr "Administrar"
-
 msgid "Logout"
 msgstr "Deconnectar"
 
@@ -391,8 +397,14 @@ msgstr "% GEA"
 msgid "No %"
 msgstr "% NA"
 
-msgid "Elections"
-msgstr "Elecziuns"
+msgid "Previous Page"
+msgstr ""
+
+msgid "Next Page"
+msgstr ""
+
+msgid "You are here"
+msgstr ""
 
 msgid "New Election"
 msgstr "Nova elecziun"
@@ -421,253 +433,11 @@ msgstr "Chargiar si resultats"
 msgid "Delete"
 msgstr "Stizzar"
 
-msgid "Votes"
-msgstr "Votaziuns"
-
 msgid "New Vote"
 msgstr "Nova votaziun"
 
 msgid "No votes yet."
 msgstr "I n'èn registradas anc naginas votaziuns."
-
-msgid "Elections &amp; Votes: Open Data"
-msgstr "Elecziuns &amp; votaziuns: Open Data"
-
-msgid "Contents"
-msgstr ""
-
-msgid "Summarized results"
-msgstr ""
-
-msgid "Election results"
-msgstr ""
-
-msgid "Vote results"
-msgstr ""
-
-msgid ""
-"The summarized results displayed at the home page (only the results of "
-"latest votes and elections) and the archive (browsable by year or date) is "
-"also available as JSON. The data contains some global informations and for "
-"every election and vote the following commong information:"
-msgstr ""
-
-msgid "${election} for elections, ${vote} for votes."
-msgstr ""
-
-msgid "An object containing the translated titles."
-msgstr ""
-
-msgid "The date (ISO 8601)."
-msgstr ""
-
-msgid "The domain of influence (federation, canton, ...)."
-msgstr ""
-
-msgid "A link to the detailed view."
-msgstr ""
-
-msgid "A link to the detailed JSON data, see below."
-msgstr ""
-
-msgid ""
-"An object containing the number already counted municipalities (${counted}) "
-"and the total number of municipalities (${total})."
-msgstr ""
-
-msgid "Vote results contain the following additional information:"
-msgstr ""
-
-msgid ""
-"The answer of the vote: ${accepted}, ${rejected}, ${proposal} or ${counter-"
-"proposal}."
-msgstr ""
-
-msgid "Yeas percentage."
-msgstr ""
-
-msgid "Nays percentage."
-msgstr ""
-
-msgid ""
-"The raw data used to display the results of votes is available in the "
-"following formats:"
-msgstr ""
-"Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan "
-"a disposiziun en ils suandants formats:"
-
-msgid "The following fields are included in all formats:"
-msgstr "Ils suandants champs èn disponibels en tut ils formats:"
-
-msgid "Title of the election."
-msgstr "Titel da l'elecziun"
-
-msgid "The date of the election (an ISO 8601 date string)."
-msgstr "La data da l'elecziun (sco segns ISO 8601)"
-
-msgid "\"proporz\" for proportional, \"majorz\" for majority system."
-msgstr ""
-"\"proporz\" en cas d'ina elecziun da proporz, \"majorz\" en cas d'ina "
-"elecziun da maiorz"
-
-msgid "The number of mandates."
-msgstr "Il dumber dals sezs."
-
-msgid ""
-"The absolute majority. Only relevant for elections based on majority system."
-msgstr ""
-
-msgid "The number of already counted municipalities."
-msgstr ""
-
-msgid "The total number of municipalities."
-msgstr ""
-
-msgid "The name of the municipality."
-msgstr "Il num da la vischnanca/dal lieu"
-
-msgid "The id of the municipality/locale (\"BFS Nummer\")."
-msgstr "La ID da la vischnanca/dal lieu. Pli enconuschent sco \"numer UST\"."
-
-msgid "The number of people eligible to vote for this municipality."
-msgstr "Il dumber da las votantas e dals votants da la vischnanca/dal lieu."
-
-msgid "The number of received ballots for this municipality."
-msgstr "Il dumber dals cedels electorals consegnads da la vischnanca/dal lieu."
-
-msgid "The number of blank ballots for this municipality."
-msgstr "Il dumber dals cedels electorals vids da la vischnanca/dal lieu."
-
-msgid "The number of invalid ballots for this municipality."
-msgstr ""
-"Il dumber dals cedels electorals nunvalaivels da la vischnanca/dal lieu."
-
-msgid "The number of unaccounted ballots for this municipality."
-msgstr ""
-"Il dumber dals cedels electorals nunvalaivels u vids da la vischnanca/dal "
-"lieu."
-
-msgid "The number of accounted ballots for this municipality."
-msgstr "Il dumber dals cedels electorals valaivels da la vischnanca/dal lieu."
-
-msgid "The number of blank votes for this municipality."
-msgstr "Il dumber da las vuschs vidas da la vischnanca/dal lieu."
-
-msgid ""
-"The number of invalid votes for this municipality. Zero for elections based "
-"on proportional representation."
-msgstr ""
-"Il dumber da las vuschs nunvalaivlas da la vischnanca/dal lieu. Nagins en "
-"cas d'ina elecziun da proporz."
-
-msgid "The number of accounted votes for this municipality."
-msgstr "Il dumber da las vuschs valaivlas da la vischnanca/dal lieu."
-
-msgid ""
-"The name of the list this candidate appears on. Only relevant for elections "
-"based on proportional representation."
-msgstr ""
-"Il num da la glista da la persuna che candidescha. Mo en cas d'elecziuns da "
-"proporz."
-
-msgid ""
-"The id of the list this candidate appears on. Only relevant for elections "
-"based on proportional representation."
-msgstr ""
-
-msgid ""
-"The number of mandates this list has got. Only relevant for elections based "
-"on proportional representation."
-msgstr ""
-
-msgid ""
-"The number of votes this list has got. Only relevant for elections based on "
-"proportional representation."
-msgstr "Il dumber da las vuschs da las glistas. Mo tar elecziuns da proporz."
-
-msgid ""
-"The ID of the list connection this list is connected to. Only relevant for "
-"elections based on proportional representation."
-msgstr "La ID da la colliaziun da glistas. Mo tar elecziuns da proporz."
-
-msgid ""
-"The ID of the parent list connection this list is connected to. Only "
-"relevant for elections based on proportional representation."
-msgstr ""
-"La ID da la colliaziun da glistas surordinada. Mo en cas d'elecziuns da "
-"proporz e sch'i sa tracta d'ina sutcolliaziun da glistas."
-
-msgid "The family name of the candidate."
-msgstr "Il num da famiglia da la persuna che candidescha."
-
-msgid "The first name of the candidate."
-msgstr "Il prenum da la persuna che candidescha."
-
-msgid "The ID of the candidate."
-msgstr ""
-
-msgid "True if the candidate has been elected."
-msgstr ""
-
-msgid "The number of votes this candidate got."
-msgstr "Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu."
-
-msgid "Title of the vote."
-msgstr "Titel da la votaziun."
-
-msgid "The date of the vote (an ISO 8601 date string)."
-msgstr "La data da la votaziun (sco segns ISO 8601)."
-
-msgid "Internal shortcode (defines the ordering of votes on the same day)."
-msgstr ""
-"Scursanida interna (definescha la successiun da pliras votaziuns che han "
-"lieu il medem di)."
-
-msgid "\"federation\" for federal, \"canton\" for cantonal votes."
-msgstr ""
-"\"federation\" per votaziuns naziunalas, \"canton\" per votaziuns chantunalas"
-
-msgid ""
-"\"proposal\" (Vorschlag), \"counter-proposal\" (Gegenvorschlag) or \"tie-"
-"breaker\" (Stichfrage)."
-msgstr ""
-"\"proposal\" (proposta), \"counter-proposal\" (cuntraproposta) or \"tie-"
-"breaker\" (dumonda decisiva)."
-
-msgid ""
-"The designation of the result. May be the district, the town's name divided "
-"by a slash, the city's name and the city's district divided by a slash or "
-"simply the town's name. This depends entirely on the canton."
-msgstr ""
-"La derivanza dal resultat. Quai po esser il district e la vischnanca, "
-"separads cun in stritg diagonal, il num da la citad ed il num dal circul, er "
-"separads cun in stritg diagonal, u simplamain il num da la vischnanca. Quai "
-"dependa dal chantun respectiv."
-
-msgid "The id of the municipality/locale. Better known as \"BFS Nummer\""
-msgstr "La ID da la vischnanca/dal lieu. Pli enconuschent sco \"numer UST\"."
-
-msgid ""
-"True if the result was counted, False if the result not known yet (the "
-"voting counts are not final yet)."
-msgstr ""
-"Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg "
-"enconuschent (las valurs n'èn anc betg correctas)."
-
-msgid "The number of yes votes."
-msgstr "Il dumber da las vuschs affirmativas"
-
-msgid "The number of no votes."
-msgstr "Il dumber da las vuschs negativas"
-
-msgid "The number of invalid votes."
-msgstr "Il dumber da las vuschs nunvalaivlas"
-
-msgid "The number of empty votes."
-msgstr "Il dumber da las vuschs vidas"
-
-msgid "The number of people elegible to vote."
-msgstr "Il dumber da las persunas cun dretg da votar"
 
 msgid "Upload results"
 msgstr "Chargiar si resultats"
@@ -751,12 +521,3 @@ msgstr "L'onn ${year} na vegn anc betg sustegnì"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Quest project ha main resultats ch'ils auters projects."
-
-#~ msgid "Format"
-#~ msgstr "Format"
-
-#~ msgid "Fields (Elections)"
-#~ msgstr "Champs (Elecziuns)"
-
-#~ msgid "Fields (Votes)"
-#~ msgstr "Champs (votaziuns)"
