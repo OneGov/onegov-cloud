@@ -2,9 +2,9 @@
 
 ## Contents
 
-1. [Summarized results](http://localhost:8080/elections/sg/opendata#summary)
-2. [Election results](http://localhost:8080/elections/sg/opendata#election)
-3. [Vote results](http://localhost:8080/elections/sg/opendata#vote)
+1. [Summarized results](#summarized-results)
+2. [Election results](#election-results)
+3. [Vote results](#vote-results)
 
 ## Summarized results
 

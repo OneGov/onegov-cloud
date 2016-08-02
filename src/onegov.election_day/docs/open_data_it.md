@@ -2,9 +2,9 @@ Elezioni & votazioni: Open Data
 
 ## Contents
 
-1. [Summarized results](#summary)
-2. [Election results](#election)
-3. [Vote results](#vote)
+1. [Summarized results](#summarized-results)
+2. [Election results](#election-results)
+3. [Vote results](#vote-results)
 
 ## Summarized results
 
