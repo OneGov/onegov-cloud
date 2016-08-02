@@ -40,7 +40,7 @@ Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
 ### Vorlage
 
-[vorlage_wahl_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_majorz.csv)
+[election_sesam_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_sesam_majorz.csv)
 
 ## SESAM Proporz
 
@@ -80,7 +80,7 @@ Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
 ### Vorlage
 
-[vorlage_wahl_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_sesam_proporz.csv)
+[election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_sesam_proporz.csv)
 
 
 ## Wabsti Majorz
@@ -119,9 +119,9 @@ Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, 
 
 ### Vorlagen
 
-[vorlage_wahl_wabsti_majorz_resultate.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_majorz_resultate.csv)
+[election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_wabsti_majorz_results.csv)
 
-[vorlage_wahl_wabsti_majorz_kandidaten.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_majorz_kandidaten.csv)
+[election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_wabsti_majorz_candidates.csv)
 
 
 ## Wabsti Proporz
@@ -172,13 +172,13 @@ Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, 
 
 ### Vorlagen
 
-[vorlage_wahl_wabsti_proporz_resultate.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_resultate.csv)
+[election_wabsti_proporz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_wabsti_proporz_results.csv)
 
-[vorlage_wahl_wabsti_proporz_statistik.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_statistik.csv)
+[election_wabsti_proporz_statistics.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_wabsti_proporz_statistics.csv)
 
-[vorlage_wahl_wabsti_proporz_listenverbindungen.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_listenverbindungen.csv)
+[election_wabsti_proporz_list_connections.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_wabsti_proporz_list_connections.csv)
 
-[vorlage_wahl_wabsti_proporz_kandidaten.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_wabsti_proporz_kandidaten.csv)
+[election_wabsti_proporz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_wabsti_proporz_candidates.csv)
 
 
 ## OneGov
@@ -212,6 +212,6 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 ### Vorlage
 
-[vorlage_wahl_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_onegov_majorz.csv)
+[election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_onegov_majorz.csv)
 
-[vorlage_wahl_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_wahl_onegov_proporz.csv)
+[election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_onegov_proporz.csv)

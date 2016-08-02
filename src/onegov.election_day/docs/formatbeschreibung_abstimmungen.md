@@ -32,7 +32,7 @@ aufgelisteten Reihenfolge erwartet:
 
 ### Vorlage
 
-[vorlage_abstimmung_standard.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_abstimmung_standard.csv)
+[vote_standard.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_standard.csv)
 
 
 ## Wabsti
@@ -59,7 +59,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 ### Vorlage
 
-[vorlage_abstimmung_wabsti.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_abstimmung_wabsti.csv)
+[vote_wabsti.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_wabsti.csv)
 
 
 ## OneGov
@@ -81,4 +81,4 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 ### Vorlage
 
-[vorlage_abstimmung_onegov.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/vorlage_abstimmung_onegov.csv)
+[vote_onegov.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_onegov.csv)
