@@ -1,5 +1,11 @@
 # Elections & Votes: Open Data
 
+## Introduction
+
+There are JSON alternatives for all important views.
+
+All responses contain the `Last-Modified` HTTP Header with the last time, the data has change (i.e. the last time, results of an election or vote have been uploaded).
+
 ## Contents
 
 1. [Summarized results](#summarized-results)

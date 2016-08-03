@@ -1,5 +1,12 @@
 # Wahlen & Abstimmungen: Open Data
 
+## Einleitung
+
+Für jede wichtige Seite gibt es eine enstprechende JSON-Alternative.
+
+All Respoonses enthalten den `Last-Modified` HTTP Header, welcher Auskunft über den Zeitpunkt der letzten Änderung gibt (z.B., wann zum letzten Mal Ergebnisse einer Wahl oder Abstimmung hochgeladen wurden).
+
+
 ## Inhalt
 
 1. [Ergebnisse](#ergebnisse)
