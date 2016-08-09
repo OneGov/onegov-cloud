@@ -14,15 +14,13 @@ All responses contain the `Last-Modified` HTTP Header with the last time, the da
 
 ## Summarized results
 
-**URL (latest)**: `/json`
-
-**URL (archive by year)**: `/archive/{year}/json`
-
-**URL (archive by date)**: `/archive/{year}-{month}-{day}/json`
-
-**URL (election)**: `/election/{id}/summary`
-
-**URL (vote)**: `/vote/{id}/summary`
+```
+URL (latest): /json
+URL (archive by year): /archive/{year}/json
+URL (archive by date): /archive/{year}-{month}-{day}/json
+URL (election): /election/{id}/summary
+URL (vote): /vote/{id}/summary
+```
 
 The summarized results displayed at the home page (only the results of latest votes and elections) and the archive (browsable by year or date) is also available as JSON. The data contains some global informations and for every election and vote the following commong information:
 
@@ -48,7 +46,11 @@ Vote results contain the following additional information:
 
 ## Election results
 
-**URL**: `/election/{id}/{data-format}`
+### Raw data
+
+```
+URL: /election/{id}/{data-format}
+```
 
 The raw data used to display the results of votes is available in the following formats:
 
@@ -120,7 +122,11 @@ The following fields are included in all formats:
 
 ## Vote results
 
-**URL**: `/vote/{id}/{data-format}`
+### Raw data
+
+```
+URL: /vote/{id}/{data-format}
+```
 
 The raw data used to display the results of votes is available in the following formats:
 

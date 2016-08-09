@@ -6,24 +6,21 @@ Für jede wichtige Seite gibt es eine enstprechende JSON-Alternative.
 
 All Respoonses enthalten den `Last-Modified` HTTP Header, welcher Auskunft über den Zeitpunkt der letzten Änderung gibt (z.B., wann zum letzten Mal Ergebnisse einer Wahl oder Abstimmung hochgeladen wurden).
 
-
 ## Inhalt
 
-1. [Ergebnisse](#ergebnisse)
+1. [Ergebnissübersicht](#ergebnissubersicht)
 2. [Wahlresultate](#wahlresultate)
 3. [Abstimmungsresultate](#abstimmungsresultate)
 
-## Ergebnisse
+## Ergebnissübersicht
 
-**URL (latest)**: `/json`
-
-**URL (archive by year)**: `/archive/{year}/json`
-
-**URL (archive by date)**: `/archive/{year}-{month}-{day}/json`
-
-**URL (election)**: `/election/{id}/summary`
-
-**URL (vote)**: `/vote/{id}/summary`
+```
+URL (latest): /json
+URL (archive by year): /archive/{year}/json
+URL (archive by date): /archive/{year}-{month}-{day}/json
+URL (election): /election/{id}/summary
+URL (vote): /vote/{id}/summary
+```
 
 Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSON Format verfügbar. Die Daten enthalten neben einigen globalen Informationen für jede Wahl / Abstimmung die folgenden Informationen:
 
@@ -49,7 +46,11 @@ Wahlresultate enthalten die folgenden zusätzlichen Informationen:
 
 ## Wahlresultate
 
-**URL**: `/election/{id}/{data-format}`
+### Rohdaten
+
+```
+URL: /election/{id}/{data-format}
+```
 
 Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
 
@@ -121,7 +122,11 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 ## Abstimmungsresultate
 
-**URL**: `/vote/{id}/{data-format}`
+### Rohdaten
+
+```
+URL: /vote/{id}/{data-format}
+```
 
 Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
 
