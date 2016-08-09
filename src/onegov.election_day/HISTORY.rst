@@ -10,38 +10,32 @@ Changelog
 - Adds the ability to download the SVG images.
   [msom]
 
-- Adds compatibility with Morepath 0.13.
-  [href]
-
-- Adds French translations.
-  [freinhard]
-
-- Adds Romansh and Italian translations.
-  [msom]
+- Adds French, Romansh and Italian translations.
+  [freinhard, msom]
 
 - Adds JSON views for results.
   [msom]
 
-- Adds the 'Last-Modified' header to the most important views.
-  [msom]
-
-- Adds pagination to management views.
+- Adds the 'Last-Modified' header to the views with results.
   [msom]
 
 - Adds some basic print styles.
   [msom]
 
-- Fixes javascript for form dependencies.
+- Adds pagination to management views.
   [msom]
 
-- Cleans up file/directory structure.
+- Clears the cache after uploading results.
   [msom]
+
+- Adds compatibility with Morepath 0.13.
+  [href]
 
 - Sorts the sublists by the ID of the list when displaying list connection
   results of elections.
   [msom]
 
-- Clears the cache after uploading results.
+- Fixes javascript for form dependencies.
   [msom]
 
 0.7.2 (2016-03-18)
