@@ -6,6 +6,7 @@ from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.utils import add_last_modified_header
 
 
 @ElectionDayApp.html(model=Vote, template='vote.pt', permission=Public)
@@ -16,11 +17,7 @@ def view_vote(self, request):
 
     @request.after
     def add_last_modified(response):
-        if self.last_result_change:
-            response.headers.add(
-                'Last-Modified',
-                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, self.last_result_change)
 
     return {
         'vote': self,
@@ -34,11 +31,7 @@ def view_vote_as_json(self, request):
 
     @request.after
     def add_last_modified(response):
-        if self.last_result_change:
-            response.headers.add(
-                'Last-Modified',
-                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, self.last_result_change)
 
     return self.export()
 
@@ -48,11 +41,7 @@ def view_vote_as_csv(self, request):
 
     @request.after
     def add_last_modified(response):
-        if self.last_result_change:
-            response.headers.add(
-                'Last-Modified',
-                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, self.last_result_change)
 
     return convert_list_of_dicts_to_csv(self.export())
 
@@ -62,11 +51,7 @@ def view_vote_as_xlsx(self, request):
 
     @request.after
     def add_last_modified(response):
-        if self.last_result_change:
-            response.headers.add(
-                'Last-Modified',
-                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, self.last_result_change)
 
     return Response(
         convert_list_of_dicts_to_xlsx(self.export()),

@@ -15,6 +15,7 @@ from onegov.core.utils import groupbylist
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.utils import add_last_modified_header
 from sqlalchemy import desc
 from sqlalchemy.orm import object_session
 
@@ -132,11 +133,7 @@ def view_election(self, request):
 
     @request.after
     def add_last_modified(response):
-        if self.last_result_change:
-            response.headers.add(
-                'Last-Modified',
-                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, self.last_result_change)
 
     return {
         'election': self,
@@ -154,11 +151,7 @@ def view_election_as_json(self, request):
 
     @request.after
     def add_last_modified(response):
-        if self.last_result_change:
-            response.headers.add(
-                'Last-Modified',
-                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, self.last_result_change)
 
     return self.export()
 
@@ -168,11 +161,7 @@ def view_election_as_csv(self, request):
 
     @request.after
     def add_last_modified(response):
-        if self.last_result_change:
-            response.headers.add(
-                'Last-Modified',
-                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, self.last_result_change)
 
     return convert_list_of_dicts_to_csv(self.export())
 
@@ -182,11 +171,7 @@ def view_election_as_xlsx(self, request):
 
     @request.after
     def add_last_modified(response):
-        if self.last_result_change:
-            response.headers.add(
-                'Last-Modified',
-                self.last_result_change.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, self.last_result_change)
 
     return Response(
         convert_list_of_dicts_to_xlsx(self.export()),

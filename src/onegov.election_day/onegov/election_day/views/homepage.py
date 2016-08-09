@@ -2,6 +2,7 @@ from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
 from onegov.election_day.models import Principal, Archive
+from onegov.election_day.utils import add_last_modified_header
 
 
 @ElectionDayApp.html(model=Principal, template='homepage.pt',
@@ -15,11 +16,7 @@ def view_principal(self, request):
 
     @request.after
     def add_last_modified(response):
-        if last_modified:
-            response.headers.add(
-                'Last-Modified',
-                last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, last_modified)
 
     return {
         'layout': DefaultLayout(self, request),
@@ -34,18 +31,14 @@ def view_principal_json(self, request):
     archive = Archive(request.app.session())
     latest = archive.latest(group=False)
     last_modified = archive.last_modified(latest)
-    latest = archive.to_json(latest, request)
+    latest = archive.latest_to_list(latest, request)
 
     @request.after
     def add_last_modified(response):
-        if last_modified:
-            response.headers.add(
-                'Last-Modified',
-                last_modified.strftime("%a, %d %b %Y %H:%M:%S GMT")
-            )
+        add_last_modified_header(response, last_modified)
 
     return {
         'canton': self.canton,
         'name': self.name,
-        'results': latest
+        'results': latest,
     }

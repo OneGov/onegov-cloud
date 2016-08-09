@@ -15,11 +15,15 @@ class Archive(object):
         return self.__class__(self.session, date)
 
     def get_years(self):
+        """ Returns a list of available years. """
+
         years = ElectionCollection(self.session).get_years() or []
         years.extend(VoteCollection(self.session).get_years() or [])
         return sorted(set(years), reverse=True)
 
     def group_items(self, ungrouped_items, reverse=False):
+        """ Groups a list of elections/votes. """
+
         if not ungrouped_items:
             return None
 
@@ -29,6 +33,8 @@ class Archive(object):
         )
 
     def last_modified(self, ungrouped_items):
+        """ Returns the last modification of the given elections/votes. """
+
         dates = (item.last_result_change for item in ungrouped_items)
         dates = list(filter(lambda x: x, dates))
 
@@ -37,7 +43,20 @@ class Archive(object):
 
         return max(dates)
 
-    def to_json(self, ungrouped_items, request):
+    def latest(self, group=True):
+        """ Returns the lastest elections/votes (grouped or ungrouped). """
+
+        items = ElectionCollection(self.session).get_latest() or []
+        items.extend(VoteCollection(self.session).get_latest() or [])
+
+        return self.group_items(items, reverse=True) if group else items
+
+    def latest_to_list(self, ungrouped_items, request):
+        """ Converts the given list of election/votes to a JSON seriazable
+        list.
+
+        """
+
         results = []
         for item in ungrouped_items:
             values = {
@@ -66,12 +85,6 @@ class Archive(object):
             results.append(values)
 
         return results
-
-    def latest(self, group=True):
-        items = ElectionCollection(self.session).get_latest() or []
-        items.extend(VoteCollection(self.session).get_latest() or [])
-
-        return self.group_items(items, reverse=True) if group else items
 
     def by_date(self, group=True):
         try:

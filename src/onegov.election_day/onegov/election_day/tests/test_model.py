@@ -101,7 +101,7 @@ def test_archive(session):
     archive = Archive(session)
 
     def _json(items):
-        return archive.to_json(items, request)
+        return archive.latest_to_list(items, request)
 
     assert archive.for_date(2015).date == 2015
 
