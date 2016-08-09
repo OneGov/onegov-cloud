@@ -19,9 +19,9 @@
             <div class="download-results">
                 <a data-dropdown="download-dropdown" data-options="align:left" aria-controls="download-dropdown" aria-expanded="false" alt="Download raw results as JSON, CSV or XLS"><i class="fa fa-download"></i></a>
                 <ul id="download-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                    <li><a href="${request.link(vote, 'json')}">JSON</a></li>
-                    <li><a href="${request.link(vote, 'csv')}">CSV</a></li>
-                    <li><a href="${request.link(vote, 'xlsx')}">XLSX</a></li>
+                    <li><a href="${request.link(vote, 'data-json')}">JSON</a></li>
+                    <li><a href="${request.link(vote, 'data-csv')}">CSV</a></li>
+                    <li><a href="${request.link(vote, 'data-xlsx')}">XLSX</a></li>
                     <li><a href="${layout.opendata_link}#vote"><em i18n:translate>Format Description</em></a></li>
                 </ul>
             </div>
