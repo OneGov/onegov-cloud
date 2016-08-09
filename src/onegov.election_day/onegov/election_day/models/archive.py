@@ -51,41 +51,6 @@ class Archive(object):
 
         return self.group_items(items, reverse=True) if group else items
 
-    def latest_to_list(self, ungrouped_items, request):
-        """ Converts the given list of election/votes to a JSON seriazable
-        list.
-
-        """
-
-        results = []
-        for item in ungrouped_items:
-            values = {
-                'data_url': request.link(item, 'json'),
-                'date': item.date.isoformat(),
-                'domain': item.domain,
-                'progress': {},
-                'title': item.title_translations,
-                'type': item.__class__.__name__.lower(),
-                'url': request.link(item),
-            }
-
-            try:
-                values['progress']['counted'] = (
-                    item.counted_municipalities or 0
-                )
-                values['progress']['total'] = item.total_municipalities or 0
-            except AttributeError:
-                divider = len(item.ballots) or 1
-                values['progress']['counted'] = item.progress[0] or 0 / divider
-                values['progress']['total'] = item.progress[1] or 0 / divider
-                values['answer'] = item.answer or ""
-                values['yeas_percentage'] = item.yeas_percentage
-                values['nays_percentage'] = item.nays_percentage
-
-            results.append(values)
-
-        return results
-
     def by_date(self, group=True):
         try:
             _date = date.fromtimestamp(mktime(strptime(self.date, '%Y-%m-%d')))
@@ -96,11 +61,3 @@ class Archive(object):
             items.extend(VoteCollection(self.session).by_year(self.date) or [])
 
         return self.group_items(items) if group else items
-
-    def archive_links(self, request):
-        """ Returns a JSON seriazable dict of available archive links. """
-
-        return {
-            str(year): request.link(self.for_date(year))
-            for year in self.get_years()
-        }

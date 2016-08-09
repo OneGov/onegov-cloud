@@ -48,10 +48,11 @@ setup(
         test=[
             'coverage',
             'freezegun',
+            'mock',
             'onegov.testing',
-            'webtest',
+            'pyquery',
             'pytest',
-            'pyquery'
+            'webtest',
         ],
     ),
     entry_points={

@@ -20,6 +20,10 @@ All responses contain the `Last-Modified` HTTP Header with the last time, the da
 
 **URL (archive by date)**: `/archive/{year}-{month}-{day}/json`
 
+**URL (election)**: `/election/{id}/summary`
+
+**URL (vote)**: `/vote/{id}/summary`
+
 The summarized results displayed at the home page (only the results of latest votes and elections) and the archive (browsable by year or date) is also available as JSON. The data contains some global informations and for every election and vote the following commong information:
 
 - **type**: `election` for elections, `vote` for votes.
@@ -31,8 +35,6 @@ The summarized results displayed at the home page (only the results of latest vo
 - **domain**: The domain of influence (federation, canton, ...).
 
 - **url**: A link to the detailed view.
-
-- **data_url**: A link to the detailed JSON data, see below.
 
 - **progess**: An object containing the number already counted municipalities (`counted`) and the total number of municipalities (`total`).
 
@@ -46,7 +48,7 @@ Vote results contain the following additional information:
 
 ## Election results
 
-**URL**: `/election/{id}/{format}`
+**URL**: `/election/{id}/data-{format}`
 
 The raw data used to display the results of votes is available in the following formats:
 
@@ -118,7 +120,7 @@ The following fields are included in all formats:
 
 ## Vote results
 
-**URL**: `/vote/{id}/{format}`
+**URL**: `/vote/{id}/data-{format}`
 
 The raw data used to display the results of votes is available in the following formats:
 

@@ -21,6 +21,10 @@ All Respoonses enthalten den `Last-Modified` HTTP Header, welcher Auskunft über
 
 **URL (archive by date)**: `/archive/{year}-{month}-{day}/json`
 
+**URL (election)**: `/election/{id}/summary`
+
+**URL (vote)**: `/vote/{id}/summary`
+
 Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSON Format verfügbar. Die Daten enthalten neben einigen globalen Informationen für jede Wahl / Abstimmung die folgenden Informationen:
 
 - **type**: `election` für Wahlen, `vote` für Abstimmungen.
@@ -32,8 +36,6 @@ Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSO
 - **domain**: Einflussbereich (Bund, Kanton, ...).
 
 - **url**: Ein Link zur Detailansicht.
-
-- **data_url**: Ein Link zu den detaillierten Resultaten im JSON Format, siehe unten.
 
 - **progess**: Ein Objekt welches die Anzahl ausgezählter Gemeinden (`counted`) die Gesamtzahl an Gemeinden (`total`) enthält.
 
@@ -47,7 +49,7 @@ Wahlresultate enthalten die folgenden zusätzlichen Informationen:
 
 ## Wahlresultate
 
-**URL**: `/election/{id}/{format}`
+**URL**: `/election/{id}/data-{format}`
 
 Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
 
@@ -119,7 +121,7 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 ## Abstimmungsresultate
 
-**URL**: `/vote/{id}/{format}`
+**URL**: `/vote/{id}/data-{format}`
 
 Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
 

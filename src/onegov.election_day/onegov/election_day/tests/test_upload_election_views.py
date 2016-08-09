@@ -676,7 +676,7 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    export = client.get('/election/election/csv').text.encode('utf-8')
+    export = client.get('/election/election/data-csv').text.encode('utf-8')
 
     upload = client.get('/election/election/upload')
     upload.form['file_format'] = 'internal'
@@ -685,7 +685,8 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    second_export = client.get('/election/election/csv').text.encode('utf-8')
+    second_export = client.get('/election/election/data-csv').text
+    second_export = second_export.encode('utf-8')
 
     assert export == second_export
 
@@ -697,7 +698,7 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    export = client.get('/election/election/csv').text.encode('utf-8')
+    export = client.get('/election/election/data-csv').text.encode('utf-8')
 
     upload = client.get('/election/election/upload')
     upload.form['file_format'] = 'internal'
@@ -706,7 +707,8 @@ def test_upload_election_majorz_roundtrip(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    second_export = client.get('/election/election/csv').text.encode('utf-8')
+    second_export = client.get('/election/election/data-csv').text
+    second_export = second_export.encode('utf-8')
 
     assert export == second_export
 
@@ -738,7 +740,7 @@ def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    export = client.get('/election/election/csv').text.encode('utf-8')
+    export = client.get('/election/election/data-csv').text.encode('utf-8')
 
     upload = client.get('/election/election/upload')
     upload.form['file_format'] = 'internal'
@@ -747,7 +749,8 @@ def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    second_export = client.get('/election/election/csv').text.encode('utf-8')
+    second_export = client.get('/election/election/data-csv').text
+    second_export = second_export.encode('utf-8')
 
     assert export == second_export
 
@@ -758,7 +761,8 @@ def test_upload_election_proporz_roundtrip(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    third_export = client.get('/election/election/csv').text.encode('utf-8')
+    third_export = client.get('/election/election/data-csv').text
+    third_export = third_export.encode('utf-8')
 
     assert export == second_export
     assert second_export == third_export

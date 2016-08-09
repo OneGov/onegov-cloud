@@ -97,16 +97,11 @@ def test_municipalities():
 
 
 def test_archive(session):
-    request = DummyRequest()
     archive = Archive(session)
-
-    def _json(items):
-        return archive.latest_to_list(items, request)
 
     assert archive.for_date(2015).date == 2015
 
     assert archive.get_years() == []
-    assert list(archive.archive_links(request).keys()) == []
     assert archive.latest() is None
 
     for year in (2009, 2011, 2014, 2016):
@@ -130,22 +125,12 @@ def test_archive(session):
     session.flush()
 
     assert archive.get_years() == [2016, 2015, 2014, 2011, 2009, 2007]
-    assert set(archive.archive_links(request).keys()) == \
-        set(['2016', '2015', '2014', '2011', '2009', '2007'])
 
     assert archive.latest() == archive.for_date(2016).by_date()
     assert archive.latest() == archive.for_date('2016').by_date()
     assert archive.latest() == archive.for_date('2016-01-01').by_date()
 
-    latest_json = _json(archive.latest(group=False))
-    assert latest_json == _json(archive.for_date(2016).by_date(group=False))
-    assert latest_json == _json(archive.for_date('2016').by_date(group=False))
-    assert latest_json == _json(
-        archive.for_date('2016-01-01').by_date(group=False)
-    )
-
     assert archive.for_date('2016-02-02').by_date() is None
-    assert _json(archive.for_date('2016-02-02').by_date(group=False)) == []
 
     for year in (2009, 2011, 2014, 2016):
         assert (
@@ -153,31 +138,8 @@ def test_archive(session):
             [session.query(Election).filter_by(date=date(year, 1, 1)).one()]
         ) in archive.for_date(year).by_date()
 
-        assert {
-            'data_url': 'Election/json',
-            'domain': 'federation',
-            'url': 'Election',
-            'title': {'de_CH': 'Election {}'.format(year)},
-            'type': 'election',
-            'date': '{}-01-01'.format(year),
-            'progress': {'total': 0, 'counted': 0}
-        } in _json(archive.for_date(year).by_date(group=False))
-
     for year in (2007, 2011, 2015, 2016):
         assert (
             ('vote', 'federation', date(year, 1, 1)),
             [session.query(Vote).filter_by(date=date(year, 1, 1)).one()]
         ) in archive.for_date(year).by_date()
-
-        assert {
-            'answer': '',
-            'data_url': 'Vote/json',
-            'date': '{}-01-01'.format(year),
-            'domain': 'federation',
-            'nays_percentage': 100.0,
-            'progress': {'counted': 0.0, 'total': 0.0},
-            'title': {'de_CH': 'Vote {}'.format(year)},
-            'type': 'vote',
-            'url': 'Vote',
-            'yeas_percentage': 0.0
-        } in _json(archive.for_date(year).by_date(group=False))

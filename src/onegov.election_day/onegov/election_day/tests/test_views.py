@@ -359,16 +359,23 @@ def test_view_last_modified(election_day_app):
         client.get('/locale/de_CH').follow()
 
         for path in (
+            '/'
             '/json',
             '/archive/2013',
             '/election/election',
-            '/election/election/json',
-            '/election/election/csv',
-            '/election/election/xlsx',
+            '/election/election/summary',
+            # todo:
+            # '/election/election/json',
+            '/election/election/data-json',
+            '/election/election/data-csv',
+            '/election/election/data-xlsx',
             '/vote/vote/',
-            '/vote/vote/json',
-            '/vote/vote/csv',
-            '/vote/vote/xlsx',
+            '/vote/vote/summary',
+            # todo:
+            # '/vote/vote/json',
+            '/vote/vote/data-json',
+            '/vote/vote/data-csv',
+            '/vote/vote/data-xlsx',
         ):
             assert client.get(path).headers.get('Last-Modified') == \
                 'Wed, 01 Jan 2014 12:00:00 GMT'
@@ -560,11 +567,11 @@ def test_view_election_export(election_day_app_gr):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    export = client.get('/election/election/json')
+    export = client.get('/election/election/data-json')
     assert all((expected in export for expected in ("FDP", "Caluori", "56")))
 
-    export = client.get('/election/election/csv')
+    export = client.get('/election/election/data-csv')
     assert all((expected in export for expected in ("FDP", "Caluori", "56")))
 
-    export = client.get('/election/election/xlsx')
+    export = client.get('/election/election/data-xlsx')
     assert export.status == '200 OK'

@@ -3,6 +3,8 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
 from onegov.election_day.models import Archive
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import get_archive_links
+from onegov.election_day.utils import get_summaries
 
 
 @ElectionDayApp.html(model=Archive, template='homepage.pt', permission=Public)
@@ -28,7 +30,7 @@ def view_archive_json(self, request):
 
     results = self.by_date(group=False)
     last_modified = self.last_modified(results)
-    results = self.latest_to_list(results, request)
+    results = get_summaries(results, request)
 
     @request.after
     def add_last_modified(response):
@@ -38,5 +40,5 @@ def view_archive_json(self, request):
         'canton': request.app.principal.canton,
         'name': request.app.principal.name,
         'results': results,
-        'archive': self.archive_links(request)
+        'archive': get_archive_links(self, request)
     }

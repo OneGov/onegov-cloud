@@ -474,7 +474,7 @@ def test_upload_vote_roundtrip(election_day_app):
     results = upload.form.submit()
     assert 'Ihre Resultate wurden erfolgreich hochgeladen' in results
 
-    export = client.get('/vote/bacon-yea-or-nay/csv').text.encode('utf-8')
+    export = client.get('/vote/bacon-yea-or-nay/data-csv').text.encode('utf-8')
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
     upload.form['file_format'] = 'internal'
@@ -484,7 +484,7 @@ def test_upload_vote_roundtrip(election_day_app):
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
     second_export = client.get(
-        '/vote/bacon-yea-or-nay/csv'
+        '/vote/bacon-yea-or-nay/data-csv'
     ).text.encode('utf-8')
 
     assert export == second_export
