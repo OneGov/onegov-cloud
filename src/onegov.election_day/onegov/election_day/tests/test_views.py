@@ -240,6 +240,7 @@ def test_view_latest_json(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
+    assert client.get('/json').json['archive'] == {}
     assert client.get('/json').json['results'] == []
 
     login(client)
@@ -259,6 +260,7 @@ def test_view_latest_json(election_day_app):
     new.form.submit()
 
     latest = client.get('/json')
+    assert list(latest.json['archive'].keys()) == ['2013']
     assert "Abstimmung 1. Januar 2013" in latest
     assert "Wahl 1. Januar 2013" in latest
 
@@ -318,14 +320,17 @@ def test_view_archive_json(election_day_app):
     new.form.submit()
 
     archive = client.get('/archive/2013/json')
+    assert list(archive.json['archive'].keys()) == ['2013']
     assert "Abstimmung 1. Januar 2013" in archive
     assert "Wahl 1. Januar 2013" in archive
 
     archive = client.get('/archive/2013-01-01/json')
+    assert list(archive.json['archive'].keys()) == ['2013']
     assert "Abstimmung 1. Januar 2013" in archive
     assert "Wahl 1. Januar 2013" in archive
 
     archive = client.get('/archive/2013-02-02/json')
+    assert list(archive.json['archive'].keys()) == ['2013']
     assert archive.json['results'] == []
 
 

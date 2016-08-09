@@ -37,5 +37,6 @@ def view_archive_json(self, request):
     return {
         'canton': request.app.principal.canton,
         'name': request.app.principal.name,
-        'results': results
+        'results': results,
+        'archive': self.archive_links(request)
     }

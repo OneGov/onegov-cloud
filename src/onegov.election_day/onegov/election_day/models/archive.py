@@ -96,3 +96,11 @@ class Archive(object):
             items.extend(VoteCollection(self.session).by_year(self.date) or [])
 
         return self.group_items(items) if group else items
+
+    def archive_links(self, request):
+        """ Returns a JSON seriazable dict of available archive links. """
+
+        return {
+            str(year): request.link(self.for_date(year))
+            for year in self.get_years()
+        }

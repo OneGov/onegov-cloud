@@ -41,4 +41,5 @@ def view_principal_json(self, request):
         'canton': self.canton,
         'name': self.name,
         'results': latest,
+        'archive': archive.archive_links(request)
     }

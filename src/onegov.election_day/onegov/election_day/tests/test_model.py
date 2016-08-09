@@ -106,6 +106,7 @@ def test_archive(session):
     assert archive.for_date(2015).date == 2015
 
     assert archive.get_years() == []
+    assert list(archive.archive_links(request).keys()) == []
     assert archive.latest() is None
 
     for year in (2009, 2011, 2014, 2016):
@@ -129,6 +130,8 @@ def test_archive(session):
     session.flush()
 
     assert archive.get_years() == [2016, 2015, 2014, 2011, 2009, 2007]
+    assert set(archive.archive_links(request).keys()) == \
+        set(['2016', '2015', '2014', '2011', '2009', '2007'])
 
     assert archive.latest() == archive.for_date(2016).by_date()
     assert archive.latest() == archive.for_date('2016').by_date()
