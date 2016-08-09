@@ -49,15 +49,15 @@ Wahlresultate enthalten die folgenden zusätzlichen Informationen:
 
 ## Wahlresultate
 
-**URL**: `/election/{id}/data-{format}`
+**URL**: `/election/{id}/{data-format}`
 
 Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
 
-- **JSON**: (`/json`)
+- **JSON**: (`/data-json`)
 
-- **CSV**: (`/csv`)
+- **CSV**: (`/data-csv`)
 
-- **XLSX**: (`/xlsx`)
+- **XLSX**: (`/data-xlsx`)
 
 Die folgenden Felder sind in allen Formaten enthalten:
 
@@ -121,15 +121,15 @@ Die folgenden Felder sind in allen Formaten enthalten:
 
 ## Abstimmungsresultate
 
-**URL**: `/vote/{id}/data-{format}`
+**URL**: `/vote/{id}/{data-format}`
 
 Die Rohdaten die zur Anzeige der Resultate verwendet werden, sind in den folgenden Formaten verfügbar:
 
-- **JSON**:(`/json`)
+- **JSON**: (`/data-json`)
 
-- **CSV**:(`/csv`)
+- **CSV**: (`/data-csv`)
 
-- **XLSX**:(`/xlsx`)
+- **XLSX**: (`/data-xlsx`)
 
 Die folgenden Felder sind in allen Formaten enthalten:
 

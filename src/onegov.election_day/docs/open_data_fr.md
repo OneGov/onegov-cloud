@@ -48,15 +48,15 @@ Vote results contain the following additional information:
 
 ## Election results
 
-**URL**: `/election/{id}/data-{format}`
+**URL**: `/election/{id}/{data-format}`
 
 Les données brutes utilisées pour afficher les résultats de votes sont disponibles dans les formats suivants:
 
-- **JSON**: (`/json`)
+- **JSON**: (`/data-json`)
 
-- **CSV**: (`/csv`)
+- **CSV**: (`/data-csv`)
 
-- **XLSX**: (`/xlsx`)
+- **XLSX**: (`/data-xlsx`)
 
 Les champs suivants sont inclus dans tous les formats:
 
@@ -120,15 +120,15 @@ Les champs suivants sont inclus dans tous les formats:
 
 ## Vote results
 
-**URL**: `/vote/{id}/data-{format}`
+**URL**: `/vote/{id}/{data-format}`
 
 Les données brutes utilisées pour afficher les résultats de votes sont disponibles dans les formats suivants:
 
-- **JSON**: (`/json`)
+- **JSON**: (`/data-json`)
 
-- **CSV**: (`/csv`)
+- **CSV**: (`/data-csv`)
 
-- **XLSX**: (`/xlsx`)
+- **XLSX**: (`/data-xlsx`)
 
 Les champs suivants sont inclus dans tous les formats:
 

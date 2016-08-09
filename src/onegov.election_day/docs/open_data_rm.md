@@ -42,15 +42,15 @@ Vote results contain the following additional information:
 
 ## Election results
 
-**URL**: `/election/{id}/data-{format}`
+**URL**: `/election/{id}/{data-format}`
 
 Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan a disposiziun en ils suandants formats:
 
-- **JSON**: (`/json`)
+- **JSON**: (`/data-json`)
 
-- **CSV**: (`/csv`)
+- **CSV**: (`/data-csv`)
 
-- **XLSX**: (`/xlsx`)
+- **XLSX**: (`/data-xlsx`)
 
 Ils suandants champs èn disponibels en tut ils formats:
 
@@ -114,15 +114,15 @@ Ils suandants champs èn disponibels en tut ils formats:
 
 ## Vote results
 
-**URL**: `/vote/{id}/data-{format}`
+**URL**: `/vote/{id}/{data-format}`
 
 Las datas nunelavuradas che vegnan duvradas per mussar ils resultats stattan a disposiziun en ils suandants formats:
 
-- **JSON**: (`/json`)
+- **JSON**: (`/data-json`)
 
-- **CSV**: (`/csv`)
+- **CSV**: (`/data-csv`)
 
-- **XLSX**: (`/xlsx`)
+- **XLSX**: (`/data-xlsx`)
 
 Ils suandants champs èn disponibels en tut ils formats:
 
