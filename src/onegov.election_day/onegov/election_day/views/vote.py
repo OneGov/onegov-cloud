@@ -46,8 +46,8 @@ def view_vote_json(self, request):
         'domain': self.domain,
         'last_change': self.last_result_change.isoformat(),
         'progress': {
-            'counted': (self.progress[0] or 0) / len(self.ballots) or 1,
-            'total': (self.progress[1] or 0) / len(self.ballots) or 1
+            'counted': (self.progress[0] or 0) / (len(self.ballots) or 1),
+            'total': (self.progress[1] or 0) / (len(self.ballots) or 1)
         },
         'related_link': self.meta.get('related_link', ''),
         'title': self.title_translations,
