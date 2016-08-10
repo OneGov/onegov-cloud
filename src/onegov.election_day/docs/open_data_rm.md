@@ -1,5 +1,11 @@
 # Elecziuns & votaziuns: Open Data
 
+## Introduction
+
+There are JSON alternatives for all important views.
+
+All responses contain the `Last-Modified` HTTP Header with the last time, the data has change (i.e. the last time, results of an election or vote have been uploaded).
+
 ## Contents
 
 1. [Summarized results](#summary)
@@ -36,6 +42,16 @@ yeas_percentage|Yeas percentage.
 nays_percentage|Nays percentage.
 
 ## Election results
+
+### Processed results
+
+```
+URL: /election/{id}/json
+```
+
+Returns the data of the main view in a structured form.
+
+### Raw data
 
 ```
 URL: `/election/{id}/{data-format}`
@@ -84,6 +100,8 @@ candidate_elected|True if the candidate has been elected.
 candidate_votes|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
 
 ## Vote results
+
+### Raw data
 
 ```
 URL: `/vote/{id}/{data-format}`

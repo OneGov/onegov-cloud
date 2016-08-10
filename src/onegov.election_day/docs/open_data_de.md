@@ -43,6 +43,14 @@ nays_percentage|Nein-Stimmen in Prozent.
 
 ## Wahlresultate
 
+### Aufbereitete Ergebnisse
+
+```
+URL: /election/{id}/json
+```
+
+Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Form zurückgegeben.
+
 ### Rohdaten
 
 ```

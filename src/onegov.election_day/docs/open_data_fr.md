@@ -43,6 +43,14 @@ nays_percentage|Nays percentage.
 
 ## Election results
 
+### Processed results
+
+```
+URL: /election/{id}/json
+```
+
+Returns the data of the main view in a structured form.
+
 ### Raw data
 
 ```
