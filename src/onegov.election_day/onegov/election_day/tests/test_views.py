@@ -369,8 +369,7 @@ def test_view_last_modified(election_day_app):
             '/election/election/data-xlsx',
             '/vote/vote/',
             '/vote/vote/summary',
-            # todo:
-            # '/vote/vote/json',
+            '/vote/vote/json',
             '/vote/vote/data-json',
             '/vote/vote/data-csv',
             '/vote/vote/data-xlsx',

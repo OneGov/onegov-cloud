@@ -101,6 +101,14 @@ candidate_votes|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu
 
 ## Vote results
 
+### Processed results
+
+```
+URL: /vote/{id}/json
+```
+
+Returns the data of the main view in a structured form.
+
 ### Raw data
 
 ```

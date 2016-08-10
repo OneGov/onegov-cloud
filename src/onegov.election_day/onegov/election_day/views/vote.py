@@ -33,7 +33,75 @@ def view_ballot_by_municipality(self, request):
     return self.percentage_by_municipality()
 
 
-# TODO: as_json
+@ElectionDayApp.json(model=Vote, permission=Public, name='json')
+def view_vote_json(self, request):
+    """" The main view as JSON. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_result_change)
+
+    divider = len(self.ballots) or 1
+
+    return {
+        'date': self.date.isoformat(),
+        'domain': self.domain,
+        'last_change': self.last_result_change.isoformat(),
+        'progress': {
+            'counted': (self.progress[0] or 0) / divider,
+            'total': (self.progress[1] or 0) / divider
+        },
+        'title': self.title_translations,
+        'type': 'election',
+        'resuts': {
+            'answer': self.answer,
+            'nays_percentage': self.nays_percentage,
+            'yeas_percentage': self.yeas_percentage,
+        },
+        'ballots': [
+            {
+                'type': ballot.type,
+                'progress': {
+                    'counted': ballot.progress[0],
+                    'total': ballot.progress[1],
+                },
+                'results': {
+                    'total': {
+                        'accepted': ballot.accepted,
+                        'yeas': ballot.yeas,
+                        'nays': ballot.nays,
+                        'empty': ballot.empty,
+                        'invalid': ballot.invalid,
+                        'yeas_percentage': ballot.yeas_percentage,
+                        'nays_percentage': ballot.nays_percentage,
+                        'elegible_voters': ballot.elegible_voters,
+                        'cast_ballots': ballot.cast_ballots,
+                        'turnout': ballot.turnout,
+                        'counted': ballot.counted,
+                    },
+                    'districts': [
+                        {
+                            'accepted': district.accepted,
+                            'yeas': district.yeas,
+                            'nays': district.nays,
+                            'empty': district.empty,
+                            'invalid': district.invalid,
+                            'yeas_percentage': district.yeas_percentage,
+                            'nays_percentage': district.nays_percentage,
+                            'elegible_voters': district.elegible_voters,
+                            'cast_ballots': district.cast_ballots,
+                            'turnout': district.turnout,
+                            'counted': district.counted,
+                            'name': district.group,
+                            'id': district.municipality_id,
+                        } for district in ballot.results
+                    ],
+                },
+            } for ballot in self.ballots
+        ],
+        'url': request.link(self),
+    }
+
 
 @ElectionDayApp.json(model=Vote, permission=Public, name='summary')
 def view_vote_summary(self, request):

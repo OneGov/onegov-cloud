@@ -233,7 +233,7 @@ def view_election_lists(self, request):
 
 @ElectionDayApp.json(model=Election, permission=Public, name='connections')
 def view_election_connections(self, request):
-    """" View the list connectionss as JSON. Used to for the sankey char in
+    """" View the list connections as JSON. Used to for the sankey char in
     the main view. """
 
     if self.type == 'majorz':
@@ -285,6 +285,7 @@ def view_election_connections(self, request):
 
 @ElectionDayApp.json(model=Election, permission=Public, name='json')
 def view_election_json(self, request):
+    """" The main view as JSON. """
 
     @request.after
     def add_last_modified(response):

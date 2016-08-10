@@ -101,6 +101,14 @@ candidate_votes|Die Anzahl Kandidierendenstimmen der Gemeinde/des Standorts.
 
 ## Abstimmungsresultate
 
+### Aufbereitete Ergebnisse
+
+```
+URL: /vote/{id}/json
+```
+
+Es werden dieselben Daten wie in der normalen Ansicht in einer strukturierten Form zurückgegeben.
+
 ### Rohdaten
 
 ```

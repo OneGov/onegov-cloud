@@ -101,6 +101,14 @@ candidate_votes|Le nombre de voix que ce candidat a obtenu.
 
 ## Vote results
 
+### Processed results
+
+```
+URL: /vote/{id}/json
+```
+
+Returns the data of the main view in a structured form.
+
 ### Raw data
 
 ```
