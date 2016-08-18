@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.5.0 (2016-08-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an organizer field.
   [href]
