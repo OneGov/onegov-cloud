@@ -2279,6 +2279,7 @@ def test_submit_event(town_app):
     form_page.form['title'] = "My Ewent"
     form_page.form['description'] = "My event is an event."
     form_page.form['location'] = "Location"
+    form_page.form['organizer'] = "The Organizer"
     form_page.form.set('tags', True, index=0)
     form_page.form.set('tags', True, index=1)
     form_page.form['start_date'] = start_date.isoformat()
@@ -2298,6 +2299,7 @@ def test_submit_event(town_app):
     assert "My event is an event." in preview_page
     assert "Location" in preview_page
     assert "Ausstellung" in preview_page
+    assert "The Organizer" in preview_page
     assert "Gastronomie" in preview_page
     assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in \
         preview_page
@@ -2347,6 +2349,7 @@ def test_submit_event(town_app):
     assert "My Event" in ticket_page
     assert "My event is an event." in ticket_page
     assert "Location" in ticket_page
+    assert "The Organizer" in ticket_page
     assert "Ausstellung" in ticket_page
     assert "Gastronomie" in ticket_page
     assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in \
@@ -2374,6 +2377,7 @@ def test_submit_event(town_app):
     assert "Location" in message
     assert "Ausstellung" in message
     assert "Gastronomie" in message
+    assert "The Organizer" in message
     assert "{} 18:00-22:00".format(start_date.strftime('%d.%m.%Y')) in message
     for days in range(5):
         assert (start_date + timedelta(days=days)).strftime('%d.%m.%Y') in \
@@ -2401,6 +2405,7 @@ def test_edit_event(town_app):
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Ewent"
     form_page.form['location'] = "Lokation"
+    form_page.form['organizer'] = "Organixator"
     form_page.form['start_date'] = event_date.isoformat()
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"
@@ -2449,6 +2454,8 @@ def test_delete_event(town_app):
     event_date = date.today() + timedelta(days=1)
     form_page.form['email'] = "test@example.org"
     form_page.form['title'] = "My Event"
+    form_page.form['organizer'] = "Organizer"
+    form_page.form['location'] = "Location"
     form_page.form['start_date'] = event_date.isoformat()
     form_page.form['start_time'] = "18:00"
     form_page.form['end_time'] = "22:00"

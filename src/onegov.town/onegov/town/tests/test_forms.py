@@ -251,6 +251,7 @@ def test_event_form_update_apply():
         ('end_date', ''),
         ('end_time', '18:00'),
         ('location', 'Salon du mieux-vivre à Saignelégier'),
+        ('organizer', 'Société de Médecine'),
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
         ('tags', 'Congress'),
@@ -270,6 +271,7 @@ def test_event_form_update_apply():
     assert form.data['location'] == 'Salon du mieux-vivre à Saignelégier'
     assert form.data['start_date'] == date(2015, 6, 16)
     assert form.data['start_time'] == time(9, 30)
+    assert form.data['organizer'] == 'Société de Médecine'
     assert sorted(form.data['tags']) == ['Congress', 'Health']
     assert form.data['title'] == 'Salon du mieux-vivre, 16e édition'
     assert form.data['weekly'] == None
@@ -282,6 +284,8 @@ def test_event_form_update_after_midnight():
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
         ('title', 'Salon du mieux-vivre, 16e édition'),
+        ('organizer', 'Société de Médecine'),
+        ('location', 'Salon du mieux-vivre à Saignelégier')
     ]))
     assert form.validate()
 
@@ -298,6 +302,8 @@ def test_event_form_validate():
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
         ('title', 'Salon du mieux-vivre, 16e édition'),
+        ('location', 'Salon du mieux-vivre à Saignelégier'),
+        ('organizer', 'Société de Médecine'),
         ('weekly', 'MO'),
     ]))
     assert not form.validate()
@@ -312,6 +318,8 @@ def test_event_form_validate():
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
         ('title', 'Salon du mieux-vivre, 16e édition'),
+        ('location', 'Salon du mieux-vivre à Saignelégier'),
+        ('organizer', 'Société de Médecine'),
         ('weekly', 'TU'),
     ]))
     assert not form.validate()
@@ -326,6 +334,8 @@ def test_event_form_validate():
         ('start_date', '2015-06-16'),
         ('start_time', '09:30'),
         ('title', 'Salon du mieux-vivre, 16e édition'),
+        ('location', 'Salon du mieux-vivre à Saignelégier'),
+        ('organizer', 'Société de Médecine'),
     ]))
     assert not form.validate()
     assert form.errors == {

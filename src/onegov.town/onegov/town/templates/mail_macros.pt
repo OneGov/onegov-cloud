@@ -33,6 +33,7 @@
 <metal:event define-macro="event" i18n:domain="onegov.town">
     <p>${model.title}</p>
     <p>${model.location}</p>
+    <p>${model.organizer}</p>
     <p tal:content="structure model.description.replace('\n', '<br />')" />
     <p>
         <ul tal:define="occurrences model.occurrence_dates(localize=True)">

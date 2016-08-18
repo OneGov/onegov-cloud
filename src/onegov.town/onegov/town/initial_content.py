@@ -260,7 +260,10 @@ def add_events(session, town_name):
         timezone="Europe/Zurich",
         tags=["Party"],
         location="Sportanlage",
-        content={"description": "Lorem ipsum."},
+        content={
+            "description": "Lorem ipsum.",
+            "organizer": "Gemeindeverwaltung"
+        },
         meta={"submitter_email": "info@example.org"},
     )
     event.submit()
@@ -272,7 +275,10 @@ def add_events(session, town_name):
         timezone="Europe/Zurich",
         tags=["Politics"],
         location="Gemeindesaal",
-        content={"description": "Lorem ipsum."},
+        content={
+            "description": "Lorem ipsum.",
+            "organizer": "Gemeindeverwaltung"
+        },
         meta={"submitter_email": "info@example.org"},
     )
     event.submit()
@@ -289,7 +295,10 @@ def add_events(session, town_name):
         timezone="Europe/Zurich",
         tags=["Sports"],
         location="Turnhalle",
-        content={"description": "Lorem ipsum."},
+        content={
+            "description": "Lorem ipsum.",
+            "organizer": "Frauenverein"
+        },
         meta={"submitter_email": "info@example.org"},
     )
     event.submit()
@@ -301,7 +310,10 @@ def add_events(session, town_name):
         timezone="Europe/Zurich",
         tags=["Sports"],
         location="Sportanlage",
-        content={"description": "Lorem ipsum."},
+        content={
+            "description": "Lorem ipsum.",
+            "organizer": "Sportverein"
+        },
         meta={"submitter_email": "info@example.org"},
     )
     event.submit()

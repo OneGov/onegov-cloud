@@ -65,7 +65,14 @@ class EventForm(Form):
 
     location = StringField(
         label=_("Location"),
-        description=_("Castle garden")
+        description=_("Castle garden"),
+        validators=[validators.InputRequired()]
+    )
+
+    organizer = StringField(
+        label=_("Organizer"),
+        description=_("Music society"),
+        validators=[validators.InputRequired()]
     )
 
     coordinates = CoordinatesField(

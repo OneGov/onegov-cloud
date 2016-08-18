@@ -59,6 +59,7 @@ def view_get_occurrence(self, request):
 
     return {
         'description': description,
+        'organizer': self.event.organizer,
         'layout': layout,
         'occurrence': self,
         'occurrences': occurrences,
