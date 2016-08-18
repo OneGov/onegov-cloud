@@ -49,7 +49,7 @@ var onLazyLoadAltText = function(element) {
         return;  // we already have an alt text
     }
 
-    if (target.hasClass('.missing-alt')) {
+    if (target.hasClass('.static-alt')) {
         return;  // this alt text is not dynamic
     }
 
@@ -64,7 +64,7 @@ var onLazyLoadAltText = function(element) {
     });
 };
 
-$('.page-text img[alt][alt!=""], .missing-alt').each(function() {
+$('.page-text img[alt][alt!=""], .static-alt').each(function() {
     appendAltText(this, $(this).attr('alt'));
 });
 

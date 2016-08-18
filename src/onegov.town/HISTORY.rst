@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Make sure that the alt text in manage images is never stale.
+  [href]
+
 - Makes the location of an event mandatory.
   [href]
 
