@@ -149,6 +149,9 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
     #: description of the event
     description = content_property('description')
 
+    #: the event organizer
+    organizer = content_property('organizer')
+
     #: Recurrence of the event (RRULE, see RFC2445)
     recurrence = Column(Text, nullable=True)
 
@@ -164,6 +167,7 @@ class Event(Base, OccurrenceMixin, ContentMixin, TimestampMixin,
         'title': {'type': 'localized'},
         'description': {'type': 'localized'},
         'location': {'type': 'localized'},
+        'organizer': {'type': 'localized'}
     }
 
     @property
