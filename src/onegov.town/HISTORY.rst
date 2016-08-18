@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Makes the location of an event mandatory.
+  [href]
+
+- Adds an organizer field to the event form.
+  [href]
+
 - Fixes image captions sometimes getting the wrong width.
   [href]
 
