@@ -2,7 +2,7 @@
 var adjustCaption = function(image) {
     var caption = image.siblings('.alt-text').first();
 
-    $(image).load(function() {
+    $(image).on('load', function() {
         caption.css("maxWidth", image.width());
     });
 };
