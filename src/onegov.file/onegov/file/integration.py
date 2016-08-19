@@ -149,12 +149,22 @@ def view_thumbnail(self, request):
 @DepotApp.view(model=File, render=render_depot_file, permission=Public,
                request_method='HEAD')
 def view_file_head(self, request):
+
+    @request.after
+    def set_cache(response):
+        response.cache_control.max_age = 60
+
     return view_file(self, request)
 
 
 @DepotApp.view(model=File, name='thumbnail', render=render_depot_file,
                permission=Public, request_method='HEAD')
 def view_thumbnail_head(self, request):
+
+    @request.after
+    def set_cache(response):
+        response.cache_control.max_age = 60
+
     return view_thumbnail(self, request)
 
 
