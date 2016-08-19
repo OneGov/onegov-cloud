@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.10.2 (2016-08-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Limits the alt text caching time to one minute.
   [href]
 
