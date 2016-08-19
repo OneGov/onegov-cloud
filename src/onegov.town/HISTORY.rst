@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Limits the alt text caching time to one minute.
+  [href]
+
 - Make sure that the alt text in manage images is never stale.
   [href]
 

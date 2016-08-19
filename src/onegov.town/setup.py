@@ -42,7 +42,7 @@ setup(
         'mistune',
         'onegov.core>=0.22.1',
         'onegov.event>=0.5.0',
-        'onegov.file',
+        'onegov.file>=0.2.1',
         'onegov.form>=0.9.0',
         'onegov.foundation>=0.0.4',
         'onegov.gis',
