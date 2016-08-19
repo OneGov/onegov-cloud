@@ -22,7 +22,7 @@
  * Opera 9-10
  */
 (function ($) {
-    $.event.special.load = {
+    $.event.special.available = {
         add: function (hollaback) {
             if ( this.nodeType === 1 && this.tagName.toLowerCase() === 'img' && this.src !== '' ) {
                 // Image is already complete, fire the hollaback (fixes browser issues were cached

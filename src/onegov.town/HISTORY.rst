@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes another image captions width edge case in Safari.
+  [href]
+
 1.10.3 (2016-08-19)
 ~~~~~~~~~~~~~~~~~~~
 
