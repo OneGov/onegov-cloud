@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.1 (2016-08-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Limits caching of HEAD request (alt-text) to one minute.
   [href]
 
