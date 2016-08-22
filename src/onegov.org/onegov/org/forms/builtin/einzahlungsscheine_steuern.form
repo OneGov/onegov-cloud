@@ -1,0 +1,23 @@
+Einzahlungsscheine Steuern
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+AHV-Nummer = # ch.ssn
+
+# Steuerperiode
+Steuerjahr * = ___
+Anzahl Einzahlungsscheine = ___
+
+# Versand
+Versand * =
+    ( ) Ich möchte die Einzahlungsscheine am Schalter abholen
+    (x) Ich möchte die Einzahlungsscheine mittels Post erhalten
+        Strasse (inkl. Hausnummer) * = ___
+        PLZ / Ort * = ___
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

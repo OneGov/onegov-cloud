@@ -8,7 +8,7 @@ from onegov.event import OccurrenceCollection
 from onegov.form import FormSubmissionFile, render_field
 from onegov.org import utils
 from onegov.ticket import TicketCollection
-from onegov.town.models import (
+from onegov.org.models import (
     GeneralFileCollection,
     ImageFile,
     ImageFileCollection,
@@ -16,7 +16,7 @@ from onegov.town.models import (
     Search,
     SiteCollection
 )
-from onegov.town.models.extensions import PersonLinkExtension
+from onegov.org.models.extensions import PersonLinkExtension
 from onegov.user import Auth
 
 

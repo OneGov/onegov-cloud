@@ -1,0 +1,47 @@
+Adressänderung (Umzug innerhalb der Gemeinde)
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+
+# Weitere Personen
+Mit Ehepartner(in) / Kinder =
+    [ ] Ehepartner(in)
+        Ehepartner(in) = ...
+    [ ] Kinder
+        Kinder = ...
+
+# Adresse bisher
+Strasse (inkl. Hausnummer) bisher * = ___
+PLZ / Ort bisher * = ___
+
+# Adresse neu
+Strasse (inkl. Hausnummer) neu * = ___
+PLZ / Ort neu * = ___
+Stockwerk = ___
+Anzahl Zimmer = ___
+
+Datum Umzug * = YYYY.MM.DD
+Wohnverhältnis =
+    (x) Wohnung
+    ( ) Haus
+    ( ) in Gemeinschaft mit
+        Wohngemeinschaft mit (Vorname, Nachname) = ___
+    ( ) in Untermiete
+        Untermiete bei (Vorname, Nachname) = ___
+
+# Vermietung / Hausverwaltung
+Name Hausverwaltung = ___
+Strasse (inkl. Hausnummer) = ___
+PLZ / Ort = ___
+
+# Berufliche Tätigkeit
+Beruf = ___
+Arbeitgeber = ___
+Tätig seit = YYYY.MM.DD
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

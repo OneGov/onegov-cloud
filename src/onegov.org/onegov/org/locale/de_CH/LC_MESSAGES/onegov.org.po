@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-22 13:59+0200\n"
+"POT-Creation-Date: 2016-08-22 15:15+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -85,10 +85,10 @@ msgid "${num}/${max} Available"
 msgstr "${num}/${max} Verfügbar"
 
 msgid "Edit"
-msgstr ""
+msgstr "Bearbeiten"
 
 msgid "Tickets"
-msgstr ""
+msgstr "Tickets"
 
 msgid "Available"
 msgstr "Verfügbar"
@@ -97,13 +97,13 @@ msgid "Unavailable"
 msgstr "Besetzt"
 
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 msgid "Do you really want to delete this allocation?"
-msgstr ""
+msgstr "Möchten Sie diese Einteilung wirklich löschen?"
 
 msgid "Delete allocation"
-msgstr ""
+msgstr "Einteilung löschen"
 
 msgid ""
 "This allocation can't be deleted because there are existing reservations "
@@ -118,3 +118,478 @@ msgid ""
 msgstr ""
 "Um die Einteilung zu löschen, müssen zuerst alle bestehenden Reservationen "
 "abgesagt werden."
+
+msgid "Mo"
+msgstr "Mo"
+
+msgid "Tu"
+msgstr "Di"
+
+msgid "We"
+msgstr "Mi"
+
+msgid "Th"
+msgstr "Do"
+
+msgid "Fr"
+msgstr "Fr"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "So"
+
+msgid "Start"
+msgstr "Von"
+
+msgid "Date"
+msgstr "Datum"
+
+msgid "End"
+msgstr "Bis"
+
+msgid "Except for"
+msgstr "Ausser an"
+
+msgid "Daypasses"
+msgstr "Tageskarten"
+
+msgid "Daypasses Limit"
+msgstr "Tageskarten pro Person und Tag"
+
+msgid "Each starting at"
+msgstr "Jeweils von"
+
+msgid "HH:MM"
+msgstr "HH:MM"
+
+msgid "Each ending at"
+msgstr "Jeweils bis"
+
+msgid "May be partially reserved"
+msgstr "Kann abschnittweise reserviert werden"
+
+msgid "Options"
+msgstr "Optionen"
+
+msgid "From"
+msgstr "Von"
+
+msgid "Until"
+msgstr "Bis zum"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "Exhibition"
+msgstr "Ausstellung"
+
+msgid "Gastronomy"
+msgstr "Gastronomie"
+
+msgid "Health"
+msgstr "Gesundheit"
+
+msgid "Cinema"
+msgstr "Kino"
+
+msgid "Congress"
+msgstr "Kongress"
+
+msgid "Concert"
+msgstr "Konzert"
+
+msgid "Art"
+msgstr "Kunst"
+
+msgid "Literature"
+msgstr "Literatur"
+
+msgid "Market"
+msgstr "Markt"
+
+msgid "Music"
+msgstr "Musik"
+
+msgid "Party"
+msgstr "Party"
+
+msgid "Politics"
+msgstr "Politik"
+
+msgid "Religion"
+msgstr "Religion"
+
+msgid "Sports"
+msgstr "Sport"
+
+msgid "Dancing"
+msgstr "Tanz"
+
+msgid "Theater"
+msgstr "Theater"
+
+msgid "Meetup"
+msgstr "Treffen"
+
+msgid "Talk"
+msgstr "Vortrag"
+
+msgid "E-Mail"
+msgstr "E-Mail"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "Concerto in the castle garden"
+msgstr "Konzert im Schlossgarten"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Enjoy a concerto in the castle garden."
+msgstr "Freuen Sie sich auf ein klassisches Konzert im Schlossgarten."
+
+msgid "Location"
+msgstr "Ort"
+
+msgid "Castle garden"
+msgstr "Schlossgarten"
+
+msgid "Organizer"
+msgstr "Organisator"
+
+msgid "Music society"
+msgstr "Musikverein"
+
+msgid "Coordinates"
+msgstr "Koordinaten"
+
+msgid "The marker can be moved by dragging it with the mouse"
+msgstr "Der Marker kann mit der Maus verschoben werden"
+
+msgid "Tags"
+msgstr "Schlagworte"
+
+msgid "To"
+msgstr "Bis"
+
+msgid "Repeats itself every"
+msgstr "Wiederholt sich jeden"
+
+msgid "Until date"
+msgstr "Bis Datum"
+
+msgid "Please set and end date if the event is recurring."
+msgstr "Bitte ein Enddatum angeben, falls eine Wiederholungen ausgewählt ist."
+
+msgid "Please select a weekday if the event is recurring."
+msgstr "Bitte ein Wochentag auswählen für sich wiederholende Veranstaltungen."
+
+msgid "The end date must be later than the start date."
+msgstr "Das Enddatum muss nach dem Startdatum liegen."
+
+msgid "The weekday of the start date must be selected."
+msgstr "Der Wochentag der Veranstaltung muss ausgewählt sein."
+
+msgid "Lead"
+msgstr "Einleitung"
+
+msgid "Describes what this form is about"
+msgstr "Beschreibt kurz um was es bei diesem Formular geht"
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Definition"
+msgstr "Definition"
+
+msgid "Describes what this photo album is about"
+msgstr "Beschreibt kurz um was es bei dem Fotoalbum geht"
+
+msgid "View"
+msgstr "Ansicht"
+
+msgid "Full size images"
+msgstr "Grosse Bilder"
+
+msgid "Grid layout"
+msgstr "Raster"
+
+msgid "Used in the overview and the e-mail subject"
+msgstr "Wird in der Übersicht und als E-Mail Subjekt verwendet"
+
+msgid "Editorial"
+msgstr "Editorial"
+
+msgid "A few words about this edition of the newsletter"
+msgstr "Ein paar Worte zu dieser Ausgabe des Newsletters"
+
+msgid "Latest news"
+msgstr "Aktuelles"
+
+msgid "Selected News / Events"
+msgstr "Ausgewählte Nachrichten und Veranstaltungen"
+
+msgid "Events"
+msgstr "Veranstaltungen"
+
+msgid "Recipients"
+msgstr "Empfänger"
+
+msgid "Please select at least one recipient"
+msgstr "Bitte wählen Sie mindestens einen Empfänger"
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Describes what this page is about"
+msgstr "Beschreibt kurz um was es bei diesem Thema geht"
+
+msgid "First name"
+msgstr "Vorname"
+
+msgid "Last name"
+msgstr "Nachname"
+
+msgid "Function"
+msgstr "Funktion"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Website"
+msgstr "Webseite"
+
+msgid "Picture"
+msgstr "Bild"
+
+msgid "URL pointing to the picture"
+msgstr "Link zum Bild"
+
+msgid "Address"
+msgstr "Addresse"
+
+msgid "Notes"
+msgstr "Notizen"
+
+msgid "Public extra information about this person"
+msgstr "Öffentliche Extra Informationen zu dieser Person"
+
+msgid "Email Address"
+msgstr "E-Mail Adresse"
+
+msgid "New Password"
+msgstr "Neues Passwort"
+
+msgid "Describes what this reservation resource is about"
+msgstr "Beschreibt um was es bei dieser Reservations-Ressource geht"
+
+msgid "Group"
+msgstr "Gruppe"
+
+msgid "Used to group the resource in the overview"
+msgstr "Dient zur Gruppierung in der Übersicht"
+
+msgid "Extra Fields Definition"
+msgstr "Extra-Felder Definition"
+
+msgid "Format"
+msgstr "Format"
+
+msgid "The end date must be later than the start date"
+msgstr "Das End-Datum muss nach dem Start-Datum liegen"
+
+msgid "CSV File"
+msgstr "CSV Datei"
+
+msgid "Excel File"
+msgstr "Excel Datei"
+
+msgid "JSON File"
+msgstr "JSON Datei"
+
+msgid "E-Mail Address"
+msgstr "E-Mail Adresse"
+
+msgid "People"
+msgstr "Personen"
+
+msgid "Hide from the public"
+msgstr "Vor der Öffentlichkeit verstecken"
+
+msgid "Visible on homepage"
+msgstr "Auf der Startseite anzeigen"
+
+msgid "Map"
+msgstr "Karte"
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "This month"
+msgstr "Diesen Monat"
+
+msgid "Last month"
+msgstr "Letzter Monat"
+
+msgid "Last year"
+msgstr "Letztes Jahr"
+
+msgid "Older"
+msgstr "Älter"
+
+msgid "This year"
+msgstr "Dieses Jahr"
+
+msgid "Event"
+msgstr "Veranstaltung"
+
+msgid "Reject reservations"
+msgstr "Reservationen absagen"
+
+msgid "Edit submission"
+msgstr "Eingabe bearbeiten"
+
+msgid "Details about the reservation"
+msgstr "Details zu Ihrer Reservation"
+
+msgid "Reject event"
+msgstr "Veranstaltung ablehnen"
+
+msgid "Do you really want to reject this event?"
+msgstr "Möchten Sie diese Veranstaltung wirklich absagen? "
+
+msgid "Rejecting this event can't be undone."
+msgstr "Eine Absage kann nicht rückgängig gemacht werden."
+
+msgid "Edit event"
+msgstr "Veranstaltung bearbeiten"
+
+msgid "Accept all reservations"
+msgstr "Alle Reservationen annehmen"
+
+msgid "Reject all"
+msgstr "Alle absagen"
+
+msgid "Do you really want to reject all reservations?"
+msgstr "Möchten Sie wirklich alle Reservationen absagen?"
+
+msgid "Rejecting these reservations can't be undone."
+msgstr "Die Absage aller Reservationen kann nicht rückgängig gemacht werden."
+
+#, python-format
+msgid "Reject ${title}"
+msgstr "${title} absagen"
+
+msgid "Do you really want to reject this reservation?"
+msgstr "Möchten Sie diese Reservation wirklich absagen?"
+
+#, python-format
+msgid "Rejecting ${title} can't be undone."
+msgstr "Die Absage von ${title} kann nicht rückgängig gemacht werden."
+
+msgid "Reject reservation"
+msgstr "Reservation absagen"
+
+msgid "Edit details"
+msgstr "Details bearbeiten"
+
+msgid "Accept event"
+msgstr "Veranstaltung annehmen"
+
+msgid "Link"
+msgstr "Verknüpfung"
+
+msgid "New Link"
+msgstr "Neue Verknüpfung"
+
+msgid "Added a new link"
+msgstr "Eine neue Verknüpfung wurde hinzugefügt"
+
+msgid "Edit Link"
+msgstr "Verknüpfung Bearbeiten"
+
+msgid "The link was deleted"
+msgstr "Die Verknüpfung wurde gelöscht"
+
+msgid "Delete link"
+msgstr "Verknüpfung Löschen"
+
+#, python-format
+msgid "Do you really want to delete the link \"${title}\"?"
+msgstr "Möchten Sie die Verknüpfung \"${title}\" wirklich löschen?"
+
+msgid "Topic"
+msgstr "Thema"
+
+msgid "New Topic"
+msgstr "Neues Thema"
+
+msgid "Added a new topic"
+msgstr "Das neue Thema wurde hinzugefügt"
+
+msgid "Edit Topic"
+msgstr "Thema Bearbeiten"
+
+msgid "The topic was deleted"
+msgstr "Das Thema wurde gelöscht"
+
+msgid "Delete topic"
+msgstr "Thema Löschen"
+
+#, python-format
+msgid "Do you really want to delete the topic \"${title}\"?"
+msgstr "Möchten Sie das Thema \"${title}\" wirklich löschen?"
+
+msgid "News"
+msgstr "Nachricht"
+
+msgid "Add News"
+msgstr "Nachricht hinzufügen"
+
+msgid "Added news"
+msgstr "Eine neue Nachricht wurde hinzugefügt"
+
+msgid "Edit News"
+msgstr "Nachricht bearbeiten"
+
+msgid "The news was deleted"
+msgstr "Die Nachricht wurde gelöscht"
+
+msgid "Delete news"
+msgstr "Nachricht löschen"
+
+#, python-format
+msgid "Do you really want to delete the news \"${title}\"?"
+msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Copy"
+msgstr "Kopieren"
+
+msgid "Paste"
+msgstr "Einfügen"
+
+msgid "Please note that this page has subpages which will also be deleted!"
+msgstr ""
+"Bitte beachten Sie dass die Unterthemen dieses Themas ebenfalls gelöscht "
+"werden!"
+
+msgid "This page can't be deleted."
+msgstr "Diese Seite kann nicht gelöscht werden."
+
+msgid ""
+"This page has subpages. Only administrators can delete pages with subpages. "
+"To delete this page, delete all subpages first or ask an administrator to do "
+"it for you."
+msgstr ""
+"Diese Seite hat Unterseiten. Nur Administratoren können Seiten mit "
+"Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
+"Unterseiten löschen, oder Sie wenden sich an einen Administrator."

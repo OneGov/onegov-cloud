@@ -1,0 +1,32 @@
+Eheschein
+-------------------
+
+# Personalien Ehefrau
+Vorname * = ___
+Name * = ___
+Ledigname = ___
+Geburtsdatum * = YYYY.MM.DD
+Heimatort * = ___
+
+# Personalien Ehemann
+Vorname * = ___
+Name * = ___
+Ledigname = ___
+Geburtsdatum * = YYYY.MM.DD
+Heimatort * = ___
+
+# Eheschliessung
+PLZ / Ort Eheschliessung * = ___
+Datum Eheschliessung * = YYYY.MM.DD
+
+# Versand
+Versand * =
+    ( ) Ich möchte das Dokument am Schalter abholen
+    (x) Ich möchte die Unterlagen mittels Post erhalten
+        Strasse (inkl. Hausnummer) * = ___
+        PLZ / Ort * = ___
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...
