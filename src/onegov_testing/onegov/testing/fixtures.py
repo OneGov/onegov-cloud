@@ -28,7 +28,7 @@ class HTTPExecutor(HTTPExecutorBase):
 
 @pytest.yield_fixture(scope='session')
 def monkeysession(request):
-    mp = monkeypatch()
+    mp = monkeypatch(request)
     yield mp
     mp.undo()
 

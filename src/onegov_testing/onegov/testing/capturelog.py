@@ -2,8 +2,9 @@
 # adjusted to our needs (namely, we don't want the log displayed
 # when the test fails)
 
-import py
 import logging
+import py
+import pytest
 
 
 def pytest_configure(config):
@@ -146,13 +147,15 @@ class CaptureLogLevel(object):
         self.obj.setLevel(self.orig_level)
 
 
-def pytest_funcarg__caplog(request):
+@pytest.fixture
+def caplog(request):
     """Returns a funcarg to access and control log capturing."""
 
     return CaptureLogFuncArg(request._pyfuncitem.capturelog_handler)
 
 
-def pytest_funcarg__capturelog(request):
+@pytest.fixture
+def capturelog(request):
     """Returns a funcarg to access and control log capturing."""
 
     return CaptureLogFuncArg(request._pyfuncitem.capturelog_handler)
