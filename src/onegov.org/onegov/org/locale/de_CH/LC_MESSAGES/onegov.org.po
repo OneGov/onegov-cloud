@@ -17,3 +17,6 @@ msgstr "Abbrechen"
 
 msgid "This site is hidden from the general public"
 msgstr "Diese Seite ist nicht öffentlich."
+
+msgid "Not a valid color."
+msgstr "Ungültige Farbe."
