@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-22 15:15+0200\n"
+"POT-Creation-Date: 2016-08-22 16:00+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -17,6 +17,174 @@ msgstr "Abbrechen"
 
 msgid "This site is hidden from the general public"
 msgstr "Diese Seite ist nicht öffentlich."
+
+msgid "Mo"
+msgstr "Mo"
+
+msgid "Tu"
+msgstr "Di"
+
+msgid "We"
+msgstr "Mi"
+
+msgid "Th"
+msgstr "Do"
+
+msgid "Fr"
+msgstr "Fr"
+
+msgid "Sa"
+msgstr "Sa"
+
+msgid "Su"
+msgstr "So"
+
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Forms"
+msgstr "Formulare"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "People"
+msgstr "Personen"
+
+msgid "Tickets"
+msgstr "Tickets"
+
+msgid "Reservations"
+msgstr "Reservationen"
+
+msgid "Edit allocation"
+msgstr "Einteilung bearbeiten"
+
+#, python-format
+msgid "Every ${days} until ${end}"
+msgstr "Jeden ${days} bis zum ${end}."
+
+msgid "Events"
+msgstr "Veranstaltungen"
+
+msgid "Newsletter"
+msgstr "Newsletter"
+
+msgid "Subscribers"
+msgstr "Abonnenten"
+
+msgid "Photo Albums"
+msgstr "Fotoalben"
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "This form can't be deleted."
+msgstr "Das Formular kann nicht gelöscht werden."
+
+msgid ""
+"The are submissions associated with the form. Those need to be removed first."
+msgstr ""
+"Es existieren Eingaben die mit diesem Formular verknüpft sind. Löschen Sie "
+"diese Eingaben bevor Sie das Formular löschen."
+
+msgid "Do you really want to delete this form?"
+msgstr "Möchten Sie das Formular wirklich löschen?"
+
+msgid "Delete form"
+msgstr "Formular löschen"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgid "Do you really want to delete this person?"
+msgstr "Möchten Sie die Person wirklich löschen?"
+
+msgid "Delete person"
+msgstr "Person löschen"
+
+msgid "Do you really want to delete this resource?"
+msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
+
+msgid "Delete resource"
+msgstr "Reservations-Ressource löschen"
+
+msgid "This resource can't be deleted."
+msgstr "Diese Reservations-Ressource kann nicht gelöscht werden."
+
+msgid "There are existing reservations associated with this resource"
+msgstr "Es existieren Reservationen für diese Reservations-Ressource"
+
+msgid "Clean up"
+msgstr "Aufräumen"
+
+msgid "Occupancy"
+msgstr "Belegung"
+
+msgid "Export"
+msgstr "Export"
+
+msgid "Do you really want to delete this event?"
+msgstr "Möchten Sie die Veranstaltung wirklich löschen?"
+
+msgid "Delete event"
+msgstr "Veranstaltung löschen"
+
+msgid "This event can't be deleted."
+msgstr "Diese Veranstaltung kann nicht gelöscht werden."
+
+msgid "To remove this event, go to the ticket and reject it."
+msgstr ""
+"Sie können die Veranstaltung jedoch in der Ticketansicht absagen, um sie zu "
+"entfernen."
+
+msgid "Send"
+msgstr "Senden"
+
+msgid "Delete newsletter"
+msgstr "Newsletter löschen"
+
+msgid "Manage images"
+msgstr "Bilder verwalten"
+
+msgid "Choose images"
+msgstr "Bilder auswählen"
+
+msgid "Delete photo album"
+msgstr "Fotoalbum löschen"
+
+msgid "Accept ticket"
+msgstr "Ticket annehmen"
+
+msgid "Do you really want to delete this allocation?"
+msgstr "Möchten Sie diese Einteilung wirklich löschen?"
+
+msgid "Delete allocation"
+msgstr "Einteilung löschen"
+
+msgid "Close ticket"
+msgstr "Ticket abschliessen"
+
+msgid "Form"
+msgstr "Formular"
+
+msgid "Person"
+msgstr "Person"
+
+msgid "Reopen ticket"
+msgstr "Ticket wieder öffnen"
+
+msgid "Room"
+msgstr "Raum"
+
+msgid "Daypass"
+msgstr "Tagskarte"
+
+msgid "Photo Album"
+msgstr "Fotoalbum"
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
@@ -84,26 +252,11 @@ msgstr "${percent}% Verfügbar"
 msgid "${num}/${max} Available"
 msgstr "${num}/${max} Verfügbar"
 
-msgid "Edit"
-msgstr "Bearbeiten"
-
-msgid "Tickets"
-msgstr "Tickets"
-
 msgid "Available"
 msgstr "Verfügbar"
 
 msgid "Unavailable"
 msgstr "Besetzt"
-
-msgid "Delete"
-msgstr "Löschen"
-
-msgid "Do you really want to delete this allocation?"
-msgstr "Möchten Sie diese Einteilung wirklich löschen?"
-
-msgid "Delete allocation"
-msgstr "Einteilung löschen"
 
 msgid ""
 "This allocation can't be deleted because there are existing reservations "
@@ -118,27 +271,6 @@ msgid ""
 msgstr ""
 "Um die Einteilung zu löschen, müssen zuerst alle bestehenden Reservationen "
 "abgesagt werden."
-
-msgid "Mo"
-msgstr "Mo"
-
-msgid "Tu"
-msgstr "Di"
-
-msgid "We"
-msgstr "Mi"
-
-msgid "Th"
-msgstr "Do"
-
-msgid "Fr"
-msgstr "Fr"
-
-msgid "Sa"
-msgstr "Sa"
-
-msgid "Su"
-msgstr "So"
 
 msgid "Start"
 msgstr "Von"
@@ -335,9 +467,6 @@ msgstr "Aktuelles"
 msgid "Selected News / Events"
 msgstr "Ausgewählte Nachrichten und Veranstaltungen"
 
-msgid "Events"
-msgstr "Veranstaltungen"
-
 msgid "Recipients"
 msgstr "Empfänger"
 
@@ -415,9 +544,6 @@ msgstr "JSON Datei"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
-
-msgid "People"
-msgstr "Personen"
 
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
@@ -568,9 +694,6 @@ msgstr "Nachricht löschen"
 msgid "Do you really want to delete the news \"${title}\"?"
 msgstr "Möchten Sie die Nachricht \"${title}\" wirklich löschen?"
 
-msgid "Add"
-msgstr "Hinzufügen"
-
 msgid "Copy"
 msgstr "Kopieren"
 
@@ -593,3 +716,116 @@ msgstr ""
 "Diese Seite hat Unterseiten. Nur Administratoren können Seiten mit "
 "Unterseiten löschen. Um diese Seite zu löschen müssen Sie erst alle "
 "Unterseiten löschen, oder Sie wenden sich an einen Administrator."
+
+msgid "Skip navigation"
+msgstr "Navigation überspringen"
+
+msgid "Back to the homepage"
+msgstr "Zurück zur Startseite"
+
+msgid "Town Logo"
+msgstr "Logo der Gemeinde"
+
+msgid "Open Ticket"
+msgstr "Offenes Ticket"
+
+msgid "Open Tickets"
+msgstr "Offene Tickets"
+
+msgid "Pending Ticket"
+msgstr "Ticket in Bearbeitung"
+
+msgid "Pending Tickets"
+msgstr "Tickets in Bearbeitung"
+
+msgid "Search"
+msgstr "Suche"
+
+msgid "The form contains errors. Please check the fields marked in red."
+msgstr ""
+"Das Formular enthält Fehler. Bitte die rot markierten Felder überprüfen."
+
+msgid "more…"
+msgstr "mehr…"
+
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+msgid "Social Media"
+msgstr "Soziale Medien"
+
+msgid "You are here"
+msgstr "Sie sind hier"
+
+msgid "Submit"
+msgstr "Absenden"
+
+msgid "Drop files to upload"
+msgstr "Dateien hierhin ziehen um sie hochzuladen"
+
+msgid ""
+"This site is hidden from the general public. To show it to everyone, edit "
+"this page and disable \"Hide from public\"."
+msgstr ""
+"Diese Seite ist nicht öffentlich. Bearbeiten Sie diese Seite und entfernen "
+"Sie das Häckchen im Feld \"Vor der Öffentlichkeit verstecken\"."
+
+msgid ""
+"This site contains no lead. Leads are used for lists and search results."
+msgstr ""
+"Diese Seite hat keine Einleitung. Die Einleitung ist wichtig für die Suche "
+"und Auflistungen."
+
+msgid "Open"
+msgstr "Offen"
+
+msgid "Pending"
+msgstr "In Bearbeitung"
+
+msgid "Closed"
+msgstr "Abgeschlossen"
+
+msgid "Ticket Number"
+msgstr "Ticket Nummer"
+
+msgid "Previous Page"
+msgstr "Vorherige Seite"
+
+msgid "Next Page"
+msgstr "Nächste Seite"
+
+msgid "Quota"
+msgstr "Anzahl"
+
+msgid "State"
+msgstr "Status"
+
+msgid "Initiated"
+msgstr "Initiiert"
+
+msgid "Submitted"
+msgstr "Gemeldet"
+
+msgid "Published"
+msgstr "Veröffentlich"
+
+msgid "Withdrawn"
+msgstr "Zurückgezogen"
+
+msgid "Submitter"
+msgstr "Antragsteller/in"
+
+msgid "Date and time"
+msgstr "Datum und Zeit"
+
+msgid "Recurrence"
+msgstr "Wiederholungen"
+
+msgid "All dates"
+msgstr "Alle Termine"
+
+msgid "No events found."
+msgstr "Keine Veranstaltungen gefunden."
+
+msgid "Filter by date"
+msgstr "Nach Datum filtern"

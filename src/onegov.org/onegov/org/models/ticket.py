@@ -7,9 +7,9 @@ from onegov.form import FormSubmissionCollection
 from onegov.libres import Resource
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.layout import DefaultLayout, EventLayout
 from onegov.org.utils import correct_time_range
 from onegov.ticket import Ticket, Handler, handlers
-from onegov.town.layout import DefaultLayout, EventLayout
 from purl import URL
 
 
@@ -105,7 +105,7 @@ class ReservationHandler(Handler):
     @cached_property
     def reservations(self):
         # libres allows for multiple reservations with a single request (token)
-        # for now we don't really have that case in onegov.town, but we
+        # for now we don't really have that case in onegov.org, but we
         # try to be aware of it as much as possible
         query = self.session.query(Reservation)
         query = query.filter(Reservation.token == self.id)

@@ -4,6 +4,7 @@ from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
+from onegov.org.theme import OrgTheme
 from onegov.search import ElasticsearchApp
 
 
@@ -64,3 +65,13 @@ def get_i18n_localedirs():
         utils.module_path('onegov.form', 'locale'),
         utils.module_path('onegov.user', 'locale')
     ]
+
+
+@OrgApp.template_directory()
+def get_template_directory():
+    return 'templates'
+
+
+@OrgApp.setting(section='core', name='theme')
+def get_theme():
+    return OrgTheme()

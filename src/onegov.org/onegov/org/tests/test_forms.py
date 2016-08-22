@@ -30,7 +30,7 @@ def test_allocation_form_dates(form_class):
     assert hasattr(form, 'data')
     assert hasattr(form, 'partly_available')
 
-    # those are not (yet) customizable in onegov.town
+    # those are not (yet) customizable in onegov.org
     assert not hasattr(form, 'grouped')
     assert not hasattr(form, 'raster')
     assert not hasattr(form, 'approve_manually')

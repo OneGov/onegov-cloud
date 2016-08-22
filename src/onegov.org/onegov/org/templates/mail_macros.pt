@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.org">
+<body>
+
+<metal:reservations define-macro="reservations" i18n:domain="onegov.org">
+    <tal:block condition="reservations">
+        <tal:block repeat="reservation reservations">
+            <tal:block define="start reservation.display_start(); end reservation.display_end()">
+                <p>
+                    <span>
+                        ${layout.format_date(start, 'weekday_long')},
+                        ${layout.format_date(start, 'date_long')}
+                        <!-- simple whole day check: -->
+                        <tal:block condition="start.time() != end.time()">
+                        <br>
+                            ${layout.format_time_range(start, end)}
+                        </tal:block>
+                    </span>
+                    <br>
+                    <span i18n:translate>Quota</span>: <span>
+                        ${reservation.quota}
+                    </span>
+                </p>
+            </tal:block>
+        </tal:block>
+    </tal:block>
+</metal:reservations>
+
+<metal:event define-macro="event" i18n:domain="onegov.org">
+    <p>${model.title}</p>
+    <p>${model.location}</p>
+    <p>${model.organizer}</p>
+    <p tal:content="structure model.description.replace('\n', '<br />')" />
+    <p>
+        <ul tal:define="occurrences model.occurrence_dates(localize=True)">
+            <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'datetime')}-${layout.format_date(model.localized_end, 'time')}</li>
+        </ul>
+    </p>
+    <p>
+        <ul><li tal:repeat="tag model.tags" i18n:translate="">${tag}</li></ul>
+    </p>
+</metal:event>
+
+</body>
+</html>

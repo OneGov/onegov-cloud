@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html class="no-js" lang="${request.html_lang}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.org"
+      metal:define-macro="layout">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title><div metal:define-slot="title"></div></title>
+    <!-- This site is running on the
+          ___              ____               ____ _                 _
+         / _ \ _ __   ___ / ___| _____   __  / ___| | ___  _   _  __| |
+        | | | | '_ \ / _ \ |  _ / _ \ \ / / | |   | |/ _ \| | | |/ _` |
+        | |_| | | | |  __/ |_| | (_) \ V /  | |___| | (_) | |_| | (_| |
+         \___/|_| |_|\___|\____|\___/ \_/    \____|_|\___/ \__,_|\__,_|
+
+         Have a look at the source code: https://onegov.readthedocs.org
+     -->
+    <link rel="stylesheet" type="text/css" href="${request.theme_link}">
+    <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
+</head>
+
+<body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}">
+
+    <!--! Skip navigation link for screenreaders -->
+    <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
+
+    <div id="inner-body">
+      <div class="row header">
+        <div class="small-12 medium-8 columns logo">
+          <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
+            <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
+            <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
+          </a>
+        </div>
+        <div class="small-12 medium-4 columns">
+          <tal:block condition="request.is_logged_in">
+            <tal:block define="ticket_count layout.request.app.ticket_count">
+              <div class="ticket-count">
+                  <div class="ticket-count-open ${ticket_count.open > 0 and 'highlight' or ''}">
+                    <a href="${layout.open_tickets_url}">
+                      <span class="number">${ticket_count.open}</span>
+                      <span class="text" i18n:translate tal:condition="ticket_count.open == 1">Open Ticket</span>
+                      <span class="text" i18n:translate tal:condition="ticket_count.open != 1">Open Tickets</span>
+                    </a>
+                  </div>
+                  <div class="ticket-count-pending ${ticket_count.pending > 0 and 'highlight' or ''}">
+                    <a href="${layout.pending_tickets_url}">
+                      <span class="number">${ticket_count.pending}</span>
+                      <span class="text" i18n:translate tal:condition="ticket_count.pending == 1">Pending Ticket</span>
+                      <span class="text" i18n:translate tal:condition="ticket_count.pending != 1">Pending Tickets</span>
+                    </a>
+                  </div>
+              </div>
+              <div class="clearfix"></div>
+            </tal:block>
+          </tal:block>
+
+          <!--! The town's site search -->
+          <!--! <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+            <div class="row collapse">
+                <div class="columns small-10">
+                    <label for="search" class="show-for-sr" i18n:translate>Search</label>
+                    <input id="search" data-typeahead-subject type="text" name="q" placeholder="Search" i18n:attributes="placeholder" autocomplete="off" autocorrect="off" />
+                </div>
+                <div class="columns small-2">
+                    <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
+                      <i class="fa fa-search" data-typeahead-spinner></i>
+                    </button>
+                </div>
+            </div>
+            <div class="row typeahead">
+              <div class="columns small-12" data-typeahead-container>
+              </div>
+            </div>
+          </form> -->
+
+        </div>
+      </div>
+      <div class="row">
+          <div class="small-12 columns">
+              <div metal:use-macro="layout.macros['top_navigation']"></div>
+              <div metal:use-macro="layout.macros['editbar']"></div>
+              <div metal:use-macro="layout.macros['breadcrumbs']"></div>
+          </div>
+      </div>
+
+      <div class="row">
+        <div class="small-12 columns">
+          <!--! If there's a form object with errors, show an alert box - works for all views that use a form -->
+          <div tal:condition="form.errors|nothing" data-alert class="alert-box alert">
+            <tal:block i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
+            <a href="#" class="close">&times;</a>
+          </div>
+          <div tal:repeat="message request.consume_messages()" data-alert class="alert-box ${message.type}">
+            ${message.text}
+            <a href="#" class="close">&times;</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="row content with-sidebar-links" tal:condition="layout.sidebar_links">
+        <div class="small-12 medium-3 large-3 columns sidebar show-for-medium-up">
+          <div metal:use-macro="layout.macros['sidebar']" />
+        </div>
+        <div class="small-12 medium-9 large-9 columns">
+          <div class="row">
+              <div class="small-12 columns">
+                <section role="main" id="content">
+                  <h1 class="main-title"><div metal:define-slot="title"></div></h1>
+                  <div metal:define-slot="content"></div>
+                </section>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="row content without-sidebar-links" tal:condition="not:layout.sidebar_links">
+        <div class="small-12 columns">
+          <div class="row">
+              <div class="small-12 columns">
+                <section role="main" id="content">
+                  <h1 class="main-title"><div metal:define-slot="title"></div></h1>
+                  <div metal:define-slot="content"></div>
+                </section>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="push"></div>
+    </div>
+    <footer class="row footer" tal:define="contact layout.town.meta.contact_html|nothing;
+                                           contact_url layout.town.meta.contact_url|nothing;
+                                           opening_hours layout.town.meta.opening_hours_html|nothing;
+                                           opening_hours_url layout.town.meta.opening_hours_url|nothing;
+                                           facebook layout.town.meta.facebook_url|nothing;
+                                           twitter layout.town.meta.twitter_url|nothing;">
+      <div class="small-12 columns">
+
+        <div class="row footer-columns" tal:condition="contact or contact_url or opening_hours or opening_hours_url or facebook or twitter">
+          <div class="small-12 medium-3 columns">
+            <h2 i18n:translate="" tal:condition="contact or contact_url">Contact</h2>
+            <div tal:content="structure layout.town.meta.contact_html" />
+            <a i18n:translate="" tal:condition="contact_url" tal:attributes="href contact_url">more…</a>
+          </div>
+          <div class="small-12 medium-5 columns">
+            <h2 i18n:translate="" tal:condition="opening_hours or opening_hours_url">Opening Hours</h2>
+            <div tal:content="structure layout.town.meta.opening_hours_html" />
+            <a i18n:translate="" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more…</a>
+          </div>
+          <div class="small-12 medium-4 columns">
+            <h2 i18n:translate="" tal:condition="facebook or twitter">Social Media</h2>
+            <ul class="social-media-links" tal:condition="facebook or twitter">
+                <li tal:condition="facebook"><a tal:attributes="href facebook"><i class="fa fa-facebook-official"></i> Facebook</a></li>
+                <li tal:condition="twitter"><a tal:attributes="href twitter"><i class="fa fa-twitter"></i> Twitter</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="row footer-links">
+          <div class="small-12 columns">
+            <div metal:use-macro="layout.macros['bottom-links']"></div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <tal:block tal:content="structure layout.town.meta.analytics_code|nothing" />
+</body>
+
+</html>

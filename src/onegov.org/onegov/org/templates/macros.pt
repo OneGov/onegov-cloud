@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      i18n:domain="onegov.org">
+<body>
+
+<metal:navigation define-macro="top_navigation">
+    <div class="main-navigation">
+        <nav class="top-bar" data-topbar role="navigation" tal:condition="layout.top_navigation">
+            <ul class="title-area">
+                <!--! this section needs to be included (even though it's empty),
+                or the responsive menu bar icon won't be rendered -->
+                <li class="name" style="width: 0;"></li>
+                <li class="toggle-topbar menu-icon">
+                    <a href="#"><span>Menu</span></a>
+                </li>
+            </ul>
+            <section class="top-bar-section">
+                <ul class="left">
+                    <tal:block repeat="link layout.top_navigation">
+                        <li>
+                            <a tal:attributes="href link.url">${link.text}</a>
+                        </li>
+                    </tal:block>
+                </ul>
+            </section>
+        </nav>
+        <div class="clearfix"></div>
+    </div>
+</metal:navigation>
+
+<metal:editbar define-macro="editbar">
+    <div class="row" tal:condition="layout.editbar_links">
+        <div class="small-12 columns">
+            <div class="edit-bar clearfix">
+                <tal:block repeat="group layout.editbar_links">
+                    <tal:block condition="group.links|nothing" define="dropdown_id 'editbar-dropdown-{}'.format(repeat.group.number)">
+                        <button href="#" data-dropdown="${dropdown_id}" class="${group.right_side and 'right-side'} tiny button dropdown">
+                            ${group.title}
+                        </button>
+                        <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
+                            <li tal:repeat="link group.links">
+                                <tal:block replace="structure link(request)" />
+                            </li>
+                        </ul>
+                    </tal:block>
+                    <tal:block condition="group.url|nothing" define="link group">
+                        <tal:block replace="structure link(request, ('tiny', 'button'))" />
+                    </tal:block>
+                </tal:block>
+            </div>
+        </div>
+    </div>
+</metal:editbar>
+
+<metal:breadcrumbs define-macro="breadcrumbs">
+    <nav role="navigation" aria-label="You are here" i18n:attributes="aria-label">
+        <ul class="breadcrumbs" tal:condition="layout.breadcrumbs">
+            <tal:block repeat="link layout.breadcrumbs">
+                <li tal:attributes="class repeat.link.end and 'current' or ''"
+                    tal:content="structure link(request)">
+                </li>
+            </tal:block>
+        </ul>
+    </nav>
+</metal:breadcrumbs>
+
+<metal:bottom_links define-macro="bottom-links">
+    <ul class="bottom-links" tal:condition="layout.bottom_links">
+        <li tal:repeat="link layout.bottom_links">
+            <tal:block replace="structure link(request)"/>
+        </li>
+    </ul>
+</metal:bottom_links>
+
+<metal:form define-macro="form">
+    <form tal:attributes="action form.action|'.';data-image-upload-url layout.image_upload_json_url; data-image-list-url layout.image_list_url;data-file-upload-url layout.file_upload_json_url; data-file-list-url layout.file_list_url; data-sitecollection-url layout.sitecollection_url;" method="${form.method|'POST'}" enctype="multipart/form-data">
+        <tal:block repeat="fieldset form.fieldsets">
+            <fieldset tal:condition="fieldset.is_visible" id="fieldset-${fieldset.label.lower()}">
+                <legend>${fieldset.label}</legend>
+                <div class="formfields">
+                    <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                    <div class="clearfix"></div>
+                </div>
+            </fieldset>
+            <tal:block condition="not:fieldset.is_visible">
+                <div class="formfields">
+                    <metal:fields use-macro="layout.macros['fields']" tal:define="fields fieldset.fields.values()" />
+                    <div class="clearfix"></div>
+                </div>
+            </tal:block>
+        </tal:block>
+        <tal:block condition="not: button_text|nothing">
+            <input type="submit" value="Submit" class="button" i18n:attributes="value">
+        </tal:block>
+        <tal:block condition="button_text|nothing">
+            <input type="submit" value="${button_text}" class="button">
+        </tal:block>
+    </form>
+</metal:form>
+
+<metal:fields define-macro="fields">
+    <tal:block repeat="field fields">
+        <div class="row"><div class="large-12 columns">
+        <tal:block define="input_type field.widget.input_type|None">
+            <tal:block condition="input_type == 'hidden'">
+                ${field()}
+                <small class="error" tal:repeat="error field.errors">${error}</small>
+            </tal:block>
+            <tal:block condition="input_type != 'hidden'">
+                <label tal:attributes="class field.errors and 'error' or None" tal:condition="not:field.contains_labels|nothing">
+                    <metal:block use-macro="layout.macros['field']" />
+                </label>
+
+                <div tal:attributes="class field.errors and 'error group-label' or 'group-label'" tal:condition="field.contains_labels|nothing">
+                    <metal:block use-macro="layout.macros['field']" />
+                </div>
+                <small class="error" tal:repeat="error field.errors">${error}</small>
+            </tal:block>
+        </tal:block>
+    </div></div>
+    </tal:block>
+</metal:fields>
+
+<metal:single_field define-macro="field">
+     <!-- render the label after the field if it's a boolean field -->
+    <tal:block condition="field.type == 'BooleanField'">
+        ${field(placeholder=request.translate(field.description))}
+        <span class="label-text">${field.label.text}</span>
+        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+    </tal:block>
+    <tal:block condition="field.type != 'BooleanField'">
+        <span class="label-text">${field.label.text}</span>
+        <span class="label-required" tal:condition="field.flags.required|nothing">*</span>
+        ${field(placeholder=request.translate(field.description))}
+    </tal:block>
+</metal:single_field>
+
+<metal:dropzone define-macro="dropzone" i18n:domain="onegov.org">
+    <form action="${upload_url}"
+          class="dropzone clearfix"
+          method="POST"
+          enctype="multipart/form-data">
+        <div class="dz-message" i18n:translate="">
+            Drop files to upload
+        </div>
+
+        <!--! Fallback if javascript is not available -->
+        <div class="fallback">
+            <input name="file" type="file" multiple />
+            <input type="submit" value="Submit" class="button" i18n:attributes="value">
+        </div>
+    </form>
+</metal:dropzone>
+
+<metal:newslist define-macro="newslist" i18n:domain="onegov.org">
+    <div class="newslist" tal:condition="news">
+        <div class="row news-list-item" tal:repeat="item news">
+            <div class="small-12 columns">
+                <a tal:attributes="href request.link(item)">
+                    <h2 tal:condition="heading == 'h2'|True">${item.title} <metal:hint use-macro="layout.macros['hidden_from_public_hint']" /></h2>
+                    <h3 tal:condition="heading == 'h3'|nothing">${item.title} <metal:hint use-macro="layout.macros['hidden_from_public_hint']" /></h3>
+                </a>
+                <p class="news-date">${layout.format_date(item.created, 'relative')}</p>
+                <p class="news-lead">${item.content.lead}</p>
+            </div>
+        </div>
+    </div>
+</metal:newslist>
+
+<metal:hidden_page_hint define-macro="hidden_from_public_hint" i18n:domain="onegov.org">
+    <tal:block condition="item.is_hidden_from_public|nothing">
+        <!--! Note, this snippet is duplicated in the Link class in elements.py -->
+        <i title="This site is hidden from the general public" i18n:attributes="title" class="hidden-from-public-hint"></i>
+    </tal:block>
+</metal:hidden_page_hint>
+
+<metal:hidden_page_hint define-macro="hidden_from_public_hint_long" i18n:domain="onegov.org">
+    <tal:block condition="item.is_hidden_from_public|nothing">
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="panel callout">
+                    <p i18n:translate>
+                    This site is hidden from the general public. To show it to
+                    everyone, edit this page and disable "Hide from public".
+                    </p>
+                </div>
+            </div>
+        </div>
+    </tal:block>
+</metal:hidden_page_hint>
+
+<metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.org">
+    <tal:block condition="not item.lead and request.is_logged_in|nothing">
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="panel callout">
+                    <p i18n:translate>This site contains no lead. Leads are used for lists and search results.</p>
+                </div>
+            </div>
+        </div>
+    </tal:block>
+</metal:empty_lead_hint>
+
+<metal:page_content define-macro="page_content" i18n:domain="onegov.org">
+    <div class="row">
+        <tal:block condition="not: people or contact or coordinates">
+            <div class="small-12 columns">
+                <span class="page-lead" tal:condition="lead" tal:content="lead" />
+                <div class="page-text" tal:condition="text" tal:content="structure text" />
+                <div metal:define-slot="after-text"></div>
+            </div>
+        </tal:block>
+        <tal:block condition="people or contact or coordinates">
+            <div class="small-12 medium-8 columns">
+                <span class="page-lead" tal:condition="lead" tal:content="lead" />
+                <div class="page-text" tal:condition="text" tal:content="structure text" />
+                <div metal:define-slot="after-text"></div>
+            </div>
+            <div class="small-12 medium-4 columns" tal:condition="people or contact or coordinates">
+                <div class="page-content-panel contact-panel" tal:condition="contact or coordinates">
+                    <tal:block condition="contact" content="structure contact" />
+                    <br tal:condition="coordinates and contact" />
+                    <h2 i18n:translate tal:condition="not contact">Map</h2>
+                    <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
+                </div>
+                <div class="page-content-panel people-panel" tal:condition="people">
+                    <h2 i18n:translate>People</h2>
+                    <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
+                        <li tal:repeat="person people" data-sortable-id="${request.is_logged_in and person.id}">
+                            <a href="${request.link(person)}">${person.title}</a>
+                            <small>${person.context_specific_function}</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </tal:block>
+    </div>
+</metal:page_content>
+
+<metal:display_form define-macro="display_form" i18n:domain="onegov.org">
+    <div tal:repeat="fieldset form.fieldsets">
+        <tal:block define="fields fieldset.non_empty_fields" condition="fields">
+            <h2 tal:condition="fieldset.is_visible">${fieldset.label}</h2>
+            <div class="field-display" tal:repeat="field fields.values()">
+                <div class="field-display-block" tal:define="rendered layout.render_field(field)" tal:condition="rendered">
+                    <div class="field-display-label">${field.label.text}</div>
+                    <div class="field-display-data" tal:define="downloadable request.is_logged_in and field.type == 'UploadField'">
+                        <tal:block condition="downloadable">
+                            <a href="${layout.field_download_link(field)}">
+                                <tal:block replace="structure layout.render_field(field)" />
+                            </a>
+                        </tal:block>
+                        <tal:block condition="not:downloadable">
+                            <tal:block replace="structure layout.render_field(field)" />
+                        </tal:block>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </tal:block>
+    </div>
+</metal:display_form>
+
+<metal:person_card define-macro="person_list_card" i18n:domain="onegov.org">
+    <div class="person-card person-list-card" tal:define="link request.link(person)">
+        <a href="${link}" aria-hidden="true" tal:define="url (person.picture_url and layout.thumbnail_url(person.picture_url))">
+            <div class="person-card-portrait">
+                <i class="fa fa-user" tal:condition="not:url"></i>
+                <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+            </div>
+        </a>
+        <ul>
+            <li class="person-card-title">
+                <a href="${link}">
+                    <span>${person.title}</span>
+                </a>
+            </li>
+            <li tal:condition="person.function" class="person-card-function">
+                <em>${person.function}</em>
+            </li>
+            <li tal:condition="person.email" class="person-card-email">
+                <a href="mailto:${person.email}">${person.email}</a>
+            </li>
+            <li tal:condition="person.phone" class="person-card-phone">
+                <a href="tel:${person.phone}">${person.phone}</a>
+            </li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+</metal:person_card>
+
+<metal:person_card define-macro="person_card" i18n:domain="onegov.org">
+    <div class="person-card person-single-item">
+        <div class="row">
+            <div class="columns small-12 medium-2">
+                <div aria-hidden="true" tal:define="url person.picture_url">
+                    <div class="person-card-portrait">
+                        <i class="fa fa-user" tal:condition="not:url"></i>
+                        <div class="cover-image" tal:condition="url" style='background-image: url("${url}");'></div>
+                    </div>
+                </div>
+            </div>
+            <div class="columns small-12 medium-10">
+                <ul>
+                    <li tal:condition="person.function" class="person-card-function">
+                        <em>${person.function}</em>
+                    </li>
+                    <li tal:condition="person.address" class="person-card-address">
+                        <span>${person.address}</span>
+                    </li>
+                    <li tal:condition="person.email" class="person-card-email">
+                        <a href="mailto:${person.email}">${person.email}</a>
+                    </li>
+                    <li tal:condition="person.phone" class="person-card-phone">
+                        <a href="tel:${person.email}">${person.phone}</a>
+                    </li>
+                    <li tal:condition="person.website" class="person-card-website">
+                        <a href="${person.website}">${person.website}</a>
+                    </li>
+                    <li tal:condition="person.notes" class="person-card-notes">
+                        <span>${person.notes}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</metal:person_card>
+
+<metal:sidebar define-macro="sidebar" i18n:domain="onegov.org">
+    <nav role="navigation">
+        <ul class="side-nav" data-sortable data-sortable-url="${layout.sortable_url_template}">
+            <tal:block repeat="link layout.sidebar_links">
+                <li tal:define="is_group hasattr(link, 'links')" class="${is_group and 'active' or ''}" data-sortable-id="${request.is_logged_in and link.model.id}">
+                    <tal:block condition="not:is_group" replace="structure link(request)" />
+                    <tal:block condition="is_group">
+                        <a href="#" class="group-title">${link.title}
+                            <metal:block use-macro="layout.macros['hidden_from_public_hint']" tal:define="item link"/>
+                        </a>
+                        <ul class="children" tal:condition="link.links"
+                            data-sortable data-sortable-url="${layout.sortable_url_template}">
+                            <li tal:repeat="child link.links" data-sortable-id="${request.is_logged_in and child.model.id}">
+                                <tal:block replace="structure child(request)" />
+                            </li>
+                        </ul>
+                    </tal:block>
+                </li>
+            </tal:block>
+        </ul>
+    </nav>
+</metal:sidebar>
+
+<metal:ticket_status define-macro="ticket_status" i18n:domain="onegov.org">
+    <div i18n:translate tal:condition="ticket.state == 'open'" class="ticket-state-open">
+        Open
+    </div>
+    <div i18n:translate tal:condition="ticket.state == 'pending'" class="ticket-state-pending">
+        Pending
+    </div>
+    <div i18n:translate tal:condition="ticket.state == 'closed'" class="ticket-state-closed">
+        Closed
+    </div>
+</metal:ticket_status>
+
+<metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.org">
+    <div class="page-content-panel" tal:condition="ticket">
+        <div class="field-display ticket-status-page">
+            <div class="field-display-block">
+                <div class="field-display-label" i18n:translate="">Ticket Number</div>
+                <div class="field-display-data ticket-number"><a href="${request.link(ticket)}">${ticket.number}</a></div>
+            </div>
+        </div>
+    </div>
+</metal:ticket_callout>
+
+<metal:pagination define-macro="pagination" i18n:domain="onegov.org">
+    <ul class="pagination" role="menubar" aria-label="Pagination">
+        <tal:block repeat="page collection.pages">
+            <tal:block define="
+                previous current_page.previous;
+                next current_page.next;
+                is_current current_page == page;
+                is_visible abs(current_page.page-page.page) < 6;
+            ">
+                <tal:block condition="repeat.page.start and previous">
+                    <li class="arrow">
+                        <a href="${request.link(previous)}" aria-label="Previous Page" i18n:attributes="aria-label"><i class="fa fa-chevron-left"></i></a>
+                    </li>
+                </tal:block>
+
+                <li tal:condition="is_visible" class="${is_current and 'current' or ''}">
+                    <a href="${request.link(page)}">${page.page + 1}</a>
+                </li>
+
+                <tal:block condition="repeat.page.end and next">
+                    <li class="arrow">
+                        <a href="${request.link(next)}" aria-label="Next Page" i18n:attributes="aria-label"><i class="fa fa-chevron-right"></i></a>
+                    </li>
+                </tal:block>
+            </tal:block>
+        </tal:block>
+    </ul>
+</metal:pagination>
+
+<metal:reservations define-macro="reservation-infos" i18n:domain="onegov.org">
+    <div tal:condition="reservation_infos" tal:define="failed failed_reservations|set()" class="reservation-selection large">
+        <div class="reservation-selection-inner">
+            <ul>
+                <li class="${info.reservation.id in failed and 'reservation failed' or 'reservation'}" tal:repeat="info reservation_infos">
+                    <span class="reservation-date" data-quota="${info.reservation.quota}">
+                        ${layout.format_date(info.reservation.display_start(), 'weekday_long')},
+                        ${layout.format_date(info.reservation.display_start(), 'date_long')}
+                    </span>
+                    <span class="reservation-time">
+                        ${info.time}
+                    </span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</metal:reservations>
+
+<metal:reservations define-macro="reservations" i18n:domain="onegov.org">
+    <ul tal:condition="reservations" class="reservations">
+        <li tal:repeat="reservation reservations">
+            <tal:block define="start reservation.display_start(); end reservation.display_end()">
+                <strong>
+                    ${layout.format_date(start, 'weekday_long')},
+                    ${layout.format_date(start, 'date_long')}
+                </strong>
+                <!--! simple whole day check: -->
+                <span tal:condition="start.time() != end.time()">
+                    <br>
+                    ${layout.format_time_range(start, end)}
+                </span>
+                <br><span i18n:translate>Quota</span>
+                <span>
+                    ${reservation.quota}
+                </span>
+            </tal:block>
+        </li>
+    </ul>
+</metal:reservations>
+
+<metal:display_event define-macro="display_event" i18n:domain="onegov.org">
+    <dl>
+        <tal:block tal:condition="request.is_logged_in">
+            <dt i18n:translate="">State</dt>
+            <dd i18n:translate="" tal:condition="event.state == 'initiated'">Initiated</dd>
+            <dd i18n:translate="" tal:condition="event.state == 'submitted'">Submitted</dd>
+            <dd i18n:translate="" tal:condition="event.state == 'published'">Published</dd>
+            <dd i18n:translate="" tal:condition="event.state == 'withdrawn'">Withdrawn</dd>
+        </tal:block>
+        <tal:block tal:condition="request.is_logged_in" tal:define="submitter event.meta.get('submitter_email') if event.meta else ''">
+            <dt i18n:translate="">Submitter</dt>
+            <dd>${submitter}</dd>
+        </tal:block>
+        <dt i18n:translate="">Title</dt>
+        <dd>${event.title}</dd>
+        <dt i18n:translate="">Description</dt>
+        <dd tal:content="structure event.description.replace('\n', '<br>')" />
+        <dt i18n:translate="">Location</dt>
+        <dd>${event.location}</dd>
+        <dt i18n:translate="" tal:condition="event.has_coordinates">Map</dt>
+        <dd tal:condition="event.has_coordinates">
+            <div class="marker-map" data-map-type="thumbnail" data-lat="${event.lat}" data-lon="${event.lon}" data-zoom="${event.zoom}"></div>
+        </dd>
+        <dt i18n:translate="">Organizer</dt>
+        <dd tal:content="event.organizer" />
+        <dt i18n:translate="">Tags</dt>
+        <dd>
+            <ul>
+                <li tal:repeat="tag event.tags" i18n:translate="">${tag}</li>
+            </ul>
+        </dd>
+        <dt i18n:translate="">Date and time</dt>
+        <dd>
+            <tal:block>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}</tal:block>
+            <tal:block tal:condition="request.is_logged_in">(${event.timezone})</tal:block>
+        </dd>
+        <dt i18n:translate="">Recurrence</dt>
+        <dd>${layout.format_recurrence(event.recurrence)}</dd>
+        <dt i18n:translate="">All dates</dt>
+        <dd tal:define="occurrences event.occurrence_dates(localize=True)">
+            <ul>
+                <li tal:repeat="occurrence occurrences">${layout.format_date(occurrence, 'weekday_long')} ${layout.format_date(occurrence, 'date')}</li>
+            </ul>
+        </dd>
+    </dl>
+</metal:display_event>
+
+<metal:atoz define-macro="atoz" i18n:domain="onegov.org">
+    <div class="atoz-block" tal:repeat="item items">
+        <h2>${item[0]}</h2>
+        <ul>
+            <li tal:repeat="detail item[1]">
+                <div metal:define-slot="item-detail">
+                    <a href="${request.link(detail)}">${detail.title}</a>
+                    <metal:hint tal:define="item detail" use-macro="layout.macros['hidden_from_public_hint']" />
+                </div>
+            </li>
+        </ul>
+    </div>
+</metal:atoz>
+
+<metal:calendar_day define-macro="calendar-day" i18n:domain="onegov.org">
+    <h2 class="calendar-day-box">
+        <metal:block use-macro="layout.macros['calendar-day-content']" />
+    </h2>
+</metal:calendar_day>
+
+<metal:calendar_day_box define-macro="calendar-day-content" i18n:domain="onegov.org">
+    <span>${layout.format_date(date, 'weekday_long')}</span>
+    <span class="day">${date.day}</span><span class="dot">.</span>
+    <span>${layout.format_date(date, 'month_long')}</span>
+</metal:calendar_day_box>
+
+<metal:occurrences define-macro="occurrences" i18n:domain="onegov.org">
+    <tal:block tal:define="global lastdaydate 0">
+        <tal:block repeat="occurrence occurrences">
+            <div class="row">
+                <div class="occurrence">
+                    <div class="large-3 columns">
+                        <tal:block tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
+                            <metal:block tal:define="date occurrence.localized_start" use-macro="layout.macros['calendar-day']" />
+                        </tal:block>
+                        <div class="show-for-large-up" style="width: 100%; height: 1px;"></div>
+                    </div>
+                    <div class="large-9 medium-12 small-12 columns">
+                        <div class="occurrence-date show-for-large-up">${layout.format_date(occurrence.localized_start, 'date')}</div>
+                        <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
+                        <div>${occurrence.location}</div>
+                        <div>${layout.format_date(occurrence.localized_start, 'time')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
+                        <div><span tal:repeat="tag occurrence.tags" class="occurrence-tag" i18n:translate="">${tag}</span></div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+            <tal:block tal:define="global lastdaydate python: layout.format_date(occurrence.localized_start, 'date')" />
+        </tal:block>
+        <div tal:condition="not occurrences" i18n:translate="">No events found.</div>
+    </tal:block>
+</metal:occurrences>
+
+<metal:date_range_selector define-macro="date-range-selector" i18n:domain="onegov.org">
+    <div class="date-range-selector">
+        <form action="" method="GET">
+            <div metal:define-slot="before-date-range"></div>
+
+            <div class="row date-range-selector">
+                <div class="large-6 columns">
+                    <div class="row collapse">
+                        <label i18n:translate="">From</label>
+                        <input class="small" name="start" type="date" value="${start}" placeholder="${layout.today().isoformat()}">
+                    </div>
+                </div>
+                <div class="large-6 columns">
+                    <div class="row collapse">
+                        <label i18n:translate="">To</label>
+                        <input class="small" name="end" type="date" value="${end}" placeholder="${layout.today().isoformat()}">
+                    </div>
+                </div>
+            </div>
+            <noscript>
+                <div class="row">
+                    <div class="large-6 columns">
+                        <div class="row collapse">
+                            <input type="submit" value="Filter by date" class="button" i18n:attributes="value">
+                        </div>
+                    </div>
+                </div>
+            </noscript>
+        </form>
+    </div>
+</metal:date_range_selector>
