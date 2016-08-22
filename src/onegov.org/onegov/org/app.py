@@ -55,3 +55,12 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 @OrgApp.webasset_path()
 def get_shared_assets_path():
     return utils.module_path('onegov.shared', 'assets/js')
+
+
+@OrgApp.setting(section='i18n', name='localedirs')
+def get_i18n_localedirs():
+    return [
+        utils.module_path('onegov.org', 'locale'),
+        utils.module_path('onegov.form', 'locale'),
+        utils.module_path('onegov.user', 'locale')
+    ]
