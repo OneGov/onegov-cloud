@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a HTML5 (RFC3339) date converter for Morepath.
+  [href]
+
 0.22.1 (2016-07-28)
 ~~~~~~~~~~~~~~~~~~~
 
