@@ -206,8 +206,8 @@ def transfer(group_context,
 
                 print("Fetching depot storage")
 
-                local_depot = remotecfg.configuration['depot_storage_path']
-                remote_depot = appcfg.configuration['depot_storage_path']
+                local_depot = appcfg.configuration['depot_storage_path']
+                remote_depot = remotecfg.configuration['depot_storage_path']
 
                 remote_storage = os.path.join(remote_dir, remote_depot)
                 local_storage = os.path.join('.', local_depot)
