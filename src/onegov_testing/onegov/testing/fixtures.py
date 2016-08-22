@@ -6,12 +6,13 @@ import subprocess
 import tempfile
 import transaction
 
+from _pytest.monkeypatch import monkeypatch
 from elasticsearch import Elasticsearch
 from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
+from onegov.core.crypto import hash_password
 from onegov.core.orm import Base, SessionManager
 from pathlib import Path
-from _pytest.monkeypatch import monkeypatch
 from sqlalchemy import create_engine
 from testing.postgresql import Postgresql
 from uuid import uuid4
@@ -288,3 +289,8 @@ def smtp_server():
 def smtp(smtp_server):
     yield smtp_server
     del smtp_server.outbox[:]
+
+
+@pytest.yield_fixture(scope="session")
+def test_password():
+    return hash_password('hunter2')
