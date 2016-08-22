@@ -1,6 +1,6 @@
 """ Contains the base application used by other applications. """
 
-from onegov.core import Framework
+from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
@@ -50,3 +50,8 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 s for s in self.session_manager.list_schemas()
                 if s.startswith(schema_prefix)
             )
+
+
+@OrgApp.webasset_path()
+def get_shared_assets_path():
+    return utils.module_path('onegov.shared', 'assets/js')
