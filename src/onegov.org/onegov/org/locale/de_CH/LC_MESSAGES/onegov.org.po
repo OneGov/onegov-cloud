@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-18 11:14+0200\n"
+"POT-Creation-Date: 2016-08-22 13:59+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -20,3 +20,101 @@ msgstr "Diese Seite ist nicht öffentlich."
 
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
+
+msgid "A conflicting allocation exists for the requested time period."
+msgstr "Es besteht bereits eine Einteilung im gewünschten Zeitraum."
+
+msgid "A conflicting reservation exists for the requested time period."
+msgstr "Dieser Termin wurde bereits ausgewählt."
+
+msgid "An existing reservation would be affected by the requested change."
+msgstr ""
+"Eine bestehende Reservation wäre von der gewünschten Änderung betroffen."
+
+msgid "A pending reservation would be affected by the requested change."
+msgstr "Eine offene Reservation wäre von der gewünschten Änderung betroffen."
+
+msgid "The requested period is no longer available."
+msgstr "Der gewünschte Zeitraum ist nicht mehr verfügbar."
+
+msgid "No reservable slot found."
+msgstr "Der gewünschte Zeitraum ist bereits besetzt."
+
+msgid "Reservations can't be made for more than 24 hours at a time."
+msgstr "Reservationen dürfen nicht länger als 24 Stunden lang sein."
+
+msgid "The given reservation paramters are invalid."
+msgstr "Die Reservationsparameter sind ungültig."
+
+msgid "The given reservation token is invalid."
+msgstr "Das Reservations-Token ist ungültig."
+
+msgid "The requested number of reservations is higher than allowed."
+msgstr "Die gewünschte Anzahl Reservationen ist höher als erlaubt."
+
+msgid "The requested quota is invalid (must be at least one)."
+msgstr ""
+"Die gewünschte Anzahl Reservationen ist ungültig (Mindestanzahl ist eins)."
+
+msgid "The allocation does not have enough free spots."
+msgstr "Die Einteilung hat nicht genügend freie Plätze."
+
+msgid "The resulting allocation would be invalid."
+msgstr "Die gewünschte Einteilung ist ungültig."
+
+msgid "No reservations to confirm."
+msgstr "Keine Reservationen gefunden die Bestätigt werden können."
+
+msgid "The given timerange is longer than the existing allocation."
+msgstr "Der gewünschte Zeitraum liegt ausserhalb der Einteilung."
+
+msgid "Reservation too short. A reservation must last at least 5 minutes."
+msgstr ""
+"Die Reservation ist zu kurz. Eine Reservation muss mindestens 5 Minuten "
+"dauern."
+
+msgid "Whole day"
+msgstr "Ganztägig"
+
+#, python-format
+msgid "${percent}% Available"
+msgstr "${percent}% Verfügbar"
+
+#, python-format
+msgid "${num}/${max} Available"
+msgstr "${num}/${max} Verfügbar"
+
+msgid "Edit"
+msgstr ""
+
+msgid "Tickets"
+msgstr ""
+
+msgid "Available"
+msgstr "Verfügbar"
+
+msgid "Unavailable"
+msgstr "Besetzt"
+
+msgid "Delete"
+msgstr ""
+
+msgid "Do you really want to delete this allocation?"
+msgstr ""
+
+msgid "Delete allocation"
+msgstr ""
+
+msgid ""
+"This allocation can't be deleted because there are existing reservations "
+"associated with it."
+msgstr ""
+"Diese Einteilung kann nicht gelöscht werden, da bestehende Reservationen "
+"betroffen wären."
+
+msgid ""
+"To delete this allocation, all existing reservations need to be cancelled "
+"first."
+msgstr ""
+"Um die Einteilung zu löschen, müssen zuerst alle bestehenden Reservationen "
+"abgesagt werden."
