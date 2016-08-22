@@ -37,6 +37,7 @@ setup(
         'onegov.gis',
         'onegov.libres',
         'onegov.search',
+        'onegov.user',
     ],
     extras_require=dict(
         test=[
