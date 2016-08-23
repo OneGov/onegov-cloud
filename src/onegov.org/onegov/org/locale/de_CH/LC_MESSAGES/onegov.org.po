@@ -760,6 +760,9 @@ msgstr "Es wurden noch keine Formulare definiert."
 msgid "Selected Topics"
 msgstr "Ausgewählte Themen"
 
+msgid "Topics"
+msgstr "Themen"
+
 msgid "All news"
 msgstr "Alle Nachrichten"
 

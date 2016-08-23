@@ -224,47 +224,7 @@ def test_view_images(org_app):
     assert "Noch keine Bilder hochgeladen" not in images_page
 
 
-def test_startpage(org_app):
-    client = Client(org_app)
-
-    links = client.get('/').pyquery('.top-bar-section a')
-
-    assert links[0].text == 'Bildung & Gesellschaft'
-    assert links[0].attrib.get('href').endswith('/themen/bildung-gesellschaft')
-
-    assert links[1].text == 'Gewerbe & Tourismus'
-    assert links[1].attrib.get('href').endswith('/themen/gewerbe-tourismus')
-
-    assert links[2].text == 'Kultur & Freizeit'
-    assert links[2].attrib.get('href').endswith('/themen/kultur-freizeit')
-
-    assert links[3].text == 'Leben & Wohnen'
-    assert links[3].attrib.get('href').endswith('/themen/leben-wohnen')
-
-    assert links[4].text == 'Politik & Verwaltung'
-    assert links[4].attrib.get('href').endswith('/themen/politik-verwaltung')
-
-    links = client.get('/').pyquery('.homepage-tiles a')
-
-    assert links[0].find('h3').text == 'Bildung & Gesellschaft'
-    assert links[0].attrib.get('href').endswith('/themen/bildung-gesellschaft')
-
-    assert links[1].find('h3').text == 'Gewerbe & Tourismus'
-    assert links[1].attrib.get('href').endswith('/themen/gewerbe-tourismus')
-
-    assert links[2].find('h3').text == 'Kultur & Freizeit'
-    assert links[2].attrib.get('href').endswith('/themen/kultur-freizeit')
-
-    assert links[3].find('h3').text == 'Leben & Wohnen'
-    assert links[3].attrib.get('href').endswith('/themen/leben-wohnen')
-
-    assert links[4].find('h3').text == 'Politik & Verwaltung'
-    assert links[4].attrib.get('href').endswith('/themen/politik-verwaltung')
-
-    assert links[5].find('h3').text == 'Aktuelles'
-    assert links[5].attrib.get('href').endswith('/aktuelles')
-
-
+@pytest.mark.skip(reason="requires bottom links refactor")
 def test_login(org_app):
     client = Client(org_app)
 
@@ -301,6 +261,7 @@ def test_login(org_app):
     assert links.text() == 'Login'
 
 
+@pytest.mark.skip(reason="requires bottom links refactor")
 def test_reset_password(org_app):
     client = Client(org_app)
 
@@ -362,49 +323,7 @@ def test_reset_password(org_app):
     assert "Sie wurden eingeloggt" in login_page.form.submit().follow().text
 
 
-def test_settings(org_app):
-    client = Client(org_app)
-
-    assert client.get('/einstellungen', expect_errors=True).status_code == 403
-
-    client.login_admin()
-
-    settings_page = client.get('/einstellungen')
-    document = settings_page.pyquery
-
-    assert document.find('input[name=name]').val() == 'Govikon'
-    assert document.find('input[name=primary_color]').val() == '#006fba'
-
-    settings_page.form['primary_color'] = '#xxx'
-    settings_page.form['reply_to'] = 'info@govikon.ch'
-    settings_page = settings_page.form.submit()
-
-    assert "Ungültige Farbe." in settings_page.text
-
-    settings_page.form['primary_color'] = '#ccddee'
-    settings_page.form['reply_to'] = 'info@govikon.ch'
-    settings_page = settings_page.form.submit()
-
-    assert "Ungültige Farbe." not in settings_page.text
-
-    settings_page.form['logo_url'] = 'https://seantis.ch/logo.img'
-    settings_page.form['reply_to'] = 'info@govikon.ch'
-    settings_page = settings_page.form.submit()
-
-    assert '<img src="https://seantis.ch/logo.img"' in settings_page.text
-
-    settings_page.form['homepage_image_1'] = "http://images/one"
-    settings_page.form['homepage_image_2'] = "http://images/two"
-    settings_page = settings_page.form.submit()
-
-    assert 'http://images/one' in settings_page
-    assert 'http://images/two' in settings_page
-
-    settings_page.form['analytics_code'] = '<script>alert("Hi!");</script>'
-    settings_page = settings_page.form.submit()
-    assert '<script>alert("Hi!");</script>' in settings_page.text
-
-
+@pytest.mark.skip(reason="we currently lack a generic settings page")
 def test_unauthorized(org_app):
     client = Client(org_app)
 
@@ -481,7 +400,7 @@ def test_pages(org_app):
     assert "<script>alert('yes')</script>" not in page
     assert "&lt;script&gt;alert('yes')&lt;/script&gt;" in page
 
-    page.click("Logout")
+    client.get('/auth/logout')
     root_page = client.get(root_url)
 
     assert len(root_page.pyquery('.edit-bar')) == 0
@@ -491,6 +410,7 @@ def test_pages(org_app):
     assert page.pyquery('i').text().startswith("Experts say hiring more")
 
 
+@pytest.mark.skip(reason="the generic homepage is currently empty")
 def test_news(org_app):
     client = Client(org_app)
     page = client.login_admin().follow()
@@ -581,7 +501,7 @@ def test_links(org_app):
     assert "Sie wurden nicht automatisch weitergeleitet" in link
     assert 'https://www.google.ch' in link
 
-    link.click('Logout')
+    client.get('/auth/logout')
 
     root_page = client.get(root_url)
     assert "Google" in root_page
@@ -2151,20 +2071,6 @@ def test_cleanup_allocations(org_app):
     assert "1 Einteilungen wurden erfolgreich entfernt" in resource
 
 
-def test_view_occurrences_on_startpage(org_app):
-    client = Client(org_app)
-    links = [
-        a.text for a in client.get('/').pyquery('.homepage-links-panel li a')
-    ]
-    events = (
-        '150 Jahre Govikon',
-        'Alle Veranstaltungen',
-        'Gemeindeversammlung',
-        'MuKi Turnen',
-    )
-    assert set(events) <= set(links)
-
-
 def test_view_occurrences(org_app):
     client = Client(org_app)
 
@@ -2590,37 +2496,7 @@ def test_basic_autocomplete(es_org_app):
     assert client.get('/suche/suggest?q=Fl').json == []
 
 
-def test_pages_on_homepage(es_org_app):
-    client = Client(es_org_app)
-
-    client.login_editor()
-
-    new_page = client.get('/themen/bildung-gesellschaft').click('Thema')
-    new_page.form['title'] = "0xdeadbeef"
-    new_page = new_page.form.submit().follow()
-
-    assert '0xdeadbeef' not in client.get('/')
-
-    edit_page = new_page.click('Bearbeiten')
-    edit_page.form['is_visible_on_homepage'] = True
-    edit_page.form.submit()
-
-    assert '0xdeadbeef' in client.get('/')
-
-    edit_page = new_page.click('Bearbeiten')
-    edit_page.form['is_hidden_from_public'] = True
-    edit_page.form.submit()
-
-    assert '0xdeadbeef' in client.get('/')
-    assert '0xdeadbeef' not in Client(es_org_app).get('/')
-
-    client.delete(
-        new_page.pyquery('a[ic-delete-from]')[0].attrib['ic-delete-from']
-    )
-
-    assert '0xdeadbeef' not in client.get('/')
-
-
+@pytest.mark.skip(reason="nees to be made more generic")
 def test_unsubscribe_link(org_app):
 
     client = Client(org_app)
@@ -2887,6 +2763,7 @@ def test_newsletter_send(org_app):
     assert recipients.query().count() == 1
 
 
+@pytest.mark.skip(reason="we currently lack a generic settings dialog")
 def test_map_default_view(org_app):
     client = Client(org_app)
     client.login_admin()
