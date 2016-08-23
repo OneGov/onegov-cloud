@@ -2,6 +2,7 @@ import arrow
 import babel.dates
 import babel.numbers
 import numbers
+import sedate
 
 from cached_property import cached_property
 from datetime import datetime
@@ -144,6 +145,19 @@ class Layout(object):
 
         result = '{{:,.{}f}}'.format(decimal_places).format(number)
         return result.translate({ord(','): group, ord('.'): decimal})
+
+    @property
+    def view_name(self):
+        """ Returns the view name of the current view, or None if it is the
+        default view.
+
+        Note: This relies on morepath internals and is experimental in nature!
+
+        """
+        return self.request.unconsumed and self.request.unconsumed[-1] or None
+
+    def today(self):
+        return sedate.to_timezone(sedate.utcnow(), self.timezone).date()
 
 
 class ChameleonLayout(Layout):

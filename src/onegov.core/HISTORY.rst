@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves two often used helpers to the base layout.
+  [href]
+
 - Adds a HTML5 (RFC3339) date converter for Morepath.
   [href]
 
