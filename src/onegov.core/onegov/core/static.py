@@ -70,15 +70,16 @@ class StaticFile(object):
         if has_insecure_path_element(absorb):
             return None
 
-        path = os.path.join(app.static_files, absorb)
+        for directory in app.static_files:
+            path = os.path.join(directory, absorb)
 
-        if not is_subpath(app.static_files, path):
-            return None
+            if not is_subpath(directory, path):
+                continue
 
-        if not os.path.isfile(path):
-            return None
+            if not os.path.isfile(path):
+                continue
 
-        return cls(os.path.relpath(path, start=app.static_files))
+            return cls(os.path.relpath(path, start=directory))
 
 
 @Framework.path(model=StaticFile, path='/static', absorb=True)
@@ -89,4 +90,12 @@ def get_static_file(app, absorb):
 @Framework.view(model=StaticFile, render=render_file, permission=Public)
 def view_static_file(self, request):
     """ Renders the given static file in the browser. """
-    return os.path.join(request.app.static_files, self.path)
+
+    for directory in request.app.static_files:
+        path = os.path.join(directory, self.path)
+
+        if not os.path.isfile(path):
+            continue
+
+        assert is_subpath(directory, path)
+        return path

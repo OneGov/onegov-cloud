@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+- Adds a static directory directive, which gives applications the ability
+  to define their own static directory and for inherited applications to
+  append a path to the list of static directory paths.
+  [href]
+
 - Moves two often used helpers to the base layout.
   [href]
 

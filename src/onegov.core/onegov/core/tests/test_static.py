@@ -1,3 +1,4 @@
+import morepath
 import os.path
 import time
 
@@ -11,7 +12,12 @@ def test_static_file(temporary_directory):
 
     class App(Framework):
         serve_static_files = True
-        static_files = temporary_directory
+
+    @App.static_directory()
+    def get_static_files():
+        return temporary_directory
+
+    morepath.commit(App)
 
     app = App()
     app.configure_application()
@@ -33,9 +39,13 @@ def test_static_file_app(temporary_directory):
 
     class App(Framework):
         serve_static_files = True
-        static_files = temporary_directory
+
+    @App.static_directory()
+    def get_static_files():
+        return temporary_directory
 
     utils.scan_morepath_modules(App)
+    morepath.commit(App)
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')
@@ -63,7 +73,10 @@ def test_static_file_app(temporary_directory):
 def test_root_file_app(temporary_directory):
     class App(Framework):
         serve_static_files = True
-        static_files = temporary_directory
+
+    @App.static_directory()
+    def get_static_files():
+        return temporary_directory
 
     class RobotsTxt(StaticFile):
         pass
@@ -73,6 +86,7 @@ def test_root_file_app(temporary_directory):
         return StaticFile.from_application(app, 'robots.txt')
 
     utils.scan_morepath_modules(App)
+    morepath.commit(App)
 
     with open(os.path.join(temporary_directory, 'robots.txt'), 'w') as f:
         f.write('foobar')
@@ -84,3 +98,49 @@ def test_root_file_app(temporary_directory):
 
     c = Client(app)
     assert c.get('/robots.txt').text == 'foobar'
+
+
+def test_static_files_directive(temporary_directory):
+
+    a = os.path.join(temporary_directory, 'a')
+    b = os.path.join(temporary_directory, 'b')
+
+    for path in (a, b):
+        os.mkdir(path)
+
+        with open(os.path.join(path, 'foobar.txt'), 'w') as f:
+            f.write(path)
+
+    class A(Framework):
+        serve_static_files = True
+
+    class B(A):
+        serve_static_files = True
+
+    @A.static_directory()
+    def get_static_files_a():
+        return a
+
+    @B.static_directory()
+    def get_static_files_b():
+        return b
+
+    utils.scan_morepath_modules(A)
+    utils.scan_morepath_modules(B)
+
+    morepath.commit(A)
+    morepath.commit(B)
+
+    app_a = A()
+    app_b = B()
+
+    for app in (app_a, app_b):
+        app.configure_application()
+        app.namespace = 'test'
+        app.set_application_id('test/test')
+
+    assert app_a.static_files == [a]
+    assert app_b.static_files == [b, a]
+
+    assert Client(app_a).get('/static/foobar.txt').text == a
+    assert Client(app_b).get('/static/foobar.txt').text == b

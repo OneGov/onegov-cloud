@@ -1,3 +1,5 @@
+import os.path
+
 from datetime import datetime
 from dectate import Action
 from inspect import isfunction
@@ -99,7 +101,7 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
 
 @Framework.directive('cronjob')
 class CronjobAction(Action):
-    """ Register a cronjob."""
+    """ Register a cronjob. """
 
     config = {
         'cronjob_registry': Bunch
@@ -123,3 +125,31 @@ class CronjobAction(Action):
     def perform(self, func, cronjob_registry):
         register_cronjob(
             cronjob_registry, func, self.hour, self.minute, self.timezone)
+
+
+@Framework.directive('static_directory')
+class StaticDirectoryAction(Action):
+    """ Registers a static files directory. """
+
+    config = {
+        'staticdirectory_registry': Bunch
+    }
+
+    counter = iter(range(1, 123456789))
+
+    def __init__(self):
+        self.name = next(self.counter)
+
+    def identifier(self, staticdirectory_registry):
+        return self.name
+
+    def perform(self, func, staticdirectory_registry):
+        if not hasattr(staticdirectory_registry, 'paths'):
+            staticdirectory_registry.paths = []
+
+        path = func()
+
+        if not os.path.isabs(path):
+            path = os.path.join(os.path.dirname(self.code_info.path), path)
+
+        staticdirectory_registry.paths.append(path)

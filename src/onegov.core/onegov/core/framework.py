@@ -19,7 +19,6 @@ Using the framework does not really differ from using Morepath::
 import hashlib
 import inspect
 import morepath
-import os.path
 import pydoc
 import pylru
 
@@ -550,12 +549,23 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
     @cached_property
     def static_files(self):
-        """ Absolute path to the static files. Defaults to the folder
-        of the application + ``/static``.
+        """ A list of static_files paths registered through the
+        :class:`onegov.core.directive.StaticDirectoryAction` directive.
+
+        To register a static files path::
+
+            @App.static_directory()
+            def get_static_directory():
+                return 'static'
+
+        For this to work, ``server_static_files`` has to be set to true.
+
+        When a child application registers a directory, the directory will
+        be considered first, before falling back to the parent's static
+        directory.
 
         """
-        app_path = os.path.dirname(inspect.getfile(self.__class__))
-        return os.path.join(app_path, 'static')
+        return getattr(self.config.staticdirectory_registry, 'paths', [])[::-1]
 
     @cached_property
     def serve_static_files(self):
