@@ -1,0 +1,20 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Hello</p>
+
+        <p i18n:translate>You are recieving this mail because you subscribed to the following newsletter:</p>
+        <p><a href="${request.link(newsletters)}">${layout.town.name}</a></p>
+
+        <p i18n:translate>Plese click the following link to confirm your subscription:</p>
+        <p><a class="btn-primary" href="${request.link(subscription, 'confirm')}" i18n:translate>Confirm subscription</a></p>
+
+        <p i18n:translate>If you did not subscribe to this newsletter you can simply ignore this e-mail. We will not bother you again.</p>
+
+        <p i18n:translate>Best regards,</p>
+        <p i18n:translate>The OneGov Cloud Team</p>
+        
+    </tal:block>
+</div>

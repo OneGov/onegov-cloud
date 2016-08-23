@@ -1,0 +1,99 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row" tal:condition="not:connection">
+            <div class="columns small-12 medium-8" i18n:translate>
+                Searching is currently unavailable due to technical difficulties.
+                Please excuse the inconvenience and try again later.
+            </div>
+        </div>
+
+        <div class="row" tal:condition="connection">
+            <div class="columns small-12 medium-8">
+                <form class="searchbox" action="${request.link(model).split('?')[0]}" method="GET" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${request.url}">
+                    <div class="row collapse">
+                        <label>${searchlabel}</label>
+                        <div class="columns small-11">
+                            <label for="search" class="show-for-sr" i18n:translate>Search</label>
+                            <input id="search" data-typeahead-subject type="text" name="q" value="${model.query}" autocomplete="off" autocorrect="off" autofocus onfocus="this.select()"/>
+                        </div>
+                        <div class="columns small-1">
+                            <button type="submit" class="button postfix" aria-label="Search" i18n:attributes="aria-label">
+                                <i class="fa fa-search" data-typeahead-spinner></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row typeahead">
+                      <div class="columns small-12" data-typeahead-container>
+                      </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <tal:block condition="connection and model.query">
+            <h2 i18n:translate>${resultslabel}</h2>
+            <div class="row">
+                <div class="columns medium-8 small-12">
+                    <p tal:condition="not: model.batch.hits.total" i18n:translate="">Your search returned no results.</p>
+
+                    <ul class="search-results">
+                        <li class="search-result-${result.es_type_name}" tal:repeat="result model.batch.load()">
+                            <tal:block switch="result.__tablename__">
+
+                                <tal:block case="'tickets'">
+                                    <a href="${request.link(result)}">${result.number}</a>
+                                    <ul>
+                                        <li>${translate(result.group)}</li>
+                                        <li tal:content="structure result.title"></li>
+                                        <li tal:content="structure result.subtitle"></li>
+                                    </ul>
+                                </tal:block>
+
+                                <tal:block case="'events'">
+                                    <a href="${request.link(result, 'latest')}">${result.title}</a>
+                                    <p tal:condition="result.description|nothing">
+                                        ${result.description[:160]}<tal:block condition="len(result.description) > 160">…</tal:block>
+                                    </p>
+                                </tal:block>
+
+                                <tal:block case="'people'">
+                                    <a href="${request.link(result)}">${result.title}</a>
+                                    <p tal:condition="result.function|nothing">${result.function}</p>
+                                </tal:block>
+
+                                <tal:block case="default">
+                                    <a href="${request.link(result)}">${result.title}</a>
+                                    <tal:block condition="result.lead">
+                                        ${result.lead[:160]}<tal:block condition="len(result.lead) > 160">…</tal:block>
+                                    </tal:block>
+                                </tal:block>
+
+                            </tal:block>
+
+                            <tal:block condition="request.is_logged_in and result.explanation|nothing">
+                                <ul class="result-explanation">
+                                    <li>Score: ${result.explanation['score']}</li>
+                                    <tal:block repeat="(title, key) [('TF', 'term-frequency'), ('IDF', 'inverse-document-frequency'), ('Field Norm', 'field-norm')]">
+                                        <li title="${result.explanation[key]['description']}" tal:condition="result.explanation[key]">
+                                            ${title}: ${result.explanation[key]['value']}
+                                        </li>
+                                    </tal:block>
+                                    
+                                    
+                                </ul>
+                            </tal:block>
+                        </li>
+                    </ul>
+
+                    <div class="pagination-centered">
+                        <div metal:use-macro="layout.macros['pagination']" tal:define="
+                        collection model; current_page model;" />
+                    </div>
+                </div>
+            </div>
+        </tal:block>
+    </tal:block>
+</div>

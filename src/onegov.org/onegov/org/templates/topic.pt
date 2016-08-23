@@ -1,0 +1,47 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+
+    <tal:block metal:fill-slot="content">
+        <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" tal:define="item page"/>
+        <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item page"/>
+
+        <tal:block condition="page.trait == 'page'">
+
+            <tal:block metal:use-macro="layout.macros.page_content"
+             tal:define="lead page.content.get('lead');text page.content.get('text'); people page.people; contact page.contact_html; coordinates page.coordinates">
+                <tal:block metal:fill-slot="after-text">
+                     <div class="row" tal:condition="children">
+                        <div class="small-12 columns">
+                            <ul class="inline-list page-links">
+                                <li tal:repeat="link children">
+                                    <tal:block replace="structure link(request)" />
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </tal:block>
+            </tal:block>
+        </tal:block>
+        <tal:block condition="page.trait == 'link'">
+            <div class="row">
+                <div class="small-12 columns">
+                    <div class="panel">
+                        <p i18n:translate>
+                        You've reached this site because you are logged in. Visitors
+                        are automatically redirected to the following link:
+                        </p>
+                        <p>
+                            <a href="${page.content.url}">${page.content.url}</a>
+                        </p>
+                        <p i18n:translate>
+                            You are not automatically redirected so you have a chance
+                            to edit or delete this link.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </tal:block>
+    </tal:block>
+</div>

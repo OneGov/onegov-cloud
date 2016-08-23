@@ -1,0 +1,1 @@
+$('.editable-alt').click(function(e){console.log(e.target);e.preventDefault();});

@@ -1,0 +1,42 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <!--! The form is either rendered with a panel on the right (boxed), or
+        without one (normal). Since the panel takes up some space and the
+        column sizes are relative we need to adjust for that. -->
+        <?python
+            size = {
+                'small': 'small-12 medium-7 large-5 columns',
+                'normal': 'small-12 medium-8 large-6 columns',
+                'large': 'small-12 medium-9 large-7 columns'
+            }[econtext.get('form_width', 'normal')]
+
+            boxed_size = {
+                'small': 'small-12 medium-10 large-8 columns',
+                'normal': 'small-12 medium-11 large-9 columns',
+                'large': 'small-12 medium-12 large-10 columns'
+            }[econtext.get('form_width', 'normal')]
+        ?>
+
+        <tal:block tal:define="item definition|nothing" tal:condition="item">
+            <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" />
+            <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
+        </tal:block>
+
+        <tal:block metal:use-macro="layout.macros.page_content"
+                   tal:define="lead lead|nothing;text text|nothing; people people|nothing; contact contact|nothing; coordinates coordinates|nothing">
+            <tal:block metal:fill-slot="after-text">
+                <div class="row">
+                    <div tal:attributes="class boxed_size" tal:condition="people or contact">
+                        <div metal:use-macro="layout.macros['form']" />
+                    </div>
+                    <div tal:attributes="class size" tal:condition="not: people or contact">
+                        <div metal:use-macro="layout.macros['form']" />
+                    </div>
+                </div>
+            </tal:block>
+        </tal:block>
+    </tal:block>
+</div>

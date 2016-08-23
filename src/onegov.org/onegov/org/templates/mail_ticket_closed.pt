@@ -1,0 +1,11 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Your ticket has been closed</p>
+
+        <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${model.number}</span></p>
+    </tal:block>
+</div>

@@ -1,0 +1,33 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <tal:block condition="not:reservation_infos">
+            <p i18n:translate>No dates found, please select dates in the calendar first</p>
+            <a i18n:translate href="${request.link(resource)}">Go to calendar</a>
+        </tal:block>
+
+        <div tal:condition="reservation_infos" class="reservation-selection large">
+            <div class="reservation-selection-inner">
+                <ul>
+                    <li class="reservation" tal:repeat="info reservation_infos">
+                        <span class="reservation-date" data-quota="${info.reservation.quota}">
+                            ${layout.format_date(info.reservation.display_start(), 'weekday_long')},
+                            ${layout.format_date(info.reservation.display_start(), 'date_long')}
+                        </span>
+                        <span class="reservation-time">
+                            ${info.time}
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div tal:condition="reservation_infos" class="row reservation-form">
+            <div class="small-12 medium-7 large-5 columns">
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div>
+    </tal:block>
+</div>

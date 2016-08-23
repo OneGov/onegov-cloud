@@ -1,0 +1,22 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <p tal:condition="not:resources" i18n:translate="">No reservation resources defined yet.</p>
+
+        <div class="row" tal:condition="resources">
+            <div class="columns small-12 medium-7">
+                <tal:block repeat="group resources">
+                    <h2 tal:condition="group">${group}</h2>
+                    <ul>
+                        <li tal:repeat="resource resources[group]">
+                            <a class="list-title" tal:attributes="href request.link(resource)">${resource.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item resource" />
+                            <div class="list-lead">${resource.meta.get('lead')}</div>
+                        </li>
+                    </ul>
+                </tal:block>
+            </div>
+        </div>
+    </tal:block>
+</div>

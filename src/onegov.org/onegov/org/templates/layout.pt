@@ -21,7 +21,7 @@
          Have a look at the source code: https://onegov.readthedocs.org
      -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
-    <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
+    <!--! <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}"> -->
 </head>
 
 <body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}">
@@ -32,8 +32,8 @@
     <div id="inner-body">
       <div class="row header">
         <div class="small-12 medium-8 columns logo">
-          <a href="${layout.homepage_url}" tal:define="logo_url layout.town.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
-            <img tal:condition="logo_url" src="${layout.town.logo_url}" alt="Town Logo" title="${layout.town.name}" i18n:attributes="alt"/>
+          <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
+            <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.name}" i18n:attributes="alt"/>
             <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
           </a>
         </div>
@@ -60,8 +60,8 @@
             </tal:block>
           </tal:block>
 
-          <!--! The town's site search -->
-          <!--! <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
+          <!--! The org's site search -->
+          <form class="searchbox" action="${layout.search_url}" method="GET" tal:condition="not:hide_search_header|nothing" data-typeahead="on" data-typeahead-source="${layout.suggestions_url}" data-typeahead-target="${layout.search_url}">
             <div class="row collapse">
                 <div class="columns small-10">
                     <label for="search" class="show-for-sr" i18n:translate>Search</label>
@@ -77,8 +77,7 @@
               <div class="columns small-12" data-typeahead-container>
               </div>
             </div>
-          </form> -->
-
+          </form>
         </div>
       </div>
       <div class="row">
@@ -132,23 +131,23 @@
       </div>
       <div class="push"></div>
     </div>
-    <footer class="row footer" tal:define="contact layout.town.meta.contact_html|nothing;
-                                           contact_url layout.town.meta.contact_url|nothing;
-                                           opening_hours layout.town.meta.opening_hours_html|nothing;
-                                           opening_hours_url layout.town.meta.opening_hours_url|nothing;
-                                           facebook layout.town.meta.facebook_url|nothing;
-                                           twitter layout.town.meta.twitter_url|nothing;">
+    <footer class="row footer" tal:define="contact layout.org.meta.contact_html|nothing;
+                                           contact_url layout.org.meta.contact_url|nothing;
+                                           opening_hours layout.org.meta.opening_hours_html|nothing;
+                                           opening_hours_url layout.org.meta.opening_hours_url|nothing;
+                                           facebook layout.org.meta.facebook_url|nothing;
+                                           twitter layout.org.meta.twitter_url|nothing;">
       <div class="small-12 columns">
 
         <div class="row footer-columns" tal:condition="contact or contact_url or opening_hours or opening_hours_url or facebook or twitter">
           <div class="small-12 medium-3 columns">
             <h2 i18n:translate="" tal:condition="contact or contact_url">Contact</h2>
-            <div tal:content="structure layout.town.meta.contact_html" />
+            <div tal:content="structure layout.org.meta.contact_html" />
             <a i18n:translate="" tal:condition="contact_url" tal:attributes="href contact_url">more…</a>
           </div>
           <div class="small-12 medium-5 columns">
             <h2 i18n:translate="" tal:condition="opening_hours or opening_hours_url">Opening Hours</h2>
-            <div tal:content="structure layout.town.meta.opening_hours_html" />
+            <div tal:content="structure layout.org.meta.opening_hours_html" />
             <a i18n:translate="" tal:condition="opening_hours_url" tal:attributes="href opening_hours_url">more…</a>
           </div>
           <div class="small-12 medium-4 columns">
@@ -166,7 +165,7 @@
         </div>
       </div>
     </footer>
-    <tal:block tal:content="structure layout.town.meta.analytics_code|nothing" />
+    <tal:block tal:content="structure layout.org.meta.analytics_code|nothing" />
 </body>
 
 </html>

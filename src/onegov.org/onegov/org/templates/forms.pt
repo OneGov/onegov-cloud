@@ -1,0 +1,15 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <p tal:condition="not:forms" i18n:translate="">No forms defined yet.</p>
+
+        <ul tal:condition="forms">
+            <li tal:repeat="form forms">
+                <a class="list-title" tal:attributes="href request.link(form)">${form.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item form" />
+                <div class="list-lead">${form.meta.get('lead')}</div>
+            </li>
+        </ul>
+    </tal:block>
+</div>

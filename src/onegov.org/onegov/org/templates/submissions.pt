@@ -1,0 +1,36 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <ul class="submissions">
+            <li tal:repeat="submission submissions" id="${submission.id}">
+                <div class="submission-date">
+                    ${layout.format_date(submission.received, 'relative')}
+                </div>
+
+                <div class="submission-title">
+                    ${submission.title}
+                </div>
+
+                <div class="submission-email" tal:condition="submission.email">
+                    <a href="mailto:${submission.email}">${submission.email}</a>
+                </div>
+
+                <div class="submission-actions">
+                    <a class="submission-action-show" href="${request.link(submission)}?readonly" i18n:translate="">Show</a>
+                    <a class="submission-action-edit" href="${request.link(submission)}?edit" i18n:translate="">Edit</a>
+
+                    <a class="submission-action-delete delete confirm"
+                           ic-delete-from="${request.link(submission)}?csrf-token=${layout.csrf_token}"
+                           ic-on-success="$('#${submission.id}').remove();"
+                           data-confirm="Do you really want to delete the submission?"
+                           data-confirm-yes="Delete Submission"
+                           data-confirm-no="Cancel"
+                           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"
+                           i18n:translate="">Delete</a>
+                </div>
+            </li>
+        </ul>
+    </tal:block>
+</div>

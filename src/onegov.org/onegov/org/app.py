@@ -1,11 +1,15 @@
 """ Contains the base application used by other applications. """
 
+from contextlib import contextmanager
 from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
+from onegov.org.models import Organisation
 from onegov.org.theme import OrgTheme
 from onegov.search import ElasticsearchApp
+from onegov.ticket import TicketCollection
+from sqlalchemy.orm.attributes import flag_modified
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -52,6 +56,63 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 if s.startswith(schema_prefix)
             )
 
+    @property
+    def org(self):
+        """ Returns the cached version of the organisation. Since the it rarely
+        ever changes, it makes sense to not hit the database for it every
+        time.
+
+        As a consequence, changes to the organisation object are not
+        propagated, unless you use :meth:`update_org` or use the ORM directly.
+
+        """
+        org = self.cache.get_or_create(
+            'org',
+            creator=self.load_org,
+            should_cache_fn=lambda org: org is not None
+        )
+
+        if org is not None:
+            return self.session().merge(org, load=False)
+
+    def load_org(self):
+        """ Loads the town from the SQL database. """
+        return self.session().query(Organisation).first()
+
+    @contextmanager
+    def update_org(self):
+        """ Yields the current town for an update. Use this instead of
+        updating the town directly, because caching is involved. It's rather
+        easy to otherwise update it wrongly.
+
+        Example::
+            with app.update_org() as org:
+                org.name = 'New Name'
+
+        """
+
+        session = self.session()
+
+        org = session.merge(self.org)
+        yield org
+
+        # nested entries in the meta json field are not detected as modified
+        flag_modified(org, 'meta')
+
+        session.flush()
+
+        self.cache.delete('org')
+
+    @property
+    def ticket_count(self):
+        return self.cache.get_or_create('ticket_count', self.load_ticket_count)
+
+    def load_ticket_count(self):
+        return TicketCollection(self.session()).get_count()
+
+    def update_ticket_count(self):
+        return self.cache.delete('ticket_count')
+
 
 @OrgApp.webasset_path()
 def get_shared_assets_path():
@@ -67,6 +128,11 @@ def get_i18n_localedirs():
     ]
 
 
+@OrgApp.setting(section='i18n', name='default_locale')
+def get_i18n_default_locale():
+    return 'de_CH'
+
+
 @OrgApp.template_directory()
 def get_template_directory():
     return 'templates'
@@ -75,3 +141,111 @@ def get_template_directory():
 @OrgApp.setting(section='core', name='theme')
 def get_theme():
     return OrgTheme()
+
+
+@OrgApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@OrgApp.webasset_path()
+def get_css_path():
+    return 'assets/css'
+
+
+@OrgApp.webasset_output()
+def get_webasset_output():
+    return 'assets/bundles'
+
+
+@OrgApp.webasset('sortable')
+def get_sortable_asset():
+    yield 'sortable.js'
+    yield 'sortable_custom.js'
+
+
+@OrgApp.webasset('fullcalendar')
+def get_fullcalendar_asset():
+    yield 'fullcalendar.css'
+    yield 'moment.js'
+    yield 'moment.de.js'
+    yield 'fullcalendar.js'
+    yield 'fullcalendar.de.js'
+    yield 'reservationcalendar.jsx'
+    yield 'reservationcalendar_custom.js'
+
+
+@OrgApp.webasset('check_contrast')
+def get_check_contrast_asset():
+    yield 'check_contrast.js'
+
+
+@OrgApp.webasset('check_password')
+def get_check_password_asset():
+    yield 'zxcvbn.js'
+    yield 'check_password.js'
+
+
+@OrgApp.webasset('code_editor')
+def get_code_editor_asset():
+    yield 'ace.js'
+    yield 'ace-mode-form.js'
+    yield 'ace-theme-tomorrow.js'
+    yield 'code_editor.js'
+
+
+@OrgApp.webasset('editor')
+def get_editor_asset():
+    yield 'bufferbuttons.js'
+    yield 'definedlinks.js'
+    yield 'filemanager.js'
+    yield 'imagemanager.js'
+    yield 'redactor.de.js'
+    yield 'input_with_button.js'
+    yield 'editor.js'
+
+
+# do NOT minify the redactor, or the copyright notice goes away, which
+# is something we are not allowed to do per our license
+@OrgApp.webasset('redactor', filters={'js': None})
+def get_redactor_asset():
+    yield 'redactor.min.js'
+    yield 'redactor.css'
+
+
+@OrgApp.webasset('dropzone')
+def get_dropzone_asset():
+    yield 'dropzone.js'
+
+
+@OrgApp.webasset('editalttext')
+def get_editalttext_asset():
+    yield 'editalttext.js'
+
+
+@OrgApp.webasset('common')
+def get_common_asset():
+    yield 'jquery.datetimepicker.css'
+    yield 'locale.js'
+    yield 'modernizr.js'
+    yield 'jquery.js'
+    yield 'fastclick.js'
+    yield 'foundation.js'
+    yield 'intercooler.js'
+    yield 'underscore.js'
+    yield 'react.js'
+    yield 'form_dependencies.js'
+    yield 'confirm.jsx'
+    yield 'typeahead.jsx'
+    yield 'leaflet'
+    yield 'jquery.datetimepicker.js'
+    yield 'jquery.mousewheel.js'
+    yield 'jquery.popupoverlay.js'
+    yield 'jquery.load.js'
+    yield 'videoframe.js'
+    yield 'datetimepicker.js'
+    yield 'url.js'
+    yield 'date-range-selector.js'
+    yield 'lazyalttext.js'
+    yield 'lazysizes.js'
+    yield 'common.js'

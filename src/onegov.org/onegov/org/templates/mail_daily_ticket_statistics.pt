@@ -1,0 +1,45 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Good morning,</p>
+        <p i18n:translate tal:condition="not:is_monday">This is what happend on the <span tal:replace='town' i18n:name='town' /> website yesterday:</p>
+        <p i18n:translate tal:condition="is_monday">This is what happend on the <span tal:replace='town' i18n:name='town' /> website over the weekend:</p>
+
+        <ul>
+            <li tal:condition="opened != 1">${opened} <span i18n:translate>tickets were opened.</span></li>
+            <li tal:condition="opened == 1">${opened} <span i18n:translate>ticket was opened.</span></li>
+
+            <li tal:condition="pending != 1">${pending} <span i18n:translate>tickets were accepted.</span></li>
+            <li tal:condition="pending == 1">${pending} <span i18n:translate>ticket was accepted.</span></li>
+
+            <li tal:condition="closed != 1">${closed} <span i18n:translate>tickets were closed.</span></li>
+            <li tal:condition="closed == 1">${closed} <span i18n:translate>ticket was closed.</span></li>
+        </ul>
+
+        <p>
+            <span i18n:translate tal:condition="currently_open != 1">There are currently <span tal:replace='currently_open' i18n:name='currently_open' /> tickets open and</span>
+            <span i18n:translate tal:condition="currently_open == 1">There is currently <span tal:replace='currently_open' i18n:name='currently_open' /> ticket open and</span>
+            <span tal:condition="currently_pending != 1">${currently_pending} <span i18n:translate>tickets are pending.</span></span>
+            <span tal:condition="currently_pending == 1">${currently_pending} <span i18n:translate>ticket is pending.</span></span>
+        </p>
+
+        <p i18n:translate tal:condition="is_monday">Have a great week!</p>
+        <p i18n:translate tal:condition="not:is_monday">Have a great day!</p>
+
+        <p i18n:translate>The OneGov Cloud Team</p>
+    </tal:block>
+    <tal:block metal:fill-slot="above-footer">
+        <p>
+            <span i18n:translate>
+                This is the daily OneGov Cloud status e-mail. If you don't want to receive this e-mail you may deactivate it by clicking on
+            </span>
+            <strong tal:define="link layout.unsubscribe_link(username)">
+                <a href="${link}" i18n:translate>unsubscribe</a>.
+            </strong>
+            <span i18n:translate>
+                Or by changing the settings in your user profile.
+            </span>
+    </tal:block>
+</div>

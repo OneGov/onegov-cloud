@@ -1,0 +1,35 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="small-12 columns" tal:define="upload_url layout.file_upload_url">
+                <h2 i18n:translate="">Upload</h2>
+                <tal:block metal:use-macro="layout.macros.dropzone" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns">
+                <h2 i18n:translate="">All Files</h2>
+                <ul tal:condition="files">
+                    <li tal:repeat="file files" id="file-${repeat.file.index}" class="file-box">
+                        <a href="${file.url}" tal:condition="file">
+                            ${file.text}
+                        </a>
+                        <a class="delete confirm"
+                           ic-delete-from="${file.url}?csrf-token=${layout.csrf_token}"
+                           ic-on-success="$('#file-${repeat.file.index}').remove();"
+                           data-confirm="Do you really want to delete the file?"
+                           data-confirm-yes="Delete File"
+                           data-confirm-no="Cancel"
+                           i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
+                    </li>
+                </ul>
+                <tal:block condition="not:files">
+                    <p i18n:translate="">No files uploaded yet</p>
+                </tal:block>
+            </div>
+        </div>
+    </tal:block>
+</div>

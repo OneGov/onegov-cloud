@@ -1,0 +1,46 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <h1>${title}</h1>
+        <p tal:condition="lead" tal:content="structure lead"></p>
+
+        <tal:block condition="news">
+            <h2 i18n:translate>Latest news</h2>
+
+            <tal:block repeat="item news">
+                <strong><a href="${request.link(item)}">${item.title}</a></strong>
+                <p>
+                    ${item.lead}
+                </p>
+            </tal:block>
+        </tal:block>
+
+        <tal:block condition="occurrences">
+            <h2 i18n:translate>Events</h2>
+
+            <tal:block repeat="occurrence occurrences">
+                <strong><a href="${request.link(occurrence)}">${occurrence.title}</a></strong>
+                <ul class="flat">
+                    <li>${layout.format_date(occurrence.localized_start, 'date')} ${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</li>
+                    <li>${occurrence.location}</li>
+                </ul>
+            </tal:block>
+        </tal:block>
+
+    </tal:block>
+    <tal:block metal:fill-slot="above-footer">
+        <p>
+            <span i18n:translate>
+                You are receiving this e-mail because you signed up for the <span tal:replace='layout.town.name' i18n:name='town' /> newsletter.
+            </span>
+            <p>
+                <a href="${request.link(newsletter)}" i18n:translate>Click here to view web version.</a>
+            </p>
+            <p>
+                <a href="${unsubscribe}" i18n:translate>Click here to unsubscribe.</a>.
+            </p>
+        </p>
+    </tal:block>
+</div>

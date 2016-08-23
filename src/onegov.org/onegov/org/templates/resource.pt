@@ -1,0 +1,50 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div tal:condition="resource.group" class="resource-group">${resource.group}</div>
+
+        <tal:block tal:define="item resource|nothing">
+            <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" />
+            <metal:hint use-macro="layout.macros['empty_page_lead_hint']" />
+        </tal:block>
+
+        <tal:block metal:use-macro="layout.macros.page_content"
+             tal:define="lead resource.meta.get('lead');text None; people None; contact None; coordinates None;" />
+
+        <div class="calendar"
+            data-feed="${feed}"
+            data-reservations="${request.link(resource, name='reservations')}"
+            data-reservationform="${request.link(resource, name='formular')}"
+            data-type="${resource.type}"
+            data-editable="${request.is_logged_in and 'true' or 'false'}"
+            data-select-url="${request.link(resource, name='neue-einteilung')}"
+            data-view="${resource.view}"
+            data-date="${resource.date and resource.date.isoformat() or ''}"
+            data-highlights-min="${resource.highlights_min or ''}"
+            data-highlights-max="${resource.highlights_max or ''}"
+        ></div>
+
+        <div class="clearfix"></div>
+
+        <div class="panel" i18n:translate tal:condition="request.is_logged_in">
+            Select a free time span in the calendar below to create an allocation.
+        </div>
+
+        <tal:block
+            define="
+                lead None; 
+                text resource.content.get('text'); 
+                people resource.people; 
+                contact resource.contact_html;
+                coordinates resource.coordinates;
+            "
+            condition="text or people or contact">
+            <h2 i18n:translate>Further Information</h2>
+            <tal:block metal:use-macro="layout.macros.page_content" />
+        </tal:block>
+
+    </tal:block>
+</div>

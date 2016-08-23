@@ -1,0 +1,47 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="small-12 columns" tal:define="upload_url layout.image_upload_url">
+                <h2 i18n:translate="">Upload</h2>
+                <tal:block metal:use-macro="layout.macros.dropzone" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 columns">
+                <h2 i18n:translate="">All Images</h2>
+
+                <div class="panel">
+                    <p i18n:translate="">
+                        To edit the image descriptions, click on one, enter your descrption and press return.
+                        To abort press escape.
+                    </p>
+                </div>
+
+                <tal:block tal:repeat="group images">
+                    <h3 i18n:translate="">${group['group']}</h3>
+                    <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
+                        <li tal:repeat="image group['images']" id="image-${repeat.image.index}" class="image-box">
+                            <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
+                                <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" />
+                                <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" />
+                            </a>
+                            <a class="delete confirm"
+                               ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}"
+                               ic-on-success="$('#image-${repeat.image.index}').remove();"
+                               data-confirm="Do you really want to delete the image?"
+                               data-confirm-yes="Delete Image"
+                               data-confirm-no="Cancel"
+                               i18n:attributes="data-confirm;data-confirm-yes;data-confirm-no"><i class="fa fa-times" aria-hidden="true"></i></a>
+                        </li>
+                    </ul>
+                </tal:block>
+                <tal:block condition="not:images">
+                    <p i18n:translate="">No images uploaded yet</p>
+                </tal:block>
+            </div>
+        </div>
+    </tal:block>
+</div>

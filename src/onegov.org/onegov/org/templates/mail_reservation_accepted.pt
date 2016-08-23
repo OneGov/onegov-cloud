@@ -1,0 +1,12 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>The following reservations have been accepted:</p>
+
+        <p>${resource.title}</p>
+        <tal:block metal:use-macro="layout.macros['reservations']"></tal:block>
+    </tal:block>
+</div>

@@ -1,0 +1,88 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+
+            <!--! note that the following snippet is DUPLICATED below, because when
+                  printing this site we want the content panel to be shown first -->
+            <div class="columns small-12 medium-8 hide-for-print">
+                <div tal:condition="deleted" class="panel callout" i18n:translate>
+                    The record behind this ticket was removed. The following information
+                    is a snapshot kept for future reference.
+                </div>
+                <div class="ticket-summary">
+                    <tal:block replace="structure summary" />
+                </div>
+            </div>
+            <!--! -->
+
+            <div class="columns small-12 medium-4">
+                <div class="page-content-panel">
+                    <div class="field-display ticket-status-page">
+                        <div class="field-display-block">
+                            <div class="field-display-label" i18n:translate>Ticket Number</div>
+                            <div class="field-display-data ticket-number">
+                                ${ticket.number}
+                            </div>
+                        </div>
+
+                        <div class="field-display-block">
+                            <div class="field-display-label" i18n:translate>State</div>
+                            <div class="field-display-data ticket-state">
+                                <tal:block metal:use-macro="layout.macros['ticket_status']" />
+                            </div>
+                        </div>
+
+                        <div class="field-display-block">
+                            <div class="field-display-label" i18n:translate>Group</div>
+                            <div class="field-display-data ticket-group">
+                                 ${ticket.group}
+                            </div>
+                        </div>
+
+                        <div tal:condition="ticket.user_id">
+                            <div class="field-display-label" i18n:translate>Owner</div>
+                            <div class="field-display-data ticket-owner">
+                                <a href="mailto:${ticket.user.username}">${ticket.user.username}</a>
+                            </div>
+                        </div>
+
+                        <div class="field-display-block" tal:define="submitter handler.email|ticket.snapshot.email|nothing" tal:condition="submitter">
+                            <div class="field-display-label" i18n:translate>Submitter</div>
+                            <div class="field-display-data ticket-submitter">
+                                <a href="mailto:${submitter}">${submitter}</a>
+                            </div>
+                        </div>
+
+                        <div class="field-display-block" tal:condition="ticket.reaction_time">
+                            <div class="field-display-label" i18n:translate>Reaction Time</div>
+                            <div class="field-display-data ticket-date">
+                                 ${layout.format_seconds(ticket.reaction_time)}
+                            </div>
+                        </div>
+
+                        <div class="field-display-block" tal:condition="ticket.process_time">
+                            <div class="field-display-label" i18n:translate>Process Time</div>
+                            <div class="field-display-data ticket-date">
+                                 ${layout.format_seconds(ticket.process_time)}
+                            </div>
+                        </div>
+
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="columns small-12 medium-8 show-for-print" aria-hidden="true">
+                <div tal:condition="deleted" class="panel callout" i18n:translate>
+                    The record behind this ticket was removed. The following information
+                    is a snapshot kept for future reference.
+                </div>
+                <div class="ticket-summary">
+                    <tal:block replace="structure summary" />
+                </div>
+            </div>
+        </div>
+    </tal:block>
+</div>

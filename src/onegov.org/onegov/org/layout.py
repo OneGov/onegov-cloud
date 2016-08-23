@@ -164,7 +164,7 @@ class Layout(ChameleonLayout):
     @cached_property
     def homepage_url(self):
         """ Returns the url to the main page. """
-        return self.request.link(self.app.town)
+        return self.request.link(self.app.org)
 
     @cached_property
     def search_url(self):
@@ -326,14 +326,14 @@ class DefaultMailLayout(Layout):
 
         """
 
-        lines = (l.strip() for l in self.town.meta['contact'].splitlines())
+        lines = (l.strip() for l in self.org.meta['contact'].splitlines())
         lines = (l for l in lines if l)
 
         return linkify(', '.join(lines))
 
     def unsubscribe_link(self, username):
         return '{}?token={}'.format(
-            self.request.link(self.town, name='unsubscribe'),
+            self.request.link(self.org, name='unsubscribe'),
             self.request.new_url_safe_token(
                 data={'user': username},
                 salt='unsubscribe'

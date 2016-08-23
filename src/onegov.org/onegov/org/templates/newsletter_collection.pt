@@ -1,0 +1,48 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <p i18n:translate>Sign up to our newsletter to always stay up to date:</p>
+        
+        <div class="row">
+            <div class="columns small-12 medium-9 large-6">
+                <form class="signup" action="${form.action}" method="POST">
+                    <div>${form.csrf_token}</div>
+                    <div class="row collapse">
+                        <div class="columns small-8 ${form.address.errors and 'error'}">
+                            <input data-typeahead-subject type="email" name="address" placeholder="E-Mail Address" i18n:attributes="placeholder"/>
+                            <small class="error" tal:repeat="error form.address.errors">${error}</small>
+                        </div>
+                        <div class="columns small-4 ${form.address.errors and 'error'}">
+                            <button type="submit" class="button postfix" i18n:translate>
+                                Signup
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row" tal:condition="request.is_logged_in">
+            <div class="columns small-12 medium-9 large-6">
+                <div i18n:translate>There are currently <tal:block i18n:name="count">${recipients_count}</tal:block> recipients registered.</div>
+            </div>
+        </div>
+
+        <h2 i18n:translate>Archive</h2>
+
+        <p tal:condition="not:newsletters" i18n:translate>
+            No newsletters yet.
+        </p>
+
+        <ul>
+            <li tal:repeat="newsletter newsletters">
+                <div><strong><a href="${request.link(newsletter)}">${newsletter.title}</a></strong></div>
+                <div tal:condition="newsletter.sent">${layout.format_date(newsletter.sent, 'relative')}</div>
+                <div tal:condition="not:newsletter.sent" i18n:translate>Not yet sent.</div>
+            </li>
+        </ul>
+    </tal:block>
+</div>

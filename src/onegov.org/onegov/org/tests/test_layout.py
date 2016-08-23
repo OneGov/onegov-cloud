@@ -1,6 +1,6 @@
 import morepath
 import onegov.core
-import onegov.town
+import onegov.org
 import more.transaction
 import more.webassets
 
@@ -155,9 +155,9 @@ def test_template_layout(postgres_dsn):
     class App(OrgApp):
         theme_options = {}
 
-        town = Mock()
-        town.name = 'Govikon'
-        town.theme_options = theme_options
+        org = Mock()
+        org.name = 'Govikon'
+        org.theme_options = theme_options
 
         # disable LibresIntegration for this test
         def configure_libres(self, **cfg):
@@ -181,7 +181,7 @@ def test_template_layout(postgres_dsn):
     morepath.scan(more.transaction)
     morepath.scan(more.webassets)
     morepath.scan(onegov.core)
-    morepath.scan(onegov.town)
+    morepath.scan(onegov.org)
     morepath.commit(App)
 
     app = App()

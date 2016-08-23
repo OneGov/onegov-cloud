@@ -1,0 +1,48 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="columns small-12 medium-8 large-8">
+                <div class="row">
+                    <div class="columns small-12 homepage-tiles">
+                        <h2 i18n:translate class="show-for-sr">Selected Topics</h2>
+                        <div tal:repeat="chunk layout.chunks(tiles, 3)" class="row">
+                            <div tal:repeat="tile chunk" class="columns small-12 medium-4 large-4">
+                                <tal:block condition="tile">
+                                    <div class="homepage-tile" id="homepage-tile-${tile.number}">
+                                        <a href="${tile.page.url}" class="tile-link">
+                                            <div class="tile-image"></div>
+                                            <h3>${tile.page.text}</h3>
+                                        </a>
+                                        <tal:block repeat="link tile.links" tal:content="structure link(request)" />
+                                    </div>
+                                </tal:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row latest-news" tal:condition="news">
+                    <div class="columns small-12">
+                        <h2 i18n:translate="">Latest news</h2>
+                        <div metal:use-macro="layout.macros.newslist" tal:define="heading 'h3'" />
+
+                        <h3 class="all-news"><a href="${news_url}" i18n:translate>All news</a></h3>
+                    </div>
+                </div>
+            </div>
+            <div class="columns small-12 medium-4 large-4 homepage-links" tal:condition="panels">
+                <div class="homepage-links-panel" tal:repeat="panel panels">
+                    <h2>${panel.title}</h2>
+                    <ul>
+                        <li tal:repeat="link panel.links">
+                            <tal:block content="structure link(request)" />
+                            <small>${link.subtitle}</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </tal:block>
+</div>

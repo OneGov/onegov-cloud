@@ -16,6 +16,7 @@ from onegov.org.models.legacy_file import (
     LegacyFileCollection,
     LegacyImageCollection
 )
+from onegov.org.models.organisation import Organisation
 from onegov.org.models.page import AtoZPages, News, Topic
 from onegov.org.models.page_move import PageMove
 from onegov.org.models.person_move import (
@@ -48,6 +49,7 @@ __all__ = [
     'ImageSet',
     'ImageSetCollection',
     'News',
+    'Organisation',
     'PageMove',
     'PagePersonMove',
     'PersonMove',

@@ -1,0 +1,35 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row fieldset-display">
+            <div class="small-12 medium-12 large-12 columns">
+                <div class="panel callout">
+                    <p i18n:translate="">
+                        Please review your data and press "Complete" to finalize the process.
+                        If there's anything you'd like to change, click on "Edit" to return
+                        to the filled-out form.
+                    </p>
+                </div>
+
+                <div metal:use-macro="layout.macros['reservation_infos']" />
+
+                <div tal:condition="reservation_infos" class="field-display">
+                    <div class="field-display-block">
+                        <div class="field-display-label" i18n:translate>E-Mail</div>
+                        <div class="field-display-data">${reservation_infos[0].reservation.email}</div>
+                    </div>
+                </div>
+
+                <div metal:use-macro="layout.macros['display_form']" tal:condition="form"/>
+            </div>
+        </div>
+        <div class="row fieldset-display-submit">
+            <div class="small-12 columns">
+                <a href="${finalize_link}" class="button" i18n:translate>Complete</a>
+                <a href="${edit_link}" class="button secondary" i18n:translate>Edit</a>
+            </div>
+        </div>
+    </tal:block>
+</div>

@@ -1,0 +1,81 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <table class="tickets-table tickets-state-${tickets_state}">
+            <thead>
+                <tr>
+                    <th colspan="6">
+                        <div class="row ticket-filters">
+                            <div class="columns small-12 medium-8">
+                                <dl class="sub-nav">
+                                    <dt class="show-for-sr" i18n:translate>State:</dt>
+                                    <tal:block repeat="link filters">
+                                        <dd class="${link.active and 'active' or ''}">
+                                            <tal:block replace="structure link(request)"></tal:block>
+                                        </dd>
+                                    </tal:block>
+                                </dl>
+                            </div>
+                            <div class="columns small-12 medium-4">
+                                <button href="#" data-dropdown="handlers" aria-controls="handlers" aria-expanded="false" class="${has_handler_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'}">
+                                    <tal:block repeat="link handlers">
+                                        <tal:block condition="link.active">
+                                            <span i18n:translate class="show-for-sr">Kind:</span> <span class="${' '.join(link.classes)}">${link.text}</span>
+                                        </tal:block>
+                                    </tal:block>
+                                </button>
+                                <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
+                                    <li tal:repeat="link handlers"><tal:block replace="structure link(request)"></tal:block></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tal:block repeat="ticket tickets">
+                    <tr tal:define="ticket_url request.link(ticket)" class="ticket ticket-handler-${ticket.handler_code} ticket-row-state-${ticket.state}">
+                        <td class="ticket-number-plain">
+                            <a href="${ticket_url}">
+                                ${ticket.number}
+                            </a>
+                        </td>
+                        <td class="ticket-group" colspan="2">
+                            <div>${translate(ticket.group)}</div>
+                            <div>${ticket.title}</div>
+                            <div>${ticket.subtitle}</div>
+                        </td>
+                        <td class="ticket-date">
+                            ${layout.format_date(ticket.created, 'relative')}
+                        </td>
+                        <td class="ticket-action" tal:condition="ticket.state == 'open'" colspan="2">
+                            <a class="ticket-accept ticket-button" href="${request.link(ticket, 'accept')}" i18n:translate>
+                                Accept
+                            </a>
+                        </td>
+                        <td class="ticket-state" tal:condition="ticket.state != 'open'">
+                            <tal:block condition="ticket.state == 'pending'" i18n:translate>
+                                Pending
+                            </tal:block>
+                            <tal:block condition="ticket.state == 'closed'" i18n:translate>
+                                Closed
+                            </tal:block>
+                        </td>
+                        <td class="ticket-user" tal:condition="ticket.state != 'open'">
+                            <div class="user-initials-small" title="${ticket.user.title}" style="background-color: ${layout.get_user_color(ticket.user.username)}">
+                                ${ticket.user.initials}
+                            </div>
+                        </td>
+                    </tr>
+                </tal:block>
+            </tbody>
+        </table>
+
+        <div class="pagination-centered">
+            <div metal:use-macro="layout.macros['pagination']" tal:define="
+            collection layout.model; current_page layout.model;" />
+        </div>
+    </tal:block>
+</div>

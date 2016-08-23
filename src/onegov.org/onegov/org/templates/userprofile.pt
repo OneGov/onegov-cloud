@@ -1,0 +1,33 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="field-display">
+            <div class="field-display-label" i18n:translate>Username</div>
+            <div class="field-display-data">
+                ${username}
+            </div>
+        </div>
+        <div class="field-display">
+            <div class="field-display-label" i18n:translate>Role</div>
+            <div class="field-display-data">
+                ${role}
+            </div>
+        </div>
+        <div class="field-display">
+            <div class="field-display-label" i18n:translate>Identicon</div>
+            <div class="field-display-data">
+                <div class="user-initials-large" style="background-color: ${layout.get_user_color(username)}">
+                    ${initials}
+                </div>
+            </div>
+        </div>
+        <div class="field-display">
+            <div class="field-display-label" i18n:translate>Settings</div>
+            <div class="field-display-data">
+                <div metal:use-macro="layout.macros['form']" />
+            </div>
+        </div>
+    </tal:block>
+</div>

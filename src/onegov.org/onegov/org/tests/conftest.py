@@ -7,6 +7,7 @@ import transaction
 import shutil
 
 from onegov.core.utils import Bunch, scan_morepath_modules
+from onegov.org.models import Organisation
 from onegov.user import User
 from uuid import uuid4
 
@@ -67,6 +68,8 @@ def new_org_app(postgres_dsn, filestorage, test_password, smtp, es_url=None):
     # *need* to go through the UserCollection. Here however, we can improve
     # the test speed by not hashing the password for every test.
     session = app.session()
+
+    session.add(Organisation(name='Govikon'))
 
     session.add(User(
         username='admin@example.org',

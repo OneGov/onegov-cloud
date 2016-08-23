@@ -1,0 +1,22 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <p tal:condition="lead" class="newsletter-lead" tal:content="structure lead" />
+
+        <tal:block condition="news">
+            <h2 i18n:translate>Latest news</h2>
+            <metal:newslist use-macro="layout.macros['newslist']" />
+        </tal:block>
+
+        <tal:block condition="occurrences">
+            <h2 i18n:translate>Events</h2>
+            <div class="row">
+                <div class="columns small-12 medium-8 end">
+                    <metal:occurrences use-macro="layout.macros['occurrences']" />
+                </div>
+            </div>
+        </tal:block>
+    </tal:block>
+</div>

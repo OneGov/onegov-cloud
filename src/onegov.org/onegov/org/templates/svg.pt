@@ -3,7 +3,7 @@
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
-      i18n:domain="onegov.town">
+      i18n:domain="onegov.org">
 <body>
 
 <metal:default_logo define-macro="default_logo">

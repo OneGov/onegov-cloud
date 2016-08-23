@@ -1,0 +1,36 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="panel" tal:condition="ticket.state in {'open', 'closed'}">
+            <p i18n:translate tal:condition="ticket.state == 'open'">
+                Your request will be processed shortly. To see the state of
+                your process your may return to this page at any time.
+
+                All information on this page has been sent to your e-mail address.
+            </p>
+            <p i18n:translate tal:condition="ticket.state == 'closed'">
+                Your request has been completed. If you asked for documents to be
+                sent to your address, they should arrive shortly. If you asked to
+                pick up documents at the municipality, the are now ready to be
+                picked up.
+            </p>
+        </div>
+        <div class="field-display ticket-status-page">
+            <div class="field-display-label" i18n:translate>Ticket Number</div>
+            <div class="field-display-data ticket-number">
+                <tal:block condition="request.is_logged_in">
+                    <a href="${request.link(ticket)}">${ticket.number}</a>
+                </tal:block>
+                <tal:block condition="not:request.is_logged_in">
+                    ${ticket.number}
+                </tal:block>
+            </div>
+            <div class="field-display-label" i18n:translate>State</div>
+            <div class="field-display-data ticket-state">
+                <tal:block metal:use-macro="layout.macros['ticket_status']" />
+            </div>
+        </div>
+    </tal:block>
+</div>

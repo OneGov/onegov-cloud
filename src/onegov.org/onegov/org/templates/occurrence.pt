@@ -1,0 +1,62 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="large-8 medium-8 columns">
+                <div class="page-lead">
+                    <div>${layout.format_date(occurrence.localized_start, 'event')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
+                    <div tal:condition="occurrence.event.location">${occurrence.event.location}</div>
+                </div>
+
+                <div class="occurrence-tags">
+                    <span tal:repeat="tag occurrence.tags" class="occurrence-tag" i18n:translate="">${tag}</span>
+                </div>
+
+                <div class="occurrence-description">
+                    <p tal:content="structure description"></p>
+                </div>
+
+                <div class="occurrence-map" tal:condition="occurrence.has_coordinates">
+                    <div class="marker-map" data-lat="${occurrence.lat}" data-lon="${occurrence.lon}" data-zoom="${occurrence.zoom}"></div>
+                </div>
+
+                <div class="occurrence-organizer" tal:condition="organizer">
+                    <p>
+                        <tal:block i18n:translate>Organizer</tal:block>: ${organizer}
+                    </p>
+                </div>
+            </div>
+
+            <div class="large-4 medium-4 columns">
+                <tal:block metal:use-macro="layout.macros['ticket_callout']"
+                    tal:condition="request.is_logged_in and ticket"
+                />
+
+                <div class="occurrence-exports">
+                    <h2>
+                        <a href="${request.link(occurrence, name='ical')}">
+                            <i class="fa fa-chevron-right"></i> <tal:block i18n:translate="">Export this event</tal:block>
+                        </a>
+                    </h2>
+                    <h2 tal:condition="len(occurrences) > 1">
+                        <a href="${request.link(occurrence.event, name='ical')}">
+                            <i class="fa fa-chevron-right"></i> <tal:block i18n:translate="">Export all occurrences of this event</tal:block>
+                        </a>
+                    </h2>
+                </div>
+
+                <div class="occurrence-occurrences">
+                    <h2 i18n:translate="">All occurrences of this event</h2>
+                    <ul>
+                        <li tal:repeat="occurrence occurrences">
+                            ${layout.format_date(occurrence, 'date')}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </tal:block>
+</div>

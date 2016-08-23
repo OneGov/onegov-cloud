@@ -1,0 +1,54 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <span class="page-lead">
+            <tal:block condition="start != end">
+                ${layout.format_date(start, 'date_long')} - ${layout.format_date(end, 'date_long')}
+            </tal:block>
+            <tal:block condition="start == end">
+                ${layout.format_date(start, 'date_long')}
+            </tal:block>
+        </span>
+
+        <div class="row">
+            <div class="small-12 medium-8 columns">
+                <div class="row occupancy-block" tal:repeat="date occupancy">
+                    <tal:block define="entries occupancy[date]">
+                        <div class="columns small-12 medium-12 large-3">
+                            <metal:block use-macro="layout.macros['calendar-day']" />
+                        </div>
+                        <div class="columns small-12 medium-12 large-9">
+                            <ul class="occupancy-entry">
+                                <li tal:repeat="entry entries">
+                                    <tal:block tal:define="whole_day entry.start.time() != entry.end.time()">
+                                        <span class="date" tal:condition="whole_day">
+                                            ${layout.format_time_range(entry.start, entry.end)}
+                                        </span>
+                                        <span class="date" tal:condition="not:whole_day" i18n:translate>
+                                            Whole day
+                                        </span>
+                                        <span class="quota" tal:condition="resource.show_quota">
+                                            (${entry.quota})
+                                        </span>
+                                        <div class="title">
+                                            <a href="${entry.url}">${entry.title}</a>
+                                        </div>
+                                    </tal:block>
+                                </li>
+                            </ul>
+                        </div>
+                    </tal:block>
+                </div>
+            </div>
+            <div class="small-12 medium-4 columns">
+                <div class="date-range-selector-result">
+                    <span>${count}</span>
+                    <span i18n:translate>Reservations</span>
+                </div>
+                <metal:block tal:define="start start.isoformat(); end end.isoformat()" use-macro="layout.macros['date-range-selector']" />
+            </div>
+        </div>
+    </tal:block>
+</div>
