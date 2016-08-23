@@ -1,8 +1,12 @@
+import os
+
 from collections import OrderedDict
 from datetime import datetime, date
 from freezegun import freeze_time
 from onegov.core.request import CoreRequest
+from onegov.core.utils import module_path, rchop
 from onegov.org.models import Clipboard, ImageFileCollection
+from onegov.org.models import SiteCollection
 from onegov.org.models.file import GroupFilesByDateMixin
 from onegov.org.models.resource import SharedMethods
 from onegov.page import PageCollection
@@ -218,3 +222,32 @@ def test_calendar_date_range():
         datetime(2016, 5, 14, tzinfo=utc),
         datetime(2016, 5, 14, 23, 59, 59, 999999, tzinfo=utc)
     )
+
+
+def test_sitecollection(org_app):
+
+    sitecollection = SiteCollection(org_app.session())
+    objects = sitecollection.get()
+
+    assert {o.name for o in objects['topics']} == {
+        'leben-wohnen',
+        'kultur-freizeit',
+        'bildung-gesellschaft',
+        'gewerbe-tourismus',
+        'politik-verwaltung'
+    }
+
+    assert {o.name for o in objects['news']} == {
+        'aktuelles',
+        'willkommen-bei-onegov'
+    }
+
+    builtin_forms_path = module_path('onegov.org', 'forms/builtin')
+
+    paths = (p for p in os.listdir(builtin_forms_path))
+    paths = (p for p in paths if p.endswith('.form'))
+    paths = (os.path.basename(p) for p in paths)
+    builtin_forms = set(rchop(p, '.form') for p in paths)
+
+    assert {o.name for o in objects['forms']} == set(builtin_forms)
+    assert {o.name for o in objects['resources']} == {'sbb-tageskarte'}
