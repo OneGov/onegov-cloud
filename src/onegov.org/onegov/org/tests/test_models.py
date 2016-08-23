@@ -36,9 +36,9 @@ def test_clipboard(org_app):
     assert clipboard.url is None
 
 
-def test_news_years(org_app):
+def test_news_years(session):
 
-    collection = PageCollection(org_app.session())
+    collection = PageCollection(session)
     news = collection.add_root("News", type='news')
     one = collection.add(news, title="One", type='news')
     two = collection.add(news, title="Two", type='news')
@@ -113,9 +113,9 @@ def test_group_intervals():
     assert intervals[4].end.date() == date(2014, 12, 31)
 
 
-def test_image_grouping(org_app):
+def test_image_grouping(session):
 
-    collection = ImageFileCollection(org_app.session())
+    collection = ImageFileCollection(session)
 
     def grouped_by_date(today):
         grouped = collection.grouped_by_date(today=today)
