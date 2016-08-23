@@ -1,11 +1,11 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.town">
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
     <tal:block metal:fill-slot="title">
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="body">
         <p i18n:translate>Good morning,</p>
-        <p i18n:translate tal:condition="not:is_monday">This is what happend on the <span tal:replace='town' i18n:name='town' /> website yesterday:</p>
-        <p i18n:translate tal:condition="is_monday">This is what happend on the <span tal:replace='town' i18n:name='town' /> website over the weekend:</p>
+        <p i18n:translate tal:condition="not:is_monday">This is what happend on the <span tal:replace='org' i18n:name='org' /> website yesterday:</p>
+        <p i18n:translate tal:condition="is_monday">This is what happend on the <span tal:replace='org' i18n:name='org' /> website over the weekend:</p>
 
         <ul>
             <li tal:condition="opened != 1">${opened} <span i18n:translate>tickets were opened.</span></li>

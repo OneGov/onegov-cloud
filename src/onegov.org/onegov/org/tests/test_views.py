@@ -2661,7 +2661,7 @@ def test_newsletters_crud(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    newsletter = client.get('/').click('Newsletter')
+    newsletter = client.get('/newsletters')
     assert 'Es wurden noch keine Newsletter versendet' in newsletter
 
     new = newsletter.click('Newsletter')
@@ -2799,7 +2799,7 @@ def test_newsletter_send(org_app):
     client.login_editor()
 
     # add a newsletter
-    new = client.get('/').click('Newsletter').click('Newsletter')
+    new = client.get('/newsletters').click('Newsletter')
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
@@ -2940,14 +2940,14 @@ def test_manage_album(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    albums = client.get('/').click('Fotoalben')
+    albums = client.get('/fotoalben')
     assert "Noch keine Fotoalben" in albums
 
     new = albums.click('Fotoalbum')
     new.form['title'] = "Comicon 2016"
     new.form.submit()
 
-    albums = client.get('/').click('Fotoalben')
+    albums = client.get('/fotoalben')
     assert "Comicon 2016" in albums
 
     album = albums.click("Comicon 2016")

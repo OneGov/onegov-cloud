@@ -22,8 +22,9 @@ from onegov.org.models import (
     Search,
     SiteCollection
 )
-from onegov.org.models.extensions import PersonLinkExtension
 from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.org.models.extensions import PersonLinkExtension
+from onegov.org.theme.org_theme import user_options
 from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
@@ -53,12 +54,22 @@ class Layout(ChameleonLayout):
     """
 
     @property
+    def org(self):
+        """ An alias for self.request.app.org. """
+        return self.request.app.org
+
+    @property
     def primary_color(self):
-        return '#006fba'
+        return self.org.theme_options.get(
+            'primary_color', user_options['primary-color'])
 
     @cached_property
     def default_map_view(self):
-        return {"lat": 47.25744658472642, "lon": 8.851633071899416, "zoom": 13}
+        return self.org.default_map_view or {
+            "lat": 47.25744658472642,
+            "lon": 8.851633071899416,
+            "zoom": 13
+        }
 
     @cached_property
     def svg(self):

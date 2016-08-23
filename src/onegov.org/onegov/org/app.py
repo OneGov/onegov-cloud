@@ -1,12 +1,15 @@
 """ Contains the base application used by other applications. """
 
+from collections import defaultdict
 from contextlib import contextmanager
 from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
 from onegov.org.models import Organisation
+from onegov.org.models import Topic
 from onegov.org.theme import OrgTheme
+from onegov.page import PageCollection
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
 from sqlalchemy.orm.attributes import flag_modified
@@ -112,6 +115,54 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     def update_ticket_count(self):
         return self.cache.delete('ticket_count')
+
+    def send_email(self, **kwargs):
+        """ Wraps :meth:`onegov.core.framework.Framework.send_email`, setting
+        the reply_to address by using the reply address from the organisation
+        settings.
+
+        """
+
+        assert 'reply_to' in self.org.meta
+
+        reply_to = "{} <{}>".format(self.org.name, self.org.meta['reply_to'])
+
+        return super().send_email(reply_to=reply_to, **kwargs)
+
+    @property
+    def theme_options(self):
+        return self.org.theme_options or {}
+
+    @property
+    def homepage_pages(self):
+        return self.cache.get_or_create(
+            'homepage_pages', self.load_homepage_pages)
+
+    def load_homepage_pages(self):
+        pages = PageCollection(self.session()).query()
+        pages = pages.filter(Topic.type == 'topic')
+
+        # XXX use JSON/JSONB for this (the attribute is not there if it's
+        # false, so this is not too bad speed-wise but it's still awful)
+        pages = pages.filter(Topic.meta.contains(
+            'is_visible_on_homepage'
+        ))
+
+        result = defaultdict(list)
+        for page in pages.all():
+            if page.is_visible_on_homepage:
+                result[page.root.id].append(page)
+
+        for key in result:
+            result[key] = list(sorted(
+                result[key],
+                key=lambda p: utils.normalize_for_url(p.title)
+            ))
+
+        return result
+
+    def update_homepage_pages(self):
+        return self.cache.delete('homepage_pages')
 
 
 @OrgApp.webasset_path()

@@ -8,6 +8,8 @@ import shutil
 
 from onegov.core.utils import Bunch, scan_morepath_modules
 from onegov.org.models import Organisation
+from onegov.org.initial_content import (
+    add_initial_content, builtin_form_definitions)
 from onegov.user import User
 from uuid import uuid4
 
@@ -19,17 +21,25 @@ def filestorage():
     shutil.rmtree(directory)
 
 
-@pytest.yield_fixture(scope='function')
-def org_app(postgres_dsn, filestorage, test_password, smtp):
-    yield new_org_app(postgres_dsn, filestorage, test_password, smtp)
+@pytest.yield_fixture(scope='session')
+def forms():
+    yield list(builtin_form_definitions())
 
 
 @pytest.yield_fixture(scope='function')
-def es_org_app(postgres_dsn, filestorage, test_password, smtp, es_url):
-    yield new_org_app(postgres_dsn, filestorage, test_password, smtp, es_url)
+def org_app(postgres_dsn, filestorage, test_password, smtp, forms):
+    yield new_org_app(
+        postgres_dsn, filestorage, test_password, smtp, forms)
 
 
-def new_org_app(postgres_dsn, filestorage, test_password, smtp, es_url=None):
+@pytest.yield_fixture(scope='function')
+def es_org_app(postgres_dsn, filestorage, test_password, smtp, es_url, forms):
+    yield new_org_app(
+        postgres_dsn, filestorage, test_password, smtp, forms, es_url)
+
+
+def new_org_app(postgres_dsn, filestorage, test_password, smtp,
+                forms, es_url=None):
 
     scan_morepath_modules(onegov.org.OrgApp)
     morepath.commit(onegov.org.OrgApp)
@@ -51,6 +61,12 @@ def new_org_app(postgres_dsn, filestorage, test_password, smtp, es_url=None):
     )
     app.set_application_id(app.namespace + '/' + 'test')
     app.bind_depot()
+    add_initial_content(
+        app.libres_registry,
+        app.session_manager,
+        'Govikon',
+        forms
+    )
 
     # cronjobs leave lingering sessions open, in real life this is not a
     # problem, but in testing it leads to connection pool exhaustion
@@ -64,13 +80,13 @@ def new_org_app(postgres_dsn, filestorage, test_password, smtp, es_url=None):
     app.mail_use_directory = False
     app.smtp = smtp
 
+    session = app.session()
+    org = session.query(Organisation).one()
+    org.meta['reply_to'] = 'mails@govikon.ch'
+
     # usually we don't want to create the users directly, anywhere else you
     # *need* to go through the UserCollection. Here however, we can improve
     # the test speed by not hashing the password for every test.
-    session = app.session()
-
-    session.add(Organisation(name='Govikon'))
-
     session.add(User(
         username='admin@example.org',
         password_hash=test_password,
