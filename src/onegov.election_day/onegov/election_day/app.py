@@ -73,6 +73,11 @@ class ElectionDayApp(Framework):
         return self.get_cache(self.application_id + ':5m', expiration_time=300)
 
 
+@ElectionDayApp.static_directory()
+def get_static_directory():
+    return 'static'
+
+
 @ElectionDayApp.template_directory()
 def get_template_directory():
     return 'templates'
