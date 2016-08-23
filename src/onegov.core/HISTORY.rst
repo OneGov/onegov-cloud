@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.23.0 (2016-08-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a static directory directive, which gives applications the ability
   to define their own static directory and for inherited applications to
