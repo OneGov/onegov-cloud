@@ -184,6 +184,11 @@ def get_i18n_default_locale():
     return 'de_CH'
 
 
+@OrgApp.static_directory()
+def get_static_directory():
+    return 'static'
+
+
 @OrgApp.template_directory()
 def get_template_directory():
     return 'templates'

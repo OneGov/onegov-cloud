@@ -5,6 +5,7 @@ from datetime import timedelta
 from dateutil import rrule
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.layout import ChameleonLayout
+from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
@@ -74,6 +75,11 @@ class Layout(ChameleonLayout):
     @cached_property
     def svg(self):
         return self.template_loader['svg.pt']
+
+    @cached_property
+    def font_awesome_path(self):
+        return self.request.link(
+            StaticFile('font-awesome/css/font-awesome.min.css'))
 
     @cached_property
     def page_id(self):

@@ -39,7 +39,7 @@ setup(
         'isodate',
         'lxml',
         'mistune',
-        'onegov.core>=0.22.1',
+        'onegov.core>=0.23.0',
         'onegov.event>=0.5.0',
         'onegov.file>=0.2.1',
         'onegov.form>=0.9.0',

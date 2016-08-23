@@ -21,7 +21,7 @@
          Have a look at the source code: https://onegov.readthedocs.org
      -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
-    <!--! <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}"> -->
+    <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 
 <body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}">
