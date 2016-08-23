@@ -52,6 +52,11 @@ class CaptureLogPlugin(object):
         root_logger.setLevel(logging.NOTSET)
 
     def pytest_runtest_teardown(self, item, nextitem):
+
+        # If the test was skipped, the setup function is as well
+        if not hasattr(item, 'capturelog_handler'):
+            return
+
         # Detach the handler from the root logger to ensure no
         # further access to the handler.
         root_logger = logging.getLogger()
