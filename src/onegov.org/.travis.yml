@@ -3,35 +3,35 @@ python: "3.4"
 cache: pip
 
 env:
-    - TOXENV=py34
-    - TOXENV=pep8
-install:
-    - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - TOXENV=py34 ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.2.0.tar.gz
+    - TOXENV=pep8 ES_URL=no
+
+install: ./.travis-install.sh
+
 script:
     - tox -e $TOXENV
+
 after_success:
     - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
-#
-# Activate this after the repository has been added to travis.
-# If enabled, travis will automatically upload eggs to pypi every time
-# a tagged commit is encountered.
-#
-# To add the pypi password use this:
-#
-# gem install travis
-# travis encrypt --repo seantis/onegov.org
-#
-# Then replace 'encrypted...' below with the new encryption string (no need to
-# copy the quotes).
-#
-# deploy:
-#     provider: pypi
-#     distributions: "sdist bdist_wheel"
-#     user: seantis
-#     password:
-#       secure: encrypted...
-#     on:
-#         tags: true
-#         condition: $TOXENV = py34
-#
+    - 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
+    - if [ "$TOXENV" = 'py34' ]; then cat requirements.txt; fi
+
+deploy:
+
+    - provider: pypi
+      distributions: "sdist bdist_wheel"
+      user: seantis
+      password:
+        secure: "gN38WfPyD7jE7kqJwyCprn8pl1xuw5qZmjd8/EhKAp4cqdHxDdrgYqoQ0ZR78CY/UZKfTpb4Iap/jsrClOGvkrgurKo6XB5Lfs2Ykr2OzcjVlBt1JCP/LnaP68YE2UF+Klegv0rXWOcR9nX7d1VuTkXKSn9Rj2QrhClGKyUtd7UsRjgqo+fSZ2jDp6kqW+jCywVAi0NotHvxO+J9F4RsGhAk32P6ZdX3SHwgaLdtdYaD+4CzcncezO29ghc1eEtza1XNpe5VttY7u7VymOhstoKVKLGhQksAdl7i6hju+snMBdwSRgXD1LP24t2poJJLsZ+Qj1UT3Z57VBlW8LQACdHDkEJMCRbwhkyvoOTN7Zb69Y4OnwwoAgRNjgF+7BoiDA+ytslQCxsAwxUzHcbwNUIwIhVd+2K8Au85wIdTSWp/IERp3BCLB8ykh+spDNv5/TSj9eV9woQ6vGFeq4x1FBX2TPy+C4ERVrqXv6YlRZKMtEoazWJHWX4P9LfUjWROBCnXhkmvGl6h22Y6obLdkffW5isUvidnyiJG28oLHbC7tuCIwaqcrekQAROGkXOQUsdtb2iWXNUgIucozEvxj4Y952IaRtSAvlAhNQU1uBMGya0kA055zFfdI+jArUsVlQtEAa2OH1If7kMUmfSdbgV6CFZ7ePt3tjD9+MYUv7k="
+      on:
+        tags: true
+        condition: $TOXENV = py34
+
+    - provider: releases
+      api_key:
+        secure: "XY3R0Vp2F7tkG3g6cPENSvf1MUNh/XSf6EnfYtoBQkX6LPwL/TFCnbaxw5vUx8Ocz3hlS1/De8f2w+V2zl1uWSUeCEbkNZAZt/Vu8/tJJKZU/KrilHZlqaNtfZmIhuAh1OgkMGxT4r9hxRUbI0jLe0i8OvNAdbZADm+kSxpTb5eAIqJmpMX9/DKG06ogY+PgcjpTe2Ycx88UNNnMg7Euqv17LkxCWA8RT3hmHpq2TdoKkrSeJKhv4gUHWkA1XBL1Ekt8WIOdnPRI+BIRwCVT6+YYTb+EuSFpcQc6zgyAr4xOYVwdHNuCSUCfWnxQR0dEt+oIDBvBUfATxA7DpgSMogfPgZ/KV1pdydYjUuD9S0LPyHY/LvZXaRHSaplhV6UERpR93PHWegyCy//WSD+tYXQSHtw5ArmsZ8LXG6rtHpehgBG5z39WQfl3OdQjmuh21GuCXiYF8Oj2ppPlAtSz00k5LV72TvGmTAXj4bvRY6IL63tYSHDJy1CxHmPNNaaI82STnVCw6js8yfqcbmUzVrSGuSJSBrMND4I0uKcIZ/dKkMKJhROMA0lrjEnkrSdSNHdsdwo7zmnkYcKoc62rTGg3ACN4/eLWasRX+CfZPMDdcyVQddDYzmM+YjXAi4rp5iHu2JEGdJvu9ffNNg+O/hYbqGKhzfDhcTrQ+A5dcy8="
+      file: requirements.txt
+      skip_cleanup: true
+      on:
+        tags: true
+        condition: $TOXENV = py34
