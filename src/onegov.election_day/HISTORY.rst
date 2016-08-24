@@ -10,9 +10,6 @@ Changelog
 - Adds the ability to download the SVG images.
   [msom]
 
-- Adds French, Romansh and Italian translations.
-  [freinhard, msom]
-
 - Adds a last update time column to the frontpage and archive pages.
   [msom]
 
@@ -31,8 +28,8 @@ Changelog
 - Clears the cache after uploading results.
   [msom]
 
-- Adds compatibility with Morepath 0.13.
-  [href]
+- Updates French, Romansh and Italian translations.
+  [freinhard, msom]
 
 - Sorts the sublists by the ID of the list when displaying list connection
   results of elections.
@@ -40,6 +37,9 @@ Changelog
 
 - Fixes javascript for form dependencies.
   [msom]
+
+- Adds compatibility with Morepath 0.13.
+  [href]
 
 0.7.2 (2016-03-18)
 ~~~~~~~~~~~~~~~~~~~
