@@ -19,7 +19,7 @@ Changelog
 - Adds the 'Last-Modified' header to the views with results.
   [msom]
 
-- Adds some basic print styles.
+- Adds basic print styles.
   [msom]
 
 - Adds pagination to management views.

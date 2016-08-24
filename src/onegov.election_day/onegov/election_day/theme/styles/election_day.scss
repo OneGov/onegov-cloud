@@ -409,6 +409,11 @@ footer {
     font-size: 85%;
     margin-top: 2rem;
     padding: 1rem 0;
+
+    .copyright::after {
+        content: ' |';
+    }
+
 }
 
 
@@ -741,7 +746,14 @@ form {
     .row.archive,
     .row.header,
     a.svg-download,
-    ul.locales {
+    ul.locales,
+    .foldable.folded,
+    .foldable-title::before,
+    .onegov-link,
+    .open-data-link,
+    .results-navigation a,
+    .results-navigation h2::after,
+    .copyright::after {
         display: none;
     }
 
@@ -754,5 +766,21 @@ form {
     svg,
     table {
         max-width: 100%;
+    }
+
+    .row.percentages .columns {
+        width: 50%;
+    }
+
+    .ballot-map {
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 60%;
+    }
+
+    h2,
+    h3,
+    .factoids {
+        page-break-after: avoid;
     }
 }

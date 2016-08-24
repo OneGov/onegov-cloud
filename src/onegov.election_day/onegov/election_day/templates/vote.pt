@@ -28,7 +28,7 @@
 
             <div class="clearfix"></div>
 
-            <div class="row">
+            <div class="row percentages">
                 <div class="columns small-12 medium-6">
                     <dl>
                         <dd class="accepted" >${'{0:.2f}'.format(vote.yeas_percentage)}%</dd>
