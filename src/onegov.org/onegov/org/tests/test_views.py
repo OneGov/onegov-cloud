@@ -323,7 +323,6 @@ def test_reset_password(org_app):
     assert "Sie wurden eingeloggt" in login_page.form.submit().follow().text
 
 
-@pytest.mark.skip(reason="we currently lack a generic settings page")
 def test_unauthorized(org_app):
     client = Client(org_app)
 
@@ -2496,7 +2495,6 @@ def test_basic_autocomplete(es_org_app):
     assert client.get('/suche/suggest?q=Fl').json == []
 
 
-@pytest.mark.skip(reason="nees to be made more generic")
 def test_unsubscribe_link(org_app):
 
     client = Client(org_app)
@@ -2763,7 +2761,6 @@ def test_newsletter_send(org_app):
     assert recipients.query().count() == 1
 
 
-@pytest.mark.skip(reason="we currently lack a generic settings dialog")
 def test_map_default_view(org_app):
     client = Client(org_app)
     client.login_admin()
@@ -2849,3 +2846,46 @@ def test_manage_album(org_app):
 
     album = albums.click("Comicon 2016")
     assert "This is an alt text" in album
+
+
+def test_settings(org_app):
+    client = Client(org_app)
+
+    assert client.get('/einstellungen', expect_errors=True).status_code == 403
+
+    client.login_admin()
+
+    settings_page = client.get('/einstellungen')
+    document = settings_page.pyquery
+
+    assert document.find('input[name=name]').val() == 'Govikon'
+    assert document.find('input[name=primary_color]').val() == '#006fba'
+
+    settings_page.form['primary_color'] = '#xxx'
+    settings_page.form['reply_to'] = 'info@govikon.ch'
+    settings_page = settings_page.form.submit()
+
+    assert "Ungültige Farbe." in settings_page.text
+
+    settings_page.form['primary_color'] = '#ccddee'
+    settings_page.form['reply_to'] = 'info@govikon.ch'
+    settings_page = settings_page.form.submit()
+
+    assert "Ungültige Farbe." not in settings_page.text
+
+    settings_page.form['logo_url'] = 'https://seantis.ch/logo.img'
+    settings_page.form['reply_to'] = 'info@govikon.ch'
+    settings_page = settings_page.form.submit()
+
+    assert '<img src="https://seantis.ch/logo.img"' in settings_page.text
+
+    settings_page.form['homepage_image_1'] = "http://images/one"
+    settings_page.form['homepage_image_2'] = "http://images/two"
+    settings_page = settings_page.form.submit()
+
+    assert 'http://images/one' in settings_page
+    assert 'http://images/two' in settings_page
+
+    settings_page.form['analytics_code'] = '<script>alert("Hi!");</script>'
+    settings_page = settings_page.form.submit()
+    assert '<script>alert("Hi!");</script>' in settings_page.text

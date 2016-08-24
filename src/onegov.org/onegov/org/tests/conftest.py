@@ -15,6 +15,12 @@ from uuid import uuid4
 
 
 @pytest.yield_fixture(scope='session')
+def handlers():
+    yield onegov.ticket.handlers
+    onegov.ticket.handlers.registry = {}
+
+
+@pytest.yield_fixture(scope='session')
 def filestorage():
     directory = tempfile.mkdtemp()
     yield directory

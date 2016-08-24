@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-23 11:48+0200\n"
+"POT-Creation-Date: 2016-08-24 09:38+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -11,6 +11,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#, python-format
+msgid "${org} OneGov Cloud Status"
+msgstr ""
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -542,8 +546,119 @@ msgstr "Excel Datei"
 msgid "JSON File"
 msgstr "JSON Datei"
 
+msgid "E-Mail Reply Address"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "Logo"
+msgstr "Logo"
+
+msgid "URL pointing to the logo"
+msgstr ""
+
+msgid "Replies to automated e-mails go to this address."
+msgstr ""
+
+msgid "Primary Color"
+msgstr ""
+
+msgid "Contact"
+msgstr "Kontakt"
+
+msgid "The address and phone number of the municipality"
+msgstr ""
+
+msgid "Contact Page"
+msgstr ""
+
+msgid "URL pointing to a contact page"
+msgstr ""
+
+msgid "Opening Hours"
+msgstr "Öffnungszeiten"
+
+msgid "The opening hours of the municipality"
+msgstr ""
+
+msgid "Opening Hours Page"
+msgstr ""
+
+msgid "URL pointing to an opening hours page"
+msgstr ""
+
+msgid "Facebook"
+msgstr ""
+
+msgid "URL pointing to the facebook site"
+msgstr ""
+
+msgid "Twitter"
+msgstr ""
+
+msgid "URL pointing to the twitter site"
+msgstr ""
+
+msgid "Homepage Image #1"
+msgstr ""
+
+msgid "Homepage Image #2"
+msgstr ""
+
+msgid "Homepage Image #3"
+msgstr ""
+
+msgid "Homepage Image #4"
+msgstr ""
+
+msgid "Homepage Image #5"
+msgstr ""
+
+msgid "Homepage Image #6"
+msgstr ""
+
+msgid "Online Counter Label"
+msgstr ""
+
+msgid "Forms and applications"
+msgstr ""
+
+msgid "Reservations Label"
+msgstr ""
+
+msgid "Daypasses and rooms"
+msgstr ""
+
+msgid "SBB Daypass Label"
+msgstr ""
+
+msgid "Generalabonnement for Towns"
+msgstr ""
+
+msgid "The default map view. This should show the whole town"
+msgstr ""
+
+msgid "Maps"
+msgstr ""
+
+msgid "Analytics Code"
+msgstr ""
+
+msgid "JavaScript for web statistics support"
+msgstr ""
+
+msgid "Advanced"
+msgstr ""
+
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
+
+msgid "Send me a daily e-mail with information about the website's state."
+msgstr ""
 
 msgid "Hide from the public"
 msgstr "Vor der Öffentlichkeit verstecken"
@@ -553,9 +668,6 @@ msgstr "Auf der Startseite anzeigen"
 
 msgid "Map"
 msgstr "Karte"
-
-msgid "Contact"
-msgstr "Kontakt"
 
 msgid "This month"
 msgstr "Diesen Monat"
@@ -760,9 +872,6 @@ msgstr "Es wurden noch keine Formulare definiert."
 msgid "Selected Topics"
 msgstr "Ausgewählte Themen"
 
-msgid "Topics"
-msgstr "Themen"
-
 msgid "All news"
 msgstr "Alle Nachrichten"
 
@@ -800,9 +909,6 @@ msgstr "Navigation überspringen"
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
 
-msgid "Logo"
-msgstr "Logo"
-
 msgid "Open Ticket"
 msgstr "Offenes Ticket"
 
@@ -824,9 +930,6 @@ msgstr ""
 
 msgid "more…"
 msgstr "mehr…"
-
-msgid "Opening Hours"
-msgstr "Öffnungszeiten"
 
 msgid "Social Media"
 msgstr "Soziale Medien"
@@ -947,12 +1050,12 @@ msgstr "Das OneGov Cloud Team"
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
-msgid "This is what happend on the ${town} website yesterday:"
-msgstr "Folgendes ist gestern auf der ${town} Webseite geschehen:"
+msgid "This is what happend on the ${org} website yesterday:"
+msgstr "Folgendes ist gestern auf der ${org} Webseite geschehen:"
 
-msgid "This is what happend on the ${town} website over the weekend:"
+msgid "This is what happend on the ${org} website over the weekend:"
 msgstr ""
-"Folgendes ist während des Wochenendes auf der ${town} Webseite geschehen:"
+"Folgendes ist während des Wochenendes auf der ${org} Webseite geschehen:"
 
 msgid "tickets were opened."
 msgstr "Tickets wurden eröffnet."
@@ -990,9 +1093,6 @@ msgstr "Wir wünschen Ihnen eine schöne Woche!"
 msgid "Have a great day!"
 msgstr "Wir wünschen Ihnen einen schönen Tag!"
 
-msgid "The OneGov Cloud Team"
-msgstr "Das OneGov Cloud Team"
-
 msgid ""
 "This is the daily OneGov Cloud status e-mail. If you don't want to receive "
 "this e-mail you may deactivate it by clicking on"
@@ -1026,8 +1126,8 @@ msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
 "newsletter."
 msgstr ""
-"Sie erhalten Diese E-Mail weil Sie sich für den ${org} Newsletter "
-"angemeldet haben."
+"Sie erhalten Diese E-Mail weil Sie sich für den ${org} Newsletter angemeldet "
+"haben."
 
 msgid "Click here to view web version."
 msgstr "Klicken Sie hier um die Web-Version anzuzeigen."
@@ -1281,6 +1381,9 @@ msgstr "Sie wurden ausgeloggt."
 msgid "Wrong e-mail address, password or yubikey."
 msgstr "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."
 
+msgid "Login"
+msgstr ""
+
 msgid "You have been logged in."
 msgstr "Sie wurden eingeloggt."
 
@@ -1324,6 +1427,12 @@ msgstr "Zugriff verweigert"
 msgid "Not Found"
 msgstr "Seite nicht gefunden"
 
+msgid "Files"
+msgstr ""
+
+msgid "Images"
+msgstr ""
+
 msgid "Manage Photo Albums"
 msgstr "Fotoalben verwalten"
 
@@ -1332,9 +1441,6 @@ msgstr "Dieser Dateityp wird nicht unterstützt"
 
 msgid "The file name is too long"
 msgstr "Der Dateiname ist zu lang"
-
-msgid "Forms"
-msgstr "Formulare"
 
 msgid "New Form"
 msgstr "Neues Formular"
@@ -1432,9 +1538,6 @@ msgstr "Die Reservation wurde abgesagt"
 msgid "Your reservations were accepted"
 msgstr "Ihre Reservationen wurden angenommen"
 
-msgid "Reset password"
-msgstr "Passwort zurücksetzen"
-
 #, python-format
 msgid ""
 "A password reset link has been sent to ${email}, provided an account exists "
@@ -1463,21 +1566,9 @@ msgstr "Ein neuer Raum wurde hinzugefügt"
 msgid "New room"
 msgstr "Neuer Raum"
 
-msgid "Clean up"
-msgstr "Aufräumen"
-
-msgid "Occupancy"
-msgstr "Belegung"
-
-msgid "Export"
-msgstr "Export"
-
 #, python-format
 msgid "Successfully removed ${count} unused allocations"
 msgstr "${count} Einteilungen wurden erfolgreich entfernt"
-
-msgid "Search"
-msgstr "Suche"
 
 #, python-format
 msgid "Search through ${count} indexed documents"
@@ -1489,6 +1580,9 @@ msgstr "${count} Resultate"
 
 msgid "Search Unavailable"
 msgstr "Suche Nicht Verfügbar"
+
+msgid "Topics"
+msgstr "Themen"
 
 msgid "Resources"
 msgstr "Reservationen"
@@ -1513,12 +1607,6 @@ msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
-msgid "Open Tickets"
-msgstr "Offene Tickets"
-
-msgid "Tickets"
-msgstr "Tickets"
-
 #, python-format
 msgid "You have accepted ticket ${number}"
 msgstr "Sie haben das Ticket ${number} angenommen"
@@ -1527,15 +1615,9 @@ msgstr "Sie haben das Ticket ${number} angenommen"
 msgid "You have closed ticket ${number}"
 msgstr "Sie haben das Ticket ${number} abgeschlossen"
 
-msgid "Your ticket has been closed"
-msgstr "Ihr Ticket wurde geschlossen"
-
 #, python-format
 msgid "You have reopened ticket ${number}"
 msgstr "Sie haben das Ticket ${number} wieder geöffnet"
-
-msgid "Your ticket has been reopened"
-msgstr "Ihr Ticket wurde wieder geöffnet"
 
 msgid "Your request is currently pending"
 msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
@@ -1569,5 +1651,8 @@ msgstr "Abgeschlossene Tickets"
 msgid "All Tickets"
 msgstr "Alle Tickets"
 
-#~ msgid "Organisation Logo"
-#~ msgstr "Logo der Organisation"
+msgid "User Profile"
+msgstr "Benutzerprofil"
+
+msgid "You have been successfully unsubscribed from all regular emails."
+msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."

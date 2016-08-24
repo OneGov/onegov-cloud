@@ -20,7 +20,10 @@ from onegov.org.forms.resource import (
     ResourceCleanupForm,
     ResourceExportForm
 )
+from onegov.org.forms.settings import SettingsForm
 from onegov.org.forms.signup import SignupForm
+from onegov.org.forms.userprofile import UserProfileForm
+
 
 __all__ = [
     'CustomDefinitionForm',
@@ -41,5 +44,7 @@ __all__ = [
     'RequestPasswordResetForm',
     'RoomAllocationForm',
     'RoomAllocationEditForm',
+    'SettingsForm',
     'SignupForm',
+    'UserProfileForm',
 ]
