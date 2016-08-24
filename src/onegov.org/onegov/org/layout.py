@@ -29,7 +29,6 @@ from onegov.org.theme.org_theme import user_options
 from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
-from onegov.user import Auth
 from purl import URL
 from sqlalchemy import desc
 
@@ -207,22 +206,6 @@ class Layout(ChameleonLayout):
     def closed_tickets_url(self):
         return self.request.link(
             TicketCollection(self.request.app.session(), state='closed'))
-
-    @cached_property
-    def login_url(self):
-        """ Returns the login url for the current page. """
-        return self.request.link(
-            Auth.from_app(self.app, self.request.transform(self.request.path)),
-            name='login'
-        )
-
-    @cached_property
-    def logout_url(self):
-        """ Returns the logout url for the current page. """
-        return self.request.link(
-            Auth.from_app(self.app, self.request.transform(self.request.path)),
-            name='logout'
-        )
 
     @cached_property
     def events_url(self):

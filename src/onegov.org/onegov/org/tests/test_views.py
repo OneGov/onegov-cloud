@@ -224,7 +224,6 @@ def test_view_images(org_app):
     assert "Noch keine Bilder hochgeladen" not in images_page
 
 
-@pytest.mark.skip(reason="requires bottom links refactor")
 def test_login(org_app):
     client = Client(org_app)
 
@@ -261,7 +260,6 @@ def test_login(org_app):
     assert links.text() == 'Login'
 
 
-@pytest.mark.skip(reason="requires bottom links refactor")
 def test_reset_password(org_app):
     client = Client(org_app)
 

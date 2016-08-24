@@ -1,6 +1,7 @@
 from onegov.core.security import Public
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultLayout
+from onegov.user.auth import Auth
 from webob.exc import HTTPForbidden, HTTPNotFound
 
 
@@ -21,7 +22,8 @@ def handle_forbidden(self, request):
     return {
         'layout': layout,
         'title': _("Access Denied"),
-        'login_url': layout.login_url
+        'login_url': request.link(
+            Auth.from_request_path(request), name='login')
     }
 
 
