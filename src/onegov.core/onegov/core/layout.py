@@ -99,6 +99,9 @@ class Layout(object):
         the given format.
 
         """
+        if dt is None:
+            return ''
+
         if getattr(dt, 'tzinfo', None) is not None:
             dt = self.timezone.normalize(dt.astimezone(self.timezone))
 

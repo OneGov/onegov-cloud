@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes formatting date failing if the date is None.
+  [msom]
+
 0.23.0 (2016-08-23)
 ~~~~~~~~~~~~~~~~~~~
 

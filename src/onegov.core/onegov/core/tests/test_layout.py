@@ -29,6 +29,7 @@ def test_format_date():
     assert layout.format_date(dt, 'time') == '15:00'
     assert layout.format_date(dt, 'time') == '15:00'
     assert layout.format_date(date(2016, 1, 3), 'date') == '03.01.2016'
+    assert layout.format_date(None, 'datetime') == ''
 
 
 def test_format_number():
