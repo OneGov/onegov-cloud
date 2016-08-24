@@ -407,14 +407,11 @@ def test_pages(org_app):
     assert page.pyquery('i').text().startswith("Experts say hiring more")
 
 
-@pytest.mark.skip(reason="the generic homepage is currently empty")
 def test_news(org_app):
     client = Client(org_app)
-    page = client.login_admin().follow()
+    client.login_admin().follow()
 
-    assert len(page.pyquery('.latest-news')) == 1
-
-    page = page.click('Aktuelles', index=1)
+    page = client.get('/aktuelles')
     assert str(datetime.utcnow().year) not in page.text
 
     page = page.click('Nachricht')
@@ -439,18 +436,7 @@ def test_news(org_app):
     # do not show the year in the news list if there's only one
     assert str(datetime.utcnow().year) not in page.text
 
-    page = client.get('/')
-
-    assert "We have a new homepage" in page.text
-    assert "It is very good" in page.text
-    assert "It is lots of fun" not in page.text
-    assert str(datetime.utcnow().year) in page.text
-
-    page = page.click('We have a new homepage')
-
-    assert "We have a new homepage" in page.text
-    assert "It is very good" in page.text
-    assert "It is lots of fun" in page.text
+    page = client.get('/aktuelles/we-have-a-new-homepage')
 
     client.delete(page.pyquery('a[ic-delete-from]').attr('ic-delete-from'))
     page = client.get('/aktuelles')
