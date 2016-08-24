@@ -40,10 +40,14 @@ from onegov.core import Framework
 
 
 def get_default_vars(request):
-    return {
+
+    default = {
         'request': request,
         'translate': request.get_translate(for_chameleon=True)
     }
+
+    return request.app.config.templatevariables_registry.get_variables(
+        request, default)
 
 
 @Framework.template_loader(extension='.pt')

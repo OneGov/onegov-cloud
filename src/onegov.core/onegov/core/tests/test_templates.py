@@ -1,3 +1,4 @@
+import morepath
 import os
 import os.path
 import polib
@@ -95,3 +96,68 @@ def test_chameleon_with_translation(temporary_directory):
     assert '<b>Wir denken, wir denken!</b>' not in client.get('/macro').text
 
     assert '<i>Makro</i>' in client.get('/macro').text
+
+
+def test_inject_default_vars(temporary_directory):
+
+    templates = os.path.join(temporary_directory, 'templates')
+    os.mkdir(templates)
+
+    with open(os.path.join(templates, 'index.pt'), 'w') as f:
+        f.write("""
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml"
+                  xmlns:tal="http://xml.zope.org/namespaces/tal">
+                <span>${injected}</span>
+                <span tal:condition="parent|nothing">padre</span>
+                <span tal:condition="child|nothing">niño</span>
+            </html>
+        """)
+
+    class Parent(Framework):
+        pass
+
+    @Parent.template_directory()
+    def get_template_directory():
+        return templates
+
+    @Parent.path(path='/')
+    class Root(object):
+        pass
+
+    @Parent.view(model=Root, template='index.pt')
+    def view_root(self, request):
+        return {}
+
+    @Parent.template_variables()
+    def get_parent_template_variables(request):
+        return {
+            'injected': 'parent',
+            'parent': True
+        }
+
+    class Child(Parent):
+        pass
+
+    @Child.template_variables()
+    def get_child_template_variables(request):
+        return {
+            'injected': 'child',
+            'child': True
+        }
+
+    utils.scan_morepath_modules(Parent)
+    utils.scan_morepath_modules(Child)
+
+    morepath.commit(Parent)
+    morepath.commit(Child)
+
+    parent_page = Client(Parent()).get('/')
+    assert 'parent' in parent_page
+    assert 'padre' in parent_page
+    assert 'niño' not in parent_page
+
+    child_page = Client(Child()).get('/')
+    assert 'child' in child_page
+    assert 'padre' not in child_page
+    assert 'niño' in child_page

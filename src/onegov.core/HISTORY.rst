@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds a template variable directive, which gives applications the ability
+  to inject their own global variables into templates.
+  [href]
+
 - Fixes formatting date failing if the date is None.
   [msom]
 

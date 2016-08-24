@@ -153,3 +153,48 @@ class StaticDirectoryAction(Action):
             path = os.path.join(os.path.dirname(self.code_info.path), path)
 
         staticdirectory_registry.paths.append(path)
+
+
+class TemplateVariablesRegistry(object):
+
+    __slots__ = ['callbacks']
+
+    def __init__(self):
+        self.callbacks = []
+
+    def get_variables(self, request, base=None):
+        base = base or {}
+
+        for callback in self.callbacks:
+            base.update(callback(request))
+
+        return base
+
+
+@Framework.directive('template_variables')
+class TemplateVariablesAction(Action):
+    """ Registers a set of global template variables for chameleon templates.
+
+    Only exists once per application. Template variables with conflicting
+    keys defined in child applications override the keys with the same
+    name in the parent application. Non-conflicting keys are kept individually.
+
+    Example::
+
+        @App.template_variables()
+        def get_template_variables(request):
+            return {
+                'foo': 'bar'
+            }
+
+    """
+
+    config = {
+        'templatevariables_registry': TemplateVariablesRegistry
+    }
+
+    def identifier(self, templatevariables_registry):
+        return 'template-variables'  # constant name => one action per app
+
+    def perform(self, func, templatevariables_registry):
+        templatevariables_registry.callbacks.append(func)
