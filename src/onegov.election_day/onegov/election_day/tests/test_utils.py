@@ -1,6 +1,7 @@
 from datetime import date, datetime
-from mock import Mock
+from freezegun import freeze_time
 from io import BytesIO
+from mock import Mock
 from onegov.ballot import Election, Vote
 from onegov.election_day.formats import load_csv
 from onegov.election_day.models import Archive
@@ -47,81 +48,97 @@ def test_add_last_modified_header():
 
 
 def test_get_election_summary(session):
-    election = Election(
-        title="Election",
-        domain='federation',
-        type='majorz',
-        date=date(2011, 1, 1),
-    )
+    with freeze_time("2014-01-01 12:00"):
+        election = Election(
+            title="Election",
+            domain='federation',
+            type='majorz',
+            date=date(2011, 1, 1),
+        )
+        session.add(election)
+        session.flush()
 
-    assert get_election_summary(election, DummyRequest()) == {
-        'date': '2011-01-01',
-        'domain': 'federation',
-        'progress': {'counted': 0, 'total': 0},
-        'title': {'de_CH': 'Election'},
-        'type': 'election',
-        'url': 'Election'
-    }
+        assert get_election_summary(election, DummyRequest()) == {
+            'date': '2011-01-01',
+            'domain': 'federation',
+            'last_modified': '2014-01-01T12:00:00+00:00',
+            'progress': {'counted': 0, 'total': 0},
+            'title': {'de_CH': 'Election'},
+            'type': 'election',
+            'url': 'Election',
+        }
 
 
 def test_get_vote_summary(session):
-    vote = Vote(
-        title="Vote",
-        domain='federation',
-        date=date(2011, 1, 1),
-    )
+    with freeze_time("2014-01-01 12:00"):
+        vote = Vote(
+            title="Vote",
+            domain='federation',
+            date=date(2011, 1, 1),
+        )
+        session.add(vote)
+        session.flush()
 
-    assert get_vote_summary(vote, DummyRequest()) == {
-        'answer': '',
-        'date': '2011-01-01',
-        'domain': 'federation',
-        'nays_percentage': 100.0,
-        'progress': {'counted': 0.0, 'total': 0.0},
-        'title': {'de_CH': 'Vote'},
-        'type': 'vote',
-        'url': 'Vote',
-        'yeas_percentage': 0.0
-    }
+        assert get_vote_summary(vote, DummyRequest()) == {
+            'answer': '',
+            'date': '2011-01-01',
+            'domain': 'federation',
+            'last_modified': '2014-01-01T12:00:00+00:00',
+            'nays_percentage': 100.0,
+            'progress': {'counted': 0.0, 'total': 0.0},
+            'title': {'de_CH': 'Vote'},
+            'type': 'vote',
+            'url': 'Vote',
+            'yeas_percentage': 0.0,
+        }
 
 
 def test_get_summary(session):
     r = DummyRequest()
 
-    election = Election(
-        title="Election",
-        domain='federation',
-        type='majorz',
-        date=date(2011, 1, 1),
-    )
-    assert get_summary(election, r) == get_election_summary(election, r)
+    with freeze_time("2014-01-01 12:00"):
+        election = Election(
+            title="Election",
+            domain='federation',
+            type='majorz',
+            date=date(2011, 1, 1),
+        )
+        vote = Vote(
+            title="Vote",
+            domain='federation',
+            date=date(2011, 1, 1),
+        )
+        session.add(election)
+        session.add(vote)
+        session.flush()
 
-    vote = Vote(
-        title="Vote",
-        domain='federation',
-        date=date(2011, 1, 1),
-    )
-    assert get_summary(vote, r) == get_vote_summary(vote, r)
+        assert get_summary(election, r) == get_election_summary(election, r)
+        assert get_summary(vote, r) == get_vote_summary(vote, r)
 
 
 def test_get_summaries(session):
-    r = DummyRequest()
+    with freeze_time("2014-01-01 12:00"):
+        r = DummyRequest()
 
-    election = Election(
-        title="Election",
-        domain='federation',
-        type='majorz',
-        date=date(2011, 1, 1),
-    )
-    vote = Vote(
-        title="Vote",
-        domain='federation',
-        date=date(2011, 1, 1),
-    )
+        election = Election(
+            title="Election",
+            domain='federation',
+            type='majorz',
+            date=date(2011, 1, 1),
+        )
+        vote = Vote(
+            title="Vote",
+            domain='federation',
+            date=date(2011, 1, 1),
+        )
+        session.add(election)
+        session.add(vote)
+        session.flush()
 
-    assert get_summaries([election, vote], r) == [
-        get_election_summary(election, r),
-        get_vote_summary(vote, r)
-    ]
+        assert get_summaries([election, vote], r) == [
+            get_election_summary(election, r),
+            get_vote_summary(vote, r)
+        ]
 
 
 def test_get_archive_links(session):

@@ -1,4 +1,5 @@
 from datetime import date
+from freezegun import freeze_time
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
@@ -177,25 +178,29 @@ def test_view_election_summary(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client)
-    upload_proporz_election(client)
 
-    assert client.get('/election/majorz-election/summary').json == {
-        'type': 'election',
-        'progress': {'counted': 1, 'total': 1},
-        'domain': 'federation',
-        'title': {'de_CH': 'Majorz Election'},
-        'date': '2015-01-01',
-        'url': 'http://localhost/election/majorz-election'
-    }
-    assert client.get('/election/proporz-election/summary').json == {
-        'type': 'election',
-        'progress': {'counted': 1, 'total': 1},
-        'domain': 'federation',
-        'title': {'de_CH': 'Proporz Election'},
-        'date': '2015-01-01',
-        'url': 'http://localhost/election/proporz-election'
-    }
+    with freeze_time("2014-01-01 12:00"):
+        upload_majorz_election(client)
+        upload_proporz_election(client)
+
+        assert client.get('/election/majorz-election/summary').json == {
+            'date': '2015-01-01',
+            'domain': 'federation',
+            'last_modified': '2014-01-01T12:00:00+00:00',
+            'progress': {'counted': 1, 'total': 1},
+            'title': {'de_CH': 'Majorz Election'},
+            'type': 'election',
+            'url': 'http://localhost/election/majorz-election',
+        }
+        assert client.get('/election/proporz-election/summary').json == {
+            'date': '2015-01-01',
+            'domain': 'federation',
+            'last_modified': '2014-01-01T12:00:00+00:00',
+            'progress': {'counted': 1, 'total': 1},
+            'title': {'de_CH': 'Proporz Election'},
+            'type': 'election',
+            'url': 'http://localhost/election/proporz-election',
+        }
 
 
 def test_view_election_data(election_day_app_gr):

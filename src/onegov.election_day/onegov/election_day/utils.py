@@ -15,10 +15,14 @@ def get_election_summary(election, request):
     """ Returns some basic informations about the given election as a JSON
     seriazable dict. """
 
+    last_modified = election.last_result_change
+    if last_modified:
+        last_modified = last_modified.isoformat()
+
     return {
         'date': election.date.isoformat(),
         'domain': election.domain,
-        'last_modified': election.last_result_change.isoformat(),
+        'last_modified': last_modified,
         'progress': {
             'counted': election.counted_municipalities or 0,
             'total': election.total_municipalities or 0
@@ -35,11 +39,15 @@ def get_vote_summary(vote, request):
 
     divider = len(vote.ballots) or 1
 
+    last_modified = vote.last_result_change
+    if last_modified:
+        last_modified = last_modified.isoformat()
+
     return {
         'answer': vote.answer or "",
         'date': vote.date.isoformat(),
         'domain': vote.domain,
-        'last_modified': vote.last_result_change.isoformat(),
+        'last_modified': last_modified,
         'nays_percentage': vote.nays_percentage,
         'progress': {
             'counted': (vote.progress[0] or 0) / divider,

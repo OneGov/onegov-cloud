@@ -1,4 +1,5 @@
 from datetime import date
+from freezegun import freeze_time
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
@@ -73,19 +74,22 @@ def test_view_vote_summary(election_day_app):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_vote(client)
 
-    assert client.get('/vote/vote/summary').json == {
-        'answer': 'rejected',
-        'date': '2015-01-01',
-        'domain': 'federation',
-        'nays_percentage': 62.78808066258552,
-        'progress': {'counted': 11.0, 'total': 11.0},
-        'title': {'de_CH': 'Vote'},
-        'type': 'vote',
-        'url': 'http://localhost/vote/vote',
-        'yeas_percentage': 37.21191933741448
-    }
+    with freeze_time("2014-01-01 12:00"):
+        upload_vote(client)
+
+        assert client.get('/vote/vote/summary').json == {
+            'answer': 'rejected',
+            'date': '2015-01-01',
+            'domain': 'federation',
+            'last_modified': '2014-01-01T12:00:00+00:00',
+            'nays_percentage': 62.78808066258552,
+            'progress': {'counted': 11.0, 'total': 11.0},
+            'title': {'de_CH': 'Vote'},
+            'type': 'vote',
+            'url': 'http://localhost/vote/vote',
+            'yeas_percentage': 37.21191933741448,
+        }
 
 
 def test_view_vote_data(election_day_app):
