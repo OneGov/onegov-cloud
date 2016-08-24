@@ -303,7 +303,7 @@ def view_election_json(self, request):
             'counted': self.counted_municipalities or 0,
             'total': self.total_municipalities or 0,
         },
-        'related_link': self.meta.get('related_link', ''),
+        'related_link': (self.meta or {}).get('related_link', ''),
         'title': self.title_translations,
         'type': 'election',
         'statistics': {
