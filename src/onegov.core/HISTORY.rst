@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.24.0 (2016-08-24)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a template variable directive, which gives applications the ability
   to inject their own global variables into templates.
