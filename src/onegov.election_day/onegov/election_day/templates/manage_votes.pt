@@ -44,10 +44,10 @@
                         <td tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
                         <td>
                             <ul class="actions">
-                                <li><a i18n:translate class="action-view" href="${request.link(vote)}">View</a></li>
-                                <li><a i18n:translate class="action-edit" href="${request.link(vote, 'edit')}">Edit</a></li>
-                                <li><a i18n:translate class="action-upload" href="${request.link(vote, 'upload')}">Upload Results</a></li>
-                                <li><a i18n:translate class="action-delete" href="${request.link(vote, 'delete')}">Delete</a></li>
+                                <li><a i18n:translate="" class="action-view" href="${request.link(vote)}">View</a></li>
+                                <li><a i18n:translate="" class="action-edit" href="${request.link(vote, 'edit')}">Edit</a></li>
+                                <li><a i18n:translate="" class="action-upload" href="${request.link(vote, 'upload')}">Upload Results</a></li>
+                                <li><a i18n:translate="" class="action-delete" href="${request.link(vote, 'delete')}">Delete</a></li>
                             </ul>
                         </td>
                     </tr>
