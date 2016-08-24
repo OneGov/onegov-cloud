@@ -47,7 +47,6 @@ setup(
         'onegov.gis',
         'onegov.libres>=0.3.0',
         'onegov.newsletter>=0.1.0',
-        'onegov.org',
         'onegov.page>=0.1.0',
         'onegov.people>=0.0.2',
         'onegov.search>=0.6.2',
