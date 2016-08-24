@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to create a login auth object to the current path.
+  [href]
+
 0.4.4 (2016-07-19)
 ~~~~~~~~~~~~~~~~~~~
 

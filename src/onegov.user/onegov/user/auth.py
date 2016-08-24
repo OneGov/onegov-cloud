@@ -86,6 +86,10 @@ class Auth(object):
     def from_request(cls, request, to='/'):
         return cls.from_app(request.app, to)
 
+    @classmethod
+    def from_request_path(cls, request):
+        return cls.from_request(request, request.transform(request.path))
+
     @property
     def users(self):
         return UserCollection(self.session)
