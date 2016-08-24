@@ -13,6 +13,9 @@ Changelog
 - Adds French, Romansh and Italian translations.
   [freinhard, msom]
 
+- Adds a last update time column to the frontpage and archive pages.
+  [msom]
+
 - Adds JSON views for results.
   [msom]
 

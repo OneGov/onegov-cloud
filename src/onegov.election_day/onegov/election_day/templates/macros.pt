@@ -151,11 +151,12 @@
                     </tal:block>
                 </tal:block>
 
-                <table class="overview stackable" tal:condition="type == 'election'">
+                <table class="overview election stackable" tal:condition="type == 'election'">
                     <thead>
                         <tr>
                             <th i18n:translate="">Election</th>
                             <th i18n:translate="" class="right-aligned">Reported</th>
+                            <th i18n:translate="" class="right-aligned">Updated</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -164,11 +165,14 @@
                             <td class="right-aligned">
                                 <div metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" />
                             </td>
+                            <td class="right-aligned">
+                                ${layout.format_date(election.last_result_change, 'datetime')}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
 
-                <table class="overview stackable" tal:condition="type == 'vote'">
+                <table class="overview vote stackable" tal:condition="type == 'vote'">
                     <thead>
                         <tr>
                             <th i18n:translate="">Vote</th>
@@ -176,6 +180,7 @@
                             <th i18n:translate="" class="right-aligned">Yes %</th>
                             <th i18n:translate="" class="right-aligned">No %</th>
                             <th i18n:translate="" class="right-aligned">Reported</th>
+                            <th i18n:translate="" class="right-aligned">Updated</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -196,6 +201,9 @@
                             </td>
                             <td class="right-aligned">
                                 <div metal:use-macro="layout.macros['progress_vote']" tal:define="progress vote.progress" />
+                            </td>
+                            <td class="right-aligned">
+                                ${layout.format_date(vote.last_result_change, 'datetime')}
                             </td>
                         </tr>
                     </tbody>

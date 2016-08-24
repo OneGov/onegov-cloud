@@ -163,17 +163,33 @@ table {
     &.overview {
         margin-bottom: 2rem;
 
-        td:nth-child(2) {
-            width: 12.5%;
+        &.vote {
+            td:nth-child(2) {
+                width: 12.5%;
+            }
+
+            td:nth-child(3),
+            td:nth-child(4) {
+                width: 7.5%;
+            }
+
+            td:nth-child(5) {
+                width: 12.5%;
+            }
+
+            td:nth-child(6) {
+                width: 10%;
+            }
         }
 
-        td:nth-child(3),
-        td:nth-child(4) {
-            width: 7.5%;
-        }
+        &.election {
+            td:nth-child(2) {
+                width: 12.5%;
+            }
 
-        td:nth-child(5) {
-            width: 12.5%;
+            td:nth-child(3) {
+                width: 10%;
+            }
         }
     }
 

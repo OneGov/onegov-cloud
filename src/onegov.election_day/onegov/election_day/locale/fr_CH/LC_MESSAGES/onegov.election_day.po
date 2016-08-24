@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-02 15:37+0200\n"
+"POT-Creation-Date: 2016-08-24 10:07+0200\n"
 "PO-Revision-Date: 2016-06-28 10:55+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -384,6 +384,9 @@ msgstr "Election"
 
 msgid "Reported"
 msgstr "Reportés"
+
+msgid "Updated"
+msgstr ""
 
 msgid "Vote"
 msgstr "Vote"
