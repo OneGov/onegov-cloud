@@ -44,7 +44,7 @@ def view_vote_json(self, request):
     return {
         'date': self.date.isoformat(),
         'domain': self.domain,
-        'last_change': self.last_result_change.isoformat(),
+        'last_modified': self.last_result_change.isoformat(),
         'progress': {
             'counted': (self.progress[0] or 0) / (len(self.ballots) or 1),
             'total': (self.progress[1] or 0) / (len(self.ballots) or 1)

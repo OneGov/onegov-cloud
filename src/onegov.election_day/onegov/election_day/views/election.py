@@ -294,7 +294,7 @@ def view_election_json(self, request):
     data = {
         'date': self.date.isoformat(),
         'domain': self.domain,
-        'last_change': self.last_result_change.isoformat(),
+        'last_modified': self.last_result_change.isoformat(),
         'mandates': {
             'allocated': self.allocated_mandates or 0,
             'total': self.number_of_mandates or 0,

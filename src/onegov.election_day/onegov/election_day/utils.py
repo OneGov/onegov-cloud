@@ -18,12 +18,13 @@ def get_election_summary(election, request):
     return {
         'date': election.date.isoformat(),
         'domain': election.domain,
-        'title': election.title_translations,
-        'type': 'election',
+        'last_modified': election.last_result_change.isoformat(),
         'progress': {
             'counted': election.counted_municipalities or 0,
             'total': election.total_municipalities or 0
         },
+        'title': election.title_translations,
+        'type': 'election',
         'url': request.link(election),
     }
 
@@ -38,6 +39,7 @@ def get_vote_summary(vote, request):
         'answer': vote.answer or "",
         'date': vote.date.isoformat(),
         'domain': vote.domain,
+        'last_modified': vote.last_result_change.isoformat(),
         'nays_percentage': vote.nays_percentage,
         'progress': {
             'counted': (vote.progress[0] or 0) / divider,
