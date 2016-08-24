@@ -39,12 +39,14 @@ from chameleon.utils import Scope, decode_string
 from onegov.core import Framework
 
 
-def get_default_vars(request):
+def get_default_vars(request, content):
 
     default = {
         'request': request,
         'translate': request.get_translate(for_chameleon=True)
     }
+
+    default.update(content)
 
     return request.app.config.templatevariables_registry.get_variables(
         request, default)
@@ -74,9 +76,7 @@ def get_chameleon_render(loader, name, original_render):
 
     def render(content, request):
 
-        variables = get_default_vars(request)
-        variables.update(content)
-
+        variables = get_default_vars(request, content)
         return original_render(template.render(**variables), request)
 
     return render
@@ -91,8 +91,7 @@ def render_template(template, request, content):
     registry = request.app.config.template_engine_registry
     template = registry._template_loaders['.pt'][template]
 
-    variables = get_default_vars(request)
-    variables.update(content)
+    variables = get_default_vars(request, content)
 
     return template.render(**variables)
 
@@ -113,7 +112,7 @@ def render_macro(macro, request, content):
 
     """
 
-    variables = get_default_vars(request)
+    variables = get_default_vars(request, content)
     variables.setdefault('__translate', variables['translate'])
     variables.setdefault('__convert', variables['translate'])
     variables.setdefault('__decode', decode_string)

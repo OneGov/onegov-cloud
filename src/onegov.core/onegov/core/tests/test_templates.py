@@ -127,7 +127,9 @@ def test_inject_default_vars(temporary_directory):
 
     @Parent.view(model=Root, template='index.pt')
     def view_root(self, request):
-        return {}
+        return {
+            'injected': 'foobar'
+        }
 
     @Parent.template_variables()
     def get_parent_template_variables(request):
