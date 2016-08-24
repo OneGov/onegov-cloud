@@ -258,7 +258,7 @@
 <metal:manage_menu define-macro="manage_menu">
     <ul class="tabs" tal:condition="layout.menu">
         <tal:block repeat="item layout.menu">
-            <li class="tab-title"><a href="${item[1]}">${item[0]}</a></li>
+            <li class="tab-title ${item[2]}"><a href="${item[1]}">${item[0]}</a></li>
         </tal:block>
     </ul>
 </metal:manage_menu>

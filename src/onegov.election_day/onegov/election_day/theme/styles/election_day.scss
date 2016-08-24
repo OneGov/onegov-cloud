@@ -436,6 +436,10 @@ footer {
     .tab-title > a {
         background-color: transparent;
     }
+
+    .tab-title.active > a {
+        background-color: $gainsboro;
+    }
 }
 
 ul.breadcrumbs {
