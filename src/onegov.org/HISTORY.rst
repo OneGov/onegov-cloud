@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.3 (2016-08-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Possibly fixes release not working for PyPI.
   [href]
 
