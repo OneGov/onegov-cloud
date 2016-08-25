@@ -30,4 +30,10 @@ def has_permission_logged_in(identity, model, permission):
     assert hasattr(identity, 'role'), """
         the identity needs to implement a role property
     """
+
+    # basic members do not get access to hidden from public
+    if identity.role == 'member':
+        if getattr(model, 'is_hidden_from_public', False):
+            return False
+
     return permission in getattr(settings().roles, identity.role)

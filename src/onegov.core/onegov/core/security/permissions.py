@@ -16,5 +16,9 @@ class Private(object):
     """ Trusted people are allowed to do this. """
 
 
+class Personal(object):
+    """ Registered members are allowed to do this. """
+
+
 class Secret(object):
     """ Only Demi-Gods are allowed to do this. """

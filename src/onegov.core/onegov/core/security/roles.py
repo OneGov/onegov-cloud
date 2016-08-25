@@ -1,5 +1,5 @@
 from onegov.core import Framework
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Personal, Private, Secret
 
 
 @Framework.setting_section(section="roles")
@@ -18,6 +18,12 @@ def get_roles_setting():
     **editor**
         Has access to most things
 
+    **member**
+        Has access their own data. Be careful though, core doesn't know about
+        personal data, so this is just a role to implement registered users.
+        As with all permissions, making sure the right information is shown
+        is up to the applications.
+
     **anonymous**
         Has access to public things
 
@@ -27,12 +33,19 @@ def get_roles_setting():
         'admin': set((
             Public,
             Private,
+            Personal,
             Secret
         )),
         # the editor can do most things
         'editor': set((
             Public,
-            Private
+            Private,
+            Personal,
+        )),
+        # registered users can do a few things
+        'member': set((
+            Public,
+            Personal,
         )),
         # the public has some access
         'anonymous': set((

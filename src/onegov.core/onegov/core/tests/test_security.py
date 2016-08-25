@@ -2,7 +2,7 @@ import morepath
 import onegov.core.security
 
 from onegov.core import Framework
-from onegov.core.security import Public, Private, Secret
+from onegov.core.security import Public, Personal, Private, Secret
 from webtest import TestApp as Client
 
 
@@ -29,6 +29,10 @@ def spawn_basic_permissions_app():
     @App.view(model=Root, name='private', permission=Private)
     def private_view(self, request):
         return 'private'
+
+    @App.view(model=Root, name='personal', permission=Personal)
+    def personal_view(self, request):
+        return 'personal'
 
     @App.view(model=Root, name='secret', permission=Secret)
     def secret_view(self, request):
@@ -75,6 +79,20 @@ def test_anonymous_access():
     client = Client(spawn_basic_permissions_app())
 
     assert client.get('/public').text == 'public'
+    assert client.get('/personal', expect_errors=True).status_code == 403
+    assert client.get('/private', expect_errors=True).status_code == 403
+    assert client.get('/secret', expect_errors=True).status_code == 403
+    assert client.get('/logout', expect_errors=True).status_code == 403
+    assert client.get('/hidden', expect_errors=True).status_code == 403
+
+
+def test_personal_access():
+    client = Client(spawn_basic_permissions_app())
+    # use the userid 'admin' to be sure that we don't let it matter
+    client.post('/login', {'userid': 'admin', 'role': 'member'})
+
+    assert client.get('/public').text == 'public'
+    assert client.get('/personal').text == 'personal'
     assert client.get('/private', expect_errors=True).status_code == 403
     assert client.get('/secret', expect_errors=True).status_code == 403
     assert client.get('/logout', expect_errors=True).status_code == 403
@@ -87,6 +105,7 @@ def test_private_access():
     client.post('/login', {'userid': 'admin', 'role': 'editor'})
 
     assert client.get('/public').text == 'public'
+    assert client.get('/personal').text == 'personal'
     assert client.get('/private').text == 'private'
     assert client.get('/hidden').text == 'hidden'
     assert client.get('/secret', expect_errors=True).status_code == 403
@@ -94,6 +113,7 @@ def test_private_access():
     client.get('/logout')
 
     assert client.get('/public').text == 'public'
+    assert client.get('/personal', expect_errors=True).status_code == 403
     assert client.get('/private', expect_errors=True).status_code == 403
     assert client.get('/secret', expect_errors=True).status_code == 403
     assert client.get('/logout', expect_errors=True).status_code == 403
@@ -106,6 +126,7 @@ def test_secret_access():
     client.post('/login', {'userid': 'editor', 'role': 'admin'})
 
     assert client.get('/public').text == 'public'
+    assert client.get('/personal').text == 'personal'
     assert client.get('/private').text == 'private'
     assert client.get('/secret').text == 'secret'
     assert client.get('/hidden').text == 'hidden'
@@ -113,6 +134,7 @@ def test_secret_access():
     client.get('/logout')
 
     assert client.get('/public').text == 'public'
+    assert client.get('/personal', expect_errors=True).status_code == 403
     assert client.get('/private', expect_errors=True).status_code == 403
     assert client.get('/secret', expect_errors=True).status_code == 403
     assert client.get('/logout', expect_errors=True).status_code == 403

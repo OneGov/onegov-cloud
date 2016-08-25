@@ -1,3 +1,3 @@
-from onegov.core.security.permissions import Public, Private, Secret
+from onegov.core.security.permissions import Public, Personal, Private, Secret
 
-__all__ = ['Public', 'Private', 'Secret']
+__all__ = ['Public', 'Personal', 'Private', 'Secret']
