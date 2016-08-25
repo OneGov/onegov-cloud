@@ -10,7 +10,17 @@ from onegov.org.models import Organisation
 def move_town_to_organisation(context):
 
     # if the organisations table does not exist (other modules), skip
-    if not context.engine.dialect.has_table(context.engine, 'organisations'):
+    has_organisations = context.app.session_manager.session().execute("""
+        select exists (select 1 from information_schema.tables
+        where table_schema='{}' and table_name='organisations')
+    """.format(context.app.schema)).scalar()
+
+    has_towns = context.app.session_manager.session().execute("""
+        select exists (select 1 from information_schema.tables
+        where table_schema='{}' and table_name='towns')
+    """.format(context.app.schema)).scalar()
+
+    if not has_organisations or not has_towns:
         return
 
     # this needs to be an always-run task for now, since on first install the
