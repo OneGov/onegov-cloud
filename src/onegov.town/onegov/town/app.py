@@ -32,6 +32,11 @@ def get_theme():
     return TownTheme()
 
 
+@TownApp.setting(section='org', name='enable_user_registration')
+def get_enable_user_registration():
+    return False
+
+
 @TownApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs():
     return [utils.module_path('onegov.town', 'locale')] \

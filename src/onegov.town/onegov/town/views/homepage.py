@@ -35,7 +35,7 @@ def view_town(self, request):
             children = homepage_pages.get(page.id, tuple())
             children = (session.merge(c, load=False) for c in children)
 
-            if not request.is_logged_in:
+            if not request.is_manager:
                 children = (c for c in children if not c.is_hidden_from_public)
 
             tiles.append(Tile(
