@@ -372,6 +372,12 @@ class CoreRequest(IncludeRequest):
         """
         return self.is_logged_in and self.identity.role or None
 
+    def has_role(self, *roles):
+        """ Returns true if the current user has any of the given roles. """
+
+        assert roles and all(roles)
+        return self.current_role in roles
+
     @cached_property
     def csrf_salt(self):
         if not self.browser_session.has('csrf_salt'):
