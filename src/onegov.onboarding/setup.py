@@ -36,6 +36,7 @@ setup(
         'onegov.core>=0.21.1',
         'onegov.foundation',
         'onegov.libres',
+        'onegov.org',
         'onegov.town>=1.10.3',
         'python-simple-hipchat',
     ],

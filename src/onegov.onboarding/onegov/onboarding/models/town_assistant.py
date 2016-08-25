@@ -11,7 +11,7 @@ from onegov.onboarding.forms import FinishForm, TownForm
 from onegov.onboarding.layout import MailLayout
 from onegov.onboarding.models.assistant import Assistant
 from onegov.town.initial_content import add_initial_content
-from onegov.town.models import Town
+from onegov.org.models import Organisation
 from onegov.user import UserCollection
 
 _valid_subdomain = re.compile(r'^[a-z0-9]+[a-z0-9-]+[a-z0-9]+$')
@@ -130,19 +130,20 @@ class TownAssistant(Assistant):
 
         try:
             self.app.session_manager.set_current_schema(self.get_schema(name))
+            session = self.app.session_manager.session()
 
-            if self.app.session_manager.session().query(Town).first():
+            if session.query(Organisation).first():
                 raise AlreadyExistsError
 
             add_initial_content(
                 libres_registry=create_default_registry(),
                 session_manager=self.app.session_manager,
-                town_name=name,
+                org_name=name,
                 reply_to=user
             )
 
-            town = self.app.session_manager.session().query(Town).first()
-            town.theme_options['primary-color'] = color
+            org = session.query(Organisation).first()
+            org.theme_options['primary-color'] = color
 
             users = UserCollection(self.app.session_manager.session())
             assert not users.query().first()
@@ -155,7 +156,7 @@ class TownAssistant(Assistant):
                 'mail': user,
                 'layout': MailLayout(self, request),
                 'title': title,
-                'town': name
+                'org': name
             })
 
             self.app.send_email(

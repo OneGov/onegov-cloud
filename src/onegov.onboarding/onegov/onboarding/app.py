@@ -30,6 +30,11 @@ class OnboardingApp(Framework, LibresIntegration):
                 log.exception("Error during Hipchat message")
 
 
+@OnboardingApp.static_directory()
+def get_static_directory():
+    return 'static'
+
+
 @OnboardingApp.template_directory()
 def get_template_directory():
     return 'templates'

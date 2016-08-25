@@ -6,7 +6,7 @@
         <p i18n:translate>Hello!</p>
         <p>
             <span i18n:translate>You have just launched a new OneGov Cloud for</span>
-            <strong>${town}.</strong>
+            <strong>${org}.</strong>
             <span i18n:translate>Welcome! We are happy to have you.</span>
         </p>
 
