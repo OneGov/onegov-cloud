@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves most code to onegov.org to allow for customized town-like apps.
+  [href]
+
 1.10.4 (2016-08-19)
 ~~~~~~~~~~~~~~~~~~~
 

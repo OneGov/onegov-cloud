@@ -32,35 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'babel',
-        'click',
-        'cssmin',
-        'elasticsearch',
-        'isodate',
-        'rjsmin',
-        'lxml',
-        'mistune',
-        'onegov.core>=0.22.1',
-        'onegov.event>=0.5.0',
-        'onegov.file>=0.2.1',
-        'onegov.form>=0.9.0',
-        'onegov.foundation>=0.0.4',
-        'onegov.gis',
-        'onegov.libres>=0.3.0',
-        'onegov.newsletter>=0.1.0',
-        'onegov.page>=0.1.0',
-        'onegov.people>=0.0.2',
-        'onegov.shared',
-        'onegov.search>=0.6.2',
-        'onegov.ticket>=0.4.1',
-        'onegov.user',
-        'pillow',
-        'purl',
-        'python-dateutil',
-        'python-magic>=0.4.12',
-        'pytz',
-        'sedate',
-        'translationstring',
+        'onegov.org',
     ],
     extras_require=dict(
         test=[
@@ -74,7 +46,7 @@ setup(
     ),
     entry_points="""
         [console_scripts]
-        onegov-town=onegov.town.cli:cli
+        onegov-town=onegov.org.cli:cli
 
         [onegov]
         upgrade=onegov.town.upgrade
