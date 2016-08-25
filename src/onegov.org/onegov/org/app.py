@@ -79,13 +79,13 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             return self.session().merge(org, load=False)
 
     def load_org(self):
-        """ Loads the town from the SQL database. """
+        """ Loads the org from the SQL database. """
         return self.session().query(Organisation).first()
 
     @contextmanager
     def update_org(self):
-        """ Yields the current town for an update. Use this instead of
-        updating the town directly, because caching is involved. It's rather
+        """ Yields the current org for an update. Use this instead of
+        updating the org directly, because caching is involved. It's rather
         easy to otherwise update it wrongly.
 
         Example::
