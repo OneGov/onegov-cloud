@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2015-11-19 16:45+0100\n"
+"POT-Creation-Date: 2016-08-25 16:31+0200\n"
 "PO-Revision-Date: 2015-10-15 09:44+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -29,3 +29,15 @@ msgstr "YubiKey"
 
 msgid "Plug your YubiKey into a USB slot and press it."
 msgstr "YubiKey anschliessen und Knopf drücken."
+
+msgid "Password Confirmation"
+msgstr "Passwort Bestätigung"
+
+msgid "Please leave this field empty"
+msgstr "Bitte lassen Sie dieses Feld leer"
+
+msgid "The password must be at least eight characters long"
+msgstr "Das Passwort muss mindestens acht Zeichen lang sein"
+
+msgid "Passwords must match"
+msgstr "Das Passwort muss mit dem vorgehenden übereinstimmen"

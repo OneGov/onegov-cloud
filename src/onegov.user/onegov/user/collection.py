@@ -77,6 +77,24 @@ class UserCollection(object):
         else:
             return None
 
+    def activate_with_token(self, username, token):
+        """ Activates the user if the given token matches the verification
+        token stored in the data dictionary.
+
+        """
+        user = self.by_username(username)
+
+        if not user:
+            return False
+
+        if user.data.get('activation_token', object()) != token:
+            return False
+
+        del user.data['activation_token']
+        user.active = True
+
+        return True
+
     def delete(self, username):
         """ Deletes the user if it exists.
 
