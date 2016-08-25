@@ -133,11 +133,11 @@ def handle_newsletters(self, request, form):
     query = query.order_by(desc(Newsletter.created))
 
     # newsletters which were not sent yet are private
-    if not request.is_logged_in:
+    if not request.is_manager:
         query = query.filter(Newsletter.sent != None)
 
     # the recipients count is only shown to logged in users
-    if request.is_logged_in:
+    if request.is_manager:
         recipients_count = RecipientCollection(self.session).query()\
             .filter(Recipient.confirmed == True)\
             .count()

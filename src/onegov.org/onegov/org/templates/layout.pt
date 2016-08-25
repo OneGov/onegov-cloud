@@ -24,7 +24,7 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 
-<body id="${layout.page_id}" class="${request.is_logged_in and 'logged-in'}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}">
+<body id="${layout.page_id}" class="${request.is_manager and 'is-manager'}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}">
 
     <!--! Skip navigation link for screenreaders -->
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
@@ -38,7 +38,7 @@
           </a>
         </div>
         <div class="small-12 medium-4 columns">
-          <tal:block condition="request.is_logged_in">
+          <tal:block condition="request.is_manager">
             <tal:block define="ticket_count layout.request.app.ticket_count">
               <div class="ticket-count">
                   <div class="ticket-count-open ${ticket_count.open > 0 and 'highlight' or ''}">

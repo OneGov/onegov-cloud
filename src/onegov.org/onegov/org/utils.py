@@ -320,7 +320,7 @@ class AllocationEventInfo(object):
 
     @property
     def event_actions(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             yield Link(
                 _("Edit"),
                 self.request.link(self.allocation, name='bearbeiten'),

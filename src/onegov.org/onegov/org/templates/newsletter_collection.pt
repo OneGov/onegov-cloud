@@ -25,7 +25,7 @@
             </div>
         </div>
 
-        <div class="row" tal:condition="request.is_logged_in">
+        <div class="row" tal:condition="request.is_manager">
             <div class="columns small-12 medium-9 large-6">
                 <div i18n:translate>There are currently <tal:block i18n:name="count">${recipients_count}</tal:block> recipients registered.</div>
             </div>

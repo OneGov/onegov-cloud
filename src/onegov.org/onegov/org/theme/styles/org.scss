@@ -417,6 +417,13 @@ form {
 }
 
 /*
+    Hide the spam bot honeypot field
+*/
+.field-roboter_falle {
+    display: none;
+}
+
+/*
     input buttons
 */
 .input-with-button {
@@ -2403,7 +2410,7 @@ button {
         margin-top: 2.25rem;
     }
 
-    .logged-in .searchbox {
+    .is-manager .searchbox {
         margin-top: 0;
     }
 }

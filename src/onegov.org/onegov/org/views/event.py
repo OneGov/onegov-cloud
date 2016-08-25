@@ -34,7 +34,7 @@ def assert_anonymous_access_only_temporary(request, event):
     after that.
 
     """
-    if request.is_logged_in:
+    if request.is_manager:
         return
 
     if event.state != 'initiated':

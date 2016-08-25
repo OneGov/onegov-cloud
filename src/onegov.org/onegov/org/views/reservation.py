@@ -32,7 +32,7 @@ def assert_anonymous_access_only_temporary(resource, reservation, request):
     after that.
 
     """
-    if request.is_logged_in:
+    if request.is_manager:
         return
 
     if not reservation.session_id:

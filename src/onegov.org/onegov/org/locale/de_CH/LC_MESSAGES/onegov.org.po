@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-24 14:26+0200\n"
+"POT-Creation-Date: 2016-08-25 16:28+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -33,6 +33,9 @@ msgstr "Einstellungen"
 
 msgid "Login"
 msgstr "Login"
+
+msgid "Register"
+msgstr "Registrierung"
 
 msgid "Cancel"
 msgstr "Abbrechen"
@@ -606,14 +609,11 @@ msgstr "Öffnungszeiten"
 msgid "Opening Hours Page"
 msgstr "Die Öffnungszeiten der Gemeindeverwaltung"
 
-msgid "URL pointing to a contact page"
-msgstr "Link zur Kontakt Seite"
+msgid "URL pointing to an opening hours page"
+msgstr "Link zur Öffnungszeiten Seite"
 
 msgid "Facebook"
 msgstr "Facebook"
-
-msgid "URL pointing to the facebook site"
-msgstr ""
 
 msgid "URL pointing to the facebook site"
 msgstr "URL zu Facebook"
@@ -890,12 +890,6 @@ msgstr "Bitte folgen Sie diesem Link um sich anzumelden."
 msgid "No forms defined yet."
 msgstr "Es wurden noch keine Formulare definiert."
 
-msgid "Selected Topics"
-msgstr "Ausgewählte Themen"
-
-msgid "All news"
-msgstr "Alle Nachrichten"
-
 msgid "All Images"
 msgstr "Alle Bilder"
 
@@ -1037,6 +1031,27 @@ msgstr "Keine Veranstaltungen gefunden."
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
 
+msgid "Dear Sir or Madam,"
+msgstr "Guten Tag"
+
+msgid "Your e-mail address was just used to create an account on ${homepage}."
+msgstr ""
+"Ihre E-Mail Adresse wurde soeben zur Erstellung eines Accounts auf "
+"${homepage} verwendet."
+
+msgid "To activate your account, click confirm below:"
+msgstr "Um Ihren Account zu aktivieren, bestätigen Sie bitte die Anmeldung:"
+
+msgid "Confirm my account"
+msgstr "Anmeldung bestätigen"
+
+msgid ""
+"If you believe this is an error, ignore this message and we'll never bother "
+"you again."
+msgstr ""
+"Falls Sie sich nicht bei dieser Seite angemeldet haben, können Sie diese "
+"Nachricht ignorieren. Sie erhalten dann keine weiteren E-Mails von uns."
+
 msgid "Hello"
 msgstr "Grüezi"
 
@@ -1127,9 +1142,6 @@ msgstr "abmelden"
 msgid "Or by changing the settings in your user profile."
 msgstr ""
 "Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
-
-msgid "Dear Sir or Madam,"
-msgstr "Guten Tag"
 
 msgid "Your event has been accepted:"
 msgstr "Ihre Veranstaltung wurde angenommen:"
@@ -1393,14 +1405,38 @@ msgstr "Themen A-Z"
 msgid "Login to ${org}"
 msgstr "${org} Login"
 
+msgid "Account Registration"
+msgstr "Account Registration"
+
 msgid "You have been logged out."
 msgstr "Sie wurden ausgeloggt."
 
 msgid "Wrong e-mail address, password or yubikey."
 msgstr "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."
 
+msgid ""
+"Your account has been activated. You may now log in with your credentials"
+msgstr ""
+"Ihr Account wurde aktiviert. Sie können sich nun mit Ihren Benutzernamen und "
+"Passwort anmelden"
+
+msgid "Unknown verification code or user already activated."
+msgstr "Unbekannter Aktivierungscode oder Benutzer bereits aktiv."
+
 msgid "You have been logged in."
 msgstr "Sie wurden eingeloggt."
+
+msgid "A user with this address already exists"
+msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
+
+#, python-format
+msgid "Your ${org} Registration"
+msgstr "Ihre ${org} Registration"
+
+msgid ""
+"Thank you for registering. Please follow the instructions on the activiation "
+"e-mail sent to you."
+msgstr "Vielen Dank für Ihre Registrierung. Bitte folgen Sie den Anleitungen im Aktivierungs-Email das wir Ihnen gesendet haben."
 
 msgid "A link was added to the clipboard"
 msgstr "Ein Verweis wurde in die Zwischenablage kopiert"

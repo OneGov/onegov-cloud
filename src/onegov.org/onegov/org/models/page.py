@@ -173,7 +173,7 @@ class AtoZPages(AtoZ):
         topics = self.request.app.session().query(Topic).all()
         topics = sorted(topics, key=self.sortkey)
 
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             return [topic for topic in topics if topic.trait == 'page']
         else:
             return [

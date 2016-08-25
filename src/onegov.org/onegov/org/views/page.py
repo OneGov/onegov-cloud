@@ -30,12 +30,12 @@ def view_topic(self, request):
 
     assert self.trait in {'link', 'page'}
 
-    if not request.is_logged_in and self.trait == 'link':
+    if not request.is_manager and self.trait == 'link':
         return morepath.redirect(self.content['url'])
 
     layout = PageLayout(self, request)
 
-    if request.is_logged_in:
+    if request.is_manager:
         layout.editbar_links = self.get_editbar_links(request)
         children = self.children
     else:
@@ -71,7 +71,7 @@ def view_news(self, request):
         query = query.filter(Page.created >= start)
         query = query.filter(Page.created < start.replace(year=year + 1))
 
-    if request.is_logged_in:
+    if request.is_manager:
         layout.editbar_links = list(self.get_editbar_links(request))
         children = query.all()
     else:

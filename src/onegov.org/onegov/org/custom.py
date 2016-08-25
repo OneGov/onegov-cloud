@@ -20,19 +20,25 @@ def get_bottom_links(request):
         yield Link(_("User Profile"), request.link(
             request.app.org, name='benutzerprofil'))
 
+    if request.is_manager:
         yield Link(_('Files'), request.link(
             GeneralFileCollection(request.app)))
 
         yield Link(_('Images'), request.link(
             ImageFileCollection(request.app)))
 
-    if request.current_role == 'admin':
+    if request.is_admin:
         yield Link(_('Settings'), request.link(
             request.app.org, 'einstellungen'))
 
     if not request.is_logged_in:
         yield Link(_("Login"), request.link(
             Auth.from_request_path(request), name='login'))
+
+        if request.app.settings.org.enable_user_registration:
+            yield Link(_("Register"), request.link(
+                Auth.from_request_path(request), name='register'
+            ))
 
     yield Link('OneGov Cloud', 'http://www.onegovcloud.ch')
     yield Link('Seantis GmbH', 'https://www.seantis.ch')

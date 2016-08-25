@@ -31,7 +31,7 @@
 
             <div class="large-4 medium-4 columns">
                 <tal:block metal:use-macro="layout.macros['ticket_callout']"
-                    tal:condition="request.is_logged_in and ticket"
+                    tal:condition="request.is_manager and ticket"
                 />
 
                 <div class="occurrence-exports">

@@ -285,7 +285,7 @@ class DefaultLayout(Layout):
         # always include the common js files
         self.request.include('common')
 
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             self.request.include('sortable')
 
     @cached_property
@@ -451,7 +451,7 @@ class FormSubmissionLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
 
-        if not self.request.is_logged_in:
+        if not self.request.is_manager:
             return
 
         # only show the edit bar links if the site is the base of the form
@@ -505,7 +505,7 @@ class FormCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             return [
                 LinkGroup(
                     title=_("Add"),
@@ -534,7 +534,7 @@ class PersonCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             return [
                 LinkGroup(
                     title=_("Add"),
@@ -568,7 +568,7 @@ class PersonLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             return [
                 Link(
                     text=_("Edit"),
@@ -612,7 +612,7 @@ class TicketLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
 
             # only show the model related links when the ticket is pending
             if self.model.state == 'pending':
@@ -655,7 +655,7 @@ class ResourcesLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             return [
                 LinkGroup(
                     title=_("Add"),
@@ -702,7 +702,7 @@ class ResourceLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             if self.model.deletable:
                 delete_link = DeleteLink(
                     text=_("Delete"),
@@ -771,7 +771,7 @@ class AllocationEditFormLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             if self.model.availability == 100.0:
                 yield DeleteLink(
                     _("Delete"),
@@ -851,7 +851,7 @@ class OccurrenceLayout(EventBaseLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             edit_url = URL(self.request.link(self.model.event, 'bearbeiten'))
             edit_url = edit_url.query_param(
                 'return-to', self.request.link(self.model.event)
@@ -895,7 +895,7 @@ class EventLayout(EventBaseLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             edit_link = Link(
                 text=_("Edit"),
                 url=self.request.link(self.model, 'bearbeiten'),
@@ -959,7 +959,7 @@ class NewsletterLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if not self.request.is_logged_in:
+        if not self.request.is_manager:
             return
 
         if self.is_collection:
@@ -1032,7 +1032,7 @@ class ImageSetCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             return [
                 Link(
                     text=_("Manage images"),
@@ -1071,7 +1071,7 @@ class ImageSetLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_logged_in:
+        if self.request.is_manager:
             return [
                 Link(
                     text=_("Choose images"),

@@ -20,10 +20,10 @@
         <div class="field-display ticket-status-page">
             <div class="field-display-label" i18n:translate>Ticket Number</div>
             <div class="field-display-data ticket-number">
-                <tal:block condition="request.is_logged_in">
+                <tal:block condition="request.is_manager">
                     <a href="${request.link(ticket)}">${ticket.number}</a>
                 </tal:block>
-                <tal:block condition="not:request.is_logged_in">
+                <tal:block condition="not:request.is_manager">
                     ${ticket.number}
                 </tal:block>
             </div>

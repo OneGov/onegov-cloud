@@ -103,7 +103,7 @@
 
 <metal:fields define-macro="fields">
     <tal:block repeat="field fields">
-        <div class="row"><div class="large-12 columns">
+        <div class="row field-${field.id}"><div class="large-12 columns">
         <tal:block define="input_type field.widget.input_type|None">
             <tal:block condition="input_type == 'hidden'">
                 ${field()}
@@ -193,7 +193,7 @@
 </metal:hidden_page_hint>
 
 <metal:empty_lead_hint define-macro="empty_page_lead_hint" i18n:domain="onegov.org">
-    <tal:block condition="not item.lead and request.is_logged_in|nothing">
+    <tal:block condition="not item.lead and request.is_manager|nothing">
         <div class="row">
             <div class="small-12 columns">
                 <div class="panel callout">
@@ -229,7 +229,7 @@
                 <div class="page-content-panel people-panel" tal:condition="people">
                     <h2 i18n:translate>People</h2>
                     <ul data-sortable data-sortable-url="${layout.move_person_url_template}">
-                        <li tal:repeat="person people" data-sortable-id="${request.is_logged_in and person.id}">
+                        <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
                             <a href="${request.link(person)}">${person.title}</a>
                             <small>${person.context_specific_function}</small>
                         </li>
@@ -247,7 +247,7 @@
             <div class="field-display" tal:repeat="field fields.values()">
                 <div class="field-display-block" tal:define="rendered layout.render_field(field)" tal:condition="rendered">
                     <div class="field-display-label">${field.label.text}</div>
-                    <div class="field-display-data" tal:define="downloadable request.is_logged_in and field.type == 'UploadField'">
+                    <div class="field-display-data" tal:define="downloadable request.is_manager and field.type == 'UploadField'">
                         <tal:block condition="downloadable">
                             <a href="${layout.field_download_link(field)}">
                                 <tal:block replace="structure layout.render_field(field)" />
@@ -333,7 +333,7 @@
     <nav role="navigation">
         <ul class="side-nav" data-sortable data-sortable-url="${layout.sortable_url_template}">
             <tal:block repeat="link layout.sidebar_links">
-                <li tal:define="is_group hasattr(link, 'links')" class="${is_group and 'active' or ''}" data-sortable-id="${request.is_logged_in and link.model.id}">
+                <li tal:define="is_group hasattr(link, 'links')" class="${is_group and 'active' or ''}" data-sortable-id="${request.is_manager and link.model.id}">
                     <tal:block condition="not:is_group" replace="structure link(request)" />
                     <tal:block condition="is_group">
                         <a href="#" class="group-title">${link.title}
@@ -341,7 +341,7 @@
                         </a>
                         <ul class="children" tal:condition="link.links"
                             data-sortable data-sortable-url="${layout.sortable_url_template}">
-                            <li tal:repeat="child link.links" data-sortable-id="${request.is_logged_in and child.model.id}">
+                            <li tal:repeat="child link.links" data-sortable-id="${request.is_manager and child.model.id}">
                                 <tal:block replace="structure child(request)" />
                             </li>
                         </ul>
@@ -446,14 +446,14 @@
 
 <metal:display_event define-macro="display_event" i18n:domain="onegov.org">
     <dl>
-        <tal:block tal:condition="request.is_logged_in">
+        <tal:block tal:condition="request.is_manager">
             <dt i18n:translate="">State</dt>
             <dd i18n:translate="" tal:condition="event.state == 'initiated'">Initiated</dd>
             <dd i18n:translate="" tal:condition="event.state == 'submitted'">Submitted</dd>
             <dd i18n:translate="" tal:condition="event.state == 'published'">Published</dd>
             <dd i18n:translate="" tal:condition="event.state == 'withdrawn'">Withdrawn</dd>
         </tal:block>
-        <tal:block tal:condition="request.is_logged_in" tal:define="submitter event.meta.get('submitter_email') if event.meta else ''">
+        <tal:block tal:condition="request.is_manager" tal:define="submitter event.meta.get('submitter_email') if event.meta else ''">
             <dt i18n:translate="">Submitter</dt>
             <dd>${submitter}</dd>
         </tal:block>
@@ -478,7 +478,7 @@
         <dt i18n:translate="">Date and time</dt>
         <dd>
             <tal:block>${layout.format_date(event.localized_start, 'datetime')}-${layout.format_date(event.localized_end, 'time')}</tal:block>
-            <tal:block tal:condition="request.is_logged_in">(${event.timezone})</tal:block>
+            <tal:block tal:condition="request.is_manager">(${event.timezone})</tal:block>
         </dd>
         <dt i18n:translate="">Recurrence</dt>
         <dd>${layout.format_recurrence(event.recurrence)}</dd>

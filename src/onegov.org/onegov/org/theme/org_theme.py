@@ -81,7 +81,7 @@ class OrgTheme(BaseTheme):
             ('topbar-link-weight', 'bold'),
             ('topbar-menu-icon-color', '#312f2e'),
             ('topbar-menu-link-color', '#312f2e'),
-            ('warning-color', '$yellow'),
+            ('warning-color', '$orange'),
         ))
         options.update(user_options)
 

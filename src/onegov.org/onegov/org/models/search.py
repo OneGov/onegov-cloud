@@ -22,7 +22,7 @@ class Search(Pagination):
 
     @cached_property
     def explain(self):
-        return self.request.is_logged_in and 'explain' in self.request.params
+        return self.request.is_manager and 'explain' in self.request.params
 
     @property
     def q(self):

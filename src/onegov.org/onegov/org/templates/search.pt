@@ -73,7 +73,7 @@
 
                             </tal:block>
 
-                            <tal:block condition="request.is_logged_in and result.explanation|nothing">
+                            <tal:block condition="request.is_manager and result.explanation|nothing">
                                 <ul class="result-explanation">
                                     <li>Score: ${result.explanation['score']}</li>
                                     <tal:block repeat="(title, key) [('TF', 'term-frequency'), ('IDF', 'inverse-document-frequency'), ('Field Norm', 'field-norm')]">

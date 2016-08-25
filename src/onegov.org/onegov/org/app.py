@@ -8,6 +8,7 @@ from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
 from onegov.org.models import Organisation
 from onegov.org.models import Topic
+from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
 from onegov.page import PageCollection
 from onegov.search import ElasticsearchApp
@@ -19,6 +20,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
              DepotApp):
 
     serve_static_files = True
+    request_class = OrgRequest
 
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
@@ -197,6 +199,11 @@ def get_template_directory():
 @OrgApp.setting(section='core', name='theme')
 def get_theme():
     return OrgTheme()
+
+
+@OrgApp.setting(section='org', name='enable_user_registration')
+def get_enable_user_registration():
+    return True
 
 
 @OrgApp.webasset_path()

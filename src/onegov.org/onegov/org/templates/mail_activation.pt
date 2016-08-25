@@ -1,0 +1,24 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.org">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+
+        <p tal:define="homepage request.link(request.app.org)">
+            <span i18n:translate>Your e-mail address was just used to create an account on <a href="${homepage}" tal:content='homepage' i18n:name='homepage' />.</span>
+        </p>
+
+        <p i18n:translate>
+            To activate your account, click confirm below:
+        </p>
+
+        <p>
+            <a href="${activation_link}" i18n:translate>Confirm my account</a>
+        </p>
+
+        <p i18n:translate>
+            If you believe this is an error, ignore this message and we'll never bother you again.
+        </p>
+    </tal:block>
+</div>
