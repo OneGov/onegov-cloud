@@ -75,6 +75,9 @@ setup(
     entry_points={
         'onegov': [
             'upgrade = onegov.org.upgrade'
+        ],
+        'console_scripts': [
+            'onegov-org=onegov.org.cli:cli'
         ]
     },
     classifiers=[
