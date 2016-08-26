@@ -9,6 +9,7 @@ HEADERS = [
     'type',
     'group',
     'municipality_id',
+    'counted',
     'yeas',
     'nays',
     'invalid',
@@ -80,6 +81,17 @@ def import_file(municipalities, vote, file, mimetype):
                     }))
             else:
                 added_municipality_ids[ballot_type].add(municipality_id)
+
+        # Add the uncounted municipality, but use the given group
+        if line.counted.lower() != 'true':
+            ballot_results[ballot_type].append(
+                BallotResult(
+                    group=group,
+                    counted=False,
+                    municipality_id=municipality_id,
+                )
+            )
+            continue
 
         # the yeas
         try:
