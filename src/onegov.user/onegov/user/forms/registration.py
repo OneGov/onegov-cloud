@@ -1,6 +1,6 @@
 from onegov.form import Form
 from onegov.user import _
-from onegov.user.collection import UserCollection
+from onegov.user.collection import UserCollection, MIN_PASSWORD_LENGTH
 from wtforms import StringField, PasswordField, validators
 
 
@@ -16,7 +16,7 @@ class RegistrationForm(Form):
         label=_("Password"),
         validators=[
             validators.InputRequired(),
-            validators.Length(min=8, message=_(
+            validators.Length(min=MIN_PASSWORD_LENGTH, message=_(
                 "The password must be at least eight characters long"
             ))
         ]
