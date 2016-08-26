@@ -3,6 +3,7 @@ import transaction
 from base64 import b64decode
 from datetime import datetime
 from freezegun import freeze_time
+from onegov.core.utils import Bunch
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
 from webtest import TestApp as Client
@@ -149,8 +150,9 @@ def test_ticket_statistics(org_app, smtp, handlers):
     ]
 
     # those will be ignored as they are inactive or not editors/admins
-    UserCollection(session).register('a', 'p@ssw0rd', 'editor')
-    UserCollection(session).register('b', 'p@ssw0rd', 'member')
+    request = Bunch(client_addr='127.0.0.1')
+    UserCollection(session).register('a', 'p@ssw0rd', request, role='editor')
+    UserCollection(session).register('b', 'p@ssw0rd', request, role='member')
 
     users = UserCollection(session).query().all()
     user = users[0]

@@ -61,7 +61,7 @@ def handle_registration(self, request, form):
     if form.submitted(request):
 
         try:
-            user = form.register_user(request.app.session())
+            user = form.register_user(request)
         except ExistingUserError:
             request.alert(_("A user with this address already exists"))
         else:
