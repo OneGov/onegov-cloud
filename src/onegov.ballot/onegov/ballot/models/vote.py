@@ -165,11 +165,6 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     @property
     def yeas_percentage(self):
         """ The percentage of yeas (discounts empty/invalid ballots). """
-        answer = self.answer
-
-        if answer is None:
-            return 0.0
-
         # if we have no counter proposal, the yeas are a simple sum
         if not self.counter_proposal:
             subject = self
@@ -181,7 +176,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
             else:
                 subject = self.counter_proposal
 
-        return subject.yeas / (subject.yeas + subject.nays) * 100
+        return subject.yeas / ((subject.yeas + subject.nays) or 1) * 100
 
     @property
     def nays_percentage(self):

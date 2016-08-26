@@ -7,6 +7,9 @@ Unreleased
 - Orders the collections by date, shortcode and title.
   [msom]
 
+- Returns the yay and nay percentages even though votes have not fully been counted.
+  [msom]
+
 0.7.0 (2016-07-06)
 ~~~~~~~~~~~~~~~~~~~
 
