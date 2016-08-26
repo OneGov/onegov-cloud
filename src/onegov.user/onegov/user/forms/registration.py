@@ -42,7 +42,7 @@ class RegistrationForm(Form):
         ))]
     )
 
-    def register_user(self, session, role='member'):
+    def register_user(self, request, role='member'):
         """ Registers the user using the information on the form.
 
         See :meth:`onegov.user.collections.UserCollection.register_user` for
@@ -50,5 +50,5 @@ class RegistrationForm(Form):
 
         """
 
-        return UserCollection(session).register(
-            self.username.data, self.password.data)
+        return UserCollection(request.app.session()).register(
+            self.username.data, self.password.data, request)

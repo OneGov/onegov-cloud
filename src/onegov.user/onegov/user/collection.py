@@ -1,4 +1,5 @@
 from onegov.core.crypto import random_token
+from onegov.user import log
 from onegov.user.model import User
 from onegov.user.errors import (
     AlreadyActivatedError,
@@ -87,7 +88,7 @@ class UserCollection(object):
         else:
             return None
 
-    def register(self, username, password, role='member'):
+    def register(self, username, password, request, role='member'):
         """ Registers a new user.
 
         The so created user needs to activated with a token before it becomes
@@ -106,6 +107,9 @@ class UserCollection(object):
 
         if self.by_username(username):
             raise ExistingUserError("{} already exists".format(username))
+
+        log.info("Registration by {} ({})".format(
+            request.client_addr, username))
 
         return self.add(
             username=username,

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Log registrations for fail2ban integration.
+  [href]
+
 0.6.0 (2016-08-26)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -85,13 +85,18 @@ def test_register_user(session):
 
     users = UserCollection(session)
 
+    class MockRequest(object):
+        client_addr = '127.0.0.1'
+
+    request = MockRequest()
+
     with pytest.raises(AssertionError):
-        users.register(None, None)
+        users.register(None, None, request)
 
     with pytest.raises(InsecurePasswordError):
-        users.register('user', 'short')
+        users.register('user', 'short', request)
 
-    user = users.register('user', 'p@ssw0rd')
+    user = users.register('user', 'p@ssw0rd', request)
     token = user.data['activation_token']
 
     assert len(token) == RANDOM_TOKEN_LENGTH
@@ -109,7 +114,7 @@ def test_register_user(session):
     assert 'activation_token' not in user.data
 
     with pytest.raises(ExistingUserError):
-        user = users.register('user', 'p@ssw0rd')
+        user = users.register('user', 'p@ssw0rd', request)
 
     with pytest.raises(AlreadyActivatedError):
         users.activate_with_token('user', token)
