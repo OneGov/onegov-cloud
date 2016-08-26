@@ -148,9 +148,12 @@ def test_ticket_statistics(org_app, smtp, handlers):
         )
     ]
 
+    # those will be ignored as they are inactive or not editors/admins
+    UserCollection(session).register('a', 'p@ssw0rd', 'editor')
+    UserCollection(session).register('b', 'p@ssw0rd', 'member')
+
     users = UserCollection(session).query().all()
     user = users[0]
-
     users[1].data = {'daily_ticket_statistics': False}
 
     for ticket in tickets:

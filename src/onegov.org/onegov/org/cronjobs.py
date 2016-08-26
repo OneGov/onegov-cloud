@@ -1,9 +1,9 @@
 from datetime import datetime, timedelta
 from onegov.core.templates import render_template
+from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.ticket import Ticket, TicketCollection
-from onegov.org import _, OrgApp
-from onegov.user import UserCollection
+from onegov.user import User, UserCollection
 from sedate import replace_timezone, to_timezone
 from sqlalchemy.orm import undefer
 
@@ -67,6 +67,8 @@ def send_daily_ticket_statistics(request):
 
     # send one e-mail per user
     users = UserCollection(request.app.session()).query()
+    users = users.filter(User.active == True)
+    users = users.filter(User.role.in_(('admin', 'editor')))
     users = users.options(undefer('data'))
     users = users.all()
 
