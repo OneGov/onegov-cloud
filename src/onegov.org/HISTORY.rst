@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.5 (2016-08-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Enables the user profile for simple members.
   [href]
 

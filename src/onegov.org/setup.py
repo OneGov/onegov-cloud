@@ -4,7 +4,7 @@ name = 'onegov.org'
 description = (
     'A OneGov Cloud base application for organisations.'
 )
-version = '0.0.4'
+version = '0.0.5'
 
 
 def get_long_description():
@@ -43,12 +43,12 @@ setup(
         'onegov.event>=0.5.0',
         'onegov.file>=0.2.1',
         'onegov.form>=0.9.0',
-        'onegov.foundation>=0.0.4',
+        'onegov.foundation>=0.0.5',
         'onegov.gis',
         'onegov.libres>=0.3.0',
         'onegov.newsletter>=0.1.0',
         'onegov.page>=0.1.0',
-        'onegov.people>=0.0.4',
+        'onegov.people>=0.0.5',
         'onegov.search>=0.6.2',
         'onegov.shared',
         'onegov.ticket>=0.4.1',
