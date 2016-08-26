@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes problem with daily ticket statistics mail.
+  [href]
+
 1.11.1 (2016-08-25)
 ~~~~~~~~~~~~~~~~~~~
 
