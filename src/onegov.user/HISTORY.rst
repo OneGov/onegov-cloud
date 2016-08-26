@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to register new users and activate them with a token.
+  [href]
+
 0.5.0 (2016-08-24)
 ~~~~~~~~~~~~~~~~~~~
 
