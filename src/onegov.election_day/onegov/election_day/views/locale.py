@@ -1,4 +1,3 @@
-from arrow import locales
 from onegov.core.i18n import SiteLocale
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
