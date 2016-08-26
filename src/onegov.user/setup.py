@@ -4,7 +4,7 @@ name = 'onegov.user'
 description = (
     'A generic user model for OneGov.'
 )
-version = '0.5.0'
+version = '0.6.0'
 
 
 def get_long_description():
@@ -33,7 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'click',
-        'onegov.core>=0.5.0',
+        'onegov.core>=0.6.0',
         'onegov.form',
         'sqlalchemy',
         'yubico-client'
