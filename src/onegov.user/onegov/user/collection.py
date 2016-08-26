@@ -1,6 +1,16 @@
+from onegov.core.crypto import random_token
 from onegov.user.model import User
-from onegov.user.errors import UnknownUserError
+from onegov.user.errors import (
+    AlreadyActivatedError,
+    ExistingUserError,
+    InsecurePasswordError,
+    InvalidActivationTokenError,
+    UnknownUserError,
+)
 from sqlalchemy import sql
+
+
+MIN_PASSWORD_LENGTH = 8
 
 
 class UserCollection(object):
@@ -77,6 +87,36 @@ class UserCollection(object):
         else:
             return None
 
+    def register(self, username, password, role='member'):
+        """ Registers a new user.
+
+        The so created user needs to activated with a token before it becomes
+        active. Use the activation_token in the data dictionary together
+        with the :meth:`activate_with_token` function.
+
+        """
+
+        assert username
+
+        # we could implement a proper password policy, but a min-length of
+        # of eight characters is a good start. What we don't want is someone
+        # registering a user with a password of one character.
+        if len(password) < MIN_PASSWORD_LENGTH:
+            raise InsecurePasswordError()
+
+        if self.by_username(username):
+            raise ExistingUserError("{} already exists".format(username))
+
+        return self.add(
+            username=username,
+            password=password,
+            role=role,
+            data={
+                'activation_token': random_token()
+            },
+            active=False
+        )
+
     def activate_with_token(self, username, token):
         """ Activates the user if the given token matches the verification
         token stored in the data dictionary.
@@ -85,15 +125,17 @@ class UserCollection(object):
         user = self.by_username(username)
 
         if not user:
-            return False
+            raise UnknownUserError("{} does not exist".format(username))
+
+        if user.active:
+            raise AlreadyActivatedError("{} already active".format(username))
 
         if user.data.get('activation_token', object()) != token:
-            return False
+            raise InvalidActivationTokenError("{} is invalid".format(token))
 
         del user.data['activation_token']
         user.active = True
-
-        return True
+        self.session.flush()
 
     def delete(self, username):
         """ Deletes the user if it exists.

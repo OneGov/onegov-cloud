@@ -1,4 +1,3 @@
-from onegov.core.crypto import random_token
 from onegov.form import Form
 from onegov.user import _
 from onegov.user.collection import UserCollection
@@ -43,27 +42,13 @@ class RegistrationForm(Form):
         ))]
     )
 
-    def create_user(self, session, role='member'):
-        """ Creates the user using the information on the form.
+    def register_user(self, session, role='member'):
+        """ Registers the user using the information on the form.
 
-        The so created user needs to activated with a token before it becomes
-        active. Use the activation_token in the data dictionary together
-        with the :meth:`onegov.user.collections.activate_with_token`
-        function.
+        See :meth:`onegov.user.collections.UserCollection.register_user` for
+        more information.
 
         """
 
-        users = UserCollection(session)
-
-        if users.by_username(self.username.data):
-            return False
-
-        return users.add(
-            username=self.username.data,
-            password=self.password.data,
-            role=role,
-            data={
-                'activation_token': random_token()
-            },
-            active=False
-        )
+        return UserCollection(session).register(
+            self.username.data, self.password.data)
