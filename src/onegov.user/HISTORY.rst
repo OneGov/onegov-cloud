@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to query a user by id.
+  [href]
+
 0.6.1 (2016-08-26)
 ~~~~~~~~~~~~~~~~~~~
 

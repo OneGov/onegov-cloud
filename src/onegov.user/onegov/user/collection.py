@@ -67,6 +67,16 @@ class UserCollection(object):
 
         return query.scalar()
 
+    def by_id(self, id):
+        """ Returns the user by the internal id.
+
+        Use this if you need to refer to a user by path. Usernames are not
+        the correct way, since they allow for user enumeration.
+
+        """
+
+        return self.query().filter(User.id == id).first()
+
     def by_username(self, username):
         """ Returns the user by username. """
         return self.query().filter(User.username == username).first()
