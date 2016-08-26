@@ -8,7 +8,14 @@ from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout, DefaultMailLayout
 from onegov.user import Auth, UserCollection
+from onegov.user.errors import (
+    AlreadyActivatedError,
+    ExistingUserError,
+    InvalidActivationTokenError,
+    UnknownUserError,
+)
 from onegov.user.forms import LoginForm, RegistrationForm
+from webob import exc
 from purl import URL
 
 
@@ -48,11 +55,14 @@ def handle_login(self, request, form):
 def handle_registration(self, request, form):
     """ Handles the user registration. """
 
+    if not request.app.settings.org.enable_user_registration:
+        raise exc.HTTPNotFound()
+
     if form.submitted(request):
 
-        user = form.create_user(request.app.session())
-
-        if not user:
+        try:
+            user = form.register_user(request.app.session())
+        except ExistingUserError:
             request.alert(_("A user with this address already exists"))
         else:
             url = URL(request.link(self, 'activate'))
@@ -100,20 +110,27 @@ def handle_registration(self, request, form):
 @OrgApp.view(model=Auth, name='activate', permission=Public)
 def handle_activation(self, request):
 
+    if not request.app.settings.org.enable_user_registration:
+        raise exc.HTTPNotFound()
+
     users = UserCollection(request.app.session())
 
     username = request.params.get('username')
     token = request.params.get('token')
 
-    if users.activate_with_token(username, token) is True:
+    try:
+        users.activate_with_token(username, token)
+    except UnknownUserError:
+        request.warning(_("Unknown user"))
+    except InvalidActivationTokenError:
+        request.warning(_("Invalid activation token"))
+    except AlreadyActivatedError:
+        request.success(_("Your account has already been activated."))
+    else:
         request.success(_(
             "Your account has been activated. "
             "You may now log in with your credentials"
         ))
-    else:
-        request.warning(
-            _("Unknown verification code or user already activated.")
-        )
 
     return morepath.redirect(request.link(request.app.org))
 

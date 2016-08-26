@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability for new users to register themselves.
+  [href]
+
 0.0.4 (2016-08-25)
 ~~~~~~~~~~~~~~~~~~~
 

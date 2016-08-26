@@ -24,6 +24,7 @@ from webtest import (
     TestRequest as BaseRequest
 )
 from webtest import Upload
+from purl import URL
 
 
 class SkipFirstForm(object):
@@ -51,7 +52,7 @@ class Request(SkipFirstForm, BaseRequest):
 class Client(SkipFirstForm, BaseApp):
     RequestClass = Request
 
-    def login(self, username, password, to):
+    def login(self, username, password, to=None):
         url = '/auth/login' + (to and ('/?to=' + to) or '')
 
         login_page = self.get(url)
@@ -72,7 +73,7 @@ class Client(SkipFirstForm, BaseApp):
 def get_message(app, index, payload=0):
     message = app.smtp.outbox[index]
     message = message.get_payload(payload).get_payload(decode=True)
-    return message.decode('iso-8859-1')
+    return message.decode('utf-8')
 
 
 def extract_href(link):
@@ -2873,3 +2874,48 @@ def test_settings(org_app):
     settings_page.form['analytics_code'] = '<script>alert("Hi!");</script>'
     settings_page = settings_page.form.submit()
     assert '<script>alert("Hi!");</script>' in settings_page.text
+
+
+def test_registration_honeypot(org_app):
+    client = Client(org_app)
+
+    register = client.get('/auth/register')
+    register.form['username'] = 'spam@example.org'
+    register.form['password'] = 'p@ssw0rd'
+    register.form['confirm'] = 'p@ssw0rd'
+    register.form['roboter_falle'] = 'buy pills now'
+
+    assert "Das Feld ist nicht leer" in register.form.submit()
+
+
+def test_registration(org_app):
+    client = Client(org_app)
+
+    register = client.get('/auth/register')
+    register.form['username'] = 'user@example.org'
+    register.form['password'] = 'p@ssw0rd'
+    register.form['confirm'] = 'p@ssw0rd'
+
+    assert "Vielen Dank" in register.form.submit().follow()
+
+    message = get_message(org_app, 0, 1)
+    assert "Anmeldung bestätigen" in message
+
+    url = re.search(r'href="[^"]+">Anmeldung bestätigen</a>', message).group()
+    url = extract_href(url)
+
+    faulty = URL(url).query_param('token', 'asdf').as_string()
+
+    assert "Ungültiger Aktivierungscode" in client.get(faulty).follow()
+    assert "Account wurde aktiviert" in client.get(url).follow()
+    assert "Account wurde bereits aktiviert" in client.get(url).follow()
+
+    logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
+    assert "eingeloggt" in logged_in
+
+
+def test_disabled_registration(org_app):
+    client = Client(org_app)
+    org_app.settings.org.enable_user_registration = False
+
+    assert client.get('/auth/register', expect_errors=True).status_code == 404
