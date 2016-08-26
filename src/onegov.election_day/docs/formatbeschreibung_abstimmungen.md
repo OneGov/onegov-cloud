@@ -30,6 +30,9 @@ aufgelisteten Reihenfolge erwartet:
 - **Leere Stimmzettel**: Die Anzahl leer eingelegter Stimmzettel. Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 - **Ungültige Stimmzettel**: Die Anzahl ungültiger Stimmzettel. Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
+### Temporäre Resultate
+Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Resultaten enthalten ist.
+
 ### Vorlage
 
 [vote_standard.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_standard.csv)
@@ -57,6 +60,11 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **StichfrNein**: Die Anzahl Nein Stimmen zur Stichfrage.
 - **StimmBet**: Die Stimmbeteilgung in Prozent. Wird verwendet, um zu entscheiden, ob die Gemeinde bereits ausgezählt wurde. Ist die Stimmbeteilgung '0', wird die Zeile ignoriert (noch nicht ausgezählt).
 
+### Temporäre Resultate
+Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
+- ``StimmBet = 0``
+- die Gemeinde ist nicht in den Resultaten enthalten
+
 ### Vorlage
 
 [vote_wabsti.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/vote_wabsti.csv)
@@ -73,11 +81,17 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **type** "proposal" (Vorschlag), "counter-proposal" (Gegenvorschlag) or "tie-breaker" (Stichfrage).
 - **group** Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
 - **municipality_id** Die BFS-Nummer der Gemeinde.
+- **counted** ``true``, falls die Gemeinde ausgezählt ist.
 - **yeas** Die Anzahl Ja Stimmen.
 - **nays** Die Anzahl Nein Stimmen.
 - **invalid** Die Anzahl ungültiger Stimmen.
 - **empty** Die Anzahl leerer Stimmen.
 - **elegible_voters** Die Anzahl Stimmberechtigter.
+
+### Temporäre Resultate
+Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
+- ``counted = false``
+- die Gemeinde ist nicht in den Resultaten enthalten
 
 ### Vorlage
 

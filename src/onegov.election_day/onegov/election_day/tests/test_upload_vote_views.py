@@ -622,3 +622,73 @@ def test_upload_vote_invalidate_cache(election_day_app):
 
     assert "3'821" not in anonymous.get('/vote/bacon-yea-or-nay/')
     assert "3'221" in anonymous.get('/vote/bacon-yea-or-nay/')
+
+
+def test_upload_vote_temporary_results(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # standard format: missing
+    csv = '\n'.join((
+        ','.join(COLUMNS),
+        ',1706,Oberägeri,811,1298,3560,18,',
+        ',1709,Unterägeri,1096,2083,5245,18,1',
+    )).encode('utf-8')
+    upload = client.get('/vote/vote/upload')
+    upload.form['type'] = 'simple'
+    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_standard = client.get('/vote/vote/data-csv').text
+    assert 'Baar,1701,False' in result_standard
+    assert 'Cham,1702,False' in result_standard
+    assert 'Oberägeri,1706,True' in result_standard
+    assert 'Unterägeri,1709,True' in result_standard
+
+    # onegov: missing or counted=False
+    csv = '\n'.join((
+        (
+            'type,group,municipality_id,counted,yeas,nays,invalid,empty,'
+            'elegible_voters'
+        ),
+        'proposal,Baar,1701,False,0,0,0,0,0',
+        'proposal,Oberägeri,1706,True,811,1298,0,18,3560',
+        'proposal,Unterägeri,1709,True,1096,2083,1,18,5245',
+    )).encode('utf-8')
+    upload = client.get('/vote/vote/upload')
+    upload.form['type'] = 'simple'
+    upload.form['file_format'] = 'internal'
+    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_internal = client.get('/vote/vote/data-csv').text
+    assert result_standard == result_internal
+
+    # wabsti: missing or stimmbet
+    csv = '\n'.join((
+        (
+            'Vorlage-Nr.,Gemeinde,BfS-Nr.,StimmBet,Ja,Nein,ungültige SZ,'
+            'leere SZ,Stimmberechtigte,GegenvJa,GegenvNein,StichfrJa,'
+            'StichfrNein'
+        ),
+        '1,Baar,1701,0.0,0,0,0,0,0,0,0,0,0',
+        '1,Oberägeri,1706,0.6,811,1298,0,18,3560,0,0,0,0',
+        '1,Unterägeri,1709,0.6,1096,2083,1,18,5245,0,0,0,0',
+    )).encode('utf-8')
+    upload = client.get('/vote/vote/upload')
+    upload.form['type'] = 'simple'
+    upload.form['file_format'] = 'wabsti'
+    upload.form['vote_number'] = '1'
+    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_wabsti = client.get('/vote/vote/data-csv').text
+    assert result_standard == result_wabsti

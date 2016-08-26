@@ -13,6 +13,9 @@ Changelog
 - Adds a last update time column to the frontpage and archive pages.
   [msom]
 
+- Shows intermediate results.
+  [msom]
+
 - Adds JSON views for results.
   [msom]
 
