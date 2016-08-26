@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.25.0 (2016-08-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Introduces a member role, which is close to an anonymous user in terms
   of access, but allows to differentiate between ananymous and registered
