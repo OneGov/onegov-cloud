@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'arrow>=0.8.0',
         'babel',
         'cached_property',
         'cssmin',
