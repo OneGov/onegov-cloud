@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-25 16:31+0200\n"
+"POT-Creation-Date: 2016-08-26 09:36+0200\n"
 "PO-Revision-Date: 2015-10-15 09:44+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -41,3 +41,6 @@ msgstr "Das Passwort muss mindestens acht Zeichen lang sein"
 
 msgid "Passwords must match"
 msgstr "Das Passwort muss mit dem vorgehenden übereinstimmen"
+
+msgid "The field is not empty"
+msgstr "Das Feld ist nicht leer"

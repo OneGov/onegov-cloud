@@ -38,7 +38,7 @@ class RegistrationForm(Form):
     roboter_falle = StringField(
         label=_("Please leave this field empty"),
         validators=[validators.Length(max=0, message=_(
-            "Please leave this field empty"
+            "The field is not empty"
         ))]
     )
 
