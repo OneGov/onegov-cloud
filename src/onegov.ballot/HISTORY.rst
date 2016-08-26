@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+0.8.0 (2016-08-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Orders the collections by date, shortcode and title.
   [msom]
