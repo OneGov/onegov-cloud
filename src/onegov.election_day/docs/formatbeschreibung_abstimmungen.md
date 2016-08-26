@@ -31,6 +31,7 @@ aufgelisteten Reihenfolge erwartet:
 - **Ungültige Stimmzettel**: Die Anzahl ungültiger Stimmzettel. Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 ### Temporäre Resultate
+
 Gemeinden gelten als noch nicht ausgezählt, falls die Gemeinde nicht in den Resultaten enthalten ist.
 
 ### Vorlage
@@ -61,6 +62,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **StimmBet**: Die Stimmbeteilgung in Prozent. Wird verwendet, um zu entscheiden, ob die Gemeinde bereits ausgezählt wurde. Ist die Stimmbeteilgung '0', wird die Zeile ignoriert (noch nicht ausgezählt).
 
 ### Temporäre Resultate
+
 Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
 - ``StimmBet = 0``
 - die Gemeinde ist nicht in den Resultaten enthalten
@@ -89,6 +91,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **elegible_voters** Die Anzahl Stimmberechtigter.
 
 ### Temporäre Resultate
+
 Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
 - ``counted = false``
 - die Gemeinde ist nicht in den Resultaten enthalten
