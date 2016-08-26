@@ -24,6 +24,8 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
 
+        <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change election.last_result_change; counted election.counted" />
+
         <h2 tal:condition="not: has_results" i18n:translate>No results yet</h2>
 
         <tal:block tal:condition="has_results">

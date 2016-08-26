@@ -271,4 +271,14 @@
     </ul>
 </metal:manage_menu>
 
+<metal:temporary_results_callout define-macro="temporary_results_callout">
+    <div class="panel callout radius" tal:condition="not:counted">
+         <h5 i18n:translate>Not yet counted.</h5>
+         <p>
+             <span i18n:translate>Last change</span>:
+             <strong>${layout.format_date(last_change, 'relative')}</strong>
+         </p>
+    </div>
+</metal:temporary_results_callout>
+
 </body>
