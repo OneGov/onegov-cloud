@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Order the collections by date, shortcode and title.
+  [msom]
+
 0.7.0 (2016-07-06)
 ~~~~~~~~~~~~~~~~~~~
 

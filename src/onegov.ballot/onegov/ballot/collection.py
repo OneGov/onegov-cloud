@@ -15,7 +15,9 @@ class ElectionCollectionPagination(Pagination):
 
     def subset(self):
         query = self.query()
-        query = query.order_by(desc(Election.date))
+        query = query.order_by(
+            desc(Election.date), Election.shortcode, Election.title
+        )
         if self.year:
             query = query.filter(extract('year', Election.date) == self.year)
 
@@ -55,7 +57,9 @@ class ElectionCollection(ElectionCollectionPagination):
         year = cast(extract('year', Election.date), Integer)
         query = self.session.query
         query = query(distinct(year))
-        query = query.order_by(desc(year))
+        query = query.order_by(
+            desc(year)
+        )
 
         return list(r[0] for r in query.all())
 
@@ -104,7 +108,7 @@ class VoteCollectionPagination(Pagination):
 
     def subset(self):
         query = self.query()
-        query = query.order_by(desc(Vote.date))
+        query = query.order_by(desc(Vote.date), Vote.shortcode, Vote.title)
         if self.year:
             query = query.filter(extract('year', Vote.date) == self.year)
 
