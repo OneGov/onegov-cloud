@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enables the user profile for simple members.
+  [href]
+
 - Adds the ability for new users to register themselves.
   [href]
 

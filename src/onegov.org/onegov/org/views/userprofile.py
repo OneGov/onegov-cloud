@@ -2,7 +2,7 @@
 
 import morepath
 
-from onegov.core.security import Private, Public
+from onegov.core.security import Personal, Public
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout
 from onegov.org import _
@@ -15,7 +15,7 @@ from webob.exc import HTTPForbidden
 
 @OrgApp.form(
     model=Organisation, name='benutzerprofil', template='userprofile.pt',
-    permission=Private, form=UserProfileForm)
+    permission=Personal, form=UserProfileForm)
 def handle_user_profile(self, request, form):
     """ Handles the GET and POST login requests. """
 
