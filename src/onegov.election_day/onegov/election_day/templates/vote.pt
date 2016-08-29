@@ -46,9 +46,7 @@
 
         <h2 tal:condition="not:vote.ballots" i18n:translate="">No results yet</h2>
 
-        <tal:block tal:condition="vote.ballots">
-            <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change vote.last_result_change;" />
-        </tal:block>
+        <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change vote.last_result_change; counted vote.ballots and counted" />
 
 
         <tal:block tal:repeat="ballot vote.ballots">
