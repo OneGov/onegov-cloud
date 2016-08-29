@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.8.0 (2016-08-29)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds diagrams to visualize list connections.
   [msom]
