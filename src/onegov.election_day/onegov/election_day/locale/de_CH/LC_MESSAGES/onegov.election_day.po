@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-24 10:07+0200\n"
-"PO-Revision-Date: 2016-06-30 15:53+0200\n"
+"POT-Creation-Date: 2016-08-29 12:51+0200\n"
+"PO-Revision-Date: 2016-08-29 13:05+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -79,9 +79,6 @@ msgstr "Unbekannter Kandidierender"
 
 msgid "Invalid values"
 msgstr "Ungültige Werte"
-
-msgid "Unknown municipality"
-msgstr "Unbekannte Gemeinde"
 
 msgid "Missing municipality"
 msgstr "Fehlender Ort"
@@ -250,20 +247,17 @@ msgstr "Formatbeschreibung"
 msgid "No results yet"
 msgstr "Noch keine Resultate"
 
-msgid "Counted municipalities"
-msgstr "Ausgezählte Gemeinden"
-
-msgid "Last change"
-msgstr "Letzte Änderung"
+msgid "Turnout"
+msgstr "Wahlbeteiligung"
 
 msgid "Elegible Voters"
 msgstr "Stimmberechtigte"
 
-msgid "Turnout"
-msgstr "Wahlbeteiligung"
-
 msgid "Received Ballots"
 msgstr "Abgegebene Wahlzettel"
+
+msgid "Counted municipalities"
+msgstr "Ausgezählte Gemeinden"
 
 msgid "Candidates"
 msgstr "Kandidierende"
@@ -400,13 +394,13 @@ msgid "No %"
 msgstr "NEIN %"
 
 msgid "Previous Page"
-msgstr ""
+msgstr "Vorherige Seite"
 
 msgid "Next Page"
-msgstr ""
+msgstr "Nächste Seite"
 
 msgid "You are here"
-msgstr ""
+msgstr "Aktuelle Seite"
 
 msgid "New Election"
 msgstr "Neue Wahl"

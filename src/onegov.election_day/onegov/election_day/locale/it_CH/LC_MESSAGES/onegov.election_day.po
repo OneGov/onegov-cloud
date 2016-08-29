@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-24 10:07+0200\n"
+"POT-Creation-Date: 2016-08-29 12:51+0200\n"
 "PO-Revision-Date: 2016-06-28 10:57+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -79,9 +79,6 @@ msgstr "Candidato non conosciuto"
 
 msgid "Invalid values"
 msgstr "Valori non validi"
-
-msgid "Unknown municipality"
-msgstr "Comune non conosciuto"
 
 msgid "Missing municipality"
 msgstr "Località mancante"
@@ -250,20 +247,17 @@ msgstr "Descrizione del formato"
 msgid "No results yet"
 msgstr "Ancora nessun risultato"
 
-msgid "Counted municipalities"
-msgstr "Comuni che hanno concluso lo spoglio"
-
-msgid "Last change"
-msgstr "Ultima modifica il"
+msgid "Turnout"
+msgstr "Partecipazione al voto"
 
 msgid "Elegible Voters"
 msgstr "Aventi diritto di voto"
 
-msgid "Turnout"
-msgstr "Partecipazione al voto"
-
 msgid "Received Ballots"
 msgstr "Schede ricevute"
+
+msgid "Counted municipalities"
+msgstr "Comuni che hanno concluso lo spoglio"
 
 msgid "Candidates"
 msgstr "Candidati"

@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-24 10:07+0200\n"
-"PO-Revision-Date: 2016-06-28 10:55+0200\n"
+"POT-Creation-Date: 2016-08-29 12:51+0200\n"
+"PO-Revision-Date: 2016-08-29 13:10+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 1.8.8\n"
 
 msgid "Elections"
 msgstr "Elections"
@@ -79,9 +79,6 @@ msgstr "Candidat inconnu"
 
 msgid "Invalid values"
 msgstr "Valeurs non valides"
-
-msgid "Unknown municipality"
-msgstr "Commune inconnue"
 
 msgid "Missing municipality"
 msgstr "Municipalité manquante"
@@ -250,20 +247,17 @@ msgstr "Description du format:"
 msgid "No results yet"
 msgstr "Pas de résultats à l'heure actuelle"
 
-msgid "Counted municipalities"
-msgstr "Municipalités comptées"
-
-msgid "Last change"
-msgstr "Dernier changement"
+msgid "Turnout"
+msgstr "Participation"
 
 msgid "Elegible Voters"
 msgstr "Electeurs valides"
 
-msgid "Turnout"
-msgstr "Participation"
-
 msgid "Received Ballots"
 msgstr "Votes reçus"
+
+msgid "Counted municipalities"
+msgstr "Municipalités comptées"
 
 msgid "Candidates"
 msgstr "Candidats"
@@ -332,7 +326,7 @@ msgid "Back to the latest elections &amp; votes"
 msgstr "Retour aux dernières élections et votes"
 
 msgid "Open Data"
-msgstr ""
+msgstr "Open Data"
 
 msgid "Login"
 msgstr "Se connecter"
@@ -386,7 +380,7 @@ msgid "Reported"
 msgstr "Reportés"
 
 msgid "Updated"
-msgstr ""
+msgstr "Actualisé"
 
 msgid "Vote"
 msgstr "Vote"

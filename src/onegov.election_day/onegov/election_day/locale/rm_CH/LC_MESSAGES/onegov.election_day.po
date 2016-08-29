@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-24 10:07+0200\n"
-"PO-Revision-Date: 2016-01-08 10:07+0100\n"
+"POT-Creation-Date: 2016-08-29 12:51+0200\n"
+"PO-Revision-Date: 2016-08-29 13:08+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 1.7.6\n"
+"X-Generator: Poedit 1.8.8\n"
 
 msgid "Elections"
 msgstr "Elecziuns"
@@ -79,9 +79,6 @@ msgstr "Candidat(a) nunenconuschent(a)"
 
 msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
-
-msgid "Unknown municipality"
-msgstr "Vischnanca nunenconuschenta"
 
 msgid "Missing municipality"
 msgstr "Lieu che manca"
@@ -206,7 +203,7 @@ msgid "Wabsti"
 msgstr "Wabsti"
 
 msgid "OneGov Cloud"
-msgstr ""
+msgstr "OneGov Cloud"
 
 msgid "Default"
 msgstr ""
@@ -250,20 +247,17 @@ msgstr "descripziun dal format"
 msgid "No results yet"
 msgstr "Anc nagins resultats avant maun"
 
-msgid "Counted municipalities"
-msgstr "Vischnancas dumbradas ora"
-
-msgid "Last change"
-msgstr "Ultima midada"
+msgid "Turnout"
+msgstr "Participaziun a las elecziuns"
 
 msgid "Elegible Voters"
 msgstr "Persunas cun dretg da votar"
 
-msgid "Turnout"
-msgstr "Participaziun a las elecziuns"
-
 msgid "Received Ballots"
 msgstr "Cedels electorals consegnads"
+
+msgid "Counted municipalities"
+msgstr "Vischnancas dumbradas ora"
 
 msgid "Candidates"
 msgstr "Candidatas e candidats"
