@@ -28,6 +28,22 @@ def to_int(value):
         return value
 
 
+def get_missing_municipalities(election, request, session):
+    result = []
+
+    all_ = request.app.principal.municipalities[election.date.year]
+
+    used = session.query(ElectionResult.municipality_id)
+    used = used.filter(ElectionResult.election_id == election.id)
+    used = used.distinct()
+    used = [item[0] for item in used]
+
+    for id in set(all_.keys()) - set(used):
+        result.append(all_[id]['name'])
+
+    return result
+
+
 def get_candidates_results(election, session):
     """ Returns the aggregated candidates results as list. """
 
@@ -165,14 +181,20 @@ def view_election(self, request):
     majorz = self.type == 'majorz'
     session = object_session(self)
 
+    candidates = get_candidates_results(self, session).all()
+
     return {
         'election': self,
         'layout': layout,
         'majorz': majorz,
         'has_results': True if self.results.first() else False,
-        'candidates': get_candidates_results(self, session),
+        'candidates': candidates,
+        'number_of_candidates': len(candidates),
         'electoral': get_candidate_electoral_results(self, session),
         'connections': get_connection_results(self, session),
+        'missing_municipalities': get_missing_municipalities(
+            self, request, session
+        ),
     }
 
 

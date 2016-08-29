@@ -25,18 +25,22 @@ Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
 - **Anzahl Sitze**
 - **Wahlkreis-Nr**
+- **Anzahl Gemeinden**
 - **Stimmberechtigte**
 - **Wahlzettel**
 - **Ungültige Wahlzettel**
 - **Leere Wahlzettel**
 - **Leere Stimmen**
+- **Ungueltige Stimmen**
 - **Kandidaten-Nr**
 - **Gewaehlt**
 - **Name**
 - **Vorname**
-- **Anzahl Gemeinden**
-- **Ungueltige Stimmen**
 - **Stimmen**
+
+### Temporäre Resultate
+
+Die Wahl gilt als noch nicht ausgezählt, falls in ``Anzahl Gemeinden`` die Anzahl ausgezählte Gemeinden nicht mit der Gesamtanzahl an Gemeinden übereinstimmt. Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
 
 ### Vorlage
 
@@ -63,25 +67,24 @@ Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 - **HLV-Nr**
 - **ULV-Nr**
 - **Anzahl Sitze Liste**
-- **Unveränderte Wahlzettel Liste**
-- **Veränderte Wahlzettel Liste**
-- **Kandidatenstimmen unveränderte Wahlzettel**
-- **Zusatzstimmen unveränderte Wahlzettel**
-- **Kandidatenstimmen veränderte Wahlzettel**
-- **Zusatzstimmen veränderte Wahlzettel**
+- **Kandidatenstimmen unveränderte Wahlzettel** (teil der Listenstimmen)
+- **Zusatzstimmen unveränderte Wahlzettel** (teil der Listenstimmen)
+- **Kandidatenstimmen veränderte Wahlzettel** (teil der Listenstimmen)
+- **Zusatzstimmen veränderte Wahlzettel** (teil der Listenstimmen)
 - **Kandidaten-Nr**
 - **Gewählt**
 - **Name**
 - **Vorname**
-- **Stimmen unveränderte Wahlzettel**
-- **Stimmen veränderte Wahlzettel**
 - **Stimmen Total aus Wahlzettel**
 - **Anzahl Gemeinden**
+
+### Temporäre Resultate
+
+Die Wahl gilt als noch nicht ausgezählt, falls in ``Anzahl Gemeinden`` die Anzahl ausgezählte Gemeinden nicht mit der Gesamtanzahl an Gemeinden übereinstimmt. Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
 
 ### Vorlage
 
 [election_sesam_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_sesam_proporz.csv)
-
 
 ## Wabsti Majorz
 
@@ -117,12 +120,17 @@ Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, 
 - **Name : Der Familienname des Kandidaten.**
 - **Vorname : Der Vorname des Kandidaten.**
 
+### Temporäre Resultate
+
+Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
+
+Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde fertig ausgezählt ist. Daher wird, solange die gesamte Wahl nicht abgeschlossen ist, für Wabsti auch keine Fortschrittsanzeige angezeigt. Falls aber Gemeinden ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
+
 ### Vorlagen
 
 [election_wabsti_majorz_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_wabsti_majorz_results.csv)
 
 [election_wabsti_majorz_candidates.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/election_wabsti_majorz_candidates.csv)
-
 
 ## Wabsti Proporz
 
@@ -141,7 +149,6 @@ Im Datenexport gibt es eine Zeile pro Kandidat und Gemeinde. Es werden folgende 
 - **Kand_StimmenTotal**
 - **Liste_ParteistimmenTotal**
 
-
 ### Spalten  Datenexport der Statistik
 
 Die Datei mit den Statistiken zu den einzelnen Gemeinden sollte folgende Spalten enthalten:
@@ -152,7 +159,6 @@ Die Datei mit den Statistiken zu den einzelnen Gemeinden sollte folgende Spalten
 - **WZLeer**
 - **WZUngueltig**
 - **StmWZVeraendertLeerAmtlLeer**
-
 
 ### Spalten Listenverbindungen
 
@@ -169,6 +175,12 @@ Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, 
 - **ID**: Die ID des Kandidaten (``Liste_KandID``).
 - **Name**: Der Familienname des Kandidaten.
 - **Vorname**: Der Vorname des Kandidaten.
+
+### Temporäre Resultate
+
+Das Datenformat enthält keine eindeutige Informationen dazu, ob die gesamte Wahl fertig ausgezählt ist. Diese Information muss direkt auf dem Formular für den Datenupload mitgeben werden.
+
+Das Datenformat enhält auch keine Information dazu, ob eine einzelne Gemeinde fertig ausgezählt ist. Daher wird, solange die gesamte Wahl nicht abgeschlossen ist, für Wabsti auch keine Fortschrittsanzeige angezeigt. Falls aber Gemeinden ganz fehlen in den Resultaten, gelten diese als noch nicht ausgezählt.
 
 ### Vorlagen
 
@@ -190,8 +202,8 @@ Das Format, welche von der Web-Applikation für den Export verwendet wird, beste
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 - **election_absolute_majority**: Absolutes Mehr der Wahl, nur falls Majorzwahl.
-- **election_counted_municipalites**: Anzahl ausgezählter Gemeinden.
-- **election_total_municipalites**: Totale Anzahl Gemeinden
+- **election_counted_municipalites**: Anzahl ausgezählter Gemeinden. Falls ``election_counted_municipalites = election_total_municipalites`` ist, gilt die Wahl als fertig ausgezählt.
+- **election_total_municipalites**: Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahlt von Wabsti importiert wurde), ist dieser Wert ``0``.
 - **municipality_bfs_number**: BFS Nummer der Gemeinde.
 - **municipality_elegible_voters**: Anzahl Stimmberechtigte der Gemeinde.
 - **municipality_received_ballots**: Anzahl abgegebene Stimmzettel der Gemeinde.
@@ -209,6 +221,13 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **candidate_first_name**: Vorname des Kandidaten.
 - **candidate_elected**: True, falls der Kandidierenden gewählt wurde.
 - **candidate_votes**: Anzahl Kandidierendenstimmen in der Gemeinde.
+
+### Temporäre Resultate
+
+Die Wahl gilt als noch nicht ausgezählt, falls ``election_counted_municipalites`` und ``election_total_municipalites`` nicht übereinstimmen. Falls ``election_total_municipalites = 0`` ist, ist keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahlt von Wabsti importiert wurde).
+
+Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
+
 
 ### Vorlage
 

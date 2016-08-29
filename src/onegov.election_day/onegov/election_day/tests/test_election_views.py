@@ -88,12 +88,14 @@ def test_view_election(election_day_app_gr):
 
     response = client.get('/election/majorz-election')
     assert all((expected in response for expected in (
-        "Engler", "Stefan", "20", "Schmid", "Martin", "18"
+        "Engler", "Stefan", "20", "Schmid", "Martin", "18", "Mutten",
+        "Brusio", "Noch nicht ausgezählt"
     )))
 
     response = client.get('/election/proporz-election')
     assert all((expected in response for expected in (
-        "Casanova", "Angela", "56", "Caluori", "Corina", "32", "CVP", "FDP"
+        "Casanova", "Angela", "56", "Caluori", "Corina", "32", "CVP", "FDP",
+        "Mutten", "Brusio", "Noch nicht ausgezählt"
     )))
 
 

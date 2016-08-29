@@ -44,16 +44,12 @@ HEADERS_PROPORZ = [
     'HLV-Nr',
     'ULV-Nr',
     'Anzahl Sitze Liste',
-    'Unveränderte Wahlzettel Liste',
-    'Veränderte Wahlzettel Liste',
     'Kandidatenstimmen unveränderte Wahlzettel',
     'Zusatzstimmen unveränderte Wahlzettel',
     'Kandidatenstimmen veränderte Wahlzettel',
     'Zusatzstimmen veränderte Wahlzettel',
     # Candidate
     'Gewählt',
-    'Stimmen unveränderte Wahlzettel',
-    'Stimmen veränderte Wahlzettel',
     'Stimmen Total aus Wahlzettel',
 ]
 

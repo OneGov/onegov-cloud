@@ -99,6 +99,8 @@ candidate_id|The ID of the candidate.
 candidate_elected|True if the candidate has been elected.
 candidate_votes|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
 
+Not yet counted municipalities are not included.
+
 ## Vote results
 
 ### Processed results

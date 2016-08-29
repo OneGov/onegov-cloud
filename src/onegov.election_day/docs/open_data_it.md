@@ -99,6 +99,8 @@ candidate_id|The ID of the candidate.
 candidate_elected|Vero se il candidato è stato eletto.
 candidate_votes|Numero di voti ricevuti da questo candidato.
 
+Not yet counted municipalities are not included.
+
 ## Vote results
 
 ### Processed results

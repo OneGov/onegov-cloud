@@ -297,13 +297,6 @@ def import_file(municipalities, election, file, mimetype,
                         results[id].blank_ballots = blank_ballots
                         results[id].invalid_ballots = invalid_ballots
                         results[id].blank_votes = blank_votes
-                    else:
-                        errors.append(
-                            FileImportError(
-                                error=_("Unknown municipality"),
-                                line=line.rownumber
-                            )
-                        )
 
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))

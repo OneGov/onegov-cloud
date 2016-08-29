@@ -1,84 +1,67 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
     <tal:block metal:fill-slot="before-content">
-        <tal:block condition="not: election.counted">
-            <h1>
-                <small i18n:translate>Not yet counted.</small>
-                ${election.title}
-            </h1>
-        </tal:block>
-        <tal:block tal:condition="election.counted">
-            <h1>${election.title}</h1>
+        <h1>
+            <small i18n:translate="" tal:condition="not: election.counted">Not yet counted.</small>
+            ${election.title}
+        </h1>
 
-            <div class="download-results">
-                <a data-dropdown="download-dropdown" data-options="align:left" aria-controls="download-dropdown" aria-expanded="false" alt="Download raw results as JSON, CSV or XLS"><i class="fa fa-download"></i></a>
-                <ul id="download-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                    <li><a href="${request.link(election, 'data-json')}">JSON</a></li>
-                    <li><a href="${request.link(election, 'data-csv')}">CSV</a></li>
-                    <li><a href="${request.link(election, 'data-xlsx')}">XLSX</a></li>
-                    <li><a href="${layout.opendata_link}"><em i18n:translate>Format Description</em></a></li>
-                </ul>
-            </div>
-        </tal:block>
+        <div class="download-results">
+            <a data-dropdown="download-dropdown" data-options="align:left" aria-controls="download-dropdown" aria-expanded="false" alt="Download raw results as JSON, CSV or XLS"><i class="fa fa-download"></i></a>
+            <ul id="download-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+                <li><a href="${request.link(election, 'data-json')}">JSON</a></li>
+                <li><a href="${request.link(election, 'data-csv')}">CSV</a></li>
+                <li><a href="${request.link(election, 'data-xlsx')}">XLSX</a></li>
+                <li><a href="${layout.opendata_link}"><em i18n:translate="">Format Description</em></a></li>
+            </ul>
+        </div>
 
         <hr />
     </tal:block>
     <tal:block metal:fill-slot="content">
 
-        <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change election.last_result_change; counted election.counted" />
-
-        <h2 tal:condition="not: has_results" i18n:translate>No results yet</h2>
+        <h2 tal:condition="not: has_results" i18n:translate="">No results yet</h2>
 
         <tal:block tal:condition="has_results">
 
-            <h2 i18n:translate>Results</h2>
+            <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change election.last_result_change; counted election.counted" />
 
-            <tal:block tal:condition="not: election.counted">
-                <ul class="small-block-grid-1 medium-block-grid-3 factoids">
-                    <li>
-                        <span i18n:translate="">Counted municipalities</span>
-                        <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" /></strong>
-                    </li>
-                    <li>
-                        <span i18n:translate="">Mandates</span>
-                        <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
-                    </li>
-                    <li>
-                        <span i18n:translate="">Last change</span>
-                        <strong>${layout.format_date(election.last_result_change, 'relative')}</strong>
-                    </li>
-                </ul>
-            </tal:block>
-            <tal:block tal:condition="election.counted">
-                <ul class="small-block-grid-1 medium-block-grid-4 factoids">
-                    <li>
-                        <span i18n:translate="">Counted municipalities</span>
-                        <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" /></strong>
-                    </li>
-                    <li>
-                        <span i18n:translate="">Mandates</span>
-                        <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
-                    </li>
-                    <li>
-                        <span i18n:translate="">Elegible Voters</span>
-                        <strong>${layout.format_number(election.elegible_voters)}</strong>
-                    </li>
-                    <li>
-                        <span i18n:translate="">Turnout</span>
-                        <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
-                    </li>
+            <h2 i18n:translate="">Results</h2>
 
-                </ul>
-                <ul class="small-block-grid-1 medium-block-grid-4 factoids">
-                    <li>
-                        <span i18n:translate="">Received Ballots</span>
-                        <strong>${layout.format_number(election.received_ballots)}</strong>
-                    </li>
-                    <li tal:condition="majorz">
-                        <span i18n:translate="">Absolute majority</span>
-                        <strong tal:condition="election.absolute_majority">${layout.format_number(election.absolute_majority or 0)}</strong>
-                    </li>
-                </ul>
-            </tal:block>
+            <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+                <li>
+                    <span i18n:translate="">Turnout</span>
+                    <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
+                </li>
+
+                <li>
+                    <span i18n:translate="">Elegible Voters</span>
+                    <strong>${layout.format_number(election.elegible_voters)}</strong>
+                </li>
+
+                <li>
+                    <span i18n:translate="">Received Ballots</span>
+                    <strong>${layout.format_number(election.received_ballots)}</strong>
+                </li>
+
+                <li>
+                    <span i18n:translate="">Counted municipalities</span>
+                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" /></strong>
+                </li>
+
+            </ul>
+
+            <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+                <li>
+                    <span i18n:translate="">Mandates</span>
+                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
+                </li>
+
+                <li tal:condition="majorz">
+                    <span i18n:translate="">Absolute majority</span>
+                    <strong tal:condition="election.absolute_majority">${layout.format_number(election.absolute_majority or 0)}</strong>
+                </li>
+
+            </ul>
 
             <div class="row" tal:condition="not: majorz">
                 <div class="small-12 small-centered large-10 columns">
@@ -93,7 +76,7 @@
             </div>
 
             <div class="foldable" tal:condition="not: majorz">
-                <h3 class="foldable-title" i18n:translate>Candidates</h3>
+                <h3 class="foldable-title" i18n:translate="">Candidates</h3>
                 <div class="foldable-panel">
                     <table class="ballot-results stackable collapsible collapsed">
                         <thead>
@@ -112,10 +95,10 @@
                                 <td class="answer right-aligned" tal:condition="candidate[2] == None" i18n:translate=""></td>
                             </tr>
                             <tr class="more">
-                                <td colspan="4" i18n:translate>All candidates</td>
+                                <td colspan="4" i18n:translate="">All candidates</td>
                             </tr>
                             <tr class="less">
-                                <td colspan="4" i18n:translate>Elected candidates only</td>
+                                <td colspan="4" i18n:translate="">Elected candidates only</td>
                             </tr>
                         </tbody>
                     </table>
@@ -123,8 +106,8 @@
             </div>
 
             <div class="foldable folded" tal:condition="not: majorz">
-                <h3 class="foldable-title" i18n:translate>List connections</h3>
-                <div class="foldable-svg-panel" class="row">
+                <h3 class="foldable-title" i18n:translate="">List connections</h3>
+                <div class="foldable-svg-panel" class="row" tal:condition="connections">
                     <div class="small-12 small-centered medium-12 large-10 columns">
                         <div class="sankey-chart" data-dataurl="${request.link(election, name='connections')}"></div>
                     </div>
@@ -133,7 +116,7 @@
                     <tal:block tal:repeat="connection connections">
                         <table class="ballot-results">
                             <thead>
-                                <th><span i18n:translate>List connection</span> ${connection[0]}</th>
+                                <th><span i18n:translate="">List connection</span> ${connection[0]}</th>
                                 <th i18n:translate="single_votes" class="right-aligned">Votes</th>
                             </thead>
                             <tbody>
@@ -143,7 +126,7 @@
                                 </tr>
                                 <tal:block tal:repeat="subconnection connection[3]">
                                     <tr>
-                                        <th><span i18n:translate>Sublist connection</span> ${subconnection[0]}</th>
+                                        <th><span i18n:translate="">Sublist connection</span> ${subconnection[0]}</th>
                                         <th></th>
                                     </tr>
                                     <tr tal:repeat="list subconnection[2]">
@@ -151,12 +134,12 @@
                                         <td class="right-aligned">${layout.format_number(int(list[1]))}</td>
                                     </tr>
                                     <tr class="subtotal">
-                                        <td i18n:translate>Subtotal</td>
+                                        <td i18n:translate="">Subtotal</td>
                                         <td class="right-aligned">${layout.format_number(int(subconnection[1]))}</td>
                                     </tr>
                                 </tal:block>
                                 <tr class="total">
-                                    <td i18n:translate>Total</td>
+                                    <td i18n:translate="">Total</td>
                                     <td class="right-aligned">${layout.format_number(int(connection[1]))}</td>
                                 </tr>
                             </tbody>
@@ -166,7 +149,7 @@
             </div>
 
             <div class="foldable folded" tal:condition="majorz">
-                <h3 class="foldable-title" i18n:translate>Electoral Districts</h3>
+                <h3 class="foldable-title" i18n:translate="">Electoral Districts</h3>
                 <div class="foldable-panel">
                     <table class="ballot-results stackable">
                         <thead>
@@ -175,15 +158,19 @@
                         </thead>
                         <tbody>
                             <tr class="total">
-                                <td i18n:translate>Total</td>
+                                <td i18n:translate="">Total</td>
                                 <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                             </tr>
                             <tr tal:repeat="result electoral">
                                 <td>${result[0]}</td>
                                 <td tal:repeat="candidate result[1]" class="right-aligned">${layout.format_number(candidate[1])}</td>
                             </tr>
+                            <tr tal:repeat="municipality missing_municipalities">
+                                <td>${municipality}</td>
+                                <td i18n:translate="" tal:attributes="colspan number_of_candidates">Not yet counted.</td>
+                            </tr>
                             <tr class="total">
-                                <td i18n:translate>Total</td>
+                                <td i18n:translate="">Total</td>
                                 <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                             </tr>
                         </tbody>
@@ -192,7 +179,7 @@
             </div>
 
             <div class="foldable folded">
-                <h3 class="foldable-title" i18n:translate>Election statistics</h3>
+                <h3 class="foldable-title" i18n:translate="">Election statistics</h3>
                 <div class="foldable-panel">
                     <table class="ballot-results stackable">
                         <thead>
@@ -207,7 +194,7 @@
                         </thead>
                         <tbody>
                             <tr class="total">
-                                <td i18n:translate>Total</td>
+                                <td i18n:translate="">Total</td>
                                 <td class="right-aligned">${layout.format_number(election.elegible_voters)}</td>
                                 <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
                                 <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>
@@ -226,8 +213,12 @@
                                 <td class="right-aligned">${layout.format_number(result.accounted_votes)}</td>
                                 <td class="right-aligned" tal:condition="election.counted">${'{0:.2f}'.format(result.turnout)} %</td>
                             </tr>
+                            <tr tal:repeat="municipality missing_municipalities">
+                                <td>${municipality}</td>
+                                <td i18n:translate="" colspan="7">Not yet counted.</td>
+                            </tr>
                             <tr class="total">
-                                <td i18n:translate>Total</td>
+                                <td i18n:translate="">Total</td>
                                 <td class="right-aligned">${layout.format_number(election.elegible_voters)}</td>
                                 <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
                                 <td class="right-aligned">${layout.format_number(election.accounted_ballots)}</td>

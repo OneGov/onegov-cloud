@@ -943,3 +943,259 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
 
     assert "1'013" not in anonymous.get('/election/election')
     assert "1'015" in anonymous.get('/election/election')
+
+
+def test_upload_election_temporary_results_majorz(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # SESAM: "Anzahl Gemeinden" + missing lines
+    csv = '\n'.join((
+        (
+            'Anzahl Sitze,Anzahl Gemeinden,Wahlkreis-Nr,Stimmberechtigte,'
+            'Wahlzettel,Leere Wahlzettel,Ungültige Wahlzettel,Leere Stimmen,'
+            'Ungueltige Stimmen,Kandidaten-Nr,Name,Vorname,Stimmen,Gewaehlt'
+        ),
+        '7,2 von 11,1701,13567,40,0,0,18,0,1,Hegglin,Peter,36,FALSE',
+        '7,2 von 11,1701,13567,40,0,0,18,0,2,Hürlimann,Urs,25,FALSE',
+        '7,2 von 11,1702,9620,41,0,1,6,0,1,Hegglin,Peter,34,FALSE',
+        '7,2 von 11,1702,9620,41,0,1,6,0,2,Hürlimann,Urs,28,FALSE',
+    )).encode('utf-8')
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_sesam = client.get('/election/election/data-csv').text
+    assert 'Baar,1701,13567' in result_sesam
+    assert 'Cham,1702,9620' in result_sesam
+    assert 'Zug' not in result_sesam
+
+    # Wabsti: form value + (optionally) missing lines
+    csv = '\n'.join((
+        (
+            'AnzMandate,BFS,StimmBer,StimmAbgegeben,StimmLeer,StimmUngueltig,'
+            'StimmGueltig,KandID_1,KandName_1,KandVorname_1,Stimmen_1,'
+            'KandResultArt_1,KandID_2,KandName_2,KandVorname_2,Stimmen_2,'
+            'KandResultArt_2,KandID_3,KandName_3,KandVorname_3,Stimmen_3,'
+            'KandResultArt_3,KandID_4,KandName_4,KandVorname_4,Stimmen_4,'
+            'KandResultArt_4'
+        ),
+        (
+            '7,1701,13567,40,0,0,40,1,Hegglin,Peter,36,2,2,Hürlimann,Urs,25,'
+            '2,1000,Leere Zeilen,,18,9,1001,Ungültige Stimmen,,0,9'
+        ),
+        (
+            '7,1702,9620,41,0,1,40,1,Hegglin,Peter,34,2,2,Hürlimann,Urs,28,2,'
+            '1000,Leere Zeilen,,6,9,1001,Ungültige Stimmen,,0,9'
+        )
+    )).encode('utf-8')
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'wabsti'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_wabsti = client.get('/election/election/data-csv').text
+    assert 'Baar,1701,13567' in result_wabsti
+    assert 'Cham,1702,9620' in result_wabsti
+    assert 'Zug' not in result_wabsti
+
+    upload.form['complete'] = True
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_wabsti = client.get('/election/election/data-csv').text
+    assert '2,2,Baar,1701' in result_wabsti
+
+    assert result_sesam == result_wabsti.replace('2,2', '2,11')
+
+    # Onegov internal: misssing and number of municpalities
+    csv = '\n'.join((
+        (
+            'election_title,election_date,election_type,election_mandates,'
+            'election_absolute_majority,election_counted_municipalities,'
+            'election_total_municipalities,municipality_name,'
+            'municipality_bfs_number,municipality_elegible_voters,'
+            'municipality_received_ballots,municipality_blank_ballots,'
+            'municipality_invalid_ballots,municipality_unaccounted_ballots,'
+            'municipality_accounted_ballots,municipality_blank_votes,'
+            'municipality_invalid_votes,municipality_accounted_votes,'
+            'list_name,list_id,list_number_of_mandates,list_votes,'
+            'list_connection,list_connection_parent,candidate_family_name,'
+            'candidate_first_name,candidate_id,candidate_elected,'
+            'candidate_votes'
+        ),
+        (
+            'majorz,2015-01-01,majorz,7,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
+            '0,262,,,,0,,,Hegglin,Peter,1,False,36'
+        ),
+        (
+            'majorz,2015-01-01,majorz,7,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
+            '0,262,,,,0,,,Hürlimann,Urs,2,False,25'
+        ),
+        (
+            'majorz,2015-01-01,majorz,7,,2,11,Cham,1702,9620,41,0,1,1,40,6,0,'
+            '274,,,,0,,,Hegglin,Peter,1,False,34'
+        ),
+        (
+            'majorz,2015-01-01,majorz,7,,2,11,Cham,1702,9620,41,0,1,1,40,6,0,'
+            '274,,,,0,,,Hürlimann,Urs,2,False,28'
+        ),
+    )).encode('utf-8')
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_onegov = client.get('/election/election/data-csv').text
+
+    assert result_sesam == result_onegov
+
+
+def test_upload_election_temporary_results_proporz(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    # SESAM: "Anzahl Gemeinden" + missing lines
+    csv = '\n'.join((
+        (
+            'Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,'
+            'Leere Wahlzettel,Ungültige Wahlzettel,Leere Stimmen,Listen-Nr,'
+            'Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,'
+            'Kandidatenstimmen unveränderte Wahlzettel,'
+            'Kandidatenstimmen veränderte Wahlzettel,'
+            'Zusatzstimmen unveränderte Wahlzettel,'
+            'Zusatzstimmen veränderte Wahlzettel,Anzahl Sitze Liste,'
+            'Kandidaten-Nr,Gewählt,Name,Vorname,'
+            'Stimmen Total aus Wahlzettel,Anzahl Gemeinden'
+        ),
+        (
+            '2,1701,14119,7462,77,196,122,1,1,ALG,,,1435,0,0,0,0,101,FALSE,'
+            'Lustenberger,Andreas,948,2 von 11'
+        ),
+        (
+            '2,1701,14119,7462,77,196,122,1,1,ALG,,,1435,0,0,0,0,102,FALSE,'
+            'Schriber-Neiger,Hanni,208,2 von 11'
+        ),
+        (
+            '2,1702,9926,4863,0,161,50,1,1,ALG,,,533,0,0,0,0,101,FALSE,'
+            'Lustenberger,Andreas,290,2 von 11'
+        ),
+        (
+            '2,1702,9926,4863,0,161,50,1,1,ALG,,,533,0,0,0,0,102,FALSE,'
+            'Schriber-Neiger,Hanni,105,2 von 11'
+        ),
+    )).encode('utf-8')
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'sesam'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_sesam = client.get('/election/election/data-csv').text
+    assert 'Baar,1701,14119' in result_sesam
+    assert 'Cham,1702,9926' in result_sesam
+    assert 'Zug' not in result_sesam
+
+    # Wabsti: form value + (optionally) missing lines
+    csv = '\n'.join((
+        (
+            'Einheit_BFS,Kand_Nachname,Kand_Vorname,Liste_KandID,Liste_ID,'
+            'Liste_Code,Kand_StimmenTotal,Liste_ParteistimmenTotal'
+        ),
+        '1701,Lustenberger,Andreas,101,1,ALG,948,1435',
+        '1701,Schriber-Neiger,Hanni,102,1,ALG,208,1435',
+        '1702,Lustenberger,Andreas,101,1,ALG,290,533',
+        '1702,Schriber-Neiger,Hanni,102,1,ALG,105,533',
+    )).encode('utf-8')
+    csv_stat = '\n'.join((
+        (
+            'Einheit_BFS,StimBerTotal,WZEingegangen,WZLeer,WZUngueltig,'
+            'StmWZVeraendertLeerAmtlLeer'
+        ),
+        '1701,14119,7462,77,196,122',
+        '1702,9926,4863,0,161,50',
+    )).encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'wabsti'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['statistics'] = Upload('data.csv', csv_stat, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_wabsti = client.get('/election/election/data-csv').text
+    assert 'Baar,1701,14119' in result_wabsti
+    assert 'Cham,1702,9926' in result_wabsti
+    assert 'Zug' not in result_wabsti
+
+    upload.form['complete'] = True
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_wabsti = client.get('/election/election/data-csv').text
+    assert '2,2,Baar,1701' in result_wabsti
+
+    assert result_sesam == result_wabsti.replace('2,2', '2,11')
+
+    # Onegov internal: misssing and number of municpalities
+    csv = '\n'.join((
+        (
+            'election_title,election_date,election_type,election_mandates,'
+            'election_absolute_majority,election_counted_municipalities,'
+            'election_total_municipalities,municipality_name,'
+            'municipality_bfs_number,municipality_elegible_voters,'
+            'municipality_received_ballots,municipality_blank_ballots,'
+            'municipality_invalid_ballots,municipality_unaccounted_ballots,'
+            'municipality_accounted_ballots,municipality_blank_votes,'
+            'municipality_invalid_votes,municipality_accounted_votes,'
+            'list_name,list_id,list_number_of_mandates,list_votes,'
+            'list_connection,list_connection_parent,candidate_family_name,'
+            'candidate_first_name,candidate_id,candidate_elected,'
+            'candidate_votes'
+        ),
+        (
+            'election,2015-01-01,proporz,2,0,2,11,Baar,1701,14119,7462,77,196,'
+            '273,7189,122,0,14256,ALG,1,0,1435,,,Lustenberger,Andreas,101,'
+            'False,948'
+        ),
+        (
+            'election,2015-01-01,proporz,2,0,2,11,Baar,1701,14119,7462,77,196,'
+            '273,7189,122,0,14256,ALG,1,0,1435,,,Schriber-Neiger,Hanni,102,'
+            'False,208'
+        ),
+        (
+            'election,2015-01-01,proporz,2,0,2,11,Cham,1702,9926,4863,0,161,'
+            '161,4702,50,0,9354,ALG,1,0,533,,,Lustenberger,Andreas,101,'
+            'False,290'
+        ),
+        (
+            'election,2015-01-01,proporz,2,0,2,11,Cham,1702,9926,4863,0,161,'
+            '161,4702,50,0,9354,ALG,1,0,533,,,Schriber-Neiger,Hanni,102,'
+            'False,105'
+        ),
+    )).encode('utf-8')
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result_onegov = client.get('/election/election/data-csv').text
+
+    assert result_sesam == result_onegov

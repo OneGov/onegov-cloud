@@ -99,6 +99,8 @@ candidate_id|Die ID des Kandidierenden.
 candidate_elected|True, falls der Kandidierenden gewählt wurde.
 candidate_votes|Die Anzahl Kandidierendenstimmen der Gemeinde/des Standorts.
 
+Noch nicht ausgezählte Gemeinden sind nicht enthalten.
+
 ## Abstimmungsresultate
 
 ### Aufbereitete Ergebnisse
