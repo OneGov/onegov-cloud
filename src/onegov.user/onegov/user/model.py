@@ -2,7 +2,7 @@ from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
-from onegov.user.utils import yubikey_otp_to_serial
+from onegov.user.utils import yubikey_otp_to_serial, is_valid_yubikey_format
 from sqlalchemy import Boolean, Column, Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred
@@ -120,6 +120,8 @@ class User(Base, TimestampMixin):
 
     @yubikey.setter
     def yubikey(self, yubikey):
+        assert is_valid_yubikey_format(yubikey)
+
         self.second_factor = {
             'type': 'yubikey',
             'data': yubikey[:12]

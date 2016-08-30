@@ -37,6 +37,25 @@ def test_user_exists(session):
     assert users.exists('dmr@example.org')
 
 
+def test_user_by_yubikey(session):
+
+    users = UserCollection(session)
+    users.add('dmr@example.org', 'p@ssw0rd', 'root', second_factor={
+        'type': 'yubikey',
+        'data': 'cccccccdefgh'
+    })
+
+    assert users.by_yubikey('cccccccdefgh')
+
+
+def test_set_yubikey(session):
+    users = UserCollection(session)
+    user = users.add('dmr@example.org', 'p@ssw0rd', 'root')
+
+    with pytest.raises(AssertionError):
+        user.yubikey = 'xxx'
+
+
 def test_user_data(session):
 
     users = UserCollection(session)

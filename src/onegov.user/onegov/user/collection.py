@@ -154,6 +154,27 @@ class UserCollection(object):
         user.active = True
         self.session.flush()
 
+    def by_yubikey(self, token, active_only=True):
+        """ Returns the user with the given yubikey token.
+
+        Only considers active users by default.
+
+        """
+
+        token = token[:12]
+
+        query = self.query().filter(User.active == True)
+
+        for user in query.all():
+            if not user.second_factor:
+                continue
+
+            if user.second_factor.get('type') != 'yubikey':
+                continue
+
+            if user.second_factor.get('data') == token:
+                return user
+
     def delete(self, username):
         """ Deletes the user if it exists.
 

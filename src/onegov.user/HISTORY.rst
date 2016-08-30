@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to find a user by yubikey.
+  [href]
+
 0.7.0 (2016-08-30)
 ~~~~~~~~~~~~~~~~~~~
 
