@@ -2,51 +2,7 @@ import morepath
 from onegov.core.utils import relative_url
 from onegov.user import log
 from onegov.user.collection import UserCollection
-from yubico_client import Yubico
-from yubico_client.yubico_exceptions import (
-    StatusCodeError,
-    SignatureVerificationError
-)
-
-
-def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
-    """ Asks the yubico validation servers if the given yubikey OTP is valid.
-
-    :client_id:
-        The yubico API client id.
-
-    :secret_key:
-        The yubico API secret key.
-
-    :expected_yubikey_id:
-        The expected yubikey id. The yubikey id is defined as the first twelve
-        characters of any yubikey value. Each user should have a yubikey
-        associated with it's account. If the yubikey value comes from a
-        different key, the key is invalid.
-
-    :yubikey:
-        The actual yubikey value that should be verified.
-
-    :return: True if yubico confirmed the validity of the key.
-
-    """
-    assert client_id and secret_key and expected_yubikey_id and yubikey
-    assert len(expected_yubikey_id) == 12
-
-    # if the yubikey doesn't start with the expected yubikey id we do not
-    # need to make a roundtrip to the validation server
-    if not yubikey.startswith(expected_yubikey_id):
-        return False
-
-    try:
-        return Yubico(client_id, secret_key).verify(yubikey)
-    except StatusCodeError as e:
-        if e.status_code != 'REPLAYED_OTP':
-            raise e
-
-        return False
-    except SignatureVerificationError as e:
-        return False
+from onegov.user.utils import is_valid_yubikey
 
 
 class Auth(object):

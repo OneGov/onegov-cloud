@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to extract the yubikey serial from one of its OTPs.
+  [href]
+
 - Adds support for yubikey removal on the login form.
   [href]
 

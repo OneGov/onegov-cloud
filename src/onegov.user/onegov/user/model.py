@@ -2,6 +2,7 @@ from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
+from onegov.user.utils import yubikey_otp_to_serial
 from sqlalchemy import Boolean, Column, Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred
@@ -102,3 +103,18 @@ class User(Base, TimestampMixin):
 
         username = self.username.split('@')[0]
         return ' '.join(p.capitalize() for p in username.split('.')[:2])
+
+    @property
+    def yubikey_serial(self):
+        """ Returns the yubikey serial of the yubikey associated with this
+        user (if any).
+
+        """
+
+        if not self.second_factor:
+            return
+
+        if not self.second_factor.get('type') == 'yubikey':
+            return
+
+        return yubikey_otp_to_serial(self.second_factor['data'])
