@@ -9,7 +9,6 @@ from onegov.user.errors import (
     UnknownUserError,
 )
 from sqlalchemy import sql
-from sqlalchemy.exc import IntegrityError
 
 
 MIN_PASSWORD_LENGTH = 8
@@ -41,6 +40,9 @@ class UserCollection(object):
         """
         assert username and password and role
 
+        if self.exists(username):
+            raise ExistingUserError(username)
+
         user = User(
             username=username,
             password=password,
@@ -50,13 +52,8 @@ class UserCollection(object):
             active=active
         )
 
-        try:
-            self.session.add(user)
-            self.session.flush()
-        except IntegrityError as e:
-            if e.orig.pgcode == '23505':  # unique_violation
-                raise ExistingUserError(username)
-            raise
+        self.session.add(user)
+        self.session.flush()
 
         return user
 

@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Be less clever about the existing user error, to avoid invalidating
+  the session.
+  [href]
+
 0.6.3 (2016-08-30)
 ~~~~~~~~~~~~~~~~~~~
 
