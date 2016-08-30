@@ -3,7 +3,9 @@ import transaction
 
 from more.itsdangerous import IdentityPolicy
 from onegov.user import (
-    Auth, is_valid_yubikey, UserCollection, yubikey_otp_to_serial)
+    Auth, is_valid_yubikey, is_valid_yubikey_format,
+    UserCollection, yubikey_otp_to_serial
+)
 from webtest import TestApp as Client
 from unittest.mock import patch
 from yubico_client import Yubico
@@ -54,6 +56,12 @@ def test_is_valid_yubikey_otp(session):
             expected_yubikey_id='ccccccbcgujh',
             yubikey='ccccccbcgujhingjrdejhgfnuetrgigvejhhgbkugded'
         )
+
+
+def test_is_valid_yubikey_format():
+    assert is_valid_yubikey_format('ccccccdefghd')
+    assert is_valid_yubikey_format('cccccccdefg' * 4)
+    assert not is_valid_yubikey_format('ccccccdefghx')
 
 
 def test_yubikey_otp_to_serial():

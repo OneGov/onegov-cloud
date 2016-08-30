@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to check the format of a yubikey OTP.
+  [href]
+
 - Adds the ability to extract the yubikey serial from one of its OTPs.
   [href]
 

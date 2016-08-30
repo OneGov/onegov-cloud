@@ -1,3 +1,5 @@
+import re
+
 from yubico_client import Yubico
 from yubico_client.yubico_exceptions import (
     StatusCodeError,
@@ -46,6 +48,16 @@ def is_valid_yubikey(client_id, secret_key, expected_yubikey_id, yubikey):
 
 
 ALPHABET = 'cbdefghijklnrtuv'
+ALPHABET_RE = re.compile(r'^[cbdefghijklnrtuv]{12,44}$')
+
+
+def is_valid_yubikey_format(otp):
+    """ Returns True if the given OTP has the correct format. Does not actually
+    contact Yubico, so this function may return true, for some invalid keys.
+
+    """
+
+    return ALPHABET_RE.match(otp) and True or False
 
 
 def yubikey_otp_to_serial(otp):

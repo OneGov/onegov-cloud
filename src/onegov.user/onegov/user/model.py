@@ -105,16 +105,33 @@ class User(Base, TimestampMixin):
         return ' '.join(p.capitalize() for p in username.split('.')[:2])
 
     @property
+    def has_yubikey(self):
+        if not self.second_factor:
+            return False
+
+        return self.second_factor.get('type') == 'yubikey'
+
+    @property
+    def yubikey(self):
+        if not self.has_yubikey:
+            return None
+
+        return self.second_factor.get('data')
+
+    @yubikey.setter
+    def yubikey(self, yubikey):
+        self.second_factor = {
+            'type': 'yubikey',
+            'data': yubikey[:12]
+        }
+
+    @property
     def yubikey_serial(self):
         """ Returns the yubikey serial of the yubikey associated with this
         user (if any).
 
         """
 
-        if not self.second_factor:
-            return
+        yubikey = self.yubikey
 
-        if not self.second_factor.get('type') == 'yubikey':
-            return
-
-        return yubikey_otp_to_serial(self.second_factor['data'])
+        return yubikey and yubikey_otp_to_serial(yubikey) or None
