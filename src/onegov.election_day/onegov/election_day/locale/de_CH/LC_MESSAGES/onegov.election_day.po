@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-29 12:51+0200\n"
+"POT-Creation-Date: 2016-08-30 14:58+0200\n"
 "PO-Revision-Date: 2016-08-29 13:05+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -401,6 +401,9 @@ msgstr "Nächste Seite"
 
 msgid "You are here"
 msgstr "Aktuelle Seite"
+
+msgid "Last change"
+msgstr "Aktualisiert"
 
 msgid "New Election"
 msgstr "Neue Wahl"

@@ -3,14 +3,14 @@
 
         <h1>
             <small i18n:translate="" tal:condition="not:counted">Not yet counted.</small>
-            <small condition="vote.answer">
+            <small tal:condition="vote.answer">
                 <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
             </small>
             ${vote.title}
         </h1>
 
         <div class="download-results">
-            <a data-dropdown="download-dropdown" data-options="align:left" aria-controls="download-dropdown" aria-expanded="false" alt="Download raw results as JSON, CSV or XLS"><i class="fa fa-download"></i></a>
+            <a data-dropdown="download-dropdown" data-options="align:left" aria-controls="download-dropdown" aria-expanded="false"><i class="fa fa-download"></i></a>
             <ul id="download-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
                 <li><a href="${request.link(vote, 'data-json')}">JSON</a></li>
                 <li><a href="${request.link(vote, 'data-csv')}">CSV</a></li>
@@ -24,14 +24,14 @@
         <div class="row percentages">
             <div class="columns small-12 medium-6">
                 <dl>
-                    <dd class="accepted" >${'{0:.2f}'.format(vote.yeas_percentage)}%</dd>
                     <dt i18n:translate="">Yeas</dt>
+                    <dd class="accepted" >${'{0:.2f}'.format(vote.yeas_percentage)}%</dd>
                 </dl>
             </div>
             <div class="columns small-12 medium-6 end">
                 <dl style="text-align: right;">
-                    <dd class="rejected" >${'{0:.2f}'.format(vote.nays_percentage)}%</dd>
                     <dt i18n:translate="">Nays</dt>
+                    <dd class="rejected" >${'{0:.2f}'.format(vote.nays_percentage)}%</dd>
                 </dl>
             </div>
         </div>
@@ -44,10 +44,7 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
 
-        <h2 tal:condition="not:vote.ballots" i18n:translate="">No results yet</h2>
-
         <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change vote.last_result_change; counted vote.ballots and counted" />
-
 
         <tal:block tal:repeat="ballot vote.ballots">
             <div class="results-navigation" tal:condition="vote.counter_proposal" tal:define="types python: ['proposal', 'counter-proposal', 'tie-breaker']">
@@ -102,14 +99,16 @@
                 <div class="foldable-panel">
                     <table class="ballot-results stackable">
                         <thead>
-                            <th i18n:translate="">Electoral District</th>
-                            <th i18n:translate="">Result</th>
-                            <th i18n:translate="" class="right-aligned">Yeas</th>
-                            <th i18n:translate="" class="right-aligned">Nays</th>
-                            <th i18n:translate="" class="right-aligned">Empty</th>
-                            <th i18n:translate="" class="right-aligned">Invalid</th>
-                            <th i18n:translate="" class="right-aligned">Yes %</th>
-                            <th i18n:translate="" class="right-aligned">No %</th>
+                            <tr>
+                                <th i18n:translate="">Electoral District</th>
+                                <th i18n:translate="">Result</th>
+                                <th i18n:translate="" class="right-aligned">Yeas</th>
+                                <th i18n:translate="" class="right-aligned">Nays</th>
+                                <th i18n:translate="" class="right-aligned">Empty</th>
+                                <th i18n:translate="" class="right-aligned">Invalid</th>
+                                <th i18n:translate="" class="right-aligned">Yes %</th>
+                                <th i18n:translate="" class="right-aligned">No %</th>
+                            </tr>
                         </thead>
                         <tbody>
                             <tr class="total">

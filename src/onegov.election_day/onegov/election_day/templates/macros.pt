@@ -51,7 +51,7 @@
 <metal:archive define-macro="archive" i18n:domain="onegov.election_day">
     <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years">
         <div class="columns small-12 small-centered">
-            <h2 i18n:translate>Archive</h2>
+            <h1 i18n:translate="">Archive</h1>
             <ul>
                 <li tal:repeat="date years">
                     <a href="${request.link(layout.archive.for_date(date))}">${date}</a>
@@ -79,7 +79,7 @@
             </tal:block>
         </tal:block>
         <tal:block condition="cancel|nothing">
-            <a class="button secondary cancel-button" href="${cancel}" i18n:translate>Cancel</a>
+            <a class="button secondary cancel-button" href="${cancel}" i18n:translate="">Cancel</a>
         </tal:block>
         <tal:block condition="not: button_text|nothing">
             <input type="submit" value="Submit" class="button ${button_class|nothing}" i18n:attributes="value">
@@ -216,7 +216,7 @@
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
     <div class="row" tal:condition="meta.get('related_link', '')|nothing">
         <div class="columns small-12">
-            <h3 i18n:translate>Related link</h3>
+            <h2 i18n:translate="">Related link</h2>
             <p tal:define="link meta.get('related_link', '')">
                 <a href="${link}">${link}</a>
             </p>
@@ -271,11 +271,11 @@
     </ul>
 </metal:manage_menu>
 
-<metal:temporary_results_callout define-macro="temporary_results_callout">
+<metal:temporary_results_callout define-macro="temporary_results_callout" i18n:domain="onegov.election_day">
     <div class="panel callout radius" tal:condition="not:counted">
-         <h5 i18n:translate>Not yet counted.</h5>
+         <h5 i18n:translate="">Not yet counted.</h5>
          <p>
-             <span i18n:translate>Last change</span>:
+             <span i18n:translate="">Last change</span>:
              <strong>${layout.format_date(last_change, 'relative')}</strong>
          </p>
     </div>
