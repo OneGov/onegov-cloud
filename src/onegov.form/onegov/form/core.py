@@ -290,6 +290,15 @@ class Form(BaseForm):
             if name in include and name not in exclude:
                 field.populate_obj(obj, name)
 
+    def delete_field(self, fieldname):
+        """ Removes the given field from the form and all the fieldsets. """
+
+        for fieldset in self.fieldsets:
+            if fieldname in fieldset.fields:
+                del fieldset.fields[fieldname]
+
+        del self[fieldname]
+
 
 class Fieldset(object):
     """ Defines a fieldset with a list of fields. """
