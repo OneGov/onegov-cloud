@@ -57,7 +57,7 @@ class UploadWidget(FileInput):
                         <li>
                             <input type="radio" id="{name}-0" name="{name}"
                                    value="keep" checked="">
-                            <label for="{name}-0">{keep_label}</label
+                            <label for="{name}-0">{keep_label}</label>
                         </li>
                         <li>
                             <input type="radio" id="{name}-1" name="{name}"
