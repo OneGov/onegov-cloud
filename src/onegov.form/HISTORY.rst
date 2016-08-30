@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.13.0 (2016-08-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to delete fields from forms/all fieldsets.
   [href]
