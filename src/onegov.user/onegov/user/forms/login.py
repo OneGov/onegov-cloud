@@ -27,8 +27,13 @@ class LoginForm(Form):
 
         """
 
+        # the yubikey field may be removed downstream - username and password
+        # however *must* be there
+        yubikey = getattr(self, 'yubikey', None)
+        yubikey = yubikey and yubikey.data.strip() or None
+
         return {
             'username': self.username.data,
             'password': self.password.data,
-            'second_factor': self.yubikey.data.strip() or None
+            'second_factor': yubikey
         }

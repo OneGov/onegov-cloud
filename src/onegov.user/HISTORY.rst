@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for yubikey removal on the login form.
+  [href]
+
 0.6.4 (2016-08-30)
 ~~~~~~~~~~~~~~~~~~~
 
