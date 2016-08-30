@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.0 (2016-08-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to check the format of a yubikey OTP.
   [href]
 
