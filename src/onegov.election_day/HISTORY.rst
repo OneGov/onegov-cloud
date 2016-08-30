@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.8.1 (2016-08-30)
+~~~~~~~~~~~~~~~~~~~
 
 - Fix election and vote templates.
   [msom]

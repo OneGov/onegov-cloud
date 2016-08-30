@@ -4,7 +4,7 @@ name = 'onegov.election_day'
 description = (
     'OneGov ballot results website used on election day.'
 )
-version = '0.8.0'
+version = '0.8.1'
 
 
 def get_long_description():
@@ -32,12 +32,12 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'arrow>=0.8.0',
+        'arrow>=0.8.1',
         'babel',
         'cached_property',
         'cssmin',
         'onegov.core>=0.23.0',
-        'onegov.ballot>=0.8.0',
+        'onegov.ballot>=0.8.1',
         'onegov.form>=0.12.0',
         'onegov.foundation>=0.0.4',
         'onegov.shared>=0.2.0',
