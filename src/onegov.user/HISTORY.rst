@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.3 (2016-08-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Raises an ExistingUserError when an existing user is added.
   [href]
 
