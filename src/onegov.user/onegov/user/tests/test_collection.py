@@ -19,6 +19,15 @@ def test_user_add(session):
     assert users.by_username(user.username).username == 'dmr@example.org'
 
 
+def test_user_add_conflict(session):
+
+    users = UserCollection(session)
+    users.add('dmr@example.org', 'p@ssw0rd', 'root')
+
+    with pytest.raises(ExistingUserError):
+        users.add('dmr@example.org', 'p@ssw0rd', 'root')
+
+
 def test_user_exists(session):
 
     users = UserCollection(session)
