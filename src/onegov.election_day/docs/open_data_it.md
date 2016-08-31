@@ -9,8 +9,8 @@ Tutte le risposte contengono l'intestazione HTTP `Last-Modified` (Ultima modific
 ## Contenuti
 
 1. [Riepilogo dei risultati](#riepilogo-dei-risultati)
-2. [Risultati dell'elezione](#risultati-dell-elezione)
-3. [Vote results](#vote-results)
+2. [Risultati dell'elezione](#risultati-dellelezione)
+3. [Risultati della votazione](#risultati-della-votazione)
 
 ## Riepilogo dei risultati
 
