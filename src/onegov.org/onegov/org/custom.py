@@ -1,7 +1,7 @@
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.models import GeneralFileCollection, ImageFileCollection
-from onegov.user.auth import Auth
+from onegov.user.auth import Auth, UserCollection
 
 
 @OrgApp.template_variables()
@@ -21,15 +21,18 @@ def get_bottom_links(request):
             request.app.org, name='benutzerprofil'))
 
     if request.is_manager:
-        yield Link(_('Files'), request.link(
-            GeneralFileCollection(request.app)))
+        yield Link(_('Files'), request.class_link(
+            GeneralFileCollection))
 
-        yield Link(_('Images'), request.link(
-            ImageFileCollection(request.app)))
+        yield Link(_('Images'), request.class_link(
+            ImageFileCollection))
 
     if request.is_admin:
         yield Link(_('Settings'), request.link(
             request.app.org, 'einstellungen'))
+
+        yield Link(_('Usermanagement'), request.class_link(
+            UserCollection))
 
     if not request.is_logged_in:
         yield Link(_("Login"), request.link(

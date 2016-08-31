@@ -2919,3 +2919,113 @@ def test_disabled_registration(org_app):
     org_app.settings.org.enable_user_registration = False
 
     assert client.get('/auth/register', expect_errors=True).status_code == 404
+
+
+def test_disabled_yubikey(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    org_app.settings.org.enable_yubikey = False
+    assert 'YubiKey' not in client.get('/auth/login')
+    assert 'YubiKey' not in client.get('/benutzerverwaltung')
+
+    org_app.settings.org.enable_yubikey = True
+    assert 'YubiKey' in client.get('/auth/login')
+    assert 'YubiKey' in client.get('/benutzerverwaltung')
+
+
+def test_disable_users(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    users = client.get('/benutzerverwaltung')
+    assert 'admin@example.org' in users
+    assert 'editor@example.org' in users
+
+    editor = users.click('Bearbeiten', index=1)
+    editor.form['active'] = False
+    editor.form.submit()
+
+    login = Client(org_app).login_editor()
+    assert login.status_code == 200
+
+    editor = users.click('Bearbeiten', index=1)
+    editor.form['role'] = 'member'
+    editor.form['active'] = True
+    editor.form.submit()
+
+    login = Client(org_app).login_editor()
+    assert login.status_code == 302
+
+
+def test_change_role(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    org_app.settings.org.enable_yubikey = True
+
+    editor = client.get('/benutzerverwaltung').click('Bearbeiten', index=1)
+    assert "müssen zwingend einen YubiKey" in editor.form.submit()
+
+    editor.form['role'] = 'member'
+    assert editor.form.submit().status_code == 302
+
+    editor.form['role'] = 'admin'
+    editor.form['active'] = False
+    assert editor.form.submit().status_code == 302
+
+    editor.form['role'] = 'admin'
+    editor.form['active'] = True
+    editor.form['yubikey'] = 'cccccccdefgh'
+    assert editor.form.submit().status_code == 302
+
+    org_app.settings.org.enable_yubikey = False
+    editor.form['role'] = 'admin'
+    editor.form['active'] = True
+    editor.form['yubikey'] = ''
+    assert editor.form.submit().status_code == 302
+
+
+def test_unique_yubikey(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    org_app.settings.org.enable_yubikey = True
+
+    users = client.get('/benutzerverwaltung')
+    admin = users.click('Bearbeiten', index=0)
+    editor = users.click('Bearbeiten', index=1)
+
+    admin.form['yubikey'] = 'cccccccdefgh'
+    assert admin.form.submit().status_code == 302
+
+    editor.form['yubikey'] = 'cccccccdefgh'
+    assert "bereits von admin@example.org verwendet" in editor.form.submit()
+
+
+def test_add_new_user(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    org_app.settings.org.enable_yubikey = True
+
+    new = client.get('/benutzerverwaltung').click('Benutzer', index=0)
+    new.form['username'] = 'admin@example.org'
+
+    assert "existiert bereits" in new.form.submit()
+
+    new.form['username'] = 'member@example.org'
+    new.form['role'] = 'admin'
+
+    assert "müssen zwingend einen YubiKey" in new.form.submit()
+
+    new.form['role'] = 'member'
+    added = new.form.submit()
+
+    assert "Passwort" in added
+    password = added.pyquery('.panel strong').text()
+
+    login = Client(org_app).get('/auth/login')
+    login.form['username'] = 'member@example.org'
+    login.form['password'] = password
+    assert login.form.submit().status_code == 302

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-26 09:31+0200\n"
+"POT-Creation-Date: 2016-08-30 16:15+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -30,6 +30,9 @@ msgstr "Bilder"
 
 msgid "Settings"
 msgstr "Einstellungen"
+
+msgid "Usermanagement"
+msgstr "Benutzerverwaltung"
 
 msgid "Login"
 msgstr "Login"
@@ -211,8 +214,20 @@ msgstr "Tagskarte"
 msgid "Photo Album"
 msgstr "Fotoalbum"
 
+msgid "User"
+msgstr "Benutzer"
+
 msgid "Not a valid color."
 msgstr "Ungültige Farbe."
+
+msgid "Admins"
+msgstr "Administratoren"
+
+msgid "Editors"
+msgstr "Editoren"
+
+msgid "Members"
+msgstr "Mitglieder"
 
 msgid "A conflicting allocation exists for the requested time period."
 msgstr "Es besteht bereits eine Einteilung im gewünschten Zeitraum."
@@ -568,7 +583,7 @@ msgid "JSON File"
 msgstr "JSON Datei"
 
 msgid "E-Mail Reply Address"
-msgstr ""
+msgstr "E-Mail Antwort Adresse"
 
 msgid "Name"
 msgstr "Name"
@@ -677,6 +692,43 @@ msgstr "Erweitert"
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
+
+msgid "Admin"
+msgstr "Administrator"
+
+msgid "Editor"
+msgstr "Editor"
+
+msgid "Member"
+msgstr "Mitglied"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Yubikey"
+msgstr "YubiKey"
+
+msgid "Plug your YubiKey into a USB slot and press it."
+msgstr "YubiKey anschliessen und Knopf drücken."
+
+msgid "The users e-mail address (a.k.a. username)"
+msgstr "Die E-Mail Adresse des Benutzers (bzw. der Benutzername)"
+
+msgid "Invalid Yubikey"
+msgstr "Ungültiger YubiKey"
+
+#, python-format
+msgid "This Yubikey is already used by ${username}"
+msgstr "Dieser YubiKey wird bereits von ${username} verwendet"
+
+msgid "A user with this e-mail address exists already"
+msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
+
+msgid "Administrators and editors must use a Yubikey"
+msgstr "Administratoren und Editoren müssen zwingend einen YubiKey verwenden"
 
 msgid "Send me a daily e-mail with information about the website's state."
 msgstr "Ich möchte ein tägliches Status E-Mail erhalten."
@@ -1031,6 +1083,12 @@ msgstr "Keine Veranstaltungen gefunden."
 msgid "Filter by date"
 msgstr "Nach Datum filtern"
 
+msgid "Administrator"
+msgstr "Administrator"
+
+msgid "Administrators"
+msgstr "Administratoren"
+
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
 
@@ -1218,6 +1276,19 @@ msgid "Not yet sent."
 msgstr "Noch nicht gesendet."
 
 msgid ""
+"The user ${username} was created successfully. Please write down the user's "
+"password, as it won't be shown to you again:"
+msgstr ""
+"Der Benutzer ${username} wurde erfolgreich erstellt. Bitte notieren Sie das "
+"Passwort des Benutzers. Es wird Ihnen nicht wieder gezeigt:"
+
+msgid "Password:"
+msgstr "Passwort:"
+
+msgid "Back to usermanagement"
+msgstr "Zurück zur Benutzerverwaltung"
+
+msgid ""
 "Sorry, the page you are looking for could not be found. Try checking the URL "
 "for errors or use the search box on the top."
 msgstr ""
@@ -1379,11 +1450,11 @@ msgstr ""
 "Sie wurden nicht automatisch weitergeleitet damit Sie die Möglichkeit haben "
 "den Verweis zu bearbeiten oder zu löschen."
 
+msgid "Inactive"
+msgstr "Inaktiv"
+
 msgid "Username"
 msgstr "Benutzername"
-
-msgid "Role"
-msgstr "Rolle"
 
 msgid "Identicon"
 msgstr "Identicon"
@@ -1703,6 +1774,18 @@ msgstr "Abgeschlossene Tickets"
 
 msgid "All Tickets"
 msgstr "Alle Tickets"
+
+msgid "User Management"
+msgstr "Benutzerverwaltung"
+
+msgid "New User"
+msgstr "Neuer Benutzer"
+
+msgid "The user was created successfully"
+msgstr "Der Benutzer wurde erfolgreich erstellt"
+
+msgid "A user with this e-mail address already exists"
+msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."

@@ -256,6 +256,10 @@ form {
         }
     }
 
+    > input[type="submit"] {
+        margin-top: .4rem;
+    }
+
     .group-label {
         color: $form-label-font-color;
         font-size: $form-label-font-size;
@@ -265,6 +269,12 @@ form {
     input[type="checkbox"] + label {
         max-width: 90%;
         vertical-align: text-top;
+    }
+
+    // make sure the label after a single checkbox has enough room
+    input[type="checkbox"] + .label-text {
+        display: inline-block;
+        margin-left: .7rem;
     }
 
     input.invalid,
@@ -702,6 +712,7 @@ $new-person-icon: '\f007';
 $new-photo-album: '\f03e';
 $new-reservation-icon: '\f271';
 $new-room-icon: '\f015';
+$new-user-icon: '\f234';
 $paste-link-icon: '\f0ea';
 $select-icon: '\f14a';
 $send-link-icon: '\f1d9';
@@ -757,6 +768,7 @@ $upload-icon: '\f0ee';
     .new-photo-album:before { @include icon($new-photo-album); }
     .new-reservation:before { @include icon($new-reservation-icon); }
     .new-room:before { @include icon($new-room-icon); }
+    .new-user:before { @include icon($new-user-icon); }
     .paste-link:before { @include icon($paste-link-icon); }
     .select:before { @include icon($select-icon); }
     .send-link:before { @include icon($send-link-icon); }
@@ -2976,4 +2988,43 @@ ul.search-results {
             margin-bottom: 0;
         }
     }
+}
+
+/*
+    Usermanagement
+*/
+
+.user-inactive td {
+    color: $base;
+}
+
+.usermanagement {
+    .subheader td {
+        border-color: $oil;
+
+        &:first-child {
+            font-weight: bold;
+        }
+    }
+
+    tbody + tbody tr:first-child td {
+        padding-top: 1.5rem;
+    }
+}
+
+.yubikey {
+    background-color: $smoke;
+    border-radius: 3px;
+    border: 1px solid $iron;
+    color: $tuatara;
+    display: inline-block;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: .8em;
+    padding: 2px 4px;
+}
+
+.user-inactive .yubikey {
+    background-color: $snow;
+    border-color: $smoke;
+    color: $base;
 }

@@ -206,6 +206,11 @@ def get_enable_user_registration():
     return True
 
 
+@OrgApp.setting(section='org', name='enable_yubikey')
+def get_enable_yubikey():
+    return False
+
+
 @OrgApp.webasset_path()
 def get_js_path():
     return 'assets/js'

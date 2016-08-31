@@ -575,3 +575,19 @@
         </form>
     </div>
 </metal:date_range_selector>
+
+<metal:role_singular define-macro="role-singular" i18n:domain="onegov.org">
+    <tal:block switch="role">
+        <tal:block case="'admin'" i18n:translate>Administrator</tal:block>
+        <tal:block case="'editor'" i18n:translate>Editor</tal:block>
+        <tal:block case="'member'" i18n:translate>Member</tal:block>
+    </tal:block>
+</metal:role_singular>
+
+<metal:role_plural define-macro="role-plural" i18n:domain="onegov.org">
+    <tal:block switch="role">
+        <tal:block case="'admin'" i18n:translate>Administrators</tal:block>
+        <tal:block case="'editor'" i18n:translate>Editors</tal:block>
+        <tal:block case="'member'" i18n:translate>Members</tal:block>
+    </tal:block>
+</metal:role_plural>

@@ -23,27 +23,30 @@ from onegov.org.forms.resource import (
 from onegov.org.forms.settings import SettingsForm
 from onegov.org.forms.signup import SignupForm
 from onegov.org.forms.userprofile import UserProfileForm
+from onegov.org.forms.user import ManageUserForm, NewUserForm
 
 
 __all__ = [
     'CustomDefinitionForm',
-    'DaypassAllocationForm',
     'DaypassAllocationEditForm',
+    'DaypassAllocationForm',
     'EventForm',
     'ImageSetForm',
     'LinkForm',
+    'ManageUserForm',
     'NewsletterForm',
     'NewsletterSendForm',
+    'NewUserForm',
     'PageForm',
     'PasswordResetForm',
     'PersonForm',
+    'RequestPasswordResetForm',
     'ReservationForm',
-    'ResourceForm',
     'ResourceCleanupForm',
     'ResourceExportForm',
-    'RequestPasswordResetForm',
-    'RoomAllocationForm',
+    'ResourceForm',
     'RoomAllocationEditForm',
+    'RoomAllocationForm',
     'SettingsForm',
     'SignupForm',
     'UserProfileForm',

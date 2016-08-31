@@ -24,6 +24,9 @@ from purl import URL
 def handle_login(self, request, form):
     """ Handles the login requests. """
 
+    if not request.app.settings.org.enable_yubikey:
+        form.delete_field('yubikey')
+
     if form.submitted(request):
         response = self.login_to(request=request, **form.login_data)
 

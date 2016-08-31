@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to manage users in a usermanagement view.
+  [href]
+
 0.0.5 (2016-08-26)
 ~~~~~~~~~~~~~~~~~~~
 

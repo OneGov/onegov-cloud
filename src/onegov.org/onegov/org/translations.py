@@ -7,3 +7,8 @@ from onegov.org import _
 
 # messages defined in wtforms-components
 _("Not a valid color.")
+
+# Roles in plural form are not defined as translatable texts anywhere
+_("Admins")
+_("Editors")
+_("Members")

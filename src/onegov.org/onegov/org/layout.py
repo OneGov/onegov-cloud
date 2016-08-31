@@ -29,6 +29,7 @@ from onegov.org.theme.org_theme import user_options
 from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
+from onegov.user import UserCollection
 from purl import URL
 from sqlalchemy import desc
 
@@ -1095,5 +1096,33 @@ class ImageSetLayout(DefaultLayout):
                         )),
                     yes_button_text=_("Delete photo album"),
                     redirect_after=self.request.link(self.collection)
+                )
+            ]
+
+
+class UserManagementLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Usermanagement"), self.request.class_link(UserCollection))
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=(
+                        Link(
+                            text=_("User"),
+                            url=self.request.class_link(
+                                UserCollection, name='neu'
+                            ),
+                            classes=('new-user', )
+                        ),
+                    )
                 )
             ]
