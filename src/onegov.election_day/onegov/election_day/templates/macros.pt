@@ -218,7 +218,7 @@
         <div class="columns small-12">
             <h2 i18n:translate="">Related link</h2>
             <p tal:define="link meta.get('related_link', '')">
-                <a href="${link}">${link}</a>
+                <a href="${link}" class="related-link">${link}</a>
             </p>
         </div>
     </div>

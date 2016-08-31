@@ -4,6 +4,9 @@ Changelog
 - Updates translations.
   [msom]
 
+- Breaks long related links.
+  [msom]
+
 0.8.1 (2016-08-30)
 ~~~~~~~~~~~~~~~~~~~
 
