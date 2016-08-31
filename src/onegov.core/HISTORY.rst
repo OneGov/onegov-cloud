@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes variable directive resulting in overwrites instead of merges.
+  [href]
+
 0.25.0 (2016-08-26)
 ~~~~~~~~~~~~~~~~~~~
 

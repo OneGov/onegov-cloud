@@ -151,8 +151,7 @@ def test_inject_default_vars(temporary_directory):
     utils.scan_morepath_modules(Parent)
     utils.scan_morepath_modules(Child)
 
-    morepath.commit(Parent)
-    morepath.commit(Child)
+    morepath.commit(Child, Parent)
 
     parent_page = Client(Parent()).get('/')
     assert 'parent' in parent_page

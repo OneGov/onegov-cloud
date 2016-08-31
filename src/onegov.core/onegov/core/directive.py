@@ -193,8 +193,16 @@ class TemplateVariablesAction(Action):
         'templatevariables_registry': TemplateVariablesRegistry
     }
 
+    counter = iter(range(1, 123456789))
+
+    def __init__(self):
+        # XXX I would expect this to work with a static name (and it does in
+        # tests), but in real world usage the same name leads to overriden
+        # paths
+        self.name = next(self.counter)
+
     def identifier(self, templatevariables_registry):
-        return 'template-variables'  # constant name => one action per app
+        return self.name
 
     def perform(self, func, templatevariables_registry):
         templatevariables_registry.callbacks.append(func)
