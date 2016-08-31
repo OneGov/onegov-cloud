@@ -4,7 +4,7 @@ name = 'onegov.town'
 description = (
     'OneGov web application for small towns.'
 )
-version = '1.11.2'
+version = '1.11.3'
 
 
 def get_long_description():
