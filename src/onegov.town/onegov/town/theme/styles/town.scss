@@ -8,3 +8,12 @@
 #homepage-tile-4 .tile-image { background-image: url(#{$tile-image-4});}
 #homepage-tile-5 .tile-image { background-image: url(#{$tile-image-5});}
 #homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
+
+
+/*
+    hide the news in the topbar
+*/
+
+.top-bar-section li:last-child {
+    display: none;
+}
