@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes yubikey property failing with empty values.
+  [href]
+
 - Adds the ability to find a user by yubikey.
   [href]
 

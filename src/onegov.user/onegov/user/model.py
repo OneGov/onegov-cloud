@@ -120,12 +120,15 @@ class User(Base, TimestampMixin):
 
     @yubikey.setter
     def yubikey(self, yubikey):
-        assert is_valid_yubikey_format(yubikey)
+        if not yubikey:
+            self.second_factor = None
+        else:
+            assert is_valid_yubikey_format(yubikey)
 
-        self.second_factor = {
-            'type': 'yubikey',
-            'data': yubikey[:12]
-        }
+            self.second_factor = {
+                'type': 'yubikey',
+                'data': yubikey[:12]
+            }
 
     @property
     def yubikey_serial(self):
