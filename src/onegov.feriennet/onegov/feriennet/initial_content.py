@@ -10,20 +10,26 @@ def create_new_organisation(request, app, name):
     pages = PageCollection(session)
 
     pages.add_root(
+        title="Angebote",
+        name='angebote',
+        type='topic',
+        meta={'trait': 'page'}
+    )
+    pages.add_root(
         title="Teilnahmebedingungen",
         name='teilnahmebedingungen',
         type='topic',
         meta={'trait': 'page'}
     )
     pages.add_root(
-        title="Sponsoren",
-        name='sponsoren',
+        title="Über uns",
+        name='ueber-uns',
         type='topic',
         meta={'trait': 'page'}
     )
     pages.add_root(
-        title="Über uns",
-        name='ueber-uns',
+        title="Sponsoren",
+        name='sponsoren',
         type='topic',
         meta={'trait': 'page'}
     )
