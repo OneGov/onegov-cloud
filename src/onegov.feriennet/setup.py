@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.core>=0.4.0'
+        'onegov.org'
     ],
     extras_require=dict(
         test=[
