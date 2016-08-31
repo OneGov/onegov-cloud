@@ -71,7 +71,7 @@ Name|Description
 ---|---
 election_title|Titel da l'elecziun
 election_date|La data da l'elecziun (sco segns ISO 8601)
-election_type|"proporz" en cas d'ina elecziun da proporz, "majorz" en cas d'ina elecziun da maiorz
+election_type|`proporz` en cas d'ina elecziun da proporz, `majorz` en cas d'ina elecziun da maiorz
 election_mandates|Il dumber dals sezs.
 election_absolute_majority|The absolute majority. Only relevant for elections based on majority system.
 election_counted_municipalities|The number of already counted municipalities.
@@ -132,8 +132,8 @@ Name|Description
 title|Titel da la votaziun.
 date|La data da la votaziun (sco segns ISO 8601).
 shortcode|Scursanida interna (definescha la successiun da pliras votaziuns che han lieu il medem di).
-domain|"federation" per votaziuns naziunalas, "canton" per votaziuns chantunalas
-type|"proposal" (proposta), "counter-proposal" (cuntraproposta) or "tie-breaker" (dumonda decisiva).
+domain|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas
+type|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
 group|La derivanza dal resultat. Quai po esser il district e la vischnanca, separads cun in stritg diagonal, il num da la citad ed il num dal circul, er separads cun in stritg diagonal, u simplamain il num da la vischnanca. Quai dependa dal chantun respectiv.
 municipality_id|La ID da la vischnanca/dal lieu. Pli enconuschent sco "numer UST".
 counted|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).

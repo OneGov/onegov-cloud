@@ -2,56 +2,56 @@
 
 ## Introduction
 
-There are JSON alternatives for all important views.
+Il y a des alternatives JSON pour toutes les vues importantes.
 
-All responses contain the `Last-Modified` HTTP Header with the last time, the data has change (i.e. the last time, results of an election or vote have been uploaded).
+Toutes les réponses contiennent l’en-tęte HTTP `Last-Modified` (Modifié pour la derničre fois) avec la derničre fois que les données ont changé (c’est-ŕ-dire la derničre fois que les résultats d'une élection ou d’une votation ont été téléchargés).
 
-## Contents
+## Contenu
 
-1. [Summarized results](#summarized-results)
-2. [Election results](#election-results)
-3. [Vote results](#vote-results)
+1. [Résultats synthétisés](#résultats-synthétisés)
+2. [Résultats des élections](#résultats-des-élections)
+3. [Les résultats de la votation](#les-résultats-de-la-votation)
 
-## Summarized results
+## Résultats synthétisés
 
 ```
-URL (latest): /json
-URL (archive by year): /archive/{year}/json
-URL (archive by date): /archive/{year}-{month}-{day}/json
-URL (election): /election/{id}/summary
-URL (vote): /vote/{id}/summary
+URL (dernier): /json
+URL (archives par année): /archive/{année}/json
+URL (archives par date): /archive/{année}-{mois}-{jour}/json
+URL (élection): /election/{id}/summary
+URL (votation): /vote/{id}/summary
 ```
 
-The summarized results displayed at the home page (only the results of latest votes and elections) and the archive (browsable by year or date) is also available as JSON. The data contains some global informations and for every election and vote the following commong information:
+Les résultats synthétisés affichés sur la page d'accueil (seuls les résultats des derničres votations et élections) et dans les archives (il est possible de rechercher par année ou par date) sont également disponibles en JSON. Les données contiennent des informations globales et pour chaque élection et votation les informations communes suivantes :
 
 Nom|Description
 ---|---
-type|`election` for elections, `vote` for votes.
-title|An object containing the translated titles.
-date|The date (ISO 8601).
-domain|The domain of influence (federation, canton, ...).
-url|A link to the detailed view.
-progess|An object containing the number already counted municipalities (`counted`) and the total number of municipalities (`total`).
+type|`election` pour les élections, `vote` pour les votations.
+title|Un objet contenant les titres traduits.
+date|La date (ISO 8601).
+domain|Le domaine d'influence (fédération, canton, ...).
+url|Un lien vers la vue détaillée.
+progess|Un objet contenant le nombre de municipalités déjŕ comptées (`counted`) et le nombre total de municipalités (`total`).
 
-Vote results contain the following additional information:
+Les résultats de la votation contiennent les informations supplémentaires suivantes :
 
 Nom|Description
 ---|---
-answer|The answer of the vote: `accepted`, `rejected`, `proposal` or `counter-proposal`.
-yeas_percentage|Yeas percentage.
-nays_percentage|Nays percentage.
+answer|La réponse de la votation : `accepted` (acceptée), `rejected` (rejetée), `proposal` (proposition) ou `counter-proposal` (contre-proposition).
+yeas_percentage|Pourcentage de oui.
+nays_percentage|Pourcentage de non.
 
-## Election results
+## Résultats des élections
 
-### Processed results
+### Résultats transformés
 
 ```
 URL: /election/{id}/json
 ```
 
-Returns the data of the main view in a structured form.
+Retourne les données de la vue principale sous une forme structurée.
 
-### Raw data
+### Données brutes
 
 ```
 URL: /election/{id}/{data-format}
@@ -71,11 +71,11 @@ Nom|Description
 ---|---
 election_title|Titre de l'élection.
 election_date|La date de l'élection (an ISO 8601 date string).
-election_type|"proporz" pour proportionnelle, "majorz" pour le système majoritaire.
+election_type|`proporz` pour proportionnelle, `majorz` pour le système majoritaire.
 election_mandates|Nombre de mandats.
-election_absolute_majority|The absolute majority. Only relevant for elections based on majority system.
-election_counted_municipalities|The number of already counted municipalities.
-election_total_municipalities|The total number of municipalities.
+election_absolute_majority|La majorité absolue. Uniquement valable pour les élections basées sur le système majoritaire.
+election_counted_municipalities|Le nombre de municipalités déjŕ comptées.
+election_total_municipalities|Le nombre total de municipalités.
 municipality_name|Le nom de la municipalité.
 municipality_bfs_number|L'identifiant de la municipalité / locale ("BFS Nummer").
 municipality_elegible_voters|Le nombre de personnes éligible à voter pour cette municipalité.
@@ -88,30 +88,30 @@ municipality_blank_votes|Le nombre de votes en blanc pour cette municipalité.
 municipality_invalid_votes|Le nombre de votes valides pour cette municipalité. Zéro pour les élections sur la base de la représentation proportionnelle.
 municipality_accounted_votes|Le nombre de votes comptabilisés pour cette municipalité.
 list_name|Le nom de la liste sur laquelle ce candidat apparaît. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
-list_id|The id of the list this candidate appears on. Only relevant for elections based on proportional representation.
-list_number_of_mandates|The number of mandates this list has got. Only relevant for elections based on proportional representation.
+list_id|L'identifiant de liste de ce candidat apparaît dessus. Uniquement valable pour les élections basées sur la représentation proportionnelle.
+list_number_of_mandates|Le nombre de mandats que cette liste a obtenus. Uniquement valable pour les élections basées sur la représentation proportionnelle.
 list_votes|Le nombre de votes que cette liste a obtenu. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 list_connection|L'Identifiant de la connexion de la liste à laquelle cette liste est connectée. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 list_connection_parent|L'Identifiant de la connexion de liste parent à laquelle cette liste est connectée. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 candidate_family_name|Le nom de famille du candidat.
 candidate_first_name|Le prénom du candidat.
-candidate_id|The ID of the candidate.
+candidate_id|L'identifiant du candidat.
 candidate_elected|Vrai si le candidat a été élu.
 candidate_votes|Le nombre de voix que ce candidat a obtenu.
 
-Not yet counted municipalities are not included.
+Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 
-## Vote results
+## Les résultats de la votation
 
-### Processed results
+### Résultats transformés
 
 ```
 URL: /vote/{id}/json
 ```
 
-Returns the data of the main view in a structured form.
+Retourne les données de la vue principale sous une forme structurée.
 
-### Raw data
+### Données brutes
 
 ```
 URL: /vote/{id}/{data-format}
@@ -132,8 +132,8 @@ Nom|Description
 title|Nom du vote.
 date|La date du vote (une chaîne de date ISO 8601).
 shortcode|Shortcode interne (définit l'ordre des votes ayant lieu le même jour).
-domain|"fédération" pour fédéral, "canton" for les votes cantonaux.
-type|"proposition" (Vorschlag), "contre-proposition" (Gegenvorschlag) or "jeu décisif" (Stichfrage).
+domain|`federation` pour fédéral, `canton` for les votes cantonaux.
+type|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
 group|La désignation du résultat. Peut être le district, le nom de la ville divisé par un slash, le nom de la ville et le district de la ville divisés par un slash ou simplement le nom de la ville. Cela dépend entièrement du canton.
 municipality_id|La référence de la municipalité/localité. Mieux connu sous le nom de "BFS Nummer"
 counted|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).

@@ -15,11 +15,11 @@ All Respoonses enthalten den `Last-Modified` HTTP Header, welcher Auskunft über
 ## Ergebnissübersicht
 
 ```
-URL (latest): /json
-URL (archive by year): /archive/{year}/json
-URL (archive by date): /archive/{year}-{month}-{day}/json
-URL (election): /election/{id}/summary
-URL (vote): /vote/{id}/summary
+URL (letzte): /json
+URL (Archiv nach Jahr): /archive/{Jahr}/json
+URL (Archiv nach Datum): /archive/{Jahr}-{Monat}-{Tag}/json
+URL (Wahl): /election/{id}/summary
+URL (Abstimmung): /vote/{id}/summary
 ```
 
 Die auf der Startseite und den Archivseiten dargestellten Ergebnisse sind im JSON Format verfügbar. Die Daten enthalten neben einigen globalen Informationen für jede Wahl / Abstimmung die folgenden Informationen:
@@ -37,7 +37,7 @@ Wahlresultate enthalten die folgenden zusätzlichen Informationen:
 
 Name|Beschreibung
 ---|---
-answer|Das Abstimmungsresultat: Angenommen (`accepted`), abgelehnt (`rejected`), Initiative (`proposal`) oder Gegenvorschlag (`counter-proposal`).
+answer|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
 yeas_percentage|Ja-Stimmen in Prozent.
 nays_percentage|Nein-Stimmen in Prozent.
 
@@ -71,7 +71,7 @@ Name|Beschreibung
 ---|---
 election_title|Titel der Wahl
 election_date|Das Datum der Wahl (ein ISO 8601 String)
-election_type|"proporz" falls Proporzwahl, "majorz" falls Majorzwahl
+election_type|`proporz` falls Proporzwahl, `majorz` falls Majorzwahl
 election_mandates|Die Anzahl der Sitze.
 election_absolute_majority|Das absolute Mehr. Nur bei Majorzwahlen.
 election_counted_municipalities|Die Anzahl ausgezählter Gemeinden.
@@ -132,8 +132,8 @@ Name|Beschreibung
 title|Titel der Abstimmung.
 date|Das Datum der Abstimmung (ein ISO 8601 String).
 shortcode|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen an einem Tag).
-domain|"federation" für Nationale Abstimmungen, "canton" für Kantonale Abstimmungen
-type|"proposal" (Vorschlag), "counter-proposal" (Gegenvorschlag) or "tie-breaker" (Stichfrage).
+domain|`federation` für Nationale Abstimmungen, `canton` für Kantonale Abstimmungen
+type|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
 group|Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
 municipality_id|Die ID der Gemeinde/des Standorts. Besser bekannt als "BFS Nummer".
 counted|Wahr wenn das Resultat ausgezählt wurde. Falsch wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).

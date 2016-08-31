@@ -1,9 +1,13 @@
 Changelog
 ---------
+
+- Updates translations.
+  [msom]
+
 0.8.1 (2016-08-30)
 ~~~~~~~~~~~~~~~~~~~
 
-- Fix election and vote templates.
+- Fixes election and vote templates.
   [msom]
 
 0.8.0 (2016-08-29)

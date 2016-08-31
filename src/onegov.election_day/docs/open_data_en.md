@@ -71,7 +71,7 @@ Name|Description
 ---|---
 election_title|Title of the election.
 election_date|The date of the election (an ISO 8601 date string).
-election_type|"proporz" for proportional, "majorz" for majority system.
+election_type|`proporz` for proportional, `majorz` for majority system.
 election_mandates|The number of mandates.
 election_absolute_majority|The absolute majority. Only relevant for elections based on majority system.
 election_counted_municipalities|The number of already counted municipalities.
@@ -132,8 +132,8 @@ Name|Description
 title|Title of the vote.
 date|The date of the vote (an ISO 8601 date string).
 shortcode|Internal shortcode (defines the ordering of votes on the same day).
-domain|"federation" for federal, "canton" for cantonal votes.
-type|"proposal" (Vorschlag), "counter-proposal" (Gegenvorschlag) or "tie-breaker" (Stichfrage).
+domain|`federation` for federal, `canton` for cantonal votes.
+type|`proposal`, `counter-proposal` or `tie-breaker`.
 group|The designation of the result. May be the district, the town's name divided by a slash, the city's name and the city's district divided by a slash or simply the town's name. This depends entirely on the canton.
 municipality_id|The id of the municipality/locale. Better known as "BFS Nummer"
 counted|True if the result was counted, False if the result not known yet (the voting counts are not final yet).

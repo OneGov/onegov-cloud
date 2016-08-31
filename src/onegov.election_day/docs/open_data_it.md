@@ -1,57 +1,57 @@
-# Elezioni & votazioni: Open Data
+# Elezioni & votazioni: Dati aperti
 
-## Introduction
+## Introduzione
 
-There are JSON alternatives for all important views.
+Ci sono alternative al formato JSON per tutte le visualizzazioni piů importanti.
 
-All responses contain the `Last-Modified` HTTP Header with the last time, the data has change (i.e. the last time, results of an election or vote have been uploaded).
+Tutte le risposte contengono l'intestazione HTTP `Last-Modified` (Ultima modifica) con l'ultima volta in cui si č verificata una modifica dei dati (ad es. l'ultima volta in cui i risultati di un'elezione o i voti sono stati caricati).
 
-## Contents
+## Contenuti
 
-1. [Summarized results](#summarized-results)
-2. [Election results](#election-results)
+1. [Riepilogo dei risultati](#riepilogo-dei-risultati)
+2. [Risultati dell'elezione](#risultati-dell-elezione)
 3. [Vote results](#vote-results)
 
-## Summarized results
+## Riepilogo dei risultati
 
 ```
-URL (latest): /json
-URL (archive by year): /archive/{year}/json
-URL (archive by date): /archive/{year}-{month}-{day}/json
-URL (election): /election/{id}/summary
-URL (vote): /vote/{id}/summary
+URL (ultimo): /json
+URL (archivio per anno): /archive/{anno}/json
+URL (archivio per data): /archive/{anno}-{mese}-{giorno}/json
+URL (elezione): /election/{id}/summary
+URL (votazione): /vote/{id}/summary
 ```
 
-The summarized results displayed at the home page (only the results of latest votes and elections) and the archive (browsable by year or date) is also available as JSON. The data contains some global informations and for every election and vote the following commong information:
+Il riepilogo dei risultati visualizzato sulla pagina iniziale (solo i risultati delle ultime votazioni ed elezioni) e l'archivio (navigabile per anno o data) sono disponibili anche nel formato JSON. I dati contengono alcune informazioni globali e, per ogni elezione e votazione, le seguenti informazioni comuni:
 
 Nome|Descrizione
 ---|---
-type|`election` for elections, `vote` for votes.
-title|An object containing the translated titles.
-date|The date (ISO 8601).
-domain|The domain of influence (federation, canton, ...).
-url|A link to the detailed view.
-progess|An object containing the number already counted municipalities (`counted`) and the total number of municipalities (`total`).
+type|`election` per elezioni, `vote` per votazioni.
+title|Un oggetto contenente i titoli tradotti.
+date|La data (ISO 8601).
+domain|Il dominio di influenza (federazione, cantone, ...).
+url|Un collegamento alla visualizzazione dettagliata.
+progess|Un oggetto contenente il numero dei comuni giŕ contati (`counted`) e il numero totale di comuni (`total`).
 
-Vote results contain the following additional information:
+I risultati della votazione contengono le seguenti informazioni aggiuntive:
 
 Nome|Descrizione
 ---|---
-answer|The answer of the vote: `accepted`, `rejected`, `proposal` or `counter-proposal`.
-yeas_percentage|Yeas percentage.
-nays_percentage|Nays percentage.
+answer|La risposta del voto: `accepted` (accettato), `rejected` (respinto), `proposal` o `counter-proposal` (controproposta).
+yeas_percentage|Percentuale voti favorevoli.
+nays_percentage|Percentuale voti contrari.
 
-## Election results
+## Risultati dell'elezione
 
-### Processed results
+### Risultati elaborati
 
 ```
 URL: /election/{id}/json
 ```
 
-Returns the data of the main view in a structured form.
+Rimanda i dati della visualizzazione principale in forma strutturata.
 
-### Raw data
+### Dati grezzi
 
 ```
 URL: /election/{id}/{data-format}
@@ -71,11 +71,11 @@ Nome|Descrizione
 ---|---
 election_title|Titolo dell'elezione.
 election_date|Data dell'elezione (stringa data in formato ISO 8601)
-election_type|"proporz" per il sistema proporzionale, "majorz" per il sistema maggioritario.
+election_type|`proporz` per il sistema proporzionale, `majorz` per il sistema maggioritario.
 election_mandates|Numero di mandati.
-election_absolute_majority|The absolute majority. Only relevant for elections based on majority system.
-election_counted_municipalities|The number of already counted municipalities.
-election_total_municipalities|The total number of municipalities.
+election_absolute_majority|La maggioranza assoluta. Rilevante solo per le elezioni basate sul sistema di maggioranza.
+election_counted_municipalities|Il numero di comuni giŕ contati.
+election_total_municipalities|Il numero totale dei comuni.
 municipality_name|Nome del comune.
 municipality_bfs_number|Identificativo del comune/località ("BFS Nummer").
 municipality_elegible_voters|Numero degli aventi diritto al voto di questo comune.
@@ -88,30 +88,30 @@ municipality_blank_votes|Numero di voti nulli in questo comune.
 municipality_invalid_votes|Numero di voti non validi in questo comune. Zero per elezioni basate sul sistema proporzionale.
 municipality_accounted_votes|Numero di voti validi in questo comune.
 list_name|Nome della lista alla quale appartiene questo candidato. Valido solo per elezioni basate sul sistema proporzionale.
-list_id|The id of the list this candidate appears on. Only relevant for elections based on proportional representation.
-list_number_of_mandates|The number of mandates this list has got. Only relevant for elections based on proportional representation.
+list_id|L'identificativo della lista su cui questo candidato compare. Rilevante solo per le elezioni basate sul metodo proporzionale.
+list_number_of_mandates|Il numero di mandati ottenuti da questa lista. Rilevante solo per le elezioni basate sul metodo proporzionale.
 list_votes|Numero di voti ricevuti da questa lista. Valido solo per elezioni basate sul sistema proporzionale.
 list_connection|L'identificato del collegamento della lista a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
 list_connection_parent|L'identificativo del collegamento della lista padre a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
 candidate_family_name|Cognome del candidato.
 candidate_first_name|Nome del candidato.
-candidate_id|The ID of the candidate.
+candidate_id|L'identificativo del candidato.
 candidate_elected|Vero se il candidato è stato eletto.
 candidate_votes|Numero di voti ricevuti da questo candidato.
 
-Not yet counted municipalities are not included.
+I comuni non ancora contati non sono inclusi.
 
-## Vote results
+## Risultati della votazione
 
-### Processed results
+### Risultati elaborati
 
 ```
 URL: /vote/{id}/json
 ```
 
-Returns the data of the main view in a structured form.
+Rimanda i dati della visualizzazione principale in forma strutturata.
 
-### Raw data
+### Dati grezzi
 
 ```
 URL: /vote/{id}/{data-format}
@@ -132,8 +132,8 @@ Nome|Descrizione
 title|Titolo della votazione.
 date|Data della votazione (una stringa ISO 8601).
 shortcode|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
-domain|"federation" per votazioni federali, "canton" per votazioni cantonali
-type|"proposal" (progetto), "counter-proposal" (controprogetto) or "tie-breaker" (domanda eventuale).
+domain|`federation` per votazioni federali, `canton` per votazioni cantonali
+type|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
 group|Da dove viene il risultato. Si può trattare del distretto e del comune, separati da una barra, del nome della città e del nome del circolo, anch'essi separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal rispettivo Cantone.
 municipality_id|ID del comune/dell'ubicazione. Meglio noto come "numero UST".
 counted|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).

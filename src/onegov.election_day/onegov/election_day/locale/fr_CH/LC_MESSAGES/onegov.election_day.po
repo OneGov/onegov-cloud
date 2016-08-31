@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-30 14:58+0200\n"
-"PO-Revision-Date: 2016-08-29 13:10+0200\n"
+"PO-Revision-Date: 2016-08-31 07:54+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -116,7 +116,7 @@ msgid "More cast votes than elegible voters"
 msgstr "Plus de votes que d'électeurs"
 
 msgid "Invalid ballot type"
-msgstr ""
+msgstr "Type de scrutin invalide"
 
 msgid "Election (German)"
 msgstr "Election (allemand)"
@@ -194,7 +194,7 @@ msgid "Tie-Breaker"
 msgstr "Jeu décisif"
 
 msgid "Vote number"
-msgstr ""
+msgstr "Numéro de votation"
 
 msgid "SESAM"
 msgstr "SESAM"
@@ -326,7 +326,7 @@ msgid "Back to the latest elections &amp; votes"
 msgstr "Retour aux dernières élections et votes"
 
 msgid "Open Data"
-msgstr "Open Data"
+msgstr "Ouvrir les données"
 
 msgid "Login"
 msgstr "Se connecter"
@@ -395,16 +395,16 @@ msgid "No %"
 msgstr "Non %"
 
 msgid "Previous Page"
-msgstr ""
+msgstr "Page précédente"
 
 msgid "Next Page"
-msgstr ""
+msgstr "Page suivante"
 
 msgid "You are here"
-msgstr ""
+msgstr "Vous ętes ici"
 
 msgid "Last change"
-msgstr ""
+msgstr "Actualisé"
 
 msgid "New Election"
 msgstr "Nouveau election"
