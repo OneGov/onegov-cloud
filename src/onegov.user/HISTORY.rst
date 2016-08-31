@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.7.1 (2016-08-31)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes yubikey property failing with empty values.
   [href]
 
