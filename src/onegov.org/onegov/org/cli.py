@@ -14,7 +14,6 @@ from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
 from onegov.org.formats import DigirezDB
-from onegov.org.initial_content import add_initial_content
 from onegov.org.models import Organisation
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection, User
@@ -41,7 +40,7 @@ def add(group_context, name):
             abort("{} already contains an organisation".format(
                 group_context.selector))
 
-        add_initial_content(app.libres_registry, app.session_manager, name)
+        app.settings.org.create_new_organisation(request, app, name)
 
         click.echo("{} was created successfully".format(name))
 

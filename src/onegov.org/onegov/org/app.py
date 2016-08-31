@@ -6,6 +6,7 @@ from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
+from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Organisation
 from onegov.org.models import Topic
 from onegov.org.request import OrgRequest
@@ -209,6 +210,11 @@ def get_enable_user_registration():
 @OrgApp.setting(section='org', name='enable_yubikey')
 def get_enable_yubikey():
     return False
+
+
+@OrgApp.setting(section='org', name='create_new_organisation')
+def get_create_new_organisation_factory():
+    return create_new_organisation
 
 
 @OrgApp.webasset_path()

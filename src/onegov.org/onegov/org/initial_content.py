@@ -13,6 +13,10 @@ from onegov.org.models import Organisation
 from sedate import as_datetime
 
 
+def create_new_organisation(request, app, name):
+    add_initial_content(app.libres_registry, app.session_manager, name)
+
+
 def add_initial_content(libres_registry, session_manager, org_name,
                         form_definitions=None, reply_to=None):
     """ Adds the initial content for the given organisation on the given

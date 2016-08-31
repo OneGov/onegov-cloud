@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to override the initial content creation function.
+  [href]
+
 - Fixes user editing not working when yubikeys are enabled.
   [href]
 
