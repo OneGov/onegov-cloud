@@ -1387,14 +1387,6 @@ div#redactor-droparea {
 }
 
 /*
-    hide the news in the topbar
-*/
-
-.top-bar-section li:last-child {
-    display: none;
-}
-
-/*
     the icon hinting at pages being hidden from the public
 */
 $hidden-page-icon: '\f070';
