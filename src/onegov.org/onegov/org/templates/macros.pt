@@ -7,8 +7,8 @@
 <body>
 
 <metal:navigation define-macro="top_navigation">
-    <div class="main-navigation">
-        <nav class="top-bar" data-topbar role="navigation" tal:condition="layout.top_navigation">
+    <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
+        <nav class="top-bar" data-topbar role="navigation" tal:condition="links">
             <ul class="title-area">
                 <!--! this section needs to be included (even though it's empty),
                 or the responsive menu bar icon won't be rendered -->
@@ -19,7 +19,7 @@
             </ul>
             <section class="top-bar-section">
                 <ul class="left">
-                    <tal:block repeat="link layout.top_navigation">
+                    <tal:block repeat="link links">
                         <li>
                             <a tal:attributes="href link.url">${link.text}</a>
                         </li>
