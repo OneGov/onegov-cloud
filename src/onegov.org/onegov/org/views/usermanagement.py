@@ -34,6 +34,11 @@ def view_usermanagement(self, request):
              permission=Secret)
 def handle_manage_user(self, request, form):
 
+    # XXX the manage user form doesn't have access to the username
+    # because it can't be edited, so we need to inject it here
+    # for validation purposes (check for a unique yubikey)
+    form.current_username = self.username
+
     if not request.app.settings.org.enable_yubikey:
         form.delete_field('yubikey')
 

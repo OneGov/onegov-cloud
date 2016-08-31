@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes user editing not working when yubikeys are enabled.
+  [href]
+
 0.0.6 (2016-08-31)
 ~~~~~~~~~~~~~~~~~~~
 

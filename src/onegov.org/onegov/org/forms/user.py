@@ -50,7 +50,10 @@ class ManageUserForm(Form):
         users = UserCollection(self.request.app.session())
         user = users.by_yubikey(field.data)
 
-        if user:
+        if not hasattr(self, 'current_username'):
+            raise NotImplementedError()
+
+        if user and user.username != self.current_username:
             raise validators.ValidationError(
                 _("This Yubikey is already used by ${username}", mapping={
                     'username': user.username
@@ -68,6 +71,10 @@ class PartialNewUserForm(Form):
         description=_("The users e-mail address (a.k.a. username)"),
         validators=[validators.InputRequired(), validators.Email()]
     )
+
+    @property
+    def current_username(self):
+        return self.username.data
 
     def validate_username(self, field):
         users = UserCollection(self.request.app.session())

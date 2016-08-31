@@ -3002,6 +3002,10 @@ def test_unique_yubikey(org_app):
     editor.form['yubikey'] = 'cccccccdefgh'
     assert "bereits von admin@example.org verwendet" in editor.form.submit()
 
+    # make sure the current owner can save its own yubikey
+    admin = users.click('Bearbeiten', index=0)
+    assert admin.form.submit().status_code == 302
+
 
 def test_add_new_user(org_app):
     client = Client(org_app)
