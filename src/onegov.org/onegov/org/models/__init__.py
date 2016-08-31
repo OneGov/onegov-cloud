@@ -9,7 +9,7 @@ from onegov.org.models.file import (
     ImageSet,
     ImageSetCollection,
 )
-from onegov.org.models.form import CustomFormDefinition
+from onegov.org.models.form import BuiltinFormDefinition, CustomFormDefinition
 from onegov.org.models.legacy_file import (
     LegacyFile,
     LegacyImage,
@@ -41,6 +41,7 @@ from onegov.org.models.extensions import (
 __all__ = [
     'AtoZ',
     'AtoZPages',
+    'BuiltinFormDefinition',
     'Clipboard',
     'ContactExtension',
     'ContentExtension',
