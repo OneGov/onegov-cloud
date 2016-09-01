@@ -24,7 +24,7 @@
                     No elections yet.
                 </p>
 
-                <table class="elections" tal:condition="elections">
+                <table class="elections stackable" tal:condition="elections">
                     <thead>
                         <tr>
                             <th i18n:translate>Election</th>

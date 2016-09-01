@@ -482,9 +482,11 @@ ul.actions {
     li {
         display: inline-block;
         font-size: $table-row-font-size;
+        float: left;
 
         + li::before {
             content: '| ';
+            padding-left: .3em;
         }
     }
 }

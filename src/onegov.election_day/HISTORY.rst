@@ -7,6 +7,9 @@ Changelog
 - Breaks long related links.
   [msom]
 
+- Makes backend tables responsive.
+  [msom]
+
 0.8.1 (2016-08-30)
 ~~~~~~~~~~~~~~~~~~~
 

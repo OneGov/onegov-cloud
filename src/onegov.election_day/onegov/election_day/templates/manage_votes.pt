@@ -25,7 +25,7 @@
                     No votes yet.
                 </p>
 
-                <table class="votes" tal:condition="votes">
+                <table class="votes stackable" tal:condition="votes">
                     <thead>
                         <tr>
                             <th i18n:translate>Vote</th>
