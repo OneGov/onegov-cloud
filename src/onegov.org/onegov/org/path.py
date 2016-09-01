@@ -52,6 +52,7 @@ from onegov.people import Person, PersonCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import Auth, User, UserCollection
 from webob import exc
+from uuid import UUID
 
 
 @OrgApp.path(model=Organisation, path='/')
@@ -64,7 +65,7 @@ def get_auth(app, to='/'):
     return Auth.from_app(app, to)
 
 
-@OrgApp.path(model=User, path='/benutzer/{id}')
+@OrgApp.path(model=User, path='/benutzer/{id}', converters=dict(id=UUID))
 def get_user(app, id):
     return UserCollection(app.session()).by_id(id)
 
@@ -105,19 +106,22 @@ def get_form(app, name):
     return FormCollection(app.session()).definitions.by_name(name)
 
 
-@OrgApp.path(model=PendingFormSubmission, path='/formular-eingabe/{id}')
+@OrgApp.path(model=PendingFormSubmission, path='/formular-eingabe/{id}',
+             converters=dict(id=UUID))
 def get_pending_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='pending', current_only=True)
 
 
-@OrgApp.path(model=CompleteFormSubmission, path='/formular-eingang/{id}')
+@OrgApp.path(model=CompleteFormSubmission, path='/formular-eingang/{id}',
+             converters=dict(id=UUID))
 def get_complete_form_submission(app, id):
     return FormCollection(app.session()).submissions.by_id(
         id, state='complete', current_only=False)
 
 
-@OrgApp.path(model=FormSubmissionFile, path='/formular-datei/{id}')
+@OrgApp.path(model=FormSubmissionFile, path='/formular-datei/{id}',
+             converters=dict(id=UUID))
 def get_form_submission_file(app, id):
     return FormCollection(app.session()).submissions.file_by_id(id)
 
@@ -141,12 +145,13 @@ def get_people(app):
     return PersonCollection(app.session())
 
 
-@OrgApp.path(model=Person, path='/person/{id}')
+@OrgApp.path(model=Person, path='/person/{id}', converters=dict(id=UUID))
 def get_person(app, id):
     return PersonCollection(app.session()).by_id(id)
 
 
-@OrgApp.path(model=Ticket, path='/ticket/{handler_code}/{id}')
+@OrgApp.path(model=Ticket, path='/ticket/{handler_code}/{id}',
+             converters=dict(id=UUID))
 def get_ticket(app, handler_code, id):
     return TicketCollection(app.session()).by_id(
         id, ensure_handler_code=handler_code)
@@ -186,7 +191,8 @@ def get_resource(app, name, date=None, view='agendaWeek',
     return resource
 
 
-@OrgApp.path(model=Allocation, path='/einteilung/{resource}/{id}')
+@OrgApp.path(model=Allocation, path='/einteilung/{resource}/{id}',
+             converters=dict(resource=UUID))
 def get_allocation(app, resource, id):
     resource = app.libres_resources.by_id(resource)
 
@@ -197,7 +203,8 @@ def get_allocation(app, resource, id):
         return allocation and allocation.get_master()
 
 
-@OrgApp.path(model=Reservation, path='/reservation/{resource}/{id}')
+@OrgApp.path(model=Reservation, path='/reservation/{resource}/{id}',
+             converters=dict(resource=UUID))
 def get_reservation(app, resource, id):
     resource = app.libres_resources.by_id(resource)
 
@@ -321,7 +328,8 @@ def get_newsletter_recipients(app):
     return RecipientCollection(app.session())
 
 
-@OrgApp.path(model=Subscription, path='/abonnement/{recipient_id}/{token}')
+@OrgApp.path(model=Subscription, path='/abonnement/{recipient_id}/{token}',
+             converters=dict(recipient_id=UUID))
 def get_subscription(app, recipient_id, token):
     recipient = RecipientCollection(app.session()).by_id(recipient_id)
     return recipient and Subscription(recipient, token)
