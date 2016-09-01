@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a uuid morepath converter.
+  [href]
+
 - Fixes variable directive resulting in overwrites instead of merges.
   [href]
 

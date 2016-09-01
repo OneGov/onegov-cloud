@@ -1,8 +1,11 @@
 """ Contains custom converters used by onegov.town. """
 
 import morepath
+
 from datetime import date
+from onegov.core.utils import is_uuid
 from time import mktime, strptime
+from uuid import UUID
 
 
 def extended_date_decode(s):
@@ -23,4 +26,23 @@ def extended_date_encode(d):
 
 extended_date_converter = morepath.Converter(
     decode=extended_date_decode, encode=extended_date_encode
+)
+
+
+def uuid_decode(s):
+    """ Turns a uuid string into a UUID instance. """
+
+    return is_uuid(s) and UUID(s) or None
+
+
+def uuid_encode(uuid):
+    """ Turns a UUID instance into a uuid string. """
+    if not uuid:
+        return ''
+
+    return uuid.hex
+
+
+uuid_converter = morepath.Converter(
+    decode=uuid_decode, encode=uuid_encode
 )
