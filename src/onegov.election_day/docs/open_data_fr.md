@@ -4,7 +4,7 @@
 
 Il y a des alternatives JSON pour toutes les vues importantes.
 
-Toutes les réponses contiennent l’en-tęte HTTP `Last-Modified` (Modifié pour la derničre fois) avec la derničre fois que les données ont changé (c’est-ŕ-dire la derničre fois que les résultats d'une élection ou d’une votation ont été téléchargés).
+Toutes les réponses contiennent l’en-tête HTTP `Last-Modified` (Modifié pour la dernière fois) avec la dernière fois que les données ont changé (c’est-à-dire la dernière fois que les résultats d'une élection ou d’une votation ont été téléchargés).
 
 ## Contenu
 
@@ -22,7 +22,7 @@ URL (élection): /election/{id}/summary
 URL (votation): /vote/{id}/summary
 ```
 
-Les résultats synthétisés affichés sur la page d'accueil (seuls les résultats des derničres votations et élections) et dans les archives (il est possible de rechercher par année ou par date) sont également disponibles en JSON. Les données contiennent des informations globales et pour chaque élection et votation les informations communes suivantes :
+Les résultats synthétisés affichés sur la page d'accueil (seuls les résultats des dernières votations et élections) et dans les archives (il est possible de rechercher par année ou par date) sont également disponibles en JSON. Les données contiennent des informations globales et pour chaque élection et votation les informations communes suivantes :
 
 Nom|Description
 ---|---
@@ -31,7 +31,7 @@ title|Un objet contenant les titres traduits.
 date|La date (ISO 8601).
 domain|Le domaine d'influence (fédération, canton, ...).
 url|Un lien vers la vue détaillée.
-progess|Un objet contenant le nombre de municipalités déjŕ comptées (`counted`) et le nombre total de municipalités (`total`).
+progess|Un objet contenant le nombre de municipalités déjà comptées (`counted`) et le nombre total de municipalités (`total`).
 
 Les résultats de la votation contiennent les informations supplémentaires suivantes :
 
@@ -74,7 +74,7 @@ election_date|La date de l'élection (an ISO 8601 date string).
 election_type|`proporz` pour proportionnelle, `majorz` pour le système majoritaire.
 election_mandates|Nombre de mandats.
 election_absolute_majority|La majorité absolue. Uniquement valable pour les élections basées sur le système majoritaire.
-election_counted_municipalities|Le nombre de municipalités déjŕ comptées.
+election_counted_municipalities|Le nombre de municipalités déjà comptées.
 election_total_municipalities|Le nombre total de municipalités.
 municipality_name|Le nom de la municipalité.
 municipality_bfs_number|L'identifiant de la municipalité / locale ("BFS Nummer").

@@ -401,7 +401,7 @@ msgid "Next Page"
 msgstr "Page suivante"
 
 msgid "You are here"
-msgstr "Vous ętes ici"
+msgstr "Vous êtes ici"
 
 msgid "Last change"
 msgstr "Actualisé"

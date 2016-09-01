@@ -2,9 +2,9 @@
 
 ## Introduzione
 
-Ci sono alternative al formato JSON per tutte le visualizzazioni piů importanti.
+Ci sono alternative al formato JSON per tutte le visualizzazioni più importanti.
 
-Tutte le risposte contengono l'intestazione HTTP `Last-Modified` (Ultima modifica) con l'ultima volta in cui si č verificata una modifica dei dati (ad es. l'ultima volta in cui i risultati di un'elezione o i voti sono stati caricati).
+Tutte le risposte contengono l'intestazione HTTP `Last-Modified` (Ultima modifica) con l'ultima volta in cui si è verificata una modifica dei dati (ad es. l'ultima volta in cui i risultati di un'elezione o i voti sono stati caricati).
 
 ## Contenuti
 
@@ -31,7 +31,7 @@ title|Un oggetto contenente i titoli tradotti.
 date|La data (ISO 8601).
 domain|Il dominio di influenza (federazione, cantone, ...).
 url|Un collegamento alla visualizzazione dettagliata.
-progess|Un oggetto contenente il numero dei comuni giŕ contati (`counted`) e il numero totale di comuni (`total`).
+progess|Un oggetto contenente il numero dei comuni già contati (`counted`) e il numero totale di comuni (`total`).
 
 I risultati della votazione contengono le seguenti informazioni aggiuntive:
 
@@ -74,7 +74,7 @@ election_date|Data dell'elezione (stringa data in formato ISO 8601)
 election_type|`proporz` per il sistema proporzionale, `majorz` per il sistema maggioritario.
 election_mandates|Numero di mandati.
 election_absolute_majority|La maggioranza assoluta. Rilevante solo per le elezioni basate sul sistema di maggioranza.
-election_counted_municipalities|Il numero di comuni giŕ contati.
+election_counted_municipalities|Il numero di comuni già contati.
 election_total_municipalities|Il numero totale dei comuni.
 municipality_name|Nome del comune.
 municipality_bfs_number|Identificativo del comune/località ("BFS Nummer").
