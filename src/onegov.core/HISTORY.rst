@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.25.1 (2016-09-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a uuid morepath converter.
   [href]
