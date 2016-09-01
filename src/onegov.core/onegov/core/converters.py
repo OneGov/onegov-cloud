@@ -41,6 +41,9 @@ def uuid_encode(uuid):
     if not uuid:
         return ''
 
+    if isinstance(uuid, str):
+        return uuid
+
     return uuid.hex
 
 
