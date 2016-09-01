@@ -155,10 +155,12 @@ def test_inject_default_vars(temporary_directory):
 
     parent_page = Client(Parent()).get('/')
     assert 'parent' in parent_page
+    assert 'child' not in parent_page
     assert 'padre' in parent_page
     assert 'niño' not in parent_page
 
     child_page = Client(Child()).get('/')
+    assert 'parent' not in child_page
     assert 'child' in child_page
-    assert 'padre' not in child_page
+    assert 'padre' in child_page
     assert 'niño' in child_page
