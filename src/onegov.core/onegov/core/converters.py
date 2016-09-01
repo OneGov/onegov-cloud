@@ -3,6 +3,7 @@
 import morepath
 
 from datetime import date
+from onegov.core import Framework
 from onegov.core.utils import is_uuid
 from time import mktime, strptime
 from uuid import UUID
@@ -46,3 +47,8 @@ def uuid_encode(uuid):
 uuid_converter = morepath.Converter(
     decode=uuid_decode, encode=uuid_encode
 )
+
+
+@Framework.converter(type=UUID)
+def get_default_uuid_converter():
+    return uuid_converter
