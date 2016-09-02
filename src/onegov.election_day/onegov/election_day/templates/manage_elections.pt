@@ -49,6 +49,7 @@
                                 <li><a i18n:translate="" class="action-view" href="${request.link(election)}">View</a></li>
                                 <li><a i18n:translate="" class="action-edit" href="${request.link(election, 'edit')}">Edit</a></li>
                                 <li><a i18n:translate="" class="action-upload" href="${request.link(election, 'upload')}">Upload Results</a></li>
+                                <li><a i18n:translate="" class="action-upload" href="${request.link(election, 'trigger-webhooks')}">Trigger Notifications</a></li>
                                 <li><a i18n:translate="" class="action-delete" href="${request.link(election, 'delete')}">Delete</a></li>
                             </ul>
                         </td>

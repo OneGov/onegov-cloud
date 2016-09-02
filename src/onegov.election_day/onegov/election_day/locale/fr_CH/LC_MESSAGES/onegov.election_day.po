@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-30 14:58+0200\n"
+"POT-Creation-Date: 2016-09-02 08:25+0200\n"
 "PO-Revision-Date: 2016-08-31 07:54+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -244,9 +244,6 @@ msgstr "Pas encore compté."
 msgid "Format Description"
 msgstr "Description du format:"
 
-msgid "No results yet"
-msgstr "Pas de résultats à l'heure actuelle"
-
 msgid "Turnout"
 msgstr "Participation"
 
@@ -406,6 +403,9 @@ msgstr "Vous êtes ici"
 msgid "Last change"
 msgstr "Actualisé"
 
+msgid "Trigger notifications"
+msgstr ""
+
 msgid "New Election"
 msgstr "Nouveau election"
 
@@ -429,6 +429,9 @@ msgstr "Editer"
 
 msgid "Upload Results"
 msgstr "Mettre à jour les résultats"
+
+msgid "Trigger Notifications"
+msgstr ""
 
 msgid "Delete"
 msgstr "Supprimer"
@@ -456,6 +459,9 @@ msgstr "Vos résultats n'ont pas pu être mis à jour."
 
 msgid "Line"
 msgstr "Ligne"
+
+msgid "Click here to trigger the notifications"
+msgstr ""
 
 msgid "No errors found in proposal"
 msgstr "Pas d'erreurs trouvées dans la proposition."
@@ -506,6 +512,14 @@ msgstr "Voulez-vous vraiment supprimer \"$ {election}\"?"
 msgid "Delete election"
 msgstr "Supprimer l'élection"
 
+msgid ""
+"There are no changes since the last time the notifications have been "
+"triggered!"
+msgstr ""
+
+msgid "Do you really want to retrigger the notfications?"
+msgstr ""
+
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
 msgstr "Souhaitez-vous vraiment supprimer \"${vote}\"?"
@@ -519,3 +533,6 @@ msgstr "L'année ${year} n'est pas encore prise en charge"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Cet urne a moins de résultats que les autres."
+
+#~ msgid "No results yet"
+#~ msgstr "Pas de résultats à l'heure actuelle"

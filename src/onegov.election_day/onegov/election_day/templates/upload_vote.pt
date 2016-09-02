@@ -22,7 +22,16 @@
                 Your results were uploaded successfully.
             </div>
 
-            <a href="${request.link(vote)}" i18n:translate="">Click here to see the updated results page.</a>
+            <div class="panel callout radius">
+                <p>
+                    <strong><a href="${request.link(vote, 'trigger-webhooks')}" i18n:translate="">Click here to trigger the notifications</a></strong>
+                </p>
+            </div>
+
+            <p>
+                <a href="${request.link(vote)}" i18n:translate="">Click here to see the updated results page.</a>
+            </p>
+
         </div>
 
         <div class="after-upload" tal:condition="status == 'error'">

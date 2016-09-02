@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-30 14:58+0200\n"
-"PO-Revision-Date: 2016-08-29 13:05+0200\n"
+"POT-Creation-Date: 2016-09-02 08:25+0200\n"
+"PO-Revision-Date: 2016-09-02 08:22+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -244,9 +244,6 @@ msgstr "Noch nicht ausgezählt."
 msgid "Format Description"
 msgstr "Formatbeschreibung"
 
-msgid "No results yet"
-msgstr "Noch keine Resultate"
-
 msgid "Turnout"
 msgstr "Wahlbeteiligung"
 
@@ -405,6 +402,9 @@ msgstr "Aktuelle Seite"
 msgid "Last change"
 msgstr "Aktualisiert"
 
+msgid "Trigger notifications"
+msgstr "Benachrichtigungen auslösen"
+
 msgid "New Election"
 msgstr "Neue Wahl"
 
@@ -428,6 +428,9 @@ msgstr "Bearbeiten"
 
 msgid "Upload Results"
 msgstr "Resultate Hochladen"
+
+msgid "Trigger Notifications"
+msgstr "Benachrichtigungen auslösen"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -456,6 +459,9 @@ msgstr "Ihre Resultate konnten leider nicht hochgeladen werden."
 
 msgid "Line"
 msgstr "Zeile"
+
+msgid "Click here to trigger the notifications"
+msgstr "Hier klicken um die Benachrichtigungen auszulösen."
 
 msgid "No errors found in proposal"
 msgstr "Keine Fehler im Vorschlag"
@@ -506,6 +512,14 @@ msgstr "Möchten Sie die Wahl \"${election}\" wirklich löschen?"
 msgid "Delete election"
 msgstr "Wahl löschen"
 
+msgid ""
+"There are no changes since the last time the notifications have been "
+"triggered!"
+msgstr "Keine Änderungen seit dem letzten Auslösen der Benachrichtigungen!"
+
+msgid "Do you really want to retrigger the notfications?"
+msgstr "Benachrichtigungen wirklich erneut auslösen?"
+
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
 msgstr "Möchten Sie die Abstimmung \"${vote}\" wirklich löschen?"
@@ -519,3 +533,12 @@ msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
+
+#~ msgid "Do you want to trigger the notfications?"
+#~ msgstr "Benachrichtigungen auslösen?"
+
+#~ msgid "Retrigger notifications"
+#~ msgstr "Benachrichtigungen erneut auslösen"
+
+#~ msgid "No results yet"
+#~ msgstr "Noch keine Resultate"

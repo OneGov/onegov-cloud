@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-30 14:58+0200\n"
+"POT-Creation-Date: 2016-09-02 08:25+0200\n"
 "PO-Revision-Date: 2016-08-29 13:08+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -244,9 +244,6 @@ msgstr "Anc betg eruì il resultat."
 msgid "Format Description"
 msgstr "descripziun dal format"
 
-msgid "No results yet"
-msgstr "Anc nagins resultats avant maun"
-
 msgid "Turnout"
 msgstr "Participaziun a las elecziuns"
 
@@ -406,6 +403,9 @@ msgstr ""
 msgid "Last change"
 msgstr ""
 
+msgid "Trigger notifications"
+msgstr ""
+
 msgid "New Election"
 msgstr "Nova elecziun"
 
@@ -429,6 +429,9 @@ msgstr "Modifitgar"
 
 msgid "Upload Results"
 msgstr "Chargiar si resultats"
+
+msgid "Trigger Notifications"
+msgstr ""
 
 msgid "Delete"
 msgstr "Stizzar"
@@ -456,6 +459,9 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 
 msgid "Line"
 msgstr "Lingia"
+
+msgid "Click here to trigger the notifications"
+msgstr ""
 
 msgid "No errors found in proposal"
 msgstr "Chattà nagins sbagls en la proposta"
@@ -508,6 +514,14 @@ msgstr "Vulais Vus propi stizzar l'elecziun \"${election}\"?"
 msgid "Delete election"
 msgstr "Stizzar l'elecziun"
 
+msgid ""
+"There are no changes since the last time the notifications have been "
+"triggered!"
+msgstr ""
+
+msgid "Do you really want to retrigger the notfications?"
+msgstr ""
+
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
 msgstr "Vulais Vus propi stizzar la votaziun \"${vote}\"?"
@@ -521,3 +535,6 @@ msgstr "L'onn ${year} na vegn anc betg sustegnì"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Quest project ha main resultats ch'ils auters projects."
+
+#~ msgid "No results yet"
+#~ msgstr "Anc nagins resultats avant maun"

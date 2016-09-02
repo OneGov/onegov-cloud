@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds webhooks.
+  [msom]
+
 - Updates translations.
   [msom]
 

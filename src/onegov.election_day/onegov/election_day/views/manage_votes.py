@@ -6,8 +6,12 @@ from onegov.ballot import Vote, VoteCollection
 from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.forms import DeleteForm, VoteForm
+from onegov.election_day.collections import WebhookCollection
+from onegov.election_day.forms import DeleteForm
+from onegov.election_day.forms import TriggerWebhookForm
+from onegov.election_day.forms import VoteForm
 from onegov.election_day.layout import ManageVotesLayout
+from onegov.election_day.utils import get_vote_summary, post_to
 
 
 @ElectionDayApp.html(model=VoteCollection, template='manage_votes.pt',
@@ -88,5 +92,50 @@ def delete_vote(self, request, form):
         'subtitle': _("Delete vote"),
         'button_text': _("Delete vote"),
         'button_class': 'alert',
+        'cancel': layout.manage_model_link
+    }
+
+
+@ElectionDayApp.form(model=Vote, name='trigger-webhooks', template='form.pt',
+                     permission=Private, form=TriggerWebhookForm)
+def trigger_webhooks(self, request, form):
+
+    session = request.app.session()
+    webhooks = WebhookCollection(session)
+    layout = ManageVotesLayout(self, request)
+
+    if form.submitted(request):
+        for url in request.app.principal.webhooks:
+            if post_to(url, get_vote_summary(self, request)):
+                webhooks.add(url, self.last_result_change, vote=self)
+        return morepath.redirect(layout.manage_model_link)
+
+    callout = None
+    message = ''
+    title = _("Trigger notifications")
+    button_class = 'primary'
+
+    for url in request.app.principal.webhooks:
+        webhook = webhooks.by_vote(self, url, self.last_result_change)
+        if webhook is not None:
+            callout = _(
+                "There are no changes since the last time the notifications "
+                "have been triggered!"
+            )
+            message = _(
+                "Do you really want to retrigger the notfications?",
+            )
+            button_class = 'alert'
+
+    return {
+        'message': message,
+        'layout': layout,
+        'form': form,
+        'title': self.title,
+        'shortcode': self.shortcode,
+        'subtitle': title,
+        'callout': callout,
+        'button_text': title,
+        'button_class': button_class,
         'cancel': layout.manage_model_link
     }

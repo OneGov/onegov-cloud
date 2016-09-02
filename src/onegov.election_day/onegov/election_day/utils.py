@@ -1,4 +1,12 @@
+import _thread
+import json
+import logging
+import urllib.request
+
 from onegov.ballot import Election, Vote
+
+
+log = logging.getLogger('onegov.election_day')  # noqa
 
 
 def add_last_modified_header(response, last_modified):
@@ -90,3 +98,25 @@ def get_archive_links(archive, request):
         str(year): request.link(archive.for_date(year))
         for year in archive.get_years()
     }
+
+
+def _post_to(url, data, timeout=30):
+    try:
+        data = json.dumps(data).encode('utf-8')
+        request = urllib.request.Request(url)
+        request.add_header('Content-Type', 'application/json; charset=utf-8')
+        request.add_header('Content-Length', len(data))
+        urllib.request.urlopen(request, data, timeout)
+    except Exception as e:
+        log.error(
+            'Error while sending a POST request to {}: {}'.format(url, e.msg)
+        )
+
+
+def post_to(url, data):
+    try:
+        _thread.start_new_thread(_post_to, (url, data))
+    except:
+        return False
+
+    return True

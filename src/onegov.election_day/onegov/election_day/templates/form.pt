@@ -13,6 +13,9 @@
         <span class="shortcode large" tal:condition="shortcode|nothing">${shortcode}</span>
         <h1>${title}</h1>
         <h2 tal:condition="subtitle|nothing" class="subheader">${subtitle}</h2>
+        <div class="panel callout radius" tal:condition="callout|nothing">
+             <p>${callout}</p>
+        </div>
         <p tal:condition="message|nothing">${message}</p>
         <div class="row">
             <div class="${size} columns">
