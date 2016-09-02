@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Name each step and have a separate body class for each named step.
+  [href]
+
 0.2.10 (2016-08-19)
 ~~~~~~~~~~~~~~~~~~~
 

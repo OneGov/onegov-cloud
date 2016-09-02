@@ -35,12 +35,13 @@ class TownAssistant(Assistant):
         form.color.data = request.browser_session.get('color', form.color.data)
 
         return {
+            'name': 'town-start',
             'title': _("Online Counter for Towns Demo"),
             'bullets': (
                 _("Start using the online counter for your town immediately."),
                 _("Setup takes less than one minute."),
                 _("Free with no commitment.")
-            )
+            ),
         }
 
     @Assistant.step(form=FinishForm)
@@ -78,12 +79,14 @@ class TownAssistant(Assistant):
 
             if error:
                 return {
+                    'name': 'town-error',
                     'title': _("Online Counter for Towns Demo"),
                     'error': error,
                     'form': None
                 }
             else:
                 return {
+                    'name': 'town-success',
                     'title': _("Online Counter for Towns Demo"),
                     'product': product,
                     'message': _("Success! Have a look at your new website!"),
@@ -95,6 +98,7 @@ class TownAssistant(Assistant):
                 }
 
         return {
+            'name': 'town-ready',
             'title': _("Online Counter for Towns Demo"),
             'message': _(
                 "We are ready to launch! Click continue once you're ready."
