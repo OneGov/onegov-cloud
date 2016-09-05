@@ -5,7 +5,7 @@ from click.testing import CliRunner
 from onegov.election_day.cli import cli
 
 
-def test_add_intance(postgres_dsn, temporary_directory):
+def test_add_instance(postgres_dsn, temporary_directory):
 
     cfg = {
         'applications': [
@@ -52,8 +52,16 @@ def test_add_intance(postgres_dsn, temporary_directory):
     assert result.exit_code == 0
     assert "Instance was created successfully" in result.output
 
+    runner = CliRunner()
+    result = runner.invoke(cli, [
+        '--config', cfg_path, '--select', '/onegov_election_day/govikon',
+        'add',
+    ])
+    assert result.exit_code == 1
+    assert "This selector may not reference an existing path" in result.output
 
-def test_add_intance_missing_config(postgres_dsn, temporary_directory):
+
+def test_add_instance_missing_config(postgres_dsn, temporary_directory):
 
     cfg = {
         'applications': [
@@ -85,5 +93,6 @@ def test_add_intance_missing_config(postgres_dsn, temporary_directory):
         '--config', cfg_path, '--select', '/onegov_election_day/govikon',
         'add',
     ])
-    assert result.exit_code == 1
+    assert result.exit_code == 0
     assert "principal.yml not found" in result.output
+    assert "Instance was created successfully" in result.output
