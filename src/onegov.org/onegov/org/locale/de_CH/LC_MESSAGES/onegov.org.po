@@ -1477,7 +1477,7 @@ msgid "Login to ${org}"
 msgstr "${org} Login"
 
 msgid "Account Registration"
-msgstr "Account Registration"
+msgstr "Benutzerkonto Registration"
 
 msgid "You have been logged out."
 msgstr "Sie wurden ausgeloggt."
@@ -1488,7 +1488,7 @@ msgstr "Falsche E-Mail Adresse, falsches Passwort oder falscher Yubikey."
 msgid ""
 "Your account has been activated. You may now log in with your credentials"
 msgstr ""
-"Ihr Account wurde aktiviert. Sie können sich nun mit Ihren Benutzernamen und "
+"Ihr Konto wurde aktiviert. Sie können sich nun mit Ihren Benutzernamen und "
 "Passwort anmelden"
 
 msgid "You have been logged in."
@@ -1512,7 +1512,7 @@ msgid "Invalid activation token"
 msgstr "Ungültiger Aktivierungscode"
 
 msgid "Your account has already been activated."
-msgstr "Ihr Account wurde bereits aktiviert."
+msgstr "Ihr Konto wurde bereits aktiviert."
 
 msgid "A user with this address already exists"
 msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"

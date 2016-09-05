@@ -2907,8 +2907,8 @@ def test_registration(org_app):
     faulty = URL(url).query_param('token', 'asdf').as_string()
 
     assert "Ungültiger Aktivierungscode" in client.get(faulty).follow()
-    assert "Account wurde aktiviert" in client.get(url).follow()
-    assert "Account wurde bereits aktiviert" in client.get(url).follow()
+    assert "Konto wurde aktiviert" in client.get(url).follow()
+    assert "Konto wurde bereits aktiviert" in client.get(url).follow()
 
     logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
     assert "eingeloggt" in logged_in
