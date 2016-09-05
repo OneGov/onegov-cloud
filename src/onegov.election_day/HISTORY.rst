@@ -13,6 +13,9 @@ Changelog
 - Makes backend tables responsive.
   [msom]
 
+- Adds command line interface to add new instances.
+  [msom]
+
 0.8.1 (2016-08-30)
 ~~~~~~~~~~~~~~~~~~~
 

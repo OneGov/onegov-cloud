@@ -62,6 +62,9 @@ setup(
         ],
         'onegov': [
             'upgrade = onegov.election_day.upgrade'
+        ],
+        'console_scripts': [
+            'onegov-election-day=onegov.election_day.cli:cli'
         ]
     },
     classifiers=[
