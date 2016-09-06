@@ -151,7 +151,7 @@ Im Datenexport gibt es eine Zeile pro Kandidat und Gemeinde. Es werden folgende 
 - **Kand_StimmenTotal**
 - **Liste_ParteistimmenTotal**
 
-### Spalten  Datenexport der Statistik
+### Spalten Datenexport der Statistik
 
 Die Datei mit den Statistiken zu den einzelnen Gemeinden sollte folgende Spalten enthalten:
 
