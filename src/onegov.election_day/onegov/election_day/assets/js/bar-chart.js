@@ -66,8 +66,9 @@ var init_bar_chart = function(el) {
             .attr('class', function(d) {
                 return 'bar ' + d.class;
             })
-            .style("fill", "#999")
-            .filter(function(d) { return d.class == "active"; })
+            .style("fill", "#999");
+
+        bar.filter(function(d) { return d.class == "active"; })
             .style("fill", "#0571b0");
 
         label = line.append('g')
