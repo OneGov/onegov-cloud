@@ -33,6 +33,14 @@ class Layout(ChameleonLayout):
         ).format(lang)
 
     @cached_property
+    def format_description_link(self):
+        lang = (self.request.locale or 'en')[:2]
+        return (
+            "https://github.com/OneGov/onegov.election_day"
+            "/blob/master/docs/format_{}.md"
+        ).format(lang)
+
+    @cached_property
     def font_awesome_path(self):
         static_file = StaticFile.from_application(
             self.app, 'font-awesome/css/font-awesome.min.css')

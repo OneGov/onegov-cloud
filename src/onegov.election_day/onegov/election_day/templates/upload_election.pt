@@ -5,20 +5,18 @@
     <tal:block metal:fill-slot="content">
         <span class="shortcode large" tal:condition="shortcode|nothing">${shortcode}</span>
         <h1>${title}</h1>
-        <h2 class="subheader" i18n:translate>Upload results</h2>
+        <h2 class="subheader" i18n:translate="">Upload results</h2>
 
         <tal:block condition="status == 'open'">
             <div class="panel">
                 <i class="fa fa-info-circle"></i>
-                <span i18n:translate>Please use the following format:</span><br>
-                <a href="https://github.com/OneGov/onegov.election_day/blob/master/docs/formatbeschreibung.md" i18n:translate>
-                    Format Description
-                </a>
+                <span i18n:translate="">Please use the following format:</span><br>
+                <a href="${layout.format_description_link}" i18n:translate="">Format Description</a>
             </div>
         </tal:block>
 
         <div class="after-upload" tal:condition="status == 'ok'">
-            <div class="alert-box success" i18n:translate>
+            <div class="alert-box success" i18n:translate="">
                 Your results were uploaded successfully.
             </div>
 
@@ -30,20 +28,20 @@
         </div>
 
         <div class="after-upload" tal:condition="status == 'error'">
-            <div class="alert-box alert" i18n:translate>
+            <div class="alert-box alert" i18n:translate="">
                 Your results could not be uploaded.
             </div>
             <ul>
                 <li tal:repeat="error results['errors']">
-                    <span class="error-line" tal:condition="error.line"><span i18n:translate>Line </span>${error.line}</span>
+                    <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
                     <span class="error-message">${error.error}</span>
                 </li>
             </ul>
         </div>
 
         <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
-            <tal:block tal:condition="not:form.error_message|nothing" i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>
-            <tal:block tal:condition="form.error_message|nothing" i18n:translate>${form.error_message}</tal:block>
+            <tal:block tal:condition="not:form.error_message|nothing" i18n:translate="">The form contains errors. Please check the fields marked in red.</tal:block>
+            <tal:block tal:condition="form.error_message|nothing" i18n:translate="">${form.error_message}</tal:block>
         </div>
 
         <div tal:condition="status != 'success'">

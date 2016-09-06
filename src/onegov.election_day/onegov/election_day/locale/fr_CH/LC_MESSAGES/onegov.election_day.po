@@ -242,7 +242,7 @@ msgid "Not yet counted."
 msgstr "Pas encore compté."
 
 msgid "Format Description"
-msgstr "Description du format:"
+msgstr "Description du format"
 
 msgid "Turnout"
 msgstr "Participation"
