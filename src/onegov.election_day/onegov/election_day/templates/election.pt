@@ -63,13 +63,22 @@
 
             <div class="row" tal:condition="not: majorz">
                 <div class="small-12 small-centered large-10 columns">
-                    <div class="bar-chart" data-dataurl="${request.link(election, name='lists')}"></div>
+                    <div class="bar-chart" i18n:attributes="data-download-link; data-embed-link"
+                        data-dataurl="${request.link(election, name='lists')}"
+                        data-download-link="Download"
+                        data-embed-link="Embed"
+                        data-embed-source="${request.link(election, name='lists-chart')}"
+                        />
                 </div>
             </div>
 
             <div class="row" tal:condition="majorz">
                 <div class="small-12 small-centered large-10 columns">
-                    <div class="bar-chart" data-dataurl="${request.link(election, name='candidates')}"></div>
+                    <div class="bar-chart" i18n:attributes="data-download-link; data-embed-link"
+                        data-dataurl="${request.link(election, name='candidates')}"
+                        data-download-link="Download"
+                        data-embed-link="Embed"
+                        data-embed-source="${request.link(election, name='candidates-chart')}" />
                 </div>
             </div>
 
@@ -109,7 +118,11 @@
                 <h3 class="foldable-title" i18n:translate="">List connections</h3>
                 <div class="foldable-svg-panel row">
                     <div class="small-12 small-centered medium-12 large-10 columns" tal:condition="connections">
-                        <div class="sankey-chart" data-dataurl="${request.link(election, name='connections')}"></div>
+                        <div class="sankey-chart" i18n:attributes="data-download-link; data-embed-link"
+                            data-dataurl="${request.link(election, name='connections')}"
+                            data-download-link="Download"
+                            data-embed-link="Embed"
+                            data-embed-source="${request.link(election, name='connections-chart')}" />
                     </div>
                 </div>
                 <div class="foldable-panel">

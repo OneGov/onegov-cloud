@@ -187,22 +187,28 @@ def get_form_asset():
 
 @ElectionDayApp.webasset('bar_chart')
 def get_bar_chart_asset():
+    yield 'jquery.js'
     yield 'd3'
+    yield 'chart-common.js'
     yield 'bar-chart.js'
 
 
 @ElectionDayApp.webasset('sankey_chart')
 def get_sankey_chart_asset():
+    yield 'jquery.js'
     yield 'd3'
+    yield 'chart-common.js'
     yield 'sankey.js'
     yield 'sankey-chart.js'
 
 
 @ElectionDayApp.webasset('ballot_map')
 def get_ballot_map_asset():
+    yield 'jquery.js'
     yield 'd3'
     yield 'd3tip.js'
     yield 'topojson.js'
+    yield 'chart-common.js'
     yield 'ballot-map.js'
     yield 'bar-chart.js'
 

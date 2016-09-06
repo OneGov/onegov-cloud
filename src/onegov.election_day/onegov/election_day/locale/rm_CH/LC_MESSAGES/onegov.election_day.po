@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-02 08:25+0200\n"
+"POT-Creation-Date: 2016-09-06 08:46+0200\n"
 "PO-Revision-Date: 2016-08-29 13:08+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -255,6 +255,12 @@ msgstr "Cedels electorals consegnads"
 
 msgid "Counted municipalities"
 msgstr "Vischnancas dumbradas ora"
+
+msgid "Download"
+msgstr ""
+
+msgid "Embed"
+msgstr ""
 
 msgid "Candidates"
 msgstr "Candidatas e candidats"

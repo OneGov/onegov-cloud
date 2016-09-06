@@ -201,16 +201,16 @@ var init_ballot_map = function(el) {
                 });
             });
 
-            var svgData = $(el).find('svg')[0].outerHTML;
-            if (svgData) {
-                $(el).append(
-                    $('<a>')
-                        .attr('class', 'svg-download')
-                        .attr('href-lang', 'image/svg+xml')
-                        .attr('href', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData))))
-                        .attr('download', 'map.svg')
-                        .text('Download')
-                );
+            var download_link = $(el).data('download-link');
+            if (download_link) {
+                append_svg_download_link(el, $(el).find('svg')[0].outerHTML, 'map', download_link);
+            }
+
+            var embed_link = $(el).data('embed-link');
+            var embed_source = $(el).data('embed-source');
+            if (embed_link && embed_source) {
+                var height = Math.floor(500 * (bbox.height/bbox.width)) + 70;
+                append_embed_code(el, 500, height, embed_source, embed_link);
             }
         });
     });

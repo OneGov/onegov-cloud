@@ -106,16 +106,15 @@ var init_bar_chart = function(el) {
                 .style("stroke-dasharray", ("4, 4"));
         }
 
-        var svgData = $(el).html();
-        if (svgData) {
-            $(el).append(
-                $('<a>')
-                    .attr('class', 'svg-download')
-                    .attr('href-lang', 'image/svg+xml')
-                    .attr('href', 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData))))
-                    .attr('download', data.title + '.svg')
-                    .text('Download')
-            );
+        var download_link = $(el).data('download-link');
+        if (download_link) {
+            append_svg_download_link(el, $(el).html(), data.title, download_link);
+        }
+
+        var embed_link = $(el).data('embed-link');
+        var embed_source = $(el).data('embed-source');
+        if (embed_link && embed_source) {
+            append_embed_code(el, '100%', 24 * data.results.length + 50, embed_source, embed_link);
         }
 
         if ($(el).is('.foldable.folded .foldable-svg-panel .bar-chart')) {

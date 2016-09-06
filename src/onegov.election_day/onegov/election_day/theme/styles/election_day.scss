@@ -382,6 +382,32 @@ table {
     font-size: .8rem;
     margin-top: 1em;
     text-align: right;
+
+    i.fa {
+        margin-right: .2em;
+    }
+}
+
+/*
+    Embed Code
+*/
+.embed {
+    font-size: .8rem;
+
+    a {
+        display: block;
+        text-align: right;
+    }
+
+    code {
+        display: block;
+        padding: 1em;
+        word-break: break-all;
+    }
+
+    i.fa {
+        margin-right: .2em;
+    }
 }
 
 /*

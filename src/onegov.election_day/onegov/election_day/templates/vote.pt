@@ -83,11 +83,14 @@
 
             <div class="row">
                 <div class="small-12 small-centered medium-8 large-6 columns">
-                    <div class="ballot-map"
+                    <div class="ballot-map" i18n:attributes="data-download-link; data-embed-link"
                         data-type="${ballot.type}"
                         data-canton="${layout.app.principal.canton}"
                         data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, vote.date.year)}"
-                        data-dataurl="${request.link(ballot, name='by-municipality')}">
+                        data-dataurl="${request.link(ballot, name='by-municipality')}"
+                        data-download-link="Download"
+                        data-embed-link="Embed"
+                        data-embed-source="${request.link(ballot, name='map')}">
 
                         <div class="legend" data-left-hand="Yay" data-right-hand="Nay" i18n:attributes="data-left-hand; data-right-hand"></div>
                     </div>

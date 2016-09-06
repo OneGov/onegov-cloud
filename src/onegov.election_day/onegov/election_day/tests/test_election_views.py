@@ -112,10 +112,18 @@ def test_view_election_candidates(election_day_app_gr):
         "Engler Stefan", "20", "Schmid Martin", "18"
     )))
 
+    chart = client.get('/election/majorz-election/candidates-chart')
+    assert chart.status_code == 200
+    assert '/election/majorz-election/candidates' in chart
+
     candidates = client.get('/election/proporz-election/candidates')
     assert all((expected in candidates for expected in (
         "Caluori Corina", "1", "Casanova Angela", "0"
     )))
+
+    chart = client.get('/election/proporz-election/candidates-chart')
+    assert chart.status_code == 200
+    assert '/election/proporz-election/candidates' in chart
 
 
 def test_view_election_lists(election_day_app_gr):
@@ -127,10 +135,18 @@ def test_view_election_lists(election_day_app_gr):
     upload_proporz_election(client)
 
     lists = client.get('/election/majorz-election/lists')
-    assert lists.json == {}
+    assert lists.json['results'] == []
+
+    chart = client.get('/election/majorz-election/lists-chart')
+    assert chart.status_code == 200
+    assert '/election/majorz-election/lists' in chart
 
     lists = client.get('/election/proporz-election/lists')
     assert all((expected in lists for expected in ("FDP", "8", "CVP", "5")))
+
+    chart = client.get('/election/proporz-election/lists-chart')
+    assert chart.status_code == 200
+    assert '/election/proporz-election/lists' in chart
 
 
 def test_view_election_connections(election_day_app_gr):
@@ -143,6 +159,10 @@ def test_view_election_connections(election_day_app_gr):
 
     assert client.get('/election/majorz-election/connections').json == {}
 
+    chart = client.get('/election/majorz-election/connections-chart')
+    assert chart.status_code == 200
+    assert '/election/majorz-election/connections' in chart
+
     data = client.get('/election/proporz-election/connections').json
 
     nodes = [node['name'] for node in data['nodes']]
@@ -154,6 +174,10 @@ def test_view_election_connections(election_day_app_gr):
     ]
     assert '{}:8'.format(nodes.index('FDP')) in links
     assert '{}:5'.format(nodes.index('CVP')) in links
+
+    chart = client.get('/election/proporz-election/connections-chart')
+    assert chart.status_code == 200
+    assert '/election/proporz-election/connections' in chart
 
 
 def test_view_election_json(election_day_app_gr):

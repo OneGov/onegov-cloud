@@ -14,16 +14,15 @@ from onegov.election_day.utils import get_vote_summary
 def view_vote(self, request):
     """" The main view. """
 
-    layout = DefaultLayout(self, request)
-    request.include('ballot_map')
-
     @request.after
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
+    request.include('ballot_map')
+
     return {
         'vote': self,
-        'layout': layout,
+        'layout': DefaultLayout(self, request),
         'counted': self.counted
     }
 
@@ -31,6 +30,26 @@ def view_vote(self, request):
 @ElectionDayApp.json(model=Ballot, permission=Public, name='by-municipality')
 def view_ballot_by_municipality(self, request):
     return self.percentage_by_municipality()
+
+
+@ElectionDayApp.html(model=Ballot, template='embed.pt', permission=Public,
+                     name='map')
+def view_ballot_as_map(self, request):
+    """" View the ballot as map. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.vote.last_result_change)
+
+    request.include('ballot_map')
+
+    return {
+        'model': self,
+        'layout': DefaultLayout(self, request),
+        'data': {
+            'map': request.link(self, name='by-municipality')
+        }
+    }
 
 
 @ElectionDayApp.json(model=Vote, permission=Public, name='json')
@@ -99,6 +118,9 @@ def view_vote_json(self, request):
             } for ballot in self.ballots
         ],
         'url': request.link(self),
+        'embed': [
+            request.link(ballot, 'map') for ballot in self.ballots
+        ]
     }
 
 

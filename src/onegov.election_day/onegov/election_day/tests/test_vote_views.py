@@ -56,6 +56,11 @@ def test_view_vote(election_day_app):
     )))
 
 
+def test_ballot_map(election_day_app):
+    pass
+    # todo: map
+
+
 def test_view_vote_json(election_day_app):
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()

@@ -174,19 +174,17 @@ def view_election(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    layout = DefaultLayout(self, request)
     request.include('bar_chart')
     request.include('sankey_chart')
 
-    majorz = self.type == 'majorz'
     session = object_session(self)
 
     candidates = get_candidates_results(self, session).all()
 
     return {
         'election': self,
-        'layout': layout,
-        'majorz': majorz,
+        'layout': DefaultLayout(self, request),
+        'majorz': self.type == 'majorz',
         'has_results': True if self.results.first() else False,
         'candidates': candidates,
         'number_of_candidates': len(candidates),
@@ -200,8 +198,7 @@ def view_election(self, request):
 
 @ElectionDayApp.json(model=Election, permission=Public, name='candidates')
 def view_election_candidates(self, request):
-    """" View the candidates as JSON. Used to for the candidates bar char
-    in the main view. """
+    """" View the candidates as JSON. Used to for the candidates bar chart. """
 
     session = object_session(self)
 
@@ -234,13 +231,36 @@ def view_election_candidates(self, request):
     }
 
 
+@ElectionDayApp.html(model=Election, permission=Public,
+                     name='candidates-chart', template='embed.pt')
+def view_election_candidates_chart(self, request):
+    """" View the candidates as bar chart. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_result_change)
+
+    request.include('bar_chart')
+
+    return {
+        'model': self,
+        'layout': DefaultLayout(self, request),
+        'data': {
+            'bar': request.link(self, name='candidates')
+        }
+    }
+
+
 @ElectionDayApp.json(model=Election, permission=Public, name='lists')
 def view_election_lists(self, request):
-    """" View the lists as JSON. Used to for the lists bar char in the main
-    view. """
+    """" View the lists as JSON. Used to for the lists bar chart. """
 
     if self.type == 'majorz':
-        return {}
+        return {
+            'results': [],
+            'majority': None,
+            'title': self.title
+        }
 
     return {
         'results': [{
@@ -253,10 +273,30 @@ def view_election_lists(self, request):
     }
 
 
+@ElectionDayApp.html(model=Election, permission=Public,
+                     name='lists-chart', template='embed.pt')
+def view_election_lists_chart(self, request):
+    """" View the lists as bar chart. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_result_change)
+
+    request.include('bar_chart')
+
+    return {
+        'model': self,
+        'layout': DefaultLayout(self, request),
+        'data': {
+            'bar': request.link(self, name='lists')
+        }
+    }
+
+
 @ElectionDayApp.json(model=Election, permission=Public, name='connections')
 def view_election_connections(self, request):
-    """" View the list connections as JSON. Used to for the sankey char in
-    the main view. """
+    """" View the list connections as JSON. Used to for the connection sankey
+    chart. """
 
     if self.type == 'majorz':
         return {}
@@ -302,6 +342,26 @@ def view_election_connections(self, request):
         'nodes': list(nodes.values()),
         'links': links,
         'title': self.title
+    }
+
+
+@ElectionDayApp.html(model=Election, permission=Public,
+                     name='connections-chart', template='embed.pt')
+def view_election_connections_chart(self, request):
+    """" View the connections as sankey chart. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_result_change)
+
+    request.include('sankey_chart')
+
+    return {
+        'model': self,
+        'layout': DefaultLayout(self, request),
+        'data': {
+            'sankey': request.link(self, name='connections')
+        }
     }
 
 
@@ -354,6 +414,12 @@ def view_election_json(self, request):
         },
         'election_type': self.type,
         'url': request.link(self),
+        'embed': [
+            request.link(self, 'lists-chart'),
+            request.link(self, 'connections-chart'),
+        ] if self.type == 'proporz' else [
+            request.link(self, 'candidates-chart'),
+        ]
     }
 
     session = object_session(self)
