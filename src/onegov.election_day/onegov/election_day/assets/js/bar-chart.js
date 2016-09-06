@@ -126,7 +126,7 @@ var init_bar_chart = function(el) {
 
     });
 
-    d3.select(window).on('resize', function() {
+    d3.select(window).on('resize.barchart', function() {
         if (bar && label) {
             // Resize
             width = $(el).width();

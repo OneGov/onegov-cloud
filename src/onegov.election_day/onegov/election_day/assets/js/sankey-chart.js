@@ -112,7 +112,7 @@ var init_sankey_chart = function(el) {
         }
     });
 
-    d3.select(window).on('resize', function() {
+    d3.select(window).on('resize.sankey', function() {
         if (node && link && path) {
             // Resize
             width = $(el).width();
