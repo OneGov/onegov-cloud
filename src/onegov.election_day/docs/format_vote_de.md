@@ -24,11 +24,11 @@ aufgelisteten Reihenfolge erwartet:
 - **Bezirk**: Der Bezirk in der sich die Gemeinde befindet. Ist die Gemeinde in keinem Bezirk, darf dieses Feld leer sein.
 - **BFS-Nummer**: Die BFS-Nummer der Gemeinde zum Zeitpunkt der Abstimmung.
 - **Gemeinde**: Der Name der Gemeinde.
-- **Ja Stimmen**: Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-- **Nein Stimmen**: Die Anzahl Nein Stimmen der Abstimmung. Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-- **Stimmberechtigte**: Die Anzahl Stimmberechtigter. Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-- **Leere Stimmzettel**: Die Anzahl leer eingelegter Stimmzettel. Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-- **Ungültige Stimmzettel**: Die Anzahl ungültiger Stimmzettel. Ist der Text 'unbekannt' eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+- **Ja Stimmen**: Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+- **Nein Stimmen**: Die Anzahl Nein Stimmen der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+- **Stimmberechtigte**: Die Anzahl Stimmberechtigter. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+- **Leere Stimmzettel**: Die Anzahl leer eingelegter Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+- **Ungültige Stimmzettel**: Die Anzahl ungültiger Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 ### Temporäre Resultate
 
@@ -59,12 +59,12 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **GegenvNein**:  Die Anzahl Nein Stimmen zum Gegenvorschlag.
 - **StichfrJa**: Die Anzahl Ja Stimmen zur Stichfrage.
 - **StichfrNein**: Die Anzahl Nein Stimmen zur Stichfrage.
-- **StimmBet**: Die Stimmbeteilgung in Prozent. Wird verwendet, um zu entscheiden, ob die Gemeinde bereits ausgezählt wurde. Ist die Stimmbeteilgung '0', wird die Zeile ignoriert (noch nicht ausgezählt).
+- **StimmBet**: Die Stimmbeteilgung in Prozent. Wird verwendet, um zu entscheiden, ob die Gemeinde bereits ausgezählt wurde. Ist die Stimmbeteilgung `0`, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 ### Temporäre Resultate
 
 Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
-- ``StimmBet = 0``
+- `StimmBet = 0`
 - die Gemeinde ist nicht in den Resultaten enthalten
 
 ### Vorlage
@@ -80,10 +80,10 @@ Das Format, welche von der Web-Applikation für den Export verwendet wird, beste
 
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-- **type** "proposal" (Vorschlag), "counter-proposal" (Gegenvorschlag) or "tie-breaker" (Stichfrage).
+- **type** `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
 - **group** Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
 - **municipality_id** Die BFS-Nummer der Gemeinde.
-- **counted** ``true``, falls die Gemeinde ausgezählt ist.
+- **counted** `true`, falls die Gemeinde ausgezählt ist.
 - **yeas** Die Anzahl Ja Stimmen.
 - **nays** Die Anzahl Nein Stimmen.
 - **invalid** Die Anzahl ungültiger Stimmen.
@@ -93,7 +93,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 ### Temporäre Resultate
 
 Gemeinden gelten als noch nicht ausgezählt, falls eine der beiden folgenden Bedinungen zutrifft:
-- ``counted = false``
+- `counted = false`
 - die Gemeinde ist nicht in den Resultaten enthalten
 
 ### Vorlage

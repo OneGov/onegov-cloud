@@ -40,7 +40,7 @@ Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
 ### Temporäre Resultate
 
-Die Wahl gilt als noch nicht ausgezählt, falls in ``Anzahl Gemeinden`` die Anzahl ausgezählte Gemeinden nicht mit der Gesamtanzahl an Gemeinden übereinstimmt. Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
+Die Wahl gilt als noch nicht ausgezählt, falls in `Anzahl Gemeinden` die Anzahl ausgezählte Gemeinden nicht mit der Gesamtanzahl an Gemeinden übereinstimmt. Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
 
 ### Vorlage
 
@@ -80,7 +80,7 @@ Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
 ### Temporäre Resultate
 
-Die Wahl gilt als noch nicht ausgezählt, falls in ``Anzahl Gemeinden`` die Anzahl ausgezählte Gemeinden nicht mit der Gesamtanzahl an Gemeinden übereinstimmt. Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
+Die Wahl gilt als noch nicht ausgezählt, falls in `Anzahl Gemeinden` die Anzahl ausgezählte Gemeinden nicht mit der Gesamtanzahl an Gemeinden übereinstimmt. Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
 
 ### Vorlage
 
@@ -104,21 +104,21 @@ Im Datenexport gibt es für jede Gemeinde eine Zeile, Kandidaten sind in Spalten
 
 Sowie für jeden Kandidaten:
 
-- **KandID_``x``**
-- **KandName_``x``**
-- **KandVorname_``x``**
-- **Stimmen_``x``**
+- **KandID_`x`**
+- **KandName_`x`**
+- **KandVorname_`x`**
+- **Stimmen_`x`**
 
 Zudem werden die leeren und ungültigen Stimmen auch als Kandidaten erfasst mittels der folgenden Kandidatennamen:
 
-- **KandName_``x`` = 'Leere Zeilen'**
-- **KandName_``x`` = 'Ungültige Stimmen'**
+- **KandName_`x` = 'Leere Zeilen'**
+- **KandName_`x` = 'Ungültige Stimmen'**
 
 ### Spalten Kandidatenresultate
 
 Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
 
-- **ID** : Die ID des Kandidaten (``KandID_x``).
+- **ID** : Die ID des Kandidaten (`KandID_x`).
 - **Name** : Der Familienname des Kandidaten.
 - **Vorname** : Der Vorname des Kandidaten.
 
@@ -174,7 +174,7 @@ Die Datei mit den Listenverbindungen sollte folgende Spalten enthalten:
 
 Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
 
-- **ID**: Die ID des Kandidaten (``Liste_KandID``).
+- **ID**: Die ID des Kandidaten (`Liste_KandID`).
 - **Name**: Der Familienname des Kandidaten.
 - **Vorname**: Der Vorname des Kandidaten.
 
@@ -204,8 +204,8 @@ Das Format, welche von der Web-Applikation für den Export verwendet wird, beste
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 - **election_absolute_majority**: Absolutes Mehr der Wahl, nur falls Majorzwahl.
-- **election_counted_municipalites**: Anzahl ausgezählter Gemeinden. Falls ``election_counted_municipalites = election_total_municipalites`` ist, gilt die Wahl als fertig ausgezählt.
-- **election_total_municipalites**: Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert ``0``.
+- **election_counted_municipalites**: Anzahl ausgezählter Gemeinden. Falls `election_counted_municipalites = election_total_municipalites` ist, gilt die Wahl als fertig ausgezählt.
+- **election_total_municipalites**: Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert `0`.
 - **municipality_bfs_number**: BFS Nummer der Gemeinde.
 - **municipality_elegible_voters**: Anzahl Stimmberechtigte der Gemeinde.
 - **municipality_received_ballots**: Anzahl abgegebene Stimmzettel der Gemeinde.
@@ -226,7 +226,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 ### Temporäre Resultate
 
-Die Wahl gilt als noch nicht ausgezählt, falls ``election_counted_municipalites`` und ``election_total_municipalites`` nicht übereinstimmen. Falls ``election_total_municipalites = 0`` ist, ist keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde).
+Die Wahl gilt als noch nicht ausgezählt, falls `election_counted_municipalites` und `election_total_municipalites` nicht übereinstimmen. Falls `election_total_municipalites = 0` ist, ist keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde).
 
 Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
 

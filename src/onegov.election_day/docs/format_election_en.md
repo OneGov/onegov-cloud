@@ -105,21 +105,21 @@ In the data export, there is a row for each municipality, candidates are arrange
 
 As well as for each candidate:
 
-- **KandID_``x``**
-- **KandName_``x``**
-- **KandVorname_``x``**
-- **Stimmen_``x``**
+- **KandID_`x`**
+- **KandName_`x`**
+- **KandVorname_`x`**
+- **Stimmen_`x`**
 
 Additionally the empty and invalid votes as well as candidates will be captured by the following candidate names:
 
-- **KandName_``x`` = 'Leere Zeilen'** (Empty votes)
-- **KandName_``x`` = 'Ungültige Stimmen'** (Invalid votes)
+- **KandName_`x` = 'Leere Zeilen'** (Empty votes)
+- **KandName_`x` = 'Ungültige Stimmen'** (Invalid votes)
 
 ### Columns candidate results
 
 Because the file format does not supply any information on the elected candidate, those must be included in a second column. Each row consists of one elected candidate with the following columns:
 
-- **ID : ID of the candidate (``KandID_x``).**
+- **ID : ID of the candidate (`KandID_x`).**
 - **Name : The surname of the candidate.**
 - **Vorname : The first name of the candidate.**
 
@@ -175,7 +175,7 @@ The file with list connections should contain the following columns:
 
 Because the file format does not supply any information on the elected candidate, those must be included in a second column. Each row consists of one elected candidate with the following columns:
 
-- **ID** : ID of the candidate (``Liste_KandID``).
+- **ID** : ID of the candidate (`Liste_KandID`).
 - **Name** : The surname of the candidate.
 - **Vorname** : The first name of the candidate.
 

@@ -104,21 +104,21 @@ Dans l'exportation des données, une ligne est présente pour chaque municipalit
 
 Ainsi que pour chaque candidat:
 
-- **KandID_``x``**
-- **KandName_``x``**
-- **KandVorname_``x``**
-- **Stimmen_``x``**
+- **KandID_`x`**
+- **KandName_`x`**
+- **KandVorname_`x`**
+- **Stimmen_`x`**
 
 De plus, les votes vides et non valides ainsi que les candidats seront saisis par les noms de candidats suivants :
 
-- **KandName_``x`` = 'Leere Zeilen'** (Bulletins vides)
-- **KandName_``x`` = 'Ungültige Stimmen'** (Bulletins non valides)
+- **KandName_`x` = 'Leere Zeilen'** (Bulletins vides)
+- **KandName_`x` = 'Ungültige Stimmen'** (Bulletins non valides)
 
 ### Résultats des candidats de colonnes
 
 Parce que ce format de fichier n'offre aucune information concernant les candidats élus, ceux-ci doivent être inclus dans une deuxième colonne. Chaque ligne est composée d'un candidat élu avec les colonnes suivantes :
 
-- **ID** : Identifiant du candidat (``KandID_x``).
+- **ID** : Identifiant du candidat (`KandID_x`).
 - **Name** : Le nom de famille du candidat.
 - **Vorname** : Le prénom du candidat.
 
@@ -174,7 +174,7 @@ Le fichier avec les connexions de liste devrait contenir les colonnes suivantes 
 
 Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
 
-- **ID**: L'identifiant du candidat (``Liste_KandID``).
+- **ID**: L'identifiant du candidat (`Liste_KandID`).
 - **Name**: Le nom de famille du candidat.
 - **Vorname**: Le prénom du candidat.
 
@@ -204,8 +204,8 @@ Le format, qui sera utilisé par l'application web pour l'exportation, se compos
 Les colonnes suivantes seront évaluées et devraient exister :
 
 - **election_absolute_majority**: Majorité absolue de l'élection, seulement si c'est une élection Majorz.
-- **election_counted_municipalites**: Nombre de municipalités comptées. Si ``election_counted_municipalites = election_total_municipalites``, on considère alors que l'élection est entièrement comptée.
-- **election_total_municipalites**: Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est ``0``.
+- **election_counted_municipalites**: Nombre de municipalités comptées. Si `election_counted_municipalites = election_total_municipalites`, on considère alors que l'élection est entièrement comptée.
+- **election_total_municipalites**: Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est `0`.
 - **municipality_bfs_number**: Numéro BFS de la municipalité..
 - **municipality_elegible_voters**: Nombre de personnes autorisées à voter dans la municipalité.
 - **municipality_received_ballots**: Nombre de bulletins soumis dans la municipalité.

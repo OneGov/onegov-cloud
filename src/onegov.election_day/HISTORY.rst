@@ -4,6 +4,9 @@ Changelog
 - Adds embed code.
   [msom]
 
+- Updates translations.
+  [msom]
+
 0.8.2 (2016-09-05)
 ~~~~~~~~~~~~~~~~~~~
 

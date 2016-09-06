@@ -104,21 +104,21 @@ Nell'esportazione dei dati, è presente una riga per ogni comune, i candidati so
 
 Così come per ogni candidato
 
-- **KandID_``x``** (ID del candidato)
-- **KandName_``x``** (Cognome del candidato)
-- **KandVorname_``x``**
-- **Stimmen_``x``**
+- **KandID_`x`** (ID del candidato)
+- **KandName_`x`** (Cognome del candidato)
+- **KandVorname_`x`**
+- **Stimmen_`x`**
 
 Inoltre i voti, così come i candidati, nulli e non validi saranno attribuiti ai seguenti nomi di candidati:
 
-- **KandName_``x`` = 'Leere Zeilen'**
-- **KandName_``x`` = 'Ungültige Stimmen'**
+- **KandName_`x` = 'Leere Zeilen'**
+- **KandName_`x` = 'Ungültige Stimmen'**
 
 ### Colonne risultati candidati
 
 Poiché il formato di file non fornisce alcuna informazione sul candidato eletto, questi devono essere inclusi in una seconda colonna. Ogni riga è composta da un candidato eletto con le seguenti colonne:
 
-- **ID** : ID del candidato (``KandID_x``).
+- **ID** : ID del candidato (`KandID_x`).
 - **Name** : Cognome del candidato.
 - **Vorname** : Nome del candidato
 
@@ -174,7 +174,7 @@ Il file con gli apparentamenti delle liste dovrebbe contenere le seguenti colonn
 
 Poiché il formato di file non fornisce alcuna informazione sul candidato eletto, questi devono essere inclusi in una seconda colonna. Ogni riga è composta da un candidato eletto con le seguenti colonne:
 
-- **ID**: ID del candidato (``Liste_KandID``).
+- **ID**: ID del candidato (`Liste_KandID`).
 - **Name**: Cognome del candidato.
 - **Vorname**: Nome del candidato.
 
@@ -204,8 +204,8 @@ Il formato che sarà utilizzato dall'applicazione web per l'esportazione è cost
 Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 
 - **election_absolute_majority**: Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
-- **election_counted_municipalites**: Numero di comuni scrutinati. Se ``election_counted_municipalites = election_total_municipalites``, allora l'elezione è considerata completamente scrutinata.
-- **election_total_municipalites**: Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è ``0``.
+- **election_counted_municipalites**: Numero di comuni scrutinati. Se `election_counted_municipalites = election_total_municipalites`, allora l'elezione è considerata completamente scrutinata.
+- **election_total_municipalites**: Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è `0`.
 - **municipality_bfs_number**: Numero BFS del comune.
 - **municipality_elegible_voters**: Numero di aventi diritto al voto nel Comune.
 - **municipality_received_ballots**: Numero di schede presentate nel Comune.
