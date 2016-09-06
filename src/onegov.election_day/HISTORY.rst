@@ -7,6 +7,9 @@ Changelog
 - Updates translations.
   [msom]
 
+- Fixes resize behaviour of charts.
+  [msom]
+
 0.8.2 (2016-09-05)
 ~~~~~~~~~~~~~~~~~~~
 
