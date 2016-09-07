@@ -5,7 +5,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.ballot import Vote
 from onegov.core.orm.types import HSTORE, JSON
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Enum, Integer, Text
 
 
 @upgrade_task('Rename yays to yeas', always_run=True)
@@ -67,6 +67,7 @@ def add_meta_data_columns(context):
 
 @upgrade_task('Add municipality domain of influence')
 def add_municipality_domain(context):
+    # Rename the columns
     renames = (
         ('elections', 'total_municipalities', 'total_entities'),
         ('elections', 'counted_municipalities', 'counted_entities'),
@@ -77,3 +78,34 @@ def add_municipality_domain(context):
     for table, old, new in renames:
         if context.has_column(table, old):
             context.operations.alter_column(table, old, new_column_name=new)
+
+    # Add the new domain, see http://stackoverflow.com/a/14845740
+    old_type = Enum('federation', 'canton', name='domain_of_influence')
+    new_type = Enum('federation', 'canton', 'municipality',
+                    name='domain_of_influence')
+    tmp_type = Enum('federation', 'canton', 'municipality',
+                    name='_domain_of_influence')
+
+    tmp_type.create(context.operations.get_bind(), checkfirst=False)
+    context.operations.execute(
+        'ALTER TABLE votes ALTER COLUMN domain TYPE _domain_of_influence '
+        'USING domain::text::_domain_of_influence'
+    )
+    context.operations.execute(
+        'ALTER TABLE elections ALTER COLUMN domain TYPE _domain_of_influence '
+        'USING domain::text::_domain_of_influence'
+    )
+
+    old_type.drop(context.operations.get_bind(), checkfirst=False)
+
+    new_type.create(context.operations.get_bind(), checkfirst=False)
+    context.operations.execute(
+        'ALTER TABLE votes ALTER COLUMN domain TYPE domain_of_influence '
+        'USING domain::text::domain_of_influence'
+    )
+    context.operations.execute(
+        'ALTER TABLE elections ALTER COLUMN domain TYPE domain_of_influence '
+        'USING domain::text::domain_of_influence'
+    )
+
+    tmp_type.drop(context.operations.get_bind(), checkfirst=False)
