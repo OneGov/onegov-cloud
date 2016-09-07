@@ -13,26 +13,31 @@ from uuid import uuid4
 from itertools import groupby
 
 
-class DerivedBallotsCount(object):
+class DerivedAttributes(object):
+
+    """ A simple mixin to add commonly used functions to elections and their
+    results. """
 
     @hybrid_property
     def unaccounted_ballots(self):
-        """ Number of unaccounted ballots, """
+        """ number of unaccounted ballots """
         return self.blank_ballots + self.invalid_ballots
 
     @hybrid_property
     def accounted_ballots(self):
-        """ Number of accounted ballots. """
+        """ number of accounted ballots """
         return self.received_ballots - self.unaccounted_ballots
 
     @hybrid_property
     def turnout(self):
-        """ Turnout of the election. """
-        return self.received_ballots / self.elegible_voters * 100\
-            if self.elegible_voters else 0
+        """ turnout of the election """
+        if not self.elegible_voters:
+            return 0
+
+        return self.received_ballots / self.elegible_voters * 100
 
 
-class Election(Base, TimestampMixin, DerivedBallotsCount,
+class Election(Base, TimestampMixin, DerivedAttributes,
                DomainOfInfluenceMixin, MetaMixin):
 
     __tablename__ = 'elections'
@@ -97,17 +102,17 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
     #: Absolute majority (majorz elections only)
     absolute_majority = Column(Integer, nullable=True, default=lambda: 0)
 
-    #: Total number of municipalities
-    total_municipalities = Column(Integer, nullable=True)
+    #: Total number of political entities
+    total_entities = Column(Integer, nullable=True)
 
-    #: Number of already counted municipalities
-    counted_municipalities = Column(Integer, nullable=True)
+    #: Number of already counted political entitites
+    counted_entities = Column(Integer, nullable=True)
 
     @property
     def counted(self):
-        """ Checks if there are results for all municipalities. """
-        if self.total_municipalities and self.counted_municipalities:
-            return self.total_municipalities == self.counted_municipalities
+        """ Checks if there are results for all entitites. """
+        if self.total_entities and self.counted_entities:
+            return self.total_entities == self.counted_entities
 
         return False
 
@@ -137,7 +142,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         order_by="Candidate.candidate_id",
     )
 
-    #: An election contains n results, one for each municipality
+    #: An election contains n results, one for each political entity
     results = relationship(
         "ElectionResult",
         cascade="all, delete-orphan",
@@ -187,12 +192,12 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
         return max(last_changes)
 
     def export(self):
-        """ Returns all date connected to this election as list with dicts.
+        """ Returns all data connected to this election as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
         therefore a flat list of dictionaries with repeating values to avoid
         the nesting of values. Each record in the resulting list is a single
-        candidate result for each municipality.
+        candidate result for each political entity.
 
         Each entry in the list (row) has the following format:
 
@@ -201,6 +206,10 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
         * ``election_date``:
             The date of the election (an ISO 8601 date string).
+
+        * ``election_domain``:
+            ``federation`` for federal, ``canton`` for cantonal,
+            ``municipality`` for communal votes.
 
         * ``election_type``:
             ``proporz`` for proportional, ``majorz`` for majority system.
@@ -212,45 +221,45 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             The absolute majority.  Only relevant for elections based on
             majority system.
 
-        * ``election_counted_municipalities``:
-            The number of already counted municipalities.
+        * ``election_counted_entities``:
+            The number of already counted entities.
 
-        * ``election_total_municipalities``:
-            The total number of municipalities.
+        * ``election_total_entities``:
+            The total number of entities.
 
-        * ``municipality_name``:
-            The name of the municipality.
+        * ``entity_name``:
+            The name of the entity.
 
-        * ``municipality_bfs_number``:
-            The id of the municipality/locale ("BFS Nummer").
+        * ``entity_bfs_number``:
+            The id of the entity (e.g. the BFS number).
 
-        * ``municipality_elegible_voters``:
-            The number of people eligible to vote for this municipality.
+        * ``entity_elegible_voters``:
+            The number of people eligible to vote in this entity.
 
-        * ``municipality_received_ballots``:
-            The number of received ballots for this municipality.
+        * ``entity_received_ballots``:
+            The number of received ballots in this entity.
 
-        * ``municipality_blank_ballots``:
-            The number of blank ballots for this municipality.
+        * ``entity_blank_ballots``:
+            The number of blank ballots in this entity.
 
-        * ``municipality_invalid_ballots``:
-            The number of invalid ballots for this municipality.
+        * ``entity_invalid_ballots``:
+            The number of invalid ballots in this entity.
 
-        * ``municipality_unaccounted_ballots``:
-            The number of unaccounted ballots for this municipality.
+        * ``entity_unaccounted_ballots``:
+            The number of unaccounted ballots in this entity.
 
-        * ``municipality_accounted_ballots``:
-            The number of accounted ballots for this municipality.
+        * ``entity_accounted_ballots``:
+            The number of accounted ballots in this entity.
 
-        * ``municipality_blank_votes``:
-            The number of blank votes for this municipality.
+        * ``entity_blank_votes``:
+            The number of blank votes in this entity.
 
-        * ``municipality_invalid_votes``:
-            The number of invalid votes for this municipality. Is zero for
+        * ``entity_invalid_votes``:
+            The number of invalid votes in this entity. Is zero for
             elections based on proportional representation.
 
-        * ``municipality_accounted_votes``:
-            The number of accounted votes for this municipality.
+        * ``entity_accounted_votes``:
+            The number of accounted votes in this entity.
 
         * ``list_name``:
             The name of the list this candidate appears on. Only relevant for
@@ -265,7 +274,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             elections based on proportional representation.
 
         * ``list_votes``:
-            The number of votes this list has got in this municipality.
+            The number of votes this list has got in this entity.
             Only relevant for elections based on proportional representation.
 
         * ``list_connection``:
@@ -303,13 +312,14 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             CandidateResult.votes,
             Election.title,
             Election.date,
+            Election.domain,
             Election.type,
             Election.number_of_mandates,
             Election.absolute_majority,
-            Election.counted_municipalities,
-            Election.total_municipalities,
+            Election.counted_entities,
+            Election.total_entities,
             ElectionResult.group,
-            ElectionResult.municipality_id,
+            ElectionResult.entity_id,
             ElectionResult.elegible_voters,
             ElectionResult.received_ballots,
             ElectionResult.blank_ballots,
@@ -343,10 +353,10 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             Candidate.first_name
         )
 
-        # We need to merge in the list results per municipality
+        # We need to merge in the list results per entity
         list_results = session.query(
             ListResult.votes,
-            ElectionResult.municipality_id,
+            ElectionResult.entity_id,
             List.list_id
         )
         list_results = list_results.outerjoin(ListResult.election_result)
@@ -355,7 +365,7 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
             ListResult.election_result_id.in_(ids)
         )
         list_results = list_results.order_by(
-            ElectionResult.municipality_id,
+            ElectionResult.entity_id,
             List.list_id
         )
         list_results_grouped = {}
@@ -368,38 +378,39 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
             row['election_title'] = result[1].strip()
             row['election_date'] = result[2].isoformat()
-            row['election_type'] = result[3]
-            row['election_mandates'] = result[4]
-            row['election_absolute_majority'] = result[5]
-            row['election_counted_municipalities'] = result[6]
-            row['election_total_municipalities'] = result[7]
+            row['election_domain'] = result[3]
+            row['election_type'] = result[4]
+            row['election_mandates'] = result[5]
+            row['election_absolute_majority'] = result[6]
+            row['election_counted_entities'] = result[7]
+            row['election_total_entities'] = result[8]
 
-            row['municipality_name'] = result[8]
-            row['municipality_bfs_number'] = result[9]
-            row['municipality_elegible_voters'] = result[10]
-            row['municipality_received_ballots'] = result[11]
-            row['municipality_blank_ballots'] = result[12]
-            row['municipality_invalid_ballots'] = result[13]
-            row['municipality_unaccounted_ballots'] = result[14]
-            row['municipality_accounted_ballots'] = result[15]
-            row['municipality_blank_votes'] = result[16]
-            row['municipality_invalid_votes'] = result[17]
-            row['municipality_accounted_votes'] = result[18]
+            row['entity_name'] = result[9]
+            row['entity_id'] = result[10]
+            row['entity_elegible_voters'] = result[11]
+            row['entity_received_ballots'] = result[12]
+            row['entity_blank_ballots'] = result[13]
+            row['entity_invalid_ballots'] = result[14]
+            row['entity_unaccounted_ballots'] = result[15]
+            row['entity_accounted_ballots'] = result[16]
+            row['entity_blank_votes'] = result[17]
+            row['entity_invalid_votes'] = result[18]
+            row['entity_accounted_votes'] = result[19]
 
-            row['list_name'] = result[19]
-            row['list_id'] = result[20]
-            row['list_number_of_mandates'] = result[21]
+            row['list_name'] = result[20]
+            row['list_id'] = result[21]
+            row['list_number_of_mandates'] = result[22]
             row['list_votes'] = list_results_grouped.get(
-                row['municipality_bfs_number'], {}
+                row['entity_id'], {}
             ).get(row['list_id'], 0)
 
-            row['list_connection'] = result[22]
-            row['list_connection_parent'] = result[23]
+            row['list_connection'] = result[23]
+            row['list_connection_parent'] = result[24]
 
-            row['candidate_family_name'] = result[24]
-            row['candidate_first_name'] = result[25]
-            row['candidate_id'] = result[26]
-            row['candidate_elected'] = result[27]
+            row['candidate_family_name'] = result[25]
+            row['candidate_first_name'] = result[26]
+            row['candidate_id'] = result[27]
+            row['candidate_elected'] = result[28]
             row['candidate_votes'] = result[0]
 
             rows.append(row)
@@ -408,6 +419,8 @@ class Election(Base, TimestampMixin, DerivedBallotsCount,
 
 
 class ListConnection(Base, TimestampMixin):
+
+    """ A list connection. """
 
     __tablename__ = 'list_connections'
 
@@ -422,7 +435,7 @@ class ListConnection(Base, TimestampMixin):
     #: the election this result belongs to
     election_id = Column(Text, ForeignKey(Election.id), nullable=True)
 
-    #: ID of the parent
+    #: ID of the parent list connection
     parent_id = Column(UUID, ForeignKey('list_connections.id'), nullable=True)
 
     #: a list connection contains n lists
@@ -472,7 +485,7 @@ class ListConnection(Base, TimestampMixin):
 
 
 class List(Base, TimestampMixin):
-    """ A list used in an election. """
+    """ A list. """
 
     __tablename__ = 'lists'
 
@@ -529,7 +542,7 @@ class List(Base, TimestampMixin):
 
 
 class Candidate(Base, TimestampMixin):
-    """ A candidate for an election. """
+    """ A candidate. """
 
     __tablename__ = 'candiates'
 
@@ -580,8 +593,8 @@ class Candidate(Base, TimestampMixin):
         return expr
 
 
-class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
-    """ The result of an election for a municipality. """
+class ElectionResult(Base, TimestampMixin, DerivedAttributes):
+    """ The election result in a single political entity. """
 
     __tablename__ = 'election_results'
 
@@ -594,8 +607,8 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
     #: groups the result in whatever structure makes sense
     group = Column(Text, nullable=False)
 
-    #: municipality id (BFS Nummer).
-    municipality_id = Column(Integer, nullable=False)
+    #: entity id (e.g. a BFS number).
+    entity_id = Column(Integer, nullable=False)
 
     #: number of elegible voters
     elegible_voters = Column(Integer, nullable=False, default=lambda: 0)
@@ -617,7 +630,7 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
 
     @hybrid_property
     def accounted_votes(self):
-        """ Number of accounted votes """
+        """ number of accounted votes """
         return (
             self.election.number_of_mandates * self.accounted_ballots -
             self.blank_votes - self.invalid_votes
@@ -625,7 +638,7 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
 
     @accounted_votes.expression
     def accounted_votes(cls):
-        """ Number of accounted votes """
+        """ number of accounted votes """
         # A bit of a hack :|
         number_of_mandates = select(
             [Election.number_of_mandates],
@@ -655,7 +668,7 @@ class ElectionResult(Base, TimestampMixin, DerivedBallotsCount):
 
 
 class ListResult(Base, TimestampMixin):
-    """ The result of an election for a list in  a municipality. """
+    """ The election result of a list in a single political entity. """
 
     __tablename__ = 'list_results'
 
@@ -675,13 +688,7 @@ class ListResult(Base, TimestampMixin):
 
 
 class CandidateResult(Base, TimestampMixin):
-    """ The result of an election for a candidate in  a municipality.
-
-    There are some properties (elected, candidate id, list id, list name,
-    family name, first name) which stay the same for a whole election and
-    could be therefore stored globally or as a reference.
-
-    """
+    """ The election result of a candidate in a single political entity. """
 
     __tablename__ = 'candiate_results'
 

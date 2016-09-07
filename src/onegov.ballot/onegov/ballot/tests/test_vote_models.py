@@ -28,7 +28,7 @@ def test_vote_create_all_models(session):
         nays=4452,
         empty=500,
         invalid=66,
-        municipality_id=1,
+        entity_id=1,
         ballot_id=ballot.id
     )
 
@@ -81,14 +81,14 @@ def test_ballot_answer_simple(session):
             counted=True,
             yeas=100,
             nays=50,
-            municipality_id=1,
+            entity_id=1,
         ),
         BallotResult(
             group='Ort B',
             counted=False,
             yeas=100,
             nays=50,
-            municipality_id=1,
+            entity_id=1,
         )
     ])
 
@@ -140,13 +140,13 @@ def test_ballot_nobody_voted_right(session):
 
     vote.proposal.results.append(
         BallotResult(
-            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=0, counted=True, entity_id=1))
     vote.proposal.results.append(
         BallotResult(
-            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=0, counted=True, entity_id=1))
     vote.proposal.results.append(
         BallotResult(
-            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=0, counted=True, entity_id=1))
 
     session.flush()
 
@@ -172,13 +172,13 @@ def test_ballot_answer_proposal_wins(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, entity_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yeas=0, nays=100, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=100, counted=True, entity_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
-            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=0, counted=True, entity_id=1))
 
     assert vote.answer == 'proposal'
     assert vote.yeas_percentage == 100.0
@@ -202,13 +202,13 @@ def test_ballot_answer_counter_proposal_wins(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yeas=0, nays=100, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=100, counted=True, entity_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, entity_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
-            group='x', yeas=0, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=0, counted=True, entity_id=1))
 
     assert vote.answer == 'counter-proposal'
     assert vote.yeas_percentage == 100.0
@@ -232,13 +232,13 @@ def test_ballot_answer_counter_tie_breaker_decides(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yeas=70, nays=30, counted=True, municipality_id=1))
+            group='x', yeas=70, nays=30, counted=True, entity_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yeas=80, nays=20, counted=True, municipality_id=1))
+            group='x', yeas=80, nays=20, counted=True, entity_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
-            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, entity_id=1))
 
     assert vote.answer == 'proposal'
     assert vote.yeas_percentage == 70.0
@@ -269,13 +269,13 @@ def test_ballot_answer_nobody_wins(session):
     # if only the proposal is accepted, the proposal wins
     vote.proposal.results.append(
         BallotResult(
-            group='x', yeas=0, nays=100, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=100, counted=True, entity_id=1))
     vote.counter_proposal.results.append(
         BallotResult(
-            group='x', yeas=0, nays=100, counted=True, municipality_id=1))
+            group='x', yeas=0, nays=100, counted=True, entity_id=1))
     vote.tie_breaker.results.append(
         BallotResult(
-            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, entity_id=1))
 
     assert vote.answer == 'rejected'
 
@@ -293,13 +293,13 @@ def test_vote_progress(session):
     session.flush()
 
     vote.proposal.results.append(
-        BallotResult(group='1', counted=True, municipality_id=1)
+        BallotResult(group='1', counted=True, entity_id=1)
     )
     vote.proposal.results.append(
-        BallotResult(group='2', counted=True, municipality_id=1)
+        BallotResult(group='2', counted=True, entity_id=1)
     )
     vote.proposal.results.append(
-        BallotResult(group='3', counted=False, municipality_id=1)
+        BallotResult(group='3', counted=False, entity_id=1)
     )
 
     assert vote.progress == (2, 3)
@@ -324,7 +324,7 @@ def test_vote_turnout(session):
             counted=True,
             elegible_voters=100,
             yeas=10,
-            municipality_id=1
+            entity_id=1
         )
     )
 
@@ -334,7 +334,7 @@ def test_vote_turnout(session):
     assert vote.proposal.turnout == 10
 
 
-def test_vote_percentage_by_municipality(session):
+def test_vote_percentage_by_entity(session):
     vote = Vote(
         title="Abstimmung",
         domain='federation',
@@ -348,20 +348,20 @@ def test_vote_percentage_by_municipality(session):
 
     vote.proposal.results.append(
         BallotResult(
-            group='1', municipality_id=1,
+            group='1', entity_id=1,
             counted=True, elegible_voters=100, yeas=75, nays=25
         )
     )
     vote.proposal.results.append(
         BallotResult(
-            group='1', municipality_id=1,
+            group='1', entity_id=1,
             counted=True, elegible_voters=100, yeas=25, nays=75
         )
     )
 
     session.flush()
 
-    assert vote.proposal.percentage_by_municipality() == {
+    assert vote.proposal.percentage_by_entity() == {
         1: {'counted': True, 'yeas_percentage': 50.0, 'nays_percentage': 50.0}
     }
 
@@ -389,7 +389,7 @@ def test_ballot_results_aggregation(session):
             nays=69,
             empty=14,
             invalid=5,
-            municipality_id=1,
+            entity_id=1,
         ),
         BallotResult(
             group='ZG/Menzingen',
@@ -398,7 +398,7 @@ def test_ballot_results_aggregation(session):
             nays=28,
             empty=5,
             invalid=0,
-            municipality_id=1,
+            entity_id=1,
         )
     ])
 
@@ -436,7 +436,7 @@ def test_ballot_results_aggregation(session):
         BallotResult(
             group='ZG/Baar',
             counted=False,
-            municipality_id=1,
+            entity_id=1,
         ),
     )
     session.flush()
@@ -504,9 +504,9 @@ def test_vote_last_result_change(session):
     # if only the proposal is accepted, the proposal wins
     with freeze_time("2015-01-01 12:00"):
         vote.proposal.results.append(BallotResult(
-            group='x', yeas=100, nays=0, counted=True, municipality_id=1))
+            group='x', yeas=100, nays=0, counted=True, entity_id=1))
         vote.proposal.results.append(BallotResult(
-            group='y', yeas=0, nays=100, counted=True, municipality_id=1))
+            group='y', yeas=0, nays=100, counted=True, entity_id=1))
 
         session.flush()
 
@@ -514,7 +514,7 @@ def test_vote_last_result_change(session):
 
     with freeze_time("2015-01-01 13:00"):
         vote.proposal.results.append(BallotResult(
-            group='z', yeas=100, nays=0, counted=True, municipality_id=1))
+            group='z', yeas=100, nays=0, counted=True, entity_id=1))
 
         session.flush()
 
@@ -552,21 +552,21 @@ def test_vote_export(session):
             invalid=5,
             empty=10,
             elegible_voters=150,
-            municipality_id=1,
+            entity_id=1,
         )
     )
     vote.proposal.results.append(
         BallotResult(
             group='Bar Town',
             counted=False,
-            municipality_id=2,
+            entity_id=2,
         )
     )
     vote.counter_proposal.results.append(
         BallotResult(
             group='Foo Town',
             counted=False,
-            municipality_id=1,
+            entity_id=1,
         )
     )
 
@@ -581,7 +581,7 @@ def test_vote_export(session):
             'type': "proposal",
             'counted': True,
             'group': "Foo Town",
-            'municipality_id': 1,
+            'entity_id': 1,
             'yeas': 90,
             'nays': 45,
             'invalid': 5,
@@ -596,7 +596,7 @@ def test_vote_export(session):
             'type': "proposal",
             'counted': False,
             'group': "Bar Town",
-            'municipality_id': 2,
+            'entity_id': 2,
             'yeas': 0,
             'nays': 0,
             'invalid': 0,
@@ -611,7 +611,7 @@ def test_vote_export(session):
             'type': "counter-proposal",
             'counted': False,
             'group': "Foo Town",
-            'municipality_id': 1,
+            'entity_id': 1,
             'yeas': 0,
             'nays': 0,
             'invalid': 0,

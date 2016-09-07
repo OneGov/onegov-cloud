@@ -3,6 +3,17 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds a new domain of influence: municipality.
+  The following rows have been renamed:
+
+  - Election.total_municipalities -> Election.total_entities
+  - Election.counted_municipalities -> Election.counted_entities
+  - ElectionResult.municipality_id -> Election.entity_id
+  - BallotResult.municipality_id -> Election.entity_id
+
+  [msom]
+
 0.8.0 (2016-08-26)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -23,6 +34,7 @@ Unreleased
 
 - Changes the behaviour of the last_result_change function to include the last
   change of the election/vote, too.
+  [msom]
 
 0.6.0 (2016-06-23)
 ~~~~~~~~~~~~~~~~~~~
@@ -114,6 +126,7 @@ Unreleased
 ~~~~~~~~~~~~~~~~~~~
 
 - Renames the "yays" to "yeas", the correct spelling.
+  [href]
 
 0.0.3 (2015-06-26)
 ~~~~~~~~~~~~~~~~~~~

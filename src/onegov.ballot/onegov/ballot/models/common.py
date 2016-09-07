@@ -11,6 +11,7 @@ class DomainOfInfluenceMixin(object):
         Enum(
             'federation',
             'canton',
+            'municipality',
             name='domain_of_influence'
         ),
         nullable=False

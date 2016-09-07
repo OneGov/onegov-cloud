@@ -65,7 +65,7 @@ def test_election_create_all_models(session):
     election_result = ElectionResult(
         election_id=election.id,
         group='group',
-        municipality_id=1000,
+        entity_id=1000,
         elegible_voters=0,
         received_ballots=0,
         blank_ballots=0,
@@ -178,7 +178,7 @@ def test_election_summarized_properties(session):
         election.results.append(
             ElectionResult(
                 group='group',
-                municipality_id=x,
+                entity_id=x,
                 elegible_voters=100 * x,
                 received_ballots=80 * x,
                 blank_ballots=4 * x,
@@ -208,7 +208,7 @@ def test_derived_properties(session):
     )
     election.results.append(ElectionResult(
         group='group',
-        municipality_id=1,
+        entity_id=1,
         elegible_voters=100,
         received_ballots=50,
         blank_ballots=2,
@@ -218,7 +218,7 @@ def test_derived_properties(session):
     ))
     election.results.append(ElectionResult(
         group='group',
-        municipality_id=2,
+        entity_id=2,
         elegible_voters=200,
         received_ballots=150,
         blank_ballots=6,
@@ -261,19 +261,19 @@ def test_election_counted(session):
 
     assert election.counted == False
 
-    election.total_municipalities = 2
+    election.total_entities = 2
     assert election.counted == False
 
-    election.counted_municipalities = 1
+    election.counted_entities = 1
     assert election.counted == False
 
-    election.counted_municipalities = 2
+    election.counted_entities = 2
     assert election.counted == True
 
-    election.total_municipalities = 0
+    election.total_entities = 0
     assert election.counted == False
 
-    election.total_municipalities = None
+    election.total_entities = None
     assert election.counted == False
 
 
@@ -292,7 +292,7 @@ def test_election_last_result_change(session):
     with freeze_time("2015-01-01 12:00"):
         election.results.append(ElectionResult(
             group='group',
-            municipality_id=1,
+            entity_id=1,
             elegible_voters=100,
             received_ballots=50,
             blank_ballots=2,
@@ -309,7 +309,7 @@ def test_election_last_result_change(session):
     with freeze_time("2015-01-01 13:00"):
         election.results.append(ElectionResult(
             group='group',
-            municipality_id=2,
+            entity_id=2,
             elegible_voters=200,
             received_ballots=150,
             blank_ballots=6,
@@ -340,10 +340,10 @@ def test_election_results(session):
     assert sorted((c.votes for c in election.candidates)) == []
     assert sorted((c.votes for c in election.list_connections)) == []
 
-    # Add two municipalities
+    # Add two entities
     election_result_1 = ElectionResult(
         group='group',
-        municipality_id=1,
+        entity_id=1,
         elegible_voters=1000,
         received_ballots=500,
         blank_ballots=10,
@@ -353,7 +353,7 @@ def test_election_results(session):
     )
     election_result_2 = ElectionResult(
         group='group',
-        municipality_id=2,
+        entity_id=2,
         elegible_voters=100,
         received_ballots=50,
         blank_ballots=1,
@@ -447,7 +447,7 @@ def test_election_results(session):
     election.candidates.append(candidate_4)
     election.candidates.append(candidate_5)
 
-    # Add 4 candidate results to the first municipality
+    # Add 4 candidate results to the first entity
     election_result_1.candidate_results.append(
         CandidateResult(
             candidate_id=candidate_1.id,
@@ -473,7 +473,7 @@ def test_election_results(session):
         )
     )
 
-    # Add 2 candidate results to the second municipality
+    # Add 2 candidate results to the second entity
     election_result_2.candidate_results.append(
         CandidateResult(
             candidate_id=candidate_1.id,
@@ -487,7 +487,7 @@ def test_election_results(session):
         )
     )
 
-    # Add 3 list results to the first municipality
+    # Add 3 list results to the first entity
     election_result_1.list_results.append(
         ListResult(
             list_id=list_1.id,
@@ -507,7 +507,7 @@ def test_election_results(session):
         )
     )
 
-    # Add 2 list results to the second municipality
+    # Add 2 list results to the second entity
     election_result_2.list_results.append(
         ListResult(
             list_id=list_1.id,
@@ -591,8 +591,8 @@ def test_election_export(session):
         date=date(2015, 6, 14),
         number_of_mandates=1,
         absolute_majority=144,
-        counted_municipalities=1,
-        total_municipalities=2
+        counted_entities=1,
+        total_entities=2
     )
 
     connection = ListConnection(
@@ -647,7 +647,7 @@ def test_election_export(session):
 
     election_result = ElectionResult(
         group='group',
-        municipality_id=1,
+        entity_id=1,
         elegible_voters=1000,
         received_ballots=500,
         blank_ballots=10,
@@ -689,22 +689,23 @@ def test_election_export(session):
         {
             'election_title': 'Election',
             'election_date': '2015-06-14',
+            'election_domain': 'federation',
             'election_type': 'majorz',
             'election_mandates': 1,
             'election_absolute_majority': 144,
-            'election_counted_municipalities': 1,
-            'election_total_municipalities': 2,
-            'municipality_name': 'group',
-            'municipality_bfs_number': 1,
-            'municipality_elegible_voters': 1000,
-            'municipality_received_ballots': 500,
-            'municipality_blank_ballots': 10,
-            'municipality_invalid_ballots': 5,
-            'municipality_unaccounted_ballots': 15,
-            'municipality_accounted_ballots': 485,
-            'municipality_blank_votes': 80,
-            'municipality_invalid_votes': 120,
-            'municipality_accounted_votes': 285,
+            'election_counted_entities': 1,
+            'election_total_entities': 2,
+            'entity_name': 'group',
+            'entity_id': 1,
+            'entity_elegible_voters': 1000,
+            'entity_received_ballots': 500,
+            'entity_blank_ballots': 10,
+            'entity_invalid_ballots': 5,
+            'entity_unaccounted_ballots': 15,
+            'entity_accounted_ballots': 485,
+            'entity_blank_votes': 80,
+            'entity_invalid_votes': 120,
+            'entity_accounted_votes': 285,
             'list_name': 'Kwik-E-Major',
             'list_id': '2',
             'list_number_of_mandates': 0,
@@ -716,26 +717,26 @@ def test_election_export(session):
             'candidate_id': '2',
             'candidate_elected': False,
             'candidate_votes': 111
-        },
-        {
+        }, {
             'election_title': 'Election',
             'election_date': '2015-06-14',
+            'election_domain': 'federation',
             'election_type': 'majorz',
             'election_mandates': 1,
             'election_absolute_majority': 144,
-            'election_counted_municipalities': 1,
-            'election_total_municipalities': 2,
-            'municipality_name': 'group',
-            'municipality_bfs_number': 1,
-            'municipality_elegible_voters': 1000,
-            'municipality_received_ballots': 500,
-            'municipality_blank_ballots': 10,
-            'municipality_invalid_ballots': 5,
-            'municipality_unaccounted_ballots': 15,
-            'municipality_accounted_ballots': 485,
-            'municipality_blank_votes': 80,
-            'municipality_invalid_votes': 120,
-            'municipality_accounted_votes': 285,
+            'election_counted_entities': 1,
+            'election_total_entities': 2,
+            'entity_name': 'group',
+            'entity_id': 1,
+            'entity_elegible_voters': 1000,
+            'entity_received_ballots': 500,
+            'entity_blank_ballots': 10,
+            'entity_invalid_ballots': 5,
+            'entity_unaccounted_ballots': 15,
+            'entity_accounted_ballots': 485,
+            'entity_blank_votes': 80,
+            'entity_invalid_votes': 120,
+            'entity_accounted_votes': 285,
             'list_name': 'Quimby Again!',
             'list_id': '1',
             'list_number_of_mandates': 1,

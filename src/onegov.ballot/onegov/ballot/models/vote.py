@@ -12,7 +12,10 @@ from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
-class DerivedPercentage(object):
+class DerivedAttributes(object):
+
+    """ A simple mixin to add commonly used functions to ballots and their
+    results. """
 
     @hybrid_property
     def yeas_percentage(self):
@@ -37,9 +40,6 @@ class DerivedPercentage(object):
         """ The percentage of nays (discounts empty/invalid ballots). """
         return 100 - self.yeas_percentage
 
-
-class DerivedAcceptance(object):
-
     @hybrid_property
     def accepted(self):
         return self.yeas > self.nays if self.counted else None
@@ -50,6 +50,9 @@ class DerivedAcceptance(object):
 
 
 class DerivedBallotsCount(object):
+
+    """ A simple mixin to add commonly used functions to votes, ballots and
+    their results. """
 
     @hybrid_property
     def cast_ballots(self):
@@ -252,7 +255,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         return max(last_changes)
 
     def export(self):
-        """ Returns all date connected to this vote as list with dicts.
+        """ Returns all data connected to this vote as list with dicts.
 
         This is meant as a base for json/csv/excel exports. The result is
         therefore a flat list of dictionaries with repeating values to avoid
@@ -271,7 +274,8 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
             Internal shortcode (defines the ordering of votes on the same day).
 
         * ``domain``:
-            ``federation`` for federal, ``canton`` for cantonal votes.
+            ``federation`` for federal, ``canton`` for cantonal,
+            ``municipality`` for communal votes.
 
         * ``type``:
             ``proposal`` (Vorschlag), ``counter-proposal`` (Gegenvorschlag) or
@@ -282,8 +286,8 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
             city's district divided by a slash or simply the town's name. This
             depends entirely on the canton.
 
-        * ``municipality_id``: The id of the municipality/locale. Better known
-            as the "BFS Nummer".
+        * ``entity_id``: The id of the political entity. The
+            "BFS Nummer" for example.
 
         * ``counted``: True if the result was counted, False if the result is
             not known yet (the voting counts are not final yet).
@@ -318,7 +322,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
                 row['domain'] = self.domain
                 row['type'] = ballot.type
                 row['group'] = result.group
-                row['municipality_id'] = result.municipality_id
+                row['entity_id'] = result.entity_id
                 row['counted'] = result.counted
                 row['yeas'] = result.yeas
                 row['nays'] = result.nays
@@ -331,8 +335,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         return rows
 
 
-class Ballot(Base, TimestampMixin,
-             DerivedPercentage, DerivedAcceptance, DerivedBallotsCount):
+class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
     """ A ballot contains a single question asked for a vote.
 
     Usually each vote has exactly one ballot, but it's possible for votes to
@@ -427,25 +430,25 @@ class Ballot(Base, TimestampMixin,
 
         return expr
 
-    def percentage_by_municipality(self):
+    def percentage_by_entity(self):
         """ Returns the yeas/nays percentage grouped and keyed by
-        municipality_id.
+        entity_id.
 
-        Uncounted municipalities are not included.
+        Uncounted entities are not included.
 
         """
 
         query = object_session(self).query(BallotResult)
 
         query = query.with_entities(
-            BallotResult.municipality_id,
+            BallotResult.entity_id,
             func.sum(BallotResult.yeas),
             func.sum(BallotResult.nays),
             BallotResult.counted
         )
 
         query = query.group_by(
-            BallotResult.municipality_id,
+            BallotResult.entity_id,
             BallotResult.counted
         )
 
@@ -465,8 +468,8 @@ class Ballot(Base, TimestampMixin,
         return result
 
 
-class BallotResult(Base, TimestampMixin,
-                   DerivedPercentage, DerivedAcceptance, DerivedBallotsCount):
+class BallotResult(Base, TimestampMixin, DerivedAttributes,
+                   DerivedBallotsCount):
     """ The result of a specific ballot. Each ballot may have multiple
     results. Those results may be aggregated or not.
 
@@ -484,8 +487,8 @@ class BallotResult(Base, TimestampMixin,
     #: '/ZH/Bezirk Zürich/Stadt Zürich'
     group = Column(Text, nullable=False)
 
-    #: The municipality id (BFS Nummer).
-    municipality_id = Column(Integer, nullable=False)
+    #: The entity id (e.g. BFS number).
+    entity_id = Column(Integer, nullable=False)
 
     #: True if the result has been counted and no changes will be made anymore.
     #: If the result is definite, all the values below must be specified.

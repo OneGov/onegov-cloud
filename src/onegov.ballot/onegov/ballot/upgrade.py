@@ -63,3 +63,17 @@ def add_meta_data_columns(context):
 
     if not context.has_column('votes', 'meta'):
         context.operations.add_column('votes', Column('meta', JSON()))
+
+
+@upgrade_task('Add municipality domain of influence')
+def add_municipality_domain(context):
+    renames = (
+        ('elections', 'total_municipalities', 'total_entities'),
+        ('elections', 'counted_municipalities', 'counted_entities'),
+        ('election_results', 'municipality_id', 'entity_id'),
+        ('ballot_results', 'municipality_id', 'entity_id'),
+    )
+
+    for table, old, new in renames:
+        if context.has_column(table, old):
+            context.operations.alter_column(table, old, new_column_name=new)
