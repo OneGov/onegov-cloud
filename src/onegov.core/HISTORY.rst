@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Adds a runtime bound cache, not shared between processes and able to
+  accept any kind of object to cache (no pickling).
+  [href]
+
 0.25.1 (2016-09-01)
 ~~~~~~~~~~~~~~~~~~~
 

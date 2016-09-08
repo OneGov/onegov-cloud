@@ -376,7 +376,8 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         if self.has_database_connection:
             self.session_manager.set_current_schema(self.schema)
 
-    def get_cache(self, namespace, expiration_time=None):
+    def get_cache(self, namespace, expiration_time=None, backend=None,
+                  backend_args=None):
         """ Creates a new cache backend for this application or reuses an
         existing one. Each backend is bound to a namespace and has its own
         expiration time (ttl).
@@ -388,11 +389,17 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         """
 
         if namespace not in self._caches:
+            backend = backend or self.cache_backend
+            backend_args = backend_args or self.cache_backend_arguments
+
+            if backend == 'dogpile.cache.memory':
+                expiration_time = backend_args = None
+
             self._caches[namespace] = cache.create_backend(
                 namespace=namespace,
                 expiration_time=expiration_time,
-                backend=self.cache_backend,
-                arguments=self.cache_backend_arguments,
+                backend=backend,
+                arguments=backend_args,
             )
 
         return self._caches[namespace]
@@ -406,6 +413,28 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def cache(self):
         """ A cache that might be invalidated frequently. """
         return self.get_cache(self.application_id + ':x', expiration_time=3600)
+
+    @property
+    def runtime_cache(self):
+        """ A cache bound to the runtime of the process and the application id.
+
+        The cache is not shared between processes and each application id
+        has it's own.
+
+        Note that this does build on dogpile.cache but doesn't use pickling.
+        This allows for a wider range of objects stored in the cache, but
+        it also means that the cache doesn't hold copied values.
+
+        Also, dogpile.cache in memory doesn't properly support expiration
+        time, so the values in the runtime_cache do not expire (until the
+        process closes of course).
+
+        """
+
+        return self.get_cache(
+            self.application_id + ':r',
+            backend='dogpile.cache.memory'
+        )
 
     @property
     def settings(self):

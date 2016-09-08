@@ -85,3 +85,21 @@ def test_cache_key():
     })
 
     region.set('x' * 500, 'y')
+
+
+def test_runtime_cache():
+
+    app = Framework()
+    app.namespace = 'towns'
+    app.configure_application(disable_memcached=True)
+
+    app.set_application_id('towns/foo')
+    app.runtime_cache.set('foo', 'bar')
+
+    assert app.runtime_cache.get('foo') == 'bar'
+
+    app.set_application_id('towns/bar')
+    assert app.runtime_cache.get('foo') is cache.NO_VALUE
+
+    app.set_application_id('towns/foo')
+    assert app.runtime_cache.get('foo') == 'bar'
