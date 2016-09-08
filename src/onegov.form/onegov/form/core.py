@@ -447,17 +447,62 @@ def merge_forms(*forms):
     class MergedForm(*forms):
         pass
 
-    processed = set()
     fields_in_order = (
         name for cls in forms for name, field
         in utils.get_fields_from_class(cls)
     )
 
+    return enforce_order(MergedForm, fields_in_order)
+
+
+def enforce_order(form_class, fields_in_order):
+    """ Takes a list of fields used in a form_class and enforces the
+    order of those fields.
+
+    If not all fields in the form are given, the resulting order is undefined.
+
+    """
+
+    # XXX to make sure the field order of the existing class remains
+    # unchanged, we need to instantiate the class once (wtforms seems
+    # to do some housekeeping somehwere)
+    form_class()
+
+    class EnforcedOrderForm(form_class):
+        pass
+
+    processed = set()
+
     for counter, name in enumerate(fields_in_order, start=1):
         if name in processed:
             continue
 
-        getattr(MergedForm, name).creation_counter = counter
+        getattr(EnforcedOrderForm, name).creation_counter = counter
         processed.add(name)
 
-    return MergedForm
+    return EnforcedOrderForm
+
+
+def move_fields(form_class, fields, after):
+    """ Reorders the given fields (given by name) by inserting them directly
+    after the given field.
+
+    If ``after`` is None, the fields are moved to the end.
+
+    """
+
+    fields_in_order = []
+
+    for name, _ in utils.get_fields_from_class(form_class):
+        if name in fields:
+            continue
+
+        fields_in_order.append(name)
+
+        if name == after:
+            fields_in_order.extend(fields)
+
+    if after is None:
+        fields_in_order.extend(fields)
+
+    return enforce_order(form_class, fields_in_order)

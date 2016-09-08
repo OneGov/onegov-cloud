@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to move in a form class.
+  [href]
+
 0.13.0 (2016-08-30)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,4 +1,4 @@
-from onegov.form import Form, merge_forms, with_options
+from onegov.form import Form, merge_forms, with_options, move_fields
 from wtforms import RadioField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired
@@ -332,3 +332,16 @@ def test_merge_forms():
     assert full.is_valid_name()
     assert full.is_valid_coordinate()
     assert full.is_valid_user()
+
+
+def test_move_fields():
+
+    class Test(Form):
+        a = StringField('a')
+        b = StringField('b')
+        c = StringField('c')
+
+    Moved = move_fields(Test, ['a'], None)
+
+    assert list(Test()._fields.keys()) == ['a', 'b', 'c']
+    assert list(Moved()._fields.keys()) == ['b', 'c', 'a']
