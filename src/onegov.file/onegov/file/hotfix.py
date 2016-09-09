@@ -10,7 +10,7 @@ def receive_before_configured():
 
     # XXX temporary fix for https://github.com/amol-/depot/issues/33
     version = pkg_resources.get_distribution('filedepot').version
-    whitelisted = ('0.3.0', '0.3.1')
+    whitelisted = ('0.3.0', '0.3.1', '0.4.0')
 
     assert version in whitelisted
 
