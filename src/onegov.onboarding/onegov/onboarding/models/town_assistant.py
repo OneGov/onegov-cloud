@@ -1,7 +1,6 @@
 import morepath
 import re
 
-from libres.context.registry import create_default_registry
 from onegov.core import utils
 from onegov.core.crypto import random_password
 from onegov.core.templates import render_template
@@ -10,7 +9,7 @@ from onegov.onboarding.errors import AlreadyExistsError
 from onegov.onboarding.forms import FinishForm, TownForm
 from onegov.onboarding.layout import MailLayout
 from onegov.onboarding.models.assistant import Assistant
-from onegov.town.initial_content import add_initial_content
+from onegov.town.initial_content import create_new_organisation
 from onegov.org.models import Organisation
 from onegov.user import UserCollection
 
@@ -139,12 +138,7 @@ class TownAssistant(Assistant):
             if session.query(Organisation).first():
                 raise AlreadyExistsError
 
-            add_initial_content(
-                libres_registry=create_default_registry(),
-                session_manager=self.app.session_manager,
-                org_name=name,
-                reply_to=user
-            )
+            create_new_organisation(self.app, name=name, reply_to=user)
 
             org = session.query(Organisation).first()
             org.theme_options['primary-color'] = color
