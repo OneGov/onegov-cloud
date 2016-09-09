@@ -57,7 +57,7 @@ def new_org_app(postgres_dsn, filestorage, test_password, smtp, es_url=None):
     app.set_application_id(app.namespace + '/' + 'test')
     app.bind_depot()
 
-    create_new_organisation(request=None, app=app, name="Govikon")
+    create_new_organisation(app=app, name="Govikon")
 
     # cronjobs leave lingering sessions open, in real life this is not a
     # problem, but in testing it leads to connection pool exhaustion

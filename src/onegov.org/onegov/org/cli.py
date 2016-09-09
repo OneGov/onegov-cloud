@@ -40,7 +40,7 @@ def add(group_context, name):
             abort("{} already contains an organisation".format(
                 group_context.selector))
 
-        app.settings.org.create_new_organisation(request, app, name)
+        app.settings.org.create_new_organisation(app, name)
 
         click.echo("{} was created successfully".format(name))
 

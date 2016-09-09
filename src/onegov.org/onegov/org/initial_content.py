@@ -12,7 +12,7 @@ from onegov.org.models import Organisation
 from sedate import as_datetime
 
 
-def create_new_organisation(request, app, name):
+def create_new_organisation(app, name):
 
     org = Organisation(name=name)
     org.homepage_structure = textwrap.dedent("""
