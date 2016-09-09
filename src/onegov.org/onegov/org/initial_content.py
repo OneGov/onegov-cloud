@@ -1,5 +1,4 @@
 import codecs
-import mistune
 import os
 import textwrap
 
@@ -7,82 +6,84 @@ from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
 from onegov.form import FormCollection
-from onegov.libres import LibresIntegration, ResourceCollection
+from onegov.libres import ResourceCollection
 from onegov.page import PageCollection
 from onegov.org.models import Organisation
 from sedate import as_datetime
 
 
 def create_new_organisation(request, app, name):
-    add_initial_content(app.libres_registry, app.session_manager, name)
 
+    org = Organisation(name=name)
+    org.homepage_structure = textwrap.dedent("""
+        <row>
+            <column span="8">
+                <homepage-cover />
+                <news />
+            </column>
+            <column span="4">
+                <panel>
+                    <links title="Dienstleistungen">
+                        <link url="./formulare"
+                            description="Anfragen &amp; Rückmeldungen">
+                            Formulare
+                        </link>
+                        <link url="./ressourcen"
+                            description="Räume &amp; Tageskarten">
+                            Reservationen
+                        </link>
+                    </links>
+                </panel>
+                <panel>
+                    <events />
+                </panel>
+                <panel>
+                    <links title="Verzeichnisse">
+                        <link url="./personen"
+                            description="Alle Kontakte">
+                            Personen
+                        </link>
+                        <link url="./fotoalben"
+                            description="Impressionen">
+                            Fotoalben
+                        </link>
+                        <link url="./a-z"
+                            description="Kataolg A-Z">
+                            Themen
+                        </link>
+                    </links>
+                </panel>
+            </column>
+        </row>
+    """)
 
-def add_initial_content(libres_registry, session_manager, org_name,
-                        form_definitions=None, reply_to=None):
-    """ Adds the initial content for the given organisation on the given
-    session. All content that comes with a new organisation is added here.
-
-    Note, the ``form_definitions`` parameter is used to speed up testing,
-    you usually do not want to specify it.
-
-    """
-
-    session = session_manager.session()
-
-    libres_context = LibresIntegration.libres_context_from_session_manager(
-        libres_registry, session_manager)
-
-    # can only be called if no organisation is defined yet
-    assert not session.query(Organisation).first()
-
-    if reply_to:
-        meta = {
-            'reply_to': reply_to
-        }
-    else:
-        meta = {}
-
-    session.add(Organisation(name=org_name, meta=meta))
+    session = app.session()
+    session.add(org)
 
     add_root_pages(session)
-    add_builtin_forms(session, form_definitions)
-    add_resources(libres_context)
-    add_events(session, org_name)
-    add_welcome_page(session)
-
-    session.flush()
+    add_builtin_forms(session)
+    add_events(session, name)
+    add_resources(app.libres_context)
 
 
 def add_root_pages(session):
     pages = PageCollection(session)
 
     pages.add_root(
-        "Leben & Wohnen",
-        name='leben-wohnen',
+        "Organisation",
+        name='organisation',
         type='topic',
         meta={'trait': 'page'}
-    ),
+    )
     pages.add_root(
-        "Kultur & Freizeit",
-        name='kultur-freizeit',
+        "Themen",
+        name='themen',
         type='topic',
         meta={'trait': 'page'}
-    ),
+    )
     pages.add_root(
-        "Bildung & Gesellschaft",
-        name='bildung-gesellschaft',
-        type='topic',
-        meta={'trait': 'page'}
-    ),
-    pages.add_root(
-        "Gewerbe & Tourismus",
-        name='gewerbe-tourismus',
-        type='topic',
-        meta={'trait': 'page'}
-    ),
-    pages.add_root(
-        "Politik & Verwaltung",
-        name='politik-verwaltung',
+        "Kontakt",
+        name='kontakt',
         type='topic',
         meta={'trait': 'page'}
     )
@@ -94,115 +95,12 @@ def add_root_pages(session):
     )
 
 
-def add_welcome_page(session):
-
-    # for now only in German, translating through gettext is not the right way
-    # here, because it splits the text into fragments which results in an
-    # incoherent text
-    title = "Willkommen bei OneGov"
-
-    lead = """
-        Der Online Schalter für Ihre Gemeinde kann ab sofort genutzt
-        werden. Um erste Schritte, mehr Informationen und eine kurze Übersicht
-        zu erhalten klicken Sie einfach auf den Titel dieser Nachricht.
-    """.replace('\n', '').strip('').replace('  ', ' ')
-
-    text = textwrap.dedent("""\
-        ## Erste Schritte
-
-        Die folgenden Vorschläge helfen Ihnen sich in der OneGov Cloud zurecht
-        zu finden. Falls Sie das lieber auf eigene Faust tun, können Sie diese
-        Schritte gerne überspringen.
-
-        **Melden Sie sich an**
-
-        Sie können sich ab sofort mit Ihrer E-Mail Adresse anmelden. Sie haben
-        das Passwort vergessen? Kein Problem,
-        [setzen Sie es zurück](/request-password).
-
-        **Passen Sie das Aussehen Ihren Bedürfnissen an**
-
-        OneGov Cloud lässt sich nach Ihrem Gusto einrichten. Sie können das
-        Logo, die Bilder auf der Startseite und mehr in den
-        [Einstellungen](/einstellungen) ändern.
-
-        **Stellen Sie Ihre Gemeinde vor**
-
-        Klicken Sie auf **Leben & Wohnen** in der Navigation und
-        anschliessend auf **Hinzufügen > Thema** gleich unterhalb der
-        Hauptnavigation. Sie sehen **Hinzufügen** nicht? Dann müssen Sie sich
-        erst noch anmelden.
-
-        **Füllen Sie ein Formular aus**
-
-        Im [Online-Schalter](/formulare) gibt es eine ganze Reihe von
-        Formularen die Bürger ausfüllen können. Füllen Sie ein Formular aus
-        und ein Ticket wird geöffnet.
-
-        In den [Tickets](/tickets/ALL/open?page=0) können Sie das Ticket
-        anschliessend bearbeiten. Übrigens: Sie können jederzeit eigene
-        Formulare hinzufügen. Die mitgelieferten Formulare sind lediglich
-        Vorschläge.
-
-        ## Über Ihre OneGov Cloud Instanz
-
-        Es gibt noch viel mehr zu entdecken - wir möchten an dieser Stelle
-        nicht schon alles verraten.
-
-        Ihre OneGov Cloud Instanz läuft auf einer Testumgebung, welche
-        frühestens nach zwei Wochen verfällt. Sie können OneGov Cloud also
-        in aller Ruhe testen.
-
-        Zwar ist die Cloud für alle Personen zugänglich, wir stellen aber
-        sicher dass sie nicht von Suchmaschinen gefunden wird. Wir
-        möchten ja nicht das Ihre Bürger auf der falschen Seite landen.
-
-        Sollten Sie Fragen haben, können Sie sich jederzeit an uns wenden:
-
-        OneGov Cloud <br>
-        Fabian Reinhard <br>
-        Unter der Egg 5 <br>
-        6004 Luzern <br>
-        Tel. +41 41 511 22 50 <br>
-        [fabian.reinhard@seantis.ch](fabian.reinhard@seantis.ch)
-
-        ## Wie weiter
-
-        Falls wir Sie überzeugen können melden Sie sich bei uns und wir
-        können Ihre Testumgebung in eine produktive Umgebung überführen. Wir
-        würden uns sehr freuen!
-    """)
-
-    pages = PageCollection(session)
-    pages.add(
-        parent=pages.by_path('aktuelles'),
-        title=title,
-        type='news',
-        meta={
-            'trait': 'page'
-        },
-        content={
-            'lead': lead,
-            'text': mistune.markdown(text, escape=False)
-        }
-    )
-
-
 def add_builtin_forms(session, definitions=None):
     forms = FormCollection(session).definitions
     definitions = definitions or builtin_form_definitions()
 
     for name, title, definition in definitions:
-        form = forms.by_name(name)
-
-        if form:
-            # update
-            if form.title != title:
-                form.title = title
-            if form.definition != definition:
-                form.definition = definition
-        else:
-            # add
+        if not forms.by_name(name):
             form = forms.add(
                 name=name,
                 title=title,
@@ -244,51 +142,58 @@ def load_definition(path):
 def add_resources(libres_context):
     resource = ResourceCollection(libres_context)
     resource.add(
-        "SBB-Tageskarte",
+        "Tageskarte",
         'Europe/Zurich',
         type='daypass',
-        name='sbb-tageskarte'
+        name='tageskarte'
+    )
+    resource.add(
+        "Konferenzraum",
+        'Europe/Zurich',
+        type='room',
+        name='konferenzraum'
     )
 
 
-def add_events(session, org_name):
+def add_events(session, name):
     start = as_datetime(datetime.today().date())
+
     while start.weekday() != 6:
         start = start + timedelta(days=1)
 
     events = EventCollection(session)
     event = events.add(
-        title="150 Jahre {}".format(org_name),
+        title="150 Jahre {}".format(name),
         start=start + timedelta(hours=11, minutes=0),
         end=start + timedelta(hours=22, minutes=0),
         timezone="Europe/Zurich",
         tags=["Party"],
         location="Sportanlage",
         content={
-            "description": "Lorem ipsum.",
-            "organizer": "Gemeindeverwaltung"
+            "description": "Wir feiern das 150 jährige Bestehen.",
+            "organizer": name
         },
         meta={"submitter_email": "info@example.org"},
     )
     event.submit()
     event.publish()
     event = events.add(
-        title="Gemeindeversammlung",
+        title="Generalversammlung",
         start=start + timedelta(days=2, hours=20, minutes=0),
         end=start + timedelta(days=2, hours=22, minutes=30),
         timezone="Europe/Zurich",
         tags=["Politics"],
         location="Gemeindesaal",
         content={
-            "description": "Lorem ipsum.",
-            "organizer": "Gemeindeverwaltung"
+            "description": "Alle Jahre wieder.",
+            "organizer": name
         },
         meta={"submitter_email": "info@example.org"},
     )
     event.submit()
     event.publish()
     event = events.add(
-        title="MuKi Turnen",
+        title="Gemeinsames Turnen",
         start=start + timedelta(days=2, hours=10, minutes=0),
         end=start + timedelta(days=2, hours=11, minutes=0),
         recurrence=(
@@ -300,7 +205,7 @@ def add_events(session, org_name):
         tags=["Sports"],
         location="Turnhalle",
         content={
-            "description": "Lorem ipsum.",
+            "description": "Gemeinsam fit werden.",
             "organizer": "Frauenverein"
         },
         meta={"submitter_email": "info@example.org"},
@@ -315,7 +220,7 @@ def add_events(session, org_name):
         tags=["Sports"],
         location="Sportanlage",
         content={
-            "description": "Lorem ipsum.",
+            "description": "Bolzen auf dem Platz.",
             "organizer": "Sportverein"
         },
         meta={"submitter_email": "info@example.org"},

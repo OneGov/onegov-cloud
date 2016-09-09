@@ -13,13 +13,10 @@ def test_initial_content(org_app):
     pages = {p.name: p.title for p in pages}
 
     assert pages == {
-        'leben-wohnen': 'Leben & Wohnen',
-        'kultur-freizeit': 'Kultur & Freizeit',
-        'bildung-gesellschaft': 'Bildung & Gesellschaft',
-        'gewerbe-tourismus': 'Gewerbe & Tourismus',
-        'politik-verwaltung': 'Politik & Verwaltung',
+        'organisation': 'Organisation',
+        'themen': 'Themen',
+        'kontakt': 'Kontakt',
         'aktuelles': 'Aktuelles',
-        'willkommen-bei-onegov': 'Willkommen bei OneGov'
     }
 
     forms = FormCollection(org_app.session()).definitions.query().all()
@@ -38,7 +35,8 @@ def test_initial_content(org_app):
     resources = {r.name: r.type for r in resources}
 
     assert resources == {
-        'sbb-tageskarte': 'daypass'
+        'konferenzraum': 'room',
+        'tageskarte': 'daypass',
     }
 
     assert EventCollection(org_app.session()).query().count() == 4

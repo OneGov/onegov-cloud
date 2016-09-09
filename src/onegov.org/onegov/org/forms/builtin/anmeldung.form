@@ -1,0 +1,27 @@
+Anmeldung
+---------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+E-Mail * = @@@
+AHV-Nummer = # ch.ssn
+Geburtsdatum * = YYYY.MM.DD
+
+# Adresse
+Strasse (inkl. Hausnummer) * = ___
+PLZ / Ort * = ___
+
+# Persönliches
+Ernährung =
+    (x) Alles
+    ( ) Vegetarisch
+    ( ) Vegan
+
+Musikstile =
+    [ ] Pop
+    [ ] Rock
+    [ ] Rap
+
+# Sonstiges
+Bemerkungen = ...

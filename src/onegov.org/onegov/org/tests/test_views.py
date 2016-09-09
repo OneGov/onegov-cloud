@@ -582,20 +582,6 @@ def test_pending_submission_successful_file_upload(org_app):
     # multiple differing fields of the same name...
 
 
-def test_edit_builtin_form(org_app):
-    client = Client(org_app)
-    client.login_editor()
-
-    # the definition is read only and must be discarded in any case
-    form_page = client.get('/formular/wohnsitzbestaetigung/bearbeiten')
-    existing_definition = form_page.form['definition']
-    form_page.form['definition'] = 'x = ___'
-    form_page.form.submit()
-
-    form_page = client.get('/formular/wohnsitzbestaetigung/bearbeiten')
-    form_page.form['definition'] == existing_definition
-
-
 def test_add_custom_form(org_app):
     client = Client(org_app)
     client.login_editor()
@@ -662,7 +648,7 @@ def test_add_duplicate_form(org_app):
 
 def test_delete_builtin_form(org_app):
     client = Client(org_app)
-    builtin_form = '/formular/wohnsitzbestaetigung'
+    builtin_form = '/formular/anmeldung'
 
     response = client.delete(builtin_form, expect_errors=True)
     assert response.status_code == 403
@@ -715,7 +701,7 @@ def test_hide_page(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    new_page = client.get('/themen/leben-wohnen').click('Thema')
+    new_page = client.get('/themen/organisation').click('Thema')
 
     new_page.form['title'] = "Test"
     new_page.form['is_hidden_from_public'] = True
@@ -759,13 +745,13 @@ def test_hide_form(org_app):
     client = Client(org_app)
     client.login_editor()
 
-    form_page = client.get('/formular/wohnsitzbestaetigung/bearbeiten')
+    form_page = client.get('/formular/anmeldung/bearbeiten')
     form_page.form['is_hidden_from_public'] = True
     page = form_page.form.submit().follow()
 
     anonymous = Client(org_app)
     response = anonymous.get(
-        '/formular/wohnsitzbestaetigung', expect_errors=True)
+        '/formular/anmeldung', expect_errors=True)
     assert response.status_code == 403
 
     edit_page = page.click("Bearbeiten")
@@ -823,7 +809,7 @@ def test_with_people(org_app):
     new_person.form['last_name'] = 'Ming'
     new_person.form.submit()
 
-    new_page = client.get('/themen/leben-wohnen').click('Thema')
+    new_page = client.get('/themen/organisation').click('Thema')
 
     assert 'Gordon Flash' in new_page
     assert 'Ming Merciless' in new_page
@@ -851,7 +837,7 @@ def test_delete_linked_person_issue_149(org_app):
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
-    new_page = client.get('/themen/leben-wohnen').click('Thema')
+    new_page = client.get('/themen/organisation').click('Thema')
     new_page.form['title'] = 'About Flash'
     new_page.form['people_gordon_flash'] = True
     new_page.form['people_gordon_flash_function'] = 'Astronaut'
@@ -1027,10 +1013,6 @@ def test_resources(org_app):
     client.login_admin()
 
     resources = client.get('/ressourcen')
-    assert 'SBB-Tageskarte' in resources
-
-    resource = resources.click('SBB-Tageskarte')
-    assert 'calendar' in resource
 
     new = resources.click('Raum')
     new.form['title'] = 'Meeting Room'
@@ -1071,7 +1053,7 @@ def test_clipboard(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    page = client.get('/themen/bildung-gesellschaft')
+    page = client.get('/themen/organisation')
     assert 'paste-link' not in page
 
     page = page.click(
@@ -1082,30 +1064,30 @@ def test_clipboard(org_app):
     assert 'paste-link' in page
 
     page = page.click('Einf').form.submit().follow()
-    assert '/bildung-gesellschaft/bildung-gesellschaft' in page.request.url
+    assert '/organisation/organisation' in page.request.url
 
 
 def test_clipboard_separation(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    page = client.get('/themen/bildung-gesellschaft')
+    page = client.get('/themen/organisation')
     page = page.click('Kopieren')
 
-    assert 'paste-link' in client.get('/themen/bildung-gesellschaft')
+    assert 'paste-link' in client.get('/themen/organisation')
 
     # new client (browser) -> new clipboard
     client = Client(org_app)
     client.login_admin()
 
-    assert 'paste-link' not in client.get('/themen/bildung-gesellschaft')
+    assert 'paste-link' not in client.get('/themen/organisation')
 
 
 def test_copy_pages_to_news(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    page = client.get('/themen/bildung-gesellschaft')
+    page = client.get('/themen/organisation')
     edit = page.click('Bearbeiten')
 
     edit.form['lead'] = '0xdeadbeef'
@@ -1118,7 +1100,7 @@ def test_copy_pages_to_news(org_app):
     assert '0xdeadbeef' in edit
     page = edit.form.submit().follow()
 
-    assert '/aktuelles/bildung-gesellschaft' in page.request.url
+    assert '/aktuelles/organisation' in page.request.url
 
 
 def test_sitecollection(org_app):
@@ -1131,8 +1113,8 @@ def test_sitecollection(org_app):
     collection = client.get('/sitecollection').json
 
     assert collection[0] == {
-        'name': 'Bildung & Gesellschaft',
-        'url': 'http://localhost/themen/bildung-gesellschaft',
+        'name': 'Kontakt',
+        'url': 'http://localhost/themen/kontakt',
         'group': 'Themen'
     }
 
@@ -1143,7 +1125,7 @@ def test_allocations(org_app):
 
     # create a new daypass allocation
     new = client.get((
-        '/ressource/sbb-tageskarte/neue-einteilung'
+        '/ressource/tageskarte/neue-einteilung'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1153,7 +1135,7 @@ def test_allocations(org_app):
 
     # view the daypasses
     slots = client.get((
-        '/ressource/sbb-tageskarte/slots'
+        '/ressource/tageskarte/slots'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1166,7 +1148,7 @@ def test_allocations(org_app):
     edit.form.submit()
 
     slots = client.get((
-        '/ressource/sbb-tageskarte/slots'
+        '/ressource/tageskarte/slots'
         '?start=2015-08-04&end=2015-08-04'
     ))
 
@@ -1175,7 +1157,7 @@ def test_allocations(org_app):
 
     # try to create a new allocation over an existing one
     new = client.get((
-        '/ressource/sbb-tageskarte/neue-einteilung'
+        '/ressource/tageskarte/neue-einteilung'
         '?start=2015-08-04&end=2015-08-04'
     ))
 
@@ -1187,7 +1169,7 @@ def test_allocations(org_app):
 
     # move the existing allocations
     slots = client.get((
-        '/ressource/sbb-tageskarte/slots'
+        '/ressource/tageskarte/slots'
         '?start=2015-08-04&end=2015-08-05'
     ))
 
@@ -1201,7 +1183,7 @@ def test_allocations(org_app):
 
     # get the new slots
     slots = client.get((
-        '/ressource/sbb-tageskarte/slots'
+        '/ressource/tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1212,7 +1194,7 @@ def test_allocations(org_app):
 
     # get the new slots
     slots = client.get((
-        '/ressource/sbb-tageskarte/slots'
+        '/ressource/tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1223,7 +1205,7 @@ def test_allocations(org_app):
 
     # get the new slots
     slots = client.get((
-        '/ressource/sbb-tageskarte/slots'
+        '/ressource/tageskarte/slots'
         '?start=2015-08-06&end=2015-08-07'
     ))
 
@@ -1298,7 +1280,7 @@ def test_reserve_allocation(org_app):
 
     # prepate the required data
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     resource.definition = 'Note = ___'
     scheduler = resource.get_scheduler(org_app.libres_context)
 
@@ -1318,7 +1300,7 @@ def test_reserve_allocation(org_app):
     assert result.headers['X-IC-Trigger'] == 'rc-reservations-changed'
 
     # and fill out the form
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
     formular.form['note'] = 'Foobar'
 
@@ -1345,7 +1327,7 @@ def test_reserve_allocation(org_app):
     client.login_admin()
 
     slots = client.get((
-        '/ressource/sbb-tageskarte/slots'
+        '/ressource/tageskarte/slots'
         '?start=2015-08-28&end=2015-08-28'
     ))
 
@@ -1372,7 +1354,7 @@ def test_reserve_allocation(org_app):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
-    assert 'SBB-Tageskarte' in message
+    assert 'Tageskarte' in message
     assert '28. August 2015' in message
     assert '4' in message
 
@@ -1404,7 +1386,7 @@ def test_reserve_allocation(org_app):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
-    assert 'SBB-Tageskarte' in message
+    assert 'Tageskarte' in message
     assert '28. August 2015' in message
     assert '4' in message
 
@@ -1420,7 +1402,7 @@ def test_reserve_allocation_partially(org_app):
 
     # prepate the required data
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     scheduler = resource.get_scheduler(org_app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1436,7 +1418,7 @@ def test_reserve_allocation_partially(org_app):
     assert reserve('10:00', '12:00').json == {'success': True}
 
     # fill out the form
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
 
     ticket = formular.form.submit().follow().click("Abschliessen").follow()
@@ -1460,13 +1442,13 @@ def test_reserve_allocation_partially(org_app):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
-    assert "SBB-Tageskarte" in message
+    assert "Tageskarte" in message
     assert "28. August 2015" in message
     assert "10:00" in message
     assert "12:00" in message
 
     # see if the slots are partitioned correctly
-    url = '/ressource/sbb-tageskarte/slots?start=2015-08-01&end=2015-08-30'
+    url = '/ressource/tageskarte/slots?start=2015-08-01&end=2015-08-30'
     slots = client.get(url).json
     assert slots[0]['partitions'] == [[50.0, True], [50.0, False]]
 
@@ -1477,7 +1459,7 @@ def test_reserve_no_definition(org_app):
 
     # prepate the required data
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     scheduler = resource.get_scheduler(org_app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1495,7 +1477,7 @@ def test_reserve_no_definition(org_app):
     assert result.json == {'success': True}
 
     # fill out the reservation form
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
 
     ticket = formular.form.submit().follow().click('Abschliessen').follow()
@@ -1509,7 +1491,7 @@ def test_reserve_confirmation_no_definition(org_app):
     client = Client(org_app)
 
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     scheduler = resource.get_scheduler(org_app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1525,7 +1507,7 @@ def test_reserve_confirmation_no_definition(org_app):
     # create a reservation
     assert reserve(quota=4).json == {'success': True}
 
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = "info@example.org"
 
     confirmation = formular.form.submit().follow()
@@ -1552,7 +1534,7 @@ def test_reserve_confirmation_with_definition(org_app):
     client = Client(org_app)
 
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     resource.definition = "Vorname *= ___\nNachname *= ___"
 
     scheduler = resource.get_scheduler(org_app.libres_context)
@@ -1569,7 +1551,7 @@ def test_reserve_confirmation_with_definition(org_app):
     # create a reservation
     assert reserve("10:30", "12:00").json == {'success': True}
 
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = "info@example.org"
     formular.form['vorname'] = "Thomas"
     formular.form['nachname'] = "Anderson"
@@ -1598,7 +1580,7 @@ def test_reserve_session_bound(org_app):
 
     # prepate the required data
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     scheduler = resource.get_scheduler(org_app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1614,7 +1596,7 @@ def test_reserve_session_bound(org_app):
     # create a reservation
     assert reserve(quota=4).json == {'success': True}
 
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
 
     confirm = formular.form.submit().follow()
@@ -1631,7 +1613,7 @@ def test_reserve_in_parallel(org_app):
 
     # prepate the required data
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     scheduler = resource.get_scheduler(org_app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1648,13 +1630,13 @@ def test_reserve_in_parallel(org_app):
 
     # create a reservation
     assert c1_reserve().json == {'success': True}
-    formular = c1.get('/ressource/sbb-tageskarte/formular')
+    formular = c1.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
     f1 = formular.form.submit().follow()
 
     # create a parallel reservation
     assert c2_reserve().json == {'success': True}
-    formular = c2.get('/ressource/sbb-tageskarte/formular')
+    formular = c2.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
     f2 = formular.form.submit().follow()
 
@@ -1669,7 +1651,7 @@ def test_occupancy_view(org_app):
 
     # prepate the required data
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     scheduler = resource.get_scheduler(org_app.libres_context)
 
     allocations = scheduler.allocate(
@@ -1685,19 +1667,19 @@ def test_occupancy_view(org_app):
 
     # create a reservation
     assert reserve().json == {'success': True}
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
     formular.form.submit().follow().click('Abschliessen')
 
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     # at this point, the reservation won't show up in the occupancy view
-    occupancy = client.get('/ressource/sbb-tageskarte/belegung?date=20150828')
+    occupancy = client.get('/ressource/tageskarte/belegung?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 0
 
     # ..until we accept it
     ticket.click('Alle Reservationen annehmen')
-    occupancy = client.get('/ressource/sbb-tageskarte/belegung?date=20150828')
+    occupancy = client.get('/ressource/tageskarte/belegung?date=20150828')
     assert len(occupancy.pyquery('.occupancy-block')) == 1
 
 
@@ -1705,7 +1687,7 @@ def test_reservation_export_view(org_app):
 
     # prepate the required data
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     resource.definition = "Vorname *= ___\nNachname *= ___"
 
     scheduler = resource.get_scheduler(org_app.libres_context)
@@ -1723,7 +1705,7 @@ def test_reservation_export_view(org_app):
 
     # create a reservation
     assert reserve().json == {'success': True}
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = 'info@example.org'
     formular.form['vorname'] = 'Charlie'
     formular.form['nachname'] = 'Carson'
@@ -1732,7 +1714,7 @@ def test_reservation_export_view(org_app):
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     # at this point, the reservation won't show up in the export
-    export = client.get('/ressource/sbb-tageskarte/export')
+    export = client.get('/ressource/tageskarte/export')
     export.form['start'] = date(2015, 8, 28)
     export.form['end'] = date(2015, 8, 28)
     export.form['file_format'] = 'json'
@@ -1817,7 +1799,7 @@ def test_reserve_multiple_allocations(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    resource = org_app.libres_resources.by_name('sbb-tageskarte')
+    resource = org_app.libres_resources.by_name('tageskarte')
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -1835,7 +1817,7 @@ def test_reserve_multiple_allocations(org_app):
     assert reserve_thursday().json == {'success': True}
     assert reserve_friday().json == {'success': True}
 
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     assert "28. April 2016" in formular
     assert "29. April 2016" in formular
     formular.form['email'] = "info@example.org"
@@ -1860,12 +1842,12 @@ def test_reserve_multiple_allocations(org_app):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
-    assert "SBB-Tageskarte" in message
+    assert "Tageskarte" in message
     assert "28. April 2016" in message
     assert "29. April 2016" in message
 
     # make sure the reservations are no longer pending
-    resource = org_app.libres_resources.by_name('sbb-tageskarte')
+    resource = org_app.libres_resources.by_name('tageskarte')
 
     reservations = resource.scheduler.managed_reservations()
     assert reservations.filter(Reservation.status == 'approved').count() == 2
@@ -1879,7 +1861,7 @@ def test_reserve_multiple_allocations(org_app):
     message = message.get_payload(0).get_payload(decode=True)
     message = message.decode('iso-8859-1')
 
-    assert "SBB-Tageskarte" in message
+    assert "Tageskarte" in message
     assert "28. April 2016" in message
     assert "29. April 2016" in message
 
@@ -1894,7 +1876,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    resource = org_app.libres_resources.by_name('sbb-tageskarte')
+    resource = org_app.libres_resources.by_name('tageskarte')
     wednesday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 27), datetime(2016, 4, 27)),
         whole_day=True
@@ -1918,7 +1900,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     assert reserve_thursday().json == {'success': True}
     assert reserve_friday().json == {'success': True}
 
-    formular = client.get('/ressource/sbb-tageskarte/formular')
+    formular = client.get('/ressource/tageskarte/formular')
     formular.form['email'] = "info@example.org"
 
     confirmation = formular.form.submit().follow()
@@ -1926,7 +1908,7 @@ def test_reserve_and_deny_multiple_dates(org_app):
     ticket = client.get('/tickets/ALL/open').click('Annehmen').follow()
 
     # the resource needs to be refetched after the commit
-    resource = org_app.libres_resources.by_name('sbb-tageskarte')
+    resource = org_app.libres_resources.by_name('tageskarte')
     assert resource.scheduler.managed_reserved_slots().count() == 3
 
     # deny the last reservation
@@ -1978,7 +1960,7 @@ def test_reserve_failing_multiple(org_app):
     c2 = Client(org_app)
     c2.login_admin()
 
-    resource = org_app.libres_resources.by_name('sbb-tageskarte')
+    resource = org_app.libres_resources.by_name('tageskarte')
     thursday = resource.scheduler.allocate(
         dates=(datetime(2016, 4, 28), datetime(2016, 4, 28)),
         whole_day=True
@@ -2001,7 +1983,7 @@ def test_reserve_failing_multiple(org_app):
     assert c2_reserve_friday().json == {'success': True}
 
     # accept the first reservation session
-    formular = c1.get('/ressource/sbb-tageskarte/formular')
+    formular = c1.get('/ressource/tageskarte/formular')
     formular.form['email'] = "info@example.org"
     formular.form.submit().follow().click("Abschliessen").follow()
 
@@ -2009,7 +1991,7 @@ def test_reserve_failing_multiple(org_app):
     ticket.click('Alle Reservationen annehmen')
 
     # then try to accept the second one
-    formular = c2.get('/ressource/sbb-tageskarte/formular')
+    formular = c2.get('/ressource/tageskarte/formular')
     formular.form['email'] = "info@example.org"
     confirmation = formular.form.submit().follow()
     confirmation = confirmation.click("Abschliessen").follow()
@@ -2022,7 +2004,7 @@ def test_cleanup_allocations(org_app):
 
     # prepate the required data
     resources = ResourceCollection(org_app.libres_context)
-    resource = resources.by_name('sbb-tageskarte')
+    resource = resources.by_name('tageskarte')
     scheduler = resource.get_scheduler(org_app.libres_context)
 
     allocations = scheduler.allocate(
@@ -2041,7 +2023,7 @@ def test_cleanup_allocations(org_app):
     client = Client(org_app)
     client.login_admin()
 
-    cleanup = client.get('/ressource/sbb-tageskarte').click("Aufräumen")
+    cleanup = client.get('/ressource/tageskarte').click("Aufräumen")
     cleanup.form['start'] = date(2015, 8, 31)
     cleanup.form['end'] = date(2015, 8, 1)
     cleanup = cleanup.form.submit()
@@ -2090,18 +2072,18 @@ def test_view_occurrences(org_app):
     query = 'tags=Politics'
     assert tags(query) == ["Politik"]
     assert total_events(query) == 1
-    assert events(query) == ["Gemeindeversammlung"]
+    assert events(query) == ["Generalversammlung"]
 
     query = 'tags=Sports'
     assert tags(query) == ["Sport"]
     assert total_events(query) == 10
-    assert set(events(query)) == set(["MuKi Turnen", "Grümpelturnier"])
+    assert set(events(query)) == set(["Gemeinsames Turnen", "Grümpelturnier"])
 
     query = 'tags=Politics&tags=Party'
     assert sorted(tags(query)) == ["Party", "Politik"]
     assert total_events(query) == 2
     assert set(events(query)) == set(["150 Jahre Govikon",
-                                      "Gemeindeversammlung"])
+                                      "Generalversammlung"])
 
     unique_dates = sorted(set(dates()))
 
@@ -2133,22 +2115,22 @@ def test_view_occurrence(org_app):
     client = Client(org_app)
     events = client.get('/veranstaltungen')
 
-    event = events.click("Gemeindeversammlung")
-    assert event.pyquery('h1.main-title').text() == "Gemeindeversammlung"
+    event = events.click("Generalversammlung")
+    assert event.pyquery('h1.main-title').text() == "Generalversammlung"
     assert "Gemeindesaal" in event
     assert "Politik" in event
-    assert "Lorem ipsum." in event
+    assert "Alle Jahre wieder" in event
     assert len(event.pyquery('.occurrence-occurrences li')) == 1
     assert len(event.pyquery('.occurrence-exports h2')) == 1
     assert event.click('Diesen Termin exportieren').text.startswith(
         'BEGIN:VCALENDAR'
     )
 
-    event = events.click("MuKi Turnen", index=0)
-    assert event.pyquery('h1.main-title').text() == "MuKi Turnen"
+    event = events.click("Gemeinsames Turnen", index=0)
+    assert event.pyquery('h1.main-title').text() == "Gemeinsames Turnen"
     assert "Turnhalle" in event
-    assert "Politik" in event
-    assert "Lorem ipsum." in event
+    assert "Sport" in event
+    assert "fit werden" in event
     assert len(event.pyquery('.occurrence-occurrences li')) == 9
     assert len(event.pyquery('.occurrence-exports h2')) == 2
 
@@ -2381,14 +2363,14 @@ def test_delete_event(org_app):
     assert "My Event" not in client.get('/veranstaltungen')
 
     # Delete a non-submitted event
-    event_page = client.get('/veranstaltungen').click("Gemeindeversammlung")
+    event_page = client.get('/veranstaltungen').click("Generalversammlung")
     assert "Möchten Sie die Veranstaltung wirklich löschen?" in \
         event_page.pyquery('a.delete-link')[0].values()
 
     delete_link = event_page.pyquery('a.delete-link').attr('ic-delete-from')
     client.delete(delete_link)
 
-    assert "Gemeindeversammlung" not in client.get('/veranstaltungen')
+    assert "Generalversammlung" not in client.get('/veranstaltungen')
 
 
 def test_basic_search(es_org_app):
@@ -2527,17 +2509,14 @@ def test_newsletters_crud(org_app):
     new.form['title'] = "Our town is AWESOME"
     new.form['lead'] = "Like many of you, I just love our town..."
 
-    select_checkbox(new, "news", "Willkommen bei OneGov")
     select_checkbox(new, "occurrences", "150 Jahre Govikon")
-    select_checkbox(new, "occurrences", "MuKi Turnen")
+    select_checkbox(new, "occurrences", "Gemeinsames Turnen")
 
     newsletter = new.form.submit().follow()
 
     assert newsletter.pyquery('h1').text() == "Our town is AWESOME"
     assert "Like many of you" in newsletter
-    assert "Willkommen bei OneGov" in newsletter
-    assert "Der Online Schalter" in newsletter
-    assert "MuKi Turnen" in newsletter
+    assert "Gemeinsames Turnen" in newsletter
     assert "Turnhalle" in newsletter
     assert "150 Jahre Govikon" in newsletter
     assert "Sportanlage" in newsletter
@@ -2550,9 +2529,7 @@ def test_newsletters_crud(org_app):
 
     assert newsletter.pyquery('h1').text() == "I can't even"
     assert "Like many of you" in newsletter
-    assert "Willkommen bei OneGov" in newsletter
-    assert "Der Online Schalter" in newsletter
-    assert "MuKi Turnen" in newsletter
+    assert "Gemeinsames Turnen" in newsletter
     assert "Turnhalle" in newsletter
     assert "150 Jahre Govikon" not in newsletter
     assert "Sportanlage" not in newsletter
@@ -2664,7 +2641,7 @@ def test_newsletter_send(org_app):
 
     select_checkbox(new, "news", "Willkommen bei OneGov")
     select_checkbox(new, "occurrences", "150 Jahre Govikon")
-    select_checkbox(new, "occurrences", "MuKi Turnen")
+    select_checkbox(new, "occurrences", "Gemeinsames Turnen")
 
     newsletter = new.form.submit().follow()
 
@@ -3060,5 +3037,4 @@ def test_homepage(org_app):
     homepage = client.get('/')
 
     assert '<b>0xdeadbeef</b>' in homepage
-    assert '<h2>Aktuelles</h2>' in homepage
     assert '<h2>Veranstaltungen</h2>' in homepage

@@ -230,16 +230,13 @@ def test_sitecollection(org_app):
     objects = sitecollection.get()
 
     assert {o.name for o in objects['topics']} == {
-        'leben-wohnen',
-        'kultur-freizeit',
-        'bildung-gesellschaft',
-        'gewerbe-tourismus',
-        'politik-verwaltung'
+        'organisation',
+        'themen',
+        'kontakt',
     }
 
     assert {o.name for o in objects['news']} == {
         'aktuelles',
-        'willkommen-bei-onegov'
     }
 
     builtin_forms_path = module_path('onegov.org', 'forms/builtin')
@@ -250,4 +247,3 @@ def test_sitecollection(org_app):
     builtin_forms = set(rchop(p, '.form') for p in paths)
 
     assert {o.name for o in objects['forms']} == set(builtin_forms)
-    assert {o.name for o in objects['resources']} == {'sbb-tageskarte'}
