@@ -3,5 +3,6 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
+        <tal:block metal:use-macro="layout.app.homepage_template" />
     </tal:block>
 </div>

@@ -1,10 +1,24 @@
+import re
+
+from lxml import etree
+from onegov.core.utils import sanitize_html
 from onegov.form import Form
+from onegov.form.core import with_options
 from onegov.gis import CoordinatesField
 from onegov.org import _
+from onegov.org.utils import annotate_html
+from onegov.org.homepage_widgets import (
+    transform_homepage_structure,
+    XML_LINE_OFFSET
+)
 from onegov.org.theme import user_options
 from wtforms import HiddenField, StringField, TextAreaField, validators
 from wtforms.fields.html5 import EmailField, URLField
 from wtforms_components import ColorField
+from wtforms import ValidationError
+
+
+ERROR_LINE_RE = re.compile(r'line ([0-9]+)')
 
 
 class SettingsForm(Form):
@@ -34,35 +48,35 @@ class SettingsForm(Form):
         label=_("Contact"),
         description=_("The address and phone number of the municipality"),
         render_kw={'rows': 8},
-        fieldset=_("General")
+        fieldset=_("Information")
     )
     contact_url = URLField(
-        label=_("Contact Page"),
+        label=_("Contact Link"),
         description=_("URL pointing to a contact page"),
-        fieldset=_("General"),
+        fieldset=_("Information"),
         render_kw={'class_': 'internal-url'}
     )
     opening_hours = TextAreaField(
         label=_("Opening Hours"),
         description=_("The opening hours of the municipality"),
         render_kw={'rows': 8},
-        fieldset=_("General")
+        fieldset=_("Information")
     )
     opening_hours_url = URLField(
-        label=_("Opening Hours Page"),
+        label=_("Opening Hours Link"),
         description=_("URL pointing to an opening hours page"),
-        fieldset=_("General"),
+        fieldset=_("Information"),
         render_kw={'class_': 'internal-url'}
     )
     facebook_url = URLField(
         label=_("Facebook"),
         description=_("URL pointing to the facebook site"),
-        fieldset=_("General")
+        fieldset=_("Social Media")
     )
     twitter_url = URLField(
         label=_("Twitter"),
         description=_("URL pointing to the twitter site"),
-        fieldset=_("General")
+        fieldset=_("Social Media")
     )
     homepage_image_1 = StringField(
         label=_("Homepage Image #1"),
@@ -94,19 +108,16 @@ class SettingsForm(Form):
         render_kw={'class_': 'image-url'},
         fieldset=_("Homepage")
     )
-    online_counter_label = StringField(
-        label=_("Online Counter Label"),
-        description=_("Forms and applications"),
-        fieldset=_("Homepage")
+    homepage_cover = TextAreaField(
+        label=_("Homepage Cover"),
+        render_kw={'class_': 'editor', 'rows': 10},
+        fieldset=_("Homepage"),
+        filters=(sanitize_html, annotate_html)
     )
-    reservations_label = StringField(
-        label=_("Reservations Label"),
-        description=_("Daypasses and rooms"),
-        fieldset=_("Homepage")
-    )
-    sbb_daypass_label = StringField(
-        label=_("SBB Daypass Label"),
-        description=_("Generalabonnement for Towns"),
+    homepage_structure = TextAreaField(
+        label=_("Homepage Structure (for advanced users only)"),
+        description=_("The structure of the homepage"),
+        render_kw={'rows': 32, 'data-editor': 'xml'},
         fieldset=_("Homepage")
     )
     default_map_view = CoordinatesField(
@@ -126,6 +137,22 @@ class SettingsForm(Form):
     # the footer height is determined by javascript, see org.scss and
     # common.js for more information (search for footer)
     footer_height = HiddenField()
+
+    def validate_homepage_structure(self, field):
+        if field.data:
+            try:
+                transform_homepage_structure(self.request.app, field.data)
+            except etree.XMLSyntaxError as e:
+                correct_line = e.position[0] - XML_LINE_OFFSET
+
+                correct_msg = 'line {}'.format(correct_line)
+                correct_msg = ERROR_LINE_RE.sub(correct_msg, e.msg)
+
+                field.widget = with_options(
+                    field.widget, **{'data-highlight-line': correct_line}
+                )
+
+                raise ValidationError(correct_msg)
 
     @property
     def theme_options(self):

@@ -13,19 +13,20 @@ from onegov.libres import ResourceCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.elements import DeleteLink, Link, LinkGroup
+from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.models import (
     GeneralFileCollection,
     ImageFile,
     ImageFileCollection,
     ImageSetCollection,
+    News,
     PageMove,
     PersonMove,
     Search,
-    SiteCollection
+    SiteCollection,
 )
-from onegov.newsletter import NewsletterCollection, RecipientCollection
-from onegov.org.models.extensions import PersonLinkExtension
 from onegov.org.theme.org_theme import user_options
+from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
@@ -213,6 +214,10 @@ class Layout(ChameleonLayout):
         return self.request.link(
             OccurrenceCollection(self.request.app.session())
         )
+
+    @cached_property
+    def news_url(self):
+        return self.request.class_link(News, {'absorb': ''})
 
     def thumbnail_url(self, url):
         """ Takes the given url and returns the thumbnail url for it.

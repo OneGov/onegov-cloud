@@ -10,13 +10,15 @@
             size = {
                 'small': 'small-12 medium-7 large-5 columns',
                 'normal': 'small-12 medium-8 large-6 columns',
-                'large': 'small-12 medium-9 large-7 columns'
+                'large': 'small-12 medium-9 large-7 columns',
+                'huge': 'small-12 medium-10 large-8 columns',
             }[econtext.get('form_width', 'normal')]
 
             boxed_size = {
                 'small': 'small-12 medium-10 large-8 columns',
                 'normal': 'small-12 medium-11 large-9 columns',
-                'large': 'small-12 medium-12 large-10 columns'
+                'large': 'small-12 medium-12 large-10 columns',
+                'huge': 'small-12 medium-12 large-11 columns',
             }[econtext.get('form_width', 'normal')]
         ?>
 

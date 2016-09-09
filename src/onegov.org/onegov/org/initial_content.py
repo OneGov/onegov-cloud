@@ -102,9 +102,9 @@ def add_welcome_page(session):
     title = "Willkommen bei OneGov"
 
     lead = """
-        Ihre neuer Online Schalter für Gemeinde kann ab sofort genutzt werden.
-        Um erste Schritte, mehr Informationen und eine kurze Übersicht zu
-        erhalten klicken Sie einfach auf den Titel dieser Nachricht.
+        Der Online Schalter für Ihre Gemeinde kann ab sofort genutzt
+        werden. Um erste Schritte, mehr Informationen und eine kurze Übersicht
+        zu erhalten klicken Sie einfach auf den Titel dieser Nachricht.
     """.replace('\n', '').strip('').replace('  ', ' ')
 
     text = textwrap.dedent("""\

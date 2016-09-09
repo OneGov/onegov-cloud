@@ -2536,7 +2536,7 @@ def test_newsletters_crud(org_app):
     assert newsletter.pyquery('h1').text() == "Our town is AWESOME"
     assert "Like many of you" in newsletter
     assert "Willkommen bei OneGov" in newsletter
-    assert "Ihre neuer Online Schalter" in newsletter
+    assert "Der Online Schalter" in newsletter
     assert "MuKi Turnen" in newsletter
     assert "Turnhalle" in newsletter
     assert "150 Jahre Govikon" in newsletter
@@ -2551,7 +2551,7 @@ def test_newsletters_crud(org_app):
     assert newsletter.pyquery('h1').text() == "I can't even"
     assert "Like many of you" in newsletter
     assert "Willkommen bei OneGov" in newsletter
-    assert "Ihre neuer Online Schalter" in newsletter
+    assert "Der Online Schalter" in newsletter
     assert "MuKi Turnen" in newsletter
     assert "Turnhalle" in newsletter
     assert "150 Jahre Govikon" not in newsletter
@@ -3033,3 +3033,32 @@ def test_add_new_user(org_app):
     login.form['username'] = 'member@example.org'
     login.form['password'] = password
     assert login.form.submit().status_code == 302
+
+
+def test_homepage(org_app):
+    with org_app.update_org() as org:
+        org.meta['homepage_cover'] = "<b>0xdeadbeef</b>"
+        org.meta['homepage_structure'] = """
+            <row>
+                <column span="8">
+                    <homepage-cover />
+                </column>
+                <column span="4">
+                    <panel>
+                        <news />
+                    </panel>
+                    <panel>
+                        <events />
+                    </panel>
+                </column>
+            </row>
+        """
+
+    transaction.commit()
+
+    client = Client(org_app)
+    homepage = client.get('/')
+
+    assert '<b>0xdeadbeef</b>' in homepage
+    assert '<h2>Aktuelles</h2>' in homepage
+    assert '<h2>Veranstaltungen</h2>' in homepage

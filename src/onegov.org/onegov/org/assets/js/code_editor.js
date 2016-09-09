@@ -26,6 +26,7 @@ $(function() {
         editor.renderer.setShowGutter(false);
         editor.renderer.setScrollMargin(10, 10, 10, 10);
         editor.getSession().setValue(textarea.val());
+        console.log(mode);
         editor.getSession().setMode("ace/mode/" + mode);
         editor.setTheme("ace/theme/tomorrow");
 

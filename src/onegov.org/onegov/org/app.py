@@ -1,14 +1,15 @@
 """ Contains the base application used by other applications. """
 
+from chameleon import PageTemplate
 from collections import defaultdict
 from contextlib import contextmanager
 from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
+from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.initial_content import create_new_organisation
-from onegov.org.models import Organisation
-from onegov.org.models import Topic
+from onegov.org.models import Topic, Organisation
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
 from onegov.page import PageCollection
@@ -107,7 +108,30 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         session.flush()
 
+        self.update_homepage_template()
         self.cache.delete('org')
+
+    @property
+    def homepage_template(self):
+        """ Returns the homepage template built from the homepage content
+        setting which contains a simplified and limited xml to define the
+        homepage.
+
+        """
+        return self.runtime_cache.get_or_create(
+            'homepage_template', self.load_homepage_template)
+
+    def load_homepage_template(self):
+        homepage_structure = self.org.meta.get('homepage_structure')
+
+        if homepage_structure:
+            return PageTemplate(
+                transform_homepage_structure(self, homepage_structure))
+        else:
+            return PageTemplate('')
+
+    def update_homepage_template(self):
+        self.runtime_cache.delete('homepage_template')
 
     @property
     def ticket_count(self):
@@ -264,6 +288,7 @@ def get_check_password_asset():
 def get_code_editor_asset():
     yield 'ace.js'
     yield 'ace-mode-form.js'
+    yield 'ace-mode-xml.js'
     yield 'ace-theme-tomorrow.js'
     yield 'code_editor.js'
 

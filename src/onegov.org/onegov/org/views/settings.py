@@ -17,6 +17,7 @@ def handle_settings(self, request, form):
 
     layout = DefaultLayout(self, request)
     layout.include_editor()
+    layout.include_code_editor()
 
     request.include('check_contrast')
 
@@ -39,5 +40,5 @@ def handle_settings(self, request, form):
         'layout': layout,
         'title': _('Settings'),
         'form': form,
-        'form_width': 'large'
+        'form_width': 'huge'
     }

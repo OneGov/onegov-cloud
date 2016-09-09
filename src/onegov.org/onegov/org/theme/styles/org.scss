@@ -427,6 +427,17 @@ form {
 }
 
 /*
+    homepage tiles images
+*/
+
+#homepage-tile-1 .tile-image { background-image: url(#{$tile-image-1});}
+#homepage-tile-2 .tile-image { background-image: url(#{$tile-image-2});}
+#homepage-tile-3 .tile-image { background-image: url(#{$tile-image-3});}
+#homepage-tile-4 .tile-image { background-image: url(#{$tile-image-4});}
+#homepage-tile-5 .tile-image { background-image: url(#{$tile-image-5});}
+#homepage-tile-6 .tile-image { background-image: url(#{$tile-image-6});}
+
+/*
     Hide the spam bot honeypot field
 */
 .field-roboter_falle {
@@ -554,6 +565,17 @@ input[type=color] {
 }
 
 /*
+    homepage
+*/
+
+.homepage {
+    small {
+        display: block;
+        font-size: .8em;
+    }
+}
+
+/*
     homepage tiles
 */
 
@@ -613,7 +635,39 @@ input[type=color] {
 
 $more-link-icon: '\f105';
 
-.homepage-links-panel,
+ul.panel-links {
+    list-style: none;
+    margin: 0;
+
+    a {
+        display: block;
+        font-weight: bold;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &.more-link {
+            font-size: .875rem;
+            font-weight: normal;
+
+            &::before {
+                @include icon($more-link-icon);
+                font-size: .875rem;
+                margin-right: 1ex;
+            }
+        }
+
+    }
+
+    li {
+        margin-bottom: .5em;
+    }
+
+    li:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.homepage-panel,
 .page-content-panel {
     background-color: $topbar-bg-color;
     margin-bottom: 1.5em;
@@ -631,43 +685,6 @@ $more-link-icon: '\f105';
         font-size: 1em;
         font-weight: normal;
         margin-top: 0;
-    }
-
-    ul {
-        list-style: none;
-        margin: 0;
-
-        a {
-            display: block;
-            font-weight: bold;
-            overflow: hidden;
-            text-overflow: ellipsis;
-
-            &.more-link {
-                font-size: .875rem;
-                font-weight: normal;
-
-                &::before {
-                    @include icon($more-link-icon);
-                    font-size: .875rem;
-                    margin-right: 1ex;
-                }
-            }
-
-        }
-
-        li {
-            margin-bottom: .5em;
-        }
-
-        li:last-child {
-            margin-bottom: 0;
-        }
-
-        small {
-            display: block;
-            font-size: .8em;
-        }
     }
 
     &.contact-panel {
@@ -1376,6 +1393,10 @@ div#redactor-droparea {
 
 .all-news {
     font-size: 1em;
+
+    a {
+        display: inline-block;
+    }
 }
 
 .all-news::before {
@@ -3006,8 +3027,8 @@ ul.search-results {
 
 .yubikey {
     background-color: $smoke;
-    border-radius: 3px;
     border: 1px solid $iron;
+    border-radius: 3px;
     color: $tuatara;
     display: inline-block;
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;

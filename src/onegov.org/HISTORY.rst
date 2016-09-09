@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define a custom homepage through widgets.
+  [href]
+
 - Use a uuid converter for all uuid-ids to turn bad requests into 404s.
   [href]
 
