@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.2 (2016-09-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Supports latest filedepot release.
   [href]
 

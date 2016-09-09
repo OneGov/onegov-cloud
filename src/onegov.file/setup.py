@@ -4,7 +4,7 @@ name = 'onegov.file'
 description = (
     'Images/files organized in collections.'
 )
-version = '0.2.1'
+version = '0.2.2'
 
 
 def get_long_description():
