@@ -54,7 +54,7 @@ def test_serve_file(app):
     assert result.body == b'README'
     assert result.content_type == 'text/plain'
     assert result.content_length == 6
-    assert 'filename=readme.txt' in result.content_disposition
+    assert 'filename="readme.txt"' in result.content_disposition
 
 
 def test_application_separation(app):
