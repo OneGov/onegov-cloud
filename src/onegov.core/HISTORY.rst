@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.26.0 (2016-09-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a runtime bound cache, not shared between processes and able to
   accept any kind of object to cache (no pickling).
