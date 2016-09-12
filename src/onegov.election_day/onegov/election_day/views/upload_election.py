@@ -26,6 +26,13 @@ def view_upload(self, request, form):
 
     result = {}
 
+    # Remove wabsti and sesam for municipalities for the moment
+    if request.app.principal.domain == 'municipality':
+        form.file_format.choices = [
+            choice for choice in form.file_format.choices
+            if choice[0] != 'wabsti' and choice[0] != 'sesam'
+        ]
+
     if form.submitted(request):
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, map_required=False):
@@ -41,29 +48,29 @@ def view_upload(self, request, form):
                 ]
             }
         else:
-            municipalities = principal.municipalities[self.date.year]
+            entities = principal.entities[self.date.year]
             if form.file_format.data == 'internal':
                 result = import_onegov_file(
-                    municipalities,
+                    entities,
                     self,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
             elif form.file_format.data == 'sesam':
                 result = import_sesam_file(
-                    municipalities,
+                    entities,
                     self,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype']
                 )
                 if self.type == 'majorz':
                     self.absolute_majority = form.majority.data
-            else:
+            elif form.file_format.data == 'wabsti':
                 connections = len(form.connections.data)
                 stats = len(form.statistics.data)
                 elected = len(form.elected.data)
                 result = import_wabsti_file(
-                    municipalities,
+                    entities,
                     self,
                     form.results.raw_data[0].file,
                     form.results.data['mimetype'],
@@ -77,7 +84,9 @@ def view_upload(self, request, form):
                 if self.type == 'majorz':
                     self.absolute_majority = form.majority.data
                 if form.complete.data:
-                    self.total_municipalities = self.counted_municipalities
+                    self.total_entities = self.counted_entities
+            else:
+                raise NotImplementedError("Unsupported import format")
 
     form.apply_model(self)
 

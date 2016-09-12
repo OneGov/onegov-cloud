@@ -14,40 +14,96 @@ class DummyRequest(object):
 
 def test_load_principal():
     principal = Principal.from_yaml(textwrap.dedent("""
-        name: Foobar
+        name: Kanton Zug
         logo:
         canton: zg
         color: '#000'
     """))
 
-    assert principal.name == 'Foobar'
-    assert principal.name == 'Foobar'
+    assert principal.name == 'Kanton Zug'
     assert principal.logo is None
     assert principal.canton == 'zg'
+    assert principal.municipality is None
     assert principal.color == '#000'
     assert principal.base is None
     assert principal.base_domain is None
     assert principal.analytics is None
+    assert principal.use_maps is True
+    assert principal.domain is 'canton'
+    assert list(principal.available_domains.keys()) == ['federation', 'canton']
 
     principal = Principal.from_yaml(textwrap.dedent("""
-        name: Foobar
+        name: Kanton Zug
         logo:
         canton: zg
         color: '#000'
         base: 'http://www.zg.ch'
         analytics: "<script type=\\"text/javascript\\"></script>"
+        use_maps: false
     """))
 
-    assert principal.name == 'Foobar'
+    assert principal.name == 'Kanton Zug'
     assert principal.logo is None
     assert principal.canton == 'zg'
+    assert principal.municipality is None
     assert principal.color == '#000'
     assert principal.base == 'http://www.zg.ch'
     assert principal.base_domain == 'zg.ch'
     assert principal.analytics == '<script type="text/javascript"></script>'
+    assert principal.use_maps is True
+    assert principal.domain is 'canton'
+    assert list(principal.available_domains.keys()) == ['federation', 'canton']
+
+    principal = Principal.from_yaml(textwrap.dedent("""
+        name: Stadt Bern
+        logo:
+        municipality: '351'
+        color: '#000'
+    """))
+
+    assert principal.name == 'Stadt Bern'
+    assert principal.logo is None
+    assert principal.canton is None
+    assert principal.municipality == '351'
+    assert principal.color == '#000'
+    assert principal.base is None
+    assert principal.base_domain is None
+    assert principal.analytics is None
+    assert principal.use_maps is False
+    assert principal.domain is 'municipality'
+    assert list(principal.available_domains.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+
+    principal = Principal.from_yaml(textwrap.dedent("""
+        name: Stadt Bern
+        logo:
+        municipality: '351'
+        color: '#000'
+        use_maps: true
+    """))
+
+    assert principal.name == 'Stadt Bern'
+    assert principal.logo is None
+    assert principal.canton is None
+    assert principal.municipality == '351'
+    assert principal.color == '#000'
+    assert principal.base is None
+    assert principal.base_domain is None
+    assert principal.analytics is None
+    assert principal.use_maps is True
+    assert principal.domain is 'municipality'
+    assert list(principal.available_domains.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
 
 
 def test_municipalities():
+    principal = Principal(
+        name='Bern', municipality='351', logo=None, color=None
+    )
+    assert principal.municipalities == {}
+
     principal = Principal(name='Zug', canton='zg', logo=None, color=None)
 
     municipalities = {
@@ -75,25 +131,97 @@ def test_municipalities():
         2016: municipalities,
     }
 
-    for year in range(2009, 2013):
-        assert not principal.is_year_available(year)
-    for year in range(2013, 2017):
-        assert principal.is_year_available(year)
-    for year in range(2009, 2017):
-        assert principal.is_year_available(year, map_required=False)
+    for canton in cantons:
+        principal = Principal(
+            name=canton, canton=canton, logo=None, color=None
+        )
+
+        for year in range(2009, 2017):
+            assert principal.municipalities[year]
+
+
+def test_districts():
+    principal = Principal(name='Zug', canton='zg', logo=None, color=None)
+    assert principal.districts == {}
+
+    principal = Principal(
+        name='Kriens', municipality='1059', logo=None, color=None
+    )
+
+    assert principal.districts == {
+        2009: {1059: {'name': 'Kriens'}},
+        2010: {1059: {'name': 'Kriens'}},
+        2011: {1059: {'name': 'Kriens'}},
+        2012: {1059: {'name': 'Kriens'}},
+        2013: {1059: {'name': 'Kriens'}},
+        2014: {1059: {'name': 'Kriens'}},
+        2015: {1059: {'name': 'Kriens'}},
+        2016: {1059: {'name': 'Kriens'}},
+    }
+
+    principal = Principal(
+        name='Bern', municipality='351', logo=None, color=None
+    )
+    districts = {
+        1: {'name': 'Innere Stadt'},
+        2: {'name': 'Länggasse/Felsenau'},
+        3: {'name': 'Mattenhof/Weissenbühl'},
+        4: {'name': 'Kirchenfeld/Schosshalde'},
+        5: {'name': 'Breitenrain/Lorraine'},
+        6: {'name': 'Bümpliz/Bethlehem'},
+    }
+    assert principal.districts == {
+        2012: districts,
+        2013: districts,
+        2014: districts,
+        2015: districts,
+        2016: districts
+    }
+
+
+def test_entities():
+    principal = Principal(name='Zug', canton='zg', logo=None, color=None)
+    assert principal.entities == principal.municipalities
+
+    principal = Principal(
+        name='Kriens', municipality='1059', logo=None, color=None
+    )
+    assert principal.entities == principal.districts
+
+    principal = Principal(
+        name='Bern', municipality='351', logo=None, color=None
+    )
+    assert principal.entities == principal.districts
+
+
+def test_years_available():
+    principal = Principal(
+        name='Kriens', municipality='1059', logo=None, color=None
+    )
+    assert not principal.is_year_available(2000)
+    assert not principal.is_year_available(2016)
+    assert not principal.is_year_available(2000, map_required=False)
+    assert principal.is_year_available(2016, map_required=False)
+
+    principal = Principal(
+        name='Bern', municipality='351', logo=None, color=None
+    )
+    assert not principal.is_year_available(2000)
+    assert principal.is_year_available(2016)
+    assert not principal.is_year_available(2000, map_required=False)
+    assert principal.is_year_available(2016, map_required=False)
 
     for canton in cantons:
         principal = Principal(
             name=canton, canton=canton, logo=None, color=None
         )
 
-        assert principal.municipalities[2009]
-        assert principal.municipalities[2010]
-        assert principal.municipalities[2011]
-        assert principal.municipalities[2012]
-        assert principal.municipalities[2013]
-        assert principal.municipalities[2014]
-        assert principal.municipalities[2015]
+        for year in range(2009, 2013):
+            assert not principal.is_year_available(year)
+        for year in range(2013, 2017):
+            assert principal.is_year_available(year)
+        for year in range(2009, 2017):
+            assert principal.is_year_available(year, map_required=False)
 
 
 def test_archive(session):

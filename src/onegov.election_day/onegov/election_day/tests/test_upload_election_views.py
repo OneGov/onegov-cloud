@@ -261,7 +261,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
     upload = upload.form.submit()
 
     assert "Ungültige Wahldaten" in upload
-    assert "BFS Nummer 1234 ist unbekannt" in upload
+    assert "1234 ist unbekannt" in upload
     assert "Ungültige Listendaten" in upload
     assert "Ungültige Listenresultate" in upload
     assert "Ungültige Kandidierendendaten" in upload
@@ -308,7 +308,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
     upload = upload.form.submit()
 
     assert "Ungültige Wahldaten" in upload
-    assert "BFS Nummer 1234 ist unbekannt" not in upload
+    assert "1234 ist unbekannt" not in upload
     assert "Ungültige Listendaten" not in upload
     assert "Ungültige Listenresultate" not in upload
     assert "Ungültige Kandidierendendaten" not in upload
@@ -523,7 +523,7 @@ def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
     upload = upload.form.submit()
 
     assert "Ungültige Wahldaten" in upload
-    assert "BFS Nummer 1234 ist unbekannt" in upload
+    assert "1234 ist unbekannt" in upload
     assert "Ungültige Gemeindedaten" in upload
     assert "Unbekannter Kandidierender" in upload
 
@@ -789,19 +789,19 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
         'election_type',
         'election_mandates',
         'election_absolute_majority',
-        'election_counted_municipalities',
-        'election_total_municipalities',
-        'municipality_name',
-        'municipality_bfs_number',
-        'municipality_elegible_voters',
-        'municipality_received_ballots',
-        'municipality_blank_ballots',
-        'municipality_invalid_ballots',
-        'municipality_unaccounted_ballots',
-        'municipality_accounted_ballots',
-        'municipality_blank_votes',
-        'municipality_invalid_votes',
-        'municipality_accounted_votes',
+        'election_counted_entities',
+        'election_total_entities',
+        'entity_name',
+        'entity_id',
+        'entity_elegible_voters',
+        'entity_received_ballots',
+        'entity_blank_ballots',
+        'entity_invalid_ballots',
+        'entity_unaccounted_ballots',
+        'entity_accounted_ballots',
+        'entity_blank_votes',
+        'entity_invalid_votes',
+        'entity_accounted_votes',
         'list_name',
         'list_id',
         'list_number_of_mandates',
@@ -867,14 +867,14 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
     upload = upload.form.submit()
 
     assert "Ungültige Wahldaten" in upload
-    assert "BFS Nummer 1234 ist unbekannt" in upload
+    assert "1234 ist unbekannt" in upload
     assert "Ungültige Listendaten" in upload
     assert "Ungültige Listenresultate" in upload
     assert "Ungültige Kandidierendendaten" in upload
     assert "Ungültige Kandidierendenresultate" in upload
 
     # Missing headers
-    headers.remove('municipality_bfs_number')
+    headers.remove('entity_id')
     csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
 
     upload = client.get('/election/election/upload')
@@ -882,7 +882,7 @@ def test_upload_election_onegov_ballot_fail(election_day_app_gr):
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
     upload = upload.form.submit()
 
-    assert "Fehlende Spalten: municipality_bfs_number" in upload
+    assert "Fehlende Spalten: entity_id" in upload
 
 
 def test_upload_election_invalidate_cache(election_day_app_gr):
@@ -902,13 +902,13 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
     # Invalid data
     csv = (
         'election_title,election_date,election_type,election_mandates,'
-        'election_absolute_majority,election_counted_municipalities,'
-        'election_total_municipalities,municipality_name,'
-        'municipality_bfs_number,municipality_elegible_voters,'
-        'municipality_received_ballots,municipality_blank_ballots,'
-        'municipality_invalid_ballots,municipality_unaccounted_ballots,'
-        'municipality_accounted_ballots,municipality_blank_votes,'
-        'municipality_invalid_votes,municipality_accounted_votes,list_name,'
+        'election_absolute_majority,election_counted_entities,'
+        'election_total_entities,entity_name,'
+        'entity_id,entity_elegible_voters,'
+        'entity_received_ballots,entity_blank_ballots,'
+        'entity_invalid_ballots,entity_unaccounted_ballots,'
+        'entity_accounted_ballots,entity_blank_votes,'
+        'entity_invalid_votes,entity_accounted_votes,list_name,'
         'list_id,list_number_of_mandates,list_votes,list_connection,'
         'list_connection_parent,candidate_family_name,candidate_first_name,'
         'candidate_id,candidate_elected,candidate_votes\r\n'
@@ -1022,13 +1022,13 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     csv = '\n'.join((
         (
             'election_title,election_date,election_type,election_mandates,'
-            'election_absolute_majority,election_counted_municipalities,'
-            'election_total_municipalities,municipality_name,'
-            'municipality_bfs_number,municipality_elegible_voters,'
-            'municipality_received_ballots,municipality_blank_ballots,'
-            'municipality_invalid_ballots,municipality_unaccounted_ballots,'
-            'municipality_accounted_ballots,municipality_blank_votes,'
-            'municipality_invalid_votes,municipality_accounted_votes,'
+            'election_absolute_majority,election_counted_entities,'
+            'election_total_entities,entity_name,'
+            'entity_id,entity_elegible_voters,'
+            'entity_received_ballots,entity_blank_ballots,'
+            'entity_invalid_ballots,entity_unaccounted_ballots,'
+            'entity_accounted_ballots,entity_blank_votes,'
+            'entity_invalid_votes,entity_accounted_votes,'
             'list_name,list_id,list_number_of_mandates,list_votes,'
             'list_connection,list_connection_parent,candidate_family_name,'
             'candidate_first_name,candidate_id,candidate_elected,'
@@ -1158,13 +1158,13 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     csv = '\n'.join((
         (
             'election_title,election_date,election_type,election_mandates,'
-            'election_absolute_majority,election_counted_municipalities,'
-            'election_total_municipalities,municipality_name,'
-            'municipality_bfs_number,municipality_elegible_voters,'
-            'municipality_received_ballots,municipality_blank_ballots,'
-            'municipality_invalid_ballots,municipality_unaccounted_ballots,'
-            'municipality_accounted_ballots,municipality_blank_votes,'
-            'municipality_invalid_votes,municipality_accounted_votes,'
+            'election_absolute_majority,election_counted_entities,'
+            'election_total_entities,entity_name,'
+            'entity_id,entity_elegible_voters,'
+            'entity_received_ballots,entity_blank_ballots,'
+            'entity_invalid_ballots,entity_unaccounted_ballots,'
+            'entity_accounted_ballots,entity_blank_votes,'
+            'entity_invalid_votes,entity_accounted_votes,'
             'list_name,list_id,list_number_of_mandates,list_votes,'
             'list_connection,list_connection_parent,candidate_family_name,'
             'candidate_first_name,candidate_id,candidate_elected,'
@@ -1199,3 +1199,208 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     result_onegov = client.get('/election/election/data-csv').text
 
     assert result_sesam == result_onegov
+
+
+def test_upload_election_available_formats_canton(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    upload = client.get('/election/election/upload')
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'internal', 'sesam', 'wabsti'
+    ]
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'canton'
+    new.form.submit()
+
+    upload = client.get('/election/election/upload')
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'internal', 'sesam', 'wabsti'
+    ]
+
+
+def test_upload_election_available_formats_municipality(election_day_app_bern):
+    client = Client(election_day_app_bern)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    upload = client.get('/election/election/upload')
+    assert [o[0] for o in upload.form['file_format'].options] == ['internal']
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'canton'
+    new.form.submit()
+
+    upload = client.get('/election/election/upload')
+    assert [o[0] for o in upload.form['file_format'].options] == ['internal']
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'proporz'
+    new.form['domain'] = 'municipality'
+    new.form.submit()
+
+    upload = client.get('/election/election/upload')
+    assert [o[0] for o in upload.form['file_format'].options] == ['internal']
+
+
+def test_upload_communal_election(election_day_app_kriens):
+    client = Client(election_day_app_kriens)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'municipality'
+    new.form.submit()
+
+    headers = [
+        'election_absolute_majority',
+        'election_counted_entities',
+        'election_total_entities',
+        'entity_id',
+        'entity_elegible_voters',
+        'entity_received_ballots',
+        'entity_blank_ballots',
+        'entity_invalid_ballots',
+        'entity_blank_votes',
+        'entity_invalid_votes',
+        'list_name',
+        'list_id',
+        'list_number_of_mandates',
+        'list_votes',
+        'list_connection',
+        'list_connection_parent',
+        'candidate_family_name',
+        'candidate_first_name',
+        'candidate_id',
+        'candidate_elected',
+        'candidate_vote'
+    ]
+
+    csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
+
+    csv = '\r\n'.join((
+        ','.join(headers),
+        '3294,1,1,1059,18699,6761,124,51,0,0,,,,,,,Koch,Patrick,1,False,1621',
+        '3294,1,1,1059,18699,6761,124,51,0,0,,,,,,,Konrad,Simon,2,False,1707',
+        '3294,1,1,1059,18699,6761,124,51,0,0,,,,,,,Faé,Franco,3,False,3176',
+        '3294,1,1,1059,18699,6761,124,51,0,0,,,,,,,Vereinzelte,,4,False,82',
+    )).encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    assert "erfolgreich hochgeladen" in upload.form.submit()
+
+    result = client.get('/election/election')
+    assert '36.16' in result
+    assert 'Wahlkreise' not in result
+    assert '<td>Total' not in result
+
+
+def test_upload_communal_election_districts(election_day_app_bern):
+    client = Client(election_day_app_bern)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'Election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'municipality'
+    new.form.submit()
+
+    headers = [
+        'election_absolute_majority',
+        'election_counted_entities',
+        'election_total_entities',
+        'entity_id',
+        'entity_elegible_voters',
+        'entity_received_ballots',
+        'entity_blank_ballots',
+        'entity_invalid_ballots',
+        'entity_blank_votes',
+        'entity_invalid_votes',
+        'list_name',
+        'list_id',
+        'list_number_of_mandates',
+        'list_votes',
+        'list_connection',
+        'list_connection_parent',
+        'candidate_family_name',
+        'candidate_first_name',
+        'candidate_id',
+        'candidate_elected',
+        'candidate_vote'
+    ]
+
+    csv = '{}\r\n'.format(','.join(headers),).encode('utf-8')
+
+    csv = '\r\n'.join((
+        ','.join(headers),
+        '12606,6,6,1,15159,5522,265,503,0,0,,,,,,,V1,N1,1,True,3596',
+        '12606,6,6,2,9399,3342,161,333,0,0,,,,,,,V1,N1,1,True,2139',
+        '12606,6,6,3,12599,4439,184,441,0,0,,,,,,,V1,N1,1,True,2827',
+        '12606,6,6,4,18461,6487,289,624,0,0,,,,,,,V1,N1,1,True,3647',
+        '12606,6,6,5,13880,4985,205,466,0,0,,,,,,,V1,N1,1,True,3192',
+        '12606,6,6,6,12999,4506,170,430,0,0,,,,,,,V1,N1,1,True,2227',
+        '12606,6,6,1,15159,5522,265,503,0,0,,,,,,,V2,N2,2,False,608',
+        '12606,6,6,2,9399,3342,161,333,0,0,,,,,,,V2,N2,2,False,352',
+        '12606,6,6,3,12599,4439,184,441,0,0,,,,,,,V2,N2,2,False,466',
+        '12606,6,6,4,18461,6487,289,624,0,0,,,,,,,V2,N2,2,False,943',
+        '12606,6,6,5,13880,4985,205,466,0,0,,,,,,,V2,N2,2,False,489',
+        '12606,6,6,6,12999,4506,170,430,0,0,,,,,,,V2,N2,2,False,489',
+        '12606,6,6,1,15159,5522,265,503,0,0,,,,,,,V3,N3,3,False,550',
+        '12606,6,6,2,9399,3342,161,333,0,0,,,,,,,V3,N3,3,False,357',
+        '12606,6,6,3,12599,4439,184,441,0,0,,,,,,,V3,N3,3,False,521',
+        '12606,6,6,4,18461,6487,289,624,0,0,,,,,,,V3,N3,3,False,984',
+        '12606,6,6,5,13880,4985,205,466,0,0,,,,,,,V3,N3,3,False,633',
+        '12606,6,6,6,12999,4506,170,430,0,0,,,,,,,V3,N3,3,False,1190',
+    )).encode('utf-8')
+
+    upload = client.get('/election/election/upload')
+    upload.form['file_format'] = 'internal'
+    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    assert "erfolgreich hochgeladen" in upload.form.submit()
+
+    result = client.get('/election/election')
+    assert '35.49' in result
+    assert 'Wahlkreise' in result
+    assert '<td>Total' in result

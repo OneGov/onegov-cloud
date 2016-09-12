@@ -6,6 +6,8 @@ Per mintga pagina impurtanta datti in'alternativa JSON correspundenta.
 
 Tuts Responses cuntegnan il `Last-Modified` HTTP Header che infurmescha, cura ch'igl è vegnida fatga l'ultima midada (p.ex. cura ch'igl èn vegnids chargiads si l'ultima giada resultats d'ina elecziun u d'ina votaziun).
 
+"Vischnanca" might refer to a district, ward, etc.
+
 ## Cuntegn
 
 1. [Survista dals resultats](#survista-dals-resultats)
@@ -74,19 +76,19 @@ election_date|La data da l'elecziun (sco segns ISO 8601)
 election_type|`proporz` en cas d'ina elecziun da proporz, `majorz` en cas d'ina elecziun da maiorz
 election_mandates|Il dumber dals sezs.
 election_absolute_majority|La maioritad absoluta. Mo tar elecziuns da maiorz.
-election_counted_municipalities|Il dumber da vischnancas ch'èn dumbradas ora.
-election_total_municipalities|Il dumber total da vischnancas.
-municipality_name|Il num da la vischnanca/dal lieu
-municipality_bfs_number|La ID da la vischnanca/dal lieu. Pli enconuschent sco "numer UST".
-municipality_elegible_voters|Il dumber da las votantas e dals votants da la vischnanca/dal lieu.
-municipality_received_ballots|Il dumber dals cedels electorals consegnads da la vischnanca/dal lieu.
-municipality_blank_ballots|Il dumber dals cedels electorals vids da la vischnanca/dal lieu.
-municipality_invalid_ballots|Il dumber dals cedels electorals nunvalaivels da la vischnanca/dal lieu.
-municipality_unaccounted_ballots|Il dumber dals cedels electorals nunvalaivels u vids da la vischnanca/dal lieu.
-municipality_accounted_ballots|Il dumber dals cedels electorals valaivels da la vischnanca/dal lieu.
-municipality_blank_votes|Il dumber da las vuschs vidas da la vischnanca/dal lieu.
-municipality_invalid_votes|Il dumber da las vuschs nunvalaivlas da la vischnanca/dal lieu. Nagins en cas d'ina elecziun da proporz.
-municipality_accounted_votes|Il dumber da las vuschs valaivlas da la vischnanca/dal lieu.
+election_counted_entities|Il dumber da vischnancas ch'èn dumbradas ora.
+election_total_entities|Il dumber total da vischnancas.
+entity_name|Il num da la vischnanca/dal lieu
+entity_id|La ID da la vischnanca/dal lieu.
+entity_elegible_voters|Il dumber da las votantas e dals votants da la vischnanca/dal lieu.
+entity_received_ballots|Il dumber dals cedels electorals consegnads da la vischnanca/dal lieu.
+entity_blank_ballots|Il dumber dals cedels electorals vids da la vischnanca/dal lieu.
+entity_invalid_ballots|Il dumber dals cedels electorals nunvalaivels da la vischnanca/dal lieu.
+entity_unaccounted_ballots|Il dumber dals cedels electorals nunvalaivels u vids da la vischnanca/dal lieu.
+entity_accounted_ballots|Il dumber dals cedels electorals valaivels da la vischnanca/dal lieu.
+entity_blank_votes|Il dumber da las vuschs vidas da la vischnanca/dal lieu.
+entity_invalid_votes|Il dumber da las vuschs nunvalaivlas da la vischnanca/dal lieu. Nagins en cas d'ina elecziun da proporz.
+entity_accounted_votes|Il dumber da las vuschs valaivlas da la vischnanca/dal lieu.
 list_name|Il num da la glista da la persuna che candidescha. Mo en cas d'elecziuns da proporz.
 list_id|La ID da la glista, per la quala la candidata u il candidat candidescha. Mo tar elecziuns da proporz.
 list_number_of_mandates|Il dumber da sezs da la glista. Mo tar elecziuns da proporz.
@@ -135,7 +137,7 @@ shortcode|Scursanida interna (definescha la successiun da pliras votaziuns che h
 domain|`federation` per votaziuns naziunalas, `canton` per votaziuns chantunalas
 type|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
 group|La derivanza dal resultat. Quai po esser il district e la vischnanca, separads cun in stritg diagonal, il num da la citad ed il num dal circul, er separads cun in stritg diagonal, u simplamain il num da la vischnanca. Quai dependa dal chantun respectiv.
-municipality_id|La ID da la vischnanca/dal lieu. Pli enconuschent sco "numer UST".
+entity_id|La ID da la vischnanca/dal lieu.
 counted|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
 yeas|Il dumber da las vuschs affirmativas
 nays|Il dumber da las vuschs negativas

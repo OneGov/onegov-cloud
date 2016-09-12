@@ -32,8 +32,8 @@ def get_election_summary(election, request):
         'domain': election.domain,
         'last_modified': last_modified,
         'progress': {
-            'counted': election.counted_municipalities or 0,
-            'total': election.total_municipalities or 0
+            'counted': election.counted_entities or 0,
+            'total': election.total_entities or 0
         },
         'title': election.title_translations,
         'type': 'election',

@@ -21,7 +21,7 @@ def view_elections(self, request):
         'layout': ManageElectionsLayout(self, request),
         'title': _("Manage"),
         'elections': self.batch,
-        'new_election': request.link(self, 'new-election'),
+        'new_election': request.link(self, 'new-election')
     }
 
 
@@ -30,6 +30,8 @@ def view_elections(self, request):
 def create_election(self, request, form):
 
     layout = ManageElectionsLayout(self, request)
+
+    form.set_domain(request.app.principal)
 
     if form.submitted(request):
         election = Election()
@@ -50,6 +52,8 @@ def create_election(self, request, form):
 def edit_election(self, request, form):
 
     layout = ManageElectionsLayout(self, request)
+
+    form.set_domain(request.app.principal)
 
     if form.submitted(request):
         form.update_model(self)

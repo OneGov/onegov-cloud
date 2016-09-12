@@ -30,7 +30,7 @@ class UploadElectionForm(Form):
         validators=[
             InputRequired()
         ],
-        default='sesam'
+        default='internal'
     )
 
     results = UploadField(

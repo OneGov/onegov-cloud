@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Il y a des alternatives JSON pour toutes les vues importantes.
+Il y a des alternatives JSON pour toutes les vues importantes. Toutes les réponses contiennent l’en-tête HTTP `Last-Modified` (Modifié pour la dernière fois) avec la dernière fois que les données ont changé (c’est-à-dire la dernière fois que les résultats d'une élection ou d’une votation ont été téléchargés).
 
-Toutes les réponses contiennent l’en-tête HTTP `Last-Modified` (Modifié pour la dernière fois) avec la dernière fois que les données ont changé (c’est-à-dire la dernière fois que les résultats d'une élection ou d’une votation ont été téléchargés).
+«Municipalité» fait référence à un district, une circonscription électorale, etc.
 
 ## Contenu
 
@@ -74,19 +74,19 @@ election_date|La date de l'élection (an ISO 8601 date string).
 election_type|`proporz` pour proportionnelle, `majorz` pour le système majoritaire.
 election_mandates|Nombre de mandats.
 election_absolute_majority|La majorité absolue. Uniquement valable pour les élections basées sur le système majoritaire.
-election_counted_municipalities|Le nombre de municipalités déjà comptées.
-election_total_municipalities|Le nombre total de municipalités.
-municipality_name|Le nom de la municipalité.
-municipality_bfs_number|L'identifiant de la municipalité / locale ("BFS Nummer").
-municipality_elegible_voters|Le nombre de personnes éligible à voter pour cette municipalité.
-municipality_received_ballots|Le nombre de bulletins de vote reçus pour cette municipalité.
-municipality_blank_ballots|Le nombre de bulletins blancs pour cette municipalité.
-municipality_invalid_ballots|Le nombre de bulletins nuls pour cette municipalité.
-municipality_unaccounted_ballots|Le nombre de bulletins de vote non comptabilisés pour cette municipalité.
-municipality_accounted_ballots|Le nombre de bulletins de votes comptabilisés pour cette municipalité.
-municipality_blank_votes|Le nombre de votes en blanc pour cette municipalité.
-municipality_invalid_votes|Le nombre de votes valides pour cette municipalité. Zéro pour les élections sur la base de la représentation proportionnelle.
-municipality_accounted_votes|Le nombre de votes comptabilisés pour cette municipalité.
+election_counted_entities|Le nombre de municipalités déjà comptées.
+election_total_entities|Le nombre total de municipalités.
+entity_name|Le nom de la municipalité.
+entity_id|L'identifiant de la municipalité.
+entity_elegible_voters|Le nombre de personnes éligible à voter pour cette municipalité.
+entity_received_ballots|Le nombre de bulletins de vote reçus pour cette municipalité.
+entity_blank_ballots|Le nombre de bulletins blancs pour cette municipalité.
+entity_invalid_ballots|Le nombre de bulletins nuls pour cette municipalité.
+entity_unaccounted_ballots|Le nombre de bulletins de vote non comptabilisés pour cette municipalité.
+entity_accounted_ballots|Le nombre de bulletins de votes comptabilisés pour cette municipalité.
+entity_blank_votes|Le nombre de votes en blanc pour cette municipalité.
+entity_invalid_votes|Le nombre de votes valides pour cette municipalité. Zéro pour les élections sur la base de la représentation proportionnelle.
+entity_accounted_votes|Le nombre de votes comptabilisés pour cette municipalité.
 list_name|Le nom de la liste sur laquelle ce candidat apparaît. Uniquement valable pour les élections sur la base de la représentation proportionnelle.
 list_id|L'identifiant de liste de ce candidat apparaît dessus. Uniquement valable pour les élections basées sur la représentation proportionnelle.
 list_number_of_mandates|Le nombre de mandats que cette liste a obtenus. Uniquement valable pour les élections basées sur la représentation proportionnelle.
@@ -135,7 +135,7 @@ shortcode|Shortcode interne (définit l'ordre des votes ayant lieu le même jour
 domain|`federation` pour fédéral, `canton` for les votes cantonaux.
 type|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
 group|La désignation du résultat. Peut être le district, le nom de la ville divisé par un slash, le nom de la ville et le district de la ville divisés par un slash ou simplement le nom de la ville. Cela dépend entièrement du canton.
-municipality_id|La référence de la municipalité/localité. Mieux connu sous le nom de "BFS Nummer"
+entity_id|La référence de la municipalité/localité.
 counted|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 yeas|Nombre de votes oui
 nays|Nombre de votes non

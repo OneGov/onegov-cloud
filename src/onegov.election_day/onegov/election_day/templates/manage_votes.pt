@@ -42,6 +42,7 @@
                         <td>${layout.format_date(vote.date, 'date')}</td>
                         <td tal:condition="vote.domain == 'federation'" i18n:translate>Federal</td>
                         <td tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
+                        <td tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
                         <td>
                             <ul class="actions">
                                 <li><a i18n:translate="" class="action-view" href="${request.link(vote)}">View</a></li>

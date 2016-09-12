@@ -8,8 +8,8 @@ BALLOT_TYPES = {'proposal', 'counter-proposal', 'tie-breaker'}
 
 HEADERS = [
     'Bezirk',
-    'BFS Nummer',
-    'Gemeinde',
+    'ID',
+    'Name',
     'Ja Stimmen',
     'Nein Stimmen',
     'Stimmberechtigte',
@@ -18,7 +18,7 @@ HEADERS = [
 ]
 
 
-def import_file(municipalities, vote, ballot_type, file, mimetype):
+def import_file(entities, vote, ballot_type, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.
 
@@ -44,7 +44,7 @@ def import_file(municipalities, vote, ballot_type, file, mimetype):
     ballot_results = []
     errors = []
 
-    added_municipality_ids = set()
+    added_entity_ids = set()
     added_groups = set()
 
     # if we have the value "unknown" or "unbekannt" in any of the following
@@ -76,38 +76,36 @@ def import_file(municipalities, vote, ballot_type, file, mimetype):
 
         line_errors = []
 
-        # the name of the municipality
-        group = '/'.join(p for p in (line.bezirk, line.gemeinde) if p)
+        # the name of the entity
+        group = '/'.join(p for p in (line.bezirk, line.name) if p)
 
         if not group.strip().replace('/', ''):
-            line_errors.append(_("Missing municipality"))
+            line_errors.append(_("Missing municipality/district"))
 
         if group in added_groups:
-            line_errors.append(_("${group} was found twice", mapping={
-                'group': group
+            line_errors.append(_("${name} was found twice", mapping={
+                'name': group
             }))
 
         added_groups.add(group)
 
-        # the id of the municipality
+        # the id of the municipality or district
         try:
-            municipality_id = int(line.bfs_nummer or 0)
+            entity_id = int(line.id or 0)
         except ValueError:
-            line_errors.append(_("Invalid municipality id"))
+            line_errors.append(_("Invalid id"))
         else:
-            if municipality_id in added_municipality_ids:
+            if entity_id in added_entity_ids:
                 line_errors.append(
-                    _("municipality id ${id} was found twice", mapping={
-                        'id': municipality_id
-                    }))
+                    _("${name} was found twice", mapping={'name': entity_id})
+                )
 
-            if municipality_id not in municipalities:
+            if entity_id not in entities:
                 line_errors.append(
-                    _("municipality id ${id} is unknown", mapping={
-                        'id': municipality_id
-                    }))
+                    _("${name} is unknown", mapping={'name': entity_id})
+                )
             else:
-                added_municipality_ids.add(municipality_id)
+                added_entity_ids.add(entity_id)
 
         # the yeas
         try:
@@ -167,7 +165,7 @@ def import_file(municipalities, vote, ballot_type, file, mimetype):
                     yeas=yeas,
                     nays=nays,
                     elegible_voters=elegible_voters,
-                    municipality_id=municipality_id,
+                    entity_id=entity_id,
                     empty=empty,
                     invalid=invalid
                 )
@@ -177,17 +175,17 @@ def import_file(municipalities, vote, ballot_type, file, mimetype):
         errors.append(FileImportError(_("No data found")))
 
     if not errors:
-        for id in (municipalities.keys() - added_municipality_ids):
-            municipality = municipalities[id]
+        for id in (entities.keys() - added_entity_ids):
+            entity = entities[id]
 
             ballot_results.append(
                 BallotResult(
                     group='/'.join(p for p in (
-                        municipality.get('district'),
-                        municipality['name']
+                        entity.get('district'),
+                        entity['name']
                     ) if p is not None),
                     counted=False,
-                    municipality_id=id
+                    entity_id=id
                 )
             )
 
@@ -204,5 +202,5 @@ def import_file(municipalities, vote, ballot_type, file, mimetype):
     return {
         'status': 'ok',
         'errors': errors,
-        'records': len(added_municipality_ids)
+        'records': len(added_entity_ids)
     }

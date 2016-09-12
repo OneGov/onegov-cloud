@@ -34,7 +34,7 @@
         <div tal:condition="map_url" class="ballot-map"
             data-type="${model.type}"
             data-canton="${layout.app.principal.canton}"
-            data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, model.vote.date.year)}"
+            data-mapurl="${layout.get_topojson_link(layout.app.principal.id, model.vote.date.year)}"
             data-dataurl="${map_url}"
             >
 

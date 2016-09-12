@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-06 08:46+0200\n"
+"POT-Creation-Date: 2016-09-09 09:38+0200\n"
 "PO-Revision-Date: 2016-09-06 09:00+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -49,12 +49,12 @@ msgstr "Il file contiene una riga vuota."
 msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
 
-msgid "Invalid municipality values"
-msgstr "Valori del comune non validi"
+msgid "Invalid entity values"
+msgstr ""
 
 #, python-format
-msgid "municipality id ${id} is unknown"
-msgstr "Il numero UST ${id} è sconosciuto"
+msgid "${name} is unknown"
+msgstr ""
 
 msgid "Invalid list values"
 msgstr "Valori della lista non validi"
@@ -74,25 +74,28 @@ msgstr "Valori della lista delle connessioni non validi"
 msgid "No data found"
 msgstr "Nessun dato trovato"
 
+msgid "Invalid municipality values"
+msgstr "Valori del comune non validi"
+
+#, python-format
+msgid "municipality id ${id} is unknown"
+msgstr "Il numero UST ${id} è sconosciuto"
+
 msgid "Unknown candidate"
 msgstr "Candidato non conosciuto"
 
 msgid "Invalid values"
 msgstr "Valori non validi"
 
-msgid "Missing municipality"
-msgstr "Località mancante"
+msgid "Missing municipality/district"
+msgstr ""
 
 #, python-format
-msgid "${group} was found twice"
-msgstr "${group} figura due volte"
+msgid "${name} was found twice"
+msgstr ""
 
-msgid "Invalid municipality id"
-msgstr "Numero UST non valido"
-
-#, python-format
-msgid "municipality id ${id} was found twice"
-msgstr "Il numero UST ${id} figura due volte"
+msgid "Invalid id"
+msgstr ""
 
 msgid "Could not read yeas"
 msgstr "Impossibile leggere 'SÌ'"
@@ -117,6 +120,20 @@ msgstr "Il numero di voti espressi supera quello degli aventi diritto di voto"
 
 msgid "Invalid ballot type"
 msgstr "Tipo di scheda non valido"
+
+msgid "Missing municipality"
+msgstr "Località mancante"
+
+#, python-format
+msgid "${group} was found twice"
+msgstr "${group} figura due volte"
+
+msgid "Invalid municipality id"
+msgstr "Numero UST non valido"
+
+#, python-format
+msgid "municipality id ${id} was found twice"
+msgstr "Il numero UST ${id} figura due volte"
 
 msgid "Election (German)"
 msgstr "Elezione (tedesco)"
@@ -148,20 +165,11 @@ msgstr "Tipo"
 msgid "Related link"
 msgstr "Ulteriori informazioni"
 
-msgid "An election with this title exists already"
-msgstr "Esiste già un'elezione con questo nome"
-
 msgid "Election based on proportional representation"
 msgstr "Sistema proporzionale"
 
 msgid "Majority system"
 msgstr "Sistema maggioritario"
-
-msgid "Federal Election"
-msgstr "Elezione federale"
-
-msgid "Cantonal Election"
-msgstr "Elezione cantonale"
 
 msgid "File format"
 msgstr "Formato del file"
@@ -226,14 +234,14 @@ msgstr "Votazione (italiano)"
 msgid "Vote (Romansh)"
 msgstr "Votazione (romancio)"
 
-msgid "A vote with this title exists already"
-msgstr "Esiste già una votazione con questo titolo"
+msgid "federal"
+msgstr ""
 
-msgid "Federal Vote"
-msgstr "Votazione federale"
+msgid "cantonal"
+msgstr ""
 
-msgid "Cantonal Vote"
-msgstr "Votazione cantonale"
+msgid "communal"
+msgstr ""
 
 msgid "Elections &amp; Votes"
 msgstr "Elezioni &amp; votazioni"
@@ -253,8 +261,8 @@ msgstr "Aventi diritto di voto"
 msgid "Received Ballots"
 msgstr "Schede ricevute"
 
-msgid "Counted municipalities"
-msgstr "Comuni che hanno concluso lo spoglio"
+msgid "Counted"
+msgstr ""
 
 msgid "Download"
 msgstr "Scarica"
@@ -320,6 +328,12 @@ msgstr "Schede nulle"
 msgid "Accounted Votes"
 msgstr "Voti validi"
 
+msgid "Yay"
+msgstr "SÌ"
+
+msgid "Nay"
+msgstr "NO"
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il modulo contiene errori. Controlli per favore i campi evidenziati in rosso."
@@ -369,11 +383,17 @@ msgstr "Elezioni federali del ${date}"
 msgid "Cantonal Elections on ${date}"
 msgstr "Elezioni cantonali del ${date}"
 
+msgid "Communal Elections on ${date}"
+msgstr ""
+
 msgid "Federal Votes on ${date}"
 msgstr "Votazioni federali del ${date}"
 
 msgid "Cantonal Votes on ${date}"
 msgstr "Votazioni cantonali del ${date}"
+
+msgid "Communal Votes on ${date}"
+msgstr ""
 
 msgid "Election"
 msgstr "Elezione"
@@ -425,6 +445,9 @@ msgstr "Nazionale"
 
 msgid "Cantonal"
 msgstr "Cantonale"
+
+msgid "Communal"
+msgstr ""
 
 msgid "View"
 msgstr "Mostrare"
@@ -495,12 +518,6 @@ msgstr "Voti contrari"
 msgid "Cast Ballots"
 msgstr "Schede rientrate"
 
-msgid "Yay"
-msgstr "SÌ"
-
-msgid "Nay"
-msgstr "NO"
-
 msgid "Empty"
 msgstr "Bianche"
 
@@ -539,5 +556,23 @@ msgstr "L'anno ${year} non viene ancora supportato"
 msgid "This ballot has fewer results than the others"
 msgstr "Questo progetto contiene meno risultati rispetto agli altri."
 
-#~ msgid "No results yet"
-#~ msgstr "Ancora nessun risultato"
+#~ msgid "Counted municipalities"
+#~ msgstr "Comuni che hanno concluso lo spoglio"
+
+#~ msgid "An election with this title exists already"
+#~ msgstr "Esiste già un'elezione con questo nome"
+
+#~ msgid "Federal Election"
+#~ msgstr "Elezione federale"
+
+#~ msgid "Cantonal Election"
+#~ msgstr "Elezione cantonale"
+
+#~ msgid "A vote with this title exists already"
+#~ msgstr "Esiste già una votazione con questo titolo"
+
+#~ msgid "Federal Vote"
+#~ msgstr "Votazione federale"
+
+#~ msgid "Cantonal Vote"
+#~ msgstr "Votazione cantonale"

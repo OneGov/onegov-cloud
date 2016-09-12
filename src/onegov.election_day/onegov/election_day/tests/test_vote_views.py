@@ -19,7 +19,7 @@ def upload_vote(client):
     new.form.submit()
 
     csv = (
-        'Bezirk,BFS Nummer,Gemeinde,Ja Stimmen,Nein Stimmen,'
+        'Bezirk,ID,Name,Ja Stimmen,Nein Stimmen,'
         'Stimmberechtigte,Leere Stimmzettel,Ungültige Stimmzettel\n'
         ',1711,Zug,3821,7405,16516,80,1\n'
         ',1706,Oberägeri,811,1298,3560,18,\n'

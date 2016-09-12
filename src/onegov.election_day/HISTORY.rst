@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds elections and votes for municipalitites.
+
+  Breaking changes: The import and export formats have changed!
+
+  [msom]
+
 - Updates translations.
   [msom]
 

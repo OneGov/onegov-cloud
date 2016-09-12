@@ -76,18 +76,18 @@
                     <strong>${layout.format_number(ballot.cast_ballots)}</strong>
                 </li>
                 <li>
-                    <span i18n:translate="">Counted municipalities</span>
+                    <span i18n:translate="">Counted</span>
                     <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress ballot.progress" /></strong>
                 </li>
             </ul>
 
-            <div class="row">
+            <div class="row" tal:condition="use_maps">
                 <div class="small-12 small-centered medium-8 large-6 columns">
                     <div class="ballot-map" i18n:attributes="data-download-link; data-embed-link"
                         data-type="${ballot.type}"
                         data-canton="${layout.app.principal.canton}"
-                        data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, vote.date.year)}"
-                        data-dataurl="${request.link(ballot, name='by-municipality')}"
+                        data-mapurl="${layout.get_topojson_link(layout.app.principal.id, vote.date.year)}"
+                        data-dataurl="${request.link(ballot, name='by-entity')}"
                         data-download-link="Download"
                         data-embed-link="Embed"
                         data-embed-source="${request.link(ballot, name='map')}">
@@ -100,7 +100,7 @@
             <div class="foldable folded">
                 <h3 class="foldable-title" i18n:translate="">Electoral Districts</h3>
                 <div class="foldable-panel">
-                    <table class="ballot-results stackable">
+                    <table class="ballot-results stackable" tal:define="summarize len(ballot.results)!=1">
                         <thead>
                             <tr>
                                 <th i18n:translate="">Electoral District</th>
@@ -114,7 +114,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="total">
+                            <tr class="total" tal:condition="summarize">
                                 <td i18n:translate="">Total</td>
                                 <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
                                 <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
@@ -127,9 +127,9 @@
                                 <td class="right-aligned">${layout.format_number(ballot.nays_percentage)}</td>
                             </tr>
 
-                            <tr tal:repeat="result ballot.results" data-municipality-id="${result.municipality_id}">
+                            <tr tal:repeat="result ballot.results" data-municipality-id="${result.entity_id}">
                                 <tal:block condition="not: result.counted">
-                                    <td >${result.group}</td>
+                                    <td tal:condition="summarize">${result.group}</td>
                                     <td class="answer" colspan="7" i18n:translate="">Not yet counted.</td>
                                 </tal:block>
                                 <tal:block condition="result.counted">
@@ -145,7 +145,7 @@
                                 </tal:block>
                             </tr>
 
-                            <tr class="total">
+                            <tr class="total" tal:condition="summarize">
                                 <td i18n:translate="">Total</td>
                                 <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
                                 <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>

@@ -37,7 +37,7 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, municipalities):
     try:
-        municipality_id = int(line.bfs or 0)
+        entity_id = int(line.bfs or 0)
         elegible_voters = int(line.stimmber or 0)
         received_ballots = int(line.stimmabgegeben or 0)
         blank_ballots = int(line.stimmleer or 0)
@@ -67,16 +67,16 @@ def parse_election_result(line, errors, municipalities):
     except ValueError:
         errors.append(_("Invalid municipality values"))
     else:
-        if municipality_id not in municipalities:
+        if entity_id not in municipalities:
             errors.append(_(
                 "municipality id ${id} is unknown",
-                mapping={'id': municipality_id}
+                mapping={'id': entity_id}
             ))
         else:
             return ElectionResult(
                 id=uuid4(),
-                group=municipalities[municipality_id]['name'],
-                municipality_id=municipality_id,
+                group=municipalities[entity_id]['name'],
+                entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,
                 blank_ballots=blank_ballots,
@@ -188,8 +188,8 @@ def import_file(municipalities, election, file, mimetype,
 
     if results:
         election.number_of_mandates = mandates
-        election.counted_municipalities = len(results)
-        election.total_municipalities = 0
+        election.counted_entities = len(results)
+        election.total_entities = 0
 
         session = object_session(election)
 

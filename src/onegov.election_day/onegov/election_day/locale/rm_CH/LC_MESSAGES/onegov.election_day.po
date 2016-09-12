@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-06 08:46+0200\n"
-"PO-Revision-Date: 2016-09-12 10:49+0200\n"
+"POT-Creation-Date: 2016-09-09 09:38+0200\n"
+"PO-Revision-Date: 2016-08-29 13:08+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -49,12 +49,12 @@ msgstr "La datoteca cuntegna ina lingia vida."
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
 
-msgid "Invalid municipality values"
-msgstr "Datas nunvalaivlas da vischnancas"
+msgid "Invalid entity values"
+msgstr ""
 
 #, python-format
-msgid "municipality id ${id} is unknown"
-msgstr "Il numer UST ${id} n'è betg enconuschent"
+msgid "${name} is unknown"
+msgstr ""
 
 msgid "Invalid list values"
 msgstr "Datas da glista nunvalaivlas"
@@ -74,25 +74,28 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 msgid "No data found"
 msgstr "Chattà naginas datas"
 
+msgid "Invalid municipality values"
+msgstr "Datas nunvalaivlas da vischnancas"
+
+#, python-format
+msgid "municipality id ${id} is unknown"
+msgstr "Il numer UST ${id} n'è betg enconuschent"
+
 msgid "Unknown candidate"
 msgstr "Candidat(a) nunenconuschent(a)"
 
 msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
 
-msgid "Missing municipality"
-msgstr "Lieu che manca"
+msgid "Missing municipality/district"
+msgstr ""
 
 #, python-format
-msgid "${group} was found twice"
-msgstr "${group} è avant maun duas giadas"
+msgid "${name} was found twice"
+msgstr ""
 
-msgid "Invalid municipality id"
-msgstr "Numer UST nunvalaivel"
-
-#, python-format
-msgid "municipality id ${id} was found twice"
-msgstr "Il numer UST ${id} vegn duvrà duas giadas"
+msgid "Invalid id"
+msgstr ""
 
 msgid "Could not read yeas"
 msgstr "I n'è betg stà pussaivel da leger las 'vuschs affirmativas'"
@@ -117,6 +120,20 @@ msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
+
+msgid "Missing municipality"
+msgstr "Lieu che manca"
+
+#, python-format
+msgid "${group} was found twice"
+msgstr "${group} è avant maun duas giadas"
+
+msgid "Invalid municipality id"
+msgstr "Numer UST nunvalaivel"
+
+#, python-format
+msgid "municipality id ${id} was found twice"
+msgstr "Il numer UST ${id} vegn duvrà duas giadas"
 
 msgid "Election (German)"
 msgstr "Elecziun (tudestg)"
@@ -148,20 +165,11 @@ msgstr "Gener"
 msgid "Related link"
 msgstr "Ulteriuras infurmaziuns"
 
-msgid "An election with this title exists already"
-msgstr "In'elecziun cun quest titel exista gia"
-
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
 
 msgid "Majority system"
 msgstr "Elecziun da maiorz"
-
-msgid "Federal Election"
-msgstr "Elecziun naziunala"
-
-msgid "Cantonal Election"
-msgstr "Elecziun chantunala"
 
 msgid "File format"
 msgstr "Format da la datoteca"
@@ -226,14 +234,14 @@ msgstr "Votaziun (talian)"
 msgid "Vote (Romansh)"
 msgstr "Votaziun (rumantsch)"
 
-msgid "A vote with this title exists already"
-msgstr "Ina votaziun cun quest titel exista gia"
+msgid "federal"
+msgstr ""
 
-msgid "Federal Vote"
-msgstr "Votaziun naziunala"
+msgid "cantonal"
+msgstr ""
 
-msgid "Cantonal Vote"
-msgstr "Votaziun chantunala"
+msgid "communal"
+msgstr ""
 
 msgid "Elections &amp; Votes"
 msgstr "Elecziuns &amp; votaziuns"
@@ -253,8 +261,8 @@ msgstr "Persunas cun dretg da votar"
 msgid "Received Ballots"
 msgstr "Cedels electorals consegnads"
 
-msgid "Counted municipalities"
-msgstr "Vischnancas dumbradas ora"
+msgid "Counted"
+msgstr ""
 
 msgid "Download"
 msgstr "telechargiar"
@@ -320,6 +328,12 @@ msgstr "Cedels electorals nunvalaivels"
 msgid "Accounted Votes"
 msgstr "Vuschs valaivlas"
 
+msgid "Yay"
+msgstr "GEA"
+
+msgid "Nay"
+msgstr "NA"
+
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
@@ -370,11 +384,17 @@ msgstr "Elecziuns federalas dals ${date}"
 msgid "Cantonal Elections on ${date}"
 msgstr "Elecziuns chantunalas dals ${date}"
 
+msgid "Communal Elections on ${date}"
+msgstr ""
+
 msgid "Federal Votes on ${date}"
 msgstr "Votaziuns federalas dals ${date}"
 
 msgid "Cantonal Votes on ${date}"
 msgstr "Votaziuns chantunalas dals ${date}"
+
+msgid "Communal Votes on ${date}"
+msgstr ""
 
 msgid "Election"
 msgstr "Elecziun"
@@ -426,6 +446,9 @@ msgstr "Sin plaun naziunal"
 
 msgid "Cantonal"
 msgstr "Sin plaun chantunal"
+
+msgid "Communal"
+msgstr ""
 
 msgid "View"
 msgstr "Mussar"
@@ -496,12 +519,6 @@ msgstr "Vuschs negativas"
 msgid "Cast Ballots"
 msgstr "Cedels da votar entrads"
 
-msgid "Yay"
-msgstr "GEA"
-
-msgid "Nay"
-msgstr "NA"
-
 msgid "Empty"
 msgstr "Vid"
 
@@ -542,5 +559,23 @@ msgstr "L'onn ${year} na vegn anc betg sustegnì"
 msgid "This ballot has fewer results than the others"
 msgstr "Quest project ha main resultats ch'ils auters projects."
 
-#~ msgid "No results yet"
-#~ msgstr "Anc nagins resultats avant maun"
+#~ msgid "Counted municipalities"
+#~ msgstr "Vischnancas dumbradas ora"
+
+#~ msgid "An election with this title exists already"
+#~ msgstr "In'elecziun cun quest titel exista gia"
+
+#~ msgid "Federal Election"
+#~ msgstr "Elecziun naziunala"
+
+#~ msgid "Cantonal Election"
+#~ msgstr "Elecziun chantunala"
+
+#~ msgid "A vote with this title exists already"
+#~ msgstr "Ina votaziun cun quest titel exista gia"
+
+#~ msgid "Federal Vote"
+#~ msgstr "Votaziun naziunala"
+
+#~ msgid "Cantonal Vote"
+#~ msgstr "Votaziun chantunala"

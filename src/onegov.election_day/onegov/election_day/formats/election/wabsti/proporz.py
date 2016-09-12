@@ -48,20 +48,20 @@ HEADERS_STATS = [
 
 def parse_election_result(line, errors, municipalities):
     try:
-        municipality_id = int(line.einheit_bfs or 0)
+        entity_id = int(line.einheit_bfs or 0)
     except ValueError:
         errors.append(_("Invalid municipality values"))
     else:
-        if municipality_id not in municipalities:
+        if entity_id not in municipalities:
             errors.append(_(
                 "municipality id ${id} is unknown",
-                mapping={'id': municipality_id}
+                mapping={'id': entity_id}
             ))
         else:
             return ElectionResult(
                 id=uuid4(),
-                group=municipalities[municipality_id]['name'],
-                municipality_id=municipality_id,
+                group=municipalities[entity_id]['name'],
+                entity_id=entity_id,
             )
 
 
@@ -179,12 +179,12 @@ def import_file(municipalities, election, file, mimetype,
                 continue
 
             # Add the data
-            result = results.setdefault(result.municipality_id, result)
+            result = results.setdefault(result.entity_id, result)
 
             list = lists.setdefault(list.list_id, list)
 
-            list_results.setdefault(result.municipality_id, {})
-            list_result = list_results[result.municipality_id].setdefault(
+            list_results.setdefault(result.entity_id, {})
+            list_result = list_results[result.entity_id].setdefault(
                 list.list_id, list_result
             )
             list_result.list_id = list.id
@@ -305,8 +305,8 @@ def import_file(municipalities, election, file, mimetype,
         return {'status': 'error', 'errors': errors}
 
     if results:
-        election.counted_municipalities = len(results)
-        election.total_municipalities = 0
+        election.counted_entities = len(results)
+        election.total_entities = 0
 
         session = object_session(election)
 
@@ -330,7 +330,7 @@ def import_file(municipalities, election, file, mimetype,
         for result in election.results:
             session.delete(result)
         for result in results.values():
-            id = result.municipality_id
+            id = result.entity_id
             for list_result in list_results.get(id, {}).values():
                 result.list_results.append(list_result)
             election.results.append(result)

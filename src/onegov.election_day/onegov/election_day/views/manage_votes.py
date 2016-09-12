@@ -22,7 +22,7 @@ def view_votes(self, request):
         'layout': ManageVotesLayout(self, request),
         'title': _("Manage"),
         'votes': self.batch,
-        'new_vote': request.link(self, 'new-vote'),
+        'new_vote': request.link(self, 'new-vote')
     }
 
 
@@ -31,6 +31,8 @@ def view_votes(self, request):
 def create_vote(self, request, form):
 
     layout = ManageVotesLayout(self, request)
+
+    form.set_domain(request.app.principal)
 
     if form.submitted(request):
         vote = Vote()
@@ -51,6 +53,8 @@ def create_vote(self, request, form):
 def edit_vote(self, request, form):
 
     layout = ManageVotesLayout(self, request)
+
+    form.set_domain(request.app.principal)
 
     if form.submitted(request):
         form.update_model(self)

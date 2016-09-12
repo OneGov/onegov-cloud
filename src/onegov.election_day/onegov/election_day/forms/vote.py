@@ -1,11 +1,9 @@
 from datetime import date
-from onegov.ballot import VoteCollection
-from onegov.core import utils
 from onegov.election_day import _
 from onegov.form import Form
 from wtforms import RadioField, StringField
 from wtforms.fields.html5 import DateField, URLField
-from wtforms.validators import InputRequired, ValidationError
+from wtforms.validators import InputRequired
 
 
 class VoteForm(Form):
@@ -37,10 +35,6 @@ class VoteForm(Form):
 
     domain = RadioField(
         label=_("Type"),
-        choices=[
-            ('federation', _("Federal Vote")),
-            ('canton', _("Cantonal Vote")),
-        ],
         validators=[
             InputRequired()
         ]
@@ -50,11 +44,11 @@ class VoteForm(Form):
         label=_("Related link")
     )
 
-    def validate_vote(self, field):
-        votes = VoteCollection(self.request.app.session())
-
-        if votes.by_id(utils.normalize_for_url(field.data)):
-            raise ValidationError(_("A vote with this title exists already"))
+    def set_domain(self, principal):
+        self.domain.choices = [
+            (key, text.capitalize())
+            for key, text in principal.available_domains.items()
+        ]
 
     def update_model(self, model):
         model.date = self.date.data

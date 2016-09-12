@@ -26,8 +26,8 @@ def upload_majorz_election(client):
         "Ungueltige Stimmen,Kandidaten-Nr,Gewaehlt,Name,Vorname,Stimmen,"
         "Anzahl Gemeinden\n"
     )
-    csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 1\n"
-    csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 1\n"
+    csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 125\n"
+    csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 125\n"
     csv = csv.encode('utf-8')
 
     upload = client.get('/election/majorz-election/upload')
@@ -62,11 +62,11 @@ def upload_proporz_election(client):
     )
     csv += (
         "5,3503,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
-        "nicht gewählt,Casanova,Angela,0,0,0,0,0,1 von 1\n"
+        "nicht gewählt,Casanova,Angela,0,0,0,0,0,1 von 125\n"
     )
     csv += (
         "5,3503,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
-        "nicht gewählt,Caluori,Corina,1,0,1,0,0,1 von 1\n"
+        "nicht gewählt,Caluori,Corina,1,0,1,0,0,1 von 125\n"
     )
     csv = csv.encode('utf-8')
 
@@ -213,7 +213,7 @@ def test_view_election_summary(election_day_app_gr):
             'date': '2015-01-01',
             'domain': 'federation',
             'last_modified': '2014-01-01T12:00:00+00:00',
-            'progress': {'counted': 1, 'total': 1},
+            'progress': {'counted': 1, 'total': 125},
             'title': {'de_CH': 'Majorz Election'},
             'type': 'election',
             'url': 'http://localhost/election/majorz-election',
@@ -222,7 +222,7 @@ def test_view_election_summary(election_day_app_gr):
             'date': '2015-01-01',
             'domain': 'federation',
             'last_modified': '2014-01-01T12:00:00+00:00',
-            'progress': {'counted': 1, 'total': 1},
+            'progress': {'counted': 1, 'total': 125},
             'title': {'de_CH': 'Proporz Election'},
             'type': 'election',
             'url': 'http://localhost/election/proporz-election',

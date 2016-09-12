@@ -8,7 +8,7 @@ from sqlalchemy.orm import object_session
 HEADERS = [
     'type',
     'group',
-    'municipality_id',
+    'entity_id',
     'counted',
     'yeas',
     'nays',
@@ -18,7 +18,7 @@ HEADERS = [
 ]
 
 
-def import_file(municipalities, vote, file, mimetype):
+def import_file(entities, vote, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     :return: A dictionary of dictionaries containing the status and a list of
@@ -35,7 +35,7 @@ def import_file(municipalities, vote, file, mimetype):
 
     ballot_results = {}
     errors = {}
-    added_municipality_ids = {}
+    added_entity_ids = {}
     added_groups = {}
     ballot_types = set()
 
@@ -48,47 +48,47 @@ def import_file(municipalities, vote, file, mimetype):
             line_errors.append(_("Invalid ballot type"))
         ballot_types.add(ballot_type)
         errors.setdefault(ballot_type, [])
-        added_municipality_ids.setdefault(ballot_type, set())
+        added_entity_ids.setdefault(ballot_type, set())
         added_groups.setdefault(ballot_type, set())
         ballot_results.setdefault(ballot_type, [])
 
-        # the name of the municipality
+        # the name of the entity
         group = line.group.strip()
         if not group:
-            line_errors.append(_("Missing municipality"))
+            line_errors.append(_("Missing municipality/district"))
         if group in added_groups[ballot_type]:
-            line_errors.append(_("${group} was found twice", mapping={
-                'group': group
+            line_errors.append(_("${name} was found twice", mapping={
+                'name': group
             }))
         added_groups[ballot_type].add(group)
 
-        # the id of the municipality
+        # the id of the entity
         try:
-            municipality_id = int(line.municipality_id or 0)
+            entity_id = int(line.entity_id or 0)
         except ValueError:
-            line_errors.append(_("Invalid municipality id"))
+            line_errors.append(_("Invalid id"))
         else:
-            if municipality_id in added_municipality_ids[ballot_type]:
+            if entity_id in added_entity_ids[ballot_type]:
                 line_errors.append(
-                    _("municipality id ${id} was found twice", mapping={
-                        'id': municipality_id
+                    _("${name} was found twice", mapping={
+                        'name': entity_id
                     }))
 
-            if municipality_id not in municipalities:
+            if entity_id not in entities:
                 line_errors.append(
-                    _("municipality id ${id} is unknown", mapping={
-                        'id': municipality_id
+                    _("${name} is unknown", mapping={
+                        'name': entity_id
                     }))
             else:
-                added_municipality_ids[ballot_type].add(municipality_id)
+                added_entity_ids[ballot_type].add(entity_id)
 
-        # Add the uncounted municipality, but use the given group
+        # Add the uncounted entity, but use the given group
         if line.counted.lower() != 'true':
             ballot_results[ballot_type].append(
                 BallotResult(
                     group=group,
                     counted=False,
-                    municipality_id=municipality_id,
+                    entity_id=entity_id,
                 )
             )
             continue
@@ -149,7 +149,7 @@ def import_file(municipalities, vote, file, mimetype):
                     yeas=yeas,
                     nays=nays,
                     elegible_voters=elegible_voters,
-                    municipality_id=municipality_id,
+                    entity_id=entity_id,
                     empty=empty,
                     invalid=invalid
                 )
@@ -175,18 +175,18 @@ def import_file(municipalities, vote, file, mimetype):
 
     for ballot_type in ballot_types:
         remaining = (
-            municipalities.keys() - added_municipality_ids[ballot_type]
+            entities.keys() - added_entity_ids[ballot_type]
         )
         for id in remaining:
-            municipality = municipalities[id]
+            entity = entities[id]
             ballot_results[ballot_type].append(
                 BallotResult(
                     group='/'.join(p for p in (
-                        municipality.get('district'),
-                        municipality['name']
+                        entity.get('district'),
+                        entity['name']
                     ) if p is not None),
                     counted=False,
-                    municipality_id=id
+                    entity_id=id
                 )
             )
 
@@ -207,6 +207,6 @@ def import_file(municipalities, vote, file, mimetype):
         ballot_type: {
             'status': 'ok',
             'errors': errors[ballot_type],
-            'records': len(added_municipality_ids[ballot_type])
+            'records': len(added_entity_ids[ballot_type])
         } for ballot_type in ballot_types
     }

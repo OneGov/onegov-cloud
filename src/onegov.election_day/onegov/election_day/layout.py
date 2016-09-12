@@ -47,9 +47,10 @@ class Layout(ChameleonLayout):
 
         return self.request.link(static_file)
 
-    def get_topojson_link(self, canton, year):
+    def get_topojson_link(self, id, year):
         return self.request.link(
-            StaticFile('mapdata/{}/{}.json'.format(year, canton)))
+            StaticFile('mapdata/{}/{}.json'.format(year, id))
+        )
 
     @cached_property
     def copyright_year(self):

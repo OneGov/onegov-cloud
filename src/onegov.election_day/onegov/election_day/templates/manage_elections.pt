@@ -42,6 +42,7 @@
                         <td>${layout.format_date(election.date, 'date')}</td>
                         <td tal:condition="election.domain == 'federation'" i18n:translate>Federal</td>
                         <td tal:condition="election.domain == 'canton'" i18n:translate>Cantonal</td>
+                        <td tal:condition="election.domain == 'municipality'" i18n:translate>Communal</td>
                         <td tal:condition="election.type == 'majorz'" i18n:translate>Majority system</td>
                         <td tal:condition="election.type == 'proporz'" i18n:translate>Election based on proportional representation</td>
                         <td>

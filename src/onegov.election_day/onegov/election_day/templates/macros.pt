@@ -137,6 +137,11 @@
                             Cantonal Elections on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
                         </h2>
                     </tal:block>
+                    <tal:block condition="domain == 'municipality'">
+                        <h2 i18n:translate="">
+                            Communal Elections on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
+                        </h2>
+                    </tal:block>
                 </tal:block>
                 <tal:block condition="type == 'vote'">
                     <tal:block condition="domain == 'federation'">
@@ -147,6 +152,11 @@
                     <tal:block condition="domain == 'canton'">
                         <h2 i18n:translate="">
                             Cantonal Votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
+                        </h2>
+                    </tal:block>
+                    <tal:block condition="domain == 'municipality'">
+                        <h2 i18n:translate="">
+                            Communal Votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
                         </h2>
                     </tal:block>
                 </tal:block>
@@ -163,7 +173,7 @@
                         <tr tal:repeat="election items">
                             <td><a href="${request.link(election)}">${election.title}</a></td>
                             <td class="right-aligned">
-                                <div metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_municipalities, election.total_municipalities)" />
+                                <div metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_entities, election.total_entities)" />
                             </td>
                             <td class="right-aligned">
                                 ${layout.format_date(election.last_result_change, 'datetime')}

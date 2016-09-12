@@ -2,9 +2,10 @@
 
 ## Introduction
 
-There are JSON alternatives for all important views.
+There are JSON alternatives for all important views. All responses contain the `Last-Modified` HTTP Header with the last time, the data has change (i.e. the last time, results of an election or vote have been uploaded).
 
-All responses contain the `Last-Modified` HTTP Header with the last time, the data has change (i.e. the last time, results of an election or vote have been uploaded).
+"Municipality" might refer to a district, ward, etc.
+
 
 ## Contents
 
@@ -74,19 +75,19 @@ election_date|The date of the election (an ISO 8601 date string).
 election_type|`proporz` for proportional, `majorz` for majority system.
 election_mandates|The number of mandates.
 election_absolute_majority|The absolute majority. Only relevant for elections based on majority system.
-election_counted_municipalities|The number of already counted municipalities.
-election_total_municipalities|The total number of municipalities.
-municipality_name|The name of the municipality.
-municipality_bfs_number|The id of the municipality/locale ("BFS Nummer").
-municipality_elegible_voters|The number of people eligible to vote for this municipality.
-municipality_received_ballots|The number of received ballots for this municipality.
-municipality_blank_ballots|The number of blank ballots for this municipality.
-municipality_invalid_ballots|The number of invalid ballots for this municipality.
-municipality_unaccounted_ballots|The number of unaccounted ballots for this municipality.
-municipality_accounted_ballots|The number of accounted ballots for this municipality.
-municipality_blank_votes|The number of blank votes for this municipality.
-municipality_invalid_votes|The number of invalid votes for this municipality. Zero for elections based on proportional representation.
-municipality_accounted_votes|The number of accounted votes for this municipality.
+election_counted_entities|The number of already counted municipalities.
+election_total_entities|The total number of municipalities.
+entity_name|The name of the municipality.
+entity_id|The id of the municipality/locale.
+entity_elegible_voters|The number of people eligible to vote for this municipality.
+entity_received_ballots|The number of received ballots for this municipality.
+entity_blank_ballots|The number of blank ballots for this municipality.
+entity_invalid_ballots|The number of invalid ballots for this municipality.
+entity_unaccounted_ballots|The number of unaccounted ballots for this municipality.
+entity_accounted_ballots|The number of accounted ballots for this municipality.
+entity_blank_votes|The number of blank votes for this municipality.
+entity_invalid_votes|The number of invalid votes for this municipality. Zero for elections based on proportional representation.
+entity_accounted_votes|The number of accounted votes for this municipality.
 list_name|The name of the list this candidate appears on. Only relevant for elections based on proportional representation.
 list_id|The id of the list this candidate appears on. Only relevant for elections based on proportional representation.
 list_number_of_mandates|The number of mandates this list has got. Only relevant for elections based on proportional representation.
@@ -135,7 +136,7 @@ shortcode|Internal shortcode (defines the ordering of votes on the same day).
 domain|`federation` for federal, `canton` for cantonal votes.
 type|`proposal`, `counter-proposal` or `tie-breaker`.
 group|The designation of the result. May be the district, the town's name divided by a slash, the city's name and the city's district divided by a slash or simply the town's name. This depends entirely on the canton.
-municipality_id|The id of the municipality/locale. Better known as "BFS Nummer"
+entity_id|The id of the municipality/locale.
 counted|True if the result was counted, False if the result not known yet (the voting counts are not final yet).
 yeas|The number of yes votes.
 nays|The number of no votes.

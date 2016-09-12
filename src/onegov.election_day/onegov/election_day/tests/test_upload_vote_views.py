@@ -10,8 +10,8 @@ from webtest.forms import Upload
 
 COLUMNS = [
     'Bezirk',
-    'BFS Nummer',
-    'Gemeinde',
+    'ID',
+    'Name',
     'Ja Stimmen',
     'Nein Stimmen',
     'Stimmberechtigte',
@@ -70,7 +70,7 @@ def test_upload_vote_all_or_nothing(election_day_app):
     assert "Keine Fehler im Vorschlag" in upload
     assert "Keine Fehler im Gegenvorschlag" in upload
     assert "Fehler in der Stichfrage" in upload
-    assert "Ungültige BFS Nummer" in upload
+    assert "Ungültige ID" in upload
     assert '<span class="error-line"><span>Zeile</span>2</span>' in upload
 
     vote = VoteCollection(election_day_app.session()).by_id('bacon-yea-or-nay')
@@ -191,7 +191,7 @@ def test_upload_vote_validation(election_day_app):
     upload.form['proposal'] = Upload('csv', csv.encode('utf-8'), 'text/plain')
     upload = upload.form.submit()
 
-    assert "Fehlender Ort" in upload
+    assert "Fehlende Bezeichnung" in upload
 
     # duplicate municipality
     csv = '\n'.join((
@@ -214,7 +214,7 @@ def test_upload_vote_validation(election_day_app):
     upload.form['proposal'] = Upload('csv', csv.encode('utf-8'), 'text/plain')
     upload = upload.form.submit()
 
-    assert "Ungültige BFS Nummer" in upload
+    assert "Ungültige ID" in upload
 
     # invalid yeas
     csv = '\n'.join((
@@ -656,7 +656,7 @@ def test_upload_vote_temporary_results(election_day_app):
     # onegov: missing or counted=False
     csv = '\n'.join((
         (
-            'type,group,municipality_id,counted,yeas,nays,invalid,empty,'
+            'type,group,entity_id,counted,yeas,nays,invalid,empty,'
             'elegible_voters'
         ),
         'proposal,Baar,1701,False,0,0,0,0,0',
@@ -692,3 +692,141 @@ def test_upload_vote_temporary_results(election_day_app):
 
     result_wabsti = client.get('/vote/vote/data-csv').text
     assert result_standard == result_wabsti
+
+
+def test_upload_vote_available_formats_canton(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    upload = client.get('/vote/vote/upload')
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'default', 'internal', 'wabsti'
+    ]
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'canton'
+    new.form.submit()
+
+    upload = client.get('/vote/vote/upload')
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'default', 'internal', 'wabsti'
+    ]
+
+
+def test_upload_vote_available_formats_municipality(election_day_app_bern):
+    client = Client(election_day_app_bern)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    upload = client.get('/vote/vote/upload')
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'default', 'internal'
+    ]
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'canton'
+    new.form.submit()
+
+    upload = client.get('/vote/vote/upload')
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'default', 'internal'
+    ]
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'municipality'
+    new.form.submit()
+
+    upload = client.get('/vote/vote/upload')
+    assert sorted([o[0] for o in upload.form['file_format'].options]) == [
+        'default', 'internal'
+    ]
+
+
+def test_upload_communal_vote(election_day_app_kriens):
+    client = Client(election_day_app_kriens)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'Vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'municipality'
+    new.form.submit()
+
+    upload = client.get('/vote/vote/upload')
+    upload.form['type'] = 'simple'
+
+    csv = '\n'.join((
+        ','.join(COLUMNS),
+        ',1059,Kriens,2182,4913,18690,56,27'
+    ))
+
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain'
+    )
+
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result = client.get('/vote/vote')
+    assert '38.41' in result
+    assert 'ballot-map' not in result
+    assert '<td>Total' not in result
+
+
+def test_upload_communal_vote_districts(election_day_app_bern):
+    client = Client(election_day_app_bern)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'Vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'municipality'
+    new.form.submit()
+
+    upload = client.get('/vote/vote/upload')
+    upload.form['type'] = 'simple'
+
+    csv = '\n'.join((
+        ','.join(COLUMNS),
+        ',1,Innere Stadt,4142,1121,14431,218,2',
+        ',2,Länggasse/Felsenau,2907,676,9788,129,7',
+        ',3,Mattenhof/Weissenbühl,3978,1043,13750,201,2',
+        ',4,Kirchenfeld/Schosshalde,5459,1730,19329,146,9',
+        ',5,Breitenrain/Lorraine,3742,1139,13410,211,3',
+        ',6,Bümpliz/Bethlehem,3491,1036,12276,133,4',
+    ))
+
+    upload.form['proposal'] = Upload(
+        'data.csv', csv.encode('utf-8'), 'text/plain'
+    )
+
+    assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+    result = client.get('/vote/vote')
+    assert '37.99' in result
+    assert 'ballot-map' in result
+    assert '<td>Total' in result

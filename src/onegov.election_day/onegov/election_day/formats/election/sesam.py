@@ -73,7 +73,7 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, municipalities):
     try:
-        municipality_id = int(line.wahlkreis_nr or 0)
+        entity_id = int(line.wahlkreis_nr or 0)
         elegible_voters = int(line.stimmberechtigte or 0)
         received_ballots = int(line.wahlzettel or 0)
         blank_ballots = int(line.leere_wahlzettel or 0)
@@ -90,16 +90,16 @@ def parse_election_result(line, errors, municipalities):
     except ValueError:
         errors.append(_("Invalid municipality values"))
     else:
-        if municipality_id not in municipalities:
+        if entity_id not in municipalities:
             errors.append(_(
                 "municipality id ${id} is unknown",
-                mapping={'id': municipality_id}
+                mapping={'id': entity_id}
             ))
         else:
             return ElectionResult(
                 id=uuid4(),
-                group=municipalities[municipality_id]['name'],
-                municipality_id=municipality_id,
+                group=municipalities[entity_id]['name'],
+                entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,
                 blank_ballots=blank_ballots,
@@ -253,7 +253,7 @@ def import_file(municipalities, election, file, mimetype):
             continue
 
         # Add the data
-        result = results.setdefault(result.municipality_id, result)
+        result = results.setdefault(result.entity_id, result)
 
         if not majorz:
             list = lists.setdefault(list.list_id, list)
@@ -270,8 +270,8 @@ def import_file(municipalities, election, file, mimetype):
                     subconnection.parent_id = connection.id
                     list.connection_id = subconnection.id
 
-            list_results.setdefault(result.municipality_id, {})
-            list_result = list_results[result.municipality_id].setdefault(
+            list_results.setdefault(result.entity_id, {})
+            list_result = list_results[result.entity_id].setdefault(
                 list.list_id, list_result
             )
             list_result.list_id = list.id
@@ -291,8 +291,8 @@ def import_file(municipalities, election, file, mimetype):
 
     if results:
         election.number_of_mandates = mandates
-        election.counted_municipalities = counted
-        election.total_municipalities = total
+        election.counted_entities = counted
+        election.total_entities = total
 
         session = object_session(election)
 
@@ -316,7 +316,7 @@ def import_file(municipalities, election, file, mimetype):
         for result in election.results:
             session.delete(result)
         for result in results.values():
-            id = result.municipality_id
+            id = result.entity_id
             for list_result in list_results.get(id, {}).values():
                 result.list_results.append(list_result)
             election.results.append(result)

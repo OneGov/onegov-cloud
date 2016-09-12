@@ -28,12 +28,12 @@ def to_int(value):
         return value
 
 
-def get_missing_municipalities(election, request, session):
+def get_missing_entities(election, request, session):
     result = []
 
-    all_ = request.app.principal.municipalities[election.date.year]
+    all_ = request.app.principal.entities[election.date.year]
 
-    used = session.query(ElectionResult.municipality_id)
+    used = session.query(ElectionResult.entity_id)
     used = used.filter(ElectionResult.election_id == election.id)
     used = used.distinct()
     used = [item[0] for item in used]
@@ -69,7 +69,7 @@ def get_candidates_results(election, session):
 
 
 def get_candidate_electoral_results(election, session):
-    """ Returns the aggregated candidates results per municipality as list. """
+    """ Returns the aggregated candidates results per entity as list. """
 
     if election.type != 'majorz':
         return []
@@ -190,7 +190,7 @@ def view_election(self, request):
         'number_of_candidates': len(candidates),
         'electoral': get_candidate_electoral_results(self, session),
         'connections': get_connection_results(self, session),
-        'missing_municipalities': get_missing_municipalities(
+        'missing_entities': get_missing_entities(
             self, request, session
         ),
     }
@@ -382,8 +382,8 @@ def view_election_json(self, request):
             'total': self.number_of_mandates or 0,
         },
         'progress': {
-            'counted': self.counted_municipalities or 0,
-            'total': self.total_municipalities or 0,
+            'counted': self.counted_entities or 0,
+            'total': self.total_entities or 0,
         },
         'related_link': (self.meta or {}).get('related_link', ''),
         'title': self.title_translations,
@@ -408,7 +408,7 @@ def view_election_json(self, request):
                     'accounted_votes': district.accounted_votes,
                     'turnout': district.turnout,
                     'name': district.group,
-                    'id': district.municipality_id,
+                    'id': district.entity_id,
                 } for district in self.results
             ],
         },

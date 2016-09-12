@@ -19,7 +19,7 @@ def election_day_password():
 
 
 def create_app(postgres_dsn, temporary_directory, election_day_password,
-               canton):
+               canton="", municipality="", use_maps="false"):
 
     scan_morepath_modules(onegov.election_day.ElectionDayApp)
     morepath.commit(onegov.election_day.ElectionDayApp)
@@ -42,8 +42,10 @@ def create_app(postgres_dsn, temporary_directory, election_day_password,
         name: Kanton Govikon
         logo: logo.jpg
         canton: {}
+        municipality: {}
+        use_maps: {}
         color: '#000'
-    """.format(canton)))
+    """.format(canton, municipality, use_maps)))
 
     app.session().add(User(
         username='admin@example.org',
@@ -79,4 +81,24 @@ def election_day_app_sg(postgres_dsn, temporary_directory,
 
     yield create_app(
         postgres_dsn, temporary_directory, election_day_password, "sg"
+    )
+
+
+@pytest.yield_fixture(scope="function")
+def election_day_app_bern(postgres_dsn, temporary_directory,
+                          election_day_password):
+
+    yield create_app(
+        postgres_dsn, temporary_directory, election_day_password, "",
+        "'351'", "true"
+    )
+
+
+@pytest.yield_fixture(scope="function")
+def election_day_app_kriens(postgres_dsn, temporary_directory,
+                            election_day_password):
+
+    yield create_app(
+        postgres_dsn, temporary_directory, election_day_password, "",
+        "'1059'", "false"
     )

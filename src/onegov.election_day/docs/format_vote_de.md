@@ -2,6 +2,8 @@
 
 Als Dateiformate werden Dateien akzeptiert, welche von Hand, vom Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" oder der Webapplikation selbst generiert werden.
 
+Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
+
 ## Inhalt
 
 [Standardformat](#standardformat)
@@ -22,8 +24,8 @@ vollständig ausgezählt wurde. Folgende Spalten werden dabei in der hier
 aufgelisteten Reihenfolge erwartet:
 
 - **Bezirk**: Der Bezirk in der sich die Gemeinde befindet. Ist die Gemeinde in keinem Bezirk, darf dieses Feld leer sein.
-- **BFS-Nummer**: Die BFS-Nummer der Gemeinde zum Zeitpunkt der Abstimmung.
-- **Gemeinde**: Der Name der Gemeinde.
+- **ID**: Die BFS-Nummer der Gemeinde zum Zeitpunkt der Abstimmung.
+- **Name**: Der Name der Gemeinde.
 - **Ja Stimmen**: Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 - **Nein Stimmen**: Die Anzahl Nein Stimmen der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 - **Stimmberechtigte**: Die Anzahl Stimmberechtigter. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
@@ -48,7 +50,7 @@ Das Format des Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" besteht au
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 - **Vorlage-Nr.**: Eine fortlaufende Nummer für jede Vorlage/Abstimmung. Muss beim Upload Dialog angegeben werden.
-- **Gemeinde**: Der Name der Gemeinde
+- **Name**: Der Name der Gemeinde
 - **BfS-Nr.**: Die BFS-Nummer der Gemeinde.
 - **Stimmberechtigte**: Die Anzahl Stimmberechtigter.
 - **leere SZ**: Die Anzahl leer eingelegter Stimmzettel.
@@ -82,7 +84,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 - **type** `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
 - **group** Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
-- **municipality_id** Die BFS-Nummer der Gemeinde.
+- **entity_id** Die BFS-Nummer der Gemeinde.
 - **counted** `true`, falls die Gemeinde ausgezählt ist.
 - **yeas** Die Anzahl Ja Stimmen.
 - **nays** Die Anzahl Nein Stimmen.

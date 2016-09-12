@@ -14,15 +14,15 @@ from uuid import uuid4
 
 HEADERS = [
     'election_absolute_majority',
-    'election_counted_municipalites',
-    'election_total_municipalites',
-    'municipality_bfs_number',
-    'municipality_elegible_voters',
-    'municipality_received_ballots',
-    'municipality_blank_ballots',
-    'municipality_invalid_ballots',
-    'municipality_blank_votes',
-    'municipality_invalid_votes',
+    'election_counted_entities',
+    'election_total_entities',
+    'entity_id',
+    'entity_elegible_voters',
+    'entity_received_ballots',
+    'entity_blank_ballots',
+    'entity_invalid_ballots',
+    'entity_blank_votes',
+    'entity_invalid_votes',
     'list_name',
     'list_id',
     'list_number_of_mandates',
@@ -44,39 +44,39 @@ def parse_election(line, errors):
     try:
         if line.election_absolute_majority:
             absolute_majority = int(line.election_absolute_majority or 0)
-        counted = int(line.election_counted_municipalites or 0)
-        total = int(line.election_total_municipalites or 0)
+        counted = int(line.election_counted_entities or 0)
+        total = int(line.election_total_entities or 0)
     except ValueError:
         errors.append(_("Invalid election values"))
     return counted, total, absolute_majority
 
 
-def parse_election_result(line, errors, municipalities):
+def parse_election_result(line, errors, entities):
     try:
-        municipality_id = int(line.municipality_bfs_number or 0)
-        elegible_voters = int(line.municipality_elegible_voters or 0)
-        received_ballots = int(line.municipality_received_ballots or 0)
-        blank_ballots = int(line.municipality_blank_ballots or 0)
-        invalid_ballots = int(line.municipality_invalid_ballots or 0)
-        blank_votes = int(line.municipality_blank_votes or 0)
-        invalid_votes = int(line.municipality_invalid_votes or 0)
+        entity_id = int(line.entity_id or 0)
+        elegible_voters = int(line.entity_elegible_voters or 0)
+        received_ballots = int(line.entity_received_ballots or 0)
+        blank_ballots = int(line.entity_blank_ballots or 0)
+        invalid_ballots = int(line.entity_invalid_ballots or 0)
+        blank_votes = int(line.entity_blank_votes or 0)
+        invalid_votes = int(line.entity_invalid_votes or 0)
 
         if not elegible_voters:
             raise ValueError()
 
     except ValueError:
-        errors.append(_("Invalid municipality values"))
+        errors.append(_("Invalid entity values"))
     else:
-        if municipality_id not in municipalities:
+        if entity_id not in entities:
             errors.append(_(
-                "municipality id ${id} is unknown",
-                mapping={'id': municipality_id}
+                "${name} is unknown",
+                mapping={'name': entity_id}
             ))
         else:
             return ElectionResult(
                 id=uuid4(),
-                group=municipalities[municipality_id]['name'],
-                municipality_id=municipality_id,
+                group=entities[entity_id]['name'],
+                entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,
                 blank_ballots=blank_ballots,
@@ -167,7 +167,7 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_file(municipalities, election, file, mimetype):
+def import_file(entities, election, file, mimetype):
     """ Tries to import the given file (sesam format).
 
     :return: A dictionary containing the status and a list of errors if any.
@@ -191,7 +191,7 @@ def import_file(municipalities, election, file, mimetype):
     subconnections = {}
     results = {}
 
-    # This format has one candiate per municipality per line
+    # This format has one candiate per entity per line
     counted = 0
     total = 0
     absolute_majority = None
@@ -200,7 +200,7 @@ def import_file(municipalities, election, file, mimetype):
 
         # Parse the line
         counted, total, absolute_majority = parse_election(line, line_errors)
-        result = parse_election_result(line, line_errors, municipalities)
+        result = parse_election_result(line, line_errors, entities)
         candidate = parse_candidate(line, line_errors)
         candidate_result = parse_candidate_result(line, line_errors)
         if not majorz:
@@ -217,7 +217,7 @@ def import_file(municipalities, election, file, mimetype):
             continue
 
         # Add the data
-        result = results.setdefault(result.municipality_id, result)
+        result = results.setdefault(result.entity_id, result)
 
         if not majorz:
             list_ = lists.setdefault(list_.list_id, list_)
@@ -234,8 +234,8 @@ def import_file(municipalities, election, file, mimetype):
                     subconnection.parent_id = connection.id
                     list_.connection_id = subconnection.id
 
-            list_results.setdefault(result.municipality_id, {})
-            list_result = list_results[result.municipality_id].setdefault(
+            list_results.setdefault(result.entity_id, {})
+            list_result = list_results[result.entity_id].setdefault(
                 list_.list_id, list_result
             )
             list_result.list_id = list_.id
@@ -256,8 +256,8 @@ def import_file(municipalities, election, file, mimetype):
     if results:
         if absolute_majority is not None:
             election.absolute_majority = absolute_majority
-        election.counted_municipalities = counted
-        election.total_municipalities = total
+        election.counted_entities = counted
+        election.total_entities = total
 
         session = object_session(election)
 
@@ -281,7 +281,7 @@ def import_file(municipalities, election, file, mimetype):
         for result in election.results:
             session.delete(result)
         for result in results.values():
-            id = result.municipality_id
+            id = result.entity_id
             for list_result in list_results.get(id, {}).values():
                 result.list_results.append(list_result)
             election.results.append(result)

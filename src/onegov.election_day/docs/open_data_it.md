@@ -2,9 +2,9 @@
 
 ## Introduzione
 
-Ci sono alternative al formato JSON per tutte le visualizzazioni più importanti.
+Ci sono alternative al formato JSON per tutte le visualizzazioni più importanti. Tutte le risposte contengono l'intestazione HTTP `Last-Modified` (Ultima modifica) con l'ultima volta in cui si è verificata una modifica dei dati (ad es. l'ultima volta in cui i risultati di un'elezione o i voti sono stati caricati).
 
-Tutte le risposte contengono l'intestazione HTTP `Last-Modified` (Ultima modifica) con l'ultima volta in cui si è verificata una modifica dei dati (ad es. l'ultima volta in cui i risultati di un'elezione o i voti sono stati caricati).
+"Comune" si riferisce ad un distretto, una circoscrizione elettorale, etc.
 
 ## Contenuti
 
@@ -74,19 +74,19 @@ election_date|Data dell'elezione (stringa data in formato ISO 8601)
 election_type|`proporz` per il sistema proporzionale, `majorz` per il sistema maggioritario.
 election_mandates|Numero di mandati.
 election_absolute_majority|La maggioranza assoluta. Rilevante solo per le elezioni basate sul sistema di maggioranza.
-election_counted_municipalities|Il numero di comuni già contati.
-election_total_municipalities|Il numero totale dei comuni.
-municipality_name|Nome del comune.
-municipality_bfs_number|Identificativo del comune/località ("BFS Nummer").
-municipality_elegible_voters|Numero degli aventi diritto al voto di questo comune.
-municipality_received_ballots|Numero di schede ricevute per questo comune.
-municipality_blank_ballots|Numero di schede bianche per questo comune.
-municipality_invalid_ballots|Numero di schede nulle per questo comune.
-municipality_unaccounted_ballots|Numero di schede non valide per questo comune.
-municipality_accounted_ballots|Numero di schede valide per questo comune.
-municipality_blank_votes|Numero di voti nulli in questo comune.
-municipality_invalid_votes|Numero di voti non validi in questo comune. Zero per elezioni basate sul sistema proporzionale.
-municipality_accounted_votes|Numero di voti validi in questo comune.
+election_counted_entities|Il numero di comuni già contati.
+election_total_entities|Il numero totale dei comuni.
+entity_name|Nome del comune.
+entity_id|Identificativo del comune.
+entity_elegible_voters|Numero degli aventi diritto al voto di questo comune.
+entity_received_ballots|Numero di schede ricevute per questo comune.
+entity_blank_ballots|Numero di schede bianche per questo comune.
+entity_invalid_ballots|Numero di schede nulle per questo comune.
+entity_unaccounted_ballots|Numero di schede non valide per questo comune.
+entity_accounted_ballots|Numero di schede valide per questo comune.
+entity_blank_votes|Numero di voti nulli in questo comune.
+entity_invalid_votes|Numero di voti non validi in questo comune. Zero per elezioni basate sul sistema proporzionale.
+entity_accounted_votes|Numero di voti validi in questo comune.
 list_name|Nome della lista alla quale appartiene questo candidato. Valido solo per elezioni basate sul sistema proporzionale.
 list_id|L'identificativo della lista su cui questo candidato compare. Rilevante solo per le elezioni basate sul metodo proporzionale.
 list_number_of_mandates|Il numero di mandati ottenuti da questa lista. Rilevante solo per le elezioni basate sul metodo proporzionale.
@@ -135,7 +135,7 @@ shortcode|Abbreviazione interna (definisce l'ordine di diverse votazioni in un g
 domain|`federation` per votazioni federali, `canton` per votazioni cantonali
 type|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
 group|Da dove viene il risultato. Si può trattare del distretto e del comune, separati da una barra, del nome della città e del nome del circolo, anch'essi separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal rispettivo Cantone.
-municipality_id|ID del comune/dell'ubicazione. Meglio noto come "numero UST".
+entity_id|ID del comune/dell'ubicazione.
 counted|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
 yeas|Numero di voti favorevoli
 nays|Numero di voti contrari

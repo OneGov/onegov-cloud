@@ -23,13 +23,14 @@ def view_vote(self, request):
     return {
         'vote': self,
         'layout': DefaultLayout(self, request),
-        'counted': self.counted
+        'counted': self.counted,
+        'use_maps': request.app.principal.use_maps
     }
 
 
-@ElectionDayApp.json(model=Ballot, permission=Public, name='by-municipality')
-def view_ballot_by_municipality(self, request):
-    return self.percentage_by_municipality()
+@ElectionDayApp.json(model=Ballot, permission=Public, name='by-entity')
+def view_ballot_by_entity(self, request):
+    return self.percentage_by_entity()
 
 
 @ElectionDayApp.html(model=Ballot, template='embed.pt', permission=Public,
@@ -47,8 +48,8 @@ def view_ballot_as_map(self, request):
         'model': self,
         'layout': DefaultLayout(self, request),
         'data': {
-            'map': request.link(self, name='by-municipality')
-        }
+            'map': request.link(self, name='by-entity')
+        } if request.app.principal.use_maps else {}
     }
 
 
@@ -111,7 +112,7 @@ def view_vote_json(self, request):
                             'turnout': district.turnout,
                             'counted': district.counted,
                             'name': district.group,
-                            'id': district.municipality_id,
+                            'id': district.entity_id,
                         } for district in ballot.results
                     ],
                 },
@@ -120,6 +121,7 @@ def view_vote_json(self, request):
         'url': request.link(self),
         'embed': [
             request.link(ballot, 'map') for ballot in self.ballots
+            if request.app.principal.use_maps
         ]
     }
 

@@ -42,7 +42,7 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
 
     ballot_results = {key: [] for key in used_ballot_types}
     errors = []
-    added_municipality_ids = set()
+    added_entity_ids = set()
     added_groups = set()
 
     skipped = 0
@@ -70,27 +70,27 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
 
         # the id of the municipality
         try:
-            municipality_id = int(line.bfs_nr_ or 0)
+            entity_id = int(line.bfs_nr_ or 0)
         except ValueError:
             line_errors.append(_("Invalid municipality id"))
         else:
-            if municipality_id in added_municipality_ids:
+            if entity_id in added_entity_ids:
                 line_errors.append(
                     _("municipality id ${id} was found twice", mapping={
-                        'id': municipality_id
+                        'id': entity_id
                     }))
 
-            if municipality_id not in municipalities:
+            if entity_id not in municipalities:
                 if line.gemeinde.strip() == 'Auslandschweizer':
                     # https://github.com/OneGov/onegov.election_day/issues/40
                     continue
 
                 line_errors.append(
                     _("municipality id ${id} is unknown", mapping={
-                        'id': municipality_id
+                        'id': entity_id
                     }))
             else:
-                added_municipality_ids.add(municipality_id)
+                added_entity_ids.add(entity_id)
 
         # the yeas
         yeas = {}
@@ -159,7 +159,7 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
                         yeas=yeas[ballot_type],
                         nays=nays[ballot_type],
                         elegible_voters=elegible_voters,
-                        municipality_id=municipality_id,
+                        entity_id=entity_id,
                         empty=empty,
                         invalid=invalid
                     )
@@ -182,7 +182,7 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
 
     for ballot_type in used_ballot_types:
         remaining = (
-            municipalities.keys() - added_municipality_ids
+            municipalities.keys() - added_entity_ids
         )
         for id in remaining:
             municipality = municipalities[id]
@@ -190,7 +190,7 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
                 BallotResult(
                     group=municipality['name'],
                     counted=False,
-                    municipality_id=id
+                    entity_id=id
                 )
             )
 
@@ -211,6 +211,6 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
         ballot_type: {
             'status': 'ok',
             'errors': errors if ballot_type == 'proposal' else [],
-            'records': len(added_municipality_ids)
+            'records': len(added_entity_ids)
         } for ballot_type in used_ballot_types
     }
