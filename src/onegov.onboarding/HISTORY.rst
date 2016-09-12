@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Depends on latest onegov.town/org release.
+  [href]
+
 - Name each step and have a separate body class for each named step.
   [href]
 
