@@ -818,4 +818,11 @@ form {
     .factoids {
         page-break-after: avoid;
     }
+
+    html,
+    body {
+        margin: 0;
+        max-width: 100%;
+        width: 100%;
+    }
 }
