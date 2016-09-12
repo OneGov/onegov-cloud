@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.11 (2016-09-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Depends on latest onegov.town/org release.
   [href]
 
