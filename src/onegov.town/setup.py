@@ -37,6 +37,7 @@ setup(
     extras_require=dict(
         test=[
             'coverage',
+            'morepath',
             'freezegun',
             'onegov.testing',
             'webtest',
@@ -46,7 +47,7 @@ setup(
     ),
     entry_points="""
         [console_scripts]
-        onegov-town=onegov.org.cli:cli
+        onegov-town=onegov.town.cli:cli
 
         [onegov]
         upgrade=onegov.town.upgrade

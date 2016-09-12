@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes initial content being filled by the org, not the town.
+  [href]
+
 1.11.4 (2016-09-12)
 ~~~~~~~~~~~~~~~~~~~
 

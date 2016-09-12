@@ -11,6 +11,7 @@ from onegov.core import utils
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 from onegov.town.theme import TownTheme
+from onegov.town.initial_content import create_new_organisation
 
 
 class TownApp(OrgApp):
@@ -46,3 +47,8 @@ def get_enable_yubikey():
 def get_i18n_localedirs():
     return [utils.module_path('onegov.town', 'locale')] \
         + get_org_i18n_localedirs()
+
+
+@TownApp.setting(section='org', name='create_new_organisation')
+def get_create_new_organisation_factory():
+    return create_new_organisation
