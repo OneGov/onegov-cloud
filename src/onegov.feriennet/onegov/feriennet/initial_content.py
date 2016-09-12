@@ -3,7 +3,7 @@ from onegov.page import PageCollection
 from onegov.org.models import Organisation
 
 
-def create_new_organisation(request, app, name):
+def create_new_organisation(app, name):
     session = app.session()
     session.add(Organisation(name=name))
 
