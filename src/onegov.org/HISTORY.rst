@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.7 (2016-09-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to define a custom homepage through widgets.
   [href]
 
