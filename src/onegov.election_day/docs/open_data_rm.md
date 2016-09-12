@@ -1,18 +1,18 @@
 # Elecziuns & votaziuns: Open Data
 
-## Introduction
+## Introducziun
 
-There are JSON alternatives for all important views.
+Per mintga pagina impurtanta datti in'alternativa JSON correspundenta.
 
-All responses contain the `Last-Modified` HTTP Header with the last time, the data has change (i.e. the last time, results of an election or vote have been uploaded).
+Tuts Responses cuntegnan il `Last-Modified` HTTP Header che infurmescha, cura ch'igl è vegnida fatga l'ultima midada (p.ex. cura ch'igl èn vegnids chargiads si l'ultima giada resultats d'ina elecziun u d'ina votaziun).
 
-## Contents
+## Cuntegn
 
-1. [Summarized results](#summary)
-2. [Election results](#election)
-3. [Vote results](#vote)
+1. [Survista dals resultats](#survista-dals-resultats)
+2. [Resultats da las elecziuns](#resultats-da-las-elecziuns)
+3. [Resultats da la votaziun](#resultats-da-la-votaziun)
 
-## Summarized results
+## Survista dals resultats
 
 ```
 URL (latest): /json
@@ -24,34 +24,34 @@ URL (vote): /vote/{id}/summary
 
 The summarized results displayed at the home page (only the results of latest votes and elections) and the archive (browsable by year or date) is also available as JSON. The data contains some global informations and for every election and vote the following commong information:
 
-Name|Description
+Num|Descripziun
 ---|---
-type|`election` for elections, `vote` for votes.
-title|An object containing the translated titles.
-date|The date (ISO 8601).
-domain|The domain of influence (federation, canton, ...).
-url|A link to the detailed view.
-progess|An object containing the number already counted municipalities (`counted`) and the total number of municipalities (`total`).
+type|`election` per elecziuns, `vote` per votaziuns.
+title|In object cun ils titels translatads.
+date|La data (ISO 8601).
+domain|Champ d'influenza (confederaziun, chantun, ...).
+url|In link a la vista detagliada.
+progess|In object che cuntegna il dumber da las vischnancas dumbradas ora (`counted`) ed il dumber total da vischnancas (`total`).
 
-Vote results contain the following additional information:
+Ils resultats da l'elecziun cuntegnan las suandantas infurmaziuns supplementaras:
 
-Name|Description
+Num|Descripziun
 ---|---
-answer|The answer of the vote: `accepted`, `rejected`, `proposal` or `counter-proposal`.
-yeas_percentage|Yeas percentage.
-nays_percentage|Nays percentage.
+answer|Il resultat da la votaziun: acceptà (`accepted`), refusà (`rejected`), iniziativa (`proposal`) u cuntraproposta (`counter-proposal`).
+yeas_percentage|Vuschs affirmativas en pertschients.
+nays_percentage|Vuschs negativas en pertschients.
 
-## Election results
+## Resultats da las elecziuns
 
-### Processed results
+### Resultats elavurads
 
 ```
 URL: /election/{id}/json
 ```
 
-Returns the data of the main view in a structured form.
+I vegnan restituidas las medemas datas sco en la vista normala, mo en ina furma structurada.
 
-### Raw data
+### Datas nunelavuradas
 
 ```
 URL: `/election/{id}/{data-format}`
@@ -67,15 +67,15 @@ XLSX|`/data-xlsx`
 
 Ils suandants champs èn disponibels en tut ils formats:
 
-Name|Description
+Num|Descripziun
 ---|---
 election_title|Titel da l'elecziun
 election_date|La data da l'elecziun (sco segns ISO 8601)
 election_type|`proporz` en cas d'ina elecziun da proporz, `majorz` en cas d'ina elecziun da maiorz
 election_mandates|Il dumber dals sezs.
-election_absolute_majority|The absolute majority. Only relevant for elections based on majority system.
-election_counted_municipalities|The number of already counted municipalities.
-election_total_municipalities|The total number of municipalities.
+election_absolute_majority|La maioritad absoluta. Mo tar elecziuns da maiorz.
+election_counted_municipalities|Il dumber da vischnancas ch'èn dumbradas ora.
+election_total_municipalities|Il dumber total da vischnancas.
 municipality_name|Il num da la vischnanca/dal lieu
 municipality_bfs_number|La ID da la vischnanca/dal lieu. Pli enconuschent sco "numer UST".
 municipality_elegible_voters|Il dumber da las votantas e dals votants da la vischnanca/dal lieu.
@@ -88,30 +88,30 @@ municipality_blank_votes|Il dumber da las vuschs vidas da la vischnanca/dal lieu
 municipality_invalid_votes|Il dumber da las vuschs nunvalaivlas da la vischnanca/dal lieu. Nagins en cas d'ina elecziun da proporz.
 municipality_accounted_votes|Il dumber da las vuschs valaivlas da la vischnanca/dal lieu.
 list_name|Il num da la glista da la persuna che candidescha. Mo en cas d'elecziuns da proporz.
-list_id|The id of the list this candidate appears on. Only relevant for elections based on proportional representation.
-list_number_of_mandates|The number of mandates this list has got. Only relevant for elections based on proportional representation.
+list_id|La ID da la glista, per la quala la candidata u il candidat candidescha. Mo tar elecziuns da proporz.
+list_number_of_mandates|Il dumber da sezs da la glista. Mo tar elecziuns da proporz.
 list_votes|Il dumber da las vuschs da las glistas. Mo tar elecziuns da proporz.
 list_connection|La ID da la colliaziun da glistas. Mo tar elecziuns da proporz.
 list_connection_parent|La ID da la colliaziun da glistas surordinada. Mo en cas d'elecziuns da proporz e sch'i sa tracta d'ina sutcolliaziun da glistas.
 candidate_family_name|Il num da famiglia da la persuna che candidescha.
 candidate_first_name|Il prenum da la persuna che candidescha.
-candidate_id|The ID of the candidate.
-candidate_elected|True if the candidate has been elected.
+candidate_id|La ID da la candidata u dal candidat.
+candidate_elected|True, sche la candidata u il candidat è vegnì elegì.
 candidate_votes|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu.
 
-Not yet counted municipalities are not included.
+Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
-## Vote results
+## Resultats da la votaziun
 
-### Processed results
+### Resultats elavurads
 
 ```
 URL: /vote/{id}/json
 ```
 
-Returns the data of the main view in a structured form.
+I vegnan restituidas las medemas datas sco en la vista normala, mo en ina furma structurada.
 
-### Raw data
+### Datas nunelavuradas
 
 ```
 URL: `/vote/{id}/{data-format}`
@@ -127,7 +127,7 @@ XLSX|`/data-xlsx`
 
 Ils suandants champs èn disponibels en tut ils formats:
 
-Name|Description
+Num|Descripziun
 ---|---
 title|Titel da la votaziun.
 date|La data da la votaziun (sco segns ISO 8601).

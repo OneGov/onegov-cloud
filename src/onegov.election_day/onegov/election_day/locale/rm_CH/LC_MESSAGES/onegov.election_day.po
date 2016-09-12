@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-06 08:46+0200\n"
-"PO-Revision-Date: 2016-08-29 13:08+0200\n"
+"PO-Revision-Date: 2016-09-12 10:49+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.9\n"
 
 msgid "Elections"
 msgstr "Elecziuns"
@@ -116,7 +116,7 @@ msgid "More cast votes than elegible voters"
 msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
 
 msgid "Invalid ballot type"
-msgstr ""
+msgstr "Tip da votaziun nunvalaivel"
 
 msgid "Election (German)"
 msgstr "Elecziun (tudestg)"
@@ -164,7 +164,7 @@ msgid "Cantonal Election"
 msgstr "Elecziun chantunala"
 
 msgid "File format"
-msgstr ""
+msgstr "Format da la datoteca"
 
 msgid "Results"
 msgstr "Resultats"
@@ -194,7 +194,7 @@ msgid "Tie-Breaker"
 msgstr "Dumonda decisiva"
 
 msgid "Vote number"
-msgstr ""
+msgstr "Numer dal project"
 
 msgid "SESAM"
 msgstr "SESAM"
@@ -206,7 +206,7 @@ msgid "OneGov Cloud"
 msgstr "OneGov Cloud"
 
 msgid "Default"
-msgstr ""
+msgstr "Standard"
 
 msgid "Simple Vote"
 msgstr "Project da votaziun simpel"
@@ -257,10 +257,10 @@ msgid "Counted municipalities"
 msgstr "Vischnancas dumbradas ora"
 
 msgid "Download"
-msgstr ""
+msgstr "telechargiar"
 
 msgid "Embed"
-msgstr ""
+msgstr "incorporar"
 
 msgid "Candidates"
 msgstr "Candidatas e candidats"
@@ -329,7 +329,7 @@ msgid "Back to the latest elections &amp; votes"
 msgstr "Enavos a las elecziuns &amp; votaziuns actualas"
 
 msgid "Open Data"
-msgstr ""
+msgstr "Open Data"
 
 msgid "Login"
 msgstr "Annunziar"
@@ -383,7 +383,7 @@ msgid "Reported"
 msgstr "Annunzià"
 
 msgid "Updated"
-msgstr ""
+msgstr "Actualisà"
 
 msgid "Vote"
 msgstr "Project"
@@ -398,16 +398,16 @@ msgid "No %"
 msgstr "% NA"
 
 msgid "Previous Page"
-msgstr ""
+msgstr "Pagina precedenta"
 
 msgid "Next Page"
-msgstr ""
+msgstr "Proxima pagina"
 
 msgid "You are here"
-msgstr ""
+msgstr "Pagina actuala"
 
 msgid "Last change"
-msgstr ""
+msgstr "Actualisà"
 
 msgid "Trigger notifications"
 msgstr ""

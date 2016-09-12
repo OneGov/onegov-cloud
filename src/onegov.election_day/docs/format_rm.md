@@ -1,15 +1,15 @@
-# Elections & votes web application
+# Applicaziun web "Elecziuns & votaziuns"
 
-## Introduction
+## Introducziun
 
-On election Sunday results will be published regularly on individual elections and votings. With the new *elections & votes* web application, this is done via a web interface, which accepts CSV or Excel (XLS / XLSX) files with provisional or definitive results. For Excel files, either the first worksheet, or, if available, the worksheet named "results" will be used.
+La dumengia da votaziun vegnan publitgads permanentamain ils resultats tar las singulas elecziuns e votaziuns. Tar la nova applicaziun web *Elecziuns & votaziuns* vegn quai fatg sur ina interfatscha web che prenda encunter datotecas CSV u Excel (XLS/XLSX) cun resultats provisorics u definitivs. En cas da datotecas Excel vegn duvrà ubain l'emprim fegl da lavur ubain, sche avant maun, il fegl da lavur cun il num `resultats`.
 
-Depending on the election / vote and format, a different number of files is required. Each of these files, irrespective of the file format, consists of a header and any number of result rows. The header contains the name of the columns and is *mandatory*.
+Tut tenor elecziun / votaziun e format vegn duvrà in dumber different da datotecas. Mintga datoteca cumpiglia – independentamain dal format da datoteca duvrà – in chau-pagina ed x-in dumber da lingias cun resultats. Il chau-pagina cuntegna las designaziuns da las colonnas ed è *stringentamain necessari*.
 
-This document describes the format of these CSV/Excel files.
+Quest document descriva il format da questas datotecas CSV/Excel.
 
-## Content
+## Cuntegn
 
-[Format Specification Elections](format_election_rm.md)
+[Format Specificaziun Elecziuns](format_election_rm.md)
 
 [Format Specification Votes](format_vote_rm.md)
