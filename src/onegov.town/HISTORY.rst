@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the separation of onegov.org/onegov.town.
+  [href]
+
 1.11.3 (2016-08-31)
 ~~~~~~~~~~~~~~~~~~~
 

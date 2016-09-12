@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-24 14:26+0200\n"
+"POT-Creation-Date: 2016-09-08 16:30+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,98 +12,8 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Selected Topics"
-msgstr "Ausgewählte Themen"
-
-msgid "Latest news"
-msgstr "Aktuelles"
-
-msgid "All news"
-msgstr "Alle Nachrichten"
-
-msgid "Good morning,"
-msgstr "Guten Morgen"
-
-msgid "This is what happend on the ${town} website yesterday:"
-msgstr "Folgendes ist gestern auf der ${town} Webseite geschehen:"
-
-msgid "This is what happend on the ${town} website over the weekend:"
-msgstr ""
-"Folgendes ist während des Wochenendes auf der ${town} Webseite geschehen:"
-
-msgid "tickets were opened."
-msgstr "Tickets wurden eröffnet."
-
-msgid "ticket was opened."
-msgstr "Ticket wurde eröffnet."
-
-msgid "tickets were accepted."
-msgstr "Tickets wurden angenommen."
-
-msgid "ticket was accepted."
-msgstr "Ticket wurde angenommen."
-
-msgid "tickets were closed."
-msgstr "Tickets wurden geschlossen."
-
-msgid "ticket was closed."
-msgstr "Ticket wurde geschlossen."
-
-msgid "There are currently ${currently_open} tickets open and"
-msgstr "Zur Zeit sind ${currently_open} Tickets offen und"
-
-msgid "There is currently ${currently_open} ticket open and"
-msgstr "Zur Zeit ist ${currently_open} Ticket offen und"
-
-msgid "tickets are pending."
-msgstr "Tickets sind in Bearbeitung."
-
-msgid "ticket is pending."
-msgstr "Ticket ist in Bearbeitung."
-
-msgid "Have a great week!"
-msgstr "Wir wünschen Ihnen eine schöne Woche!"
-
-msgid "Have a great day!"
-msgstr "Wir wünschen Ihnen einen schönen Tag!"
-
-msgid "The OneGov Cloud Team"
-msgstr "Das OneGov Cloud Team"
-
-msgid ""
-"This is the daily OneGov Cloud status e-mail. If you don't want to receive "
-"this e-mail you may deactivate it by clicking on"
-msgstr ""
-"Dies ist das tägliche Status E-Mail der OneGov Cloud. Sie können sich "
-"jederzeit über den folgenden Link"
-
-msgid "unsubscribe"
-msgstr "abmelden"
-
-msgid "Or by changing the settings in your user profile."
-msgstr ""
-"Alternativ können Sie die Einstellungen in Ihrem Benutzerprofil anpassen."
-
-msgid "Username"
-msgstr "Benutzername"
-
-msgid "Role"
-msgstr "Rolle"
-
-msgid "Identicon"
-msgstr "Identicon"
-
-msgid "Settings"
-msgstr "Einstellungen"
-
 msgid "Services"
 msgstr "Dienstleistungen"
-
-msgid "Events"
-msgstr "Veranstaltungen"
-
-msgid "Directories"
-msgstr "Verzeichnisse"
 
 msgid "Online Counter"
 msgstr "Online-Schalter"
@@ -111,8 +21,8 @@ msgstr "Online-Schalter"
 msgid "Reservations"
 msgstr "Reservationen"
 
-msgid "All events"
-msgstr "Alle Veranstaltungen"
+msgid "Directories"
+msgstr "Verzeichnisse"
 
 msgid "Forms and applications"
 msgstr "Formulare und Gesuche"
@@ -122,9 +32,6 @@ msgstr "Tageskarten und Räume"
 
 msgid "SBB Daypass"
 msgstr "SBB Tageskarte"
-
-msgid "Newsletter"
-msgstr "Newsletter"
 
 msgid "Generalabonnement for Towns"
 msgstr "Generalabonnement Gemeinde"
@@ -146,3 +53,15 @@ msgstr "Themen"
 
 msgid "Catalog A-Z"
 msgstr "Katalog A-Z"
+
+msgid "Online Counter Label"
+msgstr "Onlineschalter Label"
+
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Reservations Label"
+msgstr "Reservationen Label"
+
+msgid "SBB Daypass Label"
+msgstr "SBB Tageskarte Label"

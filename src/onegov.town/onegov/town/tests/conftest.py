@@ -1,4 +1,3 @@
-import morepath
 import onegov.core
 import onegov.town
 import pytest
@@ -6,11 +5,9 @@ import tempfile
 import transaction
 import shutil
 
-from onegov.core.utils import Bunch, scan_morepath_modules
-from onegov.org.initial_content import (
-    add_initial_content, builtin_form_definitions
-)
-from onegov.org.models import Organisation
+from onegov.core.utils import Bunch, module_path, scan_morepath_modules
+from onegov.town.initial_content import (
+    create_new_organisation, builtin_form_definitions)
 from onegov.user import User
 from uuid import uuid4
 
@@ -29,32 +26,27 @@ def filestorage():
 
 
 @pytest.yield_fixture(scope='session')
-def form_definitions():
-    yield list(builtin_form_definitions())
+def forms():
+    yield list(builtin_form_definitions(
+        module_path('onegov.town', 'forms/builtin')))
 
 
 @pytest.yield_fixture(scope='function')
-def town_app(postgres_dsn, filestorage, test_password, smtp,
-             form_definitions):
-    yield new_town_app(
-        postgres_dsn, filestorage, test_password, smtp, form_definitions
-    )
+def town_app(postgres_dsn, filestorage, test_password, smtp, forms):
+    yield new_town_app(postgres_dsn, filestorage, test_password, smtp, forms)
 
 
 @pytest.yield_fixture(scope='function')
-def es_town_app(postgres_dsn, filestorage, test_password, smtp,
-                form_definitions, es_url):
+def es_town_app(postgres_dsn, filestorage, test_password, smtp, forms, es_url):
     yield new_town_app(
-        postgres_dsn, filestorage, test_password, smtp, form_definitions,
-        es_url
-    )
+        postgres_dsn, filestorage, test_password, smtp, forms, es_url)
 
 
 def new_town_app(postgres_dsn, filestorage, test_password, smtp,
-                 form_definitions, es_url=None):
+                 forms, es_url=None):
 
     scan_morepath_modules(onegov.town.TownApp)
-    morepath.commit(onegov.town.TownApp)
+    onegov.town.TownApp.commit()
 
     app = onegov.town.TownApp()
     app.namespace = 'test_' + uuid4().hex
@@ -73,21 +65,14 @@ def new_town_app(postgres_dsn, filestorage, test_password, smtp,
     )
     app.set_application_id(app.namespace + '/' + 'test')
     app.bind_depot()
-    add_initial_content(
-        app.libres_registry,
-        app.session_manager,
-        'Govikon',
-        form_definitions
-    )
+
+    create_new_organisation(app, 'Govikon', 'mails@govikon.ch', forms)
 
     # cronjobs leave lingering sessions open, in real life this is not a
     # problem, but in testing it leads to connection pool exhaustion
     app.settings.cronjobs = Bunch(enabled=False)
 
     session = app.session()
-
-    org = session.query(Organisation).one()
-    org.meta['reply_to'] = 'mails@govikon.ch'
 
     app.mail_host, app.mail_port = smtp.address
     app.mail_sender = 'mails@govikon.ch'

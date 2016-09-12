@@ -1,0 +1,27 @@
+Abstimmungs- und Wahlunterlagen
+-------------------
+
+# Personalien
+Vorname * = ___
+Name * = ___
+
+# Adresse
+Strasse (inkl. Hausnummer) * = ___
+PLZ / Ort * = ___
+
+# Stimm- und Wahlmaterial
+Abstimmungstag * = YYYY.MM.DD
+Föderale Ebene =
+    [ ] Bund
+    [ ] Kanton
+    [ ] Gemeinde
+
+# Versand
+Versand * =
+    (x) Ich möchte die Unterlagen mittels Post erhalten
+    ( ) Ich möchte das Dokument am Schalter abholen
+
+# Kontakt & Bemerkungen
+Telefon * = ___
+E-Mail * = @@@
+Bemerkung = ...

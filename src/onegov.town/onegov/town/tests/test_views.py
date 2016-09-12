@@ -172,7 +172,7 @@ def test_startpage(town_app):
 def test_view_occurrences_on_startpage(town_app):
     client = Client(town_app)
     links = [
-        a.text for a in client.get('/').pyquery('.homepage-links-panel li a')
+        a.text for a in client.get('/').pyquery('.homepage-panel li a')
     ]
     events = (
         '150 Jahre Govikon',
