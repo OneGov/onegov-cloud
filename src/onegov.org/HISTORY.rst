@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.8 (2016-09-12)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes morepath directives not working in all cases.
   [href]
 
