@@ -1,8 +1,9 @@
+import morepath
+
 from io import BytesIO
 from PIL import Image
 from random import randint
 from unittest.mock import patch
-from onegov.core.utils import scan_morepath_modules
 
 
 def create_image(width=50, height=50):
@@ -21,10 +22,10 @@ def create_image(width=50, height=50):
 
 
 def assert_explicit_permissions(module, app_class):
-    with patch('morepath.view.ViewRegistry.register_view') as register_view:
+    morepath.autoscan()
+    app_class.commit()
 
-        scan_morepath_modules(app_class)
-        app_class.commit()
+    with patch('morepath.view.ViewRegistry.register_view') as register_view:
 
         # make sure that all registered views have an explicit permission
         for call in register_view.call_args_list:
