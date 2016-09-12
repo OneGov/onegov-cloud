@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Updates translations.
+  [msom]
+
 0.9.0 (2016-09-06)
 ~~~~~~~~~~~~~~~~~~~
 
