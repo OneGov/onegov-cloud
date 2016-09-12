@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes cli not working.
+  [href]
+
 1.11.5 (2016-09-12)
 ~~~~~~~~~~~~~~~~~~~
 
