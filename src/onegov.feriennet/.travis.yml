@@ -3,35 +3,34 @@ python: "3.4"
 cache: pip
 
 env:
-    - TOXENV=py34
-    - TOXENV=pep8
-install:
-    - pip install tox
-    - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
+    - TOXENV=py34 ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.2.0.tar.gz
+    - TOXENV=pep8 ES_URL=no
+
+install: ./.travis-install.sh
+
 script:
     - tox -e $TOXENV
+
 after_success:
     - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
-#
-# Activate this after the repository has been added to travis.
-# If enabled, travis will automatically upload eggs to pypi every time
-# a tagged commit is encountered.
-#
-# To add the pypi password use this:
-#
-# gem install travis
-# travis encrypt --repo seantis/onegov.feriennet
-#
-# Then replace 'encrypted...' below with the new encryption string (no need to
-# copy the quotes).
-#
-# deploy:
-#     provider: pypi
-#     distributions: "sdist bdist_wheel"
-#     user: seantis
-#     password:
-#       secure: encrypted...
-#     on:
-#         tags: true
-#         condition: $TOXENV = py34
-#
+    - 'if [ "$TOXENV" = "py34" ]; then $TRAVIS_BUILD_DIR/.tox/py34/bin/pip freeze | sed -r "s/^-e git.*?egg=([a-z\._]+)$/\1==${TRAVIS_TAG:1}/g" > $TRAVIS_BUILD_DIR/requirements.txt; fi'
+    - if [ "$TOXENV" = 'py34' ]; then cat requirements.txt; fi
+
+deploy:
+  - provider: releases
+    api_key:
+      secure: "ju8JAh6rnCrFu8gXnk5rkC7A9uWfjVD8Kp6CMNHQ97pXz8YZ67aChj08IToKFhzpBBsGl7W8w2+Xn60ubuZgzeGqzm1S8DfzaNvOhGivReb3uGhIszIYe7QBNEBzQOkZLBAQqO1qlGG5mQTdu7TMouhqlCimgRiRWeasi4v1GBAv4f482WG1N8zeXq13UoQRuVe6AbEq2+25xHox6UDh9ajFBDhs/IW6cmSEd53HSVHaVaPjsnvU1jPSg8AYyxFIMFf/29inMwTEHDxMpq0qfdR3/kBYd0HYDSSk+UjRWC9yxPEhbMjQ5QWzdjtEiozdfiZsRmRaOAmTmu4LGMBj+Enopn/3FZ1pu0z64DYkhEBX/jHgfylhO/oR0OjaF2U6B/nMp530hymC3nHsb/YdC2wT2L25Nv8dE+N3qRRbCcL+LxxrBYbeDUe447mIvwRh+EgukLPXMkA1f7+nszyxZZ2ThcEkutfpjZPkKoB7686y/VqpCB6vInAKLZtJfOk+woX9RfCz9pu8F83TV/OHxkDUvmcN+LnjtunNyFqhRTizkwRtYK/SOp0mrqOfj8ritqTlfIPoCBvjL8diPMvx5qXs5gw19YPlK0coj3/d2VCoakDeqsK8PzI8pHSy+8fRsIlW4ZUbbXb/b9eIqSti9J5AI7ZBe0hkSAbqTef/C2k="
+    file: requirements.txt
+    skip_cleanup: true
+    on:
+      tags: true
+      condition: $TOXENV = py34
+
+  - provider: pypi
+    distributions: "sdist bdist_wheel"
+    user: seantis
+    password:
+      secure: "Vg2MIsz3NvoTZQhFJJdA4GSszAtFOk+OfguhvrR39A/QBjNGY5tmagLpRwxZ3SqnV4tDL88kMtEMWoOrlS3cujEgRPlnmKy0Szsio0zkVldmXE+s4vmDXmdFhO/ImJ1GueaM9RszjTrSkwW6XvcRiVacuba1HbAaOFkRpkhpIQFlMko5/l9GO8gQhIHckoBTwP1SCSmP2yeca1Guc00EF2bBxpKHiV0Ftz0ZKCZd4i1JdEVEwP+DEMPwvEW0vcmrplXma2hsMXSeDjIiSocFG/Ca6TYgVrxb8zy1P5PhGik1dtuPvBpGukGrt3o4yQ92kMJaqKkv0/d07+Wycxq5rruSkPYUr8KvbAy+p3aBPgjqsqn935TWASCUhS/vhNczKEzozhtTloI/q9GpRWrHvME1rO2DHQF/31euAt/0wSWtHqG1Ynbem5J9aJuHOYnEqmfqrgXNIvBO8yq/O9vGRLMSaIosHRlfUfEnE1iziQQhUbVzGKjGoJuy8OvBQg7KY2AEWjxRCVpizKbe/1AgCx53BekR5ycmKVe1CWF2rQLC6Imuqmzv3MibxD3BaJmgAKWDcsV2XFckrXcF1DAVmnW9d/ALOZ+f/DqwZrdyA5J+hO48Zs7C1Lww2oVvRXrvQiQBdrDGpWRDLZZ5DSITgOiLZPRO4e0d0u9nM07fHa0="
+    on:
+      tags: true
+      condition: $TOXENV = py34

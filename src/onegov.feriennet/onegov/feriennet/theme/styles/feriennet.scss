@@ -1,0 +1,14 @@
+/*
+    hide the news in the topbar
+*/
+
+.top-bar-section li:last-child {
+    display: none;
+}
+
+/*
+    background color of default logo
+*/
+svg #background {
+    fill: lighten($primary-color, 25%);
+}

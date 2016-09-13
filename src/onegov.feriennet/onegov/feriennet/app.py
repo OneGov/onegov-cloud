@@ -38,3 +38,8 @@ def get_i18n_localedirs():
 @FeriennetApp.setting(section='core', name='theme')
 def get_theme():
     return FeriennetTheme()
+
+
+@OrgApp.static_directory()
+def get_static_directory():
+    return 'static'
