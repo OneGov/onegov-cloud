@@ -22,7 +22,9 @@ def create_new_organisation(app, name):
                 <news />
             </column>
             <column span="4">
-                <panel title="Verweise">
+                <registration />
+
+                <panel>
                     <links>
                         <link url="./personen"
                             description="Personen">
