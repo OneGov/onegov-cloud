@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.2 (2016-09-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds login/registration buttons to default homepage.
   [href]
 
