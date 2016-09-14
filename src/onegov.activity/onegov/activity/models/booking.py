@@ -1,0 +1,40 @@
+from onegov.core.orm import Base
+from onegov.core.orm.types import UUID
+from sqlalchemy import Column, Text, ForeignKey, Integer
+from uuid import uuid4
+from onegov.activity.utils import random_group_code
+
+
+class Booking(Base):
+    """ Bookings are created by users for occasions.
+
+    Initially, bookings are unconfirmed. In this state they represent
+    a "wish" rather than a probably booking.
+
+    Because bookings are wishes initially, they get a priority as well as
+    a group code which links multiple bookings by multiple users together.
+
+    They system will try to figure out the best booking using the priority
+    as well as the group code.
+
+    """
+
+    __tablename__ = 'bookings'
+
+    #: the public id of the booking
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: the user owning the booking
+    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
+
+    #: the priority of the booking, a higher number = a higher priority
+    priority = Column(Integer, nullable=False, default=0)
+
+    #: the group code of the booking
+    group_code = Column(Text, nullable=False, default=random_group_code)
+
+    #: the last name of the participant
+    last_name = Column(Text, nullable=False)
+
+    #: the first name of the participant
+    first_name = Column(Text, nullable=False)
