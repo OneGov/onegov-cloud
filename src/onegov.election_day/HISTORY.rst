@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.9.1 (2016-09-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds elections and votes for municipalitites.
 
