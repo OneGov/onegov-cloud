@@ -1,13 +1,14 @@
 Changelog
 ---------
-0.9.1 (2016-09-14)
-~~~~~~~~~~~~~~~~~~~
 
 - Adds elections and votes for municipalitites.
 
   Breaking changes: The import and export formats have changed!
 
   [msom]
+
+0.9.1 (2016-09-14)
+~~~~~~~~~~~~~~~~~~~
 
 - Updates translations.
   [msom]
