@@ -1,5 +1,13 @@
 Changelog
 ---------
+
+- Supports a wider range of objects which may be cached. Uses 'dill' to
+  accomplish this.
+  [href]
+
+- Removes the runtime bound cache again as it's not that useful.
+  [href]
+
 0.26.0 (2016-09-09)
 ~~~~~~~~~~~~~~~~~~~
 

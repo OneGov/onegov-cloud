@@ -304,9 +304,9 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             self.cache_backend = 'dogpile.cache.memory'
             self.cache_backend_arguments = {}
         else:
-            self.cache_backend = 'dogpile.cache.memcached'
+            self.cache_backend = 'onegov.core.memcached'
             self.cache_backend_arguments = {
-                'url': self.memcached_url
+                'url': self.memcached_url,
             }
 
     def configure_secrets(self, **cfg):
@@ -413,28 +413,6 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def cache(self):
         """ A cache that might be invalidated frequently. """
         return self.get_cache(self.application_id + ':x', expiration_time=3600)
-
-    @property
-    def runtime_cache(self):
-        """ A cache bound to the runtime of the process and the application id.
-
-        The cache is not shared between processes and each application id
-        has it's own.
-
-        Note that this does build on dogpile.cache but doesn't use pickling.
-        This allows for a wider range of objects stored in the cache, but
-        it also means that the cache doesn't hold copied values.
-
-        Also, dogpile.cache in memory doesn't properly support expiration
-        time, so the values in the runtime_cache do not expire (until the
-        process closes of course).
-
-        """
-
-        return self.get_cache(
-            self.application_id + ':r',
-            backend='dogpile.cache.memory'
-        )
 
     @property
     def settings(self):

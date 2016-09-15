@@ -40,6 +40,7 @@ setup(
         'cached_property',
         'chameleon',
         'click',
+        'dill',
         'dogpile.cache',
         'editdistance',
         'fs',

@@ -34,11 +34,56 @@ eventually be discarded by memcache if the cache is full).
 
 """
 
-from dogpile.cache import make_region
+import dill
+import memcache
+
+from dogpile.cache import make_region, register_backend
+from dogpile.cache.backends.memcached import MemcachedBackend as BaseBackend
 from dogpile.cache.api import NO_VALUE
 from dogpile.cache.proxy import ProxyBackend
 from hashlib import sha1
 from onegov.core import log
+
+
+class MemcachedBackend(BaseBackend):
+    """ A custom memcached backend with the following improvements:
+
+    * Uses dill instead of pickle, allowing for a wider range of cached objs.
+
+    """
+
+    def _create_client(self):
+        return memcache.Client(
+            self.url,
+            pickler=DillPickler,
+            unpickler=DillPickler
+        )
+
+
+register_backend(
+    'onegov.core.memcached',
+    'onegov.core.cache',
+    'MemcachedBackend'
+)
+
+
+class DillPickler(object):
+    """ A python-memcached pickler that uses dill instead of the builtin
+    pickle module.
+
+    Dill is an alternative implementation that supports a wider variety
+    of objects which it can pickle.
+
+    """
+
+    def __init__(self, file, protocol=None):
+        self.file = file
+
+    def dump(self, value):
+        return dill.dump(value, self.file)
+
+    def load(self):
+        return dill.load(self.file)
 
 
 def prefix_key_mangler(prefix):
@@ -71,6 +116,7 @@ class IgnoreUnreachableBackend(ProxyBackend):
     user experience, not in complete breakage.
 
     """
+
     def get(self, key):
         try:
             return self.proxied.get(key)
