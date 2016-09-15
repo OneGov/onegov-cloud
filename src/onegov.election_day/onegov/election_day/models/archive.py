@@ -77,6 +77,10 @@ class Archive(object):
         items = ElectionCollection(self.session).get_latest() or []
         items.extend(VoteCollection(self.session).get_latest() or [])
 
+        if items:
+            latest_date = max(item.date for item in items)
+            items = [item for item in items if item.date == latest_date]
+
         return items
 
     def by_date(self):

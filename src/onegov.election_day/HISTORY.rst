@@ -10,6 +10,9 @@ Changelog
 - Groups the elections and votes on the archive pages by date.
   [msom]
 
+- Only shows the latest election day on the homepage.
+  [msom]
+
 0.9.1 (2016-09-14)
 ~~~~~~~~~~~~~~~~~~~
 
