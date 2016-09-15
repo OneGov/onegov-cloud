@@ -246,6 +246,51 @@ msgstr "kommunal"
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
 
+msgid "There are no elections or votes defined yet."
+msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
+
+msgid "Elections and votes on ${date}"
+msgstr "Urnengang vom ${date}"
+
+msgid "Federal Elections"
+msgstr "Eidgenössische Wahlen"
+
+msgid "Cantonal Elections"
+msgstr "Kantonale Wahlen"
+
+msgid "Communal Elections"
+msgstr "Kommunale Wahlen"
+
+msgid "Federal Votes"
+msgstr "Eidgenössische Abstimmungen"
+
+msgid "Cantonal Votes"
+msgstr "Kantonale Abstimmungen"
+
+msgid "Communal Votes"
+msgstr "Kommunale Abstimmungen"
+
+msgid "Election"
+msgstr "Wahl"
+
+msgid "Reported"
+msgstr "Gemeldet"
+
+msgid "Updated"
+msgstr "Aktualisiert"
+
+msgid "Vote"
+msgstr "Vorlage"
+
+msgid "Result"
+msgstr "Resultat"
+
+msgid "Yes %"
+msgstr "JA %"
+
+msgid "No %"
+msgstr "NEIN %"
+
 msgid "Not yet counted."
 msgstr "Noch nicht ausgezählt."
 
@@ -373,48 +418,6 @@ msgstr "Abbrechen"
 
 msgid "Submit"
 msgstr "Absenden"
-
-msgid "There are no elections or votes defined yet."
-msgstr "Es wurden noch keine Wahlen oder Abstimmungen eingetragen."
-
-msgid "Federal Elections on ${date}"
-msgstr "Eidgenössische Wahlen vom ${date}"
-
-msgid "Cantonal Elections on ${date}"
-msgstr "Kantonale Wahlen vom ${date}"
-
-msgid "Communal Elections on ${date}"
-msgstr "Kommunale Wahlen vom ${date}"
-
-msgid "Federal Votes on ${date}"
-msgstr "Eidgenössische Abstimmungen vom ${date}"
-
-msgid "Cantonal Votes on ${date}"
-msgstr "Kantonale Abstimmungen vom ${date}"
-
-msgid "Communal Votes on ${date}"
-msgstr "Kommunale Abstimmungen vom ${date}"
-
-msgid "Election"
-msgstr "Wahl"
-
-msgid "Reported"
-msgstr "Gemeldet"
-
-msgid "Updated"
-msgstr "Aktualisiert"
-
-msgid "Vote"
-msgstr "Vorlage"
-
-msgid "Result"
-msgstr "Resultat"
-
-msgid "Yes %"
-msgstr "JA %"
-
-msgid "No %"
-msgstr "NEIN %"
 
 msgid "Previous Page"
 msgstr "Vorherige Seite"
@@ -556,6 +559,3 @@ msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
-
-#~ msgid "Counted municipalities"
-#~ msgstr "Ausgezählte Gemeinden"

@@ -235,16 +235,61 @@ msgid "Vote (Romansh)"
 msgstr "Votazione (romancio)"
 
 msgid "federal"
-msgstr ""
+msgstr "nazionale"
 
 msgid "cantonal"
-msgstr ""
+msgstr "cantonale"
 
 msgid "communal"
-msgstr ""
+msgstr "comunale"
 
 msgid "Elections &amp; Votes"
 msgstr "Elezioni &amp; votazioni"
+
+msgid "There are no elections or votes defined yet."
+msgstr "Non sono ancora state inserite elezioni o votazioni."
+
+msgid "Elections and votes on ${date}"
+msgstr ""
+
+msgid "Federal Elections"
+msgstr "Elezioni federali"
+
+msgid "Cantonal Elections"
+msgstr "Elezioni cantonali"
+
+msgid "Communal Elections"
+msgstr "Elezioni communali"
+
+msgid "Federal Votes"
+msgstr "Votazioni federali"
+
+msgid "Cantonal Votes"
+msgstr "Votazioni cantonali"
+
+msgid "Communal Votes"
+msgstr "Votazioni commuali"
+
+msgid "Election"
+msgstr "Elezione"
+
+msgid "Reported"
+msgstr "Comunicati"
+
+msgid "Updated"
+msgstr "Aggiornato"
+
+msgid "Vote"
+msgstr "Progetto"
+
+msgid "Result"
+msgstr "Risultato"
+
+msgid "Yes %"
+msgstr "Sì %"
+
+msgid "No %"
+msgstr "NO %"
 
 msgid "Not yet counted."
 msgstr "Non ancora conteggiato."
@@ -374,48 +419,6 @@ msgstr "Annulla"
 msgid "Submit"
 msgstr "Invia"
 
-msgid "There are no elections or votes defined yet."
-msgstr "Non sono ancora state inserite elezioni o votazioni."
-
-msgid "Federal Elections on ${date}"
-msgstr "Elezioni federali del ${date}"
-
-msgid "Cantonal Elections on ${date}"
-msgstr "Elezioni cantonali del ${date}"
-
-msgid "Communal Elections on ${date}"
-msgstr ""
-
-msgid "Federal Votes on ${date}"
-msgstr "Votazioni federali del ${date}"
-
-msgid "Cantonal Votes on ${date}"
-msgstr "Votazioni cantonali del ${date}"
-
-msgid "Communal Votes on ${date}"
-msgstr ""
-
-msgid "Election"
-msgstr "Elezione"
-
-msgid "Reported"
-msgstr "Comunicati"
-
-msgid "Updated"
-msgstr "Aggiornato"
-
-msgid "Vote"
-msgstr "Progetto"
-
-msgid "Result"
-msgstr "Risultato"
-
-msgid "Yes %"
-msgstr "Sì %"
-
-msgid "No %"
-msgstr "NO %"
-
 msgid "Previous Page"
 msgstr "Pagina precedente"
 
@@ -447,7 +450,7 @@ msgid "Cantonal"
 msgstr "Cantonale"
 
 msgid "Communal"
-msgstr ""
+msgstr "Comunale"
 
 msgid "View"
 msgstr "Mostrare"
@@ -555,24 +558,3 @@ msgstr "L'anno ${year} non viene ancora supportato"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Questo progetto contiene meno risultati rispetto agli altri."
-
-#~ msgid "Counted municipalities"
-#~ msgstr "Comuni che hanno concluso lo spoglio"
-
-#~ msgid "An election with this title exists already"
-#~ msgstr "Esiste già un'elezione con questo nome"
-
-#~ msgid "Federal Election"
-#~ msgstr "Elezione federale"
-
-#~ msgid "Cantonal Election"
-#~ msgstr "Elezione cantonale"
-
-#~ msgid "A vote with this title exists already"
-#~ msgstr "Esiste già una votazione con questo titolo"
-
-#~ msgid "Federal Vote"
-#~ msgstr "Votazione federale"
-
-#~ msgid "Cantonal Vote"
-#~ msgstr "Votazione cantonale"

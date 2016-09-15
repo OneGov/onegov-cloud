@@ -7,6 +7,9 @@ Changelog
 
   [msom]
 
+- Groups the elections and votes on the archive pages by date.
+  [msom]
+
 0.9.1 (2016-09-14)
 ~~~~~~~~~~~~~~~~~~~
 

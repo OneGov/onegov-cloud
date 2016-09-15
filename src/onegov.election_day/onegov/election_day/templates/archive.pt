@@ -2,17 +2,95 @@
     <tal:block metal:fill-slot="before-content">
         <h1>
             <small>${layout.app.principal.name}</small>
-            <tal:block i18n:translate="">Elections &amp; Votes</tal:block> ${year}
+            <tal:block i18n:translate="">Elections &amp; Votes</tal:block>
         </h1>
 
         <hr />
     </tal:block>
+
     <tal:block metal:fill-slot="content">
-        <div class="homepage">
-            <div metal:use-macro="layout.macros['archive_listing']" />
+        <div class="homepage" data-domain="${layout.principal.domain}" data-date="${date}">
+
+            <tal:block condition="not:archive_items">
+                <h2 i18n:translate="">There are no elections or votes defined yet.</h2>
+            </tal:block>
+
+            <div tal:repeat="date archive_items" class="date-${date}">
+                <h2 i18n:translate="">
+                    Elections and votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
+                </h2>
+                <div tal:repeat="domain archive_items[date]" class="domain-${domain}">
+                    <div tal:repeat="type archive_items[date][domain]" class="type-${type}">
+                        <h3 i18n:translate="" tal:condition="type == 'election' and domain == 'federation'">Federal Elections</h3>
+                        <h3 i18n:translate="" tal:condition="type == 'election' and domain == 'canton'">Cantonal Elections</h3>
+                        <h3 i18n:translate="" tal:condition="type == 'election' and domain == 'municipality'">Communal Elections</h3>
+                        <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'federation'">Federal Votes</h3>
+                        <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'canton'">Cantonal Votes</h3>
+                        <h3 i18n:translate="" tal:condition="type == 'vote' and domain == 'municipality'">Communal Votes</h3>
+
+                        <table class="overview election stackable" tal:condition="type == 'election'">
+                            <thead>
+                                <tr>
+                                    <th i18n:translate="">Election</th>
+                                    <th i18n:translate="" class="right-aligned">Reported</th>
+                                    <th i18n:translate="" class="right-aligned">Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr tal:repeat="election archive_items[date][domain][type]">
+                                    <td><a href="${request.link(election)}">${election.title}</a></td>
+                                    <td class="right-aligned">
+                                        <div metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_entities, election.total_entities)" />
+                                    </td>
+                                    <td class="right-aligned">
+                                        ${layout.format_date(election.last_result_change, 'datetime')}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="overview vote stackable" tal:condition="type == 'vote'">
+                            <thead>
+                                <tr>
+                                    <th i18n:translate="">Vote</th>
+                                    <th i18n:translate="">Result</th>
+                                    <th i18n:translate="" class="right-aligned">Yes %</th>
+                                    <th i18n:translate="" class="right-aligned">No %</th>
+                                    <th i18n:translate="" class="right-aligned">Reported</th>
+                                    <th i18n:translate="" class="right-aligned">Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr tal:repeat="vote archive_items[date][domain][type]">
+                                    <td><a href="${request.link(vote)}">${vote.title}</a></td>
+                                    <td>
+                                        <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
+                                    </td>
+                                    <td class="right-aligned">
+                                        <tal:block tal:condition="vote.counted">
+                                            ${layout.format_number(vote.yeas_percentage)}
+                                        </tal:block>
+                                    </td>
+                                    <td class="right-aligned">
+                                        <tal:block tal:condition="vote.counted">
+                                            ${layout.format_number(vote.nays_percentage)}
+                                        </tal:block>
+                                    </td>
+                                    <td class="right-aligned">
+                                        <div metal:use-macro="layout.macros['progress_vote']" tal:define="progress vote.progress" />
+                                    </td>
+                                    <td class="right-aligned">
+                                        ${layout.format_date(vote.last_result_change, 'datetime')}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div metal:use-macro="layout.macros['archive']" />
-
+        <div tal:define="h2 1" metal:use-macro="layout.macros['archive']" />
     </tal:block>
 </div>

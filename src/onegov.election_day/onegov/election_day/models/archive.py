@@ -1,7 +1,26 @@
-from time import mktime, strptime
+from collections import OrderedDict
 from datetime import date
+from itertools import groupby
 from onegov.ballot import ElectionCollection, VoteCollection
-from onegov.core.utils import groupbylist
+from time import mktime, strptime
+
+
+def domain_sortfunc(item):
+    if item.domain == 'federation':
+        return 0
+    if item.domain == 'canton':
+        return 1
+    return 2
+
+
+def groupbydict(items, keyfunc, sortfunc=None):
+    return OrderedDict(
+        (key, list(group))
+        for key, group in groupby(
+            sorted(items, key=sortfunc or keyfunc),
+            keyfunc
+        )
+    )
 
 
 class Archive(object):
@@ -21,16 +40,25 @@ class Archive(object):
         years.extend(VoteCollection(self.session).get_years() or [])
         return sorted(set(years), reverse=True)
 
-    def group_items(self, ungrouped_items, reverse=False):
+    def group_items(self, items, reverse=False):
         """ Groups a list of elections/votes. """
 
-        if not ungrouped_items:
+        if not items:
             return None
 
-        return groupbylist(
-            sorted(ungrouped_items, key=lambda i: i.date, reverse=reverse),
-            lambda i: (i.__class__.__name__.lower(), i.domain, i.date)
-        )
+        dates = groupbydict(items, lambda i: i.date)
+        for date_, items_by_date in dates.items():
+            domains = groupbydict(
+                items_by_date, lambda i: i.domain, domain_sortfunc
+            )
+            for domain, items_by_domain in domains.items():
+                types = groupbydict(
+                    items_by_domain, lambda i: i.__class__.__name__.lower()
+                )
+                domains[domain] = types
+            dates[date_] = domains
+
+        return dates
 
     def last_modified(self, ungrouped_items):
         """ Returns the last modification of the given elections/votes. """
@@ -43,15 +71,16 @@ class Archive(object):
 
         return max(dates)
 
-    def latest(self, group=True):
-        """ Returns the lastest elections/votes (grouped or ungrouped). """
+    def latest(self):
+        """ Returns the lastest elections/votes. """
 
         items = ElectionCollection(self.session).get_latest() or []
         items.extend(VoteCollection(self.session).get_latest() or [])
 
-        return self.group_items(items, reverse=True) if group else items
+        return items
 
-    def by_date(self, group=True):
+    def by_date(self):
+        """ Returns the elecetions/votes of a given date. """
         try:
             _date = date.fromtimestamp(mktime(strptime(self.date, '%Y-%m-%d')))
             items = ElectionCollection(self.session).by_date(_date) or []
@@ -60,4 +89,4 @@ class Archive(object):
             items = ElectionCollection(self.session).by_year(self.date) or []
             items.extend(VoteCollection(self.session).by_year(self.date) or [])
 
-        return self.group_items(items) if group else items
+        return items

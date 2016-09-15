@@ -51,7 +51,8 @@
 <metal:archive define-macro="archive" i18n:domain="onegov.election_day">
     <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years">
         <div class="columns small-12 small-centered">
-            <h1 i18n:translate="">Archive</h1>
+            <h1 i18n:translate="" tal:condition="not: h2|nothing">Archive</h1>
+            <h2 i18n:translate="" tal:condition="h2|nothing">Archive</h2>
             <ul>
                 <li tal:repeat="date years">
                     <a href="${request.link(layout.archive.for_date(date))}">${date}</a>
@@ -116,110 +117,6 @@
             </tal:block>
         </tal:block>
     </div></div>
-    </tal:block>
-</metal:fields>
-
-<metal:fields define-macro="archive_listing" i18n:domain="onegov.election_day">
-    <tal:block condition="not:archive_items">
-        <h2 i18n:translate="">There are no elections or votes defined yet.</h2>
-    </tal:block>
-    <tal:block condition="archive_items">
-        <tal:block repeat="(group, items) archive_items">
-            <tal:block define="(type, domain, date) group">
-                <tal:block condition="type == 'election'">
-                    <tal:block condition="domain == 'federation'">
-                        <h2 i18n:translate="">
-                            Federal Elections on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
-                        </h2>
-                    </tal:block>
-                    <tal:block condition="domain == 'canton'">
-                        <h2 i18n:translate="">
-                            Cantonal Elections on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
-                        </h2>
-                    </tal:block>
-                    <tal:block condition="domain == 'municipality'">
-                        <h2 i18n:translate="">
-                            Communal Elections on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
-                        </h2>
-                    </tal:block>
-                </tal:block>
-                <tal:block condition="type == 'vote'">
-                    <tal:block condition="domain == 'federation'">
-                        <h2 i18n:translate="">
-                            Federal Votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
-                        </h2>
-                    </tal:block>
-                    <tal:block condition="domain == 'canton'">
-                        <h2 i18n:translate="">
-                            Cantonal Votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
-                        </h2>
-                    </tal:block>
-                    <tal:block condition="domain == 'municipality'">
-                        <h2 i18n:translate="">
-                            Communal Votes on <a href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" i18n:name='date' />
-                        </h2>
-                    </tal:block>
-                </tal:block>
-
-                <table class="overview election stackable" tal:condition="type == 'election'">
-                    <thead>
-                        <tr>
-                            <th i18n:translate="">Election</th>
-                            <th i18n:translate="" class="right-aligned">Reported</th>
-                            <th i18n:translate="" class="right-aligned">Updated</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr tal:repeat="election items">
-                            <td><a href="${request.link(election)}">${election.title}</a></td>
-                            <td class="right-aligned">
-                                <div metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_entities, election.total_entities)" />
-                            </td>
-                            <td class="right-aligned">
-                                ${layout.format_date(election.last_result_change, 'datetime')}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <table class="overview vote stackable" tal:condition="type == 'vote'">
-                    <thead>
-                        <tr>
-                            <th i18n:translate="">Vote</th>
-                            <th i18n:translate="">Result</th>
-                            <th i18n:translate="" class="right-aligned">Yes %</th>
-                            <th i18n:translate="" class="right-aligned">No %</th>
-                            <th i18n:translate="" class="right-aligned">Reported</th>
-                            <th i18n:translate="" class="right-aligned">Updated</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr tal:repeat="vote items">
-                            <td><a href="${request.link(vote)}">${vote.title}</a></td>
-                            <td>
-                                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
-                            </td>
-                            <td class="right-aligned">
-                                <tal:block tal:condition="vote.counted">
-                                    ${layout.format_number(vote.yeas_percentage)}
-                                </tal:block>
-                            </td>
-                            <td class="right-aligned">
-                                <tal:block tal:condition="vote.counted">
-                                    ${layout.format_number(vote.nays_percentage)}
-                                </tal:block>
-                            </td>
-                            <td class="right-aligned">
-                                <div metal:use-macro="layout.macros['progress_vote']" tal:define="progress vote.progress" />
-                            </td>
-                            <td class="right-aligned">
-                                ${layout.format_date(vote.last_result_change, 'datetime')}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </tal:block>
-        </tal:block>
     </tal:block>
 </metal:fields>
 

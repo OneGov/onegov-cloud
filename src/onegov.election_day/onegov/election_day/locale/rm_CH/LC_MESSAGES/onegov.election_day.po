@@ -235,16 +235,61 @@ msgid "Vote (Romansh)"
 msgstr "Votaziun (rumantsch)"
 
 msgid "federal"
-msgstr ""
+msgstr "federal"
 
 msgid "cantonal"
-msgstr ""
+msgstr "chantunal"
 
 msgid "communal"
-msgstr ""
+msgstr "communal"
 
 msgid "Elections &amp; Votes"
 msgstr "Elecziuns &amp; votaziuns"
+
+msgid "There are no elections or votes defined yet."
+msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
+
+msgid "Elections and votes on ${date}"
+msgstr ""
+
+msgid "Federal Elections"
+msgstr "Elecziuns federalas"
+
+msgid "Cantonal Elections"
+msgstr "Elecziuns chantunalas"
+
+msgid "Communal Elections"
+msgstr "Elecziuns communalas"
+
+msgid "Federal Votes"
+msgstr "Votaziuns federalas"
+
+msgid "Cantonal Votes"
+msgstr "Votaziuns chantunalas"
+
+msgid "Communal Votes"
+msgstr "Votaziuns communalas"
+
+msgid "Election"
+msgstr "Elecziun"
+
+msgid "Reported"
+msgstr "Annunzià"
+
+msgid "Updated"
+msgstr "Actualisà"
+
+msgid "Vote"
+msgstr "Project"
+
+msgid "Result"
+msgstr "Resultat"
+
+msgid "Yes %"
+msgstr "% GEA"
+
+msgid "No %"
+msgstr "% NA"
 
 msgid "Not yet counted."
 msgstr "Anc betg eruì il resultat."
@@ -375,48 +420,6 @@ msgstr "Interrumper"
 msgid "Submit"
 msgstr "Trametter"
 
-msgid "There are no elections or votes defined yet."
-msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
-
-msgid "Federal Elections on ${date}"
-msgstr "Elecziuns federalas dals ${date}"
-
-msgid "Cantonal Elections on ${date}"
-msgstr "Elecziuns chantunalas dals ${date}"
-
-msgid "Communal Elections on ${date}"
-msgstr ""
-
-msgid "Federal Votes on ${date}"
-msgstr "Votaziuns federalas dals ${date}"
-
-msgid "Cantonal Votes on ${date}"
-msgstr "Votaziuns chantunalas dals ${date}"
-
-msgid "Communal Votes on ${date}"
-msgstr ""
-
-msgid "Election"
-msgstr "Elecziun"
-
-msgid "Reported"
-msgstr "Annunzià"
-
-msgid "Updated"
-msgstr "Actualisà"
-
-msgid "Vote"
-msgstr "Project"
-
-msgid "Result"
-msgstr "Resultat"
-
-msgid "Yes %"
-msgstr "% GEA"
-
-msgid "No %"
-msgstr "% NA"
-
 msgid "Previous Page"
 msgstr "Pagina precedenta"
 
@@ -448,7 +451,7 @@ msgid "Cantonal"
 msgstr "Sin plaun chantunal"
 
 msgid "Communal"
-msgstr ""
+msgstr "Sin plaun communal"
 
 msgid "View"
 msgstr "Mussar"
@@ -558,24 +561,3 @@ msgstr "L'onn ${year} na vegn anc betg sustegnì"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Quest project ha main resultats ch'ils auters projects."
-
-#~ msgid "Counted municipalities"
-#~ msgstr "Vischnancas dumbradas ora"
-
-#~ msgid "An election with this title exists already"
-#~ msgstr "In'elecziun cun quest titel exista gia"
-
-#~ msgid "Federal Election"
-#~ msgstr "Elecziun naziunala"
-
-#~ msgid "Cantonal Election"
-#~ msgstr "Elecziun chantunala"
-
-#~ msgid "A vote with this title exists already"
-#~ msgstr "Ina votaziun cun quest titel exista gia"
-
-#~ msgid "Federal Vote"
-#~ msgstr "Votaziun naziunala"
-
-#~ msgid "Cantonal Vote"
-#~ msgstr "Votaziun chantunala"
