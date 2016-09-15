@@ -118,7 +118,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
         homepage.
 
         """
-        return self.runtime_cache.get_or_create(
+        return self.cache.get_or_create(
             'homepage_template', self.load_homepage_template)
 
     def load_homepage_template(self):
@@ -131,7 +131,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
             return PageTemplate('')
 
     def update_homepage_template(self):
-        self.runtime_cache.delete('homepage_template')
+        self.cache.delete('homepage_template')
 
     @property
     def ticket_count(self):

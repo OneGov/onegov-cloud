@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes title being shown twice on the news site.
+  [href]
+
 0.0.8 (2016-09-12)
 ~~~~~~~~~~~~~~~~~~~
 

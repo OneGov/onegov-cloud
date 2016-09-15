@@ -24,7 +24,7 @@
 
         <div class="row" tal:condition="children">
             <div class="small-12 columns">
-                <div metal:use-macro="layout.macros.newslist" tal:define="news children" />
+                <div metal:use-macro="layout.macros.newslist" tal:define="news children; hide_title True" />
             </div>
         </div>
 

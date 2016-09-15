@@ -192,7 +192,7 @@
 
 <metal:newslist define-macro="newslist" i18n:domain="onegov.org">
     <div class="newslist" tal:condition="news">
-        <h2 i18n:translate="">Latest news</h2>
+        <h2 i18n:translate="" tal:condition="not:hide_title|False">Latest news</h2>
 
         <div class="row news-list-item" tal:repeat="item news">
             <div class="small-12 columns">
