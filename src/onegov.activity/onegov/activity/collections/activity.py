@@ -4,10 +4,16 @@ from onegov.core.utils import normalize_for_url, increment_name
 
 class ActivityCollection(object):
 
-    def __init__(self, session):
+    def __init__(self, session, type='*'):
         self.session = session
+        self.type = type
 
     def query(self):
+        if self.type != '*':
+            model_class = Activity.get_polymorphic_class(self.type, Activity)
+            query = self.session.query(model_class)
+            return query.filter(model_class.type == self.type)
+
         return self.session.query(Activity)
 
     def by_id(self, id):
@@ -36,8 +42,9 @@ class ActivityCollection(object):
 
         return name
 
-    def add(self, title, user, lead=None, text=None, tags=None,
-            type=None, name=None):
+    def add(self, title, user, lead=None, text=None, tags=None, name=None):
+
+        type = self.type != '*' and self.type or None
 
         name = name or self.get_unique_name(title)
         activity_class = Activity.get_polymorphic_class(type, Activity)
