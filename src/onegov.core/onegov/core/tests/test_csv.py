@@ -295,14 +295,15 @@ def test_convert_list_of_dicts_to_xlsx():
 
     with tempfile.NamedTemporaryFile() as f:
         f.write(xlsx)
-        workbook = load_workbook(f)
 
-        assert workbook.active.rows[0][0].value == 'first_name'
-        assert workbook.active.rows[0][1].value == 'last_name'
-        assert workbook.active.rows[1][0].value == 'Dick'
-        assert workbook.active.rows[1][1].value == 'Cheney'
-        assert workbook.active.rows[2][0].value == 'Donald'
-        assert workbook.active.rows[2][1].value == 'Rumsfeld'
+        rows = tuple(load_workbook(f).active.rows)
+
+        assert rows[0][0].value == 'first_name'
+        assert rows[0][1].value == 'last_name'
+        assert rows[1][0].value == 'Dick'
+        assert rows[1][1].value == 'Cheney'
+        assert rows[2][0].value == 'Donald'
+        assert rows[2][1].value == 'Rumsfeld'
 
 
 def test_convert_irregular_list_of_dicts_to_csv():
