@@ -1,7 +1,8 @@
 from onegov.core.orm import Base
 from onegov.core.orm.types import UTCDateTime, UUID
+from onegov.activity.models.activity import Activity
 from sedate import to_timezone
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -41,7 +42,14 @@ class Occasion(Base):
     spots = Column(Integer, nullable=False)
 
     #: The activity this occasion belongs to
-    activity = relationship('Activity', backref='occasions')
+    activity_id = Column(UUID, ForeignKey(Activity.id))
+
+    #: The bookings linked to this occasion
+    occasions = relationship(
+        'Booking',
+        order_by='Booking.created',
+        backref='occasion'
+    )
 
     @property
     def localized_start(self):

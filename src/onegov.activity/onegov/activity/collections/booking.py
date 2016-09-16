@@ -9,6 +9,12 @@ class BookingCollection(object):
     def query(self):
         return self.session.query(Booking)
 
+    def by_id(self, id):
+        return self.query().filter(Booking.id == id).first()
+
+    def by_user(self, user):
+        return self.query().filter(Booking.user_id == user.id)
+
     def add(self, user, priority=None, group_code=None,
             last_name=None, first_name=None):
 

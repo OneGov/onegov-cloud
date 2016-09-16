@@ -1,11 +1,13 @@
+from onegov.activity.models.occasion import Occasion
+from onegov.activity.utils import random_group_code
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from sqlalchemy import Column, Text, ForeignKey, Integer
 from uuid import uuid4
-from onegov.activity.utils import random_group_code
 
 
-class Booking(Base):
+class Booking(Base, TimestampMixin):
     """ Bookings are created by users for occasions.
 
     Initially, bookings are unconfirmed. In this state they represent
@@ -38,3 +40,10 @@ class Booking(Base):
 
     #: the first name of the participant
     first_name = Column(Text, nullable=False)
+
+    #: the occasion this booking belongs to
+    occasion_id = Column(UUID, ForeignKey(Occasion.id))
+
+    __mapper_args__ = {
+        'order_by': priority
+    }

@@ -6,9 +6,11 @@ from onegov.core.orm.mixins import (
     TimestampMixin,
 )
 from onegov.core.orm.types import UUID
+from onegov.user import User
 from sqlalchemy import Column, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import relationship
 from uuid import uuid4
 
 
@@ -42,7 +44,14 @@ class Activity(Base, ContentMixin, TimestampMixin):
     _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
 
     #: The user id to which this activity belongs to (organiser)
-    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
+    user_id = Column(UUID, ForeignKey(User.id), nullable=False)
+
+    #: The occasions linked to this activity
+    occasions = relationship(
+        'Occasion',
+        order_by='Occasion.start',
+        backref='activity'
+    )
 
     #: the type of the item, this can be used to create custom polymorphic
     #: subclasses of this class. See
@@ -53,3 +62,11 @@ class Activity(Base, ContentMixin, TimestampMixin):
     __mapper_args__ = {
         'polymorphic_on': 'type'
     }
+
+    @property
+    def tags(self):
+        return set(self._tags.keys()) if self._tags else set()
+
+    @tags.setter
+    def tags(self, value):
+        self._tags = {k: '' for k in value} if value else None
