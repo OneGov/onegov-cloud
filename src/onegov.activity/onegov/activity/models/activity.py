@@ -7,7 +7,7 @@ from onegov.core.orm.mixins import (
 )
 from onegov.core.orm.types import UUID
 from onegov.user import User
-from sqlalchemy import Column, Text, ForeignKey
+from sqlalchemy import Column, Enum, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
@@ -59,6 +59,16 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: orm/extensions/declarative/inheritance.html>`_.
     type = Column(Text, nullable=True)
 
+    #: the state of the activity
+    state = Column(
+        Enum(
+            'proposed', 'accepted', 'denied', 'archived',
+            name='activity_state'
+        ),
+        nullable=False,
+        default='proposed'
+    )
+
     __mapper_args__ = {
         'polymorphic_on': 'type'
     }
@@ -70,3 +80,15 @@ class Activity(Base, ContentMixin, TimestampMixin):
     @tags.setter
     def tags(self, value):
         self._tags = {k: '' for k in value} if value else None
+
+    def accept(self):
+        assert self.state == 'proposed'
+        self.state = 'accepted'
+
+    def deny(self):
+        assert self.state == 'proposed'
+        self.state = 'denied'
+
+    def archive(self):
+        assert self.state == 'accepted'
+        self.state == 'archived'

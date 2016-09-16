@@ -3,7 +3,7 @@ from onegov.activity.utils import random_group_code
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Text, ForeignKey, Integer
+from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
 from uuid import uuid4
 
 
@@ -44,6 +44,21 @@ class Booking(Base, TimestampMixin):
     #: the occasion this booking belongs to
     occasion_id = Column(UUID, ForeignKey(Occasion.id))
 
+    #: the state of the booking
+    state = Column(
+        Enum('unconfirmed', 'confirmed', 'cancelled', name='booking_state'),
+        nullable=False,
+        default='unconfirmed'
+    )
+
     __mapper_args__ = {
         'order_by': priority
     }
+
+    def confirm(self):
+        assert self.state == 'unconfirmed'
+        self.state == 'confirmed'
+
+    def cancel(self):
+        assert self.state in ('confirmed', 'unconfirmed')
+        self.state == 'cancel'
