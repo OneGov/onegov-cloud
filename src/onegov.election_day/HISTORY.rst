@@ -4,6 +4,33 @@ Changelog
 - Adds elections and votes for municipalitites.
 
   Breaking changes: The import and export formats have changed!
+  Make sure to change your column names:
+
+  - Election: OneGov Cloud
+
+    - election_counted_municipalities -> election_counted_entities
+    - election_total_municipalities -> election_total_entities
+    - municipality_name -> entity_name
+    - municipality_bfs_number -> entity_bfs_number
+    - municipality_elegible_voters -> entity_elegible_voters
+    - municipality_received_ballots -> entity_received_ballots
+    - municipality_blank_ballots -> entity_blank_ballots
+    - municipality_invalid_ballots -> entity_invalid_ballots
+    - municipality_unaccounted_ballots -> entity_unaccounted_ballots
+    - municipality_accounted_ballots -> entity_accounted_ballots
+    - municipality_blank_votes -> entity_blank_votes
+    - municipality_invalid_votes -> entity_invalid_votes
+    - municipality_accounted_votes -> entity_accounted_votes
+    - municipality_bfs_number -> entity_id
+
+  - Vote: OneGov Cloud
+
+    - municipality_id -> entity_id
+
+  - Vote: Default
+
+    - BFS Nummer -> ID
+    - Gemeinde -> Name
 
   [msom]
 
