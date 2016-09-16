@@ -12,3 +12,11 @@
 svg #background {
     fill: lighten($primary-color, 25%);
 }
+
+/*
+    editbar icons
+*/
+
+.edit-bar {
+    .new-activity:before { @include icon('\f135'); }
+}

@@ -32,7 +32,8 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
-        'onegov.org'
+        'onegov.activity',
+        'onegov.org',
     ],
     extras_require=dict(
         test=[

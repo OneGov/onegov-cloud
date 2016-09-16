@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-08-31 14:16+0200\n"
+"POT-Creation-Date: 2016-09-16 15:45+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -12,11 +12,44 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "Activities"
-msgstr "Angebote"
+msgid "Register a new account"
+msgstr "Ein neues Konto eröffnen"
 
 msgid "Go to Login"
 msgstr "Zum Benutzerkonto"
 
-msgid "Register a new account"
-msgstr "Ein neues Konto eröffnen"
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Activities"
+msgstr "Angebote"
+
+msgid "New"
+msgstr "Neu"
+
+msgid "Submit Activity"
+msgstr "Angebot erfassen"
+
+msgid "Editor"
+msgstr "Organisator"
+
+msgid "Editors"
+msgstr "Organisatoren"
+
+msgid "Title"
+msgstr "Titel"
+
+msgid "The title of the activity"
+msgstr "Der Titel des Angebots"
+
+msgid "Lead"
+msgstr "Einleitung"
+
+msgid "Describes briefly what this activity is about"
+msgstr "Beschreibt kurz um was es beim Angebot geht"
+
+msgid "Text"
+msgstr "Text"
+
+msgid "New Activity"
+msgstr "Neues Angebot"

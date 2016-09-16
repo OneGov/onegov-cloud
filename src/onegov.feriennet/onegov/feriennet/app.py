@@ -1,12 +1,14 @@
 from onegov.core import utils
 from onegov.feriennet.initial_content import create_new_organisation
+from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.theme import FeriennetTheme
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
 
 
 class FeriennetApp(OrgApp):
-    pass
+
+    request_class = FeriennetRequest
 
 
 @FeriennetApp.template_directory()
