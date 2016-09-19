@@ -655,7 +655,11 @@ ul.panel-links {
                 margin-right: 1ex;
             }
         }
+    }
 
+    small {
+        display: block;
+        font-size: .8rem;
     }
 
     li {
@@ -688,8 +692,13 @@ ul.panel-links {
     }
 
     &.contact-panel {
+        a {
+            font-weight: bold;
+        }
+
         ul {
             list-style-type: none;
+            margin: 0;
         }
 
         li:first-child {
