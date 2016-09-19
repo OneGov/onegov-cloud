@@ -5,6 +5,7 @@ from onegov.ballot import Vote
 from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.collection import ArchivedResultCollection
 from onegov.election_day.forms import UploadVoteForm
 from onegov.election_day.layout import ManageVotesLayout
 from onegov.election_day.formats import FileImportError
@@ -91,6 +92,9 @@ def view_upload(self, request, form):
                     )
             else:
                 raise NotImplementedError("Unsupported import format")
+
+            archive = ArchivedResultCollection(request.app.session())
+            archive.update(self, request)
 
     if results:
         if all(r['status'] == 'ok' for r in results.values()):

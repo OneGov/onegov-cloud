@@ -4,6 +4,7 @@ import logging
 import urllib.request
 
 from onegov.ballot import Election, Vote
+from onegov.election_day.models import ArchivedResult
 
 
 log = logging.getLogger('onegov.election_day')  # noqa
@@ -19,7 +20,7 @@ def add_last_modified_header(response, last_modified):
         )
 
 
-def get_election_summary(election, request):
+def get_election_summary(election, request, url=None):
     """ Returns some basic informations about the given election as a JSON
     seriazable dict. """
 
@@ -37,15 +38,18 @@ def get_election_summary(election, request):
         },
         'title': election.title_translations,
         'type': 'election',
-        'url': request.link(election),
+        'url': url or request.link(election),
     }
 
 
-def get_vote_summary(vote, request):
+def get_vote_summary(vote, request, url=None):
     """ Returns some basic informations about the given vote as a JSON
     seriazable dict. """
 
-    divider = len(vote.ballots) or 1
+    try:
+        divider = len(vote.ballots) or 1
+    except AttributeError:
+        divider = 1
 
     last_modified = vote.last_result_change
     if last_modified:
@@ -63,7 +67,7 @@ def get_vote_summary(vote, request):
         },
         'title': vote.title_translations,
         'type': 'vote',
-        'url': request.link(vote),
+        'url': url or request.link(vote),
         'yeas_percentage': vote.yeas_percentage,
     }
 
@@ -76,6 +80,12 @@ def get_summary(item, request):
 
     if isinstance(item, Vote):
         return get_vote_summary(item, request)
+
+    if isinstance(item, ArchivedResult):
+        if item.type == 'election':
+            return get_election_summary(item, None, item.url)
+        if item.type == 'vote':
+            return get_vote_summary(item, None, item.url)
 
     raise NotImplementedError(
         "get_summary can't handle type {}".format(type(item))

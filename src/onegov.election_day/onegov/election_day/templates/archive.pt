@@ -38,7 +38,9 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="election archive_items[date][domain][type]">
-                                    <td><a href="${request.link(election)}">${election.title}</a></td>
+                                    <td tal:define="prefix election.title_prefix(request)">
+                                        <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
+                                    </td>
                                     <td class="right-aligned">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_entities, election.total_entities)" />
                                     </td>
@@ -62,7 +64,9 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="vote archive_items[date][domain][type]">
-                                    <td><a href="${request.link(vote)}">${vote.title}</a></td>
+                                    <td tal:define="prefix vote.title_prefix(request)">
+                                        <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
+                                    </td>
                                     <td>
                                         <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
                                     </td>
@@ -77,7 +81,7 @@
                                         </tal:block>
                                     </td>
                                     <td class="right-aligned">
-                                        <div metal:use-macro="layout.macros['progress_vote']" tal:define="progress vote.progress" />
+                                        <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                     </td>
                                     <td class="right-aligned">
                                         ${layout.format_date(vote.last_result_change, 'datetime')}

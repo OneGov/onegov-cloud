@@ -1,9 +1,11 @@
 import onegov.election_day
+import transaction
 
 from datetime import date
 from freezegun import freeze_time
 from onegov.testing import utils
 from webtest import TestApp as Client
+from onegov.election_day.collection import ArchivedResultCollection
 
 
 COLUMNS = [
@@ -53,6 +55,7 @@ def test_view_login_logout(election_day_app):
 
 
 def test_view_manage(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -74,12 +77,16 @@ def test_view_manage(election_day_app):
     new.form['mandates'] = 1
     manage = new.form.submit().follow()
 
+    last_result_change = archive.query().one().last_result_change
+
     assert "Elect a new president" in manage
     edit = manage.click('Bearbeiten')
     edit.form['election_de'] = 'Elect a new federal councillor'
     manage = edit.form.submit().follow()
 
     assert "Elect a new federal councillor" in manage
+    assert "Elect a new federal councillor" == archive.query().one().title
+    assert last_result_change != archive.query().one().last_result_change
 
     delete = manage.click("Löschen")
     assert "Wahl löschen" in delete
@@ -88,6 +95,8 @@ def test_view_manage(election_day_app):
 
     manage = delete.form.submit().follow()
     assert "Noch keine Wahlen erfasst" in manage
+
+    assert archive.query().count() == 0
 
     manage = client.get('/manage/votes')
 
@@ -99,12 +108,16 @@ def test_view_manage(election_day_app):
     new.form['domain'] = 'federation'
     manage = new.form.submit().follow()
 
+    last_result_change = archive.query().one().last_result_change
+
     assert "Vote for a better yesterday" in manage
     edit = manage.click('Bearbeiten')
     edit.form['vote_de'] = 'Vote for a better tomorrow'
     manage = edit.form.submit().follow()
 
     assert "Vote for a better tomorrow" in manage
+    assert "Vote for a better tomorrow" == archive.query().one().title
+    assert last_result_change != archive.query().one().last_result_change
 
     delete = manage.click("Löschen")
     assert "Abstimmung löschen" in delete
@@ -113,6 +126,8 @@ def test_view_manage(election_day_app):
 
     manage = delete.form.submit().follow()
     assert "Noch keine Abstimmungen erfasst" in manage
+
+    assert archive.query().count() == 0
 
 
 def test_i18n(election_day_app):
@@ -376,3 +391,45 @@ def test_view_last_modified(election_day_app):
         ):
             assert client.get(path).headers.get('Last-Modified') == \
                 'Wed, 01 Jan 2014 12:00:00 GMT'
+
+
+def test_view_update_results(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = "Abstimmung 1. Januar 2013"
+    new.form['date'] = date(2013, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = "Wahl 1. Januar 2013"
+    new.form['date'] = date(2013, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    assert len(client.get('/json').json['results']) == 2
+
+    session = election_day_app.session()
+    archive = ArchivedResultCollection(session)
+
+    results = archive.query().all()
+    assert len(results) == 2
+
+    for result in results:
+        session.delete(result)
+
+    transaction.commit()
+
+    results = archive.query().count() == 0
+    assert len(client.get('/json').json['results']) == 0
+
+    client.get('/update-results')
+
+    results = archive.query().count() == 2
+    assert len(client.get('/json').json['results']) == 2

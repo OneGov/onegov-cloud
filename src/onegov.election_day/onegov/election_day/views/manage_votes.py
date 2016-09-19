@@ -6,10 +6,8 @@ from onegov.ballot import Vote, VoteCollection
 from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.collections import WebhookCollection
-from onegov.election_day.forms import DeleteForm
-from onegov.election_day.forms import TriggerWebhookForm
-from onegov.election_day.forms import VoteForm
+from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.forms import DeleteForm, VoteForm
 from onegov.election_day.layout import ManageVotesLayout
 from onegov.election_day.utils import get_vote_summary, post_to
 
@@ -31,13 +29,14 @@ def view_votes(self, request):
 def create_vote(self, request, form):
 
     layout = ManageVotesLayout(self, request)
+    archive = ArchivedResultCollection(request.app.session())
 
     form.set_domain(request.app.principal)
 
     if form.submitted(request):
         vote = Vote()
         form.update_model(vote)
-        request.app.session().add(vote)
+        archive.add(vote, request)
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -53,11 +52,13 @@ def create_vote(self, request, form):
 def edit_vote(self, request, form):
 
     layout = ManageVotesLayout(self, request)
+    archive = ArchivedResultCollection(request.app.session())
 
     form.set_domain(request.app.principal)
 
     if form.submitted(request):
         form.update_model(self)
+        archive.update(self, request)
         return morepath.redirect(layout.manage_model_link)
 
     form.apply_model(self)
@@ -77,9 +78,10 @@ def edit_vote(self, request, form):
 def delete_vote(self, request, form):
 
     layout = ManageVotesLayout(self, request)
+    archive = ArchivedResultCollection(request.app.session())
 
     if form.submitted(request):
-        request.app.session().delete(self)
+        archive.delete(self, request)
         return morepath.redirect(layout.manage_model_link)
 
     return {

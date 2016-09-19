@@ -6,10 +6,8 @@ from onegov.ballot import Election, ElectionCollection
 from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.collections import WebhookCollection
-from onegov.election_day.forms import DeleteForm
-from onegov.election_day.forms import ElectionForm
-from onegov.election_day.forms import TriggerWebhookForm
+from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.forms import DeleteForm, ElectionForm
 from onegov.election_day.layout import ManageElectionsLayout
 
 
@@ -30,13 +28,14 @@ def view_elections(self, request):
 def create_election(self, request, form):
 
     layout = ManageElectionsLayout(self, request)
+    archive = ArchivedResultCollection(request.app.session())
 
     form.set_domain(request.app.principal)
 
     if form.submitted(request):
         election = Election()
         form.update_model(election)
-        request.app.session().add(election)
+        archive.add(election, request)
         return morepath.redirect(layout.manage_model_link)
 
     return {
@@ -52,11 +51,13 @@ def create_election(self, request, form):
 def edit_election(self, request, form):
 
     layout = ManageElectionsLayout(self, request)
+    archive = ArchivedResultCollection(request.app.session())
 
     form.set_domain(request.app.principal)
 
     if form.submitted(request):
         form.update_model(self)
+        archive.update(self, request)
         return morepath.redirect(layout.manage_model_link)
 
     form.apply_model(self)
@@ -76,9 +77,10 @@ def edit_election(self, request, form):
 def delete_election(self, request, form):
 
     layout = ManageElectionsLayout(self, request)
+    archive = ArchivedResultCollection(request.app.session())
 
     if form.submitted(request):
-        request.app.session().delete(self)
+        archive.delete(self, request)
         return morepath.redirect(layout.manage_model_link)
 
     return {

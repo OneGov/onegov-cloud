@@ -3,7 +3,8 @@ from onegov.ballot import Election, ElectionCollection
 from onegov.ballot import Ballot, BallotCollection
 from onegov.ballot import Vote, VoteCollection
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.models import Archive, Principal
+from onegov.election_day.models import Principal
+from onegov.election_day.collection import ArchivedResultCollection
 from onegov.user import Auth
 
 
@@ -42,9 +43,9 @@ def get_ballot(app, id):
     return BallotCollection(app.session()).by_id(id)
 
 
-@ElectionDayApp.path(model=Archive, path='/archive/{date}')
+@ElectionDayApp.path(model=ArchivedResultCollection, path='/archive/{date}')
 def get_archive_by_year(app, date):
-    return Archive(app.session(), date)
+    return ArchivedResultCollection(app.session(), date)
 
 
 @ElectionDayApp.path(model=SiteLocale, path='/locale/{locale}')

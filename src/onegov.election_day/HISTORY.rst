@@ -3,8 +3,8 @@ Changelog
 
 - Adds elections and votes for municipalitites.
 
-  Breaking changes: The import and export formats have changed!
-  Make sure to change your column names:
+  **Breaking changes: The import and export formats have changed!
+  Make sure to change your column names!**
 
   - Election: OneGov Cloud
 
@@ -31,6 +31,16 @@ Changelog
 
     - BFS Nummer -> ID
     - Gemeinde -> Name
+
+  [msom]
+
+- Stores results of votes and elections in a separate table and allows
+  to fetch results from other instances via command line interface.
+
+  **Upgrading requires a manual extra step!**
+
+  After running the upgrade, log in and visit *'update-results'*. This fixes
+  the automatically generated URL linking to the elections and votes.
 
   [msom]
 

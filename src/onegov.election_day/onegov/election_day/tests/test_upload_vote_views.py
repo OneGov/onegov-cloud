@@ -4,6 +4,7 @@ import tarfile
 from datetime import date
 from onegov.ballot import VoteCollection
 from onegov.core.utils import module_path
+from onegov.election_day.collection import ArchivedResultCollection
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
@@ -28,6 +29,8 @@ def login(client):
 
 
 def test_upload_vote_all_or_nothing(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -38,6 +41,7 @@ def test_upload_vote_all_or_nothing(election_day_app):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     # when uploading a proposal, a counter-proposal and a tie-breaker we
     # want the process to stop completely if any of these three files has
@@ -72,12 +76,15 @@ def test_upload_vote_all_or_nothing(election_day_app):
     assert "Fehler in der Stichfrage" in upload
     assert "Ungültige ID" in upload
     assert '<span class="error-line"><span>Zeile</span>2</span>' in upload
+    assert archive.query().one().progress == (0, 0)
 
     vote = VoteCollection(election_day_app.session()).by_id('bacon-yea-or-nay')
     assert not vote.ballots
 
 
 def test_upload_vote_success(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -88,6 +95,7 @@ def test_upload_vote_success(election_day_app):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     # when uploading a proposal, a counter-proposal and a tie-breaker we
     # want the process to stop completely if any of these three files has
@@ -116,6 +124,7 @@ def test_upload_vote_success(election_day_app):
     )
 
     results = upload.form.submit().click("Hier klicken")
+    assert archive.query().one().progress == (11, 11)
 
     assert 'Zug' in results
     assert 'Oberägeri' in results
@@ -139,6 +148,8 @@ def test_upload_vote_success(election_day_app):
 
 
 def test_upload_vote_validation(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -149,6 +160,7 @@ def test_upload_vote_validation(election_day_app):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
     upload.form['type'] = 'simple'
@@ -158,6 +170,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Keine gültige CSV/XLS/XLSX Datei" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # missing columns
     csv = '\n'.join((
@@ -170,6 +183,7 @@ def test_upload_vote_validation(election_day_app):
 
     assert "Fehlende Spalten: Leere Stimmzettel, Ungültige Stimmzettel"\
         in upload
+    assert archive.query().one().progress == (0, 0)
 
     # duplicate columns
     csv = '\n'.join((
@@ -181,6 +195,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Einige Spaltennamen erscheinen doppelt" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # missing municipality
     csv = '\n'.join((
@@ -192,6 +207,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Fehlende Bezeichnung" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # duplicate municipality
     csv = '\n'.join((
@@ -204,6 +220,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Zug kommt zweimal vor" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # invalid municipality id
     csv = '\n'.join((
@@ -215,6 +232,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Ungültige ID" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # invalid yeas
     csv = '\n'.join((
@@ -226,6 +244,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Konnte 'Ja Stimmen' nicht lesen" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # invalid nays
     csv = '\n'.join((
@@ -237,6 +256,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Konnte 'Nein Stimmen' nicht lesen" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # invalid nays
     csv = '\n'.join((
@@ -248,6 +268,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Konnte 'Nein Stimmen' nicht lesen" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # invalid elegible voters
     csv = '\n'.join((
@@ -259,6 +280,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Konnte 'Stimmberechtigte' nicht lesen" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # invalid empty votes
     csv = '\n'.join((
@@ -270,6 +292,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Konnte 'Leere Stimmzettel' nicht lesen" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # invalid faulty votes
     csv = '\n'.join((
@@ -281,6 +304,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Konnte 'Ungültige Stimmzettel' nicht lesen" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # more votes than elegible voters
     csv = '\n'.join((
@@ -292,6 +316,7 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Mehr eingelegte Stimmen als Stimmberechtigte" in upload
+    assert archive.query().one().progress == (0, 0)
 
     # no elegible voters at all
     csv = '\n'.join((
@@ -303,9 +328,12 @@ def test_upload_vote_validation(election_day_app):
     upload = upload.form.submit()
 
     assert "Keine Stimmberechtigten" in upload
+    assert archive.query().one().progress == (0, 0)
 
 
 def test_upload_vote_missing_town(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -316,6 +344,7 @@ def test_upload_vote_missing_town(election_day_app):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     # when uploading a proposal, a counter-proposal and a tie-breaker we
     # want the process to stop completely if any of these three files has
@@ -353,9 +382,12 @@ def test_upload_vote_missing_town(election_day_app):
 
     assert "Diese Vorlage hat weniger Resultate als die Anderen" in \
         upload.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
 
 def test_upload_vote_unknown_result(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -366,6 +398,7 @@ def test_upload_vote_unknown_result(election_day_app):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     # when uploading a proposal, a counter-proposal and a tie-breaker we
     # want the process to stop completely if any of these three files has
@@ -389,6 +422,7 @@ def test_upload_vote_unknown_result(election_day_app):
     assert "Abgelehnt" in r.pyquery('tr[data-municipality-id="1711"]').text()
     assert "Noch nicht ausgezählt" in r.pyquery(
         'tr[data-municipality-id="1706"]').text()
+    assert archive.query().one().progress == (1, 11)
 
     # adding unknown results should override existing results
     upload = client.get('/vote/bacon-yea-or-nay/upload')
@@ -407,6 +441,7 @@ def test_upload_vote_unknown_result(election_day_app):
 
     assert "Noch nicht ausgezählt" in r.pyquery(
         'tr[data-municipality-id="1711"]').text()
+    assert archive.query().one().progress == (0, 11)
 
 
 def test_upload_vote_year_unavailable(election_day_app):
@@ -434,6 +469,8 @@ def test_upload_vote_year_unavailable(election_day_app):
 
 
 def test_upload_vote_roundtrip(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -444,6 +481,7 @@ def test_upload_vote_roundtrip(election_day_app):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     # when uploading a proposal, a counter-proposal and a tie-breaker we
     # want the process to stop completely if any of these three files has
@@ -473,6 +511,7 @@ def test_upload_vote_roundtrip(election_day_app):
 
     results = upload.form.submit()
     assert 'Ihre Resultate wurden erfolgreich hochgeladen' in results
+    assert archive.query().one().progress == (11, 11)
 
     export = client.get('/vote/bacon-yea-or-nay/data-csv').text.encode('utf-8')
 
@@ -494,6 +533,8 @@ def test_upload_vote_roundtrip(election_day_app):
     module_path('onegov.election_day', 'tests/fixtures/wabsti_vote.tar.gz'),
 ])
 def test_upload_vote_wabsti(election_day_app_sg, tar_file):
+    archive = ArchivedResultCollection(election_day_app_sg.session())
+
     client = Client(election_day_app_sg)
     client.get('/locale/de_CH').follow()
 
@@ -504,6 +545,7 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
     new.form['date'] = date(2016, 6, 6)
     new.form['domain'] = 'federation'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     with tarfile.open(tar_file, 'r|gz') as f:
         csv = f.extractfile(f.next()).read()
@@ -516,6 +558,7 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    assert archive.query().one().progress == (77, 77)
 
     results = upload.click("Hier klicken")
 
@@ -533,6 +576,7 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+    assert archive.query().one().progress == (3, 77)
 
     results = upload.click("Hier klicken")
 
@@ -625,6 +669,8 @@ def test_upload_vote_invalidate_cache(election_day_app):
 
 
 def test_upload_vote_temporary_results(election_day_app):
+    archive = ArchivedResultCollection(election_day_app.session())
+
     client = Client(election_day_app)
     client.get('/locale/de_CH').follow()
 
@@ -635,6 +681,7 @@ def test_upload_vote_temporary_results(election_day_app):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     # standard format: missing
     csv = '\n'.join((
@@ -646,6 +693,7 @@ def test_upload_vote_temporary_results(election_day_app):
     upload.form['type'] = 'simple'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
+    assert archive.query().one().progress == (2, 11)
 
     result_standard = client.get('/vote/vote/data-csv').text
     assert 'Baar,1701,False' in result_standard
@@ -668,6 +716,7 @@ def test_upload_vote_temporary_results(election_day_app):
     upload.form['file_format'] = 'internal'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
+    assert archive.query().one().progress == (2, 11)
 
     result_internal = client.get('/vote/vote/data-csv').text
     assert result_standard == result_internal
@@ -689,6 +738,7 @@ def test_upload_vote_temporary_results(election_day_app):
     upload.form['vote_number'] = '1'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
+    assert archive.query().one().progress == (2, 11)
 
     result_wabsti = client.get('/vote/vote/data-csv').text
     assert result_standard == result_wabsti
@@ -764,6 +814,8 @@ def test_upload_vote_available_formats_municipality(election_day_app_bern):
 
 
 def test_upload_communal_vote(election_day_app_kriens):
+    archive = ArchivedResultCollection(election_day_app_kriens.session())
+
     client = Client(election_day_app_kriens)
     client.get('/locale/de_CH').follow()
 
@@ -774,6 +826,7 @@ def test_upload_communal_vote(election_day_app_kriens):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'municipality'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     upload = client.get('/vote/vote/upload')
     upload.form['type'] = 'simple'
@@ -788,6 +841,7 @@ def test_upload_communal_vote(election_day_app_kriens):
     )
 
     assert 'erfolgreich hochgeladen' in upload.form.submit()
+    assert archive.query().one().progress == (1, 1)
 
     result = client.get('/vote/vote')
     assert '38.41' in result
@@ -796,6 +850,8 @@ def test_upload_communal_vote(election_day_app_kriens):
 
 
 def test_upload_communal_vote_districts(election_day_app_bern):
+    archive = ArchivedResultCollection(election_day_app_bern.session())
+
     client = Client(election_day_app_bern)
     client.get('/locale/de_CH').follow()
 
@@ -806,6 +862,7 @@ def test_upload_communal_vote_districts(election_day_app_bern):
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'municipality'
     new.form.submit()
+    assert archive.query().one().progress == (0, 0)
 
     upload = client.get('/vote/vote/upload')
     upload.form['type'] = 'simple'
@@ -825,6 +882,7 @@ def test_upload_communal_vote_districts(election_day_app_bern):
     )
 
     assert 'erfolgreich hochgeladen' in upload.form.submit()
+    assert archive.query().one().progress == (6, 6)
 
     result = client.get('/vote/vote')
     assert '37.99' in result

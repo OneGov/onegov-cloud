@@ -1,17 +1,18 @@
-from onegov.core.security import Public
+from onegov.core.security import Public, Private
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
-from onegov.election_day.models import Principal, Archive
+from onegov.election_day.models import Principal
+from onegov.election_day.collection import ArchivedResultCollection
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_archive_links
 from onegov.election_day.utils import get_summaries
 
 
-@ElectionDayApp.html(model=Archive, template='archive.pt', permission=Public)
+@ElectionDayApp.html(model=ArchivedResultCollection, template='archive.pt',
+                     permission=Public)
 def view_archive(self, request):
 
-    results = self.by_date()
-    last_modified = self.last_modified(results)
+    results, last_modified = self.by_date()
     results = self.group_items(results)
 
     @request.after
@@ -25,11 +26,11 @@ def view_archive(self, request):
     }
 
 
-@ElectionDayApp.json(model=Archive, permission=Public, name='json')
+@ElectionDayApp.json(model=ArchivedResultCollection, permission=Public,
+                     name='json')
 def view_archive_json(self, request):
 
-    results = self.by_date()
-    last_modified = self.last_modified(results)
+    results, last_modified = self.by_date()
     results = get_summaries(results, request)
 
     @request.after
@@ -47,9 +48,8 @@ def view_archive_json(self, request):
 @ElectionDayApp.html(model=Principal, template='archive.pt', permission=Public)
 def view_principal(self, request):
 
-    archive = Archive(request.app.session())
-    latest = archive.latest()
-    last_modified = archive.last_modified(latest)
+    archive = ArchivedResultCollection(request.app.session())
+    latest, last_modified = archive.latest()
     latest = archive.group_items(latest, reverse=True)
 
     @request.after
@@ -67,9 +67,8 @@ def view_principal(self, request):
 @ElectionDayApp.json(model=Principal, permission=Public, name='json')
 def view_principal_json(self, request):
 
-    archive = Archive(request.app.session())
-    latest = archive.latest()
-    last_modified = archive.last_modified(latest)
+    archive = ArchivedResultCollection(request.app.session())
+    latest, last_modified = archive.latest()
     latest = get_summaries(latest, request)
 
     @request.after
@@ -82,3 +81,13 @@ def view_principal_json(self, request):
         'results': latest,
         'archive': get_archive_links(archive, request)
     }
+
+
+@ElectionDayApp.json(model=Principal, permission=Private,
+                     name='update-results')
+def view_update_results(self, request):
+
+    archive = ArchivedResultCollection(request.app.session())
+    archive.update_all(request)
+
+    return {'result': 'ok'}

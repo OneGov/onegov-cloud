@@ -5,9 +5,10 @@ from onegov.ballot import Election
 from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.formats import FileImportError
 from onegov.election_day.forms import UploadElectionForm
 from onegov.election_day.layout import ManageElectionsLayout
-from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats.election.onegov_ballot import (
     import_file as import_onegov_file
 )
@@ -87,6 +88,9 @@ def view_upload(self, request, form):
                     self.total_entities = self.counted_entities
             else:
                 raise NotImplementedError("Unsupported import format")
+
+            archive = ArchivedResultCollection(request.app.session())
+            archive.update(self, request)
 
     form.apply_model(self)
 

@@ -6,7 +6,7 @@ from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
-from onegov.election_day.models import Archive
+from onegov.election_day.collection import ArchivedResultCollection
 from onegov.user import Auth
 
 
@@ -76,7 +76,7 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def archive(self):
-        return Archive(self.request.app.session())
+        return ArchivedResultCollection(self.request.app.session())
 
     @cached_property
     def locales(self):

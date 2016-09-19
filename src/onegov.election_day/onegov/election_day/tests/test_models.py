@@ -1,15 +1,8 @@
 import textwrap
 
-from datetime import date
-from onegov.ballot import Election, Vote
-from onegov.election_day.models import Archive, Principal
+from datetime import date, datetime, timezone
+from onegov.election_day.models import ArchivedResult, Principal
 from onegov.election_day.models.principal import cantons
-
-
-class DummyRequest(object):
-
-    def link(self, model, name=''):
-        return '{}/{}'.format(model.__class__.__name__, name).rstrip('/')
 
 
 def test_load_principal():
@@ -31,6 +24,7 @@ def test_load_principal():
     assert principal.use_maps is True
     assert principal.domain is 'canton'
     assert list(principal.available_domains.keys()) == ['federation', 'canton']
+    assert principal.fetch == {}
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
@@ -40,6 +34,11 @@ def test_load_principal():
         base: 'http://www.zg.ch'
         analytics: "<script type=\\"text/javascript\\"></script>"
         use_maps: false
+        fetch:
+            steinhausen:
+                - municipality
+            baar:
+                - municipality
     """))
 
     assert principal.name == 'Kanton Zug'
@@ -53,6 +52,10 @@ def test_load_principal():
     assert principal.use_maps is True
     assert principal.domain is 'canton'
     assert list(principal.available_domains.keys()) == ['federation', 'canton']
+    assert principal.fetch == {
+        'steinhausen': ['municipality'],
+        'baar': ['municipality']
+    }
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -74,6 +77,7 @@ def test_load_principal():
     assert list(principal.available_domains.keys()) == [
         'federation', 'canton', 'municipality'
     ]
+    assert principal.fetch == {}
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -96,6 +100,7 @@ def test_load_principal():
     assert list(principal.available_domains.keys()) == [
         'federation', 'canton', 'municipality'
     ]
+    assert principal.fetch == {}
 
 
 def test_municipalities():
@@ -224,54 +229,83 @@ def test_years_available():
             assert principal.is_year_available(year, map_required=False)
 
 
-def test_archive(session):
-    archive = Archive(session)
+def test_archived_result(session):
+    result = ArchivedResult()
+    result.date = date(2007, 1, 1)
+    result.last_result_change = datetime(2007, 1, 1, 0, 0, tzinfo=timezone.utc)
+    result.schema = 'schema'
+    result.url = 'url'
+    result.title = 'title'
+    result.domain = 'canton'
+    result.type = 'vote'
+    result.name = 'name'
 
-    assert archive.for_date(2015).date == 2015
-
-    assert archive.get_years() == []
-    assert archive.latest() == []
-    assert archive.for_date(2015).by_date() == []
-
-    for year in (2009, 2011, 2014, 2016):
-        session.add(
-            Election(
-                title="Election {}".format(year),
-                domain='federation',
-                type='majorz',
-                date=date(year, 1, 1),
-            )
-        )
-    for year in (2007, 2011, 2015, 2016):
-        session.add(
-            Vote(
-                title="Vote {}".format(year),
-                domain='federation',
-                date=date(year, 1, 1),
-            )
-        )
-
+    session.add(result)
     session.flush()
 
-    assert archive.get_years() == [2016, 2015, 2014, 2011, 2009, 2007]
+    assert result.id
 
-    for date_ in (2016, '2016', '2016-01-01'):
-        assert archive.latest() == archive.for_date(date_).by_date()
+    assert result.progress == (0, 0)
+    result.total_entities = 10
+    assert result.progress == (0, 10)
+    result.counted_entities = 5
+    assert result.progress == (5, 10)
 
-    assert archive.for_date('2016-02-02').by_date() == []
+    result.answer = 'rejected'
+    assert result.answer == 'rejected'
 
-    for year in (2009, 2011, 2014, 2016):
-        item = session.query(Election).filter_by(date=date(year, 1, 1)).one()
-        items = archive.for_date(year).by_date()
-        assert item in items
+    result.nays_percentage = 20.5
+    assert result.nays_percentage == 20.5
 
-        groups = archive.group_items(items)
-        assert groups[date(year, 1, 1)]['federation']['election'] == [item]
+    result.yeas_percentage = 79.5
+    assert result.yeas_percentage == 79.5
 
-    for year in (2007, 2011, 2015, 2016):
-        item = session.query(Vote).filter_by(date=date(year, 1, 1)).one()
-        items = archive.for_date(year).by_date()
-        assert item in items
+    result.counted = True
+    assert result.counted == True
 
-        groups = archive.group_items(items)
-        assert groups[date(year, 1, 1)]['federation']['vote'] == [item]
+    assert result.meta == {
+        'answer': 'rejected',
+        'nays_percentage': 20.5,
+        'yeas_percentage': 79.5,
+        'counted': True,
+    }
+
+    assert result.title == 'title'
+
+    result.title_translations['en'] = 'title'
+    assert result.title_translations == {'en': 'title', 'de_CH': 'title'}
+
+    assert result.name == 'name'
+    assert result.title_prefix(session=session) == ''
+
+    result.domain = 'municipality'
+    assert result.title_prefix(session=session) == result.name
+
+    result.shortcode = 'shortcode'
+
+    copied = ArchivedResult()
+    copied.copy_from(result)
+
+    assert copied.date == date(2007, 1, 1)
+    assert copied.last_result_change == datetime(2007, 1, 1, 0, 0,
+                                                 tzinfo=timezone.utc)
+    assert copied.schema == 'schema'
+    assert copied.url == 'url'
+    assert copied.title == 'title'
+    assert copied.title_translations == {'en': 'title', 'de_CH': 'title'}
+    assert copied.domain == 'municipality'
+    assert copied.type == 'vote'
+    assert copied.name == 'name'
+    assert copied.total_entities == 10
+    assert copied.counted_entities == 5
+    assert copied.answer == 'rejected'
+    assert copied.nays_percentage == 20.5
+    assert copied.yeas_percentage == 79.5
+    assert copied.counted == True
+    assert copied.meta == {
+        'answer': 'rejected',
+        'nays_percentage': 20.5,
+        'yeas_percentage': 79.5,
+        'counted': True,
+    }
+    assert copied.shortcode == 'shortcode'
