@@ -5,6 +5,9 @@ Changelog
   localization.
   [msom]
 
+- Fixes bug in folding of proporz election view.
+  [msom]
+
 0.9.1 (2016-09-14)
 ~~~~~~~~~~~~~~~~~~~
 

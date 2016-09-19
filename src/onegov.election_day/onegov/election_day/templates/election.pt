@@ -78,7 +78,8 @@
                         data-dataurl="${request.link(election, name='candidates')}"
                         data-download-link="Download"
                         data-embed-link="Embed"
-                        data-embed-source="${request.link(election, name='candidates-chart')}" />
+                        data-embed-source="${request.link(election, name='candidates-chart')}">
+                    </div>
                 </div>
             </div>
 
@@ -122,7 +123,8 @@
                             data-dataurl="${request.link(election, name='connections')}"
                             data-download-link="Download"
                             data-embed-link="Embed"
-                            data-embed-source="${request.link(election, name='connections-chart')}" />
+                            data-embed-source="${request.link(election, name='connections-chart')}">
+                        </div>
                     </div>
                 </div>
                 <div class="foldable-panel">
