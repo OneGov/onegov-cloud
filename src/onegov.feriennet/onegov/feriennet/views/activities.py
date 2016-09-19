@@ -7,6 +7,7 @@ from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.forms import VacationActivityForm
 from onegov.feriennet.layout import (
     NewVacationActivityLayout,
+    VacationActivityLayout,
     VacationActivityCollectionLayout
 )
 
@@ -47,4 +48,15 @@ def handle_new_activity(self, request, form):
         'layout': NewVacationActivityLayout(self, request),
         'title': _("New Activity"),
         'form': form
+    }
+
+
+@FeriennetApp.html(model=VacationActivity, template='activity.pt',
+                   permission=Public)
+def view_activity(self, request):
+
+    return {
+        'layout': VacationActivityLayout(self, request),
+        'title': self.title,
+        'activity': self
     }
