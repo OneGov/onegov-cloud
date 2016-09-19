@@ -14,6 +14,14 @@ class FeriennetRequest(OrgRequest):
         return self.has_role('admin', 'editor')
 
     @cached_property
+    def is_organiser_only(self):
+        """ Returns true if the current user is an organiser, but not an admin.
+
+        """
+
+        return self.has_role('editor')
+
+    @cached_property
     def is_manager(self):
         """ Using feriennet only admins are managers. The editors are
         organisers with a very limited set of capabilities.

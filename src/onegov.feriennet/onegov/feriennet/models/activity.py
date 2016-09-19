@@ -1,9 +1,12 @@
+from cached_property import cached_property
 from onegov.activity import Activity
-from onegov.org.models.extensions import (
-    ContactExtension,
-    CoordinatesExtension,
-    PersonLinkExtension,
-)
+from onegov.core.templates import render_macro
+from onegov.feriennet.collections import VacationActivityCollection
+from onegov.feriennet.layout import DefaultLayout
+from onegov.org.models.extensions import ContactExtension
+from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import PersonLinkExtension
+from onegov.ticket import handlers, Handler
 
 
 class VacationActivity(Activity, ContactExtension, PersonLinkExtension,
@@ -32,3 +35,50 @@ class VacationActivity(Activity, ContactExtension, PersonLinkExtension,
         return {
             'input': (self.title.lower(), )
         }
+
+
+@handlers.registered_handler('FER')
+class VacationActivityHandler(Handler):
+
+    @cached_property
+    def collection(self):
+        return VacationActivityCollection(self.session)
+
+    @cached_property
+    def activity(self):
+        return self.collection.by_id(self.id)
+
+    @property
+    def deleted(self):
+        return self.activity is None
+
+    @property
+    def email(self):
+        return self.activity.user.username
+
+    @property
+    def title(self):
+        return self.activity.title
+
+    @property
+    def subtitle(self):
+        return None
+
+    @property
+    def group(self):
+        return self.submission.form.title
+
+    @property
+    def extra_data(self):
+        return None
+
+    def get_summary(self, request):
+        layout = DefaultLayout(self.submission, request)
+
+        return render_macro(layout.macros['activity_detailed'], request, {
+            'activity': self.activity,
+            'layout': layout
+        })
+
+    def get_links(self, request):
+        return []
