@@ -12,12 +12,8 @@ from onegov.election_day.utils import get_summaries
                      permission=Public)
 def view_archive(self, request):
 
-    results, last_modified = self.by_date()
+    results = self.by_date(group=False)
     results = self.group_items(results)
-
-    @request.after
-    def add_last_modified(response):
-        add_last_modified_header(response, last_modified)
 
     return {
         'layout': DefaultLayout(self, request),

@@ -170,10 +170,6 @@ def get_connection_results(election, session):
 def view_election(self, request):
     """" The main view. """
 
-    @request.after
-    def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
-
     request.include('bar_chart')
     request.include('sankey_chart')
 

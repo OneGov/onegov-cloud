@@ -373,16 +373,12 @@ def test_view_last_modified(election_day_app):
         client.get('/locale/de_CH').follow()
 
         for path in (
-            '/'
             '/json',
-            '/archive/2013',
-            '/election/election',
             '/election/election/summary',
             '/election/election/json',
             '/election/election/data-json',
             '/election/election/data-csv',
             '/election/election/data-xlsx',
-            '/vote/vote/',
             '/vote/vote/summary',
             '/vote/vote/json',
             '/vote/vote/data-json',
@@ -392,44 +388,10 @@ def test_view_last_modified(election_day_app):
             assert client.get(path).headers.get('Last-Modified') == \
                 'Wed, 01 Jan 2014 12:00:00 GMT'
 
-
-def test_view_update_results(election_day_app):
-    client = Client(election_day_app)
-    client.get('/locale/de_CH').follow()
-
-    login(client)
-
-    new = client.get('/manage/votes/new-vote')
-    new.form['vote_de'] = "Abstimmung 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = "Wahl 1. Januar 2013"
-    new.form['date'] = date(2013, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
-    assert len(client.get('/json').json['results']) == 2
-
-    session = election_day_app.session()
-    archive = ArchivedResultCollection(session)
-
-    results = archive.query().all()
-    assert len(results) == 2
-
-    for result in results:
-        session.delete(result)
-
-    transaction.commit()
-
-    results = archive.query().count() == 0
-    assert len(client.get('/json').json['results']) == 0
-
-    client.get('/update-results')
-
-    results = archive.query().count() == 2
-    assert len(client.get('/json').json['results']) == 2
+        for path in (
+            '/'
+            '/archive/2013',
+            '/election/election',
+            '/vote/vote/',
+        ):
+            assert 'Last-Modified' not in client.get(path).headers

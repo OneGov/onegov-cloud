@@ -14,10 +14,6 @@ from onegov.election_day.utils import get_vote_summary
 def view_vote(self, request):
     """" The main view. """
 
-    @request.after
-    def add_last_modified(response):
-        add_last_modified_header(response, self.last_result_change)
-
     request.include('ballot_map')
 
     return {

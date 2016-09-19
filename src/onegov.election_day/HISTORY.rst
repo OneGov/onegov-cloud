@@ -1,53 +1,8 @@
 Changelog
 ---------
 
-- Adds elections and votes for municipalitites.
-
-  **Breaking changes: The import and export formats have changed!
-  Make sure to change your column names!**
-
-  - Election: OneGov Cloud
-
-    - election_counted_municipalities -> election_counted_entities
-    - election_total_municipalities -> election_total_entities
-    - municipality_name -> entity_name
-    - municipality_bfs_number -> entity_bfs_number
-    - municipality_elegible_voters -> entity_elegible_voters
-    - municipality_received_ballots -> entity_received_ballots
-    - municipality_blank_ballots -> entity_blank_ballots
-    - municipality_invalid_ballots -> entity_invalid_ballots
-    - municipality_unaccounted_ballots -> entity_unaccounted_ballots
-    - municipality_accounted_ballots -> entity_accounted_ballots
-    - municipality_blank_votes -> entity_blank_votes
-    - municipality_invalid_votes -> entity_invalid_votes
-    - municipality_accounted_votes -> entity_accounted_votes
-    - municipality_bfs_number -> entity_id
-
-  - Vote: OneGov Cloud
-
-    - municipality_id -> entity_id
-
-  - Vote: Default
-
-    - BFS Nummer -> ID
-    - Gemeinde -> Name
-
-  [msom]
-
-- Stores results of votes and elections in a separate table and allows
-  to fetch results from other instances via command line interface.
-
-  **Upgrading requires a manual extra step!**
-
-  After running the upgrade, log in and visit *'update-results'*. This fixes
-  the automatically generated URL linking to the elections and votes.
-
-  [msom]
-
-- Groups the elections and votes on the archive pages by date.
-  [msom]
-
-- Only shows the latest election day on the homepage.
+- Removes the Last-Modified header from certain views, it interferes with the
+  localization.
   [msom]
 
 0.9.1 (2016-09-14)
