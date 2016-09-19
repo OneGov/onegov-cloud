@@ -34,6 +34,24 @@ class PersonMove(object):
 
     @staticmethod
     def get_implementation(obj):
+        # XXX this is not really extendable by other org applications. They
+        # need to override this function *and* define new paths for each class
+        # they add.
+        #
+        # To simplify we should create a registry using dectate, which handles
+        # the classes for us. We'd only have one path and the PersonMove
+        # class would gain a 'type' and a generic 'key' property which we would
+        # use to lookup the actual handler for the move.
+        #
+        # For example:
+        #
+        # @App.person_move_handler()
+        # class PagePersonMoveMapping(object):
+        #     def get_object(self, key):
+        #        ...
+        #     def get_key(self, obj):
+        #        ...
+        #
         if isinstance(obj, Page):
             return PagePersonMove
 
