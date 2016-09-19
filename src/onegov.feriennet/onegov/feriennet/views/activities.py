@@ -6,9 +6,8 @@ from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.forms import VacationActivityForm
-from onegov.feriennet.layout import EditVacationActivityLayout
-from onegov.feriennet.layout import NewVacationActivityLayout
 from onegov.feriennet.layout import VacationActivityCollectionLayout
+from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import VacationActivity
 
@@ -65,7 +64,7 @@ def new_activity(self, request, form):
         return morepath.redirect(request.link(self))
 
     return {
-        'layout': NewVacationActivityLayout(self, request),
+        'layout': VacationActivityFormLayout(self, request, ("New Activity")),
         'title': _("New Activity"),
         'form': form
     }
@@ -89,7 +88,7 @@ def edit_activity(self, request, form):
         form.process(obj=self)
 
     return {
-        'layout': EditVacationActivityLayout(self, request),
+        'layout': VacationActivityFormLayout(self, request, self.title),
         'title': self.title,
         'form': form
     }
