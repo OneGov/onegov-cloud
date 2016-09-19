@@ -1,3 +1,4 @@
+from chameleon import PageTemplate
 from onegov.core import cache
 from onegov.core import Framework
 from webtest import TestApp as Client
@@ -85,3 +86,12 @@ def test_cache_key():
     })
 
     region.set('x' * 500, 'y')
+
+
+def test_cache_page_template():
+    region = cache.create_backend('ns', 'onegov.core.memcached', arguments={
+        'url': '127.0.0.1:12345'
+    })
+
+    region.set('template', PageTemplate('<!DOCTYPE html>'))
+    region.get('template')

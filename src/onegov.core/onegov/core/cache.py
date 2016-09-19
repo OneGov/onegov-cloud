@@ -66,6 +66,8 @@ register_backend(
     'MemcachedBackend'
 )
 
+dill.settings['recurse'] = True
+
 
 class DillPickler(object):
     """ A python-memcached pickler that uses dill instead of the builtin
