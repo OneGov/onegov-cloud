@@ -194,4 +194,5 @@ class ChameleonLayout(Layout):
         See ``templates/macros.pt``.
 
         """
-        return self.template_loader['macros.pt']
+
+        return self.template_loader.macros

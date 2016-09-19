@@ -5,6 +5,7 @@ import polib
 
 from onegov.core import Framework
 from onegov.core import utils
+from onegov.core.layout import ChameleonLayout
 from onegov.core.templates import render_macro
 from translationstring import TranslationStringFactory
 from webtest import TestApp as Client
@@ -164,3 +165,92 @@ def test_inject_default_vars(temporary_directory):
     assert 'child' in child_page
     assert 'padre' in child_page
     assert 'niño' in child_page
+
+
+def test_macro_lookup(temporary_directory):
+
+    parent = os.path.join(temporary_directory, 'parent')
+    child = os.path.join(temporary_directory, 'child')
+
+    os.mkdir(parent)
+    os.mkdir(child)
+
+    with open(os.path.join(parent, 'index.pt'), 'w') as f:
+        f.write("""
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml"
+                  xmlns:tal="http://xml.zope.org/namespaces/tal"
+                  xmlns:metal="http://xml.zope.org/namespaces/metal">
+                <metal:block use-macro="layout.macros.foo" />
+                <metal:block use-macro="layout.macros.bar" />
+                <metal:block use-macro="layout.macros.id" />
+            </html>
+        """)
+
+    with open(os.path.join(parent, 'macros.pt'), 'w') as f:
+        f.write("""
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml"
+                  xmlns:tal="http://xml.zope.org/namespaces/tal"
+                  xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+                <metal:block define-macro="foo">
+                    Foo
+                </metal:block>
+
+                <metal:block define-macro="id">
+                    Parent
+                </metal:block>
+            </html>
+        """)
+
+    with open(os.path.join(child, 'macros.pt'), 'w') as f:
+        f.write("""
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml"
+                  xmlns:tal="http://xml.zope.org/namespaces/tal"
+                  xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+                <metal:block define-macro="bar">
+                    Bar
+                </metal:block>
+
+                <metal:block define-macro="id">
+                    Child
+                </metal:block>
+            </html>
+        """)
+
+    class Parent(Framework):
+        pass
+
+    @Parent.template_directory()
+    def get_parent_template_directory():
+        return parent
+
+    @Parent.path(path='/')
+    class Root(object):
+        pass
+
+    @Parent.view(model=Root, template='index.pt')
+    def view_root(self, request):
+        return {
+            'layout': ChameleonLayout(self, request)
+        }
+
+    class Child(Parent):
+        pass
+
+    @Child.template_directory()
+    def get_child_template_directory():
+        return child
+
+    utils.scan_morepath_modules(Parent)
+    utils.scan_morepath_modules(Child)
+
+    morepath.commit(Child, Parent)
+
+    page = Client(Child()).get('/')
+    assert 'Foo' in page
+    assert 'Bar' in page
+    assert 'Child' in page

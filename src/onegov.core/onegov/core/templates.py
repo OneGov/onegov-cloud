@@ -33,7 +33,10 @@ path.
 
 """
 
-from chameleon import PageTemplateLoader
+import os.path
+
+from cached_property import cached_property
+from chameleon import PageTemplateLoader, PageTemplateFile
 from chameleon.tal import RepeatDict
 from chameleon.utils import Scope, decode_string
 from onegov.core import Framework
@@ -52,6 +55,56 @@ def get_default_vars(request, content):
         request, default)
 
 
+class TemplateLoader(PageTemplateLoader):
+    """ Extends the default page template loader with the ability to
+    lookup macros in various folders.
+
+    """
+
+    @cached_property
+    def macros(self):
+        return MacrosLookup(self.search_path)
+
+
+class MacrosLookup(object):
+    """ Takes a list of search paths and provides a lookup for macros.
+
+    This means that when a macro is access through this lookup, it will travel
+    up the search path of the template loader, to look for the macro and
+    return with the first match.
+
+    As a result, it is possible to have a macros.pt file in each search path
+    and have them act as if they were one file, with macros further up the
+    list of paths having precedence over the macros further down the path.
+
+    For example, given the search paths 'foo' and 'bar', foo/macros.pt could
+    define 'users' and 'page', while bar/macros.pt could define 'users' and
+    'site'. In the lookup this would result in 'users' and 'page' being loaded
+    loaded from foo and 'site' being loaded from bar.
+
+    """
+
+    def __init__(self, search_paths, name='macros.pt'):
+        paths = (os.path.join(base, name) for base in search_paths)
+        paths = (path for path in paths if os.path.isfile(path))
+
+        # map each macro name to a template
+        self.lookup = {
+            name: template
+            for template in (
+                PageTemplateFile(path, search_paths)
+                for path in reversed(list(paths))
+            )
+            for name in template.macros.names
+        }
+
+    def __getitem__(self, name):
+        # macro names in chameleon are normalized internally and we need
+        # to do the same to get the correct name in any case:
+        name = name.replace('-', '_')
+        return self.lookup[name].macros[name]
+
+
 @Framework.template_loader(extension='.pt')
 def get_template_loader(template_directories, settings):
     """ Returns the Chameleon template loader for templates with the extension
@@ -59,7 +112,7 @@ def get_template_loader(template_directories, settings):
 
     """
 
-    return PageTemplateLoader(
+    return TemplateLoader(
         template_directories,
         default_extension='.pt',
         prepend_relative_search_path=False,

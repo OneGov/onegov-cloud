@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to override a specific macro in child applications.
+  [href]
+
 - Supports a wider range of objects which may be cached. Uses 'dill' to
   accomplish this.
   [href]
