@@ -3,14 +3,11 @@ from onegov.activity import Activity
 from onegov.core.templates import render_macro
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
-from onegov.org.models.extensions import ContactExtension
 from onegov.org.models.extensions import CoordinatesExtension
-from onegov.org.models.extensions import PersonLinkExtension
 from onegov.ticket import handlers, Handler
 
 
-class VacationActivity(Activity, ContactExtension, PersonLinkExtension,
-                       CoordinatesExtension):
+class VacationActivity(Activity, CoordinatesExtension):
 
     __mapper_args__ = {'polymorphic_identity': 'vacation'}
 
