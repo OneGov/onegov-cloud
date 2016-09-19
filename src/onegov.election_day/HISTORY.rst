@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.9.2 (2016-09-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Clarify the result of a vote with counter proposal.
   [msom]
