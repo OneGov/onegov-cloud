@@ -32,11 +32,21 @@ class FeriennetRequest(OrgRequest):
 
     @cached_property
     def is_admin(self):
-        """ Returns true if the current user is an admin.
-
-        """
+        """ Returns true if the current user is an admin. """
 
         return self.has_role('admin')
+
+    @cached_property
+    def is_owner(self):
+        """ Returns true if the curent user owns the current model. """
+
+        if not self.identity:
+            return False
+
+        if not hasattr(self.model, 'user_id'):
+            return False
+
+        return self.identity.userid == self.model.user_id
 
     @cached_property
     def current_user(self):

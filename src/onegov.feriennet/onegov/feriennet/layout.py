@@ -45,7 +45,7 @@ class NewVacationActivityLayout(DefaultLayout):
         return None
 
 
-class VacationActivityLayout(DefaultLayout):
+class EditVacationActivityLayout(DefaultLayout):
 
     def __init__(self, model, request):
         super().__init__(model, request)
@@ -57,5 +57,33 @@ class VacationActivityLayout(DefaultLayout):
             Link(_("Homepage"), self.homepage_url),
             Link(_("Activities"), self.request.class_link(
                 VacationActivityCollection)),
+            Link(self.model.title,
+                 self.request.link(self.model, name='bearbeiten'))
+        )
+
+    @cached_property
+    def editbar_links(self):
+        return None
+
+
+class VacationActivityLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Activities"), self.request.class_link(
+                VacationActivityCollection)),
             Link(self.model.title, self.request.link(self.model))
         )
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_admin or self.request.is_owner:
+            return (
+                Link(
+                    text=_("Edit"),
+                    url=self.request.link(self.model, name='bearbeiten'),
+                    classes=('edit-link', )
+                ),
+            )

@@ -1,9 +1,12 @@
 import morepath
 
+from onegov.core.security import Private
 from onegov.core.security import Public
-from onegov.feriennet import FeriennetApp, _
+from onegov.feriennet import _
+from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.forms import VacationActivityForm
+from onegov.feriennet.layout import EditVacationActivityLayout
 from onegov.feriennet.layout import NewVacationActivityLayout
 from onegov.feriennet.layout import VacationActivityCollectionLayout
 from onegov.feriennet.layout import VacationActivityLayout
@@ -47,7 +50,7 @@ def view_activity(self, request):
     model=VacationActivityCollection,
     template='form.pt',
     form=get_activity_form_class,
-    permission=Public,
+    permission=Private,
     name='neu')
 def new_activity(self, request, form):
 
@@ -64,5 +67,29 @@ def new_activity(self, request, form):
     return {
         'layout': NewVacationActivityLayout(self, request),
         'title': _("New Activity"),
+        'form': form
+    }
+
+
+@FeriennetApp.form(
+    model=VacationActivity,
+    template='form.pt',
+    form=get_activity_form_class,
+    permission=Private,
+    name='bearbeiten')
+def edit_activity(self, request, form):
+
+    if form.submitted(request):
+        form.populate_obj(self)
+
+        request.success(_("Your changes were saved"))
+        return morepath.redirect(request.link(self))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'layout': EditVacationActivityLayout(self, request),
+        'title': self.title,
         'form': form
     }
