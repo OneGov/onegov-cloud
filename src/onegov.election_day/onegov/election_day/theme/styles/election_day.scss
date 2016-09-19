@@ -448,36 +448,6 @@ footer {
 
 
 /*
-    Results Navigation
-*/
-.results-navigation {
-    h2 {
-        display: inline-block;
-        margin-bottom: 1rem;
-        margin-right: .4ex;
-    }
-
-    a {
-        color: $base;
-        font-size: $h2-font-size;
-    }
-
-    > *::after {
-        content: ' / ';
-    }
-
-    > *:last-child::after {
-        content: '';
-    }
-}
-
-@media #{$small-only} {
-    .results-navigation a {
-        font-size: $h2-font-size - $h2-font-reduction;
-    }
-}
-
-/*
     Manage navigation
 */
 .tabs {
@@ -714,6 +684,8 @@ form {
 
 .foldable {
 
+    margin-bottom: 2rem;
+
     .foldable-title {
         background-color: $snow;
         border-top: 5px solid $primary-color;
@@ -745,6 +717,7 @@ form {
         }
     }
 }
+
 
 /*
     Related Links

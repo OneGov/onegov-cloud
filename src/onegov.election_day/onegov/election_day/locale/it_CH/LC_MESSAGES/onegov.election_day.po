@@ -512,6 +512,21 @@ msgstr "Nessun errore nella domanda eventuale"
 msgid "Errors found in tie-breaker"
 msgstr "Errori nella domanda eventuale"
 
+msgid "Proposal and counter proposal rejected"
+msgstr "Respinto"
+
+msgid "Proposal accepted"
+msgstr "Accolto"
+
+msgid "Counter proposal accepted"
+msgstr "Controprogetto"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Accolto"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Controprogetto"
+
 msgid "Yeas"
 msgstr "Voti favorevoli"
 

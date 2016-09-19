@@ -513,6 +513,21 @@ msgstr "Keine Fehler in der Stichfrage"
 msgid "Errors found in tie-breaker"
 msgstr "Fehler in der Stichfrage"
 
+msgid "Proposal and counter proposal rejected"
+msgstr "Initative und Gegenvorschlag abgelehnt"
+
+msgid "Proposal accepted"
+msgstr "Initiative angenommen"
+
+msgid "Counter proposal accepted"
+msgstr "Gegenvorschlag angenommen"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Stichfrage zugunsten der Initiative"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Stichfrage zugunsten des Gegenvorschlages"
+
 msgid "Yeas"
 msgstr "JA Stimmen"
 

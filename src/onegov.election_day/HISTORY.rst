@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Clarify the result of a vote with counter proposal.
+  [msom]
+
 - Removes the Last-Modified header from certain views, it interferes with the
   localization.
   [msom]

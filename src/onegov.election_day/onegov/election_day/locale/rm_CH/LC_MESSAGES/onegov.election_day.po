@@ -513,6 +513,21 @@ msgstr "Chattà nagins sbagls en la dumonda decisiva"
 msgid "Errors found in tie-breaker"
 msgstr "Chattà sbagls en la dumonda decisiva"
 
+msgid "Proposal and counter proposal rejected"
+msgstr "Refusà"
+
+msgid "Proposal accepted"
+msgstr "Acceptà"
+
+msgid "Counter proposal accepted"
+msgstr "Cuntraproposta"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Acceptà"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Cuntraproposta"
+
 msgid "Yeas"
 msgstr "Vuschs affirmativas"
 

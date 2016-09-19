@@ -513,6 +513,21 @@ msgstr "Pas d'erreurs trouvées dans le jeu décisif."
 msgid "Errors found in tie-breaker"
 msgstr "Erreurs trouvées dans le jeu décisif."
 
+msgid "Proposal and counter proposal rejected"
+msgstr "Refusé"
+
+msgid "Proposal accepted"
+msgstr "Accepté"
+
+msgid "Counter proposal accepted"
+msgstr "Contre-proposition"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Accepté"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Contre-proposition"
+
 msgid "Yeas"
 msgstr "Oui"
 

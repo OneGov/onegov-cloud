@@ -4,7 +4,30 @@
         <h1>
             <small i18n:translate="" tal:condition="not:counted">Not yet counted.</small>
             <small tal:condition="vote.answer">
-                <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
+                <div tal:condition="not: vote.counter_proposal" metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/>
+                <div tal:condition="vote.counter_proposal">
+                    <tal:block tal:define="proposal vote.proposal.accepted;
+                                           counter_proposal vote.counter_proposal.accepted;
+                                           tie_breaker vote.tie_breaker.accepted">
+                        <span tal:condition="python: not proposal and not counter_proposal" class="answer rejected" i18n:translate="">
+                            Proposal and counter proposal rejected
+                        </span>
+                        <span tal:condition="python: proposal and not counter_proposal" class="answer accepted" i18n:translate="">
+                            Proposal accepted
+                        </span>
+                        <span tal:condition="python: not proposal and counter_proposal" class="answer accepted" i18n:translate="">
+                            Counter proposal accepted
+                        </span>
+                        <tal:block tal:condition="python: proposal and counter_proposal">
+                            <span tal:condition="tie_breaker" class="answer accepted" i18n:translate="">
+                                Tie breaker in favor of the proposal
+                            </span>
+                            <span tal:condition="not: tie_breaker" class="answer rejected" i18n:translate="">
+                                Tie breaker in favor of the counter proposal
+                            </span>
+                        </tal:block>
+                    </tal:block>
+                </div>
             </small>
             ${vote.title}
         </h1>
@@ -46,21 +69,12 @@
 
         <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change vote.last_result_change; counted vote.ballots and counted" />
 
-        <tal:block tal:repeat="ballot vote.ballots">
-            <div class="results-navigation" tal:condition="vote.counter_proposal" tal:define="types python: ['proposal', 'counter-proposal', 'tie-breaker']">
-                <tal:block repeat="type types">
-                    <h2 id="${ballot.type}" tal:condition="type == ballot.type">
-                        <metal:type use-macro="layout.macros['ballot-type']" tal:define="ballot_type type" />
-                    </h2>
-                    <a href="#${type}" tal:condition="type != ballot.type">
-                        <metal:type use-macro="layout.macros['ballot-type']" tal:define="ballot_type type" />
-                    </a>
-                </tal:block>
-            </div>
+        <h2 i18n:translate="">Results</h2>
 
-            <h2 tal:condition="not:vote.counter_proposal" i18n:translate="">
-                Results
-            </h2>
+        <tal:block tal:repeat="ballot vote.ballots">
+            <h3 tal:condition="vote.counter_proposal">
+                <metal:type use-macro="layout.macros['ballot-type']" tal:define="ballot_type ballot.type" />
+            </h3>
 
             <ul class="small-block-grid-1 medium-block-grid-4 factoids">
                 <li>
@@ -98,7 +112,8 @@
             </div>
 
             <div class="foldable folded">
-                <h3 class="foldable-title" i18n:translate="">Electoral Districts</h3>
+                <h3 tal:condition="not:vote.counter_proposal" class="foldable-title" i18n:translate="">Electoral Districts</h3>
+                <h4 tal:condition="vote.counter_proposal" class="foldable-title" i18n:translate="">Electoral Districts</h4>
                 <div class="foldable-panel">
                     <table class="ballot-results stackable" tal:define="summarize len(ballot.results)!=1">
                         <thead>
