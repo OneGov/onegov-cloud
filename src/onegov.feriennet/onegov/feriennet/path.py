@@ -8,7 +8,7 @@ def get_vacation_activities(request, app, page=0):
     return VacationActivityCollection(
         session=app.session(),
         page=page,
-        user=request.current_user
+        identity=request.identity
     )
 
 

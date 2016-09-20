@@ -1,23 +1,18 @@
+import morepath
+
 from cached_property import cached_property
 from onegov.feriennet import _
 from onegov.feriennet.collections import VacationActivityCollection
+from onegov.feriennet.security import ActivityOwnerPolicy
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout as BaseLayout
 
 
 class DefaultLayout(BaseLayout):
 
-    @cached_property
+    @morepath.reify
     def is_owner(self):
-        """ Returns true if the curent user owns the current model. """
-
-        if not self.request.current_username:
-            return False
-
-        if not hasattr(self.model, 'username'):
-            return False
-
-        return self.request.current_username == self.model.username
+        return ActivityOwnerPolicy.for_layout(self).is_owner
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
