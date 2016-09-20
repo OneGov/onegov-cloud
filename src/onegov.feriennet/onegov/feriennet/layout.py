@@ -2,7 +2,22 @@ from cached_property import cached_property
 from onegov.feriennet import _
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.elements import Link
-from onegov.org.layout import DefaultLayout
+from onegov.org.layout import DefaultLayout as BaseLayout
+
+
+class DefaultLayout(BaseLayout):
+
+    @cached_property
+    def is_owner(self):
+        """ Returns true if the curent user owns the current model. """
+
+        if not self.request.current_user_id:
+            return False
+
+        if not hasattr(self.model, 'user_id'):
+            return False
+
+        return self.current_user_id == self.model.user_id
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
@@ -59,7 +74,7 @@ class VacationActivityLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        if self.request.is_admin or self.request.is_owner:
+        if self.request.is_admin or self.is_owner:
             return (
                 Link(
                     text=_("Edit"),

@@ -8,6 +8,6 @@
 
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
     <tal:block metal:use-macro="layout.macros.page_content"
-        tal:define="lead activity.lead;text activity.text; people activity.people; contact activity.contact_html; coordinates activity.coordinates">
+        tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None">
     </tal:block>
 </metal:activity_detailed>

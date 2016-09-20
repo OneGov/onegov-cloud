@@ -37,19 +37,11 @@ class FeriennetRequest(OrgRequest):
         return self.has_role('admin')
 
     @cached_property
-    def is_owner(self):
-        """ Returns true if the curent user owns the current model. """
-
-        if not self.identity:
-            return False
-
-        if not hasattr(self.model, 'user_id'):
-            return False
-
-        return self.identity.userid == self.model.user_id
-
-    @cached_property
     def current_user(self):
         if self.identity:
             return UserCollection(self.app.session()).by_username(
                 self.identity.userid)
+
+    @property
+    def current_user_id(self):
+        return self.identity and self.identity.userid or None
