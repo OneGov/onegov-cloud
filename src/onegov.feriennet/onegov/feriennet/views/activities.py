@@ -61,7 +61,7 @@ def new_activity(self, request, form):
         # TODO redirect user to preview, then create a ticket
         form.populate_obj(activity)
 
-        return morepath.redirect(request.link(self))
+        return morepath.redirect(request.link(activity))
 
     return {
         'layout': VacationActivityFormLayout(self, request, ("New Activity")),
