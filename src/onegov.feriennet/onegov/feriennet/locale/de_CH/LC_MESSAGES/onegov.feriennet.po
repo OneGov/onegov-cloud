@@ -64,7 +64,7 @@ msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
 "and then press \"Request Publication\". An Administrator will then review "
 "your proposal."
-msgstr "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. Im Anschluss wählen Sie \"Publikation Beantragen\" in der Menübar. Ein Administrator überprüft darauf ihr Angebot."
+msgstr "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. Im Anschluss wählen Sie \"Publikation Beantragen\" in der Menübar. Ein Administrator überprüft darauf Ihr Angebot."
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
