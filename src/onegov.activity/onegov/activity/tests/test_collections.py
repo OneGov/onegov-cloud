@@ -51,3 +51,13 @@ def test_activity_pagination(session, owner):
     assert [a.title for a in collection.batch] == [
         "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"
     ]
+
+
+def test_activity_order(session, owner):
+
+    collection = ActivityCollection(session)
+    collection.add(title="Ä", username=owner.username)
+    collection.add(title="B", username=owner.username)
+    collection.add(title="C", username=owner.username)
+
+    assert [a.title for a in collection.query().all()] == ["Ä", "B", "C"]

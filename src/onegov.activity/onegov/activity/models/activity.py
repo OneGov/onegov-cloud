@@ -6,11 +6,13 @@ from onegov.core.orm.mixins import (
     TimestampMixin,
 )
 from onegov.core.orm.types import UUID
+from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
+from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
@@ -33,6 +35,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     #: The title of the activity
     title = Column(Text, nullable=False)
+
+    #: The normalized title for sorting
+    order = Column(Text, nullable=False, index=True)
 
     #: Describes the activity briefly
     lead = meta_property('lead')
@@ -70,8 +75,13 @@ class Activity(Base, ContentMixin, TimestampMixin):
     )
 
     __mapper_args__ = {
-        'polymorphic_on': 'type'
+        'polymorphic_on': 'type',
+        'order_by': order,
     }
+
+    @observes('title')
+    def title_observer(self, title):
+        self.order = normalize_for_url(title)
 
     @property
     def tags(self):

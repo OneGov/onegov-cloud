@@ -15,10 +15,7 @@ class ActivityCollection(Pagination):
         self.type == type and self.page == other.page
 
     def subset(self):
-        query = self.query()
-        query = query.order_by(desc(Activity.title))
-
-        return query
+        return self.query()
 
     @property
     def page_index(self):

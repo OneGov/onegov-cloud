@@ -34,7 +34,7 @@ setup(
     install_requires=[
         'onegov.core>=0.4.0',
         'onegov.user',
-        'sedate',
+        'sedate'
     ],
     extras_require=dict(
         test=[
