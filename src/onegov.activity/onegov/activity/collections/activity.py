@@ -25,6 +25,9 @@ class ActivityCollection(object):
     def by_user(self, user):
         return self.query().filter(Activity.user_id == user.id)
 
+    def by_user_id(self, user_id):
+        return self.query().filter(Activity.user_id == user_id)
+
     def get_unique_name(self, name):
         """ Given a desired name, finds a variant of that name that's not
         yet used. So if 'foobar' is already used, 'foobar-1' will be returned.
