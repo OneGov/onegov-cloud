@@ -43,5 +43,5 @@ class FeriennetRequest(OrgRequest):
                 self.identity.userid)
 
     @property
-    def current_user_id(self):
+    def current_username(self):
         return self.identity and self.identity.userid or None

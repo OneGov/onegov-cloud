@@ -26,7 +26,7 @@ def get_activity_form_class(model, request):
 def view_activities(self, request):
 
     return {
-        'activities': self.query().all(),
+        'activities': self.batch,
         'layout': VacationActivityCollectionLayout(self, request),
         'title': _("Activities")
     }
@@ -56,7 +56,7 @@ def new_activity(self, request, form):
     if form.submitted(request):
         activity = self.add(
             title=form.title.data,
-            user=request.current_user)
+            username=request.current_username)
 
         # TODO redirect user to preview, then create a ticket
         form.populate_obj(activity)

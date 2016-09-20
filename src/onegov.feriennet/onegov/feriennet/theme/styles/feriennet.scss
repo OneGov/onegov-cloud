@@ -19,4 +19,5 @@ svg #background {
 
 .edit-bar {
     .new-activity:before { @include icon('\f135'); }
+    .request-publication:before { @include icon('\f087'); }
 }

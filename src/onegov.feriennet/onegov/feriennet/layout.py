@@ -11,13 +11,13 @@ class DefaultLayout(BaseLayout):
     def is_owner(self):
         """ Returns true if the curent user owns the current model. """
 
-        if not self.request.current_user_id:
+        if not self.request.current_username:
             return False
 
-        if not hasattr(self.model, 'user_id'):
+        if not hasattr(self.model, 'username'):
             return False
 
-        return self.current_user_id == self.model.user_id
+        return self.request.current_username == self.model.username
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
@@ -77,8 +77,13 @@ class VacationActivityLayout(DefaultLayout):
         if self.request.is_admin or self.is_owner:
             return (
                 Link(
+                    text=_("Request Publication"),
+                    url=self.request.link(self.model, name='einreichen'),
+                    classes=('request-publication', )
+                ),
+                Link(
                     text=_("Edit"),
                     url=self.request.link(self.model, name='bearbeiten'),
                     classes=('edit-link', )
-                ),
+                )
             )

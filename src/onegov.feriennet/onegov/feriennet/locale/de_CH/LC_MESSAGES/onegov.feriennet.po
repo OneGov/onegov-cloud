@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-09-16 15:45+0200\n"
+"POT-Creation-Date: 2016-09-20 11:25+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -30,6 +30,12 @@ msgstr "Neu"
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
 
+msgid "Request Publication"
+msgstr "Publikation Beantragen"
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
 msgid "Editor"
 msgstr "Organisator"
 
@@ -51,5 +57,37 @@ msgstr "Beschreibt kurz um was es beim Angebot geht"
 msgid "Text"
 msgstr "Text"
 
+msgid "No activites found."
+msgstr "Keine Angebote gefunden."
+
+msgid ""
+"This is a preview. Please edit it until you are satisifed with the result "
+"and then press \"Request Publication\". An Administrator will then review "
+"your proposal."
+msgstr "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. Im Anschluss wählen Sie \"Publikation Beantragen\" in der Menübar. Ein Administrator überprüft darauf ihr Angebot."
+
+msgid ""
+"This is a preview. Please edit it until you are satisifed with the result "
+"and then press \"Publish\" to make this activity public."
+msgstr "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. Im Anschluss wählen Sie \"Veröffentlichen\" in der Menübar."
+
+msgid "Preview"
+msgstr "Vorschau"
+
+msgid "Proposed"
+msgstr "Beantragt"
+
+msgid "Accepted"
+msgstr "Veröffentlicht"
+
+msgid "Denied"
+msgstr "Abgelehnt"
+
+msgid "Archived"
+msgstr "Archiviert"
+
 msgid "New Activity"
 msgstr "Neues Angebot"
+
+msgid "Your changes were saved"
+msgstr "Ihre Änderungen wurden gespeichert"

@@ -5,7 +5,7 @@
     <tal:block metal:fill-slot="content">
         <metal:hint use-macro="layout.macros['empty_page_lead_hint']" tal:define="item activity"/>
 
-        <tal:block condition="activity.state == 'proposed'">
+        <tal:block condition="activity.state == 'preview'">
             <div class="panel callout" tal:condition="request.is_organiser_only" i18n:translate>
                 This is a preview. Please edit it until you are satisifed with the result and then press "Request Publication". An Administrator will then review your proposal.
             </div>

@@ -11,3 +11,19 @@
         tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None">
     </tal:block>
 </metal:activity_detailed>
+
+<metal:activity_state define-macro="activity_state" i18n:domain="onegov.feriennet">
+    <div class="activity activity-${activity.state}">
+        <metal:block use-macro="layout.macros.activity_state_text" />
+    </div>
+</metal:activity_state>
+
+<metal:activity_state_text define-macro="activity_state_text" i18n:domain="onegov.feriennet">
+    <tal:block switch="activity.state">
+        <tal:block i18n:translate case="string:preview">Preview</tal:block>
+        <tal:block i18n:translate case="string:proposed">Proposed</tal:block>
+        <tal:block i18n:translate case="string:accepted">Accepted</tal:block>
+        <tal:block i18n:translate case="string:denied">Denied</tal:block>
+        <tal:block i18n:translate case="string:archived">Archived</tal:block>
+    </tal:block>
+</metal:activity_state_text>
