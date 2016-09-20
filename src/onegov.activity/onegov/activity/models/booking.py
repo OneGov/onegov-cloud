@@ -57,8 +57,8 @@ class Booking(Base, TimestampMixin):
 
     def confirm(self):
         assert self.state == 'unconfirmed'
-        self.state == 'confirmed'
+        self.state = 'confirmed'
 
     def cancel(self):
         assert self.state in ('confirmed', 'unconfirmed')
-        self.state == 'cancel'
+        self.state = 'cancel'
