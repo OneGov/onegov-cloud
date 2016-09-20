@@ -95,4 +95,4 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     def archive(self):
         assert self.state == 'accepted'
-        self.state == 'archived'
+        self.state = 'archived'
