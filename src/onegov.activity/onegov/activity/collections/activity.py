@@ -42,10 +42,10 @@ class ActivityCollection(Pagination):
         return self.query().filter(Activity.name == name).first()
 
     def by_user(self, user):
-        return self.query().filter(Activity.user_id == user.id)
+        return self.query().filter(Activity.username == user.username)
 
-    def by_user_id(self, user_id):
-        return self.query().filter(Activity.user_id == user_id)
+    def by_username(self, username):
+        return self.query().filter(Activity.username == username)
 
     def get_unique_name(self, name):
         """ Given a desired name, finds a variant of that name that's not
@@ -64,7 +64,7 @@ class ActivityCollection(Pagination):
 
         return name
 
-    def add(self, title, user, lead=None, text=None, tags=None, name=None):
+    def add(self, title, username, lead=None, text=None, tags=None, name=None):
 
         type = self.type != '*' and self.type or None
 
@@ -76,7 +76,7 @@ class ActivityCollection(Pagination):
             title=title,
             tags=tags,
             type=type,
-            user_id=user.id,
+            username=username,
             lead=lead,
             text=text
         )

@@ -27,7 +27,7 @@ class Booking(Base, TimestampMixin):
     id = Column(UUID, primary_key=True, default=uuid4)
 
     #: the user owning the booking
-    user_id = Column(UUID, ForeignKey('users.id'), nullable=False)
+    username = Column(Text, ForeignKey('users.username'), nullable=False)
 
     #: the priority of the booking, a higher number = a higher priority
     priority = Column(Integer, nullable=False, default=0)

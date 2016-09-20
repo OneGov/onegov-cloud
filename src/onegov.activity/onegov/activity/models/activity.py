@@ -43,8 +43,8 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: Tags/Categories of the activity
     _tags = Column(MutableDict.as_mutable(HSTORE), nullable=True, name='tags')
 
-    #: The user id to which this activity belongs to (organiser)
-    user_id = Column(UUID, ForeignKey(User.id), nullable=False)
+    #: The user to which this activity belongs to (organiser)
+    username = Column(Text, ForeignKey(User.username), nullable=False)
 
     #: The occasions linked to this activity
     occasions = relationship(
@@ -62,11 +62,11 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: the state of the activity
     state = Column(
         Enum(
-            'proposed', 'accepted', 'denied', 'archived',
+            'preview', 'proposed', 'accepted', 'denied', 'archived',
             name='activity_state'
         ),
         nullable=False,
-        default='proposed'
+        default='preview'
     )
 
     __mapper_args__ = {
@@ -80,6 +80,10 @@ class Activity(Base, ContentMixin, TimestampMixin):
     @tags.setter
     def tags(self, value):
         self._tags = {k: '' for k in value} if value else None
+
+    def propose(self):
+        assert self.state == 'preview'
+        self.state = 'proposed'
 
     def accept(self):
         assert self.state == 'proposed'
