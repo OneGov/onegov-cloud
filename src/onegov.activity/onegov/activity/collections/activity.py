@@ -1,12 +1,31 @@
 from onegov.activity.models import Activity
+from onegov.core.collection import Pagination
 from onegov.core.utils import normalize_for_url, increment_name
+from sqlalchemy import desc
 
 
-class ActivityCollection(object):
+class ActivityCollection(Pagination):
 
-    def __init__(self, session, type='*'):
+    def __init__(self, session, type='*', page=0):
         self.session = session
         self.type = type
+        self.page = page
+
+    def __eq__(self, other):
+        self.type == type and self.page == other.page
+
+    def subset(self):
+        query = self.query()
+        query = query.order_by(desc(Activity.title))
+
+        return query
+
+    @property
+    def page_index(self):
+        return self.page
+
+    def page_by_index(self, index):
+        return self.__class__(self.session, self.type, index)
 
     def query(self):
         if self.type != '*':
