@@ -1,32 +1,16 @@
 from onegov.activity import ActivityCollection
 from onegov.core.security import Public
 from onegov.core.utils import Bunch
-from onegov.feriennet.security import ActivityOwnerPolicy
 from onegov.feriennet.security import ActivityQueryPolicy
 from onegov.feriennet.security import has_public_permission_logged_in
 from onegov.feriennet.security import has_public_permission_not_logged_in
+from onegov.feriennet.security import is_owner
 from onegov.user import UserCollection
 
 
-def test_activity_owner_policy():
-
-    policy = ActivityOwnerPolicy(username=None, activity=Bunch(username=None))
-    assert not policy.is_owner
-
-    policy = ActivityOwnerPolicy(username='xy', activity=Bunch(username='xy'))
-    assert policy.is_owner
-
-    policy = ActivityOwnerPolicy.for_layout(layout=Bunch(
-        request=Bunch(current_username=None),
-        model=Bunch(username=None)
-    ))
-    assert not policy.is_owner
-
-    policy = ActivityOwnerPolicy.for_layout(layout=Bunch(
-        request=Bunch(current_username='xy'),
-        model=Bunch(username='xy')
-    ))
-    assert policy.is_owner
+def test_is_owner():
+    assert not is_owner(username=None, activity=Bunch(username=None))
+    assert is_owner(username='xy', activity=Bunch(username='xy'))
 
 
 def test_activity_query_policy(session):

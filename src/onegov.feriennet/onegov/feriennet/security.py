@@ -25,25 +25,15 @@ VISIBLE_ACTIVITY_STATES = {
 }
 
 
-class ActivityOwnerPolicy(object):
-    """ Decides if a user is an owner of an activity or not. """
+def is_owner(username, activity):
+    """ Returns true if the given username is the owner of the given
+    activity.
 
-    def __init__(self, username, activity):
-        self.username = username
-        self.activity = activity
+    """
+    if not username:
+        return False
 
-        assert hasattr(self.activity, 'username')
-
-    @classmethod
-    def for_layout(cls, layout):
-        return cls(layout.request.current_username, layout.model)
-
-    @property
-    def is_owner(self):
-        if not self.username:
-            return False
-
-        return self.activity.username == self.username
+    return username == activity.username
 
 
 class ActivityQueryPolicy(object):
@@ -108,5 +98,5 @@ def has_public_permission_logged_in(identity, model, permission):
     if identity.role not in ('admin', 'editor'):
         return has_public_permission_not_logged_in(None, model, permission)
 
-    return model.username == identity.userid \
+    return is_owner(identity.userid, model) \
         or model.state in VISIBLE_ACTIVITY_STATES[identity.role]

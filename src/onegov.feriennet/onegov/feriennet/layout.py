@@ -1,18 +1,16 @@
-import morepath
-
 from cached_property import cached_property
 from onegov.feriennet import _
+from onegov.feriennet import security
 from onegov.feriennet.collections import VacationActivityCollection
-from onegov.feriennet.security import ActivityOwnerPolicy
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout as BaseLayout
 
 
 class DefaultLayout(BaseLayout):
 
-    @morepath.reify
+    @property
     def is_owner(self):
-        return ActivityOwnerPolicy.for_layout(self).is_owner
+        return security.is_owner(self.request.current_username, self.model)
 
 
 class VacationActivityCollectionLayout(DefaultLayout):
