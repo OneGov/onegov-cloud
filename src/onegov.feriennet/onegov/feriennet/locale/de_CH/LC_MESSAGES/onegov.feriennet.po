@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-09-20 11:25+0200\n"
+"POT-Creation-Date: 2016-09-21 11:07+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -33,6 +33,12 @@ msgstr "Angebot erfassen"
 msgid "Request Publication"
 msgstr "Publikation Beantragen"
 
+msgid "Do you really want to request publication?"
+msgstr "Möchten Sie die Publikation wirklich beantragen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -57,6 +63,15 @@ msgstr "Beschreibt kurz um was es beim Angebot geht"
 msgid "Text"
 msgstr "Text"
 
+msgid "Activity"
+msgstr "Angebot"
+
+msgid "Edit activity"
+msgstr "Angebot bearbeiten"
+
+msgid "Search"
+msgstr "Suche"
+
 msgid "No activites found."
 msgstr "Keine Angebote gefunden."
 
@@ -64,12 +79,17 @@ msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
 "and then press \"Request Publication\". An Administrator will then review "
 "your proposal."
-msgstr "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. Im Anschluss wählen Sie \"Publikation Beantragen\" in der Menübar. Ein Administrator überprüft darauf Ihr Angebot."
+msgstr ""
+"Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
+"Im Anschluss wählen Sie \"Publikation Beantragen\" in der Menübar. Ein "
+"Administrator überprüft darauf Ihr Angebot."
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
 "and then press \"Publish\" to make this activity public."
-msgstr "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. Im Anschluss wählen Sie \"Veröffentlichen\" in der Menübar."
+msgstr ""
+"Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
+"Im Anschluss wählen Sie \"Veröffentlichen\" in der Menübar."
 
 msgid "Preview"
 msgstr "Vorschau"
@@ -89,5 +109,11 @@ msgstr "Archiviert"
 msgid "New Activity"
 msgstr "Neues Angebot"
 
+msgid "Thank you for your proposal!"
+msgstr "Vielen Dank für Ihren Antrag!"
+
 msgid "Your changes were saved"
 msgstr "Ihre Änderungen wurden gespeichert"
+
+msgid "A ticket has been opened"
+msgstr "Ein Ticket wurde eröffnet"

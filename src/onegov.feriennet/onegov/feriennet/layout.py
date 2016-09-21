@@ -2,7 +2,7 @@ from cached_property import cached_property
 from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import VacationActivityCollection
-from onegov.org.elements import Link
+from onegov.org.elements import Link, ConfirmLink
 from onegov.org.layout import DefaultLayout as BaseLayout
 
 
@@ -69,10 +69,13 @@ class VacationActivityLayout(DefaultLayout):
     def editbar_links(self):
         if self.request.is_admin or self.is_owner:
             return (
-                Link(
+                ConfirmLink(
                     text=_("Request Publication"),
-                    url=self.request.link(self.model, name='einreichen'),
-                    classes=('request-publication', )
+                    url=self.request.link(self.model, name='beantragen'),
+                    confirm=_("Do you really want to request publication?"),
+                    extra_information=_("This cannot be undone."),
+                    classes=('confirm', 'request-publication'),
+                    yes_button_text=_("Request Publication")
                 ),
                 Link(
                     text=_("Edit"),

@@ -1,11 +1,14 @@
 from cached_property import cached_property
 from onegov.activity import Activity
 from onegov.core.templates import render_macro
+from onegov.feriennet import _
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
+from onegov.org.elements import Link
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.search import ORMSearchable
-from onegov.ticket import handlers, Handler
+from onegov.ticket import handlers, Handler, Ticket
+from purl import URL
 
 
 class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
@@ -39,6 +42,11 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
         }
 
 
+class ActivityTicket(Ticket):
+    __mapper_args__ = {'polymorphic_identity': 'FER'}
+    es_type_name = 'activity_tickets'
+
+
 @handlers.registered_handler('FER')
 class VacationActivityHandler(Handler):
 
@@ -56,7 +64,7 @@ class VacationActivityHandler(Handler):
 
     @property
     def email(self):
-        return self.activity.user.username
+        return self.activity.username
 
     @property
     def title(self):
@@ -68,14 +76,14 @@ class VacationActivityHandler(Handler):
 
     @property
     def group(self):
-        return self.submission.form.title
+        return _("Activity")
 
     @property
     def extra_data(self):
         return None
 
     def get_summary(self, request):
-        layout = DefaultLayout(self.submission, request)
+        layout = DefaultLayout(self.activity, request)
 
         return render_macro(layout.macros['activity_detailed'], request, {
             'activity': self.activity,
@@ -83,4 +91,14 @@ class VacationActivityHandler(Handler):
         })
 
     def get_links(self, request):
-        return []
+
+        edit_link = URL(request.link(self.activity, 'bearbeiten'))
+        edit_link = edit_link.query_param('return-to', request.url)
+
+        return [
+            Link(
+                text=_('Edit activity'),
+                url=edit_link.as_string(),
+                classes=('edit-link', )
+            )
+        ]
