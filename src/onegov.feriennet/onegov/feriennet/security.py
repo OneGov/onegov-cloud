@@ -1,3 +1,4 @@
+from morepath.authentication import NO_IDENTITY
 from onegov.activity import Activity
 from onegov.core.security import Public
 from onegov.feriennet import FeriennetApp
@@ -45,7 +46,7 @@ class ActivityQueryPolicy(object):
 
     @classmethod
     def for_identity(cls, identity):
-        if not identity:
+        if identity is None or identity is NO_IDENTITY:
             return cls(None, None)
         else:
             return cls(identity.userid, identity.role)
