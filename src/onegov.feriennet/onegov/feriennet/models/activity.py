@@ -4,10 +4,11 @@ from onegov.core.templates import render_macro
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.models.extensions import CoordinatesExtension
+from onegov.search import ORMSearchable
 from onegov.ticket import handlers, Handler
 
 
-class VacationActivity(Activity, CoordinatesExtension):
+class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
 
     __mapper_args__ = {'polymorphic_identity': 'vacation'}
 
@@ -22,6 +23,10 @@ class VacationActivity(Activity, CoordinatesExtension):
     @property
     def es_public(self):
         return self.state == 'accepted'
+
+    @property
+    def es_skip(self):
+        return self.state == 'preview'
 
     @property
     def es_language(self):
