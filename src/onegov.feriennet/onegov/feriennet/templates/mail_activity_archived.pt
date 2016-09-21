@@ -5,7 +5,7 @@
     <tal:block metal:fill-slot="body">
         <p i18n:translate>Dear Sir or Madam,</p>
         <p i18n:translate>Your activity has been archived:</p>
-
+        <br>
         <p><b>${model.title}</b></p>
         <p>${model.lead}</p>
 
