@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.27.0 (2016-09-21)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to override a specific macro in child applications.
   [href]
