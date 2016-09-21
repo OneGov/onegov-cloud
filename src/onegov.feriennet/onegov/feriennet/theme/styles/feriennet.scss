@@ -28,6 +28,9 @@ svg #background {
 .edit-bar {
     .new-activity:before { @include icon('\f135'); }
     .request-publication:before { @include icon('\f087'); }
+    .accept-activity:before { @include icon('\f087'); }
+    .reject-activity:before { @include icon('\f088'); }
+    .archive-activity:before { @include icon('\f187'); }
 }
 
 /*
@@ -80,5 +83,16 @@ svg #background {
 
     .activity-state {
         font-size: .875rem;
+    }
+}
+
+
+/*
+    ticket view
+*/
+.ticket-summary {
+    .page-content-main,
+    .page-content-sidebar {
+        @include grid-column(12);
     }
 }

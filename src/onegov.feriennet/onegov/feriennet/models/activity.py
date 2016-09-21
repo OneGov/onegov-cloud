@@ -4,7 +4,7 @@ from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
-from onegov.org.elements import Link
+from onegov.org.elements import Link, ConfirmLink
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers, Handler, Ticket
@@ -85,20 +85,58 @@ class VacationActivityHandler(Handler):
     def get_summary(self, request):
         layout = DefaultLayout(self.activity, request)
 
-        return render_macro(layout.macros['activity_detailed'], request, {
-            'activity': self.activity,
-            'layout': layout
-        })
+        return render_macro(
+            layout.macros['activity_ticket_summary'], request, {
+                'activity': self.activity,
+                'layout': layout,
+                'show_ticket_panel': False
+            }
+        )
 
     def get_links(self, request):
+
+        links = []
+
+        if self.activity.state == 'proposed':
+            links.append(ConfirmLink(
+                text=_("Approve"),
+                url=request.link(self.activity, name='annehmen'),
+                confirm=_("Do you really want to approve this activity?"),
+                extra_information=_(
+                    "This cannot be undone. "
+                    "The activity will be made public as a result."
+                ),
+                classes=('confirm', 'accept-activity'),
+                yes_button_text=_("Approve Activity")
+            ))
+            links.append(ConfirmLink(
+                text=_("Reject"),
+                url=request.link(self.activity, name='ablehnen'),
+                confirm=_("Do you really want to reject this activity?"),
+                extra_information=_("This cannot be undone. "),
+                classes=('confirm', 'reject-activity'),
+                yes_button_text=_("Approve Activity")
+            ))
+        elif self.activity.state == 'accepted':
+            links.append(ConfirmLink(
+                text=_("Archive"),
+                url=request.link(self.activity, name='archivieren'),
+                confirm=_("Do you really want to archive this activity?"),
+                extra_information=_(
+                    "This cannot be undone. "
+                    "The activity will be made private as a result."
+                ),
+                classes=('confirm', 'archive-activity'),
+                yes_button_text=_("Archive Activity")
+            ))
 
         edit_link = URL(request.link(self.activity, 'bearbeiten'))
         edit_link = edit_link.query_param('return-to', request.url)
 
-        return [
-            Link(
-                text=_('Edit activity'),
-                url=edit_link.as_string(),
-                classes=('edit-link', )
-            )
-        ]
+        links.append(Link(
+            text=_('Edit activity'),
+            url=edit_link.as_string(),
+            classes=('edit-link', )
+        ))
+
+        return links

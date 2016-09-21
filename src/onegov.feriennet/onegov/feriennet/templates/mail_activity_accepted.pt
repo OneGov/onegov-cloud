@@ -1,0 +1,18 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="body">
+        <p i18n:translate>Dear Sir or Madam,</p>
+        <p i18n:translate>Your activity has been accepted:</p>
+
+        <p><b>${model.title}</b></p>
+        <p>${model.lead}</p>
+
+        <tal:block tal:condition="ticket">
+            <p>&nbsp;</p>
+            <p><span i18n:translate>The ticket number is</span>: <span class="ticket-number">${ticket.number}</span></p>
+            <a href="${request.link(ticket, 'status')}" i18n:translate>Check ticket status</a>
+        </tal:block>
+    </tal:block>
+</div>

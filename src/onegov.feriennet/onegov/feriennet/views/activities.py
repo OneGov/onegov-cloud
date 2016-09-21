@@ -2,6 +2,7 @@ import morepath
 
 from onegov.core.security import Private
 from onegov.core.security import Public
+from onegov.core.security import Secret
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
@@ -139,6 +140,80 @@ def propose_activity(self, request):
     @request.after
     def redirect_intercooler(response):
         response.headers.add('X-IC-Redirect', request.link(ticket, 'status'))
+
+    # do not redirect here, intercooler doesn't deal well with that...
+    return
+
+
+@FeriennetApp.view(
+    model=VacationActivity,
+    permission=Secret,
+    name='annehmen',
+    request_method='POST')
+def accept_activity(self, request):
+
+    return administer_activity(
+        model=self,
+        request=request,
+        action='accept',
+        template='mail_activity_accepted.pt',
+        subject=_("Your activity has been accepted")
+    )
+
+
+@FeriennetApp.view(
+    model=VacationActivity,
+    permission=Secret,
+    name='ablehnen',
+    request_method='POST')
+def reject_activity(self, request):
+
+    return administer_activity(
+        model=self,
+        request=request,
+        action='deny',
+        template='mail_activity_rejected.pt',
+        subject=_("Your activity has been rejected")
+    )
+
+
+@FeriennetApp.view(
+    model=VacationActivity,
+    permission=Secret,
+    name='archivieren',
+    request_method='POST')
+def archive_activity(self, request):
+
+    return administer_activity(
+        model=self,
+        request=request,
+        action='archive',
+        template='mail_activity_archived.pt',
+        subject=_("Your activity has been archived")
+    )
+
+
+def administer_activity(model, request, action, template, subject):
+    session = request.app.session()
+    ticket = TicketCollection(session).by_handler_id(model.id.hex)
+
+    # execute state change
+    getattr(model, action)()
+
+    send_html_mail(
+        request=request,
+        template=template,
+        subject=subject,
+        receivers=(request.current_username, ),
+        content={
+            'model': model,
+            'ticket': ticket
+        }
+    )
+
+    @request.after
+    def redirect_intercooler(response):
+        response.headers.add('X-IC-Redirect', request.link(ticket))
 
     # do not redirect here, intercooler doesn't deal well with that...
     return

@@ -6,38 +6,41 @@
       i18n:domain="onegov.feriennet">
 <body>
 
+<metal:activity_ticket_summary define-macro="activity_ticket_summary">
+    <h2>${activity.title}</h2>
+    <metal:block use-macro="layout.macros.activity_detailed" />
+</metal:activity_ticket_summary>
+
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
     <tal:block metal:use-macro="layout.macros.page_content"
-        tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None">
+        tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None; show_ticket_panel show_ticket_panel|False">
 
-        <tal:block condition="show_ticket_panel|nothing">
-            <div metal:fill-slot="after-panels" tal:condition="request.is_organiser">
-                <div class="page-content-panel plain-panel activity-status-panel">
-                    <h2 class="show-for-sr" i18n:translate>Activity</h2>
+        <div metal:fill-slot="after-panels" tal:condition="show_ticket_panel and request.is_organiser">
+            <div class="page-content-panel plain-panel activity-status-panel">
+                <h2 class="show-for-sr" i18n:translate>Activity</h2>
 
-                    <dl>
+                <dl>
+                    <dt i18n:translate>
+                        Status
+                    </dt>
+                    <dd>
+                        <metal:block use-macro="layout.macros.activity_state" />
+                    </dd>
+
+                    <tal:block condition="ticket|nothing">
                         <dt i18n:translate>
-                            Status
+                            Ticket
                         </dt>
                         <dd>
-                            <metal:block use-macro="layout.macros.activity_state" />
+                            <span class="ticket-number">
+                                <a tal:condition="request.is_admin" href="${request.link(ticket)}">${ticket.number}</a>
+                                <a tal:condition="not:request.is_admin" href="${request.link(ticket, 'status')}">${ticket.number}</a>
+                            </span>
                         </dd>
-
-                        <tal:block condition="ticket">
-                            <dt i18n:translate>
-                                Ticket
-                            </dt>
-                            <dd>
-                                <span class="ticket-number">
-                                    <a tal:condition="request.is_admin" href="${request.link(ticket)}">${ticket.number}</a>
-                                    <a tal:condition="not:request.is_admin" href="${request.link(ticket, 'status')}">${ticket.number}</a>
-                                </span>
-                            </dd>
-                        </tal:block>
-                    </dl>
-                </div>
+                    </tal:block>
+                </dl>
             </div>
-        </tal:block>
+        </div>
 
     </tal:block>
 </metal:activity_detailed>
