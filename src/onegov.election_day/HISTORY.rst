@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds MIME types typically returned by libmagic for XLS/XLSX files.
+  [msom]
+
 0.9.4 (2016-09-21)
 ~~~~~~~~~~~~~~~~~~~
 
