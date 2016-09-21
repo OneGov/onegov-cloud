@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.4 (2016-09-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to define which request gets access to private searches.
   [href]
 
