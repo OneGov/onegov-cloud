@@ -41,10 +41,13 @@ def view_activities(self, request):
     permission=Public)
 def view_activity(self, request):
 
+    ticket = TicketCollection(request.app.session()).by_handler_id(self.id.hex)
+
     return {
         'layout': VacationActivityLayout(self, request),
         'title': self.title,
-        'activity': self
+        'activity': self,
+        'ticket': ticket,
     }
 
 
