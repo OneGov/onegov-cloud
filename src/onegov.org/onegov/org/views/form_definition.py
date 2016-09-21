@@ -17,6 +17,7 @@ def get_form_class(model, request):
         model = CustomFormDefinition()
 
     form_classes = {
+        'builtin': CustomDefinitionForm,
         'custom': CustomDefinitionForm
     }
 
