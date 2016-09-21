@@ -259,6 +259,7 @@
                 <div metal:define-slot="after-text"></div>
             </div>
             <div class="small-12 medium-4 columns" tal:condition="people or contact or coordinates">
+                <div metal:define-slot="before-panels"></div>
                 <div class="page-content-panel contact-panel" tal:condition="contact or coordinates">
                     <tal:block condition="contact" content="structure contact" />
                     <br tal:condition="coordinates and contact" />
@@ -274,6 +275,7 @@
                         </li>
                     </ul>
                 </div>
+                <div metal:define-slot="after-panels"></div>
             </div>
         </tal:block>
     </div>
