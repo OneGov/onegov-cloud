@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define which request gets access to private searches.
+  [href]
+
 - Moves some code to onegov.core.
   [href]
 

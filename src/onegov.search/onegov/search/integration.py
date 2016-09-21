@@ -150,7 +150,7 @@ class ElasticsearchApp(morepath.App):
         return self.es_search(
             languages=[request.locale.split('_')[0]],
             types=types,
-            include_private=request.is_logged_in,
+            include_private=self.es_may_use_private_search(request),
             explain=explain
         )
 
@@ -198,8 +198,17 @@ class ElasticsearchApp(morepath.App):
             query,
             languages=[request.locale.split('_')[0]],
             types=types,
-            include_private=request.is_logged_in
+            include_private=self.es_may_use_private_search(request)
         )
+
+    def es_may_use_private_search(self, request):
+        """ Returns True if the given request is allowed to access private
+        search results. By default every logged in user has access to those.
+
+        This method may be overwritten if this is not desired.
+
+        """
+        return request.is_logged_in
 
 
 @ElasticsearchApp.tween_factory(over=transaction_tween_factory)
