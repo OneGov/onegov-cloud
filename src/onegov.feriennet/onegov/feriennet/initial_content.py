@@ -82,12 +82,12 @@ def create_new_organisation(app, name):
     forms.add(
         name='kontakt',
         title="Kontakt",
-        definition="""
+        definition=textwrap.dedent("""\
             Vorname *= ___
             Nachname *= ___
             Telefon *= ___
             E-Mail *= @@@
             Mitteilung *= ...[12]
-        """,
+        """),
         type='builtin'
     )
