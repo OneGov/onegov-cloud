@@ -118,7 +118,8 @@ class DeleteLink(Link):
                  no_button_text=None,
                  extra_information=None,
                  redirect_after=None,
-                 request_method='DELETE'):
+                 request_method='DELETE',
+                 classes=('confirm', 'delete-link')):
 
         attr = {
             'data-confirm': confirm
@@ -141,14 +142,38 @@ class DeleteLink(Link):
         if request_method == 'GET':
             attr['ic-get-from'] = url
             url = '#'
+        elif request_method == 'POST':
+            attr['ic-post-to'] = url
+            url = '#'
+        elif request_method == 'DELETE':
+            pass
+        else:
+            raise NotImplementedError
 
         super().__init__(
             text=text,
             url=url,
-            classes=('confirm', 'delete-link'),
+            classes=classes,
             request_method=request_method,
             attributes=attr
         )
+
+
+class ConfirmLink(DeleteLink):
+    # XXX this is some wonky class hierarchy with tons of paramters.
+    # We can do better!
+
+    def __init__(self, text, url, confirm,
+                 yes_button_text=None,
+                 no_button_text=None,
+                 extra_information=None,
+                 redirect_after=None,
+                 request_method='POST',
+                 classes=('confirm', 'confirm-link')):
+
+        super().__init__(
+            text, url, confirm, yes_button_text, no_button_text,
+            extra_information, redirect_after, request_method, classes)
 
 
 class Img(object):

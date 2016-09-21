@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a ConfirmLink element which works like a DeleteLink but for POST.
+  [href]
+
 - Fixes title being shown twice on the news site.
   [href]
 
