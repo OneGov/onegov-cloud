@@ -58,7 +58,7 @@ class Layout(ChameleonLayout):
 
     @cached_property
     def manage_link(self):
-        return self.request.link(ElectionCollection(self.app.session()))
+        return self.request.link(VoteCollection(self.app.session()))
 
     @cached_property
     def login_link(self):
@@ -109,13 +109,13 @@ class ManageLayout(DefaultLayout):
         menu = []
         session = self.request.app.session()
 
-        link = self.request.link(ElectionCollection(session))
-        class_ = 'active' if link == self.manage_model_link else ''
-        menu.append((_("Elections"), link, class_))
-
         link = self.request.link(VoteCollection(session))
         class_ = 'active' if link == self.manage_model_link else ''
         menu.append((_("Votes"), link, class_))
+
+        link = self.request.link(ElectionCollection(session))
+        class_ = 'active' if link == self.manage_model_link else ''
+        menu.append((_("Elections"), link, class_))
 
         return menu
 

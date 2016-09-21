@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Changes the order of backend menu.
+  [msom]
+
 0.9.3 (2016-09-19)
 ~~~~~~~~~~~~~~~~~~~
 
