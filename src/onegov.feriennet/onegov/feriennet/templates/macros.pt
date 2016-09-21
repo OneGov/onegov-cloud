@@ -9,6 +9,20 @@
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
     <tal:block metal:use-macro="layout.macros.page_content"
         tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None">
+
+        <div metal:fill-slot="after-panels" tal:condition="request.is_organiser">
+            <div class="page-content-panel activity-status-panel">
+                <h2 class="show-for-sr" i18n:translate>Activity</h2>
+
+                <div class="field-display-block">
+                    <div class="field-display-label" i18n:translate>Status</div>
+                    <div class="field-display-data">
+                        <metal:block use-macro="layout.macros.activity_state" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </tal:block>
 </metal:activity_detailed>
 

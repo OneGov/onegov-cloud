@@ -68,18 +68,22 @@ class VacationActivityLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_admin or self.is_owner:
-            return (
-                ConfirmLink(
+            links = []
+
+            if self.model.state == 'preview':
+                links.append(ConfirmLink(
                     text=_("Request Publication"),
                     url=self.request.link(self.model, name='beantragen'),
                     confirm=_("Do you really want to request publication?"),
                     extra_information=_("This cannot be undone."),
                     classes=('confirm', 'request-publication'),
                     yes_button_text=_("Request Publication")
-                ),
-                Link(
-                    text=_("Edit"),
-                    url=self.request.link(self.model, name='bearbeiten'),
-                    classes=('edit-link', )
-                )
-            )
+                ))
+
+            links.append(Link(
+                text=_("Edit"),
+                url=self.request.link(self.model, name='bearbeiten'),
+                classes=('edit-link', )
+            ))
+
+            return links

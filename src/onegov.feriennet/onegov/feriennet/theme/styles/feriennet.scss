@@ -59,3 +59,17 @@ svg #background {
         background-color: $gray-dark;
     }
 }
+
+
+/*
+    activity view
+*/
+.activity-status-panel {
+    .field-display-label {
+        font-weight: normal;
+    }
+
+    .activity-state {
+        font-size: .875rem;
+    }
+}
