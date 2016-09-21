@@ -10,6 +10,9 @@ class FeriennetApp(OrgApp):
 
     request_class = FeriennetRequest
 
+    def es_may_use_private_search(self, request):
+        return request.is_admin
+
 
 @FeriennetApp.template_directory()
 def get_template_directory():
