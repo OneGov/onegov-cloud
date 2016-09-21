@@ -13,7 +13,7 @@
 </metal:activity_detailed>
 
 <metal:activity_state define-macro="activity_state" i18n:domain="onegov.feriennet">
-    <div class="activity activity-${activity.state}">
+    <div class="activity-state activity-state-${activity.state}">
         <metal:block use-macro="layout.macros.activity_state_text" />
     </div>
 </metal:activity_state>

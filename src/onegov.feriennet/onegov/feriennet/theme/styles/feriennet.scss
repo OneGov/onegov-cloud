@@ -21,3 +21,41 @@ svg #background {
     .new-activity:before { @include icon('\f135'); }
     .request-publication:before { @include icon('\f087'); }
 }
+
+/*
+    activities list
+*/
+.activity-list-item {
+    margin-bottom: 1.5rem;
+
+    .page-lead {
+        font-size: 1rem;
+        margin-bottom: .5rem;
+    }
+}
+
+.activity-state {
+    @include label(
+        $radius:2px
+    );
+
+    &.activity-state-preview {
+        background-color: $yellow-dark;
+    }
+
+    &.activity-state-proposed {
+        background-color: $orange-dark;
+    }
+
+    &.activity-state-accepted {
+        background-color: $primary-color;
+    }
+
+    &.activity-state-denied {
+        background-color: $red-dark;
+    }
+
+    &.activity-state-archived {
+        background-color: $gray-dark;
+    }
+}
