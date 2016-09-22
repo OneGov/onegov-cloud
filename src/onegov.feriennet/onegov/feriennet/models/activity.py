@@ -50,6 +50,8 @@ class ActivityTicket(Ticket):
 @handlers.registered_handler('FER')
 class VacationActivityHandler(Handler):
 
+    handler_title = _("Activities")
+
     @cached_property
     def collection(self):
         return VacationActivityCollection(self.session)

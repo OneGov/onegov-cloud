@@ -96,3 +96,13 @@ svg #background {
         @include grid-column(12);
     }
 }
+
+.FER-link::before {
+    @include icon('\f135');
+    display: inline-block;
+    margin-right: 1ex;
+}
+
+.ticket-handler-FER td:first-child::before {
+    @include icon('\f135');
+}
