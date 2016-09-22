@@ -1,7 +1,6 @@
 from onegov.activity.models import Activity
 from onegov.core.collection import Pagination
 from onegov.core.utils import normalize_for_url, increment_name
-from sqlalchemy import desc
 
 
 class ActivityCollection(Pagination):
