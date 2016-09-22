@@ -4,6 +4,7 @@ from onegov.core.security import Public, Private
 from onegov.org.elements import Link
 from onegov.org.layout import DefaultLayout, TicketLayout, TicketsLayout
 from onegov.ticket import Ticket, TicketCollection
+from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.org import _, OrgApp
 from onegov.org.mail import send_html_mail
@@ -166,12 +167,14 @@ def view_tickets(self, request):
             )
 
     def get_handlers():
-        handlers = (
-            ('ALL', _("All")),
-            ('EVN', _("Events")),
-            ('FRM', _("Form Submissions")),
-            ('RSV', _("Reservations")),
-        )
+
+        handlers = []
+
+        for key, handler in ticket_handlers.registry.items():
+            handlers.append((key, request.translate(handler.handler_title)))
+
+        handlers.sort(key=lambda item: item[1])
+        handlers.insert(0, ('ALL', _("All")))
 
         for id, text in handlers:
             groups = id != 'ALL' and tuple(get_groups(id))

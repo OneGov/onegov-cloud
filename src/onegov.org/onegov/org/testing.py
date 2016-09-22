@@ -65,7 +65,7 @@ def get_message(app, index, payload=0):
 
 def extract_href(link):
     """ Takes a link (<a href...>) and returns the href address. """
-    result = re.search(r'(?:href|ic-delete-from)="([^"]+)', link)
+    result = re.search(r'(?:href|ic-post-to|ic-delete-from)="([^"]+)', link)
 
     return result and result.group(1) or None
 

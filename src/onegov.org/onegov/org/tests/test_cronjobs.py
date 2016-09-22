@@ -29,6 +29,8 @@ def register_echo_handler(handlers):
     @handlers.registered_handler('ECO')
     class EchoHandler(Handler):
 
+        handler_title = "Echo"
+
         @property
         def deleted(self):
             return False

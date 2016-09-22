@@ -31,6 +31,8 @@ class EventSubmissionTicket(Ticket):
 @handlers.registered_handler('FRM')
 class FormSubmissionHandler(Handler):
 
+    handler_title = _("Form Submissions")
+
     @cached_property
     def collection(self):
         return FormSubmissionCollection(self.session)
@@ -94,6 +96,8 @@ class FormSubmissionHandler(Handler):
 
 @handlers.registered_handler('RSV')
 class ReservationHandler(Handler):
+
+    handler_title = _("Reservations")
 
     @cached_property
     def resource(self):
@@ -312,6 +316,8 @@ class ReservationHandler(Handler):
 
 @handlers.registered_handler('EVN')
 class EventSubmissionHandler(Handler):
+
+    handler_title = _("Events")
 
     @cached_property
     def collection(self):
