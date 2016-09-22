@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds webhooks.
+  [msom]
+
 0.9.5 (2016-09-21)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -54,9 +58,6 @@ Changelog
 
 0.8.2 (2016-09-05)
 ~~~~~~~~~~~~~~~~~~~
-
-- Adds webhooks.
-  [msom]
 
 - Updates translations.
   [msom]
