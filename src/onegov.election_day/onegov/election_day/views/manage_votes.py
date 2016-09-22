@@ -115,7 +115,7 @@ def trigger_notifications(self, request, form):
     if form.submitted(request):
         for url in request.app.principal.webhooks:
             if post_to(url, get_vote_summary(self, request)):
-                notifications.add(url, self.last_result_change, vote=self)
+                notifications.add(url, self.last_result_change, self)
         return morepath.redirect(layout.manage_model_link)
 
     callout = None
