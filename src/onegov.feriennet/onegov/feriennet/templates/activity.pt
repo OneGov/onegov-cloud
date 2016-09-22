@@ -7,10 +7,28 @@
 
         <tal:block condition="activity.state == 'preview'">
             <div class="panel callout" tal:condition="request.is_organiser_only" i18n:translate>
-                This is a preview. Please edit it until you are satisifed with the result and then press "Request Publication". An Administrator will then review your proposal.
+                This is a preview. Please edit it until you are satisifed with the result and then press "Request Publication". An administrator will then review your proposal.
             </div>
             <div class="panel callout" tal:condition="request.is_admin" i18n:translate>
                 This is a preview. Please edit it until you are satisifed with the result and then press "Publish" to make this activity public.
+            </div>
+        </tal:block>
+
+        <tal:block condition="activity.state == 'proposed' and request.is_organiser_only">
+            <div class="panel callout" i18n:translate>
+                This activity is currently being reviewd by an administrator.
+            </div>
+        </tal:block>
+
+        <tal:block condition="activity.state == 'denied' and request.is_organiser_only">
+            <div class="panel callout" i18n:translate>
+                This activity has been reviewed by an administrator and was denied.
+            </div>
+        </tal:block>
+
+        <tal:block condition="activity.state == 'archived'">
+            <div class="panel callout" i18n:translate>
+                This activity has been archived and cannot be activated again.
             </div>
         </tal:block>
 
