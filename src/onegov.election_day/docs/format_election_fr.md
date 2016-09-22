@@ -2,8 +2,6 @@
 
 En ce qui concerne les formats de fichiers, les fichiers XLS et XLSX sont acceptés, ils sont générés par les programmes électoraux « élections (SESAM) » et « Wabsti élections et votes (VRSG) », ou par l'application web elle-même. Si une table est créée manuellement, le format de l'application web sera alors le plus facile.
 
-«Municipalité» fait référence à un district, une circonscription électorale, etc.
-
 ## Contenu
 
 [SESAM Majorz](#sesam-majorz)
@@ -206,15 +204,15 @@ Le format, qui sera utilisé par l'application web pour l'exportation, se compos
 Les colonnes suivantes seront évaluées et devraient exister :
 
 - **election_absolute_majority**: Majorité absolue de l'élection, seulement si c'est une élection Majorz.
-- **election_counted_entities**: Nombre de municipalités comptées. Si `election_counted_entities = election_total_entities`, on considère alors que l'élection est entièrement comptée.
-- **election_total_entities**: Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est `0`.
-- **entity_id**: Numéro BFS de la municipalité..
-- **entity_elegible_voters**: Nombre de personnes autorisées à voter dans la municipalité.
-- **entity_received_ballots**: Nombre de bulletins soumis dans la municipalité.
-- **entity_blank_ballots**: Nombre de bulletins vides dans la municipalité.
-- **entity_invalid_ballots**: Nombre de bulletins non valides dans la municipalité.
-- **entity_blank_votes**: Nombre de votes vides dans la municipalité.
-- **entity_invalid_votes**: Nombre de votes non valides dans la municipalité. Zéro si c'est une élection Proporz.
+- **election_counted_municipalites**: Nombre de municipalités comptées. Si `election_counted_municipalites = election_total_municipalites`, on considère alors que l'élection est entièrement comptée.
+- **election_total_municipalites**: Nombre total de municipalités. Si aucune information précise à propos de la situation de l'élection n'est possible (parce que l'élection a été importée par Wabsti), alors cette valeur est `0`.
+- **municipality_bfs_number**: Numéro BFS de la municipalité..
+- **municipality_elegible_voters**: Nombre de personnes autorisées à voter dans la municipalité.
+- **municipality_received_ballots**: Nombre de bulletins soumis dans la municipalité.
+- **municipality_blank_ballots**: Nombre de bulletins vides dans la municipalité.
+- **municipality_invalid_ballots**: Nombre de bulletins non valides dans la municipalité.
+- **municipality_blank_votes**: Nombre de votes vides dans la municipalité.
+- **municipality_invalid_votes**: Nombre de votes non valides dans la municipalité. Zéro si c'est une élection Proporz.
 - **list_name**: Nom de la liste de candidats. Uniquement avec les élections Proporz.
 - **list_id**: Identifiant de la liste de candidats. Uniquement avec les élections Proporz.
 - **list_number_of_mandates**: Nombre total de mandats de la liste. Uniquement avec les élections Proporz.
@@ -228,7 +226,7 @@ Les colonnes suivantes seront évaluées et devraient exister :
 
 ### Résultats temporaires
 
-On considère que l'élection n'est pas entièrement comptée, si « election_counted_entities » et « election_total_entities » ne correspondent pas. Si « election_total_entities = 0 », aucune information claire n'est alors possible à propos de la situation de l'élection (parce que l'élection a été importée par Wabsti).
+On considère que l'élection n'est pas entièrement comptée, si « election_counted_municipalites » et « election_total_municipalites » ne correspondent pas. Si « election_total_municipalites = 0 », aucune information claire n'est alors possible à propos de la situation de l'élection (parce que l'élection a été importée par Wabsti).
 
 Les municipalités pas encore entièrement comptées ne sont pas incluses dans les fichiers.
 

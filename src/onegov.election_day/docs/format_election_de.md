@@ -206,15 +206,15 @@ Das Format, welche von der Web-Applikation für den Export verwendet wird, beste
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 - **election_absolute_majority**: Absolutes Mehr der Wahl, nur falls Majorzwahl.
-- **election_counted_entities**: Anzahl ausgezählter Gemeinden. Falls `election_counted_entities = election_total_entities` ist, gilt die Wahl als fertig ausgezählt.
-- **election_total_entities**: Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert `0`.
-- **entity_id**: BFS Nummer der Gemeinde.
-- **entity_elegible_voters**: Anzahl Stimmberechtigte der Gemeinde.
-- **entity_received_ballots**: Anzahl abgegebene Stimmzettel der Gemeinde.
-- **entity_blank_ballots**: Anzahl leere Stimmzettel der Gemeinde.
-- **entity_invalid_ballots**: Anzahl ungültige Stimmzettel der Gemeinde.
-- **entity_blank_votes**: Anzahl leerer Stimmen der Gemeinde.
-- **entity_invalid_votes**: Anzahl ungültige Stimmen der Gemeinde. Null falls Proporzwahl.
+- **election_counted_municipalites**: Anzahl ausgezählter Gemeinden. Falls `election_counted_municipalites = election_total_municipalites` ist, gilt die Wahl als fertig ausgezählt.
+- **election_total_municipalites**: Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert `0`.
+- **municipality_bfs_number**: BFS Nummer der Gemeinde.
+- **municipality_elegible_voters**: Anzahl Stimmberechtigte der Gemeinde.
+- **municipality_received_ballots**: Anzahl abgegebene Stimmzettel der Gemeinde.
+- **municipality_blank_ballots**: Anzahl leere Stimmzettel der Gemeinde.
+- **municipality_invalid_ballots**: Anzahl ungültige Stimmzettel der Gemeinde.
+- **municipality_blank_votes**: Anzahl leerer Stimmen der Gemeinde.
+- **municipality_invalid_votes**: Anzahl ungültige Stimmen der Gemeinde. Null falls Proporzwahl.
 - **list_name**: Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
 - **list_id**: ID der Liste des Kandidierenden. Nur bei Proporzwahlen.
 - **list_number_of_mandates**: Gesamte Anzahl der Mandate der Liste. Nur bei Proporzwahlen.
@@ -228,7 +228,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 ### Temporäre Resultate
 
-Die Wahl gilt als noch nicht ausgezählt, falls `election_counted_entities` und `election_total_entities` nicht übereinstimmen. Falls `election_total_entities = 0` ist, ist keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde).
+Die Wahl gilt als noch nicht ausgezählt, falls `election_counted_municipalites` und `election_total_municipalites` nicht übereinstimmen. Falls `election_total_municipalites = 0` ist, ist keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde).
 
 Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
 

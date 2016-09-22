@@ -100,8 +100,8 @@
                     <div class="ballot-map" i18n:attributes="data-download-link; data-embed-link"
                         data-type="${ballot.type}"
                         data-canton="${layout.app.principal.canton}"
-                        data-mapurl="${layout.get_topojson_link(layout.app.principal.id, vote.date.year)}"
-                        data-dataurl="${request.link(ballot, name='by-entity')}"
+                        data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, vote.date.year)}"
+                        data-dataurl="${request.link(ballot, name='by-municipality')}"
                         data-download-link="Download"
                         data-embed-link="Embed"
                         data-embed-source="${request.link(ballot, name='map')}">

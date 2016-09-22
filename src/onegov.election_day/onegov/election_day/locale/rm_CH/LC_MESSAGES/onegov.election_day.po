@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-09 09:38+0200\n"
-"PO-Revision-Date: 2016-08-29 13:08+0200\n"
+"POT-Creation-Date: 2016-09-06 08:46+0200\n"
+"PO-Revision-Date: 2016-09-12 10:49+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -120,20 +120,6 @@ msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
-
-msgid "Missing municipality"
-msgstr "Lieu che manca"
-
-#, python-format
-msgid "${group} was found twice"
-msgstr "${group} è avant maun duas giadas"
-
-msgid "Invalid municipality id"
-msgstr "Numer UST nunvalaivel"
-
-#, python-format
-msgid "municipality id ${id} was found twice"
-msgstr "Il numer UST ${id} vegn duvrà duas giadas"
 
 msgid "Election (German)"
 msgstr "Elecziun (tudestg)"
@@ -315,6 +301,12 @@ msgstr "telechargiar"
 msgid "Embed"
 msgstr "incorporar"
 
+msgid "Download"
+msgstr "telechargiar"
+
+msgid "Embed"
+msgstr "incorporar"
+
 msgid "Candidates"
 msgstr "Candidatas e candidats"
 
@@ -419,6 +411,42 @@ msgstr "Interrumper"
 
 msgid "Submit"
 msgstr "Trametter"
+
+msgid "There are no elections or votes defined yet."
+msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
+
+msgid "Federal Elections on ${date}"
+msgstr "Elecziuns federalas dals ${date}"
+
+msgid "Cantonal Elections on ${date}"
+msgstr "Elecziuns chantunalas dals ${date}"
+
+msgid "Federal Votes on ${date}"
+msgstr "Votaziuns federalas dals ${date}"
+
+msgid "Cantonal Votes on ${date}"
+msgstr "Votaziuns chantunalas dals ${date}"
+
+msgid "Election"
+msgstr "Elecziun"
+
+msgid "Reported"
+msgstr "Annunzià"
+
+msgid "Updated"
+msgstr "Actualisà"
+
+msgid "Vote"
+msgstr "Project"
+
+msgid "Result"
+msgstr "Resultat"
+
+msgid "Yes %"
+msgstr "% GEA"
+
+msgid "No %"
+msgstr "% NA"
 
 msgid "Previous Page"
 msgstr "Pagina precedenta"

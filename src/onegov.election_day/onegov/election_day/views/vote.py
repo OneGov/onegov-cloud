@@ -19,8 +19,7 @@ def view_vote(self, request):
     return {
         'vote': self,
         'layout': DefaultLayout(self, request),
-        'counted': self.counted,
-        'use_maps': request.app.principal.use_maps
+        'counted': self.counted
     }
 
 
@@ -46,6 +45,26 @@ def view_ballot_as_map(self, request):
         'data': {
             'map': request.link(self, name='by-entity')
         } if request.app.principal.use_maps else {}
+    }
+
+
+@ElectionDayApp.html(model=Ballot, template='embed.pt', permission=Public,
+                     name='map')
+def view_ballot_as_map(self, request):
+    """" View the ballot as map. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.vote.last_result_change)
+
+    request.include('ballot_map')
+
+    return {
+        'model': self,
+        'layout': DefaultLayout(self, request),
+        'data': {
+            'map': request.link(self, name='by-municipality')
+        }
     }
 
 
@@ -117,7 +136,6 @@ def view_vote_json(self, request):
         'url': request.link(self),
         'embed': [
             request.link(ballot, 'map') for ballot in self.ballots
-            if request.app.principal.use_maps
         ]
     }
 
