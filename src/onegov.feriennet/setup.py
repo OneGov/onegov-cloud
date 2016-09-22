@@ -40,7 +40,8 @@ setup(
             'coverage',
             'onegov.testing',
             'pytest',
-            'pytest-localserver'
+            'pytest-localserver',
+            'pyquery',
         ],
     ),
     entry_points={
