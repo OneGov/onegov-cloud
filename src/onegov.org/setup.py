@@ -61,13 +61,13 @@ setup(
         'rjsmin',
         'sedate',
         'translationstring',
+        'webtest',
     ],
     extras_require=dict(
         test=[
             'coverage',
             'freezegun',
             'onegov.testing',
-            'webtest',
             'pyquery',
             'pytest-localserver'
         ],

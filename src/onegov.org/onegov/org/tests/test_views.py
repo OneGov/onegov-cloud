@@ -6,7 +6,6 @@ import re
 import textwrap
 import transaction
 
-from base64 import b64decode, b64encode
 from datetime import datetime, date, timedelta
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
@@ -15,97 +14,17 @@ from onegov.core.utils import Bunch
 from onegov.form import FormCollection, FormSubmission
 from onegov.libres import ResourceCollection
 from onegov.newsletter import RecipientCollection
+from onegov.org.testing import Client
+from onegov.org.testing import decode_map_value
+from onegov.org.testing import encode_map_value
+from onegov.org.testing import extract_href
+from onegov.org.testing import get_message
+from onegov.org.testing import select_checkbox
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
-from webtest import (
-    TestApp as BaseApp,
-    TestResponse as BaseResponse,
-    TestRequest as BaseRequest
-)
-from webtest import Upload
 from purl import URL
-
-
-class SkipFirstForm(object):
-
-    @property
-    def form(self):
-        """ Ignore the first form, which is the general search form on
-        the top of the page.
-
-        """
-        if len(self.forms) > 1:
-            return self.forms[1]
-        else:
-            return super().form
-
-
-class Response(SkipFirstForm, BaseResponse):
-    pass
-
-
-class Request(SkipFirstForm, BaseRequest):
-    ResponseClass = Response
-
-
-class Client(SkipFirstForm, BaseApp):
-    RequestClass = Request
-
-    def login(self, username, password, to=None):
-        url = '/auth/login' + (to and ('/?to=' + to) or '')
-
-        login_page = self.get(url)
-        login_page.form.set('username', username)
-        login_page.form.set('password', password)
-        return login_page.form.submit()
-
-    def login_admin(self, to=None):
-        return self.login('admin@example.org', 'hunter2', to)
-
-    def login_editor(self, to=None):
-        return self.login('editor@example.org', 'hunter2', to)
-
-    def logout(self):
-        return self.get('/auth/logout')
-
-
-def get_message(app, index, payload=0):
-    message = app.smtp.outbox[index]
-    message = message.get_payload(payload).get_payload(decode=True)
-    return message.decode('utf-8')
-
-
-def extract_href(link):
-    """ Takes a link (<a href...>) and returns the href address. """
-    result = re.search(r'(?:href|ic-delete-from)="([^"]+)', link)
-
-    return result and result.group(1) or None
-
-
-def select_checkbox(page, groupname, label, form=None, checked=True):
-    """ Selects one of many checkboxes by fuzzy searching the label next to
-    it. Webtest is not good enough in this regard.
-
-    Selects the checkbox from the form returned by page.form, or the given
-    form if passed. In any case, the form needs to be part of the page.
-
-    """
-
-    elements = page.pyquery('input[name="{}"]'.format(groupname))
-    form = form or page.form
-
-    for ix, el in enumerate(elements):
-        if label in el.label.text_content():
-            form.get(groupname, index=ix).value = checked
-
-
-def encode_map_value(dictionary):
-    return b64encode(json.dumps(dictionary).encode('utf-8'))
-
-
-def decode_map_value(value):
-    return json.loads(b64decode(value).decode('utf-8'))
+from webtest import Upload
 
 
 def bound_reserve(client, allocation):
