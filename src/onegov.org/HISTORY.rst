@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Fixes being unable to edit buildint forms.
+- Fixes being unable to edit builtin forms.
   [href]
 
 - Adds a ConfirmLink element which works like a DeleteLink but for POST.
