@@ -94,7 +94,7 @@ def handle_select_images(self, request):
 
 
 @OrgApp.form(model=ImageSetCollection, name='neu', template='form.pt',
-             permission=Public, form=get_form_class)
+             permission=Private, form=get_form_class)
 def handle_new_imageset(self, request, form):
 
     if form.submitted(request):
