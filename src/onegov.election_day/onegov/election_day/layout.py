@@ -93,6 +93,10 @@ class Layout(ChameleonLayout):
             for locale in sorted(self.app.locales)
         ]
 
+    @cached_property
+    def notifications(self):
+        return len(self.principal.webhooks) > 0
+
 
 class DefaultLayout(Layout):
     pass

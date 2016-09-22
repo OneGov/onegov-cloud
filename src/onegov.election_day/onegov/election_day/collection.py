@@ -1,38 +1,44 @@
-from onegov.election_day.models import Webhook
+from onegov.ballot.models import Election, Vote
+from onegov.election_day.models import Notification
 
 
-class WebhookCollection(object):
+class NotificationCollection(object):
 
     def __init__(self, session):
         self.session = session
 
-    def add(self, url, last_change, election=None, vote=None):
-        webhook = Webhook()
-        webhook.url = url
-        webhook.last_change = last_change
-        if election:
-            webhook.election_id = election.id
-        if vote:
-            webhook.vote_id = vote.id
+    def add(self, url, last_change, election_or_vote):
+        """ Adds a new notification. """
 
-        self.session.add(webhook)
+        notification = Notification()
+        notification.url = url
+        notification.last_change = last_change
+        if isinstance(election_or_vote, Election):
+            notification.election_id = election_or_vote.id
+        if isinstance(election_or_vote, Vote):
+            notification.vote_id = election_or_vote.id
+
+        self.session.add(notification)
         self.session.flush()
 
-        return webhook
+        return notification
 
     def query(self):
-        return self.session.query(Webhook)
+        return self.session.query(Notification)
 
     def by_election(self, election, url, last_change):
+        """ Returns the notification specified by given parameters. """
         return self.query().filter(
-            Webhook.election_id == election.id,
-            Webhook.url == url,
-            Webhook.last_change == last_change
+            Notification.election_id == election.id,
+            Notification.url == url,
+            Notification.last_change == last_change
         ).first()
 
     def by_vote(self, vote, url, last_change):
+        """ Returns the notification specified by given parameters. """
+
         return self.query().filter(
-            Webhook.vote_id == vote.id,
-            Webhook.url == url,
-            Webhook.last_change == last_change
+            Notification.vote_id == vote.id,
+            Notification.url == url,
+            Notification.last_change == last_change
         ).first()

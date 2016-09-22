@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Adds webhooks.
+- Adds support for webhooks.
   [msom]
 
 0.9.5 (2016-09-21)

@@ -1,5 +1,6 @@
 from onegov.election_day.models.archived_result import ArchivedResult
 from onegov.election_day.models.principal import Principal
-from onegov.election_day.models.webhook import Webhook
+from onegov.election_day.models.notification import Notification
 
-__all__ = ['ArchivedResult', 'Principal']
+
+__all__ = ['Archive', 'Principal', 'Notification']

@@ -11,13 +11,14 @@ class DeleteForm(Form):
     pass
 
 
-class TriggerWebhookForm(Form):
+class TriggerNotificationForm(Form):
     pass
 
 
 __all__ = [
     'DeleteForm',
     'ElectionForm',
+    'TriggerNotificationForm',
     'UploadElectionForm',
     'UploadVoteForm',
     'VoteForm'

@@ -8,17 +8,22 @@ from sqlalchemy import Column, ForeignKey
 from uuid import uuid4
 
 
-class Webhook(Base, TimestampMixin):
-    """ tbd """
+class Notification(Base, TimestampMixin):
+    """ Stores triggered notifications. """
 
-    __tablename__ = 'webhooks'
+    __tablename__ = 'notifications'
 
+    #: Identifies the notification
     id = Column(UUID, primary_key=True, default=uuid4)
 
+    #: The URL to call
     url = Column(Text, nullable=False)
 
+    #: The corresponding election
     election_id = Column(Text, ForeignKey(Election.id), nullable=True)
 
+    #: The corresponding vote
     vote_id = Column(Text, ForeignKey(Vote.id), nullable=True)
 
+    #: The last update of the corresponding election/vote
     last_change = Column(UTCDateTime)
