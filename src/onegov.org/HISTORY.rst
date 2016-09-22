@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.10 (2016-09-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Upgrade to latest onegov.core release.
   [href]
 
