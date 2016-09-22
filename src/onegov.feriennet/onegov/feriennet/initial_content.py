@@ -91,3 +91,5 @@ def create_new_organisation(app, name):
         """),
         type='builtin'
     )
+
+    return org
