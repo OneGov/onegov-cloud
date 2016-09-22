@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.9 (2016-09-22)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes being unable to edit builtin forms.
   [href]
 
