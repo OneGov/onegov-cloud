@@ -21,7 +21,7 @@
                 Your results were uploaded successfully.
             </div>
 
-            <div class="panel callout radius">
+            <div tal:condition="layout.principal.webhooks"  class="panel callout radius">
                 <p>
                     <strong><a href="${request.link(vote, 'trigger-webhooks')}" i18n:translate="">Click here to trigger the notifications</a></strong>
                 </p>
