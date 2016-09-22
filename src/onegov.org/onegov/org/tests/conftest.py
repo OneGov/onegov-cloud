@@ -1,15 +1,11 @@
-import onegov.core
-import onegov.org
-import pytest
-import tempfile
+import onegov.ticket
 import transaction
-import shutil
+import pytest
 
-from onegov.core.utils import Bunch, scan_morepath_modules
-from onegov.org.models import Organisation
-from onegov.org.initial_content import create_new_organisation
+from onegov.org import OrgApp
 from onegov.user import User
-from uuid import uuid4
+from onegov.org.initial_content import create_new_organisation
+from onegov.testing.utils import create_app
 
 
 @pytest.yield_fixture(scope='session')
@@ -18,66 +14,28 @@ def handlers():
     onegov.ticket.handlers.registry = {}
 
 
-@pytest.yield_fixture(scope='session')
-def filestorage():
-    directory = tempfile.mkdtemp()
-    yield directory
-    shutil.rmtree(directory)
+@pytest.yield_fixture(scope='function')
+def org_app(request):
+    yield create_org_app(request, use_elasticsearch=False)
 
 
 @pytest.yield_fixture(scope='function')
-def org_app(postgres_dsn, filestorage, test_password, smtp):
-    yield new_org_app(postgres_dsn, filestorage, test_password, smtp)
+def es_org_app(request):
+    yield create_org_app(request, use_elasticsearch=True)
 
 
-@pytest.yield_fixture(scope='function')
-def es_org_app(postgres_dsn, filestorage, test_password, smtp, es_url):
-    yield new_org_app(postgres_dsn, filestorage, test_password, smtp, es_url)
-
-
-def new_org_app(postgres_dsn, filestorage, test_password, smtp, es_url=None):
-    scan_morepath_modules(onegov.org.OrgApp)
-    onegov.org.OrgApp.commit()
-
-    app = onegov.org.OrgApp()
-    app.namespace = 'test_' + uuid4().hex
-    app.configure_application(
-        dsn=postgres_dsn,
-        filestorage='fs.osfs.OSFS',
-        filestorage_options={
-            'root_path': filestorage,
-            'create': True
-        },
-        depot_backend='depot.io.memory.MemoryFileStorage',
-        identity_secure=False,
-        disable_memcached=True,
-        enable_elasticsearch=es_url and True or False,
-        elasticsearch_hosts=[es_url]
-    )
-    app.set_application_id(app.namespace + '/' + 'test')
-    app.bind_depot()
-
-    create_new_organisation(app=app, name="Govikon")
-
-    # cronjobs leave lingering sessions open, in real life this is not a
-    # problem, but in testing it leads to connection pool exhaustion
-    app.settings.cronjobs = Bunch(enabled=False)
-
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'mails@govikon.ch'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
-    app.smtp = smtp
-
+def create_org_app(request, use_elasticsearch):
+    app = create_app(OrgApp, request, use_elasticsearch=use_elasticsearch)
     session = app.session()
-    org = session.query(Organisation).one()
+
+    org = create_new_organisation(app, name="Govikon")
     org.meta['reply_to'] = 'mails@govikon.ch'
 
     # usually we don't want to create the users directly, anywhere else you
     # *need* to go through the UserCollection. Here however, we can improve
     # the test speed by not hashing the password for every test.
+    test_password = request.getfixturevalue('test_password')
+
     session.add(User(
         username='admin@example.org',
         password_hash=test_password,

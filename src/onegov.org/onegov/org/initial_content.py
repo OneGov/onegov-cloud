@@ -65,6 +65,8 @@ def create_new_organisation(app, name):
     add_events(session, name)
     add_resources(app.libres_context)
 
+    return org
+
 
 def add_root_pages(session):
     pages = PageCollection(session)
