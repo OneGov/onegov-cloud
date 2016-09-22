@@ -1,6 +1,7 @@
 from morepath.authentication import NO_IDENTITY
-from onegov.activity import Activity
-from onegov.core.security import Public
+from onegov.activity import Activity, ActivityCollection
+from onegov.core.security import Public, Private
+from onegov.core.security.rules import has_permission_logged_in
 from onegov.feriennet import FeriennetApp
 from sqlalchemy import or_
 
@@ -80,19 +81,51 @@ class ActivityQueryPolicy(object):
         ))
 
 
+@FeriennetApp.permission_rule(model=object, permission=Private)
+def has_private_permission_logged_in(identity, model, permission):
+    """ Take away private permission for editors. """
+
+    if identity.role != 'editor':
+        return has_permission_logged_in(identity, model, permission)
+
+    return False
+
+
+@FeriennetApp.permission_rule(model=ActivityCollection, permission=Private)
+def has_private_permission_activity_collections(identity, model, permission):
+    """ Give the editor private permission for activity collections (needed
+    to create new activites).
+
+    """
+
+    # only overries the editor role
+    if identity.role != 'editor':
+        return has_permission_logged_in(identity, model, permission)
+
+    return True
+
+
+@FeriennetApp.permission_rule(model=Activity, permission=Private)
+def has_private_permission_activities(identity, model, permission):
+    """ Give the editor private permission for activities. """
+
+    # only overries the editor role
+    if identity.role != 'editor':
+        return has_permission_logged_in(identity, model, permission)
+
+    return True
+
+
 @FeriennetApp.permission_rule(model=Activity, permission=Public, identity=None)
 def has_public_permission_not_logged_in(identity, model, permission):
-    """ Overrides the public permission rule of activites for anonymous users.
-    """
-    assert permission is Public
+    """ Only make activites anonymously accessible with certain states. """
 
     return model.state in VISIBLE_ACTIVITY_STATES['anonymous']
 
 
 @FeriennetApp.permission_rule(model=Activity, permission=Public)
 def has_public_permission_logged_in(identity, model, permission):
-    """ Overrides the public permission rule of activites for logged-in users.
-    """
+    """ Only make activites accessible with certain states (or if owner). """
 
     # roles other than admin/editor are basically treated as anonymous,
     # so fallback in this case
