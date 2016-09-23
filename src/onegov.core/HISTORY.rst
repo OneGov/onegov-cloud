@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.27.1 (2016-09-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an utility function to fetch unique hstore keys from a table.
   [href]
