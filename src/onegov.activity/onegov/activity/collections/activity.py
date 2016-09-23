@@ -1,6 +1,8 @@
 from onegov.activity.models import Activity
 from onegov.core.collection import Pagination
-from onegov.core.utils import normalize_for_url, increment_name
+from onegov.core.utils import get_unique_hstore_keys
+from onegov.core.utils import increment_name
+from onegov.core.utils import normalize_for_url
 
 
 class ActivityCollection(Pagination):
@@ -23,13 +25,18 @@ class ActivityCollection(Pagination):
     def page_by_index(self, index):
         return self.__class__(self.session, self.type, index)
 
+    @property
+    def model_class(self):
+        return Activity.get_polymorphic_class(self.type, Activity)
+
     def query(self):
+        model_class = self.model_class
+
         if self.type != '*':
-            model_class = Activity.get_polymorphic_class(self.type, Activity)
             query = self.session.query(model_class)
             return query.filter(model_class.type == self.type)
 
-        return self.session.query(Activity)
+        return self.session.query(model_class)
 
     def by_id(self, id):
         return self.query().filter(Activity.id == id).first()
@@ -42,6 +49,15 @@ class ActivityCollection(Pagination):
 
     def by_username(self, username):
         return self.query().filter(Activity.username == username)
+
+    @property
+    def used_tags(self):
+        """ Returns a list of all the tags used on *all* activites of
+        the current type.
+
+        """
+
+        return get_unique_hstore_keys(self.session, self.model_class._tags)
 
     def get_unique_name(self, name):
         """ Given a desired name, finds a variant of that name that's not
@@ -65,9 +81,8 @@ class ActivityCollection(Pagination):
         type = self.type != '*' and self.type or None
 
         name = name or self.get_unique_name(title)
-        activity_class = Activity.get_polymorphic_class(type, Activity)
 
-        activity = activity_class(
+        activity = self.model_class(
             name=name,
             title=title,
             tags=tags,
