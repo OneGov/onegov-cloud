@@ -11,6 +11,7 @@ from onegov.feriennet.layout import VacationActivityCollectionLayout
 from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import VacationActivity
+from onegov.org.elements import Link
 from onegov.org.mail import send_html_mail
 from onegov.ticket import TicketCollection
 from purl import URL
@@ -29,10 +30,21 @@ def get_activity_form_class(model, request):
     permission=Public)
 def view_activities(self, request):
 
+    tags = [(tag, request.translate(_(tag))) for tag in self.used_tags]
+    tags.sort(key=lambda i: i[1])
+
+    taglinks = tuple(
+        Link(
+            text=translation,
+            url='#'
+        ) for tag, translation in tags
+    )
+
     return {
         'activities': self.batch,
         'layout': VacationActivityCollectionLayout(self, request),
-        'title': _("Activities")
+        'title': _("Activities"),
+        'taglinks': taglinks
     }
 
 

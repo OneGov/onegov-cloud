@@ -43,6 +43,10 @@ svg #background {
         font-size: 1rem;
         margin-bottom: .5rem;
     }
+
+    ul.tags {
+        margin-bottom: .75rem;
+    }
 }
 
 .activity-state {
@@ -71,6 +75,22 @@ svg #background {
     }
 }
 
+.activity-list-search {
+    @include hairline;
+    border-bottom-style: dashed;
+
+    margin: 1rem 0;
+    padding-bottom: 1.5rem;
+
+    h2 {
+        font-size: 1rem;
+    }
+
+    ul.tags {
+        margin: 0;
+    }
+}
+
 
 /*
     Activity view
@@ -83,6 +103,16 @@ ul.tags {
             $bg: $secondary-color,
             $radius:4px
         );
+
+        &.active {
+            @include label(
+                $radius: 4px
+            );
+        }
+
+        a {
+            color: inherit;
+        }
     }
 }
 
