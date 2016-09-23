@@ -41,6 +41,9 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
             'input': (self.title.lower(), )
         }
 
+    def ordered_tags(self, request):
+        return sorted([request.translate(_(tag)) for tag in self.tags])
+
 
 class ActivityTicket(Ticket):
     __mapper_args__ = {'polymorphic_identity': 'FER'}

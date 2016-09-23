@@ -12,8 +12,17 @@
 </metal:activity_ticket_summary>
 
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
+
     <tal:block metal:use-macro="layout.macros.page_content"
         tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None; show_ticket_panel show_ticket_panel|False">
+
+        <div metal:fill-slot="after-lead" tal:condition="activity.tags">
+            <ul class="tags">
+                <li tal:repeat="tag activity.ordered_tags(request)">
+                    ${request.translate(tag)}
+                </li>
+            </ul>
+        </div>
 
         <div metal:fill-slot="after-panels" tal:condition="show_ticket_panel and request.is_organiser">
             <div class="page-content-panel plain-panel activity-status-panel">

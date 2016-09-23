@@ -48,7 +48,7 @@ def view_activity(self, request):
         'layout': VacationActivityLayout(self, request),
         'title': self.title,
         'activity': self,
-        'ticket': ticket,
+        'ticket': ticket
     }
 
 

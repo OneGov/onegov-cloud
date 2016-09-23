@@ -73,8 +73,19 @@ svg #background {
 
 
 /*
-    activity view
+    Activity view
 */
+ul.tags {
+    margin: 0 0 2rem;
+
+    li {
+        @include label(
+            $bg: $secondary-color,
+            $radius:4px
+        );
+    }
+}
+
 .activity-status-panel {
 
     .field-display-label {
@@ -88,7 +99,7 @@ svg #background {
 
 
 /*
-    ticket view
+    Ticket view
 */
 .ticket-summary {
     .page-content-main,
