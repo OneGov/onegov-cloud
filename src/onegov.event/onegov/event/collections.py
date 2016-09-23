@@ -6,6 +6,7 @@ from onegov.event.models import Event, Occurrence
 from sedate import as_datetime, replace_timezone, standardize_date
 from sqlalchemy import and_, distinct, or_
 from sqlalchemy.dialects.postgresql import array
+from onegov.core.utils import get_unique_hstore_keys
 
 
 class EventCollectionPagination(Pagination):
@@ -200,11 +201,8 @@ class OccurrenceCollection(OccurrenceCollectionPagination):
         http://stackoverflow.com/q/12015942/3690178
 
         """
-        tags = []
-        for result in self.session.query(distinct(Occurrence._tags.keys())):
-            tags.extend(result[0])
 
-        return sorted(set(tags))
+        return get_unique_hstore_keys(self.session, Occurrence._tags)
 
     def query(self, start=None, end=None, tags=None, outdated=False):
         """ Queries occurrences with the given parameters.
