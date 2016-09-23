@@ -3,14 +3,16 @@ from onegov.core.collection import Pagination
 from onegov.core.utils import get_unique_hstore_keys
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
+from sqlalchemy.dialects.postgresql import array
 
 
 class ActivityCollection(Pagination):
 
-    def __init__(self, session, type='*', page=0):
+    def __init__(self, session, type='*', page=0, tags=None):
         self.session = session
         self.type = type
         self.page = page
+        self.tags = set(tags) if tags else set()
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -31,12 +33,40 @@ class ActivityCollection(Pagination):
 
     def query(self):
         model_class = self.model_class
+        query = self.session.query(model_class)
 
         if self.type != '*':
-            query = self.session.query(model_class)
-            return query.filter(model_class.type == self.type)
+            query = query.filter(model_class.type == self.type)
 
-        return self.session.query(model_class)
+        if self.tags:
+            query = query.filter(model_class._tags.has_any(array(self.tags)))
+
+        return query
+
+    def for_filter(self, tag):
+        """ Returns a new collection instance.
+
+        The given tag is excluded if already in the list, included if not
+        yet in the list.
+
+        """
+
+        if tag in self.tags:
+            tags = self.tags - {tag}
+        else:
+            tags = self.tags | {tag}
+
+        return self.__class__(self.session, self.type, 0, tags)
+
+    def without_tag(self, tag):
+        """ Returns a new collection instance excluding the given tag.
+
+        The page is reset to 0.
+
+        """
+
+        return self.__class__(
+            self.session, 0, [t for t in self.tags if t != tag])
 
     def by_id(self, id):
         return self.query().filter(Activity.id == id).first()
