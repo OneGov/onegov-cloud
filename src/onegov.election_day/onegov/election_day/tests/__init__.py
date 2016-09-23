@@ -1,6 +1,7 @@
 
 class DummyPrincipal(object):
     name = 'name'
+    webhooks = []
 
 
 class DummyApp(object):
