@@ -1,5 +1,4 @@
-from onegov.ballot.models import Election, Vote
-from onegov.election_day.models import Notification
+from onegov.election_day.models import Notification, WebhookNotification
 
 
 class NotificationCollection(object):
@@ -7,38 +6,37 @@ class NotificationCollection(object):
     def __init__(self, session):
         self.session = session
 
-    def add(self, url, last_change, election_or_vote):
-        """ Adds a new notification. """
-
-        notification = Notification()
-        notification.url = url
-        notification.last_change = last_change
-        if isinstance(election_or_vote, Election):
-            notification.election_id = election_or_vote.id
-        if isinstance(election_or_vote, Vote):
-            notification.vote_id = election_or_vote.id
-
-        self.session.add(notification)
-        self.session.flush()
-
-        return notification
-
     def query(self):
         return self.session.query(Notification)
 
-    def by_election(self, election, url, last_change):
-        """ Returns the notification specified by given parameters. """
+    def by_election(self, election):
+        """ Returns the notification for the given election and its
+        modification times.
+
+        """
+
         return self.query().filter(
             Notification.election_id == election.id,
-            Notification.url == url,
-            Notification.last_change == last_change
-        ).first()
+            Notification.last_change == election.last_result_change
+        ).all()
 
-    def by_vote(self, vote, url, last_change):
-        """ Returns the notification specified by given parameters. """
+    def by_vote(self, vote):
+        """ Returns the notification for the given vote and its modification
+        time.
+
+        """
 
         return self.query().filter(
             Notification.vote_id == vote.id,
-            Notification.url == url,
-            Notification.last_change == last_change
-        ).first()
+            Notification.last_change == vote.last_result_change
+        ).all()
+
+    def trigger(self, request, model):
+        """ Triggers and adds all notifications. """
+
+        if request.app.principal.webhooks:
+            notification = WebhookNotification()
+            notification.trigger(request, model)
+            self.session.add(notification)
+
+        self.session.flush()

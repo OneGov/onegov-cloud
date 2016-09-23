@@ -113,8 +113,7 @@ def trigger_notifications(self, request, form):
     layout = ManageElectionsLayout(self, request)
 
     if form.submitted(request):
-        for url in request.app.principal.webhooks:
-            notifications.add(url, self.last_result_change, self)
+        notifications.trigger(request, self)
         return morepath.redirect(layout.manage_model_link)
 
     callout = None
@@ -122,19 +121,15 @@ def trigger_notifications(self, request, form):
     title = _("Trigger notifications")
     button_class = 'primary'
 
-    for url in request.app.principal.webhooks:
-        existing = notifications.by_election(
-            self, url, self.last_result_change
+    if notifications.by_election(self):
+        callout = _(
+            "There are no changes since the last time the notifications "
+            "have been triggered!"
         )
-        if existing is not None:
-            callout = _(
-                "There are no changes since the last time the notifications "
-                "have been triggered!"
-            )
-            message = _(
-                "Do you really want to retrigger the notfications?",
-            )
-            button_class = 'alert'
+        message = _(
+            "Do you really want to retrigger the notfications?",
+        )
+        button_class = 'alert'
 
     return {
         'message': message,
