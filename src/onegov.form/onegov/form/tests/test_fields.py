@@ -1,10 +1,13 @@
 import base64
+import re
 import tempfile
 
 from cgi import FieldStorage
 from gzip import GzipFile
 from io import BytesIO
 from onegov.form import Form
+from onegov.form.fields import MultiCheckboxField
+from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.form.fields import UploadField
 
 
@@ -35,3 +38,32 @@ def test_upload_file():
             return f.read()
 
     assert decompress(base64.b64decode(data['data'])) == b'foobar'
+
+
+def test_ordered_multi_checkbox_field():
+    ordinary = MultiCheckboxField(choices=[
+        ('c', 'C'),
+        ('b', 'B'),
+        ('a', 'A')
+    ])
+    ordered = OrderedMultiCheckboxField(choices=[
+        ('c', 'C'),
+        ('b', 'B'),
+        ('a', 'A')
+    ])
+    ordinary = ordinary.bind(Form(), 'choices')
+    ordered = ordered.bind(Form(), 'choices')
+
+    ordinary.data = ordered.data = []
+
+    assert re.findall(r'value="((a|b|c){1})"', ordinary()) == [
+        ('c', 'c'),
+        ('b', 'b'),
+        ('a', 'a'),
+    ]
+
+    assert re.findall(r'value="((a|b|c){1})"', ordered()) == [
+        ('a', 'a'),
+        ('b', 'b'),
+        ('c', 'c'),
+    ]

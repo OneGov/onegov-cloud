@@ -3,7 +3,9 @@ import gzip
 import magic
 
 from io import BytesIO
-from onegov.form.widgets import MultiCheckboxWidget, UploadWidget
+from onegov.form.widgets import MultiCheckboxWidget
+from onegov.form.widgets import OrderedMultiCheckboxWidget
+from onegov.form.widgets import UploadWidget
 from wtforms import FileField, SelectMultipleField, widgets
 
 
@@ -15,6 +17,10 @@ class MultiCheckboxField(SelectMultipleField):
     def __init__(self, *args, **kwargs):
         kwargs['option_widget'] = widgets.CheckboxInput()
         super().__init__(*args, **kwargs)
+
+
+class OrderedMultiCheckboxField(MultiCheckboxField):
+    widget = OrderedMultiCheckboxWidget()
 
 
 class UploadField(FileField):

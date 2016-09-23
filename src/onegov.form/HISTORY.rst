@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an ordered multi checkbox field.
+  [href]
+
 0.14.0 (2016-09-09)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -6,12 +6,48 @@ from wtforms.widgets import ListWidget, FileInput, TextInput
 from wtforms.widgets.core import HTMLString
 
 
+class OrderedListWidget(ListWidget):
+    """ Extends the default list widget with automated ordering using the
+    translated text of each element.
+
+    """
+
+    def __call__(self, field, **kwargs):
+
+        # ListWidget expects a field internally, but it will only use
+        # its id property and __iter__ method, so we can get away
+        # with passing a fake field with an id and an iterator.
+        #
+        # It's not great, since we have to assume internal knowledge,
+        # but builting a new field or changing the existing one would
+        # require even more knowledge, so this is the better approach
+        #
+        # We also need to call each field once so it gets hooked up with
+        # our translation machinary
+        ordered = [subfield for subfield in field]
+        ordered.sort(key=lambda f: (f(), str(f.label.text))[1])
+
+        class FakeField(object):
+
+            id = field.id
+
+            def __iter__(self):
+                return iter(ordered)
+
+        return super().__call__(FakeField(), **kwargs)
+
+
 class MultiCheckboxWidget(ListWidget):
-    """ The default wtforms ListWidget, extended different default values. """
+    """ The default list widget with the label behind the checkbox. """
 
     def __init__(self, *args, **kwargs):
         kwargs['prefix_label'] = False
         super().__init__(*args, **kwargs)
+
+
+class OrderedMultiCheckboxWidget(MultiCheckboxWidget, OrderedListWidget):
+    """ The sorted list widget with the label behind the checkbox. """
+    pass
 
 
 class CoordinateWidget(TextInput):
