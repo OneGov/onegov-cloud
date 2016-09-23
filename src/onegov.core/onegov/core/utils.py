@@ -17,6 +17,7 @@ from functools import partial
 from importlib import import_module
 from itertools import groupby, tee
 from purl import URL
+from sqlalchemy import distinct
 from unidecode import unidecode
 from uuid import UUID
 from webob import static
@@ -447,3 +448,16 @@ def scan_morepath_modules(cls):
     """
     for module in sorted(morepath_modules(cls)):
         morepath.scan(import_module(module))
+
+
+def get_unique_hstore_keys(session, column):
+    """ Returns a set of keys found in an hstore column over all records
+    of its table.
+
+    """
+
+    return {
+        key
+        for row in session.query(distinct(column.keys())).all()
+        for key in row[0]
+    }

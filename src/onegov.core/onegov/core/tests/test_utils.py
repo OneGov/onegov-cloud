@@ -2,6 +2,10 @@ import onegov.core
 import os.path
 
 from onegov.core import utils
+from onegov.core.orm import SessionManager
+from onegov.core.orm.types import HSTORE
+from sqlalchemy import Column, Integer
+from sqlalchemy.ext.declarative import declarative_base
 from uuid import uuid4
 
 
@@ -136,3 +140,32 @@ def test_is_sorted():
     assert utils.is_sorted('aBc', key=lambda i: i.lower())
     assert not utils.is_sorted('321')
     assert utils.is_sorted('321', reverse=True)
+
+
+def test_get_unique_hstore_keys(postgres_dsn):
+
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        _tags = Column(HSTORE, nullable=True)
+
+        @property
+        def tags(self):
+            return set(self._tags.keys()) if self._tags else set()
+
+        @tags.setter
+        def tags(self, value):
+            self._tags = {k: '' for k in value} if value else None
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('foo')
+
+    mgr.session().add(Document(tags=['foo', 'bar']))
+    mgr.session().add(Document(tags=['foo', 'baz']))
+
+    assert utils.get_unique_hstore_keys(mgr.session(), Document._tags) == {
+        'foo', 'bar', 'baz'
+    }
