@@ -248,6 +248,8 @@
         <tal:block condition="not: people or contact or coordinates">
             <div class="small-12 columns page-content-main">
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
+                <div metal:define-slot="after-lead"></div>
+
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
                 <div metal:define-slot="after-text"></div>
             </div>
@@ -255,6 +257,8 @@
         <tal:block condition="people or contact or coordinates">
             <div class="small-12 medium-8 columns page-content-main">
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
+                <div metal:define-slot="after-lead"></div>
+
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
                 <div metal:define-slot="after-text"></div>
             </div>
