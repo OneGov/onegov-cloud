@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.5.1 (2016-09-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Uses newly added onegov.core.utils.get_unique_hstore_keys function.
   [href]
