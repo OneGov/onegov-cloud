@@ -4,8 +4,8 @@ from onegov.feriennet.security import ActivityQueryPolicy
 
 class VacationActivityCollection(ActivityCollection):
 
-    def __init__(self, session, identity=None, page=0):
-        super().__init__(session, type='vacation', page=page)
+    def __init__(self, session, identity=None, page=0, tags=None):
+        super().__init__(session, type='vacation', page=page, tags=tags)
         self.identity = identity
 
     def subset(self):

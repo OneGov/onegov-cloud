@@ -36,7 +36,8 @@ def view_activities(self, request):
     taglinks = tuple(
         Link(
             text=translation,
-            url='#'
+            active=tag in self.tags,
+            url=request.link(self.for_filter(tag))
         ) for tag, translation in tags
     )
 

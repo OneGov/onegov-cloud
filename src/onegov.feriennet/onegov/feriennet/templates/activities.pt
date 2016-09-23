@@ -8,7 +8,9 @@
             <h2 i18n:translate>Tags</h2>
 
             <ul class="tags" tal:condition="taglinks">
-                <li tal:repeat="link taglinks" tal:content="structure link(request)" />
+                <li tal:repeat="link taglinks" 
+                    tal:content="structure link(request)" 
+                    class="${link.active and 'active'}" />
             </ul>
         </div>
 

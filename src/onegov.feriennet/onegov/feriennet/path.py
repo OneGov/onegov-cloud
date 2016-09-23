@@ -3,12 +3,16 @@ from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.models import VacationActivity
 
 
-@FeriennetApp.path(model=VacationActivityCollection, path='/angebote')
-def get_vacation_activities(request, app, page=0):
+@FeriennetApp.path(
+    model=VacationActivityCollection,
+    path='/angebote',
+    converters=dict(tags=[str]))
+def get_vacation_activities(request, app, page=0, tags=[]):
     return VacationActivityCollection(
         session=app.session(),
         page=page,
-        identity=request.identity
+        identity=request.identity,
+        tags=tags
     )
 
 
