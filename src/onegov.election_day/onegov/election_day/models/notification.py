@@ -28,14 +28,14 @@ class Notification(Base, TimestampMixin):
     #: The action made (e.g. the URL called)
     action = Column(Text, nullable=False)
 
+    #: The last update of the corresponding election/vote
+    last_change = Column(UTCDateTime, nullable=False)
+
     #: The corresponding election
     election_id = Column(Text, ForeignKey(Election.id), nullable=True)
 
     #: The corresponding vote
     vote_id = Column(Text, ForeignKey(Vote.id), nullable=True)
-
-    #: The last update of the corresponding election/vote
-    last_change = Column(UTCDateTime)
 
     def update_from_model(self, model):
         """ Copy """
@@ -79,11 +79,11 @@ class WebhookNotification(Notification):
             process.start()
 
         """
+        self.update_from_model(model)
+        self.action = 'webhooks'
+
         urls = request.app.principal.webhooks
         if urls:
-            self.update_from_model(model)
-            self.action = 'webhooks'
-
             summary = get_summary(model, request)
             data = json.dumps(summary).encode('utf-8')
             headers = (
