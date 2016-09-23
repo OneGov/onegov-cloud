@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Order tags by alphabet in events view.
+  [href]
+
 0.0.10 (2016-09-22)
 ~~~~~~~~~~~~~~~~~~~
 

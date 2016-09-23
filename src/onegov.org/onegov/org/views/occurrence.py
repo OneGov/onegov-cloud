@@ -23,12 +23,17 @@ def view_occurrences(self, request):
 
     layout = OccurrencesLayout(self, request)
 
+    translated_tags = [
+        (tag, request.translate(_(tag))) for tag in self.used_tags
+    ]
+    translated_tags.sort(key=lambda i: i[1])
+
     tags = (
         Link(
-            text=request.translate(_(tag)),
+            text=translation,
             url=request.link(self.for_filter(tag=tag)),
             active=tag in self.tags and 'active' or ''
-        ) for tag in self.used_tags
+        ) for tag, translation in translated_tags
     )
 
     return {
