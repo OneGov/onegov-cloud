@@ -14,11 +14,11 @@ msgstr ""
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 1.8.9\n"
 
-msgid "Elections"
-msgstr "Elezioni"
-
 msgid "Votes"
 msgstr "Votazioni"
+
+msgid "Elections"
+msgstr "Elezioni"
 
 msgid "Manage"
 msgstr "Amministrare"
@@ -437,9 +437,6 @@ msgstr "Tu sei qui"
 msgid "Last change"
 msgstr "Aggiornato"
 
-msgid "Trigger notifications"
-msgstr ""
-
 msgid "New Election"
 msgstr "Nuova elezione"
 
@@ -488,8 +485,8 @@ msgstr "Utilizzi per favore il formato seguente:"
 msgid "Your results were uploaded successfully."
 msgstr "I Suoi risultati sono stati caricati correttamente."
 
-msgid "Click here to see the updated results page."
-msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
+msgid "Click here to trigger the notifications"
+msgstr ""
 
 msgid "Your results could not be uploaded."
 msgstr "I Suoi risultati non hanno potuto essere caricati."
@@ -497,8 +494,8 @@ msgstr "I Suoi risultati non hanno potuto essere caricati."
 msgid "Line"
 msgstr "Riga"
 
-msgid "Click here to trigger the notifications"
-msgstr ""
+msgid "Click here to see the updated results page."
+msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
 
 msgid "No errors found in proposal"
 msgstr "Nessun errore nel progetto"

@@ -13,11 +13,11 @@ msgstr ""
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 1.8.9\n"
 
-msgid "Elections"
-msgstr "Elecziuns"
-
 msgid "Votes"
 msgstr "Votaziuns"
+
+msgid "Elections"
+msgstr "Elecziuns"
 
 msgid "Manage"
 msgstr "Administrar"
@@ -460,9 +460,6 @@ msgstr "Pagina actuala"
 msgid "Last change"
 msgstr "Actualisà"
 
-msgid "Trigger notifications"
-msgstr ""
-
 msgid "New Election"
 msgstr "Nova elecziun"
 
@@ -511,8 +508,8 @@ msgstr "Duvrai per plaschair il suandant format:"
 msgid "Your results were uploaded successfully."
 msgstr "Voss resultats èn vegnids chargiads si cun success."
 
-msgid "Click here to see the updated results page."
-msgstr "Cliccai qua per mussar la pagina cun ils resultats actualisads."
+msgid "Click here to trigger the notifications"
+msgstr ""
 
 msgid "Your results could not be uploaded."
 msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
@@ -520,8 +517,8 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 msgid "Line"
 msgstr "Lingia"
 
-msgid "Click here to trigger the notifications"
-msgstr ""
+msgid "Click here to see the updated results page."
+msgstr "Cliccai qua per mussar la pagina cun ils resultats actualisads."
 
 msgid "No errors found in proposal"
 msgstr "Chattà nagins sbagls en la proposta"
