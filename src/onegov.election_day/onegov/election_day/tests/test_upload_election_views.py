@@ -3,16 +3,9 @@ import tarfile
 
 from datetime import date
 from onegov.core.utils import module_path
-from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.tests import login
 from webtest import TestApp as Client
 from webtest.forms import Upload
-
-
-def login(client):
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
 
 
 def test_upload_election_year_unavailable(election_day_app_gr):

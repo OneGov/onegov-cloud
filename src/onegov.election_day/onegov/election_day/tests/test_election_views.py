@@ -1,81 +1,8 @@
-from datetime import date
 from freezegun import freeze_time
 from webtest import TestApp as Client
-from webtest.forms import Upload
-
-
-def login(client):
-    login = client.get('/auth/login')
-    login.form['username'] = 'admin@example.org'
-    login.form['password'] = 'hunter2'
-    login.form.submit()
-
-
-def upload_majorz_election(client):
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Majorz Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
-    csv = (
-        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
-        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,"
-        "Ungueltige Stimmen,Kandidaten-Nr,Gewaehlt,Name,Vorname,Stimmen,"
-        "Anzahl Gemeinden\n"
-    )
-    csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 125\n"
-    csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 125\n"
-    csv = csv.encode('utf-8')
-
-    upload = client.get('/election/majorz-election/upload')
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
-
-
-def upload_proporz_election(client):
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = 'Proporz Election'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'proporz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
-    csv = (
-        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
-        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Listen-Nr,"
-        "Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,Anzahl Sitze Liste,"
-        "Unveränderte Wahlzettel Liste,Veränderte Wahlzettel Liste,"
-        "Kandidatenstimmen unveränderte Wahlzettel,"
-        "Zusatzstimmen unveränderte Wahlzettel,"
-        "Kandidatenstimmen veränderte Wahlzettel,"
-        "Zusatzstimmen veränderte Wahlzettel,Kandidaten-Nr,Gewählt,Name,"
-        "Vorname,Stimmen unveränderte Wahlzettel,"
-        "Stimmen veränderte Wahlzettel,Stimmen Total aus Wahlzettel,"
-        "01 FDP,02 CVP, Anzahl Gemeinden\n"
-    )
-    csv += (
-        "5,3503,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
-        "nicht gewählt,Casanova,Angela,0,0,0,0,0,1 von 125\n"
-    )
-    csv += (
-        "5,3503,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
-        "nicht gewählt,Caluori,Corina,1,0,1,0,0,1 von 125\n"
-    )
-    csv = csv.encode('utf-8')
-
-    upload = client.get('/election/proporz-election/upload')
-    upload.form['file_format'] = 'sesam'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload = upload.form.submit()
-
-    assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+from onegov.election_day.tests import login
+from onegov.election_day.tests import upload_majorz_election
+from onegov.election_day.tests import upload_proporz_election
 
 
 def test_view_election(election_day_app_gr):
