@@ -39,7 +39,7 @@ def upload_vote(client, create=True):
         new.form.submit()
 
     csv = (
-        'Bezirk,BFS Nummer,Gemeinde,Ja Stimmen,Nein Stimmen,'
+        'Bezirk,ID,Name,Ja Stimmen,Nein Stimmen,'
         'Stimmberechtigte,Leere Stimmzettel,Ungültige Stimmzettel\n'
         ',1711,Zug,3821,7405,16516,80,1\n'
         ',1706,Oberägeri,811,1298,3560,18,\n'
@@ -80,8 +80,8 @@ def upload_majorz_election(client, create=True):
         "Ungueltige Stimmen,Kandidaten-Nr,Gewaehlt,Name,Vorname,Stimmen,"
         "Anzahl Gemeinden\n"
     )
-    csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 1\n"
-    csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 1\n"
+    csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 125\n"
+    csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 125\n"
     csv = csv.encode('utf-8')
 
     upload = client.get('/election/majorz-election/upload')
@@ -118,11 +118,11 @@ def upload_proporz_election(client, create=True):
     )
     csv += (
         "5,3503,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
-        "nicht gewählt,Casanova,Angela,0,0,0,0,0,1 von 1\n"
+        "nicht gewählt,Casanova,Angela,0,0,0,0,0,1 von 125\n"
     )
     csv += (
         "5,3503,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
-        "nicht gewählt,Caluori,Corina,1,0,1,0,0,1 von 1\n"
+        "nicht gewählt,Caluori,Corina,1,0,1,0,0,1 von 125\n"
     )
     csv = csv.encode('utf-8')
 

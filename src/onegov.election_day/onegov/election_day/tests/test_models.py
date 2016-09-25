@@ -5,7 +5,7 @@ import pytest
 from datetime import date, datetime, timezone
 from freezegun import freeze_time
 from onegov.ballot import Election, Vote
-from onegov.election_day.models import Archive
+from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Notification
 from onegov.election_day.models import Principal
 from onegov.election_day.models import WebhookNotification
@@ -31,6 +31,10 @@ def test_load_principal():
     assert principal.base is None
     assert principal.base_domain is None
     assert principal.analytics is None
+    assert principal.use_maps is True
+    assert principal.domain is 'canton'
+    assert list(principal.available_domains.keys()) == ['federation', 'canton']
+    assert principal.fetch == {}
     assert principal.webhooks == []
 
     principal = Principal.from_yaml(textwrap.dedent("""
@@ -40,6 +44,12 @@ def test_load_principal():
         color: '#000'
         base: 'http://www.zg.ch'
         analytics: "<script type=\\"text/javascript\\"></script>"
+        use_maps: false
+        fetch:
+            steinhausen:
+                - municipality
+            baar:
+                - municipality
         webhooks:
           - 'http://abc.com/1'
           - 'http://abc.com/2'
@@ -53,7 +63,61 @@ def test_load_principal():
     assert principal.base == 'http://www.zg.ch'
     assert principal.base_domain == 'zg.ch'
     assert principal.analytics == '<script type="text/javascript"></script>'
+    assert principal.use_maps is True
+    assert principal.domain is 'canton'
+    assert list(principal.available_domains.keys()) == ['federation', 'canton']
+    assert principal.fetch == {
+        'steinhausen': ['municipality'],
+        'baar': ['municipality']
+    }
     assert principal.webhooks == ['http://abc.com/1', 'http://abc.com/2']
+
+    principal = Principal.from_yaml(textwrap.dedent("""
+        name: Stadt Bern
+        logo:
+        municipality: '351'
+        color: '#000'
+    """))
+
+    assert principal.name == 'Stadt Bern'
+    assert principal.logo is None
+    assert principal.canton is None
+    assert principal.municipality == '351'
+    assert principal.color == '#000'
+    assert principal.base is None
+    assert principal.base_domain is None
+    assert principal.analytics is None
+    assert principal.use_maps is False
+    assert principal.domain is 'municipality'
+    assert list(principal.available_domains.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert principal.fetch == {}
+    assert principal.webhooks == []
+
+    principal = Principal.from_yaml(textwrap.dedent("""
+        name: Stadt Bern
+        logo:
+        municipality: '351'
+        color: '#000'
+        use_maps: true
+    """))
+
+    assert principal.name == 'Stadt Bern'
+    assert principal.logo is None
+    assert principal.canton is None
+    assert principal.municipality == '351'
+    assert principal.color == '#000'
+    assert principal.base is None
+    assert principal.base_domain is None
+    assert principal.analytics is None
+    assert principal.use_maps is True
+    assert principal.domain is 'municipality'
+    assert list(principal.available_domains.keys()) == [
+        'federation', 'canton', 'municipality'
+    ]
+    assert principal.fetch == {}
+    assert principal.webhooks == []
 
 
 def test_municipalities():
@@ -234,11 +298,34 @@ def test_archived_result(session):
     result.domain = 'municipality'
     assert result.title_prefix(session=session) == result.name
 
-    for year in (2007, 2011, 2015, 2016):
-        assert (
-            ('vote', 'federation', date(year, 1, 1)),
-            [session.query(Vote).filter_by(date=date(year, 1, 1)).one()]
-        ) in archive.for_date(year).by_date()
+    result.shortcode = 'shortcode'
+
+    copied = ArchivedResult()
+    copied.copy_from(result)
+
+    assert copied.date == date(2007, 1, 1)
+    assert copied.last_result_change == datetime(2007, 1, 1, 0, 0,
+                                                 tzinfo=timezone.utc)
+    assert copied.schema == 'schema'
+    assert copied.url == 'url'
+    assert copied.title == 'title'
+    assert copied.title_translations == {'en': 'title', 'de_CH': 'title'}
+    assert copied.domain == 'municipality'
+    assert copied.type == 'vote'
+    assert copied.name == 'name'
+    assert copied.total_entities == 10
+    assert copied.counted_entities == 5
+    assert copied.answer == 'rejected'
+    assert copied.nays_percentage == 20.5
+    assert copied.yeas_percentage == 79.5
+    assert copied.counted == True
+    assert copied.meta == {
+        'answer': 'rejected',
+        'nays_percentage': 20.5,
+        'yeas_percentage': 79.5,
+        'counted': True,
+    }
+    assert copied.shortcode == 'shortcode'
 
 
 def test_notification(session):

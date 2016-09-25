@@ -42,7 +42,8 @@ class Principal(object):
     """
 
     def __init__(self, name, logo, color, canton=None, municipality=None,
-                 base=None, analytics=None, use_maps=False, fetch=None):
+                 base=None, analytics=None, use_maps=False, fetch=None,
+                 webhooks=None):
         assert (
             (canton in cantons and municipality is None) or
             (canton is None and municipality is not None)
@@ -57,6 +58,7 @@ class Principal(object):
         self.analytics = analytics
         self.use_maps = True if canton is not None else use_maps
         self.fetch = fetch or {}
+        self.webhooks = webhooks or []
 
     @classmethod
     def from_yaml(cls, yaml_source):
