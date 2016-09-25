@@ -32,6 +32,36 @@ Changelog
   localization.
   [msom]
 
+- Only shows the latest election day on the homepage.
+
+0.9.5 (2016-09-21)
+~~~~~~~~~~~~~~~~~~~
+
+- Adds MIME types typically returned by libmagic for XLS/XLSX files.
+  [msom]
+
+0.9.4 (2016-09-21)
+~~~~~~~~~~~~~~~~~~~
+
+- Changes the order of backend menu.
+  [msom]
+
+0.9.3 (2016-09-19)
+~~~~~~~~~~~~~~~~~~~
+
+- Re-release 0.9.2.
+  [msom]
+
+0.9.2 (2016-09-19)
+~~~~~~~~~~~~~~~~~~~
+
+- Clarify the result of a vote with counter proposal.
+  [msom]
+
+- Removes the Last-Modified header from certain views, it interferes with the
+  localization.
+  [msom]
+
 - Fixes bug in folding of proporz election view.
   [msom]
 
