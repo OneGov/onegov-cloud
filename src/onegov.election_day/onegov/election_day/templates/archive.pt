@@ -42,7 +42,7 @@
                                         <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
                                     </td>
                                     <td class="right-aligned">
-                                        <div metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_entities, election.total_entities)" />
+                                        <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
                                     </td>
                                     <td class="right-aligned">
                                         ${layout.format_date(election.last_result_change, 'datetime')}
