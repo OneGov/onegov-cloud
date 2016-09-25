@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-06 08:46+0200\n"
-"PO-Revision-Date: 2016-09-12 10:49+0200\n"
+"POT-Creation-Date: 2016-09-09 09:38+0200\n"
+"PO-Revision-Date: 2016-09-25 14:32+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -50,11 +50,11 @@ msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
 
 msgid "Invalid entity values"
-msgstr ""
+msgstr "Datas nunvalaivlas"
 
 #, python-format
 msgid "${name} is unknown"
-msgstr ""
+msgstr "${id} n'è betg enconuschent"
 
 msgid "Invalid list values"
 msgstr "Datas da glista nunvalaivlas"
@@ -88,14 +88,14 @@ msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
 
 msgid "Missing municipality/district"
-msgstr ""
+msgstr "Lieu che manca"
 
 #, python-format
 msgid "${name} was found twice"
-msgstr ""
+msgstr "${name} è avant maun duas giadas"
 
 msgid "Invalid id"
-msgstr ""
+msgstr "ID nunvalaivel"
 
 msgid "Could not read yeas"
 msgstr "I n'è betg stà pussaivel da leger las 'vuschs affirmativas'"

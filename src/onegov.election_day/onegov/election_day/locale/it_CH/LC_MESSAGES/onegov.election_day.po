@@ -50,11 +50,11 @@ msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
 
 msgid "Invalid entity values"
-msgstr ""
+msgstr "Valori non validi"
 
 #, python-format
 msgid "${name} is unknown"
-msgstr ""
+msgstr "${id} è sconosciuto"
 
 msgid "Invalid list values"
 msgstr "Valori della lista non validi"
@@ -88,14 +88,14 @@ msgid "Invalid values"
 msgstr "Valori non validi"
 
 msgid "Missing municipality/district"
-msgstr ""
+msgstr "Località/Distretto mancante"
 
 #, python-format
 msgid "${name} was found twice"
-msgstr ""
+msgstr "${name} figura due volte"
 
 msgid "Invalid id"
-msgstr ""
+msgstr "ID non valido"
 
 msgid "Could not read yeas"
 msgstr "Impossibile leggere 'SÌ'"
@@ -307,7 +307,7 @@ msgid "Received Ballots"
 msgstr "Schede ricevute"
 
 msgid "Counted"
-msgstr ""
+msgstr "Contati"
 
 msgid "Download"
 msgstr "Scarica"
