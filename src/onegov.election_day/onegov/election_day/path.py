@@ -4,7 +4,7 @@ from onegov.ballot import Ballot, BallotCollection
 from onegov.ballot import Vote, VoteCollection
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.models import Principal
-from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.collections import ArchivedResultCollection
 from onegov.user import Auth
 
 

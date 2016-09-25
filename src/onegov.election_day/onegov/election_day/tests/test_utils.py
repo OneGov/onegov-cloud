@@ -3,7 +3,7 @@ from freezegun import freeze_time
 from io import BytesIO
 from mock import Mock
 from onegov.ballot import Election, Vote
-from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import load_csv
 from onegov.election_day.tests import DummyRequest
 from onegov.election_day.utils import add_last_modified_header

@@ -8,7 +8,7 @@ from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_vote
 from onegov.testing import utils
 from webtest import TestApp as Client
-from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.collections import ArchivedResultCollection
 
 
 COLUMNS = [

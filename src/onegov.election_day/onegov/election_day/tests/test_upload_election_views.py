@@ -3,7 +3,7 @@ import tarfile
 
 from datetime import date
 from onegov.core.utils import module_path
-from onegov.election_day.tests import login
+from onegov.election_day.collections import ArchivedResultCollection
 from webtest import TestApp as Client
 from webtest.forms import Upload
 

@@ -5,7 +5,7 @@ from onegov.ballot import Election
 from onegov.core.security import Private
 from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.forms import UploadElectionForm
 from onegov.election_day.layout import ManageElectionsLayout

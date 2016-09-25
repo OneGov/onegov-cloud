@@ -1,6 +1,6 @@
 from datetime import date
 from onegov.ballot import Election, Vote
-from onegov.election_day.collection import ArchivedResultCollection
+from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.tests import DummyRequest
 
