@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.0.3 (2016-09-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes upload and view election templates.
   [msom]
