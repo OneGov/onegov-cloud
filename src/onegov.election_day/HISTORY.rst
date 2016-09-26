@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes encoding issue in the static data.
+  [msom]
+
 1.0.0 (2016-09-26)
 ~~~~~~~~~~~~~~~~~~~
 

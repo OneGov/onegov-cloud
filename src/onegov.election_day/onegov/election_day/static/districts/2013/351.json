@@ -3,10 +3,10 @@
         "name": "Innere Stadt",
     },
     "2": {
-        "name": "Länggasse/Felsenau",
+        "name": "L\u00e4nggasse/Felsenau",
     },
     "3": {
-        "name": "Mattenhof/Weissenbühl",
+        "name": "Mattenhof/Weissenb\u00fchl",
     },
     "4": {
         "name": "Kirchenfeld/Schosshalde",
@@ -15,6 +15,6 @@
         "name": "Breitenrain/Lorraine",
     },
     "6": {
-        "name": "Bümpliz/Bethlehem",
+        "name": "B\u00fcmpliz/Bethlehem",
     },
 }
