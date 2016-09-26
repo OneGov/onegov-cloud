@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+1.0.0 (2016-09-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a new domain of influence: municipality.
 
