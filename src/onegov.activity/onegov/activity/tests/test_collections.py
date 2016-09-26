@@ -104,8 +104,17 @@ def test_activity_used_tags(session, owner):
 
     c.states = ('proposed', )
 
-    assert c.used_tags == set()
+    assert c.used_tags == {'sport', 'dance', 'fun'}
 
     activities[0].propose()
 
+    assert c.used_tags == {'sport', 'dance', 'fun'}
+
+    class LimitedActivityCollection(ActivityCollection):
+
+        def query_base(self):
+            return self.session.query(self.model_class).filter(
+                self.model_class.state == 'proposed')
+
+    c = LimitedActivityCollection(session)
     assert c.used_tags == {'sport', 'fun'}

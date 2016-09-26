@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to override the query base on a subclass.
+  [href]
+
 - Adds the ability to filter the collection by state.
   [href]
 

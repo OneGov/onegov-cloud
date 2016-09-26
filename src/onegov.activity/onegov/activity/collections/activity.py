@@ -38,9 +38,20 @@ class ActivityCollection(Pagination):
     def model_class(self):
         return Activity.get_polymorphic_class(self.type, Activity)
 
+    def query_base(self):
+        """ Returns the query based used by :meth:`query`. Overriding this
+        function is useful to apply a general filter to the query before
+        any other filter is applied.
+
+        For example, a policy can be enforced that only allows public
+        activites.
+
+        """
+        return self.session.query(self.model_class)
+
     def query(self):
+        query = self.query_base()
         model_class = self.model_class
-        query = self.session.query(model_class)
 
         if self.type != '*':
             query = query.filter(model_class.type == self.type)
@@ -87,7 +98,7 @@ class ActivityCollection(Pagination):
 
         """
 
-        query = self.query().with_entities(
+        query = self.query_base().with_entities(
             distinct(self.model_class._tags.keys()))
 
         return {key for row in query.all() if row[0] for key in row[0]}
