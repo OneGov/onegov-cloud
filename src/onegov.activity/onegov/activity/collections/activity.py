@@ -13,7 +13,7 @@ class ActivityCollection(Pagination):
         self.type = type
         self.page = page
         self.tags = set(tags) if tags else set()
-        self.states = states
+        self.states = set(states) if states else set()
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -64,20 +64,33 @@ class ActivityCollection(Pagination):
 
         return query
 
-    def for_filter(self, tag):
+    def for_filter(self, tag=None, state=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
-        yet in the list.
+        yet in the list. Same goes for the given state.
 
         """
 
-        if tag in self.tags:
-            tags = self.tags - {tag}
-        else:
-            tags = self.tags | {tag}
+        assert tag or state
 
-        return self.__class__(self.session, self.type, 0, tags, self.states)
+        if tag:
+            if tag in self.tags:
+                tags = self.tags - {tag}
+            else:
+                tags = self.tags | {tag}
+        else:
+            tags = self.tags
+
+        if state:
+            if state in self.states:
+                states = self.states - {state}
+            else:
+                states = self.states | {state}
+        else:
+            states = self.states
+
+        return self.__class__(self.session, self.type, 0, tags, states)
 
     def by_id(self, id):
         return self.query().filter(Activity.id == id).first()
