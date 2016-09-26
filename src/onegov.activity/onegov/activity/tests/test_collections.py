@@ -61,3 +61,51 @@ def test_activity_order(session, owner):
     collection.add(title="C", username=owner.username)
 
     assert [a.title for a in collection.query().all()] == ["Ä", "B", "C"]
+
+
+def test_activity_states(session, owner):
+
+    c = ActivityCollection(session)
+    c.add("A", username=owner.username)
+    c.add("B", username=owner.username).propose()
+    c.add("C", username=owner.username).propose().accept()
+    c.add("D", username=owner.username).propose().deny()
+    c.add("E", username=owner.username).propose().accept().archive()
+
+    c.states = ('preview', )
+    assert c.query().count() == 1
+
+    c.states = ('preview', 'proposed')
+    assert c.query().count() == 2
+
+    c.states = ('preview', 'proposed', 'accepted')
+    assert c.query().count() == 3
+
+    c.states = ('preview', 'proposed', 'accepted', 'denied')
+    assert c.query().count() == 4
+
+    c.states = ('preview', 'proposed', 'accepted', 'denied', 'archived')
+    assert c.query().count() == 5
+
+    c.states = None
+    assert c.query().count() == 5
+
+
+def test_activity_used_tags(session, owner):
+
+    c = ActivityCollection(session)
+
+    activities = (
+        c.add("Paintball", username=owner.username, tags=('sport', 'fun')),
+        c.add("Dancing", username=owner.username, tags=('dance', 'fun'))
+    )
+
+    assert c.used_tags == {'sport', 'dance', 'fun'}
+
+    c.states = ('proposed', )
+
+    assert c.used_tags == set()
+
+    activities[0].propose()
+
+    assert c.used_tags == {'sport', 'fun'}

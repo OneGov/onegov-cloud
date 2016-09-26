@@ -1,18 +1,19 @@
 from onegov.activity.models import Activity
 from onegov.core.collection import Pagination
-from onegov.core.utils import get_unique_hstore_keys
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
+from sqlalchemy import distinct
 from sqlalchemy.dialects.postgresql import array
 
 
 class ActivityCollection(Pagination):
 
-    def __init__(self, session, type='*', page=0, tags=None):
+    def __init__(self, session, type='*', page=0, tags=None, states=None):
         self.session = session
         self.type = type
         self.page = page
         self.tags = set(tags) if tags else set()
+        self.states = states
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -25,7 +26,13 @@ class ActivityCollection(Pagination):
         return self.page
 
     def page_by_index(self, index):
-        return self.__class__(self.session, self.type, index)
+        return self.__class__(
+            self.session,
+            type=self.type,
+            page=index,
+            tags=self.tags,
+            states=self.states
+        )
 
     @property
     def model_class(self):
@@ -40,6 +47,9 @@ class ActivityCollection(Pagination):
 
         if self.tags:
             query = query.filter(model_class._tags.has_any(array(self.tags)))
+
+        if self.states:
+            query = query.filter(model_class.state.in_(self.states))
 
         return query
 
@@ -56,17 +66,7 @@ class ActivityCollection(Pagination):
         else:
             tags = self.tags | {tag}
 
-        return self.__class__(self.session, self.type, 0, tags)
-
-    def without_tag(self, tag):
-        """ Returns a new collection instance excluding the given tag.
-
-        The page is reset to 0.
-
-        """
-
-        return self.__class__(
-            self.session, 0, [t for t in self.tags if t != tag])
+        return self.__class__(self.session, self.type, 0, tags, self.states)
 
     def by_id(self, id):
         return self.query().filter(Activity.id == id).first()
@@ -87,7 +87,10 @@ class ActivityCollection(Pagination):
 
         """
 
-        return get_unique_hstore_keys(self.session, self.model_class._tags)
+        query = self.query().with_entities(
+            distinct(self.model_class._tags.keys()))
+
+        return {key for row in query.all() if row[0] for key in row[0]}
 
     def get_unique_name(self, name):
         """ Given a desired name, finds a variant of that name that's not
