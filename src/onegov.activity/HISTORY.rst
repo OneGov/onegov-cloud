@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.2 (2016-09-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to override the query base on a subclass.
   [href]
 
