@@ -6,7 +6,7 @@ from onegov.core.upgrade import upgrade_task
 from onegov.election_day.collections import ArchivedResultCollection
 
 
-@upgrade_task('Create archived results', always_run=True)
+@upgrade_task('Create archived results')
 def create_archived_results(context):
 
     """ Create an initial archived result entry for all existing votes
