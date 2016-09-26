@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.27.2 (2016-09-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes get_unique_hstore_keys failing if the hstore is set to None.
   [href]
