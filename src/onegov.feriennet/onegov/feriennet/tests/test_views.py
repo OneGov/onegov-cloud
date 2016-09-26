@@ -33,8 +33,8 @@ def test_activity_permissions(es_feriennet_app):
     assert "Learn How to Program" not in anonymous.get('/angebote')
     assert "Learn How to Program" not in admin.get('/angebote')
     assert editor.get(url).status_code == 200
-    assert anonymous.get(url, expect_errors=True).status_code == 403
-    assert admin.get(url, expect_errors=True).status_code == 403
+    assert anonymous.get(url, expect_errors=True).status_code == 404
+    assert admin.get(url, expect_errors=True).status_code == 404
 
     editor.post(get_publication_url(editor.get(url), 'request-publication'))
 
@@ -42,7 +42,7 @@ def test_activity_permissions(es_feriennet_app):
     assert "Learn How to Program" not in anonymous.get('/angebote')
     assert "Learn How to Program" in admin.get('/angebote')
     assert editor.get(url).status_code == 200
-    assert anonymous.get(url, expect_errors=True).status_code == 403
+    assert anonymous.get(url, expect_errors=True).status_code == 404
     assert admin.get(url).status_code == 200
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
@@ -62,7 +62,7 @@ def test_activity_permissions(es_feriennet_app):
     assert "Learn How to Program" not in anonymous.get('/angebote')
     assert "Learn How to Program" in admin.get('/angebote')
     assert editor.get(url).status_code == 200
-    assert anonymous.get(url, expect_errors=True).status_code == 403
+    assert anonymous.get(url, expect_errors=True).status_code == 404
     assert admin.get(url).status_code == 200
 
 

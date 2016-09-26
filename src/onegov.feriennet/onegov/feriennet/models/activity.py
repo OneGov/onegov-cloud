@@ -1,8 +1,7 @@
 from cached_property import cached_property
-from onegov.activity import Activity
+from onegov.activity import Activity, ActivityCollection
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
-from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
 from onegov.org.elements import Link, ConfirmLink
 from onegov.org.models.extensions import CoordinatesExtension
@@ -57,7 +56,10 @@ class VacationActivityHandler(Handler):
 
     @cached_property
     def collection(self):
-        return VacationActivityCollection(self.session)
+        # use the base class here, because the VacationActivityCollection
+        # enforces the query policy for which we need the current request's
+        # identity -> we're too far down the stack to care for this here
+        return ActivityCollection(self.session, type='vacation')
 
     @cached_property
     def activity(self):
