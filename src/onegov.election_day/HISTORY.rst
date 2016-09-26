@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.0.2 (2016-09-26)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes upgrade step running more than once.
   [msom]
