@@ -6,14 +6,15 @@ from onegov.feriennet.models import VacationActivity
 @FeriennetApp.path(
     model=VacationActivityCollection,
     path='/angebote',
-    converters=dict(tags=[str]))
-def get_vacation_activities(request, app, page=0, tags=[]):
+    converters=dict(tags=[str], states=[str]))
+def get_vacation_activities(request, app, page=0, tags=[], states=[]):
 
     return VacationActivityCollection(
         session=app.session(),
         page=page,
         identity=request.identity,
-        tags=tags
+        tags=tags,
+        states=states,
     )
 
 

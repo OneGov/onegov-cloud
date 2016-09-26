@@ -1,5 +1,6 @@
 import morepath
 
+from onegov.activity.models import ACTIVITY_STATES
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security import Secret
@@ -30,16 +31,25 @@ def get_activity_form_class(model, request):
     permission=Public)
 def view_activities(self, request):
 
-    tags = [(tag, request.translate(_(tag))) for tag in self.used_tags]
-    tags.sort(key=lambda i: i[1])
-
-    taglinks = tuple(
+    taglinks = [
         Link(
-            text=translation,
+            text=request.translate(_(tag)),
             active=tag in self.tags,
-            url=request.link(self.for_filter(tag))
-        ) for tag, translation in tags
-    )
+            url=request.link(self.for_filter(tag=tag))
+        ) for tag in self.used_tags
+    ]
+
+    if request.is_organiser:
+
+        taglinks.extend(
+            Link(
+                text=request.translate(_(state.capitalize())),
+                active=state in self.states,
+                url=request.link(self.for_filter(state=state))
+            ) for state in ACTIVITY_STATES
+        )
+
+    taglinks.sort(key=lambda link: link.text)
 
     return {
         'activities': self.batch,

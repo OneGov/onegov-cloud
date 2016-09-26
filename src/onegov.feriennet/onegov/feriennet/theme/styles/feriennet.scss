@@ -49,41 +49,15 @@ svg #background {
     }
 }
 
-.activity-state {
-    @include label(
-        $radius:2px
-    );
-
-    &.activity-state-preview {
-        background-color: $yellow-dark;
-    }
-
-    &.activity-state-proposed {
-        background-color: $orange-dark;
-    }
-
-    &.activity-state-accepted {
-        background-color: $primary-color;
-    }
-
-    &.activity-state-denied {
-        background-color: $red-dark;
-    }
-
-    &.activity-state-archived {
-        background-color: $gray-dark;
-    }
-}
-
 .activity-list-search {
     @include hairline;
     border-bottom-style: dashed;
 
-    margin: 1rem 0;
-    padding-bottom: 1.5rem;
+    margin: 1rem 0 !important;
+    padding-bottom: 1rem;
 
     h2 {
-        font-size: 1rem;
+        font-size: $h3-font-size - $h3-font-reduction;
     }
 
     ul.tags {
@@ -100,13 +74,18 @@ ul.tags {
 
     li {
         @include label(
+            $text-size: .8rem,
+            $radius: 15px,
             $bg: $secondary-color,
-            $radius:4px
+            $padding: 4px 12px
         );
 
         &.active {
             @include label(
-                $radius: 4px
+                $text-size: .8rem,
+                $radius: 15px,
+                $bg: $primary-color,
+                $padding: 4px 12px
             );
         }
 
@@ -126,7 +105,6 @@ ul.tags {
         font-size: .875rem;
     }
 }
-
 
 /*
     Ticket view
