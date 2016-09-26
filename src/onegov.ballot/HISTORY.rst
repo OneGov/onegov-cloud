@@ -5,12 +5,16 @@ Unreleased
 ~~~~~~~~~~
 
 - Adds a new domain of influence: municipality.
-  The following rows have been renamed:
 
-  - Election.total_municipalities -> Election.total_entities
-  - Election.counted_municipalities -> Election.counted_entities
-  - ElectionResult.municipality_id -> Election.entity_id
-  - BallotResult.municipality_id -> Election.entity_id
+  **This release includes some breaking changes!**
+
+  The following rows have been renamed:
+    - Election.total_municipalities -> Election.total_entities
+    - Election.counted_municipalities -> Election.counted_entities
+    - ElectionResult.municipality_id -> Election.entity_id
+    - BallotResult.municipality_id -> Election.entity_id
+
+  The election and vote exports have changed their columns accordingly.
 
   [msom]
 
