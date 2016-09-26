@@ -25,6 +25,10 @@
                     <strong><a href="${request.link(election, 'trigger')}" i18n:translate="">Click here to trigger the notifications</a></strong>
                 </p>
             </div>
+
+            <p>
+                <a href="${request.link(election)}" i18n:translate="">Click here to see the updated results page.</a>
+            </p>
         </div>
 
         <div class="after-upload" tal:condition="status == 'error'">

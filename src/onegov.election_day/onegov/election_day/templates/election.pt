@@ -165,7 +165,7 @@
                 </div>
             </div>
 
-            <div class="foldable folded" tal:condition="summarize">
+            <div class="foldable folded" tal:condition="summarize and majorz">
                 <h3 class="foldable-title" i18n:translate="">Electoral Districts</h3>
                 <div class="foldable-panel">
                     <table class="ballot-results stackable">
