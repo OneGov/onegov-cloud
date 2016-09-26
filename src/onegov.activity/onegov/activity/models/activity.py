@@ -16,6 +16,10 @@ from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
+# Note, a database migration is needed if these states are changed
+ACTIVITY_STATES = ('preview', 'proposed', 'accepted', 'denied', 'archived')
+
+
 class Activity(Base, ContentMixin, TimestampMixin):
     """ Describes an activity that is made available to participants on
     certain occasions (i.e. dates).
@@ -66,10 +70,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     #: the state of the activity
     state = Column(
-        Enum(
-            'preview', 'proposed', 'accepted', 'denied', 'archived',
-            name='activity_state'
-        ),
+        Enum(*ACTIVITY_STATES, name='activity_state'),
         nullable=False,
         default='preview'
     )
