@@ -260,21 +260,27 @@ def test_election_counted(session):
     session.flush()
 
     assert election.counted == False
+    assert election.progress == (0, 0)
 
     election.total_entities = 2
     assert election.counted == False
+    assert election.progress == (0, 2)
 
     election.counted_entities = 1
     assert election.counted == False
+    assert election.progress == (1, 2)
 
     election.counted_entities = 2
     assert election.counted == True
+    assert election.progress == (2, 2)
 
     election.total_entities = 0
     assert election.counted == False
+    assert election.progress == (2, 0)
 
     election.total_entities = None
     assert election.counted == False
+    assert election.progress == (2, 0)
 
 
 def test_election_last_result_change(session):

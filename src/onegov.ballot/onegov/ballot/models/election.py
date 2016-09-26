@@ -109,6 +109,15 @@ class Election(Base, TimestampMixin, DerivedAttributes,
     counted_entities = Column(Integer, nullable=True)
 
     @property
+    def progress(self):
+        """ Returns a tuple with the first value being the number of counted
+        entities and the second value being the number of total entities.
+
+        """
+
+        return (self.counted_entities or 0, self.total_entities or 0)
+
+    @property
     def counted(self):
         """ Checks if there are results for all entitites. """
         if self.total_entities and self.counted_entities:
