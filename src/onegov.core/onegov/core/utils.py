@@ -458,6 +458,6 @@ def get_unique_hstore_keys(session, column):
 
     return {
         key
-        for row in session.query(distinct(column.keys())).all()
+        for row in session.query(distinct(column.keys())).all() if row[0]
         for key in row[0]
     }

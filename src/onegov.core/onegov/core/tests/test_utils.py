@@ -163,6 +163,9 @@ def test_get_unique_hstore_keys(postgres_dsn):
     mgr = SessionManager(postgres_dsn, Base)
     mgr.set_current_schema('foo')
 
+    assert utils.get_unique_hstore_keys(mgr.session(), Document._tags) == set()
+
+    mgr.session().add(Document(tags=None))
     mgr.session().add(Document(tags=['foo', 'bar']))
     mgr.session().add(Document(tags=['foo', 'baz']))
 

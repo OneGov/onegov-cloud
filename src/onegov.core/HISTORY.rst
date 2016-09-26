@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes get_unique_hstore_keys failing if the hstore is set to None.
+  [href]
+
 0.27.1 (2016-09-23)
 ~~~~~~~~~~~~~~~~~~~
 
