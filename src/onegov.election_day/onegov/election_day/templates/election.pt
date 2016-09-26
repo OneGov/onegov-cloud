@@ -43,7 +43,7 @@
 
                 <li>
                     <span i18n:translate="">Counted</span>
-                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.counted_entities, election.total_entities)" /></strong>
+                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></strong>
                 </li>
 
             </ul>

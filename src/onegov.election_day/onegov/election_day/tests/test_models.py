@@ -315,6 +315,7 @@ def test_archived_result(session):
     assert copied.name == 'name'
     assert copied.total_entities == 10
     assert copied.counted_entities == 5
+    assert copied.progress == (5, 10)
     assert copied.answer == 'rejected'
     assert copied.nays_percentage == 20.5
     assert copied.yeas_percentage == 79.5

@@ -146,6 +146,7 @@ def test_archived_results(session):
     assert result.type == 'election'
     assert result.counted_entities == None
     assert result.total_entities == None
+    assert result.progress == (0, 0)
 
     last_result_change = result.last_result_change
 
