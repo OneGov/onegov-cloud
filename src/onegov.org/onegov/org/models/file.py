@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from itertools import groupby
 from onegov.core.orm.mixins import meta_property
 from onegov.file import File, FileSet, FileCollection, FileSetCollection
+from onegov.file.utils import IMAGE_MIME_TYPES_AND_SVG
 from onegov.org import _
 from onegov.org.models.extensions import HiddenFromPublicExtension
 from onegov.search import ORMSearchable
@@ -154,11 +155,15 @@ class ImageSetCollection(FileSetCollection):
 
 class GeneralFileCollection(FileCollection, GroupFilesByDateMixin):
 
+    supported_content_types = 'all'
+
     def __init__(self, session):
         super().__init__(session, type='general', allow_duplicates=False)
 
 
 class ImageFileCollection(FileCollection, GroupFilesByDateMixin):
+
+    supported_content_types = IMAGE_MIME_TYPES_AND_SVG
 
     def __init__(self, session):
         super().__init__(session, type='image', allow_duplicates=False)

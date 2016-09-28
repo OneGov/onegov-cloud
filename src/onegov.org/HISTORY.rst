@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensure that all image upload views enforce the same checks.
+  [href]
+
 - Order tags by alphabet in events view.
   [href]
 

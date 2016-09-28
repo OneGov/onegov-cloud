@@ -5,7 +5,6 @@ import morepath
 from onegov.core.filestorage import view_filestorage_file
 from onegov.core.security import Private, Public
 from onegov.file import File, FileCollection
-from onegov.file.utils import IMAGE_MIME_TYPES
 from onegov.org import _, OrgApp
 from onegov.org.elements import Img, Link
 from onegov.org.layout import DefaultLayout
@@ -118,10 +117,14 @@ def handle_file_upload(self, request):
 
     """
 
-    return self.add(
+    file = self.add(
         filename=request.params['file'].filename,
         content=request.params['file'].file
     )
+
+    if self.supported_content_types is not 'all':
+        if file.reference.content_type not in self.supported_content_types:
+            raise exc.HTTPUnsupportedMediaType()
 
 
 @OrgApp.view(model=FileCollection, name='upload',
@@ -130,18 +133,10 @@ def view_upload_file(self, request):
     request.assert_valid_csrf_token()
 
     try:
-        file = handle_file_upload(self, request)
+        handle_file_upload(self, request)
     except FileExistsError as e:
         # mark existing files as modified to put them in front of the queue
         e.args[0].modified = utcnow()
-    else:
-        if isinstance(self, GeneralFileCollection):
-            pass
-        elif isinstance(self, ImageFileCollection):
-            if file.reference.content_type not in IMAGE_MIME_TYPES:
-                raise exc.HTTPUnsupportedMediaType()
-        else:
-            raise NotImplementedError
 
     return morepath.redirect(request.link(self))
 
