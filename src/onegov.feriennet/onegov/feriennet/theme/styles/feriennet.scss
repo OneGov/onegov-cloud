@@ -62,9 +62,20 @@ svg #background {
 
     ul.tags {
         margin: 0;
+        max-width: 80ex;
+    }
+
+    a::before {
+        @include icon('\f096');
+        display: inline-block;
+        font-size: 95%;
+        margin-right: .7ex;
+    }
+
+    li.active a::before {
+        @include icon('\f046');
     }
 }
-
 
 /*
     Activity view
