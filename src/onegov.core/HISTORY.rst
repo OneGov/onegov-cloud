@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.28.0 (2016-09-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Moves the html sanitizer to its own module and introduce an svg sanitizer.
   [href]
