@@ -89,3 +89,4 @@ def get_supported_image_mime_types():
 # we don't support *all* the image types PIL supports
 EXCLUDED_IMAGE_TYPES = {'application/pdf'}
 IMAGE_MIME_TYPES = get_supported_image_mime_types() - EXCLUDED_IMAGE_TYPES
+IMAGE_MIME_TYPES_AND_SVG = IMAGE_MIME_TYPES | {'image/svg+xml'}

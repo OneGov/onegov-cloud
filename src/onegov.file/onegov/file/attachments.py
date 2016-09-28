@@ -4,9 +4,11 @@ from depot.fields.upload import UploadedFile
 from depot.io import utils
 from depot.io.interfaces import FileStorage
 from depot.io.utils import INMEMORY_FILESIZE
+from onegov.core.html import sanitize_svg
 from onegov.file.utils import IMAGE_MIME_TYPES
 from PIL import Image
 from tempfile import SpooledTemporaryFile
+from io import BytesIO
 
 
 IMAGE_MAX_SIZE = 1024
@@ -42,9 +44,17 @@ def store_checksum(file, content, content_type):
     file.checksum = calculate_checksum(content)
 
 
+def sanitize_svg_images(file, content, content_type):
+    if content_type == 'image/svg+xml':
+        sane_svg = sanitize_svg(content.read().decode('utf-8'))
+        content = BytesIO(sane_svg.encode('utf-8'))
+
+    return content
+
+
 class ProcessedUploadedFile(UploadedFile):
 
-    processors = (store_checksum, limit_image_size)
+    processors = (store_checksum, limit_image_size, sanitize_svg_images)
 
     def process_content(self, content, filename=None, content_type=None):
         filename, content_type = FileStorage.fileinfo(content)[1:]
