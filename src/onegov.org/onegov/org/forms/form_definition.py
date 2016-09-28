@@ -1,4 +1,4 @@
-from onegov.core.utils import sanitize_html
+from onegov.core.html import sanitize_html
 from onegov.form import Form
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _

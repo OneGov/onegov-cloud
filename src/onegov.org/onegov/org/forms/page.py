@@ -1,4 +1,4 @@
-from onegov.core.utils import sanitize_html
+from onegov.core.html import sanitize_html
 from onegov.form import Form
 from onegov.org import _
 from onegov.org.utils import annotate_html

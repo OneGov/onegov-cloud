@@ -1,7 +1,7 @@
 import re
 
 from lxml import etree
-from onegov.core.utils import sanitize_html
+from onegov.core.html import sanitize_html
 from onegov.form import Form
 from onegov.form.core import with_options
 from onegov.gis import CoordinatesField
