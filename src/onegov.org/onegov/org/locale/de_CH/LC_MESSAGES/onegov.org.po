@@ -541,7 +541,7 @@ msgid "URL pointing to the picture"
 msgstr "Link zum Bild"
 
 msgid "Address"
-msgstr "Addresse"
+msgstr "Adresse"
 
 msgid "Notes"
 msgstr "Notizen"
