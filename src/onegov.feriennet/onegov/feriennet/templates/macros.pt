@@ -8,13 +8,13 @@
 
 <metal:activity_ticket_summary define-macro="activity_ticket_summary">
     <h2>${activity.title}</h2>
-    <metal:block use-macro="layout.macros.activity_detailed" />
+    <metal:block use-macro="layout.macros.activity_detailed" tal:define="show_ticket_panel False" />
 </metal:activity_ticket_summary>
 
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
 
     <tal:block metal:use-macro="layout.macros.page_content"
-        tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None; show_side_panel show_side_panel|False">
+        tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None; show_side_panel True;">
 
         <div metal:fill-slot="after-lead" tal:condition="activity.tags">
             <ul class="tags">
@@ -24,7 +24,18 @@
             </ul>
         </div>
 
-        <div metal:fill-slot="after-panels" tal:condition="show_side_panel and request.is_organiser">
+        <div metal:fill-slot="before-panels">
+            <div class="page-content-panel activity-organiser-panel" tal:define="organiser activity.user">
+                <h2 i18n:translate>Organiser</h2>
+                <metal:block use-macro="layout.macros.organiser" />
+
+                <div tal:condition="show_ticket_panel and organiser.username == request.identity.userid|nothing">
+                    <a href="${request.link(request.app.org, 'benutzerprofil')}" i18n:translate>Edit your contact info</a>
+                </div>
+            </div>
+        </div>
+
+        <div metal:fill-slot="after-panels" tal:condition="show_ticket_panel and request.is_organiser">
             <div class="page-content-panel plain-panel activity-status-panel">
                 <h2 class="show-for-sr" i18n:translate>Activity</h2>
 
@@ -69,3 +80,14 @@
         <tal:block i18n:translate case="string:archived">Archived</tal:block>
     </tal:block>
 </metal:activity_state_text>
+
+
+<metal:organiser define-macro="organiser" i18n:domain="onegov.feriennet">
+    <div class="organiser">
+        <ul>
+            <li class="organiser-email">
+                <a href="mailto:${organiser.username}">${organiser.username}</a>
+            </li>
+        </ul>
+    </div>
+</metal:organiser>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-09-26 15:09+0200\n"
+"POT-Creation-Date: 2016-09-28 16:43+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -126,6 +126,21 @@ msgstr "Theater"
 msgid "Trade"
 msgstr "Handwerk"
 
+msgid "Name"
+msgstr "Name"
+
+msgid "Personal-, Society- or Company-Name"
+msgstr "Persönlicher, Vereins- oder Firmen-Name"
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Website"
+msgstr "Webseite"
+
 msgid "Activity"
 msgstr "Angebot"
 
@@ -168,9 +183,6 @@ msgstr ""
 msgid "Archive Activity"
 msgstr "Angebot Archivieren"
 
-msgid "States"
-msgstr "Status"
-
 msgid "No activites found."
 msgstr "Keine Angebote gefunden."
 
@@ -198,6 +210,12 @@ msgstr "Dieses Angebot wurde von einem Administrator geprüft und abgelehnt."
 
 msgid "This activity has been archived and cannot be activated again."
 msgstr "Dieses Angebot wurde archiviert und kann nicht mehr aktiviert werden."
+
+msgid "Organiser"
+msgstr "Veranstalter"
+
+msgid "Edit your contact info"
+msgstr "Kontakt ändern"
 
 msgid "Status"
 msgstr "Status"
@@ -258,6 +276,3 @@ msgstr "Ihr Angebot wurde abgelehnt"
 
 msgid "Your activity has been archived"
 msgstr "Ihr Angebot wurde archiviert"
-
-#~ msgid "Search"
-#~ msgstr "Suche"
