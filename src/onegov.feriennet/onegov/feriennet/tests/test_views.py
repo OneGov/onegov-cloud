@@ -1,7 +1,9 @@
 import onegov.feriennet
+import transaction
 
 from onegov.testing import utils
-from onegov.org.testing import Client, get_message
+from onegov.org.testing import Client, get_message, select_checkbox
+from onegov.activity import ActivityCollection
 
 
 def get_publication_url(page, kind):
@@ -14,7 +16,7 @@ def test_view_permissions():
 
 
 def test_activity_permissions(es_feriennet_app):
-    anonymous = Client(es_feriennet_app)
+    anon = Client(es_feriennet_app)
 
     admin = Client(es_feriennet_app)
     admin.login_admin()
@@ -30,39 +32,39 @@ def test_activity_permissions(es_feriennet_app):
     url = '/angebot/learn-how-to-program'
 
     assert "Learn How to Program" in editor.get('/angebote')
-    assert "Learn How to Program" not in anonymous.get('/angebote')
+    assert "Learn How to Program" not in anon.get('/angebote')
     assert "Learn How to Program" not in admin.get('/angebote')
     assert editor.get(url).status_code == 200
-    assert anonymous.get(url, expect_errors=True).status_code == 404
+    assert anon.get(url, expect_errors=True).status_code == 404
     assert admin.get(url, expect_errors=True).status_code == 404
 
     editor.post(get_publication_url(editor.get(url), 'request-publication'))
 
     assert "Learn How to Program" in editor.get('/angebote')
-    assert "Learn How to Program" not in anonymous.get('/angebote')
+    assert "Learn How to Program" not in anon.get('/angebote')
     assert "Learn How to Program" in admin.get('/angebote')
     assert editor.get(url).status_code == 200
-    assert anonymous.get(url, expect_errors=True).status_code == 404
+    assert anon.get(url, expect_errors=True).status_code == 404
     assert admin.get(url).status_code == 200
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     admin.post(get_publication_url(ticket, 'accept-activity'))
 
     assert "Learn How to Program" in editor.get('/angebote')
-    assert "Learn How to Program" in anonymous.get('/angebote')
+    assert "Learn How to Program" in anon.get('/angebote')
     assert "Learn How to Program" in admin.get('/angebote')
     assert editor.get(url).status_code == 200
-    assert anonymous.get(url).status_code == 200
+    assert anon.get(url).status_code == 200
     assert admin.get(url).status_code == 200
 
     ticket = admin.get(ticket.request.url)
     admin.post(get_publication_url(ticket, 'archive-activity'))
 
     assert "Learn How to Program" in editor.get('/angebote')
-    assert "Learn How to Program" not in anonymous.get('/angebote')
+    assert "Learn How to Program" not in anon.get('/angebote')
     assert "Learn How to Program" in admin.get('/angebote')
     assert editor.get(url).status_code == 200
-    assert anonymous.get(url, expect_errors=True).status_code == 404
+    assert anon.get(url, expect_errors=True).status_code == 404
     assert admin.get(url).status_code == 200
 
 
@@ -117,7 +119,7 @@ def test_activity_communication(feriennet_app):
 
 
 def test_activity_search(es_feriennet_app):
-    anonymous = Client(es_feriennet_app)
+    anon = Client(es_feriennet_app)
 
     admin = Client(es_feriennet_app)
     admin.login_admin()
@@ -132,28 +134,28 @@ def test_activity_search(es_feriennet_app):
 
     url = '/angebot/learn-how-to-program'
 
-    # in preview, activites can't be found
+    # in preview, activities can't be found
     es_feriennet_app.es_client.indices.refresh(index='_all')
     assert 'search-result-vacation' not in admin.get('/suche?q=Learn')
     assert 'search-result-vacation' not in editor.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in anonymous.get('/suche?q=Learn')
+    assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
 
     editor.post(get_publication_url(editor.get(url), 'request-publication'))
 
-    # once proposed, activites can be found by the admin only
+    # once proposed, activities can be found by the admin only
     es_feriennet_app.es_client.indices.refresh(index='_all')
     assert 'search-result-vacation' in admin.get('/suche?q=Learn')
     assert 'search-result-vacation' not in editor.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in anonymous.get('/suche?q=Learn')
+    assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     admin.post(get_publication_url(ticket, 'accept-activity'))
 
-    # once accepted, activites can be found by anyone
+    # once accepted, activities can be found by anyone
     es_feriennet_app.es_client.indices.refresh(index='_all')
     assert 'search-result-vacation' in admin.get('/suche?q=Learn')
     assert 'search-result-vacation' in editor.get('/suche?q=Learn')
-    assert 'search-result-vacation' in anonymous.get('/suche?q=Learn')
+    assert 'search-result-vacation' in anon.get('/suche?q=Learn')
 
     ticket = admin.get(ticket.request.url)
     admin.post(get_publication_url(ticket, 'archive-activity'))
@@ -162,4 +164,78 @@ def test_activity_search(es_feriennet_app):
     es_feriennet_app.es_client.indices.refresh(index='_all')
     assert 'search-result-vacation' in admin.get('/suche?q=Learn')
     assert 'search-result-vacation' not in editor.get('/suche?q=Learn')
-    assert 'search-result-vacation' not in anonymous.get('/suche?q=Learn')
+    assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
+
+
+def test_activity_filter(feriennet_app):
+
+    anon = Client(feriennet_app)
+
+    editor = Client(feriennet_app)
+    editor.login_editor()
+
+    new = editor.get('/angebote').click("Angebot erfassen")
+    new.form['title'] = "Learn How to Program"
+    new.form['lead'] = "Using a Raspberry Pi we will learn Python"
+
+    select_checkbox(new, "tags", "Computer")
+    select_checkbox(new, "tags", "Wissenschaft")
+
+    new.form.submit()
+
+    new = editor.get('/angebote').click("Angebot erfassen")
+    new.form['title'] = "Learn How to Cook"
+    new.form['lead'] = "Using a Stove we will cook a Python"
+
+    select_checkbox(new, "tags", "Kochen")
+    select_checkbox(new, "tags", "Wissenschaft")
+
+    new.form.submit()
+
+    for activity in ActivityCollection(feriennet_app.session()).query().all():
+        activity.propose().accept()
+
+    transaction.commit()
+
+    activities = anon.get('/angebote')
+    assert "Learn How to Cook" in activities
+    assert "Learn How to Program" in activities
+
+    activities = activities.click('Computer')
+    assert "Learn How to Cook" not in activities
+    assert "Learn How to Program" in activities
+
+    activities = activities.click('Computer')
+    assert "Learn How to Cook" in activities
+    assert "Learn How to Program" in activities
+
+    activities = activities.click('Kochen')
+    assert "Learn How to Cook" in activities
+    assert "Learn How to Program" not in activities
+
+    activities = activities.click('Computer')
+    assert "Learn How to Cook" in activities
+    assert "Learn How to Program" in activities
+
+    activities = activities.click('Computer')
+    activities = activities.click('Kochen')
+    activities = activities.click('Wissenschaft')
+    assert "Learn How to Cook" in activities
+    assert "Learn How to Program" in activities
+
+    # the state filter works for editors
+    new = editor.get('/angebote').click("Angebot erfassen")
+    new.form['title'] = "Learn How to Dance"
+    new.form['lead'] = "We will dance with a Python"
+    new.form.submit()
+
+    # editors see the state as a filter
+    assert "Vorschau" in editor.get('/angebote')
+
+    # anonymous does not
+    assert "Vorschau" not in anon.get('/angebote')
+
+    activities = editor.get('/angebote').click('Vorschau')
+    assert "Learn How to Cook" not in activities
+    assert "Learn How to Program" not in activities
+    assert "Learn How to Dance" in activities
