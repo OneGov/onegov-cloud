@@ -1,5 +1,5 @@
 from onegov.feriennet import _
-from onegov.core.utils import sanitize_html
+from onegov.core.html import sanitize_html
 from onegov.form import Form
 from onegov.form.fields import OrderedMultiCheckboxField
 from onegov.org.utils import annotate_html
