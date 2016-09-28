@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to directly access the user object from the activity.
+  [href]
+
 0.0.2 (2016-09-26)
 ~~~~~~~~~~~~~~~~~~~
 

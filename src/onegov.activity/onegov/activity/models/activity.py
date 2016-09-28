@@ -55,6 +55,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: The user to which this activity belongs to (organiser)
     username = Column(Text, ForeignKey(User.username), nullable=False)
 
+    #: Access the user linked to this activity
+    user = relationship('User')
+
     #: The occasions linked to this activity
     occasions = relationship(
         'Occasion',
