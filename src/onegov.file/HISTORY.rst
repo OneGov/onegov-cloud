@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.3 (2016-09-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Use onegov.core's svg sanitiser when adding an svg file.
   [href]
 
