@@ -126,6 +126,8 @@ def handle_file_upload(self, request):
         if file.reference.content_type not in self.supported_content_types:
             raise exc.HTTPUnsupportedMediaType()
 
+    return file
+
 
 @OrgApp.view(model=FileCollection, name='upload',
              request_method='POST', permission=Private)
