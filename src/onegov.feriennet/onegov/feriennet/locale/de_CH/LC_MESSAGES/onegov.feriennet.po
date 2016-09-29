@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-09-28 16:43+0200\n"
+"POT-Creation-Date: 2016-09-29 10:06+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -134,6 +134,12 @@ msgstr "Persönlicher, Vereins- oder Firmen-Name"
 
 msgid "Address"
 msgstr "Adresse"
+
+msgid "Public E-Mail Address"
+msgstr "Öffentliche E-Mail Adresse"
+
+msgid "If different than username"
+msgstr "Falls anders als Benutzername"
 
 msgid "Phone"
 msgstr "Telefon"

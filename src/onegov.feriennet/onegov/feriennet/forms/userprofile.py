@@ -8,7 +8,7 @@ from wtforms.validators import URL
 class UserProfileForm(Form):
     """ Custom userprofile form for feriennet """
 
-    extra_fields = ('name', 'address', 'phone', 'website')
+    extra_fields = ('name', 'address', 'email', 'phone', 'website')
 
     name = StringField(
         label=_("Name"),
@@ -18,6 +18,11 @@ class UserProfileForm(Form):
     address = TextAreaField(
         label=_("Address"),
         render_kw={'rows': 4},
+    )
+
+    email = StringField(
+        label=_("Public E-Mail Address"),
+        description=_("If different than username")
     )
 
     phone = StringField(

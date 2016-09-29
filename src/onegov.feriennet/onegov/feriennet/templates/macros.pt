@@ -93,8 +93,8 @@
                 tal:condition="organiser.data.address|nothing"
                 tal:content="organiser.data.address">
             </li>
-            <li class="organiser-email">
-                <a href="mailto:${organiser.username}">${organiser.username}</a>
+            <li class="organiser-email" tal:define="email organiser.data.email or organiser.username|organiser.username">
+                <a href="mailto:${email}">${email}</a>
             </li>
             <li class="organiser-phone" tal:condition="organiser.data.phone|nothing">
                 <a href="tel:${organiser.data.phone}">${organiser.data.phone}</a>

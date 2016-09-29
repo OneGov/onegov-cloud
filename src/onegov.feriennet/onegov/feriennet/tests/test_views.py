@@ -239,3 +239,57 @@ def test_activity_filter(feriennet_app):
     assert "Learn How to Cook" not in activities
     assert "Learn How to Program" not in activities
     assert "Learn How to Dance" in activities
+
+
+def test_organiser_info(feriennet_app):
+
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    editor = Client(feriennet_app)
+    editor.login_editor()
+
+    new = editor.get('/angebote').click("Angebot erfassen")
+    new.form['title'] = "Play with Legos"
+    new.form['lead'] = "Like Minecraft, but in the real world"
+    new.form.submit()
+
+    new = admin.get('/angebote').click("Angebot erfassen")
+    new.form['title'] = "Play with Playmobil"
+    new.form['lead'] = "Like Second Life, but in the real world"
+    new.form.submit()
+
+    for activity in ActivityCollection(feriennet_app.session()).query().all():
+        activity.propose().accept()
+
+    transaction.commit()
+
+    # by default the email address of the owner is shown
+    assert 'editor@example.org' in admin.get('/angebot/play-with-legos')
+    assert 'admin@example.org' in editor.get('/angebot/play-with-playmobil')
+
+    # only the owner gets the change contact link
+    assert "Kontakt ändern" in editor.get('/angebot/play-with-legos')
+    assert "Kontakt ändern" not in editor.get('/angebot/play-with-playmobil')
+
+    # only the owner gets the change contact link
+    assert "Kontakt ändern" not in admin.get('/angebot/play-with-legos')
+    assert "Kontakt ändern" in admin.get('/angebot/play-with-playmobil')
+
+    # changes are reflected on the activity
+    contact = editor.get('/angebot/play-with-legos').click('Kontakt ändern')
+    contact.form['name'] = 'Editors Association'
+    contact.form['address'] = 'Washington'
+    contact.form['email'] = 'editors-association@example.org'
+    contact.form['phone'] = '+41 23 456 789'
+    contact.form['website'] = 'https://www.example.org'
+    contact.form.submit()
+
+    activity = editor.get('/angebot/play-with-legos')
+
+    assert "Editors Association" in activity
+    assert "Washington" in activity
+    assert "editors-association@example.org" in activity
+    assert "editor@example.org" not in activity
+    assert "+41 23 456 789" in activity
+    assert "https://www.example.org" in activity
