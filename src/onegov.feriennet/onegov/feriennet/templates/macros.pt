@@ -29,9 +29,9 @@
                 <h2 i18n:translate>Organiser</h2>
                 <metal:block use-macro="layout.macros.organiser" />
 
-                <div tal:condition="show_ticket_panel and organiser.username == request.identity.userid|nothing">
+                <small tal:condition="show_ticket_panel and organiser.username == request.identity.userid|nothing">
                     <a href="${request.link(request.app.org, 'benutzerprofil')}" i18n:translate>Edit your contact info</a>
-                </div>
+                </small>
             </div>
         </div>
 
@@ -85,8 +85,22 @@
 <metal:organiser define-macro="organiser" i18n:domain="onegov.feriennet">
     <div class="organiser">
         <ul>
+            <li class="organiser-name"
+                tal:condition="organiser.data.name|nothing"
+                tal:content="organiser.data.name">
+            </li>
+            <li class="organiser-address"
+                tal:condition="organiser.data.address|nothing"
+                tal:content="organiser.data.address">
+            </li>
             <li class="organiser-email">
                 <a href="mailto:${organiser.username}">${organiser.username}</a>
+            </li>
+            <li class="organiser-phone" tal:condition="organiser.data.phone|nothing">
+                <a href="tel:${organiser.data.phone}">${organiser.data.phone}</a>
+            </li>
+            <li class="organiser-website" tal:condition="organiser.data.website|nothing">
+                <a href="${organiser.data.website}">${organiser.data.website.replace('http://', '').replace('https://', '')}</a>
             </li>
         </ul>
     </div>

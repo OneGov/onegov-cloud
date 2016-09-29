@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows the organiser of each activity on the activity itself.
+  [href]
+
 - Adds the ability to filter activites by tag.
   [href]
 

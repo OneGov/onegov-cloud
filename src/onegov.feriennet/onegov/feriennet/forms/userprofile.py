@@ -2,6 +2,7 @@ from onegov.feriennet import _
 from onegov.form import Form
 from wtforms import StringField, TextAreaField
 from wtforms.fields.html5 import URLField
+from wtforms.validators import URL
 
 
 class UserProfileForm(Form):
@@ -24,7 +25,8 @@ class UserProfileForm(Form):
     )
 
     website = URLField(
-        label=_("Website")
+        label=_("Website"),
+        validators=[URL()]
     )
 
     def update_model(self, model):

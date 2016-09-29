@@ -125,3 +125,59 @@ ul.tags {
 .ticket-handler-FER td:first-child::before {
     @include icon('\f135');
 }
+
+/*
+    Organiser contact
+*/
+
+.activity-organiser-panel > small {
+    display: inline-block;
+    font-size: .8rem;
+    margin-top: .75rem;
+}
+
+.organiser {
+    ul {
+        list-style: none;
+        margin: 0;
+    }
+
+    .organiser-name {
+        font-weight: bold;
+    }
+
+    .organiser-address {
+        white-space: pre-line;
+        word-break: break-all;
+    }
+
+    .organiser-email {
+        margin-top: .5rem;
+
+        a::before {
+            @include icon('\f0e0');
+        }
+    }
+
+    .organiser-phone a::before {
+        @include icon('\f095');
+    }
+
+    .organiser-website a::before {
+        @include icon('\f0c1');
+    }
+
+    .organiser-phone,
+    .organiser-email,
+    .organiser-website {
+        font-size: .875rem;
+    }
+
+    .organiser-phone a::before,
+    .organiser-email a::before,
+    .organiser-website a::before {
+        color: $body-font-color;
+        display: inline-block;
+        margin-right: 1ex;
+    }
+}
