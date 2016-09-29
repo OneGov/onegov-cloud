@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.11 (2016-09-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Ensure that all image upload views enforce the same checks.
   [href]
 
