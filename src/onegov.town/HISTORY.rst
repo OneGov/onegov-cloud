@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.11.8 (2016-09-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Update to latest onegov.org release.
   [href]
 
