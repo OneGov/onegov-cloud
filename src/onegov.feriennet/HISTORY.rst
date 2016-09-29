@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.4 (2016-09-29)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows the organiser of each activity on the activity itself.
   [href]
 
