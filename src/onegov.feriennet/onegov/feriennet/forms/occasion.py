@@ -1,36 +1,22 @@
-from datetime import datetime
 from onegov.feriennet import _
 from onegov.form import Form
 from sedate import replace_timezone, utcnow
 from wtforms.fields import StringField
-from wtforms.fields.html5 import DateField, IntegerField
+from wtforms.fields.html5 import DateTimeField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
-from wtforms_components import TimeField
 
 
 class OccasionForm(Form):
 
     timezone = 'Europe/Zurich'
 
-    start_date = DateField(
-        label=_("Start Date"),
+    start = DateTimeField(
+        label=_("Start"),
         validators=[InputRequired()]
     )
 
-    start_time = TimeField(
-        label=_("Start Time"),
-        description="09:00",
-        validators=[InputRequired()]
-    )
-
-    end_date = DateField(
-        label=_("End Date"),
-        validators=[InputRequired()]
-    )
-
-    end_time = TimeField(
-        label=_("End Time"),
-        description="18:00",
+    end = DateTimeField(
+        label=_("End"),
         validators=[InputRequired()]
     )
 
@@ -67,38 +53,26 @@ class OccasionForm(Form):
     )
 
     @property
-    def start(self):
+    def localized_start(self):
         return replace_timezone(
-            datetime(
-                self.start_date.data.year,
-                self.start_date.data.month,
-                self.start_date.data.day,
-                self.start_time.data.hour,
-                self.start_time.data.minute
-            ),
+            self.start,
             self.timezone
         )
 
     @property
-    def end(self):
+    def localized_end(self):
         return replace_timezone(
-            datetime(
-                self.end_date.data.year,
-                self.end_date.data.month,
-                self.end_date.data.day,
-                self.end_time.data.hour,
-                self.end_time.data.minute
-            ),
+            self.end,
             self.timezone
         )
 
     def validate(self):
         result = super().validate()
 
-        if self.start_date.data and self.end_date.data:
-            if self.end_date.data > self.start_date.data:
-                self.end_date.errors.append(
-                    _("The end date must be later than the start date")
+        if self.start.data and self.end.data:
+            if self.start.data > self.end.data:
+                self.end.errors.append(
+                    _("The end date must be after the start date")
                 )
                 result = False
 
@@ -111,27 +85,13 @@ class OccasionForm(Form):
 
         return result
 
-    def process(self, *args, **kwargs):
-
-        super().process(*args, **kwargs)
-
-        model = kwargs.get('obj')
-
-        if model:
-            self.start_date.data = model.localized_start.date()
-            self.start_time.data = model.localized_start.time()
-            self.end_date.data = model.localized_end.date()
-            self.end_time.data = model.localized_end.time()
-
     def populate_obj(self, model):
         super().populate_obj(model, exclude={
-            'start_date',
-            'start_time',
-            'end_date',
-            'end_time'
+            'start',
+            'end',
         })
 
         model.timezone = self.timezone
-        model.start = self.start
-        model.end = self.end
+        model.start = self.localized_start
+        model.end = self.localized_end
         model.booking_start = utcnow()
