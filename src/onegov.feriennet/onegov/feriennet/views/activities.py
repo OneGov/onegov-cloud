@@ -139,8 +139,7 @@ def edit_activity(self, request, form):
     template='form.pt',
     form=OccasionForm,
     permission=Private,
-    name='neue-durchfuehrung'
-)
+    name='neue-durchfuehrung')
 def new_occasion(self, request, form):
 
     if form.submitted(request):
@@ -163,8 +162,7 @@ def new_occasion(self, request, form):
     template='form.pt',
     form=OccasionForm,
     permission=Private,
-    name='bearbeiten'
-)
+    name='bearbeiten')
 def edit_occasion(self, request, form):
 
     if form.submitted(request):
