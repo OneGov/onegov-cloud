@@ -1,6 +1,6 @@
 import morepath
 
-from onegov.activity.models import ACTIVITY_STATES
+from onegov.activity.models import ACTIVITY_STATES, Occasion
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security import Secret
@@ -8,6 +8,8 @@ from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.forms import VacationActivityForm
+from onegov.feriennet.forms.occasion import OccasionForm
+from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.layout import VacationActivityCollectionLayout
 from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
@@ -128,6 +130,55 @@ def edit_activity(self, request, form):
     return {
         'layout': VacationActivityFormLayout(self, request, self.title),
         'title': self.title,
+        'form': form
+    }
+
+
+@FeriennetApp.form(
+    model=VacationActivity,
+    template='form.pt',
+    form=OccasionForm,
+    permission=Private,
+    name='neue-durchfuehrung'
+)
+def new_occasion(self, request, form):
+
+    if form.submitted(request):
+        occasion = Occasion()
+        form.populate_obj(occasion)
+        self.occasions.append(occasion)
+
+        request.success(_("Your changes were saved"))
+        return morepath.redirect(request.link(self))
+
+    return {
+        'layout': OccasionFormLayout(self, request, _("New Occasion")),
+        'title': _("New Occasion"),
+        'form': form
+    }
+
+
+@FeriennetApp.form(
+    model=Occasion,
+    template='form.pt',
+    form=OccasionForm,
+    permission=Private,
+    name='bearbeiten'
+)
+def edit_occasion(self, request, form):
+
+    if form.submitted(request):
+        form.populate_obj(self)
+        request.success(_("Your changes were saved"))
+        return morepath.redirect(request.link(self.activity))
+
+    elif not request.POST:
+        form.process(obj=self)
+
+    return {
+        'layout': OccasionFormLayout(
+            self.activity, request, _("Edit Occasion")),
+        'title': _("Edit Occasion"),
         'form': form
     }
 

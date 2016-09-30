@@ -122,7 +122,7 @@ class VacationActivityHandler(Handler):
                 confirm=_("Do you really want to reject this activity?"),
                 extra_information=_("This cannot be undone. "),
                 classes=('confirm', 'reject-activity'),
-                yes_button_text=_("Approve Activity")
+                yes_button_text=_("Reject Activity")
             ))
         elif self.activity.state == 'accepted':
             links.append(ConfirmLink(

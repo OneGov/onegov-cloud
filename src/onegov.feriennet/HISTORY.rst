@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds the ability to enter occasions.
+  [href]
+
+- Fix activity access rule for editors.
+  [href]
+
 0.0.4 (2016-09-29)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,4 +1,5 @@
 from cached_property import cached_property
+from onegov.activity import Activity
 from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import VacationActivityCollection
@@ -46,7 +47,30 @@ class VacationActivityFormLayout(DefaultLayout):
         return (
             Link(_("Homepage"), self.homepage_url),
             Link(_("Activities"), self.request.link(self.model)),
-            Link(_("New"), self.title)
+            Link(self.title, '#')
+        )
+
+    @cached_property
+    def editbar_links(self):
+        return None
+
+
+class OccasionFormLayout(DefaultLayout):
+
+    def __init__(self, model, request, title):
+        assert isinstance(model, Activity)
+
+        super().__init__(model, request)
+        self.title = title
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("Activities"), self.request.class_link(
+                VacationActivityCollection)),
+            Link(self.model.title, self.request.link(self.model)),
+            Link(self.title, '#')
         )
 
     @cached_property
@@ -81,7 +105,13 @@ class VacationActivityLayout(DefaultLayout):
                 ))
 
             links.append(Link(
-                text=_("Edit"),
+                text=_("New Occasion"),
+                url=self.request.link(self.model, 'neue-durchfuehrung'),
+                classes=('new-occasion', )
+            ))
+
+            links.append(Link(
+                text=_("Edit Activity"),
                 url=self.request.link(self.model, name='bearbeiten'),
                 classes=('edit-link', )
             ))

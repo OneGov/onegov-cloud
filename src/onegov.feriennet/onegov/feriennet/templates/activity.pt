@@ -32,6 +32,28 @@
             </div>
         </tal:block>
 
-        <tal:block metal:use-macro="layout.macros.activity_detailed" tal:define="show_ticket_panel True" />
+        <tal:block metal:use-macro="layout.macros.activity_detailed" tal:define="show_ticket_panel True">
+            <metal:block fill-slot="after-text">
+                <h3 i18n:translate>Occasions</h3>
+                <p tal:condition="not:activity.occasions" i18n:translate>
+                    There are currently no occasions planned.
+                </p>
+
+                <ul tal:condition="activity.occasions">
+                    <li tal:repeat="occasion activity.occasions">
+                        <h4>
+                            ${layout.format_date(occasion.localized_start, 'datetime')}
+                            -
+                            ${layout.format_date(occasion.localized_end, 'datetime')}
+                        </h4>
+                        <div>${occasion.location}</div>
+                        <div>${occasion.spots}</div>
+                        <div>${occasion.min_age}</div>
+                        <div>${occasion.max_age}</div>
+                        <a href="${request.link(occasion, 'bearbeiten')}" i18n:translate>Edit</a>
+                    </li>
+                </ul>
+            </metal:block>
+        </tal:block>
     </tal:block>
 </div>

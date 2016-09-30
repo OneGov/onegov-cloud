@@ -31,6 +31,7 @@ svg #background {
     .accept-activity:before { @include icon('\f087'); }
     .reject-activity:before { @include icon('\f088'); }
     .archive-activity:before { @include icon('\f187'); }
+    .new-occasion:before { @include icon('\f133'); }
 }
 
 /*

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-09-29 10:06+0200\n"
+"POT-Creation-Date: 2016-09-30 15:06+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -24,14 +24,14 @@ msgstr "Startseite"
 msgid "Activities"
 msgstr "Angebote"
 
-msgid "New"
-msgstr "Neu"
-
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
 
-msgid "Edit"
-msgstr "Bearbeiten"
+msgid "New Occasion"
+msgstr "Neue Durchführung"
+
+msgid "Edit Activity"
+msgstr "Angebot Bearbeiten"
 
 msgid "Request Publication"
 msgstr "Publikation Beantragen"
@@ -126,6 +126,39 @@ msgstr "Theater"
 msgid "Trade"
 msgstr "Handwerk"
 
+msgid "Start Date"
+msgstr "Von Datum"
+
+msgid "Start Time"
+msgstr "Von Zeit"
+
+msgid "End Date"
+msgstr "Bis Datum"
+
+msgid "End Time"
+msgstr "Bis Zeit"
+
+msgid "Location"
+msgstr "Ort"
+
+msgid "Spots"
+msgstr "Anzahl Plätze"
+
+msgid "Participants"
+msgstr "Teilnehmer"
+
+msgid "Minimum Age"
+msgstr "Mindestalter"
+
+msgid "Maximum Age"
+msgstr "Maximumalter"
+
+msgid "The end date must be later than the start date"
+msgstr "Das End-Datum muss nach dem Von-Datum liegen"
+
+msgid "The minium age cannot be higher than the maximum age"
+msgstr "Das Mindestalter kann nicht tiefer als das Maximalalter sein"
+
 msgid "Name"
 msgstr "Name"
 
@@ -175,6 +208,9 @@ msgstr "Möchten Sie dieses Angebot wirklich ablehnen?"
 msgid "This cannot be undone. "
 msgstr "Dies kann nicht rückgängig gemacht werden."
 
+msgid "Reject Activity"
+msgstr "Angebote Ablehnen"
+
 msgid "Archive"
 msgstr "Archivieren"
 
@@ -216,6 +252,15 @@ msgstr "Dieses Angebot wurde von einem Administrator geprüft und abgelehnt."
 
 msgid "This activity has been archived and cannot be activated again."
 msgstr "Dieses Angebot wurde archiviert und kann nicht mehr aktiviert werden."
+
+msgid "Occasions"
+msgstr "Durchführungen"
+
+msgid "There are currently no occasions planned."
+msgstr "Es sind zur Zeit keine Durchführungen geplant."
+
+msgid "Edit"
+msgstr "Bearbeiten"
 
 msgid "Organiser"
 msgstr "Veranstalter"
@@ -264,6 +309,9 @@ msgstr "Ihr Angebot wurde leider abgelehnt:"
 
 msgid "New Activity"
 msgstr "Neues Angebot"
+
+msgid "Edit Occasion"
+msgstr "Durchfürung Bearbeiten"
 
 msgid "Thank you for your proposal!"
 msgstr "Vielen Dank für Ihren Antrag!"

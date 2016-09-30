@@ -1,5 +1,5 @@
 from morepath.authentication import NO_IDENTITY
-from onegov.activity import Activity, ActivityCollection
+from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.core.security import Public, Private
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.feriennet import FeriennetApp
@@ -113,7 +113,18 @@ def has_private_permission_activities(identity, model, permission):
     if identity.role != 'editor':
         return has_permission_logged_in(identity, model, permission)
 
-    return True
+    return is_owner(identity.userid, model)
+
+
+@FeriennetApp.permission_rule(model=Occasion, permission=Private)
+def has_private_permission_occasions(identity, model, permission):
+    """ Give the editor private permission for occasions. """
+
+    # only overries the editor role
+    if identity.role != 'editor':
+        return has_permission_logged_in(identity, model, permission)
+
+    return is_owner(identity.userid, model.activity)
 
 
 @FeriennetApp.permission_rule(model=Activity, permission=Public, identity=None)
