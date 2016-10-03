@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-09-08 14:27+0200\n"
+"POT-Creation-Date: 2016-10-03 14:34+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -757,6 +757,9 @@ msgstr "Älter"
 msgid "This year"
 msgstr "Dieses Jahr"
 
+msgid "Form Submissions"
+msgstr "Formulareingaben"
+
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -1462,6 +1465,9 @@ msgstr "Benutzername"
 msgid "Identicon"
 msgstr "Identicon"
 
+msgid "Password"
+msgstr ""
+
 msgid "New allocation"
 msgstr "Neue Einteilung"
 
@@ -1768,9 +1774,6 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 
 msgid "All"
 msgstr "Alle"
-
-msgid "Form Submissions"
-msgstr "Formulareingaben"
 
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
