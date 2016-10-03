@@ -45,7 +45,7 @@
                         <h4>${layout.format_date_range(occasion.localized_start, occasion.localized_end)}</h4>
 
                         <div class="row">
-                            <div class="small-12 medium-5 columns">
+                            <div class="small-12 medium-5 columns factoids">
                                 <div class="location">
                                     <span i18n:translate class="show-for-sr">Location</span>
                                     ${occasion.location}
