@@ -55,14 +55,14 @@ class OccasionForm(Form):
     @property
     def localized_start(self):
         return replace_timezone(
-            self.start,
+            self.start.data,
             self.timezone
         )
 
     @property
     def localized_end(self):
         return replace_timezone(
-            self.end,
+            self.end.data,
             self.timezone
         )
 
@@ -95,3 +95,12 @@ class OccasionForm(Form):
         model.start = self.localized_start
         model.end = self.localized_end
         model.booking_start = utcnow()
+
+    def process(self, *args, **kwargs):
+        super().process(*args, **kwargs)
+
+        if 'obj' in kwargs:
+            model = kwargs['obj']
+
+            self.start.data = model.localized_start
+            self.end.data = model.localized_end

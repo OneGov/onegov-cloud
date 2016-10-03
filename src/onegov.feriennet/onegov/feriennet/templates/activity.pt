@@ -41,16 +41,12 @@
 
                 <ul tal:condition="activity.occasions">
                     <li tal:repeat="occasion activity.occasions">
-                        <h4>
-                            ${layout.format_date(occasion.localized_start, 'datetime')}
-                            -
-                            ${layout.format_date(occasion.localized_end, 'datetime')}
-                        </h4>
+                        <h4>${layout.format_date_range(occasion.localized_start, occasion.localized_end)}</h4>
                         <div>${occasion.location}</div>
                         <div>${occasion.spots}</div>
                         <div>${occasion.min_age}</div>
                         <div>${occasion.max_age}</div>
-                        <a href="${request.link(occasion, 'bearbeiten')}" i18n:translate>Edit</a>
+                        <a tal:condition="request.is_admin or layout.is_owner" href="${request.link(occasion, 'bearbeiten')}" i18n:translate>Edit</a>
                     </li>
                 </ul>
             </metal:block>
