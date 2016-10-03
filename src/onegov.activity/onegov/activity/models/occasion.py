@@ -1,8 +1,10 @@
+from onegov.activity.models.activity import Activity
 from onegov.core.orm import Base
 from onegov.core.orm.types import UTCDateTime, UUID
-from onegov.activity.models.activity import Activity
+from psycopg2.extras import NumericRange
 from sedate import to_timezone
-from sqlalchemy import Column, Enum, Integer, Text, ForeignKey
+from sqlalchemy import Column, Enum, Text, ForeignKey
+from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
@@ -29,20 +31,19 @@ class Occasion(Base):
     #: End date and time of the event (of the first event if recurring)
     end = Column(UTCDateTime, nullable=False)
 
-    #: The date when the occasion becomes bookable
-    booking_start = Column(UTCDateTime, nullable=False)
-
     #: Describes the location of the activity
     location = Column(Text, nullable=False)
 
-    #: The minimal age of participants
-    min_age = Column(Integer, nullable=False, default=6)
+    #: The expected age of participants
+    age = Column(
+        INT4RANGE, nullable=False, default=NumericRange(6, 17, bounds='[]'))
 
-    #: The maximal age of participants
-    max_age = Column(Integer, nullable=False, default=16)
+    #: The expected number of participants
+    spots = Column(
+        INT4RANGE, nullable=False, default=NumericRange(0, 10, bounds='[]'))
 
-    #: The number of available spots
-    spots = Column(Integer, nullable=False)
+    #: A note about the occurrence
+    note = Column(Text, nullable=True)
 
     #: The activity this occasion belongs to
     activity_id = Column(UUID, ForeignKey(Activity.id))
