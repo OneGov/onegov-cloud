@@ -196,15 +196,43 @@ ul.occasions {
     }
 
     li {
-        margin: 0 0 .75rem;
+        p {
+            background-color: $panel-bg;
+            font-size: .875rem;
+            font-style: italic;
+            max-width: $max-line-width;
+            padding: .25rem .75rem;
+            white-space: pre-line;
+        }
 
-        > div,
-        > a {
-            margin-left: 1rem;    
+        div {
+            font-size: .875rem;
         }
 
         a {
-            font-size: .8rem;
+            display: inline-block;
+            font-size: .875rem;
+            margin-bottom: .75rem;
+            margin-top: .25rem;
         }
     }
+
+    .location:before {
+        @include icon('\f041');
+        display: inline-block;
+        width: 1.25em;
+    }
+
+    .age:before {
+        @include icon('\f1ae');
+        display: inline-block;
+        width: 1.25em;
+    }
+
+    .spots:before {
+        @include icon('\f105');
+        display: inline-block;
+        width: 1.25em;
+    }
+
 }

@@ -1,7 +1,8 @@
 from onegov.feriennet import _
 from onegov.form import Form
-from sedate import replace_timezone, utcnow
-from wtforms.fields import StringField
+from psycopg2.extras import NumericRange
+from sedate import replace_timezone
+from wtforms.fields import StringField, TextAreaField
 from wtforms.fields.html5 import DateTimeField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
 
@@ -25,8 +26,22 @@ class OccasionForm(Form):
         validators=[InputRequired()]
     )
 
-    spots = IntegerField(
-        label=_("Spots"),
+    note = TextAreaField(
+        label=_("Note"),
+        render_kw={'rows': 4}
+    )
+
+    min_spots = IntegerField(
+        label=_("Minimum Number of Participants"),
+        validators=[
+            InputRequired(),
+            NumberRange(0, 10000)
+        ],
+        fieldset=_("Participants")
+    )
+
+    max_spots = IntegerField(
+        label=_("Maximum Number of Participants"),
         validators=[
             InputRequired(),
             NumberRange(1, 10000)
@@ -83,6 +98,16 @@ class OccasionForm(Form):
                 )
                 result = False
 
+        if self.min_spots.data and self.max_spots.data:
+            if self.min_spots.data > self.max_spots.data:
+                self.min_spots.errors.append(
+                    _(
+                        "The minium number of participants cannot be higher "
+                        "than the maximum number of participants"
+                    )
+                )
+                result = False
+
         return result
 
     def populate_obj(self, model):
@@ -94,7 +119,10 @@ class OccasionForm(Form):
         model.timezone = self.timezone
         model.start = self.localized_start
         model.end = self.localized_end
-        model.booking_start = utcnow()
+        model.age = NumericRange(
+            self.min_age.data, self.max_age.data, bounds='[]')
+        model.spots = NumericRange(
+            self.min_spots.data, self.max_spots.data, bounds='[]')
 
     def process(self, *args, **kwargs):
         super().process(*args, **kwargs)
@@ -104,3 +132,7 @@ class OccasionForm(Form):
 
             self.start.data = model.localized_start
             self.end.data = model.localized_end
+            self.min_age.data = model.age.lower
+            self.max_age.data = model.age.upper - 1
+            self.min_spots.data = model.spots.lower
+            self.max_spots.data = model.spots.upper - 1

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-10-03 14:26+0200\n"
+"POT-Creation-Date: 2016-10-03 16:20+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -138,23 +138,35 @@ msgstr "Ende"
 msgid "Location"
 msgstr "Ort"
 
-msgid "Spots"
-msgstr "Anzahl Plätze"
+msgid "Note"
+msgstr "Bemerkung"
+
+msgid "Minimum Number of Participants"
+msgstr "Mindestteilnehmerzahl"
 
 msgid "Participants"
 msgstr "Teilnehmer"
+
+msgid "Maximum Number of Participants"
+msgstr "Anzahl Plätze"
 
 msgid "Minimum Age"
 msgstr "Mindestalter"
 
 msgid "Maximum Age"
-msgstr "Maximumalter"
+msgstr "Höchstalter"
 
 msgid "The end date must be after the start date"
 msgstr "Das End-Datum muss nach dem Start-Datum liegen"
 
 msgid "The minium age cannot be higher than the maximum age"
 msgstr "Das Mindestalter kann nicht tiefer als das Maximalalter sein"
+
+msgid ""
+"The minium number of participants cannot be higher than the maximum number "
+"of participants"
+msgstr ""
+"The Mindestteilnehmerzahl darf nicht grösser als die Anzahl Plätze sein"
 
 msgid "Name"
 msgstr "Name"
@@ -259,6 +271,15 @@ msgstr "Es sind zur Zeit keine Durchführungen geplant."
 msgid "Age"
 msgstr "Alter"
 
+msgid "${min_age} - ${max_age} years old"
+msgstr "${min_age} - ${max_age} Jahre alt"
+
+msgid "${min_spots} - ${max_spots} participants"
+msgstr "${min_spots} - ${max_spots} Teilnehmer"
+
+msgid "up to ${max_spots} participants"
+msgstr "bis zu ${max_spots} Teilnehmer"
+
 msgid "Edit"
 msgstr "Bearbeiten"
 
@@ -330,6 +351,15 @@ msgstr "Ihr Angebot wurde abgelehnt"
 
 msgid "Your activity has been archived"
 msgstr "Ihr Angebot wurde archiviert"
+
+#~ msgid "Minimum number of participants"
+#~ msgstr "Mindestteilnehmerzahl"
+
+#~ msgid "Maximum number of participants"
+#~ msgstr "Anzahl Plätze"
+
+#~ msgid "Spots"
+#~ msgstr "Anzahl Plätze"
 
 #~ msgid "Start Date"
 #~ msgstr "Von Datum"
