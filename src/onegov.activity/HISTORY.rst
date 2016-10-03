@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.4 (2016-10-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Overhauls the occasion model.
   [href]
 
