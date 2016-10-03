@@ -5,12 +5,17 @@ from onegov.feriennet import FeriennetApp, _
 class RegistrationWidget(object):
     template = """
         <xsl:template match="registration">
-            <div>
+            <div tal:condition="not:request.is_logged_in">
                 <a href="./auth/register" class="button">
                     ${register_text}
                 </a>
                 <a href="./auth/login" class="button secondary">
                     ${login_text}
+                </a>
+            </div>
+            <div tal:condition="request.is_logged_in">
+                <a href="./benutzerprofil" class="button secondary">
+                    ${profile_text}
                 </a>
             </div>
         </xsl:template>
@@ -19,5 +24,6 @@ class RegistrationWidget(object):
     def get_variables(self, layout):
         return {
             'register_text': _("Register a new account"),
-            'login_text': _("Go to Login")
+            'login_text': _("Go to Login"),
+            'profile_text': _("Go to Profile")
         }
