@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds input-type:datetime support to the datetimepicker.
+  [href]
+
 0.0.11 (2016-09-29)
 ~~~~~~~~~~~~~~~~~~~
 

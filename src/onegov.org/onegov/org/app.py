@@ -265,8 +265,6 @@ def get_sortable_asset():
 @OrgApp.webasset('fullcalendar')
 def get_fullcalendar_asset():
     yield 'fullcalendar.css'
-    yield 'moment.js'
-    yield 'moment.de.js'
     yield 'fullcalendar.js'
     yield 'fullcalendar.de.js'
     yield 'reservationcalendar.jsx'
@@ -337,6 +335,8 @@ def get_common_asset():
     yield 'confirm.jsx'
     yield 'typeahead.jsx'
     yield 'leaflet'
+    yield 'moment.js'
+    yield 'moment.de.js'
     yield 'jquery.datetimepicker.js'
     yield 'jquery.mousewheel.js'
     yield 'jquery.popupoverlay.js'
