@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to easily format a date range.
+  [href]
+
 - Adds input-type:datetime support to the datetimepicker.
   [href]
 

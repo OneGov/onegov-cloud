@@ -55,6 +55,9 @@ class Layout(ChameleonLayout):
 
     """
 
+    date_long_without_year_format = 'd. MMMM'
+    datetime_long_without_year_format = 'd. MMMM HH:mm'
+
     @property
     def org(self):
         """ An alias for self.request.app.org. """
@@ -271,6 +274,18 @@ class Layout(ChameleonLayout):
 
     def format_time_range(self, start, end):
         return utils.format_time_range(start, end)
+
+    def format_date_range(self, start, end):
+        if (end - start) <= timedelta(hours=23):
+            return ' '.join((
+                self.format_date(start, 'date_long_without_year'),
+                self.format_time_range(start, end)
+            ))
+        else:
+            return ' - '.join((
+                self.format_date(start, 'datetime_long_without_year'),
+                self.format_date(end, 'datetime_long_without_year')
+            ))
 
     def format_timedelta(self, delta):
         return babel.dates.format_timedelta(
