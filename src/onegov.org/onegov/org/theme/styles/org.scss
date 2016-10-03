@@ -226,6 +226,13 @@ $warning-icon: '\f071';
 }
 
 /*
+    horizontal rules
+*/
+hr.hairline {
+    @include hairline;
+}
+
+/*
     tables
 */
 table {
