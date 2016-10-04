@@ -82,17 +82,18 @@ class ActivityQueryPolicy(object):
 
 
 @FeriennetApp.permission_rule(model=object, permission=Private)
-def has_private_permission_logged_in(identity, model, permission):
+def has_private_permission_logged_in(app, identity, model, permission):
     """ Take away private permission for editors. """
 
     if identity.role != 'editor':
-        return has_permission_logged_in(identity, model, permission)
+        return has_permission_logged_in(app, identity, model, permission)
 
     return False
 
 
 @FeriennetApp.permission_rule(model=ActivityCollection, permission=Private)
-def has_private_permission_activity_collections(identity, model, permission):
+def has_private_permission_activity_collections(
+        app, identity, model, permission):
     """ Give the editor private permission for activity collections (needed
     to create new activites).
 
@@ -100,48 +101,49 @@ def has_private_permission_activity_collections(identity, model, permission):
 
     # only overries the editor role
     if identity.role != 'editor':
-        return has_permission_logged_in(identity, model, permission)
+        return has_permission_logged_in(app, identity, model, permission)
 
     return True
 
 
 @FeriennetApp.permission_rule(model=Activity, permission=Private)
-def has_private_permission_activities(identity, model, permission):
+def has_private_permission_activities(app, identity, model, permission):
     """ Give the editor private permission for activities. """
 
     # only overries the editor role
     if identity.role != 'editor':
-        return has_permission_logged_in(identity, model, permission)
+        return has_permission_logged_in(app, identity, model, permission)
 
     return is_owner(identity.userid, model)
 
 
 @FeriennetApp.permission_rule(model=Occasion, permission=Private)
-def has_private_permission_occasions(identity, model, permission):
+def has_private_permission_occasions(app, identity, model, permission):
     """ Give the editor private permission for occasions. """
 
     # only overries the editor role
     if identity.role != 'editor':
-        return has_permission_logged_in(identity, model, permission)
+        return has_permission_logged_in(app, identity, model, permission)
 
     return is_owner(identity.userid, model.activity)
 
 
 @FeriennetApp.permission_rule(model=Activity, permission=Public, identity=None)
-def has_public_permission_not_logged_in(identity, model, permission):
+def has_public_permission_not_logged_in(app, identity, model, permission):
     """ Only make activites anonymously accessible with certain states. """
 
     return model.state in VISIBLE_ACTIVITY_STATES['anonymous']
 
 
 @FeriennetApp.permission_rule(model=Activity, permission=Public)
-def has_public_permission_logged_in(identity, model, permission):
+def has_public_permission_logged_in(app, identity, model, permission):
     """ Only make activites accessible with certain states (or if owner). """
 
     # roles other than admin/editor are basically treated as anonymous,
     # so fallback in this case
     if identity.role not in ('admin', 'editor'):
-        return has_public_permission_not_logged_in(None, model, permission)
+        return has_public_permission_not_logged_in(
+            app, None, model, permission)
 
     return is_owner(identity.userid, model) \
         or model.state in VISIBLE_ACTIVITY_STATES[identity.role]

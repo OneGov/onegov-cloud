@@ -129,6 +129,7 @@ def test_activity_permission_anonymous():
 
     def has_permission(state):
         return has_public_permission_not_logged_in(
+            app=None,
             identity=None,
             model=Bunch(state=state),
             permission=Public
@@ -145,6 +146,7 @@ def test_activity_permission():
 
     def has_permission(owner, user, role, state):
         return has_public_permission_logged_in(
+            app=None,
             identity=Bunch(userid=user, role=role),
             model=Bunch(state=state, username=owner),
             permission=Public
