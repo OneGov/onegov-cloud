@@ -1,8 +1,7 @@
-import inspect
-import pydoc
 import yaml
 
 from onegov.server import errors
+from onegov.server.utils import load_class
 
 
 class Config(object):
@@ -127,10 +126,7 @@ class ApplicationConfig(object):
 
     @property
     def application_class(self):
-        if inspect.isclass(self._cfg['application']):
-            application_class = self._cfg['application']
-        else:
-            application_class = pydoc.locate(self._cfg['application'])
+        application_class = load_class(self._cfg['application'])
 
         if application_class is None:
             raise errors.ApplicationConfigError(
