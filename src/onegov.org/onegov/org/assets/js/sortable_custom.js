@@ -117,8 +117,10 @@ var setup_sortable_list = function(list_element) {
 };
 
 
-$(document).ready(function() {
-    $('ul[data-sortable]').each(function() {
-        setup_sortable_list(this);
+(function($) {
+    $(document).ready(function() {
+        $('ul[data-sortable]').each(function() {
+            setup_sortable_list(this);
+        });
     });
-});
+})(jQuery);

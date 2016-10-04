@@ -161,7 +161,7 @@ var setup_datetimepicker = function(type) {
 
         input.datetimepicker($.extend(
             general,
-            type_specific,
+            type_specific
         ));
 
         // convert the initial value to the localized format

@@ -57,7 +57,7 @@ var onLazyLoadAltText = function(element) {
         success: function(_data, _textStatus, request) {
             var alt = request.getResponseHeader('X-File-Note');
 
-            if (alt.trim() !== "") {
+            if (alt && alt.trim() !== "") {
                 appendAltText(target, alt);
             }
         }
