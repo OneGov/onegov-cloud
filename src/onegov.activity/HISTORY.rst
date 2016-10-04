@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an occasion collection.
+  [href]
+
 0.0.4 (2016-10-03)
 ~~~~~~~~~~~~~~~~~~~
 

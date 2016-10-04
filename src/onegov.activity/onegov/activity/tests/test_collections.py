@@ -1,4 +1,9 @@
+import transaction
+
+from datetime import datetime
 from onegov.activity import ActivityCollection
+from onegov.activity import OccasionCollection
+from pytz import utc
 
 
 def test_add_activity(session, owner):
@@ -118,3 +123,41 @@ def test_activity_used_tags(session, owner):
 
     c = LimitedActivityCollection(session)
     assert c.used_tags == {'sport', 'fun'}
+
+
+def test_occasion_collection(session, owner):
+
+    activites = ActivityCollection(session)
+    occasions = OccasionCollection(session)
+
+    tournament = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        location="Lucerne",
+        age=(6, 9),
+        spots=(2, 10),
+        note="Bring game-face",
+        activity=activites.add("Sport", username=owner.username)
+    )
+
+    assert tournament.start == datetime(2016, 10, 4, 11, tzinfo=utc)
+    assert tournament.end == datetime(2016, 10, 4, 12, tzinfo=utc)
+    assert tournament.timezone == "Europe/Zurich"
+    assert tournament.location == "Lucerne"
+    assert tournament.note == "Bring game-face"
+    assert tournament.activity_id == activites.query().first().id
+
+    # postgres ranges are coeced into half-open intervals
+    assert tournament.age.lower == 6
+    assert tournament.age.upper == 10
+    assert tournament.spots.lower == 2
+    assert tournament.spots.upper == 11
+
+    transaction.commit()
+
+    tournament = occasions.query().first()
+    assert tournament.age.lower == 6
+    assert tournament.age.upper == 10
+    assert tournament.spots.lower == 2
+    assert tournament.spots.upper == 11
