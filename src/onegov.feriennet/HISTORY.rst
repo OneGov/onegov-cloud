@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.5 (2016-10-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to enter/delete occasions.
   [href]
 
