@@ -1,8 +1,6 @@
 from dectate import Action
-from onegov.org import OrgApp
 
 
-@OrgApp.directive('homepage_widget')
 class HomepageWidgetAction(Action):
     """ Register a cronjob. """
 

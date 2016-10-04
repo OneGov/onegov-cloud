@@ -3,10 +3,12 @@
 from chameleon import PageTemplate
 from collections import defaultdict
 from contextlib import contextmanager
+from dectate import directive
 from onegov.core import Framework, utils
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
+from onegov.org import directives
 from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Topic, Organisation
@@ -23,6 +25,9 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     serve_static_files = True
     request_class = OrgRequest
+
+    #: org directives
+    homepage_widget = directive(directives.HomepageWidgetAction)
 
     def is_allowed_application_id(self, application_id):
         """ Stops onegov.server from ever passing the request to the org
