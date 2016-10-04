@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Introduces a generic collection meant to share common functionalty.
+  [href]
+
 0.28.0 (2016-09-28)
 ~~~~~~~~~~~~~~~~~~~
 

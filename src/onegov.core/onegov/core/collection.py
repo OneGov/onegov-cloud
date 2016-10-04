@@ -1,6 +1,39 @@
 import math
 
 from cached_property import cached_property
+from sqlalchemy.inspection import inspect
+
+
+class GenericCollection(object):
+
+    def __init__(self, session):
+        self.session = session
+
+    @property
+    def model_class(self):
+        raise NotImplementedError
+
+    @cached_property
+    def primary_key(self):
+        return inspect(self.model_class).primary_key[0]
+
+    def query(self):
+        return self.session.query(self.model_class)
+
+    def by_id(self, id):
+        return self.query().filter(self.primary_key == id).first()
+
+    def add(self, **kwargs):
+        item = self.model_class(**kwargs)
+
+        self.session.add(item)
+        self.session.flush()
+
+        return item
+
+    def delete(self, item):
+        self.session.delete(item)
+        self.session.flush()
 
 
 class Pagination(object):

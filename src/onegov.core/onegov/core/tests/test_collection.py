@@ -1,4 +1,7 @@
-from onegov.core.collection import Pagination
+from onegov.core.collection import GenericCollection, Pagination
+from onegov.core.orm import SessionManager
+from sqlalchemy import Column, Integer, Text
+from sqlalchemy.ext.declarative import declarative_base
 
 
 def test_pagination():
@@ -63,3 +66,33 @@ def test_pagination():
     assert next(pages).batch == list(range(0, 10))
     assert next(pages).batch == list(range(10, 20))
     assert next(pages).batch == list(range(20, 25))
+
+
+def test_generic_collection(postgres_dsn):
+    Base = declarative_base()
+
+    class Document(Base):
+        __tablename__ = 'document'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text)
+
+    class DocumentCollection(GenericCollection):
+
+        @property
+        def model_class(self):
+            return Document
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('generic_collection')
+
+    collection = DocumentCollection(mgr.session())
+    assert collection.query().all() == []
+
+    readme = collection.add(title="Readme")
+    assert [c.title for c in collection.query().all()] == ["Readme"]
+    assert collection.by_id(readme.id).title == "Readme"
+
+    collection.delete(readme)
+    assert collection.query().all() == []
+    assert collection.by_id(readme.id) is None
