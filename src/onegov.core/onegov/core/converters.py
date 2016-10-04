@@ -3,7 +3,7 @@
 import morepath
 
 from datetime import date
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core.utils import is_uuid
 from time import mktime, strptime
 from uuid import UUID

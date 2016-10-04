@@ -40,7 +40,7 @@ import pycurl
 
 from contextlib import suppress
 from datetime import datetime, time, timedelta
-from onegov.core import Framework, log
+from onegov.core.framework import Framework, log
 from onegov.core.locking import lock, AlreadyLockedError
 from onegov.core.security import Public
 from sedate import ensure_timezone, replace_timezone

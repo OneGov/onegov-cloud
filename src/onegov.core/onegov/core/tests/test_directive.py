@@ -1,4 +1,4 @@
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core.security import Secret
 from webtest import TestApp as Client
 from wtforms import Form

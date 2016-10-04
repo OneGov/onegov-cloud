@@ -13,7 +13,7 @@ Applications wishing to use i18n need to define two settings:
 
 For example::
 
-    from onegov.core import Framework
+    from onegov.core.framework import Framework
     from onegov.core import utils
 
     class App(Framework):
@@ -42,7 +42,7 @@ import re
 
 from functools import lru_cache
 from io import BytesIO
-from onegov.core import Framework, log
+from onegov.core.framework import Framework, log
 from onegov.core.utils import pairwise
 from translationstring import ChameleonTranslate
 from translationstring import Translator

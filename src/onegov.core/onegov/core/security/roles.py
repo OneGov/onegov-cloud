@@ -1,4 +1,4 @@
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core.security import Public, Personal, Private, Secret
 
 

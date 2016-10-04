@@ -4,7 +4,7 @@ By default the ``/static`` folder of the application is used, relative to
 the path of the application class. Files in that folder are available to
 everyone if enabled::
 
-    from onegov.core import Framework
+    from onegov.core.framework import Framework
 
     class App(Framework):
         serve_static_files = True
@@ -33,7 +33,7 @@ If you need to serve something on another path you can::
 
 import os.path
 
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core.utils import render_file
 from onegov.core.security import Public
 from more.webassets.tweens import (

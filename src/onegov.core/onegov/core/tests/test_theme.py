@@ -1,6 +1,6 @@
 import morepath
 
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core.theme import get_filename
 from webtest import TestApp as Client
 

@@ -3,7 +3,7 @@ import os
 import os.path
 import polib
 
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core import utils
 from onegov.core.layout import ChameleonLayout
 from onegov.core.templates import render_macro

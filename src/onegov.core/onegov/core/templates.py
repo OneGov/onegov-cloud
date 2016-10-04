@@ -9,7 +9,7 @@ directiory, in addition to inheriting from
 
 For example::
 
-    from onegov.core import Framework
+    from onegov.core.framework import Framework
 
     class App(Framework):
         pass
@@ -39,7 +39,7 @@ from cached_property import cached_property
 from chameleon import PageTemplateLoader, PageTemplateFile
 from chameleon.tal import RepeatDict
 from chameleon.utils import Scope, decode_string
-from onegov.core import Framework
+from onegov.core.framework import Framework
 
 
 def get_default_vars(request, content):

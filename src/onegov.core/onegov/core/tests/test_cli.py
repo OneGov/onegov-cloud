@@ -6,7 +6,7 @@ import yaml
 from click.testing import CliRunner
 from email.header import decode_header
 from email.utils import parseaddr
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core.cli import cli, GroupContext
 from smtplib import SMTPRecipientsRefused
 from unittest.mock import patch

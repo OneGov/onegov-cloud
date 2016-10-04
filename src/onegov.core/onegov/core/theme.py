@@ -40,7 +40,7 @@ template::
 Note that for the theme to work you need to define a filestorage. See
 :meth:`onegov.core.framework.Framework.configure_application`.
 """
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core import log
 from onegov.core import utils
 from onegov.core.filestorage import FilestorageFile

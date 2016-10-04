@@ -9,7 +9,7 @@ features for applications deriving from it:
 
 Using the framework does not really differ from using Morepath::
 
-    from onegov.core import Framework
+    from onegov.core.framework import Framework
 
     class MyApplication(Framework):
         pass

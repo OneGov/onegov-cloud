@@ -8,7 +8,7 @@ See :attr:`onegov.core.framework.Framework.filestorage` for more information.
 """
 
 from fs.errors import BackReferenceError
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core.crypto import random_token
 from onegov.core.utils import render_file
 from onegov.core.security import Public, Private

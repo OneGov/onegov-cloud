@@ -1,6 +1,6 @@
 from chameleon import PageTemplate
 from onegov.core import cache
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from webtest import TestApp as Client
 
 

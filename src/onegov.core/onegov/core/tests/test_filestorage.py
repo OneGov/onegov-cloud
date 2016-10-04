@@ -1,7 +1,7 @@
 import morepath
 import os.path
 
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core import utils
 from webtest import TestApp as Client
 

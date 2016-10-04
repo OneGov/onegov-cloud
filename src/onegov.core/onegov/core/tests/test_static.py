@@ -2,7 +2,7 @@ import morepath
 import os.path
 import time
 
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core import utils
 from onegov.core.static import StaticFile
 from webtest import TestApp as Client

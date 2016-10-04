@@ -1,5 +1,5 @@
 from morepath import settings
-from onegov.core import Framework
+from onegov.core.framework import Framework
 
 
 @Framework.permission_rule(model=object, permission=object, identity=None)

@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from email.header import decode_header
 from email.utils import parseaddr
 from freezegun import freeze_time
-from onegov.core import Framework
+from onegov.core.framework import Framework
 from onegov.core.upgrade import UpgradeState
 from onegov.core.mail import convert_to_plaintext
 from onegov.server import Config, Server

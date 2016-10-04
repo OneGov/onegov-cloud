@@ -1,5 +1,5 @@
 from morepath import Identity
-from onegov.core import Framework
+from onegov.core.framework import Framework
 
 
 class IdentityPolicy(object):
