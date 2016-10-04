@@ -38,6 +38,7 @@ from onegov.core.mail import email, Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
 from onegov.core.request import CoreRequest
 from onegov.server import Application as ServerApplication
+from onegov.server.utils import load_class
 from psycopg2.extensions import TransactionRollbackError
 from purl import URL
 from sqlalchemy.exc import OperationalError
@@ -333,7 +334,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     def configure_filestorage(self, **cfg):
 
         if 'filestorage' in cfg:
-            filestorage_class = pydoc.locate(cfg.get('filestorage'))
+            filestorage_class = load_class(cfg.get('filestorage'))
             filestorage_options = cfg.get('filestorage_options', {})
         else:
             filestorage_class = None

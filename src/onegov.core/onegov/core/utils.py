@@ -1,12 +1,12 @@
 import bleach
 import hashlib
+import importlib
 import inspect
 import json
 import magic
 import mimetypes
 import morepath
 import os.path
-import pydoc
 import re
 
 from collections import Iterable
@@ -150,7 +150,7 @@ def module_path(module, subpath):
     subpath = subpath.strip('/')
 
     if isinstance(module, str):
-        module = pydoc.locate(module)
+        module = importlib.import_module(module)
 
     assert module is not None
 
