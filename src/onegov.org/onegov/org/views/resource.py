@@ -153,6 +153,8 @@ def view_resource(self, request):
 @OrgApp.view(model=Resource, request_method='DELETE', permission=Private)
 def handle_delete_resource(self, request):
 
+    request.assert_valid_csrf_token()
+
     if not self.deletable:
         raise exc.HTTPMethodNotAllowed()
 

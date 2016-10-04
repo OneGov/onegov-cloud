@@ -85,4 +85,5 @@ def handle_edit_person(self, request, form):
 
 @OrgApp.view(model=Person, request_method='DELETE', permission=Private)
 def handle_delete_person(self, request):
+    request.assert_valid_csrf_token()
     PersonCollection(request.app.session()).delete(self)

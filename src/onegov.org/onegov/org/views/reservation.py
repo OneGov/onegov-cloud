@@ -118,6 +118,8 @@ def reserve_allocation(self, request):
 
 @OrgApp.json(model=Reservation, request_method='DELETE', permission=Public)
 def delete_reservation(self, request):
+    request.assert_valid_csrf_token()
+
     resource = request.app.libres_resources.by_reservation(self)
 
     # this view is public, but only for a limited time
