@@ -23,15 +23,18 @@ import pylru
 
 from cached_property import cached_property
 from datetime import datetime
+from dectate import directive
 from email.utils import parseaddr, formataddr
 from itsdangerous import BadSignature, Signer
 from mailthon.middleware import TLS, Auth
+from morepath.publish import resolve_model
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
 from more.webassets.core import webassets_injector_tween
 from more.webassets.tweens import METHODS, CONTENT_TYPES
 from onegov.core import cache, log, utils
+from onegov.core import directives
 from onegov.core.datamanager import MailDataManager
 from onegov.core.mail import email, Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
@@ -56,6 +59,12 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     #: holdes the current schema associated with the database connection, set
     #: by and derived from :meth:`set_application_id`.
     schema = None
+
+    #: framework directives
+    form = directive(directives.HtmlHandleFormAction)
+    cronjob = directive(directives.CronjobAction)
+    static_directory = directive(directives.StaticDirectoryAction)
+    template_variables = directive(directives.TemplateVariablesAction)
 
     @morepath.reify
     def __call__(self):
@@ -455,7 +464,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             'SERVER_PROTOCOL': 'https'
         }, app=self)
 
-        obj = morepath.publish.resolve_model(request)
+        obj = resolve_model(request)
 
         # if there is more than one token unconsumed, this can't be a view
         if len(request.unconsumed) > 1:

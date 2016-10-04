@@ -329,7 +329,7 @@ class CoreRequest(IncludeRequest):
         else:
             permitted = self.app.modules.rules.has_permission_not_logged_in
 
-        return permitted(self.identity, model, permission)
+        return permitted(self.app, self.identity, model, permission)
 
     def exclude_invisible(self, models):
         """ Excludes models invisble to the current user from the list. """

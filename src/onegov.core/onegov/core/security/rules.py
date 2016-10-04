@@ -1,9 +1,8 @@
-from morepath import settings
 from onegov.core.framework import Framework
 
 
 @Framework.permission_rule(model=object, permission=object, identity=None)
-def has_permission_not_logged_in(identity, model, permission):
+def has_permission_not_logged_in(app, identity, model, permission):
     """ This catch-all rule returns the default permission rule. It says
     that the permission must be part of the anonymous rule.
 
@@ -16,11 +15,11 @@ def has_permission_not_logged_in(identity, model, permission):
     if getattr(model, 'is_hidden_from_public', False):
         return False
 
-    return permission in settings().roles.anonymous
+    return permission in app.settings.roles.anonymous
 
 
 @Framework.permission_rule(model=object, permission=object)
-def has_permission_logged_in(identity, model, permission):
+def has_permission_logged_in(app, identity, model, permission):
     """ This permission rule matches all logged in identities. It requires
     the identity to have a 'role' attribute. Said role attribute is used
     to determine if the given permission is part of the given role.
@@ -36,4 +35,4 @@ def has_permission_logged_in(identity, model, permission):
         if getattr(model, 'is_hidden_from_public', False):
             return False
 
-    return permission in getattr(settings().roles, identity.role)
+    return permission in getattr(app.settings.roles, identity.role)

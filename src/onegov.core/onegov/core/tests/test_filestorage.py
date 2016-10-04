@@ -73,6 +73,7 @@ def test_filestorage(temporary_directory):
         return request.new_csrf_token()
 
     utils.scan_morepath_modules(App)
+    App.commit()
 
     app = App()
     app.configure_application(
@@ -123,8 +124,6 @@ def test_filestorage(temporary_directory):
 
     protected_url = '/files/readme?csrf-token={}'.format(anonymous_csrf_token)
     assert client.delete(protected_url, expect_errors=True).status_code == 403
-
-    print('admin')
 
     protected_url = '/files/readme?csrf-token={}'.format(admin_csrf_token)
     assert client.delete(protected_url, expect_errors=True).status_code == 403

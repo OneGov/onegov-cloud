@@ -4,13 +4,10 @@ from datetime import datetime
 from dectate import Action
 from inspect import isfunction
 from morepath.directive import HtmlAction
-from onegov.core.cronjobs import register_cronjob
-from onegov.core.framework import Framework
 from onegov.core.utils import Bunch
 from sedate import to_timezone, replace_timezone
 
 
-@Framework.directive('form')
 class HtmlHandleFormAction(HtmlAction):
     """ Register Form view.
 
@@ -99,7 +96,6 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
     return handle_form
 
 
-@Framework.directive('cronjob')
 class CronjobAction(Action):
     """ Register a cronjob. """
 
@@ -123,11 +119,12 @@ class CronjobAction(Action):
         )
 
     def perform(self, func, cronjob_registry):
+        from onegov.core.cronjobs import register_cronjob
+
         register_cronjob(
             cronjob_registry, func, self.hour, self.minute, self.timezone)
 
 
-@Framework.directive('static_directory')
 class StaticDirectoryAction(Action):
     """ Registers a static files directory. """
 
@@ -171,7 +168,6 @@ class TemplateVariablesRegistry(object):
         return base
 
 
-@Framework.directive('template_variables')
 class TemplateVariablesAction(Action):
     """ Registers a set of global template variables for chameleon templates.
 

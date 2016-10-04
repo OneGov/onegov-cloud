@@ -49,7 +49,7 @@ setup(
         'isodate',
         'lazy-object-proxy',
         'mailthon>=0.1.1',
-        'morepath>0.12',
+        'morepath>=0.16',
         'more.transaction>=0.5',
         'more.webassets>=0.3.1',
         'networkx',

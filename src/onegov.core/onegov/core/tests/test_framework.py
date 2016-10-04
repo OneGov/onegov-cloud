@@ -653,6 +653,8 @@ def test_object_by_path():
         def __init__(self, absorb):
             self.absorb = absorb
 
+    App.commit()
+
     app = App()
     assert isinstance(app.object_by_path('/'), Root)
     assert isinstance(app.object_by_path('https://www.example.org/'), Root)
