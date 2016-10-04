@@ -42,7 +42,7 @@ class Booking(Base, TimestampMixin):
     first_name = Column(Text, nullable=False)
 
     #: the occasion this booking belongs to
-    occasion_id = Column(UUID, ForeignKey(Occasion.id))
+    occasion_id = Column(UUID, ForeignKey(Occasion.id), nullable=False)
 
     #: the state of the booking
     state = Column(

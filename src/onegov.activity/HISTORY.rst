@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Occasions and bookings can no longer be orphaned.
+  [href]
+
+- Location is now optional.
+  [href]
+
 - Adds an occasion collection.
   [href]
 

@@ -32,7 +32,7 @@ class Occasion(Base):
     end = Column(UTCDateTime, nullable=False)
 
     #: Describes the location of the activity
-    location = Column(Text, nullable=False)
+    location = Column(Text, nullable=True)
 
     #: The expected age of participants
     age = Column(
@@ -46,10 +46,10 @@ class Occasion(Base):
     note = Column(Text, nullable=True)
 
     #: The activity this occasion belongs to
-    activity_id = Column(UUID, ForeignKey(Activity.id))
+    activity_id = Column(UUID, ForeignKey(Activity.id), nullable=False)
 
     #: The bookings linked to this occasion
-    occasions = relationship(
+    bookings = relationship(
         'Booking',
         order_by='Booking.created',
         backref='occasion'

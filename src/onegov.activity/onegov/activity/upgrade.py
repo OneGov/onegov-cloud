@@ -34,3 +34,14 @@ def redesign_occasion_table(context):
 
     context.operations.alter_column('occasions', 'spots', nullable=False)
     context.operations.alter_column('occasions', 'age', nullable=False)
+
+
+@upgrade_task('Make occasion location optional')
+def make_occasion_location_optional(context):
+    context.operations.alter_column('occasions', 'location', nullable=True)
+
+
+@upgrade_task('Ensure occasions/bookings cannot be orphaned')
+def ensure_occasions_bookings_cannot_be_orphaned(context):
+    context.operations.alter_column('occasions', 'activity_id', nullable=False)
+    context.operations.alter_column('bookings', 'occasion_id', nullable=False)

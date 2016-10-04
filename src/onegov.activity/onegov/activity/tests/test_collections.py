@@ -161,3 +161,51 @@ def test_occasion_collection(session, owner):
     assert tournament.age.upper == 10
     assert tournament.spots.lower == 2
     assert tournament.spots.upper == 11
+
+
+def test_no_orphan_bookings(session, owner):
+
+    activities = ActivityCollection(session)
+    occasions = OccasionCollection(session)
+
+    tournament = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=activities.add("Sport", username=owner.username)
+    )
+
+    tournament.bookings.append(Booking(
+        username=owner.username,
+        last_name='Muster',
+        first_name='Peter'
+    ))
+
+    session.flush()
+
+    with pytest.raises(sqlalchemy.exc.IntegrityError):
+        occasions.delete(tournament)
+
+
+def test_no_orphan_occasions(session, owner):
+
+    activities = ActivityCollection(session)
+    occasions = OccasionCollection(session)
+
+    tournament = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=activities.add("Sport", username=owner.username)
+    )
+
+    tournament.bookings.append(Booking(
+        username=owner.username,
+        last_name='Muster',
+        first_name='Peter'
+    ))
+
+    session.flush()
+
+    with pytest.raises(sqlalchemy.exc.IntegrityError):
+        activities.delete(activities.query().first())
