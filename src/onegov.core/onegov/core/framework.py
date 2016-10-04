@@ -19,7 +19,6 @@ Using the framework does not really differ from using Morepath::
 import hashlib
 import inspect
 import morepath
-import pydoc
 import pylru
 
 from cached_property import cached_property
