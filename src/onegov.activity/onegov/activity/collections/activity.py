@@ -156,4 +156,4 @@ class ActivityCollection(Pagination):
 
     def delete(self, activity):
         self.session.delete(activity)
-        self.sesison.flush()
+        self.session.flush()
