@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds compatibility with Morepath 0.16.
+  [href]
+
 - Adds the ability to easily format a date range.
   [href]
 
