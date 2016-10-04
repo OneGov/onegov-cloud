@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.2 (2016-10-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Fix application class not loading in Python 3.5.
   [href]
 
