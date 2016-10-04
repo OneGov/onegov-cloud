@@ -706,7 +706,8 @@ def test_people_view(org_app):
 
     assert 'Ming Merciless' in person
 
-    client.delete(person.request.url)
+    delete_link = person.pyquery('a.delete-link').attr('ic-delete-from')
+    client.delete(delete_link)
 
     people = client.get('/personen')
     assert 'noch keine Personen' in people
@@ -946,7 +947,10 @@ def test_resources(org_app):
 
     assert 'Besprechungsraum' in client.get('/ressourcen')
 
-    assert client.delete('/ressource/meeting-room').status_code == 200
+    resource = client.get('/ressource/meeting-room')
+    delete_link = resource.pyquery('a.delete-link').attr('ic-delete-from')
+
+    assert client.delete(delete_link, status=200)
 
 
 def test_reserved_resources_fields(org_app):
