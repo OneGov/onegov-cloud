@@ -239,3 +239,12 @@ ul.occasions {
     }
 
 }
+
+.occasion-links a:first-child:before {
+    content: '';
+}
+
+.occasion-links a:before {
+    color: $body-font-color;
+    content: ' | ';
+}

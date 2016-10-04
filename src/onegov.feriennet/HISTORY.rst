@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Adds the ability to enter occasions.
+- Adds the ability to enter/delete occasions.
   [href]
 
 - Fix activity access rule for editors.

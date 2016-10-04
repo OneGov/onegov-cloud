@@ -46,7 +46,7 @@
 
                         <div class="row">
                             <div class="small-12 medium-5 columns factoids">
-                                <div class="location">
+                                <div class="location" tal:condition="occasion.location">
                                     <span i18n:translate class="show-for-sr">Location</span>
                                     ${occasion.location}
                                 </div>
@@ -78,11 +78,11 @@
                                     </tal:block>
                                 </div>
 
-                                <a tal:condition="request.is_admin or layout.is_owner"
-                                   href="${request.link(occasion, 'bearbeiten')}"
-                                   i18n:translate>
-                                   Edit
-                                </a>
+                                <div class="occasion-links" tal:condition="request.is_admin or layout.is_owner">
+                                    <tal:block repeat="link occasion_links">
+                                        <tal:block replace="structure link(occasion)(request)" />
+                                    </tal:block>
+                                </div>
                             </div>
 
                             <div class="small-12 medium-7 columns">

@@ -1,6 +1,6 @@
 import morepath
 
-from onegov.activity.models import ACTIVITY_STATES, Occasion
+from onegov.activity.models import ACTIVITY_STATES
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security import Secret
@@ -8,13 +8,11 @@ from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.forms import VacationActivityForm
-from onegov.feriennet.forms.occasion import OccasionForm
-from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.layout import VacationActivityCollectionLayout
 from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import VacationActivity
-from onegov.org.elements import Link
+from onegov.org.elements import Link, DeleteLink
 from onegov.org.mail import send_html_mail
 from onegov.ticket import TicketCollection
 from purl import URL
@@ -68,12 +66,30 @@ def view_activities(self, request):
 def view_activity(self, request):
 
     ticket = TicketCollection(request.app.session()).by_handler_id(self.id.hex)
+    layout = VacationActivityLayout(self, request)
+
+    occasion_links = (
+        lambda o: Link(text=_("Edit"), url=request.link(o, name='bearbeiten')),
+        lambda o: DeleteLink(
+            text=_("Delete"), url=layout.csrf_protected_url(request.link(o)),
+            confirm=_('Do you really want to delete "${title}"?', mapping={
+                'title': layout.format_date_range(
+                    o.localized_start,
+                    o.localized_end
+                ),
+            }),
+            redirect_after=request.link(self),
+            yes_button_text=_("Delete Occasion"),
+            classes=('confirm', )
+        )
+    )
 
     return {
-        'layout': VacationActivityLayout(self, request),
+        'layout': layout,
         'title': self.title,
         'activity': self,
-        'ticket': ticket
+        'ticket': ticket,
+        'occasion_links': occasion_links
     }
 
 
@@ -130,53 +146,6 @@ def edit_activity(self, request, form):
     return {
         'layout': VacationActivityFormLayout(self, request, self.title),
         'title': self.title,
-        'form': form
-    }
-
-
-@FeriennetApp.form(
-    model=VacationActivity,
-    template='form.pt',
-    form=OccasionForm,
-    permission=Private,
-    name='neue-durchfuehrung')
-def new_occasion(self, request, form):
-
-    if form.submitted(request):
-        occasion = Occasion()
-        form.populate_obj(occasion)
-        self.occasions.append(occasion)
-
-        request.success(_("Your changes were saved"))
-        return morepath.redirect(request.link(self))
-
-    return {
-        'layout': OccasionFormLayout(self, request, _("New Occasion")),
-        'title': _("New Occasion"),
-        'form': form
-    }
-
-
-@FeriennetApp.form(
-    model=Occasion,
-    template='form.pt',
-    form=OccasionForm,
-    permission=Private,
-    name='bearbeiten')
-def edit_occasion(self, request, form):
-
-    if form.submitted(request):
-        form.populate_obj(self)
-        request.success(_("Your changes were saved"))
-        return morepath.redirect(request.link(self.activity))
-
-    elif not request.POST:
-        form.process(obj=self)
-
-    return {
-        'layout': OccasionFormLayout(
-            self.activity, request, _("Edit Occasion")),
-        'title': _("Edit Occasion"),
         'form': form
     }
 

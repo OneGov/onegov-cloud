@@ -1,6 +1,6 @@
+from onegov.activity import OccasionCollection
 from onegov.feriennet import _
 from onegov.form import Form
-from psycopg2.extras import NumericRange
 from sedate import replace_timezone
 from wtforms.fields import StringField, TextAreaField
 from wtforms.fields.html5 import DateTimeField, IntegerField
@@ -22,8 +22,7 @@ class OccasionForm(Form):
     )
 
     location = StringField(
-        label=_("Location"),
-        validators=[InputRequired()]
+        label=_("Location")
     )
 
     note = TextAreaField(
@@ -119,10 +118,10 @@ class OccasionForm(Form):
         model.timezone = self.timezone
         model.start = self.localized_start
         model.end = self.localized_end
-        model.age = NumericRange(
-            self.min_age.data, self.max_age.data, bounds='[]')
-        model.spots = NumericRange(
-            self.min_spots.data, self.max_spots.data, bounds='[]')
+        model.age = OccasionCollection.to_half_open_interval(
+            self.min_age.data, self.max_age.data)
+        model.spots = OccasionCollection.to_half_open_interval(
+            self.min_spots.data, self.max_spots.data)
 
     def process(self, *args, **kwargs):
         super().process(*args, **kwargs)
