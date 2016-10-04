@@ -1,8 +1,11 @@
+import pytest
+import sqlalchemy
 import transaction
 
 from datetime import datetime
 from onegov.activity import ActivityCollection
 from onegov.activity import OccasionCollection
+from onegov.activity.models import Booking
 from pytz import utc
 
 
@@ -127,7 +130,7 @@ def test_activity_used_tags(session, owner):
 
 def test_occasion_collection(session, owner):
 
-    activites = ActivityCollection(session)
+    activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
 
     tournament = occasions.add(
@@ -138,7 +141,7 @@ def test_occasion_collection(session, owner):
         age=(6, 9),
         spots=(2, 10),
         note="Bring game-face",
-        activity=activites.add("Sport", username=owner.username)
+        activity=activities.add("Sport", username=owner.username)
     )
 
     assert tournament.start == datetime(2016, 10, 4, 11, tzinfo=utc)
@@ -146,7 +149,7 @@ def test_occasion_collection(session, owner):
     assert tournament.timezone == "Europe/Zurich"
     assert tournament.location == "Lucerne"
     assert tournament.note == "Bring game-face"
-    assert tournament.activity_id == activites.query().first().id
+    assert tournament.activity_id == activities.query().first().id
 
     # postgres ranges are coeced into half-open intervals
     assert tournament.age.lower == 6
