@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.5 (2016-10-04)
+~~~~~~~~~~~~~~~~~~~
+
 - Occasions and bookings can no longer be orphaned.
   [href]
 
