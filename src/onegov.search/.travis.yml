@@ -6,7 +6,7 @@ env:
     - TOXENV=py34 DEPLOY=no ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.2.2.tar.gz
     - TOXENV=py35 DEPLOY=no ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.2.2.tar.gz
     - TOXENV=py34 DEPLOY=yes ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.4.0.tar.gz
-    - TOXENV=py35 DEPLOY=yes ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.4.0.tar.gz
+    - TOXENV=py35 DEPLOY=no ES_BINARY=/tmp/elasticsearch/bin/elasticsearch ES_URL=https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.4.0.tar.gz
     - TOXENV=pep8 ES_URL=no DEPLOY=no
 
 install: ./.travis-install.sh
