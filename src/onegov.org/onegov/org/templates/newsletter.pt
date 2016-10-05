@@ -6,7 +6,6 @@
         <p tal:condition="lead" class="newsletter-lead" tal:content="structure lead" />
 
         <tal:block condition="news">
-            <h2 i18n:translate>Latest news</h2>
             <metal:newslist use-macro="layout.macros['newslist']" />
         </tal:block>
 

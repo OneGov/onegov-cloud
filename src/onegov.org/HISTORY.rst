@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Fixes 'News' title showing up twice on the newsletter view.
+  [href]
+ 
+
 0.0.12 (2016-10-04)
 ~~~~~~~~~~~~~~~~~~~
 
