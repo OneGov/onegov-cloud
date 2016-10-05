@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-pip install tox==1.9.2
+pip install tox
 
 if [ "$TOXENV" = 'py34' ]; then
     pip install coveralls
