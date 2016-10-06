@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Always show an "Activities" link in the top bar.
+  [href]
+
 - Organisers may now upload images and set internal links, file uploads
   are prohibited though.
   [href]

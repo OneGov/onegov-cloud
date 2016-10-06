@@ -45,6 +45,6 @@ def get_theme():
     return FeriennetTheme()
 
 
-@OrgApp.static_directory()
+@FeriennetApp.static_directory()
 def get_static_directory():
     return 'static'
