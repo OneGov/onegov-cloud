@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.6 (2016-10-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a reporter column to activites.
   [href]
 
