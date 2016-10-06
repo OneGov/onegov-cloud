@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Introduces a realname column.
+  [href]
+
 - Adds the ability to query users by role through the collection.
   [href]
 

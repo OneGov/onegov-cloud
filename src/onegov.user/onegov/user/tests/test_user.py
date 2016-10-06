@@ -11,13 +11,16 @@ def test_user_initials():
     user = User(username='a.b.c.d.e.f')
     assert user.initials == 'AB'
 
+    user = User(username='victor', realname='Victor Sullivan')
+    assert user.initials == 'VS'
 
-def test_user_title():
+    user = User(username='burns', realname='Charles Montgomery Burns')
+    assert user.initials == 'CB'
+
+
+def test_user_title(session):
     user = User(username='admin')
-    assert user.title == 'Admin'
+    assert user.title == 'admin'
 
-    user = User(username='nathan.drake@example.org')
-    assert user.title == 'Nathan Drake'
-
-    user = User(username='a.b.c.d.e.f')
-    assert user.title == 'A B'
+    user = User(username='nathan', realname="Nathan Drake")
+    assert user.title == "Nathan Drake"

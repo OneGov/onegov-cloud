@@ -32,7 +32,7 @@ class UserCollection(object):
         return self.session.query(User)
 
     def add(self, username, password, role,
-            data=None, second_factor=None, active=True):
+            data=None, second_factor=None, active=True, realname=None):
         """ Add a user to the collection.
 
             The arguments given to this function are the attributes of the
@@ -49,7 +49,8 @@ class UserCollection(object):
             role=role,
             data=data,
             second_factor=second_factor,
-            active=active
+            active=active,
+            realname=realname
         )
 
         self.session.add(user)

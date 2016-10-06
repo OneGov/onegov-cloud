@@ -2,8 +2,10 @@ from onegov.core.crypto import hash_password, verify_password
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
-from onegov.user.utils import yubikey_otp_to_serial, is_valid_yubikey_format
-from sqlalchemy import Boolean, Column, Text
+from onegov.core.utils import remove_repeated_spaces
+from onegov.user.utils import is_valid_yubikey_format
+from onegov.user.utils import yubikey_otp_to_serial
+from sqlalchemy import Boolean, Column, Text, func
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import deferred
 from uuid import uuid4
@@ -25,6 +27,10 @@ class User(Base, TimestampMixin):
 
     #: the role is relevant for security in onegov.core
     role = Column(Text, nullable=False)
+
+    #: the real name of the user for display (use the :attr:`name` property
+    #: to automatically get the name or the username)
+    realname = Column(Text, nullable=True)
 
     #: extra data that may be stored with this user, the format and content
     #: of this data is defined by the consumer of onegov.user
@@ -56,6 +62,16 @@ class User(Base, TimestampMixin):
     active = Column(Boolean, nullable=False, default=True)
 
     @hybrid_property
+    def title(self):
+        """ Returns the realname or the username of the user, depending on
+        what's available first. """
+        return self.realname or self.username
+
+    @title.expression
+    def title(cls):
+        return func.coalesce(cls.realname, cls.username)
+
+    @hybrid_property
     def password(self):
         """ An alias for :attr:`password_hash`. """
         return self.password_hash
@@ -77,32 +93,35 @@ class User(Base, TimestampMixin):
 
     @property
     def initials(self):
-        """ Takes the username and returns initials which are at most two
+        """ Takes the name and returns initials which are at most two
         characters wide.
 
         Examples:
 
         admin => A
         nathan.drake@example.org => ND
+        Victor Sullivan => VS
+        Charles Montgomery Burns => CB
 
         """
 
-        username = self.username.split('@')[0]
-        return ''.join(p[0] for p in username.split('.')[:2]).upper()
+        # for e-mail addresses assume the dot splits the name and use
+        # the first two parts of said split (probably won't have a middle
+        # name in the e-mail address)
+        if not self.realname:
+            username = self.username.split('@')[0]
+            parts = username.split('.')[:2]
 
-    @property
-    def title(self):
-        """ Takes the username and returns a more readable version.
+        # for real names split by space and assume that with more than one
+        # part that the first and last part are the most important to get rid
+        # of middlenames
+        else:
+            parts = remove_repeated_spaces(self.realname).split(' ')
 
-        Examples:
+            if len(parts) > 2:
+                parts = (parts[0], parts[-1])
 
-        admin => Admin
-        nathan.drake@example.org => Nathan Drake
-
-        """
-
-        username = self.username.split('@')[0]
-        return ' '.join(p.capitalize() for p in username.split('.')[:2])
+        return ''.join(p[0] for p in parts).upper()
 
     @property
     def has_yubikey(self):
