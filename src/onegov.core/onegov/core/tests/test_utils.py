@@ -167,3 +167,11 @@ def test_get_unique_hstore_keys(postgres_dsn):
     assert utils.get_unique_hstore_keys(mgr.session(), Document._tags) == {
         'foo', 'bar', 'baz'
     }
+
+
+def test_remove_repeated_spaces():
+
+    assert utils.remove_repeated_spaces('  ') == ' '
+    assert utils.remove_repeated_spaces('a b') == 'a b'
+    assert utils.remove_repeated_spaces('a       b') == 'a b'
+    assert utils.remove_repeated_spaces((' x  ')) == ' x '

@@ -30,6 +30,7 @@ from onegov.core.html import sanitize_html  # noqa
 _unwanted_url_chars = re.compile(r'[\.\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
 _double_dash = re.compile(r'[-]+')
 _number_suffix = re.compile(r'-([0-9]+)$')
+_repeated_spaces = re.compile(r'\s\s+')
 _uuid = re.compile(
     r'[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}')
 
@@ -99,6 +100,12 @@ def rchop(text, end):
         return text[:-len(end)]
 
     return text
+
+
+def remove_repeated_spaces(text):
+    """ Removes repeated spaces in the text ('a  b' -> 'a b'). """
+
+    return _repeated_spaces.sub(' ', text)
 
 
 @contextmanager

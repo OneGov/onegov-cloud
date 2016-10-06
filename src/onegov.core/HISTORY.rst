@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds an utility function to remove repeated spaces.
+  [href]
+
 0.29.1 (2016-10-04)
 ~~~~~~~~~~~~~~~~~~~
 
