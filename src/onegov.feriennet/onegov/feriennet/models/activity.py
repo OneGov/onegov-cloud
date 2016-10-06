@@ -71,7 +71,7 @@ class VacationActivityHandler(Handler):
 
     @property
     def email(self):
-        return self.activity.username
+        return self.activity.reporter
 
     @property
     def title(self):
