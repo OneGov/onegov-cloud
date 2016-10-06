@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.15.1 (2016-10-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Make sure that empty fieldsets are cleaned up when a field is deleted.
   [href]
