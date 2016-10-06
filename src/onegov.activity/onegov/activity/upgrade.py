@@ -3,7 +3,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 
-from onegov.activity.models import Occasion
+from onegov.activity.models import Activity, Occasion
 from onegov.core.upgrade import upgrade_task
 from psycopg2.extras import NumericRange
 from sqlalchemy import Column, Text
@@ -45,3 +45,16 @@ def make_occasion_location_optional(context):
 def ensure_occasions_bookings_cannot_be_orphaned(context):
     context.operations.alter_column('occasions', 'activity_id', nullable=False)
     context.operations.alter_column('bookings', 'occasion_id', nullable=False)
+
+
+@upgrade_task('Add reporter column')
+def add_reporter_column(context):
+    context.operations.add_column('activities', Column(
+        'reporter', Text, nullable=True))
+
+    for activity in context.session.query(Activity).all():
+        activity.reporter = activity.username
+
+    context.session.flush()
+
+    context.operations.alter_column('activities', 'reporter', nullable=True)

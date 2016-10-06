@@ -23,6 +23,7 @@ def test_add_activity(session, owner):
     activity = collection.by_name('visit-the-butcher')
     assert activity.title == "Visit the Butcher"
     assert activity.username == owner.username
+    assert activity.reporter == owner.username
     assert activity.lead.startswith("Come visit the butcher")
     assert activity.text.startswith("<h1>Babe was such a")
     assert activity.tags == {'butcher', 'killing', 'blood', 'fun'}

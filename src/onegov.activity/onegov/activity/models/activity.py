@@ -55,6 +55,10 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: The user to which this activity belongs to (organiser)
     username = Column(Text, ForeignKey(User.username), nullable=False)
 
+    #: The user which initially reported this activity (same as username, but
+    #: this value may not change after initialisation)
+    reporter = Column(Text, nullable=False)
+
     #: Access the user linked to this activity
     user = relationship('User')
 
@@ -86,6 +90,11 @@ class Activity(Base, ContentMixin, TimestampMixin):
     @observes('title')
     def title_observer(self, title):
         self.order = normalize_for_url(title)
+
+    @observes('username')
+    def username_observer(self, username):
+        if not self.reporter:
+            self.reporter = username
 
     @property
     def tags(self):
