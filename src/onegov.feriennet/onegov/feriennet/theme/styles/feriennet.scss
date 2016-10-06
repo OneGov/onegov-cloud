@@ -248,3 +248,14 @@ ul.occasions {
     color: $body-font-color;
     content: ' | ';
 }
+
+/*
+    Hide certain things from non-managers
+*/
+.is-not-manager {
+
+    // file upload manager
+    .redactor-toolbar .re-file {
+        display: none;
+    }
+}

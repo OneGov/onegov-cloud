@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Organisers may now upload images and set internal links, file uploads
+  are prohibited though.
+  [href]
+
 - Gives admins the ability to change the organiser of an activity.
   [href]
 

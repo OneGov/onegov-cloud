@@ -3,6 +3,7 @@ from onegov.activity import Activity, ActivityCollection, Occasion
 from onegov.core.security import Public, Private
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.feriennet import FeriennetApp
+from onegov.org.models import ImageFileCollection, SiteCollection
 from sqlalchemy import or_
 
 
@@ -83,12 +84,38 @@ class ActivityQueryPolicy(object):
 
 @FeriennetApp.permission_rule(model=object, permission=Private)
 def has_private_permission_logged_in(app, identity, model, permission):
-    """ Take away private permission for editors. """
+    """ Take away private permission for editors. For exceptions see
+    the permission rules below.
+
+    """
 
     if identity.role != 'editor':
         return has_permission_logged_in(app, identity, model, permission)
 
     return False
+
+
+@FeriennetApp.permission_rule(model=SiteCollection, permission=Private)
+def has_private_permission_site_collection(app, identity, model, permission):
+    """ Give editors the ability to access the site collection. """
+
+    if identity.role != 'editor':
+        return has_permission_logged_in(app, identity, model, permission)
+
+    return True
+
+
+@FeriennetApp.permission_rule(model=ImageFileCollection, permission=Private)
+def has_private_permission_image_collection(app, identity, model, permission):
+    """ Give editors the ability to access the image file collection (but not
+    the file collection!).
+
+    """
+
+    if identity.role != 'editor':
+        return has_permission_logged_in(app, identity, model, permission)
+
+    return True
 
 
 @FeriennetApp.permission_rule(model=ActivityCollection, permission=Private)
