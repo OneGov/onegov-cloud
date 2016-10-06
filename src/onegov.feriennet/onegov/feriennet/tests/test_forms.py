@@ -24,6 +24,7 @@ def test_vacation_activity_form(session, test_password):
     form = VacationActivityForm()
     form.request = Bunch(
         is_admin=True,
+        current_username='editor@example.org',
         app=Bunch(
             session=lambda: session
         )
@@ -31,6 +32,7 @@ def test_vacation_activity_form(session, test_password):
 
     form.on_request()
 
+    assert form.username.data == 'editor@example.org'
     assert form.username.choices == [
         ('editor@example.org', 'editor@example.org'),
         ('admin@example.org', 'Robert Baratheon')
