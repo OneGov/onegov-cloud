@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.29.2 (2016-10-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Forms handled through the form directive may now define a `on_request`
   method, which is called after the request has been bound to the form and
