@@ -4,7 +4,11 @@ Changelog
 - Fixes onegov.ballot not working with SQLAlchemy 1.1.
   [href]
 
-1.0.0 (2016-09-26)
+
+Unreleased
+~~~~~~~~~~
+1.0.1 (2016-10-06)
+~~~~~~~~~~~~~~~~~~~ (2016-09-26)
 ~~~~~~~~~~~~~~~~~~~
 
 - Adds a new domain of influence: municipality.
