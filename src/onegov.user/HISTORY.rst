@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to query users by role through the collection.
+  [href]
+
 0.7.1 (2016-08-31)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -146,3 +146,17 @@ def test_register_user(session):
 
     with pytest.raises(AlreadyActivatedError):
         users.activate_with_token('user', token)
+
+
+def test_user_by_role(session):
+
+    users = UserCollection(session)
+
+    assert users.by_roles('admin', 'member').count() == 0
+
+    users.add('admin@example.org', 'p@ssw0rd', role='admin')
+    users.add('member@example.org', 'p@ssw0rd', role='member')
+
+    assert users.by_roles('admin', 'member').count() == 2
+    assert users.by_roles('admin').count() == 1
+    assert users.by_roles('member').count() == 1

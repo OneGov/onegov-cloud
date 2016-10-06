@@ -101,6 +101,11 @@ class UserCollection(object):
         else:
             return None
 
+    def by_roles(self, role, *roles):
+        """ Queries the users by roles. """
+        roles = [role] + list(roles)
+        return self.query().filter(User.role.in_(roles))
+
     def register(self, username, password, request, role='member'):
         """ Registers a new user.
 
