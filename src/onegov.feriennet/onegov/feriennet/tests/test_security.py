@@ -39,13 +39,14 @@ def test_activity_query_policy(session):
         )
     ]
 
-    # owners see their own
+    # admins see all
     policy = ActivityQueryPolicy("Steven", 'admin')
-    assert policy.granted_subset(collection.query()).count() == 1
+    assert policy.granted_subset(collection.query()).count() == 2
 
     policy = ActivityQueryPolicy("Leland", 'admin')
-    assert policy.granted_subset(collection.query()).count() == 1
+    assert policy.granted_subset(collection.query()).count() == 2
 
+    # owners see their own
     policy = ActivityQueryPolicy("Steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
 
@@ -59,17 +60,9 @@ def test_activity_query_policy(session):
     policy = ActivityQueryPolicy("Leland", 'member')
     assert policy.granted_subset(collection.query()).count() == 0
 
-    # admins don't see activites in preview
-    policy = ActivityQueryPolicy("Bob", 'admin')
-    assert policy.granted_subset(collection.query()).count() == 0
-
-    # once an activity is proposed, admins see it
+    # proposed activites stay visible to owners but keep hidden from others
     activities[0].propose()
 
-    policy = ActivityQueryPolicy("Bob", 'admin')
-    assert policy.granted_subset(collection.query()).count() == 1
-
-    # the owner still sees it, others do not
     policy = ActivityQueryPolicy("Steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
 
@@ -80,7 +73,7 @@ def test_activity_query_policy(session):
     activities[0].accept()
 
     policy = ActivityQueryPolicy("Steven", 'admin')
-    assert policy.granted_subset(collection.query()).count() == 1
+    assert policy.granted_subset(collection.query()).count() == 2
 
     policy = ActivityQueryPolicy("Steven", 'editor')
     assert policy.granted_subset(collection.query()).count() == 1
@@ -157,12 +150,8 @@ def test_activity_permission():
     assert has_permission('owner', 'owner', 'editor', 'preview')
     assert not has_permission('owner', 'owner', 'member', 'preview')
 
-    # only the owner has permission to the preview
-    assert not has_permission('owner', 'user', 'admin', 'preview')
-    assert not has_permission('owner', 'user', 'editor', 'preview')
-    assert not has_permission('owner', 'user', 'member', 'preview')
-
-    # the admin sees all other states
+    # the admin sees all states
+    assert has_permission('owner', 'user', 'admin', 'preview')
     assert has_permission('owner', 'user', 'admin', 'proposed')
     assert has_permission('owner', 'user', 'admin', 'accepted')
     assert has_permission('owner', 'user', 'admin', 'denied')

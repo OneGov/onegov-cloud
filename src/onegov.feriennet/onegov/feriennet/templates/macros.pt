@@ -86,8 +86,8 @@
     <div class="organiser">
         <ul>
             <li class="organiser-name"
-                tal:condition="organiser.data.name|nothing"
-                tal:content="organiser.data.name">
+                tal:condition="organiser.realname|nothing"
+                tal:content="organiser.realname">
             </li>
             <li class="organiser-address"
                 tal:condition="organiser.data.address|nothing"

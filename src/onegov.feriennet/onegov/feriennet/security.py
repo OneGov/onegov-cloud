@@ -10,6 +10,7 @@ from sqlalchemy import or_
 # ownership in account!)
 VISIBLE_ACTIVITY_STATES = {
     'admin': (
+        'preview',
         'proposed',
         'accepted',
         'denied',
@@ -69,8 +70,7 @@ class ActivityQueryPolicy(object):
     def private_subset(self, query):
         """ Limits the given query to activites meant for admins/owners.
 
-        Admins see all states (except for previews) and everyone sees all the
-        states if they own the activity.
+        Admins see all the states and owners see the states of their own.
         """
 
         assert self.role and self.username

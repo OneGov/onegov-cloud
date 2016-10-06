@@ -37,19 +37,19 @@ def test_activity_permissions(es_feriennet_app):
 
     assert "Learn How to Program" in editor.get('/angebote')
     assert "Learn How to Program" not in anon.get('/angebote')
-    assert "Learn How to Program" not in admin.get('/angebote')
-    assert editor.get(url).status_code == 200
-    assert anon.get(url, expect_errors=True).status_code == 404
-    assert admin.get(url, expect_errors=True).status_code == 404
+    assert "Learn How to Program" in admin.get('/angebote')
+    assert editor.get(url, status=200)
+    assert anon.get(url, status=404)
+    assert admin.get(url, status=200)
 
     editor.post(get_publication_url(editor.get(url), 'request-publication'))
 
     assert "Learn How to Program" in editor.get('/angebote')
     assert "Learn How to Program" not in anon.get('/angebote')
     assert "Learn How to Program" in admin.get('/angebote')
-    assert editor.get(url).status_code == 200
-    assert anon.get(url, expect_errors=True).status_code == 404
-    assert admin.get(url).status_code == 200
+    assert editor.get(url, status=200)
+    assert anon.get(url, status=404)
+    assert admin.get(url, status=200)
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     admin.post(get_publication_url(ticket, 'accept-activity'))
@@ -57,9 +57,9 @@ def test_activity_permissions(es_feriennet_app):
     assert "Learn How to Program" in editor.get('/angebote')
     assert "Learn How to Program" in anon.get('/angebote')
     assert "Learn How to Program" in admin.get('/angebote')
-    assert editor.get(url).status_code == 200
-    assert anon.get(url).status_code == 200
-    assert admin.get(url).status_code == 200
+    assert editor.get(url, status=200)
+    assert anon.get(url, status=200)
+    assert admin.get(url, status=200)
 
     ticket = admin.get(ticket.request.url)
     admin.post(get_publication_url(ticket, 'archive-activity'))
@@ -67,9 +67,9 @@ def test_activity_permissions(es_feriennet_app):
     assert "Learn How to Program" in editor.get('/angebote')
     assert "Learn How to Program" not in anon.get('/angebote')
     assert "Learn How to Program" in admin.get('/angebote')
-    assert editor.get(url).status_code == 200
-    assert anon.get(url, expect_errors=True).status_code == 404
-    assert admin.get(url).status_code == 200
+    assert editor.get(url, status=200)
+    assert anon.get(url, status=404)
+    assert admin.get(url, status=200)
 
 
 def test_activity_communication(feriennet_app):
@@ -282,7 +282,7 @@ def test_organiser_info(feriennet_app):
 
     # changes are reflected on the activity
     contact = editor.get('/angebot/play-with-legos').click('Kontakt ändern')
-    contact.form['name'] = 'Editors Association'
+    contact.form['realname'] = 'Editors Association'
     contact.form['address'] = 'Washington'
     contact.form['email'] = 'editors-association@example.org'
     contact.form['phone'] = '+41 23 456 789'

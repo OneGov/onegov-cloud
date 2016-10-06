@@ -8,9 +8,9 @@ from wtforms.validators import URL
 class UserProfileForm(Form):
     """ Custom userprofile form for feriennet """
 
-    extra_fields = ('name', 'address', 'email', 'phone', 'website')
+    extra_fields = ('address', 'email', 'phone', 'website')
 
-    name = StringField(
+    realname = StringField(
         label=_("Name"),
         description=_("Personal-, Society- or Company-Name")
     )
@@ -36,12 +36,14 @@ class UserProfileForm(Form):
 
     def update_model(self, model):
         model.data = model.data or {}
+        model.realname = self.realname.data
 
         for key in self.extra_fields:
             model.data[key] = self.data.get(key)
 
     def apply_model(self, model):
         modeldata = model.data or {}
+        self.realname.data = model.realname
 
         for key in self.extra_fields:
             getattr(self, key).data = modeldata.get(key)

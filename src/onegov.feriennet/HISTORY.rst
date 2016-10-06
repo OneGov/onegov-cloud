@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Gives admins the ability to change the organiser of an activity.
+  [href]
+
+- Activites in preview are now always visible for admins.
+  [href]
+
 0.0.5 (2016-10-04)
 ~~~~~~~~~~~~~~~~~~~
 
