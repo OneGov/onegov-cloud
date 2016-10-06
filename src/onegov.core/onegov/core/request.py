@@ -183,6 +183,11 @@ class CoreRequest(IncludeRequest):
         correct translator and with CSRF protection enabled (the latter
         doesn't work yet).
 
+        Form classes passed to this function (or defined through the
+        ``App.form`` directive) may define a ``on_request`` method, which
+        is called after the request has been bound to the form and before
+        the view function is called.
+
         """
         meta = {}
 
@@ -205,6 +210,9 @@ class CoreRequest(IncludeRequest):
 
         assert not hasattr(form, 'request')
         form.request = self
+
+        if hasattr(form, 'on_request'):
+            form.on_request()
 
         return form
 

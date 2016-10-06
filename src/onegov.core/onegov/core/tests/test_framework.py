@@ -410,6 +410,45 @@ def test_csrf():
         assert client.post('/', {'csrf_token': csrf_token}).text == 'fail'
 
 
+def test_get_form():
+
+    class PlainForm(Form):
+        called = False
+
+    class OnRequestForm(Form):
+        def on_request(self):
+            self.called = True
+
+    class App(Framework):
+        pass
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.form(model=Root, form=PlainForm, name='plain')
+    def view_get_plain(self, request, form):
+        return form.called and 'called' or 'not-called'
+
+    @App.form(model=Root, form=OnRequestForm, name='on-request')
+    def view_get_on_request(self, request, form):
+        return form.called and 'called' or 'not-called'
+
+    App.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(
+        identity_secure=False,
+        disable_memcached=True,
+        csrf_time_limit=60
+    )
+
+    client = Client(app)
+    assert client.get('/plain').text == 'not-called'
+    assert client.get('/on-request').text == 'called'
+
+
 def test_send_email(smtp):
 
     app = Framework()

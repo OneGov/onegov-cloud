@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+- Forms handled through the form directive may now define a `on_request`
+  method, which is called after the request has been bound to the form and
+  before the view is handled.
+  [href]
+
 - Adds an utility function to remove repeated spaces.
   [href]
 
