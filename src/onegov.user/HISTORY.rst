@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.0 (2016-10-06)
+~~~~~~~~~~~~~~~~~~~
+
 - Introduces a realname column.
   [href]
 
