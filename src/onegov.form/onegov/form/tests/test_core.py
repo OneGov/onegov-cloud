@@ -345,3 +345,31 @@ def test_move_fields():
 
     assert list(Test()._fields.keys()) == ['a', 'b', 'c']
     assert list(Moved()._fields.keys()) == ['b', 'c', 'a']
+
+
+def test_delete_fields():
+
+    class Test(Form):
+        a = StringField('a', fieldset='Letters')
+        one = StringField('1', fieldset='Numerals')
+        two = StringField('2', fieldset='Numerals')
+
+    form = Test()
+    assert form.a.name == 'a'
+    assert form.one.name == 'one'
+    assert form.two.name == 'two'
+    assert len(form.fieldsets) == 2
+
+    form.delete_field('one')
+
+    assert form.a.name == 'a'
+    assert form.one is None
+    assert form.two.name == 'two'
+    assert len(form.fieldsets) == 2
+
+    form.delete_field('two')
+
+    assert form.a.name == 'a'
+    assert form.one is None
+    assert form.two is None
+    assert len(form.fieldsets) == 1

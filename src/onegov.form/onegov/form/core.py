@@ -293,9 +293,15 @@ class Form(BaseForm):
     def delete_field(self, fieldname):
         """ Removes the given field from the form and all the fieldsets. """
 
-        for fieldset in self.fieldsets:
-            if fieldname in fieldset.fields:
-                del fieldset.fields[fieldname]
+        def fieldsets_without_field():
+            for fieldset in self.fieldsets:
+                if fieldname in fieldset.fields:
+                    del fieldset.fields[fieldname]
+
+                if fieldset.fields:
+                    yield fieldset
+
+        self.fieldsets = list(fieldsets_without_field())
 
         del self[fieldname]
 
