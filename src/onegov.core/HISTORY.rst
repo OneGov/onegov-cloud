@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.29.3 (2016-10-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Gets SQLAlchemy-Utils' aggregates decorator to work with the session manager.
   [href]
