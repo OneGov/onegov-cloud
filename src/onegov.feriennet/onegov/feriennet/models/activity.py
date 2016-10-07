@@ -1,5 +1,6 @@
 from cached_property import cached_property
 from onegov.activity import Activity, ActivityCollection
+from onegov.activity.models import DAYS
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
@@ -41,7 +42,16 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
         }
 
     def ordered_tags(self, request):
-        return sorted([request.translate(_(tag)) for tag in self.tags])
+        tags = [request.translate(_(tag)) for tag in self.tags]
+
+        if DAYS.has(self.durations, DAYS.half):
+            tags.append(request.translate(_("Half day")))
+        if DAYS.has(self.durations, DAYS.full):
+            tags.append(request.translate(_("Full day")))
+        if DAYS.has(self.durations, DAYS.many):
+            tags.append(request.translate(_("Multiple days")))
+
+        return sorted(tags)
 
 
 class ActivityTicket(Ticket):

@@ -1,6 +1,6 @@
 import morepath
 
-from onegov.activity.models import ACTIVITY_STATES
+from onegov.activity.models import ACTIVITY_STATES, DAYS
 from onegov.core.security import Private
 from onegov.core.security import Public
 from onegov.core.security import Secret
@@ -38,6 +38,28 @@ def view_activities(self, request):
             url=request.link(self.for_filter(tag=tag))
         ) for tag in self.used_tags
     ]
+
+    taglinks.append(
+        Link(
+            text=_("Half day"),
+            active=DAYS.half in self.durations,
+            url=request.link(self.for_filter(duration=DAYS.half))
+        )
+    )
+    taglinks.append(
+        Link(
+            text=_("Full day"),
+            active=DAYS.full in self.durations,
+            url=request.link(self.for_filter(duration=DAYS.full))
+        )
+    )
+    taglinks.append(
+        Link(
+            text=_("Multiple days"),
+            active=DAYS.many in self.durations,
+            url=request.link(self.for_filter(duration=DAYS.many))
+        )
+    )
 
     if request.is_organiser:
 

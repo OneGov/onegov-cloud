@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter activites by the duration of their occasions.
+  [href]
+
 - Always show an "Activities" link in the top bar.
   [href]
 

@@ -8,8 +8,9 @@ from uuid import UUID
 @FeriennetApp.path(
     model=VacationActivityCollection,
     path='/angebote',
-    converters=dict(tags=[str], states=[str]))
-def get_vacation_activities(request, app, page=0, tags=[], states=[]):
+    converters=dict(tags=[str], states=[str], durations=[int]))
+def get_vacation_activities(request, app, page=0,
+                            tags=[], states=[], durations=[]):
 
     return VacationActivityCollection(
         session=app.session(),
@@ -17,6 +18,7 @@ def get_vacation_activities(request, app, page=0, tags=[], states=[]):
         identity=request.identity,
         tags=tags,
         states=states,
+        durations=durations
     )
 
 
