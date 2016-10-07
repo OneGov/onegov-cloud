@@ -4,9 +4,10 @@ import transaction
 
 from datetime import datetime
 from onegov.activity import ActivityCollection
-from onegov.activity import OccasionCollection
+from onegov.activity import Occasion, OccasionCollection
 from onegov.activity.models import Booking
 from pytz import utc
+from sedate import replace_timezone
 
 
 def test_add_activity(session, owner):
@@ -165,6 +166,18 @@ def test_occasion_collection(session, owner):
     assert tournament.age.upper == 10
     assert tournament.spots.lower == 2
     assert tournament.spots.upper == 11
+
+
+def test_occasions_daterange_constraint(session, owner):
+    sport = ActivityCollection(session).add("Sport", username=owner.username)
+    sport.occasions.append(Occasion(
+        start=replace_timezone(datetime(2020, 10, 10), 'Europe/Zurich'),
+        end=replace_timezone(datetime(2010, 10, 10), 'Europe/Zurich'),
+        timezone='Europe/Zurich'
+    ))
+
+    with pytest.raises(sqlalchemy.exc.IntegrityError):
+        session.flush()
 
 
 def test_no_orphan_bookings(session, owner):

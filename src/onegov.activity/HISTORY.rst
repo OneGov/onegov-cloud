@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a db constraint ensuring that an occasion always starts before it ends.
+  [href]
+
 - Adds an archived state to occasions.
   [href]
 

@@ -75,3 +75,13 @@ def add_archive_state(context):
             "ALTER TYPE occasion_state ADD VALUE IF NOT EXISTS 'archived'")
     finally:
         connection.execution_options(isolation_level=previous_isolation_level)
+
+
+@upgrade_task('Add start before end constraint to occasions')
+def add_start_before_end_constraint_to_occasions(context):
+
+    context.operations.create_check_constraint(
+        "start_before_end",
+        "occasions",
+        '"start" <= "end"'
+    )

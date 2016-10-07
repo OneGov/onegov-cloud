@@ -3,7 +3,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.types import UTCDateTime, UUID
 from psycopg2.extras import NumericRange
 from sedate import to_timezone
-from sqlalchemy import Column, Enum, Text, ForeignKey
+from sqlalchemy import Column, Enum, Text, ForeignKey, CheckConstraint
 from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -60,6 +60,10 @@ class Occasion(Base):
         Enum('active', 'cancelled', 'archived', name='occasion_state'),
         nullable=False,
         default='active'
+    )
+
+    __table_args__ = (
+        CheckConstraint('"start" <= "end"', name='start_before_end'),
     )
 
     @property
