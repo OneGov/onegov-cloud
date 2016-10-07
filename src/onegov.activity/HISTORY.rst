@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an archived state to occasions.
+  [href]
+
 0.0.6 (2016-10-06)
 ~~~~~~~~~~~~~~~~~~~
 

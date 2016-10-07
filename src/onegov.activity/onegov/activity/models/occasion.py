@@ -57,7 +57,7 @@ class Occasion(Base):
 
     #: The state of the occasion
     state = Column(
-        Enum('active', 'cancelled', name='occasion_state'),
+        Enum('active', 'cancelled', 'archived', name='occasion_state'),
         nullable=False,
         default='active'
     )
@@ -75,5 +75,9 @@ class Occasion(Base):
         return to_timezone(self.end, self.timezone)
 
     def cancel(self):
-        assert self.state == 'active'
+        assert self.state in ('active', 'cancelled')
         self.state == 'cancelled'
+
+    def archive(self):
+        assert self.state in ('active', 'cancelled', 'archived')
+        self.state == 'archived'

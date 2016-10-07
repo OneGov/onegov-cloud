@@ -58,3 +58,20 @@ def add_reporter_column(context):
     context.session.flush()
 
     context.operations.alter_column('activities', 'reporter', nullable=True)
+
+
+@upgrade_task('Add archived state to occasions')
+def add_archive_state(context):
+
+    # ALTER TYPE statements don't work inside of transactions -> if you reuse
+    # this code, do not put it inside an update that has other things going
+    # on!
+    connection = context.operations.get_bind()
+    previous_isolation_level = connection.get_isolation_level()
+    connection.execution_options(isolation_level='AUTOCOMMIT')
+
+    try:
+        context.operations.execute(
+            "ALTER TYPE occasion_state ADD VALUE IF NOT EXISTS 'archived'")
+    finally:
+        connection.execution_options(isolation_level=previous_isolation_level)
