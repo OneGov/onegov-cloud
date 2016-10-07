@@ -20,10 +20,12 @@ from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
 from psycopg2.extensions import TransactionRollbackError
 from pytz import timezone
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, Integer, Text, ForeignKey, func
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
+from sqlalchemy.orm import relationship
+from sqlalchemy_utils import aggregated
 from threading import Thread
 from webob.exc import HTTPUnauthorized, HTTPConflict
 from webtest import TestApp as Client
@@ -1161,3 +1163,62 @@ def test_find_models():
 
     results = list(find_models(Base, lambda cls: True))
     assert results == [A, B]
+
+
+def test_sqlalchemy_aggregate(postgres_dsn):
+
+    called = 0
+
+    def count_calls(fn):
+        def wrapper(*args, **kwargs):
+            nonlocal called
+            called += 1
+            return fn(*args, **kwargs)
+        return wrapper
+
+    from sqlalchemy_utils.aggregates import manager
+    manager.construct_aggregate_queries = count_calls(
+        manager.construct_aggregate_queries)
+
+    Base = declarative_base(cls=ModelBase)
+
+    class Thread(Base):
+        __tablename__ = 'thread'
+
+        id = Column(Integer, primary_key=True)
+        name = Column(Text)
+
+        @aggregated('comments', Column(Integer))
+        def comment_count(self):
+            return func.count('1')
+
+        comments = relationship(
+            'Comment',
+            backref='thread'
+        )
+
+    class Comment(Base):
+        __tablename__ = 'comment'
+
+        id = Column(Integer, primary_key=True)
+        content = Column(Text)
+        thread_id = Column(Integer, ForeignKey(Thread.id))
+
+    mgr = SessionManager(postgres_dsn, Base)
+    mgr.set_current_schema('foo')
+
+    session = mgr.session()
+
+    thread = Thread(name='SQLAlchemy development')
+    thread.comments.append(Comment(content='Going good!'))
+    thread.comments.append(Comment(content='Great new features!'))
+
+    session.add(thread)
+
+    transaction.commit()
+
+    thread = session.query(Thread).first()
+    assert thread.comment_count == 2
+
+    # if this goes up, we need to remove our custom fix
+    assert called == 1

@@ -8,6 +8,7 @@ from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.pool import QueuePool
 from sqlalchemy.orm.query import Query
+from sqlalchemy_utils.aggregates import manager as aggregates_manager
 
 
 class ForceFetchQueryClass(Query):
@@ -244,6 +245,16 @@ class SessionManager(object):
             (self.on_insert, lambda session: session.new),
             (self.on_update, lambda session: session.dirty),
             (self.on_delete, lambda session: session.deleted)
+        )
+
+        # SQLAlchemy-Utils' aggregates decorator doesn't work correctly
+        # with our sessions - we need to setup the appropriate event handler
+        # manually. There's a test that makes sure that this is not done
+        # twice. The cause of this has to be investigated still.
+        event.listen(
+            target=session,
+            identifier='after_flush',
+            fn=aggregates_manager.construct_aggregate_queries
         )
 
         @event.listens_for(session, 'after_flush')
