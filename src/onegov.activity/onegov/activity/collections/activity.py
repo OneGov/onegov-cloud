@@ -2,18 +2,20 @@ from onegov.activity.models import Activity
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
-from sqlalchemy import distinct
+from sqlalchemy import distinct, or_, func
 from sqlalchemy.dialects.postgresql import array
 
 
 class ActivityCollection(Pagination):
 
-    def __init__(self, session, type='*', page=0, tags=None, states=None):
+    def __init__(self, session, type='*', page=0,
+                 tags=None, states=None, durations=None):
         self.session = session
         self.type = type
         self.page = page
         self.tags = set(tags) if tags else set()
         self.states = set(states) if states else set()
+        self.durations = set(durations) if durations else set()
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -31,7 +33,8 @@ class ActivityCollection(Pagination):
             type=self.type,
             page=index,
             tags=self.tags,
-            states=self.states
+            states=self.states,
+            durations=self.durations
         )
 
     @property
@@ -62,9 +65,16 @@ class ActivityCollection(Pagination):
         if self.states:
             query = query.filter(model_class.state.in_(self.states))
 
+        if self.durations:
+            conditions = [
+                func.coalesce(model_class.durations, 0).op('&')(int(d)) > 0
+                for d in self.durations
+            ]
+            query = query.filter(or_(*conditions))
+
         return query
 
-    def for_filter(self, tag=None, state=None):
+    def for_filter(self, tag=None, state=None, duration=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -72,25 +82,28 @@ class ActivityCollection(Pagination):
 
         """
 
-        assert tag or state
+        assert tag or state or duration
 
-        if tag:
-            if tag in self.tags:
-                tags = self.tags - {tag}
+        duration = int(duration) if duration is not None else None
+
+        def toggle(collection, item):
+            if item is None:
+                return collection
+
+            if item in collection:
+                return collection - {item}
             else:
-                tags = self.tags | {tag}
-        else:
-            tags = self.tags
+                return collection | {item}
 
-        if state:
-            if state in self.states:
-                states = self.states - {state}
-            else:
-                states = self.states | {state}
-        else:
-            states = self.states
+        toggled = (
+            toggle(collection, item) for collection, item in (
+                (self.tags, tag),
+                (self.states, state),
+                (self.durations, duration)
+            )
+        )
 
-        return self.__class__(self.session, self.type, 0, tags, states)
+        return self.__class__(self.session, self.type, 0, *toggled)
 
     def by_id(self, id):
         return self.query().filter(Activity.id == id).first()

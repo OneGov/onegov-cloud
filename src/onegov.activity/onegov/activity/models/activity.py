@@ -1,3 +1,4 @@
+from onegov.activity.models.occasion import Occasion
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import (
     content_property,
@@ -8,11 +9,12 @@ from onegov.core.orm.mixins import (
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
-from sqlalchemy import Column, Enum, Text, ForeignKey
+from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
+from sqlalchemy import func, distinct
 from sqlalchemy.dialects.postgresql import HSTORE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
-from sqlalchemy_utils import observes
+from sqlalchemy_utils import aggregated, observes
 from uuid import uuid4
 
 
@@ -61,6 +63,10 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     #: Access the user linked to this activity
     user = relationship('User')
+
+    @aggregated('occasions', Column(Integer, nullable=True, default=0))
+    def durations(self):
+        return func.sum(distinct(Occasion.duration))
 
     #: The occasions linked to this activity
     occasions = relationship(

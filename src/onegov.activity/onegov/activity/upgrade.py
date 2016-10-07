@@ -6,7 +6,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.activity.models import Activity, Occasion
 from onegov.core.upgrade import upgrade_task
 from psycopg2.extras import NumericRange
-from sqlalchemy import Column, Text
+from sqlalchemy import Column, Text, Integer
 from sqlalchemy.dialects.postgresql import INT4RANGE
 
 
@@ -85,3 +85,26 @@ def add_start_before_end_constraint_to_occasions(context):
         "occasions",
         '"start" <= "end"'
     )
+
+
+@upgrade_task('Add occasion durations')
+def add_occasion_durations(context):
+
+    context.operations.add_column(
+        'activities', Column('durations', Integer, nullable=True, default=0))
+
+    # force an update of all occasions
+    for occasion in context.session.query(Occasion).all():
+        occasion.note = occasion.note and occasion.note + ' ' or ' '
+
+    context.session.flush()
+
+
+@upgrade_task('Add occasion durations (second step)')
+def add_occasion_durations_second_step(context):
+
+    # undo the damage from the last step
+    for occasion in context.session.query(Occasion).all():
+        occasion.note = occasion.note and occasion.note.strip() or None
+
+    context.session.flush()

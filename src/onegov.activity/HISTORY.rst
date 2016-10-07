@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter activites by the duration of their occasions.
+  [href]
+
 - Adds a db constraint ensuring that an occasion always starts before it ends.
   [href]
 

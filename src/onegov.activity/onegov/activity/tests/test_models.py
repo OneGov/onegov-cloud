@@ -5,6 +5,7 @@ import transaction
 from datetime import datetime
 from onegov.activity import ActivityCollection
 from onegov.activity import Occasion, OccasionCollection
+from onegov.activity.models import DAYS
 from onegov.activity.models import Booking
 from pytz import utc
 from sedate import replace_timezone
@@ -226,3 +227,162 @@ def test_no_orphan_occasions(session, owner):
 
     with pytest.raises(sqlalchemy.exc.IntegrityError):
         activities.delete(activities.query().first())
+
+
+def test_occasion_durations(session, owner):
+
+    activities = ActivityCollection(session)
+    occasions = OccasionCollection(session)
+
+    retreat = activities.add("Management Retreat", username=owner.username)
+
+    assert not DAYS.has(retreat.durations, DAYS.half)
+    assert not DAYS.has(retreat.durations, DAYS.full)
+    assert not DAYS.has(retreat.durations, DAYS.many)
+
+    # add an occasion that last half a day
+    monday = occasions.add(
+        start=datetime(2016, 10, 3, 12),
+        end=datetime(2016, 10, 3, 16),
+        timezone="Europe/Zurich",
+        activity=retreat
+    )
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert DAYS.has(retreat.durations, DAYS.half)
+    assert not DAYS.has(retreat.durations, DAYS.full)
+    assert not DAYS.has(retreat.durations, DAYS.many)
+
+    # add another half a day occasion
+    tuesday = occasions.add(
+        start=datetime(2016, 10, 4, 12),
+        end=datetime(2016, 10, 4, 16),
+        timezone="Europe/Zurich",
+        activity=retreat
+    )
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert DAYS.has(retreat.durations, DAYS.half)
+    assert not DAYS.has(retreat.durations, DAYS.full)
+    assert not DAYS.has(retreat.durations, DAYS.many)
+
+    # add a full day occasion
+    wednesday = occasions.add(
+        start=datetime(2016, 10, 5, 8),
+        end=datetime(2016, 10, 5, 16),
+        timezone="Europe/Zurich",
+        activity=retreat
+    )
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert DAYS.has(retreat.durations, DAYS.half)
+    assert DAYS.has(retreat.durations, DAYS.full)
+    assert not DAYS.has(retreat.durations, DAYS.many)
+
+    # add a multi day occasion
+    weekend = occasions.add(
+        start=datetime(2016, 10, 8, 8),
+        end=datetime(2016, 10, 9, 16),
+        timezone="Europe/Zurich",
+        activity=retreat
+    )
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert DAYS.has(retreat.durations, DAYS.half)
+    assert DAYS.has(retreat.durations, DAYS.full)
+    assert DAYS.has(retreat.durations, DAYS.many)
+
+    # remove a the first half-day occasion (nothing should change)
+    occasions.delete(monday)
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert DAYS.has(retreat.durations, DAYS.half)
+    assert DAYS.has(retreat.durations, DAYS.full)
+    assert DAYS.has(retreat.durations, DAYS.many)
+
+    # remove the second half-day occasion (no more half-days)
+    occasions.delete(tuesday)
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert not DAYS.has(retreat.durations, DAYS.half)
+    assert DAYS.has(retreat.durations, DAYS.full)
+    assert DAYS.has(retreat.durations, DAYS.many)
+
+    # remove the full day occasion
+    occasions.delete(wednesday)
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert not DAYS.has(retreat.durations, DAYS.half)
+    assert not DAYS.has(retreat.durations, DAYS.full)
+    assert DAYS.has(retreat.durations, DAYS.many)
+
+    # remove the remaining occasion
+    occasions.delete(weekend)
+    transaction.commit()
+
+    retreat = activities.query().first()
+    assert not DAYS.has(retreat.durations, DAYS.half)
+    assert not DAYS.has(retreat.durations, DAYS.full)
+    assert not DAYS.has(retreat.durations, DAYS.many)
+
+
+def test_occasion_durations_query(session, owner):
+
+    activities = ActivityCollection(session)
+    occasions = OccasionCollection(session)
+
+    retreat = activities.add("Management Retreat", username=owner.username)
+    meeting = activities.add("Management Meeting", username=owner.username)
+
+    # the retreat lasts a weekend
+    occasions.add(
+        start=datetime(2016, 10, 8, 8),
+        end=datetime(2016, 10, 9, 16),
+        timezone="Europe/Zurich",
+        activity=retreat
+    )
+
+    # the meeting has a day and a half-day occasion
+    occasions.add(
+        start=datetime(2016, 10, 10, 8),
+        end=datetime(2016, 10, 10, 12),
+        timezone="Europe/Zurich",
+        activity=meeting
+    )
+
+    occasions.add(
+        start=datetime(2016, 10, 11, 8),
+        end=datetime(2016, 10, 11, 16),
+        timezone="Europe/Zurich",
+        activity=meeting
+    )
+
+    transaction.commit()
+
+    assert activities.query().count() == 2
+    assert activities.for_filter(duration=DAYS.half).query().count() == 1
+    assert activities.for_filter(duration=DAYS.full).query().count() == 1
+    assert activities.for_filter(duration=DAYS.many).query().count() == 1
+
+    assert activities\
+        .for_filter(duration=DAYS.half)\
+        .for_filter(duration=DAYS.full)\
+        .query().count() == 1
+
+    assert activities\
+        .for_filter(duration=DAYS.half)\
+        .for_filter(duration=DAYS.full)\
+        .for_filter(duration=DAYS.many)\
+        .query().count() == 2
+
+    assert activities\
+        .for_filter(duration=DAYS.half)\
+        .for_filter(duration=DAYS.many)\
+        .query().count() == 2
