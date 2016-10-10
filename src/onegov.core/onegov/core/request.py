@@ -79,7 +79,12 @@ class CoreRequest(IncludeRequest):
     @cached_property
     def url(self):
         """ Returns the current url, taking the virtual hosting in account. """
-        return self.transform(self.path)
+        url = self.transform(self.path)
+
+        if self.query_string:
+            url += '?' + self.query_string
+
+        return url
 
     def transform(self, url):
         """ Applies X_VHM_HOST and X_VHM_ROOT to the given url (which is

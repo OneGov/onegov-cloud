@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes request.url not having the same semantics as webob.request.url.
+  [href]
+
 - Adds the ability to query form class associated with a model.
   [href]
 

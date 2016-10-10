@@ -47,8 +47,7 @@ class HtmlHandleFormAction(HtmlAction):
 
         keys = self.key_dict()
 
-        wrapped = wrap_with_generic_form_handler(
-            obj, self.form, keys.get('name'))
+        wrapped = wrap_with_generic_form_handler(obj, self.form)
 
         if 'request_method' not in keys:
 
@@ -106,7 +105,7 @@ def query_form_class(request, model, name=None):
             return fetch_form_class(a.form, model, request)
 
 
-def wrap_with_generic_form_handler(obj, form_class, view_name):
+def wrap_with_generic_form_handler(obj, form_class):
     """ Wraps a view handler with generic form handling.
 
     This includes instantiatng the form with translations/csrf protection
@@ -120,7 +119,7 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
 
         if _class:
             form = request.get_form(_class)
-            form.action = request.link(self, name=view_name)
+            form.action = request.url
         else:
             form = None
 
