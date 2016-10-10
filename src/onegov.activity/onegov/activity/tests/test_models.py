@@ -386,3 +386,32 @@ def test_occasion_durations_query(session, owner):
         .for_filter(duration=DAYS.half)\
         .for_filter(duration=DAYS.many)\
         .query().count() == 2
+
+
+def test_occasion_ages(session, owner):
+
+    activities = ActivityCollection(session)
+    occasions = OccasionCollection(session)
+
+    workshop = activities.add("DjangoGirls Workshop", username=owner.username)
+    saturday = occasions.add(
+        start=datetime(2017, 2, 18, 8),
+        end=datetime(2017, 2, 18, 17),
+        timezone="Europe/Zurich",
+        age=(1, 10),
+        activity=workshop
+    )
+    sunday = occasions.add(
+        start=datetime(2018, 2, 19, 8),
+        end=datetime(2018, 2, 19, 17),
+        timezone="Europe/Zurich",
+        age=(10, 20),
+        activity=workshop
+    )
+
+    assert saturday.ages == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    assert sunday.ages == (10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+
+    ages = occasions.query().with_entities(Occasion.ages).all()
+    assert ages[0] == saturday.ages
+    assert ages[1] == sunday.ages
