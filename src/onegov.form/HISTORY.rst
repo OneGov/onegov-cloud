@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Adds a process_obj function which may be overridden by forms that need
+  to change the way objects are processed.
+  [href]
+
 0.15.1 (2016-10-06)
 ~~~~~~~~~~~~~~~~~~~
 

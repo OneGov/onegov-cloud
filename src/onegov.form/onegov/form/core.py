@@ -290,6 +290,28 @@ class Form(BaseForm):
             if name in include and name not in exclude:
                 field.populate_obj(obj, name)
 
+    def process(self, *args, **kwargs):
+        """ Calls :meth:`process_obj` if ``process()`` was called with
+        the ``obj`` keyword argument.
+
+        This saves an extra check in many cases where we want to extend the
+        process function, but only *if* an obj has been provided.
+
+        """
+        super().process(*args, **kwargs)
+
+        if 'obj' in kwargs:
+            self.process_obj(kwargs.get('obj'))
+
+    def process_obj(self, obj):
+        """ Called by :meth:`process` if an object was passed.
+
+        Do *not* use this function directly. To process an object, you should
+        call ``form.process(obj=obj)`` instead.
+
+        """
+        pass
+
     def delete_field(self, fieldname):
         """ Removes the given field from the form and all the fieldsets. """
 
