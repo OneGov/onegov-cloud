@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.15.2 (2016-10-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a process_obj function which may be overridden by forms that need
   to change the way objects are processed.
