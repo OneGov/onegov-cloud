@@ -66,6 +66,9 @@ class ReturnToMixin(object):
 
         return URL(url).query_param('return-to', signed).as_string()
 
+    def return_here(self, url):
+        return self.return_to(url, self.url)
+
     def redirect(self, url):
         if 'return-to' in self.GET:
             try:
