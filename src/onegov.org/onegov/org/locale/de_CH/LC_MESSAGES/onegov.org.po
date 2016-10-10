@@ -727,8 +727,8 @@ msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
 msgid "Administrators and editors must use a Yubikey"
 msgstr "Administratoren und Editoren müssen zwingend einen YubiKey verwenden"
 
-msgid "Send me a daily e-mail with information about the website's state."
-msgstr "Ich möchte ein tägliches Status E-Mail erhalten."
+msgid "Send a daily status e-mail."
+msgstr "Ein tägliches Status E-Mail senden."
 
 msgid "All events"
 msgstr "Alle Veranstaltungen"

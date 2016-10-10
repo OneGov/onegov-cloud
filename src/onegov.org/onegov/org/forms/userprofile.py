@@ -6,9 +6,7 @@ from wtforms import BooleanField
 class UserProfileForm(Form):
     """ Defines the settings form for user profiles. """
 
-    daily_ticket_statistics = BooleanField(_(
-        "Send me a daily e-mail with information about the website's state."
-    ))
+    daily_ticket_statistics = BooleanField(_("Send a daily status e-mail."))
 
     def populate_obj(self, model):
         super().populate_obj(model, exclude={
@@ -23,4 +21,4 @@ class UserProfileForm(Form):
         super().process_obj(obj)
 
         self.daily_ticket_statistics.data\
-            = obj.data.get('daily_ticket_statistics', True)
+            = (obj.data or {}).get('daily_ticket_statistics', True)

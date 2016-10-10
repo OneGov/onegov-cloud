@@ -2,7 +2,9 @@ import morepath
 
 from collections import defaultdict
 from onegov.core.crypto import random_password
+from onegov.core.directives import query_form_class
 from onegov.core.security import Secret
+from onegov.form import merge_forms
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import ManageUserForm, NewUserForm
@@ -30,7 +32,14 @@ def view_usermanagement(self, request):
     }
 
 
-@OrgApp.form(model=User, template='form.pt', form=ManageUserForm,
+def get_manage_user_form(self, request):
+    userprofile_form = query_form_class(request, self, name='benutzerprofil')
+    assert userprofile_form
+
+    return merge_forms(ManageUserForm, userprofile_form)
+
+
+@OrgApp.form(model=User, template='form.pt', form=get_manage_user_form,
              permission=Secret)
 def handle_manage_user(self, request, form):
 

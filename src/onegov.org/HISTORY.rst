@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Includes the userprofile in the usermanagement view.
+  [href]
+
 - Fixes 'News' title showing up twice on the newsletter view.
   [href]
 
