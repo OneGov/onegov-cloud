@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to change any userprofile as administrator.
+  [href]
+
 - Adds the ability to filter activites by the duration of their occasions.
   [href]
 

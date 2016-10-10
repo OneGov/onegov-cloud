@@ -29,8 +29,12 @@
                 <h2 i18n:translate>Organiser</h2>
                 <metal:block use-macro="layout.macros.organiser" />
 
-                <small tal:condition="show_ticket_panel and organiser.username == request.identity.userid|nothing">
-                    <a href="${request.link(request.app.org, 'benutzerprofil')}" i18n:translate>Edit your contact info</a>
+                <small tal:condition="show_ticket_panel and not request.is_admin and organiser.username == request.identity.userid|nothing">
+                    <a href="${request.link(request.app.org, 'benutzerprofil')}" i18n:translate>Edit contact info</a>
+                </small>
+
+                <small tal:condition="show_ticket_panel and request.is_admin">
+                    <a href="${request.link(activity.user)}" i18n:translate>Edit contact info</a>
                 </small>
             </div>
         </div>
