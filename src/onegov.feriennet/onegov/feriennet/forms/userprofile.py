@@ -34,14 +34,18 @@ class UserProfileForm(Form):
         validators=[URL()]
     )
 
-    def update_model(self, model):
+    def populate_obj(self, model):
+        super().populate_obj(model)
+
         model.data = model.data or {}
         model.realname = self.realname.data
 
         for key in self.extra_fields:
             model.data[key] = self.data.get(key)
 
-    def apply_model(self, model):
+    def process_obj(self, model):
+        super().process_obj(model)
+
         modeldata = model.data or {}
         self.realname.data = model.realname
 

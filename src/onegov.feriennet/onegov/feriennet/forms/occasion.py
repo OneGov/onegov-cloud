@@ -123,15 +123,12 @@ class OccasionForm(Form):
         model.spots = OccasionCollection.to_half_open_interval(
             self.min_spots.data, self.max_spots.data)
 
-    def process(self, *args, **kwargs):
-        super().process(*args, **kwargs)
+    def process_obj(self, model):
+        super().process_obj(model)
 
-        if 'obj' in kwargs:
-            model = kwargs['obj']
-
-            self.start.data = model.localized_start
-            self.end.data = model.localized_end
-            self.min_age.data = model.age.lower
-            self.max_age.data = model.age.upper - 1
-            self.min_spots.data = model.spots.lower
-            self.max_spots.data = model.spots.upper - 1
+        self.start.data = model.localized_start
+        self.end.data = model.localized_end
+        self.min_age.data = model.age.lower
+        self.max_age.data = model.age.upper - 1
+        self.min_spots.data = model.spots.lower
+        self.max_spots.data = model.spots.upper - 1
