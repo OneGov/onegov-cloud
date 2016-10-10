@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.7 (2016-10-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to filter activites by the duration of their occasions.
   [href]
 
