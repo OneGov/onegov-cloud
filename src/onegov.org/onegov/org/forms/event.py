@@ -213,27 +213,24 @@ class EventForm(Form):
                 )
             )
 
-    def process(self, *args, **kwargs):
+    def process_obj(self, model):
         """ Stores the page values on the form. """
 
-        super().process(*args, **kwargs)
+        super().process_obj(model)
 
-        if 'obj' in kwargs:
-            model = kwargs['obj']
+        self.start_time.data = model.localized_start.time()
+        self.end_time.data = model.localized_end.time()
+        self.start_date.data = model.localized_start.date()
 
-            self.start_time.data = model.localized_start.time()
-            self.end_time.data = model.localized_end.time()
-            self.start_date.data = model.localized_start.date()
+        if model.recurrence:
+            last_occurrence = model.occurrence_dates(localize=True)[-1]
+            self.end_date.data = last_occurrence.date()
 
-            if model.recurrence:
-                last_occurrence = model.occurrence_dates(localize=True)[-1]
-                self.end_date.data = last_occurrence.date()
+            rule = rrule.rrulestr(model.recurrence)
+            if rule._freq == rrule.WEEKLY:
+                self.weekly.data = [
+                    WEEKDAYS[day][0] for day in rule._byweekday
+                ]
 
-                rule = rrule.rrulestr(model.recurrence)
-                if rule._freq == rrule.WEEKLY:
-                    self.weekly.data = [
-                        WEEKDAYS[day][0] for day in rule._byweekday
-                    ]
-
-            if model.meta:
-                self.email.data = model.meta.get('submitter_email')
+        if model.meta:
+            self.email.data = model.meta.get('submitter_email')

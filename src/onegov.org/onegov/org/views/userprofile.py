@@ -25,10 +25,10 @@ def handle_user_profile(self, request, form):
     user = collection.by_username(request.identity.userid)
 
     if form.submitted(request):
-        form.update_model(user)
+        form.populate_obj(user)
         request.success(_("Your changes were saved"))
     else:
-        form.apply_model(user)
+        form.process(obj=user)
 
     layout.breadcrumbs = [
         Link(_("Homepage"), layout.homepage_url),

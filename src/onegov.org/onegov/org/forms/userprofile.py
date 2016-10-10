@@ -10,13 +10,17 @@ class UserProfileForm(Form):
         "Send me a daily e-mail with information about the website's state."
     ))
 
-    def update_model(self, model):
-        if model.data is None:
-            model.data = {}
+    def populate_obj(self, model):
+        super().populate_obj(model, exclude={
+            'daily_ticket_statistics'
+        })
 
+        model.data = model.data or {}
         model.data['daily_ticket_statistics']\
-            = self.data['daily_ticket_statistics']
+            = self.daily_ticket_statistics.data
 
-    def apply_model(self, model):
+    def process_obj(self, obj):
+        super().process_obj(obj)
+
         self.daily_ticket_statistics.data\
-            = (model.data or {}).get('daily_ticket_statistics', True)
+            = obj.data.get('daily_ticket_statistics', True)

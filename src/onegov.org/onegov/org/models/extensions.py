@@ -302,15 +302,11 @@ class PersonLinkExtension(ContentExtension):
                 super().populate_obj(obj, *args, **kwargs)
                 self.update_model(obj)
 
-            def process(self, *args, **kwargs):
+            def process_obj(self, obj):
                 # XXX this no longer be necessary once the person links
                 # have been turned into a field, see #74
-                super().process(*args, **kwargs)
-
-                obj = kwargs.get('obj')
-
-                if obj:
-                    self.apply_model(obj)
+                super().process_obj(obj)
+                self.apply_model(obj)
 
             def update_model(self, model):
                 previous_people = model.content.get('people', [])
