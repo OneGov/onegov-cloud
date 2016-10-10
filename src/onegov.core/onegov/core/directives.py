@@ -1,7 +1,7 @@
 import os.path
 
 from datetime import datetime
-from dectate import Action
+from dectate import Action, Query
 from inspect import isfunction
 from morepath.directive import HtmlAction
 from onegov.core.utils import Bunch
@@ -70,6 +70,42 @@ class HtmlHandleFormAction(HtmlAction):
                 self.permission, self.internal)
 
 
+def fetch_form_class(form_class, model, request):
+    """ Given the form_class defined with the form action, together with
+    model and request, this function returns the actual class to be used.
+
+    """
+
+    if isfunction(form_class):
+        return form_class(model, request)
+    else:
+        return form_class
+
+
+def query_form_class(request, model, name=None):
+    """ Queries the app configuration for the form class associated with
+    the given model and name. Take this configuration for example::
+
+        @App.form(model=Model, form_class=Form, name='foobar')
+        ...
+
+    The form class defined here can be retrieved as follows:
+
+        query_form_class(request, model=Model, name='foobar')
+
+    """
+
+    appcls = request.app.__class__
+    action = appcls.form.action_factory
+
+    for a, fn in Query(action)(appcls):
+        if not isinstance(a, action):
+            continue
+
+        if a.key_dict().get('name') == name:
+            return fetch_form_class(a.form, model, request)
+
+
 def wrap_with_generic_form_handler(obj, form_class, view_name):
     """ Wraps a view handler with generic form handling.
 
@@ -80,10 +116,7 @@ def wrap_with_generic_form_handler(obj, form_class, view_name):
 
     def handle_form(self, request):
 
-        if isfunction(form_class):
-            _class = form_class(self, request)
-        else:
-            _class = form_class
+        _class = fetch_form_class(form_class, self, request)
 
         if _class:
             form = request.get_form(_class)

@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to query form class associated with a model.
+  [href]
+
 0.29.3 (2016-10-07)
 ~~~~~~~~~~~~~~~~~~~
 

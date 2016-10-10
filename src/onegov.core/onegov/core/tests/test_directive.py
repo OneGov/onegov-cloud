@@ -1,3 +1,4 @@
+from onegov.core.directives import query_form_class
 from onegov.core.framework import Framework
 from onegov.core.security import Secret
 from webtest import TestApp as Client
@@ -58,3 +59,56 @@ def test_form_directive():
     assert client.post('/2', expect_errors=True).status_code == 405
     assert client.get('/3', expect_errors=True).status_code == 405
     assert client.post('/3', expect_errors=True).status_code == 403
+
+
+def test_query_form_class():
+
+    class FormA(Form):
+        pass
+
+    class FormB(Form):
+        pass
+
+    def get_form_b(self, request):
+        return FormB
+
+    class App(Framework):
+        pass
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.form(model=Root, form=FormA)
+    def handle_form(self, request, form):
+        return ''
+
+    @App.form(model=Root, name='b', form=get_form_b)
+    def get_form(self, request, form):
+        return ''
+
+    @App.view(model=Root, name='assert-form-a')
+    def assert_form_a(self, request):
+        assert query_form_class(request, Root) is FormA
+
+    @App.view(model=Root, name='assert-form-b')
+    def assert_form_b(self, request):
+        assert query_form_class(request, Root, name='b') is FormB
+
+    @App.view(model=Root, name='assert-form-missing')
+    def assert_form_c(self, request):
+        assert query_form_class(request, Root, name='foobar') is None
+
+    App.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(
+        identity_secure=False,
+        disable_memcached=True
+    )
+
+    client = Client(app)
+    assert client.get('/assert-form-a')
+    assert client.get('/assert-form-b')
+    assert client.get('/assert-form-missing')
