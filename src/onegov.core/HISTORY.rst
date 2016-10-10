@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a convenient and safe way to define return-to url parameters.
+  [href]
+
 - Fixes request.url not having the same semantics as webob.request.url.
   [href]
 

@@ -1,4 +1,5 @@
 import collections
+import morepath
 
 from cached_property import cached_property
 from datetime import timedelta
@@ -6,6 +7,7 @@ from itsdangerous import (
     BadSignature,
     SignatureExpired,
     TimestampSigner,
+    URLSafeSerializer,
     URLSafeTimedSerializer
 )
 from more.webassets.core import IncludeRequest
@@ -14,12 +16,67 @@ from onegov.core import utils
 from onegov.core.crypto import random_token
 from webob.exc import HTTPForbidden
 from wtforms.csrf.session import SessionCSRF
+from purl import URL
 
 
 Message = collections.namedtuple('Message', ['text', 'type'])
 
 
-class CoreRequest(IncludeRequest):
+class ReturnToMixin(object):
+    """ Provides a safe and convenient way of using return-to links.
+
+    Return-to links are links with an added 'return-to' query parameter
+    which points to the url a specific view (usually with a form) should
+    return to, once all is said and done.
+
+    There's no magic involved. If a view should honor the return-to
+    paramter, it should use request.redirect instead of morepath.redirect.
+
+    If no return-to parameter was specified, rqeuest.redirect is a
+    transparent proxy to morepath.redirect.
+
+    To create a link::
+
+        url = request.return_to(original_url, redirect)
+
+    To honor the paramter in a view, if present::
+
+        return request.redirect(default_url)
+
+    *Do not use the return-to parameter directly*. Redirect parameters
+    are notorious for being used in phising attacks. By using ``return_to``
+    and ``redirect`` you are kept safe from these attacks as the redirect
+    url is signed and verified.
+
+    For the same reason you should not allow the user-data for return-to
+    links. Those are meant for internally generated links!
+
+    """
+
+    @property
+    def identity_secret(self):
+        raise NotImplementedError
+
+    @property
+    def redirect_signer(self):
+        return URLSafeSerializer(self.identity_secret, 'return-to')
+
+    def return_to(self, url, redirect):
+        signed = self.redirect_signer.dumps(redirect)
+
+        return URL(url).query_param('return-to', signed).as_string()
+
+    def redirect(self, url):
+        if 'return-to' in self.GET:
+            try:
+                url = self.redirect_signer.loads(self.GET['return-to'])
+            except BadSignature:
+                pass
+
+        return morepath.redirect(url)
+
+
+class CoreRequest(IncludeRequest, ReturnToMixin):
     """ Extends the default Morepath request with virtual host support and
     other useful methods.
 
@@ -27,6 +84,10 @@ class CoreRequest(IncludeRequest):
     https://github.com/morepath/morepath/issues/185
 
     """
+
+    @cached_property
+    def identity_secret(self):
+        return self.app.identity_secret
 
     def link_prefix(self):
         """ Override the `link_prefix` with the application base path provided
@@ -428,7 +489,7 @@ class CoreRequest(IncludeRequest):
         # more.itsdangerous, which uses the same algorithm
         assert self.csrf_salt
 
-        signer = TimestampSigner(self.app.identity_secret, salt=self.csrf_salt)
+        signer = TimestampSigner(self.identity_secret, salt=self.csrf_salt)
         return signer.sign(random_token())
 
     def assert_valid_csrf_token(self, signed_value=None):
@@ -448,7 +509,7 @@ class CoreRequest(IncludeRequest):
         if not self.csrf_salt:
             raise HTTPForbidden()
 
-        signer = TimestampSigner(self.app.identity_secret, salt=self.csrf_salt)
+        signer = TimestampSigner(self.identity_secret, salt=self.csrf_salt)
         try:
             signer.unsign(signed_value, max_age=self.app.csrf_time_limit)
         except (SignatureExpired, BadSignature):
@@ -459,7 +520,7 @@ class CoreRequest(IncludeRequest):
         using :meth:`load_url_safe_token`.
 
         """
-        serializer = URLSafeTimedSerializer(self.app.identity_secret)
+        serializer = URLSafeTimedSerializer(self.identity_secret)
         return serializer.dumps(data, salt=salt)
 
     def load_url_safe_token(self, data, salt=None, max_age=3600):
@@ -468,7 +529,7 @@ class CoreRequest(IncludeRequest):
         If the token is invalid, None is returned.
 
         """
-        serializer = URLSafeTimedSerializer(self.app.identity_secret)
+        serializer = URLSafeTimedSerializer(self.identity_secret)
         try:
             return serializer.loads(data, salt=salt, max_age=max_age)
         except (SignatureExpired, BadSignature):
