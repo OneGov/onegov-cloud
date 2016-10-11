@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.30.0 (2016-10-11)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a convenient and safe way to define return-to url parameters.
   [href]
