@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes occasion factoids not aligning nicely over multiple lines.
+  [href]
+
 0.0.7 (2016-10-14)
 ~~~~~~~~~~~~~~~~~~~
 

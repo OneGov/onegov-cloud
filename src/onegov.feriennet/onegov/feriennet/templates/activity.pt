@@ -48,34 +48,34 @@
                             <div class="small-12 medium-5 columns factoids">
                                 <div class="location" tal:condition="occasion.location">
                                     <span i18n:translate class="show-for-sr">Location</span>
-                                    ${occasion.location}
+                                    <span>${occasion.location}</span>
                                 </div>
 
                                 <div class="age">
                                     <span i18n:translate class="show-for-sr">Age</span>
-                                    <tal:block i18n:translate>
+                                    <span i18n:translate>
                                         <tal:block replace="occasion.age.lower" i18n:name='min_age' />
                                         -
                                         <tal:block replace="occasion.age.upper - 1" i18n:name='max_age' />
                                         years old
-                                    </tal:block>
+                                    </span
                                 </div>
 
                                 <div class="spots">
                                     <span i18n:translate class="show-for-sr">Participants</span>
 
-                                    <tal:block i18n:translate condition="occasion.spots.lower">
+                                    <span i18n:translate tal:condition="occasion.spots.lower">
                                         <tal:block replace="occasion.spots.lower" i18n:name='min_spots' />
                                         -
                                         <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
                                         participants
-                                    </tal:block>
+                                    </span>
 
-                                    <tal:block i18n:translate condition="not:occasion.spots.lower">
+                                    <span i18n:translate tal:condition="not:occasion.spots.lower">
                                         up to
                                         <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
                                         participants
-                                    </tal:block>
+                                    </span>
                                 </div>
 
                                 <div class="occasion-links" tal:condition="request.is_admin or layout.is_owner">
