@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.13 (2016-10-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Hardens all return-to links.
   [href]
 
