@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.6 (2016-10-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to change any userprofile as administrator.
   [href]
 
