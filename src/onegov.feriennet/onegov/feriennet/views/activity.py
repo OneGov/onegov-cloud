@@ -1,5 +1,3 @@
-import morepath
-
 from onegov.activity.models import ACTIVITY_STATES, DAYS
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -15,7 +13,6 @@ from onegov.feriennet.models import VacationActivity
 from onegov.org.elements import Link, DeleteLink
 from onegov.org.mail import send_html_mail
 from onegov.ticket import TicketCollection
-from purl import URL
 
 
 def get_activity_form_class(model, request):
@@ -130,7 +127,7 @@ def new_activity(self, request, form):
 
         form.populate_obj(activity)
 
-        return morepath.redirect(request.link(activity))
+        return request.redirect(request.link(activity))
 
     return {
         'layout': VacationActivityFormLayout(self, request, _("New Activity")),
@@ -152,18 +149,10 @@ def edit_activity(self, request, form):
 
         request.success(_("Your changes were saved"))
 
-        if 'return-to' in request.params:
-            return morepath.redirect(request.params['return-to'])
-
-        return morepath.redirect(request.link(self))
+        return request.redirect(request.link(self))
 
     elif not request.POST:
         form.process(obj=self)
-
-    if 'return-to' in request.GET:
-        form.action = URL(form.action)\
-            .query_param('return-to', request.GET['return-to'])\
-            .as_string()
 
     return {
         'layout': VacationActivityFormLayout(self, request, self.title),

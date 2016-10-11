@@ -276,11 +276,11 @@ def test_organiser_info(feriennet_app):
     assert "Kontakt ändern" in editor.get('/angebot/play-with-legos')
     assert "Kontakt ändern" not in editor.get('/angebot/play-with-playmobil')
 
-    # only the owner gets the change contact link
-    assert "Kontakt ändern" not in admin.get('/angebot/play-with-legos')
+    # admins get the change contact link as well
+    assert "Kontakt ändern" in admin.get('/angebot/play-with-legos')
     assert "Kontakt ändern" in admin.get('/angebot/play-with-playmobil')
 
-    # changes are reflected on the activity
+    # owner changes are reflected on the activity
     contact = editor.get('/angebot/play-with-legos').click('Kontakt ändern')
     contact.form['realname'] = 'Editors Association'
     contact.form['address'] = 'Washington'
@@ -297,6 +297,15 @@ def test_organiser_info(feriennet_app):
     assert "editor@example.org" not in activity
     assert "+41 23 456 789" in activity
     assert "https://www.example.org" in activity
+
+    # admin changes are reflected on the activity
+    contact = admin.get('/angebot/play-with-legos').click('Kontakt ändern')
+    contact.form['realname'] = 'Admins Association'
+    contact.form.submit()
+
+    activity = editor.get('/angebot/play-with-legos')
+
+    assert "Admins Association" in activity
 
 
 def test_occasions_form(feriennet_app):

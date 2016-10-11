@@ -1,5 +1,3 @@
-import morepath
-
 from onegov.activity import Occasion, OccasionCollection
 from onegov.core.security import Private
 from onegov.feriennet import _
@@ -27,7 +25,7 @@ def new_occasion(self, request, form):
         ))
 
         request.success(_("Your changes were saved"))
-        return morepath.redirect(request.link(self))
+        return request.redirect(request.link(self))
 
     return {
         'layout': OccasionFormLayout(self, request, _("New Occasion")),
@@ -47,7 +45,7 @@ def edit_occasion(self, request, form):
     if form.submitted(request):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
-        return morepath.redirect(request.link(self.activity))
+        return request.redirect(request.link(self.activity))
 
     elif not request.POST:
         form.process(obj=self)

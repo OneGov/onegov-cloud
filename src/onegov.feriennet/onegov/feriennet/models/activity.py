@@ -8,7 +8,6 @@ from onegov.org.elements import Link, ConfirmLink
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.search import ORMSearchable
 from onegov.ticket import handlers, Handler, Ticket
-from purl import URL
 
 
 class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
@@ -147,12 +146,9 @@ class VacationActivityHandler(Handler):
                 yes_button_text=_("Archive Activity")
             ))
 
-        edit_link = URL(request.link(self.activity, 'bearbeiten'))
-        edit_link = edit_link.query_param('return-to', request.url)
-
         links.append(Link(
             text=_('Edit activity'),
-            url=edit_link.as_string(),
+            url=request.return_here(request.link(self.activity, 'bearbeiten')),
             classes=('edit-link', )
         ))
 
