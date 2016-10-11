@@ -96,7 +96,8 @@ def handle_pending_submission(self, request):
         if 'quiet' not in request.GET:
             request.success(_("Your changes were saved"))
 
-        return morepath.redirect(request.GET['return-to'])
+        # the default url should actually never be called
+        return request.redirect(request.url)
 
     if 'title' in request.GET:
         title = request.GET['title']

@@ -10,7 +10,6 @@ from onegov.org.forms import EventForm
 from onegov.org.layout import EventLayout
 from onegov.org.mail import send_html_mail
 from onegov.ticket import TicketCollection
-from purl import URL
 from sedate import utcnow
 from uuid import uuid4
 from webob import exc
@@ -74,10 +73,7 @@ def publish_event(self, request):
             }
         )
 
-    if 'return-to' in request.GET:
-        return morepath.redirect(request.GET['return-to'])
-
-    return morepath.redirect(request.link(self))
+    return request.redirect(request.link(self))
 
 
 @OrgApp.form(model=OccurrenceCollection, name='neu', template='form.pt',
@@ -204,18 +200,9 @@ def handle_edit_event(self, request, form):
         form.populate_obj(self)
 
         request.success(_("Your changes were saved"))
-
-        if 'return-to' in request.GET:
-            return morepath.redirect(request.GET['return-to'])
-
-        return morepath.redirect(request.link(self))
+        return request.redirect(request.link(self))
 
     form.process(obj=self)
-
-    if 'return-to' in request.GET:
-        action = URL(form.action)
-        action = action.query_param('return-to', request.GET['return-to'])
-        form.action = action.as_string()
 
     layout = EventLayout(self, request)
     layout.breadcrumbs.append(Link(_("Edit"), '#'))

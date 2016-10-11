@@ -2392,7 +2392,9 @@ def test_unsubscribe_link(org_app):
     user = UserCollection(org_app.session()).by_username('editor@example.org')
     assert user.data is None
 
-    token = org_app.request_class.new_url_safe_token(Bunch(app=org_app), {
+    request = Bunch(identity_secret=org_app.identity_secret, app=org_app)
+
+    token = org_app.request_class.new_url_safe_token(request, {
         'user': 'editor@example.org'
     }, salt='unsubscribe')
 
@@ -2403,7 +2405,7 @@ def test_unsubscribe_link(org_app):
     user = UserCollection(org_app.session()).by_username('editor@example.org')
     assert user.data['daily_ticket_statistics'] == False
 
-    token = org_app.request_class.new_url_safe_token(Bunch(app=org_app), {
+    token = org_app.request_class.new_url_safe_token(request, {
         'user': 'unknown@example.org'
     }, salt='unsubscribe')
 
@@ -2411,7 +2413,7 @@ def test_unsubscribe_link(org_app):
         '/unsubscribe?token={}'.format(token), expect_errors=True)
     assert page.status_code == 403
 
-    token = org_app.request_class.new_url_safe_token(Bunch(app=org_app), {
+    token = org_app.request_class.new_url_safe_token(request, {
         'user': 'editor@example.org'
     }, salt='foobar')
 
@@ -2933,6 +2935,31 @@ def test_add_new_user(org_app):
     login.form['username'] = 'member@example.org'
     login.form['password'] = password
     assert login.form.submit().status_code == 302
+
+
+def test_edit_user_settings(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    org_app.settings.org.enable_yubikey = False
+
+    new = client.get('/benutzerverwaltung').click('Benutzer', index=0)
+    new.form['username'] = 'new@example.org'
+    new.form['role'] = 'member'
+    new.form.submit()
+
+    users = UserCollection(org_app.session())
+    assert not users.by_username('new@example.org').data
+
+    edit = client.get('/benutzerverwaltung').click('Bearbeiten', index=2)
+    assert "new@example.org" in edit
+
+    edit.form.get('daily_ticket_statistics').checked = False
+    edit.form.submit()
+
+    assert users.by_username('new@example.org').data == {
+        'daily_ticket_statistics': False
+    }
 
 
 def test_homepage(org_app):

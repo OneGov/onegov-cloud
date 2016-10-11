@@ -31,7 +31,6 @@ from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
-from purl import URL
 from sqlalchemy import desc
 
 
@@ -873,13 +872,12 @@ class OccurrenceLayout(EventBaseLayout):
     @cached_property
     def editbar_links(self):
         if self.request.is_manager:
-            edit_url = URL(self.request.link(self.model.event, 'bearbeiten'))
-            edit_url = edit_url.query_param(
-                'return-to', self.request.link(self.model.event)
-            )
             edit_link = Link(
                 text=_("Edit"),
-                url=edit_url.as_string(),
+                url=self.request.return_to(
+                    self.request.link(self.model.event, 'bearbeiten'),
+                    self.request.link(self.model.event)
+                ),
                 classes=('edit-link', )
             )
 

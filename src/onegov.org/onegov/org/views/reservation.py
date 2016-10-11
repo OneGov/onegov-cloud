@@ -351,7 +351,7 @@ def accept_reservation(self, request):
     else:
         request.warning(_("The reservations have already been accepted"))
 
-    return morepath.redirect(request.params['return-to'])
+    return request.redirect(request.link(self))
 
 
 @OrgApp.view(model=Reservation, name='absagen', permission=Private)
@@ -403,4 +403,4 @@ def reject_reservation(self, request):
 
     # return none on intercooler js requests
     if not request.headers.get('X-IC-Request'):
-        return morepath.redirect(request.params['return-to'])
+        return request.redirect(request.link(self))

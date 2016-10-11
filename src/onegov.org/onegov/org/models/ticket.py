@@ -82,13 +82,12 @@ class FormSubmissionHandler(Handler):
     def get_links(self, request):
 
         edit_link = URL(request.link(self.submission))
-        edit_link = edit_link.query_param('edit', '')
-        edit_link = edit_link.query_param('return-to', request.url)
+        edit_link = edit_link.query_param('edit', '').as_string()
 
         return [
             Link(
                 text=_('Edit submission'),
-                url=edit_link.as_string(),
+                url=request.return_here(edit_link),
                 classes=('edit-link', )
             )
         ]
@@ -236,26 +235,24 @@ class ReservationHandler(Handler):
         )
 
         if not all(accepted):
-            link = URL(request.link(self.reservations[0], 'annehmen'))
-            link = link.query_param('return-to', request.url)
-
             links.append(
                 Link(
                     text=_("Accept all reservations"),
-                    url=link.as_string(),
+                    url=request.return_here(
+                        request.link(self.reservations[0], 'annehmen')
+                    ),
                     classes=('accept-link', )
                 )
             )
-
-        reject_all_link = URL(request.link(self.reservations[0], 'absagen'))
-        reject_all_link = reject_all_link.query_param('return-to', request.url)
 
         reject = LinkGroup(
             _("Reject reservations"),
             [
                 DeleteLink(
                     text=_("Reject all"),
-                    url=reject_all_link.as_string(),
+                    url=request.return_here(
+                        request.link(self.reservations[0], 'absagen')
+                    ),
                     confirm=_(
                         "Do you really want to reject all reservations?"
                     ),
@@ -273,12 +270,13 @@ class ReservationHandler(Handler):
         for reservation in self.reservations:
             link = URL(request.link(reservation, 'absagen'))
             link = link.query_param('reservation-id', reservation.id)
-            link = link.query_param('return-to', request.url)
+            link = request.return_here(link.as_string())
+
             title = self.get_reservation_title(reservation)
             reject.links.append(
                 DeleteLink(
                     text=_("Reject ${title}", mapping={'title': title}),
-                    url=link.as_string(),
+                    url=link,
                     confirm=_(
                         "Do you really want to reject this reservation?"
                     ),
@@ -298,15 +296,14 @@ class ReservationHandler(Handler):
         if self.submission:
             link = URL(request.link(self.submission))
             link = link.query_param('edit', '')
-            link = link.query_param('return-to', request.url)
             link = link.query_param('title', request.translate(
-                _("Details about the reservation"))
-            )
+                _("Details about the reservation")))
+            link = request.return_here(link.as_string())
 
             links.append(
                 Link(
                     text=_('Edit details'),
-                    url=link.as_string(),
+                    url=link,
                     classes=('edit-link', )
                 )
             )
@@ -376,11 +373,9 @@ class EventSubmissionHandler(Handler):
 
         links = []
         if self.event.state == 'submitted':
-            link = URL(request.link(self.event, 'publish'))
-            link = link.query_param('return-to', request.link(self.ticket))
             links.append(Link(
                 text=_("Accept event"),
-                url=link.as_string(),
+                url=request.return_here(request.link(self.event, 'publish')),
                 classes=('accept-link', ),
             ))
 
@@ -395,11 +390,9 @@ class EventSubmissionHandler(Handler):
             redirect_after=request.link(self.ticket)
         ))
 
-        link = URL(request.link(self.event, 'bearbeiten'))
-        link = link.query_param('return-to', request.url)
         links.append(Link(
             text=_('Edit event'),
-            url=link.as_string(),
+            url=request.return_here(request.link(self.event, 'bearbeiten')),
             classes=('edit-link', )
         ))
 

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hardens all return-to links.
+  [href]
+
 - Includes the userprofile in the usermanagement view.
   [href]
 
