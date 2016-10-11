@@ -7,7 +7,7 @@ from onegov.activity.models import Activity, Occasion
 from onegov.core.upgrade import upgrade_task
 from psycopg2.extras import NumericRange
 from sqlalchemy import Column, Text, Integer
-from sqlalchemy.dialects.postgresql import INT4RANGE
+from sqlalchemy.dialects.postgresql import ARRAY, INT4RANGE
 
 
 @upgrade_task('Redesign occasion table')
@@ -102,6 +102,29 @@ def add_occasion_durations(context):
 
 @upgrade_task('Add occasion durations (second step)')
 def add_occasion_durations_second_step(context):
+
+    # undo the damage from the last step
+    for occasion in context.session.query(Occasion).all():
+        occasion.note = occasion.note and occasion.note.strip() or None
+
+    context.session.flush()
+
+
+@upgrade_task('Add activity ages')
+def add_activity_ages(context):
+
+    context.operations.add_column(
+        'activities', Column('ages', ARRAY(INT4RANGE), default=list))
+
+    # force an update of all occasions
+    for occasion in context.session.query(Occasion).all():
+        occasion.note = occasion.note and occasion.note + ' ' or ' '
+
+    context.session.flush()
+
+
+@upgrade_task('Add activity ages (second step)')
+def add_activity_ages_second_step(context):
 
     # undo the damage from the last step
     for occasion in context.session.query(Occasion).all():

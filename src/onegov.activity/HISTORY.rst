@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter the activites by age_ranges.
+  [href]
+
 0.0.7 (2016-10-10)
 ~~~~~~~~~~~~~~~~~~~
 

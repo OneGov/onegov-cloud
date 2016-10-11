@@ -3,9 +3,9 @@ from onegov.core.orm import Base
 from onegov.core.orm.types import UTCDateTime, UUID
 from psycopg2.extras import NumericRange
 from sedate import to_timezone
-from sqlalchemy import Column, Enum, Text, ForeignKey, CheckConstraint, Integer
-from sqlalchemy import case, func, select, literal_column, alias
-from sqlalchemy.dialects.postgresql import INT4RANGE, ARRAY
+from sqlalchemy import Column, Enum, Text, ForeignKey, CheckConstraint
+from sqlalchemy import case, func
+from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -111,24 +111,6 @@ class Occasion(Base):
             (Occasion.duration_in_seconds <= (6 * 3600), int(DAYS.half)),
             (Occasion.duration_in_seconds <= (24 * 3600), int(DAYS.full)),
         ), else_=int(DAYS.many))
-
-    @hybrid_property
-    def ages(self):
-        return tuple(range(self.age.lower, self.age.upper))
-
-    @ages.expression
-    def ages(self):
-        return alias(select([
-            func.array_agg(
-                literal_column("generate_series"),
-                type=ARRAY(Integer, as_tuple=True)
-            )
-        ]).select_from(
-            func.generate_series(
-                func.lower(self.age),
-                func.upper(self.age) - 1
-            )
-        ))
 
     @hybrid_property
     def duration_in_seconds(self):

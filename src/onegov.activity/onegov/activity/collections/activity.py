@@ -1,21 +1,24 @@
 from onegov.activity.models import Activity
+from onegov.activity.utils import merge_ranges, overlaps
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
-from sqlalchemy import distinct, or_, func
+from sqlalchemy import distinct, or_, func, text, bindparam, Integer
 from sqlalchemy.dialects.postgresql import array
 
 
 class ActivityCollection(Pagination):
 
     def __init__(self, session, type='*', page=0,
-                 tags=None, states=None, durations=None):
+                 tags=None, states=None, durations=None, age_ranges=None):
         self.session = session
         self.type = type
         self.page = page
         self.tags = set(tags) if tags else set()
         self.states = set(states) if states else set()
         self.durations = set(durations) if durations else set()
+        self.age_ranges = set(merge_ranges(age_ranges)) \
+            if age_ranges else set()
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -34,8 +37,15 @@ class ActivityCollection(Pagination):
             page=index,
             tags=self.tags,
             states=self.states,
-            durations=self.durations
+            durations=self.durations,
+            age_ranges=self.age_ranges
         )
+
+    def contains_age_range(self, age_range):
+        for r in self.age_ranges:
+            if overlaps(r, age_range):
+                return True
+        return False
 
     @property
     def model_class(self):
@@ -66,15 +76,24 @@ class ActivityCollection(Pagination):
             query = query.filter(model_class.state.in_(self.states))
 
         if self.durations:
-            conditions = [
+            conditions = tuple(
                 func.coalesce(model_class.durations, 0).op('&')(int(d)) > 0
                 for d in self.durations
-            ]
+            )
+            query = query.filter(or_(*conditions))
+
+        if self.age_ranges:
+            conditions = tuple(
+                text("'[:min,:max]'::int4range && ANY(ages)").bindparams(
+                    bindparam('min', min_age, type_=Integer),
+                    bindparam('max', max_age, type_=Integer),
+                ) for min_age, max_age in self.age_ranges
+            )
             query = query.filter(or_(*conditions))
 
         return query
 
-    def for_filter(self, tag=None, state=None, duration=None):
+    def for_filter(self, tag=None, state=None, duration=None, age_range=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -82,7 +101,7 @@ class ActivityCollection(Pagination):
 
         """
 
-        assert tag or state or duration
+        assert tag or state or duration or age_range
 
         duration = int(duration) if duration is not None else None
 
@@ -99,7 +118,8 @@ class ActivityCollection(Pagination):
             toggle(collection, item) for collection, item in (
                 (self.tags, tag),
                 (self.states, state),
-                (self.durations, duration)
+                (self.durations, duration),
+                (self.age_ranges, age_range)
             )
         )
 

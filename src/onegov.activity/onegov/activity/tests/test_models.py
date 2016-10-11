@@ -393,25 +393,60 @@ def test_occasion_ages(session, owner):
     activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
 
-    workshop = activities.add("DjangoGirls Workshop", username=owner.username)
-    saturday = occasions.add(
+    retreat = activities.add("Management Retreat", username=owner.username)
+    meeting = activities.add("Management Meeting", username=owner.username)
+
+    occasions.add(
         start=datetime(2017, 2, 18, 8),
         end=datetime(2017, 2, 18, 17),
         timezone="Europe/Zurich",
         age=(1, 10),
-        activity=workshop
+        activity=retreat
     )
-    sunday = occasions.add(
+    occasions.add(
         start=datetime(2018, 2, 19, 8),
         end=datetime(2018, 2, 19, 17),
         timezone="Europe/Zurich",
         age=(10, 20),
-        activity=workshop
+        activity=meeting
     )
 
-    assert saturday.ages == (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-    assert sunday.ages == (10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+    transaction.commit()
 
-    ages = occasions.query().with_entities(Occasion.ages).all()
-    assert ages[0] == saturday.ages
-    assert ages[1] == sunday.ages
+    assert activities.for_filter(age_range=(1, 20)).query().count() == 2
+    assert activities.for_filter(age_range=(1, 10)).query().count() == 2
+    assert activities.for_filter(age_range=(10, 20)).query().count() == 2
+    assert activities.for_filter(age_range=(1, 5)).query().count() == 1
+    assert activities.for_filter(age_range=(15, 20)).query().count() == 1
+    assert activities.for_filter(age_range=(20, 21)).query().count() == 1
+    assert activities.for_filter(age_range=(21, 22)).query().count() == 0
+    assert activities.for_filter(age_range=(4, 4)).query().count() == 1
+    assert activities.for_filter(age_range=(15, 15)).query().count() == 1
+    assert activities.for_filter(age_range=(0, 0)).query().count() == 0
+    assert activities.for_filter(age_range=(1, 5))\
+        .for_filter(age_range=(5, 15)).query().count() == 2
+
+    assert activities.for_filter(age_range=(1, 1)).contains_age_range((0, 2))
+    assert activities.for_filter(age_range=(1, 1)).contains_age_range((1, 1))
+    assert activities.for_filter(age_range=(1, 1)).contains_age_range((1, 2))
+
+    assert not activities.for_filter(age_range=(1, 1))\
+        .contains_age_range((0, 0))
+
+    assert not activities.for_filter(age_range=(1, 10))\
+        .contains_age_range((20, 30))
+
+    assert activities\
+        .for_filter(age_range=(1, 10))\
+        .for_filter(age_range=(20, 30))\
+        .contains_age_range((10, 15))
+
+    assert activities\
+        .for_filter(age_range=(1, 10))\
+        .for_filter(age_range=(20, 30))\
+        .contains_age_range((10, 20))
+
+    assert not activities\
+        .for_filter(age_range=(1, 10))\
+        .for_filter(age_range=(20, 30))\
+        .contains_age_range((15, 16))

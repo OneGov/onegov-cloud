@@ -11,7 +11,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
 from sqlalchemy import func, distinct
-from sqlalchemy.dialects.postgresql import HSTORE
+from sqlalchemy.dialects.postgresql import HSTORE, ARRAY, INT4RANGE
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import aggregated, observes
@@ -64,9 +64,13 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: Access the user linked to this activity
     user = relationship('User')
 
-    @aggregated('occasions', Column(Integer, nullable=True, default=0))
+    @aggregated('occasions', Column(Integer, default=0))
     def durations(self):
         return func.sum(distinct(Occasion.duration))
+
+    @aggregated('occasions', Column(ARRAY(INT4RANGE), default=list))
+    def ages(self):
+        return func.array_agg(distinct(Occasion.age))
 
     #: The occasions linked to this activity
     occasions = relationship(
