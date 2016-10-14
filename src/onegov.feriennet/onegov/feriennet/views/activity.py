@@ -36,25 +36,28 @@ def view_activities(self, request):
         ) for tag in self.used_tags
     ]
 
-    taglinks.append(
+    taglinks.extend(
         Link(
-            text=_("Half day"),
-            active=DAYS.half in self.durations,
-            url=request.link(self.for_filter(duration=DAYS.half))
+            text=text,
+            active=duration in self.durations,
+            url=request.link(self.for_filter(duration=duration))
+        ) for text, duration in (
+            (_("Half day"), DAYS.half),
+            (_("Full day"), DAYS.full),
+            (_("Multiple days"), DAYS.many),
         )
     )
-    taglinks.append(
+
+    taglinks.extend(
         Link(
-            text=_("Full day"),
-            active=DAYS.full in self.durations,
-            url=request.link(self.for_filter(duration=DAYS.full))
-        )
-    )
-    taglinks.append(
-        Link(
-            text=_("Multiple days"),
-            active=DAYS.many in self.durations,
-            url=request.link(self.for_filter(duration=DAYS.many))
+            text=request.translate(text) + ' ({} - {})'.format(*age_range),
+            active=self.contains_age_range(age_range),
+            url=request.link(self.for_filter(age_range=age_range))
+        ) for text, age_range in (
+            (_("Preschool"), (3, 6)),
+            (_("Lower grades"), (7, 10)),
+            (_("Junior high"), (11, 13)),
+            (_("High school"), (14, 17))
         )
     )
 

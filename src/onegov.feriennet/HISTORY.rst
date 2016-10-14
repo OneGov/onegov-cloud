@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter activities by age.
+  [href]
+
 0.0.6 (2016-10-11)
 ~~~~~~~~~~~~~~~~~~~
 
