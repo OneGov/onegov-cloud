@@ -47,6 +47,9 @@ setup(
     entry_points={
         'onegov': [
             'upgrade = onegov.feriennet.upgrade'
+        ],
+        'console_scripts': [
+            'onegov-feriennet=onegov.feriennet.cli:cli'
         ]
     },
     classifiers=[
