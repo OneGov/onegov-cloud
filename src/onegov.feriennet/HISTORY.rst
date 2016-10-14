@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.7 (2016-10-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to discard activites in the "preview" state.
   [href]
 
