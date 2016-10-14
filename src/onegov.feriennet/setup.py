@@ -32,6 +32,7 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=[
+        'faker',
         'onegov.activity',
         'onegov.org>=0.0.13',
     ],
