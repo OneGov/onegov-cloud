@@ -8,6 +8,7 @@ import mimetypes
 import morepath
 import os.path
 import re
+import sqlalchemy
 
 from collections import Iterable
 from contextlib import contextmanager
@@ -17,7 +18,6 @@ from functools import partial
 from importlib import import_module
 from itertools import groupby, tee
 from purl import URL
-from sqlalchemy import distinct
 from unidecode import unidecode
 from uuid import UUID
 from webob import static
@@ -420,8 +420,13 @@ def get_unique_hstore_keys(session, column):
 
     """
 
-    return {
-        key
-        for row in session.query(distinct(column.keys())).all() if row[0]
-        for key in row[0]
-    }
+    base = session.query(column.keys()).with_entities(
+        sqlalchemy.func.skeys(column).label('keys'))
+
+    query = sqlalchemy.select(
+        [sqlalchemy.func.array_agg(sqlalchemy.column('keys'))],
+        distinct=True
+    ).select_from(base.subquery())
+
+    keys = session.execute(query).scalar()
+    return set(keys) if keys else set()

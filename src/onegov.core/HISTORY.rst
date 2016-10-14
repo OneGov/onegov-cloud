@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the performance of the unique hstore keys utility function.
+  [href]
+
 - Improves the performance of pagination collections by speeding up the count.
   [href]
 

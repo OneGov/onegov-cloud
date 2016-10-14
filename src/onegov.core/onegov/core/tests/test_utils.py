@@ -1,5 +1,6 @@
 import onegov.core
 import os.path
+import transaction
 
 from onegov.core import utils
 from onegov.core.orm import SessionManager
@@ -163,6 +164,8 @@ def test_get_unique_hstore_keys(postgres_dsn):
     mgr.session().add(Document(tags=None))
     mgr.session().add(Document(tags=['foo', 'bar']))
     mgr.session().add(Document(tags=['foo', 'baz']))
+
+    transaction.commit()
 
     assert utils.get_unique_hstore_keys(mgr.session(), Document._tags) == {
         'foo', 'bar', 'baz'
