@@ -38,7 +38,7 @@ def view_activities(self, request):
 
     taglinks.extend(
         Link(
-            text=text,
+            text=request.translate(text),
             active=duration in self.durations,
             url=request.link(self.for_filter(duration=duration))
         ) for text, duration in (
@@ -62,6 +62,15 @@ def view_activities(self, request):
     )
 
     if request.is_organiser:
+
+        taglinks.append(
+            Link(
+                text=request.translate(_("Own")),
+                active=request.current_username in self.owners,
+                url=request.link(
+                    self.for_filter(owner=request.current_username))
+            )
+        )
 
         taglinks.extend(
             Link(

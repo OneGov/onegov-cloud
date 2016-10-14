@@ -5,7 +5,11 @@ from onegov.feriennet.security import ActivityQueryPolicy
 class VacationActivityCollection(ActivityCollection):
 
     def __init__(self, session, identity, page=0,
-                 tags=None, states=None, durations=None, age_ranges=None):
+                 tags=None,
+                 states=None,
+                 durations=None,
+                 age_ranges=None,
+                 owners=None):
         super().__init__(
             session=session,
             type='vacation',
@@ -14,6 +18,7 @@ class VacationActivityCollection(ActivityCollection):
             states=states,
             durations=durations,
             age_ranges=age_ranges,
+            owners=owners
         )
         self.identity = identity
 
@@ -32,5 +37,6 @@ class VacationActivityCollection(ActivityCollection):
             tags=self.tags,
             states=self.states,
             durations=self.durations,
-            age_ranges=self.age_ranges
+            age_ranges=self.age_ranges,
+            owners=self.owners
         )

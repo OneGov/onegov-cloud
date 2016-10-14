@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter ones own activities.
+  [href]
+
 - Adds the ability to filter activities by age.
   [href]
 
