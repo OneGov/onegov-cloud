@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.8 (2016-10-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to filter the activites by one or many owners.
   [href]
 
