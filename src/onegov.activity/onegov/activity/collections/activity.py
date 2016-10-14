@@ -3,7 +3,7 @@ from onegov.activity.utils import merge_ranges, overlaps
 from onegov.core.collection import Pagination
 from onegov.core.utils import increment_name
 from onegov.core.utils import normalize_for_url
-from sqlalchemy import distinct, or_, func, text, bindparam, Integer
+from sqlalchemy import or_, func, text, bindparam, Integer, select, column
 from sqlalchemy.dialects.postgresql import array
 
 
@@ -169,10 +169,15 @@ class ActivityCollection(Pagination):
 
         """
 
-        query = self.query_base().with_entities(
-            distinct(self.model_class._tags.keys()))
+        base = self.query_base().with_entities(
+            func.skeys(self.model_class._tags).label('keys'))
 
-        return {key for row in query.all() if row[0] for key in row[0]}
+        query = select([func.array_agg(column('keys'))], distinct=True)
+        query = query.select_from(base.subquery())
+
+        tags = self.session.execute(query).scalar()
+
+        return set(tags) if tags else set()
 
     def get_unique_name(self, name):
         """ Given a desired name, finds a variant of that name that's not

@@ -127,6 +127,8 @@ def test_activity_used_tags(session, owner):
             return self.session.query(self.model_class).filter(
                 self.model_class.state == 'proposed')
 
+    transaction.commit()
+
     c = LimitedActivityCollection(session)
     assert c.used_tags == {'sport', 'fun'}
 
