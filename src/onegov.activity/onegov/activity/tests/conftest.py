@@ -9,3 +9,12 @@ def owner(session):
         password='hunter2',
         role='editor'
     )
+
+
+@fixture(scope='function')
+def secondary_owner(session):
+    return UserCollection(session).add(
+        username='secondary@example.org',
+        password='hunter2',
+        role='editor'
+    )

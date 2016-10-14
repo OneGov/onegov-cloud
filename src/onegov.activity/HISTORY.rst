@@ -1,7 +1,10 @@
 Changelog
 ---------
 
-- Adds the ability to filter the activites by age_ranges.
+- Adds the ability to filter the activites by one or many owners.
+  [href]
+
+- Adds the ability to filter the activites by age ranges.
   [href]
 
 0.0.7 (2016-10-10)

@@ -10,7 +10,11 @@ from sqlalchemy.dialects.postgresql import array
 class ActivityCollection(Pagination):
 
     def __init__(self, session, type='*', page=0,
-                 tags=None, states=None, durations=None, age_ranges=None):
+                 tags=None,
+                 states=None,
+                 durations=None,
+                 age_ranges=None,
+                 owners=None):
         self.session = session
         self.type = type
         self.page = page
@@ -19,6 +23,7 @@ class ActivityCollection(Pagination):
         self.durations = set(durations) if durations else set()
         self.age_ranges = set(merge_ranges(age_ranges)) \
             if age_ranges else set()
+        self.owners = set(owners) if owners else set()
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -38,7 +43,8 @@ class ActivityCollection(Pagination):
             tags=self.tags,
             states=self.states,
             durations=self.durations,
-            age_ranges=self.age_ranges
+            age_ranges=self.age_ranges,
+            owners=self.owners
         )
 
     def contains_age_range(self, age_range):
@@ -98,9 +104,20 @@ class ActivityCollection(Pagination):
 
             query = query.filter(or_(*conditions))
 
+        if self.owners:
+            conditions = tuple(
+                model_class.username == username for username in self.owners)
+
+            query = query.filter(or_(*conditions))
+
         return query
 
-    def for_filter(self, tag=None, state=None, duration=None, age_range=None):
+    def for_filter(self,
+                   tag=None,
+                   state=None,
+                   duration=None,
+                   age_range=None,
+                   owner=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -108,7 +125,7 @@ class ActivityCollection(Pagination):
 
         """
 
-        assert tag or state or duration or age_range
+        assert tag or state or duration or age_range or owner
 
         duration = int(duration) if duration is not None else None
 
@@ -126,7 +143,8 @@ class ActivityCollection(Pagination):
                 (self.tags, tag),
                 (self.states, state),
                 (self.durations, duration),
-                (self.age_ranges, age_range)
+                (self.age_ranges, age_range),
+                (self.owners, owner)
             )
         )
 

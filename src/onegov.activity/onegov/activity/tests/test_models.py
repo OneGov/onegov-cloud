@@ -450,3 +450,25 @@ def test_occasion_ages(session, owner):
         .for_filter(age_range=(1, 10))\
         .for_filter(age_range=(20, 30))\
         .contains_age_range((15, 16))
+
+
+def test_occasion_owners(session, owner, secondary_owner):
+
+    activities = ActivityCollection(session)
+
+    activities.add("Management Retreat", username=owner.username)
+    activities.add("Management Meeting", username=secondary_owner.username)
+
+    transaction.commit()
+
+    assert activities\
+        .for_filter(owner='owner@example.org')\
+        .query().count() == 1
+    assert activities\
+        .for_filter(owner='owner@example.org')\
+        .for_filter(owner='secondary@example.org')\
+        .query().count() == 2
+
+    assert activities\
+        .for_filter(owner='secondary@example.org')\
+        .query().count() == 1
