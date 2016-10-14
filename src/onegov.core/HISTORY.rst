@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves the performance of pagination collections by speeding up the count.
+  [href]
+
 0.30.0 (2016-10-11)
 ~~~~~~~~~~~~~~~~~~~
 

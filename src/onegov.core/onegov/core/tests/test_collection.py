@@ -28,6 +28,9 @@ def test_pagination():
         def count(self):
             return len(self.all())
 
+        def order_by(self, *args):
+            return self
+
     class Collection(Pagination):
 
         def __init__(self, page, values):

@@ -81,7 +81,10 @@ class Pagination(object):
         """ Returns the total number of elements this pagination represents.
 
         """
-        return self.cached_subset.count()
+
+        # the ordering is entirely unnecessary for a count, so remove it
+        # to count things faster
+        return self.cached_subset.order_by(None).count()
 
     @cached_property
     def batch(self):
