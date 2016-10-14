@@ -446,5 +446,5 @@ def test_occasions_form(feriennet_app):
     activity = occasion.form.submit().follow()
     assert "15 - 20 Jahre alt" in activity
 
-    editor.delete(get_delete_link(activity))
+    editor.delete(get_delete_link(activity, index=1))
     assert "keine Durchführungen" in editor.get('/angebot/play-with-legos')

@@ -3,7 +3,7 @@ from onegov.activity import Activity
 from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import VacationActivityCollection
-from onegov.org.elements import Link, ConfirmLink
+from onegov.org.elements import Link, ConfirmLink, DeleteLink
 from onegov.org.layout import DefaultLayout as BaseLayout
 
 
@@ -103,17 +103,34 @@ class VacationActivityLayout(DefaultLayout):
                     classes=('confirm', 'request-publication'),
                     yes_button_text=_("Request Publication")
                 ))
-
-            links.append(Link(
-                text=_("New Occasion"),
-                url=self.request.link(self.model, 'neue-durchfuehrung'),
-                classes=('new-occasion', )
-            ))
+                links.append(DeleteLink(
+                    text=_("Discard Activity"),
+                    url=self.csrf_protected_url(
+                        self.request.link(self.model)
+                    ),
+                    confirm=_(
+                        'Do you really want to discrd "${title}"?', mapping={
+                            'title': self.model.title
+                        }
+                    ),
+                    extra_information=_("This cannot be undone."),
+                    redirect_after=self.request.class_link(
+                        VacationActivityCollection
+                    ),
+                    yes_button_text=_("Discard Activity"),
+                    classes=('confirm', 'delete-link')
+                ))
 
             links.append(Link(
                 text=_("Edit Activity"),
                 url=self.request.link(self.model, name='bearbeiten'),
                 classes=('edit-link', )
+            ))
+
+            links.append(Link(
+                text=_("New Occasion"),
+                url=self.request.link(self.model, 'neue-durchfuehrung'),
+                classes=('new-occasion', )
             ))
 
             return links

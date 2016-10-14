@@ -13,6 +13,7 @@ from onegov.feriennet.models import VacationActivity
 from onegov.org.elements import Link, DeleteLink
 from onegov.org.mail import send_html_mail
 from onegov.ticket import TicketCollection
+from webob import exc
 
 
 def get_activity_form_class(model, request):
@@ -171,6 +172,29 @@ def edit_activity(self, request, form):
         'title': self.title,
         'form': form
     }
+
+
+@FeriennetApp.view(
+    model=VacationActivity,
+    permission=Private,
+    request_method='DELETE')
+def discard_activity(self, request):
+
+    request.assert_valid_csrf_token()
+
+    # discard really is like delete, but activites can only be deleted
+    # before they are submitted for publication, so 'discard' is a more
+    # accurate description
+    if self.state != 'preview':
+        raise exc.HTTPMethodNotAllowed()
+
+    activities = VacationActivityCollection(
+        request.app.session(),
+        request.identity
+    )
+    activities.delete(self)
+
+    request.success(_("The activity was discarded"))
 
 
 @FeriennetApp.view(

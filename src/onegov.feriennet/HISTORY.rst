@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to discard activites in the "preview" state.
+  [href]
+
 - Adds the ability to filter ones own activities.
   [href]
 
