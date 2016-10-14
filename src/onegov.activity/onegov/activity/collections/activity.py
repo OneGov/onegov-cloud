@@ -83,12 +83,19 @@ class ActivityCollection(Pagination):
             query = query.filter(or_(*conditions))
 
         if self.age_ranges:
-            conditions = tuple(
-                text("'[:min,:max]'::int4range && ANY(ages)").bindparams(
-                    bindparam('min', min_age, type_=Integer),
-                    bindparam('max', max_age, type_=Integer),
-                ) for min_age, max_age in self.age_ranges
-            )
+            conditions = []
+
+            # SQLAlchemy needs unique parameter names if multiple text
+            # queries with bind params are used
+            for i, (min_age, max_age) in enumerate(self.age_ranges, start=1):
+                stmt = "'[:min_{i},:max_{i}]'::int4range && ANY(ages)".format(
+                    i=i)
+
+                conditions.append(text(stmt).bindparams(
+                    bindparam('min_' + str(i), min_age, type_=Integer),
+                    bindparam('max_' + str(i), max_age, type_=Integer),
+                ))
+
             query = query.filter(or_(*conditions))
 
         return query
