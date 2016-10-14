@@ -1,9 +1,11 @@
 import onegov.feriennet
 import transaction
 
+from datetime import datetime, timedelta
 from onegov.testing import utils
 from onegov.org.testing import Client, get_message, select_checkbox
-from onegov.activity import ActivityCollection
+from onegov.activity import ActivityCollection, OccasionCollection
+from psycopg2.extras import NumericRange
 
 
 def get_publication_url(page, kind):
@@ -171,7 +173,7 @@ def test_activity_search(es_feriennet_app):
     assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
 
 
-def test_activity_filter(feriennet_app):
+def test_activity_filter_tags(feriennet_app):
 
     anon = Client(feriennet_app)
 
@@ -243,6 +245,107 @@ def test_activity_filter(feriennet_app):
     assert "Learn How to Cook" not in activities
     assert "Learn How to Program" not in activities
     assert "Learn How to Dance" in activities
+
+
+def test_activity_filter_duration(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    occasions = OccasionCollection(feriennet_app.session())
+
+    retreat = activities.add("Retreat", username='admin@example.org')
+    meeting = activities.add("Meeting", username='admin@example.org')
+
+    retreat.propose().accept()
+    meeting.propose().accept()
+
+    # the retreat lasts a weekend
+    reatreat_occasion_id = occasions.add(
+        start=datetime(2016, 10, 8, 8),
+        end=datetime(2016, 10, 9, 16),
+        timezone="Europe/Zurich",
+        activity=retreat
+    ).id
+
+    # the meeting lasts half a day
+    occasions.add(
+        start=datetime(2016, 10, 10, 8),
+        end=datetime(2016, 10, 10, 12),
+        timezone="Europe/Zurich",
+        activity=meeting
+    )
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+
+    half_day = client.get('/angebote').click('Halbtägig')
+    many_day = client.get('/angebote').click('Mehrtägig')
+
+    assert "Meeting" in half_day
+    assert "Retreat" not in half_day
+
+    assert "Meeting" not in many_day
+    assert "Retreat" in many_day
+
+    # shorten the retreat
+    occasions.by_id(reatreat_occasion_id).end -= timedelta(days=1)
+    transaction.commit()
+
+    full_day = client.get('/angebote').click('Ganztägig')
+    many_day = client.get('/angebote').click('Mehrtägig')
+
+    assert "Retreat" in full_day
+    assert "Retreat" not in many_day
+
+
+def test_activity_filter_age_ranges(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    occasions = OccasionCollection(feriennet_app.session())
+
+    retreat = activities.add("Retreat", username='admin@example.org')
+    meeting = activities.add("Meeting", username='admin@example.org')
+
+    retreat.propose().accept()
+    meeting.propose().accept()
+
+    # the retreat lasts a weekend
+    occasions.add(
+        start=datetime(2016, 10, 8, 8),
+        end=datetime(2016, 10, 9, 16),
+        age=(0, 10),
+        timezone="Europe/Zurich",
+        activity=retreat
+    )
+
+    # the meeting lasts half a day
+    meeting_occasion_id = occasions.add(
+        start=datetime(2016, 10, 8, 8),
+        end=datetime(2016, 10, 9, 16),
+        age=(5, 15),
+        timezone="Europe/Zurich",
+        activity=meeting
+    ).id
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+
+    preschool = client.get('/angebote').click('Vorschule')
+    highschool = client.get('/angebote').click('Oberstufe')
+
+    assert "Retreat" in preschool
+    assert "Meeting" in preschool
+
+    assert "Retreat" not in highschool
+    assert "Meeting" in highschool
+
+    # change the meeting age
+    occasions.by_id(meeting_occasion_id).age = NumericRange(15, 20)
+    transaction.commit()
+
+    preschool = client.get('/angebote').click('Vorschule')
+
+    assert "Retreat" in preschool
+    assert "Meeting" not in preschool
 
 
 def test_organiser_info(feriennet_app):
