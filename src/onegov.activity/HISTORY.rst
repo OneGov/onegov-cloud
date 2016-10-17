@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.9 (2016-10-17)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves the performance of the used_tags method.
   [href]
 
