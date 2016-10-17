@@ -11,10 +11,10 @@ from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
 from sqlalchemy import func, distinct
-from sqlalchemy.dialects.postgresql import HSTORE, ARRAY, INT4RANGE
+from sqlalchemy.dialects.postgresql import HSTORE, ARRAY
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
-from sqlalchemy_utils import aggregated, observes
+from sqlalchemy_utils import aggregated, observes, IntRangeType
 from uuid import uuid4
 
 
@@ -68,7 +68,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     def durations(self):
         return func.sum(distinct(Occasion.duration))
 
-    @aggregated('occasions', Column(ARRAY(INT4RANGE), default=list))
+    @aggregated('occasions', Column(ARRAY(IntRangeType), default=list))
     def ages(self):
         return func.array_agg(distinct(Occasion.age))
 
