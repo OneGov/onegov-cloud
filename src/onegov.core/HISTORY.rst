@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.30.1 (2016-10-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves the performance of the unique hstore keys utility function.
   [href]
