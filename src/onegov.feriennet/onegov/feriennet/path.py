@@ -1,4 +1,5 @@
 from onegov.activity import Occasion, OccasionCollection
+from onegov.activity import Period, PeriodCollection
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.models import VacationActivity
@@ -48,4 +49,19 @@ def get_vacation_activity(request, app, name):
     path='/durchfuehrungen/{id}',
     converters=dict(id=UUID))
 def get_occasion(request, app, id):
+    return OccasionCollection(app.session()).by_id(id)
+
+
+@FeriennetApp.path(
+    model=PeriodCollection,
+    path='/perioden')
+def get_periods(request, app):
+    return PeriodCollection(app.session())
+
+
+@FeriennetApp.path(
+    model=Period,
+    path='/periode/{id}',
+    converters=dict(id=UUID))
+def get_period(request, app, id):
     return OccasionCollection(app.session()).by_id(id)

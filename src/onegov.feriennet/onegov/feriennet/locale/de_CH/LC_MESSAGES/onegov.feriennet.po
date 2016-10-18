@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-10-14 13:49+0200\n"
+"POT-Creation-Date: 2016-10-18 15:00+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -30,11 +30,11 @@ msgstr "Startseite"
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
 
+msgid "Manage Periods"
+msgstr "Perioden Verwalten"
+
 msgid "Edit Activity"
 msgstr "Angebot Bearbeiten"
-
-msgid "New Occasion"
-msgstr "Neue Durchführung"
 
 msgid "Request Publication"
 msgstr "Publikation Beantragen"
@@ -51,6 +51,18 @@ msgstr "Angebot Verwerfen"
 #, python-format
 msgid "Do you really want to discrd \"${title}\"?"
 msgstr "Möchten Sie \"${title}\" wirklich verwerfen?"
+
+msgid "New Occasion"
+msgstr "Neue Durchführung"
+
+msgid "Occasions cannot be created yet"
+msgstr "Durchführungen können noch nicht erstellt werden"
+
+msgid ""
+"There are no periods defined yet. At least one period needs to be defined "
+"before occasions can be created"
+msgstr "Es existieren zur Zeit keine Perioden. Mindestens eine Periode muss "
+"bestehen bevor Durchführungen erfasst werden können"
 
 msgid "Editor"
 msgstr "Veranstalter"

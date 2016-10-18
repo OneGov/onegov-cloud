@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from onegov.activity import Activity
+from onegov.activity import Activity, PeriodCollection
 from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import VacationActivityCollection
@@ -25,14 +25,27 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
+        links = []
+
         if self.request.is_organiser:
-            return (
+            links.append(
                 Link(
                     text=_("Submit Activity"),
                     url=self.request.link(self.model, name='neu'),
                     classes=('new-activity', )
-                ),
+                )
             )
+
+        if self.request.is_admin:
+            links.append(
+                Link(
+                    text=_("Manage Periods"),
+                    url=self.request.class_link(PeriodCollection),
+                    classes=('manage-periods', )
+                )
+            )
+
+        return links
 
 
 class VacationActivityFormLayout(DefaultLayout):
@@ -127,10 +140,23 @@ class VacationActivityLayout(DefaultLayout):
                 classes=('edit-link', )
             ))
 
-            links.append(Link(
-                text=_("New Occasion"),
-                url=self.request.link(self.model, 'neue-durchfuehrung'),
-                classes=('new-occasion', )
-            ))
+            if not PeriodCollection(self.app.session()).query().first():
+                links.append(ConfirmLink(
+                    text=_("New Occasion"),
+                    url='#',
+                    confirm=_("Occasions cannot be created yet"),
+                    extra_information=_(
+                        "There are no periods defined yet. At least one "
+                        "period needs to be defined before occasions can "
+                        "be created"
+                    ),
+                    classes=('confirm', 'new-occasion', )
+                ))
+            else:
+                links.append(Link(
+                    text=_("New Occasion"),
+                    url=self.request.link(self.model, 'neue-durchfuehrung'),
+                    classes=('new-occasion', )
+                ))
 
             return links

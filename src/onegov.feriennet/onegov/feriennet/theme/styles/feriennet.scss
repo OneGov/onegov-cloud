@@ -32,6 +32,7 @@ svg #background {
     .reject-activity:before { @include icon('\f088'); }
     .archive-activity:before { @include icon('\f187'); }
     .new-occasion:before { @include icon('\f133'); }
+    .manage-periods:before { @include icon('\f02d'); }
 }
 
 /*
@@ -226,8 +227,8 @@ ul.occasions {
             display: inline-block;
             left: -2px;
             position: absolute;
-            width: .625rem;
             text-align: center;
+            width: .625rem;
         }
 
         .location:before {
