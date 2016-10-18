@@ -4,7 +4,9 @@ import transaction
 
 from datetime import datetime
 from onegov.activity import ActivityCollection
-from onegov.activity import Occasion, OccasionCollection
+from onegov.activity import Occasion
+from onegov.activity import OccasionCollection
+from onegov.activity import PeriodCollection
 from onegov.activity.models import DAYS
 from onegov.activity.models import Booking
 from pytz import utc
@@ -133,10 +135,19 @@ def test_activity_used_tags(session, owner):
     assert c.used_tags == {'sport', 'fun'}
 
 
-def test_occasion_collection(session, owner):
+def test_occasions(session, owner):
 
     activities = ActivityCollection(session)
     occasions = OccasionCollection(session)
+    periods = PeriodCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        timezone="Europe/Zurich",
+        active=True
+    )
 
     tournament = occasions.add(
         start=datetime(2016, 10, 4, 13),
@@ -146,15 +157,21 @@ def test_occasion_collection(session, owner):
         age=(6, 9),
         spots=(2, 10),
         note="Bring game-face",
-        activity=activities.add("Sport", username=owner.username)
+        activity=activities.add("Sport", username=owner.username),
+        period=period
     )
 
+    transaction.commit()
+
+    tournament = occasions.query().one()
     assert tournament.start == datetime(2016, 10, 4, 11, tzinfo=utc)
     assert tournament.end == datetime(2016, 10, 4, 12, tzinfo=utc)
     assert tournament.timezone == "Europe/Zurich"
     assert tournament.location == "Lucerne"
     assert tournament.note == "Bring game-face"
     assert tournament.activity_id == activities.query().first().id
+    assert tournament.period_id == periods.query().first().id
+    assert tournament.active
 
     # postgres ranges are coeced into half-open intervals
     assert tournament.age.lower == 6
@@ -169,6 +186,67 @@ def test_occasion_collection(session, owner):
     assert tournament.age.upper == 10
     assert tournament.spots.lower == 2
     assert tournament.spots.upper == 11
+
+    # the occasions active flag is bound to the period's activity
+    periods.query().first().deactivate()
+    transaction.commit()
+    assert not occasions.query().first().active
+    assert not activities.query().first().has_active_occasions
+
+    periods.query().first().activate()
+    transaction.commit()
+    assert occasions.query().first().active
+    assert activities.query().first().has_active_occasions
+
+    # this activities flag is bound to the occasion activites
+    occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        location="Lucerne",
+        age=(6, 9),
+        spots=(2, 10),
+        note="Bring game-face",
+        activity=activities.query().first(),
+        period=periods.query().first()
+    )
+
+    transaction.commit()
+
+    assert activities.query().first().has_active_occasions
+
+    periods.query().first().deactivate()
+    transaction.commit()
+    assert not activities.query().first().has_active_occasions
+
+    periods.query().first().activate()
+    transaction.commit()
+    assert activities.query().first().has_active_occasions
+
+    periods.query().first().deactivate()
+    transaction.commit()
+    assert not activities.query().first().has_active_occasions
+
+    occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        location="Lucerne",
+        age=(6, 9),
+        spots=(2, 10),
+        note="Bring game-face",
+        activity=activities.query().first(),
+        period=periods.add(
+            title="Autmn 2016",
+            prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+            execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+            timezone="Europe/Zurich",
+            active=True
+        )
+    )
+
+    transaction.commit()
+    assert activities.query().first().has_active_occasions
 
 
 def test_occasions_daterange_constraint(session, owner):
@@ -186,19 +264,28 @@ def test_occasions_daterange_constraint(session, owner):
 def test_no_orphan_bookings(session, owner):
 
     activities = ActivityCollection(session)
+    periods = PeriodCollection(session)
     occasions = OccasionCollection(session)
 
     tournament = occasions.add(
         start=datetime(2016, 10, 4, 13),
         end=datetime(2016, 10, 4, 14),
         timezone="Europe/Zurich",
-        activity=activities.add("Sport", username=owner.username)
+        activity=activities.add("Sport", username=owner.username),
+        period=periods.add(
+            title="Autumn 2016",
+            prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+            execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+            timezone="Europe/Zurich",
+            active=True
+        )
     )
 
     tournament.bookings.append(Booking(
         username=owner.username,
         last_name='Muster',
-        first_name='Peter'
+        first_name='Peter',
+        period_id=periods.query().first().id
     ))
 
     session.flush()
@@ -210,19 +297,30 @@ def test_no_orphan_bookings(session, owner):
 def test_no_orphan_occasions(session, owner):
 
     activities = ActivityCollection(session)
+    periods = PeriodCollection(session)
     occasions = OccasionCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        timezone="Europe/Zurich",
+        active=True
+    )
 
     tournament = occasions.add(
         start=datetime(2016, 10, 4, 13),
         end=datetime(2016, 10, 4, 14),
         timezone="Europe/Zurich",
-        activity=activities.add("Sport", username=owner.username)
+        activity=activities.add("Sport", username=owner.username),
+        period=period
     )
 
     tournament.bookings.append(Booking(
         username=owner.username,
         last_name='Muster',
-        first_name='Peter'
+        first_name='Peter',
+        period_id=period.id
     ))
 
     session.flush()
@@ -234,6 +332,7 @@ def test_no_orphan_occasions(session, owner):
 def test_occasion_durations(session, owner):
 
     activities = ActivityCollection(session)
+    periods = PeriodCollection(session)
     occasions = OccasionCollection(session)
 
     retreat = activities.add("Management Retreat", username=owner.username)
@@ -242,12 +341,21 @@ def test_occasion_durations(session, owner):
     assert not DAYS.has(retreat.durations, DAYS.full)
     assert not DAYS.has(retreat.durations, DAYS.many)
 
+    periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        timezone="Europe/Zurich",
+        active=True
+    )
+
     # add an occasion that last half a day
     monday = occasions.add(
         start=datetime(2016, 10, 3, 12),
         end=datetime(2016, 10, 3, 16),
         timezone="Europe/Zurich",
-        activity=retreat
+        activity=retreat,
+        period=periods.active()
     )
     transaction.commit()
 
@@ -261,7 +369,8 @@ def test_occasion_durations(session, owner):
         start=datetime(2016, 10, 4, 12),
         end=datetime(2016, 10, 4, 16),
         timezone="Europe/Zurich",
-        activity=retreat
+        activity=retreat,
+        period=periods.active()
     )
     transaction.commit()
 
@@ -275,7 +384,8 @@ def test_occasion_durations(session, owner):
         start=datetime(2016, 10, 5, 8),
         end=datetime(2016, 10, 5, 16),
         timezone="Europe/Zurich",
-        activity=retreat
+        activity=retreat,
+        period=periods.active()
     )
     transaction.commit()
 
@@ -289,7 +399,8 @@ def test_occasion_durations(session, owner):
         start=datetime(2016, 10, 8, 8),
         end=datetime(2016, 10, 9, 16),
         timezone="Europe/Zurich",
-        activity=retreat
+        activity=retreat,
+        period=periods.active()
     )
     transaction.commit()
 
@@ -338,17 +449,27 @@ def test_occasion_durations(session, owner):
 def test_occasion_durations_query(session, owner):
 
     activities = ActivityCollection(session)
+    periods = PeriodCollection(session)
     occasions = OccasionCollection(session)
 
     retreat = activities.add("Management Retreat", username=owner.username)
     meeting = activities.add("Management Meeting", username=owner.username)
+
+    periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        timezone="Europe/Zurich",
+        active=True
+    )
 
     # the retreat lasts a weekend
     occasions.add(
         start=datetime(2016, 10, 8, 8),
         end=datetime(2016, 10, 9, 16),
         timezone="Europe/Zurich",
-        activity=retreat
+        activity=retreat,
+        period=periods.active()
     )
 
     # the meeting has a day and a half-day occasion
@@ -356,14 +477,16 @@ def test_occasion_durations_query(session, owner):
         start=datetime(2016, 10, 10, 8),
         end=datetime(2016, 10, 10, 12),
         timezone="Europe/Zurich",
-        activity=meeting
+        activity=meeting,
+        period=periods.active()
     )
 
     occasions.add(
         start=datetime(2016, 10, 11, 8),
         end=datetime(2016, 10, 11, 16),
         timezone="Europe/Zurich",
-        activity=meeting
+        activity=meeting,
+        period=periods.active()
     )
 
     transaction.commit()
@@ -393,24 +516,35 @@ def test_occasion_durations_query(session, owner):
 def test_occasion_ages(session, owner):
 
     activities = ActivityCollection(session)
+    periods = PeriodCollection(session)
     occasions = OccasionCollection(session)
 
     retreat = activities.add("Management Retreat", username=owner.username)
     meeting = activities.add("Management Meeting", username=owner.username)
+
+    periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        timezone="Europe/Zurich",
+        active=True
+    )
 
     occasions.add(
         start=datetime(2017, 2, 18, 8),
         end=datetime(2017, 2, 18, 17),
         timezone="Europe/Zurich",
         age=(1, 10),
-        activity=retreat
+        activity=retreat,
+        period=periods.active()
     )
     occasions.add(
         start=datetime(2018, 2, 19, 8),
         end=datetime(2018, 2, 19, 17),
         timezone="Europe/Zurich",
         age=(10, 20),
-        activity=meeting
+        activity=meeting,
+        period=periods.active()
     )
 
     transaction.commit()

@@ -9,8 +9,8 @@ from onegov.core.orm.mixins import (
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
-from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
-from sqlalchemy import func, distinct
+from sqlalchemy import Boolean, Column, Enum, Text, ForeignKey, Integer
+from sqlalchemy import case, func, distinct, select, column, table
 from sqlalchemy.dialects.postgresql import HSTORE, ARRAY
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
@@ -71,6 +71,22 @@ class Activity(Base, ContentMixin, TimestampMixin):
     @aggregated('occasions', Column(ARRAY(IntRangeType), default=list))
     def ages(self):
         return func.array_agg(distinct(Occasion.age))
+
+    @aggregated('occasions.period', Column(Boolean, default=False))
+    def has_active_occasions(self):
+        # careful, this sum's total is not accurate, the sum is simply bigger
+        # than 0 if there *isn't* an active occasion, > 0 if there *is*
+        # -> changing this into a an actual count takes more than this expr
+        return func.sum(case(
+            [
+                (Occasion.period_id == (
+                    select([column("id")])
+                    .select_from(table("periods"))
+                    .where(column("active") == True)
+                ), 1),
+            ],
+            else_=0
+        )) > 0
 
     #: The occasions linked to this activity
     occasions = relationship(

@@ -2,7 +2,8 @@ from onegov.activity.models import Activity, Booking, Occasion
 from onegov.activity.collections import (
     ActivityCollection,
     BookingCollection,
-    OccasionCollection
+    OccasionCollection,
+    PeriodCollection
 )
 
 
@@ -13,4 +14,5 @@ __all__ = [
     'ActivityCollection',
     'BookingCollection',
     'OccasionCollection',
+    'PeriodCollection'
 ]

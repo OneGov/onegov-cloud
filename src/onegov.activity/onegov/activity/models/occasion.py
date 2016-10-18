@@ -1,13 +1,21 @@
 from enum import IntEnum
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime, UUID
 from psycopg2.extras import NumericRange
 from sedate import to_timezone
-from sqlalchemy import Column, Enum, Text, ForeignKey, CheckConstraint
-from sqlalchemy import case, func
+from sqlalchemy import Boolean
+from sqlalchemy import case
+from sqlalchemy import CheckConstraint
+from sqlalchemy import column
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import func
+from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
+from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
 
@@ -21,7 +29,7 @@ class DAYS(IntEnum):
         return value & mask > 0 if value else False
 
 
-class Occasion(Base):
+class Occasion(Base, TimestampMixin):
     """ Describes a single occurrence of an Activity. "Occurence" would have
     been a good word for it too, but that's used by onegov.event.
 
@@ -61,18 +69,19 @@ class Occasion(Base):
     activity_id = Column(
         UUID, ForeignKey("activities.id", use_alter=True), nullable=False)
 
+    #: The period this occasion belongs to
+    period_id = Column(
+        UUID, ForeignKey("periods.id", use_alter=True), nullable=False)
+
+    @aggregated('period', Column(Boolean, default=False))
+    def active(self):
+        return column('active')
+
     #: The bookings linked to this occasion
     bookings = relationship(
         'Booking',
         order_by='Booking.created',
         backref='occasion'
-    )
-
-    #: The state of the occasion
-    state = Column(
-        Enum('active', 'cancelled', 'archived', name='occasion_state'),
-        nullable=False,
-        default='active'
     )
 
     __table_args__ = (

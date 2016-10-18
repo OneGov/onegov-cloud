@@ -1,4 +1,3 @@
-from onegov.activity.models.occasion import Occasion
 from onegov.activity.utils import random_group_code
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -42,7 +41,11 @@ class Booking(Base, TimestampMixin):
     first_name = Column(Text, nullable=False)
 
     #: the occasion this booking belongs to
-    occasion_id = Column(UUID, ForeignKey(Occasion.id), nullable=False)
+    occasion_id = Column(UUID, ForeignKey("occasions.id"), nullable=False)
+
+    #: the period this booking belongs to (also set on the occasion, this
+    #: is redundant to make it easier to query bookings by period)
+    period_id = Column(UUID, ForeignKey("periods.id"), nullable=False)
 
     #: the state of the booking
     state = Column(
