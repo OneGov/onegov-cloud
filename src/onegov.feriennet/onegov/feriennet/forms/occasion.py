@@ -1,15 +1,21 @@
-from onegov.activity import OccasionCollection
+from onegov.activity import Period, PeriodCollection, OccasionCollection
 from onegov.feriennet import _
 from onegov.form import Form
 from sedate import replace_timezone
-from wtforms.fields import StringField, TextAreaField
+from wtforms.fields import StringField, TextAreaField, SelectField
 from wtforms.fields.html5 import DateTimeField, IntegerField
 from wtforms.validators import InputRequired, NumberRange
+from sqlalchemy import desc
 
 
 class OccasionForm(Form):
 
     timezone = 'Europe/Zurich'
+
+    period_id = SelectField(
+        label=_("Period"),
+        validators=[InputRequired()],
+        default='0xdeadbeef')
 
     start = DateTimeField(
         label=_("Start"),
@@ -79,6 +85,26 @@ class OccasionForm(Form):
             self.end.data,
             self.timezone
         )
+
+    def setup_period_choices(self):
+        query = PeriodCollection(self.request.app.session()).query()
+        query = query.order_by(desc(Period.active), Period.title)
+
+        def choice(period):
+            return str(period.id), '{} ({:%d.%m.%Y} - {:%d.%m.%Y})'.format(
+                period.title,
+                period.execution_start,
+                period.execution_end
+            )
+
+        periods = query.all()
+        self.period_id.choices = [choice(p) for p in periods]
+
+        if self.period_id.data == '0xdeadbeef':
+            self.period_id.data = periods[0].id
+
+    def on_request(self):
+        self.setup_period_choices()
 
     def validate(self):
         result = super().validate()

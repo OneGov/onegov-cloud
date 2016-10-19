@@ -1,4 +1,4 @@
-from onegov.activity import Occasion, OccasionCollection
+from onegov.activity import Occasion, OccasionCollection, PeriodCollection
 from onegov.core.security import Private
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
@@ -17,11 +17,14 @@ def new_occasion(self, request, form):
 
     if form.submitted(request):
         occasions = OccasionCollection(request.app.session())
+        periods = PeriodCollection(request.app.session())
+
         form.populate_obj(occasions.add(
             activity=self,
             start=form.start.data,
             end=form.end.data,
-            timezone=form.timezone
+            timezone=form.timezone,
+            period=periods.by_id(form.period_id.data)
         ))
 
         request.success(_("Your changes were saved"))

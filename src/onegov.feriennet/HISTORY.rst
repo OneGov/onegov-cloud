@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to manage periods for occasions.
+  [href]
+
 - Fixes occasion factoids not aligning nicely over multiple lines.
   [href]
 

@@ -4,7 +4,9 @@ import transaction
 from datetime import datetime, timedelta
 from onegov.testing import utils
 from onegov.org.testing import Client, get_message, select_checkbox
-from onegov.activity import ActivityCollection, OccasionCollection
+from onegov.activity import ActivityCollection
+from onegov.activity import OccasionCollection
+from onegov.activity import PeriodCollection
 from psycopg2.extras import NumericRange
 
 
@@ -249,10 +251,18 @@ def test_activity_filter_tags(feriennet_app):
 
 def test_activity_filter_duration(feriennet_app):
     activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    periods = PeriodCollection(feriennet_app.session())
     occasions = OccasionCollection(feriennet_app.session())
 
     retreat = activities.add("Retreat", username='admin@example.org')
     meeting = activities.add("Meeting", username='admin@example.org')
+
+    period = periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        active=True
+    )
 
     retreat.propose().accept()
     meeting.propose().accept()
@@ -262,7 +272,8 @@ def test_activity_filter_duration(feriennet_app):
         start=datetime(2016, 10, 8, 8),
         end=datetime(2016, 10, 9, 16),
         timezone="Europe/Zurich",
-        activity=retreat
+        activity=retreat,
+        period=period
     ).id
 
     # the meeting lasts half a day
@@ -270,7 +281,8 @@ def test_activity_filter_duration(feriennet_app):
         start=datetime(2016, 10, 10, 8),
         end=datetime(2016, 10, 10, 12),
         timezone="Europe/Zurich",
-        activity=meeting
+        activity=meeting,
+        period=period
     )
 
     transaction.commit()
@@ -299,10 +311,18 @@ def test_activity_filter_duration(feriennet_app):
 
 def test_activity_filter_age_ranges(feriennet_app):
     activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    periods = PeriodCollection(feriennet_app.session())
     occasions = OccasionCollection(feriennet_app.session())
 
     retreat = activities.add("Retreat", username='admin@example.org')
     meeting = activities.add("Meeting", username='admin@example.org')
+
+    period = periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        active=True
+    )
 
     retreat.propose().accept()
     meeting.propose().accept()
@@ -313,7 +333,8 @@ def test_activity_filter_age_ranges(feriennet_app):
         end=datetime(2016, 10, 9, 16),
         age=(0, 10),
         timezone="Europe/Zurich",
-        activity=retreat
+        activity=retreat,
+        period=period
     )
 
     # the meeting lasts half a day
@@ -322,7 +343,8 @@ def test_activity_filter_age_ranges(feriennet_app):
         end=datetime(2016, 10, 9, 16),
         age=(5, 15),
         timezone="Europe/Zurich",
-        activity=meeting
+        activity=meeting,
+        period=period
     ).id
 
     transaction.commit()
@@ -416,11 +438,25 @@ def test_occasions_form(feriennet_app):
     editor = Client(feriennet_app)
     editor.login_editor()
 
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
     new = editor.get('/angebote').click("Angebot erfassen")
     new.form['title'] = "Play with Legos"
     new.form['lead'] = "Like Minecraft, but in the real world"
-    activity = new.form.submit().follow()
+    new.form.submit().follow()
 
+    periods = admin.get('/angebote').click("Perioden Verwalten")
+
+    period = periods.click("Neue Periode")
+    period.form['title'] = "Vacation Program 2016"
+    period.form['prebooking_start'] = '2016-09-01'
+    period.form['prebooking_end'] = '2016-09-30'
+    period.form['execution_start'] = '2016-10-01'
+    period.form['execution_end'] = '2016-10-31'
+    period.form.submit()
+
+    activity = editor.get('/angebote').click("Play with Legos")
     assert "keine Durchführungen" in activity
 
     occasion = activity.click("Neue Durchführung")
