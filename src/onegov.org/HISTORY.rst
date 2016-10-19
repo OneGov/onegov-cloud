@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.14 (2016-10-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a separate date_range function for dates instead of datetimes.
   [href]
 
