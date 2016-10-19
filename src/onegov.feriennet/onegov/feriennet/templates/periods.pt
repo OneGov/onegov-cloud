@@ -1,0 +1,47 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div tal:condition="not:periods" i18n:translate>
+            No periods defined.
+        </div>
+
+        <table class="periods" tal:condition="periods">
+            <thead>
+                <tr>
+                    <th i18n:translate>Title</th>
+                    <th i18n:translate>Prebooking Phase</th>
+                    <th i18n:translate>Exeuction Phase</th>
+                    <th colspan="2" i18n:translate>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr tal:repeat="period periods" class="${period.active and 'active' or ''}">
+                    <td>${period.title}</td>
+                    <td>
+                        ${layout.format_date(period.prebooking_start, 'date')}
+                        -
+                        ${layout.format_date(period.prebooking_end, 'date')}
+                    </td>
+                    <td>
+                        ${layout.format_date(period.execution_start, 'date')}
+                        -
+                        ${layout.format_date(period.execution_end, 'date')}
+                    </td>
+                    <td>
+                        <span tal:condition="period.active" i18n:translate>Active</span>
+                        <span tal:condition="not:period.active" i18n:translate>Inactive</span>
+                    </td>
+                    <td>
+                        <a href="${request.link(period, 'bearbeiten')}" i18n:translate>
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </tal:block>
+</div>

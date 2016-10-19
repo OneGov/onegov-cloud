@@ -160,3 +160,53 @@ class VacationActivityLayout(DefaultLayout):
                 ))
 
             return links
+
+
+class PeriodCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(_("Manage Periods"), '#')
+        )
+
+    @cached_property
+    def editbar_links(self):
+        return (
+            Link(
+                _("New Period"),
+                self.request.link(self.model, 'neu'),
+                classes=('new-period', )
+            ),
+        )
+
+
+class PeriodFormLayout(DefaultLayout):
+
+    def __init__(self, model, request, title):
+        super().__init__(model, request)
+        self.title = title
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(
+                _("Manage Periods"),
+                self.request.class_link(PeriodCollection)
+            ),
+            Link(self.title, '#')
+        )
+
+    @cached_property
+    def editbar_links(self):
+        return None

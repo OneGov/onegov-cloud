@@ -64,4 +64,4 @@ def get_periods(request, app):
     path='/periode/{id}',
     converters=dict(id=UUID))
 def get_period(request, app, id):
-    return OccasionCollection(app.session()).by_id(id)
+    return PeriodCollection(app.session()).by_id(id)

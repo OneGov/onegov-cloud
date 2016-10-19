@@ -33,6 +33,7 @@ svg #background {
     .archive-activity:before { @include icon('\f187'); }
     .new-occasion:before { @include icon('\f133'); }
     .manage-periods:before { @include icon('\f02d'); }
+    .new-period:before { @include icon('\f055'); }
 }
 
 /*
