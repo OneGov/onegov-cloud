@@ -25,9 +25,6 @@ class Period(Base, TimestampMixin):
     #: Only one period is active at a time
     active = Column(Boolean, nullable=False, default=False)
 
-    #: Timezone of the period
-    timezone = Column(Text, nullable=False)
-
     #: Start of the wishlist-phase
     prebooking_start = Column(Date, nullable=False)
 

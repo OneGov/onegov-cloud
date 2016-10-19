@@ -145,7 +145,6 @@ def test_occasions(session, owner):
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
-        timezone="Europe/Zurich",
         active=True
     )
 
@@ -240,7 +239,6 @@ def test_occasions(session, owner):
             title="Autmn 2016",
             prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
             execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
-            timezone="Europe/Zurich",
             active=True
         )
     )
@@ -276,7 +274,6 @@ def test_no_orphan_bookings(session, owner):
             title="Autumn 2016",
             prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
             execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
-            timezone="Europe/Zurich",
             active=True
         )
     )
@@ -304,7 +301,6 @@ def test_no_orphan_occasions(session, owner):
         title="Autumn 2016",
         prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
         execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
-        timezone="Europe/Zurich",
         active=True
     )
 
@@ -345,7 +341,6 @@ def test_occasion_durations(session, owner):
         title="2016",
         prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
         execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        timezone="Europe/Zurich",
         active=True
     )
 
@@ -459,7 +454,6 @@ def test_occasion_durations_query(session, owner):
         title="2016",
         prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
         execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        timezone="Europe/Zurich",
         active=True
     )
 
@@ -526,7 +520,6 @@ def test_occasion_ages(session, owner):
         title="2016",
         prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
         execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
-        timezone="Europe/Zurich",
         active=True
     )
 
