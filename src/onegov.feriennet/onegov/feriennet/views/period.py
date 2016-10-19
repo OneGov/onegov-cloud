@@ -4,7 +4,7 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.forms import PeriodForm
 from onegov.feriennet.layout import PeriodCollectionLayout
 from onegov.feriennet.layout import PeriodFormLayout
-from onegov.org.elements import DeleteLink, Link
+from onegov.org.elements import ConfirmLink, DeleteLink, Link
 from sqlalchemy.exc import IntegrityError
 
 
@@ -17,6 +17,32 @@ def view_periods(self, request):
     layout = PeriodCollectionLayout(self, request)
 
     def links(period):
+        if period.active:
+            yield ConfirmLink(
+                text=_("Deactivate"),
+                url=request.link(period, name='deaktivieren'),
+                confirm=_(
+                    'Do you really want to deactivate "${title}"?', mapping={
+                        'title': period.title
+                    }),
+                extra_information=_("This will hide all associated occasions"),
+                classes=('confirm', ),
+                yes_button_text=_("Deactivate Period"))
+        else:
+            yield ConfirmLink(
+                text=_("Activate"),
+                url=request.link(period, name='aktivieren'),
+                confirm=_(
+                    'Do you really want to activate "${title}"?', mapping={
+                        'title': period.title
+                    }),
+                extra_information=_(
+                    "This will deactivate the currently active period. All "
+                    "associated occasions will be made public"
+                ),
+                classes=('confirm', ),
+                yes_button_text=_("Activate Period"))
+
         yield Link(_("Edit"), request.link(period, 'bearbeiten'))
         yield DeleteLink(
             text=_("Delete"),
@@ -26,8 +52,7 @@ def view_periods(self, request):
             }),
             extra_information=_("This cannot be undone."),
             classes=('confirm', ),
-            yes_button_text=_("Delete Period")
-        )
+            yes_button_text=_("Delete Period"))
 
     return {
         'layout': layout,
@@ -103,6 +128,36 @@ def delete_period(self, request):
     else:
         request.success(
             _("The period was deleted successfully"))
+
+    @request.after
+    def redirect_intercooler(response):
+        response.headers.add(
+            'X-IC-Redirect', request.class_link(PeriodCollection))
+
+
+@FeriennetApp.view(
+    model=Period,
+    request_method='POST',
+    name='aktivieren',
+    permission=Secret)
+def activate_period(self, request):
+    self.activate()
+    request.success(_("The period was activated successfully"))
+
+    @request.after
+    def redirect_intercooler(response):
+        response.headers.add(
+            'X-IC-Redirect', request.class_link(PeriodCollection))
+
+
+@FeriennetApp.view(
+    model=Period,
+    request_method='POST',
+    name='deaktivieren',
+    permission=Secret)
+def deactivate_period(self, request):
+    self.activate()
+    request.success(_("The period was deactivated successfully"))
 
     @request.after
     def redirect_intercooler(response):

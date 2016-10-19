@@ -268,3 +268,22 @@ ul.occasions {
         display: none;
     }
 }
+
+/*
+    Periods view
+*/
+.periods {
+    td {
+        color: $charcoal;
+    }
+
+    .active {
+        td {
+            color: $jet;
+            
+            &:first-child {
+                border-left: 10px solid $primary-color;
+            }
+        }
+    }
+}
