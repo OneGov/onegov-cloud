@@ -22,6 +22,18 @@ svg #background {
 }
 
 /*
+    Links in simple text style (side by side)
+*/
+.text-links a:first-child:before {
+    content: '';
+}
+
+.text-links a:before {
+    color: $body-font-color;
+    content: ' | ';
+}
+
+/*
     editbar icons
 */
 
@@ -244,15 +256,6 @@ ul.occasions {
             @include icon('\f105');
         }
     }
-}
-
-.occasion-links a:first-child:before {
-    content: '';
-}
-
-.occasion-links a:before {
-    color: $body-font-color;
-    content: ' | ';
 }
 
 /*

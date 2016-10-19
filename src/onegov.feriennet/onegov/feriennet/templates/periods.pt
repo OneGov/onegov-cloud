@@ -21,23 +21,17 @@
                 <tr tal:repeat="period periods" class="${period.active and 'active' or ''}">
                     <td>${period.title}</td>
                     <td>
-                        ${layout.format_date(period.prebooking_start, 'date')}
-                        -
-                        ${layout.format_date(period.prebooking_end, 'date')}
+                        ${layout.format_date_range(period.prebooking_start, period.prebooking_end)}
                     </td>
                     <td>
-                        ${layout.format_date(period.execution_start, 'date')}
-                        -
-                        ${layout.format_date(period.execution_end, 'date')}
+                        ${layout.format_date_range(period.execution_start, period.execution_end)}
                     </td>
                     <td>
                         <span tal:condition="period.active" i18n:translate>Active</span>
                         <span tal:condition="not:period.active" i18n:translate>Inactive</span>
                     </td>
-                    <td>
-                        <a href="${request.link(period, 'bearbeiten')}" i18n:translate>
-                            Edit
-                        </a>
+                    <td class="text-links">
+                        <tal:block repeat="link links(period)" content="structure link(request)" />
                     </td>
                 </tr>
             </tbody>

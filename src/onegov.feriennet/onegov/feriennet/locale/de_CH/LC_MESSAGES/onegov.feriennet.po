@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-10-18 15:00+0200\n"
+"POT-Creation-Date: 2016-10-19 11:41+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -27,11 +27,14 @@ msgstr "Benutzerprofil"
 msgid "Homepage"
 msgstr "Startseite"
 
-msgid "Submit Activity"
-msgstr "Angebot erfassen"
-
 msgid "Manage Periods"
 msgstr "Perioden Verwalten"
+
+msgid "New Period"
+msgstr "Neue Periode"
+
+msgid "Submit Activity"
+msgstr "Angebot erfassen"
 
 msgid "Edit Activity"
 msgstr "Angebot Bearbeiten"
@@ -61,8 +64,9 @@ msgstr "Durchführungen können noch nicht erstellt werden"
 msgid ""
 "There are no periods defined yet. At least one period needs to be defined "
 "before occasions can be created"
-msgstr "Es existieren zur Zeit keine Perioden. Mindestens eine Periode muss "
-"bestehen bevor Durchführungen erfasst werden können"
+msgstr ""
+"Es existieren zur Zeit keine Perioden. Mindestens eine Periode muss bestehen "
+"bevor Durchführungen erfasst werden können"
 
 msgid "Editor"
 msgstr "Veranstalter"
@@ -192,6 +196,27 @@ msgid ""
 "of participants"
 msgstr ""
 "The Mindestteilnehmerzahl darf nicht grösser als die Anzahl Plätze sein"
+
+#, python-format
+msgid "Ferienpass Summer ${year}"
+msgstr "Ferienpass Sommer ${year}"
+
+msgid "Prebooking Start"
+msgstr "Start Anmeldungs-Phase"
+
+msgid "Prebooking End"
+msgstr "Ende Anmeldungs-Phase"
+
+msgid "Execution Start"
+msgstr "Start Ausführung"
+
+msgid "Execution End"
+msgstr "Ende Ausführung"
+
+msgid ""
+"The prebooking period must start before the exeuction period and each period "
+"must start before it ends."
+msgstr ""
 
 msgid "Name"
 msgstr "Name"
@@ -356,6 +381,21 @@ msgstr "Ihr Angebot wurde archiviert:"
 msgid "Your activity has unfortunately been rejected:"
 msgstr "Ihr Angebot wurde leider abgelehnt:"
 
+msgid "No periods defined."
+msgstr "Keine Perioden definiert."
+
+msgid "Prebooking Phase"
+msgstr "Anmeldungs-Phase"
+
+msgid "Exeuction Phase"
+msgstr "Ausführungs-Phase"
+
+msgid "Active"
+msgstr "Aktiv"
+
+msgid "Inactive"
+msgstr "Inaktiv"
+
 msgid "New Activity"
 msgstr "Neues Angebot"
 
@@ -411,5 +451,12 @@ msgstr "Eigene"
 msgid "Edit Occasion"
 msgstr "Durchfürung Bearbeiten"
 
-#~ msgid "Discard"
-#~ msgstr "Verwerfen"
+msgid "The period was deleted successfully"
+msgstr "Die Periode wurde erfolgreich gelöscht"
+
+msgid "The period could not be deleted as it is still in use"
+msgstr ""
+"Die Periode konnte nicht gelöscht werden, da sie bereits verwendet wird"
+
+msgid "Delete Period"
+msgstr "Periode Löschen"

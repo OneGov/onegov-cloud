@@ -105,7 +105,7 @@ def view_activity(self, request):
         lambda o: DeleteLink(
             text=_("Delete"), url=layout.csrf_protected_url(request.link(o)),
             confirm=_('Do you really want to delete "${title}"?', mapping={
-                'title': layout.format_date_range(
+                'title': layout.format_datetime_range(
                     o.localized_start,
                     o.localized_end
                 ),

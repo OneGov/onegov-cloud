@@ -42,7 +42,7 @@
 
                 <ul tal:condition="activity.occasions" class="occasions">
                     <li tal:repeat="occasion activity.occasions">
-                        <h4>${layout.format_date_range(occasion.localized_start, occasion.localized_end)}</h4>
+                        <h4>${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</h4>
 
                         <div class="row">
                             <!--! the width of this column together with the next one doesn't add up to 12 by
@@ -80,7 +80,7 @@
                                     </span>
                                 </div>
 
-                                <div class="occasion-links" tal:condition="request.is_admin or layout.is_owner">
+                                <div class="text-links" tal:condition="request.is_admin or layout.is_owner">
                                     <tal:block repeat="link occasion_links">
                                         <tal:block replace="structure link(occasion)(request)" />
                                     </tal:block>
