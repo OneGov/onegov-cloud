@@ -275,6 +275,15 @@ class Layout(ChameleonLayout):
         return utils.format_time_range(start, end)
 
     def format_date_range(self, start, end):
+        if start == end:
+            return self.format_date(start, 'date')
+        else:
+            return ' - '.join((
+                self.format_date(start, 'date'),
+                self.format_date(end, 'date')
+            ))
+
+    def format_datetime_range(self, start, end):
         if (end - start) <= timedelta(hours=23):
             return ' '.join((
                 self.format_date(start, 'date_long_without_year'),
