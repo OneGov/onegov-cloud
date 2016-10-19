@@ -44,9 +44,7 @@ class PeriodForm(Form):
     def execution(self):
         return (self.execution_start.data, self.execution_end.data)
 
-    def validate(self):
-        result = super().validate()
-
+    def ensure_valid_daterange_periods(self):
         fields = (
             self.prebooking_start,
             self.prebooking_end,
@@ -65,9 +63,21 @@ class PeriodForm(Form):
                     "The prebooking period must start before the exeuction "
                     "period and each period must start before it ends."
                 ))
-                result = False
-                break
+                return False
 
             stack.append(field)
+
+        return True
+
+    def validate(self):
+        result = super().validate()
+
+        ensurances = (
+            self.ensure_valid_daterange_periods,
+        )
+
+        for ensurance in ensurances:
+            if not ensurance():
+                return False
 
         return result
