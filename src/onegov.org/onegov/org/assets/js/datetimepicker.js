@@ -175,7 +175,17 @@ var setup_datetimepicker = function(type) {
 
     $('form').submit(function() {
         $(this).find(selector).each(function() {
-            $(this).val(type_specific.client_to_server($(this).val()));
+            var field = $(this);
+            var oldval = field.val();
+
+            field.val(type_specific.client_to_server(oldval));
+
+            // reset the value after submitting it, which helps with certain
+            // browsers that will otherwise retain this value when pressing
+            // the back button (Safari + Firefox)
+            _.defer(function() {
+                field.val(oldval);
+            });
             return true;
         });
         return true;
