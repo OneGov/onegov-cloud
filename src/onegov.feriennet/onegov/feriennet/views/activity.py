@@ -1,3 +1,5 @@
+from itertools import groupby
+from onegov.activity import Occasion, OccasionCollection, Period
 from onegov.activity.models import ACTIVITY_STATES, DAYS
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -13,6 +15,8 @@ from onegov.feriennet.models import VacationActivity
 from onegov.org.elements import Link, DeleteLink
 from onegov.org.mail import send_html_mail
 from onegov.ticket import TicketCollection
+from sqlalchemy import desc
+from sqlalchemy.orm import contains_eager
 from webob import exc
 
 
@@ -21,6 +25,27 @@ def get_activity_form_class(model, request):
         model = VacationActivity()
 
     return model.with_content_extensions(VacationActivityForm, request)
+
+
+def occasions_by_period(session, activity, active_only):
+    query = OccasionCollection(session).query()
+    query = query.filter(Occasion.activity_id == activity.id)
+
+    if active_only:
+        query = query.filter(Occasion.active == True)
+
+    query = query.join(Occasion.period)
+    query = query.options(contains_eager(Occasion.period))
+
+    query = query.order_by(
+        desc(Period.active),
+        Period.execution_start,
+        Occasion.start)
+
+    return tuple(
+        (title, tuple(occasions)) for title, occasions in
+        groupby(query.all(), key=lambda o: o.period.title)
+    )
 
 
 @FeriennetApp.html(
@@ -121,7 +146,12 @@ def view_activity(self, request):
         'title': self.title,
         'activity': self,
         'ticket': ticket,
-        'occasion_links': occasion_links
+        'occasion_links': occasion_links,
+        'occasions_by_period': occasions_by_period(
+            session=request.app.session(),
+            activity=self,
+            active_only=not request.is_organiser
+        )
     }
 
 
