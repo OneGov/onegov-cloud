@@ -81,6 +81,9 @@ class Period(Base, TimestampMixin):
         if active_period:
             active_period.deactivate()
 
+        # avoid triggering the only_one_active_period index constraint
+        session.flush()
+
         self.active = True
 
     def deactivate(self):
