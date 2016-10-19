@@ -57,6 +57,9 @@ class PeriodForm(Form):
         stack = [fields[0]]
 
         for field in fields:
+            if field.data is None:
+                continue
+
             if stack.pop().data > field.data:
                 field.errors.append(_(
                     "The prebooking period must start before the exeuction "
