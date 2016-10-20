@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.10 (2016-10-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Reworks the datamodel to include a period linked to the occasion/bookings.
   [href]
 
