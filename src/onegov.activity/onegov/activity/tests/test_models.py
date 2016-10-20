@@ -190,61 +190,81 @@ def test_occasions(session, owner):
     periods.query().first().deactivate()
     transaction.commit()
     assert not occasions.query().first().active
-    assert not activities.query().first().has_active_occasions
 
     periods.query().first().activate()
     transaction.commit()
     assert occasions.query().first().active
-    assert activities.query().first().has_active_occasions
 
-    # this activities flag is bound to the occasion activites
+
+def test_profiles(session, owner):
+
+    activities = ActivityCollection(session)
+    occasions = OccasionCollection(session)
+    periods = PeriodCollection(session)
+
+    sport = activities.add("Sport", username=owner.username)
+
+    autumn = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31))
+    )
+
+    winter = periods.add(
+        title="Winter 2016",
+        prebooking=(datetime(2016, 11, 1), datetime(2016, 11, 30)),
+        execution=(datetime(2016, 12, 1), datetime(2016, 12, 31))
+    )
+
+    autumn_id, winter_id = autumn.id, winter.id
+
+    # 2 occasions in autumn
     occasions.add(
-        start=datetime(2016, 10, 4, 13),
-        end=datetime(2016, 10, 4, 14),
+        start=datetime(2016, 10, 1, 13),
+        end=datetime(2016, 10, 1, 14),
         timezone="Europe/Zurich",
-        location="Lucerne",
         age=(6, 9),
         spots=(2, 10),
-        note="Bring game-face",
-        activity=activities.query().first(),
-        period=periods.query().first()
+        activity=sport,
+        period=autumn
+    )
+
+    occasions.add(
+        start=datetime(2016, 10, 1, 13),
+        end=datetime(2016, 10, 1, 14),
+        timezone="Europe/Zurich",
+        age=(6, 9),
+        spots=(2, 10),
+        activity=sport,
+        period=autumn
+    )
+
+    # 1 occasion in winter
+    occasions.add(
+        start=datetime(2016, 12, 1, 13),
+        end=datetime(2016, 12, 1, 14),
+        timezone="Europe/Zurich",
+        age=(6, 9),
+        spots=(2, 10),
+        activity=sport,
+        period=winter
     )
 
     transaction.commit()
 
-    assert activities.query().first().has_active_occasions
+    sport = activities.query().first()
+    assert len(sport.periods) == 2
+    assert winter_id in sport.periods
+    assert autumn_id in sport.periods
 
-    periods.query().first().deactivate()
+    # drop the winter occasion
+    occasions.delete(
+        occasions.query().filter(Occasion.period_id == winter_id).first())
     transaction.commit()
-    assert not activities.query().first().has_active_occasions
 
-    periods.query().first().activate()
-    transaction.commit()
-    assert activities.query().first().has_active_occasions
-
-    periods.query().first().deactivate()
-    transaction.commit()
-    assert not activities.query().first().has_active_occasions
-
-    occasions.add(
-        start=datetime(2016, 10, 4, 13),
-        end=datetime(2016, 10, 4, 14),
-        timezone="Europe/Zurich",
-        location="Lucerne",
-        age=(6, 9),
-        spots=(2, 10),
-        note="Bring game-face",
-        activity=activities.query().first(),
-        period=periods.add(
-            title="Autmn 2016",
-            prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
-            execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
-            active=True
-        )
-    )
-
-    transaction.commit()
-    assert activities.query().first().has_active_occasions
+    sport = activities.query().first()
+    assert len(sport.periods) == 1
+    assert autumn_id in sport.periods
 
 
 def test_occasions_daterange_constraint(session, owner):

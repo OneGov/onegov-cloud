@@ -4,9 +4,10 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 
 from onegov.activity.models import Activity, Occasion
+from onegov.core.orm.types import UUID
 from onegov.core.upgrade import upgrade_task
 from psycopg2.extras import NumericRange
-from sqlalchemy import Boolean, Column, Text, Integer
+from sqlalchemy import Column, Text, Integer
 from sqlalchemy.dialects.postgresql import ARRAY, INT4RANGE
 
 
@@ -139,9 +140,8 @@ def rebuild_models(context):
     # too many changes + we're at an early stage
     context.operations.drop_table('bookings')
     context.operations.drop_table('occasions')
-
     context.operations.add_column(
-        'activities', Column('has_active_occasions', Boolean, default=False))
+        'activities', Column('periods', ARRAY(UUID), default=list))
 
 
 @upgrade_task('Drop occasion state type')
