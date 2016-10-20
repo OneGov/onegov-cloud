@@ -66,9 +66,12 @@ def view_periods(self, request):
     model=PeriodCollection,
     name='neu',
     form=PeriodForm,
-    template='form.pt',
+    template='period_form.pt',
     permission=Secret)
 def new_period(self, request, form):
+
+    # the model does not exist yet
+    form.model = None
 
     if form.submitted(request):
         period = self.add(
@@ -92,9 +95,12 @@ def new_period(self, request, form):
     model=Period,
     name='bearbeiten',
     form=PeriodForm,
-    template='form.pt',
+    template='period_form.pt',
     permission=Secret)
 def edit_period(self, request, form):
+
+    # pass the form model for extended validation if data was posted
+    form.model = request.POST and self or None
 
     if form.submitted(request):
         form.populate_obj(self)

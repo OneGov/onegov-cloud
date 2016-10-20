@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-10-19 15:07+0200\n"
+"POT-Creation-Date: 2016-10-20 11:33+0200\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -200,15 +200,18 @@ msgid ""
 msgstr ""
 "The Mindestteilnehmerzahl darf nicht grösser als die Anzahl Plätze sein"
 
+msgid "The date is outside the selected period"
+msgstr "Das Datum liegt ausserhalb der gewählten Periode"
+
 #, python-format
 msgid "Ferienpass Summer ${year}"
 msgstr "Ferienpass Sommer ${year}"
 
 msgid "Prebooking Start"
-msgstr "Start Anmeldungs-Phase"
+msgstr "Start Anmeldungs"
 
 msgid "Prebooking End"
-msgstr "Ende Anmeldungs-Phase"
+msgstr "Ende Anmeldungs"
 
 msgid "Execution Start"
 msgstr "Start Ausführung"
@@ -216,10 +219,14 @@ msgstr "Start Ausführung"
 msgid "Execution End"
 msgstr "Ende Ausführung"
 
+msgid "The execution phase conflicts with existing occasions"
+msgstr "Konflikt mit bestehenden Durchführungen"
+
 msgid ""
 "The prebooking period must start before the exeuction period and each period "
 "must start before it ends."
-msgstr ""
+msgstr "Die Anmeldung muss vor der Ausführung statfinden und die Start-Daten müssen "
+"vor den End-Daten liegen."
 
 msgid "Name"
 msgstr "Name"
@@ -383,6 +390,11 @@ msgstr "Ihr Angebot wurde archiviert:"
 
 msgid "Your activity has unfortunately been rejected:"
 msgstr "Ihr Angebot wurde leider abgelehnt:"
+
+msgid ""
+"The following activites contain occasions which are in conflict with the "
+"given execution phase:"
+msgstr "Folgende Angebote enthalten Durchführungen welche in Konflikt mit den Ausführungs-Daten stehen:"
 
 msgid "No periods defined."
 msgstr "Keine Perioden definiert."

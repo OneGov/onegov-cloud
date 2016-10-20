@@ -1,3 +1,4 @@
+from cached_property import cached_property
 from onegov.activity import Period, PeriodCollection, OccasionCollection
 from onegov.feriennet import _
 from onegov.form import Form
@@ -86,6 +87,11 @@ class OccasionForm(Form):
             self.timezone
         )
 
+    @cached_property
+    def selected_period(self):
+        return PeriodCollection(self.request.app.session()).by_id(
+            self.period_id.data)
+
     def setup_period_choices(self):
         query = PeriodCollection(self.request.app.session()).query()
         query = query.order_by(desc(Period.active), Period.title)
@@ -111,26 +117,42 @@ class OccasionForm(Form):
 
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
-                self.end.errors.append(
-                    _("The end date must be after the start date")
-                )
+                self.end.errors.append(_(
+                    "The end date must be after the start date"
+                ))
                 result = False
 
         if self.min_age.data and self.max_age.data:
             if self.min_age.data > self.max_age.data:
-                self.min_age.errors.append(
-                    _("The minium age cannot be higher than the maximum age")
-                )
+                self.min_age.errors.append(_(
+                    "The minium age cannot be higher than the maximum age"
+                ))
                 result = False
 
         if self.min_spots.data and self.max_spots.data:
             if self.min_spots.data > self.max_spots.data:
-                self.min_spots.errors.append(
-                    _(
-                        "The minium number of participants cannot be higher "
-                        "than the maximum number of participants"
-                    )
-                )
+                self.min_spots.errors.append(_(
+                    "The minium number of participants cannot be higher "
+                    "than the maximum number of participants"
+                ))
+                result = False
+
+        if self.selected_period and self.start.data and self.end.data:
+            execution_start = self.selected_period.execution_start
+            execution_end = self.selected_period.execution_end
+            start = self.start.data.date()
+            end = self.start.data.date()
+
+            if start < execution_start or execution_end < start:
+                self.start.errors.append(_(
+                    "The date is outside the selected period"
+                ))
+                result = False
+
+            if end < execution_start or execution_end < end:
+                self.end.errors.append(_(
+                    "The date is outside the selected period"
+                ))
                 result = False
 
         return result
