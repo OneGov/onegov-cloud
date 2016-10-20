@@ -1,3 +1,4 @@
+import functools
 import threading
 import re
 import weakref
@@ -257,6 +258,20 @@ class SessionManager(object):
             fn=aggregates_manager.construct_aggregate_queries
         )
 
+        # This check we need in any case, since aggregates don't work with
+        # bulk udpdates/deletes, which is something we make sure can't
+        # happen by accident (it'll lead to hard to debug errors)
+        cache_size = min(len(aggregates_manager.generator_registry), 32)
+
+        @functools.lru_cache(cache_size)
+        def prevent_bulk_changes_on_aggregate_modules(module_class):
+            for registered in aggregates_manager.generator_registry:
+                assert not issubclass(module_class, registered), """
+                    Bulk queries run on models that use sqlalchemy-utils
+                    aggregates won't lead to a proper update. It's impossible
+                    to have both aggregates and bulk updates/deletes.
+                """
+
         @event.listens_for(session, 'after_flush')
         def on_after_flush(session, flush_context):
             for signal, get_objects in signals:
@@ -266,6 +281,9 @@ class SessionManager(object):
 
         @event.listens_for(session, 'after_bulk_update')
         def on_after_bulk_update(update_context):
+            prevent_bulk_changes_on_aggregate_modules(
+                update_context.mapper.class_)
+
             if self.on_update.receivers:
                 assert hasattr(update_context, 'matched_objects'), """
                     Bulk queries which use synchronize_session=False or
@@ -280,6 +298,9 @@ class SessionManager(object):
 
         @event.listens_for(session, 'after_bulk_delete')
         def on_after_bulk_delete(delete_context):
+            prevent_bulk_changes_on_aggregate_modules(
+                delete_context.mapper.class_)
+
             if self.on_delete.receivers:
                 for row in delete_context.matched_rows:
                     obj = delete_context.mapper.class_(**{

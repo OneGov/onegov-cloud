@@ -1222,3 +1222,10 @@ def test_sqlalchemy_aggregate(postgres_dsn):
 
     # if this goes up, we need to remove our custom fix
     assert called == 1
+
+    # make sure that bulk queries are prohibited on aggregated models
+    with pytest.raises(AssertionError):
+        session.query(Comment).delete()
+
+    with pytest.raises(AssertionError):
+        session.query(Comment).update({'content': 'foobar'})
