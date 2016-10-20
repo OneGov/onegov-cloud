@@ -1,5 +1,8 @@
 from itertools import groupby
-from onegov.activity import Occasion, OccasionCollection, Period
+from onegov.activity import Occasion
+from onegov.activity import OccasionCollection
+from onegov.activity import Period
+from onegov.activity import PeriodCollection
 from onegov.activity.models import ACTIVITY_STATES, DAYS
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -86,6 +89,20 @@ def view_activities(self, request):
             (_("High school"), (14, 17))
         )
     )
+
+    if request.is_organiser:
+        periods = PeriodCollection(request.app.session()).query().all()
+    else:
+        periods = [PeriodCollection(request.app.session()).active()]
+
+    if periods:
+        taglinks.extend(
+            Link(
+                text=period.title,
+                active=period.id in self.period_ids,
+                url=request.link(self.for_filter(period_id=period.id))
+            ) for period in periods if period
+        )
 
     if request.is_organiser:
 

@@ -81,6 +81,7 @@ def new_period(self, request, form):
             active=False)
 
         form.populate_obj(period)
+        request.success(_("The period was added successfully"))
 
         return request.redirect(request.link(self))
 

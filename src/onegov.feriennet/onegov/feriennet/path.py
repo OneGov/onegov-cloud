@@ -15,14 +15,16 @@ from uuid import UUID
         states=[str],
         durations=[int],
         age_ranges=[age_range_converter],
-        owners=[str]
+        owners=[str],
+        period_ids=[UUID]
     ))
 def get_vacation_activities(request, app, page=0,
                             tags=None,
                             states=None,
                             durations=None,
                             age_ranges=None,
-                            owners=None):
+                            owners=None,
+                            period_ids=None):
 
     return VacationActivityCollection(
         session=app.session(),
@@ -32,7 +34,8 @@ def get_vacation_activities(request, app, page=0,
         states=states,
         durations=durations,
         age_ranges=age_ranges,
-        owners=owners
+        owners=owners,
+        period_ids=period_ids
     )
 
 

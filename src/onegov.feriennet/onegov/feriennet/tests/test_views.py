@@ -484,3 +484,56 @@ def test_occasions_form(feriennet_app):
 
     editor.delete(get_delete_link(activity, index=1))
     assert "keine Durchführungen" in editor.get('/angebot/play-with-legos')
+
+
+def test_execution_period(feriennet_app):
+
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    new = admin.get('/angebote').click("Angebot erfassen")
+    new.form['title'] = "Play with Legos"
+    new.form['lead'] = "Like Minecraft, but in the real world"
+    new.form.submit().follow()
+
+    periods = admin.get('/angebote').click("Perioden Verwalten")
+
+    period = periods.click("Neue Periode")
+    period.form['title'] = "Vacation Program 2016"
+    period.form['prebooking_start'] = '2016-09-01'
+    period.form['prebooking_end'] = '2016-09-30'
+    period.form['execution_start'] = '2016-10-01'
+    period.form['execution_end'] = '2016-10-01'
+    period.form.submit()
+
+    occasion = admin.get('/angebot/play-with-legos').click("Neue Durchführung")
+    occasion.form['min_age'] = 10
+    occasion.form['max_age'] = 20
+    occasion.form['min_spots'] = 30
+    occasion.form['max_spots'] = 40
+
+    occasion.form['start'] = '2016-10-01 00:00:00'
+    occasion.form['end'] = '2016-10-02 23:59:59'
+    assert "ausserhalb der gewählten Periode" in occasion.form.submit()
+
+    occasion.form['start'] = '2016-09-30 00:00:00'
+    occasion.form['end'] = '2016-10-01 23:59:59'
+    assert "ausserhalb der gewählten Periode" in occasion.form.submit()
+
+    occasion.form['start'] = '2016-10-01 00:00:00'
+    occasion.form['end'] = '2016-10-01 23:59:59'
+    assert "Änderungen wurden gespeichert" in occasion.form.submit().follow()
+
+    period = admin.get('/perioden').click("Bearbeiten")
+    period.form['execution_start'] = '2016-10-02'
+    period.form['execution_end'] = '2016-10-02'
+    period = period.form.submit()
+
+    assert "in Konflikt" in period
+    assert "Play with Legos" in period
+
+    period.form['execution_start'] = '2016-10-01'
+    period.form['execution_end'] = '2016-10-01'
+    periods = period.form.submit().follow()
+
+    assert "gespeichert" in periods

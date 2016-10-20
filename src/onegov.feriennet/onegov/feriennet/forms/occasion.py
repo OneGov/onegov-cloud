@@ -141,7 +141,7 @@ class OccasionForm(Form):
             execution_start = self.selected_period.execution_start
             execution_end = self.selected_period.execution_end
             start = self.start.data.date()
-            end = self.start.data.date()
+            end = self.end.data.date()
 
             if start < execution_start or execution_end < start:
                 self.start.errors.append(_(
