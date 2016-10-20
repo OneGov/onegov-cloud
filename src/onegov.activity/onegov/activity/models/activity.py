@@ -73,7 +73,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
         return func.array_agg(distinct(Occasion.age))
 
     @aggregated('occasions', Column(ARRAY(UUID), default=list))
-    def periods(self):
+    def period_ids(self):
         return func.array_agg(distinct(Occasion.period_id))
 
     #: The occasions linked to this activity

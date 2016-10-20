@@ -141,7 +141,7 @@ def rebuild_models(context):
     context.operations.drop_table('bookings')
     context.operations.drop_table('occasions')
     context.operations.add_column(
-        'activities', Column('periods', ARRAY(UUID), default=list))
+        'activities', Column('period_ids', ARRAY(UUID), default=list))
 
 
 @upgrade_task('Drop occasion state type')

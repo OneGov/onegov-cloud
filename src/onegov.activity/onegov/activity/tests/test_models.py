@@ -253,9 +253,9 @@ def test_profiles(session, owner):
     transaction.commit()
 
     sport = activities.query().first()
-    assert len(sport.periods) == 2
-    assert winter_id in sport.periods
-    assert autumn_id in sport.periods
+    assert len(sport.period_ids) == 2
+    assert winter_id in sport.period_ids
+    assert autumn_id in sport.period_ids
 
     # drop the winter occasion
     occasions.delete(
@@ -263,8 +263,8 @@ def test_profiles(session, owner):
     transaction.commit()
 
     sport = activities.query().first()
-    assert len(sport.periods) == 1
-    assert autumn_id in sport.periods
+    assert len(sport.period_ids) == 1
+    assert autumn_id in sport.period_ids
 
 
 def test_occasions_daterange_constraint(session, owner):

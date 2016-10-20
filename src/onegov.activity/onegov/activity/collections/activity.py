@@ -14,7 +14,8 @@ class ActivityCollection(Pagination):
                  states=None,
                  durations=None,
                  age_ranges=None,
-                 owners=None):
+                 owners=None,
+                 period_ids=None):
         self.session = session
         self.type = type
         self.page = page
@@ -24,6 +25,7 @@ class ActivityCollection(Pagination):
         self.age_ranges = set(merge_ranges(age_ranges)) \
             if age_ranges else set()
         self.owners = set(owners) if owners else set()
+        self.period_ids = set(period_ids) if period_ids else set()
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -44,7 +46,8 @@ class ActivityCollection(Pagination):
             states=self.states,
             durations=self.durations,
             age_ranges=self.age_ranges,
-            owners=self.owners
+            owners=self.owners,
+            period_ids=self.period_ids
         )
 
     def contains_age_range(self, age_range):
@@ -110,6 +113,10 @@ class ActivityCollection(Pagination):
 
             query = query.filter(or_(*conditions))
 
+        if self.period_ids:
+            query = query.filter(
+                model_class.period_ids.op('&&')(array(self.period_ids)))
+
         return query
 
     def for_filter(self,
@@ -117,7 +124,8 @@ class ActivityCollection(Pagination):
                    state=None,
                    duration=None,
                    age_range=None,
-                   owner=None):
+                   owner=None,
+                   period_id=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
@@ -125,7 +133,7 @@ class ActivityCollection(Pagination):
 
         """
 
-        assert tag or state or duration or age_range or owner
+        assert tag or state or duration or age_range or owner or period_id
 
         duration = int(duration) if duration is not None else None
 
@@ -144,7 +152,8 @@ class ActivityCollection(Pagination):
                 (self.states, state),
                 (self.durations, duration),
                 (self.age_ranges, age_range),
-                (self.owners, owner)
+                (self.owners, owner),
+                (self.period_ids, period_id)
             )
         )
 
