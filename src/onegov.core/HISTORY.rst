@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.30.2 (2016-10-20)
+~~~~~~~~~~~~~~~~~~~
 
 - Prevents bulk updates/deletes on aggregated models.
   [href]
