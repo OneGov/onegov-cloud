@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.8 (2016-10-20)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to manage periods for occasions.
   [href]
 
