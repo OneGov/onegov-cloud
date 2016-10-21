@@ -163,7 +163,7 @@ def activate_period(self, request):
     name='deaktivieren',
     permission=Secret)
 def deactivate_period(self, request):
-    self.activate()
+    self.deactivate()
     request.success(_("The period was deactivated successfully"))
 
     @request.after
