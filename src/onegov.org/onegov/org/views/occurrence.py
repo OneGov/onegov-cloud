@@ -94,6 +94,9 @@ def csv_export_occurences(self, request):
     events = session.query(
         Occurrence.title,
         Occurrence.location,
+        func.json_extract_path_text(
+            func.cast(Event.content, JSON), 'organizer'
+        ),
         func.array_to_string(func.akeys(Occurrence._tags), ','),
         func.to_char(Occurrence.start, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
         func.to_char(Occurrence.end, 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
@@ -113,6 +116,7 @@ def csv_export_occurences(self, request):
     csv_writer.writerow((
         'title',
         'location',
+        'organizer',
         'tags',
         'start',
         'end',

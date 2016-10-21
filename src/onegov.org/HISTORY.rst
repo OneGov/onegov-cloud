@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds organizer to events export.
+  [href]
+
 - Dates in excel exports are now formatted in a localized manner.
   [href]
 
