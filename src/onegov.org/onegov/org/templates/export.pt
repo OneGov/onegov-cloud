@@ -4,7 +4,7 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
         <div class="panel" i18n:translate>
-            Exports the reservations of the given date range.
+            ${explanation}
         </div>
         <div class="row">
             <div class="small-12 medium-8 large-6 columns">

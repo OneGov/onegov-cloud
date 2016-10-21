@@ -1,4 +1,3 @@
-import json
 import morepath
 import sedate
 
@@ -7,11 +6,7 @@ from datetime import datetime, timedelta
 from isodate import parse_date, ISO8601Error
 from itertools import groupby
 from libres.db.models import Reservation
-from morepath.request import Response
-from onegov.core.csv import convert_list_of_dicts_to_csv
-from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.security import Public, Private
-from onegov.core.utils import normalize_for_url
 from onegov.form import FormSubmission
 from onegov.libres import ResourceCollection
 from onegov.libres.models import Resource
@@ -280,7 +275,7 @@ def view_occupancy(self, request):
 
 
 @OrgApp.form(model=Resource, permission=Private, name='export',
-             template='resource_export.pt', form=ResourceExportForm)
+             template='export.pt', form=ResourceExportForm)
 def view_export(self, request, form):
 
     layout = ResourceLayout(self, request)
@@ -292,26 +287,13 @@ def view_export(self, request, form):
     # a good API story anyway we don't have spend to much energy on it here
     # - instead we should do this in a comprehensive fashion
     if form.submitted(request):
-        file_format = form.data['file_format']
-
-        if file_format == 'xlsx':
-            def formatter(value):
-                if isinstance(value, datetime):
-                    return layout.format_date(value, 'datetime')
-                return value
-        else:
-            def formatter(value):
-                if isinstance(value, datetime):
-                    return value.isoformat()
-                return value
-
         constant_fields, results = run_export(
             resource=self,
             request=request,
             start=form.data['start'],
             end=form.data['end'],
-            nested=file_format == 'json',
-            formatter=formatter
+            nested=form.format == 'json',
+            formatter=layout.export_formatter(form.format)
         )
 
         def field_order(field):
@@ -322,29 +304,7 @@ def view_export(self, request, form):
             else:
                 return 0, field
 
-        if file_format == 'json':
-            return Response(
-                json.dumps(results),
-                content_type='application/json'
-            )
-        elif file_format == 'csv':
-            return Response(
-                convert_list_of_dicts_to_csv(results, key=field_order),
-                content_type='text/plain'
-            )
-        elif file_format == 'xlsx':
-            return Response(
-                convert_list_of_dicts_to_xlsx(results, key=field_order),
-                content_type=(
-                    'application/vnd.openxmlformats'
-                    '-officedocument.spreadsheetml.sheet'
-                ),
-                content_disposition='inline; filename={}.xlsx'.format(
-                    normalize_for_url(self.title)
-                )
-            )
-        else:
-            raise NotImplemented()
+        return form.as_export_response(results, self.title, key=field_order)
 
     if request.method == 'GET':
         form.start.data, form.end.data = get_date_range(self, request.params)
@@ -352,7 +312,8 @@ def view_export(self, request, form):
     return {
         'layout': layout,
         'title': _("Export"),
-        'form': form
+        'form': form,
+        'explanation': _("Exports the reservations of the given date range.")
     }
 
 

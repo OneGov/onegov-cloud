@@ -1,11 +1,11 @@
 from onegov.core.html import sanitize_html
-from onegov.form import Form
+from onegov.form import Form, merge_forms
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
+from onegov.org.forms.generic import DateRangeForm, ExportForm
 from onegov.org.forms.reservation import RESERVED_FIELDS
 from onegov.org.utils import annotate_html
-from wtforms import RadioField, StringField, TextAreaField, validators
-from wtforms.fields.html5 import DateField
+from wtforms import StringField, TextAreaField, validators
 
 
 class ResourceForm(Form):
@@ -40,47 +40,9 @@ class ResourceForm(Form):
     )
 
 
-class DateRangeForm(Form):
-    """ A form providing a start/end date range. """
-
-    start = DateField(
-        label=_("Start"),
-        validators=[validators.InputRequired()]
-    )
-
-    end = DateField(
-        label=_("End"),
-        validators=[validators.InputRequired()]
-    )
-
-    def validate(self):
-        result = super().validate()
-
-        if self.start.data and self.end.data:
-            if self.start.data > self.end.data:
-                message = _("The end date must be later than the start date")
-                self.end.errors.append(message)
-                result = False
-
-        return result
-
-
 class ResourceCleanupForm(DateRangeForm):
     """ Defines the form to remove multiple allocations. """
 
 
-class ResourceExportForm(DateRangeForm):
-    """ Defines the form to export reservations. """
-
-    file_format = RadioField(
-        label=_("Format"),
-        choices=[
-            ('csv', _("CSV File")),
-            ('xlsx', _("Excel File")),
-            ('json', _("JSON File"))
-        ],
-        default='csv',
-        validators=[
-            validators.InputRequired()
-        ]
-    )
+class ResourceExportForm(merge_forms(DateRangeForm, ExportForm)):
+    """ Resource export form with start/end date. """

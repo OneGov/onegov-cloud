@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Supports excel/csv/json in the events export.
+  [href]
+
 - Adds organizer to events export.
   [href]
 

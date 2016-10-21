@@ -1,7 +1,7 @@
 import babel.dates
 
 from cached_property import cached_property
-from datetime import timedelta
+from datetime import datetime, timedelta
 from dateutil import rrule
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.layout import ChameleonLayout
@@ -220,6 +220,31 @@ class Layout(ChameleonLayout):
     @cached_property
     def news_url(self):
         return self.request.class_link(News, {'absorb': ''})
+
+    def export_formatter(self, format):
+        """ Returns a formatter function which takes a value and returns
+        the value ready for export.
+
+        """
+        def default(value):
+            if isinstance(value, datetime):
+                return value.isoformat()
+            if isinstance(value, str):
+                return "\n".join(value.splitlines())  # normalize newlines
+
+            return value
+
+        if format == 'xlsx':
+            def formatter(value):
+                if isinstance(value, datetime):
+                    return self.format_date(value, 'datetime')
+                if isinstance(value, (list, tuple)):
+                    return ', '.join(value)
+                return default(value)
+        else:
+            formatter = default
+
+        return formatter
 
     def thumbnail_url(self, url):
         """ Takes the given url and returns the thumbnail url for it.
@@ -863,6 +888,17 @@ class OccurrencesLayout(EventBaseLayout):
             Link(_("Events"), self.request.link(self.model))
         ]
 
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_manager:
+            return (
+                Link(
+                    text=_("Export"),
+                    url=self.request.link(self.model, 'export'),
+                    classes=('export-link', )
+                ),
+            )
+
 
 class OccurrenceLayout(EventBaseLayout):
 
@@ -875,7 +911,7 @@ class OccurrenceLayout(EventBaseLayout):
         return [
             Link(_("Homepage"), self.homepage_url),
             Link(_("Events"), self.request.link(self.collection)),
-            Link(self.model.title, '#')
+            Link(self.model.title, self.request.link(self.model))
         ]
 
     @cached_property
