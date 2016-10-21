@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes input placeholder having the wrong color in IE11.
+  [href]
+
 - Supports excel/csv/json in the events export.
   [href]
 

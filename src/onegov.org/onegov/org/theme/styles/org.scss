@@ -56,6 +56,14 @@
 $max-line-width: 67ex;
 
 /*
+    Zurb foundation uses this without !import, which causes IE11 to not
+    apply the placeholder color.
+*/
+:-ms-input-placeholder {
+   color: $input-placeholder-font-color !important;
+}
+
+/*
     Hyphenation for browsers which support it.
 */
 
