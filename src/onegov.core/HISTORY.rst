@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Automatically sets the width of excel columns in the export.
+  [href]
+
 0.30.2 (2016-10-20)
 ~~~~~~~~~~~~~~~~~~~
 
