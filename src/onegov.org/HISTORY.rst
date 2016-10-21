@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes telephone links not working in person detail view.
+  [href]
+
 - Fixes input placeholder having the wrong color in IE11.
   [href]
 
