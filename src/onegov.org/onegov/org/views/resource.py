@@ -301,6 +301,8 @@ def view_export(self, request, form):
                 return value
         else:
             def formatter(value):
+                if isinstance(value, datetime):
+                    return value.isoformat()
                 return value
 
         constant_fields, results = run_export(
