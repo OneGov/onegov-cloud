@@ -208,10 +208,10 @@ msgid "Ferienpass Summer ${year}"
 msgstr "Ferienpass Sommer ${year}"
 
 msgid "Prebooking Start"
-msgstr "Start Anmeldungs"
+msgstr "Start Anmeldung"
 
 msgid "Prebooking End"
-msgstr "Ende Anmeldungs"
+msgstr "Ende Anmeldung"
 
 msgid "Execution Start"
 msgstr "Start Ausführung"
