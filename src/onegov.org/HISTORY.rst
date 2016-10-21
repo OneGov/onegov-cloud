@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Dates in excel exports are now formatted in a localized manner.
+  [href]
+
 0.0.14 (2016-10-19)
 ~~~~~~~~~~~~~~~~~~~
 

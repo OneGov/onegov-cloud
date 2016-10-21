@@ -283,6 +283,10 @@ def view_occupancy(self, request):
              template='resource_export.pt', form=ResourceExportForm)
 def view_export(self, request, form):
 
+    layout = ResourceLayout(self, request)
+    layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
+    layout.editbar_links = None
+
     # XXX this could be turned into a redirect to a GET view, which would
     # make it easier for scripts to get this data, but since we don't have
     # a good API story anyway we don't have spend to much energy on it here
@@ -290,12 +294,22 @@ def view_export(self, request, form):
     if form.submitted(request):
         file_format = form.data['file_format']
 
+        if file_format == 'xlsx':
+            def formatter(value):
+                if isinstance(value, datetime):
+                    return layout.format_date(value, 'datetime')
+                return value
+        else:
+            def formatter(value):
+                return value
+
         constant_fields, results = run_export(
             resource=self,
             request=request,
             start=form.data['start'],
             end=form.data['end'],
-            nested=file_format == 'json'
+            nested=file_format == 'json',
+            formatter=formatter
         )
 
         def field_order(field):
@@ -333,10 +347,6 @@ def view_export(self, request, form):
     if request.method == 'GET':
         form.start.data, form.end.data = get_date_range(self, request.params)
 
-    layout = ResourceLayout(self, request)
-    layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
-    layout.editbar_links = None
-
     return {
         'layout': layout,
         'title': _("Export"),
@@ -344,7 +354,7 @@ def view_export(self, request, form):
     }
 
 
-def run_export(resource, request, start, end, nested):
+def run_export(resource, request, start, end, nested, formatter):
     start = sedate.replace_timezone(
         datetime(start.year, start.month, start.day),
         resource.timezone
@@ -380,12 +390,12 @@ def run_export(resource, request, start, end, nested):
         end = sedate.to_timezone(record[1], resource.timezone)
         end += timedelta(microseconds=1)
 
-        result['start'] = start.isoformat()
-        result['end'] = end.isoformat()
-        result['quota'] = record[2]
-        result['email'] = record[3]
-        result['ticket'] = record[4]
-        result['title'] = record[5]
+        result['start'] = formatter(start)
+        result['end'] = formatter(end)
+        result['quota'] = formatter(record[2])
+        result['email'] = formatter(record[3])
+        result['ticket'] = formatter(record[4])
+        result['title'] = formatter(record[5])
 
         if nested:
             result['form'] = record[6]
