@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Upgrade to Fullcalendar 3.0.1.
+  [href]
+
 - Fixes telephone links not working in person detail view.
   [href]
 
