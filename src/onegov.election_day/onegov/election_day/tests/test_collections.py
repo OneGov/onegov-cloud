@@ -216,7 +216,7 @@ def test_notification_collection(session):
         assert collection.by_election(election) == []
         assert collection.by_vote(vote) == []
 
-        request.app.principal.webhooks = ['http://abc.com/1']
+        request.app.principal.webhooks = {'http://abc.com/1': None}
         collection.trigger(request, election)
         collection.trigger(request, vote)
 
@@ -243,7 +243,7 @@ def test_notification_collection(session):
         assert collection.by_vote(vote) == []
 
         request = DummyRequest()
-        request.app.principal.webhooks = ['http://abc.com/1']
+        request.app.principal.webhooks = {'http://abc.com/1': None}
         collection.trigger(request, election)
         collection.trigger(request, vote)
 

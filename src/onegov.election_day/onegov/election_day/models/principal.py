@@ -58,7 +58,7 @@ class Principal(object):
         self.analytics = analytics
         self.use_maps = True if canton is not None else use_maps
         self.fetch = fetch or {}
-        self.webhooks = webhooks or []
+        self.webhooks = webhooks or {}
 
     @classmethod
     def from_yaml(cls, yaml_source):

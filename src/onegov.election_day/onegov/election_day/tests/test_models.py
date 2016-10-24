@@ -35,7 +35,7 @@ def test_load_principal():
     assert principal.domain is 'canton'
     assert list(principal.available_domains.keys()) == ['federation', 'canton']
     assert principal.fetch == {}
-    assert principal.webhooks == []
+    assert principal.webhooks == {}
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
@@ -51,8 +51,9 @@ def test_load_principal():
             baar:
                 - municipality
         webhooks:
-          - 'http://abc.com/1'
-          - 'http://abc.com/2'
+          'http://abc.com/1':
+          'http://abc.com/2':
+            My-Header: My-Value
     """))
 
     assert principal.name == 'Kanton Zug'
@@ -70,7 +71,12 @@ def test_load_principal():
         'steinhausen': ['municipality'],
         'baar': ['municipality']
     }
-    assert principal.webhooks == ['http://abc.com/1', 'http://abc.com/2']
+    assert principal.webhooks == {
+        'http://abc.com/1': None,
+        'http://abc.com/2': {
+            'My-Header': 'My-Value'
+        }
+    }
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -93,7 +99,7 @@ def test_load_principal():
         'federation', 'canton', 'municipality'
     ]
     assert principal.fetch == {}
-    assert principal.webhooks == []
+    assert principal.webhooks == {}
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -117,7 +123,7 @@ def test_load_principal():
         'federation', 'canton', 'municipality'
     ]
     assert principal.fetch == {}
-    assert principal.webhooks == []
+    assert principal.webhooks == {}
 
 
 def test_municipalities():
@@ -426,7 +432,7 @@ def test_webhook_notification(session):
 
         with patch('urllib.request.urlopen') as urlopen:
             request = DummyRequest()
-            request.app.principal.webhooks = ['http://abc.com/1']
+            request.app.principal.webhooks = {'http://abc.com/1': None}
 
             notification.trigger(DummyRequest(), election)
             sleep(5)

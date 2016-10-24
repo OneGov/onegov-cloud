@@ -2,7 +2,6 @@ import json
 import logging
 import urllib.request
 
-from _thread import start_new_thread
 from onegov.ballot.models import Election, Vote
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -11,6 +10,7 @@ from onegov.core.orm.types import UUID
 from onegov.election_day.utils import get_summary
 from sqlalchemy import Column, ForeignKey
 from sqlalchemy import Text
+from threading import Thread
 from uuid import uuid4
 
 
@@ -51,19 +51,27 @@ class Notification(Base, TimestampMixin):
         raise NotImplementedError
 
 
-def send_post_request(url, data, headers, timeout=30):
-    """ """
-    try:
-        request = urllib.request.Request(url)
-        for header in headers:
-            request.add_header(header[0], header[1])
-        urllib.request.urlopen(request, data, timeout)
-    except Exception as e:
-        log.error(
-            'Error while sending a POST request to {}: {}'.format(
-                url, str(e)
+class WebhookThread(Thread):
+
+    def __init__(self, url, data, headers, timeout=30):
+        Thread.__init__(self)
+        self.url = url
+        self.data = data
+        self.headers = headers
+        self.timeout = timeout
+
+    def run(self):
+        try:
+            request = urllib.request.Request(self.url)
+            for header in self.headers:
+                request.add_header(header[0], header[1])
+            urllib.request.urlopen(request, self.data, self.timeout)
+        except Exception as e:
+            log.error(
+                'Error while sending a POST request to {}: {}'.format(
+                    self.url, str(e)
+                )
             )
-        )
 
 
 class WebhookNotification(Notification):
@@ -82,13 +90,16 @@ class WebhookNotification(Notification):
         self.update_from_model(model)
         self.action = 'webhooks'
 
-        urls = request.app.principal.webhooks
-        if urls:
+        webhooks = request.app.principal.webhooks
+        if webhooks:
             summary = get_summary(model, request)
             data = json.dumps(summary).encode('utf-8')
-            headers = (
-                ('Content-Type', 'application/json; charset=utf-8'),
-                ('Content-Length', len(data))
-            )
-            for url in urls:
-                start_new_thread(send_post_request, (url, data, headers))
+            for url, headers in webhooks.items():
+                headers = headers or {}
+                headers['Content-Type'] = 'application/json; charset=utf-8'
+                headers['Content-Length'] = len(data)
+                WebhookThread(
+                    url,
+                    data,
+                    tuple((key, value) for key, value in headers.items())
+                ).start()
