@@ -48,6 +48,25 @@ var defaultOptions = {
     selectUrl: null,
 
     /*
+        Url which returns all available resources in the following format:
+        {
+            'group': [
+                {
+                    'name': 'name',
+                    'title': 'title',
+                    'url': 'url'
+                }
+            ]
+        }
+    */
+    resourcesUrl: null,
+
+    /*
+        The name of the currently active resource
+    */
+    resourceActive: null,
+
+    /*
         The view shown initially
     */
     view: 'month',
@@ -191,6 +210,9 @@ rc.getFullcalendarOptions = function(options) {
 
     // reservation selection
     rc.setupReservationSelect(fcOptions);
+
+    // resource switching mechanism
+    rc.setupResourceSwitch(fcOptions, rcOptions.resourcesUrl, rcOptions.resourceActive);
 
     // setup allocation refresh handling
     fcOptions.afterSetup.push(rc.setupAllocationsRefetch);
@@ -468,6 +490,47 @@ rc.setupReservationSelect = function(fcOptions) {
         });
 
         calendar.trigger('rc-reservations-changed');
+    });
+};
+
+// setup the ability to switch to other resources
+rc.setupResourceSwitch = function(fcOptions, resourcesUrl, active) {
+    fcOptions.afterSetup.push(function(calendar) {
+        var setup = function(choices) {
+            var container = $(calendar).find('.fc-center');
+
+            if (fcOptions.header.right === '') {
+                container.css('float', 'right');
+            }
+
+            var lookup = {};
+
+            var switcher = $('<select>').append(
+                _.map(choices, function(resources, group) {
+                    return $('<optgroup>').attr('label', group || '').append(
+                        _.map(resources, function(resource) {
+                            lookup[resource.name] = resource.url;
+
+                            return $('<option>')
+                                .attr('value', resource.name)
+                                .attr('selected', resource.name === active)
+                                .text(resource.title);
+                        })
+                    );
+                })
+            );
+
+            switcher.change(function() {
+                var url = new Url(lookup[$(this).val()]);
+                url.query = (new Url(window.location.href)).query;
+
+                window.location = url;
+            });
+
+            container.append(switcher);
+        };
+
+        $.getJSON(resourcesUrl, setup);
     });
 };
 

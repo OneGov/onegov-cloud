@@ -2170,6 +2170,43 @@ button {
 }
 
 /*
+    Fullcalendar responsive design
+*/
+@media #{$small-up} {
+    .fc .fc-toolbar {
+        width: 100%;
+    }
+
+    .fc-view-container {
+        margin-bottom: 1rem;
+    }
+}
+
+@media #{$large-up} {
+    .fc .fc-toolbar {
+        width: 80%;
+    }
+
+    .fc-view-container {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 850px) {
+    .fc-center {
+        display: block;
+        width: 100%;
+    }
+}
+
+@media (min-width: 850px) {
+    .fc-center {
+        display: inline-block;
+        width: 40%;
+    }
+}
+
+/*
     A box rendering the following structure as a calendar-like box:
 
     <h2 class="calendar-day-box">
@@ -2778,7 +2815,11 @@ ul.search-results {
     }
 }
 
-@media #{$medium-up} {
+/*
+    Reservation selection responsive
+*/
+
+@media #{$large-up} {
     .reservation-selection {
         float: right;
         width: 20%;
@@ -2788,6 +2829,19 @@ ul.search-results {
         display: inline-block;
         float: left;
         width: 80%;
+    }
+}
+
+@media #{$medium-only} {
+    .reservation-selection {
+        float: none;
+        padding: 0;
+        width: 100%;
+    }
+
+    .fc-view-container {
+        display: block;
+        width: 100%;
     }
 }
 

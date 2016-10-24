@@ -25,6 +25,8 @@
             data-date="${resource.date and resource.date.isoformat() or ''}"
             data-highlights-min="${resource.highlights_min or ''}"
             data-highlights-max="${resource.highlights_max or ''}"
+            data-resources-url="${resources_url}"
+            data-resource-active="${resource.name}"
         ></div>
 
         <div class="clearfix"></div>

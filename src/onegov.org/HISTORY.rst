@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to easily switch between resources.
+  [href]
+
 - Use auto-height for fullcalendar, mainly to improve mobile usage.
   [href]
 

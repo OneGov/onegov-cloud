@@ -54,24 +54,56 @@ def get_resource_form(self, request, type=None):
     return model.with_content_extensions(ResourceForm, request)
 
 
-@OrgApp.html(model=ResourceCollection, template='resources.pt',
-             permission=Public)
-def view_resources(self, request):
-    resources = self.query().order_by(nullsfirst(Resource.group)).all()
+def get_grouped_resources(resources, request, transform=None):
+    resources = resources.query().order_by(nullsfirst(Resource.group)).all()
     resources = request.exclude_invisible(resources)
+
     grouped = OrderedDict()
 
-    for group, items in groupby(resources, lambda r: r.group or _("General")):
-        grouped[group] = sorted(tuple(items), key=lambda r: r.title)
+    def group_key(resource):
+        return resource.group or request.translate(_("General"))
+
+    def sort_key(resource):
+        return resource.title
+
+    transform = transform or (lambda value: value)
+
+    for group, items in groupby(resources, group_key):
+        grouped[group] = sorted([i for i in items], key=sort_key)
+        grouped[group] = [transform(i) for i in grouped[group]]
 
     if len(grouped) == 1:
         grouped = {None: tuple(grouped.values())[0]}
 
+    return grouped
+
+
+@OrgApp.html(model=ResourceCollection, template='resources.pt',
+             permission=Public)
+def view_resources(self, request):
     return {
         'title': _("Reservations"),
-        'resources': grouped,
+        'resources': get_grouped_resources(self, request),
         'layout': ResourcesLayout(self, request)
     }
+
+
+@OrgApp.json(model=ResourceCollection, permission=Public, name='json')
+def view_resources_json(self, request):
+
+    def transform(resource):
+        return {
+            'name': resource.name,
+            'title': resource.title,
+            'url': request.link(resource),
+        }
+
+    @request.after
+    def cache(response):
+        # only update once every 5 minutes
+        response.cache_control.max_age = 300
+
+    return get_grouped_resources(self, request, transform=transform)
 
 
 @OrgApp.form(model=ResourceCollection, name='neuer-raum',
@@ -141,7 +173,8 @@ def view_resource(self, request):
         'title': self.title,
         'resource': self,
         'layout': ResourceLayout(self, request),
-        'feed': request.link(self, name='slots')
+        'feed': request.link(self, name='slots'),
+        'resources_url': request.class_link(ResourceCollection, name='json')
     }
 
 
