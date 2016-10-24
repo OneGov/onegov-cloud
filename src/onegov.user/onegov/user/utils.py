@@ -76,7 +76,13 @@ def yubikey_otp_to_serial(otp):
         https://github.com/Yubico/yubikey-salesforce-client/blob/
         e38e46ee90296a852374a8b744555e99d16b6ca7/src/classes/Modhex.cls
 
+    If the key cannot be calculated, None is returned. This can happen if
+    they key is malformed.
+
     """
+
+    if not is_valid_yubikey_format(otp):
+        return None
 
     token = 'cccc' + otp[:12]
 
@@ -87,6 +93,7 @@ def yubikey_otp_to_serial(otp):
 
     for char in token:
         n = ALPHABET.index(char)
+
         toggle = not toggle
 
         if toggle:

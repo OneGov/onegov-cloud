@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes yubikey to otp raising an error if the yubikey is malformed.
+  [href]
+
 0.8.0 (2016-10-06)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -67,6 +67,7 @@ def test_is_valid_yubikey_format():
 def test_yubikey_otp_to_serial():
     assert yubikey_otp_to_serial(
         'ccccccdefghdefghdefghdefghdefghdefghdefghklv') == 2311522
+    assert yubikey_otp_to_serial("ceci n'est pas une yubikey") is None
 
 
 def test_auth_login_yubikey(session):
