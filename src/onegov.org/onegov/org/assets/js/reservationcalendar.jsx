@@ -86,6 +86,7 @@ rc.getFullcalendarOptions = function(options) {
     // the fullcalendar default options
     var fcOptions = {
         allDaySlot: false,
+        height: 'auto',
         events: rcOptions.feed,
         minTime: rcOptions.minTime,
         maxTime: rcOptions.maxTime,

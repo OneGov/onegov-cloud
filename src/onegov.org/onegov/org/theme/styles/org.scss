@@ -2006,9 +2006,18 @@ button {
         pointer-events: none;
     }
 
+    // extra space for the last row in each week-row, improves the auto-height
+    // based rendering of the calendar
+    .fc-row .fc-content-skeleton tbody tr:last-child a {
+        margin-bottom: .75rem;
+    }
+
+    .fc-event-container:last-child {
+        margin-bottom: .5rem;
+    }
+
     .fc-toolbar {
         margin-bottom: 0;
-        width: 80%;
 
         h2 {
             clear: both;

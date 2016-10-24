@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Use auto-height for fullcalendar, mainly to improve mobile usage.
+  [href]
+
 - Upgrade to Fullcalendar 3.0.1.
   [href]
 
