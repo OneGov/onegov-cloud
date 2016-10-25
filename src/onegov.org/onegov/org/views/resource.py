@@ -54,7 +54,7 @@ def get_resource_form(self, request, type=None):
     return model.with_content_extensions(ResourceForm, request)
 
 
-def get_grouped_resources(resources, request, transform=None):
+def get_grouped_resources(resources, request, transform=None, emptygroup=None):
     resources = resources.query().order_by(nullsfirst(Resource.group)).all()
     resources = request.exclude_invisible(resources)
 
@@ -73,7 +73,7 @@ def get_grouped_resources(resources, request, transform=None):
         grouped[group] = [transform(i) for i in grouped[group]]
 
     if len(grouped) == 1:
-        grouped = {None: tuple(grouped.values())[0]}
+        grouped = {emptygroup: tuple(grouped.values())[0]}
 
     return grouped
 
@@ -100,10 +100,14 @@ def view_resources_json(self, request):
 
     @request.after
     def cache(response):
-        # only update once every 5 minutes
-        response.cache_control.max_age = 300
+        # only update once every minute
+        response.cache_control.max_age = 60
 
-    return get_grouped_resources(self, request, transform=transform)
+    return get_grouped_resources(
+        self, request,
+        transform=transform,
+        emptygroup=request.translate(_("Reservations"))
+    )
 
 
 @OrgApp.form(model=ResourceCollection, name='neuer-raum',
