@@ -876,29 +876,12 @@ ReservationForm = React.createClass({
     },
     handleTimeInputBlur: function(e) {
         if (!Modernizr.inputtypes.time) {
-            e.target.value = this.inferTime(e.target.value);
+            e.target.value = OneGov.utils.inferTime(e.target.value);
             this.handleInputChange(e);
         }
     },
-    inferTime: function(time) {
-        time = time.replace(':', '');
-
-        if (time.match(/^\d{1}$/)) {
-            time = '0' + time + '00';
-        } else if (time.match(/^\d{2}$/)) {
-            time += '00';
-        } else if (time.match(/^\d{3}$/)) {
-            time += '0';
-        }
-
-        if (time.match(/^\d{4}$/)) {
-            time = time.slice(0, 2) + ':' + time.slice(2, 4);
-        }
-
-        return time;
-    },
     parseTime: function(date, time) {
-        time = this.inferTime(time);
+        time = OneGov.utils.inferTime(time);
 
         if (!time.match(/^[0-2]{1}[0-9]{1}:?[0-5]{1}[0-9]{1}$/)) {
             return null;

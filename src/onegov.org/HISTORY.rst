@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Make sure that all time input fields support input parsing.
+  [href]
+
+- Accept a wider range of values in the time input fields.
+  [href]
+
 - Fix search url being wrong after multiple searches.
   [href]
 

@@ -201,3 +201,10 @@ if (!Modernizr.inputtypes.date) {
 if (!Modernizr.inputtypes.datetime) {
     setup_datetimepicker('datetime');
 }
+
+// for time fields we only add time parsing
+if (!Modernizr.inputtypes.time) {
+    $('input[type=time]').change(function() {
+        $(this).val(OneGov.utils.inferTime($(this).val()));
+    });
+}

@@ -327,6 +327,7 @@ def get_editalttext_asset():
 
 @OrgApp.webasset('common')
 def get_common_asset():
+    yield 'global.js'
     yield 'jquery.datetimepicker.css'
     yield 'locale.js'
     yield 'modernizr.js'
