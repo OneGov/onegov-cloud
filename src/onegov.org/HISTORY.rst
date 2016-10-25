@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix search url being wrong after multiple searches.
+  [href]
+
 - Upgrade to latest React release.
   [href]
 
