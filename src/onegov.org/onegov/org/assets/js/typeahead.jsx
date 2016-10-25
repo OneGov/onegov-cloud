@@ -91,16 +91,12 @@ var TypeAhead = function(form) {
 
     var update_typeahead = function(results) {
         var el = $('<div>');
+        container.empty();
+        container.append(el);
 
-        if (typeahead === null) {
-            container.append(el);
-
-            typeahead = React.render(
-                <TypeaheadList results={results} target={target} />, el.get(0)
-            );
-        } else {
-            typeahead.setProps({results: results});
-        }
+        typeahead = ReactDOM.render(
+            <TypeaheadList results={results} target={target} />, el.get(0)
+        );
     };
 
     var update_suggestions = _.debounce(function(text) {

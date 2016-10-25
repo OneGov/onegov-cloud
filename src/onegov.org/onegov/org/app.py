@@ -336,6 +336,7 @@ def get_common_asset():
     yield 'intercooler.js'
     yield 'underscore.js'
     yield 'react.js'
+    yield 'react-dom.js'
     yield 'form_dependencies.js'
     yield 'confirm.jsx'
     yield 'typeahead.jsx'

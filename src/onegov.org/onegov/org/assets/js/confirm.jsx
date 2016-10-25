@@ -74,18 +74,18 @@ var show_confirmation = function(question, yes, no, extra, handle_yes) {
     var confirm = null;
 
     if (_.isUndefined(yes)) {
-        confirm = React.render(
+        confirm = ReactDOM.render(
             <DenyConfirmation question={question} no={no} extra={extra} />,
             el.get(0)
         );
     } else {
-        confirm = React.render(
+        confirm = ReactDOM.render(
             <Confirmation
                 question={question} yes={yes} no={no} extra={extra} />,
             el.get(0)
         );
     }
-    var confirm_el = $(confirm.getDOMNode());
+    var confirm_el = $(ReactDOM.findDOMNode(confirm));
 
     confirm_el.find('a.no').click(function() {
         confirm_el.foundation('reveal', 'close');

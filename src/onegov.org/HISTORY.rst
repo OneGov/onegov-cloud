@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Upgrade to latest React release.
+  [href]
+
 - Adds the ability to easily switch between resources.
   [href]
 

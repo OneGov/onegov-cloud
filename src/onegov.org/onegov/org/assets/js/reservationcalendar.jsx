@@ -762,7 +762,7 @@ ReservationSelection = React.createClass({
 });
 
 ReservationSelection.render = function(element, calendar, reservations, reservationform) {
-    React.render(<ReservationSelection calendar={calendar} reservations={reservations} reservationform={reservationform} />, element);
+    ReactDOM.render(<ReservationSelection calendar={calendar} reservations={reservations} reservationform={reservationform} />, element);
 };
 
 /*
@@ -792,7 +792,7 @@ ReservationForm = React.createClass({
         return state;
     },
     componentDidMount: function() {
-        var node = $(this.getDOMNode());
+        var node = $(ReactDOM.findDOMNode(this));
 
         // the timeout is set to 100ms because the popup will do its own focusing
         // after 50ms (we could use it, but we want to focus AND select)
@@ -824,7 +824,7 @@ ReservationForm = React.createClass({
         this.setState(state);
     },
     handleButton: function(e) {
-        var node = this.getDOMNode();
+        var node = ReactDOM.findDOMNode(this);
         var self = this;
 
         $(node).find('input').each(function(_ix, el) {
@@ -839,7 +839,7 @@ ReservationForm = React.createClass({
     },
     handleSetPreviousTime: function(e) {
         var previousState = this.props.previousReservationState;
-        var node = $(this.getDOMNode());
+        var node = $(ReactDOM.findDOMNode(this));
         var inputs = node.find('[name="start"],[name="end"]');
 
         $(inputs[0]).val(previousState.start);
@@ -1040,7 +1040,7 @@ ReservationForm.render = function(element, event, previousReservationState, onSu
 
     var fullyAvailable = event.partitions.length === 1 && event.partitions[0][1] === false;
 
-    React.render(
+    ReactDOM.render(
         <ReservationForm
             partlyAvailable={event.partlyAvailable}
             quota={event.quota}
