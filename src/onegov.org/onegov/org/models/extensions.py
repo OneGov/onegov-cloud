@@ -122,7 +122,9 @@ class VisibleOnHomepageExtension(ContentExtension):
             return form_class
 
         class VisibleOnHomepageForm(form_class):
-            is_visible_on_homepage = BooleanField(_("Visible on homepage"))
+            # pass label by keyword to give the News model access
+            is_visible_on_homepage = BooleanField(
+                label=_("Visible on homepage"))
 
         return VisibleOnHomepageForm
 

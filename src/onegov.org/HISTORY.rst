@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to stick certain news items to the homepage.
+  [href]
+
 - Make sure that all time input fields support input parsing.
   [href]
 

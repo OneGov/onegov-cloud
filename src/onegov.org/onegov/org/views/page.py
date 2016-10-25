@@ -64,7 +64,7 @@ def view_news(self, request):
     except (ValueError, KeyError):
         year = years and years[0] or None
 
-    query = self.news_query
+    query = self.news_query(limit=None)
 
     if year:
         start = replace_timezone(datetime(year, 1, 1), 'UTC')

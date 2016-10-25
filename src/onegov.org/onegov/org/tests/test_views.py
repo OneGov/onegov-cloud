@@ -20,6 +20,7 @@ from onegov.org.testing import encode_map_value
 from onegov.org.testing import extract_href
 from onegov.org.testing import get_message
 from onegov.org.testing import select_checkbox
+from onegov.page import PageCollection
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
@@ -364,6 +365,80 @@ def test_news(org_app):
     assert "We have a new homepage" not in page.text
     assert "It is very good" not in page.text
     assert "It is lots of fun" not in page.text
+
+
+def test_news_on_homepage(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    anon = Client(org_app)
+
+    news_list = client.get('/aktuelles')
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Foo"
+    page.form['lead'] = "Lorem"
+    page.form.submit()
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Bar"
+    page.form['lead'] = "Lorem"
+    page.form.submit()
+
+    page = news_list.click('Nachricht')
+    page.form['title'] = "Baz"
+    page.form['lead'] = "Lorem"
+    page.form.submit()
+
+    # only two items are shown on the homepage
+    homepage = client.get('/')
+    assert "Baz" in homepage
+    assert "Bar" in homepage
+    assert "Foo" not in homepage
+
+    # sticky news don't count toward that limit
+    foo = PageCollection(org_app.session()).by_path('aktuelles/foo')
+    foo.is_visible_on_homepage = True
+
+    transaction.commit()
+
+    homepage = client.get('/')
+    assert "Baz" in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+    # hidden news don't count for anonymous users
+    baz = PageCollection(org_app.session()).by_path('aktuelles/baz')
+    baz.is_hidden_from_public = True
+
+    transaction.commit()
+
+    homepage = anon.get('/')
+    assert "Baz" not in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+    homepage = client.get('/')
+    assert "Baz" in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+    # even if they are stickied
+    baz = PageCollection(org_app.session()).by_path('aktuelles/baz')
+    baz.is_hidden_from_public = True
+    baz.is_visible_on_homepage = True
+
+    transaction.commit()
+
+    homepage = anon.get('/')
+    assert "Baz" not in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
+
+    homepage = client.get('/')
+    assert "Baz" in homepage
+    assert "Bar" in homepage
+    assert "Foo" in homepage
 
 
 def test_delete_pages(org_app):

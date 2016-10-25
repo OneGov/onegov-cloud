@@ -1,18 +1,18 @@
 from onegov.core import utils
 from onegov.core.orm.mixins import content_property
-from onegov.page import Page
-from onegov.search import ORMSearchable
+from onegov.org import _
 from onegov.org.forms import LinkForm, PageForm
 from onegov.org.models.atoz import AtoZ
-from onegov.org.models.extensions import (
-    ContactExtension,
-    CoordinatesExtension,
-    HiddenFromPublicExtension,
-    PersonLinkExtension,
-    VisibleOnHomepageExtension,
-)
+from onegov.org.models.extensions import ContactExtension
+from onegov.org.models.extensions import CoordinatesExtension
+from onegov.org.models.extensions import HiddenFromPublicExtension
+from onegov.org.models.extensions import PersonLinkExtension
+from onegov.org.models.extensions import VisibleOnHomepageExtension
 from onegov.org.models.traitinfo import TraitInfo
+from onegov.page import Page
+from onegov.search import ORMSearchable
 from sqlalchemy import desc, func
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import undefer, object_session
 
 
@@ -99,8 +99,8 @@ class Topic(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
         raise NotImplementedError
 
 
-class News(Page, TraitInfo, SearchablePage,
-           HiddenFromPublicExtension, ContactExtension, PersonLinkExtension,
+class News(Page, TraitInfo, SearchablePage, HiddenFromPublicExtension,
+           VisibleOnHomepageExtension, ContactExtension, PersonLinkExtension,
            CoordinatesExtension):
     __mapper_args__ = {'polymorphic_identity': 'news'}
 
@@ -138,19 +138,34 @@ class News(Page, TraitInfo, SearchablePage,
 
     def get_form_class(self, trait, request):
         if trait == 'news':
-            return self.with_content_extensions(PageForm, request)
+            form_class = self.with_content_extensions(PageForm, request)
+
+            if hasattr(form_class, 'is_visible_on_homepage'):
+                # clarify the intent of this particular flag on the news, as
+                # the effect is not entirely the same (news may be shown on the
+                # homepage anyway)
+                form_class.is_visible_on_homepage.kwargs['label'] = _(
+                    "Always visible on homepage")
+
+            return form_class
 
         raise NotImplementedError
 
-    @property
-    def news_query(self):
-        query = object_session(self).query(News)
-        query = query.filter(Page.parent == self)
-        query = query.order_by(desc(Page.created))
-        query = query.options(undefer('created'))
-        query = query.options(undefer('content'))
+    def news_query(self, limit=2):
+        news = object_session(self).query(News)
+        news = news.filter(Page.parent == self)
+        news = news.order_by(desc(Page.created))
+        news = news.options(undefer('created'))
+        news = news.options(undefer('content'))
+        news = news.limit(limit)
 
-        return query
+        sticky = func.json_extract_path_text(
+            func.cast(Page.meta, JSON), 'is_visible_on_homepage') == 'true'
+
+        sticky_news = news.limit(None)
+        sticky_news = sticky_news.filter(sticky)
+
+        return news.union(sticky_news).order_by(desc(Page.created))
 
     @property
     def years(self):

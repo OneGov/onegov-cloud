@@ -82,8 +82,24 @@ class NewsWidget(object):
     """
 
     def get_variables(self, layout):
+        # request more than the required amount of news to account for hidden
+        # items which might be in front of the queue
+        news = layout.request.exclude_invisible(
+            layout.root_pages[-1].news_query(limit=4).all())
+
+        # limits the news, but doesn't count sticky news towards that limit
+        def limited(news, limit):
+            count = 0
+
+            for item in news:
+                if count < limit or item.is_visible_on_homepage:
+                    yield item
+
+                if not item.is_visible_on_homepage:
+                    count += 1
+
         return {
-            'news': layout.root_pages[-1].news_query.limit(2).all()
+            'news': limited(news, limit=2)
         }
 
 
