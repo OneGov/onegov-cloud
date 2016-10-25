@@ -13,6 +13,7 @@ from onegov.org.forms import (
     RoomAllocationEditForm
 )
 from onegov.org.layout import ResourceLayout, AllocationEditFormLayout
+from sqlalchemy.orm import defer, defaultload
 from purl import URL
 
 
@@ -28,20 +29,27 @@ def view_allocations_json(self, request):
     start, end = utils.parse_fullcalendar_request(request, self.timezone)
 
     if not (start and end):
-        return []
+        return tuple()
 
     # get all allocations (including mirrors), for the availability calculation
     query = self.scheduler.allocations_in_range(start, end, masters_only=False)
     query = query.order_by(Allocation._start)
+    query = query.options(defer(Allocation.data))
+    query = query.options(defer(Allocation.group))
+    query = query.options(
+        defaultload('reserved_slots')
+        .defer('reservation_token')
+        .defer('allocation_id')
+        .defer('end'))
 
     allocations = query.all()
 
     # but only return the master allocations
-    return [
+    return tuple(
         e.as_dict() for e in utils.AllocationEventInfo.from_allocations(
             request, self.scheduler, allocations
         )
-    ]
+    )
 
 
 def get_new_allocation_form_class(resource, request):
