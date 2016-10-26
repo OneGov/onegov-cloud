@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.0 (2016-10-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to stick certain news items to the homepage.
   [href]
 
