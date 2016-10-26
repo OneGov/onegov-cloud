@@ -232,16 +232,20 @@ ul.occasions {
     }
 
     .factoids {
-        margin: 0 0 .75rem 1.25rem;
+        margin: 0 0 .75rem;
 
-        .location:before,
-        .age:before,
-        .spots:before {
-            display: inline-block;
-            left: -2px;
-            position: absolute;
-            text-align: center;
-            width: .625rem;
+        .age,
+        .location,
+        .spots {
+            margin-left: 1.25rem;
+
+            &:before {
+                display: inline-block;
+                left: 1rem;
+                position: absolute;
+                text-align: center;
+                width: .625rem;
+            }
         }
 
         .location:before {
