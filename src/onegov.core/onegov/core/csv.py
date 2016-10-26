@@ -335,18 +335,34 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
     """
 
     small_chars = set('fijlrt:,;.+i ')
-    large_chars = set('GHMWQ')
+    large_chars = set('GHMWQ_')
+
+    max_width = 75
 
     def character_width(char):
+        # those numbers have been acquired by chasing unicorns
+        # and fairies in the magic forest of Excel
+        #
+        # tweak them as needed, but know that there's no correct answer,
+        # as each excel version on each platform or os-version will render
+        # the fonts used at different widths
         if char in small_chars:
             return 0.75
         elif char in large_chars:
-            return 1.1
+            return 1.2
         else:
             return 1
 
     def estimate_width(text):
-        return sum(character_width(c) for c in text)
+        if not text:
+            return 0
+
+        width = max(
+            sum(character_width(c) for c in line)
+            for line in text.splitlines()
+        )
+
+        return min(width, max_width)
 
     with tempfile.NamedTemporaryFile() as file:
         workbook = Workbook(file.name, options={'constant_memory': True})
