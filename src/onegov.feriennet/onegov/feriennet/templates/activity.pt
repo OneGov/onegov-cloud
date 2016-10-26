@@ -96,6 +96,22 @@
                                     <p tal:condition="occasion.note">${occasion.note}</p>
                                 </div>
                             </div>
+
+                            <div class="call-to-action">
+                                <tal:block switch="age_bracket(occasion.age)">
+                                    <span tal:case="'young'" i18n:translate>
+                                        Enroll your young child now.
+                                    </span>
+                                    <span tal:case="'teenager'" i18n:translate>
+                                        Enroll your teenager now.
+                                    </span>
+                                    <span tal:case="default" i18n:translate>
+                                        Enroll your child now.
+                                    </span>
+                                </tal:block>
+
+                                <button class="button" i18n:translate>Enroll</button>
+                            </div>
                         </li>
                     </ul>
                 </tal:block>

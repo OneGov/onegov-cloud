@@ -206,11 +206,18 @@ ul.occasions {
     position: relative;
 
     h4 {
-        font-size: 1rem;
+        font-size: 1.2rem;
         font-weight: bold;
     }
 
     li {
+
+        margin-bottom: 2.5rem;
+
+        &:first-child {
+            margin-top: 1.5rem;
+        }
+
         p {
             background-color: $panel-bg;
             font-size: .875rem;
@@ -227,16 +234,13 @@ ul.occasions {
         a {
             display: inline-block;
             font-size: .875rem;
-            margin-top: .25rem;
         }
     }
 
     .factoids {
         margin: 0 0 .75rem;
 
-        .age,
-        .location,
-        .spots {
+        > div {
             margin-left: 1.25rem;
 
             &:before {
@@ -259,6 +263,33 @@ ul.occasions {
         .spots:before {
             @include icon('\f105');
         }
+
+        .text-links:before {
+            @include icon('\f192');
+        }
+    }
+}
+
+/*
+    Call to Action
+*/
+
+.call-to-action {
+    background-color: $panel-bg;
+    border: 1px solid $base;
+    border-radius: 2px;
+    border-width: 0 0 1px;
+    min-height: 5.4rem;
+    padding: 1rem 1.25rem;
+
+    span {
+        font-size: 1rem;
+    }
+
+    button {
+        float: right;
+        margin: 0;
+        width: 25%;
     }
 }
 
@@ -284,7 +315,7 @@ ul.occasions {
     .active {
         td {
             color: $jet;
-            
+
             &:first-child {
                 border-left: 10px solid $primary-color;
             }

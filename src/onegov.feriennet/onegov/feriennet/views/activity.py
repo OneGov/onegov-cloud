@@ -158,6 +158,14 @@ def view_activity(self, request):
         )
     )
 
+    def age_bracket(age):
+        if 13 <= age.lower:
+            return 'teenager'
+        elif (age.upper - 1) <= 7:
+            return 'young'
+        else:
+            return 'general'
+
     return {
         'layout': layout,
         'title': self.title,
@@ -168,7 +176,8 @@ def view_activity(self, request):
             session=request.app.session(),
             activity=self,
             active_only=not request.is_organiser
-        )
+        ),
+        'age_bracket': age_bracket
     }
 
 
