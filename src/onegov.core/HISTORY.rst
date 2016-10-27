@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.31.0 (2016-10-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to check if the current user may view an url.
   [href]
