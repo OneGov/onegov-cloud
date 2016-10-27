@@ -33,7 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'click',
-        'onegov.core',
+        'onegov.core>=0.31.0',
         'onegov.form',
         'sqlalchemy',
         'yubico-client'

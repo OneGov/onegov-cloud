@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to check if the login can be skipped.
+  [href]
+
 0.8.1 (2016-10-24)
 ~~~~~~~~~~~~~~~~~~~
 

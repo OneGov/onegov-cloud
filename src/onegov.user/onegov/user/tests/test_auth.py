@@ -1,6 +1,6 @@
-import morepath
 import transaction
 
+from onegov.core import Framework
 from more.itsdangerous import IdentityPolicy
 from onegov.user import (
     Auth, is_valid_yubikey, is_valid_yubikey_format,
@@ -157,7 +157,7 @@ def test_auth_logging(session, capturelog):
 
 def test_auth_integration(session):
 
-    class App(morepath.App):
+    class App(Framework):
         pass
 
     @App.identity_policy()
@@ -185,7 +185,14 @@ def test_auth_integration(session):
     UserCollection(session).add('AzureDiamond', 'hunter2', 'irc-user')
     transaction.commit()
 
-    client = Client(App())
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(
+        identity_secure=False,
+        disable_memcached=True
+    )
+
+    client = Client(app)
 
     response = client.get('/auth?username=AzureDiamond&password=hunter1')
     assert response.text == 'Error'

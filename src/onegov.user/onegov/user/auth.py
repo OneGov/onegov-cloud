@@ -50,6 +50,20 @@ class Auth(object):
     def users(self):
         return UserCollection(self.session)
 
+    def redirect(self, request):
+        return morepath.redirect(request.transform(self.to))
+
+    def skippable(self, request):
+
+        # this is the default paramter, we won't skip to it in any case
+        if self.to == '/':
+            return False
+
+        try:
+            return request.has_access_to_url(self.to)
+        except KeyError:
+            return False
+
     def is_valid_second_factor(self, user, second_factor_value):
         if not user.second_factor:
             return True
@@ -120,7 +134,7 @@ class Auth(object):
         if identity is None:
             return None
 
-        response = morepath.redirect(self.to)
+        response = self.redirect(request)
         request.app.remember_identity(response, request, identity)
 
         return response
@@ -133,7 +147,7 @@ class Auth(object):
 
         """
 
-        response = morepath.redirect(self.to)
+        response = self.redirect(request)
         request.app.forget_identity(response, request)
 
         return response
