@@ -8,6 +8,18 @@
                 <div metal:use-macro="layout.macros['form']" />
             </div>
         </div>
+        <div class="row no-account-yet" tal:condition="may_register">
+            <div class="small-12 columns">
+                <span i18n:translate>
+                    Don't have an account yet?
+                </span>
+                <span>
+                    <a href="${register_link}" i18n:translate>
+                        Register now
+                    </a>.
+                </span>
+            </div>
+        </div>
         <div class="row">
             <div class="small-12 columns">
                 <span i18n:translate>

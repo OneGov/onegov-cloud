@@ -3134,3 +3134,13 @@ ul.search-results {
         margin-bottom: .25rem;
     }
 }
+
+/*
+    New account
+*/
+
+.no-account-yet span:last-child {
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom: .6rem;
+}
