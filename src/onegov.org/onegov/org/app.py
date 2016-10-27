@@ -233,7 +233,7 @@ def get_theme():
 
 @OrgApp.setting(section='org', name='enable_user_registration')
 def get_enable_user_registration():
-    return True
+    return False
 
 
 @OrgApp.setting(section='org', name='enable_yubikey')

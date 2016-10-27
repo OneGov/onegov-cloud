@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Automatically skip the login view if the target url is accessable.
+  [href]
+
 0.1.0 (2016-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

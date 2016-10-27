@@ -6,6 +6,7 @@ import re
 import textwrap
 import transaction
 
+from contextlib import contextmanager
 from datetime import datetime, date, timedelta
 from libres.db.models import Reservation
 from libres.modules.errors import AffectedReservationError
@@ -57,6 +58,18 @@ def bound_reserve(client, allocation):
         )
 
     return reserve
+
+
+@contextmanager
+def temporary_setting(app, section, setting, value):
+    section = getattr(app.settings, section)
+    oldvalue = getattr(section, setting)
+
+    setattr(section, setting, value)
+
+    yield
+
+    setattr(section, setting, oldvalue)
 
 
 def test_view_permissions():
@@ -282,7 +295,8 @@ def test_pages(org_app):
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
     assert len(client.get(root_url).pyquery('.edit-bar')) == 0
 
-    root_page = client.login_admin(to=root_url).follow()
+    client.login_admin()
+    root_page = client.get(root_url)
 
     assert len(root_page.pyquery('.edit-bar')) == 1
     new_page = root_page.click('Thema')
@@ -445,7 +459,9 @@ def test_delete_pages(org_app):
     client = Client(org_app)
 
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
-    root_page = client.login_admin(to=root_url).follow()
+
+    client.login_admin()
+    root_page = client.get(root_url)
     new_page = root_page.click('Thema')
 
     new_page.form['title'] = "Living in Govikon is Swell"
@@ -467,7 +483,8 @@ def test_links(org_app):
     client = Client(org_app)
 
     root_url = client.get('/').pyquery('.top-bar-section a').attr('href')
-    root_page = client.login_admin(to=root_url).follow()
+    client.login_admin()
+    root_page = client.get(root_url)
 
     new_link = root_page.click("Verknüpfung")
     assert "Neue Verknüpfung" in new_link
@@ -2854,48 +2871,59 @@ def test_settings(org_app):
 
 
 def test_registration_honeypot(org_app):
-    client = Client(org_app)
 
-    register = client.get('/auth/register')
-    register.form['username'] = 'spam@example.org'
-    register.form['password'] = 'p@ssw0rd'
-    register.form['confirm'] = 'p@ssw0rd'
-    register.form['roboter_falle'] = 'buy pills now'
+    with temporary_setting(org_app, 'org', 'enable_user_registration', True):
+        org_app.settings.org.enable_user_registration = True
 
-    assert "Das Feld ist nicht leer" in register.form.submit()
+        client = Client(org_app)
+
+        register = client.get('/auth/register')
+        register.form['username'] = 'spam@example.org'
+        register.form['password'] = 'p@ssw0rd'
+        register.form['confirm'] = 'p@ssw0rd'
+        register.form['roboter_falle'] = 'buy pills now'
+
+        assert "Das Feld ist nicht leer" in register.form.submit()
 
 
 def test_registration(org_app):
-    client = Client(org_app)
 
-    register = client.get('/auth/register')
-    register.form['username'] = 'user@example.org'
-    register.form['password'] = 'p@ssw0rd'
-    register.form['confirm'] = 'p@ssw0rd'
+    with temporary_setting(org_app, 'org', 'enable_user_registration', True):
+        org_app.settings.org.enable_user_registration = True
 
-    assert "Vielen Dank" in register.form.submit().follow()
+        client = Client(org_app)
 
-    message = get_message(org_app, 0, 1)
-    assert "Anmeldung bestätigen" in message
+        register = client.get('/auth/register')
+        register.form['username'] = 'user@example.org'
+        register.form['password'] = 'p@ssw0rd'
+        register.form['confirm'] = 'p@ssw0rd'
 
-    url = re.search(r'href="[^"]+">Anmeldung bestätigen</a>', message).group()
-    url = extract_href(url)
+        assert "Vielen Dank" in register.form.submit().follow()
 
-    faulty = URL(url).query_param('token', 'asdf').as_string()
+        message = get_message(org_app, 0, 1)
+        assert "Anmeldung bestätigen" in message
 
-    assert "Ungültiger Aktivierungscode" in client.get(faulty).follow()
-    assert "Konto wurde aktiviert" in client.get(url).follow()
-    assert "Konto wurde bereits aktiviert" in client.get(url).follow()
+        expr = r'href="[^"]+">Anmeldung bestätigen</a>'
+        url = re.search(expr, message).group()
+        url = extract_href(url)
 
-    logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
-    assert "eingeloggt" in logged_in
+        faulty = URL(url).query_param('token', 'asdf').as_string()
+
+        assert "Ungültiger Aktivierungscode" in client.get(faulty).follow()
+        assert "Konto wurde aktiviert" in client.get(url).follow()
+        assert "Konto wurde bereits aktiviert" in client.get(url).follow()
+
+        logged_in = client.login('user@example.org', 'p@ssw0rd').follow()
+        assert "eingeloggt" in logged_in
 
 
-def test_disabled_registration(org_app):
-    client = Client(org_app)
-    org_app.settings.org.enable_user_registration = False
+def test_registration_disabled(org_app):
 
-    assert client.get('/auth/register', expect_errors=True).status_code == 404
+    with temporary_setting(org_app, 'org', 'enable_user_registration', False):
+        client = Client(org_app)
+        org_app.settings.org.enable_user_registration = False
+
+        assert client.get('/auth/register', status=404)
 
 
 def test_disabled_yubikey(org_app):

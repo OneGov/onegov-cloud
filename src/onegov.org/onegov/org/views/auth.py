@@ -27,6 +27,9 @@ def handle_login(self, request, form):
     if not request.app.settings.org.enable_yubikey:
         form.delete_field('yubikey')
 
+    if self.skippable(request):
+        return self.redirect(request)
+
     if form.submitted(request):
         response = self.login_to(request=request, **form.login_data)
 
