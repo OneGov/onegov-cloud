@@ -1,9 +1,14 @@
+import morepath
+import pytest
+
 from datetime import datetime, timedelta
 from freezegun import freeze_time
 from onegov.core.framework import Framework
 from onegov.core.request import CoreRequest, ReturnToMixin
-from onegov.core.utils import Bunch
+from onegov.core.security import Public, Private, Secret
+from onegov.core.utils import Bunch, scan_morepath_modules
 from webtest import TestApp as Client
+from urllib.parse import quote
 
 
 def test_url_safe_token():
@@ -97,3 +102,156 @@ def test_return_to():
     assert c.get(do_something_url).location == 'http://localhost/'
     assert c.get(do_something_url + 'x').location == 'http://localhost/default'
     assert c.get('/do-something').location == 'http://localhost/default'
+
+
+def test_has_permission():
+
+    class App(Framework):
+        pass
+
+    @App.path(path='/')
+    class Root(object):
+        allowed_for = (Public, Private, Secret)
+
+    @App.view(model=Root, permission=Public)
+    def view(self, request):
+        permission = {
+            'public': Public,
+            'private': Private,
+            'secret': Secret
+        }[request.params.get('permission')]
+
+        return request.has_permission(self, permission) and 'true' or 'false'
+
+    @App.view(model=Root, permission=Public, name='login')
+    def login(self, request):
+
+        @request.after
+        def remember_identity(response):
+            request.app.remember_identity(response, request, morepath.Identity(
+                userid='foo',
+                role='admin',
+                application_id=request.app.application_id
+            ))
+
+        return 'ok'
+
+    @App.permission_rule(model=Root, permission=object, identity=None)
+    def has_permission_not_logged_in(identity, model, permission):
+        return permission is Public
+
+    @App.permission_rule(model=Root, permission=object)
+    def has_permission_logged_in(identity, model, permission):
+        return permission in model.allowed_for
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    app = App()
+
+    app.application_id = 'test'
+    app.configure_application(
+        identity_secure=False,
+        disable_memcached=True
+    )
+
+    c = Client(app)
+    assert c.get('/?permission=public').text == 'true'
+    assert c.get('/?permission=private').text == 'false'
+    assert c.get('/?permission=secret').text == 'false'
+
+    c.get('/login')
+
+    assert c.get('/?permission=public').text == 'true'
+    assert c.get('/?permission=private').text == 'true'
+    assert c.get('/?permission=secret').text == 'true'
+
+
+def test_permission_by_view():
+    class App(Framework):
+        pass
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.view(model=Root, name='public', permission=Public)
+    def public_view(self, request):
+        assert False  # we don't want this view to be called
+
+    @App.view(model=Root, name='private', permission=Private)
+    def private_view(self, request):
+        assert False  # we don't want this view to be called
+
+    @App.view(model=Root, name='secret', permission=Secret)
+    def secret_view(self, request):
+        assert False  # we don't want this view to be called
+
+    @App.view(model=Root, name='login', permission=Public)
+    def login(self, request):
+
+        @request.after
+        def remember_identity(response):
+            request.app.remember_identity(response, request, morepath.Identity(
+                userid='foo',
+                role='admin',
+                application_id=request.app.application_id
+            ))
+
+        return 'ok'
+
+    @App.view(model=Root)
+    def view(self, request):
+        url = request.params.get('url')
+        return request.has_access_to_url(url) and 'true' or 'false'
+
+    scan_morepath_modules(App)
+    App.commit()
+
+    app = App()
+
+    app.application_id = 'test'
+    app.configure_application(
+        identity_secure=False,
+        disable_memcached=True
+    )
+
+    c = Client(app)
+
+    def has_access(url):
+        return c.get('/?url={}'.format(quote(url))).text == 'true'
+
+    assert app.permission_by_view(Root) is None
+    assert app.permission_by_view(Root, 'login') is Public
+    assert app.permission_by_view(Root, 'public') is Public
+    assert app.permission_by_view(Root, 'private') is Private
+    assert app.permission_by_view(Root, 'secret') is Secret
+
+    assert app.permission_by_view(Root()) is None
+    assert app.permission_by_view(Root(), 'login') is Public
+    assert app.permission_by_view(Root(), 'public') is Public
+    assert app.permission_by_view(Root(), 'private') is Private
+    assert app.permission_by_view(Root(), 'secret') is Secret
+
+    with pytest.raises(AssertionError):
+        app.permission_by_view(None)
+
+    with pytest.raises(KeyError):
+        app.permission_by_view(Root, 'foobar')
+
+    # the domain is ignored
+    for domain in ('', 'https://example.org'):
+        assert has_access('{}/'.format(domain))
+        assert has_access('{}/login'.format(domain))
+        assert has_access('{}/public'.format(domain))
+        assert not has_access('{}/private'.format(domain))
+        assert not has_access('{}/secret'.format(domain))
+
+    c.get('/login')
+
+    for domain in ('', 'https://example.org'):
+        assert has_access('{}/'.format(domain))
+        assert has_access('{}/login'.format(domain))
+        assert has_access('{}/public'.format(domain))
+        assert has_access('{}/private'.format(domain))
+        assert has_access('{}/secret'.format(domain))

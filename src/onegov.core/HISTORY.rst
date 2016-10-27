@@ -1,5 +1,12 @@
 Changelog
 ---------
+
+- Adds the ability to check if the current user may view an url.
+  [href]
+
+- Make sure has_permission works with overriden rules.
+  [href]
+
 0.30.3 (2016-10-26)
 ~~~~~~~~~~~~~~~~~~~
 

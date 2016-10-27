@@ -16,6 +16,7 @@ Using the framework does not really differ from using Morepath::
 
 """
 
+import dectate
 import hashlib
 import inspect
 import morepath
@@ -27,7 +28,7 @@ from dectate import directive
 from email.utils import parseaddr, formataddr
 from itsdangerous import BadSignature, Signer
 from mailthon.middleware import TLS, Auth
-from morepath.publish import resolve_model
+from morepath.publish import resolve_model, get_view_name
 from more.transaction import TransactionApp
 from more.transaction.main import transaction_tween_factory
 from more.webassets import WebassetsApp
@@ -438,7 +439,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         # used for...
         return hashlib.sha1(self.application_id.encode('utf-8')).hexdigest()
 
-    def object_by_path(self, path):
+    def object_by_path(self, path, with_view_name=False):
         """ Takes a path and returns the object associated with it. If a
         scheme or a host is passed it is ignored.
 
@@ -468,9 +469,36 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
         # if there is more than one token unconsumed, this can't be a view
         if len(request.unconsumed) > 1:
-            return None
+            return (None, None) if with_view_name else None
+
+        if with_view_name:
+            return obj, get_view_name(request.unconsumed) or None
 
         return obj
+
+    def permission_by_view(self, model, view_name=None):
+        """ Returns the permission required for the given model and view_name.
+
+        The model may be an instance or a class.
+
+        If the view cannot be evaluated, a KeyError is raised.
+
+        """
+        assert model is not None
+
+        model = model if inspect.isclass(model) else model.__class__
+        predicates = {'name': view_name} if view_name else {}
+
+        query = dectate.Query('view')
+        query = query.filter(model=model, predicates=predicates)
+
+        try:
+            action, handler = next(query(self.__class__))
+        except (StopIteration, RuntimeError):
+            raise KeyError(
+                "{!r} has no view named {}".format(model, view_name))
+
+        return action.permission
 
     @cached_property
     def session(self):

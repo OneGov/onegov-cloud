@@ -401,12 +401,32 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
         given model.
 
         """
-        if self.is_logged_in:
-            permitted = self.app.modules.rules.has_permission_logged_in
-        else:
-            permitted = self.app.modules.rules.has_permission_not_logged_in
+        if permission is None:
+            return True
 
-        return permitted(self.app, self.identity, model, permission)
+        return self.app._permits(self.identity, model, permission)
+
+    def has_access_to_url(self, url):
+        """ Returns true if the current user has access to the given url.
+
+        The domain part of the url is completely ignored. This method should
+        only be used if you have no other choice. Loading the object by
+        url first is slower than if you can get the object otherwise.
+
+        The initial use-case for this function is the to parameter in the
+        login view. If the to-url is accessible anyway, we skip the login
+        view.
+
+        If we can't find a view for the url, a KeyError is thrown.
+
+        """
+        obj, view_name = self.app.object_by_path(url, with_view_name=True)
+
+        if obj is None:
+            raise KeyError("Could not find view for '{}'".format(url))
+
+        permission = self.app.permission_by_view(obj, view_name)
+        return self.has_permission(obj, permission)
 
     def exclude_invisible(self, models):
         """ Excludes models invisble to the current user from the list. """
