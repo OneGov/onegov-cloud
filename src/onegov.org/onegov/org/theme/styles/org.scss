@@ -412,9 +412,16 @@ form {
         }
     }
 
-    .error .code-editor-wrapper {
-        margin-bottom: 0;
-        padding: 0;
+    .error {
+        .code-editor-wrapper {
+            margin-bottom: 0;
+            padding: 0;
+        }
+
+        input[type="checkbox"],
+        input[type="radio"] {
+            margin-bottom: inherit;
+        }
     }
 
     .code-editor {
