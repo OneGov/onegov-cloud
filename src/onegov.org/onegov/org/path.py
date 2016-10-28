@@ -60,9 +60,9 @@ def get_org(app):
     return app.org
 
 
-@OrgApp.path(model=Auth, path='/auth')
-def get_auth(app, to='/'):
-    return Auth.from_app(app, to)
+@OrgApp.path(model=Auth, path='/auth', converters=dict(skip=bool))
+def get_auth(app, to='/', skip=False):
+    return Auth.from_app(app, to, skip)
 
 
 @OrgApp.path(model=User, path='/benutzer/{id}', converters=dict(id=UUID))

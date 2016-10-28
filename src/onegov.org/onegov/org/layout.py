@@ -30,7 +30,7 @@ from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
-from onegov.user import UserCollection
+from onegov.user import Auth, UserCollection
 from sqlalchemy import desc
 
 
@@ -220,6 +220,10 @@ class Layout(ChameleonLayout):
     @cached_property
     def news_url(self):
         return self.request.class_link(News, {'absorb': ''})
+
+    def login_to_url(self, to, skip=False):
+        auth = Auth.from_request(self.request, to=to, skip=skip)
+        return self.request.link(auth, 'login')
 
     def export_formatter(self, format):
         """ Returns a formatter function which takes a value and returns
