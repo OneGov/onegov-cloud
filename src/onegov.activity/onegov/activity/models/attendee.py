@@ -2,7 +2,7 @@ from datetime import date, timedelta
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Date, Text, ForeignKey, func
+from sqlalchemy import Column, Date, Index, Text, ForeignKey, func
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from uuid import uuid4
@@ -44,4 +44,8 @@ class Attendee(Base, TimestampMixin):
         'Booking',
         order_by='Booking.created',
         backref='attendee'
+    )
+
+    __table_args__ = (
+        Index('unique_child_name', 'username', 'name', unique=True),
     )

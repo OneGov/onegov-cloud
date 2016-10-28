@@ -309,8 +309,7 @@ def test_no_orphan_bookings(session, owner):
 
     tournament.bookings.append(Booking(
         username=owner.username,
-        attendee_id=dustin.id,
-        period_id=periods.query().first().id
+        attendee_id=dustin.id
     ))
 
     session.flush()
@@ -349,8 +348,7 @@ def test_no_orphan_occasions(session, owner):
 
     tournament.bookings.append(Booking(
         username=owner.username,
-        attendee=dustin,
-        period_id=period.id
+        attendee=dustin
     ))
 
     session.flush()

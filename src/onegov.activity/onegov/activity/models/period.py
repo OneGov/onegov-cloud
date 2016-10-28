@@ -56,12 +56,6 @@ class Period(Base, TimestampMixin):
         backref='period'
     )
 
-    #: The bookings linked to this period
-    bookings = relationship(
-        'Booking',
-        backref='period'
-    )
-
     def activate(self):
         """ Activates the current period, causing all occasions and activites
         to update their status and book-keeping.

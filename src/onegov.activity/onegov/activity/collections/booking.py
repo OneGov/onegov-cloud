@@ -14,11 +14,15 @@ class BookingCollection(GenericCollection):
     def by_username(self, username):
         return self.query().filter(Booking.username == username)
 
-    def add(self, user, attendee, priority=None, group_code=None):
+    def by_occasion(self, occasion):
+        return self.query().filter(Booking.occasion_id == occasion.id)
+
+    def add(self, user, attendee, occasion, priority=None, group_code=None):
 
         return super().add(
             username=user.username,
             attendee_id=attendee.id,
+            occasion_id=occasion.id,
             priority=priority,
             group_code=group_code,
         )
