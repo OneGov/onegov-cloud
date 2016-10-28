@@ -2,11 +2,12 @@ import onegov.feriennet
 import transaction
 
 from datetime import datetime, timedelta
-from onegov.testing import utils
-from onegov.org.testing import Client, get_message, select_checkbox
 from onegov.activity import ActivityCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
+from onegov.org.testing import Client, get_message, select_checkbox
+from onegov.testing import utils
+from onegov.user import UserCollection
 from psycopg2.extras import NumericRange
 
 
@@ -537,3 +538,73 @@ def test_execution_period(feriennet_app):
     periods = period.form.submit().follow()
 
     assert "gespeichert" in periods
+
+
+def test_enroll_child(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    retreat = activities.add("Retreat", username='admin@example.org')
+    retreat.propose().accept()
+
+    occasions.add(
+        start=datetime(2016, 10, 8, 8),
+        end=datetime(2016, 10, 9, 16),
+        age=(0, 10),
+        timezone="Europe/Zurich",
+        activity=retreat,
+        period=periods.add(
+            title="2016",
+            prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+            execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+            active=True
+        )
+    )
+
+    UserCollection(feriennet_app.session()).add(
+        'member@example.org', 'hunter2', 'member')
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+
+    activity = client.get('/angebot/retreat')
+
+    login = activity.click("Anmelden")
+    assert "Login" in login
+
+    login.form['username'] = 'member@example.org'
+    login.form['password'] = 'hunter2'
+    enroll = login.form.submit().follow()
+    assert "Teilnehmer Anmelden" in enroll
+
+    # now that we're logged in, the login link automatically skips ahead
+    enroll = activity.click("Anmelden").follow()
+    assert "Teilnehmer Anmelden" in enroll
+
+    # the link changes, but the result stays the same
+    enroll = client.get('/angebot/retreat').click("Anmelden")
+    assert "Teilnehmer Anmelden" in enroll
+
+    enroll.form["name"] = "Tom Sawyer"
+    enroll.form["birth_date"] = "1876-01-01"
+    activity = enroll.form.submit().follow()
+
+    assert "zu Tom Sawyer's Wunschliste hinzugefügt" in activity
+
+    enroll = activity.click("Anmelden")
+    assert "Tom Sawyer hat sich bereits für diese Durchführung angemeldet"\
+        in enroll.form.submit()
+
+    enroll.form['attendee'] = 'other'
+    enroll.form['name'] = "Tom Sawyer"
+    enroll.form["birth_date"] = "1876-01-01"
+
+    assert "Sie haben bereits ein Kind mit diesem Namen eingegeben"\
+        in enroll.form.submit()
+
+    enroll.form['name'] = "Huckleberry Finn"
+    activity = enroll.form.submit().follow()
+
+    assert "zu Huckleberry Finn's Wunschliste hinzugefügt" in activity

@@ -173,8 +173,8 @@ msgstr "Anderer"
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
 
-msgid "This occasion has already been booked by this child"
-msgstr "Dieses Kind hat sich bereits für die Durchführung angemeldet"
+msgid "This occasion has already been booked by ${name}"
+msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
 
 msgid "Period"
 msgstr "Periode"

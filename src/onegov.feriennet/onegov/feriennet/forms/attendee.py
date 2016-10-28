@@ -70,9 +70,13 @@ class AttendeeForm(Form):
             query = bookings.by_occasion(self.model)
             query = query.filter(Booking.attendee_id == self.attendee.data)
 
-            if query.first():
-                self.attendee.errors.append(
-                    _("This occasion has already been booked by this child"))
+            booking = query.first()
+
+            if booking:
+                self.attendee.errors.append(_(
+                    "This occasion has already been booked by ${name}",
+                    mapping={'name': booking.attendee.name}
+                ))
 
                 return False
 
