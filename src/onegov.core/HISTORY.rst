@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes url permission check not working for anonymous users.
+  [href]
+
 - Adds a default path argument converter for booleans.
   [href]
 

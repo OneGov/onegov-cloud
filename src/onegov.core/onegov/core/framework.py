@@ -458,7 +458,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         # strip host and scheme
         path = URL(path).path()
 
-        request = morepath.request.Request(environ={
+        request = self.request_class(environ={
             'PATH_INFO': URL(path).path(),
             'SERVER_NAME': '',
             'SERVER_PORT': '',
