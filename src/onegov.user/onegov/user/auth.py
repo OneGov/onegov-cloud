@@ -13,7 +13,7 @@ class Auth(object):
 
     identity_class = morepath.Identity
 
-    def __init__(self, session, application_id, to='/',
+    def __init__(self, session, application_id, to='/', skip=False,
                  yubikey_client_id=None, yubikey_secret_key=None):
         assert application_id  # may not be empty!
 
@@ -24,27 +24,29 @@ class Auth(object):
         # to trick the user into thinking he's on our page after entering his
         # password and being redirected to a phising site.
         self.to = relative_url(to)
+        self.skip = skip
 
         self.yubikey_client_id = yubikey_client_id
         self.yubikey_secret_key = yubikey_secret_key
 
     @classmethod
-    def from_app(cls, app, to='/'):
+    def from_app(cls, app, to='/', skip=False):
         return cls(
             session=app.session(),
             application_id=app.application_id,
             yubikey_client_id=getattr(app, 'yubikey_client_id', None),
             yubikey_secret_key=getattr(app, 'yubikey_secret_key', None),
-            to=to
+            to=to,
+            skip=skip
         )
 
     @classmethod
-    def from_request(cls, request, to='/'):
-        return cls.from_app(request.app, to)
+    def from_request(cls, request, to='/', skip=False):
+        return cls.from_app(request.app, to, skip)
 
     @classmethod
-    def from_request_path(cls, request):
-        return cls.from_request(request, request.transform(request.path))
+    def from_request_path(cls, request, skip=False):
+        return cls.from_request(request, request.transform(request.path), skip)
 
     @property
     def users(self):
@@ -54,6 +56,9 @@ class Auth(object):
         return morepath.redirect(request.transform(self.to))
 
     def skippable(self, request):
+
+        if not self.skip:
+            return False
 
         # this is the default paramter, we won't skip to it in any case
         if self.to == '/':
