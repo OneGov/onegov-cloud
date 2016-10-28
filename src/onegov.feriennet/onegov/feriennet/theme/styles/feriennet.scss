@@ -200,23 +200,25 @@ ul.tags {
 /*
     Occasions
 */
-ul.occasions {
+.occasions {
     list-style: none;
     margin: 0;
     position: relative;
 
+    h2,
+    h3,
     h4 {
         font-size: 1.2rem;
         font-weight: bold;
+        margin: 0 0 .5rem;
     }
 
-    li {
+    li:first-child {
+        margin-top: 1.5rem;
+    }
 
+    > * {
         margin-bottom: 2.5rem;
-
-        &:first-child {
-            margin-top: 1.5rem;
-        }
 
         p {
             background-color: $panel-bg;
@@ -286,7 +288,7 @@ ul.occasions {
         font-size: 1rem;
     }
 
-    button {
+    .button {
         float: right;
         margin: 0;
         width: 25%;
@@ -320,5 +322,21 @@ ul.occasions {
                 border-left: 10px solid $primary-color;
             }
         }
+    }
+}
+
+
+/*
+    Enrollment
+*/
+
+.enroll-form {
+    h2 {
+        font-size: $h2-font-size - $h2-font-reduction;
+        margin: .5rem 0;
+    }
+
+    .hide-attendee .field-attendee {
+        display: none;
     }
 }

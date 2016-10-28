@@ -49,69 +49,7 @@
                     <ul class="occasions">
                         <li tal:repeat="occasion occasions">
                             <h4>${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</h4>
-
-                            <div class="row">
-                                <!--! the width of this column together with the next one doesn't add up to 12 by
-                                intention to make space for the icons rendered ::before the first column. -->
-                                <div class="small-12 medium-4 columns factoids">
-                                    <div class="location" tal:condition="occasion.location">
-                                        <span i18n:translate class="show-for-sr">Location</span>
-                                        <span>${occasion.location}</span>
-                                    </div>
-
-                                    <div class="age">
-                                        <span i18n:translate class="show-for-sr">Age</span>
-                                        <span i18n:translate>
-                                            <tal:block replace="occasion.age.lower" i18n:name='min_age' />
-                                            -
-                                            <tal:block replace="occasion.age.upper - 1" i18n:name='max_age' />
-                                            years old
-                                        </span>
-                                    </div>
-
-                                    <div class="spots">
-                                        <span i18n:translate class="show-for-sr">Participants</span>
-
-                                        <span i18n:translate tal:condition="occasion.spots.lower">
-                                            <tal:block replace="occasion.spots.lower" i18n:name='min_spots' />
-                                            -
-                                            <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
-                                            participants
-                                        </span>
-
-                                        <span i18n:translate tal:condition="not:occasion.spots.lower">
-                                            up to
-                                            <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
-                                            participants
-                                        </span>
-                                    </div>
-
-                                    <div class="text-links" tal:condition="request.is_admin or layout.is_owner">
-                                        <tal:block repeat="link occasion_links">
-                                            <tal:block replace="structure link(occasion)(request)" />
-                                        </tal:block>
-                                    </div>
-                                </div>
-                                <div class="small-12 medium-7 columns">
-                                    <p tal:condition="occasion.note">${occasion.note}</p>
-                                </div>
-                            </div>
-
-                            <div class="call-to-action">
-                                <tal:block switch="age_bracket(occasion.age)">
-                                    <span tal:case="'young'" i18n:translate>
-                                        Enroll your young child now.
-                                    </span>
-                                    <span tal:case="'teenager'" i18n:translate>
-                                        Enroll your teenager now.
-                                    </span>
-                                    <span tal:case="default" i18n:translate>
-                                        Enroll your child now.
-                                    </span>
-                                </tal:block>
-
-                                <button class="button" i18n:translate>Enroll</button>
-                            </div>
+                            <tal:block metal:use-macro="layout.macros.occasion" tal:define="show_enroll True; show_links True" />
                         </li>
                     </ul>
                 </tal:block>

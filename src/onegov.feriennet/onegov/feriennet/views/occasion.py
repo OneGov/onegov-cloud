@@ -1,8 +1,11 @@
-from onegov.activity import Occasion, OccasionCollection, PeriodCollection
-from onegov.core.security import Private
+from onegov.activity import AttendeeCollection
+from onegov.activity import BookingCollection
+from onegov.activity import Occasion, OccasionCollection
+from onegov.activity import PeriodCollection
+from onegov.core.security import Private, Personal
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
-from onegov.feriennet.forms.occasion import OccasionForm
+from onegov.feriennet.forms import AttendeeForm, OccasionForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
 
@@ -69,3 +72,51 @@ def delete_occasion(self, request):
     request.assert_valid_csrf_token()
 
     OccasionCollection(request.app.session()).delete(self)
+
+
+@FeriennetApp.form(
+    model=Occasion,
+    form=AttendeeForm,
+    permission=Personal,
+    name='anmelden',
+    template='enroll_form.pt')
+def book_occasion(self, request, form):
+
+    # pass the form model for extended validation if data was posted
+    form.model = request.POST and self or None
+
+    if form.submitted(request):
+        attendees = AttendeeCollection(request.app.session())
+        user = request.current_user
+
+        if form.is_new:
+            attendee = attendees.add(
+                user=user,
+                name=form.name.data,
+                birth_date=form.birth_date.data
+            )
+        else:
+            attendee = attendees.by_id(form.attendee.data)
+
+        bookings = BookingCollection(request.app.session())
+        bookings.add(
+            user=user,
+            attendee=attendee,
+            occasion=self
+        )
+
+        request.success(
+            _("The occasion was added to ${name}'s wishlist", mapping={
+                'name': attendee.name
+            }))
+
+        return request.redirect(request.link(self.activity))
+
+    title = _("Enroll Attendee")
+
+    return {
+        'layout': OccasionFormLayout(self.activity, request, title),
+        'title': title,
+        'form': form,
+        'occasion': self
+    }
