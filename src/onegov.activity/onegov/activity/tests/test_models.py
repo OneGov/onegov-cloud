@@ -2,8 +2,10 @@ import pytest
 import sqlalchemy
 import transaction
 
-from datetime import datetime
+from datetime import datetime, date
 from onegov.activity import ActivityCollection
+from onegov.activity import Attendee
+from onegov.activity import AttendeeCollection
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
@@ -282,6 +284,7 @@ def test_occasions_daterange_constraint(session, owner):
 def test_no_orphan_bookings(session, owner):
 
     activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
     periods = PeriodCollection(session)
     occasions = OccasionCollection(session)
 
@@ -298,10 +301,15 @@ def test_no_orphan_bookings(session, owner):
         )
     )
 
+    dustin = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2002, 9, 8)
+    )
+
     tournament.bookings.append(Booking(
         username=owner.username,
-        last_name='Muster',
-        first_name='Peter',
+        attendee_id=dustin.id,
         period_id=periods.query().first().id
     ))
 
@@ -314,6 +322,7 @@ def test_no_orphan_bookings(session, owner):
 def test_no_orphan_occasions(session, owner):
 
     activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
     periods = PeriodCollection(session)
     occasions = OccasionCollection(session)
 
@@ -332,10 +341,15 @@ def test_no_orphan_occasions(session, owner):
         period=period
     )
 
+    dustin = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2002, 9, 8)
+    )
+
     tournament.bookings.append(Booking(
         username=owner.username,
-        last_name='Muster',
-        first_name='Peter',
+        attendee=dustin,
         period_id=period.id
     ))
 
@@ -621,3 +635,19 @@ def test_occasion_owners(session, owner, secondary_owner):
     assert activities\
         .for_filter(owner='secondary@example.org')\
         .query().count() == 1
+
+
+def test_attendee_age(session, owner):
+
+    def age(years):
+        return date.today().replace(year=date.today().year - years)
+
+    attendees = AttendeeCollection(session)
+    d = attendees.add(owner, "Dustin Henderson", age(13))
+    m = attendees.add(owner, "Mike Wheeler", age(14))
+
+    assert d.age == 13
+    assert m.age == 14
+
+    assert attendees.query().filter(Attendee.age <= 13).count() == 1
+    assert attendees.query().filter(Attendee.age <= 14).count() == 2

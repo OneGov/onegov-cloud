@@ -34,11 +34,8 @@ class Booking(Base, TimestampMixin):
     #: the group code of the booking
     group_code = Column(Text, nullable=False, default=random_group_code)
 
-    #: the last name of the participant
-    last_name = Column(Text, nullable=False)
-
-    #: the first name of the participant
-    first_name = Column(Text, nullable=False)
+    #: the attendee behind this booking
+    attendee_id = Column(UUID, ForeignKey("attendees.id"), nullable=False)
 
     #: the occasion this booking belongs to
     occasion_id = Column(UUID, ForeignKey("occasions.id"), nullable=False)

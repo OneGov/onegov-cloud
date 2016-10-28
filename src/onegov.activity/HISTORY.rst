@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an attendee model.
+  [href]
+
 0.0.10 (2016-10-20)
 ~~~~~~~~~~~~~~~~~~~
 

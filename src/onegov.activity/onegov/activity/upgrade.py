@@ -147,3 +147,9 @@ def rebuild_models(context):
 @upgrade_task('Drop occasion state type')
 def drop_occasion_state_type(context):
     context.operations.execute('DROP TYPE occasion_state')
+
+
+@upgrade_task('Rebuild bookings')
+def rebuild_bookings(context):
+    # having not created any bookings yet, we can rebuild them
+    context.operations.drop_table('bookings')
