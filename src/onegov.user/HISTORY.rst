@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.3 (2016-10-28)
+~~~~~~~~~~~~~~~~~~~
+
 - The login is now unskippable by default.
   [href]
 
