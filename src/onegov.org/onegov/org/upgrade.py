@@ -21,13 +21,13 @@ def move_town_to_organisation(context):
     """.format(context.app.schema)).scalar()
 
     if not has_organisations or not has_towns:
-        return
+        return False
 
     # this needs to be an always-run task for now, since on first install the
     # module is deteced as new and it is assumed that no tasks need to be run
     # as a result
     if context.session.query(Organisation).first():
-        return
+        return False
 
     context.operations.drop_table('organisations')
     context.operations.rename_table('towns', 'organisations')
