@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a default path argument converter for booleans.
+  [href]
+
 0.31.0 (2016-10-27)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -55,3 +55,23 @@ uuid_converter = morepath.Converter(
 @Framework.converter(type=UUID)
 def get_default_uuid_converter():
     return uuid_converter
+
+
+def bool_decode(s):
+    """ Decodes a boolean. """
+    return False if s == '0' or s == '' else True
+
+
+def bool_encode(d):
+    """ Encodes a boolean. """
+    return d and '1' or '0'
+
+
+bool_converter = morepath.Converter(
+    decode=bool_decode, encode=bool_encode
+)
+
+
+@Framework.converter(type=bool)
+def get_default_bool_converter():
+    return bool_converter
