@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.31.1 (2016-10-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes url permission check not working for anonymous users.
   [href]
