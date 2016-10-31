@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.0 (2016-10-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows the base link everywhere.
   [msom]
