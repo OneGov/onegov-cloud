@@ -19,11 +19,7 @@
             </ul>
             <section class="top-bar-section">
                 <ul class="left">
-                    <tal:block repeat="link links">
-                        <li>
-                            <a tal:attributes="href link.url">${link.text}</a>
-                        </li>
-                    </tal:block>
+                    <li tal:repeat="link links" tal:content="structure link(request)" />
                 </ul>
             </section>
         </nav>

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Generate links in top-navigation just like it is done in other palces.
+  [href]
+
 - Automatically skip the login view if the target url is accessable.
   [href]
 
