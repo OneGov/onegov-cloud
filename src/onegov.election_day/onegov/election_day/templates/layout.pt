@@ -22,8 +22,8 @@ metal:define-macro="layout">
 
     Have a look at the source code: https://onegov.readthedocs.org
 -->
-<link rel="stylesheet" type="text/css" href="${request.theme_link}">
-<link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
+    <link rel="stylesheet" type="text/css" href="${request.theme_link}">
+    <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 <body>
     <div tal:condition="'headerless' not in request.params" class="row header">
