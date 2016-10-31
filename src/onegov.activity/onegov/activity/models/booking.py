@@ -56,6 +56,7 @@ class Booking(Base, TimestampMixin):
             'one_booking_per_attendee', 'occasion_id', 'attendee_id',
             unique=True
         ),
+        Index('bookings_by_state', 'state', 'username')
     )
 
     def confirm(self):

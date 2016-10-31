@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Includes a count method for bookings per user.
+  [href]
+
 - Adds an attendee model.
   [href]
 

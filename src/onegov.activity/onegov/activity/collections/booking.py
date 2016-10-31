@@ -8,6 +8,17 @@ class BookingCollection(GenericCollection):
     def model_class(self):
         return Booking
 
+    def count(self, username, state='unconfirmed'):
+        """ Returns the number of bookings for the given username and state.
+
+        """
+
+        query = self.query().with_entities(Booking.id)
+        query = query.filter(Booking.state == state)
+        query = query.filter(Booking.username == username)
+
+        return query.count()
+
     def by_user(self, user):
         return self.query().filter(Booking.username == user.username)
 
