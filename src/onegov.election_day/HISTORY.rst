@@ -25,7 +25,7 @@ Changelog
 1.0.4 (2016-10-24)
 ~~~~~~~~~~~~~~~~~~~
 
-- Allosw to set custom headers for each webhook.
+- Allow to set custom headers for each webhook.
   [msom]
 
 1.0.3 (2016-09-26)
