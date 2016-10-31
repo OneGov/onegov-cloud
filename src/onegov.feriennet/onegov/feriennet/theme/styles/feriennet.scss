@@ -364,3 +364,73 @@ ul.tags {
     background-color: $alert-color;
     color: $white;
 }
+
+/*
+    My bookings
+*/
+
+.my-bookings {
+    .panel {
+        max-width: 77ex;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0 0 2rem;
+        padding: 0;
+
+        li {
+            margin-bottom: 1rem;
+        }
+    }
+
+    h3 {
+        border: 1px solid $primary-color;
+        border-width: 0 0 1px;
+        font-size: 1.4rem;
+        font-weight: 500;
+        padding-bottom: .5rem;
+    }
+
+    h4 {
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-bottom: .25rem;
+    }
+
+    .occasion {
+        font-size: .875rem;
+        margin-bottom: .1rem;
+    }
+
+    .state {
+        background-color: $base;
+        border-radius: 5px;
+        color: $white;
+        display: inline-block;
+        font-size: .8rem;    
+        padding: 0 6px;
+
+        &.cancelled {
+            background-color: $alert-color;
+        }
+
+        &.confirmed {
+            background-color: $success-color;
+        }
+    }
+
+    .fa-star-o,
+    .fa-star {
+        font-size: 1.5rem;
+        padding: 2px 0;
+    }
+
+    .fa-star-o {
+        color: $base;
+    }
+
+    .fa-star {
+        color: $yellow;
+    }
+}

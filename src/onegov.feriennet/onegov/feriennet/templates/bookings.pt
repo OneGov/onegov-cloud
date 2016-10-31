@@ -1,0 +1,71 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <p tal:condition="not:has_bookings" i18n:translate>
+            No bookings in the current period.
+        </p>
+
+        <div class="my-bookings" tal:condition="has_bookings">
+            <h2>${period.title}</h2>
+
+            <div class="panel">
+                <p i18n:translate>
+                    The <span tal:replace="period.title" i18n:name='title' />'s prebooking phase lasts from <strong i18n:name='start' tal:content="layout.format_date(period.prebooking_start, 'date_long')" /> until <strong i18n:name='end' tal:content="layout.format_date(period.prebooking_end, 'date_long')" />. During this time you can add new courses and remove existing ones.
+                </p>
+
+                <p i18n:translate>
+                    After this period you are automatically assigned to the courses depending on your preferences and the availability of the course.
+                </p>
+
+                <p i18n:translate>
+                    To help us find the best spot for you, you can mark three courses as favorites for each child. This doesn't mean that you will be guaranteed a spot, but it will help us decide who gets to be in which course.
+                </p>
+            </div>
+
+            <div class="row attendee-bookings" tal:repeat="attendee attendees">
+                <div class="columns small-12 medium-6 end">
+                    <h3>${attendee.name}</h3>
+                    <ul>
+                        <li tal:repeat="booking bookings_by_attendee(attendee)">
+                            <div class="row">
+                                <div class="columns small-1">
+                                    <a href="#" tal:condition="booking.priority > 0">
+                                        <i class="fa fa-star" aria-hidden="true"></i>
+                                        <span class="show-for-sr" i18n:translate>Mark activity as favorite</span>
+                                    </a>
+                                    <a href="#" tal:condition="booking.priority == 0">
+                                        <i class="fa fa-star-o" aria-hidden="true"></i>
+                                        <span class="show-for-sr" i18n:translate>Unmark activity as favorite</span>
+                                    </a>
+                                </div>
+                                <div class="columns small-11">
+                                    <a href="${request.link(booking.occasion.activity)}">
+                                        <h4>${booking.occasion.activity.title}</h4>
+                                    </a>
+                                    <div class="occasion">
+                                        ${layout.format_datetime_range(booking.occasion.start, booking.occasion.end)}
+                                    </div>
+                                    <div class="state">
+                                        <tal:block switch="booking.state">
+                                            <span tal:case="'unconfirmed'" class="${booking.state}" i18n:translate>
+                                                Unconfirmed
+                                            </span>
+                                            <span tal:case="'confirmed'" class="${booking.state}" i18n:translate>
+                                                Confirmed
+                                            </span>
+                                            <span tal:case="'cancelled'" class="${booking.state}" i18n:translate>
+                                                Cancelled
+                                            </span>
+                                        </tal:block>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </tal:block>
+</div>

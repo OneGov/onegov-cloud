@@ -48,6 +48,16 @@ class VacationActivityCollectionLayout(DefaultLayout):
         return links
 
 
+class BookingCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(_("My Bookings"), self.request.link(self.model))
+        )
+
+
 class VacationActivityFormLayout(DefaultLayout):
 
     def __init__(self, model, request, title):

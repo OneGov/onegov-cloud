@@ -73,6 +73,17 @@ def get_period(request, app, id):
 
 @FeriennetApp.path(
     model=BookingCollection,
-    path='/buchungen')
-def get_my_bookings(request, app):
-    return BookingCollection(app.session())
+    path='/buchungen',
+    converters=dict(period_id=UUID))
+def get_my_bookings(request, app, period_id=None, username=None):
+    # only admins can actually specify the username
+    if not request.is_admin:
+        username = request.current_username
+
+    # the default username is the current user
+    if not username:
+        username = request.current_username
+
+    period_id = period_id or PeriodCollection(app.session()).active().id
+
+    return BookingCollection(app.session(), period_id, username)
