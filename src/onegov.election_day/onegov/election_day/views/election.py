@@ -89,7 +89,9 @@ def get_candidate_electoral_results(election, session):
 def get_list_results(election, session):
     """ Returns the aggregated list results as list. """
 
-    result = session.query(List.name, List.votes, List.list_id)
+    result = session.query(
+        List.name, List.votes, List.list_id, List.number_of_mandates
+    )
     result = result.order_by(desc(List.votes))
     result = result.filter(List.election_id == election.id)
 
@@ -262,7 +264,8 @@ def view_election_lists(self, request):
         'results': [{
             'text': item[0],
             'value': item[1],
-            'class': 'inactive'
+            'value2': item[3],
+            'class': 'active' if item[3] else 'inactive',
         } for item in get_list_results(self, object_session(self))],
         'majority': None,
         'title': self.title

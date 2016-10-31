@@ -13,6 +13,13 @@ var update_labels = function(line) {
     });
 };
 
+var label_text = function(d) {
+    if (!d.value2) {
+        return d.value
+    }
+    return d.value + ' | ' + (d.value2 || 0);
+}
+
 var init_bar_chart = function(el) {
 
     var dataurl = $(el).data('dataurl');
@@ -80,7 +87,7 @@ var init_bar_chart = function(el) {
         label.append('text')
             .attr('dx', -3)
             .attr('class', 'left')
-            .text(function(d) { return d.value; })
+            .text(function(d) { return label_text(d); })
             .style("font-size", "12px")
             .style("font-family", "sans-serif")
             .style("text-anchor", "end")
@@ -88,7 +95,7 @@ var init_bar_chart = function(el) {
         label.append('text')
             .attr('dx', 8)
             .attr('class', 'right')
-            .text(function(d) { return d.value; })
+            .text(function(d) { return label_text(d); })
             .style("font-size", "12px")
             .style("font-family", "sans-serif")
             .style("fill", "#999");

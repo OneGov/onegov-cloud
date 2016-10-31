@@ -19,6 +19,9 @@ Changelog
 - Improves the mobile styling of vote views.
   [msom]
 
+- Displays the number of mandates per list in the bar chart.
+  [msom]
+
 1.0.4 (2016-10-24)
 ~~~~~~~~~~~~~~~~~~~
 
