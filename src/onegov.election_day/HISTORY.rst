@@ -22,6 +22,9 @@ Changelog
 - Displays the number of mandates per list in the bar chart.
   [msom]
 
+- Adds iFrameResizer.
+  [msom]
+
 1.0.4 (2016-10-24)
 ~~~~~~~~~~~~~~~~~~~
 

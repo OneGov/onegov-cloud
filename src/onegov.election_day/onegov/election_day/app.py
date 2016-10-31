@@ -221,4 +221,5 @@ def get_common_asset():
     yield 'foundation.js'
     yield 'underscore.js'
     yield 'stackable.js'
+    yield 'iframeResizer.contentWindow.js'
     yield 'common.js'
