@@ -1,8 +1,30 @@
-from onegov.activity.models import Booking
+from onegov.activity.models import Booking, Occasion
+from onegov.activity.collections.occasion import OccasionCollection
 from onegov.core.collection import GenericCollection
 
 
 class BookingCollection(GenericCollection):
+
+    def __init__(self, session, period_id=None, username=None):
+        super().__init__(session)
+        self.period_id = period_id
+        self.username = username
+
+    def query(self):
+        query = super().query()
+
+        if self.username is not None:
+            query = query.filter(Booking.username == self.username)
+
+        if self.period_id is not None:
+            o = OccasionCollection(self.session).query()
+            o = o.with_entities(Occasion.id)
+            o = o.filter(Occasion.period_id == self.period_id)
+            o = o.subquery()
+
+            query = query.filter(Booking.occasion_id.in_(o))
+
+        return query
 
     @property
     def model_class(self):
