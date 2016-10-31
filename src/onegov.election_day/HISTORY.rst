@@ -1,16 +1,22 @@
 Changelog
 ---------
 
-- Show the base link everywhere.
+- Shows the base link everywhere.
   [msom]
 
-- Introduce a headerless query parameter.
+- Introduces a headerless query parameter.
+  [msom]
+
+- Shows data download links in the primary color.
+  [msom]
+
+- Uses darker callout panels.
   [msom]
 
 1.0.4 (2016-10-24)
 ~~~~~~~~~~~~~~~~~~~
 
-- Allow to set custom headers for each webhook.
+- Allosw to set custom headers for each webhook.
   [msom]
 
 1.0.3 (2016-09-26)

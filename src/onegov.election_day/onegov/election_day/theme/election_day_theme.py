@@ -22,6 +22,7 @@ class ElectionDayTheme(BaseTheme):
             'subheader-line-height': '1.3',
             'h1-font-reduction': 'rem-calc(15)',
             'h2-font-reduction': 'rem-calc(12)',
+            'callout-panel-bg': 'scale-color($primary-color, $lightness: 80%)'
         }
 
     @property
