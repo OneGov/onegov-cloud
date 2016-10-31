@@ -51,8 +51,7 @@ def view_principal(self, request):
     return {
         'layout': DefaultLayout(self, request),
         'archive_items': latest,
-        'date': None,
-        'show_base_link': True
+        'date': None
     }
 
 
