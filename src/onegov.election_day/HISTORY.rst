@@ -13,6 +13,9 @@ Changelog
 - Uses darker callout panels.
   [msom]
 
+- Removes Archive from Election/Vote Detail View.
+  [msom]
+
 1.0.4 (2016-10-24)
 ~~~~~~~~~~~~~~~~~~~
 

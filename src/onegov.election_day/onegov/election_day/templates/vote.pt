@@ -180,7 +180,5 @@
 
         <div metal:use-macro="layout.macros['related_link']" tal:define="meta vote.meta" />
 
-        <div metal:use-macro="layout.macros['archive']" />
-
     </tal:block>
 </div>
