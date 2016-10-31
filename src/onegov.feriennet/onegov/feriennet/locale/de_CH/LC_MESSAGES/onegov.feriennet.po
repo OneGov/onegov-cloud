@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-10-28 15:27+0200\n"
+"POT-Creation-Date: 2016-10-31 10:25+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -14,6 +14,9 @@ msgstr ""
 
 msgid "Activities"
 msgstr "Angebote"
+
+msgid "My Bookings"
+msgstr "Meine Buchungen"
 
 msgid "Register a new account"
 msgstr "Ein neues Konto eröffnen"
@@ -173,6 +176,7 @@ msgstr "Anderer"
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
 
+#, python-format
 msgid "This occasion has already been booked by ${name}"
 msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
 

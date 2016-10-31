@@ -340,3 +340,27 @@ ul.tags {
         display: none;
     }
 }
+
+
+/*
+    My bookings count
+*/
+
+.count[data-count]:after {
+    border-radius: 100px;
+    content: attr(data-count);
+    display: inline-block;
+    font-size: .875rem;
+    font-weight: bold;
+    height: 1.4rem;
+    line-height: 1.4rem;
+    margin: 0 0 0 1ex;
+    min-width: 1.4rem;
+    padding: 0 4px;
+    text-align: center;
+}
+
+.count.alert[data-count]:after {
+    background-color: $alert-color;
+    color: $white;
+}
