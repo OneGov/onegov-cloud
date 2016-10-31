@@ -314,6 +314,10 @@ class UpgradeContext(object):
         inspector = Inspector(self.operations_connection)
         return column in {c['name'] for c in inspector.get_columns(table)}
 
+    def has_table(self, table):
+        inspector = Inspector(self.operations_connection)
+        return table in inspector.get_table_names()
+
 
 class UpgradeRunner(object):
     """ Runs all tasks of a :class:`UpgradeTasksRegistry`. """

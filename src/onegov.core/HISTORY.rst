@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds has_table to UpgradeContext.
+  [msom]
+
 0.31.1 (2016-10-28)
 ~~~~~~~~~~~~~~~~~~~
 
