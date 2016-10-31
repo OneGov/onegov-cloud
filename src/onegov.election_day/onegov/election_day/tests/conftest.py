@@ -1,4 +1,3 @@
-import mock
 import morepath
 import onegov.core
 import onegov.election_day
@@ -53,9 +52,6 @@ def create_app(postgres_dsn, temporary_directory, election_day_password,
         password_hash=election_day_password,
         role='admin'
     ))
-
-    default_theme_options = mock.PropertyMock(return_value={})
-    type(app.settings.core.theme).default_options = default_theme_options
 
     transaction.commit()
 
