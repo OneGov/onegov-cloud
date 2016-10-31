@@ -13,7 +13,10 @@ Changelog
 - Uses darker callout panels.
   [msom]
 
-- Removes Archive from Election/Vote Detail View.
+- Removes archive from election/vote detail views.
+  [msom]
+
+- Improves the mobile styling of vote views.
   [msom]
 
 1.0.4 (2016-10-24)
