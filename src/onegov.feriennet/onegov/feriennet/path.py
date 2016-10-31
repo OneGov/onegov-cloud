@@ -1,4 +1,4 @@
-from onegov.activity import BookingCollection
+from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
 from onegov.feriennet import FeriennetApp
@@ -87,3 +87,11 @@ def get_my_bookings(request, app, period_id=None, username=None):
     period_id = period_id or PeriodCollection(app.session()).active().id
 
     return BookingCollection(app.session(), period_id, username)
+
+
+@FeriennetApp.path(
+    model=Booking,
+    path='/buchung/{id}',
+    converters=dict(id=UUID))
+def get_booking(request, app, id):
+    return BookingCollection(app.session()).by_id(id)

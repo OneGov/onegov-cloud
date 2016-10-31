@@ -1,13 +1,16 @@
 from itertools import groupby
-from onegov.core.security import Personal
-from onegov.activity import AttendeeCollection
+from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
 from onegov.activity import BookingCollection
 from onegov.activity import Occasion
+from onegov.activity import OccasionCollection
+from onegov.core.security import Personal
+from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
-from sqlalchemy.orm import joinedload
+from sqlalchemy import desc
+from sqlalchemy.orm import contains_eager
 
 
 @FeriennetApp.html(
@@ -16,10 +19,19 @@ from sqlalchemy.orm import joinedload
     permission=Personal)
 def view_my_bookings(self, request):
     query = self.query()
-    query = query.options(joinedload(Booking.attendee))
+
+    query = query.join(Booking.attendee)
+    query = query.join(Booking.occasion)
+    query = query.join(Occasion.activity)
+
+    query = query.options(contains_eager(Booking.attendee))
     query = query.options(
-        joinedload(Booking.occasion).
-        joinedload(Occasion.activity))
+        contains_eager(Booking.occasion).
+        contains_eager(Occasion.activity))
+
+    query = query.order_by(Booking.attendee_id)
+    query = query.order_by(Activity.name)
+    query = query.order_by(Occasion.start)
 
     bookings = query.all()
     bookings_by_attendee = {
@@ -46,3 +58,34 @@ def view_my_bookings(self, request):
         'has_bookings': bookings and True or False,
         'title': _("My Bookings")
     }
+
+
+@FeriennetApp.view(
+    model=Booking,
+    name='toggle-star',
+    permission=Personal,
+    request_method='POST')
+def toggle_star(self, request):
+
+    # only up to three bookings per attendee may be favorited
+    if self.priority == 0:
+        o = OccasionCollection(request.app.session()).query()
+        o = o.with_entities(Occasion.id)
+        o = o.filter(Occasion.period_id == self.occasion.period_id)
+        o = o.subquery()
+
+        q = BookingCollection(request.app.session()).query()
+        q = q.filter(Booking.attendee_id == self.attendee_id)
+        q = q.filter(Booking.username == self.username)
+        q = q.filter(Booking.occasion_id.in_(o))
+        q = q.filter(Booking.id != self.id)
+        q = q.filter(Booking.priority != 0)
+        q = q.order_by(desc(Booking.last_change))
+
+        if q.count() < 3:
+            self.priority = 1
+    else:
+        self.priority = 0
+
+    layout = BookingCollectionLayout(self, request)
+    return render_macro(layout.macros['star'], request, {'booking': self})

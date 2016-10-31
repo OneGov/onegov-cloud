@@ -31,13 +31,8 @@
                         <li tal:repeat="booking bookings_by_attendee(attendee)">
                             <div class="row">
                                 <div class="columns small-1">
-                                    <a href="#" tal:condition="booking.priority > 0">
-                                        <i class="fa fa-star" aria-hidden="true"></i>
-                                        <span class="show-for-sr" i18n:translate>Mark activity as favorite</span>
-                                    </a>
-                                    <a href="#" tal:condition="booking.priority == 0">
-                                        <i class="fa fa-star-o" aria-hidden="true"></i>
-                                        <span class="show-for-sr" i18n:translate>Unmark activity as favorite</span>
+                                    <a ic-post-to="${request.link(booking, 'toggle-star')}">
+                                        <tal:block metal:use-macro="layout.macros['star']" />
                                     </a>
                                 </div>
                                 <div class="columns small-11">

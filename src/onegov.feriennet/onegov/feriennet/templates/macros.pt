@@ -178,3 +178,14 @@
         </div>
     </tal:block>
 </metal:occasion>
+
+<metal:star define-macro="star" i18n:domain="onegov.feriennet">
+    <tal:block condition="booking.priority == 0">
+        <i id="star-${booking.id}" class="fa fa-star-o" aria-hidden="true"></i>
+        <span class="show-for-sr" i18n:translate>Mark activity as favorite</span>
+    </tal:block>
+    <tal:block condition="booking.priority != 0">
+        <i id="star-${booking.id}" class="fa fa-star" aria-hidden="true"></i>
+        <span class="show-for-sr" i18n:translate>Unmark activity as favorite</span>
+    </tal:block>
+</metal:star>
