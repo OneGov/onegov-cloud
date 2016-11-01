@@ -31,7 +31,7 @@
                     <div id="alert-boxes-for-${attendee.id}"></div>
 
                     <ul>
-                        <li tal:repeat="booking bookings_by_attendee(attendee)">
+                        <li tal:repeat="booking bookings_by_attendee(attendee)" id="booking-${booking.id}">
                             <div class="row">
                                 <div class="columns small-1">
                                     <a ic-post-to="${request.link(booking, 'toggle-star')}">
@@ -57,6 +57,11 @@
                                                 Cancelled
                                             </span>
                                         </tal:block>
+                                    </div>
+                                    <div class="actions" tal:define="actions actions_by_booking(booking)">
+                                        <ul tal:condition="actions">
+                                            <li tal:repeat="action actions" tal:content="structure action(request)" />
+                                        </ul>
                                     </div>
                                 </div>
                             </div>

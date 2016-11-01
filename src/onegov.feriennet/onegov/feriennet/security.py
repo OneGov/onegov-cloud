@@ -1,6 +1,6 @@
 from morepath.authentication import NO_IDENTITY
-from onegov.activity import Activity, ActivityCollection, Occasion
-from onegov.core.security import Public, Private
+from onegov.activity import Activity, ActivityCollection, Booking, Occasion
+from onegov.core.security import Public, Private, Personal
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.feriennet import FeriennetApp
 from onegov.org.models import ImageFileCollection, SiteCollection
@@ -160,6 +160,16 @@ def has_public_permission_not_logged_in(app, identity, model, permission):
     """ Only make activites anonymously accessible with certain states. """
 
     return model.state in VISIBLE_ACTIVITY_STATES['anonymous']
+
+
+@FeriennetApp.permission_rule(model=Booking, permission=Personal)
+def has_personal_permission_bookings(app, identity, model, permission):
+    """ Ensure that logged in users may only change their own bookings. """
+
+    if identity.role == 'admin':
+        return True
+
+    return model.username == identity.userid
 
 
 @FeriennetApp.permission_rule(model=Activity, permission=Public)

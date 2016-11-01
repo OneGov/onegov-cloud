@@ -11,6 +11,7 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
+from onegov.org.elements import DeleteLink
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
 
@@ -46,20 +47,70 @@ def view_my_bookings(self, request):
         return bookings and bookings[0] or None
 
     period = bookings and first(bookings).occasion.period or None
+    layout = BookingCollectionLayout(self, request)
 
     attendees = AttendeeCollection(request.app.session())\
         .by_username(self.username)\
         .all()
     attendees.sort(key=lambda a: normalize_for_url(a.name))
 
+    def actions_by_booking(booking):
+        actions = []
+
+        if booking.state == 'unconfirmed':
+            actions.append(DeleteLink(
+                text=_("Remove"),
+                url=layout.csrf_protected_url(request.link(booking)),
+                confirm=_('Do you really want to remove "${title}"?', mapping={
+                    'title': "{} - {}".format(
+                        booking.occasion.activity.title,
+                        layout.format_datetime_range(
+                            booking.occasion.start,
+                            booking.occasion.end))
+                }),
+                yes_button_text=_("Remove Booking"),
+                classes=('confirm', ),
+                target='#booking-{}'.format(booking.id)
+            ))
+
+        return actions
+
     return {
-        'layout': BookingCollectionLayout(self, request),
+        'layout': layout,
         'attendees': attendees,
         'bookings_by_attendee': lambda a: bookings_by_attendee[a.id],
+        'actions_by_booking': actions_by_booking,
         'period': period,
         'has_bookings': bookings and True or False,
         'title': _("My Bookings")
     }
+
+
+@FeriennetApp.view(
+    model=Booking,
+    permission=Personal,
+    request_method='DELETE')
+def delete_booking(self, request):
+    request.assert_valid_csrf_token()
+
+    if self.state != 'unconfirmed':
+        @request.after
+        def show_error(response):
+            response.headers.add('X-IC-Trigger', 'show-alert')
+            response.headers.add('X-IC-Trigger-Data', json.dumps({
+                'type': 'alert',
+                'target': '#alert-boxes-for-{}'.format(self.attendee_id),
+                'message': request.translate(
+                    _("Only unconfirmed bookings may be deleted"))
+            }))
+
+        return
+
+    BookingCollection(request.app.session()).delete(self)
+
+    @request.after
+    def remove_target(response):
+        response.headers.add('X-IC-Remove', 'true')
 
 
 @FeriennetApp.view(
