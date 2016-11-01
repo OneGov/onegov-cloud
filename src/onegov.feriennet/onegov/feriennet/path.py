@@ -84,7 +84,13 @@ def get_my_bookings(request, app, period_id=None, username=None):
     if not username:
         username = request.current_username
 
-    period_id = period_id or PeriodCollection(app.session()).active().id
+    # the default period is the active period or the first we can find
+    if not period_id:
+        periods = PeriodCollection(app.session())
+        period = periods.active() or periods.query().first()
+
+        if period:
+            period_id = period.id
 
     return BookingCollection(app.session(), period_id, username)
 
