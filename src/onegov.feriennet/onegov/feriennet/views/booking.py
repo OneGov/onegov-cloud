@@ -6,12 +6,15 @@ from onegov.activity import Booking
 from onegov.activity import BookingCollection
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
+from onegov.activity import Period
+from onegov.activity import PeriodCollection
 from onegov.core.security import Personal
 from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
 from onegov.org.elements import DeleteLink
+from onegov.user import UserCollection, User
 from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
 
@@ -38,6 +41,18 @@ def all_bookings(collection):
     query = query.order_by(Occasion.start)
 
     return query.all()
+
+
+def all_users(request):
+    u = UserCollection(request.app.session()).query()
+    u = u.order_by(User.title)
+    return u.all()
+
+
+def all_periods(request):
+    p = PeriodCollection(request.app.session()).query()
+    p = p.order_by(Period.execution_start)
+    return p.all()
 
 
 def group_bookings_by_attendee(bookings):
@@ -105,7 +120,22 @@ def view_my_bookings(self, request):
     bookings = all_bookings(self)
     bookings_by_attendee = group_bookings_by_attendee(bookings)
 
-    period = bookings and bookings[0].occasion.period or None
+    periods = all_periods(request)
+    period = next(p for p in periods if p.id == self.period_id)
+
+    if request.is_admin:
+        users = all_users(request)
+        user = next(u for u in users if u.username == self.username)
+    else:
+        users, user = None, None
+
+    if user is None or user.username == request.current_username:
+        title = _("My Bookings")
+    else:
+        title = _("Bookings of ${user}", mapping={
+            'user': user.title
+        })
+
     layout = BookingCollectionLayout(self, request)
 
     return {
@@ -114,8 +144,12 @@ def view_my_bookings(self, request):
         'bookings_by_attendee': bookings_by_attendee.get,
         'has_bookings': bookings and True or False,
         'layout': layout,
+        'model': self,
         'period': period,
-        'title': _("My Bookings"),
+        'periods': periods,
+        'user': user,
+        'users': users,
+        'title': title,
     }
 
 

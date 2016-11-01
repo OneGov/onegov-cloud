@@ -4,7 +4,7 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
         <p tal:condition="not:has_bookings" i18n:translate>
-            No bookings in the current period.
+            No bookings in <span tal:replace="period.title" i18n:name="period" />.
         </p>
 
         <div class="my-bookings" tal:condition="has_bookings">
@@ -80,6 +80,30 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+        </div>
+
+        <div class="row other-periods" tal:condition="len(periods) > 1">
+            <div class="columns small-12">
+                <h2 i18n:translate>Periods</h2>
+                <ul>
+                    <li tal:repeat="p periods">
+                        <a tal:condition="p.id != period.id" href="${request.link(model.for_period(p))}">${p.title}</a>
+                        <strong tal:condition="p.id == period.id" href="${request.link(model.for_period(p))}">${p.title}</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row other-users" tal:condition="request.is_admin and users">
+            <div class="columns small-12">
+                <h2 i18n:translate>Users</h2>
+                <ul>
+                    <li tal:repeat="u users">
+                        <a tal:condition="u.id != user.id" href="${request.link(model.for_username(u.username))}">${u.title}</a>
+                        <strong i18n:translate tal:condition="u.id == user.id" href="${request.link(model.for_username(u.username))}">${u.title}</strong>
+                    </li>
+                </ul>
             </div>
         </div>
     </tal:block>

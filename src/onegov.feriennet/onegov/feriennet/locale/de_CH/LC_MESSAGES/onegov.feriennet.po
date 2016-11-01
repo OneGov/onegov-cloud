@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-01 15:24+0100\n"
+"POT-Creation-Date: 2016-11-01 16:34+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -366,8 +366,8 @@ msgstr "Durchführungen"
 msgid "There are currently no occasions planned."
 msgstr "Es sind zur Zeit keine Durchführungen geplant."
 
-msgid "No bookings in the current period."
-msgstr "Noch keine Buchungen in der aktuellen Periode."
+msgid "No bookings in ${period}."
+msgstr "Keine Buchungen in ${period}."
 
 msgid "Mark up to three occasions per child as favorites"
 msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren"
@@ -377,7 +377,9 @@ msgid ""
 msgstr "Nach der Voranmeldungsphase verteilen wir die Kinder auf die Angebote"
 
 msgid "We cannot guarantee that everyone gets into their favorite activity"
-msgstr "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot eingeteilt wird"
+msgstr ""
+"Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
+"eingeteilt wird"
 
 msgid "Unconfirmed"
 msgstr "Offen"
@@ -387,6 +389,12 @@ msgstr "Bestätigt"
 
 msgid "Cancelled"
 msgstr "Abgesagt"
+
+msgid "Periods"
+msgstr "Perioden"
+
+msgid "Users"
+msgstr "Benutzer"
 
 msgid "Edit contact info"
 msgstr "Kontakt ändern"
@@ -543,6 +551,10 @@ msgstr "Oberstufe"
 msgid "Own"
 msgstr "Eigene"
 
+#, python-format
+msgid "Bookings of ${user}"
+msgstr "Buchungen von ${user}"
+
 msgid "Only unconfirmed bookings may be deleted"
 msgstr "Nur offene Buchungen können entfernt werden"
 
@@ -617,3 +629,6 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
+
+#~ msgid "No bookings in the current period."
+#~ msgstr "Noch keine Buchungen in der aktuellen Periode."

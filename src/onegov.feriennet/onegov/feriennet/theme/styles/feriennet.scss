@@ -398,16 +398,6 @@ ul.tags {
         max-width: 77ex;
     }
 
-    ul {
-        list-style: none;
-        margin: 0 0 2rem;
-        padding: 0;
-
-        li {
-            margin-bottom: 1rem;
-        }
-    }
-
     h3 {
         border: 1px solid $primary-color;
         border-width: 0 0 1px;
@@ -469,6 +459,16 @@ ul.tags {
     }
 
     .attendee-bookings {
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            li {
+                margin-bottom: 1rem;
+            }
+        }
+
         .fa-star-o,
         .fa-star {
             font-size: 1.5rem;
