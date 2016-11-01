@@ -308,6 +308,14 @@ ul.tags {
         float: right;
         margin: 0;
         width: 25%;
+
+        @media #{$medium-only} {
+            width: 30%;
+        }
+
+        @media #{$small-only} {
+            width: 40%;
+        }
     }
 }
 
