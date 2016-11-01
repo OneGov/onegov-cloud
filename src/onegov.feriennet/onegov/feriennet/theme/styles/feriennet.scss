@@ -230,11 +230,9 @@ ul.tags {
 
     > * {
         p {
-            background-color: $panel-bg;
             font-size: .875rem;
             font-style: italic;
             max-width: $max-line-width;
-            padding: .25rem .75rem;
             white-space: pre-line;
         }
 
@@ -290,12 +288,10 @@ ul.tags {
 */
 
 .call-to-action {
-    background-color: $panel-bg;
-    border: 1px solid $base;
+    background-color: transparentize($primary-color, .95);
     border-radius: 2px;
-    border-width: 0 0 1px;
-    min-height: 5.4rem;
-    padding: 1rem 1.25rem;
+    min-height: 5rem;
+    padding: 1rem;
 
     span {
         font-size: 1rem;
