@@ -49,8 +49,7 @@ def handle_login(self, request, form):
         'layout': layout,
         'password_reset_link': request.link(
             request.app.org, name='request-password'),
-        'register_link': request.link(
-            request.app.org, name='register'),
+        'register_link': request.link(self, name='register'),
         'may_register': request.app.settings.org.enable_user_registration,
         'title': _('Login to ${org}', mapping={
             'org': request.app.org.name
