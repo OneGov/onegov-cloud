@@ -16,12 +16,13 @@ from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
 
 
-@FeriennetApp.html(
-    model=BookingCollection,
-    template='bookings.pt',
-    permission=Personal)
-def view_my_bookings(self, request):
-    query = self.query()
+def all_bookings(collection):
+    """ Loads all bookings together with the linked occasions, attendees and
+    activities. This is somewhat of a heavy query, but it beats having to
+    load all these things separately.
+
+    """
+    query = collection.query()
 
     query = query.join(Booking.attendee)
     query = query.join(Booking.occasion)
@@ -36,53 +37,85 @@ def view_my_bookings(self, request):
     query = query.order_by(Activity.name)
     query = query.order_by(Occasion.start)
 
-    bookings = query.all()
-    bookings_by_attendee = {
-        attendee_id: tuple(bookings)
-        for attendee_id, bookings
-        in groupby(bookings, key=lambda b: b.attendee_id)
-    }
+    return query.all()
 
-    def first(bookings):
-        return bookings and bookings[0] or None
 
-    period = bookings and first(bookings).occasion.period or None
-    layout = BookingCollectionLayout(self, request)
-
-    attendees = AttendeeCollection(request.app.session())\
-        .by_username(self.username)\
-        .all()
-    attendees.sort(key=lambda a: normalize_for_url(a.name))
-
-    def actions_by_booking(booking):
-        actions = []
-
-        if booking.state == 'unconfirmed':
-            actions.append(DeleteLink(
-                text=_("Remove"),
-                url=layout.csrf_protected_url(request.link(booking)),
-                confirm=_('Do you really want to remove "${title}"?', mapping={
-                    'title': "{} - {}".format(
-                        booking.occasion.activity.title,
-                        layout.format_datetime_range(
-                            booking.occasion.start,
-                            booking.occasion.end))
-                }),
-                yes_button_text=_("Remove Booking"),
-                classes=('confirm', ),
-                target='#booking-{}'.format(booking.id)
-            ))
-
-        return actions
+def group_bookings_by_attendee(bookings):
+    """ Takes a list of bookings and groups them by attendee. """
 
     return {
-        'layout': layout,
+        attendee: tuple(bookings)
+        for attendee, bookings
+        in groupby(bookings, key=lambda b: b.attendee)
+    }
+
+
+def attendees_by_username(request, username):
+    """ Loads the given attendees linked to the given username, sorted by
+    their name.
+
+    """
+
+    a = AttendeeCollection(request.app.session()).by_username(username).all()
+    a.sort(key=lambda a: normalize_for_url(a.name))
+
+    return a
+
+
+def actions_by_booking(layout, booking):
+    actions = []
+
+    if booking.state == 'unconfirmed':
+        actions.append(DeleteLink(
+            text=_("Remove"),
+            url=layout.csrf_protected_url(layout.request.link(booking)),
+            confirm=_('Do you really want to remove "${title}"?', mapping={
+                'title': "{} - {}".format(
+                    booking.occasion.activity.title,
+                    layout.format_datetime_range(
+                        booking.occasion.start,
+                        booking.occasion.end))
+            }),
+            yes_button_text=_("Remove Booking"),
+            classes=('confirm', ),
+            target='#booking-{}'.format(booking.id)
+        ))
+
+    return actions
+
+
+def show_error_on_attendee(request, attendee, message):
+    @request.after
+    def show_error(response):
+        response.headers.add('X-IC-Trigger', 'show-alert')
+        response.headers.add('X-IC-Trigger-Data', json.dumps({
+            'type': 'alert',
+            'target': '#alert-boxes-for-{}'.format(attendee.id),
+            'message': request.translate(message)
+        }))
+
+
+@FeriennetApp.html(
+    model=BookingCollection,
+    template='bookings.pt',
+    permission=Personal)
+def view_my_bookings(self, request):
+    attendees = attendees_by_username(request, self.username)
+
+    bookings = all_bookings(self)
+    bookings_by_attendee = group_bookings_by_attendee(bookings)
+
+    period = bookings and bookings[0].occasion.period or None
+    layout = BookingCollectionLayout(self, request)
+
+    return {
+        'actions_by_booking': lambda b: actions_by_booking(layout, b),
         'attendees': attendees,
-        'bookings_by_attendee': lambda a: bookings_by_attendee[a.id],
-        'actions_by_booking': actions_by_booking,
-        'period': period,
+        'bookings_by_attendee': bookings_by_attendee.get,
         'has_bookings': bookings and True or False,
-        'title': _("My Bookings")
+        'layout': layout,
+        'period': period,
+        'title': _("My Bookings"),
     }
 
 
@@ -94,15 +127,8 @@ def delete_booking(self, request):
     request.assert_valid_csrf_token()
 
     if self.state != 'unconfirmed':
-        @request.after
-        def show_error(response):
-            response.headers.add('X-IC-Trigger', 'show-alert')
-            response.headers.add('X-IC-Trigger-Data', json.dumps({
-                'type': 'alert',
-                'target': '#alert-boxes-for-{}'.format(self.attendee_id),
-                'message': request.translate(
-                    _("Only unconfirmed bookings may be deleted"))
-            }))
+        show_error_on_attendee(request, self.attendee, _(
+            "Only unconfirmed bookings may be deleted"))
 
         return
 
@@ -138,15 +164,8 @@ def toggle_star(self, request):
         if q.count() < 3:
             self.priority = 1
         else:
-            @request.after
-            def show_error(response):
-                response.headers.add('X-IC-Trigger', 'show-alert')
-                response.headers.add('X-IC-Trigger-Data', json.dumps({
-                    'type': 'alert',
-                    'target': '#alert-boxes-for-{}'.format(self.attendee_id),
-                    'message': request.translate(
-                        _("Cannot select more than three favorites per child"))
-                }))
+            show_error_on_attendee(request, self.attendee, _(
+                "Cannot select more than three favorites per child"))
     else:
         self.priority = 0
 
