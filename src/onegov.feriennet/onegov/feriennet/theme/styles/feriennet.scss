@@ -121,14 +121,21 @@ ul.tags {
     }
 }
 
-.hint {
-    @include hairline();
+.hints {
+    padding: 0 0 1.25rem;
 
+    .hint {
+        padding-bottom: .5rem;
+    }
+
+    .hint:last-child {
+        @include hairline();
+    }
+}
+
+.hint {
     font-size: .875rem;
-    line-height: .875rem;
-    margin-bottom: 1.25rem;
-    margin-top: .75rem;
-    padding-bottom: .5rem;
+    line-height: 1.4rem;
 
     i.fa {
         position: relative;
@@ -453,18 +460,19 @@ ul.tags {
         }
     }
 
-    .fa-star-o,
-    .fa-star {
-        font-size: 1.5rem;
-        padding: 2px 0;
-    }
+    .attendee-bookings {
+        .fa-star-o,
+        .fa-star {
+            font-size: 1.5rem;
+            padding: 2px 0;
+        }
 
-    .fa-star-o {
-        color: $base;
-    }
+        .fa-star-o {
+            color: $base;
+        }
 
-    .fa-star {
-        color: $yellow;
+        .fa-star {
+            color: $yellow;
+        }
     }
-
 }

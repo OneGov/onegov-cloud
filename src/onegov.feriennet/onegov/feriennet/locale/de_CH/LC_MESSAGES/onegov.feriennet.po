@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-01 14:24+0100\n"
+"POT-Creation-Date: 2016-11-01 15:24+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -366,41 +366,18 @@ msgstr "Durchführungen"
 msgid "There are currently no occasions planned."
 msgstr "Es sind zur Zeit keine Durchführungen geplant."
 
-msgid "Prebooking begins on ${date}"
-msgstr "Die Voranmeldung beginnt am ${date}"
-
-msgid "Prebooking is now active until ${date}"
-msgstr "Die Voranmeldung ist jetzt bis am ${date} aktiv"
-
-msgid "Prebooking ended on ${date}"
-msgstr "Die Voranmeldung ging am ${date} zu Ende"
-
 msgid "No bookings in the current period."
 msgstr "Noch keine Buchungen in der aktuellen Periode."
 
-msgid ""
-"The ${title}'s prebooking phase lasts from ${start} until ${end}. During "
-"this time you can add new courses and remove existing ones."
-msgstr ""
-"Die Vorbuchungsphase des ${title} dauert vom ${start} bis zum ${end}. "
-"Während dieser Zeit können Sie sich bei weiteren Kursen anmelden und "
-"bestehende Anmeldungen absagen."
+msgid "Mark up to three occasions per child as favorites"
+msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren"
 
 msgid ""
-"After this period you are automatically assigned to the courses depending on "
-"your preferences and the availability of the course."
-msgstr ""
-"Nach dieser Phase werden die Angebot automatisch nach Präferenz und "
-"Verfügbarkeit zugeteilt."
+"Once the pre-booking is over, we will divide all children into activities"
+msgstr "Nach der Voranmeldungsphase verteilen wir die Kinder auf die Angebote"
 
-msgid ""
-"To help us find the best spot for you, you can mark three courses as "
-"favorites for each child. This doesn't mean that you will be guaranteed a "
-"spot, but it will help us decide who gets to be in which course."
-msgstr ""
-"Damit wir den besten Platz für Sie finden, können Sie bis zu drei Kurse pro "
-"Kind als Favorit markieren. Damit ist Ihnen zwar kein Platz garantiert, es "
-"hilft uns aber die Zuteilung fair zu gestalten."
+msgid "We cannot guarantee that everyone gets into their favorite activity"
+msgstr "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot eingeteilt wird"
 
 msgid "Unconfirmed"
 msgstr "Offen"
@@ -464,6 +441,15 @@ msgstr "Angebot als Favorit markieren"
 
 msgid "Unmark activity as favorite"
 msgstr "Angebot nicht mehr als Favorit markieren"
+
+msgid "Prebooking begins on ${date}"
+msgstr "Die Voranmeldung beginnt am ${date}"
+
+msgid "Prebooking is now active until ${date}"
+msgstr "Die Voranmeldung ist jetzt bis am ${date} aktiv"
+
+msgid "Prebooking ended on ${date}"
+msgstr "Die Voranmeldung ging am ${date} zu Ende"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -631,6 +617,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "Do you really want to remove this booking?"
-#~ msgstr "Möchten Sie diese Buchung wirklich entfernen?"

@@ -45,28 +45,8 @@
                     <h3>${title}</h3>
 
                     <tal:block define="period occasions[0].period">
-                        <div class="hint" tal:condition="layout.today < period.prebooking_start">
-                            <i class="fa fa-calendar-o" aria-hidden="true"></i>
-
-                            <tal:block i18n:translate>
-                                Prebooking begins on <strong tal:content="layout.format_date(period.prebooking_start, 'date_long')" i18n:name="date" />
-                            </tal:block>
-                        </div>
-
-                        <div class="hint" tal:condition="period.prebooking_start <= layout.today and layout.today <= period.prebooking_end">
-                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-
-                            <tal:block i18n:translate>
-                                Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />
-                            </tal:block>
-                        </div>
-
-                        <div class="hint" tal:condition="period.prebooking_end < layout.today">
-                            <i class="fa fa-calendar-times-o" aria-hidden="true"></i>
-
-                            <tal:block i18n:translate>
-                                Prebooking ended on <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />
-                            </tal:block>
+                        <div class="hints">
+                            <tal:block metal:use-macro="layout.macros.period_hints" />
                         </div>
 
                         <ul class="occasions" tal:define="show_enroll period.prebooking_start <= layout.today and layout.today <= period.prebooking_end">
