@@ -26,6 +26,12 @@ class BookingCollection(GenericCollection):
 
         return query
 
+    def for_period(self, period):
+        return self.__class__(self.session, period.id, self.username)
+
+    def for_username(self, username):
+        return self.__class__(self.session, self.period_id, username)
+
     @property
     def model_class(self):
         return Booking
