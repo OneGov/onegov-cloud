@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-01 10:51+0100\n"
+"POT-Creation-Date: 2016-11-01 14:24+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -173,6 +173,12 @@ msgstr "Geburtsdatum"
 msgid "Other"
 msgstr "Anderer"
 
+msgid "This occasion is outside the currently active period"
+msgstr "Diese Durchführung liegt ausserhalb der aktiven Periode"
+
+msgid "Cannot create a booking outside the prebooking period"
+msgstr "Anmeldungen können nur während der Voranmeldungsphase gemacht werden"
+
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
 
@@ -230,10 +236,10 @@ msgid "Ferienpass Summer ${year}"
 msgstr "Ferienpass Sommer ${year}"
 
 msgid "Prebooking Start"
-msgstr "Start Anmeldung"
+msgstr "Start Voranmeldung"
 
 msgid "Prebooking End"
-msgstr "Ende Anmeldung"
+msgstr "Ende Voranmeldung"
 
 msgid "Execution Start"
 msgstr "Start Ausführung"
@@ -359,6 +365,15 @@ msgstr "Durchführungen"
 
 msgid "There are currently no occasions planned."
 msgstr "Es sind zur Zeit keine Durchführungen geplant."
+
+msgid "Prebooking begins on ${date}"
+msgstr "Die Voranmeldung beginnt am ${date}"
+
+msgid "Prebooking is now active until ${date}"
+msgstr "Die Voranmeldung ist jetzt bis am ${date} aktiv"
+
+msgid "Prebooking ended on ${date}"
+msgstr "Die Voranmeldung ging am ${date} zu Ende"
 
 msgid "No bookings in the current period."
 msgstr "Noch keine Buchungen in der aktuellen Periode."
@@ -542,6 +557,12 @@ msgstr "Oberstufe"
 msgid "Own"
 msgstr "Eigene"
 
+msgid "Only unconfirmed bookings may be deleted"
+msgstr "Nur offene Buchungen können entfernt werden"
+
+msgid "Cannot select more than three favorites per child"
+msgstr "Pro Kind können maximal drei Favoriten gewählt werden"
+
 msgid "Remove"
 msgstr "Entfernen"
 
@@ -551,12 +572,6 @@ msgstr "Möchten Sie \"${title}\" wirklich entfernen?"
 
 msgid "Remove Booking"
 msgstr "Buchung entfernen"
-
-msgid "Only unconfirmed bookings may be deleted"
-msgstr "Nur offene Buchungen können entfernt werden"
-
-msgid "Cannot select more than three favorites per child"
-msgstr "Pro Kind können maximal drei Favoriten gewählt werden"
 
 msgid "Enroll Attendee"
 msgstr "Teilnehmer Anmelden"
