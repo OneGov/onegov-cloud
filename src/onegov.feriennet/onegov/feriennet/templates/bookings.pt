@@ -27,6 +27,9 @@
             <div class="row attendee-bookings" tal:repeat="attendee attendees">
                 <div class="columns small-12 medium-6 end">
                     <h3>${attendee.name}</h3>
+
+                    <div id="alert-boxes-for-${attendee.id}"></div>
+
                     <ul>
                         <li tal:repeat="booking bookings_by_attendee(attendee)">
                             <div class="row">

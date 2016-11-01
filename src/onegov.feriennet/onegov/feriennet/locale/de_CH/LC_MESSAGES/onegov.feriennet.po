@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-10-31 15:13+0100\n"
+"POT-Creation-Date: 2016-11-01 10:03+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -366,24 +366,26 @@ msgstr "Noch keine Buchungen in der aktuellen Periode."
 msgid ""
 "The ${title}'s prebooking phase lasts from ${start} until ${end}. During "
 "this time you can add new courses and remove existing ones."
-msgstr "Die Vorbuchungsphase des ${title} dauert vom ${start} bis zum ${end}. Während dieser Zeit können Sie sich bei weiteren Kursen anmelden und bestehende Anmeldungen absagen."
+msgstr ""
+"Die Vorbuchungsphase des ${title} dauert vom ${start} bis zum ${end}. "
+"Während dieser Zeit können Sie sich bei weiteren Kursen anmelden und "
+"bestehende Anmeldungen absagen."
 
 msgid ""
 "After this period you are automatically assigned to the courses depending on "
 "your preferences and the availability of the course."
-msgstr "Nach dieser Phase werden die Angebot automatisch nach Präferenz und Verfügbarkeit zugeteilt."
+msgstr ""
+"Nach dieser Phase werden die Angebot automatisch nach Präferenz und "
+"Verfügbarkeit zugeteilt."
 
 msgid ""
 "To help us find the best spot for you, you can mark three courses as "
 "favorites for each child. This doesn't mean that you will be guaranteed a "
 "spot, but it will help us decide who gets to be in which course."
-msgstr "Damit wir den besten Platz für Sie finden, können Sie bis zu drei Kurse pro Kind als Favorit markieren. Damit ist Ihnen zwar kein Platz garantiert, es hilft uns aber die Zuteilung fair zu gestalten."
-
-msgid "Mark activity as favorite"
-msgstr "Angebot als Favorit markieren"
-
-msgid "Unmark activity as favorite"
-msgstr "Angebot nicht mehr als Favorit markieren"
+msgstr ""
+"Damit wir den besten Platz für Sie finden, können Sie bis zu drei Kurse pro "
+"Kind als Favorit markieren. Damit ist Ihnen zwar kein Platz garantiert, es "
+"hilft uns aber die Zuteilung fair zu gestalten."
 
 msgid "Unconfirmed"
 msgstr "Offen"
@@ -441,6 +443,12 @@ msgstr "Melden Sie Ihr Kind jetzt an."
 
 msgid "Enroll"
 msgstr "Anmelden"
+
+msgid "Mark activity as favorite"
+msgstr "Angebot als Favorit markieren"
+
+msgid "Unmark activity as favorite"
+msgstr "Angebot nicht mehr als Favorit markieren"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -533,6 +541,9 @@ msgstr "Oberstufe"
 
 msgid "Own"
 msgstr "Eigene"
+
+msgid "Cannot select more than three favorites per child"
+msgstr "Pro Kind können maximal drei Favoriten gewählt werden"
 
 msgid "Enroll Attendee"
 msgstr "Teilnehmer Anmelden"

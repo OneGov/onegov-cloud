@@ -1,3 +1,5 @@
+import json
+
 from itertools import groupby
 from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
@@ -84,6 +86,16 @@ def toggle_star(self, request):
 
         if q.count() < 3:
             self.priority = 1
+        else:
+            @request.after
+            def show_error(response):
+                response.headers.add('X-IC-Trigger', 'show-alert')
+                response.headers.add('X-IC-Trigger-Data', json.dumps({
+                    'type': 'alert',
+                    'target': '#alert-boxes-for-{}'.format(self.attendee_id),
+                    'message': request.translate(
+                        _("Cannot select more than three favorites per child"))
+                }))
     else:
         self.priority = 0
 
