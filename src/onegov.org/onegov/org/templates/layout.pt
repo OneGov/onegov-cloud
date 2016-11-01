@@ -89,7 +89,7 @@
       </div>
 
       <div class="row">
-        <div class="small-12 columns">
+        <div class="small-12 columns" id="alert-boxes">
           <!--! If there's a form object with errors, show an alert box - works for all views that use a form -->
           <div tal:condition="form.errors|nothing" data-alert class="alert-box alert">
             <tal:block i18n:translate>The form contains errors. Please check the fields marked in red.</tal:block>

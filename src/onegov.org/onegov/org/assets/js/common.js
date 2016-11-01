@@ -58,3 +58,17 @@ $('.image-select input[type="checkbox"]').on('click', function(e) {
 
     target.closest('.image-box').toggleClass('selected', checked);
 });
+
+// A generic error messages handler
+$(document).on('show-alert', function(_, data) {
+    var alert = $('<div />')
+        .attr('data-alert', '')
+        .attr('class', 'alert-box ' + data.type)
+        .text(data.message)
+        .append($('<a href="#" class="close">&times;</a>'));
+
+    var target = $(data.target || '#alert-boxes');
+    target.append(alert);
+
+    $(document).foundation();
+});
