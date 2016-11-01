@@ -119,7 +119,8 @@ class DeleteLink(Link):
                  extra_information=None,
                  redirect_after=None,
                  request_method='DELETE',
-                 classes=('confirm', 'delete-link')):
+                 classes=('confirm', 'delete-link'),
+                 target=None):
 
         attr = {
             'data-confirm': confirm
@@ -138,6 +139,9 @@ class DeleteLink(Link):
 
         if redirect_after:
             attr['redirect-after'] = redirect_after
+
+        if target:
+            attr['ic-target'] = target
 
         if request_method == 'GET':
             attr['ic-get-from'] = url
