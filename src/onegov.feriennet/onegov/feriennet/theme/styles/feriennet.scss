@@ -121,6 +121,21 @@ ul.tags {
     }
 }
 
+.hint {
+    @include hairline();
+
+    font-size: .875rem;
+    line-height: .875rem;
+    margin-bottom: 1.25rem;
+    margin-top: .75rem;
+    padding-bottom: .5rem;
+
+    i.fa {
+        position: relative;
+        top: -1px;
+    }
+}
+
 /*
     Ticket view
 */
@@ -213,13 +228,7 @@ ul.tags {
         margin: 0 0 .5rem;
     }
 
-    li:first-child {
-        margin-top: 1.5rem;
-    }
-
     > * {
-        margin-bottom: 2.5rem;
-
         p {
             background-color: $panel-bg;
             font-size: .875rem;
@@ -237,6 +246,10 @@ ul.tags {
             display: inline-block;
             font-size: .875rem;
         }
+    }
+
+    .call-to-action {
+        margin-bottom: 1.5rem;
     }
 
     .factoids {
@@ -409,7 +422,7 @@ ul.tags {
         border-radius: 5px;
         color: $white;
         display: inline-block;
-        font-size: .8rem;    
+        font-size: .8rem;
         padding: 0 6px;
         position: absolute;
         right: 1rem;
@@ -433,7 +446,7 @@ ul.tags {
                 margin: 0;
 
                 &:after {
-                    color: $body-font-color; 
+                    color: $body-font-color;
                     content: ' | ';
                 }
 
