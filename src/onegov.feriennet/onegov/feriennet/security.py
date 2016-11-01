@@ -163,7 +163,7 @@ def has_public_permission_not_logged_in(app, identity, model, permission):
 
 
 @FeriennetApp.permission_rule(model=Booking, permission=Personal)
-def has_personal_permission_bookings(app, identity, model, permission):
+def has_personal_permission_booking(app, identity, model, permission):
     """ Ensure that logged in users may only change their own bookings. """
 
     if identity.role == 'admin':
