@@ -31,6 +31,9 @@ class Attendee(Base, TimestampMixin):
     #: birth date of the attendee for the age calculation
     birth_date = Column(Date, nullable=False)
 
+    def __hash__(self):
+        return hash(self.id)
+
     @hybrid_property
     def age(self):
         return (date.today() - self.birth_date) // timedelta(days=365.2425)
