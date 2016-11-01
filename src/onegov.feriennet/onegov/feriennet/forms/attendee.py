@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.feriennet import _
@@ -82,10 +83,36 @@ class AttendeeForm(Form):
 
         return True
 
+    def ensure_active_period(self):
+        if not self.model.period.active:
+            self.attendee.errors.append(_(
+                "This occasion is outside the currently active period"
+            ))
+            return False
+
+        return True
+
+    def ensure_within_prebooking_period(self):
+        start, end = (
+            self.model.period.prebooking_start,
+            self.model.period.prebooking_end
+        )
+        today = date.today()
+
+        if not (start <= today and today <= end):
+            self.attendee.errors.append(_(
+                "Cannot create a booking outside the prebooking period"
+            ))
+            return False
+
+        return True
+
     def validate(self):
         result = super().validate()
 
         ensurances = (
+            self.ensure_active_period,
+            self.ensure_within_prebooking_period,
             self.ensure_no_duplicate_child,
             self.ensure_no_duplicate_booking
         )
