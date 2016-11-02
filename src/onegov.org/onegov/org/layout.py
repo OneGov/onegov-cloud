@@ -1,7 +1,7 @@
 import babel.dates
 
 from cached_property import cached_property
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from dateutil import rrule
 from onegov.core.crypto import RANDOM_TOKEN_LENGTH
 from onegov.core.layout import ChameleonLayout
@@ -66,10 +66,6 @@ class Layout(ChameleonLayout):
     def primary_color(self):
         return self.org.theme_options.get(
             'primary_color', user_options['primary-color'])
-
-    @cached_property
-    def today(self):
-        return date.today()
 
     @cached_property
     def default_map_view(self):
