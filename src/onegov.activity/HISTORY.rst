@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.11 (2016-11-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to star/unstar a booking.
   [href]
 
