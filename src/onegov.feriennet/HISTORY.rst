@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.0.9 (2016-11-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to enroll children in occasions.
   [href]
 
