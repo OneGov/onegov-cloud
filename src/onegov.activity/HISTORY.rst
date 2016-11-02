@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds the ability to switch the username or period on the bookings collection.
+  [href]
+
+- Adds the ability to filter the bookings by username or period.
+  [href]
+
 - Includes a count method for bookings per user.
   [href]
 
