@@ -64,7 +64,7 @@ def upload_vote(client, create=True):
     return upload
 
 
-def upload_majorz_election(client, create=True):
+def upload_majorz_election(client, create=True, zg=False):
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Majorz Election'
@@ -80,8 +80,12 @@ def upload_majorz_election(client, create=True):
         "Ungueltige Stimmen,Kandidaten-Nr,Gewaehlt,Name,Vorname,Stimmen,"
         "Anzahl Gemeinden\n"
     )
-    csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 125\n"
-    csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 125\n"
+    if zg:
+        csv += "2,1711,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 125\n"
+        csv += "2,1710,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 125\n"
+    else:
+        csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 125\n"
+        csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 125\n"
     csv = csv.encode('utf-8')
 
     upload = client.get('/election/majorz-election/upload')

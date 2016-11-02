@@ -15,6 +15,8 @@ def view_vote(self, request):
     """" The main view. """
 
     request.include('ballot_map')
+    if 'headerless' in request.params:
+        request.include('frame_resizer')
 
     return {
         'vote': self,
@@ -38,6 +40,7 @@ def view_ballot_as_map(self, request):
         add_last_modified_header(response, self.vote.last_result_change)
 
     request.include('ballot_map')
+    request.include('frame_resizer')
 
     return {
         'model': self,

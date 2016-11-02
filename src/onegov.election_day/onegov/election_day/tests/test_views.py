@@ -3,12 +3,13 @@ import transaction
 
 from datetime import date
 from freezegun import freeze_time
+from onegov.ballot import Ballot
+from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_vote
 from onegov.testing import utils
 from webtest import TestApp as Client
-from onegov.election_day.collections import ArchivedResultCollection
 
 
 COLUMNS = [
@@ -521,3 +522,54 @@ def test_view_notifications_elections(election_day_app_gr):
     assert "erneut auslösen" not in client.get(
         '/election/majorz-election/trigger'
     )
+
+
+def test_view_headerless(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    upload_vote(client)
+    upload_majorz_election(client, zg=True)
+
+    ballot = election_day_app.session().query(Ballot).one().id
+
+    for path in (
+        '/',
+        '/archive/2013',
+        '/election/majorz-election',
+        '/vote/vote',
+    ):
+        assert 'frame_resizer' not in client.get(path)
+        assert 'frame_resizer' in client.get(path + '?headerless')
+
+    for path in (
+        '/archive/2013/json',
+        '/election/majorz-election/candidates',
+        '/election/majorz-election/connections',
+        '/election/majorz-election/data-csv',
+        '/election/majorz-election/data-json',
+        '/election/majorz-election/data-xlsx',
+        '/election/majorz-election/json',
+        '/election/majorz-election/lists',
+        '/election/majorz-election/summary',
+        '/json',
+        '/ballot/{}/by-entity'.format(ballot),
+        '/vote/vote/data-csv',
+        '/vote/vote/data-json',
+        '/vote/vote/data-xlsx',
+        '/vote/vote/json',
+        '/vote/vote/summary',
+    ):
+        assert 'frame_resizer' not in client.get(path)
+        assert 'frame_resizer' not in client.get(path + '?headerless')
+
+    for path in (
+        '/election/majorz-election/candidates-chart',
+        '/election/majorz-election/lists-chart',
+        '/election/majorz-election/connections-chart',
+        '/ballot/{}/map'.format(ballot),
+    ):
+        assert 'frame_resizer' in client.get(path)
+        assert 'frame_resizer' in client.get(path + '?headerless')

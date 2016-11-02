@@ -213,6 +213,11 @@ def get_ballot_map_asset():
     yield 'bar-chart.js'
 
 
+@ElectionDayApp.webasset('frame_resizer')
+def get_resizer_asset():
+    yield 'iframeResizer.contentWindow.js'
+
+
 @ElectionDayApp.webasset('common')
 def get_common_asset():
     yield 'modernizr.js'

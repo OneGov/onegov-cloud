@@ -174,6 +174,8 @@ def view_election(self, request):
 
     request.include('bar_chart')
     request.include('sankey_chart')
+    if 'headerless' in request.params:
+        request.include('frame_resizer')
 
     session = object_session(self)
 
@@ -239,6 +241,7 @@ def view_election_candidates_chart(self, request):
         add_last_modified_header(response, self.last_result_change)
 
     request.include('bar_chart')
+    request.include('frame_resizer')
 
     return {
         'model': self,
@@ -282,6 +285,7 @@ def view_election_lists_chart(self, request):
         add_last_modified_header(response, self.last_result_change)
 
     request.include('bar_chart')
+    request.include('frame_resizer')
 
     return {
         'model': self,
@@ -354,6 +358,7 @@ def view_election_connections_chart(self, request):
         add_last_modified_header(response, self.last_result_change)
 
     request.include('sankey_chart')
+    request.include('frame_resizer')
 
     return {
         'model': self,
