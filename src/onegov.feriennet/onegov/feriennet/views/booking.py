@@ -5,7 +5,6 @@ from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
 from onegov.activity import BookingCollection
 from onegov.activity import Occasion
-from onegov.activity import OccasionCollection
 from onegov.activity import Period
 from onegov.activity import PeriodCollection
 from onegov.core.security import Personal
@@ -15,7 +14,6 @@ from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
 from onegov.org.elements import DeleteLink
 from onegov.user import UserCollection, User
-from sqlalchemy import desc
 from sqlalchemy.orm import contains_eager
 
 
@@ -180,28 +178,12 @@ def delete_booking(self, request):
     request_method='POST')
 def toggle_star(self, request):
 
-    # only up to three bookings per attendee may be favorited
-    if self.priority == 0:
-        o = OccasionCollection(request.app.session()).query()
-        o = o.with_entities(Occasion.id)
-        o = o.filter(Occasion.period_id == self.occasion.period_id)
-        o = o.subquery()
-
-        q = BookingCollection(request.app.session()).query()
-        q = q.filter(Booking.attendee_id == self.attendee_id)
-        q = q.filter(Booking.username == self.username)
-        q = q.filter(Booking.occasion_id.in_(o))
-        q = q.filter(Booking.id != self.id)
-        q = q.filter(Booking.priority != 0)
-        q = q.order_by(desc(Booking.last_change))
-
-        if q.count() < 3:
-            self.priority = 1
-        else:
+    if not self.starred:
+        if not self.star(max_stars=3):
             show_error_on_attendee(request, self.attendee, _(
                 "Cannot select more than three favorites per child"))
     else:
-        self.priority = 0
+        self.unstar()
 
     layout = BookingCollectionLayout(self, request)
     return render_macro(layout.macros['star'], request, {'booking': self})

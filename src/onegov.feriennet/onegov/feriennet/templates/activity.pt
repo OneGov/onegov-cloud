@@ -41,7 +41,7 @@
                     </p>
                 </tal:block>
 
-                <tal:block condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
+                <tal:block define="today layout.today()" condition="occasions_by_period" repeat="(title, occasions) occasions_by_period">
                     <h3>${title}</h3>
 
                     <tal:block define="period occasions[0].period">
@@ -49,7 +49,7 @@
                             <tal:block metal:use-macro="layout.macros.period_hints" />
                         </div>
 
-                        <ul class="occasions" tal:define="show_enroll period.prebooking_start <= layout.today and layout.today <= period.prebooking_end">
+                        <ul class="occasions" tal:define="show_enroll period.prebooking_start <= today and today <= period.prebooking_end">
                             <li tal:repeat="occasion occasions">
                                 <h4>${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</h4>
                                 <tal:block metal:use-macro="layout.macros.occasion" tal:define="show_links True" />

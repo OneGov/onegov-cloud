@@ -1,8 +1,10 @@
 import onegov.feriennet
 import transaction
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from onegov.activity import ActivityCollection
+from onegov.activity import AttendeeCollection
+from onegov.activity import BookingCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.org.testing import Client, get_message, select_checkbox
@@ -548,6 +550,16 @@ def test_enroll_child(feriennet_app):
     retreat = activities.add("Retreat", username='admin@example.org')
     retreat.propose().accept()
 
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
     occasions.add(
         start=datetime(2016, 10, 8, 8),
         end=datetime(2016, 10, 9, 16),
@@ -556,8 +568,8 @@ def test_enroll_child(feriennet_app):
         activity=retreat,
         period=periods.add(
             title="2016",
-            prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
-            execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+            prebooking=prebooking,
+            execution=execution,
             active=True
         )
     )
@@ -593,6 +605,7 @@ def test_enroll_child(feriennet_app):
 
     assert "zu Tom Sawyer's Wunschliste hinzugefügt" in activity
 
+    # prevent double-subscriptions
     enroll = activity.click("Anmelden")
     assert "Tom Sawyer hat sich bereits für diese Durchführung angemeldet"\
         in enroll.form.submit()
@@ -601,10 +614,155 @@ def test_enroll_child(feriennet_app):
     enroll.form['name'] = "Tom Sawyer"
     enroll.form["birth_date"] = "1876-01-01"
 
+    # prevent adding two kids with the same name
     assert "Sie haben bereits ein Kind mit diesem Namen eingegeben"\
         in enroll.form.submit()
+
+    # prevent enrollment for inactive periods
+    periods.query().first().active = False
+    transaction.commit()
+
+    enroll.form['name'] = "Huckleberry Finn"
+    assert "Diese Durchführung liegt ausserhalb der aktiven Periode"\
+        in enroll.form.submit()
+
+    # prevent enrollment outside of prebooking
+    period = periods.query().first()
+    period.active = True
+    period.prebooking_start -= timedelta(days=10)
+    period.prebooking_end -= timedelta(days=10)
+
+    transaction.commit()
+
+    assert "nur während der Voranmeldungsphase" in enroll.form.submit()
+
+    # set the record straight again
+    period = periods.query().first()
+    period.prebooking_start += timedelta(days=10)
+    period.prebooking_end += timedelta(days=10)
+
+    transaction.commit()
 
     enroll.form['name'] = "Huckleberry Finn"
     activity = enroll.form.submit().follow()
 
     assert "zu Huckleberry Finn's Wunschliste hinzugefügt" in activity
+
+
+def test_booking_view(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+    users = UserCollection(feriennet_app.session())
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    periods.add(
+        title="2017",
+        prebooking=prebooking,
+        execution=execution,
+        active=False
+    )
+
+    o = []
+
+    for i in range(4):
+        a = activities.add("A {}".format(i), username='admin@example.org')
+        a.propose().accept()
+
+        o.append(occasions.add(
+            start=datetime(2016, 10, 8, 8),
+            end=datetime(2016, 10, 9, 16),
+            age=(0, 10),
+            timezone="Europe/Zurich",
+            activity=a,
+            period=period
+        ))
+
+    m1 = users.add('m1@example.org', 'hunter2', 'member')
+    m2 = users.add('m2@example.org', 'hunter2', 'member')
+
+    a1 = attendees.add(m1, 'Dustin', date(2000, 1, 1))
+    a2 = attendees.add(m2, 'Mike', date(2000, 1, 1))
+
+    # hookup a1 with all courses
+    bookings.add(m1, a1, o[0])
+    bookings.add(m1, a1, o[1])
+    bookings.add(m1, a1, o[2])
+    bookings.add(m1, a1, o[3])
+
+    # m2 only gets one for the permission check
+    bookings.add(m2, a2, o[0])
+
+    transaction.commit()
+
+    c1 = Client(feriennet_app)
+    c1.login('m1@example.org', 'hunter2')
+
+    c2 = Client(feriennet_app)
+    c2.login('m2@example.org', 'hunter2')
+
+    # make sure the bookings count is correct
+    assert 'data-count="4"' in c1.get('/')
+    assert 'data-count="1"' in c2.get('/')
+
+    # make sure the bookings show up under my view
+    def count(page):
+        return len(page.pyquery('.attendee-bookings > div > ul > li'))
+
+    c1_bookings = c1.get('/').click('Meine Buchungen')
+    c2_bookings = c2.get('/').click('Meine Buchungen')
+
+    assert count(c1_bookings) == 4
+    assert count(c2_bookings) == 1
+
+    # make sure each user only has access to their own bookings
+    def star_url(page, index):
+        return page.pyquery(
+            page.pyquery('a[ic-post-to]')[index]).attr['ic-post-to']
+
+    assert c1.post(star_url(c2_bookings, 0), status=403)
+    assert c2.post(star_url(c1_bookings, 0), status=403)
+
+    # star three bookings - the last one should fail
+    result = c1.post(star_url(c1_bookings, 0))
+    assert result.headers.get('X-IC-Trigger') is None
+
+    result = c1.post(star_url(c1_bookings, 1))
+    assert result.headers.get('X-IC-Trigger') is None
+
+    result = c1.post(star_url(c1_bookings, 2))
+    assert result.headers.get('X-IC-Trigger') is None
+
+    result = c1.post(star_url(c1_bookings, 3))
+    assert result.headers.get('X-IC-Trigger') == 'show-alert'
+    assert "maximal drei Favoriten" in result.headers.get('X-IC-Trigger-Data')
+
+    # users may switch between other periods
+    assert "Keine Buchungen in 2017" in c1_bookings.click('2017')
+
+    # admins may switch between other users
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    m1_bookings = admin.get('/').click('Meine Buchungen')\
+        .click('m1@example.org')
+
+    assert count(m1_bookings) == 4
