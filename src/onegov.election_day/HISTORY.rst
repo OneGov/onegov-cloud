@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.1 (2016-11-02)
+~~~~~~~~~~~~~~~~~~~
 
 - Only include the iFrameResizer if headerless query parameter is set.
   [msom]
