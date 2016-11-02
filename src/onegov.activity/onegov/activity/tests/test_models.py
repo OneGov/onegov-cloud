@@ -689,3 +689,51 @@ def test_booking_collection(session, owner):
 
     assert bookings.count(owner.username) == 1
     assert bookings.for_period(Bunch(id=uuid4())).count(owner.username) == 0
+
+
+def test_star_booking(session, owner):
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    sport = activities.add("Sport", username=owner.username)
+
+    autumn = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True
+    )
+
+    s1 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=autumn
+    )
+
+    s2 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=autumn
+    )
+
+    dustin = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2002, 9, 8)
+    )
+
+    b1 = bookings.add(owner, dustin, s1)
+    b2 = bookings.add(owner, dustin, s2)
+
+    assert b1.star(max_stars=1) is True
+    assert b2.star(max_stars=1) is False
+
+    assert b1.starred is True
+    assert b2.starred is False

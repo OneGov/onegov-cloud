@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to star/unstar a booking.
+  [href]
+
 - Adds the ability to switch the username or period on the bookings collection.
   [href]
 

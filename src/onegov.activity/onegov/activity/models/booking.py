@@ -2,7 +2,10 @@ from onegov.activity.utils import random_group_code
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
+from onegov.activity.models.occasion import Occasion
 from sqlalchemy import Column, Enum, Index, Text, ForeignKey, Integer
+from sqlalchemy.orm import object_session
+from sqlalchemy.ext.hybrid import hybrid_property
 from uuid import uuid4
 
 
@@ -66,3 +69,40 @@ class Booking(Base, TimestampMixin):
     def cancel(self):
         assert self.state in ('confirmed', 'unconfirmed')
         self.state = 'cancel'
+
+    @hybrid_property
+    def starred(self):
+        return self.priority != 0
+
+    def star(self, max_stars=3):
+        """ Stars the current booking (giving it a priority of 1), up to
+        a limit per period and attendee.
+
+        :return: True if successful (or already set), False if over limit.
+
+        """
+
+        if self.starred:
+            return True
+
+        session = object_session(self)
+
+        o = session.query(Occasion)
+        o = o.with_entities(Occasion.id)
+        o = o.filter(Occasion.period_id == self.occasion.period_id)
+
+        q = session.query(Booking)
+        q = q.filter(Booking.attendee_id == self.attendee_id)
+        q = q.filter(Booking.username == self.username)
+        q = q.filter(Booking.occasion_id.in_(o.subquery()))
+        q = q.filter(Booking.id != self.id)
+        q = q.filter(Booking.priority != 0)
+
+        if q.count() < max_stars:
+            self.priority = 1
+            return True
+
+        return False
+
+    def unstar(self):
+        self.priority = 0
