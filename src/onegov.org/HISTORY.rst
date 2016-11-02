@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.1 (2016-11-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Generate links in top-navigation just like it is done in other palces.
   [href]
 
