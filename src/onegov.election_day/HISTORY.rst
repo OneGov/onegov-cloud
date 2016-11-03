@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.2 (2016-11-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Stores the headerless query parameter in the browser session.
   [msom]
