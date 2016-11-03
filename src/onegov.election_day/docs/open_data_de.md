@@ -33,7 +33,7 @@ domain|Einflussbereich (Bund, Kanton, ...).
 url|Ein Link zur Detailansicht.
 progess|Ein Objekt welches die Anzahl ausgezählter Gemeinden (`counted`) die Gesamtzahl an Gemeinden (`total`) enthält.
 
-Wahlresultate enthalten die folgenden zusätzlichen Informationen:
+Abstimmungsresultate enthalten die folgenden zusätzlichen Informationen:
 
 Name|Beschreibung
 ---|---
