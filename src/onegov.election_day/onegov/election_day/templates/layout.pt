@@ -26,7 +26,7 @@ metal:define-macro="layout">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
 </head>
 <body>
-    <div tal:condition="'headerless' not in request.params" class="row header">
+    <div tal:condition="not request.browser_session.get('headerless')" class="row header">
         <div class="small-12 medium-4 columns text-left">
             <a href="${layout.principal.base}" class="back-to-base" tal:condition="layout.principal.base|nothing">${layout.principal.base_domain}</a>
         </div>

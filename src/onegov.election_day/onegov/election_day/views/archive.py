@@ -1,19 +1,19 @@
 from onegov.core.security import Public, Private
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.layout import DefaultLayout
 from onegov.election_day.models import Principal
-from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_archive_links
 from onegov.election_day.utils import get_summaries
+from onegov.election_day.utils import handle_headerless_params
 
 
 @ElectionDayApp.html(model=ArchivedResultCollection, template='archive.pt',
                      permission=Public)
 def view_archive(self, request):
 
-    if 'headerless' in request.params:
-        request.include('frame_resizer')
+    handle_headerless_params(request)
 
     results, last_modified = self.by_date()
     results = self.group_items(results)
@@ -47,8 +47,7 @@ def view_archive_json(self, request):
 @ElectionDayApp.html(model=Principal, template='archive.pt', permission=Public)
 def view_principal(self, request):
 
-    if 'headerless' in request.params:
-        request.include('frame_resizer')
+    handle_headerless_params(request)
 
     archive = ArchivedResultCollection(request.app.session())
     latest, last_modified = archive.latest()

@@ -17,6 +17,7 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
+from onegov.election_day.utils import handle_headerless_params
 from sqlalchemy import desc
 from sqlalchemy.orm import object_session
 
@@ -174,8 +175,8 @@ def view_election(self, request):
 
     request.include('bar_chart')
     request.include('sankey_chart')
-    if 'headerless' in request.params:
-        request.include('frame_resizer')
+
+    handle_headerless_params(request)
 
     session = object_session(self)
 
