@@ -53,7 +53,7 @@ metal:define-macro="layout">
         </div>
     </div>
 
-    <footer>
+    <footer tal:condition="not request.browser_session.get('headerless')">
         <div class="row">
             <div class="small-4 columns">
                 <span class="copyright">&copy; ${layout.copyright_year} ${layout.app.principal.name}</span> <a class="onegov-link" href="https://onegovcloud.ch">OneGov Cloud</a><br>
