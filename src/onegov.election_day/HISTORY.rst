@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.1.3 (2016-11-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Hides the footer too when headerless query parameter is set.
   [msom]
