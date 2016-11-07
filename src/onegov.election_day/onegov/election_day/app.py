@@ -1,10 +1,13 @@
+import os
 import re
 
+from datetime import datetime
 from onegov.core import Framework, utils
-from onegov.core.framework import transaction_tween_factory
+from onegov.core.datamanager import FileDataManager
 from onegov.core.filestorage import FilestorageFile
-from onegov.election_day.theme import ElectionDayTheme
+from onegov.core.framework import transaction_tween_factory
 from onegov.election_day.models import Principal
+from onegov.election_day.theme import ElectionDayTheme
 
 
 class ElectionDayApp(Framework):
@@ -14,6 +17,7 @@ class ElectionDayApp(Framework):
     """
 
     serve_static_files = True
+    sms_directory = './smsdir'
 
     @property
     def principal(self):
@@ -40,6 +44,32 @@ class ElectionDayApp(Framework):
             return Principal.from_yaml(
                 self.filestorage.open('principal.yml', encoding='utf-8').read()
             )
+
+    def send_sms(self, receiver=None, content=None):
+        """ Sends an SMS by writing a file to the `sms_directory` of the
+        principal.
+
+        SMS sent through this method are bound to the current transaction.
+        If that transaction is aborted or not commited, the SMS is not sent.
+
+        Usually you'll use this method inside a request, where transactions
+        are automatically commited at the end.
+
+        """
+        path = os.path.join(self.sms_directory, self.schema)
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        path = os.path.join(
+            path, '{}.{}'.format(receiver, datetime.now().timestamp())
+        )
+
+        try:
+            content = content.encode('utf-8')
+        except AttributeError:
+            pass
+
+        FileDataManager.write_file(content, path)
 
     @property
     def logo(self):

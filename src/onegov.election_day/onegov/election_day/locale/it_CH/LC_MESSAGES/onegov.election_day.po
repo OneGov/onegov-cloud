@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-06 08:46+0200\n"
+"POT-Creation-Date: 2016-11-07 16:30+0100\n"
 "PO-Revision-Date: 2016-09-06 09:00+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -171,6 +171,9 @@ msgstr "Sistema proporzionale"
 msgid "Majority system"
 msgstr "Sistema maggioritario"
 
+msgid "Phone number"
+msgstr ""
+
 msgid "File format"
 msgstr "Formato del file"
 
@@ -222,6 +225,9 @@ msgstr "Progetto semplice"
 msgid "Vote with Counter-Proposal"
 msgstr "Progetto con controprogetto"
 
+msgid "Not a valid phone number."
+msgstr ""
+
 msgid "Vote (German)"
 msgstr "Votazione (tedesco)"
 
@@ -233,6 +239,10 @@ msgstr "Votazione (italiano)"
 
 msgid "Vote (Romansh)"
 msgstr "Votazione (romancio)"
+
+#, python-format
+msgid "New results are avaiable on ${url}"
+msgstr ""
 
 msgid "federal"
 msgstr "nazionale"
@@ -392,6 +402,12 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Ritorna alle elezioni &amp; votazioni attuali"
 
+msgid "Subscribe"
+msgstr ""
+
+msgid "Unsubscribe"
+msgstr ""
+
 msgid "Open Data"
 msgstr "Dati aperti"
 
@@ -488,14 +504,14 @@ msgstr "I Suoi risultati sono stati caricati correttamente."
 msgid "Click here to trigger the notifications"
 msgstr ""
 
+msgid "Click here to see the updated results page."
+msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
+
 msgid "Your results could not be uploaded."
 msgstr "I Suoi risultati non hanno potuto essere caricati."
 
 msgid "Line"
 msgstr "Riga"
-
-msgid "Click here to see the updated results page."
-msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
 
 msgid "No errors found in proposal"
 msgstr "Nessun errore nel progetto"
@@ -569,6 +585,25 @@ msgstr "Desidera davvero cancellare la votazione \"${vote}\"?"
 
 msgid "Delete vote"
 msgstr "Cancellare votazione"
+
+msgid ""
+"Successfully subscribed to the SMS services. You will receive an SMS every "
+"time new results are published."
+msgstr ""
+
+msgid "Get SMS alerts"
+msgstr ""
+
+msgid "Receive an SMS when new results are published."
+msgstr ""
+
+msgid ""
+"Successfully unsubscribed from the SMS services. You will no longer receive "
+"SMS when new results are published."
+msgstr ""
+
+msgid "Stop SMS subscription"
+msgstr ""
 
 #, python-format
 msgid "The year ${year} is not yet supported"

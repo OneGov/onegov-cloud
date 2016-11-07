@@ -20,7 +20,7 @@
                 Your results were uploaded successfully.
             </div>
 
-            <div tal:condition="layout.notifications" class="panel callout radius">
+            <div tal:condition="layout.principal.notifications" class="panel callout radius">
                 <p>
                     <strong><a href="${request.link(election, 'trigger')}" i18n:translate="">Click here to trigger the notifications</a></strong>
                 </p>

@@ -8,14 +8,16 @@ from onegov.ballot import Election, Vote
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.models import Notification
 from onegov.election_day.models import Principal
+from onegov.election_day.models import SmsNotification
+from onegov.election_day.models import Subscriber
 from onegov.election_day.models import WebhookNotification
 from onegov.election_day.models.principal import cantons
 from onegov.election_day.tests import DummyRequest
 from time import sleep
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 
-def test_load_principal():
+def test_principal_load():
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
         logo:
@@ -36,6 +38,7 @@ def test_load_principal():
     assert list(principal.available_domains.keys()) == ['federation', 'canton']
     assert principal.fetch == {}
     assert principal.webhooks == {}
+    assert principal.sms_notification == None
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Kanton Zug
@@ -54,6 +57,7 @@ def test_load_principal():
           'http://abc.com/1':
           'http://abc.com/2':
             My-Header: My-Value
+        sms_notification: 'https://wab.zg.ch'
     """))
 
     assert principal.name == 'Kanton Zug'
@@ -77,6 +81,7 @@ def test_load_principal():
             'My-Header': 'My-Value'
         }
     }
+    assert principal.sms_notification == 'https://wab.zg.ch'
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -100,6 +105,7 @@ def test_load_principal():
     ]
     assert principal.fetch == {}
     assert principal.webhooks == {}
+    assert principal.sms_notification == None
 
     principal = Principal.from_yaml(textwrap.dedent("""
         name: Stadt Bern
@@ -124,9 +130,10 @@ def test_load_principal():
     ]
     assert principal.fetch == {}
     assert principal.webhooks == {}
+    assert principal.sms_notification == None
 
 
-def test_municipalities():
+def test_principal_municipalities():
     principal = Principal(
         name='Bern', municipality='351', logo=None, color=None
     )
@@ -168,7 +175,7 @@ def test_municipalities():
             assert principal.municipalities[year]
 
 
-def test_districts():
+def test_principal_districts():
     principal = Principal(name='Zug', canton='zg', logo=None, color=None)
     assert principal.districts == {}
 
@@ -207,7 +214,7 @@ def test_districts():
     }
 
 
-def test_entities():
+def test_principal_entities():
     principal = Principal(name='Zug', canton='zg', logo=None, color=None)
     assert principal.entities == principal.municipalities
 
@@ -222,7 +229,7 @@ def test_entities():
     assert principal.entities == principal.districts
 
 
-def test_years_available():
+def test_principal_years_available():
     principal = Principal(
         name='Kriens', municipality='1059', logo=None, color=None
     )
@@ -250,6 +257,27 @@ def test_years_available():
             assert principal.is_year_available(year)
         for year in range(2009, 2017):
             assert principal.is_year_available(year, map_required=False)
+
+
+def test_principal_notifications_enabled():
+    assert Principal(
+        name='Kriens', municipality='1059', logo=None, color=None
+    ).notifications == False
+
+    assert Principal(
+        name='Kriens', municipality='1059', logo=None, color=None,
+        webhooks={'a', 'b'}
+    ).notifications == True
+
+    assert Principal(
+        name='Kriens', municipality='1059', logo=None, color=None,
+        sms_notification='https://wab.kriens.ch'
+    ).notifications == True
+
+    assert Principal(
+        name='Kriens', municipality='1059', logo=None, color=None,
+        webhooks={'a', 'b'}, sms_notification='https://wab.kriens.ch'
+    ).notifications == True
 
 
 def test_archived_result(session):
@@ -474,3 +502,82 @@ def test_webhook_notification(session):
                 'url': 'Vote/vote',
                 'yeas_percentage': 0.0
             }
+
+
+def test_sms_notification(request, election_day_app, session):
+    with freeze_time("2008-01-01 00:00"):
+        election_day_app.send_sms = Mock()
+        election_day_app.principal.sms_notification = 'https://wab.ch.ch'
+
+        session.add(
+            Election(
+                title="Election",
+                domain='federation',
+                type='majorz',
+                date=date(2011, 1, 1)
+            )
+        )
+        election = session.query(Election).one()
+
+        session.add(
+            Vote(
+                title="Vote",
+                domain='federation',
+                date=date(2011, 1, 1),
+            )
+        )
+        vote = session.query(Vote).one()
+
+        request = DummyRequest(app=election_day_app, session=session)
+        freezed = datetime(2008, 1, 1, 0, 0, tzinfo=timezone.utc)
+
+        notification = SmsNotification()
+        notification.trigger(request, election)
+        assert notification.action == 'sms'
+        assert notification.election_id == election.id
+        assert notification.last_change == freezed
+        assert election_day_app.send_sms.call_count == 0
+
+        notification = SmsNotification()
+        notification.trigger(request, vote)
+        assert notification.action == 'sms'
+        assert notification.vote_id == vote.id
+        assert notification.last_change == freezed
+        assert election_day_app.send_sms.call_count == 0
+
+        session.add(Subscriber(phone_number='+41791112233'))
+
+        notification = SmsNotification()
+        request.app.session().query(Subscriber).one()
+        notification.trigger(request, election)
+
+        assert notification.action == 'sms'
+        assert notification.election_id == election.id
+        assert notification.last_change == freezed
+        assert election_day_app.send_sms.call_count == 1
+        assert election_day_app.send_sms.call_args[0] == (
+            '+41791112233', 'New results are avaiable on https://wab.ch.ch'
+        )
+
+        notification = SmsNotification()
+        notification.trigger(request, vote)
+
+        assert notification.action == 'sms'
+        assert notification.vote_id == vote.id
+        assert notification.last_change == freezed
+        assert election_day_app.send_sms.call_count == 2
+        assert election_day_app.send_sms.call_args[0] == (
+            '+41791112233', 'New results are avaiable on https://wab.ch.ch'
+        )
+
+
+def test_subscriber(session):
+    subscriber = Subscriber()
+    subscriber.phone_number = '+41791112233'
+
+    session.add(subscriber)
+    session.flush()
+
+    subscriber = session.query(Subscriber).one()
+    assert subscriber.id
+    assert subscriber.phone_number == '+41791112233'

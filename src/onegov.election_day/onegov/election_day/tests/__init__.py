@@ -1,17 +1,31 @@
 from datetime import date
+from unittest.mock import Mock
 from webtest.forms import Upload
 
 
 class DummyPrincipal(object):
     name = 'name'
     webhooks = []
+    sms_notification = None
 
 
 class DummyApp(object):
+    def __init__(self, session=None):
+        self._session = session
+
+    def session(self):
+        return self._session
+
     principal = DummyPrincipal()
 
 
 class DummyRequest(object):
+
+    def __init__(self, session=None, app=None):
+        self.session = session
+        self._app = app
+        if app and session:
+            app.session = Mock(return_value=session)
 
     def link(self, model, name=''):
         return '{}/{}'.format(
@@ -20,7 +34,10 @@ class DummyRequest(object):
 
     @property
     def app(self):
-        return DummyApp()
+        return self._app or DummyApp(session=self.session)
+
+    def translate(self, text):
+        return text.interpolate()
 
 
 def login(client):

@@ -474,6 +474,7 @@ def test_view_notifications_votes(election_day_app):
     assert "Benachrichtigungen auszulösen" not in upload_vote(client, False)
 
     election_day_app.principal.webhooks = {'http://example.com/1': None}
+    del election_day_app.principal.notifications
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/votes')
     assert "Benachrichtigungen auszulösen" in upload_vote(client, False)
@@ -506,6 +507,7 @@ def test_view_notifications_elections(election_day_app_gr):
     )
 
     election_day_app_gr.principal.webhooks = {'http://example.com/1': None}
+    del election_day_app_gr.principal.notifications
 
     assert "Benachrichtigungen auslösen" in client.get('/manage/elections')
     assert "Benachrichtigungen auszulösen" in upload_majorz_election(
@@ -582,3 +584,34 @@ def test_view_headerless(election_day_app):
         assert 'frame_resizer' in client.get(path)
         assert 'frame_resizer' in client.get(path + '?headerful')
         assert 'frame_resizer' in client.get(path)
+
+
+def test_view_subscription(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    subscribe = client.get('/subscribe')
+    subscribe.form['phone_number'] = 'abcd'
+    subscribe = subscribe.form.submit()
+    assert "Ungültige Telefonnummer" in subscribe
+
+    subscribe.form['phone_number'] = '0791112233'
+    subscribe = subscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde abonniert" in subscribe
+
+    subscribe.form['phone_number'] = '0791112233'
+    subscribe = subscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde abonniert" in subscribe
+
+    unsubscribe = client.get('/unsubscribe')
+    unsubscribe.form['phone_number'] = 'abcd'
+    unsubscribe = unsubscribe.form.submit()
+    assert "Ungültige Telefonnummer" in unsubscribe
+
+    unsubscribe.form['phone_number'] = '0791112233'
+    unsubscribe = unsubscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde beendet." in unsubscribe
+
+    unsubscribe.form['phone_number'] = '0791112233'
+    unsubscribe = unsubscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde beendet." in unsubscribe

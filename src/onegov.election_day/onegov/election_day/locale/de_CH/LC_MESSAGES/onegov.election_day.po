@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-06 08:46+0200\n"
-"PO-Revision-Date: 2016-09-05 16:44+0200\n"
+"POT-Creation-Date: 2016-11-07 16:30+0100\n"
+"PO-Revision-Date: 2016-11-07 16:32+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.9\n"
+"X-Generator: Poedit 1.8.11\n"
 
 msgid "Votes"
 msgstr "Abstimmungen"
@@ -171,6 +171,9 @@ msgstr "Proporzwahl"
 msgid "Majority system"
 msgstr "Majorzwahl"
 
+msgid "Phone number"
+msgstr "Telefonnummer"
+
 msgid "File format"
 msgstr "Dateiformat"
 
@@ -222,6 +225,9 @@ msgstr "Einfache Vorlage"
 msgid "Vote with Counter-Proposal"
 msgstr "Vorlage mit Gegenvorschlag"
 
+msgid "Not a valid phone number."
+msgstr "Ungültige Telefonnummer."
+
 msgid "Vote (German)"
 msgstr "Abstimmung (Deutsch)"
 
@@ -233,6 +239,10 @@ msgstr "Abstimmung (Italienisch)"
 
 msgid "Vote (Romansh)"
 msgstr "Abstimmung (Rumantsch)"
+
+#, python-format
+msgid "New results are avaiable on ${url}"
+msgstr "Neue Resultate verfügbar auf ${url}"
 
 msgid "federal"
 msgstr "national"
@@ -392,6 +402,12 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
 
+msgid "Subscribe"
+msgstr "Abbonnieren"
+
+msgid "Unsubscribe"
+msgstr "Abbstellen"
+
 msgid "Open Data"
 msgstr "Open Data"
 
@@ -488,15 +504,15 @@ msgstr "Ihre Resultate wurden erfolgreich hochgeladen."
 msgid "Click here to trigger the notifications"
 msgstr "Hier klicken um die Benachrichtigungen auszulösen."
 
+msgid "Click here to see the updated results page."
+msgstr ""
+"Hier klicken um die Seite mit den aktualisierten Resultaten anzuzeigen."
+
 msgid "Your results could not be uploaded."
 msgstr "Ihre Resultate konnten leider nicht hochgeladen werden."
 
 msgid "Line"
 msgstr "Zeile"
-
-msgid "Click here to see the updated results page."
-msgstr ""
-"Hier klicken um die Seite mit den aktualisierten Resultaten anzuzeigen."
 
 msgid "No errors found in proposal"
 msgstr "Keine Fehler im Vorschlag"
@@ -571,9 +587,47 @@ msgstr "Möchten Sie die Abstimmung \"${vote}\" wirklich löschen?"
 msgid "Delete vote"
 msgstr "Abstimmung löschen"
 
+msgid ""
+"Successfully subscribed to the SMS services. You will receive an SMS every "
+"time new results are published."
+msgstr ""
+"Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine SMS, "
+"sobald neue Resultate publiziert wurden."
+
+msgid "Get SMS alerts"
+msgstr "SMS-Benachrichtigung abonnieren"
+
+msgid "Receive an SMS when new results are published."
+msgstr "Eine SMS erhalten, sobald neue Resultate publiziert werden."
+
+msgid ""
+"Successfully unsubscribed from the SMS services. You will no longer receive "
+"SMS when new results are published."
+msgstr ""
+"Die SMS-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine SMS "
+"mehr."
+
+msgid "Stop SMS subscription"
+msgstr "SMS-Abonnement beenden"
+
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
+
+#~ msgid "Receive an SMS when new results are available."
+#~ msgstr "SMS bei neuen Resultaten erhalten."
+
+#~ msgid "+417911122233"
+#~ msgstr "+417911122233"
+
+#~ msgid "Cancel your SMS subscription."
+#~ msgstr "Keine SMS mehr erhalten bei neuen Resultaten."
+
+#~ msgid "New vote results: ${url}"
+#~ msgstr "Neue Abstimmungsresultate auf ${url}"
+
+#~ msgid "New election results: ${url}"
+#~ msgstr "Neue Wahlresultate auf ${url}"

@@ -1,11 +1,11 @@
-from onegov.election_day.collections.notification_collection import (
+from onegov.election_day.collections.notifications import \
     NotificationCollection
-)
-from onegov.election_day.collections.archived_result_collection import (
+from onegov.election_day.collections.archived_results import \
     ArchivedResultCollection
-)
+from onegov.election_day.collections.subscribers import SubscriberCollection
 
 __all__ = [
     'NotificationCollection',
-    'ArchivedResultCollection'
+    'ArchivedResultCollection',
+    'SubscriberCollection'
 ]

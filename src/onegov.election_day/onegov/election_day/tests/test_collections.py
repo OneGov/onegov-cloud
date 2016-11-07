@@ -3,6 +3,7 @@ from freezegun import freeze_time
 from onegov.ballot.models import Election, Vote
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import NotificationCollection
+from onegov.election_day.collections import SubscriberCollection
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.tests import DummyRequest
 
@@ -239,29 +240,60 @@ def test_notification_collection(session):
         election.title = "An election"
         session.flush()
 
+        freezed = datetime(2009, 1, 1, 0, 0, tzinfo=timezone.utc)
+
         assert collection.by_election(election) == []
         assert collection.by_vote(vote) == []
 
-        request = DummyRequest()
+        request = DummyRequest(session=session)
         request.app.principal.webhooks = {'http://abc.com/1': None}
+        request.app.principal.sms_notification = 'http://example.com'
         collection.trigger(request, election)
         collection.trigger(request, vote)
 
         notifications = collection.by_election(election)
-        assert len(notifications) == 1
-        assert notifications[0].action == 'webhooks'
+        assert len(notifications) == 2
+        assert notifications[0].action in ('webhooks', 'sms')
+        assert notifications[1].action in ('webhooks', 'sms')
+        assert notifications[0].action != notifications[1].action
         assert notifications[0].election_id == election.id
-        assert notifications[0].last_change == datetime(2009, 1, 1, 0, 0,
-                                                        tzinfo=timezone.utc)
+        assert notifications[1].election_id == election.id
+        assert notifications[0].last_change == freezed
+        assert notifications[1].last_change == freezed
 
         notifications = collection.by_vote(vote)
-        assert len(notifications) == 1
-        assert notifications[0].action == 'webhooks'
+        assert len(notifications) == 2
+        assert notifications[0].action in ('webhooks', 'sms')
+        assert notifications[1].action in ('webhooks', 'sms')
+        assert notifications[0].action != notifications[1].action
         assert notifications[0].vote_id == vote.id
-        assert notifications[0].last_change == datetime(2009, 1, 1, 0, 0,
-                                                        tzinfo=timezone.utc)
+        assert notifications[1].vote_id == vote.id
+        assert notifications[0].last_change == freezed
+        assert notifications[1].last_change == freezed
 
         collection.trigger(request, election)
         collection.trigger(request, vote)
-        assert len(collection.by_election(election)) == 2
-        assert len(collection.by_vote(vote)) == 2
+        assert len(collection.by_election(election)) == 4
+        assert len(collection.by_vote(vote)) == 4
+
+
+def test_subscriber_collection(session):
+
+    collection = SubscriberCollection(session)
+    collection.subscribe('+41791112233')
+    assert collection.query().one().phone_number == '+41791112233'
+
+    collection.subscribe('+41791112233')
+    assert collection.query().count() == 1
+
+    collection.subscribe('+41792223344')
+    assert collection.query().count() == 2
+
+    collection.unsubscribe('+41791112233')
+    assert collection.query().one().phone_number == '+41792223344'
+
+    collection.unsubscribe('+41791112233')
+    assert collection.query().count() == 1
+
+    collection.unsubscribe('+41792223344')
+    assert collection.query().count() == 0

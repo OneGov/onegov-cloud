@@ -5,11 +5,11 @@ import urllib.request
 from onegov.ballot.models import Election, Vote
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UTCDateTime
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import UTCDateTime, UUID
+from onegov.election_day import _
+from onegov.election_day.models.subscriber import Subscriber
 from onegov.election_day.utils import get_summary
-from sqlalchemy import Column, ForeignKey
-from sqlalchemy import Text
+from sqlalchemy import Column, ForeignKey, Text
 from threading import Thread
 from uuid import uuid4
 
@@ -103,3 +103,28 @@ class WebhookNotification(Notification):
                     data,
                     tuple((key, value) for key, value in headers.items())
                 ).start()
+
+
+class SmsNotification(Notification):
+
+    def trigger(self, request, model):
+        """ Posts a link to the vote or election to all subscribers.
+
+        This is done by writing files to a directory similary to maildir,
+        sending the SMS is done using an external command, probably called
+        by a cronjob.
+
+        """
+        self.update_from_model(model)
+        self.action = 'sms'
+
+        content = _(
+            "New results are avaiable on ${url}",
+            mapping={'url': request.app.principal.sms_notification}
+        )
+        content = request.translate(content)
+
+        session = request.app.session()
+        subscribers = session.query(Subscriber).all()
+        for subscriber in subscribers:
+            request.app.send_sms(subscriber.phone_number, content)
