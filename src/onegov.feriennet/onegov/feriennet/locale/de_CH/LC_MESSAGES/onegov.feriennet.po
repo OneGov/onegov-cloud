@@ -316,7 +316,7 @@ msgid "This cannot be undone. "
 msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Reject Activity"
-msgstr "Angebote Ablehnen"
+msgstr "Angebot Ablehnen"
 
 msgid "Archive"
 msgstr "Archivieren"
