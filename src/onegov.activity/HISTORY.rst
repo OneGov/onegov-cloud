@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Make sure all models are hashable.
+  [href]
+
 0.0.11 (2016-11-02)
 ~~~~~~~~~~~~~~~~~~~
 

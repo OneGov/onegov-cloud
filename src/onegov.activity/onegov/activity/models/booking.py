@@ -25,6 +25,9 @@ class Booking(Base, TimestampMixin):
 
     __tablename__ = 'bookings'
 
+    def __hash__(self):
+        return hash(self.id)
+
     #: the public id of the booking
     id = Column(UUID, primary_key=True, default=uuid4)
 

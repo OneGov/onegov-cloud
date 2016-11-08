@@ -39,6 +39,9 @@ class Occasion(Base, TimestampMixin):
 
     __tablename__ = 'occasions'
 
+    def __hash__(self):
+        return hash(self.id)
+
     #: the public id of this occasion
     id = Column(UUID, primary_key=True, default=uuid4)
 

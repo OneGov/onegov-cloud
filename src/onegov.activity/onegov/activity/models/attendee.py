@@ -19,6 +19,9 @@ class Attendee(Base, TimestampMixin):
 
     __tablename__ = 'attendees'
 
+    def __hash__(self):
+        return hash(self.id)
+
     #: the public id of the attendee
     id = Column(UUID, primary_key=True, default=uuid4)
 
@@ -30,9 +33,6 @@ class Attendee(Base, TimestampMixin):
 
     #: birth date of the attendee for the age calculation
     birth_date = Column(Date, nullable=False)
-
-    def __hash__(self):
-        return hash(self.id)
 
     @hybrid_property
     def age(self):
