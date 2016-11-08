@@ -84,12 +84,14 @@ html {
     Homepage
 */
 
-.homepage h2 {
-    font-size: $h3-font-size;
-}
+.homepage {
+    h2 {
+        font-size: $h3-font-size;
+    }
 
-.homepage h3 {
-    font-size: $h4-font-size;
+    h3 {
+        font-size: $h4-font-size;
+    }
 }
 
 .archive {
@@ -727,6 +729,19 @@ form {
 }
 
 /*
+    Subscription links
+*/
+.subscription-links {
+    h2 {
+        margin-top: 2rem;
+    }
+
+    a {
+        display: block;
+    }
+}
+
+/*
     Open Data
 */
 .open-data {
@@ -761,6 +776,7 @@ form {
     ul.locales,
     .foldable.folded,
     .foldable-title::before,
+    .subscription-links,
     .onegov-link,
     .open-data-link,
     .results-navigation a,

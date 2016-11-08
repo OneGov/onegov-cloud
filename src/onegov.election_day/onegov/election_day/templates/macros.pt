@@ -180,4 +180,14 @@
     </div>
 </metal:temporary_results_callout>
 
+<metal:subscription_links define-macro="subscription_links" i18n:domain="onegov.election_day">
+    <div class="row subscription-links" tal:condition="not request.browser_session.get('headerless')">
+        <div class="columns small-12">
+            <h2 i18n:translate>SMS alerts</h2>
+            <a href="${layout.subscribe_link}" i18n:translate>Get SMS alerts</a>
+            <a href="${layout.unsubscribe_link}" i18n:translate>Stop SMS subscription</a>
+        </div>
+    </div>
+</metal:subscription_links>
+
 </body>

@@ -96,5 +96,7 @@
         </div>
 
         <div tal:define="h2 1" metal:use-macro="layout.macros['archive']" />
+
+        <div metal:use-macro="layout.macros['subscription_links']" />
     </tal:block>
 </div>

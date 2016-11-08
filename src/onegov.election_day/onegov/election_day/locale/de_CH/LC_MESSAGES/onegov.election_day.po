@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-07 16:30+0100\n"
-"PO-Revision-Date: 2016-11-07 16:32+0100\n"
+"POT-Creation-Date: 2016-11-08 08:49+0100\n"
+"PO-Revision-Date: 2016-11-08 08:49+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -402,11 +402,14 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
 
-msgid "Subscribe"
-msgstr "Abbonnieren"
+msgid "SMS alerts"
+msgstr "SMS Benachrichtigung"
 
-msgid "Unsubscribe"
-msgstr "Abbstellen"
+msgid "Get SMS alerts"
+msgstr "SMS-Benachrichtigung abonnieren"
+
+msgid "Stop SMS subscription"
+msgstr "SMS-Abonnement beenden"
 
 msgid "Open Data"
 msgstr "Open Data"
@@ -594,9 +597,6 @@ msgstr ""
 "Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine SMS, "
 "sobald neue Resultate publiziert wurden."
 
-msgid "Get SMS alerts"
-msgstr "SMS-Benachrichtigung abonnieren"
-
 msgid "Receive an SMS when new results are published."
 msgstr "Eine SMS erhalten, sobald neue Resultate publiziert werden."
 
@@ -607,15 +607,18 @@ msgstr ""
 "Die SMS-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine SMS "
 "mehr."
 
-msgid "Stop SMS subscription"
-msgstr "SMS-Abonnement beenden"
-
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
+
+#~ msgid "Subscribe"
+#~ msgstr "Abbonnieren"
+
+#~ msgid "Unsubscribe"
+#~ msgstr "Abbstellen"
 
 #~ msgid "Receive an SMS when new results are available."
 #~ msgstr "SMS bei neuen Resultaten erhalten."

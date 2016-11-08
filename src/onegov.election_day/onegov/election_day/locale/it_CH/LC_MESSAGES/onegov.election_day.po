@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-07 16:30+0100\n"
+"POT-Creation-Date: 2016-11-08 08:49+0100\n"
 "PO-Revision-Date: 2016-09-06 09:00+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -402,10 +402,13 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Ritorna alle elezioni &amp; votazioni attuali"
 
-msgid "Subscribe"
+msgid "SMS alerts"
 msgstr ""
 
-msgid "Unsubscribe"
+msgid "Get SMS alerts"
+msgstr ""
+
+msgid "Stop SMS subscription"
 msgstr ""
 
 msgid "Open Data"
@@ -591,18 +594,12 @@ msgid ""
 "time new results are published."
 msgstr ""
 
-msgid "Get SMS alerts"
-msgstr ""
-
 msgid "Receive an SMS when new results are published."
 msgstr ""
 
 msgid ""
 "Successfully unsubscribed from the SMS services. You will no longer receive "
 "SMS when new results are published."
-msgstr ""
-
-msgid "Stop SMS subscription"
 msgstr ""
 
 #, python-format

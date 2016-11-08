@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Add SMS notifications.
+- Adds SMS notifications.
   [msom]
 
 1.1.3 (2016-11-04)
