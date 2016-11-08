@@ -15,10 +15,10 @@ var update_labels = function(line) {
 
 var label_text = function(d) {
     if (!d.value2) {
-        return d.value
+        return d.value;
     }
     return d.value + ' | ' + (d.value2 || 0);
-}
+};
 
 var init_bar_chart = function(el) {
 
