@@ -135,7 +135,19 @@ def session_manager(postgres_dsn):
 
     """
 
-    mgr = SessionManager(postgres_dsn, Base)
+    # in testing we often reuse loaded values after commiting a transaction,
+    # so we set expire_on_commit to False. The test applications will still
+    # use the default value of True however. This only affects unit tests
+    # not working with the app.
+    mgr = SessionManager(
+        postgres_dsn, Base,
+        session_config={
+            'expire_on_commit': False
+        },
+        engine_config={
+            'echo': 'ECHO' in os.environ
+        }
+    )
     yield mgr
     mgr.dispose()
 
