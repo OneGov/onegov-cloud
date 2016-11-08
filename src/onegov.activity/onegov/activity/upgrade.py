@@ -3,6 +3,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 
+from contextlib import contextmanager
 from onegov.activity import Booking
 from onegov.core.orm.types import UUID
 from onegov.core.upgrade import upgrade_task
@@ -31,3 +32,30 @@ def add_period_id_to_bookings(context):
 
     context.session.flush()
     context.operations.alter_column('bookings', 'period_id', nullable=False)
+
+
+@upgrade_task('Add additional states to bookings')
+def add_additional_states_to_bookings(context):
+
+    # ALTER TYPE statements don't work inside of transactions -> if you reuse
+    # this code, do not put it inside an update that has other things going
+    # on!
+    type_name = 'booking_state'
+    states = ('blocked', 'denied')
+
+    @contextmanager
+    def temporary_isolation_level(isolation_level):
+        connection = context.operations.get_bind()
+        previous_isolation_level = connection.get_isolation_level()
+        connection.execution_options(isolation_level=isolation_level)
+
+        yield
+
+        connection.execution_options(isolation_level=previous_isolation_level)
+
+    with temporary_isolation_level('AUTOCOMMIT'):
+        for state in states:
+            context.operations.execute(
+                "ALTER TYPE {} ADD VALUE IF NOT EXISTS '{}'".format(
+                    type_name, state)
+            )
