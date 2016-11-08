@@ -1,11 +1,18 @@
 from datetime import date, timedelta
+from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Date, Index, Text, ForeignKey, func
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import Column, Date, Index, Text, ForeignKey, Float, Numeric
+from sqlalchemy import case, cast, func, select, and_, type_coerce
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import relationship
 from uuid import uuid4
+
+# attendees without a booking have a happiness of 0.5 as each new
+# booking has the possibility to make them happier if its accepted
+# or unhappier if not. 0.5 is in the middle of that.
+INITIAL_HAPPINESS = 0.5
 
 
 class Attendee(Base, TimestampMixin):
@@ -41,6 +48,62 @@ class Attendee(Base, TimestampMixin):
     @age.expression
     def age(self):
         return func.extract('year', func.age(self.birth_date))
+
+    @hybrid_method
+    def happiness(self, period_id):
+        """ Returns the happiness of the attende in the given period.
+
+        The happiness is a value between 0.0 and 1.0, indicating how many
+        of the bookings on the wishlist were fulfilled.
+
+        If all bookings were fulfilled, the happiness is 1.0, if no bookings
+        were fulfilled the hapiness is 0.0.
+
+        The priority of the bookings is taken into account. The decision on
+        a high-priority booking has a higher impact than the decision on a
+        low-priority booking. To model this we simply multiply the booking
+        priority when summing up the happiness. So if a booking with priority
+        1 is confirmed, it is as if 2 bookings were confirmed. If a booking
+        with priority 1 is denied, it is as if 2 bookings were denied.
+
+        """
+
+        score = 0
+        score_max = 0
+
+        bookings = (b for b in self.bookings if b.period_id == period_id)
+
+        for booking in bookings:
+            score += booking.state == 'confirmed' and booking.priority + 1
+            score_max += booking.priority + 1
+
+        # attendees without a booking have no known happiness (incidentally,
+        # this works well with the sql expression below -> other default values
+        # are harder to come by)
+        if not score_max:
+            return None
+
+        return score / score_max
+
+    @happiness.expression
+    def happiness(cls, period_id):
+        return select([
+            # force the result to be a float instead of a decimal
+            type_coerce(
+                func.sum(
+                    case([
+                        (Booking.state == 'confirmed', Booking.priority + 1),
+                    ], else_=0)
+                ) / cast(
+                    # force the division to produce a float instead of an int
+                    func.sum(Booking.priority) + func.count(Booking.id), Float
+                ),
+                Numeric(asdecimal=False)
+            )
+        ]).where(and_(
+            Booking.period_id == period_id,
+            Booking.attendee_id == cls.id
+        )).label("happiness")
 
     #: The bookings linked to this attendee
     bookings = relationship(

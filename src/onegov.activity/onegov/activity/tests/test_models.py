@@ -784,3 +784,148 @@ def test_booking_period_id_reference(session, owner):
     transaction.commit()
 
     assert bookings.query().first().period_id == new.id
+
+
+def test_happiness(session, owner):
+
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True
+    )
+
+    sport = activities.add("Sport", username=owner.username)
+
+    o1 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period
+    )
+
+    o2 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period
+    )
+
+    o3 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period
+    )
+
+    dustin = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2002, 9, 8)
+    )
+
+    transaction.commit()
+
+    def assert_happiness(period_id, value):
+
+        def equal(result):
+            if value is None:
+                return result is None
+            else:
+                return round(result, 3) == value
+
+        dustin = attendees.query().first()
+        assert equal(dustin.happiness(period_id))
+
+        q = attendees.query().with_entities(Attendee.happiness(period_id))
+        assert equal(q.first().happiness)
+
+    # no bookings yet
+    assert_happiness(period.id, None)
+
+    bookings.add(owner, dustin, o1)
+    bookings.add(owner, dustin, o2)
+    bookings.add(owner, dustin, o3)
+
+    transaction.commit()
+
+    # low priorities, all bookings accepted
+    b1, b2, b3 = bookings.query().all()
+    b1.state = 'confirmed'
+    b2.state = 'confirmed'
+    b3.state = 'confirmed'
+
+    transaction.commit()
+
+    assert_happiness(period.id, 1.0)
+
+    # high priorities, all bookings accepted
+    b1, b2, b3 = bookings.query().all()
+    b1.priority = 1
+    b2.priority = 1
+    b3.priority = 1
+
+    transaction.commit()
+
+    assert_happiness(period.id, 1.0)
+
+    # low priorities denied, one high priority accepted
+    b1, b2, b3 = bookings.query().all()
+    b1.priority = 1
+    b1.state = 'confirmed'
+    b2.priority = 0
+    b2.state = 'unconfirmed'
+    b3.priority = 0
+    b3.state = 'unconfirmed'
+
+    transaction.commit()
+
+    assert_happiness(period.id, 0.5)
+
+    # low priorities accepted, one high priority denied
+    b1, b2, b3 = bookings.query().all()
+    b1.priority = 1
+    b1.state = 'unconfirmed'
+    b2.priority = 0
+    b2.state = 'confirmed'
+    b3.priority = 0
+    b3.state = 'confirmed'
+
+    transaction.commit()
+
+    assert_happiness(period.id, 0.5)
+
+    # 1/3 high priorities accepted
+    b1, b2, b3 = bookings.query().all()
+    b1.priority = 1
+    b1.state = 'confirmed'
+    b2.priority = 1
+    b2.state = 'unconfirmed'
+    b3.priority = 1
+    b3.state = 'unconfirmed'
+
+    transaction.commit()
+
+    assert_happiness(period.id, 0.333)
+
+    # 1 extra high priority booking accepted
+    b1, b2, b3 = bookings.query().all()
+    b1.priority = 7
+    b1.state = 'confirmed'
+    b2.priority = 0
+    b2.state = 'unconfirmed'
+    b3.priority = 0
+    b3.state = 'unconfirmed'
+
+    transaction.commit()
+
+    assert_happiness(period.id, 0.8)

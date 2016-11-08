@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+- Introduces a happiness function on the attendee which returns a value
+  between 0.0 and 1.0 depending on how happy the attendee is assumed to be
+  with the bookings confirmed for the given period.
+  [href]
+
 - Adds the denormalized period_id to the bookings.
   [href]
 
