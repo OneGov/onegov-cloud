@@ -77,6 +77,11 @@ metal:define-macro="layout">
             </div>
         </div>
     </footer>
+    <footer tal:condition="request.browser_session.get('headerless')">
+        <div class="row">
+            <div class="small-12 columns">&copy; ${layout.copyright_year} ${layout.app.principal.name}</div>
+        </div>
+    </footer>
     <tal:block tal:content="structure layout.principal.analytics|nothing" />
 </body>
 </html>
