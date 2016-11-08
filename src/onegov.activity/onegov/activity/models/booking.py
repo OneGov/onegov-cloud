@@ -3,9 +3,10 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.activity.models.occasion import Occasion
-from sqlalchemy import Column, Enum, Index, Text, ForeignKey, Integer
+from sqlalchemy import Column, Enum, Index, Text, ForeignKey, Integer, func
 from sqlalchemy.orm import object_session
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
 
@@ -45,6 +46,13 @@ class Booking(Base, TimestampMixin):
 
     #: the occasion this booking belongs to
     occasion_id = Column(UUID, ForeignKey("occasions.id"), nullable=False)
+
+    #: the period this booking belongs to
+    @aggregated('occasion', Column(
+        UUID, ForeignKey("periods.id"), nullable=False)
+    )
+    def period_id(self):
+        return func.coalesce(Occasion.period_id, None)
 
     #: the state of the booking
     state = Column(

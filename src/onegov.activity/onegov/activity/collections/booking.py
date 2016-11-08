@@ -1,5 +1,4 @@
-from onegov.activity.models import Booking, Occasion
-from onegov.activity.collections.occasion import OccasionCollection
+from onegov.activity.models import Booking
 from onegov.core.collection import GenericCollection
 
 
@@ -17,12 +16,7 @@ class BookingCollection(GenericCollection):
             query = query.filter(Booking.username == self.username)
 
         if self.period_id is not None:
-            o = OccasionCollection(self.session).query()
-            o = o.with_entities(Occasion.id)
-            o = o.filter(Occasion.period_id == self.period_id)
-            o = o.subquery()
-
-            query = query.filter(Booking.occasion_id.in_(o))
+            query = query.filter(Booking.period_id == self.period_id)
 
         return query
 
@@ -64,4 +58,5 @@ class BookingCollection(GenericCollection):
             occasion_id=occasion.id,
             priority=priority,
             group_code=group_code,
+            period_id=occasion.period_id
         )

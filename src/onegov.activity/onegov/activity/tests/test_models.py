@@ -9,7 +9,6 @@ from onegov.activity import AttendeeCollection
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
-from onegov.activity import Booking
 from onegov.activity import BookingCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
@@ -290,43 +289,7 @@ def test_no_orphan_bookings(session, owner):
     attendees = AttendeeCollection(session)
     periods = PeriodCollection(session)
     occasions = OccasionCollection(session)
-
-    tournament = occasions.add(
-        start=datetime(2016, 10, 4, 13),
-        end=datetime(2016, 10, 4, 14),
-        timezone="Europe/Zurich",
-        activity=activities.add("Sport", username=owner.username),
-        period=periods.add(
-            title="Autumn 2016",
-            prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
-            execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
-            active=True
-        )
-    )
-
-    dustin = attendees.add(
-        user=owner,
-        name="Dustin Henderson",
-        birth_date=date(2002, 9, 8)
-    )
-
-    tournament.bookings.append(Booking(
-        username=owner.username,
-        attendee_id=dustin.id
-    ))
-
-    session.flush()
-
-    with pytest.raises(sqlalchemy.exc.IntegrityError):
-        occasions.delete(tournament)
-
-
-def test_no_orphan_occasions(session, owner):
-
-    activities = ActivityCollection(session)
-    attendees = AttendeeCollection(session)
-    periods = PeriodCollection(session)
-    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
 
     period = periods.add(
         title="Autumn 2016",
@@ -349,10 +312,44 @@ def test_no_orphan_occasions(session, owner):
         birth_date=date(2002, 9, 8)
     )
 
-    tournament.bookings.append(Booking(
-        username=owner.username,
-        attendee=dustin
-    ))
+    bookings.add(owner, dustin, tournament)
+
+    transaction.commit()
+
+    with pytest.raises(sqlalchemy.exc.IntegrityError):
+        occasions.delete(tournament)
+
+
+def test_no_orphan_occasions(session, owner):
+
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True
+    )
+
+    tournament = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=activities.add("Sport", username=owner.username),
+        period=period
+    )
+
+    dustin = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2002, 9, 8)
+    )
+
+    bookings.add(owner, dustin, tournament)
 
     session.flush()
 
@@ -737,3 +734,53 @@ def test_star_booking(session, owner):
 
     assert b1.starred is True
     assert b2.starred is False
+
+
+def test_booking_period_id_reference(session, owner):
+
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True
+    )
+
+    tournament = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=activities.add("Sport", username=owner.username),
+        period=period
+    )
+
+    dustin = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2002, 9, 8)
+    )
+
+    bookings.add(owner, dustin, tournament)
+
+    transaction.commit()
+
+    assert bookings.query().first().period_id == period.id
+
+    new = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=False
+    )
+
+    tournament = occasions.query().first()
+    tournament.period_id = new.id
+
+    transaction.commit()
+
+    assert bookings.query().first().period_id == new.id

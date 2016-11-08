@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the denormalized period_id to the bookings.
+  [href]
+
 - Make sure all models are hashable.
   [href]
 
