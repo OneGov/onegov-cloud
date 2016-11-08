@@ -5,6 +5,7 @@ from datetime import date
 from freezegun import freeze_time
 from onegov.ballot import Ballot
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.models import Subscriber
 from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_vote
@@ -598,10 +599,15 @@ def test_view_subscription(election_day_app):
     subscribe.form['phone_number'] = '0791112233'
     subscribe = subscribe.form.submit()
     assert "SMS-Benachrichtigung wurde abonniert" in subscribe
+    assert election_day_app.session().query(Subscriber).one().locale == 'de_CH'
+
+    client.get('/locale/fr_CH').follow()
 
     subscribe.form['phone_number'] = '0791112233'
     subscribe = subscribe.form.submit()
-    assert "SMS-Benachrichtigung wurde abonniert" in subscribe
+    assert election_day_app.session().query(Subscriber).one().locale == 'fr_CH'
+
+    client.get('/locale/de_CH').follow()
 
     unsubscribe = client.get('/unsubscribe')
     unsubscribe.form['phone_number'] = 'abcd'

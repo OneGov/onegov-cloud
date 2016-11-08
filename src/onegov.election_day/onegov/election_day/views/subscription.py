@@ -15,7 +15,7 @@ def subscribe(self, request, form):
     callout = None
     if form.submitted(request):
         subscribers = SubscriberCollection(request.app.session())
-        subscribers.subscribe(form.formatted_phone_number)
+        subscribers.subscribe(form.formatted_phone_number, request.locale)
         callout = _(
             "Successfully subscribed to the SMS services. You will receive an "
             "SMS every time new results are published."

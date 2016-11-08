@@ -9,15 +9,29 @@ class SubscriberCollection(object):
     def query(self):
         return self.session.query(Subscriber)
 
-    def subscribe(self, phone_number):
-        """ Subscribe with the given phone number. """
+    def subscribe(self, phone_number, locale):
+        """ Subscribe with the given phone number and locale.
 
-        if self.query().filter_by(phone_number=phone_number).first():
-            return
+        Existing subscriptions with the given number will be updated according
+        to the new locale.
+        """
 
-        subscriber = Subscriber(phone_number=phone_number)
+        subscriber = None
+        for existing in self.query().filter_by(phone_number=phone_number):
+            if not subscriber:
+                subscriber = existing
+                if subscriber.locale != locale:
+                    subscriber.locale = locale
+            else:
+                self.session.delete(existing)
 
-        self.session.add(subscriber)
+        if not subscriber:
+            subscriber = Subscriber(
+                phone_number=phone_number,
+                locale=locale
+            )
+            self.session.add(subscriber)
+
         self.session.flush()
 
         return subscriber

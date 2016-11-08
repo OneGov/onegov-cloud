@@ -545,18 +545,22 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.last_change == freezed
         assert election_day_app.send_sms.call_count == 0
 
-        session.add(Subscriber(phone_number='+41791112233'))
+        session.add(Subscriber(phone_number='+41791112233', locale='en'))
+        session.add(Subscriber(phone_number='+41791112233', locale='de_CH'))
 
         notification = SmsNotification()
-        request.app.session().query(Subscriber).one()
+        # request.app.session().query(Subscriber).one()
         notification.trigger(request, election)
 
         assert notification.action == 'sms'
         assert notification.election_id == election.id
         assert notification.last_change == freezed
-        assert election_day_app.send_sms.call_count == 1
-        assert election_day_app.send_sms.call_args[0] == (
+        assert election_day_app.send_sms.call_count == 2
+        assert election_day_app.send_sms.call_args_list[0][0] == (
             '+41791112233', 'New results are avaiable on https://wab.ch.ch'
+        )
+        assert election_day_app.send_sms.call_args_list[1][0] == (
+            '+41791112233', 'Neue Resultate verfügbar auf https://wab.ch.ch'
         )
 
         notification = SmsNotification()
@@ -565,15 +569,13 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.action == 'sms'
         assert notification.vote_id == vote.id
         assert notification.last_change == freezed
-        assert election_day_app.send_sms.call_count == 2
-        assert election_day_app.send_sms.call_args[0] == (
-            '+41791112233', 'New results are avaiable on https://wab.ch.ch'
-        )
+        assert election_day_app.send_sms.call_count == 4
 
 
 def test_subscriber(session):
     subscriber = Subscriber()
     subscriber.phone_number = '+41791112233'
+    subscriber.locale = 'de_CH'
 
     session.add(subscriber)
     session.flush()
@@ -581,3 +583,4 @@ def test_subscriber(session):
     subscriber = session.query(Subscriber).one()
     assert subscriber.id
     assert subscriber.phone_number == '+41791112233'
+    assert subscriber.locale == 'de_CH'

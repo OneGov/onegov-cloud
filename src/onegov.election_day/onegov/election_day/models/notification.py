@@ -122,9 +122,12 @@ class SmsNotification(Notification):
             "New results are avaiable on ${url}",
             mapping={'url': request.app.principal.sms_notification}
         )
-        content = request.translate(content)
 
         session = request.app.session()
         subscribers = session.query(Subscriber).all()
         for subscriber in subscribers:
-            request.app.send_sms(subscriber.phone_number, content)
+            translator = request.app.translations.get(subscriber.locale)
+            translated = translator.gettext(content) if translator else content
+            translated = content.interpolate(translated)
+
+            request.app.send_sms(subscriber.phone_number, translated)

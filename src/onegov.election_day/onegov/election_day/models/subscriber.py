@@ -15,3 +15,6 @@ class Subscriber(Base, TimestampMixin):
 
     #: The phone number of the subscriber
     phone_number = Column(Text, nullable=False)
+
+    #: The locale used by the subscriber
+    locale = Column(Text, nullable=False)

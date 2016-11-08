@@ -280,13 +280,19 @@ def test_notification_collection(session):
 def test_subscriber_collection(session):
 
     collection = SubscriberCollection(session)
-    collection.subscribe('+41791112233')
+    collection.subscribe('+41791112233', 'de_CH')
     assert collection.query().one().phone_number == '+41791112233'
+    assert collection.query().one().locale == 'de_CH'
 
-    collection.subscribe('+41791112233')
-    assert collection.query().count() == 1
+    collection.subscribe('+41791112233', 'de_CH')
+    assert collection.query().one().phone_number == '+41791112233'
+    assert collection.query().one().locale == 'de_CH'
 
-    collection.subscribe('+41792223344')
+    collection.subscribe('+41791112233', 'en')
+    assert collection.query().one().phone_number == '+41791112233'
+    assert collection.query().one().locale == 'en'
+
+    collection.subscribe('+41792223344', 'de_CH')
     assert collection.query().count() == 2
 
     collection.unsubscribe('+41791112233')
