@@ -17,7 +17,6 @@ class ElectionDayApp(Framework):
     """
 
     serve_static_files = True
-    sms_directory = './smsdir'
 
     @property
     def principal(self):
@@ -56,7 +55,7 @@ class ElectionDayApp(Framework):
         are automatically commited at the end.
 
         """
-        path = os.path.join(self.sms_directory, self.schema)
+        path = os.path.join(self.configuration['sms_directory'], self.schema)
         if not os.path.exists(path):
             os.makedirs(path)
 

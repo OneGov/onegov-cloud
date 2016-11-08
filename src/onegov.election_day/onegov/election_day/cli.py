@@ -1,8 +1,11 @@
 """ Provides commands used to initialize election day websites. """
 
 import click
+import os
 
 from onegov.core.cli import command_group, pass_group_context
+from onegov.election_day.models import ArchivedResult
+from onegov.election_day.sms_processor import SmsQueueProcessor
 
 
 cli = command_group()
@@ -25,3 +28,64 @@ def add(group_context):
         click.echo("Instance was created successfully")
 
     return add_instance
+
+
+@cli.command()
+@pass_group_context
+def fetch(group_context):
+    """ Fetches the results from other instances as defined in the
+        principal.yml. Only fetches results from the same namespace.
+
+        onegov-election-day --select '/onegov_election_day/zg' fetch
+
+    """
+
+    def fetch_results(request, app):
+        local_session = app.session()
+        assert local_session.info['schema'] == app.schema
+
+        available = app.session_manager.list_schemas()
+
+        if app.principal:
+            for key in app.principal.fetch:
+                schema = '{}-{}'.format(app.namespace, key)
+                assert schema in available
+                app.session_manager.set_current_schema(schema)
+                remote_session = app.session_manager.session()
+                assert remote_session.info['schema'] == schema
+
+                items = local_session.query(ArchivedResult)
+                items = items.filter_by(schema=schema)
+                for item in items:
+                    local_session.delete(item)
+
+                for domain in app.principal.fetch[key]:
+                    items = remote_session.query(ArchivedResult)
+                    items = items.filter_by(schema=schema, domain=domain)
+                    for item in items:
+                        new_item = ArchivedResult()
+                        new_item.copy_from(item)
+                        local_session.add(new_item)
+
+        click.echo("Results fetched successfully")
+
+    return fetch_results
+
+
+@cli.command()
+@click.argument('username')
+@click.argument('password')
+def send_sms(username, password):
+    """ Sends the SMS in the smsdir for a given instance. For example:
+
+        onegov-election-day --select '/onegov_election_day/zg' send_sms
+            'info@seantis.ch' 'top-secret'
+
+    """
+
+    def send(request, app):
+        path = os.path.join(app.configuration['sms_directory'], app.schema)
+        qp = SmsQueueProcessor(path, username, password)
+        qp.send_messages()
+
+    return send

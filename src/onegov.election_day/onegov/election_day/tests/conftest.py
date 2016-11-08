@@ -34,7 +34,8 @@ def create_app(postgres_dsn, temporary_directory, election_day_password,
             'create': True
         },
         identity_secure=False,
-        disable_memcached=True
+        disable_memcached=True,
+        sms_directory=os.path.join(temporary_directory, 'sms'),
     )
     app.set_application_id(app.namespace + '/' + 'test')
 

@@ -44,6 +44,7 @@ setup(
         'onegov.user',
         'phonenumbers',
         'pyyaml',
+        'requests',
         'rjsmin'
     ],
     extras_require=dict(
