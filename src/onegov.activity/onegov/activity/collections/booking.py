@@ -30,7 +30,7 @@ class BookingCollection(GenericCollection):
     def model_class(self):
         return Booking
 
-    def count(self, username, state='unconfirmed'):
+    def count(self, username, state='open'):
         """ Returns the number of bookings for the given username and state.
 
         """

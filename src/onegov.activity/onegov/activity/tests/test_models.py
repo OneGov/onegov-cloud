@@ -860,9 +860,9 @@ def test_happiness(session, owner):
 
     # low priorities, all bookings accepted
     b1, b2, b3 = bookings.query().all()
-    b1.state = 'confirmed'
-    b2.state = 'confirmed'
-    b3.state = 'confirmed'
+    b1.state = 'accepted'
+    b2.state = 'accepted'
+    b3.state = 'accepted'
 
     transaction.commit()
 
@@ -881,11 +881,11 @@ def test_happiness(session, owner):
     # low priorities denied, one high priority accepted
     b1, b2, b3 = bookings.query().all()
     b1.priority = 1
-    b1.state = 'confirmed'
+    b1.state = 'accepted'
     b2.priority = 0
-    b2.state = 'unconfirmed'
+    b2.state = 'open'
     b3.priority = 0
-    b3.state = 'unconfirmed'
+    b3.state = 'open'
 
     transaction.commit()
 
@@ -894,11 +894,11 @@ def test_happiness(session, owner):
     # low priorities accepted, one high priority denied
     b1, b2, b3 = bookings.query().all()
     b1.priority = 1
-    b1.state = 'unconfirmed'
+    b1.state = 'open'
     b2.priority = 0
-    b2.state = 'confirmed'
+    b2.state = 'accepted'
     b3.priority = 0
-    b3.state = 'confirmed'
+    b3.state = 'accepted'
 
     transaction.commit()
 
@@ -907,11 +907,11 @@ def test_happiness(session, owner):
     # 1/3 high priorities accepted
     b1, b2, b3 = bookings.query().all()
     b1.priority = 1
-    b1.state = 'confirmed'
+    b1.state = 'accepted'
     b2.priority = 1
-    b2.state = 'unconfirmed'
+    b2.state = 'open'
     b3.priority = 1
-    b3.state = 'unconfirmed'
+    b3.state = 'open'
 
     transaction.commit()
 
@@ -920,11 +920,11 @@ def test_happiness(session, owner):
     # 1 extra high priority booking accepted
     b1, b2, b3 = bookings.query().all()
     b1.priority = 7
-    b1.state = 'confirmed'
+    b1.state = 'accepted'
     b2.priority = 0
-    b2.state = 'unconfirmed'
+    b2.state = 'open'
     b3.priority = 0
-    b3.state = 'unconfirmed'
+    b3.state = 'open'
 
     transaction.commit()
 

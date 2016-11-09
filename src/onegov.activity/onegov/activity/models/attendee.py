@@ -63,7 +63,7 @@ class Attendee(Base, TimestampMixin):
         a high-priority booking has a higher impact than the decision on a
         low-priority booking. To model this we simply multiply the booking
         priority when summing up the happiness. So if a booking with priority
-        1 is confirmed, it is as if 2 bookings were confirmed. If a booking
+        1 is accepted, it is as if 2 bookings were accepted. If a booking
         with priority 1 is denied, it is as if 2 bookings were denied.
 
         """
@@ -74,7 +74,7 @@ class Attendee(Base, TimestampMixin):
         bookings = (b for b in self.bookings if b.period_id == period_id)
 
         for booking in bookings:
-            score += booking.state == 'confirmed' and booking.priority + 1
+            score += booking.state == 'accepted' and booking.priority + 1
             score_max += booking.priority + 1
 
         # attendees without a booking have no known happiness (incidentally,
@@ -92,7 +92,7 @@ class Attendee(Base, TimestampMixin):
             type_coerce(
                 func.sum(
                     case([
-                        (Booking.state == 'confirmed', Booking.priority + 1),
+                        (Booking.state == 'accepted', Booking.priority + 1),
                     ], else_=0)
                 ) / cast(
                     # force the division to produce a float instead of an int

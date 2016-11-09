@@ -13,8 +13,8 @@ from uuid import uuid4
 class Booking(Base, TimestampMixin):
     """ Bookings are created by users for occasions.
 
-    Initially, bookings are unconfirmed. In this state they represent
-    a "wish" rather than a probably booking.
+    Initially, bookings are open. In this state they represent a "wish" rather
+    than booking.
 
     Because bookings are wishes initially, they get a priority as well as
     a group code which links multiple bookings by multiple users together.
@@ -65,7 +65,7 @@ class Booking(Base, TimestampMixin):
             name='booking_state'
         ),
         nullable=False,
-        default='unconfirmed'
+        default='open'
     )
 
     __mapper_args__ = {
