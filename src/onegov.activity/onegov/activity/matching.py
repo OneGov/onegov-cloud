@@ -91,9 +91,11 @@ class AttendeeAgent(object):
         security measure to make sure there's no bug.
 
         """
-        for a, b in product(self.accepted, 2):
+        for a, b in product(self.accepted, self.accepted):
             if a != b and overlaps(a, b):
                 return False
+
+        return True
 
 
 class OccasionAgent(object):
@@ -168,10 +170,13 @@ def match_bookings_with_occasions(session, period_id):
         session.query(Occasion).options(joinedload(Occasion.bookings))
         .filter(Occasion.period_id == period_id))
 
-    occasions_by_booking = {o.booking: o for o in occasions}
+    occasions_by_booking = {
+        booking: occasion
+        for occasion in occasions
+        for booking in occasion.occasion.bookings}
 
     # while there are attendees with entries in a wishlist
-    while next((a for a in attendees if a.wishlist)):
+    while next((a for a in attendees if a.wishlist), None):
 
         # until all occaisons are filled
         if all(o.full for o in occasions):
