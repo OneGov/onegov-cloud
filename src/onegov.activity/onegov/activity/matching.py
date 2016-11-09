@@ -7,7 +7,7 @@ quadratic runtime.
 
 import sedate
 
-from onegov.activity import Attendee, Booking, Occasion
+from onegov.activity import Attendee, Booking, Occasion, log
 from itertools import product
 from sortedcontainers import SortedSet
 from sqlalchemy.orm import joinedload
@@ -183,8 +183,18 @@ def match_bookings_with_occasions(session, period_id):
         for occasion in occasions
         for booking in occasion.occasion.bookings}
 
+    # I haven't proven yet that the following loop will always end. Until I
+    # do there's a fallback check to make sure that we'll stop at some point
+    n = 0
+    n_max = len(attendees) * 2
+
     # while there are attendees with entries in a wishlist
     while next((a for a in attendees if a.wishlist), None):
+        n += 1
+
+        if n >= n_max:
+            log.warn("The matching algorithm ran more than {} times".format(n))
+            break
 
         candidates = [a for a in attendees if a.wishlist]
         matched = 0

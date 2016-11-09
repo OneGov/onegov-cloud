@@ -1,3 +1,7 @@
+import logging
+log = logging.getLogger('onegov.activity')  # noqa
+log.addHandler(logging.NullHandler())  # noqa
+
 from onegov.activity.models import (
     Activity,
     Attendee,
