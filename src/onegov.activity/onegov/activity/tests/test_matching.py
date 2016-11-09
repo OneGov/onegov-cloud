@@ -38,10 +38,8 @@ def test_simple_match(session, owner, collections, prebooking_period):
 
     """
 
-    period = prebooking_period
-
-    o1 = new_occasion(collections, period, 0, 1, spots=(0, 1))
-    o2 = new_occasion(collections, period, 0, 1, spots=(0, 1))
+    o1 = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 1))
+    o2 = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 1))
 
     a1 = new_attendee(collections)
     a2 = new_attendee(collections)
@@ -49,14 +47,47 @@ def test_simple_match(session, owner, collections, prebooking_period):
     collections.bookings.add(owner, a1, o1)
     collections.bookings.add(owner, a2, o2)
 
+    # multiple runs lead to the same result
+    for i in range(0, 2):
+        match_bookings_with_occasions(session, prebooking_period.id)
+
+        bookings = collections.bookings.query().all()
+
+        assert len(bookings) == 2
+
+        assert bookings[0].state == 'accepted'
+        assert bookings[1].state == 'accepted'
+
+        assert a1.happiness(prebooking_period.id) == 1.0
+        assert a2.happiness(prebooking_period.id) == 1.0
+
+
+def test_changing_priorities(session, owner, collections, prebooking_period):
+    """ Makes sure that changing priorities lead to a changing match. """
+
+    # only one available spot
+    o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 1))
+
+    # two attendees
+    a1 = new_attendee(collections)
+    a2 = new_attendee(collections)
+
+    # one booking is prioritised
+    b1 = collections.bookings.add(owner, a1, o)
+    b2 = collections.bookings.add(owner, a2, o)
+
+    b1.priority = 1
+    b2.priority = 0
+
     match_bookings_with_occasions(session, prebooking_period.id)
 
-    bookings = collections.bookings.query().all()
+    assert b1.state == 'accepted'
+    assert b2.state == 'open'
 
-    assert len(bookings) == 2
+    b1.priority = 0
+    b2.priority = 1
 
-    assert bookings[0].state == 'accepted'
-    assert bookings[1].state == 'accepted'
+    match_bookings_with_occasions(session, prebooking_period.id)
 
-    assert a1.happiness(prebooking_period.id) == 1.0
-    assert a2.happiness(prebooking_period.id) == 1.0
+    assert b1.state == 'open'
+    assert b2.state == 'accepted'

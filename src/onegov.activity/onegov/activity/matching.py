@@ -112,10 +112,18 @@ class OccasionAgent(object):
 
     __slots__ = ('occasion', 'bookings', 'attendees')
 
-    def __init__(self, occasion):
+    def __init__(self, occasion, attendees):
         self.occasion = occasion
         self.bookings = set(bookings_by_state(occasion.bookings, 'accepted'))
-        self.attendees = {}
+
+        # keep track of the attendees associated with a booking -> this
+        # indicates that we might need some kind of interlocutor which
+        # handles the relationship between the agents
+        self.attendees = {
+            booking: a
+            for a in attendees
+            for booking in a.accepted
+        }
 
     def __hash__(self):
         return hash(self.occasion)
@@ -148,11 +156,11 @@ class OccasionAgent(object):
         # another one out, if there exists a better fit
         for b in self.bookings:
             if self.score(b) < self.score(booking):
-                self.attendees[b].unconfirm(b)
+                self.attendees[b].deny(b)
                 self.bookings.remove(b)
                 self.bookings.add(booking)
 
-                attendee.confirm(booking)
+                attendee.accept(booking)
                 return True
 
         return False
@@ -166,7 +174,7 @@ def match_bookings_with_occasions(session, period_id):
         session.query(Attendee).options(joinedload(Attendee.bookings)))
 
     occasions = set(
-        OccasionAgent(o) for o in
+        OccasionAgent(o, attendees) for o in
         session.query(Occasion).options(joinedload(Occasion.bookings))
         .filter(Occasion.period_id == period_id))
 
@@ -177,10 +185,6 @@ def match_bookings_with_occasions(session, period_id):
 
     # while there are attendees with entries in a wishlist
     while next((a for a in attendees if a.wishlist), None):
-
-        # until all occaisons are filled
-        if all(o.full for o in occasions):
-            break
 
         candidates = [a for a in attendees if a.wishlist]
         matched = 0
