@@ -57,11 +57,11 @@ class Booking(Base, TimestampMixin):
     #: the state of the booking
     state = Column(
         Enum(
+            'open',
             'blocked',
-            'cancelled',
-            'confirmed',
+            'accepted',
             'denied',
-            'unconfirmed',
+            'cancelled',
             name='booking_state'
         ),
         nullable=False,
@@ -79,26 +79,6 @@ class Booking(Base, TimestampMixin):
         ),
         Index('bookings_by_state', 'state', 'username')
     )
-
-    def confirm(self):
-        assert self.state == 'maybe_confirmed'
-        self.state = 'confirmed'
-
-    def cancel(self):
-        assert self.state in ('confirmed', 'unconfirmed', 'denied')
-        self.state = 'cancelled'
-
-    def deny(self):
-        assert self.state == 'maybe_denied'
-        self.state = 'denied'
-
-    def maybe_confirm(self):
-        self.state in ('unconfirmed', 'maybe_denied')
-        self.state = 'maybe_confirmed'
-
-    def maybe_deny(self):
-        self.state in ('unconfirmed', 'maybe_confirmed')
-        self.state = 'maybe_denied'
 
     @hybrid_property
     def starred(self):

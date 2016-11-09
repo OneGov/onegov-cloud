@@ -3,11 +3,10 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 
-from contextlib import contextmanager
 from onegov.activity import Booking
 from onegov.core.orm.types import UUID
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column, Enum, ForeignKey
 from sqlalchemy.orm import joinedload
 
 
@@ -34,28 +33,29 @@ def add_period_id_to_bookings(context):
     context.operations.alter_column('bookings', 'period_id', nullable=False)
 
 
-@upgrade_task('Add additional states to bookings')
-def add_additional_states_to_bookings(context):
+@upgrade_task('Change booking states')
+def change_booking_states(context):
 
-    # ALTER TYPE statements don't work inside of transactions -> if you reuse
-    # this code, do not put it inside an update that has other things going
-    # on!
-    type_name = 'booking_state'
-    states = ('blocked', 'denied')
+    new_type = Enum(
+        'open',
+        'blocked',
+        'accepted',
+        'denied',
+        'cancelled',
+        name='booking_state'
+    )
 
-    @contextmanager
-    def temporary_isolation_level(isolation_level):
-        connection = context.operations.get_bind()
-        previous_isolation_level = connection.get_isolation_level()
-        connection.execution_options(isolation_level=isolation_level)
+    op = context.operations
 
-        yield
+    op.execute("""
+        ALTER TABLE bookings ALTER COLUMN state TYPE Text;
+        UPDATE bookings SET state = 'open' WHERE state = 'unconfirmed';
+        DROP TYPE booking_state;
+    """)
 
-        connection.execution_options(isolation_level=previous_isolation_level)
+    new_type.create(op.get_bind())
 
-    with temporary_isolation_level('AUTOCOMMIT'):
-        for state in states:
-            context.operations.execute(
-                "ALTER TYPE {} ADD VALUE IF NOT EXISTS '{}'".format(
-                    type_name, state)
-            )
+    op.execute("""
+        ALTER TABLE bookings ALTER COLUMN state
+        TYPE booking_state USING state::text::booking_state;
+    """)
