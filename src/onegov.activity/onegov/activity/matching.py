@@ -142,6 +142,11 @@ class OccasionAgent(object):
     def score(self, booking):
         return booking.priority
 
+    def preferred(self, booking):
+        for b in self.bookings:
+            if self.score(b) < self.score(booking):
+                return b
+
     def match(self, attendee, booking):
 
         # as long as there are spots, automatically accept new requests
@@ -154,14 +159,16 @@ class OccasionAgent(object):
 
         # if the occasion is already full, accept the booking by throwing
         # another one out, if there exists a better fit
-        for b in self.bookings:
-            if self.score(b) < self.score(booking):
-                self.attendees[b].deny(b)
-                self.bookings.remove(b)
-                self.bookings.add(booking)
+        over = self.preferred(booking)
 
-                attendee.accept(booking)
-                return True
+        if over:
+            self.attendees[over].deny(over)
+            self.bookings.remove(over)
+
+            self.bookings.add(booking)
+            attendee.accept(booking)
+
+            return True
 
         return False
 
@@ -216,6 +223,9 @@ def match_bookings_with_occasions(session, period_id):
     for a in attendees:
         assert a.is_valid
 
+    # make sure the result is stable
+    assert is_stable(attendees, occasions)
+
     # write the changes to the database
     def update_states(bookings, state):
         ids = set(b.id for b in bookings)
@@ -230,3 +240,27 @@ def match_bookings_with_occasions(session, period_id):
     update_states(set(b for a in attendees for b in a.wishlist), 'open')
     update_states(set(b for a in attendees for b in a.accepted), 'accepted')
     update_states(set(b for a in attendees for b in a.blocked), 'blocked')
+
+
+def is_stable(attendees, occasions):
+    """ Returns true if the matching between attendees and occasions is
+    stable.
+
+    """
+
+    for attendee in attendees:
+        for booking in attendee.accepted:
+            for occasion in occasions:
+
+                # the booking was actually accepted, skip
+                if booking in occasion.bookings:
+                    continue
+
+                over = occasion.preferred(booking)
+
+                if over:
+                    for o in occasion:
+                        if o != occasion and o.preferred(over):
+                            return False
+
+    return True
