@@ -429,7 +429,9 @@ ul.tags {
         right: 1rem;
         top: .5rem;
 
-        &.cancelled {
+        &.cancelled,
+        &.blocked,
+        &.denied {
             background-color: $alert-color;
         }
 

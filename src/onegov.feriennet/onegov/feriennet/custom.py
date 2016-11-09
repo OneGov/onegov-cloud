@@ -17,7 +17,7 @@ def get_template_variables(request):
         url=request.class_link(VacationActivityCollection)
     ))
 
-    # for logged-in users show the number of unconfirmed bookings
+    # for logged-in users show the number of open bookings
     if request.is_logged_in:
         bookings = BookingCollection(request.app.session())
         count = bookings.count(request.current_username)

@@ -78,7 +78,7 @@ def attendees_by_username(request, username):
 def actions_by_booking(layout, booking):
     actions = []
 
-    if booking.state == 'unconfirmed':
+    if booking.state == 'open':
         actions.append(DeleteLink(
             text=_("Remove"),
             url=layout.csrf_protected_url(layout.request.link(booking)),
@@ -158,9 +158,9 @@ def view_my_bookings(self, request):
 def delete_booking(self, request):
     request.assert_valid_csrf_token()
 
-    if self.state != 'unconfirmed':
+    if self.state != 'open':
         show_error_on_attendee(request, self.attendee, _(
-            "Only unconfirmed bookings may be deleted"))
+            "Only open bookings may be deleted"))
 
         return
 

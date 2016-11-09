@@ -59,14 +59,20 @@
                                     </div>
                                     <div class="state">
                                         <tal:block switch="booking.state">
-                                            <span tal:case="'unconfirmed'" class="${booking.state}" i18n:translate>
-                                                Unconfirmed
+                                            <span tal:case="'open'" class="${booking.state}" i18n:translate>
+                                                Open
                                             </span>
-                                            <span tal:case="'confirmed'" class="${booking.state}" i18n:translate>
+                                            <span tal:case="'accepted'" class="${booking.state}" i18n:translate>
                                                 Confirmed
                                             </span>
                                             <span tal:case="'cancelled'" class="${booking.state}" i18n:translate>
                                                 Cancelled
+                                            </span>
+                                            <span tal:case="'denied'" class="${booking.state}" i18n:translate>
+                                                Denied
+                                            </span>
+                                            <span tal:case="'blocked'" class="${booking.state}" i18n:translate>
+                                                Blocked
                                             </span>
                                         </tal:block>
                                     </div>
