@@ -204,6 +204,7 @@ def deferred_acceptance(bookings, occasions,
             for booking in candidate.wishlist:
                 if occasions[booking.occasion_id].match(candidate, booking):
                     matched += 1
+                    break  # required because the wishlist has been changed
 
         # if no matches were possible the situation can't be improved
         if not matched:
