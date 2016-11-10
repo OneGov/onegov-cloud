@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.0 (2016-11-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds SMS notifications.
   [msom]
