@@ -1,0 +1,90 @@
+from abc import ABCMeta, abstractmethod
+
+
+class MatchableOccasion(metaclass=ABCMeta):
+    """ Describes the interface required by the occasion class used by
+    the algorithm.
+
+    This allows us to untie our implementation from the database.
+
+    """
+
+    @property
+    @abstractmethod
+    def id(self):
+        """ The id of the occasion. """
+
+    @property
+    @abstractmethod
+    def max_spots(self):
+        """ The maximum number of available spots. """
+
+
+class MatchableBooking(metaclass=ABCMeta):
+    """ Describes the interface required by the booking class used by
+    the algorithm.
+
+    This allows us to untie our implementation from the database.
+
+    """
+
+    def __eq__(self, other):
+        """ The class must be comparable to other classes. """
+
+    @abstractmethod
+    def __hash__(self):
+        """ The class must be hashable. """
+
+    @property
+    @abstractmethod
+    def occasion_id(self):
+        """ Returns the id of the occasion this booking belongs to. """
+
+    @property
+    @abstractmethod
+    def attendee_id(self):
+        """ Returns the id of the attendee this booking belongs to. """
+
+    @abstractmethod
+    def score(self):
+        """ Returns the score of the current booking. Occasions prefer
+        bookings by score. The higher the score, the more the booking is
+        preferred over others.
+
+        The value of the score is an integer which must not change during
+        the runtime of the algorithm (otherwise the algorithm may not halt).
+
+        """
+
+    @property
+    @abstractmethod
+    def state(self):
+        """ Returns the state of the booking, one of:
+
+        * "open" (for unassigned bookings)
+        * "accepted" (for already accepted bookings)
+        * "blocked" (for bookings blocked by another accepted booking)
+
+        """
+
+    @property
+    @abstractmethod
+    def priority(self):
+        """ Returns the priority of the booking. The higher the priority
+        the further up the wishlist.
+
+        Bookings further up the wishlist are first passed to the occasions.
+        All things being equal (i.e. the scores of the other bookings), this
+        leads to a higher chance of placement.
+
+        """
+
+    @property
+    @abstractmethod
+    def start(self):
+        """ Returns the start-time of the booking. """
+
+    @property
+    @abstractmethod
+    def end(self):
+        """ Returns the start-time of the booking. """

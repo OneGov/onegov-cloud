@@ -5,120 +5,15 @@ quadratic runtime.
 
 """
 
-import sedate
-
-from abc import ABCMeta, abstractmethod
-from onegov.activity import log
 from onegov.activity import Booking, Occasion
+from onegov.activity.matching.utils import overlaps, LoopBudget, hashable
 from onegov.core.utils import Bunch
 from itertools import groupby, product
 from sortedcontainers import SortedSet
 from sqlalchemy.orm import joinedload
 
 
-def overlaps(booking, other):
-    assert booking != other
-
-    return sedate.overlaps(
-        booking.start, booking.end,
-        other.start, other.end
-    )
-
-
-def bookings_by_state(bookings, state):
-    yield from (b for b in bookings if b.state == state)
-
-
-class MatchableBooking(metaclass=ABCMeta):
-    """ Describes the interface required by the booking class used by
-    the algorithm.
-
-    This allows us to untie our implementation from the database.
-
-    """
-
-    def __eq__(self, other):
-        """ The class must be comparable to other classes. """
-
-    @abstractmethod
-    def __hash__(self):
-        """ The class must be hashable. """
-
-    @property
-    @abstractmethod
-    def occasion_id(self):
-        """ Returns the id of the occasion this booking belongs to. """
-
-    @property
-    @abstractmethod
-    def attendee_id(self):
-        """ Returns the id of the attendee this booking belongs to. """
-
-    @abstractmethod
-    def score(self):
-        """ Returns the score of the current booking. Occasions prefer
-        bookings by score. The higher the score, the more the booking is
-        preferred over others.
-
-        The value of the score is an integer which must not change during
-        the runtime of the algorithm (otherwise the algorithm may not halt).
-
-        """
-
-    @property
-    @abstractmethod
-    def state(self):
-        """ Returns the state of the booking, one of:
-
-        * "open" (for unassigned bookings)
-        * "accepted" (for already accepted bookings)
-        * "blocked" (for bookings blocked by another accepted booking)
-
-        """
-
-    @property
-    @abstractmethod
-    def priority(self):
-        """ Returns the priority of the booking. The higher the priority
-        the further up the wishlist.
-
-        Bookings further up the wishlist are first passed to the occasions.
-        All things being equal (i.e. the scores of the other bookings), this
-        leads to a higher chance of placement.
-
-        """
-
-    @property
-    @abstractmethod
-    def start(self):
-        """ Returns the start-time of the booking. """
-
-    @property
-    @abstractmethod
-    def end(self):
-        """ Returns the start-time of the booking. """
-
-
-class MatchableOccasion(metaclass=ABCMeta):
-    """ Describes the interface required by the occasion class used by
-    the algorithm.
-
-    This allows us to untie our implementation from the database.
-
-    """
-
-    @property
-    @abstractmethod
-    def id(self):
-        """ The id of the occasion. """
-
-    @property
-    @abstractmethod
-    def max_spots(self):
-        """ The maximum number of available spots. """
-
-
-class AttendeeAgent(object):
+class AttendeeAgent(hashable('id')):
     """ Acts on behalf of the attendee with the goal to get a stable booking
     with an occasion.
 
@@ -141,12 +36,6 @@ class AttendeeAgent(object):
         self.wishlist = SortedSet(bookings, key=lambda b: b.priority * -1)
         self.accepted = set()
         self.blocked = set()
-
-    def __hash__(self):
-        return hash(self.id)
-
-    def __eq__(self, other):
-        return self.id == other.id
 
     def accept(self, booking):
         """ Accepts the given booking. """
@@ -189,7 +78,7 @@ class AttendeeAgent(object):
         return True
 
 
-class OccasionAgent(object):
+class OccasionAgent(hashable('id')):
     """ Represents the other side of the Attendee/Occasion pair.
 
     While the attende agent will try to get the best possible occasion
@@ -204,15 +93,10 @@ class OccasionAgent(object):
     __slots__ = ('occasion', 'bookings', 'attendees')
 
     def __init__(self, occasion):
+        self.id = occasion.id
         self.occasion = occasion
         self.bookings = set()
         self.attendees = {}
-
-    def __hash__(self):
-        return hash(self.occasion)
-
-    def __eq__(self, other):
-        return self.occasion.id == other.occasion.id
 
     @property
     def full(self):
@@ -257,10 +141,7 @@ class OccasionAgent(object):
         return False
 
 
-def match_bookings_with_occasions_from_db(session, period_id, **kwargs):
-    MatchableBooking.register(Booking)
-    MatchableOccasion.register(Occasion)
-
+def deferred_acceptance_from_database(session, period_id, **kwargs):
     b = session.query(Booking)
     b = b.options(joinedload(Booking.occasion))
     b = b.filter(Booking.period_id == period_id)
@@ -269,7 +150,7 @@ def match_bookings_with_occasions_from_db(session, period_id, **kwargs):
     o = session.query(Occasion)
     o = o.filter(Occasion.period_id == period_id)
 
-    bookings = match_bookings_with_occasions(bookings=b, occasions=o, **kwargs)
+    bookings = deferred_acceptance(bookings=b, occasions=o, **kwargs)
 
     # write the changes to the database
     def update_states(bookings, state):
@@ -287,60 +168,27 @@ def match_bookings_with_occasions_from_db(session, period_id, **kwargs):
     update_states(bookings.blocked, 'blocked')
 
 
-def valid_bookings(bookings):
-    for booking in bookings:
-        assert issubclass(booking.__class__, MatchableBooking)
-        yield booking
-
-
-def valid_occasions(occasions):
-    for occasion in occasions:
-        assert issubclass(occasion.__class__, MatchableOccasion)
-        yield occasion
-
-
-def by_attendee(booking):
-    return booking.attendee_id
-
-
-class LoopProtection(object):
-
-    def __init__(self, max_ticks):
-        self.ticks = 0
-        self.max_ticks = max_ticks
-
-    def limit_reached(self):
-        self.ticks += 1
-
-        if self.ticks >= self.max_ticks:
-            log.warn("Loop limit of {} has been reached".format(self.ticks))
-            return True
-
-
-def match_bookings_with_occasions(bookings, occasions, stability_check=False):
+def deferred_acceptance(bookings, occasions, stability_check=False):
     """ Matches bookings with occasions. """
 
-    bookings = [b for b in valid_bookings(bookings)]
-    bookings.sort(key=by_attendee)
+    bookings = [b for b in bookings]
+    bookings.sort(key=lambda b: b.attendee_id)
+
+    occasions = {o.id: OccasionAgent(o) for o in occasions}
 
     attendees = {
         aid: AttendeeAgent(aid, bookings)
-        for aid, bookings in groupby(bookings, key=by_attendee)
-    }
-
-    occasions = {
-        o.id: OccasionAgent(o)
-        for o in valid_occasions(occasions)
+        for aid, bookings in groupby(bookings, key=lambda b: b.attendee_id)
     }
 
     # I haven't proven yet that the following loop will always end. Until I
     # do there's a fallback check to make sure that we'll stop at some point
-    protection = LoopProtection(max_ticks=len(attendees) * 2)
+    budget = LoopBudget(max_ticks=len(attendees) * 2)
 
     # while there are attendees with entries in a wishlist
     while next((a for a in attendees.values() if a.wishlist), None):
 
-        if protection.limit_reached():
+        if budget.limit_reached():
             break
 
         candidates = [a for a in attendees.values() if a.wishlist]

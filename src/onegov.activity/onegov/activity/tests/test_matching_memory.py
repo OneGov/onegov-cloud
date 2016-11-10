@@ -2,11 +2,11 @@ from datetime import date, timedelta
 from functools import partial
 from onegov.activity.matching import MatchableBooking
 from onegov.activity.matching import MatchableOccasion
-from onegov.activity.matching import match_bookings_with_occasions
+from onegov.activity.matching import deferred_acceptance
 
 
 today = date.today
-match = partial(match_bookings_with_occasions, stability_check=True)
+match = partial(deferred_acceptance, stability_check=True)
 
 
 class Booking(MatchableBooking):
