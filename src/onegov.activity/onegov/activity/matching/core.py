@@ -57,7 +57,7 @@ class AttendeeAgent(hashable('id')):
 
         for accepted in self.accepted:
             for blocked in self.blocked:
-                if self.overlaps(accepted, blocked):
+                if overlaps(accepted, blocked):
                     free.remove(blocked)
 
         self.blocked -= free
@@ -168,13 +168,16 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
     update_states(bookings.blocked, 'blocked')
 
 
-def deferred_acceptance(bookings, occasions, stability_check=False):
+def deferred_acceptance(bookings, occasions,
+                        validity_check=True, stability_check=False):
     """ Matches bookings with occasions. """
 
     bookings = [b for b in bookings]
     bookings.sort(key=lambda b: b.attendee_id)
 
-    occasions = {o.id: OccasionAgent(o) for o in occasions}
+    occasions = {
+        o.id: OccasionAgent(o) for o in occasions
+    }
 
     attendees = {
         aid: AttendeeAgent(aid, bookings)
@@ -201,15 +204,15 @@ def deferred_acceptance(bookings, occasions, stability_check=False):
             for booking in candidate.wishlist:
                 if occasions[booking.occasion_id].match(candidate, booking):
                     matched += 1
-                    break
 
         # if no matches were possible the situation can't be improved
         if not matched:
             break
 
     # make sure the algorithm didn't make any mistakes
-    for a in attendees.values():
-        assert a.is_valid
+    if validity_check:
+        for a in attendees.values():
+            assert a.is_valid
 
     # make sure the result is stable
     if stability_check:
