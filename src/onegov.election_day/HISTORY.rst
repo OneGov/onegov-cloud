@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.1 (2016-11-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds sentry support for SMS queue.
   [msom]
