@@ -372,6 +372,10 @@ def is_stable(attendees, occasions):
     """ Returns true if the matching between attendees and occasions is
     stable.
 
+    This runs in O(n^4) time, where n is the combination of
+    bookings and occasions. So this is a testing tool, not something to
+    run in production.
+
     """
 
     for attendee in attendees:
