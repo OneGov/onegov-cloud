@@ -37,18 +37,22 @@ class MatchableBooking(metaclass=ABCMeta):
 
     """
 
-    @abstractmethod
     def __eq__(self, other):
         """ The class must be comparable to other classes. """
 
     @abstractmethod
-    def __hash__(self, other):
+    def __hash__(self):
         """ The class must be hashable. """
 
     @property
     @abstractmethod
     def occasion_id(self):
         """ Returns the id of the occasion this booking belongs to. """
+
+    @property
+    @abstractmethod
+    def attendee_id(self):
+        """ Returns the id of the attendee this booking belongs to. """
 
     @abstractmethod
     def score(self):
@@ -131,14 +135,12 @@ class AttendeeAgent(object):
     def __init__(self, id, bookings):
         self.id = id
 
-        # keep the wishlist sorted from highest to lowest priority
-        self.wishlist = SortedSet(
-            bookings_by_state(bookings, 'open'),
-            key=lambda b: b.priority * -1
-        )
-
-        self.accepted = set(bookings_by_state(bookings, 'accepted'))
-        self.blocked = set(bookings_by_state(bookings, 'blocked'))
+        # keep the wishlist sorted from highest to lowest priority, ignoring
+        # the current state of the booking as we will assign them anew
+        # each time we run the algorithm
+        self.wishlist = SortedSet(bookings, key=lambda b: b.priority * -1)
+        self.accepted = set()
+        self.blocked = set()
 
     def __hash__(self):
         return hash(self.id)
@@ -201,18 +203,10 @@ class OccasionAgent(object):
 
     __slots__ = ('occasion', 'bookings', 'attendees')
 
-    def __init__(self, occasion, bookings, attendees):
+    def __init__(self, occasion):
         self.occasion = occasion
-        self.bookings = set(bookings_by_state(bookings, 'accepted'))
-
-        # keep track of the attendees associated with a booking -> this
-        # indicates that we might need some kind of interlocutor which
-        # handles the relationship between the agents
-        self.attendees = {
-            booking: a
-            for a in attendees
-            for booking in a.accepted
-        }
+        self.bookings = set()
+        self.attendees = {}
 
     def __hash__(self):
         return hash(self.occasion)
@@ -316,26 +310,28 @@ def match_bookings_with_occasions(bookings, occasions, stability_check=False):
     bookings.sort(key=by_attendee)
 
     attendees = {
-        aid: AttendeeAgent(aid, tuple(bookings))
+        aid: AttendeeAgent(aid, bookings)
         for aid, bookings in groupby(bookings, key=by_attendee)
     }
 
     occasions = {
-        o.id: OccasionAgent(o, bookings, attendees.values())
+        o.id: OccasionAgent(o)
         for o in valid_occasions(occasions)
     }
 
     # I haven't proven yet that the following loop will always end. Until I
     # do there's a fallback check to make sure that we'll stop at some point
-    n = 0
-    n_max = len(attendees) * 2
+    run = 0
+    run_max = len(attendees) * 2
 
     # while there are attendees with entries in a wishlist
     while next((a for a in attendees.values() if a.wishlist), None):
-        n += 1
+        run += 1
 
-        if n >= n_max:
-            log.warn("The matching algorithm ran more than {} times".format(n))
+        if run >= run_max:
+            log.warn("The matching algorithm ran more than {} times".format(
+                run
+            ))
             break
 
         candidates = [a for a in attendees.values() if a.wishlist]
