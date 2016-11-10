@@ -204,23 +204,11 @@ def test_pages_cache(election_day_app):
     edit.form.submit()
 
     assert '0xdeadc0de' in client.get('/')
-    assert '0xdeadbeef' in anonymous.get('/')
-    assert '0xdeadc0de' in anonymous.get('/', headers=[
+    assert '0xdeadc0de' in anonymous.get('/')
+    assert '0xdeadbeef' in anonymous.get('/vote/0xdeadbeef')
+    assert '0xdeadc0de' in anonymous.get('/vote/0xdeadbeef', headers=[
         ('Cache-Control', 'no-cache')
     ])
-
-    new = client.get('/manage/elections/new-election')
-    new.form['election_de'] = '0xdeafbeef'
-    new.form['date'] = date(2015, 1, 1)
-    new.form['mandates'] = 1
-    new.form['election_type'] = 'majorz'
-    new.form['domain'] = 'federation'
-    new.form.submit()
-
-    assert '0xdeafbeef' not in anonymous.get('/')
-    assert '0xdeafbeef' in anonymous.get(
-        '/', headers=[('Cache-Control', 'no-cache')]
-    )
 
 
 def test_view_latest(election_day_app):

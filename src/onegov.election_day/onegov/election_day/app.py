@@ -98,7 +98,7 @@ class ElectionDayApp(Framework):
 
     @property
     def pages_cache(self):
-        """ A one minute cache for pages. """
+        """ A five minute cache for pages. """
         return self.get_cache(self.application_id + ':5m', expiration_time=300)
 
 
@@ -135,7 +135,6 @@ def get_i18n_default_locale():
 def micro_cache_anonymous_pages_tween_factory(app, handler):
 
     cache_paths = (
-        '/',
         '/ballot/.*',
         '/vote/.*',
         '/votes/.*',
@@ -168,9 +167,10 @@ def micro_cache_anonymous_pages_tween_factory(app, handler):
         if request.headers.get('cache-control') == 'no-cache':
             return handler(request)
 
-        # each page is cached once per language (and by application id as the
-        # pages_cache is bound to it)
-        key = ':'.join((request.locale, request.path_info))
+        # each page is cached once per language and headerless/headerful
+        # (and by application id as the pages_cache is bound to it)
+        mode = 'headerless' in request.browser_session and 'hl' or 'hf'
+        key = ':'.join((request.locale, request.path_info, mode))
 
         return app.pages_cache.get_or_create(
             key,

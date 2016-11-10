@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves cache handling.
+  [msom]
+
 1.2.3 (2016-11-10)
 ~~~~~~~~~~~~~~~~~~~
 
