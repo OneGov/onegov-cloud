@@ -126,3 +126,11 @@ class Booking(Base, TimestampMixin):
         """
 
         return self.priority
+
+    @property
+    def start(self):
+        return self.occasion.start
+
+    @property
+    def end(self):
+        return self.occasion.end

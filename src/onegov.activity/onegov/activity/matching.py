@@ -13,6 +13,7 @@ from onegov.activity import Booking, Occasion
 from onegov.core.utils import Bunch
 from itertools import groupby, product
 from sortedcontainers import SortedSet
+from sqlalchemy.orm import joinedload
 
 
 def overlaps(booking, other):
@@ -152,6 +153,7 @@ class AttendeeAgent(object):
         self.accepted.add(booking)
 
         self.blocked |= {b for b in self.wishlist if overlaps(booking, b)}
+        self.wishlist -= self.blocked
 
     def deny(self, booking):
         """ Removes the given booking from the accepted bookings. """
@@ -266,6 +268,7 @@ def match_bookings_with_occasions_from_db(session, period_id):
     MatchableOccasion.register(Occasion)
 
     b = session.query(Booking)
+    b = b.options(joinedload(Booking.occasion))
     b = b.filter(Booking.period_id == period_id)
     b = b.filter(Booking.state.in_(('open', 'accepted', 'blocked')))
 
@@ -382,7 +385,7 @@ def is_stable(attendees, occasions):
                 over = occasion.preferred(booking)
 
                 if over:
-                    for o in occasion:
+                    for o in occasions:
                         if o != occasion and o.preferred(over):
                             return False
 
