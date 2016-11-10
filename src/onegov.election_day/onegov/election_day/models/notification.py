@@ -119,7 +119,7 @@ class SmsNotification(Notification):
         self.action = 'sms'
 
         content = _(
-            "New results are avaiable on ${url}",
+            "New results are available on ${url}",
             mapping={'url': request.app.principal.sms_notification}
         )
 

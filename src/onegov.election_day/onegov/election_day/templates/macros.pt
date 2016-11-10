@@ -184,8 +184,11 @@
     <div class="row subscription-links" tal:condition="python: not request.browser_session.get('headerless') and layout.principal.sms_notification">
         <div class="columns small-12">
             <h2 i18n:translate>SMS alerts</h2>
-            <a href="${layout.subscribe_link}" i18n:translate>Get SMS alerts</a>
-            <a href="${layout.unsubscribe_link}" i18n:translate>Stop SMS subscription</a>
+            <p i18n:translate>The SMS service provides free information on the publication of new results (intermediate results, final results):</p>
+            <ul>
+                <li><a href="${layout.subscribe_link}" i18n:translate>Get SMS alerts</a></li>
+                <li><a href="${layout.unsubscribe_link}" i18n:translate>Stop SMS subscription</a></li>
+            </ul>
         </div>
     </div>
 </metal:subscription_links>

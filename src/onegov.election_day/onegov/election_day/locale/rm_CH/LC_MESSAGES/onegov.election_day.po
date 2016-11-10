@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-10 11:16+0100\n"
+"POT-Creation-Date: 2016-11-10 13:50+0100\n"
 "PO-Revision-Date: 2016-09-25 14:32+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -227,7 +227,7 @@ msgid "Vote (Romansh)"
 msgstr "Votaziun (rumantsch)"
 
 #, python-format
-msgid "New results are avaiable on ${url}"
+msgid "New results are available on ${url}"
 msgstr ""
 
 msgid "federal"
@@ -473,6 +473,11 @@ msgstr "Actualisà"
 msgid "SMS alerts"
 msgstr ""
 
+msgid ""
+"The SMS service provides free information on the publication of new results "
+"(intermediate results, final results):"
+msgstr ""
+
 msgid "Get SMS alerts"
 msgstr ""
 
@@ -628,7 +633,9 @@ msgid ""
 "time new results are published."
 msgstr ""
 
-msgid "Receive an SMS when new results are published."
+msgid ""
+"You will receive an SMS as soon as new results have been published. The SMS "
+"service is free of charge. You can unsubscribe at any time."
 msgstr ""
 
 msgid ""

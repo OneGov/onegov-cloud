@@ -25,7 +25,11 @@ def subscribe(self, request, form):
         'layout': layout,
         'form': form,
         'title': _("Get SMS alerts"),
-        'message': _("Receive an SMS when new results are published."),
+        'message': _(
+            "You will receive an SMS as soon as new results have been "
+            "published. The SMS service is free of charge. You can "
+            "unsubscribe at any time."
+        ),
         'cancel': layout.homepage_link,
         'callout': callout
     }

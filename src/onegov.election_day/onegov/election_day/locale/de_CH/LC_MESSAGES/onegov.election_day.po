@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-10 11:16+0100\n"
-"PO-Revision-Date: 2016-11-10 11:17+0100\n"
+"POT-Creation-Date: 2016-11-10 13:50+0100\n"
+"PO-Revision-Date: 2016-11-10 13:46+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -241,7 +241,7 @@ msgid "Vote (Romansh)"
 msgstr "Abstimmung (Rumantsch)"
 
 #, python-format
-msgid "New results are avaiable on ${url}"
+msgid "New results are available on ${url}"
 msgstr "Neue Resultate verfügbar auf ${url}"
 
 msgid "federal"
@@ -450,6 +450,13 @@ msgstr "Aktualisiert"
 msgid "SMS alerts"
 msgstr "SMS Benachrichtigung"
 
+msgid ""
+"The SMS service provides free information on the publication of new results "
+"(intermediate results, final results):"
+msgstr ""
+"Der SMS Service informiert kostenlos über die Publikation neuer Resultate "
+"(Zwischenresultate, Schlussresultate):"
+
 msgid "Get SMS alerts"
 msgstr "SMS-Benachrichtigung abonnieren"
 
@@ -606,8 +613,12 @@ msgstr ""
 "Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine SMS, "
 "sobald neue Resultate publiziert wurden."
 
-msgid "Receive an SMS when new results are published."
-msgstr "Eine SMS erhalten, sobald neue Resultate publiziert werden."
+msgid ""
+"You will receive an SMS as soon as new results have been published. The SMS "
+"service is free of charge. You can unsubscribe at any time."
+msgstr ""
+"Sie erhalten eine SMS, sobald neue Resultate publiziert wurden. Der SMS "
+"Service ist kostenlos. Sie können sich jederzeit vom Service abmelden."
 
 msgid ""
 "Successfully unsubscribed from the SMS services. You will no longer receive "
@@ -622,24 +633,3 @@ msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
-
-#~ msgid "Subscribe"
-#~ msgstr "Abbonnieren"
-
-#~ msgid "Unsubscribe"
-#~ msgstr "Abbstellen"
-
-#~ msgid "Receive an SMS when new results are available."
-#~ msgstr "SMS bei neuen Resultaten erhalten."
-
-#~ msgid "+417911122233"
-#~ msgstr "+417911122233"
-
-#~ msgid "Cancel your SMS subscription."
-#~ msgstr "Keine SMS mehr erhalten bei neuen Resultaten."
-
-#~ msgid "New vote results: ${url}"
-#~ msgstr "Neue Abstimmungsresultate auf ${url}"
-
-#~ msgid "New election results: ${url}"
-#~ msgstr "Neue Wahlresultate auf ${url}"
