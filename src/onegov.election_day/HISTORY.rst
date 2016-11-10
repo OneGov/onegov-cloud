@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a simple subscribers view.
+  [msom]
+
 1.2.0 (2016-11-10)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-08 08:49+0100\n"
+"POT-Creation-Date: 2016-11-10 11:16+0100\n"
 "PO-Revision-Date: 2016-09-06 09:00+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -402,15 +402,6 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Ritorna alle elezioni &amp; votazioni attuali"
 
-msgid "SMS alerts"
-msgstr ""
-
-msgid "Get SMS alerts"
-msgstr ""
-
-msgid "Stop SMS subscription"
-msgstr ""
-
 msgid "Open Data"
 msgstr "Dati aperti"
 
@@ -456,6 +447,15 @@ msgstr "Tu sei qui"
 msgid "Last change"
 msgstr "Aggiornato"
 
+msgid "SMS alerts"
+msgstr ""
+
+msgid "Get SMS alerts"
+msgstr ""
+
+msgid "Stop SMS subscription"
+msgstr ""
+
 msgid "New Election"
 msgstr "Nuova elezione"
 
@@ -488,6 +488,15 @@ msgstr ""
 
 msgid "Delete"
 msgstr "Cancellare"
+
+msgid "Subscribers"
+msgstr ""
+
+msgid "No subscribers yet."
+msgstr ""
+
+msgid "Locale"
+msgstr ""
 
 msgid "New Vote"
 msgstr "Nuova votazione"

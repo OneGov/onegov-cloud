@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-08 08:49+0100\n"
-"PO-Revision-Date: 2016-11-08 08:49+0100\n"
+"POT-Creation-Date: 2016-11-10 11:16+0100\n"
+"PO-Revision-Date: 2016-11-10 11:17+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -402,15 +402,6 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
 
-msgid "SMS alerts"
-msgstr "SMS Benachrichtigung"
-
-msgid "Get SMS alerts"
-msgstr "SMS-Benachrichtigung abonnieren"
-
-msgid "Stop SMS subscription"
-msgstr "SMS-Abonnement beenden"
-
 msgid "Open Data"
 msgstr "Open Data"
 
@@ -456,6 +447,15 @@ msgstr "Aktuelle Seite"
 msgid "Last change"
 msgstr "Aktualisiert"
 
+msgid "SMS alerts"
+msgstr "SMS Benachrichtigung"
+
+msgid "Get SMS alerts"
+msgstr "SMS-Benachrichtigung abonnieren"
+
+msgid "Stop SMS subscription"
+msgstr "SMS-Abonnement beenden"
+
 msgid "New Election"
 msgstr "Neue Wahl"
 
@@ -488,6 +488,15 @@ msgstr "Benachrichtigungen auslösen"
 
 msgid "Delete"
 msgstr "Löschen"
+
+msgid "Subscribers"
+msgstr "Abonnenten"
+
+msgid "No subscribers yet."
+msgstr "Noch keine Abonnenten."
+
+msgid "Locale"
+msgstr "Gebietsschema"
 
 msgid "New Vote"
 msgstr "Neue Abstimmung"
