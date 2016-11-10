@@ -309,7 +309,7 @@ def by_attendee(booking):
     return booking.attendee_id
 
 
-def match_bookings_with_occasions(bookings, occasions, stability_check):
+def match_bookings_with_occasions(bookings, occasions, stability_check=False):
     """ Matches bookings with occasions. """
 
     bookings = [b for b in valid_bookings(bookings)]
