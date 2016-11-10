@@ -557,7 +557,7 @@ def test_sms_notification(request, election_day_app, session):
         assert notification.last_change == freezed
         assert election_day_app.send_sms.call_count == 2
         assert election_day_app.send_sms.call_args_list[0][0] == (
-            '+41791112233', 'New results are avaiable on https://wab.ch.ch'
+            '+41791112233', 'New results are available on https://wab.ch.ch'
         )
         assert election_day_app.send_sms.call_args_list[1][0] == (
             '+41791112233', 'Neue Resultate verfügbar auf https://wab.ch.ch'
