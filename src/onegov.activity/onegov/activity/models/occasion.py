@@ -103,6 +103,10 @@ class Occasion(Base, TimestampMixin):
 
         return to_timezone(self.end, self.timezone)
 
+    @property
+    def max_spots(self):
+        return self.spots.upper - 1
+
     @hybrid_property
     def duration(self):
         hours = self.duration_in_seconds / 3600
