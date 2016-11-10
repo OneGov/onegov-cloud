@@ -303,6 +303,20 @@ def by_attendee(booking):
     return booking.attendee_id
 
 
+class LoopProtection(object):
+
+    def __init__(self, max_ticks):
+        self.ticks = 0
+        self.max_ticks = max_ticks
+
+    def limit_reached(self):
+        self.ticks += 1
+
+        if self.ticks >= self.max_ticks:
+            log.warn("Loop limit of {} has been reached".format(self.ticks))
+            return True
+
+
 def match_bookings_with_occasions(bookings, occasions, stability_check=False):
     """ Matches bookings with occasions. """
 
@@ -321,17 +335,12 @@ def match_bookings_with_occasions(bookings, occasions, stability_check=False):
 
     # I haven't proven yet that the following loop will always end. Until I
     # do there's a fallback check to make sure that we'll stop at some point
-    run = 0
-    run_max = len(attendees) * 2
+    protection = LoopProtection(max_ticks=len(attendees) * 2)
 
     # while there are attendees with entries in a wishlist
     while next((a for a in attendees.values() if a.wishlist), None):
-        run += 1
 
-        if run >= run_max:
-            log.warn("The matching algorithm ran more than {} times".format(
-                run
-            ))
+        if protection.limit_reached():
             break
 
         candidates = [a for a in attendees.values() if a.wishlist]
