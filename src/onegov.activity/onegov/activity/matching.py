@@ -263,7 +263,7 @@ class OccasionAgent(object):
         return False
 
 
-def match_bookings_with_occasions_from_db(session, period_id):
+def match_bookings_with_occasions_from_db(session, period_id, **kwargs):
     MatchableBooking.register(Booking)
     MatchableOccasion.register(Occasion)
 
@@ -275,7 +275,7 @@ def match_bookings_with_occasions_from_db(session, period_id):
     o = session.query(Occasion)
     o = o.filter(Occasion.period_id == period_id)
 
-    bookings = match_bookings_with_occasions(bookings=b, occasions=o)
+    bookings = match_bookings_with_occasions(bookings=b, occasions=o, **kwargs)
 
     # write the changes to the database
     def update_states(bookings, state):
@@ -309,7 +309,7 @@ def by_attendee(booking):
     return booking.attendee_id
 
 
-def match_bookings_with_occasions(bookings, occasions):
+def match_bookings_with_occasions(bookings, occasions, stability_check):
     """ Matches bookings with occasions. """
 
     bookings = [b for b in valid_bookings(bookings)]
@@ -359,7 +359,8 @@ def match_bookings_with_occasions(bookings, occasions):
         assert a.is_valid
 
     # make sure the result is stable
-    assert is_stable(attendees.values(), occasions.values())
+    if stability_check:
+        assert is_stable(attendees.values(), occasions.values())
 
     return Bunch(
         open=set(b for a in attendees.values() for b in a.wishlist),

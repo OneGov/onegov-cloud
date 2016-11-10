@@ -49,7 +49,8 @@ def test_simple_match(session, owner, collections, prebooking_period):
 
     # multiple runs lead to the same result
     for i in range(0, 2):
-        match_bookings_with_occasions_from_db(session, prebooking_period.id)
+        match_bookings_with_occasions_from_db(
+            session, prebooking_period.id, stability_check=True)
 
         bookings = collections.bookings.query().all()
 
@@ -79,7 +80,8 @@ def test_changing_priorities(session, owner, collections, prebooking_period):
     b1.priority = 1
     b2.priority = 0
 
-    match_bookings_with_occasions_from_db(session, prebooking_period.id)
+    match_bookings_with_occasions_from_db(
+        session, prebooking_period.id, stability_check=True)
 
     assert b1.state == 'accepted'
     assert b2.state == 'open'
@@ -87,7 +89,8 @@ def test_changing_priorities(session, owner, collections, prebooking_period):
     b1.priority = 0
     b2.priority = 1
 
-    match_bookings_with_occasions_from_db(session, prebooking_period.id)
+    match_bookings_with_occasions_from_db(
+        session, prebooking_period.id, stability_check=True)
 
     assert b1.state == 'open'
     assert b2.state == 'accepted'
