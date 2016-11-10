@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds sentry support for SMS queue.
+  [msom]
+
 - Adds a simple subscribers view.
   [msom]
 

@@ -44,6 +44,7 @@ setup(
         'onegov.user',
         'phonenumbers',
         'pyyaml',
+        'raven',
         'requests',
         'rjsmin'
     ],

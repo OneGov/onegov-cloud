@@ -75,18 +75,18 @@ def fetch(group_context):
 @cli.command()
 @click.argument('username')
 @click.argument('password')
-def send_sms(username, password):
+@click.option('--sentry')
+def send_sms(username, password, sentry):
     """ Sends the SMS in the smsdir for a given instance. For example:
 
         onegov-election-day --select '/onegov_election_day/zg' send_sms
             'info@seantis.ch' 'top-secret'
 
     """
-
     def send(request, app):
         path = os.path.join(app.configuration['sms_directory'], app.schema)
         if os.path.exists(path):
-            qp = SmsQueueProcessor(path, username, password)
+            qp = SmsQueueProcessor(path, username, password, sentry)
             qp.send_messages()
 
     return send

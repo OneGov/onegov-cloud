@@ -15,6 +15,9 @@ import stat
 import time
 import requests
 
+from raven import Client
+
+
 log = logging.getLogger('onegov.election_day')
 
 
@@ -80,13 +83,13 @@ MAX_SEND_TIME = 60 * 60 * 3
 
 class SmsQueueProcessor(object):
 
-    def __init__(self, path, username, password):
+    def __init__(self, path, username, password, sentry_dsn=None):
         self.path = path
         self.username = username
         self.password = password
+        self.sentry_client = Client(sentry_dsn) if sentry_dsn else None
 
     def _send(self, number, content):
-        # Show available credits
         response = requests.post(
             'https://json.aspsms.com/SendSimpleTextSMS',
             json={
@@ -251,7 +254,10 @@ class SmsQueueProcessor(object):
 
         # Catch errors and log them here
         except:
-            log.error(
-                "Error while sending SMS {}".format(filename),
-                exc_info=True
-            )
+            if self.sentry_client:
+                self.sentry_client.captureException()
+            else:
+                log.error(
+                    "Error while sending SMS {}".format(filename),
+                    exc_info=True
+                )
