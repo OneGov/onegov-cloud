@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.2.4 (2016-11-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves cache handling.
   [msom]
