@@ -609,6 +609,10 @@ def test_view_subscription(election_day_app):
 
     client.get('/locale/de_CH').follow()
 
+    login(client)
+    assert '+41791112233' in client.get('/manage/subscribers')
+    assert 'fr_CH' in client.get('/manage/subscribers')
+
     unsubscribe = client.get('/unsubscribe')
     unsubscribe.form['phone_number'] = 'abcd'
     unsubscribe = unsubscribe.form.submit()
