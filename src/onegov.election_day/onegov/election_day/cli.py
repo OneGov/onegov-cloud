@@ -85,7 +85,8 @@ def send_sms(username, password):
 
     def send(request, app):
         path = os.path.join(app.configuration['sms_directory'], app.schema)
-        qp = SmsQueueProcessor(path, username, password)
-        qp.send_messages()
+        if os.path.exists(path):
+            qp = SmsQueueProcessor(path, username, password)
+            qp.send_messages()
 
     return send
