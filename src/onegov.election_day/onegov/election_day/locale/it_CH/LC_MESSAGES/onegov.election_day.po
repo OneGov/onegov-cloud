@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-11-10 13:50+0100\n"
-"PO-Revision-Date: 2016-11-11 12:05+0100\n"
+"PO-Revision-Date: 2016-11-11 14:00+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -242,7 +242,7 @@ msgstr "Votazione (romancio)"
 
 #, python-format
 msgid "New results are available on ${url}"
-msgstr ""
+msgstr "Nuovi risultati sono disponibili su ${url}"
 
 msgid "federal"
 msgstr "nazionale"
@@ -448,18 +448,20 @@ msgid "Last change"
 msgstr "Aggiornato"
 
 msgid "SMS alerts"
-msgstr ""
+msgstr "SMS Alert"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
 "(intermediate results, final results):"
 msgstr ""
+"Il servizio SMS garantisce informazione gratuita sulla pubblicazione di "
+"nuovi risultati (risultati intermedi, risultati finali):"
 
 msgid "Get SMS alerts"
-msgstr ""
+msgstr "Ottieni SMS Alert"
 
 msgid "Stop SMS subscription"
-msgstr ""
+msgstr "Interrompi abbonamento SMS\r"
 
 msgid "New Election"
 msgstr "Nuova elezione"
@@ -489,7 +491,7 @@ msgid "Upload Results"
 msgstr "Caricare risultati"
 
 msgid "Trigger Notifications"
-msgstr ""
+msgstr "Attivazione delle notifiche"
 
 msgid "Delete"
 msgstr "Cancellare"
@@ -519,7 +521,7 @@ msgid "Your results were uploaded successfully."
 msgstr "I Suoi risultati sono stati caricati correttamente."
 
 msgid "Click here to trigger the notifications"
-msgstr ""
+msgstr "Clicca qui per attivare le notifiche"
 
 msgid "Click here to see the updated results page."
 msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
@@ -549,19 +551,19 @@ msgid "Errors found in tie-breaker"
 msgstr "Errori nella domanda eventuale"
 
 msgid "Proposal and counter proposal rejected"
-msgstr "Respinto"
+msgstr "Iniziativa e controprogetto sono state rifiutate"
 
 msgid "Proposal accepted"
-msgstr "Accolto"
+msgstr "Iniziativa accettata"
 
 msgid "Counter proposal accepted"
-msgstr "Controprogetto"
+msgstr "Controprogetto accettata"
 
 msgid "Tie breaker in favor of the proposal"
-msgstr "Accolto"
+msgstr "Spareggio a favore della iniziativa"
 
 msgid "Tie breaker in favor of the counter proposal"
-msgstr "Controprogetto"
+msgstr "Spareggio a favore della controprogetto"
 
 msgid "Yeas"
 msgstr "Voti favorevoli"
@@ -592,9 +594,11 @@ msgid ""
 "There are no changes since the last time the notifications have been "
 "triggered!"
 msgstr ""
+"Non ci sono stati cambiamenti dall’ultima che le notifiche sono state "
+"attivate!"
 
 msgid "Do you really want to retrigger the notfications?"
-msgstr ""
+msgstr "Vuoi davvero riattivare le notifiche?"
 
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
@@ -607,16 +611,22 @@ msgid ""
 "Successfully subscribed to the SMS services. You will receive an SMS every "
 "time new results are published."
 msgstr ""
+"Ti sei iscritto con successo al servizio SMS. Riceverai un SMS ogni volta "
+"che un nuovo risultato verrà pubblicato."
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "
 "service is free of charge. You can unsubscribe at any time."
 msgstr ""
+"Riceverai un SMS appena un nuovo risultato verrà pubblicato. Il servizio SMS "
+"è gratuito. Puoi eliminare il tuo abbonamento in ogni momento."
 
 msgid ""
 "Successfully unsubscribed from the SMS services. You will no longer receive "
 "SMS when new results are published."
 msgstr ""
+"Il tuo abbonamento al servizio SMS è stato annullato con successo. Non "
+"riceverai più SMS quando nuovi risultati saranno pubblicati.\r"
 
 #, python-format
 msgid "The year ${year} is not yet supported"
