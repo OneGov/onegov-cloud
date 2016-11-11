@@ -16,6 +16,7 @@ def view_vote(self, request):
     """" The main view. """
 
     request.include('ballot_map')
+    request.include('tablesorter')
 
     handle_headerless_params(request)
 

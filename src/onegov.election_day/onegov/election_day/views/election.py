@@ -175,6 +175,7 @@ def view_election(self, request):
 
     request.include('bar_chart')
     request.include('sankey_chart')
+    request.include('tablesorter')
 
     handle_headerless_params(request)
 

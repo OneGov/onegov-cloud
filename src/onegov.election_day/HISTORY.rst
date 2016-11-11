@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds table sorting.
+  [msom]
+
 1.2.4 (2016-11-10)
 ~~~~~~~~~~~~~~~~~~~
 

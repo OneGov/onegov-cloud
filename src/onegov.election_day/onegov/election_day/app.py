@@ -247,6 +247,14 @@ def get_resizer_asset():
     yield 'iframeResizer.contentWindow.js'
 
 
+@ElectionDayApp.webasset('tablesorter')
+def get_tablesorter_asset():
+    yield 'jquery.js'
+    yield 'jquery.tablesorter.js'
+    yield 'widget-staticRow.js'
+    yield 'tablesorter.js'
+
+
 @ElectionDayApp.webasset('common')
 def get_common_asset():
     yield 'modernizr.js'

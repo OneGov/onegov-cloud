@@ -115,11 +115,11 @@
                 <h3 tal:condition="not:vote.counter_proposal" class="foldable-title" i18n:translate="">Electoral Districts</h3>
                 <h4 tal:condition="vote.counter_proposal" class="foldable-title" i18n:translate="">Electoral Districts</h4>
                 <div class="foldable-panel">
-                    <table class="ballot-results stackable" tal:define="summarize len(ballot.results)!=1">
+                    <table class="ballot-results stackable sortable" tal:define="summarize len(ballot.results)!=1">
                         <thead>
                             <tr>
-                                <th i18n:translate="">Electoral District</th>
-                                <th i18n:translate="">Result</th>
+                                <th i18n:translate="" class="left-aligned">Electoral District</th>
+                                <th i18n:translate="" class="left-aligned">Result</th>
                                 <th i18n:translate="" class="right-aligned">Yeas</th>
                                 <th i18n:translate="" class="right-aligned">Nays</th>
                                 <th i18n:translate="" class="right-aligned">Empty</th>
@@ -129,7 +129,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="total" tal:condition="summarize">
+                            <tr class="total static" tal:condition="summarize">
                                 <td i18n:translate="">Total</td>
                                 <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
                                 <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>
@@ -160,7 +160,7 @@
                                 </tal:block>
                             </tr>
 
-                            <tr class="total" tal:condition="summarize">
+                            <tr class="total static" tal:condition="summarize">
                                 <td i18n:translate="">Total</td>
                                 <td class="answer" tal:condition="not:counted" i18n:translate="">Not yet counted.</td>
                                 <td class="answer accepted" tal:condition="counted and ballot.accepted" i18n:translate="">Accepted</td>

@@ -86,7 +86,7 @@
             <div class="foldable" tal:condition="not: majorz">
                 <h3 class="foldable-title" i18n:translate="">Candidates</h3>
                 <div class="foldable-panel">
-                    <table class="ballot-results stackable collapsible collapsed">
+                    <table class="ballot-results stackable collapsible collapsed sortable">
                         <thead>
                             <tr>
                                 <th i18n:translate="">Candidate</th>
@@ -104,10 +104,10 @@
                                 <td class="answer rejected right-aligned" tal:condition="candidate[2] == False" i18n:translate="">No</td>
                                 <td class="answer right-aligned" tal:condition="candidate[2] == None" i18n:translate=""></td>
                             </tr>
-                            <tr class="more">
+                            <tr class="more static">
                                 <td colspan="4" i18n:translate="">All candidates</td>
                             </tr>
-                            <tr class="less">
+                            <tr class="less static">
                                 <td colspan="4" i18n:translate="">Elected candidates only</td>
                             </tr>
                         </tbody>
@@ -168,7 +168,7 @@
             <div class="foldable folded" tal:condition="summarize and majorz">
                 <h3 class="foldable-title" i18n:translate="">Electoral Districts</h3>
                 <div class="foldable-panel">
-                    <table class="ballot-results stackable">
+                    <table class="ballot-results stackable sortable">
                         <thead>
                             <tr>
                                 <th i18n:translate="">Electoral District</th>
@@ -176,7 +176,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="total">
+                            <tr class="total static">
                                 <td i18n:translate="">Total</td>
                                 <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                             </tr>
@@ -188,7 +188,7 @@
                                 <td>${entity}</td>
                                 <td i18n:translate="" tal:attributes="colspan number_of_candidates">Not yet counted.</td>
                             </tr>
-                            <tr class="total">
+                            <tr class="total static">
                                 <td i18n:translate="">Total</td>
                                 <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
                             </tr>
@@ -200,7 +200,7 @@
             <div class="foldable folded">
                 <h3 class="foldable-title" i18n:translate="">Election statistics</h3>
                 <div class="foldable-panel">
-                    <table class="ballot-results stackable">
+                    <table class="ballot-results stackable sortable">
                         <thead>
                             <tr>
                                 <th i18n:translate="">Electoral District</th>
@@ -214,7 +214,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr class="total" tal:condition="summarize">
+                            <tr class="total static" tal:condition="summarize">
                                 <td i18n:translate="">Total</td>
                                 <td class="right-aligned">${layout.format_number(election.elegible_voters)}</td>
                                 <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
@@ -238,7 +238,7 @@
                                 <td tal:condition="summarize">${entity}</td>
                                 <td i18n:translate="" colspan="6">Not yet counted.</td>
                             </tr>
-                            <tr class="total" tal:condition="summarize">
+                            <tr class="total static" tal:condition="summarize">
                                 <td i18n:translate="">Total</td>
                                 <td class="right-aligned">${layout.format_number(election.elegible_voters)}</td>
                                 <td class="right-aligned">${layout.format_number(election.received_ballots)}</td>
