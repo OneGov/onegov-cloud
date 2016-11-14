@@ -77,9 +77,13 @@ class Occasion(MatchableOccasion):
 
 def test_overlapping_bookings():
 
+    def days(n):
+        return timedelta(days=n)
+
     # the algorithm will block other bookings, favoring higher priorities
     o1 = Occasion("Daytrip", today(), today())
-    o2 = Occasion("Camp", today(), today() + timedelta(days=1))
+    o2 = Occasion("Camp", today(), today() + days(1))
+    o3 = Occasion("Zoo", today() + days(1), today() + days(2))
 
     bookings = [
         o1.booking("Justin", 'open', 1),
@@ -115,3 +119,17 @@ def test_overlapping_bookings():
     assert not result.open
     assert result.accepted == {bookings[0]}
     assert result.blocked == {bookings[1]}
+
+    # always prefer the booking with the highest priority, even if it leads
+    # to more blocked bookings than it would otherwise
+    bookings = [
+        o1.booking("Justin", 'open', 0),
+        o2.booking("Justin", 'open', 1),
+        o3.booking("Justin", 'open', 0)
+    ]
+
+    result = match(bookings, (o1, o2, o3))
+
+    assert not result.open
+    assert result.blocked == {bookings[0], bookings[2]}
+    assert result.accepted == {bookings[1]}
