@@ -220,3 +220,17 @@ class PeriodFormLayout(DefaultLayout):
     @cached_property
     def editbar_links(self):
         return None
+
+
+class MatchCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(_("Matches"), '#')
+        )

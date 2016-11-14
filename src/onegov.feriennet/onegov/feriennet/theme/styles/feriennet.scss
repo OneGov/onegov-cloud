@@ -486,3 +486,50 @@ ul.tags {
         }
     }
 }
+
+
+/*
+    Matches
+*/
+
+.matched-occasion {
+    border-left: 2rem solid $aluminum;
+    padding-left: 1rem;
+
+    h4 {
+        margin-top: 1rem;
+    }
+
+    span {
+        display: block;
+        font-weight: bold;
+        margin: -.5rem 0 1rem;
+    }
+
+    &::before {
+        color: $white;
+        font-size: 1.25rem;
+        left: 1.45rem;
+        position: absolute;
+    }
+
+    &.matched-state-full {
+        border-color: $green-dark;
+    }
+
+    &.matched-state-operable {
+        border-color: $green-light;
+    }
+
+    &.matched-state-unoperable {
+        border-color: $red-light;
+    }
+
+    &.matched-state-empty {
+        border-color: $red-dark;
+
+        &::before {
+            @include icon('\f05e');
+        }
+    }
+}

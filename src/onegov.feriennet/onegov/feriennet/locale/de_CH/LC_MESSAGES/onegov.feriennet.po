@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-09 11:53+0100\n"
+"POT-Creation-Date: 2016-11-14 16:30+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -35,6 +35,9 @@ msgstr "Perioden Verwalten"
 
 msgid "New Period"
 msgstr "Neue Periode"
+
+msgid "Matches"
+msgstr "Zuteilungen"
 
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
@@ -480,6 +483,33 @@ msgstr "Ihr Angebot wurde archiviert:"
 msgid "Your activity has unfortunately been rejected:"
 msgstr "Ihr Angebot wurde leider abgelehnt:"
 
+msgid "Full"
+msgstr "Voll"
+
+msgid "Operable"
+msgstr "Genügend Teilnehmer"
+
+msgid "Unoperable"
+msgstr "Zuwenig Teilnehmer"
+
+msgid "Empty"
+msgstr "Keine Teilnehmer"
+
+msgid "Accepted Bookings"
+msgstr "Angenommene Buchungen"
+
+msgid "No accepted bookings."
+msgstr "Keine angenommenen Buchungen."
+
+msgid "Other Bookings"
+msgstr "Andere Buchungen"
+
+msgid "No other bookings."
+msgstr "Keine anderen Buchungen."
+
+msgid "State"
+msgstr "Status"
+
 msgid ""
 "The following activites contain occasions which are in conflict with the "
 "given execution phase:"
@@ -573,6 +603,10 @@ msgstr "Möchten Sie \"${title}\" wirklich entfernen?"
 
 msgid "Remove Booking"
 msgstr "Buchung entfernen"
+
+#, python-format
+msgid "Matches for ${title}"
+msgstr "Zuteilungen für ${title}"
 
 msgid "Enroll Attendee"
 msgstr "Teilnehmer Anmelden"

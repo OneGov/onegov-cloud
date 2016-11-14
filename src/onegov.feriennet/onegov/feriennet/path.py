@@ -2,9 +2,10 @@ from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
 from onegov.feriennet import FeriennetApp
+from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import VacationActivityCollection
-from onegov.feriennet.models import VacationActivity
 from onegov.feriennet.converters import age_range_converter
+from onegov.feriennet.models import VacationActivity
 from uuid import UUID
 
 
@@ -101,3 +102,27 @@ def get_my_bookings(request, app, period_id=None, username=None):
     converters=dict(id=UUID))
 def get_booking(request, app, id):
     return BookingCollection(app.session()).by_id(id)
+
+
+@FeriennetApp.path(
+    model=MatchCollection,
+    path='/zuteilungen',
+    converters=dict(period_id=UUID))
+def get_matches(request, app, period_id, username=None):
+    # non-admins are limited to the ativites they own, admins may view
+    # all the occasions (this differs slighty from the booking collection path)
+    if not request.is_admin:
+        username = request.current_username
+
+    # the default period is the active period or the first we can find
+    periods = PeriodCollection(app.session())
+
+    if not period_id:
+        period = periods.active() or periods.query().first()
+    else:
+        period = periods.by_id(period_id)
+
+    if not period:
+        return None
+
+    return MatchCollection(app.session(), period, username)
