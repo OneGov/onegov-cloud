@@ -18,7 +18,7 @@ def search(self, request):
     try:
         request.app.es_client.ping()
     except TransportError:
-        log.warn("Elasticsearch cluster is offline")
+        log.warning("Elasticsearch cluster is offline")
         return {
             'title': _("Search Unavailable"),
             'layout': layout,
