@@ -46,6 +46,8 @@ svg #background {
     .new-occasion:before { @include icon('\f133'); }
     .manage-periods:before { @include icon('\f02d'); }
     .new-period:before { @include icon('\f055'); }
+    .run-matching:before { @include icon('\f0d0'); }
+    .reset-matching:before { @include icon('\f12d'); }
 }
 
 /*

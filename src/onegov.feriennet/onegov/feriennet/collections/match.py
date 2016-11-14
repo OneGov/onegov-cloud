@@ -10,6 +10,10 @@ class MatchCollection(object):
         self.period = period
         self.username = username
 
+    @property
+    def period_id(self):
+        return self.period.id
+
     def for_period(self, period):
         return self.__class__(self.session, period, self.username)
 
