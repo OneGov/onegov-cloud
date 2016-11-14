@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a to_timezone helper function to the default layout.
+  [href]
+
 0.1.1 (2016-11-02)
 ~~~~~~~~~~~~~~~~~~~
 

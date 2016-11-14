@@ -31,6 +31,7 @@ from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection
+from sedate import to_timezone
 from sqlalchemy import desc
 
 
@@ -299,6 +300,9 @@ class Layout(ChameleonLayout):
 
     def get_user_color(self, username):
         return utils.get_user_color(username)
+
+    def to_timezone(self, date, timezone):
+        return to_timezone(date, timezone)
 
     def format_time_range(self, start, end):
         return utils.format_time_range(start, end)
