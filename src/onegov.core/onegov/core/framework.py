@@ -849,7 +849,7 @@ def http_conflict_tween_factory(app, handler):
             if not isinstance(e.orig, TransactionRollbackError):
                 raise
 
-            log.warn("A transaction failed because there was a conflict")
+            log.warning("A transaction failed because there was a conflict")
 
             return HTTPConflict()
 

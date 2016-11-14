@@ -216,7 +216,7 @@ class ApplicationBoundCronjobs(Thread):
                 duration = (datetime.utcnow() - start).total_seconds()
 
                 if duration > CRONJOB_MAX_DURATION:
-                    log.warn(
+                    log.warning(
                         "The job for {} at {}:{} took too long ({}s)".format(
                             self.application_id, job.hour, job.minute, duration
                         )
