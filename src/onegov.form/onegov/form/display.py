@@ -37,7 +37,7 @@ class Registry(object):
         renderer = self.renderer_map.get(field.type)
 
         if renderer is None:
-            log.warn('No renderer found for {}'.format(field.type))
+            log.warning('No renderer found for {}'.format(field.type))
             return ''
         else:
             return renderer(field)
