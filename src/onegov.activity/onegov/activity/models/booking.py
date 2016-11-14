@@ -29,6 +29,9 @@ class Booking(Base, TimestampMixin):
     def __hash__(self):
         return hash(self.id)
 
+    def __eq__(self, other):
+        return self.id == other.id
+
     #: the public id of the booking
     id = Column(UUID, primary_key=True, default=uuid4)
 

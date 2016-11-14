@@ -29,10 +29,10 @@ class Booking(MatchableBooking):
         self._end = end
 
     def __eq__(self, other):
-        return self.occasion == other.occasion
+        return self._id == other._id
 
     def __hash__(self):
-        return hash(self.occasion)
+        return hash(self._id)
 
     @property
     def id(self):
@@ -159,3 +159,40 @@ def test_overlapping_bookings():
     assert not result.open
     assert result.accepted == {bookings[0], bookings[2]}
     assert result.blocked == {bookings[1]}
+
+
+def test_accept_highest_priority():
+
+    o = Occasion("Best Activity Ever", today(), today(), max_spots=2)
+    bookings = [
+        o.booking("Tick", 'open', 0),
+        o.booking("Trick", 'open', 1),
+        o.booking("Track", 'open', 1)
+    ]
+
+    result = match(bookings, [o])
+
+    assert result.open == {bookings[0]}
+    assert result.accepted == {bookings[1], bookings[2]}
+    assert not result.blocked
+
+    # all other things being equal, the choice is inherently random.
+    # to be predictable we need to change all the set and dictionaries to
+    # their ordered counterparts which is something we want to avoid for
+    # performance/memory usage reasons
+    o = Occasion("Best Activity Ever", today(), today(), max_spots=2)
+    bookings = [
+        o.booking("Tick", 'open', 0),
+        o.booking("Trick", 'open', 0),
+        o.booking("Track", 'open', 1)
+    ]
+
+    result = match(bookings, [o])
+
+    # the first result loses, because it's the first result with a lower
+    # score than the third booking - we could turn this around, the important
+    # thing is that we are predictable
+    assert result.open == {bookings[0]} or result.open == {bookings[1]}
+    assert result.accepted == {bookings[1], bookings[2]} or\
+        result.accepted == {bookings[0], bookings[2]}
+    assert not result.blocked
