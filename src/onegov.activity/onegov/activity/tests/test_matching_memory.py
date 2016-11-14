@@ -1,12 +1,20 @@
 from datetime import date, timedelta
 from functools import partial
+from itertools import count
 from onegov.activity.matching import MatchableBooking
 from onegov.activity.matching import MatchableOccasion
 from onegov.activity.matching import deferred_acceptance
 
 
 today = date.today
-match = partial(deferred_acceptance, stability_check=True)
+keycount = count(start=1, step=1)
+
+match = partial(
+    deferred_acceptance,
+    stability_check=True,
+    validity_check=True,
+    hard_budget=True
+)
 
 
 class Booking(MatchableBooking):
@@ -14,6 +22,7 @@ class Booking(MatchableBooking):
     def __init__(self, occasion, attendee, state, priority, start, end):
         self.occasion = occasion
         self.attendee = attendee
+        self._id = next(keycount)
         self._state = state
         self._priority = priority
         self._start = start
@@ -24,6 +33,10 @@ class Booking(MatchableBooking):
 
     def __hash__(self):
         return hash(self.occasion)
+
+    @property
+    def id(self):
+        return self._id
 
     @property
     def occasion_id(self):
@@ -133,3 +146,16 @@ def test_overlapping_bookings():
     assert not result.open
     assert result.blocked == {bookings[0], bookings[2]}
     assert result.accepted == {bookings[1]}
+
+    # be predictable if there are no other preferences
+    bookings = [
+        o1.booking("Justin", 'open', 0),
+        o2.booking("Justin", 'open', 0),
+        o3.booking("Justin", 'open', 0)
+    ]
+
+    result = match(bookings, (o1, o2, o3))
+
+    assert not result.open
+    assert result.accepted == {bookings[0], bookings[2]}
+    assert result.blocked == {bookings[1]}

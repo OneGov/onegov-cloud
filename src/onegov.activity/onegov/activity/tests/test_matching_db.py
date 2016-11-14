@@ -5,7 +5,12 @@ from onegov.core.utils import Bunch
 from uuid import uuid4
 
 
-match = partial(deferred_acceptance_from_database, stability_check=True)
+match = partial(
+    deferred_acceptance_from_database,
+    stability_check=True,
+    validity_check=True,
+    hard_budget=True
+)
 
 
 def new_occasion(collections, period, offset, length,

@@ -37,6 +37,11 @@ class MatchableBooking(metaclass=ABCMeta):
 
     @property
     @abstractmethod
+    def id(self):
+        """ The id of the booking. """
+
+    @property
+    @abstractmethod
     def occasion_id(self):
         """ Returns the id of the occasion this booking belongs to. """
 

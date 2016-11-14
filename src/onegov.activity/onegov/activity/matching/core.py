@@ -33,7 +33,10 @@ class AttendeeAgent(hashable('id')):
         # keep the wishlist sorted from highest to lowest priority, ignoring
         # the current state of the booking as we will assign them anew
         # each time we run the algorithm
-        self.wishlist = SortedSet(bookings, key=lambda b: b.priority * -1)
+        def booking_order(booking):
+            return booking.priority * -1, booking.id
+
+        self.wishlist = SortedSet(bookings, key=booking_order)
         self.accepted = set()
         self.blocked = set()
 
@@ -169,7 +172,9 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
 
 
 def deferred_acceptance(bookings, occasions,
-                        validity_check=True, stability_check=False):
+                        validity_check=True,
+                        stability_check=False,
+                        hard_budget=False):
     """ Matches bookings with occasions. """
 
     bookings = [b for b in bookings]
@@ -186,12 +191,12 @@ def deferred_acceptance(bookings, occasions,
 
     # I haven't proven yet that the following loop will always end. Until I
     # do there's a fallback check to make sure that we'll stop at some point
-    budget = LoopBudget(max_ticks=len(attendees) * 2)
+    budget = LoopBudget(max_ticks=len(bookings) * len(attendees))
 
     # while there are attendees with entries in a wishlist
     while next((a for a in attendees.values() if a.wishlist), None):
 
-        if budget.limit_reached():
+        if budget.limit_reached(as_exception=hard_budget):
             break
 
         candidates = [a for a in attendees.values() if a.wishlist]
