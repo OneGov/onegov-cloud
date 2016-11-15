@@ -164,7 +164,9 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
 
         b = session.query(Booking)
         b = b.filter(Booking.id.in_(ids))
-        b.update({Booking.state: state}, 'fetch')
+
+        for booking in b:
+            booking.state = state
 
     update_states(bookings.open, 'open')
     update_states(bookings.accepted, 'accepted')
