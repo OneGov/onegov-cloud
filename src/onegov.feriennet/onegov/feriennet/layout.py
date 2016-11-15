@@ -2,6 +2,7 @@ from cached_property import cached_property
 from onegov.activity import Activity, PeriodCollection
 from onegov.feriennet import _
 from onegov.feriennet import security
+from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
 from onegov.org.layout import DefaultLayout as BaseLayout
@@ -42,6 +43,13 @@ class VacationActivityCollectionLayout(DefaultLayout):
                     text=_("Manage Periods"),
                     url=self.request.class_link(PeriodCollection),
                     classes=('manage-periods', )
+                )
+            )
+            links.append(
+                Link(
+                    text=_("Manage Matches"),
+                    url=self.request.class_link(MatchCollection),
+                    classes=('manage-matches', )
                 )
             )
 
