@@ -495,8 +495,8 @@ ul.tags {
 */
 
 .matched-occasion {
-    border-left: 2rem solid $aluminum;
-    padding-left: 1rem;
+    margin-bottom: 1rem;
+    padding-left: 3rem;
 
     h4 {
         margin-top: 1rem;
@@ -508,30 +508,41 @@ ul.tags {
         margin: -.5rem 0 1rem;
     }
 
+    table {
+        margin-bottom: 0;
+    }
+
     &::before {
-        color: $white;
         font-size: 1.25rem;
         left: 1.45rem;
         position: absolute;
     }
 
     &.matched-state-full {
-        border-color: $green-dark;
+        &::before {
+            @include icon('\f240');
+            color: $green;
+        }
     }
 
     &.matched-state-operable {
-        border-color: $green-light;
+        &::before {
+            @include icon('\f241');
+            color: $green-light;
+        }
     }
 
     &.matched-state-unoperable {
-        border-color: $red-light;
+        &::before {
+            @include icon('\f243');
+            color: $red-light;
+        }
     }
 
     &.matched-state-empty {
-        border-color: $red-dark;
-
         &::before {
-            @include icon('\f05e');
+            @include icon('\f244');
+            color: $red;
         }
     }
 }

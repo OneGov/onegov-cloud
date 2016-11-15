@@ -246,6 +246,7 @@ class MatchCollectionLayout(DefaultLayout):
                 confirm=_("Do you really want to execute a new matching run?"),
                 extra_information=_("This cannot be undone."),
                 classes=('confirm', 'run-matching'),
+                redirect_after=self.request.link(self.model),
                 yes_button_text=_("Execute Matching Run")
             ))
             links.append(ConfirmLink(
@@ -254,6 +255,7 @@ class MatchCollectionLayout(DefaultLayout):
                 confirm=_("Do you really want to reset the current period?"),
                 extra_information=_("This cannot be undone."),
                 classes=('confirm', 'reset-matching'),
+                redirect_after=self.request.link(self.model),
                 yes_button_text=_("Reset Matching")
             ))
 

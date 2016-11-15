@@ -15,7 +15,10 @@
                         records['first'].occasion_end,
                         records['first'].occasion_timezone
                     ),
-                )}</span>
+                )}, ${records['first'].occasion_spots.lower} -
+                    ${records['first'].occasion_spots.upper - 1}
+                    <i class="fa fa-child" aria-hidden="true"></i>
+                </span>
 
                 <h4 i18n:translate>Accepted Bookings</h4>
                 <tal:block condition="not:records['accepted']" i18n:translate>
@@ -27,6 +30,7 @@
                         <tr>
                             <th i18n:translate>Name</th>
                             <th i18n:translate>Age</th>
+                            <th i18n:translate>State</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -35,7 +39,7 @@
                                 <i class="fa fa-star-o" aria-hidden="true"></i>
                                 ${record.attendee_name}
                             </td>
-                            <td>${record.attendee_age}</td>
+                            <td>${int(record.attendee_age)}</td>
                             <td>${record.booking_state}</td>
                         </tr>
                     </tbody>

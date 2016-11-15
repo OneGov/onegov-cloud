@@ -161,6 +161,10 @@ class OccasionForm(Form):
         super().populate_obj(model, exclude={
             'start',
             'end',
+            'max_spots',
+            'min_spots',
+            'min_age',
+            'max_age'
         })
 
         model.timezone = self.timezone
