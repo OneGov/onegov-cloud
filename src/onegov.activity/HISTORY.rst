@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an implementation of Deferred Acceptance as a matching algorithm.
+  [href]
+
 - Introduces a happiness function on the attendee which returns a value
   between 0.0 and 1.0 depending on how happy the attendee is assumed to be
   with the bookings confirmed for the given period.
