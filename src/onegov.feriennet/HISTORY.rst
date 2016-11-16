@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to match bookings/attendees with occasions.
+  [href]
+
 0.0.9 (2016-11-02)
 ~~~~~~~~~~~~~~~~~~~
 
