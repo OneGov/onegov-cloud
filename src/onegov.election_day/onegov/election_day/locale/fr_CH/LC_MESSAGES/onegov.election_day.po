@@ -449,7 +449,7 @@ msgid "Last change"
 msgstr "Actualisé"
 
 msgid "SMS alerts"
-msgstr "alertes SMS"
+msgstr "Alertes SMS"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
