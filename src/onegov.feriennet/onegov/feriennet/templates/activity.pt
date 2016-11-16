@@ -10,7 +10,7 @@
                 This is a preview. Please edit it until you are satisifed with the result and then press "Request Publication". An administrator will then review your proposal.
             </div>
             <div class="panel callout" tal:condition="request.is_admin" i18n:translate>
-                This is a preview. Please edit it until you are satisifed with the result and then press "Publish" to make this activity public.
+                This is a preview. Please edit it until you are satisifed with the result and then press "Request Publication" to mark the activity ready for review.
             </div>
         </tal:block>
 

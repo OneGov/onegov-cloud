@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-15 09:28+0100\n"
+"POT-Creation-Date: 2016-11-16 10:40+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -367,10 +367,10 @@ msgstr ""
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
-"and then press \"Publish\" to make this activity public."
-msgstr ""
-"Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
-"Im Anschluss wählen Sie \"Veröffentlichen\" in der Menübar."
+"and then press \"Request Publication\" to mark the activity ready for review."
+msgstr "Dies ist eine Vorschau. Bitte bearbeiten Sie diese, bis Sie zufrieden sind. "
+"Im Anschluss wählen Sie \"Publikation Beantragen\". Sie oder ein anderer "
+"Administrator können daraufhin das Angebot prüfen und veröffentlichen."
 
 msgid "This activity is currently being reviewd by an administrator."
 msgstr "Dieses Angebot wird zur Zeit überprüft."
@@ -678,15 +678,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "Full"
-#~ msgstr "Voll"
-
-#~ msgid "Operable"
-#~ msgstr "Genügend Teilnehmer"
-
-#~ msgid "Unoperable"
-#~ msgstr "Zuwenig Teilnehmer"
-
-#~ msgid "Empty"
-#~ msgstr "Keine Teilnehmer"
