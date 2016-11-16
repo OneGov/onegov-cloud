@@ -198,7 +198,7 @@ msgid "This occasion is outside the currently active period"
 msgstr "Diese Durchführung liegt ausserhalb der aktiven Periode"
 
 msgid "Cannot create a booking outside the prebooking period"
-msgstr "Anmeldungen können nur während der Voranmeldungsphase gemacht werden"
+msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
 
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
@@ -257,16 +257,16 @@ msgid "Ferienpass Summer ${year}"
 msgstr "Ferienpass Sommer ${year}"
 
 msgid "Prebooking Start"
-msgstr "Start Voranmeldung"
+msgstr "Start Wunschphase"
 
 msgid "Prebooking End"
-msgstr "Ende Voranmeldung"
+msgstr "Ende Wunschphase"
 
 msgid "Execution Start"
-msgstr "Start Ausführung"
+msgstr "Start Durchführung"
 
 msgid "Execution End"
-msgstr "Ende Ausführung"
+msgstr "Ende Durchführung"
 
 msgid "The execution phase conflicts with existing occasions"
 msgstr "Konflikt mit bestehenden Durchführungen"
@@ -275,7 +275,7 @@ msgid ""
 "The prebooking period must start before the exeuction period and each period "
 "must start before it ends."
 msgstr ""
-"Die Anmeldung muss vor der Ausführung statfinden und die Start-Daten müssen "
+"Die Wunschphase muss vor der Durchführung statfinden und die Start-Daten müssen "
 "vor den End-Daten liegen."
 
 msgid "Name"
@@ -399,7 +399,7 @@ msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren"
 
 msgid ""
 "Once the pre-booking is over, we will divide all children into activities"
-msgstr "Nach der Voranmeldungsphase verteilen wir die Kinder auf die Angebote"
+msgstr "Nach der Wunschphase verteilen wir die Kinder auf die Angebote"
 
 msgid "We cannot guarantee that everyone gets into their favorite activity"
 msgstr ""
@@ -479,13 +479,13 @@ msgid "Unmark activity as favorite"
 msgstr "Angebot nicht mehr als Favorit markieren"
 
 msgid "Prebooking begins on ${date}"
-msgstr "Die Voranmeldung beginnt am ${date}"
+msgstr "Die Wunschphase beginnt am ${date}"
 
 msgid "Prebooking is now active until ${date}"
-msgstr "Die Voranmeldung ist jetzt bis am ${date} aktiv"
+msgstr "Die Wunschphase ist jetzt bis am ${date} aktiv"
 
 msgid "Prebooking ended on ${date}"
-msgstr "Die Voranmeldung ging am ${date} zu Ende"
+msgstr "Die Wunschphase ging am ${date} zu Ende"
 
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
@@ -525,13 +525,13 @@ msgid ""
 "given execution phase:"
 msgstr ""
 "Folgende Angebote enthalten Durchführungen welche in Konflikt mit den "
-"Ausführungs-Daten stehen:"
+"Durchfürhrungs-Daten stehen:"
 
 msgid "No periods defined."
 msgstr "Keine Perioden definiert."
 
 msgid "Prebooking Phase"
-msgstr "Anmeldungs-Phase"
+msgstr "Wunschphase"
 
 msgid "Exeuction Phase"
 msgstr "Ausführungs-Phase"
