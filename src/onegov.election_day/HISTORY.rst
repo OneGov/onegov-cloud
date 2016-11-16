@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.2 (2016-11-16)
+~~~~~~~~~~~~~~~~~~~
 
 - Update translations.
 [msom]
