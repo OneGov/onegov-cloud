@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes userprofile data being lost on erronous input.
+  [href]
+
 - Fixes datetime/date picker weeks not starting on the region-specific day.
   [href]
 

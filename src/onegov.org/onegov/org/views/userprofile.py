@@ -27,7 +27,7 @@ def handle_user_profile(self, request, form):
     if form.submitted(request):
         form.populate_obj(user)
         request.success(_("Your changes were saved"))
-    else:
+    elif not request.POST:
         form.process(obj=user)
 
     layout.breadcrumbs = [
