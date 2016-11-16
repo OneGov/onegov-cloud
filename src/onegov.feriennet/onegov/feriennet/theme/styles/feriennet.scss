@@ -376,6 +376,7 @@ ul.tags {
 // use px in this block as rem is buggy in pseud-elements in IE 11
 .count[data-count]:after {
     border-radius: 100px;
+    color: $white;
     content: attr(data-count);
     display: inline-block;
     font-size: 13px;
@@ -387,9 +388,12 @@ ul.tags {
     text-align: center;
 }
 
+.count.success[data-count]:after {
+    background-color: $success-color;
+}
+
 .count.alert[data-count]:after {
     background-color: $alert-color;
-    color: $white;
 }
 
 /*
@@ -422,7 +426,7 @@ ul.tags {
     }
 
     .state {
-        background-color: $base;
+        background-color: $aluminum;
         border-radius: 5px;
         color: $white;
         display: inline-block;
@@ -432,13 +436,19 @@ ul.tags {
         right: 1rem;
         top: .5rem;
 
-        &.cancelled,
-        &.blocked,
+        &.cancelled {
+            background-color: $red;
+        }
+
+        &.blocked {
+            background-color: $orange;
+        }
+
         &.denied {
             background-color: $alert-color;
         }
 
-        &.confirmed {
+        &.accepted {
             background-color: $success-color;
         }
     }

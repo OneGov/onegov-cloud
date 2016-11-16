@@ -57,23 +57,33 @@
                                     <div class="occasion">
                                         ${layout.format_datetime_range(booking.occasion.start, booking.occasion.end)}
                                     </div>
-                                    <div class="state">
-                                        <tal:block switch="booking.state">
-                                            <span tal:case="'open'" class="${booking.state}" i18n:translate>
-                                                Open
-                                            </span>
-                                            <span tal:case="'accepted'" class="${booking.state}" i18n:translate>
-                                                Confirmed
-                                            </span>
-                                            <span tal:case="'cancelled'" class="${booking.state}" i18n:translate>
+                                    <div>
+                                        <!--! During pre-booking we don't show the actual state of the booking, unless the
+                                        occasion was cancelled, otherwise the user might see accepted bookings at a point where those states are not confirmed yet. -->
+                                        <tal:block switch="booking.state" condition="not:period.confirmed">
+                                            <div tal:case="'cancelled'" class="state ${booking.state}" i18n:translate>
                                                 Cancelled
-                                            </span>
-                                            <span tal:case="'denied'" class="${booking.state}" i18n:translate>
+                                            </div>
+                                            <div tal:case="default" class="state open" i18n:translate>
+                                                Open
+                                            </div>
+                                        </tal:block>
+                                        <tal:block switch="booking.state" condition="period.confirmed">
+                                            <div tal:case="'open'" class="state ${booking.state}" i18n:translate>
+                                                Open
+                                            </div>
+                                            <div tal:case="'accepted'" class="state ${booking.state}" i18n:translate>
+                                                Confirmed
+                                            </div>
+                                            <div tal:case="'cancelled'" class="state ${booking.state}" i18n:translate>
+                                                Cancelled
+                                            </div>
+                                            <div tal:case="'denied'" class="state ${booking.state}" i18n:translate>
                                                 Denied
-                                            </span>
-                                            <span tal:case="'blocked'" class="${booking.state}" i18n:translate>
+                                            </div>
+                                            <div tal:case="'blocked'" class="state ${booking.state}" i18n:translate>
                                                 Blocked
-                                            </span>
+                                            </div>
                                         </tal:block>
                                     </div>
                                     <div class="actions" tal:define="actions actions_by_booking(booking)">

@@ -128,13 +128,17 @@ def view_my_bookings(self, request):
         users, user = None, None
 
     if user is None or user.username == request.current_username:
-        title = _("My Bookings")
-    else:
+        title = period.confirmed and _("My Bookings") or _("My Wishlist")
+    elif period.confirmed:
         title = _("Bookings of ${user}", mapping={
             'user': user.title
         })
+    else:
+        title = _("Wishlist of ${user}", mapping={
+            'user': user.title
+        })
 
-    layout = BookingCollectionLayout(self, request)
+    layout = BookingCollectionLayout(self, request, title)
 
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, b),

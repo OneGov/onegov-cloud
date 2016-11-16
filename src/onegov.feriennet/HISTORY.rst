@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- The bookings are now called wishlists until the period is confirmed.
+  [href]
+
 - Adds the ability to match bookings/attendees with occasions.
   [href]
 

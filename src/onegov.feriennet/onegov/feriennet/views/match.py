@@ -29,7 +29,7 @@ def view_matches(self, request):
     permission=Secret,
     request_method="POST")
 def run_matching(self, request):
-    assert self.period.active
+    assert self.period.active and not self.period.confirmed
 
     deferred_acceptance_from_database(request.app.session(), self.period_id)
     request.success(_("The matching run executed successfully"))
@@ -41,7 +41,7 @@ def run_matching(self, request):
     permission=Secret,
     request_method="POST")
 def reset_matching(self, request):
-    assert self.period.active
+    assert self.period.active and not self.period.confirmed
 
     bookings = BookingCollection(request.app.session(), self.period_id)
     bookings.query().update({Booking.state: 'open'})

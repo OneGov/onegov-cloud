@@ -1,5 +1,5 @@
 from itertools import chain
-from onegov.activity import BookingCollection
+from onegov.activity import BookingCollection, PeriodCollection
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
@@ -19,20 +19,27 @@ def get_template_variables(request):
 
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
-        bookings = BookingCollection(request.app.session())
-        count = bookings.count(request.current_username)
+        period = PeriodCollection(request.app.session()).active()
 
-        if count:
-            attributes = {'data-count': str(count)}
-        else:
-            attributes = {}
+        if period:
+            bookings = BookingCollection(request.app.session())
 
-        front.append(Link(
-            text=_("My Bookings"),
-            url=request.link(bookings),
-            classes=('count', 'alert'),
-            attributes=attributes
-        ))
+            if period.confirmed:
+                count = bookings.booking_count(request.current_username)
+            else:
+                count = bookings.wishlist_count(request.current_username)
+
+            if count:
+                attributes = {'data-count': str(count)}
+            else:
+                attributes = {}
+
+            front.append(Link(
+                text=period.confirmed and _("My Bookings") or _("My Wishlist"),
+                url=request.link(bookings),
+                classes=('count', period.confirmed and 'success' or 'alert'),
+                attributes=attributes
+            ))
 
     layout = DefaultLayout(request.app.org, request)
     links = chain(front, layout.top_navigation)
