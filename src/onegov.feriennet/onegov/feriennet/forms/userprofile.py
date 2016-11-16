@@ -2,7 +2,7 @@ from onegov.feriennet import _
 from onegov.form import Form
 from wtforms import StringField, TextAreaField
 from wtforms.fields.html5 import URLField
-from wtforms.validators import URL
+from wtforms.validators import Optional, URL
 
 
 class UserProfileForm(Form):
@@ -31,7 +31,8 @@ class UserProfileForm(Form):
 
     website = URLField(
         label=_("Website"),
-        validators=[URL()]
+        description=_("Website address including http:// or https://"),
+        validators=[Optional(), URL()]
     )
 
     def populate_obj(self, model):
