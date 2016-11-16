@@ -25,6 +25,10 @@ class Period(Base, TimestampMixin):
     #: Only one period is active at a time
     active = Column(Boolean, nullable=False, default=False)
 
+    #: A confirmed period may not be automatically matched anymore and all
+    #: booking changes to it are communicted to the customer
+    confirmed = Column(Boolean, nullable=False, default=False)
+
     #: Start of the wishlist-phase
     prebooking_start = Column(Date, nullable=False)
 

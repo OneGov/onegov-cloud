@@ -1,4 +1,4 @@
-from onegov.activity.models import Booking
+from onegov.activity.models import Booking, Period
 from onegov.core.collection import GenericCollection
 
 
@@ -30,16 +30,59 @@ class BookingCollection(GenericCollection):
     def model_class(self):
         return Booking
 
-    def count(self, username, state='open'):
-        """ Returns the number of bookings for the given username and state.
+    def count(self, usernames='*', periods='*', states='*'):
+        """ Returns the number of bookings, optionally filtered by usernames,
+        periods and states.
+
+        All parameters may either be iterables or subqueries.
 
         """
 
         query = self.query().with_entities(Booking.id)
-        query = query.filter(Booking.state == state)
-        query = query.filter(Booking.username == username)
+
+        if states != '*':
+            query = query.filter(Booking.state.in_(states))
+
+        if periods != '*':
+            query = query.filter(Booking.period_id.in_(periods))
+
+        if usernames != '*':
+            query = query.filter(Booking.username.in_(usernames))
 
         return query.count()
+
+    def wishlist_count(self, username):
+        """ Returns the number wishlist entries in the active period.
+
+        This value is equal to the number of bookings for a given user in
+        the active period.
+
+        """
+
+        periods = self.session.query(Period)
+        periods = periods.with_entities(Period.id)
+        periods = periods.filter(Period.active == True)
+        periods = periods.filter(Period.confirmed == False)
+
+        return self.count(
+            usernames=(username, ),
+            periods=periods.subquery(),
+            states='*'
+        )
+
+    def booking_count(self, username):
+        """ Returns the number of accepted bookings in the active period. """
+
+        periods = self.session.query(Period)
+        periods = periods.with_entities(Period.id)
+        periods = periods.filter(Period.active == True)
+        periods = periods.filter(Period.confirmed == True)
+
+        return self.count(
+            usernames=(username, ),
+            periods=periods.subquery(),
+            states=('accepted', )
+        )
 
     def by_user(self, user):
         return self.query().filter(Booking.username == user.username)

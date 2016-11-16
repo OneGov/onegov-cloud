@@ -1,6 +1,11 @@
 Changelog
 ---------
 
+- Periods now have a confirmed flag. Confirmed periods can be booked directly,
+  while unconfirmed bookings an be booked through the wishlist and matched
+  using the matching algorithm.
+  [href]
+
 - Adds an implementation of Deferred Acceptance as a matching algorithm.
   [href]
 
