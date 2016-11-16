@@ -373,17 +373,17 @@ ul.tags {
     My bookings count
 */
 
+// use px in this block as rem is buggy in pseud-elements in IE 11
 .count[data-count]:after {
     border-radius: 100px;
     content: attr(data-count);
     display: inline-block;
-    font-size: .875rem;
+    font-size: 13px;
     font-weight: bold;
-    height: 1.4rem;
-    line-height: 1.4rem;
-    margin: 0 0 0 1ex;
-    min-width: 1.4rem;
-    padding: 0 4px;
+    height: 23px;
+    line-height: 23px;
+    margin: 0 0 0 7px;
+    min-width: 23px;
     text-align: center;
 }
 
