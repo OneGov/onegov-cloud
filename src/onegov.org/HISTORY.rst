@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes datetime/date picker weeks not starting on the region-specific day.
+  [href]
+
 - Adds a to_timezone helper function to the default layout.
   [href]
 

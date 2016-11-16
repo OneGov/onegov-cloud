@@ -128,7 +128,7 @@ var setup_datetimepicker = function(type) {
     var general = {
         allowBlank: true,
         lazyInit: false,
-        dayOfWeekStart: i18n_options.dayOfWeekstart,
+        dayOfWeekStart: i18n_options.dayOfWeekStart,
         lang: i18n_options.lang,
         onShow: function(_current_time, $input) {
             this.setOptions({
