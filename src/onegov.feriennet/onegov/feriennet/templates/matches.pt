@@ -25,29 +25,42 @@
                     No bookings.
                 </tal:block>
 
-                <table class="matches" tal:condition="records['accepted'] or records['other']">
-                    <thead>
-                        <tr>
-                            <th i18n:translate>Name</th>
-                            <th i18n:translate>Age</th>
-                            <th i18n:translate>State</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tal:block repeat="kind ('accepted', 'other')">
-                            <tr tal:repeat="record records[kind]" class="booking booking-${kind} ${record.booking_state}">
-                                <td>${record.attendee_name}</td>
-                                <td>${int(record.attendee_age)}</td>
-                                <td>
-                                    <tal:block
-                                        define="state record.booking_state"
-                                        metal:use-macro="layout.macros.confirmed_booking_state"
-                                    />
-                                </td>
+                <div style="display: inline-block;">
+                    <div class="progress" tal:define="
+                        accepted len(records['accepted']);
+                        total len(records['accepted']) + len(records['other']);
+                        min_spots records['first'].occasion_spots.lower;
+                        max_spots records['first'].occasion_spots.upper - 1;
+                    ">
+                        <span class="meter ${accepted >= min_spots and 'success' or 'alert'}" style="width: ${accepted / max_spots * 100}%;">
+                            ${accepted} / ${max_spots} <span i18n:translate>Accepted</span>
+                        </span>
+                    </div>
+
+                    <table class="matches" tal:condition="records['accepted'] or records['other']">
+                        <thead>
+                            <tr>
+                                <th i18n:translate>Name</th>
+                                <th i18n:translate>Age</th>
+                                <th i18n:translate>State</th>
                             </tr>
-                        </tal:block>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <tal:block repeat="kind ('accepted', 'other')">
+                                <tr tal:repeat="record records[kind]" class="booking booking-${kind} ${record.booking_state}">
+                                    <td>${record.attendee_name}</td>
+                                    <td>${int(record.attendee_age)}</td>
+                                    <td>
+                                        <tal:block
+                                            define="state record.booking_state"
+                                            metal:use-macro="layout.macros.confirmed_booking_state"
+                                        />
+                                    </td>
+                                </tr>
+                            </tal:block>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </tal:block>
     </tal:block>
