@@ -507,53 +507,21 @@ ul.tags {
 
 .matched-occasion {
     margin-bottom: 1rem;
-    padding-left: 3rem;
 
     h4 {
         margin-top: 1rem;
     }
 
-    span {
+    .subtitle {
         display: block;
-        font-weight: bold;
-        margin: -.5rem 0 1rem;
+        margin: 0 0 1rem;
     }
 
-    table {
-        margin-bottom: 0;
+    .booking-accepted {
+        background-color: $green-pastel !important;
     }
 
-    &::before {
-        font-size: 1.25rem;
-        left: 1.45rem;
-        position: absolute;
-    }
-
-    &.matched-state-full {
-        &::before {
-            @include icon('\f240');
-            color: $green;
-        }
-    }
-
-    &.matched-state-operable {
-        &::before {
-            @include icon('\f241');
-            color: $green-light;
-        }
-    }
-
-    &.matched-state-unoperable {
-        &::before {
-            @include icon('\f243');
-            color: $red-light;
-        }
-    }
-
-    &.matched-state-empty {
-        &::before {
-            @include icon('\f244');
-            color: $red;
-        }
+    .booking-accepted + .booking-other td {
+        box-shadow: 0 -2px 0 $green;
     }
 }

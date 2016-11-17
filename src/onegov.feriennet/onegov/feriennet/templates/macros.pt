@@ -79,7 +79,7 @@
     <tal:block switch="activity.state">
         <tal:block i18n:translate case="string:preview">Preview</tal:block>
         <tal:block i18n:translate case="string:proposed">Proposed</tal:block>
-        <tal:block i18n:translate case="string:accepted">Accepted</tal:block>
+        <tal:block i18n:translate case="string:accepted">Published</tal:block>
         <tal:block i18n:translate case="string:denied">Denied</tal:block>
         <tal:block i18n:translate case="string:archived">Archived</tal:block>
     </tal:block>
@@ -218,3 +218,36 @@
         </div>
     </tal:block>
 </metal:hints>
+
+
+<metal:confirmed_booking_state define-macro="confirmed_booking_state" i18n:domain="onegov.feriennet">
+    <tal:block switch="state">
+        <div tal:case="'open'" class="state ${state}" i18n:translate>
+            Open
+        </div>
+        <div tal:case="'accepted'" class="state ${state}" i18n:translate>
+            Accepted
+        </div>
+        <div tal:case="'cancelled'" class="state ${state}" i18n:translate>
+            Cancelled
+        </div>
+        <div tal:case="'denied'" class="state ${state}" i18n:translate>
+            Denied
+        </div>
+        <div tal:case="'blocked'" class="state ${state}" i18n:translate>
+            Blocked
+        </div>
+    </tal:block>
+</metal:confirmed_booking_state>
+
+
+<metal:wishlist_booking_state define-macro="wishlist_booking_state" i18n:domain="onegov.feriennet">
+    <tal:block switch="state">
+        <div tal:case="'cancelled'" class="state ${state}" i18n:translate>
+            Accepted
+        </div>
+        <div tal:case="default" class="state open" i18n:translate>
+            Open
+        </div>
+    </tal:block>
+</metal:wishlist_booking_state>

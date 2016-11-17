@@ -446,7 +446,7 @@ msgid "Proposed"
 msgstr "Beantragt"
 
 msgid "Accepted"
-msgstr "Veröffentlicht"
+msgstr "Angenommen"
 
 msgid "Archived"
 msgstr "Archiviert"
