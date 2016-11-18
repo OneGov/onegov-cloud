@@ -189,5 +189,5 @@ def toggle_star(self, request):
     else:
         self.unstar()
 
-    layout = BookingCollectionLayout(self, request)
+    layout = BookingCollectionLayout(self, request, None)
     return render_macro(layout.macros['star'], request, {'booking': self})
