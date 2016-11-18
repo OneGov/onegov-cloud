@@ -31,14 +31,15 @@
                         min_spots records['first'].occasion_spots.lower;
                         max_spots records['first'].occasion_spots.upper - 1;
                 ">
-                    <div class="progress ${accepted >= min_spots and 'success' or 'alert'}">
+                    <div class="progress ${accepted >= min_spots and 'success' or 'alert'}"
+                    onclick="$('#button-${oid}').click();">
                         <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
                         <span class="meter-text">
                             ${accepted} / ${max_spots} <span i18n:translate>Accepted</span>
                         </span>
                     </div>
 
-                    <button data-toggle="#details-${oid}" class="untoggled ${accepted >= min_spots and 'success' or 'alert'}">
+                    <button id="button-${oid}" data-toggle="#details-${oid}" class="untoggled ${accepted >= min_spots and 'success' or 'alert'}">
                         <span i18n:translate class="show-for-sr">Show Details</span>
                         <i class="fa fa-angle-double-down" aria-hidden="true"></i>
                     </button>
