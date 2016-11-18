@@ -33,8 +33,8 @@ msgstr "Benutzerprofil"
 msgid "Homepage"
 msgstr "Startseite"
 
-msgid "Manage Periods"
-msgstr "Perioden Verwalten"
+msgid "Periods"
+msgstr "Perioden"
 
 msgid "New Period"
 msgstr "Neue Periode"
@@ -45,8 +45,8 @@ msgstr "Zuteilungen"
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
 
-msgid "Manage Matches"
-msgstr "Zuteilungen Verwalten"
+msgid "Matching"
+msgstr "Zuteilung"
 
 msgid "Edit Activity"
 msgstr "Angebot Bearbeiten"

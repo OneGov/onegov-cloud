@@ -7,14 +7,15 @@ from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
+from onegov.core.utils import Bunch
 from onegov.org.testing import Client, get_message, select_checkbox
 from onegov.testing import utils
 from onegov.user import UserCollection
 from psycopg2.extras import NumericRange
 
 
-def get_publication_url(page, kind):
-    return page.pyquery('a.{}'.format(kind)).attr('ic-post-to')
+def get_post_url(page, css_class):
+    return page.pyquery('a.{}'.format(css_class)).attr('ic-post-to')
 
 
 def get_delete_link(page, index=0):
@@ -49,7 +50,7 @@ def test_activity_permissions(es_feriennet_app):
     assert anon.get(url, status=404)
     assert admin.get(url, status=200)
 
-    editor.post(get_publication_url(editor.get(url), 'request-publication'))
+    editor.post(get_post_url(editor.get(url), 'request-publication'))
 
     assert "Learn How to Program" in editor.get('/angebote')
     assert "Learn How to Program" not in anon.get('/angebote')
@@ -59,7 +60,7 @@ def test_activity_permissions(es_feriennet_app):
     assert admin.get(url, status=200)
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
-    admin.post(get_publication_url(ticket, 'accept-activity'))
+    admin.post(get_post_url(ticket, 'accept-activity'))
 
     assert "Learn How to Program" in editor.get('/angebote')
     assert "Learn How to Program" in anon.get('/angebote')
@@ -69,7 +70,7 @@ def test_activity_permissions(es_feriennet_app):
     assert admin.get(url, status=200)
 
     ticket = admin.get(ticket.request.url)
-    admin.post(get_publication_url(ticket, 'archive-activity'))
+    admin.post(get_post_url(ticket, 'archive-activity'))
 
     assert "Learn How to Program" in editor.get('/angebote')
     assert "Learn How to Program" not in anon.get('/angebote')
@@ -91,7 +92,7 @@ def test_activity_communication(feriennet_app):
     new.form['lead'] = "Using a Raspberry Pi we will learn PHP"
     new.form.submit()
 
-    editor.post(get_publication_url(
+    editor.post(get_post_url(
         editor.get('/angebot/learn-php'), 'request-publication'))
 
     assert len(feriennet_app.smtp.outbox) == 1
@@ -100,7 +101,7 @@ def test_activity_communication(feriennet_app):
     ticket = admin.get('/tickets/ALL/open').click("Annehmen", index=0).follow()
     assert "Learn PHP" in ticket
 
-    admin.post(get_publication_url(ticket, 'reject-activity'))
+    admin.post(get_post_url(ticket, 'reject-activity'))
     assert len(feriennet_app.smtp.outbox) == 2
     message = get_message(feriennet_app, 1)
     assert "leider abgelehnt" in message
@@ -112,7 +113,7 @@ def test_activity_communication(feriennet_app):
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     new.form.submit()
 
-    editor.post(get_publication_url(
+    editor.post(get_post_url(
         editor.get('/angebot/learn-python'), 'request-publication'))
 
     assert len(feriennet_app.smtp.outbox) == 3
@@ -121,7 +122,7 @@ def test_activity_communication(feriennet_app):
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Learn Python" in ticket
 
-    admin.post(get_publication_url(ticket, 'accept-activity'))
+    admin.post(get_post_url(ticket, 'accept-activity'))
     assert len(feriennet_app.smtp.outbox) == 4
     message = get_message(feriennet_app, 3)
     assert "wurde angenommen" in message
@@ -151,7 +152,7 @@ def test_activity_search(es_feriennet_app):
     assert 'search-result-vacation' not in editor.get('/suche?q=Learn')
     assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
 
-    editor.post(get_publication_url(editor.get(url), 'request-publication'))
+    editor.post(get_post_url(editor.get(url), 'request-publication'))
 
     # once proposed, activities can be found by the admin only
     es_feriennet_app.es_client.indices.refresh(index='_all')
@@ -160,7 +161,7 @@ def test_activity_search(es_feriennet_app):
     assert 'search-result-vacation' not in anon.get('/suche?q=Learn')
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
-    admin.post(get_publication_url(ticket, 'accept-activity'))
+    admin.post(get_post_url(ticket, 'accept-activity'))
 
     # once accepted, activities can be found by anyone
     es_feriennet_app.es_client.indices.refresh(index='_all')
@@ -169,7 +170,7 @@ def test_activity_search(es_feriennet_app):
     assert 'search-result-vacation' in anon.get('/suche?q=Learn')
 
     ticket = admin.get(ticket.request.url)
-    admin.post(get_publication_url(ticket, 'archive-activity'))
+    admin.post(get_post_url(ticket, 'archive-activity'))
 
     # archived the search will fail again, except for admins
     es_feriennet_app.es_client.indices.refresh(index='_all')
@@ -449,7 +450,7 @@ def test_occasions_form(feriennet_app):
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit().follow()
 
-    periods = admin.get('/angebote').click("Perioden Verwalten")
+    periods = admin.get('/angebote').click("Perioden")
 
     period = periods.click("Neue Periode")
     period.form['title'] = "Vacation Program 2016"
@@ -499,7 +500,7 @@ def test_execution_period(feriennet_app):
     new.form['lead'] = "Like Minecraft, but in the real world"
     new.form.submit().follow()
 
-    periods = admin.get('/angebote').click("Perioden Verwalten")
+    periods = admin.get('/angebote').click("Perioden")
 
     period = periods.click("Neue Periode")
     period.form['title'] = "Vacation Program 2016"
@@ -634,7 +635,7 @@ def test_enroll_child(feriennet_app):
 
     transaction.commit()
 
-    assert "nur während der Voranmeldungsphase" in enroll.form.submit()
+    assert "nur während der Wunschphase" in enroll.form.submit()
 
     # set the record straight again
     period = periods.query().first()
@@ -727,8 +728,8 @@ def test_booking_view(feriennet_app):
     def count(page):
         return len(page.pyquery('.attendee-bookings > div > ul > li'))
 
-    c1_bookings = c1.get('/').click('Meine Buchungen')
-    c2_bookings = c2.get('/').click('Meine Buchungen')
+    c1_bookings = c1.get('/').click('Meine Wunschliste')
+    c2_bookings = c2.get('/').click('Meine Wunschliste')
 
     assert count(c1_bookings) == 4
     assert count(c2_bookings) == 1
@@ -762,7 +763,90 @@ def test_booking_view(feriennet_app):
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    m1_bookings = admin.get('/').click('Meine Buchungen')\
+    m1_bookings = admin.get('/').click('Meine Wunschliste')\
         .click('m1@example.org')
 
     assert count(m1_bookings) == 4
+
+
+def test_matching_view(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    o = []
+
+    for i in range(2):
+        a = activities.add("A {}".format(i), username='admin@example.org')
+        a.propose().accept()
+
+        o.append(occasions.add(
+            start=datetime(2016, 10, 8 + i, 8),
+            end=datetime(2016, 10, 8 + i, 16),
+            age=(0, 10),
+            spots=(2, 4),
+            timezone="Europe/Zurich",
+            activity=a,
+            period=period
+        ))
+
+    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    a2 = attendees.add(owner, 'Mike', date(2000, 1, 1))
+
+    # the first course has enough attendees
+    bookings.add(owner, a1, o[0])
+    bookings.add(owner, a2, o[0])
+
+    # the second one does not
+    bookings.add(owner, a1, o[1])
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+    client.login_admin()
+
+    matching = client.get('/angebote').click("Zuteilung")
+
+    # check the initial state
+    assert "Ferienpass 2016" in matching
+    assert "Zufriedenheit liegt bei 0%" in matching
+    assert "0% aller Durchführungen haben genug Teilnehmer" in matching
+    assert "0 / 4" in matching
+    assert "Dustin" in matching
+
+    # run a matching
+    client.post(get_post_url(matching, 'run-matching'))
+    matching = client.get('/angebote').click("Zuteilung")
+
+    assert "Zufriedenheit liegt bei 100%" in matching
+    assert "50% aller Durchführungen haben genug Teilnehmer" in matching
+    assert "1 / 4" in matching
+    assert "2 / 4" in matching
+
+    # reset it again
+    client.post(get_post_url(matching, 'reset-matching'))
+    matching = client.get('/angebote').click("Zuteilung")
+
+    assert "Zufriedenheit liegt bei 0%" in matching
+    assert "0% aller Durchführungen haben genug Teilnehmer" in matching

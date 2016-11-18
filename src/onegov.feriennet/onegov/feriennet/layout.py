@@ -40,14 +40,14 @@ class VacationActivityCollectionLayout(DefaultLayout):
         if self.request.is_admin:
             links.append(
                 Link(
-                    text=_("Manage Periods"),
+                    text=_("Periods"),
                     url=self.request.class_link(PeriodCollection),
                     classes=('manage-periods', )
                 )
             )
             links.append(
                 Link(
-                    text=_("Manage Matches"),
+                    text=_("Matching"),
                     url=self.request.class_link(MatchCollection),
                     classes=('manage-matches', )
                 )
