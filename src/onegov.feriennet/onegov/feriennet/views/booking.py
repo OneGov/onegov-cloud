@@ -75,10 +75,10 @@ def attendees_by_username(request, username):
     return a
 
 
-def actions_by_booking(layout, booking):
+def actions_by_booking(layout, period, booking):
     actions = []
 
-    if booking.state == 'open':
+    if not period.confirmed or booking.state == 'open':
         actions.append(DeleteLink(
             text=_("Remove"),
             url=layout.csrf_protected_url(layout.request.link(booking)),
@@ -141,7 +141,7 @@ def view_my_bookings(self, request):
     layout = BookingCollectionLayout(self, request, title)
 
     return {
-        'actions_by_booking': lambda b: actions_by_booking(layout, b),
+        'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
         'bookings_by_attendee': bookings_by_attendee.get,
         'has_bookings': bookings and True or False,
@@ -162,7 +162,7 @@ def view_my_bookings(self, request):
 def delete_booking(self, request):
     request.assert_valid_csrf_token()
 
-    if self.state != 'open':
+    if self.period.confirmed and self.state != 'open':
         show_error_on_attendee(request, self.attendee, _(
             "Only open bookings may be deleted"))
 
