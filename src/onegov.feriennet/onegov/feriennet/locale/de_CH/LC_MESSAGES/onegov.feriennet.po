@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-16 14:32+0100\n"
+"POT-Creation-Date: 2016-11-18 13:13+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -409,21 +409,6 @@ msgstr ""
 "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
 "eingeteilt wird"
 
-msgid "Open"
-msgstr "Offen"
-
-msgid "Confirmed"
-msgstr "Bestätigt"
-
-msgid "Cancelled"
-msgstr "Abgesagt"
-
-msgid "Denied"
-msgstr "Abgelehnt"
-
-msgid "Blocked"
-msgstr "Blockiert"
-
 msgid "Periods"
 msgstr "Perioden"
 
@@ -445,8 +430,11 @@ msgstr "Vorschau"
 msgid "Proposed"
 msgstr "Beantragt"
 
-msgid "Accepted"
-msgstr "Angenommen"
+msgid "Published"
+msgstr "Veröffentlicht"
+
+msgid "Denied"
+msgstr "Abgelehnt"
 
 msgid "Archived"
 msgstr "Archiviert"
@@ -490,6 +478,18 @@ msgstr "Die Wunschphase ist jetzt bis am ${date} aktiv"
 msgid "Prebooking ended on ${date}"
 msgstr "Die Wunschphase ging am ${date} zu Ende"
 
+msgid "Open"
+msgstr "Offen"
+
+msgid "Accepted"
+msgstr "Angenommen"
+
+msgid "Cancelled"
+msgstr "Abgesagt"
+
+msgid "Blocked"
+msgstr "Blockiert"
+
 msgid "Dear Sir or Madam,"
 msgstr "Sehr geehrte Damen und Herren,"
 
@@ -508,20 +508,23 @@ msgstr "Ihr Angebot wurde archiviert:"
 msgid "Your activity has unfortunately been rejected:"
 msgstr "Ihr Angebot wurde leider abgelehnt:"
 
-msgid "Accepted Bookings"
-msgstr "Angenommene Buchungen"
+msgid "The average happiness is ${happiness}"
+msgstr "Die durchschnittliche Zufriedenheit liegt bei ${happiness}"
 
-msgid "No accepted bookings."
-msgstr "Keine angenommenen Buchungen."
+msgid "${operability} of all occasions have enough attendees"
+msgstr "${operability} aller Durchführungen haben genug Teilnehmer"
+
+msgid "Bookings"
+msgstr "Buchungen"
+
+msgid "No bookings."
+msgstr "Keine Buchungen."
+
+msgid "Show Details"
+msgstr "Details Anzeigen"
 
 msgid "State"
 msgstr "Status"
-
-msgid "Other Bookings"
-msgstr "Andere Buchungen"
-
-msgid "No other bookings."
-msgstr "Keine anderen Buchungen."
 
 msgid ""
 "The following activites contain occasions which are in conflict with the "
@@ -600,6 +603,10 @@ msgstr "Eigene"
 #, python-format
 msgid "Bookings of ${user}"
 msgstr "Buchungen von ${user}"
+
+#, python-format
+msgid "Wishlist of ${user}"
+msgstr "Wunschliste von ${user}"
 
 msgid "Only open bookings may be deleted"
 msgstr "Nur offene Buchungen können entfernt werden"

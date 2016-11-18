@@ -23,7 +23,10 @@ def view_matches(self, request):
             'title': self.period.title
         }),
         'occasions': self.occasions,
-        'activity_link': activity_link
+        'activity_link': activity_link,
+        'happiness': '{}%'.format(round(self.happiness * 100)),
+        'operability': '{}%'.format(round(self.operability * 100)),
+        'period': self.period
     }
 
 

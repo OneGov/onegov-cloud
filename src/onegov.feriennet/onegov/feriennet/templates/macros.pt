@@ -194,7 +194,7 @@
 <metal:hints define-macro="period_hints" i18n:domain="onegov.feriennet">
     <tal:block define="today layout.today()">
         <div class="hint" tal:condition="today < period.prebooking_start">
-            <i class="fa fa-calendar-o" aria-hidden="true"></i>
+            <i class="fa fa-calendar-o fa-fw" aria-hidden="true"></i>
 
             <tal:block i18n:translate>
                 Prebooking begins on <strong tal:content="layout.format_date(period.prebooking_start, 'date_long')" i18n:name="date" />
@@ -202,7 +202,7 @@
         </div>
 
         <div class="hint" tal:condition="period.prebooking_start <= today and today <= period.prebooking_end">
-            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+            <i class="fa fa-calendar-check-o fa-fw" aria-hidden="true"></i>
 
             <tal:block i18n:translate>
                 Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />

@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from itertools import groupby
 from onegov.activity import Activity, Booking, Attendee, Occasion
+from statistics import mean
+from sqlalchemy import func
 
 
 class MatchCollection(object):
@@ -44,6 +46,34 @@ class MatchCollection(object):
         q = q.join(Attendee)
 
         return q
+
+    @property
+    def happiness(self):
+        q = self.session.query(Attendee)
+        q = q.with_entities(Attendee.happiness(self.period_id))
+
+        return mean(a.happiness for a in q if a.happiness is not None)
+
+    @property
+    def operability(self):
+        accepted = self.session.query(Booking)\
+            .with_entities(func.count(Booking.id).label('count'))\
+            .filter(Booking.occasion_id == Occasion.id)\
+            .filter(Booking.period_id == self.period_id)\
+            .filter(Booking.state == 'accepted')\
+            .subquery().lateral()
+
+        o = self.session.query(Occasion, accepted.c.count)
+
+        bits = []
+
+        for occasion, count in o:
+            bits.append(count >= occasion.spots.lower and 1 or 0)
+
+        if not bits:
+            return 0
+
+        return sum(bits) / len(bits)
 
     @property
     def occasions(self):
