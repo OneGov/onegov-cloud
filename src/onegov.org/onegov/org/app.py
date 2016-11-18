@@ -354,4 +354,5 @@ def get_common_asset():
     yield 'date-range-selector.js'
     yield 'lazyalttext.js'
     yield 'lazysizes.js'
+    yield 'toggle.js'
     yield 'common.js'

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a jquery plugin to easily toggle blocks by button.
+  [href]
+
 - Fixes userprofile data being lost on erronous input.
   [href]
 

@@ -72,3 +72,5 @@ $(document).on('show-alert', function(_, data) {
 
     $(document).foundation();
 });
+
+$('button[data-toggle]').toggleButton();
