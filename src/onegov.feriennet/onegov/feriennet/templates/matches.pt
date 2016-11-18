@@ -25,14 +25,15 @@
                     No bookings.
                 </tal:block>
 
-                <div style="display: inline-block;">
-                    <div class="progress" tal:define="
+                <div class="matching-details">
+                    <div tal:define="
                         accepted len(records['accepted']);
                         total len(records['accepted']) + len(records['other']);
                         min_spots records['first'].occasion_spots.lower;
                         max_spots records['first'].occasion_spots.upper - 1;
-                    ">
-                        <span class="meter ${accepted >= min_spots and 'success' or 'alert'}" style="width: ${accepted / max_spots * 100}%;">
+                    " class="progress ${accepted >= min_spots and 'success' or 'alert'}">
+                        <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
+                        <span class="meter-text">
                             ${accepted} / ${max_spots} <span i18n:translate>Accepted</span>
                         </span>
                     </div>
@@ -48,8 +49,8 @@
                         <tbody>
                             <tal:block repeat="kind ('accepted', 'other')">
                                 <tr tal:repeat="record records[kind]" class="booking booking-${kind} ${record.booking_state}">
-                                    <td>${record.attendee_name}</td>
-                                    <td>${int(record.attendee_age)}</td>
+                                    <td><span>${record.attendee_name}</span></td>
+                                    <td><span>${int(record.attendee_age)}</span></td>
                                     <td>
                                         <tal:block
                                             define="state record.booking_state"

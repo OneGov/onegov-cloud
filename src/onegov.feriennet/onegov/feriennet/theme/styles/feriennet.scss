@@ -512,6 +512,35 @@ ul.tags {
         margin-top: 1rem;
     }
 
+    table {
+        width: 100%;
+
+        td:first-child,
+        th:first-child {
+            width: 50%;
+        }
+
+        td {
+            position: relative;
+
+            span,
+            div {
+                display: inline-block;
+                left: 10px;
+                overflow: hidden;
+                position: absolute;
+                right: 10px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        td:before {
+            content: '&nbsp;';
+            visibility: hidden;
+        }
+    }
+
     .subtitle {
         display: block;
         margin: 0 0 1rem;
@@ -519,9 +548,54 @@ ul.tags {
 
     .booking-accepted {
         background-color: $green-pastel !important;
+
+        + .booking-other td {
+            box-shadow: 0 -2px 0 $green;
+        }
     }
 
-    .booking-accepted + .booking-other td {
-        box-shadow: 0 -2px 0 $green;
+    .matching-details {
+        display: inline-block;
+        width: 50%;
+    }
+
+    .progress {
+        height: 2.5rem;
+        padding: 0;
+        position: relative;
+        width: 100%;
+
+        .meter {
+            width: 100%;
+        }
+
+        &.success .meter {
+            background-color: $green-pastel;
+        }
+
+        &.alert .meter {
+            background-color: $red-pastel;
+        }
+
+        &.success .meter-text::before {
+            @include icon('\f058');
+            color: $green;
+            margin-right: 1ex;
+        }
+
+        &.alert .meter-text::before {
+            @include icon('\f057');
+            color: $red;
+            margin-right: 1ex;
+        }
+    }
+
+    .meter-text {
+        font-size: .9rem;
+        left: 0;
+        line-height: .9rem;
+        padding: .75rem;
+        position: absolute;
+        top: 0;
     }
 }
