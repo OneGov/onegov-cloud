@@ -5,7 +5,10 @@
     <tal:block metal:fill-slot="content">
         <tal:block repeat="oid occasions">
             <div tal:define="records occasions[oid]" class="matched-occasion matched-state-${records['state']}">
-                <h3>${records['first'].activity_title}</h3>
+                <a href="${activity_link(oid)}">
+                    <h3>${records['first'].activity_title}</h3>
+                </a>
+
                 <span class="subtitle">${layout.format_datetime_range(
                     layout.to_timezone(
                         records['first'].occasion_start,

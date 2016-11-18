@@ -2,12 +2,20 @@ from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import PeriodCollection
-from onegov.core.security import Private, Personal
+from onegov.core.security import Private, Personal, Public
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.forms import AttendeeForm, OccasionForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
+
+
+@FeriennetApp.view(
+    model=Occasion,
+    permission=Public,
+)
+def view_occasion(self, request):
+    return request.redirect(request.link(self.activity))
 
 
 @FeriennetApp.form(
