@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-11-10 13:50+0100\n"
-"PO-Revision-Date: 2016-09-25 14:32+0200\n"
+"PO-Revision-Date: 2016-11-18 09:16+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
-"X-Generator: Poedit 1.8.9\n"
+"X-Generator: Poedit 1.8.11\n"
 
 msgid "Votes"
 msgstr "Votaziuns"
@@ -158,7 +158,7 @@ msgid "Majority system"
 msgstr "Elecziun da maiorz"
 
 msgid "Phone number"
-msgstr ""
+msgstr "Numer da telefon"
 
 msgid "File format"
 msgstr "Format da la datoteca"
@@ -212,7 +212,7 @@ msgid "Vote with Counter-Proposal"
 msgstr "Project cun cuntraproposta"
 
 msgid "Not a valid phone number."
-msgstr ""
+msgstr "Numer da telefon nunvalaivel."
 
 msgid "Vote (German)"
 msgstr "Votaziun (tudestg)"
@@ -228,7 +228,7 @@ msgstr "Votaziun (rumantsch)"
 
 #, python-format
 msgid "New results are available on ${url}"
-msgstr ""
+msgstr "Novs resultats disponibels sin ${url}"
 
 msgid "federal"
 msgstr "federal"
@@ -246,7 +246,7 @@ msgid "There are no elections or votes defined yet."
 msgstr "I n'èn anc vegnidas endatadas naginas elecziuns u votaziuns."
 
 msgid "Elections and votes on ${date}"
-msgstr ""
+msgstr "Votaziun dals ${date}"
 
 msgid "Federal Elections"
 msgstr "Elecziuns federalas"
@@ -303,7 +303,7 @@ msgid "Received Ballots"
 msgstr "Cedels electorals consegnads"
 
 msgid "Counted"
-msgstr ""
+msgstr "Dumbrà ora"
 
 msgid "Download"
 msgstr "telechargiar"
@@ -471,18 +471,20 @@ msgid "Last change"
 msgstr "Actualisà"
 
 msgid "SMS alerts"
-msgstr ""
+msgstr "Communicaziun per SMS"
 
 msgid ""
 "The SMS service provides free information on the publication of new results "
 "(intermediate results, final results):"
 msgstr ""
+"Il servetsch dad SMS infurmescha gratuitamain davart la publicaziun da novs "
+"resultats (resultats intermediars, resultats finals):"
 
 msgid "Get SMS alerts"
-msgstr ""
+msgstr "Abunar la communicaziun per SMS"
 
 msgid "Stop SMS subscription"
-msgstr ""
+msgstr "Terminar l'abunament dad SMS"
 
 msgid "New Election"
 msgstr "Nova elecziun"
@@ -512,19 +514,19 @@ msgid "Upload Results"
 msgstr "Chargiar si resultats"
 
 msgid "Trigger Notifications"
-msgstr ""
+msgstr "Trametter communicaziuns als abunents"
 
 msgid "Delete"
 msgstr "Stizzar"
 
 msgid "Subscribers"
-msgstr ""
+msgstr "Abunents"
 
 msgid "No subscribers yet."
-msgstr ""
+msgstr "Anc nagins abunents."
 
 msgid "Locale"
-msgstr ""
+msgstr "Regiun linguistica"
 
 msgid "New Vote"
 msgstr "Nova votaziun"
@@ -542,7 +544,7 @@ msgid "Your results were uploaded successfully."
 msgstr "Voss resultats èn vegnids chargiads si cun success."
 
 msgid "Click here to trigger the notifications"
-msgstr ""
+msgstr "Cliccar qua per trametter communicaziuns als abunents."
 
 msgid "Click here to see the updated results page."
 msgstr "Cliccai qua per mussar la pagina cun ils resultats actualisads."
@@ -572,19 +574,19 @@ msgid "Errors found in tie-breaker"
 msgstr "Chattà sbagls en la dumonda decisiva"
 
 msgid "Proposal and counter proposal rejected"
-msgstr "Refusà"
+msgstr "Refusà l'iniziativa e la cuntraproposta"
 
 msgid "Proposal accepted"
-msgstr "Acceptà"
+msgstr "Acceptà l'iniziativa"
 
 msgid "Counter proposal accepted"
-msgstr "Cuntraproposta"
+msgstr "Acceptà la cuntraproposta"
 
 msgid "Tie breaker in favor of the proposal"
-msgstr "Acceptà"
+msgstr "Dumonda decisiva a favur da l'iniziativa"
 
 msgid "Tie breaker in favor of the counter proposal"
-msgstr "Cuntraproposta"
+msgstr "Dumonda decisiva a favur da la cuntraproposta"
 
 msgid "Yeas"
 msgstr "Vuschs affirmativas"
@@ -617,9 +619,11 @@ msgid ""
 "There are no changes since the last time the notifications have been "
 "triggered!"
 msgstr ""
+"Naginas midadas dapi l'ultima giada che las communicaziuns èn vegnidas "
+"tramessas als abunents!"
 
 msgid "Do you really want to retrigger the notfications?"
-msgstr ""
+msgstr "Propi trametter danovamain communicaziuns als abunents?"
 
 #, python-format
 msgid "Do you really want to delete \"${vote}\"?"
@@ -632,16 +636,23 @@ msgid ""
 "Successfully subscribed to the SMS services. You will receive an SMS every "
 "time new results are published."
 msgstr ""
+"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
+"SMS, uschespert che novs resultats èn vegnids publitgads."
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "
 "service is free of charge. You can unsubscribe at any time."
 msgstr ""
+"Vus survegnis in SMS, uschespert che novs resultats èn vegnids publitgads. "
+"Quest servetsch dad SMS è gratuit. Vus pudais terminar da tut temp il "
+"servetsch dad SMS."
 
 msgid ""
 "Successfully unsubscribed from the SMS services. You will no longer receive "
 "SMS when new results are published."
 msgstr ""
+"La communicaziun per SMS è vegnida terminada. A partir d'ussa na survegnis "
+"Vus pli nagins SMS en chaussa."
 
 #, python-format
 msgid "The year ${year} is not yet supported"
