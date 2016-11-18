@@ -25,20 +25,27 @@
                     No bookings.
                 </tal:block>
 
-                <div class="matching-details">
-                    <div tal:define="
+                <div class="matching-details" tal:define="
                         accepted len(records['accepted']);
                         total len(records['accepted']) + len(records['other']);
                         min_spots records['first'].occasion_spots.lower;
                         max_spots records['first'].occasion_spots.upper - 1;
-                    " class="progress ${accepted >= min_spots and 'success' or 'alert'}">
+                ">
+                    <div class="progress ${accepted >= min_spots and 'success' or 'alert'}">
                         <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
                         <span class="meter-text">
                             ${accepted} / ${max_spots} <span i18n:translate>Accepted</span>
                         </span>
                     </div>
 
-                    <table class="matches" tal:condition="records['accepted'] or records['other']">
+                    <button data-toggle="#details-${oid}" class="untoggled ${accepted >= min_spots and 'success' or 'alert'}">
+                        <span i18n:translate class="show-for-sr">Show Details</span>
+                        <i class="fa fa-angle-double-down" aria-hidden="true"></i>
+                    </button>
+
+                    <div class="clearfix"></div>
+
+                    <table id="details-${oid}" class="matches" style="display: none;" tal:condition="records['accepted'] or records['other']">
                         <thead>
                             <tr>
                                 <th i18n:translate>Name</th>
