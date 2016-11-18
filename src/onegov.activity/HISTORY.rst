@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.0 (2016-11-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Periods now have a confirmed flag. Confirmed periods can be booked directly,
   while unconfirmed bookings an be booked through the wishlist and matched
   using the matching algorithm.
