@@ -57,7 +57,7 @@
                     onclick="$('#button-${oid}').click();">
                         <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
                         <span class="meter-text">
-                            ${accepted} / ${max_spots} <span i18n:translate>Accepted</span>
+                            ${accepted} / ${max_spots} <span i18n:translate>Attendees</span>
                         </span>
                     </div>
 
