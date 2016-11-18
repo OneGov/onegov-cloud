@@ -115,15 +115,12 @@ class VacationActivityHandler(Handler):
 
         if self.activity.state == 'proposed':
             links.append(ConfirmLink(
-                text=_("Approve"),
+                text=_("Publish"),
                 url=request.link(self.activity, name='annehmen'),
-                confirm=_("Do you really want to approve this activity?"),
-                extra_information=_(
-                    "This cannot be undone. "
-                    "The activity will be made public as a result."
-                ),
+                confirm=_("Do you really want to publish this activity?"),
+                extra_information=_("This cannot be undone."),
                 classes=('confirm', 'accept-activity'),
-                yes_button_text=_("Approve Activity")
+                yes_button_text=_("Publish Activity")
             ))
             links.append(ConfirmLink(
                 text=_("Reject"),
