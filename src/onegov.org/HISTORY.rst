@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.2 (2016-11-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a jquery plugin to easily toggle blocks by button.
   [href]
 
