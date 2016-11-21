@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Starring a booking no longer leads to a cascade of updates.
+  [href]
+
 0.1.0 (2016-11-18)
 ~~~~~~~~~~~~~~~~~~~
 

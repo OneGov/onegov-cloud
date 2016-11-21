@@ -100,16 +100,13 @@ class Booking(Base, TimestampMixin):
 
         session = object_session(self)
 
-        o = session.query(Occasion)
-        o = o.with_entities(Occasion.id)
-        o = o.filter(Occasion.period_id == self.occasion.period_id)
-
-        q = session.query(Booking)
+        q = session.query(Booking.id)
         q = q.filter(Booking.attendee_id == self.attendee_id)
         q = q.filter(Booking.username == self.username)
-        q = q.filter(Booking.occasion_id.in_(o.subquery()))
+        q = q.filter(Booking.period_id == self.period_id)
         q = q.filter(Booking.id != self.id)
         q = q.filter(Booking.priority != 0)
+        q = q.limit(4)
 
         if q.count() < max_stars:
             self.priority = 1
