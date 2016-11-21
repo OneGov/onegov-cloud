@@ -118,16 +118,6 @@ class Booking(Base, TimestampMixin):
         self.priority = 0
 
     @property
-    def score(self):
-        """ The score of this booking for the matching algorithm. This should
-        be a value that doesn't during the runtime of the algorithm (so
-        no timestamp for example).
-
-        """
-
-        return self.priority
-
-    @property
     def start(self):
         return self.occasion.start
 

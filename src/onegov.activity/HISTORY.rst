@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Introduces the ability to configure custom scoring functions for matching.
+  [href]
+
 - Starring a booking no longer leads to a cascade of updates.
   [href]
 

@@ -47,10 +47,6 @@ class Booking(MatchableBooking):
         return self.attendee
 
     @property
-    def score(self):
-        return self.priority
-
-    @property
     def state(self):
         return self._state
 

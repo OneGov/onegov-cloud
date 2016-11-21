@@ -50,17 +50,6 @@ class MatchableBooking(metaclass=ABCMeta):
     def attendee_id(self):
         """ Returns the id of the attendee this booking belongs to. """
 
-    @abstractmethod
-    def score(self):
-        """ Returns the score of the current booking. Occasions prefer
-        bookings by score. The higher the score, the more the booking is
-        preferred over others.
-
-        The value of the score is an integer which must not change during
-        the runtime of the algorithm (otherwise the algorithm may not halt).
-
-        """
-
     @property
     @abstractmethod
     def state(self):

@@ -93,13 +93,14 @@ class OccasionAgent(hashable('id')):
 
     """
 
-    __slots__ = ('occasion', 'bookings', 'attendees')
+    __slots__ = ('occasion', 'bookings', 'attendees', 'score_function')
 
-    def __init__(self, occasion):
+    def __init__(self, occasion, score_function):
         self.id = occasion.id
         self.occasion = occasion
         self.bookings = set()
         self.attendees = {}
+        self.score_function = score_function
 
     @property
     def full(self):
@@ -114,7 +115,10 @@ class OccasionAgent(hashable('id')):
 
         """
         return next(
-            (b for b in self.bookings if b.score < booking.score),
+            (
+                b for b in self.bookings
+                if self.score_function(b) < self.score_function(booking)
+            ),
             None
         )
 
@@ -142,6 +146,16 @@ class OccasionAgent(hashable('id')):
             return True
 
         return False
+
+
+def eager_score(bookings, score_function):
+    """ Eagerly caches the booking scores by calculating them in advance.
+
+    Returns a new score_function which uses those precomupted values.
+
+    """
+    scores = {b: score_function(b) for b in bookings}
+    return scores.get
 
 
 def deferred_acceptance_from_database(session, period_id, **kwargs):
@@ -174,16 +188,45 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
 
 
 def deferred_acceptance(bookings, occasions,
+                        score_function=lambda b: b.priority,
                         validity_check=True,
                         stability_check=False,
-                        hard_budget=False):
-    """ Matches bookings with occasions. """
+                        hard_budget=True):
+    """ Matches bookings with occasions.
+
+    :score_function:
+        A function accepting a booking and returning a score. Occasions prefer
+        bookings with a higher score over bookings with a lower score, if and
+        only if the occasion is not yet full.
+
+        The score function is meant to return a constant value for each
+        booking during the run of the algorithm. If this is not the case,
+        the algorithm might not halt.
+
+    :validity_check:
+        Ensures that the algorithm doesn't lead to any overlapping bookings.
+        Runs in O(b) time, where b is the number of bookings per period.
+
+    :stability_check:
+        Ensures that the result does not contain any blocking pairs, that is
+        it checks that the result is stable. This runs in O(b^3) time, so
+        do not run this in production (it's more of a testing tool).
+
+    :hard_budget:
+        Makes sure that the algorithm halts eventually by raising an exception
+        if the runtime budget of O(a*b) is reached (number of attendees
+        times the number of bookings).
+
+        Feel free to proof that this can't happen and then remove the check ;)
+    """
+
+    score_function = eager_score(bookings, score_function)
 
     bookings = [b for b in bookings]
     bookings.sort(key=lambda b: b.attendee_id)
 
     occasions = {
-        o.id: OccasionAgent(o) for o in occasions
+        o.id: OccasionAgent(o, score_function) for o in occasions
     }
 
     attendees = {
