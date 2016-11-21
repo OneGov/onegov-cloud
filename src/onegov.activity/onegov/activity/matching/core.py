@@ -6,6 +6,7 @@ quadratic runtime.
 """
 
 from onegov.activity import Booking, Occasion
+from onegov.activity.matching.scoring import Scoring
 from onegov.activity.matching.utils import overlaps, LoopBudget, hashable
 from onegov.core.utils import Bunch
 from itertools import groupby, product
@@ -188,7 +189,7 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
 
 
 def deferred_acceptance(bookings, occasions,
-                        score_function=lambda b: b.priority,
+                        score_function=None,
                         validity_check=True,
                         stability_check=False,
                         hard_budget=True):
@@ -220,7 +221,7 @@ def deferred_acceptance(bookings, occasions,
         Feel free to proof that this can't happen and then remove the check ;)
     """
 
-    score_function = eager_score(bookings, score_function)
+    score_function = eager_score(bookings, score_function or Scoring())
 
     bookings = [b for b in bookings]
     bookings.sort(key=lambda b: b.attendee_id)
