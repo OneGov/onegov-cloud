@@ -517,6 +517,16 @@ ul.tags {
             border: 0;
             margin: .5rem 0 .75rem;
         }
+
+        .field-confirm .label-text {
+            display: inline-block;
+            font-weight: bold;
+            margin-bottom: .5rem;
+        }
+
+        .field-sure {
+            margin-bottom: 1rem;
+        }
     }
 
     a {

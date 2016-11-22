@@ -4,7 +4,7 @@ from onegov.activity.matching import PreferOrganiserChildren
 from onegov.activity.matching import Scoring
 from onegov.feriennet import _
 from onegov.form import Form
-from wtforms.fields import BooleanField
+from wtforms.fields import BooleanField, RadioField
 
 
 class MatchForm(Form):
@@ -23,6 +23,24 @@ class MatchForm(Form):
         label=_("Children of administrators"),
         fieldset=_("Prefer the following children:"),
         default=False)
+
+    confirm = RadioField(
+        label=_("Confirm period:"),
+        default='no',
+        choices=[
+            ('no', _("No, preview only")),
+            ('yes', _("Yes, confirm period"))
+        ]
+    )
+
+    sure = BooleanField(
+        label=_(
+            "I know this cannot be undone and that parents will be "
+            "informed of the result"
+        ),
+        default=False,
+        depends_on=('confirm', 'yes')
+    )
 
     def scoring(self, session):
         scoring = Scoring()
@@ -43,7 +61,11 @@ class MatchForm(Form):
 
     def store_to_period(self, period):
         period.data['match-settings'] = {
-            k: v for k, v in self.data.items() if k != 'csrf_token'
+            k: v for k, v in self.data.items() if k not in (
+                'csrf_token',
+                'confirm',
+                'sure',
+            )
         }
 
     def load_from_period(self, period):
