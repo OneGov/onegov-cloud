@@ -28,6 +28,15 @@ def secondary_owner(session):
 
 
 @fixture(scope='function')
+def member(session):
+    return UserCollection(session).add(
+        username='member@example.org',
+        password='hunter2',
+        role='member'
+    )
+
+
+@fixture(scope='function')
 def collections(session):
     return Bunch(
         activities=ActivityCollection(session),
@@ -69,4 +78,21 @@ def execution_period(collections):
         prebooking=(s - timedelta(days=20), s - timedelta(days=10)),
         execution=(s, e),
         active=True
+    )
+
+
+@fixture(scope='function')
+def inactive_period(collections):
+    """ Returns a previously used period """
+
+    s, e = (
+        datetime.utcnow() - timedelta(days=100),
+        datetime.utcnow() - timedelta(days=10)
+    )
+
+    return collections.periods.add(
+        title="Testperiod",
+        prebooking=(s - timedelta(days=20), s - timedelta(days=10)),
+        execution=(s, e),
+        active=False
     )

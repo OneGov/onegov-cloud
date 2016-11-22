@@ -6,7 +6,7 @@ quadratic runtime.
 """
 
 from onegov.activity import Booking, Occasion
-from onegov.activity.matching.scoring import Scoring
+from onegov.activity.matching.score import Scoring
 from onegov.activity.matching.utils import overlaps, LoopBudget, hashable
 from onegov.core.utils import Bunch
 from itertools import groupby, product

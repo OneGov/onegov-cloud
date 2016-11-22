@@ -150,7 +150,7 @@ class PreferAssociationChildren(object):
             if members is None:
                 members = {
                     u.username for u in session.query(User)
-                    .filter(User.role.in_('admin', 'editor'))
+                    .filter(User.role.in_(('admin', 'editor')))
                     .filter(User.active == True)
                 }
 

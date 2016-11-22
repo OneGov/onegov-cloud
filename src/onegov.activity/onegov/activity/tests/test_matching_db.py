@@ -1,7 +1,13 @@
 from datetime import date, timedelta
+from freezegun import freeze_time
 from functools import partial
 from onegov.activity.matching import deferred_acceptance_from_database
+from onegov.activity.matching import Scoring
+from onegov.activity.matching import PreferAssociationChildren
+from onegov.activity.matching import PreferOrganiserChildren
+from onegov.activity.matching import PreferInAgeBracket
 from onegov.core.utils import Bunch
+from psycopg2.extras import NumericRange
 from uuid import uuid4
 
 
@@ -100,3 +106,101 @@ def test_changing_priorities(session, owner, collections, prebooking_period):
 
     assert b1.state == 'open'
     assert b2.state == 'accepted'
+
+
+@freeze_time("2016-11-22")
+def test_prefer_in_age_bracket(session, owner, collections, prebooking_period):
+    o = new_occasion(
+        collections, prebooking_period, 0, 1, spots=(0, 1), age=(10, 20))
+
+    # two attendees, one is inside the age bracket, the other is outside
+    a1 = new_attendee(collections, birth_date=date(1980, 11, 22))
+    a2 = new_attendee(collections, birth_date=date(2000, 11, 22))
+
+    b1 = collections.bookings.add(owner, a1, o)
+    b2 = collections.bookings.add(owner, a2, o)
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferInAgeBracket.from_session(session)]
+    ))
+
+    assert b1.state == 'open'
+    assert b2.state == 'accepted'
+
+    o.age = NumericRange(20, 50)
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferInAgeBracket.from_session(session)]
+    ))
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'open'
+
+
+def test_prefer_organisers_of_period(session, owner, secondary_owner,
+                                     collections, prebooking_period,
+                                     inactive_period):
+
+    # if someone was an organiser in another period, it doesn't count
+    new_occasion(collections, inactive_period, 0, 1, spots=(0, 1),
+                 username=secondary_owner.username, activity_name="old")
+
+    # what counts is being an organiser in the current period
+    o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 1),
+                     username=owner.username, activity_name="new")
+
+    # two attendees, one belonging to an organiser
+    a1 = new_attendee(collections, user=owner)
+    a2 = new_attendee(collections, user=secondary_owner)
+
+    b1 = collections.bookings.add(owner, a1, o)
+    b2 = collections.bookings.add(secondary_owner, a2, o)
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferOrganiserChildren.from_session(session)]
+    ))
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'open'
+
+
+def test_prefer_organisers_over_members(session, owner, member,
+                                        collections, prebooking_period):
+
+    # organisers > members
+    o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 1),
+                     username=owner.username)
+
+    # two attendees, one belonging to an organiser
+    a1 = new_attendee(collections, user=member)
+    a2 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(member, a1, o)
+    b2 = collections.bookings.add(owner, a2, o)
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferOrganiserChildren.from_session(session)]
+    ))
+
+    assert b1.state == 'open'
+    assert b2.state == 'accepted'
+
+
+def test_prefer_association_children(session, owner, member, collections,
+                                     prebooking_period):
+
+    o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 1))
+
+    # two attendees, one belonging to an association member (editor)
+    a1 = new_attendee(collections, user=member)
+    a2 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o)
+    b2 = collections.bookings.add(member, a2, o)
+
+    match(session, prebooking_period.id, score_function=Scoring(
+        criteria=[PreferAssociationChildren.from_session(session)]
+    ))
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'open'
