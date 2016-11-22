@@ -78,7 +78,7 @@ def attendees_by_username(request, username):
 def actions_by_booking(layout, period, booking):
     actions = []
 
-    if not period.confirmed or booking.state == 'open':
+    if period.wishlist_phase:
         actions.append(DeleteLink(
             text=_("Remove"),
             url=layout.csrf_protected_url(layout.request.link(booking)),
@@ -128,13 +128,13 @@ def view_my_bookings(self, request):
         users, user = None, None
 
     if user is None or user.username == request.current_username:
-        title = period.confirmed and _("My Bookings") or _("My Wishlist")
-    elif period.confirmed:
-        title = _("Bookings of ${user}", mapping={
+        title = period.wishlist_phase and _("My Wishlist") or _("My Bookings")
+    elif period.wishlist_phase:
+        title = _("Wishlist of ${user}", mapping={
             'user': user.title
         })
     else:
-        title = _("Wishlist of ${user}", mapping={
+        title = _("Bookings of ${user}", mapping={
             'user': user.title
         })
 
@@ -182,12 +182,16 @@ def delete_booking(self, request):
     request_method='POST')
 def toggle_star(self, request):
 
-    if not self.starred:
-        if not self.star(max_stars=3):
-            show_error_on_attendee(request, self.attendee, _(
-                "Cannot select more than three favorites per child"))
+    if self.period.wishlist_phase:
+        if not self.starred:
+            if not self.star(max_stars=3):
+                show_error_on_attendee(request, self.attendee, _(
+                    "Cannot select more than three favorites per child"))
+        else:
+            self.unstar()
     else:
-        self.unstar()
+        show_error_on_attendee(request, self.attendee, _(
+            "The period is not in the wishlist-phase"))
 
     layout = BookingCollectionLayout(self, request, None)
     return render_macro(layout.macros['star'], request, {'booking': self})

@@ -20,10 +20,9 @@ def get_template_variables(request):
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
         period = PeriodCollection(request.app.session()).active()
+        bookings = BookingCollection(request.app.session())
 
         if period:
-            bookings = BookingCollection(request.app.session())
-
             if period.confirmed:
                 count = bookings.booking_count(request.current_username)
             else:
@@ -39,6 +38,11 @@ def get_template_variables(request):
                 url=request.link(bookings),
                 classes=('count', period.confirmed and 'success' or 'alert'),
                 attributes=attributes
+            ))
+        else:
+            front.append(Link(
+                text=_("My Bookings"),
+                url=request.link(bookings)
             ))
 
     layout = DefaultLayout(request.app.org, request)
