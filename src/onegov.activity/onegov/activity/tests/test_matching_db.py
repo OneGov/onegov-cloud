@@ -186,8 +186,10 @@ def test_prefer_organisers_over_members(session, owner, member,
     assert b2.state == 'accepted'
 
 
-def test_prefer_association_children(session, owner, member, collections,
-                                     prebooking_period):
+def test_prefer_admin_children(session, owner, member, collections,
+                               prebooking_period):
+
+    owner.role = 'admin'
 
     o = new_occasion(collections, prebooking_period, 0, 1, spots=(0, 1))
 
