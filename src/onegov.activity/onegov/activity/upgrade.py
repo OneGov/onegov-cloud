@@ -4,7 +4,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 """
 
 from onegov.activity import Booking, Period
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean, Column, Enum, ForeignKey
 from sqlalchemy.orm import joinedload
@@ -72,3 +72,16 @@ def add_confirmed_flag_to_period(context):
 
     context.session.flush()
     context.operations.alter_column('periods', 'confirmed', nullable=False)
+
+
+@upgrade_task('Add data column to period')
+def add_data_column_to_period(context):
+    context.operations.add_column('periods', Column(
+        'data', JSON, nullable=True, default=dict
+    ))
+
+    for period in context.session.query(Period):
+        period.data = {}
+
+    context.session.flush()
+    context.operations.alter_column('periods', 'data', nullable=False)

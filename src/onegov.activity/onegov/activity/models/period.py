@@ -1,6 +1,6 @@
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UUID
+from onegov.core.orm.types import UUID, JSON
 from sqlalchemy import Boolean
 from sqlalchemy import CheckConstraint
 from sqlalchemy import column
@@ -40,6 +40,9 @@ class Period(Base, TimestampMixin):
 
     #: Date of the latest possible occasion end of this period
     execution_end = Column(Date, nullable=False)
+
+    #: Extra data stored on the period
+    data = Column(JSON, nullable=False, default=dict)
 
     __table_args__ = (
         CheckConstraint((

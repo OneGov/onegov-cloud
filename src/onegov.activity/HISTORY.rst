@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a custom data column to the period.
+  [href]
+
 - Introduces the ability to configure custom scoring functions for matching.
   [href]
 
