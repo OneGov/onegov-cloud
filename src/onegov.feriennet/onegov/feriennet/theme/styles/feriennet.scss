@@ -504,6 +504,25 @@ ul.tags {
 /*
     Matches
 */
+.matching-panel {
+    form {
+        legend {
+            background: transparent;
+            margin: 0 0 .5rem;
+            padding: 0;
+            text-align: left;
+        }
+
+        fieldset {
+            border: 0;
+            margin: .5rem 0 .75rem;
+        }
+    }
+
+    a {
+        font-size: .875rem;
+    }
+}
 
 .matched-occasion {
     margin-bottom: 1rem;
@@ -556,7 +575,7 @@ ul.tags {
 
     .matching-details {
         display: inline-block;
-        width: 50%;
+        width: 75%;
 
         button {
             float: right;

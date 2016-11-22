@@ -10,89 +10,104 @@
             <div class="hint">
                 <i class="fa fa-smile-o fa-fw" aria-hidden="true"></i>
                 <tal:block i18n:translate>
-                    The average happiness is <tal:block replace="happiness" i18n:name="happiness" />
+                    The average happiness is <strong tal:content="happiness" i18n:name="happiness" />
                 </tal:block>
             </div>
 
             <div class="hint">
                 <i class="fa fa-check-circle fa-fw" aria-hidden="true"></i>
                 <tal:block i18n:translate>
-                    <tal:block replace="operability" i18n:name="operability" /> of all occasions have enough attendees
+                    <strong tal:content="operability" i18n:name="operability" /> of all occasions have enough attendees
                 </tal:block>
             </div>
         </div>
 
-        <tal:block repeat="oid occasions">
-            <div tal:define="records occasions[oid]" class="matched-occasion matched-state-${records['state']}">
-                <a href="${activity_link(oid)}">
-                    <h3>${records['first'].activity_title}</h3>
-                </a>
+        <div class="row">
+            <div class="columns small-12 medium-8">
+                <tal:block repeat="oid occasions">
+                    <div tal:define="records occasions[oid]" class="matched-occasion matched-state-${records['state']}">
+                        <a href="${activity_link(oid)}">
+                            <h3>${records['first'].activity_title}</h3>
+                        </a>
 
-                <span class="subtitle">${layout.format_datetime_range(
-                    layout.to_timezone(
-                        records['first'].occasion_start,
-                        records['first'].occasion_timezone
-                    ),
-                    layout.to_timezone(
-                        records['first'].occasion_end,
-                        records['first'].occasion_timezone
-                    ),
-                )}, ${records['first'].occasion_spots.lower} -
-                    ${records['first'].occasion_spots.upper - 1}
-                    <i class="fa fa-child" aria-hidden="true"></i>
-                </span>
-
-                <h4 class="show-for-sr" i18n:translate>Bookings</h4>
-                <tal:block condition="not:records['accepted'] or records['other']" i18n:translate>
-                    No bookings.
-                </tal:block>
-
-                <div class="matching-details" tal:define="
-                        accepted len(records['accepted']);
-                        total len(records['accepted']) + len(records['other']);
-                        min_spots records['first'].occasion_spots.lower;
-                        max_spots records['first'].occasion_spots.upper - 1;
-                ">
-                    <div class="progress ${accepted >= min_spots and 'success' or 'alert'}"
-                    onclick="$('#button-${oid}').click();">
-                        <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
-                        <span class="meter-text">
-                            ${accepted} / ${max_spots} <span i18n:translate>Attendees</span>
+                        <span class="subtitle">${layout.format_datetime_range(
+                            layout.to_timezone(
+                                records['first'].occasion_start,
+                                records['first'].occasion_timezone
+                            ),
+                            layout.to_timezone(
+                                records['first'].occasion_end,
+                                records['first'].occasion_timezone
+                            ),
+                        )}, ${records['first'].occasion_spots.lower} -
+                            ${records['first'].occasion_spots.upper - 1}
+                            <span i18n:translate>Attendees</span>,
+                            ${records['first'].occasion_age.lower} - ${records['first'].occasion_age.upper - 1}
+                            <span i18n:translate>Years</span>
                         </span>
+
+                        <h4 class="show-for-sr" i18n:translate>Bookings</h4>
+                        <tal:block condition="not:records['accepted'] or records['other']" i18n:translate>
+                            No bookings.
+                        </tal:block>
+
+                        <div class="matching-details" tal:define="
+                                accepted len(records['accepted']);
+                                total len(records['accepted']) + len(records['other']);
+                                min_spots records['first'].occasion_spots.lower;
+                                max_spots records['first'].occasion_spots.upper - 1;
+                        ">
+                            <div class="progress ${accepted >= min_spots and 'success' or 'alert'}"
+                            onclick="$('#button-${oid}').click();">
+                                <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
+                                <span class="meter-text">
+                                    ${accepted} / ${max_spots} <span i18n:translate>Attendees</span>
+                                </span>
+                            </div>
+
+                            <button id="button-${oid}" data-toggle="#details-${oid}" class="untoggled ${accepted >= min_spots and 'success' or 'alert'}">
+                                <span i18n:translate class="show-for-sr">Show Details</span>
+                                <i class="fa fa-angle-double-down" aria-hidden="true"></i>
+                            </button>
+
+                            <div class="clearfix"></div>
+
+                            <table id="details-${oid}" class="matches" style="display: none;" tal:condition="records['accepted'] or records['other']">
+                                <thead>
+                                    <tr>
+                                        <th i18n:translate>Name</th>
+                                        <th i18n:translate>Age</th>
+                                        <th i18n:translate>State</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tal:block repeat="kind ('accepted', 'other')">
+                                        <tr tal:repeat="record records[kind]" class="booking booking-${kind} ${record.booking_state}">
+                                            <td><span>${record.attendee_name}</span></td>
+                                            <td><span>${int(record.attendee_age)}</span></td>
+                                            <td>
+                                                <tal:block
+                                                    define="state record.booking_state"
+                                                    metal:use-macro="layout.macros.confirmed_booking_state"
+                                                />
+                                            </td>
+                                        </tr>
+                                    </tal:block>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-
-                    <button id="button-${oid}" data-toggle="#details-${oid}" class="untoggled ${accepted >= min_spots and 'success' or 'alert'}">
-                        <span i18n:translate class="show-for-sr">Show Details</span>
-                        <i class="fa fa-angle-double-down" aria-hidden="true"></i>
-                    </button>
-
-                    <div class="clearfix"></div>
-
-                    <table id="details-${oid}" class="matches" style="display: none;" tal:condition="records['accepted'] or records['other']">
-                        <thead>
-                            <tr>
-                                <th i18n:translate>Name</th>
-                                <th i18n:translate>Age</th>
-                                <th i18n:translate>State</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tal:block repeat="kind ('accepted', 'other')">
-                                <tr tal:repeat="record records[kind]" class="booking booking-${kind} ${record.booking_state}">
-                                    <td><span>${record.attendee_name}</span></td>
-                                    <td><span>${int(record.attendee_age)}</span></td>
-                                    <td>
-                                        <tal:block
-                                            define="state record.booking_state"
-                                            metal:use-macro="layout.macros.confirmed_booking_state"
-                                        />
-                                    </td>
-                                </tr>
-                            </tal:block>
-                        </tbody>
-                    </table>
+                </tal:block>
+            </div>
+            <div class="columns small-12 medium-4">
+                <div class="page-content-panel matching-panel">
+                    <h4 i18n:translate>Matching</h4>
+                    <div metal:use-macro="layout.macros['form']" />
+                    <a ic-post-to="${request.link(model, 'zuruecksetzen')}" redirect-after="${request.link(model)}" i18n:translate class="reset-matching">
+                        Reset Matching
+                    </a>
                 </div>
             </div>
-        </tal:block>
+        </div>
     </tal:block>
 </div>

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to influence the matching algorithm using various options.
+  [href]
+
 0.1.0 (2016-11-18)
 ~~~~~~~~~~~~~~~~~~~
 

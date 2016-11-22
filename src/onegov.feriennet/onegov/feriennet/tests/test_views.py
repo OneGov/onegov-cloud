@@ -830,17 +830,16 @@ def test_matching_view(feriennet_app):
 
     # check the initial state
     assert "Ferienpass 2016" in matching
-    assert "Zufriedenheit liegt bei 0%" in matching
-    assert "0% aller Durchführungen haben genug Teilnehmer" in matching
+    assert "Zufriedenheit liegt bei <strong>0%</strong>" in matching
+    assert "<strong>0%</strong> aller Durchführungen haben genug" in matching
     assert "0 / 4" in matching
     assert "Dustin" in matching
 
     # run a matching
-    client.post(get_post_url(matching, 'run-matching'))
-    matching = client.get('/angebote').click("Zuteilung")
+    matching = matching.form.submit()
 
-    assert "Zufriedenheit liegt bei 100%" in matching
-    assert "50% aller Durchführungen haben genug Teilnehmer" in matching
+    assert "Zufriedenheit liegt bei <strong>100%</strong>" in matching
+    assert "<strong>50%</strong> aller Durchführungen haben genug" in matching
     assert "1 / 4" in matching
     assert "2 / 4" in matching
 
@@ -848,5 +847,5 @@ def test_matching_view(feriennet_app):
     client.post(get_post_url(matching, 'reset-matching'))
     matching = client.get('/angebote').click("Zuteilung")
 
-    assert "Zufriedenheit liegt bei 0%" in matching
-    assert "0% aller Durchführungen haben genug Teilnehmer" in matching
+    assert "Zufriedenheit liegt bei <strong>0%</strong>" in matching
+    assert "<strong>0%</strong> aller Durchführungen haben genug" in matching

@@ -30,6 +30,7 @@ class MatchCollection(object):
             Occasion.end.label('occasion_end'),
             Occasion.timezone.label('occasion_timezone'),
             Occasion.spots.label('occasion_spots'),
+            Occasion.age.label('occasion_age'),
             Attendee.name.label('attendee_name'),
             Attendee.age.label('attendee_age')
         )

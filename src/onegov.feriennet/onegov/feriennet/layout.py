@@ -246,29 +246,3 @@ class MatchCollectionLayout(DefaultLayout):
             ),
             Link(_("Matches"), '#')
         )
-
-    @cached_property
-    def editbar_links(self):
-        links = []
-
-        if self.request.is_admin:
-            links.append(ConfirmLink(
-                text=_("Run Matching"),
-                url=self.request.link(self.model, name='ausfuehren'),
-                confirm=_("Do you really want to execute a new matching run?"),
-                extra_information=_("This cannot be undone."),
-                classes=('confirm', 'run-matching'),
-                redirect_after=self.request.link(self.model),
-                yes_button_text=_("Execute Matching Run")
-            ))
-            links.append(ConfirmLink(
-                text=_("Reset Matching"),
-                url=self.request.link(self.model, name='zuruecksetzen'),
-                confirm=_("Do you really want to reset the current period?"),
-                extra_information=_("This cannot be undone."),
-                classes=('confirm', 'reset-matching'),
-                redirect_after=self.request.link(self.model),
-                yes_button_text=_("Reset Matching")
-            ))
-
-        return links

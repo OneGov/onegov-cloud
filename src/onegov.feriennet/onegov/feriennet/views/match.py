@@ -3,16 +3,32 @@ from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.activity.matching import deferred_acceptance_from_database
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import MatchCollection
+from onegov.feriennet.forms import MatchForm
 from onegov.feriennet.layout import MatchCollectionLayout
 
 
-@FeriennetApp.html(
+@FeriennetApp.form(
     model=MatchCollection,
+    form=MatchForm,
     template='matches.pt',
     permission=Secret)
-def view_matches(self, request):
+def handle_matches(self, request, form):
 
     layout = MatchCollectionLayout(self, request)
+
+    if form.submitted(request):
+        assert self.period.active and not self.period.confirmed
+
+        deferred_acceptance_from_database(
+            session=request.app.session(),
+            period_id=self.period_id,
+            score_function=form.scoring(request.app.session()))
+
+        form.store_to_period(self.period)
+        request.success(_("The matching run executed successfully"))
+
+    elif not request.POST:
+        form.load_from_period(self.period)
 
     def activity_link(oid):
         return request.class_link(Occasion, {'id': oid})
@@ -26,20 +42,11 @@ def view_matches(self, request):
         'activity_link': activity_link,
         'happiness': '{}%'.format(round(self.happiness * 100)),
         'operability': '{}%'.format(round(self.operability * 100)),
-        'period': self.period
+        'period': self.period,
+        'form': form,
+        'button_text': _("Run Matching"),
+        'model': self
     }
-
-
-@FeriennetApp.view(
-    model=MatchCollection,
-    name='ausfuehren',
-    permission=Secret,
-    request_method="POST")
-def run_matching(self, request):
-    assert self.period.active and not self.period.confirmed
-
-    deferred_acceptance_from_database(request.app.session(), self.period_id)
-    request.success(_("The matching run executed successfully"))
 
 
 @FeriennetApp.view(

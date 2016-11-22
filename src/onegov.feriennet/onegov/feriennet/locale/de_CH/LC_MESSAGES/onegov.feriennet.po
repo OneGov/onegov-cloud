@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-18 14:53+0100\n"
+"POT-Creation-Date: 2016-11-22 11:42+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -34,7 +34,7 @@ msgid "Homepage"
 msgstr "Startseite"
 
 msgid "Manage Periods"
-msgstr ""
+msgstr "Perioden"
 
 msgid "New Period"
 msgstr "Neue Periode"
@@ -54,29 +54,14 @@ msgstr "Zuteilung"
 msgid "Edit Activity"
 msgstr "Angebot Bearbeiten"
 
-msgid "Run Matching"
-msgstr "Zuteilung Ausführen"
-
-msgid "Do you really want to execute a new matching run?"
-msgstr "Möchten Sie wirklich einen neuen Zuteilungs-Lauf ausführen?"
-
-msgid "This cannot be undone."
-msgstr "Dies kann nicht rückgängig gemacht werden."
-
-msgid "Execute Matching Run"
-msgstr "Zuteilungs-Lauf ausführen"
-
-msgid "Reset Matching"
-msgstr "Zuteilung Zurücksetzen"
-
-msgid "Do you really want to reset the current period?"
-msgstr "Möchten Sie die Zuteilung wirklich zurücksetzen?"
-
 msgid "Request Publication"
 msgstr "Publikation Beantragen"
 
 msgid "Do you really want to request publication?"
 msgstr "Möchten Sie die Publikation wirklich beantragen?"
+
+msgid "This cannot be undone."
+msgstr "Dies kann nicht rückgängig gemacht werden."
 
 msgid "Discard Activity"
 msgstr "Angebot Verwerfen"
@@ -212,6 +197,18 @@ msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
 #, python-format
 msgid "This occasion has already been booked by ${name}"
 msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
+
+msgid "Children in the right age"
+msgstr "Kinder im passenden Alter"
+
+msgid "Prefer the following children:"
+msgstr "Folgende Kinder bevorzugen:"
+
+msgid "Children of organisers"
+msgstr "Kinder von Organisatoren"
+
+msgid "Children of administrators"
+msgstr "Kinder von Administratoren"
 
 msgid "Period"
 msgstr "Periode"
@@ -510,6 +507,9 @@ msgstr "Die durchschnittliche Zufriedenheit liegt bei ${happiness}"
 msgid "${operability} of all occasions have enough attendees"
 msgstr "${operability} aller Durchführungen haben genug Teilnehmer"
 
+msgid "Years"
+msgstr "Jahre"
+
 msgid "Bookings"
 msgstr "Buchungen"
 
@@ -524,6 +524,9 @@ msgstr "Details Anzeigen"
 
 msgid "State"
 msgstr "Status"
+
+msgid "Reset Matching"
+msgstr "Zuteilung Zurücksetzen"
 
 msgid ""
 "The following activites contain occasions which are in conflict with the "
@@ -627,11 +630,14 @@ msgstr "Buchung entfernen"
 msgid "Matches for ${title}"
 msgstr "Zuteilungen für ${title}"
 
-msgid "The matching run executed successfully"
-msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
+msgid "Run Matching"
+msgstr "Zuteilung Ausführen"
 
 msgid "The period was successfully reset"
 msgstr "Die Periode wurde erfolgreich zurückgesetzt"
+
+msgid "The matching run executed successfully"
+msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
 
 msgid "Enroll Attendee"
 msgstr "Teilnehmer Anmelden"
