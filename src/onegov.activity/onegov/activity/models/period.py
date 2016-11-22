@@ -1,3 +1,4 @@
+from datetime import date
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, JSON
@@ -103,3 +104,11 @@ class Period(Base, TimestampMixin):
             return
 
         self.active = False
+
+    @property
+    def wishlist_phase(self):
+        today = date.today()
+
+        return self.active and \
+            not self.confirmed and \
+            self.prebooking_start <= today and today <= self.prebooking_end
