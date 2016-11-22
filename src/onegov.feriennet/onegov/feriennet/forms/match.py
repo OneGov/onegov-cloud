@@ -49,4 +49,5 @@ class MatchForm(Form):
     def load_from_period(self, period):
         if 'match-settings' in period.data:
             for key, value in period.data['match-settings'].items():
-                getattr(self, key).data = value
+                if hasattr(self, key):
+                    getattr(self, key).data = value
