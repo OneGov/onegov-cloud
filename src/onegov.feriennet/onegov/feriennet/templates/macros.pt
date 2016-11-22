@@ -201,7 +201,7 @@
             </tal:block>
         </div>
 
-        <div class="hint" tal:condition="period.prebooking_start <= today and today <= period.prebooking_end">
+        <div class="hint" tal:condition="period.wishlist_phase and period.prebooking_start <= today and today <= period.prebooking_end">
             <i class="fa fa-calendar-check-o fa-fw" aria-hidden="true"></i>
 
             <tal:block i18n:translate>
@@ -209,11 +209,11 @@
             </tal:block>
         </div>
 
-        <div class="hint" tal:condition="period.prebooking_end < today">
+        <div class="hint" tal:condition="not: period.wishlist_phase">
             <i class="fa fa-calendar-times-o fa-fw" aria-hidden="true"></i>
 
             <tal:block i18n:translate>
-                Prebooking ended on <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />
+                Prebooking has ended
             </tal:block>
         </div>
     </tal:block>

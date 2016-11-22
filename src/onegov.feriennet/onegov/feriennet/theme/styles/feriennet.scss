@@ -506,6 +506,10 @@ ul.tags {
 */
 .matching-panel {
     form {
+        #confirm {
+            margin-bottom: .5rem;
+        }
+
         legend {
             background: transparent;
             margin: 0 0 .5rem;
@@ -524,8 +528,8 @@ ul.tags {
             margin-bottom: .5rem;
         }
 
-        .field-sure {
-            margin-bottom: 1rem;
+        .field-sure label {
+            margin: 0 0 .5rem;
         }
     }
 
