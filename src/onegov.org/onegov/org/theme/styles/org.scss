@@ -280,16 +280,19 @@ form {
         font-size: $form-label-font-size;
     }
 
-    // fix text wrapping to a seaprate new line in a label following a checkbox
-    input[type="checkbox"] + label {
-        max-width: 90%;
-        vertical-align: text-top;
-    }
-
-    // make sure the label after a single checkbox has enough room
-    input[type="checkbox"] + .label-text {
+    input[type="checkbox"] {
         display: inline-block;
-        margin-left: .7rem;
+        float: left;
+        margin: .4rem .5rem 0 0 !important;
+
+        + .label-text,
+        + label {
+            display: inline-block;
+            margin-bottom: .2rem;
+            margin-left: 0;
+            max-width: 75%;
+            vertical-align: text-top;
+        }
     }
 
     input.invalid,
