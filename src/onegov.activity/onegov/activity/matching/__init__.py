@@ -6,7 +6,7 @@ from onegov.activity.matching.score import Scoring
 from onegov.activity.matching.score import PreferMotivated
 from onegov.activity.matching.score import PreferInAgeBracket
 from onegov.activity.matching.score import PreferOrganiserChildren
-from onegov.activity.matching.score import PreferAssociationChildren
+from onegov.activity.matching.score import PreferAdminChildren
 
 __all__ = [
     'deferred_acceptance',
@@ -17,5 +17,5 @@ __all__ = [
     'PreferMotivated',
     'PreferInAgeBracket',
     'PreferOrganiserChildren',
-    'PreferAssociationChildren',
+    'PreferAdminChildren',
 ]

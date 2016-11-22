@@ -3,7 +3,7 @@ from freezegun import freeze_time
 from functools import partial
 from onegov.activity.matching import deferred_acceptance_from_database
 from onegov.activity.matching import Scoring
-from onegov.activity.matching import PreferAssociationChildren
+from onegov.activity.matching import PreferAdminChildren
 from onegov.activity.matching import PreferOrganiserChildren
 from onegov.activity.matching import PreferInAgeBracket
 from onegov.core.utils import Bunch
@@ -199,7 +199,7 @@ def test_prefer_association_children(session, owner, member, collections,
     b2 = collections.bookings.add(member, a2, o)
 
     match(session, prebooking_period.id, score_function=Scoring(
-        criteria=[PreferAssociationChildren.from_session(session)]
+        criteria=[PreferAdminChildren.from_session(session)]
     ))
 
     assert b1.state == 'accepted'

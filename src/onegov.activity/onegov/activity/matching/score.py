@@ -127,15 +127,8 @@ class PreferOrganiserChildren(object):
         return self.get_is_organiser_child(booking) and 1.0 or 0.0
 
 
-class PreferAssociationChildren(object):
-    """ Scores bookings of children higher if their parents are admins or
-    organisers - without checking if the admin/organiser actually offered
-    a course or not, only looking at the role.
-
-    We call these children assocation-children because their parents are
-    active in the association in some capacity.
-
-    """
+class PreferAdminChildren(object):
+    """ Scores bookings of children higher if their parents are admins. """
 
     def __init__(self, get_is_association_child):
         self.get_is_association_child = get_is_association_child
@@ -150,7 +143,7 @@ class PreferAssociationChildren(object):
             if members is None:
                 members = {
                     u.username for u in session.query(User)
-                    .filter(User.role.in_(('admin', 'editor')))
+                    .filter(User.role == 'admin')
                     .filter(User.active == True)
                 }
 

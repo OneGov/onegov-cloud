@@ -4,7 +4,7 @@ from itertools import count
 from onegov.activity.matching import deferred_acceptance
 from onegov.activity.matching import MatchableBooking
 from onegov.activity.matching import MatchableOccasion
-from onegov.activity.matching import PreferAssociationChildren
+from onegov.activity.matching import PreferAdminChildren
 from onegov.activity.matching import PreferInAgeBracket
 from onegov.activity.matching import PreferMotivated
 from onegov.activity.matching import PreferOrganiserChildren
@@ -257,7 +257,7 @@ def test_prefer_association_children():
 
     is_association_child = None
 
-    association_child_score = PreferAssociationChildren(
+    association_child_score = PreferAdminChildren(
         get_is_association_child=lambda c: is_association_child)
 
     is_association_child = True
