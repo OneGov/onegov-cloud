@@ -280,7 +280,8 @@ form {
         font-size: $form-label-font-size;
     }
 
-    input[type="checkbox"] {
+    input[type="checkbox"],
+    input[type="radio"] {
         display: inline-block;
         float: left;
         margin: .4rem .5rem 0 0 !important;
@@ -293,6 +294,10 @@ form {
             max-width: 75%;
             vertical-align: text-top;
         }
+    }
+
+    input[type="radio"] {
+        margin: .29rem .4rem 0 0 !important;
     }
 
     input.invalid,
