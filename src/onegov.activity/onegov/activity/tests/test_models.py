@@ -684,20 +684,7 @@ def test_booking_collection(session, owner):
     assert bookings.for_period(Bunch(id=uuid4())).query().count() == 0
     assert bookings.for_username('foobar').query().count() == 0
     assert bookings.for_period(Bunch(id=uuid4())).count(owner.username) == 0
-
-    assert bookings.wishlist_count(owner.username) == 1
-    assert bookings.booking_count(owner.username) == 0
-
-    bookings.query().one().state = 'accepted'
-    periods.query().one().confirmed = True
-
-    assert bookings.wishlist_count(owner.username) == 0
     assert bookings.booking_count(owner.username) == 1
-
-    bookings.query().one().state = 'denied'
-
-    assert bookings.wishlist_count(owner.username) == 0
-    assert bookings.booking_count(owner.username) == 0
 
 
 def test_star_booking(session, owner):

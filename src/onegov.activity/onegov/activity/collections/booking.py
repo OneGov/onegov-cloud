@@ -51,37 +51,17 @@ class BookingCollection(GenericCollection):
 
         return query.count()
 
-    def wishlist_count(self, username):
-        """ Returns the number wishlist entries in the active period.
-
-        This value is equal to the number of bookings for a given user in
-        the active period.
-
-        """
+    def booking_count(self, username):
+        """ Returns the number of bookings in the active period. """
 
         periods = self.session.query(Period)
         periods = periods.with_entities(Period.id)
         periods = periods.filter(Period.active == True)
-        periods = periods.filter(Period.confirmed == False)
 
         return self.count(
             usernames=(username, ),
             periods=periods.subquery(),
             states='*'
-        )
-
-    def booking_count(self, username):
-        """ Returns the number of accepted bookings in the active period. """
-
-        periods = self.session.query(Period)
-        periods = periods.with_entities(Period.id)
-        periods = periods.filter(Period.active == True)
-        periods = periods.filter(Period.confirmed == True)
-
-        return self.count(
-            usernames=(username, ),
-            periods=periods.subquery(),
-            states=('accepted', )
         )
 
     def by_user(self, user):
