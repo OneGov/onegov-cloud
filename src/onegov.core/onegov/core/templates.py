@@ -42,7 +42,7 @@ from chameleon.utils import Scope, decode_string
 from onegov.core.framework import Framework
 
 
-def get_default_vars(request, content):
+def get_default_vars(request, content, suppress_global_variables=False):
 
     default = {
         'request': request,
@@ -51,8 +51,11 @@ def get_default_vars(request, content):
 
     default.update(content)
 
-    return request.app.config.templatevariables_registry.get_variables(
-        request, default)
+    if suppress_global_variables:
+        return default
+    else:
+        return request.app.config.templatevariables_registry.get_variables(
+            request, default)
 
 
 class TemplateLoader(PageTemplateLoader):
@@ -135,16 +138,24 @@ def get_chameleon_render(loader, name, original_render):
     return render
 
 
-def render_template(template, request, content):
+def render_template(template, request, content, is_mail_template='infer'):
     """ Renders the given template. Use this if you need to get the rendered
     value directly. If oyu render a view, this is not needed!
 
+    By default, mail templates (templates strting with 'mail_') skip the
+    inclusion of global variables defined through the template_variables
+    directive.
+
     """
+
+    if is_mail_template == 'infer':
+        is_mail_template = template.startswith('mail_')
 
     registry = request.app.config.template_engine_registry
     template = registry._template_loaders['.pt'][template]
 
-    variables = get_default_vars(request, content)
+    variables = get_default_vars(
+        request, content, suppress_global_variables=is_mail_template)
 
     return template.render(**variables)
 

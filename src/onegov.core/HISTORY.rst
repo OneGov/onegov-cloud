@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- By default, ignore custom global template variables in e-mail templates.
+  [href]
+
 0.32.0 (2016-11-07)
 ~~~~~~~~~~~~~~~~~~~
 
