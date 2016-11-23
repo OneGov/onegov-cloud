@@ -107,6 +107,15 @@ class AttendeeForm(Form):
 
         return True
 
+    def ensure_available_spots(self):
+        if self.model.full:
+            self.attendee.errors.append(_(
+                "This occasion is already fully booked"
+            ))
+            return False
+
+        return True
+
     def validate(self):
         result = super().validate()
 
@@ -114,7 +123,8 @@ class AttendeeForm(Form):
             self.ensure_active_period,
             self.ensure_within_prebooking_period,
             self.ensure_no_duplicate_child,
-            self.ensure_no_duplicate_booking
+            self.ensure_no_duplicate_booking,
+            self.ensure_available_spots,
         )
 
         for ensurance in ensurances:
