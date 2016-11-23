@@ -76,7 +76,7 @@ def fetch(group_context):
 @click.argument('username')
 @click.argument('password')
 @click.option('--sentry')
-@click.option('--sender')
+@click.option('--originator')
 def send_sms(username, password, sentry, originator):
     """ Sends the SMS in the smsdir for a given instance. For example:
 
