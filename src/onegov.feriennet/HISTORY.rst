@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Indicate unoperable occasions in the booking view.
+  [href]
+
+- Adds the ability to confirm the automatic matching.
+  [href]
+
 - Adds the ability to influence the matching algorithm using various options.
   [href]
 

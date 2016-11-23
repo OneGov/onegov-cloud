@@ -44,7 +44,7 @@
 
                     <ul>
                         <li tal:repeat="booking bookings_by_attendee(attendee)" id="booking-${booking.id}">
-                            <div class="row">
+                            <div class="row ${booking.occasion.operable and 'operable' or 'non-operable'}">
                                 <div class="columns small-1">
                                     <a ic-post-to="${request.link(booking, 'toggle-star')}">
                                         <tal:block metal:use-macro="layout.macros['star']" />
@@ -62,6 +62,9 @@
                                         occasion was cancelled, otherwise the user might see accepted bookings at a point where those states are not confirmed yet. -->
                                         <tal:block condition="not:period.confirmed" metal:use-macro="layout.macros.wishlist_booking_state" define="state booking.state" />
                                         <tal:block condition="period.confirmed" metal:use-macro="layout.macros.confirmed_booking_state" define="state booking.state" />
+                                    </div>
+                                    <div class="operability-warning" tal:condition="not period.wishlist_phase and not booking.occasion.operable" i18n:translate>
+                                        This occasion does not have enough attendees yet.
                                     </div>
                                     <div class="actions" tal:define="actions actions_by_booking(booking)">
                                         <ul tal:condition="actions">

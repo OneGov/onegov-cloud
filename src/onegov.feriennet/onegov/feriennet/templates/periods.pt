@@ -21,7 +21,10 @@
                 <tr tal:repeat="period periods" class="${period.active and 'active' or ''}">
                     <td>${period.title}</td>
                     <td>
-                        ${layout.format_date_range(period.prebooking_start, period.prebooking_end)}
+                        <tal:block condition="not:period.confirmed">
+                            ${layout.format_date_range(period.prebooking_start, period.prebooking_end)}
+                        </tal:block>
+                        <tal:block condition="period.confirmed" i18n:translate>Completed</tal:block>
                     </td>
                     <td>
                         ${layout.format_date_range(period.execution_start, period.execution_end)}

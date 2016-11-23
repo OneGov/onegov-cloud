@@ -375,6 +375,7 @@ ul.tags {
 
 // use px in this block as rem is buggy in pseud-elements in IE 11
 .count[data-count]:after {
+    background-color: $alert-color;
     border-radius: 100px;
     color: $white;
     content: attr(data-count);
@@ -386,14 +387,6 @@ ul.tags {
     margin: 0 0 0 7px;
     min-width: 23px;
     text-align: center;
-}
-
-.count.success[data-count]:after {
-    background-color: $success-color;
-}
-
-.count.alert[data-count]:after {
-    background-color: $alert-color;
 }
 
 /*
@@ -425,6 +418,17 @@ ul.tags {
         margin-bottom: .1rem;
     }
 
+    .operability-warning {
+        color: $orange-dark;
+        font-size: .8rem;
+        padding-top: .15rem;
+
+        &:before {
+            @include icon('\f06a');
+            margin-right: 1ex;
+        }
+    }
+
     .state {
         background-color: $aluminum;
         border-radius: 5px;
@@ -451,6 +455,10 @@ ul.tags {
         &.accepted {
             background-color: $success-color;
         }
+    }
+
+    .non-operable .state.accepted {
+        background-color: $orange;
     }
 
     .actions {
@@ -653,7 +661,7 @@ ul.tags {
         }
 
         &.alert .meter-text::before {
-            @include icon('\f057');
+            @include icon('\f06a');
             color: $red;
             margin-right: 1ex;
         }

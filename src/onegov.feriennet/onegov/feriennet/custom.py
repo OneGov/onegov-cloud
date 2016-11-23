@@ -23,10 +23,7 @@ def get_template_variables(request):
         bookings = BookingCollection(request.app.session())
 
         if period:
-            if period.confirmed:
-                count = bookings.booking_count(request.current_username)
-            else:
-                count = bookings.wishlist_count(request.current_username)
+            count = bookings.booking_count(request.current_username)
 
             if count:
                 attributes = {'data-count': str(count)}
