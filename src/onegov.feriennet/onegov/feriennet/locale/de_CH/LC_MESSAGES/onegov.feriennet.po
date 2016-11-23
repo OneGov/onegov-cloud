@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-22 14:29+0100\n"
+"POT-Creation-Date: 2016-11-23 13:19+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -210,20 +210,17 @@ msgstr "Kinder von Organisatoren"
 msgid "Children of administrators"
 msgstr "Kinder von Administratoren"
 
-msgid "Confirm period:"
-msgstr "Periode abschliessen:"
+msgid "Confirm matching:"
+msgstr "Zuteilung abschliessen:"
 
-msgid ""
-"I know this cannot be undone and that parents will be informed of the result"
-msgstr ""
-"Mir ist bewusst dass dies nicht rückgängig gemacht werden kann und dass die "
-"Eltern informiert werden"
+msgid "I know the wishlist-phase ends as a result."
+msgstr "Mir ist bewusst dass die Wunschphase damit endet."
 
 msgid "No, preview only"
 msgstr "Nein, nur Vorschau"
 
-msgid "Yes, confirm period"
-msgstr "Ja, Periode abschliessen"
+msgid "Yes, confirm matching"
+msgstr "Ja, Zuteilung abschliessen"
 
 msgid "Period"
 msgstr "Periode"
@@ -540,8 +537,19 @@ msgstr "Details Anzeigen"
 msgid "State"
 msgstr "Status"
 
+msgid "Automatic Matching"
+msgstr "Automatische Zuteilung"
+
 msgid "Reset Matching"
 msgstr "Zuteilung Zurücksetzen"
+
+msgid ""
+"The matching for this period has been confirmed. If you want to change "
+"matching you need to book/cancel bookings manually."
+msgstr ""
+"Die automatische Zuteilung in der aktuellen Periode wurde bereits bestätigt. "
+"Die Zuteilung kann nur noch manuell über Buchungen/Stornierungen gemacht "
+"werden."
 
 msgid ""
 "The following activites contain occasions which are in conflict with the "
@@ -654,6 +662,9 @@ msgstr "Zuteilung Ausführen"
 msgid "The period was successfully reset"
 msgstr "Die Periode wurde erfolgreich zurückgesetzt"
 
+msgid "The matching was confirmed successfully"
+msgstr "Die Zuteilung wurde erfoglreich abgeschlossen"
+
 msgid "The matching run executed successfully"
 msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
 
@@ -715,12 +726,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "Prebooking ended on ${date}"
-#~ msgstr "Die Wunschphase ging am ${date} zu Ende"
-
-#~ msgid "Confirm period and send out notifications"
-#~ msgstr "Abschliessen und benachrichtigen"
-
-#~ msgid "Finish:"
-#~ msgstr "Abschluss der Periode:"

@@ -25,7 +25,12 @@ def handle_matches(self, request, form):
             score_function=form.scoring(request.app.session()))
 
         form.store_to_period(self.period)
-        request.success(_("The matching run executed successfully"))
+
+        if form.confirm_period:
+            self.period.confirmed = True
+            request.success(_("The matching was confirmed successfully"))
+        else:
+            request.success(_("The matching run executed successfully"))
 
     elif not request.POST:
         form.load_from_period(self.period)

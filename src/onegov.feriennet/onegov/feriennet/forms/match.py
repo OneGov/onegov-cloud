@@ -25,19 +25,16 @@ class MatchForm(Form):
         default=False)
 
     confirm = RadioField(
-        label=_("Confirm period:"),
+        label=_("Confirm matching:"),
         default='no',
         choices=[
             ('no', _("No, preview only")),
-            ('yes', _("Yes, confirm period"))
+            ('yes', _("Yes, confirm matching"))
         ]
     )
 
     sure = BooleanField(
-        label=_(
-            "I know this cannot be undone and that parents will be "
-            "informed of the result"
-        ),
+        label=_("I know the wishlist-phase ends as a result."),
         default=False,
         depends_on=('confirm', 'yes')
     )
@@ -58,6 +55,10 @@ class MatchForm(Form):
                 PreferAdminChildren.from_session(session))
 
         return scoring
+
+    @property
+    def confirm_period(self):
+        return self.confirm.data == 'yes' and self.sure.data is True
 
     def store_to_period(self, period):
         period.data['match-settings'] = {
