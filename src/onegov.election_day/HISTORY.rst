@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.4 (2016-11-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Allows the speficify the originator of SMS.
   [msom]
