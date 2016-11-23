@@ -13,14 +13,14 @@
             <div class="callout panel">
                 <tal:block metal:use-macro="layout.macros.period_hints" />
 
-                <div class="hint">
+                <div class="hint" tal:condition="period.wishlist_phase">
                     <i class="fa fa-star fa-fw" aria-hidden="true"></i>
                     <tal:block i18n:translate>
                         Mark up to three occasions per child as favorites
                     </tal:block>
                 </div>
 
-                <div class="hint">
+                <div class="hint" tal:condition="period.wishlist_phase">
                     <i class="fa fa-puzzle-piece fa-fw" aria-hidden="true"></i>
                     <tal:block i18n:translate>
                         Once the pre-booking is over, we will divide all children
@@ -28,7 +28,7 @@
                     </tal:block>
                 </div>
 
-                <div class="hint">
+                <div class="hint" tal:condition="period.wishlist_phase">
                     <i class="fa fa-balance-scale fa-fw" aria-hidden="true"></i>
                     <tal:block i18n:translate>
                         We cannot guarantee that everyone gets into their favorite activity
@@ -37,7 +37,7 @@
             </div>
 
             <div class="row attendee-bookings" tal:repeat="attendee attendees">
-                <div class="columns small-12 medium-6 end">
+                <div class="columns small-12 medium-8 end">
                     <h3>${attendee.name}</h3>
 
                     <div id="alert-boxes-for-${attendee.id}"></div>

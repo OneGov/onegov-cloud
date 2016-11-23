@@ -419,12 +419,12 @@ ul.tags {
     }
 
     .operability-warning {
-        color: $orange-dark;
         font-size: .8rem;
         padding-top: .15rem;
 
         &:before {
             @include icon('\f06a');
+            color: $orange-dark;
             margin-right: 1ex;
         }
     }
@@ -442,10 +442,6 @@ ul.tags {
 
         &.cancelled {
             background-color: $red;
-        }
-
-        &.blocked {
-            background-color: $orange;
         }
 
         &.denied {
