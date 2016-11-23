@@ -275,6 +275,10 @@ ul.tags {
             }
         }
 
+        .full {
+            font-weight: bold;
+        }
+
         .full:before {
             @include icon('\f05e');
             color: $red;
