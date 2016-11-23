@@ -928,3 +928,82 @@ def test_happiness(session, owner):
     transaction.commit()
 
     assert_happiness(period.id, 0.8)
+
+
+def test_attendees_count(session, owner):
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True
+    )
+
+    sport = activities.add("Sport", username=owner.username)
+
+    o = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(1, 2)
+    )
+
+    a1 = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2002, 9, 8)
+    )
+
+    a2 = attendees.add(
+        user=owner,
+        name="Mike Wheeler",
+        birth_date=date(2002, 8, 8)
+    )
+
+    transaction.commit()
+
+    assert occasions.query().one().attendee_count == 0
+    assert not occasions.query().one().operable
+
+    bookings.add(owner, a1, o)
+    transaction.commit()
+
+    assert occasions.query().one().attendee_count == 0
+    assert not occasions.query().one().operable
+
+    bookings.query().one().state = 'accepted'
+    transaction.commit()
+
+    assert occasions.query().one().attendee_count == 1
+    assert occasions.query().one().operable
+
+    bookings.add(owner, a2, o)
+    transaction.commit()
+
+    assert occasions.query().one().attendee_count == 1
+    assert occasions.query().one().operable
+
+    bookings.query().all()[0].state = 'accepted'
+    bookings.query().all()[1].state = 'accepted'
+    transaction.commit()
+
+    assert occasions.query().one().attendee_count == 2
+    assert occasions.query().one().operable
+
+    session.delete(bookings.query().first())
+    transaction.commit()
+
+    assert occasions.query().one().attendee_count == 1
+    assert occasions.query().one().operable
+
+    bookings.query().one().state = 'open'
+
+    assert occasions.query().one().attendee_count == 0
+    assert not occasions.query().one().operable

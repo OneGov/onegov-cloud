@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds an accepted booking count to the occasion, along with properties to
+  check for operable and/or full occasions.
+  [href]
+
 - Adds a custom data column to the period.
   [href]
 

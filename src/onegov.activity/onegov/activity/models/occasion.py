@@ -11,6 +11,7 @@ from sqlalchemy import column
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
+from sqlalchemy import Integer
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -80,12 +81,24 @@ class Occasion(Base, TimestampMixin):
     def active(self):
         return column('active')
 
+    @aggregated('accepted', Column(Integer, default=0))
+    def attendee_count(self):
+        return func.count('1')
+
     #: The bookings linked to this occasion
     bookings = relationship(
         'Booking',
         order_by='Booking.created',
         backref='occasion'
     )
+
+    accepted = relationship(
+        'Booking',
+        primaryjoin=("""and_(
+            Booking.occasion_id == Occasion.id,
+            Booking.state == 'accepted'
+        )"""),
+        viewonly=True)
 
     __table_args__ = (
         CheckConstraint('"start" <= "end"', name='start_before_end'),
@@ -102,6 +115,14 @@ class Occasion(Base, TimestampMixin):
         """ The localized version of the end date/time. """
 
         return to_timezone(self.end, self.timezone)
+
+    @hybrid_property
+    def operable(self):
+        return self.attendee_count >= self.spots.lower
+
+    @hybrid_property
+    def full(self):
+        return self.attendee_count == self.spots.upper - 1
 
     @property
     def max_spots(self):
