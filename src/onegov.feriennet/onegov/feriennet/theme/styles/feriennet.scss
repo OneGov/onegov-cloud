@@ -425,7 +425,7 @@ ul.tags {
         &:before {
             @include icon('\f06a');
             color: $orange-dark;
-            margin-right: 1ex;
+            margin: 0 1ex;
         }
     }
 
@@ -435,10 +435,8 @@ ul.tags {
         color: $white;
         display: inline-block;
         font-size: .8rem;
+        margin-bottom: .5rem;
         padding: 0 6px;
-        position: absolute;
-        right: 1rem;
-        top: .5rem;
 
         &.cancelled {
             background-color: $red;
