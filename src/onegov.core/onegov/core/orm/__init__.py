@@ -44,6 +44,7 @@ class ModelBase(object):
 
         return mapper and mapper.class_ or default
 
+
 Base = declarative_base(cls=ModelBase)
 
 #: A translation hybrid integrated with OneGov Core. See also:
@@ -73,5 +74,6 @@ def find_models(base, is_match):
 
         for cls in find_models(cls, is_match):
             yield cls
+
 
 __all__ = ['Base', 'SessionManager', 'translation_hybrid', 'find_models']
