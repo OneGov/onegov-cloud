@@ -83,11 +83,13 @@ MAX_SEND_TIME = 60 * 60 * 3
 
 class SmsQueueProcessor(object):
 
-    def __init__(self, path, username, password, sentry_dsn=None):
+    def __init__(self, path, username, password, sentry_dsn=None,
+                 originator=None):
         self.path = path
         self.username = username
         self.password = password
         self.sentry_client = Client(sentry_dsn) if sentry_dsn else None
+        self.originator = originator or "OneGov"
 
     def _send(self, number, content):
         response = requests.post(
@@ -95,7 +97,7 @@ class SmsQueueProcessor(object):
             json={
                 "UserName": self.username,
                 "Password": self.password,
-                "Originator": "OneGov",
+                "Originator": self.originator,
                 "Recipients": [number],
                 "MessageText": content
             }

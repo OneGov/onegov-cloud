@@ -76,7 +76,8 @@ def fetch(group_context):
 @click.argument('username')
 @click.argument('password')
 @click.option('--sentry')
-def send_sms(username, password, sentry):
+@click.option('--sender')
+def send_sms(username, password, sentry, originator):
     """ Sends the SMS in the smsdir for a given instance. For example:
 
         onegov-election-day --select '/onegov_election_day/zg' send_sms
@@ -86,7 +87,13 @@ def send_sms(username, password, sentry):
     def send(request, app):
         path = os.path.join(app.configuration['sms_directory'], app.schema)
         if os.path.exists(path):
-            qp = SmsQueueProcessor(path, username, password, sentry)
+            qp = SmsQueueProcessor(
+                path,
+                username,
+                password,
+                sentry,
+                originator
+            )
             qp.send_messages()
 
     return send
