@@ -115,6 +115,10 @@
             <!--! the width of this column together with the next one doesn't add up to 12 by
             intention to make space for the icons rendered ::before the first column. -->
             <div class="small-12 medium-4 columns factoids">
+                <div class="full" tal:condition="occasion.full">
+                    <span i18n:translate>Fully booked</span>
+                </div>
+
                 <div class="location" tal:condition="occasion.location">
                     <span i18n:translate class="show-for-sr">Location</span>
                     <span>${occasion.location}</span>
@@ -158,7 +162,7 @@
             </div>
         </div>
 
-        <div class="call-to-action" tal:condition="show_enroll and occasion.active">
+        <div class="call-to-action" tal:condition="show_enroll and occasion.active and not occasion.full">
             <tal:block switch="age_bracket(occasion.age)">
                 <span tal:case="'young'" i18n:translate>
                     Enroll your young child now.

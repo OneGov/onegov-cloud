@@ -275,6 +275,11 @@ ul.tags {
             }
         }
 
+        .full:before {
+            @include icon('\f05e');
+            color: $red;
+        }
+
         .location:before {
             @include icon('\f041');
         }
