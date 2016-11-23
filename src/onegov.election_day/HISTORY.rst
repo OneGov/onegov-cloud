@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.3.5 (2016-11-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes the SMS send command.
   [msom]
