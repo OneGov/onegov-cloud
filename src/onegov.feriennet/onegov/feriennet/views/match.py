@@ -1,5 +1,5 @@
 from onegov.core.security import Secret
-from onegov.activity import Booking, BookingCollection, Occasion
+from onegov.activity import BookingCollection, Occasion
 from onegov.activity.matching import deferred_acceptance_from_database
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import MatchCollection
@@ -63,6 +63,7 @@ def reset_matching(self, request):
     assert self.period.active and not self.period.confirmed
 
     bookings = BookingCollection(request.app.session(), self.period_id)
-    bookings.query().update({Booking.state: 'open'})
+    for booking in bookings.query():
+        booking.state = 'open'
 
     request.success(_("The period was successfully reset"))
