@@ -1,5 +1,6 @@
 from onegov.activity.models import Booking, Period
 from onegov.core.collection import GenericCollection
+from sqlalchemy.orm import joinedload
 
 
 class BookingCollection(GenericCollection):
@@ -105,6 +106,7 @@ class BookingCollection(GenericCollection):
 
         bookings = tuple(
             self.session.query(Booking)
+                .options(joinedload(Booking.occasion))
                 .filter(Booking.attendee_id == booking.attendee_id)
                 .filter(Booking.period_id == booking.period_id)
                 .filter(Booking.id != booking.id)
@@ -155,6 +157,7 @@ class BookingCollection(GenericCollection):
 
         bookings = tuple(
             self.session.query(Booking)
+                .options(joinedload(Booking.occasion))
                 .filter(Booking.attendee_id == booking.attendee_id)
                 .filter(Booking.period_id == booking.period_id)
                 .filter(Booking.id != booking.id))
@@ -169,7 +172,7 @@ class BookingCollection(GenericCollection):
         for a in accepted:
             for b in blocked:
                 if a.overlaps(b):
-                    unblocked.remove(blocked)
+                    unblocked.remove(b)
 
         for b in unblocked:
             b.state = 'denied'
@@ -183,6 +186,7 @@ class BookingCollection(GenericCollection):
                 self.session.flush()
 
         # try to accept the open/denied bookings in the current occasion
+        spots = booking.occasion.available_spots
         denied_bookings = sorted(
             (
                 b for b in booking.occasion.bookings
@@ -192,6 +196,7 @@ class BookingCollection(GenericCollection):
             reverse=True)
 
         for b in denied_bookings:
-            if not booking.occasion.full:
+            if spots:
                 self.accept_booking(b)
                 self.session.flush()
+                spots -= 1

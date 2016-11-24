@@ -1164,6 +1164,15 @@ def test_cancel_booking(session, owner):
         spots=(0, 2)
     )
 
+    o4 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 15),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 1)
+    )
+
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
@@ -1279,3 +1288,20 @@ def test_cancel_booking(session, owner):
     assert b3.state == 'accepted'
 
     transaction.abort()
+
+    # make sure a cancellation doesn't lead to overbooking
+    b1 = bookings.add(owner, a1, o4)
+    b2 = bookings.add(owner, a2, o4, priority=1)
+    b3 = bookings.add(owner, a3, o4)
+
+    bookings.accept_booking(b1)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'open'
+    assert b3.state == 'open'
+
+    bookings.cancel_booking(b1)
+
+    assert b1.state == 'cancelled'
+    assert b2.state == 'accepted'
+    assert b3.state == 'open'
