@@ -275,13 +275,22 @@ ul.tags {
             }
         }
 
+        .text-links {
+            margin-top: .5rem;
+        }
+
+        .available-spots,
         .full {
             font-weight: bold;
+            margin-bottom: .4rem;
         }
 
         .full:before {
-            @include icon('\f05e');
-            color: $red;
+            @include icon('\f00d');
+        }
+
+        .available-spots:before {
+            @include icon('\f00c');
         }
 
         .location:before {

@@ -111,12 +111,16 @@
 
 <metal:occasion define-macro="occasion" i18n:domain="onegov.feriennet">
     <tal:block define="show_enroll show_enroll|nothing; show_links show_links|nothing">
-        <div class="row">
+        <div class="row" tal:define="show_stats not occasion.period.wishlist_phase">
             <!--! the width of this column together with the next one doesn't add up to 12 by
             intention to make space for the icons rendered ::before the first column. -->
             <div class="small-12 medium-4 columns factoids">
-                <div class="full" tal:condition="occasion.full">
+                <div class="full" tal:condition="show_stats and occasion.full">
                     <span i18n:translate>Fully booked</span>
+                </div>
+
+                <div class="available-spots" tal:condition="show_stats and not occasion.full">
+                    <span i18n:translate><tal:block i18n:name="count" replace="occasion.available_spots" /> spots available</span>
                 </div>
 
                 <div class="location" tal:condition="occasion.location">
