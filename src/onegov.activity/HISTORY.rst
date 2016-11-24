@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to accept/cancel bookings in a confirmed period.
+  [href]
+
 - Adds an accepted booking count to the occasion, along with properties to
   check for operable and/or full occasions.
   [href]

@@ -83,3 +83,115 @@ class BookingCollection(GenericCollection):
             group_code=group_code,
             period_id=occasion.period_id
         )
+
+    def accept_booking(self, booking):
+        """ Accepts the given booking, setting all other bookings which
+        conflict with it to 'blocked'.
+
+        Can only be done if the period has been confirmed already, the
+        occasion is not yet full and the given booking doesn't conflict
+        with another accepted booking.
+
+        """
+
+        if not booking.period.confirmed:
+            raise RuntimeError("The period has not yet been confirmed")
+
+        if booking.occasion.full:
+            raise RuntimeError("The occasion is already full")
+
+        if booking.state not in ('open', 'denied'):
+            raise RuntimeError("Only open/denied bookings can be accepted")
+
+        bookings = tuple(
+            self.session.query(Booking)
+                .filter(Booking.attendee_id == booking.attendee_id)
+                .filter(Booking.period_id == booking.period_id)
+                .filter(Booking.id != booking.id)
+        )
+
+        for b in bookings:
+            if b.overlaps(booking):
+                if b.state == 'accepted':
+                    raise RuntimeError("Conflict with booking {}".format(b.id))
+
+                if b.state == 'cancelled':
+                    continue
+
+                b.state = 'blocked'
+
+        booking.state = 'accepted'
+
+    def cancel_booking(self, booking, score_function=lambda b: b.priority):
+        """ Cancels the given booking, setting all other bookings which
+        conflict only with this booking to 'open'.
+
+        All denied bookings which have a chance of becoming accepted as a
+        result (because the occasion frees up) are accepted according to their
+        matching score (already accepted bookings are not touched).
+
+        All bookings which get unblocked for the current user are tried
+        to be accepted as well, also with the highest score first. Contrary
+        to the other influenced bookings, these bookings are not limited to
+        the occasion of the cancelled booking.
+
+        This won't necesserily create a new stable matching, but it will
+        keep the operability as high as possible. It's not ideal from a
+        usability perspective as a single cancel may have a bigger impact
+        than the user intended, but it beats having occasions fail with
+        too few attendees when there are bookings waiting.
+
+        Can only be done if the period has been confirmed already and the
+        booking is an accepted bookings. Open, cancelled, blocked and
+        denied bookings can simply be deleted.
+
+        """
+
+        if not booking.period.confirmed:
+            raise RuntimeError("The period has not yet been confirmed")
+
+        if booking.state != 'accepted':
+            raise RuntimeError("Only accepted bookings can be cancelled")
+
+        bookings = tuple(
+            self.session.query(Booking)
+                .filter(Booking.attendee_id == booking.attendee_id)
+                .filter(Booking.period_id == booking.period_id)
+                .filter(Booking.id != booking.id))
+
+        booking.state = 'cancelled'
+
+        # mark the no-longer blocked bookings as denied
+        accepted = {b for b in bookings if b.state == 'accepted'}
+        blocked = {b for b in bookings if b.state == 'blocked'}
+        unblocked = {b for b in blocked}
+
+        for a in accepted:
+            for b in blocked:
+                if a.overlaps(b):
+                    unblocked.remove(blocked)
+
+        for b in unblocked:
+            b.state = 'denied'
+
+        # try to accept the denied bookings in their respective occasions
+        for b in unblocked:
+
+            # the denied state changes during the loop execution
+            if b.state == 'denied' and not b.occasion.full:
+                self.accept_booking(b)
+                self.session.flush()
+
+        # try to accept the open/denied bookings in the current occasion
+        denied_bookings = sorted(
+            (
+                b for b in booking.occasion.bookings
+                if b.state in ('open', 'denied')
+            ),
+            key=score_function,
+            reverse=True)
+
+        for b in denied_bookings:
+            if not booking.occasion.full:
+                self.accept_booking(b)
+                self.session.flush()

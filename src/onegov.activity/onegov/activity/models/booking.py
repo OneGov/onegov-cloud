@@ -1,11 +1,13 @@
+import sedate
+
+from onegov.activity.models.occasion import Occasion
 from onegov.activity.utils import random_group_code
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from onegov.activity.models.occasion import Occasion
 from sqlalchemy import Column, Enum, Index, Text, ForeignKey, Integer, func
-from sqlalchemy.orm import object_session
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import object_session
 from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
@@ -124,3 +126,6 @@ class Booking(Base, TimestampMixin):
     @property
     def end(self):
         return self.occasion.end
+
+    def overlaps(self, other):
+        return sedate.overlaps(self.start, self.end, other.start, other.end)

@@ -1007,3 +1007,275 @@ def test_attendees_count(session, owner):
 
     assert occasions.query().one().attendee_count == 0
     assert not occasions.query().one().operable
+
+
+def test_accept_booking(session, owner):
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True,
+    )
+
+    sport = activities.add("Sport", username=owner.username)
+
+    o1 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+
+    o2 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+
+    a1 = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2000, 1, 1)
+    )
+
+    a2 = attendees.add(
+        user=owner,
+        name="Mike Wheeler",
+        birth_date=date(2000, 1, 1)
+    )
+
+    a3 = attendees.add(
+        user=owner,
+        name="Eleven",
+        birth_date=date(2000, 1, 1)
+    )
+
+    transaction.commit()
+
+    # only works for confirmed periods
+    with pytest.raises(RuntimeError) as e:
+        bookings.accept_booking(bookings.add(owner, a1, o1))
+
+    assert "The period has not yet been confirmed" in str(e)
+    transaction.abort()
+
+    periods.active().confirmed = True
+    transaction.commit()
+
+    # adding bookings works until the occasion is full
+    bookings.accept_booking(bookings.add(owner, a1, o1))
+    bookings.accept_booking(bookings.add(owner, a2, o1))
+
+    with pytest.raises(RuntimeError) as e:
+        bookings.accept_booking(bookings.add(owner, a3, o1))
+
+    assert "The occasion is already full" in str(e)
+    transaction.abort()
+
+    # only open/denied bookings can be accepted this way
+    booking = bookings.add(owner, a1, o1)
+
+    for state in ('accepted', 'blocked', 'cancelled'):
+        booking.state = state
+
+        with pytest.raises(RuntimeError) as e:
+            bookings.accept_booking(booking)
+
+    transaction.abort()
+
+    # we can't accept a booking that conflicts with another accepted booking
+    bookings.accept_booking(bookings.add(owner, a1, o1))
+
+    with pytest.raises(RuntimeError) as e:
+        bookings.accept_booking(bookings.add(owner, a1, o2))
+
+    assert "Conflict with booking" in str(e)
+    transaction.abort()
+
+    # other conflicting bookings are marked as blocked
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a1, o2)
+
+    bookings.accept_booking(b1)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'blocked'
+
+    b1.state = 'open'
+    b2.state = 'open'
+
+    bookings.accept_booking(b2)
+
+    assert b2.state == 'accepted'
+    assert b1.state == 'blocked'
+
+
+def test_cancel_booking(session, owner):
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True,
+    )
+
+    sport = activities.add("Sport", username=owner.username)
+
+    o1 = occasions.add(
+        start=datetime(2016, 10, 4, 10),
+        end=datetime(2016, 10, 4, 12),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+
+    o2 = occasions.add(
+        start=datetime(2016, 10, 4, 11),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+
+    o3 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 15),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+
+    a1 = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2000, 1, 1)
+    )
+
+    a2 = attendees.add(
+        user=owner,
+        name="Mike Wheeler",
+        birth_date=date(2000, 1, 1)
+    )
+
+    a3 = attendees.add(
+        user=owner,
+        name="Eleven",
+        birth_date=date(2000, 1, 1)
+    )
+
+    transaction.commit()
+
+    # only works for confirmed periods
+    with pytest.raises(RuntimeError) as e:
+        bookings.cancel_booking(bookings.add(owner, a1, o1))
+
+    assert "The period has not yet been confirmed" in str(e)
+    transaction.abort()
+
+    periods.active().confirmed = True
+    transaction.commit()
+
+    # only works for accepted bookings
+    with pytest.raises(RuntimeError) as e:
+        bookings.cancel_booking(bookings.add(owner, a1, o1))
+
+    assert "Only accepted bookings can be cancelled" in str(e)
+    transaction.abort()
+
+    # cancelling a booking will automatically accept the blocked ones
+    # (this is run after matching, so we want to make sure the matching
+    # is kept tight, with no unnecessarily open/denied bookings)
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a1, o2)
+    b3 = bookings.add(owner, a1, o3)
+
+    bookings.accept_booking(b2)
+
+    assert b1.state == 'blocked'
+    assert b2.state == 'accepted'
+    assert b1.state == 'blocked'
+
+    bookings.cancel_booking(b2)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'cancelled'
+    assert b3.state == 'accepted'
+
+    transaction.abort()
+
+    # same, this time with only one overlap
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a1, o2)
+    b3 = bookings.add(owner, a1, o3)
+
+    bookings.accept_booking(b1)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'blocked'
+    assert b3.state == 'open'
+
+    bookings.cancel_booking(b1)
+
+    assert b1.state == 'cancelled'
+    assert b2.state == 'accepted'
+    assert b3.state == 'blocked'
+
+    transaction.abort()
+
+    # if the occasions are already full, the state is going to be 'denied'
+    bookings.accept_booking(bookings.add(owner, a2, o1))
+    bookings.accept_booking(bookings.add(owner, a3, o1))
+
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a1, o2)
+
+    bookings.accept_booking(b2)
+
+    assert b1.state == 'blocked'
+    assert b2.state == 'accepted'
+
+    bookings.cancel_booking(b2)
+
+    assert b1.state == 'denied'
+    assert b2.state == 'cancelled'
+
+    transaction.abort()
+
+    # if the cancellation leads to open spots, other bookings are considered
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a2, o1)
+    b3 = bookings.add(owner, a3, o1)
+
+    bookings.accept_booking(b1)
+    bookings.accept_booking(b2)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'accepted'
+    assert b3.state == 'open'
+
+    bookings.cancel_booking(b2)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'cancelled'
+    assert b3.state == 'accepted'
+
+    transaction.abort()
