@@ -106,17 +106,28 @@ def book_occasion(self, request, form):
         else:
             attendee = attendees.by_id(form.attendee.data)
 
+        # should be caught by the form
+        assert not (self.full and self.period.confirmed)
+
         bookings = BookingCollection(request.app.session())
-        bookings.add(
+        booking = bookings.add(
             user=user,
             attendee=attendee,
             occasion=self
         )
 
-        request.success(
-            _("The occasion was added to ${name}'s wishlist", mapping={
-                'name': attendee.name
-            }))
+        if self.period.confirmed:
+            bookings.accept_booking(booking)
+            request.success(
+                _("The booking for ${name} was succesfull", mapping={
+                    'name': attendee.name
+                })
+            )
+        else:
+            request.success(
+                _("The occasion was added to ${name}'s wishlist", mapping={
+                    'name': attendee.name
+                }))
 
         return request.redirect(request.link(self.activity))
 

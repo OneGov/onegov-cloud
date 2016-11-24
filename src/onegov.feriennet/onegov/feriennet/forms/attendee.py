@@ -116,6 +116,25 @@ class AttendeeForm(Form):
 
         return True
 
+    def ensure_no_conflict(self):
+        if self.model.period.confirmed:
+            bookings = BookingCollection(
+                session=self.request.app.session(),
+                period_id=self.model.period_id)
+
+            query = bookings.query()
+            query = query.filter(Booking.attendee_id == self.attendee.data)
+            query = query.filter(Booking.state == 'accepted')
+
+            for booking in query:
+                if booking.overlaps(self.model):
+                    self.attendee.errors.append(_(
+                        "This occasion overlaps with another booking"
+                    ))
+                    return False
+
+        return True
+
     def validate(self):
         result = super().validate()
 
@@ -125,6 +144,7 @@ class AttendeeForm(Form):
             self.ensure_no_duplicate_child,
             self.ensure_no_duplicate_booking,
             self.ensure_available_spots,
+            self.ensure_no_conflict,
         )
 
         for ensurance in ensurances:

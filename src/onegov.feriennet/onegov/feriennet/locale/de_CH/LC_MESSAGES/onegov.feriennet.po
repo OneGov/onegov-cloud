@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-24 09:14+0100\n"
+"POT-Creation-Date: 2016-11-24 14:32+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -200,6 +200,9 @@ msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
 #, python-format
 msgid "This occasion has already been booked by ${name}"
 msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
+
+msgid "This occasion overlaps with another booking"
+msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
 
 msgid "Children in the right age"
 msgstr "Kinder im passenden Alter"
@@ -453,6 +456,9 @@ msgstr "Archiviert"
 msgid "Fully booked"
 msgstr "Ausgebucht"
 
+msgid "${count} spots available"
+msgstr "Noch ${count} Plätze frei"
+
 msgid "Age"
 msgstr "Alter"
 
@@ -464,9 +470,6 @@ msgstr "${min_spots} - ${max_spots} Teilnehmer"
 
 msgid "up to ${max_spots} participants"
 msgstr "bis zu ${max_spots} Teilnehmer"
-
-msgid "${count} spots available"
-msgstr "Noch ${count} Plätze frei"
 
 msgid "Enroll your young child now."
 msgstr "Melden Sie Ihr Kleinkind jetzt an."
@@ -640,6 +643,9 @@ msgstr "Oberstufe"
 msgid "Own"
 msgstr "Eigene"
 
+msgid "Your booking was cancelled successfully"
+msgstr "Ihre Buchung wurde erfolgreich storniert"
+
 #, python-format
 msgid "Wishlist of ${user}"
 msgstr "Wunschliste von ${user}"
@@ -648,8 +654,8 @@ msgstr "Wunschliste von ${user}"
 msgid "Bookings of ${user}"
 msgstr "Buchungen von ${user}"
 
-msgid "Only open bookings may be deleted"
-msgstr "Nur offene Buchungen können entfernt werden"
+msgid "Only open, cancelled, denied or blocked bookings may be deleted"
+msgstr "Nur offene, abgesagte, abgelehnte und blockierte Buchungen können gelöscht werden"
 
 msgid "The period is not in the wishlist-phase"
 msgstr "Die Periode befindet sich nicht in der Wunschphase"
@@ -666,6 +672,22 @@ msgstr "Buchung entfernen"
 
 msgid "Cannot select more than three favorites per child"
 msgstr "Pro Kind können maximal drei Favoriten gewählt werden"
+
+msgid "Cancel Booking"
+msgstr "Stornieren"
+
+#, python-format
+msgid "Do you really want to cancel \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich stornieren?"
+
+msgid ""
+"This cannot be undone! Note that cancellations make it hard for us to plan "
+"and conduct vacation activities. So please be sure to cancel only if you "
+"absolutely have to! We will also automatically try to accomodate your other "
+"wishes should this cancellation make that possible. To avoid that, delete "
+"your blocked and rejected bookings first."
+msgstr ""
+"Dies kann nicht rückgängig gemacht werden. Bitte Beachten Sie dass Stornierungen es uns schwer machen Ferienangebote zu planen und durchzführen. Bitte sagen Sie deshalb nur ab wenn Sie keine Wahl haben! Wir werden automatisch versuchen Ihre anderen Wünsche zu buchen welche durch die Absage möglich werden. Um das zu umgehen löschen Sie zuerst Ihre blockierten und abgelehnten Buchungen."
 
 #, python-format
 msgid "Matches for ${title}"
@@ -688,6 +710,10 @@ msgstr "Teilnehmer Anmelden"
 
 msgid "Edit Occasion"
 msgstr "Durchfürung Bearbeiten"
+
+#, python-format
+msgid "The booking for ${name} was succesfull"
+msgstr "Die Buchung für ${name} war erfolgreich"
 
 #, python-format
 msgid "The occasion was added to ${name}'s wishlist"

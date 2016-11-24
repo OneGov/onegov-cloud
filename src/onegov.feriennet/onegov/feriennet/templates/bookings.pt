@@ -55,7 +55,7 @@
                                         <h4>${booking.occasion.activity.title}</h4>
                                     </a>
                                     <div class="occasion">
-                                        ${layout.format_datetime_range(booking.occasion.start, booking.occasion.end)}
+                                        ${layout.format_datetime_range(booking.occasion.localized_start, booking.occasion.localized_end)}
                                     </div>
                                     <div>
                                         <!--! During pre-booking we don't show the actual state of the booking, unless the

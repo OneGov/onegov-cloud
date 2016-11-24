@@ -1,8 +1,5 @@
-from onegov.activity.matching import PreferAdminChildren
-from onegov.activity.matching import PreferInAgeBracket
-from onegov.activity.matching import PreferOrganiserChildren
-from onegov.activity.matching import Scoring
 from onegov.feriennet import _
+from onegov.feriennet.utils import scoring_from_match_settings
 from onegov.form import Form
 from wtforms.fields import BooleanField, RadioField
 
@@ -40,34 +37,24 @@ class MatchForm(Form):
     )
 
     def scoring(self, session):
-        scoring = Scoring()
-
-        if self.prefer_in_age_bracket.data:
-            scoring.criteria.append(
-                PreferInAgeBracket.from_session(session))
-
-        if self.prefer_organiser.data:
-            scoring.criteria.append(
-                PreferOrganiserChildren.from_session(session))
-
-        if self.prefer_admins.data:
-            scoring.criteria.append(
-                PreferAdminChildren.from_session(session))
-
-        return scoring
+        return scoring_from_match_settings(session, self.match_settings)
 
     @property
     def confirm_period(self):
         return self.confirm.data == 'yes' and self.sure.data is True
 
-    def store_to_period(self, period):
-        period.data['match-settings'] = {
+    @property
+    def match_settings(self):
+        return {
             k: v for k, v in self.data.items() if k not in (
                 'csrf_token',
                 'confirm',
                 'sure',
             )
         }
+
+    def store_to_period(self, period):
+        period.data['match-settings'] = self.match_settings
 
     def load_from_period(self, period):
         if 'match-settings' in period.data:

@@ -12,9 +12,13 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
-from onegov.org.elements import DeleteLink
+from onegov.feriennet.utils import scoring_from_match_settings
+from onegov.org.elements import ConfirmLink, DeleteLink
 from onegov.user import UserCollection, User
 from sqlalchemy.orm import contains_eager
+
+
+DELETABLE_STATES = ('open', 'cancelled', 'denied', 'blocked')
 
 
 def all_bookings(collection):
@@ -75,23 +79,48 @@ def attendees_by_username(request, username):
     return a
 
 
+def get_booking_title(layout, booking):
+    return "{} - {}".format(
+        booking.occasion.activity.title,
+        layout.format_datetime_range(
+            booking.occasion.start,
+            booking.occasion.end))
+
+
 def actions_by_booking(layout, period, booking):
     actions = []
 
-    if period.wishlist_phase:
+    if period.wishlist_phase or booking.state in DELETABLE_STATES:
         actions.append(DeleteLink(
             text=_("Remove"),
             url=layout.csrf_protected_url(layout.request.link(booking)),
             confirm=_('Do you really want to remove "${title}"?', mapping={
-                'title': "{} - {}".format(
-                    booking.occasion.activity.title,
-                    layout.format_datetime_range(
-                        booking.occasion.start,
-                        booking.occasion.end))
+                'title': get_booking_title(layout, booking)
             }),
             yes_button_text=_("Remove Booking"),
             classes=('confirm', ),
             target='#booking-{}'.format(booking.id)
+        ))
+    elif not period.wishlist_phase and booking.state == 'accepted':
+        actions.append(ConfirmLink(
+            text=_("Cancel Booking"),
+            url=layout.csrf_protected_url(
+                layout.request.link(booking, 'absagen')
+            ),
+            confirm=_('Do you really want to cancel "${title}"?', mapping={
+                'title': get_booking_title(layout, booking)
+            }),
+            extra_information=_(
+                "This cannot be undone! Note that cancellations make it hard "
+                "for us to plan and conduct vacation activities. So please be "
+                "sure to cancel only if you absolutely have to! We will also "
+                "automatically try to accomodate your other wishes should "
+                "this cancellation make that possible. To avoid that, delete "
+                "your blocked and rejected bookings first."
+            ),
+            yes_button_text=("Cancel Booking"),
+            redirect_after=layout.request.class_link(BookingCollection),
+            classes=('confirm', )
         ))
 
     return actions
@@ -162,9 +191,9 @@ def view_my_bookings(self, request):
 def delete_booking(self, request):
     request.assert_valid_csrf_token()
 
-    if self.period.confirmed and self.state != 'open':
+    if self.period.confirmed and self.state not in DELETABLE_STATES:
         show_error_on_attendee(request, self.attendee, _(
-            "Only open bookings may be deleted"))
+            "Only open, cancelled, denied or blocked bookings may be deleted"))
 
         return
 
@@ -173,6 +202,23 @@ def delete_booking(self, request):
     @request.after
     def remove_target(response):
         response.headers.add('X-IC-Remove', 'true')
+
+
+@FeriennetApp.view(
+    model=Booking,
+    name='absagen',
+    permission=Personal,
+    request_method='POST')
+def cancel_booking(self, request):
+    request.assert_valid_csrf_token()
+    BookingCollection(request.app.session()).cancel_booking(
+        booking=self,
+        score_function=scoring_from_match_settings(
+            session=request.app.session(),
+            match_settings=self.period.data.get('match-settings')
+        ))
+
+    request.success(_("Your booking was cancelled successfully"))
 
 
 @FeriennetApp.view(

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to book directly and cancel existing bookings.
+  [href]
+
 - Indicate unoperable occasions in the booking view.
   [href]
 
