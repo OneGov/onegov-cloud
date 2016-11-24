@@ -124,6 +124,10 @@ class Occasion(Base, TimestampMixin):
     def full(self):
         return self.attendee_count == self.spots.upper - 1
 
+    @hybrid_property
+    def available_spots(self):
+        return self.spots.upper - 1 - self.attendee_count
+
     @property
     def max_spots(self):
         return self.spots.upper - 1
