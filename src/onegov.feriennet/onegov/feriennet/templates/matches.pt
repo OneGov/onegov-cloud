@@ -47,9 +47,6 @@
                         </span>
 
                         <h4 class="show-for-sr" i18n:translate>Bookings</h4>
-                        <tal:block condition="not:records['accepted'] or records['other']" i18n:translate>
-                            No bookings.
-                        </tal:block>
 
                         <div class="matching-details" tal:define="
                                 accepted len(records['accepted']);
@@ -80,7 +77,12 @@
                                         <th i18n:translate>State</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody tal:condition="not:records['first'].booking_state">
+                                    <tr class="booking booking-none">
+                                        <td colspan="3"><span i18n:translate>No bookings.</span></td>
+                                    </tr>
+                                </tbody>
+                                <tbody tal:condition="records['first'].booking_state">
                                     <tal:block repeat="kind ('accepted', 'other')">
                                         <tr tal:repeat="record records[kind]" class="booking booking-${kind} ${record.booking_state}">
                                             <td><span>${record.attendee_name}</span></td>

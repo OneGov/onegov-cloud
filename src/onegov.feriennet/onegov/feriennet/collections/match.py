@@ -2,7 +2,7 @@ from collections import OrderedDict
 from itertools import groupby
 from onegov.activity import Activity, Booking, Attendee, Occasion
 from statistics import mean
-from sqlalchemy import func
+from sqlalchemy import func, literal_column, not_, distinct
 
 
 class MatchCollection(object):
@@ -46,7 +46,31 @@ class MatchCollection(object):
         q = q.join(Activity)
         q = q.join(Attendee)
 
-        return q
+        # include the occasions for which there is no booking
+        e = self.session.query(Occasion)
+        e = e.with_entities(
+            literal_column('NULL').label('booking_state'),
+            Activity.title.label('activity_title'),
+            Occasion.id.label('occasion_id'),
+            Occasion.start.label('occasion_start'),
+            Occasion.end.label('occasion_end'),
+            Occasion.timezone.label('occasion_timezone'),
+            Occasion.spots.label('occasion_spots'),
+            Occasion.age.label('occasion_age'),
+            literal_column('NULL').label('attendee_name'),
+            literal_column('NULL').label('attendee_age'),
+        )
+        e = e.filter(Occasion.period_id == self.period.id)
+        e = e.filter(not_(
+            Occasion.id.in_(
+                self.session.query(distinct(Booking.occasion_id))
+                .filter(Booking.period_id == self.period.id)
+                .subquery()
+            )
+        ))
+        e = e.join(Occasion.activity)
+
+        return q.union(e).order_by('activity_title')
 
     @property
     def happiness(self):
