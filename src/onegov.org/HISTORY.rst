@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.3 (2016-11-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Fix datetime picker not showing the hour/minutes in the placeholder.
   [href]
 
