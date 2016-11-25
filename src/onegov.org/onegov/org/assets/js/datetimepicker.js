@@ -6,7 +6,7 @@ var datetimepicker_i18n = {
         datetimeformat: 'd.m.Y H:i',
         datetimeformat_momentjs: 'DD.MM.YYYY HH:mm',
         placeholder_date: 'TT.MM.JJJJ',
-        placeholder_datetime: 'TT.MM.JJJJ',
+        placeholder_datetime: 'TT.MM.JJJJ hh:mm',
         lang: 'de'
     },
     it_CH: {

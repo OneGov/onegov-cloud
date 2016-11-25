@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+- Fix datetime picker not showing the hour/minutes in the placeholder.
+  [href]
+
+- Point the default map view to the Seantis office.
+  [href]
+
+- Improve multi-line checkbox/radio-button handling.
+  [href]
+
 0.1.2 (2016-11-18)
 ~~~~~~~~~~~~~~~~~~~
 
