@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.1 (2016-11-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a finalized flag to the periods which indicates that the period
   transitioned from the booking to the payment phase.
   [href]
