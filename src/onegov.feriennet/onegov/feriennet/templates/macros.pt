@@ -166,7 +166,7 @@
             </div>
         </div>
 
-        <div class="call-to-action" tal:condition="show_enroll and occasion.active and not occasion.full">
+        <div class="call-to-action" tal:condition="show_enroll and occasion.active and (occasion.period.wishlist_phase or not occasion.full)">
             <tal:block switch="age_bracket(occasion.age)">
                 <span tal:case="'young'" i18n:translate>
                     Enroll your young child now.

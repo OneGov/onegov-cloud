@@ -1,5 +1,5 @@
 from cached_property import cached_property
-from onegov.activity import Activity, PeriodCollection
+from onegov.activity import Activity, PeriodCollection, Period
 from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import MatchCollection
@@ -45,13 +45,15 @@ class VacationActivityCollectionLayout(DefaultLayout):
                     classes=('manage-periods', )
                 )
             )
-            links.append(
-                Link(
-                    text=_("Matching"),
-                    url=self.request.class_link(MatchCollection),
-                    classes=('manage-matches', )
+
+            if self.app.session().query(Period.id).first():
+                links.append(
+                    Link(
+                        text=_("Matching"),
+                        url=self.request.class_link(MatchCollection),
+                        classes=('manage-matches', )
+                    )
                 )
-            )
 
         return links
 

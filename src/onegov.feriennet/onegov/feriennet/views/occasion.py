@@ -69,7 +69,7 @@ def edit_occasion(self, request, form):
         'layout': OccasionFormLayout(
             self.activity, request, _("Edit Occasion")),
         'title': _("Edit Occasion"),
-        'form': form
+        'form': form,
     }
 
 
@@ -149,5 +149,6 @@ def book_occasion(self, request, form):
         'title': title,
         'form': form,
         'occasion': self,
-        'users': users
+        'users': users,
+        'button_text': _("Enroll")
     }

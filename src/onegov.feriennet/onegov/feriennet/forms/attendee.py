@@ -130,7 +130,7 @@ class AttendeeForm(Form):
         return True
 
     def ensure_available_spots(self):
-        if self.model.full:
+        if self.model.full and not self.model.period.wishlist_phase:
             self.attendee.errors.append(_(
                 "This occasion is already fully booked"
             ))

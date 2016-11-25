@@ -849,3 +849,197 @@ def test_matching_view(feriennet_app):
 
     assert "Zufriedenheit liegt bei <strong>0%</strong>" in matching
     assert "<strong>0%</strong> aller Durchführungen haben genug" in matching
+
+    # confirm the matching
+    matching.form['confirm'] = 'yes'
+    matching.form['sure'] = 'yes'
+    matching = matching.form.submit()
+
+    assert "wurde bereits bestätigt" in matching
+    assert "Abgeschlossen" in client.get('/angebote').click("Perioden")
+
+
+def test_confirmed_booking_view(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    o = occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        age=(0, 10),
+        spots=(0, 10),
+        timezone="Europe/Zurich",
+        activity=activities.add("A", username='admin@example.org'),
+        period=period
+    )
+
+    a = attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    bookings.add(owner, a, o)
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+    client.login_admin()
+
+    # When the period is unconfirmed, no storno is available, and the
+    # state is always "open"
+    periods.query().one().confirmed = False
+    bookings.query().one().state = 'accepted'
+
+    transaction.commit()
+
+    page = client.get('/buchungen')
+    assert "Offen" in page
+    assert "Stornieren" not in page
+    assert "Entfernen" in page
+    assert "Angenommen" not in page
+
+    # When the period is confirmed, the state is shown
+    periods.query().one().confirmed = True
+    bookings.query().one().state = 'accepted'
+
+    transaction.commit()
+
+    page = client.get('/buchungen')
+    assert "Angenommen" in page
+    assert "Stornieren" in page
+    assert "Entfernen" not in page
+    assert "nicht genügend Teilnehmer" not in page
+
+    # Other states are shown too
+    states = [
+        ('cancelled', "Storniert"),
+        ('denied', "Abgelehnt"),
+        ('blocked', "Blockiert")
+    ]
+
+    for state, text in states:
+        bookings.query().one().state = state
+        transaction.commit()
+
+        assert text in client.get('/buchungen')
+
+    # If there are not enough attendees, show a warning
+    periods.query().one().confirmed = True
+    bookings.query().one().state = 'accepted'
+    occasions.query().one().spots = NumericRange(2, 5)
+
+    transaction.commit()
+
+    page = client.get('/buchungen')
+    assert "nicht genügend Teilnehmer" in page
+
+
+def test_direct_booking_and_storno(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    member = UserCollection(feriennet_app.session()).add(
+        'member@example.org', 'hunter2', 'member')
+
+    period.confirmed = True
+
+    foobar = activities.add("Foobar", username='admin@example.org')
+    foobar.propose().accept()
+
+    occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        age=(0, 10),
+        spots=(0, 1),
+        timezone="Europe/Zurich",
+        activity=foobar,
+        period=period
+    )
+
+    attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    attendees.add(member, 'Mike', date(2000, 1, 1))
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+    client.login_admin()
+
+    member = Client(feriennet_app)
+    member.login('member@example.org', 'hunter2')
+
+    # in a confirmed period parents can book directly
+    page = client.get('/angebot/foobar')
+    assert "1 Plätze frei" in page
+
+    other = member.get('/angebot/foobar').click('Anmelden')
+
+    page = page.click('Anmelden')
+    booked = page.form.submit().follow()
+    assert "Ausgebucht" in booked
+    assert "Dustin" in booked
+
+    other = other.form.submit()
+    assert "ist bereits ausgebucht" in other
+
+    page = page.form.submit()
+    assert "bereits für diese Durchführung angemeldet" in page
+
+    # cancel the booking
+    page = client.get('/buchungen')
+    client.post(get_post_url(page, 'confirm'))
+
+    page = client.get('/angebot/foobar')
+    assert "1 Plätze frei" in page
+
+    # admins may do this for other members
+    page = page.click('Anmelden').click('member@example.org')
+    other_url = page.request.url
+    assert "Mike" in page
+    assert "Für <strong>member@example.org</strong>" in page
+
+    # members may not (simply ignores the other user)
+    page = member.get('/angebot/foobar').click('Anmelden')
+    assert "admin@example.org" not in page
+
+    page = member.get(other_url.replace('member@', 'admin@'))
+    assert "Für <strong>admin@example.org</strong>" not in page
+    assert "Mike" in page
