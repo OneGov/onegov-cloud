@@ -8,6 +8,7 @@ from onegov.feriennet import FeriennetApp
 from onegov.feriennet.forms import AttendeeForm, OccasionForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
+from onegov.user import User, UserCollection
 
 
 @FeriennetApp.view(
@@ -95,7 +96,7 @@ def book_occasion(self, request, form):
 
     if form.submitted(request):
         attendees = AttendeeCollection(request.app.session())
-        user = request.current_user
+        user = form.user
 
         if form.is_new:
             attendee = attendees.add(
@@ -105,6 +106,7 @@ def book_occasion(self, request, form):
             )
         else:
             attendee = attendees.by_id(form.attendee.data)
+            assert attendee.username == form.username
 
         # should be caught by the form
         assert not (self.full and self.period.confirmed)
@@ -133,9 +135,19 @@ def book_occasion(self, request, form):
 
     title = _("Enroll Attendee")
 
+    users = []
+
+    if request.is_admin:
+        u = UserCollection(request.app.session()).query()
+        u = u.with_entities(User.username, User.title)
+        u = u.order_by(User.title)
+
+        users = u
+
     return {
         'layout': OccasionFormLayout(self.activity, request, title),
         'title': title,
         'form': form,
-        'occasion': self
+        'occasion': self,
+        'users': users
     }

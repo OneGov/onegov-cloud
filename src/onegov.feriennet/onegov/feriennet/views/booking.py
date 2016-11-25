@@ -118,7 +118,7 @@ def actions_by_booking(layout, period, booking):
                 "this cancellation make that possible. To avoid that, delete "
                 "your blocked and rejected bookings first."
             ),
-            yes_button_text=("Cancel Booking"),
+            yes_button_text=_("Cancel Booking"),
             redirect_after=layout.request.class_link(BookingCollection),
             classes=('confirm', )
         ))

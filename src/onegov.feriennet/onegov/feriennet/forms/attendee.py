@@ -1,8 +1,11 @@
+from cached_property import cached_property
 from datetime import date
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.feriennet import _
 from onegov.form import Form
+from onegov.user import UserCollection
+from purl import URL
 from wtforms.fields import RadioField, StringField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
@@ -33,11 +36,30 @@ class AttendeeForm(Form):
     def css_class(self):
         return len(self.attendee.choices) == 1 and 'hide-attendee'
 
+    @cached_property
+    def username(self):
+        if not self.request.is_admin:
+            return self.request.current_username
+
+        return self.request.params.get(
+            'username', self.request.current_username)
+
+    @cached_property
+    def user(self):
+        users = UserCollection(self.request.app.session())
+        return users.by_username(self.username)
+
+    def for_username(self, username):
+        url = URL(self.action)
+        url = url.query_param('username', username)
+
+        return url.as_string()
+
     def populate_attendees(self):
         assert self.request.is_logged_in
 
         attendees = AttendeeCollection(self.request.app.session())
-        attendees = attendees.by_username(self.request.current_username)
+        attendees = attendees.by_username(self.username)
         attendees = attendees.with_entities(Attendee.id, Attendee.name)
         attendees = attendees.order_by(Attendee.name)
 
@@ -54,7 +76,7 @@ class AttendeeForm(Form):
     def ensure_no_duplicate_child(self):
         if self.is_new:
             attendees = AttendeeCollection(self.request.app.session())
-            query = attendees.by_username(self.request.current_username)
+            query = attendees.by_username(self.username)
             query = query.filter(Attendee.name == self.name.data.strip())
 
             if query.first():

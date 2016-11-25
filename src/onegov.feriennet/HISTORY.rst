@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability for administrators to create a booking for someone else.
+  [href]
+
 - Adds the ability to book directly and cancel existing bookings.
   [href]
 

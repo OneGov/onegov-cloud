@@ -98,7 +98,7 @@
                 <ul>
                     <li tal:repeat="u users">
                         <a tal:condition="u.id != user.id" href="${request.link(model.for_username(u.username))}">${u.title}</a>
-                        <strong i18n:translate tal:condition="u.id == user.id" href="${request.link(model.for_username(u.username))}">${u.title}</strong>
+                        <strong i18n:translate tal:condition="u.id == user.id">${u.title}</strong>
                     </li>
                 </ul>
             </div>

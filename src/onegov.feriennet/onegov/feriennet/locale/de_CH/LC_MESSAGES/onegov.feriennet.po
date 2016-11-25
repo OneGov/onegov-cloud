@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-24 14:32+0100\n"
+"POT-Creation-Date: 2016-11-25 10:16+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -429,6 +429,9 @@ msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."
 msgid "Users"
 msgstr "Benutzer"
 
+msgid "For ${user}"
+msgstr "Für ${user}"
+
 msgid "Edit contact info"
 msgstr "Kontakt ändern"
 
@@ -543,14 +546,14 @@ msgstr "Jahre"
 msgid "Bookings"
 msgstr "Buchungen"
 
-msgid "No bookings."
-msgstr "Keine Buchungen."
-
 msgid "Show Details"
 msgstr "Details Anzeigen"
 
 msgid "State"
 msgstr "Status"
+
+msgid "No bookings."
+msgstr "Keine Buchungen."
 
 msgid "Automatic Matching"
 msgstr "Automatische Zuteilung"
@@ -655,7 +658,9 @@ msgid "Bookings of ${user}"
 msgstr "Buchungen von ${user}"
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
-msgstr "Nur offene, abgesagte, abgelehnte und blockierte Buchungen können gelöscht werden"
+msgstr ""
+"Nur offene, abgesagte, abgelehnte und blockierte Buchungen können gelöscht "
+"werden"
 
 msgid "The period is not in the wishlist-phase"
 msgstr "Die Periode befindet sich nicht in der Wunschphase"
@@ -687,7 +692,12 @@ msgid ""
 "wishes should this cancellation make that possible. To avoid that, delete "
 "your blocked and rejected bookings first."
 msgstr ""
-"Dies kann nicht rückgängig gemacht werden. Bitte Beachten Sie dass Stornierungen es uns schwer machen Ferienangebote zu planen und durchzführen. Bitte sagen Sie deshalb nur ab wenn Sie keine Wahl haben! Wir werden automatisch versuchen Ihre anderen Wünsche zu buchen welche durch die Absage möglich werden. Um das zu umgehen löschen Sie zuerst Ihre blockierten und abgelehnten Buchungen."
+"Dies kann nicht rückgängig gemacht werden. Bitte Beachten Sie dass "
+"Stornierungen es uns schwer machen Ferienangebote zu planen und "
+"durchzführen. Bitte sagen Sie deshalb nur ab wenn Sie keine Wahl haben! Wir "
+"werden automatisch versuchen Ihre anderen Wünsche zu buchen welche durch die "
+"Absage möglich werden. Um das zu umgehen löschen Sie zuerst Ihre blockierten "
+"und abgelehnten Buchungen."
 
 #, python-format
 msgid "Matches for ${title}"
@@ -767,3 +777,6 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
+
+#~ msgid "For user ${user}"
+#~ msgstr "Für Benutzer ${user}"
