@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix user title sql expression not working as intended.
+  [href]
+
 0.8.3 (2016-10-28)
 ~~~~~~~~~~~~~~~~~~~
 

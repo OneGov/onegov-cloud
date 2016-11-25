@@ -69,7 +69,7 @@ class User(Base, TimestampMixin):
 
     @title.expression
     def title(cls):
-        return func.coalesce(cls.realname, cls.username)
+        return func.coalesce(func.nullif(cls.realname, ''), cls.username)
 
     @hybrid_property
     def password(self):
