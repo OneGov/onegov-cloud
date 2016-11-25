@@ -146,6 +146,11 @@ ul.tags {
     }
 }
 
+.inactive-occasions * {
+    border-bottom-color: $gainsboro !important;
+    color: $charcoal;
+}
+
 /*
     Ticket view
 */

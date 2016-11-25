@@ -217,7 +217,7 @@
             </tal:block>
         </div>
 
-        <div class="hint" tal:condition="not: period.wishlist_phase">
+        <div class="hint" tal:condition="today > period.prebooking_start and not period.wishlist_phase">
             <i class="fa fa-calendar-times-o fa-fw" aria-hidden="true"></i>
 
             <tal:block i18n:translate>
