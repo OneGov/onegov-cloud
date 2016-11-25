@@ -99,3 +99,16 @@ def add_attendee_count_column_to_occasion(context):
     context.session.flush()
     context.operations.alter_column(
         'occasions', 'attendee_count', nullable=False)
+
+
+@upgrade_task('Add finalized flag to period')
+def add_finalized_flag_to_period(context):
+    context.operations.add_column('periods', Column(
+        'finalized', Boolean, nullable=True, default=False
+    ))
+
+    for period in context.session.query(Period):
+        period.finalized = False
+
+    context.session.flush()
+    context.operations.alter_column('periods', 'finalized', nullable=False)

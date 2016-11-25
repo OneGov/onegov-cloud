@@ -3,6 +3,7 @@ import sqlalchemy
 import transaction
 
 from datetime import datetime, date
+from freezegun import freeze_time
 from onegov.activity import ActivityCollection
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
@@ -1305,3 +1306,33 @@ def test_cancel_booking(session, owner):
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
     assert b3.state == 'open'
+
+
+def test_period_phases(session):
+    periods = PeriodCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(date(2016, 9, 1), date(2016, 9, 30)),
+        execution=(date(2016, 11, 1), date(2016, 11, 30)),
+        active=False,
+    )
+
+    assert period.phase == 'inactive'
+
+    period.active = True
+    assert period.phase == 'wishlist'
+
+    period.confirmed = True
+    assert period.phase == 'booking'
+
+    period.finalized = True
+
+    with freeze_time('2016-10-31'):
+        assert period.phase == 'payment'
+
+    with freeze_time('2016-11-01'):
+        assert period.phase == 'execution'
+
+    with freeze_time('2016-12-01'):
+        assert period.phase == 'archive'

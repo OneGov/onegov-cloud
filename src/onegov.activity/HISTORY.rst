@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds a finalized flag to the periods which indicates that the period
+  transitioned from the booking to the payment phase.
+  [href]
+
 - Adds the ability to accept/cancel bookings in a confirmed period.
   [href]
 

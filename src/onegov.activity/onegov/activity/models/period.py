@@ -30,6 +30,9 @@ class Period(Base, TimestampMixin):
     #: booking changes to it are communicted to the customer
     confirmed = Column(Boolean, nullable=False, default=False)
 
+    #: A finalized period may not have any change in bookings anymore
+    finalized = Column(Boolean, nullable=False, default=False)
+
     #: Start of the wishlist-phase
     prebooking_start = Column(Date, nullable=False)
 
@@ -106,9 +109,43 @@ class Period(Base, TimestampMixin):
         self.active = False
 
     @property
-    def wishlist_phase(self):
+    def phase(self):
+        if not self.active:
+            return 'inactive'
+
+        if not self.confirmed:
+            return 'wishlist'
+
+        if not self.finalized:
+            return 'booking'
+
         today = date.today()
 
-        return self.active and \
-            not self.confirmed and \
-            self.prebooking_start <= today and today <= self.prebooking_end
+        if today < self.execution_start:
+            return 'payment'
+
+        if self.execution_start <= today and today <= self.execution_end:
+            return 'execution'
+
+        if today > self.execution_end:
+            return 'archive'
+
+    @property
+    def wishlist_phase(self):
+        return self.phase == 'wishlist'
+
+    @property
+    def booking_phase(self):
+        return self.phase == 'booking'
+
+    @property
+    def payment_phase(self):
+        return self.phase == 'payment'
+
+    @property
+    def execution_phase(self):
+        return self.phase == 'execution'
+
+    @property
+    def archive_phase(self):
+        return self.phase == 'archive'
