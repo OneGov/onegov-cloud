@@ -77,7 +77,12 @@ class MatchCollection(object):
         q = self.session.query(Attendee)
         q = q.with_entities(Attendee.happiness(self.period_id))
 
-        return mean(a.happiness for a in q if a.happiness is not None)
+        values = tuple(a.happiness for a in q if a.happiness is not None)
+
+        if values:
+            return mean(values)
+        else:
+            return 0
 
     @property
     def operability(self):
