@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.1 (2016-11-25)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability for administrators to create a booking for someone else.
   [href]
 
