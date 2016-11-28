@@ -4,8 +4,8 @@ from onegov.feriennet import _
 from onegov.form import Form
 from sedate import replace_timezone
 from wtforms.fields import StringField, TextAreaField, SelectField
-from wtforms.fields.html5 import DateTimeField, IntegerField
-from wtforms.validators import InputRequired, NumberRange
+from wtforms.fields.html5 import DecimalField, DateTimeField, IntegerField
+from wtforms.validators import InputRequired, NumberRange, Optional
 from sqlalchemy import desc
 
 
@@ -35,6 +35,15 @@ class OccasionForm(Form):
     note = TextAreaField(
         label=_("Note"),
         render_kw={'rows': 4}
+    )
+
+    cost = DecimalField(
+        label=_("Cost"),
+        description=_("The amount paid to the organiser"),
+        validators=[
+            Optional(),
+            NumberRange(0.00, 10000.00)
+        ]
     )
 
     min_spots = IntegerField(

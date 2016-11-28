@@ -310,6 +310,10 @@ ul.tags {
             @include icon('\f105');
         }
 
+        .cost:before {
+            @include icon('\f155');
+        }
+
         .text-links:before {
             @include icon('\f192');
         }

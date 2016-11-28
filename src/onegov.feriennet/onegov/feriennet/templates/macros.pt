@@ -155,6 +155,18 @@
                     </span>
                 </div>
 
+                <div class="cost" tal:condition="occasion.cost is not None">
+                    <span i18n:translate class="show-for-sr">Cost</span>
+
+                    <tal:block condition="not:occasion.cost" i18n:translate>
+                        Free of charge
+                    </tal:block>
+
+                    <tal:block condition="occasion.cost" i18n:translate>
+                        ${occasion.cost} CHF
+                    </tal:block>
+                </div>
+
                 <div class="text-links" tal:condition="show_links and (request.is_admin or layout.is_owner)">
                     <tal:block repeat="link occasion_links">
                         <tal:block replace="structure link(occasion)(request)" />
