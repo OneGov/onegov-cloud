@@ -154,5 +154,5 @@ class Server(object):
             return application(environ, start_response)
         except:
             if self.post_mortem:
-                import pdb; pdb.post_mortem()
+                import pdb; pdb.post_mortem()  # noqa
             raise
