@@ -73,7 +73,7 @@ def test_upload_vote_all_or_nothing(election_day_app):
     assert archive.query().one().progress == (0, 0)
 
     vote = VoteCollection(election_day_app.session()).by_id('bacon-yea-or-nay')
-    assert not vote.ballots
+    assert not vote.ballots.count()
 
 
 def test_upload_vote_success(election_day_app):

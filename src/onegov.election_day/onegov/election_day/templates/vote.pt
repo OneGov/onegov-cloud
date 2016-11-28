@@ -115,7 +115,7 @@
                 <h3 tal:condition="not:vote.counter_proposal" class="foldable-title" i18n:translate="">Electoral Districts</h3>
                 <h4 tal:condition="vote.counter_proposal" class="foldable-title" i18n:translate="">Electoral Districts</h4>
                 <div class="foldable-panel">
-                    <table class="ballot-results stackable sortable" tal:define="summarize len(ballot.results)!=1">
+                    <table class="ballot-results stackable sortable" tal:define="summarize ballot.results.count()!=1">
                         <thead>
                             <tr>
                                 <th i18n:translate="" class="left-aligned">Electoral District</th>

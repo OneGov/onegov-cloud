@@ -4,6 +4,9 @@ Changelog
 - Shows the number of SMS subscribers in the manage view.
   [msom]
 
+- Uses onegov.ballot 1.0.3.
+  [msom]
+
 1.3.5 (2016-11-23)
 ~~~~~~~~~~~~~~~~~~~
 

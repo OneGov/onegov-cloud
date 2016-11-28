@@ -50,7 +50,7 @@ def get_vote_summary(vote, request, url=None):
     seriazable dict. """
 
     try:
-        divider = len(vote.ballots) or 1
+        divider = vote.ballots.count() or 1
     except AttributeError:
         divider = 1
 
