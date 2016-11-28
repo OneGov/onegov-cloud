@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes matching resulting in an error in certain constellations.
+  [href]
+
 0.1.1 (2016-11-25)
 ~~~~~~~~~~~~~~~~~~~
 

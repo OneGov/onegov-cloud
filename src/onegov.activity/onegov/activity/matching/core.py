@@ -123,14 +123,22 @@ class OccasionAgent(hashable('id')):
             None
         )
 
+    def accept(self, attendee, booking):
+        self.attendees[booking] = attendee
+        self.bookings.add(booking)
+        attendee.accept(booking)
+
+    def deny(self, booking):
+        self.attendees[booking].deny(booking)
+        self.bookings.remove(booking)
+        del self.attendees[booking]
+
     def match(self, attendee, booking):
 
         # as long as there are spots, automatically accept new requests
         if not self.full:
-            self.attendees[booking] = attendee
-            self.bookings.add(booking)
+            self.accept(attendee, booking)
 
-            attendee.accept(booking)
             return True
 
         # if the occasion is already full, accept the booking by throwing
@@ -138,11 +146,8 @@ class OccasionAgent(hashable('id')):
         over = self.preferred(booking)
 
         if over:
-            self.attendees[over].deny(over)
-            self.bookings.remove(over)
-
-            self.bookings.add(booking)
-            attendee.accept(booking)
+            self.deny(over)
+            self.accept(attendee, booking)
 
             return True
 
