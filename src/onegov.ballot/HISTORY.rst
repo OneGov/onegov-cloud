@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+1.0.3 (2016-11-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes handling of changed model relationships.
   [msom]
