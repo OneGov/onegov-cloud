@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Shows the number of SMS subscribers in the manage view.
+  [msom]
+
 1.3.5 (2016-11-23)
 ~~~~~~~~~~~~~~~~~~~
 

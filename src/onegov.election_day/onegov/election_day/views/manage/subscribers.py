@@ -15,5 +15,6 @@ def view_subscribers(self, request):
     return {
         'layout': ManageLayout(self, request),
         'title': _("Manage"),
-        'subscribers': self.query().all(),
+        'count': self.query().count(),
+        'subscribers': self.query().all()
     }

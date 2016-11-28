@@ -12,7 +12,10 @@
 
                 <div class="row">
                     <div class="small-12 medium-6 columns">
-                        <h1 i18n:translate>Subscribers</h1>
+                        <h1>
+                            <tal:block i18n:translate>Subscribers</tal:block>
+                            <tal:block tal:condition="subscribers">(${count})</tal:block>
+                        </h1>
                     </div>
                 </div>
 
