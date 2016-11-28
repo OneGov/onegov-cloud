@@ -201,9 +201,13 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
         theme = self.app.settings.core.theme
         assert theme is not None, "Do not call if no theme is used"
 
+        force = self.app.always_compile_theme or (
+            self.app.allow_shift_f5_compile and
+            self.headers.get('cache-control') == 'no-cache')
+
         filename = self.app.modules.theme.compile(
             self.app.themestorage, theme, self.app.theme_options,
-            force=self.app.always_compile_theme
+            force=force
         )
 
         return self.link(self.app.modules.theme.ThemeFile(filename))

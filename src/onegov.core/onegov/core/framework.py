@@ -214,6 +214,10 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         :always_compile_theme:
             If true, the theme is always compiled - no caching is employed.
 
+        :allow_shift_f5_comple:
+            If true, the theme is recompiled if shift+f5 is done on the
+            browser (or shift + reload button click).
+
         :csrf_secret:
             A random string used to sign the csrf token. Make sure this differs
             from ``identity_secret``! The algorithms behind identity_secret and
@@ -356,6 +360,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
 
     def configure_debug(self, **cfg):
         self.always_compile_theme = cfg.get('always_compile_theme', False)
+        self.allow_shift_f5_compile = cfg.get('allow_shift_f5_compile', False)
         self.sql_query_report = cfg.get('sql_query_report', False)
         self.profile = cfg.get('profile', False)
 

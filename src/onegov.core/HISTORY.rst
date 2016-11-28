@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds the ability to recompile themes using shift+f5 in the browser.
+  This option has to be enabled using the 'allow_shift_f5_compile' flag.
+  [href]
+
 - By default, ignore custom global template variables in e-mail templates.
   [href]
 
