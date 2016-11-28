@@ -103,7 +103,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     #: proposal, a counter proposal and a tie breaker)
     @property
     def proposal(self):
-        return self.ballots and self.ballots[0]
+        return self.ballots.count() and self.ballots[0]
 
     @property
     def counter_proposal(self):
@@ -135,7 +135,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
     @property
     def answer(self):
-        if not self.counted:
+        if not self.counted or not self.proposal:
             return None
 
         # standard ballot, no counter proposal
