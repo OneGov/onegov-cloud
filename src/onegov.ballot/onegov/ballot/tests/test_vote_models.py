@@ -463,7 +463,7 @@ def test_ballot_results_aggregation(session):
     round(session.query(Ballot.nays_percentage).first()[0], 2) == 10.62
 
     # mark as counted, but don't change any results from 0
-    ballot.results[-1].counted = True
+    ballot.results.filter_by(group='ZG/Baar').one().counted = True
     session.flush()
 
     assert ballot.yeas == 309 + 507
@@ -579,21 +579,6 @@ def test_vote_export(session):
             'shortcode': "FOO",
             'domain': "federation",
             'type': "proposal",
-            'counted': True,
-            'group': "Foo Town",
-            'entity_id': 1,
-            'yeas': 90,
-            'nays': 45,
-            'invalid': 5,
-            'empty': 10,
-            'elegible_voters': 150,
-        },
-        {
-            'title': "Is this a test?",
-            'date': "2015-06-14",
-            'shortcode': "FOO",
-            'domain': "federation",
-            'type': "proposal",
             'counted': False,
             'group': "Bar Town",
             'entity_id': 2,
@@ -602,6 +587,21 @@ def test_vote_export(session):
             'invalid': 0,
             'empty': 0,
             'elegible_voters': 0
+        },
+        {
+            'title': "Is this a test?",
+            'date': "2015-06-14",
+            'shortcode': "FOO",
+            'domain': "federation",
+            'type': "proposal",
+            'counted': True,
+            'group': "Foo Town",
+            'entity_id': 1,
+            'yeas': 90,
+            'nays': 45,
+            'invalid': 5,
+            'empty': 10,
+            'elegible_voters': 150,
         },
         {
             'title': "Is this a test?",

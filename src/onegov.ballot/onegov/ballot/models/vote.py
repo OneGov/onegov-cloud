@@ -96,7 +96,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         cascade="all, delete-orphan",
         order_by="Ballot.type",
         backref=backref("vote"),
-        lazy='joined'
+        lazy='dynamic'
     )
 
     #: a vote contains either one ballot (a proposal), or three ballots (a
@@ -107,11 +107,11 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
     @property
     def counter_proposal(self):
-        return len(self.ballots) == 3 and self.ballots[1]
+        return self.ballots.count() == 3 and self.ballots[1]
 
     @property
     def tie_breaker(self):
-        return len(self.ballots) == 3 and self.ballots[2]
+        return self.ballots.count() == 3 and self.ballots[2]
 
     @observes('title_translations')
     def title_observer(self, translations):
@@ -381,14 +381,16 @@ class Ballot(Base, TimestampMixin, DerivedAttributes, DerivedBallotsCount):
         "BallotResult",
         cascade="all, delete-orphan",
         backref=backref("ballot"),
-        lazy='joined',
+        lazy='dynamic',
         order_by="BallotResult.group",
     )
 
     @hybrid_property
     def counted(self):
         """ True if all results have been counted. """
-        return sum(1 for r in self.results if r.counted) == len(self.results)
+        return (
+            sum(1 for r in self.results if r.counted) == self.results.count()
+        )
 
     @counted.expression
     def counted(cls):
