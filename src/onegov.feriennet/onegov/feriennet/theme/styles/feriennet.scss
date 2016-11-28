@@ -478,6 +478,32 @@ ul.tags {
         background-color: $orange;
     }
 
+    .attendee-bookings {
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            li {
+                margin-bottom: .5rem;
+            }
+        }
+
+        .fa-star-o,
+        .fa-star {
+            font-size: 1.5rem;
+            padding: 2px 0;
+        }
+
+        .fa-star-o {
+            color: $base;
+        }
+
+        .fa-star {
+            color: $yellow;
+        }
+    }
+
     .actions {
         ul {
             margin: 0;
@@ -495,32 +521,6 @@ ul.tags {
                     content: '';
                 }
             }
-        }
-    }
-
-    .attendee-bookings {
-        ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-
-            li {
-                margin-bottom: 1rem;
-            }
-        }
-
-        .fa-star-o,
-        .fa-star {
-            font-size: 1.5rem;
-            padding: 2px 0;
-        }
-
-        .fa-star-o {
-            color: $base;
-        }
-
-        .fa-star {
-            color: $yellow;
         }
     }
 }
