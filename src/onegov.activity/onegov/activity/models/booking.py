@@ -5,7 +5,15 @@ from onegov.activity.utils import random_group_code
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Enum, Index, Text, ForeignKey, Integer, func
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import Enum
+from sqlalchemy import ForeignKey
+from sqlalchemy import func
+from sqlalchemy import Index
+from sqlalchemy import Integer
+from sqlalchemy import Numeric
+from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import object_session
 from sqlalchemy_utils import aggregated
@@ -51,6 +59,15 @@ class Booking(Base, TimestampMixin):
 
     #: the occasion this booking belongs to
     occasion_id = Column(UUID, ForeignKey("occasions.id"), nullable=False)
+
+    #: the cost of the booking
+    cost = Column(Numeric(precision=8, scale=2), nullable=True)
+
+    #: the payment status of the booking
+    paid = Column(Boolean, nullable=False, default=False)
+
+    #: the transaction id of the payment if it's an online payment
+    tid = Column(Text, nullable=True)
 
     #: the period this booking belongs to
     @aggregated('occasion', Column(

@@ -11,7 +11,7 @@ from onegov.activity.matching.utils import overlaps, LoopBudget, hashable
 from onegov.core.utils import Bunch
 from itertools import groupby, product
 from sortedcontainers import SortedSet
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, defer
 
 
 class AttendeeAgent(hashable('id')):
@@ -169,9 +169,20 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
     b = b.options(joinedload(Booking.occasion))
     b = b.filter(Booking.period_id == period_id)
     b = b.filter(Booking.state.in_(('open', 'accepted', 'blocked')))
+    b = b.options(
+        defer('group_code'),
+        defer('cost'),
+        defer('paid'),
+        defer('tid')
+    )
 
     o = session.query(Occasion)
     o = o.filter(Occasion.period_id == period_id)
+    o = o.options(
+        defer('location'),
+        defer('note'),
+        defer('cost')
+    )
 
     bookings = deferred_acceptance(bookings=b, occasions=o, **kwargs)
 

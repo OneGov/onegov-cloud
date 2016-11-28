@@ -8,6 +8,8 @@ from sqlalchemy import column
 from sqlalchemy import Column
 from sqlalchemy import Date
 from sqlalchemy import Index
+from sqlalchemy import Integer
+from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.orm import object_session, relationship
 from uuid import uuid4
@@ -47,6 +49,12 @@ class Period(Base, TimestampMixin):
 
     #: Extra data stored on the period
     data = Column(JSON, nullable=False, default=dict)
+
+    #: Maximum number of bookings per attendee
+    max_bookings_per_attendee = Column(Integer, nullable=True, default=None)
+
+    #: Base cost for each booking
+    booking_cost = Column(Numeric(precision=8, scale=2), nullable=True)
 
     __table_args__ = (
         CheckConstraint((
