@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+1.0.2 (2016-11-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Changes vote model relationships.
   [msom]
