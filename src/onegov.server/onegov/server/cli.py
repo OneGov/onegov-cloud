@@ -82,7 +82,13 @@ from xtermcolor import colorize
     help="Port to bind to",
     default=8080
 )
-def run(config_file, port):
+@click.option(
+    '--pdb',
+    help="Enable post-mortem debugging",
+    default=False,
+    is_flag=True
+)
+def run(config_file, port, pdb):
     """ Runs the onegov server with the given configuration file in the
     foreground.
 
@@ -104,7 +110,7 @@ def run(config_file, port):
     # see https://github.com/mitsuhiko/click/issues/127
 
     def wsgi_factory():
-        return Server(Config.from_yaml_file(config_file))
+        return Server(Config.from_yaml_file(config_file), post_mortem=pdb)
 
     server = WsgiServer(wsgi_factory, port=port)
     server.start()

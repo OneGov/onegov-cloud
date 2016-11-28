@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds the ability to pass '--pdb' to the onegov-server cli to enable
+  post-mortem debugging.
+  [href]
+
 0.3.2 (2016-10-04)
 ~~~~~~~~~~~~~~~~~~~
 

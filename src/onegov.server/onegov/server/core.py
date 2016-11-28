@@ -67,7 +67,7 @@ class Server(object):
 
     """
 
-    def __init__(self, config, configure_morepath=True):
+    def __init__(self, config, configure_morepath=True, post_mortem=False):
         self.applications = ApplicationCollection(config.applications)
         self.wildcard_applications = set(
             a.root for a in config.applications if not a.is_static)
@@ -76,6 +76,8 @@ class Server(object):
 
         if configure_morepath:
             self.configure_morepath()
+
+        self.post_mortem = post_mortem
 
     def configure_logging(self, config):
         """ Configures the python logging.
@@ -148,4 +150,9 @@ class Server(object):
         application.set_application_id(
             application.namespace + '/' + application_id)
 
-        return application(environ, start_response)
+        try:
+            return application(environ, start_response)
+        except:
+            if self.post_mortem:
+                import pdb; pdb.post_mortem()
+            raise
