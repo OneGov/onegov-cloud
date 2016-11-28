@@ -12,6 +12,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
+from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -68,6 +69,11 @@ class Occasion(Base, TimestampMixin):
 
     #: A note about the occurrence
     note = Column(Text, nullable=True)
+
+    #: The cost of the occasion (max value is 100'000.00), the currency is
+    #: assumed to be CHF as this system will probably never be used outside
+    #: Switzerland
+    cost = Column(Numeric(precision=8, scale=2), nullable=True)
 
     #: The activity this occasion belongs to
     activity_id = Column(

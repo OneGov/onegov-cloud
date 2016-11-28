@@ -6,7 +6,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 from onegov.activity import Booking, Period, Occasion
 from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task
-from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer
+from sqlalchemy import Boolean, Column, Enum, ForeignKey, Integer, Numeric
 from sqlalchemy.orm import joinedload
 
 
@@ -112,3 +112,10 @@ def add_finalized_flag_to_period(context):
 
     context.session.flush()
     context.operations.alter_column('periods', 'finalized', nullable=False)
+
+
+@upgrade_task('Add cost column to occasion')
+def add_cost_column_to_occasion(context):
+    context.operations.add_column('occasions', Column(
+        'cost', Numeric(precision=8, scale=2), nullable=True
+    ))
