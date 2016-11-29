@@ -4,9 +4,9 @@ from onegov.activity import Activity, Period, Occasion, OccasionCollection
 from onegov.feriennet import _
 from onegov.form import Form
 from sqlalchemy import distinct, func, or_, literal
-from wtforms.fields import StringField
-from wtforms.fields.html5 import DateField
-from wtforms.validators import InputRequired
+from wtforms.fields import StringField, RadioField
+from wtforms.fields.html5 import DateField, IntegerField, DecimalField
+from wtforms.validators import InputRequired, Optional, NumberRange
 
 
 class PeriodForm(Form):
@@ -21,22 +21,66 @@ class PeriodForm(Form):
 
     prebooking_start = DateField(
         label=_("Prebooking Start"),
+        fieldset=_("Dates"),
         validators=[InputRequired()]
     )
 
     prebooking_end = DateField(
         label=_("Prebooking End"),
+        fieldset=_("Dates"),
         validators=[InputRequired()]
     )
 
     execution_start = DateField(
         label=_("Execution Start"),
+        fieldset=_("Dates"),
         validators=[InputRequired()]
     )
 
     execution_end = DateField(
         label=_("Execution End"),
+        fieldset=_("Dates"),
         validators=[InputRequired()]
+    )
+
+    pass_system = RadioField(
+        label=_("Pass System"),
+        fieldset=_("Execution Settings"),
+        choices=[
+            ('no', _("Each attendee may book as many activites as he likes")),
+            ('yes', _("Each attendee may attend a fixed number of activites")),
+        ],
+        default='no',
+    )
+
+    pass_system_limit = IntegerField(
+        label=_("Maximum Number of Activities"),
+        fieldset=_("Execution Settings"),
+        validators=[
+            Optional(),
+            NumberRange(0, 100)
+        ],
+        depends_on=('pass_system', 'yes')
+    )
+
+    pass_system_cost = DecimalField(
+        label=_("Cost of the Pass"),
+        fieldset=_("Execution Settings"),
+        validators=[
+            Optional(),
+            NumberRange(0.00, 10000.00)
+        ],
+        depends_on=('pass_system', 'yes')
+    )
+
+    single_booking_cost = DecimalField(
+        label=_("The administrative cost of each booking"),
+        fieldset=_("Execution Settings"),
+        validators=[
+            Optional(),
+            NumberRange(0.00, 10000.00)
+        ],
+        depends_on=('pass_system', 'no')
     )
 
     @property
@@ -46,6 +90,32 @@ class PeriodForm(Form):
     @property
     def execution(self):
         return (self.execution_start.data, self.execution_end.data)
+
+    def populate_obj(self, model):
+        super().populate_obj(model, exclude={
+            'max_bookings_per_attendee',
+            'booking_cost'
+        })
+
+        if self.pass_system.data == 'yes':
+            model.max_bookings_per_attendee = self.pass_system_limit.data
+            model.booking_cost = self.pass_system_cost.data
+            model.all_inclusive = True
+        else:
+            model.max_bookings_per_attendee = None
+            model.booking_cost = self.single_booking_cost.data
+            model.all_inclusive = False
+
+    def process_obj(self, model):
+        super().process_obj(model)
+
+        if model.all_inclusive:
+            self.pass_system.data = 'yes'
+            self.pass_system_limit.data = model.max_bookings_per_attendee
+            self.pass_system_cost.data = model.booking_cost
+        else:
+            self.pass_system.data = 'no'
+            self.single_booking_cost.data = model.booking_cost
 
     @cached_property
     def conflicting_activites(self):

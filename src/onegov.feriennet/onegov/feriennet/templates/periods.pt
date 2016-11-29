@@ -14,6 +14,7 @@
                     <th i18n:translate>Title</th>
                     <th i18n:translate>Prebooking Phase</th>
                     <th i18n:translate>Exeuction Phase</th>
+                    <th i18n:translate>Cost</th>
                     <th colspan="2" i18n:translate>Status</th>
                 </tr>
             </thead>
@@ -30,11 +31,29 @@
                         ${layout.format_date_range(period.execution_start, period.execution_end)}
                     </td>
                     <td>
+                        <span tal:condition="period.all_inclusive and period.booking_cost" i18n:translate>
+                            <tal:block i18n:name="cost" tal:replace="period.booking_cost" /> for 
+                            <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> bookings
+                        </span>
+                        <span tal:condition="period.all_inclusive and not period.booking_cost" i18n:translate>
+                            Free of charge for 
+                            <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> bookings
+                        </span>
+                        <span tal:condition="not period.all_inclusive and period.booking_cost" i18n:translate>
+                            <tal:block i18n:name="cost" tal:replace="period.booking_cost" /> per booking
+                        </span>
+                        <span tal:condition="not period.all_inclusive and not period.booking_cost" i18n:translate>
+                            Free of charge
+                        </span>
+                    </td>
+                    <td>
                         <span tal:condition="period.active" i18n:translate>Active</span>
                         <span tal:condition="not:period.active" i18n:translate>Inactive</span>
                     </td>
-                    <td class="text-links">
-                        <tal:block repeat="link links(period)" content="structure link(request)" />
+                    <td>
+                        <ul class="small dense">
+                            <li tal:repeat="link links(period)" tal:content="structure link(request)" />
+                        </ul>
                     </td>
                 </tr>
             </tbody>
