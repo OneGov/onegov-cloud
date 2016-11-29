@@ -110,8 +110,8 @@
 </metal:organiser>
 
 <metal:occasion define-macro="occasion" i18n:domain="onegov.feriennet">
-    <tal:block define="show_enroll show_enroll|nothing; show_links show_links|nothing">
-        <div class="row" tal:define="show_stats not occasion.period.wishlist_phase">
+    <tal:block define="show_enroll show_enroll|nothing; show_links show_links|nothing; period occasion.period">
+        <div class="row" tal:define="show_stats not period.wishlist_phase">
             <!--! the width of this column together with the next one doesn't add up to 12 by
             intention to make space for the icons rendered ::before the first column. -->
             <div class="small-12 medium-4 columns factoids">
@@ -155,15 +155,24 @@
                     </span>
                 </div>
 
-                <div class="cost" tal:condition="occasion.cost is not None">
+                <div class="cost">
                     <span i18n:translate class="show-for-sr">Cost</span>
 
-                    <tal:block condition="not:occasion.cost" i18n:translate>
-                        Free of charge
+                    <tal:block condition="period.all_inclusive">
+                        <tal:block condition="occasion.cost" i18n:translate>
+                            <tal:block i18n:name="cost" replace="occasion.cost" /> CHF
+                        </tal:block>
+                        <tal:block condition="not:occasion.cost" i18n:translate>
+                            No additional costs
+                        </tal:block>
                     </tal:block>
-
-                    <tal:block condition="occasion.cost" i18n:translate>
-                        ${occasion.cost} CHF
+                    <tal:block condition="not:period.all_inclusive">
+                        <tal:block condition="occasion.cost or period.booking_cost" i18n:translate>
+                            <tal:block i18n:name="cost" replace="(occasion.cost or 0) + (period.booking_cost or 0)" /> CHF
+                        </tal:block>
+                        <tal:block condition="not:occasion.cost or period.booking_cost" i18n:translate>
+                            Free of charge
+                        </tal:block>
                     </tal:block>
                 </div>
 
@@ -178,7 +187,7 @@
             </div>
         </div>
 
-        <div class="call-to-action" tal:condition="show_enroll and occasion.active and (occasion.period.wishlist_phase or not occasion.full)">
+        <div class="call-to-action" tal:condition="show_enroll and occasion.active and (period.wishlist_phase or not occasion.full)">
             <tal:block switch="age_bracket(occasion.age)">
                 <span tal:case="'young'" i18n:translate>
                     Enroll your young child now.
