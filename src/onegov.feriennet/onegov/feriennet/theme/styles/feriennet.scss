@@ -47,6 +47,7 @@ svg #background {
 */
 .small {
     font-size: .875rem;
+    line-height: 1.2rem;
 }
 
 /*
@@ -382,6 +383,7 @@ ul.tags {
 .periods {
     td {
         color: $charcoal;
+        vertical-align: top;
     }
 
     .active {
