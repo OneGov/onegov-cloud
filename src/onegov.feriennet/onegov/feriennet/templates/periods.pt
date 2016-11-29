@@ -14,7 +14,7 @@
                     <th i18n:translate>Title</th>
                     <th i18n:translate>Prebooking Phase</th>
                     <th i18n:translate>Exeuction Phase</th>
-                    <th i18n:translate>Cost</th>
+                    <th i18n:translate>Administrative Costs</th>
                     <th colspan="2" i18n:translate>Status</th>
                 </tr>
             </thead>
