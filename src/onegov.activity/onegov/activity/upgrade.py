@@ -123,8 +123,22 @@ def add_finalized_flag_to_period(context):
 @upgrade_task('Add payment model columns')
 def add_payment_model_columns(context):
     context.operations.add_column('periods', Column(
-        'cost', Numeric(precision=8, scale=2), nullable=True
+        'max_bookings_per_attendee', Integer, nullable=True
     ))
+
+    context.operations.add_column('periods', Column(
+        'booking_cost', Numeric(precision=8, scale=2), nullable=True
+    ))
+
+    context.operations.add_column('periods', Column(
+        'all_inclusive', Boolean, nullable=True
+    ))
+
+    for period in context.session.query(Period):
+        period.all_inclusive = False
+
+    context.session.flush()
+    context.operations.alter_column('periods', 'all_inclusive', nullable=False)
 
     context.operations.add_column('occasions', Column(
         'cost', Numeric(precision=8, scale=2), nullable=True

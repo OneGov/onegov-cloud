@@ -51,10 +51,14 @@ class Period(Base, TimestampMixin):
     data = Column(JSON, nullable=False, default=dict)
 
     #: Maximum number of bookings per attendee
-    max_bookings_per_attendee = Column(Integer, nullable=True, default=None)
+    max_bookings_per_attendee = Column(Integer, nullable=True)
 
-    #: Base cost for each booking
+    #: Base cost for one or many bookings
     booking_cost = Column(Numeric(precision=8, scale=2), nullable=True)
+
+    #: True if the booking cost is meant for all bookings in a period
+    #: or for each single booking
+    all_inclusive = Column(Boolean, nullable=False, default=False)
 
     __table_args__ = (
         CheckConstraint((
