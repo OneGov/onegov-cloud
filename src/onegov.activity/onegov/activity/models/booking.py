@@ -5,7 +5,6 @@ from onegov.activity.utils import random_group_code
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
@@ -62,12 +61,6 @@ class Booking(Base, TimestampMixin):
 
     #: the cost of the booking
     cost = Column(Numeric(precision=8, scale=2), nullable=True)
-
-    #: the payment status of the booking
-    paid = Column(Boolean, nullable=False, default=False)
-
-    #: the transaction id of the payment if it's an online payment
-    tid = Column(Text, nullable=True)
 
     #: the period this booking belongs to
     @aggregated('occasion', Column(

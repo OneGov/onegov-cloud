@@ -7,10 +7,11 @@ from freezegun import freeze_time
 from onegov.activity import ActivityCollection
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
+from onegov.activity import BookingCollection
+from onegov.activity import InvoiceItemCollection
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
-from onegov.activity import BookingCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
 from pytz import utc
@@ -1336,3 +1337,20 @@ def test_period_phases(session):
 
     with freeze_time('2016-12-01'):
         assert period.phase == 'archive'
+
+
+def test_invoice_items(session, owner):
+    items = InvoiceItemCollection(session)
+    items.add(owner, "Ferienpass 2016", "Malcolm", "Camp", 100.0, 1.0)
+    items.add(owner, "Ferienpass 2016", "Malcolm", "Pass", 25.0, 1.0)
+    items.add(owner, "Ferienpass 2016", "Dewey", "Football", 100.0, 1.0)
+    items.add(owner, "Ferienpass 2016", "Dewey", "Pass", 25.0, 1.0)
+    items.add(owner, "Ferienpass 2016", "Discount", "8%", 250, -0.05)
+
+    assert items.total == 237.5
+
+    items.add(owner, "Ferienpass 2017", "Malcolm", "Camp", 100, 1 / 3)
+
+    assert items.for_invoice("Ferienpass 2017").total == 33
+    assert items.for_invoice("asdf").total is None
+    assert items.total == 270.5

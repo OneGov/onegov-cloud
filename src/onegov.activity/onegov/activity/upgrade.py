@@ -12,7 +12,6 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
-from sqlalchemy import Text
 from sqlalchemy.orm import joinedload
 
 
@@ -147,17 +146,3 @@ def add_payment_model_columns(context):
     context.operations.add_column('bookings', Column(
         'cost', Numeric(precision=8, scale=2), nullable=True
     ))
-
-    context.operations.add_column('bookings', Column(
-        'tid', Text, nullable=True
-    ))
-
-    context.operations.add_column('bookings', Column(
-        'paid', Boolean, nullable=True, default=False
-    ))
-
-    for booking in context.session.query(Booking):
-        booking.paid = False
-
-    context.session.flush()
-    context.operations.alter_column('bookings', 'paid', nullable=False)

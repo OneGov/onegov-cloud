@@ -171,9 +171,6 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
     b = b.filter(Booking.state.in_(('open', 'accepted', 'blocked')))
     b = b.options(
         defer('group_code'),
-        defer('cost'),
-        defer('paid'),
-        defer('tid')
     )
 
     o = session.query(Occasion)
