@@ -1,6 +1,7 @@
 from onegov.activity.models import Booking, Period
 from onegov.core.collection import GenericCollection
 from onegov.activity.matching.utils import unblockable, booking_order
+from onegov.activity.errors import BookingLimitReached
 from sqlalchemy.orm import joinedload
 
 
@@ -118,7 +119,7 @@ class BookingCollection(GenericCollection):
             accepted = sum(1 for b in bookings if b.state == 'accepted')
 
             if accepted >= limit:
-                raise RuntimeError("The booking limit has been reached")
+                raise BookingLimitReached()
 
             # accepting one more booking will reach the limit
             block_rest = (accepted + 1) >= limit
@@ -193,6 +194,8 @@ class BookingCollection(GenericCollection):
             booking.state = 'denied'
             unblocked.add(booking)
 
+        self.session.flush()
+
         # try to accept the denied bookings in their respective occasions
         for b in unblocked:
 
@@ -212,6 +215,9 @@ class BookingCollection(GenericCollection):
 
         for b in denied_bookings:
             if spots:
-                self.accept_booking(b)
-                self.session.flush()
-                spots -= 1
+                try:
+                    self.accept_booking(b)
+                    self.session.flush()
+                    spots -= 1
+                except BookingLimitReached:
+                    pass

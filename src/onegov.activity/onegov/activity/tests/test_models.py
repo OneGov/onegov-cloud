@@ -1381,6 +1381,30 @@ def test_cancel_booking(session, owner):
     assert b3.state == 'accepted'
     assert b4.state == 'blocked'
 
+    transaction.abort()
+
+    # make sure accepting a previously denied booking of the same occasion will
+    # will be skipped if doing so would conflict with the limit
+    period = periods.active()
+    period.all_inclusive = True
+    period.max_bookings_per_attendee = 1
+
+    b1 = bookings.add(owner, a1, o4)
+    b2 = bookings.add(owner, a2, o1)
+    b3 = bookings.add(owner, a2, o4)
+
+    b1.state = 'accepted'
+    b2.state = 'accepted'
+    b3.state = 'denied'
+
+    session.flush()
+
+    bookings.cancel_booking(b1)
+
+    assert b1.state == 'cancelled'
+    assert b2.state == 'accepted'
+    assert b3.state == 'denied'
+
 
 def test_period_phases(session):
     periods = PeriodCollection(session)
