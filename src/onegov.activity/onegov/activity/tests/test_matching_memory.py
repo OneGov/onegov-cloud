@@ -22,6 +22,10 @@ match = partial(
 )
 
 
+def days(n):
+    return timedelta(days=n)
+
+
 class Booking(MatchableBooking):
 
     def __init__(self, occasion, attendee, state, priority, start, end):
@@ -90,9 +94,6 @@ class Occasion(MatchableOccasion):
 
 
 def test_overlapping_bookings():
-
-    def days(n):
-        return timedelta(days=n)
 
     # the algorithm will block other bookings, favoring higher priorities
     o1 = Occasion("Daytrip", today(), today())
@@ -265,3 +266,81 @@ def test_prefer_association_children():
 
     is_association_child = False
     assert association_child_score(None) == 0.0
+
+
+def test_booking_limit():
+
+    o1 = Occasion(1, today(), today())
+    o2 = Occasion(2, today() + days(1), today() + days(1))
+    o3 = Occasion(3, today() + days(2), today() + days(2))
+    o4 = Occasion(4, today() + days(3), today() + days(3))
+
+    bookings = [
+        o1.booking("Tom", 'open', 0),
+        o2.booking("Tom", 'open', 0),
+        o3.booking("Tom", 'open', 0),
+        o4.booking("Tom", 'open', 0)
+    ]
+
+    result = match(bookings, (o1, o2, o3, o4), limit=1)
+
+    assert not result.open
+    assert result.accepted == {bookings[0]}
+    assert result.blocked == {bookings[1], bookings[2], bookings[3]}
+
+    result = match(bookings, (o1, o2, o3, o4), limit=2)
+
+    assert not result.open
+    assert result.accepted == {bookings[0], bookings[1]}
+    assert result.blocked == {bookings[2], bookings[3]}
+
+    result = match(bookings, (o1, o2, o3, o4), limit=3)
+
+    assert not result.open
+    assert result.accepted == {bookings[0], bookings[1], bookings[2]}
+    assert result.blocked == {bookings[3]}
+
+    result = match(bookings, (o1, o2, o3, o4), limit=4)
+
+    assert not result.open
+    assert len(result.accepted) == 4
+    assert not result.blocked
+
+    bookings = [
+        o1.booking("Tom", 'open', 0),
+        o2.booking("Tom", 'open', 0),
+        o3.booking("Tom", 'open', 1),
+        o4.booking("Tom", 'open', 0)
+    ]
+
+    result = match(bookings, (o1, o2, o3, o4), limit=1)
+
+    assert not result.open
+    assert result.accepted == {bookings[2]}
+    assert result.blocked == {bookings[0], bookings[1], bookings[3]}
+
+    bookings = [
+        o1.booking("Tom", 'open', 2),
+        o2.booking("Tom", 'open', 1),
+        o3.booking("Tom", 'open', 0),
+        o1.booking("Harry", 'open', 0),
+        o2.booking("Harry", 'open', 2),
+        o3.booking("Harry", 'open', 1),
+    ]
+
+    result = match(bookings, (o1, o2, o3, o4), limit=1)
+
+    assert not result.open
+    assert result.accepted == {bookings[0], bookings[4]}
+    assert len(result.blocked) == 4
+
+    result = match(bookings, (o1, o2, o3, o4), limit=2)
+
+    assert not result.open
+    assert result.accepted == {
+        bookings[0],
+        bookings[1],
+        bookings[4],
+        bookings[5]
+    }
+    assert len(result.blocked) == 2

@@ -1045,6 +1045,15 @@ def test_accept_booking(session, owner):
         spots=(0, 2)
     )
 
+    o3 = occasions.add(
+        start=datetime(2016, 10, 5, 13),
+        end=datetime(2016, 10, 5, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
@@ -1122,6 +1131,37 @@ def test_accept_booking(session, owner):
     assert b2.state == 'accepted'
     assert b1.state == 'blocked'
 
+    transaction.abort()
+
+    # if there's a booking limit we ensure it isn't violated
+    period = periods.active()
+    period.all_inclusive = True
+    period.max_bookings_per_attendee = 1
+
+    b1 = bookings.add(owner, a1, o1)
+    bookings.accept_booking(b1)
+
+    with pytest.raises(RuntimeError) as e:
+        bookings.accept_booking(bookings.add(owner, a1, o3))
+
+    assert "The booking limit has been reached" in str(e)
+
+    transaction.abort()
+
+    # if accepting the booking leads to the booking limit, the rest is blocked
+    period = periods.active()
+    period.all_inclusive = True
+    period.max_bookings_per_attendee = 1
+
+    assert o1.end < o3.start
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a1, o3)
+
+    bookings.accept_booking(b1)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'blocked'
+
 
 def test_cancel_booking(session, owner):
     activities = ActivityCollection(session)
@@ -1140,7 +1180,7 @@ def test_cancel_booking(session, owner):
     sport = activities.add("Sport", username=owner.username)
 
     o1 = occasions.add(
-        start=datetime(2016, 10, 4, 10),
+        start=datetime(2016, 10, 4, 9),
         end=datetime(2016, 10, 4, 12),
         timezone="Europe/Zurich",
         activity=sport,
@@ -1159,7 +1199,7 @@ def test_cancel_booking(session, owner):
 
     o3 = occasions.add(
         start=datetime(2016, 10, 4, 13),
-        end=datetime(2016, 10, 4, 15),
+        end=datetime(2016, 10, 4, 16),
         timezone="Europe/Zurich",
         activity=sport,
         period=period,
@@ -1167,8 +1207,8 @@ def test_cancel_booking(session, owner):
     )
 
     o4 = occasions.add(
-        start=datetime(2016, 10, 4, 13),
-        end=datetime(2016, 10, 4, 15),
+        start=datetime(2016, 10, 4, 15),
+        end=datetime(2016, 10, 4, 18),
         timezone="Europe/Zurich",
         activity=sport,
         period=period,
@@ -1307,6 +1347,39 @@ def test_cancel_booking(session, owner):
     assert b1.state == 'cancelled'
     assert b2.state == 'accepted'
     assert b3.state == 'open'
+
+    transaction.abort()
+
+    # make sure the booking limit is honored
+    period = periods.active()
+    period.all_inclusive = True
+    period.max_bookings_per_attendee = 1
+
+    b1 = bookings.add(owner, a1, o1, priority=4)
+    b2 = bookings.add(owner, a1, o2, priority=3)
+    b3 = bookings.add(owner, a1, o3, priority=2)
+    b4 = bookings.add(owner, a1, o4, priority=1)
+
+    bookings.accept_booking(b1)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'blocked'
+    assert b3.state == 'blocked'
+    assert b4.state == 'blocked'
+
+    bookings.cancel_booking(b1)
+
+    assert b1.state == 'cancelled'
+    assert b2.state == 'accepted'
+    assert b3.state == 'blocked'
+    assert b4.state == 'blocked'
+
+    bookings.cancel_booking(b2)
+
+    assert b1.state == 'cancelled'
+    assert b2.state == 'cancelled'
+    assert b3.state == 'accepted'
+    assert b4.state == 'blocked'
 
 
 def test_period_phases(session):

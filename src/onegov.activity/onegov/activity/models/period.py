@@ -151,6 +151,11 @@ class Period(Base, TimestampMixin):
             booking.cost = booking_cost
 
     @property
+    def booking_limit(self):
+        """ Returns the max_bookings_per_attendee limit if it applies. """
+        return self.all_inclusive and self.max_bookings_per_attendee
+
+    @property
     def phase(self):
         if not self.active:
             return 'inactive'

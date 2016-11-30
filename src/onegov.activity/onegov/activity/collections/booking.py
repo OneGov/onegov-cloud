@@ -1,5 +1,6 @@
 from onegov.activity.models import Booking, Period
 from onegov.core.collection import GenericCollection
+from onegov.activity.matching.utils import unblockable, booking_order
 from sqlalchemy.orm import joinedload
 
 
@@ -112,8 +113,20 @@ class BookingCollection(GenericCollection):
                 .filter(Booking.id != booking.id)
         )
 
+        if booking.period.booking_limit:
+            limit = booking.period.booking_limit
+            accepted = sum(1 for b in bookings if b.state == 'accepted')
+
+            if accepted >= limit:
+                raise RuntimeError("The booking limit has been reached")
+
+            # accepting one more booking will reach the limit
+            block_rest = (accepted + 1) >= limit
+        else:
+            block_rest = False
+
         for b in bookings:
-            if b.overlaps(booking):
+            if block_rest or b.overlaps(booking):
                 if b.state == 'accepted':
                     raise RuntimeError("Conflict with booking {}".format(b.id))
 
@@ -124,7 +137,7 @@ class BookingCollection(GenericCollection):
 
         booking.state = 'accepted'
 
-    def cancel_booking(self, booking, score_function=lambda b: b.priority):
+    def cancel_booking(self, booking, score_function=booking_order):
         """ Cancels the given booking, setting all other bookings which
         conflict only with this booking to 'open'.
 
@@ -167,15 +180,18 @@ class BookingCollection(GenericCollection):
         # mark the no-longer blocked bookings as denied
         accepted = {b for b in bookings if b.state == 'accepted'}
         blocked = {b for b in bookings if b.state == 'blocked'}
-        unblocked = {b for b in blocked}
+        unblocked = set()
 
-        for a in accepted:
-            for b in blocked:
-                if a.overlaps(b):
-                    unblocked.remove(b)
+        limit = booking.period.booking_limit
+        unblockable_bookings = unblockable(accepted, blocked, score_function)
 
-        for b in unblocked:
-            b.state = 'denied'
+        for cnt, booking in enumerate(unblockable_bookings, start=1):
+
+            if limit and limit < (cnt + len(accepted)):
+                break
+
+            booking.state = 'denied'
+            unblocked.add(booking)
 
         # try to accept the denied bookings in their respective occasions
         for b in unblocked:
@@ -192,8 +208,7 @@ class BookingCollection(GenericCollection):
                 b for b in booking.occasion.bookings
                 if b.state in ('open', 'denied')
             ),
-            key=score_function,
-            reverse=True)
+            key=score_function)
 
         for b in denied_bookings:
             if spots:

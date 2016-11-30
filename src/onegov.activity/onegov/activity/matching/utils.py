@@ -1,6 +1,7 @@
 import sedate
 
 from onegov.activity import log
+from sortedcontainers import SortedSet
 
 
 def overlaps(booking, other):
@@ -31,8 +32,6 @@ class LoopBudget(object):
         self.max_ticks = max_ticks
 
     def limit_reached(self, as_exception=False):
-        self.ticks += 1
-
         if self.ticks >= self.max_ticks:
             message = "Loop limit of {} has been reached".format(self.ticks)
 
@@ -42,6 +41,8 @@ class LoopBudget(object):
                 log.warning(message)
 
             return True
+
+        self.ticks += 1
 
 
 def hashable(attribute):
@@ -55,3 +56,27 @@ def hashable(attribute):
             return getattr(self, attribute) == getattr(other, attribute)
 
     return Hashable
+
+
+def booking_order(booking):
+    """ Keeps the bookings predictably sorted from highest to lowest priority.
+
+    """
+
+    return booking.priority * -1, booking.id
+
+
+def unblockable(accepted, blocked, key=booking_order):
+    """ Returns a set of items in the blocked set which do not block
+    with anything. The set is ordered using :func:`booking_order`.
+
+    """
+
+    unblockable = SortedSet(blocked, key=key)
+
+    for accepted in accepted:
+        for blocked in blocked:
+            if accepted.overlaps(blocked):
+                unblockable.remove(blocked)
+
+    return unblockable

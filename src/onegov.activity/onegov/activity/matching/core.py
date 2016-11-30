@@ -5,9 +5,10 @@ quadratic runtime.
 
 """
 
-from onegov.activity import Booking, Occasion
+from onegov.activity import Booking, Occasion, Period
 from onegov.activity.matching.score import Scoring
 from onegov.activity.matching.utils import overlaps, LoopBudget, hashable
+from onegov.activity.matching.utils import booking_order, unblockable
 from onegov.core.utils import Bunch
 from itertools import groupby, product
 from sortedcontainers import SortedSet
@@ -28,15 +29,9 @@ class AttendeeAgent(hashable('id')):
 
     __slots__ = ('id', 'wishlist', 'accepted', 'blocked')
 
-    def __init__(self, id, bookings):
+    def __init__(self, id, bookings, limit=None):
         self.id = id
-
-        # keep the wishlist sorted from highest to lowest priority, ignoring
-        # the current state of the booking as we will assign them anew
-        # each time we run the algorithm
-        def booking_order(booking):
-            return booking.priority * -1, booking.id
-
+        self.limit = limit
         self.wishlist = SortedSet(bookings, key=booking_order)
         self.accepted = set()
         self.blocked = set()
@@ -47,7 +42,11 @@ class AttendeeAgent(hashable('id')):
         self.wishlist.remove(booking)
         self.accepted.add(booking)
 
-        self.blocked |= {b for b in self.wishlist if overlaps(booking, b)}
+        if self.limit and len(self.accepted) >= self.limit:
+            self.blocked |= self.wishlist
+        else:
+            self.blocked |= {b for b in self.wishlist if overlaps(booking, b)}
+
         self.wishlist -= self.blocked
 
     def deny(self, booking):
@@ -57,15 +56,12 @@ class AttendeeAgent(hashable('id')):
         self.accepted.remove(booking)
 
         # remove bookings from the blocked list which are not blocked anymore
-        free = set(self.blocked)
+        for booking in unblockable(self.accepted, self.blocked):
+            if self.limit and len(self.wishlist) >= self.limit:
+                break
 
-        for accepted in self.accepted:
-            for blocked in self.blocked:
-                if overlaps(accepted, blocked):
-                    free.remove(blocked)
-
-        self.blocked -= free
-        self.wishlist |= free
+            self.blocked.remove(booking)
+            self.wishlist.add(booking)
 
     @property
     def is_valid(self):
@@ -181,7 +177,14 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
         defer('cost')
     )
 
-    bookings = deferred_acceptance(bookings=b, occasions=o, **kwargs)
+    period = session.query(Period).filter(Period.id == period_id).one()
+    if period.all_inclusive and period.max_bookings_per_attendee:
+        limit = period.max_bookings_per_attendee
+    else:
+        limit = None
+
+    bookings = deferred_acceptance(
+        bookings=b, occasions=o, limit=limit, **kwargs)
 
     # write the changes to the database
     def update_states(bookings, state):
@@ -205,7 +208,8 @@ def deferred_acceptance(bookings, occasions,
                         score_function=None,
                         validity_check=True,
                         stability_check=False,
-                        hard_budget=True):
+                        hard_budget=True,
+                        limit=None):
     """ Matches bookings with occasions.
 
     :score_function:
@@ -232,6 +236,11 @@ def deferred_acceptance(bookings, occasions,
         times the number of bookings).
 
         Feel free to proof that this can't happen and then remove the check ;)
+
+    :limit:
+        The maximum number of bookings which should be accepted for each
+        attendee.
+
     """
 
     score_function = eager_score(bookings, score_function or Scoring())
@@ -244,7 +253,7 @@ def deferred_acceptance(bookings, occasions,
     }
 
     attendees = {
-        aid: AttendeeAgent(aid, bookings)
+        aid: AttendeeAgent(aid, limit=limit, bookings=bookings)
         for aid, bookings in groupby(bookings, key=lambda b: b.attendee_id)
     }
 

@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds the ability to limit the number of matched bookings.
+  [href]
+
+- Adds the ability to create invoices for bookings.
+  [href]
+
 - Fixes matching resulting in an error in certain constellations.
   [href]
 
