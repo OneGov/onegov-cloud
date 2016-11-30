@@ -8,6 +8,7 @@ from onegov.ballot import (
     List,
     ListConnection,
     ListResult,
+    PanachageResult
 )
 from uuid import uuid4
 
@@ -86,6 +87,15 @@ def test_election_create_all_models(session):
     session.add(list_result)
     session.flush()
 
+    panachage_result = PanachageResult(
+        target_list_id=list.id,
+        source_list_id=1,
+        votes=0
+    )
+
+    session.add(panachage_result)
+    session.flush()
+
     candidate_result = CandidateResult(
         election_result_id=election_result.id,
         candidate_id=candidate.id,
@@ -125,6 +135,9 @@ def test_election_create_all_models(session):
     assert list_result.election_result == election_result
     assert list_result.list == list
 
+    assert list.panachage_results.one() == panachage_result
+    assert panachage_result.list == list
+
     assert candidate_result.election_result == election_result
     assert candidate_result.candidate == candidate
 
@@ -138,6 +151,7 @@ def test_election_create_all_models(session):
     assert session.query(List).all() == []
     assert session.query(ListConnection).all() == []
     assert session.query(ListResult).all() == []
+    assert session.query(PanachageResult).all() == []
 
 
 def test_election_id_generation(session):
@@ -330,6 +344,53 @@ def test_election_last_result_change(session):
         '2015-01-01T13:00:00+00:00'
 
 
+def test_election_has_panachage_data(session):
+    election = Election(
+        title='Legislative Election',
+        domain='federation',
+        type='proporz',
+        date=date(2015, 6, 14),
+    )
+    election.lists.append(
+        List(
+            number_of_mandates=0,
+            list_id="1",
+            name="List A",
+        )
+    )
+    election.lists.append(
+        List(
+            number_of_mandates=0,
+            list_id="2",
+            name="List B",
+        )
+    )
+
+    session.add(election)
+    session.flush()
+
+    assert not election.has_panachage_data
+
+    election.lists[0].panachage_results.append(
+        PanachageResult(
+            target_list_id=election.lists[0].id,
+            source_list_id=2,
+            votes=0
+        )
+    )
+    election.lists[1].panachage_results.append(
+        PanachageResult(
+            target_list_id=election.lists[1].id,
+            source_list_id=1,
+            votes=0
+        )
+    )
+
+    session.flush()
+
+    assert election.has_panachage_data
+
+
 def test_election_results(session):
     election = Election(
         title='Election',
@@ -405,6 +466,47 @@ def test_election_results(session):
     election.lists.append(list_2)
     election.lists.append(list_3)
     election.lists.append(list_4)
+
+    # Add panachage results
+    list_1.panachage_results.append(
+        PanachageResult(target_list_id=list_1.id, source_list_id=2, votes=1)
+    )
+    list_1.panachage_results.append(
+        PanachageResult(target_list_id=list_1.id, source_list_id=3, votes=1)
+    )
+    list_1.panachage_results.append(
+        PanachageResult(target_list_id=list_1.id, source_list_id=4, votes=1)
+    )
+
+    list_2.panachage_results.append(
+        PanachageResult(target_list_id=list_2.id, source_list_id=1, votes=2)
+    )
+    list_2.panachage_results.append(
+        PanachageResult(target_list_id=list_2.id, source_list_id=3, votes=2)
+    )
+    list_2.panachage_results.append(
+        PanachageResult(target_list_id=list_2.id, source_list_id=4, votes=2)
+    )
+
+    list_3.panachage_results.append(
+        PanachageResult(target_list_id=list_3.id, source_list_id=1, votes=3)
+    )
+    list_3.panachage_results.append(
+        PanachageResult(target_list_id=list_3.id, source_list_id=2, votes=3)
+    )
+    list_3.panachage_results.append(
+        PanachageResult(target_list_id=list_3.id, source_list_id=4, votes=3)
+    )
+
+    list_4.panachage_results.append(
+        PanachageResult(target_list_id=list_4.id, source_list_id=1, votes=4)
+    )
+    list_4.panachage_results.append(
+        PanachageResult(target_list_id=list_4.id, source_list_id=2, votes=4)
+    )
+    list_4.panachage_results.append(
+        PanachageResult(target_list_id=list_4.id, source_list_id=3, votes=4)
+    )
 
     # Add 5 candidates
     candidate_1 = Candidate(
@@ -544,6 +646,10 @@ def test_election_results(session):
     assert sorted((c.votes for c in election.list_connections)) == []
 
     assert election.number_of_mandates == election.allocated_mandates
+
+    assert sum(
+        [p.votes for l in election.lists for p in l.panachage_results]
+    ) == 30
 
     # Add list connections
     connection_1 = ListConnection(
@@ -689,6 +795,13 @@ def test_election_export(session):
     )
     election.results.append(election_result)
 
+    list_1.panachage_results.append(
+        PanachageResult(source_list_id=list_2.list_id, votes=12)
+    )
+    list_1.panachage_results.append(
+        PanachageResult(source_list_id='99', votes=4)
+    )
+
     session.flush()
 
     assert election.export() == [
@@ -722,7 +835,10 @@ def test_election_export(session):
             'candidate_first_name': 'Apu',
             'candidate_id': '2',
             'candidate_elected': False,
-            'candidate_votes': 111
+            'candidate_votes': 111,
+            'panachage_votes_from_list_1': None,
+            'panachage_votes_from_list_2': None,
+            'panachage_votes_from_list_99': None,
         }, {
             'election_title': 'Election',
             'election_date': '2015-06-14',
@@ -753,7 +869,10 @@ def test_election_export(session):
             'candidate_first_name': 'Joe',
             'candidate_id': '1',
             'candidate_elected': True,
-            'candidate_votes': 520
+            'candidate_votes': 520,
+            'panachage_votes_from_list_1': None,
+            'panachage_votes_from_list_2': 12,
+            'panachage_votes_from_list_99': 4,
         }
     ]
 

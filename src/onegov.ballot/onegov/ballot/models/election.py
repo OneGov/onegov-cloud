@@ -200,6 +200,19 @@ class Election(Base, TimestampMixin, DerivedAttributes,
 
         return max(last_changes)
 
+    @property
+    def has_panachage_data(self):
+        """ Checks if there are panachage data available. """
+        session = object_session(self)
+
+        ids = session.query(List.id)
+        ids = ids.filter(List.election_id == self.id)
+
+        results = session.query(PanachageResult)
+        results = results.filter(PanachageResult.target_list_id.in_(ids))
+
+        return results.first() is not None
+
     def export(self):
         """ Returns all data connected to this election as list with dicts.
 
@@ -381,6 +394,28 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         for key, group in groupby(list_results, lambda x: x[1]):
             list_results_grouped[key] = dict([(g[2], g[0]) for g in group])
 
+        # We need to collect the panachage results per list
+        list_ids = session.query(List.id, List.list_id)
+        list_ids = list_ids.filter(List.election_id == self.id)
+        panachage_results = session.query(PanachageResult)
+        panachage_results = panachage_results.filter(
+            PanachageResult.target_list_id.in_((id[0] for id in list_ids))
+        )
+
+        panachage_lists = session.query(List.list_id)
+        panachage_lists = panachage_lists.filter(List.election_id == self.id)
+        panachage_lists = [t[0] for t in panachage_lists]
+        panachage_lists = sorted(
+            set(panachage_lists) |
+            set([r.source_list_id for r in panachage_results])
+        )
+
+        list_lookup = {id[0]: id[1] for id in list_ids}
+        panachage = {id: {} for id in panachage_lists}
+        for result in panachage_results:
+            key = list_lookup.get(result.target_list_id)
+            panachage[key][result.source_list_id] = result.votes
+
         rows = []
         for result in results:
             row = OrderedDict()
@@ -421,6 +456,10 @@ class Election(Base, TimestampMixin, DerivedAttributes,
             row['candidate_id'] = result[27]
             row['candidate_elected'] = result[28]
             row['candidate_votes'] = result[0]
+
+            for target_id in panachage_lists:
+                key = 'panachage_votes_from_list_{}'.format(target_id)
+                row[key] = panachage.get(result[21], {}).get(target_id)
 
             rows.append(row)
 
@@ -532,6 +571,14 @@ class List(Base, TimestampMixin):
         cascade="all, delete-orphan",
         backref=backref("list"),
         lazy="dynamic",
+    )
+
+    #: a (proporz) list contains votes from other other lists
+    panachage_results = relationship(
+        "PanachageResult",
+        cascade="all, delete-orphan",
+        backref=backref("list"),
+        lazy="dynamic"
     )
 
     def aggregate_results(self, attribute):
@@ -694,6 +741,25 @@ class ListResult(Base, TimestampMixin):
 
     #: the list this result belongs to
     list_id = Column(UUID, ForeignKey(List.id), nullable=False)
+
+
+class PanachageResult(Base, TimestampMixin):
+
+    """ The votes transferred from one list to another. """
+
+    __tablename__ = 'panachage_results'
+
+    #: identifies the result
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: the target this result belongs to
+    target_list_id = Column(UUID, ForeignKey(List.id), nullable=False)
+
+    #: the source this result belongs to
+    source_list_id = Column(Text, nullable=False)
+
+    # votes
+    votes = Column(Integer, nullable=False, default=lambda: 0)
 
 
 class CandidateResult(Base, TimestampMixin):

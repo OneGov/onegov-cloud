@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds model for panachage results.
+  [msom]
+
 1.0.3 (2016-11-28)
 ~~~~~~~~~~~~~~~~~~~
 

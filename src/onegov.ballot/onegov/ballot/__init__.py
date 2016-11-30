@@ -8,6 +8,7 @@ from onegov.ballot.models import (
     List,
     ListConnection,
     ListResult,
+    PanachageResult,
     Vote
 )
 from onegov.ballot.collection import ElectionCollection
@@ -25,6 +26,7 @@ __all__ = [
     'List',
     'ListConnection',
     'ListResult',
+    'PanachageResult',
     'Vote',
     'VoteCollection'
 ]
