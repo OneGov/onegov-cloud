@@ -1,4 +1,5 @@
 from datetime import date
+from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID, JSON
@@ -11,7 +12,7 @@ from sqlalchemy import Index
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
-from sqlalchemy.orm import object_session, relationship
+from sqlalchemy.orm import object_session, relationship, joinedload, defer
 from uuid import uuid4
 
 
@@ -119,6 +120,35 @@ class Period(Base, TimestampMixin):
             return
 
         self.active = False
+
+    def confirm(self):
+        """ Confirms the current period. """
+
+        self.confirmed = True
+
+        # open bookings are marked as denied during completion
+        # and the booking costs are copied over permanently (so they can't
+        # change anymore)
+        b = object_session(self).query(Booking)
+        b = b.filter(Booking.period_id == self.id)
+        b = b.options(joinedload(Booking.occasion))
+        b = b.options(
+            defer(Booking.group_code),
+            defer(Booking.attendee_id),
+            defer(Booking.priority),
+            defer(Booking.username),
+        )
+
+        for booking in b:
+            if booking.state == 'open':
+                booking.state = 'denied'
+
+            booking_cost = booking.occasion.cost or 0
+
+            if not self.all_inclusive and self.booking_cost:
+                booking_cost += self.booking_cost
+
+            booking.cost = booking_cost
 
     @property
     def phase(self):

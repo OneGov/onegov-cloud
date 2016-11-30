@@ -1354,3 +1354,70 @@ def test_invoice_items(session, owner):
     assert items.for_invoice("Ferienpass 2017").total == 33
     assert items.for_invoice("asdf").total is None
     assert items.total == 270.5
+
+
+def test_confirm_period(session, owner):
+
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True)
+    period.all_inclusive = False
+    period.booking_cost = 10
+
+    sport = activities.add("Sport", username=owner.username)
+
+    o = occasions.add(
+        start=datetime(2016, 10, 4, 10),
+        end=datetime(2016, 10, 4, 12),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2))
+    o.cost = 20
+
+    a1 = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2000, 1, 1))
+
+    a2 = attendees.add(
+        user=owner,
+        name="Mike Wheeler",
+        birth_date=date(2000, 1, 1))
+
+    transaction.commit()
+
+    b1 = bookings.add(owner, a1, o)
+    b2 = bookings.add(owner, a2, o)
+    b1.state = 'open'
+    b2.state = 'accepted'
+
+    period = periods.query().one()
+    period.confirm()
+
+    assert bookings.query().all()[0].cost == 30.0
+    assert bookings.query().all()[1].cost == 30.0
+    assert sorted([b.state for b in bookings.query()]) == [
+        'accepted',
+        'denied',
+    ]
+
+    transaction.abort()
+
+    period = periods.query().one()
+    period.all_inclusive = True
+    period.booking_cost = 10
+
+    b1 = bookings.add(owner, a1, o)
+
+    period.confirm()
+
+    assert bookings.query().one().cost == 20.0
