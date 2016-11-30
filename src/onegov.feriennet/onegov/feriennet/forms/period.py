@@ -1,6 +1,7 @@
 from cached_property import cached_property
 from datetime import datetime
 from onegov.activity import Activity, Period, Occasion, OccasionCollection
+from onegov.core.utils import Bunch
 from onegov.feriennet import _
 from onegov.form import Form
 from sqlalchemy import distinct, func, or_, literal
@@ -54,7 +55,7 @@ class PeriodForm(Form):
     )
 
     pass_system_limit = IntegerField(
-        label=_("Maximum Number of Activities"),
+        label=_("Maximum Number of Activities per Attendee"),
         fieldset=_("Execution Settings"),
         validators=[
             Optional(),
@@ -191,12 +192,34 @@ class PeriodForm(Form):
 
         return True
 
+    def ensure_no_payment_changes_after_confirmation(self):
+        if self.model and self.model.confirmed:
+            preview = Bunch()
+            self.populate_obj(preview)
+
+            fields = (
+                'all_inclusive',
+                'booking_cost',
+                'max_bookings_per_attendee',
+            )
+
+            for field in fields:
+                if getattr(self.model, field) != getattr(preview, field):
+                    self.pass_system.errors.append(_(
+                        "It is no longer possible to change the execution "
+                        "settings since the period has already been confirmed"
+                    ))
+                    return False
+
+        return True
+
     def validate(self):
         result = super().validate()
 
         ensurances = (
             self.ensure_valid_daterange_periods,
             self.ensure_no_occasion_conflicts,
+            self.ensure_no_payment_changes_after_confirmation
         )
 
         for ensurance in ensurances:

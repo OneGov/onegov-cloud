@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-11-29 13:21+0100\n"
+"POT-Creation-Date: 2016-11-30 11:44+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -304,8 +304,8 @@ msgstr "Pass-System"
 msgid "Execution Settings"
 msgstr "Ausführungs-Einstellungen"
 
-msgid "Maximum Number of Activities"
-msgstr "Maximale Anzahl von Angeboten"
+msgid "Maximum Number of Activities per Attendee"
+msgstr "Maximale Anzahl Angebote pro Teilnehmer"
 
 msgid "Cost of the Pass"
 msgstr "Kosten des Passes"
@@ -329,6 +329,11 @@ msgid ""
 msgstr ""
 "Die Wunschphase muss vor der Durchführung statfinden und die Start-Daten "
 "müssen vor den End-Daten liegen."
+
+msgid ""
+"It is no longer possible to change the execution settings since the period "
+"has already been confirmed"
+msgstr "Es ist nicht mehr möglich die Ausführungs-Einstellungen zu verändern da die Periode bereits bestätigt wurde."
 
 msgid "Name"
 msgstr "Name"
@@ -454,8 +459,17 @@ msgstr ""
 "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
 "eingeteilt wird"
 
+msgid "Free of charge"
+msgstr "Kostenlos"
+
 msgid "This occasion does not have enough attendees yet."
 msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."
+
+msgid "Passport"
+msgstr "Ferienpass"
+
+msgid "Total"
+msgstr "Total"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -510,9 +524,6 @@ msgstr "${cost} CHF"
 
 msgid "No additional costs"
 msgstr "Keine zusätzlichen Kosten"
-
-msgid "Free of charge"
-msgstr "Kostenlos"
 
 msgid "Enroll your young child now."
 msgstr "Melden Sie Ihr Kleinkind jetzt an."
@@ -829,9 +840,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "${occasion.cost} CHF"
-#~ msgstr "${occasion.cost} CHF"
-
-#~ msgid "Booking Cost"
-#~ msgstr "Buchungskosten"
