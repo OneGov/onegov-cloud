@@ -1,5 +1,6 @@
 import json
 
+from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
@@ -65,6 +66,22 @@ def group_bookings_by_attendee(bookings):
         for attendee, bookings
         in groupby(bookings, key=lambda b: b.attendee)
     }
+
+
+def total_by_bookings(period, bookings):
+    if bookings:
+        total = sum(
+            b.cost for b in bookings
+            if b.state == 'accepted' and b.cost
+        )
+        total = total or Decimal("0.00")
+    else:
+        return Decimal("0.00")
+
+    if period.all_inclusive and period.booking_cost:
+        total += period.booking_cost
+
+    return total
 
 
 def attendees_by_username(request, username):
@@ -167,12 +184,16 @@ def view_my_bookings(self, request):
             'user': user.title
         })
 
+    def get_total(attendee):
+        return total_by_bookings(period, bookings_by_attendee.get(attendee))
+
     layout = BookingCollectionLayout(self, request, title)
 
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
         'bookings_by_attendee': bookings_by_attendee.get,
+        'total_by_attendee': get_total,
         'has_bookings': bookings and True or False,
         'layout': layout,
         'model': self,

@@ -726,7 +726,7 @@ def test_booking_view(feriennet_app):
 
     # make sure the bookings show up under my view
     def count(page):
-        return len(page.pyquery('.attendee-bookings > div > ul > li'))
+        return len(page.pyquery('.attendee-bookings > ul > li'))
 
     c1_bookings = c1.get('/').click('Meine Wunschliste')
     c2_bookings = c2.get('/').click('Meine Wunschliste')
