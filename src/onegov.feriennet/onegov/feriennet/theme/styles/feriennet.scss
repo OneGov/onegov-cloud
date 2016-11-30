@@ -51,6 +51,13 @@ svg #background {
 }
 
 /*
+    Strikethrough text
+*/
+.strikethrough {
+    text-decoration: line-through;
+}
+
+/*
     editbar icons
 */
 
@@ -476,6 +483,14 @@ ul.tags {
             box-shadow: 3px 3px 5px $white-smoke;
             margin-bottom: 1.5rem;
             padding: .5rem 0 .25rem;
+        }
+
+        .cost {
+            font-family: $font-family-monospace;
+            font-size: .875rem;
+            position: absolute;
+            right: 1rem;
+            top: .5rem;
         }
 
         .fa-star-o,

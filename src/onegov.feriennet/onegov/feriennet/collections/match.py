@@ -141,14 +141,3 @@ class MatchCollection(object):
                 occasions[oid]['state'] = 'full'
 
         return occasions
-
-    def confirm_period(self):
-        self.period.confirmed = True
-
-        # open bookings are marked as denied during completion
-        b = self.session.query(Booking)
-        b = b.filter(Booking.period_id == self.period_id)
-        b = b.filter(Booking.state == 'open')
-
-        for booking in b:
-            booking.state = 'denied'

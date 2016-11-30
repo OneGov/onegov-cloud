@@ -58,6 +58,16 @@
                                         <div class="occasion">
                                             ${layout.format_datetime_range(booking.occasion.localized_start, booking.occasion.localized_end)}
                                         </div>
+                                        <div class="cost" tal:condition="period.confirmed">
+                                            <span class="${booking.state != 'accepted' and 'strikethrough' or ''}">
+                                                <tal:block condition="booking.cost">
+                                                    ${booking.cost}
+                                                </tal:block>
+                                                <tal:block condition="not:booking.cost" i18n:translate>
+                                                    Free of charge
+                                                </tal:block>
+                                            </span>
+                                        </div>
                                         <div>
                                             <!--! During pre-booking we don't show the actual state of the booking, unless the
                                             occasion was cancelled, otherwise the user might see accepted bookings at a point where those states are not confirmed yet. -->

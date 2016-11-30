@@ -27,7 +27,7 @@ def handle_matches(self, request, form):
         form.store_to_period(self.period)
 
         if form.confirm_period:
-            self.confirm_period()
+            self.period.confirm()
             request.success(_("The matching was confirmed successfully"))
         else:
             request.success(_("The matching run executed successfully"))
