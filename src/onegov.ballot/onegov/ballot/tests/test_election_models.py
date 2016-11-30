@@ -309,6 +309,9 @@ def test_election_last_result_change(session):
         session.add(election)
         session.flush()
 
+    assert election.last_result_change.isoformat() == \
+        '2014-01-01T12:00:00+00:00'
+
     with freeze_time("2015-01-01 12:00"):
         election.results.append(ElectionResult(
             group='group',
