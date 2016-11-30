@@ -443,12 +443,54 @@ ul.tags {
         max-width: 77ex;
     }
 
-    h3 {
-        border: 1px solid $primary-color;
-        border-width: 0 0 1px;
-        font-size: 1.4rem;
-        font-weight: 500;
-        padding-bottom: .5rem;
+    .attendee-bookings {
+        h3 {
+            background-color: $white-smoke;
+            border: 1px solid $gainsboro;
+            border-radius: 2px 2px 0 0;
+            border-width: 1px 1px 0;
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin: 0;
+
+            // 8.3333% is 1000 (row-width) / 12 (number of rows)
+            // -> one column wide in percentage
+            padding: .75rem 1rem .75rem 8.3333%;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            li {
+                margin-bottom: .5rem;
+            }
+        }
+
+        > ul {
+            background-color: $white;
+            border: 1px solid $gainsboro;
+            border-radius: 0 0 2px 2px;
+            border-width: 0 1px 1px;
+            box-shadow: 3px 3px 5px $white-smoke;
+            margin-bottom: 1.5rem;
+            padding: .5rem 0 .25rem;
+        }
+
+        .fa-star-o,
+        .fa-star {
+            font-size: 1.5rem;
+            padding: 2px 0;
+        }
+
+        .fa-star-o {
+            color: $base;
+        }
+
+        .fa-star {
+            color: $yellow;
+        }
     }
 
     h4 {
@@ -498,32 +540,6 @@ ul.tags {
 
     .non-operable .state.accepted {
         background-color: $orange;
-    }
-
-    .attendee-bookings {
-        ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-
-            li {
-                margin-bottom: .5rem;
-            }
-        }
-
-        .fa-star-o,
-        .fa-star {
-            font-size: 1.5rem;
-            padding: 2px 0;
-        }
-
-        .fa-star-o {
-            color: $base;
-        }
-
-        .fa-star {
-            color: $yellow;
-        }
     }
 
     .actions {
