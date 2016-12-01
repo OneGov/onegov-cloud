@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.5 (2016-12-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a 'is-logged-in' and 'is-not-logged-in' body class to all views.
   [href]
 
