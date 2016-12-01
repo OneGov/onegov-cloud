@@ -187,14 +187,23 @@ def view_my_bookings(self, request):
     def get_total(attendee):
         return total_by_bookings(period, bookings_by_attendee.get(attendee))
 
+    def booking_cost(booking):
+        if period.confirmed:
+            return booking.cost
+        else:
+            base_cost = 0 if period.all_inclusive else period.booking_cost
+            return (booking.occasion.cost or 0) + (base_cost or 0)
+
     layout = BookingCollectionLayout(self, request, title)
 
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
         'attendees': attendees,
         'bookings_by_attendee': bookings_by_attendee.get,
+        'attendee_has_bookings': lambda a: a in bookings_by_attendee,
         'total_by_attendee': get_total,
         'has_bookings': bookings and True or False,
+        'booking_cost': booking_cost,
         'layout': layout,
         'model': self,
         'period': period,

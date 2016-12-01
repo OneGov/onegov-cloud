@@ -269,7 +269,7 @@
 <metal:wishlist_booking_state define-macro="wishlist_booking_state" i18n:domain="onegov.feriennet">
     <tal:block switch="state">
         <div tal:case="'cancelled'" class="state ${state}" i18n:translate>
-            Accepted
+            Cancelled
         </div>
         <div tal:case="default" class="state open" i18n:translate>
             Open

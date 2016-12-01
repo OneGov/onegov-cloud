@@ -2,8 +2,31 @@
     hide the news in the topbar
 */
 
-.top-bar-section li:last-child {
-    display: none;
+.top-bar-section {
+    ul {
+        width: 100%;
+    }
+
+    li:last-child {
+        display: none;
+    }
+}
+
+@media #{$medium-up} {
+    .is-logged-in .top-bar-section {
+        li:nth-child(2) {
+            float: right;
+
+            a {
+                background-color: $gainsboro;
+                box-shadow: 0 4px 0 $charcoal;
+            }
+
+            a:hover {
+                background-color: $iron;
+            }
+        }
+    }
 }
 
 /*
@@ -209,6 +232,7 @@ ul.tags {
 
     .hint:last-child {
         border: 0;
+        padding-bottom: 0;
     }
 }
 
@@ -498,6 +522,10 @@ ul.tags {
     }
 
     .attendee-bookings {
+        .alert-box {
+            margin-bottom: 0;
+        }
+
         h3 {
             background-color: $white-smoke;
             border: 1px solid $gainsboro;
