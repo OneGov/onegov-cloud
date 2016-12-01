@@ -143,12 +143,7 @@ class Period(Base, TimestampMixin):
             if booking.state == 'open':
                 booking.state = 'denied'
 
-            booking_cost = booking.occasion.cost or 0
-
-            if not self.all_inclusive and self.booking_cost:
-                booking_cost += self.booking_cost
-
-            booking.cost = booking_cost
+            booking.cost = booking.provisional_booking_cost(period=self)
 
     @property
     def booking_limit(self):

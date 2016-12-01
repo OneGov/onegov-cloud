@@ -137,6 +137,7 @@ class BookingCollection(GenericCollection):
                 b.state = 'blocked'
 
         booking.state = 'accepted'
+        booking.cost = booking.provisional_booking_cost()
 
     def cancel_booking(self, booking, score_function=booking_order):
         """ Cancels the given booking, setting all other bookings which

@@ -99,6 +99,23 @@ class Booking(Base, TimestampMixin):
     def starred(self):
         return self.priority != 0
 
+    def provisional_booking_cost(self, period=None):
+        """ The costs of the final booking, including the booking costs
+        of the period (if not all-inclusive).
+
+        This cost is written to the booking.cost when the period is
+        confirmed.
+
+        """
+
+        period = period or self.period
+        cost = self.occasion.cost or 0
+
+        if not period.all_inclusive and period.booking_cost:
+            cost += period.booking_cost
+
+        return cost or 0
+
     def star(self, max_stars=3):
         """ Stars the current booking (giving it a priority of 1), up to
         a limit per period and attendee.

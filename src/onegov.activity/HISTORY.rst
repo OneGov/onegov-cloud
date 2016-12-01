@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Make sure direct bookings have the correct cost set.
+  [href]
+
 0.1.2 (2016-12-01)
 ~~~~~~~~~~~~~~~~~~~
 
