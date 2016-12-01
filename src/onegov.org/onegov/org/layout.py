@@ -99,6 +99,13 @@ class Layout(ChameleonLayout):
         return page_id or 'root'
 
     @cached_property
+    def body_classes(self):
+        """ Yields a list of body classes used on the body. """
+
+        yield self.request.is_manager and 'is-manager' or 'is-not-manager'
+        yield self.request.is_logged_in and 'is-logged-in' or 'is-logged-out'
+
+    @cached_property
     def top_navigation(self):
         """ Returns a list of :class:`onegov.org.elements.Link` objects.
         Those links are used for the top navigation.
