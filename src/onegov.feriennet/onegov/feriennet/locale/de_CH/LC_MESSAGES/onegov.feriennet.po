@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-01 10:37+0100\n"
+"POT-Creation-Date: 2016-12-01 13:05+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -194,12 +194,21 @@ msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
 msgid "This occasion is already fully booked"
 msgstr "Diese Durchüfhrung ist bereits ausgebucht"
 
+msgid "The attendee already has a booking for this activity"
+msgstr "Der Teilnehmer hat bereits eine Durchführung dieses Angebots gebucht"
+
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
 
 #, python-format
 msgid "This occasion has already been booked by ${name}"
 msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
+
+#, python-format
+msgid ""
+"The attendee already has already reached the maximum number of ${count} "
+"bookings"
+msgstr "Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen"
 
 msgid "This occasion overlaps with another booking"
 msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
@@ -557,7 +566,10 @@ msgstr "Die Wunschphase wurde abgeschlossen."
 msgid ""
 "Each child is assigned up to ${count} activities. To ensure a good matching "
 "you can signup for more activities than those."
-msgstr "Jedes Kind wird in bis zu ${count} Angebote eingeteilt. Für eine gute Einteilung können Sie ihr Kind jedoch für mehr als ${count} Angebote anmelden."
+msgstr ""
+"Jedes Kind wird in bis zu ${count} Angebote eingeteilt. Für eine gute "
+"Einteilung können Sie ihr Kind jedoch für mehr als ${count} Angebote "
+"anmelden."
 
 msgid ""
 "The passport costs ${amount} CHF per child. Individual activities may incur "
@@ -854,9 +866,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "Each child is assigned up to ${count} activities."
-#~ msgstr "Jedes Kind wird in bis zu ${count} Angebote eingeteilt."
-
-#~ msgid "Each child can attend up to ${count} activities."
-#~ msgstr "Jedes Kind kann an bis zu ${count} Angeboten teilnehmen."

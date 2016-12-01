@@ -649,6 +649,55 @@ def test_enroll_child(feriennet_app):
 
     assert "zu Huckleberry Finn's Wunschliste hinzugefügt" in activity
 
+    # prevent booking over the limit
+    period = periods.query().first()
+    period.all_inclusive = True
+    period.max_bookings_per_attendee = 1
+    period.confirmed = True
+
+    retreat = activities.add("Another Retreat", username='admin@example.org')
+    retreat.propose().accept()
+    occasions.add(
+        start=datetime(2016, 10, 8, 8),
+        end=datetime(2016, 10, 9, 16),
+        age=(0, 10),
+        timezone="Europe/Zurich",
+        activity=retreat,
+        period=period
+    )
+
+    transaction.commit()
+
+    enroll = client.get('/angebot/another-retreat').click("Anmelden")
+    enroll.form.submit()
+
+    assert "maximale Anzahl von 1 Buchungen" in enroll.form.submit()
+
+    # prevent booking one activity more than once
+    period = periods.query().first()
+    period.all_inclusive = False
+    period.max_bookings_per_attendee = None
+    period.confirmed = False
+
+    occasions.add(
+        start=datetime(2016, 10, 8, 18),
+        end=datetime(2016, 10, 9, 20),
+        age=(0, 10),
+        timezone="Europe/Zurich",
+        activity=activities.by_name('another-retreat'),
+        period=period
+    )
+
+    transaction.commit()
+
+    enroll = client.get('/angebot/another-retreat').click("Anmelden", index=0)
+    enroll = enroll.form.submit()
+
+    enroll = client.get('/angebot/another-retreat').click("Anmelden", index=1)
+    enroll = enroll.form.submit()
+
+    assert "bereits eine Durchführung dieses Angebots gebucht" in enroll
+
 
 def test_booking_view(feriennet_app):
     activities = ActivityCollection(feriennet_app.session(), type='vacation')

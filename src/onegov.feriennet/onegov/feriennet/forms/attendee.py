@@ -2,6 +2,7 @@ from cached_property import cached_property
 from datetime import date
 from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
+from onegov.activity import Occasion
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.user import UserCollection
@@ -49,6 +50,12 @@ class AttendeeForm(Form):
         users = UserCollection(self.request.app.session())
         return users.by_username(self.username)
 
+    @cached_property
+    def booking_collection(self):
+        return BookingCollection(
+            session=self.request.app.session(),
+            period_id=self.model.period_id)
+
     def for_username(self, username):
         url = URL(self.action)
         url = url.query_param('username', username)
@@ -89,7 +96,8 @@ class AttendeeForm(Form):
 
     def ensure_no_duplicate_booking(self):
         if not self.is_new:
-            bookings = BookingCollection(self.request.app.session())
+            bookings = self.booking_collection
+
             query = bookings.by_occasion(self.model)
             query = query.filter(Booking.attendee_id == self.attendee.data)
 
@@ -138,11 +146,58 @@ class AttendeeForm(Form):
 
         return True
 
+    def ensure_not_over_limit(self):
+        if self.is_new:
+            return True
+
+        if self.model.period.confirmed and self.model.period.booking_limit:
+            bookings = self.booking_collection
+
+            query = bookings.query().with_entities(Booking.id)
+            query = query.filter(Booking.attendee_id == self.attendee.data)
+            count = query.count()
+
+            if count >= self.model.period.booking_limit:
+                self.attendee.errors.append(_((
+                    "The attendee already has already reached the maximum "
+                    "number of ${count} bookings"
+                ), mapping={
+                    'count': self.model.period.booking_limit
+                }))
+
+                return False
+
+        return True
+
+    def ensure_one_booking_per_activity(self):
+        if self.is_new:
+            return True
+
+        bookings = self.booking_collection
+
+        query = bookings.query().with_entities(Booking.id)
+        query = query.filter(Booking.occasion_id.in_(
+            self.request.app.session().query(Occasion.id)
+            .filter(Occasion.activity_id == self.model.activity_id)
+            .subquery()
+        ))
+        query = query.filter(Booking.attendee_id == self.attendee.data)
+
+        if query.first():
+            self.attendee.errors.append(
+                _("The attendee already has a booking for this activity")
+            )
+
+            return False
+
+        return True
+
     def ensure_no_conflict(self):
+        if self.is_new:
+            return True
+
         if self.model.period.confirmed:
-            bookings = BookingCollection(
-                session=self.request.app.session(),
-                period_id=self.model.period_id)
+            bookings = self.booking_collection
 
             query = bookings.query()
             query = query.filter(Booking.attendee_id == self.attendee.data)
@@ -167,6 +222,8 @@ class AttendeeForm(Form):
             self.ensure_no_duplicate_booking,
             self.ensure_available_spots,
             self.ensure_no_conflict,
+            self.ensure_not_over_limit,
+            self.ensure_one_booking_per_activity
         )
 
         for ensurance in ensurances:
