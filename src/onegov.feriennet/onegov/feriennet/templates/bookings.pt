@@ -11,28 +11,20 @@
             <h2>${period.title}</h2>
 
             <div class="callout panel">
-                <tal:block metal:use-macro="layout.macros.period_hints" />
+                <div class="hints">
+                    <tal:block metal:use-macro="layout.macros.period_hints" />
 
-                <div class="hint" tal:condition="period.wishlist_phase">
-                    <i class="fa fa-star fa-fw" aria-hidden="true"></i>
-                    <tal:block i18n:translate>
-                        Mark up to three occasions per child as favorites
-                    </tal:block>
-                </div>
+                    <div class="hint hint-favorites" tal:condition="period.wishlist_phase" i18n:translate>
+                        Mark up to three occasions per child as favorites.
+                    </div>
 
-                <div class="hint" tal:condition="period.wishlist_phase">
-                    <i class="fa fa-puzzle-piece fa-fw" aria-hidden="true"></i>
-                    <tal:block i18n:translate>
-                        Once the pre-booking is over, we will divide all children
-                        into activities
-                    </tal:block>
-                </div>
+                    <div class="hint hint-matching" tal:condition="period.wishlist_phase" i18n:translate>
+                        Once the pre-booking is over, we will divide all children into activities.
+                    </div>
 
-                <div class="hint" tal:condition="period.wishlist_phase">
-                    <i class="fa fa-balance-scale fa-fw" aria-hidden="true"></i>
-                    <tal:block i18n:translate>
-                        We cannot guarantee that everyone gets into their favorite activity
-                    </tal:block>
+                    <div class="hint hint-fairness" tal:condition="period.wishlist_phase" i18n:translate>
+                        We cannot guarantee that everyone gets into their favorite activity.
+                    </div>
                 </div>
             </div>
 
@@ -58,8 +50,8 @@
                                         <div class="occasion">
                                             ${layout.format_datetime_range(booking.occasion.localized_start, booking.occasion.localized_end)}
                                         </div>
-                                        <div class="cost" tal:condition="period.confirmed">
-                                            <span class="${booking.state != 'accepted' and 'strikethrough' or ''}">
+                                        <div class="cost">
+                                            <span class="${period.confirmed and booking.state != 'accepted' and 'strikethrough' or ''}">
                                                 <tal:block condition="booking.cost">
                                                     ${booking.cost}
                                                 </tal:block>

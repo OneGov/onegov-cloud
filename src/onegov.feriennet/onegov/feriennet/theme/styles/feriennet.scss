@@ -150,9 +150,52 @@ ul.tags {
 
 .hints {
     padding: 0 0 1.25rem;
+    position: relative;
 
     .hint {
-        padding-bottom: .5rem;
+        margin-left: 1.5rem;
+        padding-bottom: .25rem;
+
+        &:before {
+            display: inline-block;
+            left: 0;
+            margin-top: -1px;
+            position: absolute;
+            text-align: center;
+            width: 1rem;
+        }
+    }
+
+    .hint-prebooking:before {
+        @include icon('\f133');
+    }
+
+    .hint-max-activities:before {
+        @include icon('\f2c3');
+    }
+
+    .hint-costs:before {
+        @include icon('\f0d6');
+    }
+
+    .hint-favorites:before {
+        @include icon('\f005');
+    }
+
+    .hint-matching:before {
+        @include icon('\f12e');
+    }
+
+    .hint-fairness:before {
+        @include icon('\f24e');
+    }
+
+    .hint-happiness:before {
+        @include icon('\f118');
+    }
+
+    .hint-operability:before {
+        @include icon('\f058');
     }
 
     .hint:last-child {
@@ -160,14 +203,18 @@ ul.tags {
     }
 }
 
+.panel .hints {
+    margin: 0;
+    padding: 0;
+
+    .hint:last-child {
+        border: 0;
+    }
+}
+
 .hint {
     font-size: .875rem;
     line-height: 1.4rem;
-
-    i.fa {
-        position: relative;
-        top: -1px;
-    }
 }
 
 .inactive-occasions * {
@@ -293,14 +340,14 @@ ul.tags {
         margin: 0 0 .75rem;
 
         > div {
-            margin-left: 1.25rem;
+            margin-left: 1.5rem;
 
             &:before {
                 display: inline-block;
                 left: 1rem;
                 position: absolute;
                 text-align: center;
-                width: .625rem;
+                width: 1rem;
             }
         }
 

@@ -222,28 +222,24 @@
 
 <metal:hints define-macro="period_hints" i18n:domain="onegov.feriennet">
     <tal:block define="today layout.today()">
-        <div class="hint" tal:condition="today < period.prebooking_start">
-            <i class="fa fa-calendar-o fa-fw" aria-hidden="true"></i>
-
-            <tal:block i18n:translate>
-                Prebooking begins on <strong tal:content="layout.format_date(period.prebooking_start, 'date_long')" i18n:name="date" />
-            </tal:block>
+        <div class="hint hint-prebooking" tal:condition="today < period.prebooking_start" i18n:translate>
+            Prebooking begins on <strong tal:content="layout.format_date(period.prebooking_start, 'date_long')" i18n:name="date" />.
         </div>
 
-        <div class="hint" tal:condition="period.wishlist_phase and period.prebooking_start <= today and today <= period.prebooking_end">
-            <i class="fa fa-calendar-check-o fa-fw" aria-hidden="true"></i>
-
-            <tal:block i18n:translate>
-                Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />
-            </tal:block>
+        <div class="hint hint-prebooking" tal:condition="period.wishlist_phase and period.prebooking_start <= today and today <= period.prebooking_end" i18n:translate>
+            Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
         </div>
 
-        <div class="hint" tal:condition="today > period.prebooking_start and not period.wishlist_phase">
-            <i class="fa fa-calendar-times-o fa-fw" aria-hidden="true"></i>
+        <div class="hint hint-prebooking" tal:condition="today > period.prebooking_start and not period.wishlist_phase" i18n:translate>
+            Prebooking has ended.
+        </div>
 
-            <tal:block i18n:translate>
-                Prebooking has ended
-            </tal:block>
+        <div class="hint hint-max-activities" tal:condition="period.all_inclusive and period.max_bookings_per_attendee" i18n:translate>
+            Each child is assigned up to <tal:block i18n:name="count" tal:replace="period.max_bookings_per_attendee" /> activities. To ensure a good matching you can signup for more activities than those.
+        </div>
+
+        <div class="hint hint-costs" tal:condition="period.all_inclusive and period.booking_cost" i18n:translate>
+            The passport costs <tal:block i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
         </div>
     </tal:block>
 </metal:hints>
