@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds columns for payment/booking costs.
+  [href]
+
 - Adds the ability to limit the number of matched bookings.
   [href]
 
