@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.2 (2016-12-01)
+~~~~~~~~~~~~~~~~~~~
+
 - Attendees may no longer book multiple occasions of an activity.
   [href]
 
