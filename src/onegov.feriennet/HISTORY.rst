@@ -1,6 +1,24 @@
 Changelog
 ---------
 
+- Attendees may no longer book multiple occasions of an activity.
+  [href]
+
+- Shows the total costs on the booking view.
+  [href]
+
+- Shows the price of each booking and the cost for the activity pass.
+  [href]
+
+- Adds the ability to limit the number of bookings per attendee and period.
+  [href]
+
+- Adds the ability to set the price of a booking on the period.
+  [href]
+
+- Adds the ability to change the cost of an occasion.
+  [href]
+
 0.1.1 (2016-11-25)
 ~~~~~~~~~~~~~~~~~~~
 
