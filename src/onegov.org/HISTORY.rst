@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Update FontAwesome to 4.7.
+  [href]
+
 0.1.3 (2016-11-25)
 ~~~~~~~~~~~~~~~~~~~
 
