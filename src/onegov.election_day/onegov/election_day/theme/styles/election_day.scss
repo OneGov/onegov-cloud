@@ -376,12 +376,6 @@ table {
 .sankey-chart {
     margin-bottom: 2rem;
     margin-top: 2rem;
-
-    .link {
-      &:hover {
-        stroke-opacity: .4 !important;
-      }
-    }
 }
 
 /*

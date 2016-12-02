@@ -7,6 +7,9 @@ Changelog
 - Uses onegov.ballot 1.0.3.
   [msom]
 
+- Uses fading effects on sankey charts instead of hover.
+  [msom]
+
 1.3.5 (2016-11-23)
 ~~~~~~~~~~~~~~~~~~~
 

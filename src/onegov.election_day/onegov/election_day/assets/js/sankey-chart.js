@@ -27,10 +27,13 @@ var init_sankey_chart = function(el) {
                 .links(data.links)
                 .layout(1);
 
+            // Add the nodes <g><rect><text></g>
+            var count = 0;
             node = svg.append("g").selectAll(".node")
                 .data(data.nodes)
                 .enter().append("g")
                 .attr("class", "node")
+                .attr("id", function(d) { return 'node-' + count++; })
                 .call(
                     d3.behavior.drag()
                         .origin(function(d) { return d; })
@@ -38,20 +41,22 @@ var init_sankey_chart = function(el) {
                         .on("drag", dragmove)
                 );
 
+            // ... the bar
             var bar = node.append("rect")
                 .attr("height", function(d) { return d.dy; })
                 .attr("width", sankey.nodeWidth())
                 .style("cursor", "move")
                 .style("fill", "#999")
                 .style("shape-rendering", "crispEdges")
-                .filter(function(d) { return d.value_2 > 0; })
-                .style("fill", "#0571b0");
             bar.append("title")
-                .text(function(d) { return d.value_2; });
+                .text(function(d) { return d.value; });
+            bar.filter(function(d) { return d.active; })
+                .style("fill", "#0571b0");
 
-            node.filter(function(d) { return d.value_2 > 0; })
+            // ... the inner value of the bar
+            node.filter(function(d) { return d.display_value; })
                 .append("text")
-                .text(function(d) { return d.value_2; })
+                .text(function(d) { return d.display_value; })
                 .attr("x", 0)
                 .attr("y", function(d) { return d.dy / 2; })
                 .attr("dx", ".5em")
@@ -61,6 +66,7 @@ var init_sankey_chart = function(el) {
                 .style("fill", "#fff")
                 .style("pointer-events", "none");
 
+            // Add the node names to the left of the bars
             var name = node.filter(function(d) { return d.name; })
                 .append("text")
                 .text(function(d) { return d.name; })
@@ -78,6 +84,7 @@ var init_sankey_chart = function(el) {
 
             node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
 
+            // Add the links
             path = sankey.link(scale);
             link = svg.append("g").selectAll(".link")
                 .data(data.links)
@@ -95,6 +102,38 @@ var init_sankey_chart = function(el) {
                 sankey.relayout();
                 link.attr("d", path);
             }
+
+
+            // Fade-Effect on mouseover
+            node.on("mouseover", function(d) {
+            	link.transition()
+                    .duration(700)
+            		.style("opacity", .1);
+            	link.filter(function(s) { return d.id == s.source.id; })
+                    .transition()
+                    .duration(700)
+            		.style("opacity", 1);
+            	link.filter(function(t) { return d.id == t.target.id; })
+                    .transition()
+                    .duration(700)
+            		.style("opacity", 1);
+            });
+            node.on("mouseout", function(d) {
+                link.transition()
+                    .duration(700)
+            		.style("opacity", 1)
+            });
+            link.on("mouseover", function(d) {
+            	link.filter(function(s) { return s != d; })
+                    .transition()
+                    .duration(700)
+            		.style("opacity", .1);
+            });
+            link.on("mouseout", function(d) {
+                link.transition()
+                    .duration(700)
+            		.style("opacity", 1)
+            });
 
             var download_link = $(el).data('download-link');
             if (download_link) {
@@ -127,7 +166,6 @@ var init_sankey_chart = function(el) {
             link.attr("d", path);
         }
     });
-
 };
 
 (function($) {

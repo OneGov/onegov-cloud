@@ -21,12 +21,16 @@ def view_election_connections(self, request):
     for list_ in self.lists:
         nodes[list_.id] = {
             'name': list_.name,
-            'value_2': list_.number_of_mandates,
+            'value': list_.votes,
+            'display_value': list_.number_of_mandates or '',
+            'active': list_.number_of_mandates > 0
         }
         if list_.connection:
+            mandates = list_.connection.total_number_of_mandates
             nodes.setdefault(list_.connection.id, {
                 'name': '',
-                'value_2': list_.connection.total_number_of_mandates,
+                'display_value': mandates or '',
+                'active': mandates > 0
             })
             links.append({
                 'source': list(nodes.keys()).index(list_.id),
@@ -37,19 +41,28 @@ def view_election_connections(self, request):
     # Add remaining connections
     for connection in self.list_connections:
         if connection.parent:
+            mandates = connection.total_number_of_mandates
             nodes.setdefault(connection.id, {
                 'name': '',
-                'value_2': connection.total_number_of_mandates,
+                'display_value': mandates or '',
+                'active': mandates > 0
             })
+            mandates = connection.parent.total_number_of_mandates
             nodes.setdefault(connection.parent.id, {
                 'name': '',
-                'value_2': connection.parent.total_number_of_mandates,
+                'display_value': mandates or '',
+                'active': mandates > 0
             })
             links.append({
                 'source': list(nodes.keys()).index(connection.id),
                 'target': list(nodes.keys()).index(connection.parent.id),
                 'value': connection.votes
             })
+
+    count = 0
+    for key in nodes.keys():
+        count = count + 1
+        nodes[key]['id'] = count
 
     return {
         'nodes': list(nodes.values()),
