@@ -38,99 +38,101 @@ var init_bar_chart = function(el) {
 
     $.ajax({ url: dataurl }).done(function(data) {
 
-        svg.attr('height', 24 * data.results.length);
+        if (data.results) {
 
-        line = svg.selectAll('g')
-            .data(data.results)
-            .enter().append('g')
-            .attr('class', 'line')
-            .attr('transform', function(d, i) {
-              return 'translate(0,' + i * 24 + ')';
+            svg.attr('height', 24 * data.results.length);
+
+            line = svg.selectAll('g')
+                .data(data.results)
+                .enter().append('g')
+                .attr('class', 'line')
+                .attr('transform', function(d, i) {
+                  return 'translate(0,' + i * 24 + ')';
+                });
+
+            var name = line.append('text')
+                .attr('y', 24 / 2)
+                .attr('dy', '4')
+                .attr('class', 'name')
+                .text(function(d) { return d.text; })
+                .style("font-size", "14px")
+                .style("font-family", "sans-serif")
+                .style("text-anchor", "end");
+
+            offset = d3.max(name[0], function(d) {
+                return d.getBBox().width;
             });
 
-        var name = line.append('text')
-            .attr('y', 24 / 2)
-            .attr('dy', '4')
-            .attr('class', 'name')
-            .text(function(d) { return d.text; })
-            .style("font-size", "14px")
-            .style("font-family", "sans-serif")
-            .style("text-anchor", "end");
+            name.attr('x', offset);
 
-        offset = d3.max(name[0], function(d) {
-            return d.getBBox().width;
-        });
+            scale.domain([0, d3.max(data.results, function(d) { return d.value; })])
+                 .range([0, width - offset]);
 
-        name.attr('x', offset);
+            bar = line.append('rect')
+                .attr('x', offset + 5)
+                .attr('width', function(d) { return scale(d.value); })
+                .attr('height', 24 - 2)
+                .attr('class', function(d) {
+                    return 'bar ' + d.class;
+                })
+                .style("fill", "#999");
 
-        scale.domain([0, d3.max(data.results, function(d) { return d.value; })])
-             .range([0, width - offset]);
+            bar.filter(function(d) { return d.class == "active"; })
+                .style("fill", "#0571b0");
 
-        bar = line.append('rect')
-            .attr('x', offset + 5)
-            .attr('width', function(d) { return scale(d.value); })
-            .attr('height', 24 - 2)
-            .attr('class', function(d) {
-                return 'bar ' + d.class;
-            })
-            .style("fill", "#999");
+            label = line.append('g')
+                .attr('transform', function(d) {
+                  return 'translate(' + (offset + scale(d.value)) + ',16)';
+                })
+                .attr('class', 'label');
 
-        bar.filter(function(d) { return d.class == "active"; })
-            .style("fill", "#0571b0");
+            label.append('text')
+                .attr('dx', -3)
+                .attr('class', 'left')
+                .text(function(d) { return label_text(d); })
+                .style("font-size", "12px")
+                .style("font-family", "sans-serif")
+                .style("text-anchor", "end")
+                .style("fill", "#FFF");
+            label.append('text')
+                .attr('dx', 8)
+                .attr('class', 'right')
+                .text(function(d) { return label_text(d); })
+                .style("font-size", "12px")
+                .style("font-family", "sans-serif")
+                .style("fill", "#999");
 
-        label = line.append('g')
-            .attr('transform', function(d) {
-              return 'translate(' + (offset + scale(d.value)) + ',16)';
-            })
-            .attr('class', 'label');
+            update_labels(line);
 
-        label.append('text')
-            .attr('dx', -3)
-            .attr('class', 'left')
-            .text(function(d) { return label_text(d); })
-            .style("font-size", "12px")
-            .style("font-family", "sans-serif")
-            .style("text-anchor", "end")
-            .style("fill", "#FFF");
-        label.append('text')
-            .attr('dx', 8)
-            .attr('class', 'right')
-            .text(function(d) { return label_text(d); })
-            .style("font-size", "12px")
-            .style("font-family", "sans-serif")
-            .style("fill", "#999");
+            if (data.majority) {
+                majority = data.majority;
+                majority_line = svg.append("line")
+                    .attr("x1", offset + 5 + scale(majority))
+                    .attr("x2", offset + 5 + scale(majority))
+                    .attr("y1", 0)
+                    .attr("y2", 24 * data.results.length)
+                    .attr("stroke-width", 3)
+                    .attr("stroke", "black")
+                    .style("stroke-dasharray", ("4, 4"));
+            }
 
-        update_labels(line);
+            var download_link = $(el).data('download-link');
+            if (download_link) {
+                append_svg_download_link(el, $(el).html(), data.title, download_link);
+            }
 
-        if (data.majority) {
-            majority = data.majority;
-            majority_line = svg.append("line")
-                .attr("x1", offset + 5 + scale(majority))
-                .attr("x2", offset + 5 + scale(majority))
-                .attr("y1", 0)
-                .attr("y2", 24 * data.results.length)
-                .attr("stroke-width", 3)
-                .attr("stroke", "black")
-                .style("stroke-dasharray", ("4, 4"));
+            var embed_link = $(el).data('embed-link');
+            var embed_source = $(el).data('embed-source');
+            if (embed_link && embed_source) {
+                append_embed_code(el, '100%', 24 * data.results.length + 50, embed_source, embed_link);
+            }
+
+            if ($(el).is('.foldable.folded .foldable-svg-panel .bar-chart')) {
+                $(el).closest('.foldable-svg-panel').each(function() {
+                    $(this).hide();
+                });
+            }
         }
-
-        var download_link = $(el).data('download-link');
-        if (download_link) {
-            append_svg_download_link(el, $(el).html(), data.title, download_link);
-        }
-
-        var embed_link = $(el).data('embed-link');
-        var embed_source = $(el).data('embed-source');
-        if (embed_link && embed_source) {
-            append_embed_code(el, '100%', 24 * data.results.length + 50, embed_source, embed_link);
-        }
-
-        if ($(el).is('.foldable.folded .foldable-svg-panel .bar-chart')) {
-            $(el).closest('.foldable-svg-panel').each(function() {
-                $(this).hide();
-            });
-        }
-
     });
 
     d3.select(window).on('resize.barchart', function() {
