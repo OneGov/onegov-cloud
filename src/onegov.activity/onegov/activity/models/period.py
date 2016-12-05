@@ -191,3 +191,16 @@ class Period(Base, TimestampMixin):
     @property
     def archive_phase(self):
         return self.phase == 'archive'
+
+    @property
+    def scoring(self):
+        # circular import
+        from onegov.activity.matching.score import Scoring
+
+        return Scoring.from_settings(
+            settings=self.data.get('match-settings', {}),
+            session=object_session(self))
+
+    @scoring.setter
+    def scoring(self, scoring):
+        self.data['match-settings'] = scoring.settings

@@ -16,6 +16,40 @@ class Scoring(object):
     def __call__(self, booking):
         return sum(criterium(booking) for criterium in self.criteria)
 
+    @classmethod
+    def from_settings(cls, settings, session):
+        scoring = cls()
+
+        if settings.get('prefer_in_age_bracket'):
+            scoring.criteria.append(
+                PreferInAgeBracket.from_session(session))
+
+        if settings.get('prefer_organiser'):
+            scoring.criteria.append(
+                PreferOrganiserChildren.from_session(session))
+
+        if settings.get('prefer_admins'):
+            scoring.criteria.append(
+                PreferAdminChildren.from_session(session))
+
+        return scoring
+
+    @property
+    def settings(self):
+        classes = {c.__class__ for c in self.criteria}
+        settings = {}
+
+        if PreferInAgeBracket in classes:
+            settings['prefer_in_age_bracket'] = True
+
+        if PreferOrganiserChildren in classes:
+            settings['prefer_organiser'] = True
+
+        if PreferAdminChildren in classes:
+            settings['prefer_admins'] = True
+
+        return settings
+
 
 class PreferMotivated(object):
     """ Scores "motivated" bookings higher. A motivated booking is simply a

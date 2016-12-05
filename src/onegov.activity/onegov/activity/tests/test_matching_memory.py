@@ -8,6 +8,7 @@ from onegov.activity.matching import PreferAdminChildren
 from onegov.activity.matching import PreferInAgeBracket
 from onegov.activity.matching import PreferMotivated
 from onegov.activity.matching import PreferOrganiserChildren
+from onegov.activity.matching import Scoring
 from onegov.core.utils import Bunch
 
 
@@ -266,6 +267,34 @@ def test_prefer_association_children():
 
     is_association_child = False
     assert association_child_score(None) == 0.0
+
+
+def test_serialize_scoring(session):
+
+    scoring = Scoring()
+    assert scoring.settings == {}
+
+    scoring.criteria.append(PreferInAgeBracket.from_session(session))
+    assert scoring.settings == {
+        'prefer_in_age_bracket': True
+    }
+
+    scoring.criteria.append(PreferOrganiserChildren.from_session(session))
+    assert scoring.settings == {
+        'prefer_in_age_bracket': True,
+        'prefer_organiser': True
+    }
+
+    scoring.criteria.append(PreferAdminChildren.from_session(session))
+    assert scoring.settings == {
+        'prefer_in_age_bracket': True,
+        'prefer_organiser': True,
+        'prefer_admins': True
+    }
+
+    scoring = Scoring.from_settings(scoring.settings, session)
+
+    assert len(scoring.criteria) == 4
 
 
 def test_booking_limit():
