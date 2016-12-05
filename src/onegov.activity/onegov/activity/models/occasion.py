@@ -16,7 +16,7 @@ from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, object_session
 from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
@@ -82,6 +82,9 @@ class Occasion(Base, TimestampMixin):
     #: The period this occasion belongs to
     period_id = Column(
         UUID, ForeignKey("periods.id", use_alter=True), nullable=False)
+
+    #: True if the occasion has been cancelled
+    cancelled = Column(Boolean, nullable=False, default=False)
 
     @aggregated('period', Column(Boolean, default=False))
     def active(self):
@@ -168,9 +171,23 @@ class Occasion(Base, TimestampMixin):
         return func.extract('epoch', self.end - self.start)
 
     def cancel(self):
-        assert self.state in ('active', 'cancelled')
-        self.state == 'cancelled'
+        from onegov.activity.collections import BookingCollection
 
-    def archive(self):
-        assert self.state in ('active', 'cancelled', 'archived')
-        self.state == 'archived'
+        assert not self.cancelled
+        period = self.period
+
+        if not period.confirmed:
+            def cancel(booking):
+                booking.state = 'cancelled'
+        else:
+            bookings = BookingCollection(object_session(self))
+            scoring = period.scoring
+
+            def cancel(booking):
+                bookings.cancel_booking(booking, scoring)
+
+        for booking in self.bookings:
+            assert booking.period_id == period.id
+            cancel(booking)
+
+        self.cancelled = True

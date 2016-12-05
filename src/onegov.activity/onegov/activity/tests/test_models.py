@@ -1245,13 +1245,6 @@ def test_cancel_booking(session, owner):
     periods.active().confirmed = True
     transaction.commit()
 
-    # only works for accepted bookings
-    with pytest.raises(RuntimeError) as e:
-        bookings.cancel_booking(bookings.add(owner, a1, o1))
-
-    assert "Only accepted bookings can be cancelled" in str(e)
-    transaction.abort()
-
     # cancelling a booking will automatically accept the blocked ones
     # (this is run after matching, so we want to make sure the matching
     # is kept tight, with no unnecessarily open/denied bookings)
@@ -1518,3 +1511,75 @@ def test_confirm_period(session, owner):
     period.confirm()
 
     assert bookings.query().one().cost == 20.0
+
+
+def test_cancel_occasion(session, owner):
+
+    activities = ActivityCollection(session)
+    attendees = AttendeeCollection(session)
+    periods = PeriodCollection(session)
+    occasions = OccasionCollection(session)
+    bookings = BookingCollection(session)
+
+    period = periods.add(
+        title="Autumn 2016",
+        prebooking=(datetime(2016, 9, 1), datetime(2016, 9, 30)),
+        execution=(datetime(2016, 10, 1), datetime(2016, 10, 31)),
+        active=True)
+
+    o1 = occasions.add(
+        start=datetime(2016, 10, 4, 10),
+        end=datetime(2016, 10, 4, 12),
+        timezone="Europe/Zurich",
+        activity=activities.add("Sport", username=owner.username),
+        period=period,
+        spots=(0, 2))
+
+    o2 = occasions.add(
+        start=datetime(2016, 10, 4, 10),
+        end=datetime(2016, 10, 4, 12),
+        timezone="Europe/Zurich",
+        activity=activities.add("Science", username=owner.username),
+        period=period,
+        spots=(0, 2))
+
+    a1 = attendees.add(
+        user=owner,
+        name="Dustin Henderson",
+        birth_date=date(2000, 1, 1))
+
+    a2 = attendees.add(
+        user=owner,
+        name="Mike Wheeler",
+        birth_date=date(2000, 1, 1))
+
+    transaction.commit()
+
+    o1, o2 = occasions.query().all()
+
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a2, o1)
+
+    o1.cancel()
+    assert b1.state == 'cancelled'
+    assert b2.state == 'cancelled'
+    assert o1.cancelled
+    assert not o2.cancelled
+
+    transaction.abort()
+
+    periods.active().confirmed = True
+    o1, o2 = occasions.query().all()
+
+    b1 = bookings.add(owner, a1, o1)
+    b2 = bookings.add(owner, a1, o2)
+
+    b1.state = 'accepted'
+    b2.state = 'blocked'
+
+    o1.cancel()
+
+    assert b1.state == 'cancelled'
+    assert b2.state == 'accepted'
+    assert o1.cancelled
+    assert not o2.cancelled

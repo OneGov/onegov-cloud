@@ -146,3 +146,16 @@ def add_payment_model_columns(context):
     context.operations.add_column('bookings', Column(
         'cost', Numeric(precision=8, scale=2), nullable=True
     ))
+
+
+@upgrade_task('Add cancelled flag to occasion')
+def add_cancelled_flag_to_occasion(context):
+    context.operations.add_column('occasions', Column(
+        'cancelled', Boolean, nullable=True
+    ))
+
+    for occasion in context.session.query(Occasion):
+        occasion.cancelled = False
+
+    context.session.flush()
+    context.operations.alter_column('occasions', 'cancelled', nullable=False)

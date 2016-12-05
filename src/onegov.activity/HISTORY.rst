@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to cancel an occasion.
+  [href]
+
 - Make sure direct bookings have the correct cost set.
   [href]
 

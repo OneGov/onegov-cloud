@@ -167,8 +167,10 @@ class BookingCollection(GenericCollection):
         if not booking.period.confirmed:
             raise RuntimeError("The period has not yet been confirmed")
 
+        # if the booking wasn't accepted there's no extra work
         if booking.state != 'accepted':
-            raise RuntimeError("Only accepted bookings can be cancelled")
+            booking.state = 'cancelled'
+            return
 
         bookings = tuple(
             self.session.query(Booking)
