@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to cancel, reactivate and delete occasions.
+  [href]
+
 0.1.2 (2016-12-01)
 ~~~~~~~~~~~~~~~~~~~
 

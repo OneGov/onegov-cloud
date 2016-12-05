@@ -1092,3 +1092,91 @@ def test_direct_booking_and_storno(feriennet_app):
     page = member.get(other_url.replace('member@', 'admin@'))
     assert "Für <strong>admin@example.org</strong>" not in page
     assert "Mike" in page
+
+
+def test_cancel_occasion(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+    period.confirmed = True
+
+    member = UserCollection(feriennet_app.session()).add(
+        'member@example.org', 'hunter2', 'member')
+
+    foobar = activities.add("Foobar", username='admin@example.org')
+    foobar.propose().accept()
+
+    occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        age=(0, 10),
+        spots=(0, 1),
+        timezone="Europe/Zurich",
+        activity=foobar,
+        period=period
+    )
+
+    attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    attendees.add(member, 'Mike', date(2000, 1, 1))
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+    client.login_admin()
+
+    page = client.get('/angebot/foobar')
+    assert "L&#246;schen" in page
+    assert "Absagen" not in page
+    assert "Reaktivieren" not in page
+
+    page.click('Anmelden').form.submit()
+    assert "Angenommen" in client.get('/buchungen')
+
+    page = client.get('/angebot/foobar')
+    assert "L&#246;schen" not in page
+    assert "Absagen" in page
+    assert "Reaktivieren" not in page
+
+    client.post(get_post_url(page, 'confirm'))
+    assert "Storniert" in client.get('/buchungen')
+
+    page = client.get('/angebot/foobar')
+    assert "L&#246;schen" not in page
+    assert "Absagen" not in page
+    assert "Reaktivieren" in page
+
+    client.post(get_post_url(page, 'confirm'))
+    assert "Storniert" in client.get('/buchungen')
+
+    page = client.get('/angebot/foobar')
+    assert "L&#246;schen" not in page
+    assert "Absagen" in page
+    assert "Reaktivieren" not in page
+
+    client.delete(get_delete_link(client.get('/buchungen')))
+    page = client.get('/angebot/foobar')
+    assert "L&#246;schen" in page
+    assert "Absagen" not in page
+    assert "Reaktivieren" not in page
+
+    client.delete(get_delete_link(page))

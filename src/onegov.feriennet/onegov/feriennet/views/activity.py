@@ -1,4 +1,5 @@
 from itertools import groupby
+from onegov.activity import Booking
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
@@ -15,7 +16,7 @@ from onegov.feriennet.layout import VacationActivityCollectionLayout
 from onegov.feriennet.layout import VacationActivityFormLayout
 from onegov.feriennet.layout import VacationActivityLayout
 from onegov.feriennet.models import VacationActivity
-from onegov.org.elements import Link, DeleteLink
+from onegov.org.elements import Link, ConfirmLink, DeleteLink
 from onegov.org.mail import send_html_mail
 from onegov.ticket import TicketCollection
 from sqlalchemy import desc
@@ -139,7 +140,8 @@ def view_activities(self, request):
     permission=Public)
 def view_activity(self, request):
 
-    ticket = TicketCollection(request.app.session()).by_handler_id(self.id.hex)
+    session = request.app.session()
+    ticket = TicketCollection(session).by_handler_id(self.id.hex)
     layout = VacationActivityLayout(self, request)
 
     occasion_links = (
@@ -158,6 +160,72 @@ def view_activity(self, request):
         )
     )
 
+    occasion_ids = {o.id for o in self.occasions}
+    occasion_ids_with_bookings = occasion_ids and {
+        b.occasion_id for b in session.query(Booking)
+        .with_entities(Booking.occasion_id)
+        .filter(Booking.occasion_id.in_(occasion_ids))
+    } or set()
+
+    def occasion_links(o):
+        yield Link(text=_("Edit"), url=request.link(o, name='bearbeiten'))
+
+        title = layout.format_datetime_range(
+            o.localized_start,
+            o.localized_end
+        )
+
+        if o.cancelled:
+            yield ConfirmLink(
+                text=_("Reinstate"),
+                url=layout.csrf_protected_url(
+                    request.link(o, name='reinstate')
+                ),
+                confirm=_((
+                    'Do you really want to reinstate "${title}"?'
+                ), mapping={
+                    'title': title
+                }),
+                extra_information=_("Previous attendees need to re-apply"),
+                redirect_after=request.link(self),
+                yes_button_text=_("Reinstate Occasion"),
+                classes=('confirm', )
+            )
+        elif o.id in occasion_ids_with_bookings:
+            yield ConfirmLink(
+                text=_("Rescind"),
+                url=layout.csrf_protected_url(request.link(o, name='cancel')),
+                confirm=_((
+                    'Do you really want to rescind "${title}"?'
+                ), mapping={
+                    'title': title
+                }),
+                extra_information=_((
+                    "${count} already accepted bookings will be cancelled"
+                ), mapping={
+                    'count': o.attendee_count
+                }),
+                redirect_after=request.link(self),
+                yes_button_text=_("Rescind Occasion"),
+                classes=('confirm', )
+            )
+        else:
+            yield DeleteLink(
+                text=_("Delete"),
+                url=layout.csrf_protected_url(request.link(o)),
+                confirm=_('Do you really want to delete "${title}"?', mapping={
+                    'title': title
+                }),
+                extra_information=_((
+                    "There are no accepted bookings associated with this "
+                    "occasion, though there might be cancelled/blocked "
+                    "bookings which will be deleted."
+                )),
+                redirect_after=request.link(self),
+                yes_button_text=_("Delete Occasion"),
+                classes=('confirm', )
+            )
+
     def age_bracket(age):
         if 13 <= age.lower:
             return 'teenager'
@@ -173,7 +241,7 @@ def view_activity(self, request):
         'ticket': ticket,
         'occasion_links': occasion_links,
         'occasions_by_period': occasions_by_period(
-            session=request.app.session(),
+            session=session,
             activity=self,
             active_only=not request.is_organiser
         ),

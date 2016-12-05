@@ -83,6 +83,28 @@ def delete_occasion(self, request):
     OccasionCollection(request.app.session()).delete(self)
 
 
+@FeriennetApp.view(
+    model=Occasion,
+    permission=Private,
+    request_method='POST',
+    name='cancel')
+def cancel_occasion(self, request):
+    request.assert_valid_csrf_token()
+
+    self.cancel()
+
+
+@FeriennetApp.view(
+    model=Occasion,
+    permission=Private,
+    request_method='POST',
+    name='reinstate')
+def reinstate_occasion(self, request):
+    request.assert_valid_csrf_token()
+
+    self.cancelled = False
+
+
 @FeriennetApp.form(
     model=Occasion,
     form=AttendeeForm,

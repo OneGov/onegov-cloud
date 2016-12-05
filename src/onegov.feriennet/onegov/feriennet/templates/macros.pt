@@ -115,11 +115,15 @@
             <!--! the width of this column together with the next one doesn't add up to 12 by
             intention to make space for the icons rendered ::before the first column. -->
             <div class="small-12 medium-4 columns factoids">
-                <div class="full" tal:condition="show_stats and occasion.full">
+                <div class="full" tal:condition="show_stats and not occasion.cancelled and occasion.full">
                     <span i18n:translate>Fully booked</span>
                 </div>
 
-                <div class="available-spots" tal:condition="show_stats and not occasion.full">
+                <div class="full" tal:condition="show_stats and occasion.cancelled">
+                    <span i18n:translate>Rescinded</span>
+                </div>
+
+                <div class="available-spots" tal:condition="show_stats and not occasion.cancelled and not occasion.full">
                     <span i18n:translate><tal:block i18n:name="count" replace="occasion.available_spots" /> spots available</span>
                 </div>
 
@@ -177,8 +181,8 @@
                 </div>
 
                 <div class="text-links" tal:condition="show_links and (request.is_admin or layout.is_owner)">
-                    <tal:block repeat="link occasion_links">
-                        <tal:block replace="structure link(occasion)(request)" />
+                    <tal:block repeat="link occasion_links(occasion)">
+                        <tal:block replace="structure link(request)" />
                     </tal:block>
                 </div>
             </div>
@@ -187,7 +191,7 @@
             </div>
         </div>
 
-        <div class="call-to-action" tal:condition="show_enroll and occasion.active and (period.wishlist_phase or not occasion.full)">
+        <div class="call-to-action" tal:condition="show_enroll and occasion.active and not occasion.cancelled and (period.wishlist_phase or not occasion.full)">
             <tal:block switch="age_bracket(occasion.age)">
                 <span tal:case="'young'" i18n:translate>
                     Enroll your young child now.
