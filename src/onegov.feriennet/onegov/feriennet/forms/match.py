@@ -1,5 +1,8 @@
+from onegov.activity.matching.score import PreferAdminChildren
+from onegov.activity.matching.score import PreferInAgeBracket
+from onegov.activity.matching.score import PreferOrganiserChildren
+from onegov.activity.matching.score import Scoring
 from onegov.feriennet import _
-from onegov.feriennet.utils import scoring_from_match_settings
 from onegov.form import Form
 from wtforms.fields import BooleanField, RadioField
 
@@ -37,27 +40,28 @@ class MatchForm(Form):
     )
 
     def scoring(self, session):
-        return scoring_from_match_settings(session, self.match_settings)
+        scoring = Scoring()
+
+        if self.prefer_in_age_bracket.data:
+            scoring.criteria.append(
+                PreferInAgeBracket.from_session(session))
+
+        if self.prefer_organiser.data:
+            scoring.criteria.append(
+                PreferOrganiserChildren.from_session(session))
+
+        if self.prefer_admins.data:
+            scoring.criteria.append(
+                PreferAdminChildren.from_session(session))
+
+        return scoring
 
     @property
     def confirm_period(self):
         return self.confirm.data == 'yes' and self.sure.data is True
 
-    @property
-    def match_settings(self):
-        return {
-            k: v for k, v in self.data.items() if k not in (
-                'csrf_token',
-                'confirm',
-                'sure',
-            )
-        }
-
-    def store_to_period(self, period):
-        period.data['match-settings'] = self.match_settings
-
-    def load_from_period(self, period):
-        if 'match-settings' in period.data:
-            for key, value in period.data['match-settings'].items():
-                if hasattr(self, key):
-                    getattr(self, key).data = value
+    def process_scoring(self, scoring):
+        classes = {criterium.__class__ for criterium in scoring.criteria}
+        self.prefer_in_age_bracket.data = PreferInAgeBracket in classes
+        self.prefer_organiser.data = PreferOrganiserChildren in classes
+        self.prefer_admins.data = PreferAdminChildren in classes

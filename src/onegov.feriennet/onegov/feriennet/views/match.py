@@ -24,7 +24,7 @@ def handle_matches(self, request, form):
             period_id=self.period_id,
             score_function=form.scoring(request.app.session()))
 
-        form.store_to_period(self.period)
+        self.period.scoring = form.scoring(request.app.session())
 
         if form.confirm_period:
             self.period.confirm()
@@ -33,7 +33,7 @@ def handle_matches(self, request, form):
             request.success(_("The matching run executed successfully"))
 
     elif not request.POST:
-        form.load_from_period(self.period)
+        form.process_scoring(self.period.scoring)
 
     def activity_link(oid):
         return request.class_link(Occasion, {'id': oid})

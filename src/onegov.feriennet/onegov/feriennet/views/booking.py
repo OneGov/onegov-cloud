@@ -13,7 +13,6 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
-from onegov.feriennet.utils import scoring_from_match_settings
 from onegov.org.elements import ConfirmLink, DeleteLink
 from onegov.user import UserCollection, User
 from sqlalchemy.orm import contains_eager
@@ -243,10 +242,7 @@ def cancel_booking(self, request):
     request.assert_valid_csrf_token()
     BookingCollection(request.app.session()).cancel_booking(
         booking=self,
-        score_function=scoring_from_match_settings(
-            session=request.app.session(),
-            match_settings=self.period.data.get('match-settings')
-        ))
+        score_function=self.period.scoring)
 
     request.success(_("Your booking was cancelled successfully"))
 
