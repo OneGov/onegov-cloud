@@ -230,7 +230,7 @@
             Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
         </div>
 
-        <div class="hint hint-prebooking" tal:condition="today > period.prebooking_start and not period.wishlist_phase" i18n:translate>
+        <div class="hint hint-prebooking" tal:condition="today > period.prebooking_end or not period.wishlist_phase" i18n:translate>
             Prebooking has ended.
         </div>
 
