@@ -959,7 +959,7 @@ def test_confirmed_booking_view(feriennet_app):
 
     transaction.commit()
 
-    page = client.get('/buchungen')
+    page = client.get('/meine-buchungen')
     assert "Offen" in page
     assert "Stornieren" not in page
     assert "Entfernen" in page
@@ -971,7 +971,7 @@ def test_confirmed_booking_view(feriennet_app):
 
     transaction.commit()
 
-    page = client.get('/buchungen')
+    page = client.get('/meine-buchungen')
     assert "Angenommen" in page
     assert "Stornieren" in page
     assert "Entfernen" not in page
@@ -988,7 +988,7 @@ def test_confirmed_booking_view(feriennet_app):
         bookings.query().one().state = state
         transaction.commit()
 
-        assert text in client.get('/buchungen')
+        assert text in client.get('/meine-buchungen')
 
     # If there are not enough attendees, show a warning
     periods.query().one().confirmed = True
@@ -997,7 +997,7 @@ def test_confirmed_booking_view(feriennet_app):
 
     transaction.commit()
 
-    page = client.get('/buchungen')
+    page = client.get('/meine-buchungen')
     assert "nicht genügend Teilnehmer" in page
 
 
@@ -1073,7 +1073,7 @@ def test_direct_booking_and_storno(feriennet_app):
     assert "bereits für diese Durchführung angemeldet" in page
 
     # cancel the booking
-    page = client.get('/buchungen')
+    page = client.get('/meine-buchungen')
     client.post(get_post_url(page, 'confirm'))
 
     page = client.get('/angebot/foobar')
@@ -1150,7 +1150,7 @@ def test_cancel_occasion(feriennet_app):
     assert "Reaktivieren" not in page
 
     page.click('Anmelden').form.submit()
-    assert "Angenommen" in client.get('/buchungen')
+    assert "Angenommen" in client.get('/meine-buchungen')
 
     page = client.get('/angebot/foobar')
     assert "L&#246;schen" not in page
@@ -1158,7 +1158,7 @@ def test_cancel_occasion(feriennet_app):
     assert "Reaktivieren" not in page
 
     client.post(get_post_url(page, 'confirm'))
-    assert "Storniert" in client.get('/buchungen')
+    assert "Storniert" in client.get('/meine-buchungen')
 
     page = client.get('/angebot/foobar')
     assert "L&#246;schen" not in page
@@ -1166,14 +1166,14 @@ def test_cancel_occasion(feriennet_app):
     assert "Reaktivieren" in page
 
     client.post(get_post_url(page, 'confirm'))
-    assert "Storniert" in client.get('/buchungen')
+    assert "Storniert" in client.get('/meine-buchungen')
 
     page = client.get('/angebot/foobar')
     assert "L&#246;schen" not in page
     assert "Absagen" in page
     assert "Reaktivieren" not in page
 
-    client.delete(get_delete_link(client.get('/buchungen')))
+    client.delete(get_delete_link(client.get('/meine-buchungen')))
     page = client.get('/angebot/foobar')
     assert "L&#246;schen" in page
     assert "Absagen" not in page

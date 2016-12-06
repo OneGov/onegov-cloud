@@ -101,13 +101,23 @@
                 <div class="page-content-panel matching-panel">
                     <h4 i18n:translate>Automatic Matching</h4>
 
-                    <tal:block condition="period.wishlist_phase">
+                    <tal:block condition="period.active and period.wishlist_phase">
                         <div metal:use-macro="layout.macros['form']" />
                         <a ic-post-to="${request.link(model, 'zuruecksetzen')}" redirect-after="${request.link(model)}" i18n:translate class="reset-matching">
                             Reset Matching
                         </a>
                     </tal:block>
-                    <tal:block condition="not:period.wishlist_phase">
+
+                    <tal:block condition="not period.active">
+                        <p>
+                            <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
+                            <span i18n:translate>
+                                This period is not active. Only the active period may be matched.
+                            </span>
+                        </p>
+                    </tal:block>
+
+                    <tal:block condition="period.active and not period.wishlist_phase">
                         <p>
                             <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
                             <span i18n:translate>
@@ -116,6 +126,8 @@
                         </p>
                     </tal:block>
                 </div>
+
+                <tal:block metal:use-macro="layout.macros.periods" />
             </div>
         </div>
     </tal:block>

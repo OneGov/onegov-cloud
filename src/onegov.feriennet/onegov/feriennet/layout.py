@@ -2,6 +2,7 @@ from cached_property import cached_property
 from onegov.activity import Activity, PeriodCollection, Period
 from onegov.feriennet import _
 from onegov.feriennet import security
+from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
@@ -52,6 +53,14 @@ class VacationActivityCollectionLayout(DefaultLayout):
                         text=_("Matching"),
                         url=self.request.class_link(MatchCollection),
                         classes=('manage-matches', )
+                    )
+                )
+
+                links.append(
+                    Link(
+                        text=_("Billing"),
+                        url=self.request.class_link(BillingCollection),
+                        classes=('manage-billing', )
                     )
                 )
 
@@ -247,4 +256,18 @@ class MatchCollectionLayout(DefaultLayout):
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(_("Matches"), '#')
+        )
+
+
+class BillingCollectionLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(_("Billing"), '#')
         )

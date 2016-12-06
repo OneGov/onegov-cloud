@@ -7,17 +7,16 @@ from sqlalchemy import func, literal_column, not_, distinct
 
 class MatchCollection(object):
 
-    def __init__(self, session, period, username):
+    def __init__(self, session, period):
         self.session = session
         self.period = period
-        self.username = username
 
     @property
     def period_id(self):
         return self.period.id
 
     def for_period(self, period):
-        return self.__class__(self.session, period, self.username)
+        return self.__class__(self.session, period)
 
     @property
     def base(self):
@@ -35,9 +34,6 @@ class MatchCollection(object):
             Attendee.age.label('attendee_age')
         )
         q = q.filter(Booking.period_id == self.period.id)
-
-        if self.username:
-            q = q.filter(Activity.username == self.username)
 
         q = q.order_by(Activity.name)
         q = q.order_by(Occasion.start)

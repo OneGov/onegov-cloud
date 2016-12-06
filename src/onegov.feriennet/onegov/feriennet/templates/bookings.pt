@@ -105,17 +105,7 @@
             </div>
         </div>
 
-        <div class="row other-periods" tal:condition="len(periods) > 1">
-            <div class="columns small-12">
-                <h2 i18n:translate>Periods</h2>
-                <ul>
-                    <li tal:repeat="p periods">
-                        <a tal:condition="p.id != period.id" href="${request.link(model.for_period(p))}">${p.title}</a>
-                        <strong tal:condition="p.id == period.id" href="${request.link(model.for_period(p))}">${p.title}</strong>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <tal:block metal:use-macro="layout.macros.periods" />
 
         <div class="row other-users" tal:condition="request.is_admin and users">
             <div class="columns small-12">

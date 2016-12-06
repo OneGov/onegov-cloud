@@ -96,6 +96,7 @@ svg #background {
     .run-matching:before { @include icon('\f0d0'); }
     .reset-matching:before { @include icon('\f12d'); }
     .manage-matches:before { @include icon('\f24e'); }
+    .manage-billing:before { @include icon('\f155'); }
 }
 
 /*

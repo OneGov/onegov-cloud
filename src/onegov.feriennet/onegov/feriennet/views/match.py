@@ -5,6 +5,7 @@ from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.forms import MatchForm
 from onegov.feriennet.layout import MatchCollectionLayout
+from onegov.feriennet.views.shared import all_periods
 
 
 @FeriennetApp.form(
@@ -48,6 +49,7 @@ def handle_matches(self, request, form):
         'happiness': '{}%'.format(round(self.happiness * 100)),
         'operability': '{}%'.format(round(self.operability * 100)),
         'period': self.period,
+        'periods': all_periods(request),
         'form': form,
         'button_text': _("Run Matching"),
         'model': self

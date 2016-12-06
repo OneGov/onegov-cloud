@@ -234,7 +234,7 @@
             Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
         </div>
 
-        <div class="hint hint-prebooking" tal:condition="today > period.prebooking_end or not period.wishlist_phase" i18n:translate>
+        <div class="hint hint-prebooking" tal:condition="today > period.prebooking_end or (period.prebooking_start <= today and not period.wishlist_phase)" i18n:translate>
             Prebooking has ended.
         </div>
 
@@ -280,3 +280,18 @@
         </div>
     </tal:block>
 </metal:wishlist_booking_state>
+
+
+<metal:periods define-macro="periods" i18n:domain="onegov.feriennet">
+    <div class="row other-periods" tal:condition="len(periods) > 1">
+        <div class="columns small-12">
+            <h2 i18n:translate>Periods</h2>
+            <ul>
+                <li tal:repeat="p periods">
+                    <a tal:condition="p.id != period.id" href="${request.link(model.for_period(p))}">${p.title}</a>
+                    <strong tal:condition="p.id == period.id" href="${request.link(model.for_period(p))}">${p.title}</strong>
+                </li>
+            </ul>
+        </div>
+    </div>
+</metal:periods>

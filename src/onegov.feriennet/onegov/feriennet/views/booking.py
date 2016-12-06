@@ -6,13 +6,12 @@ from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
 from onegov.activity import BookingCollection
 from onegov.activity import Occasion
-from onegov.activity import Period
-from onegov.activity import PeriodCollection
 from onegov.core.security import Personal
 from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
+from onegov.feriennet.views.shared import all_periods
 from onegov.org.elements import ConfirmLink, DeleteLink
 from onegov.user import UserCollection, User
 from sqlalchemy.orm import contains_eager
@@ -49,12 +48,6 @@ def all_users(request):
     u = UserCollection(request.app.session()).query()
     u = u.order_by(User.title)
     return u.all()
-
-
-def all_periods(request):
-    p = PeriodCollection(request.app.session()).query()
-    p = p.order_by(Period.execution_start)
-    return p.all()
 
 
 def group_bookings_by_attendee(bookings):

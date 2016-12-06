@@ -2,6 +2,7 @@ from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
 from onegov.feriennet import FeriennetApp
+from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.converters import age_range_converter
@@ -74,7 +75,7 @@ def get_period(request, app, id):
 
 @FeriennetApp.path(
     model=BookingCollection,
-    path='/buchungen',
+    path='/meine-buchungen',
     converters=dict(period_id=UUID))
 def get_my_bookings(request, app, period_id=None, username=None):
     # only admins can actually specify the username
@@ -108,12 +109,7 @@ def get_booking(request, app, id):
     model=MatchCollection,
     path='/zuteilungen',
     converters=dict(period_id=UUID))
-def get_matches(request, app, period_id, username=None):
-    # non-admins are limited to the ativites they own, admins may view
-    # all the occasions (this differs slighty from the booking collection path)
-    if not request.is_admin:
-        username = request.current_username
-
+def get_matches(request, app, period_id):
     # the default period is the active period or the first we can find
     periods = PeriodCollection(app.session())
 
@@ -125,4 +121,23 @@ def get_matches(request, app, period_id, username=None):
     if not period:
         return None
 
-    return MatchCollection(app.session(), period, username)
+    return MatchCollection(app.session(), period)
+
+
+@FeriennetApp.path(
+    model=BillingCollection,
+    path='/rechnungen',
+    converters=dict(period_id=UUID))
+def get_billing(request, app, period_id):
+    # the default period is the active period or the first we can find
+    periods = PeriodCollection(app.session())
+
+    if not period_id:
+        period = periods.active() or periods.query().first()
+    else:
+        period = periods.by_id(period_id)
+
+    if not period:
+        return None
+
+    return BillingCollection(app.session(), period)
