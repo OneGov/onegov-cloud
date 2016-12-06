@@ -118,7 +118,7 @@ def wrap_with_generic_form_handler(obj, form_class):
         _class = fetch_form_class(form_class, self, request)
 
         if _class:
-            form = request.get_form(_class)
+            form = request.get_form(_class, model=self)
             form.action = request.url
         else:
             form = None

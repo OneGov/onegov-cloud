@@ -429,10 +429,14 @@ def test_get_form():
     @App.form(model=Root, form=PlainForm, name='plain')
     def view_get_plain(self, request, form):
         return form.called and 'called' or 'not-called'
+        assert form.model is self
+        assert form.request is request
 
     @App.form(model=Root, form=OnRequestForm, name='on-request')
     def view_get_on_request(self, request, form):
         return form.called and 'called' or 'not-called'
+        assert form.model is self
+        assert form.request is request
 
     App.commit()
 

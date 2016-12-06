@@ -250,8 +250,8 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
             on_dirty=on_dirty
         )
 
-    def get_form(self, form_class,
-                 i18n_support=True, csrf_support=True, data=None):
+    def get_form(self, form_class, i18n_support=True, csrf_support=True,
+                 data=None, model=None):
         """ Returns an instance of the given form class, set up with the
         correct translator and with CSRF protection enabled (the latter
         doesn't work yet).
@@ -283,6 +283,7 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
 
         assert not hasattr(form, 'request')
         form.request = self
+        form.model = model
 
         if hasattr(form, 'on_request'):
             form.on_request()
