@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.33.0 (2016-12-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the model to the form object created by the form directive.
   [href]
