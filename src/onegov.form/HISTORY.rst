@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Adds the ability to define ensure_* functions on forms which get called
+  automatically by the validate function.
+  [href]
+
 0.15.2 (2016-10-10)
 ~~~~~~~~~~~~~~~~~~~
 

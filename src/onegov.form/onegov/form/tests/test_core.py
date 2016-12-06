@@ -373,3 +373,43 @@ def test_delete_fields():
     assert form.one is None
     assert form.two is None
     assert len(form.fieldsets) == 1
+
+
+def test_ensurances():
+
+    class EnsuredForm(Form):
+        foo = StringField('foo')
+        bar = StringField('bar')
+
+        ensure_foo_and_bar_called = 0
+        ensure_foo_or_bar_called = 0
+
+        @property
+        def ensure_not_triggered(self):
+            assert False
+
+        def ensure_foo_and_bar(self):
+            self.ensure_foo_and_bar_called += 1
+
+            if not (self.foo.data and self.bar.data):
+                return False
+
+        def ensure_foo_or_bar(self):
+            self.ensure_foo_or_bar_called += 1
+
+            if not (self.foo.data or self.bar.data):
+                return False
+
+    form = EnsuredForm()
+
+    assert not form.validate()
+    assert form.ensure_foo_and_bar_called == 1
+    assert form.ensure_foo_or_bar_called == 1
+
+    form.foo.data = 'foo'
+    form.bar.data = 'bar'
+
+    assert form.validate()
+
+    assert form.ensure_foo_and_bar_called == 2
+    assert form.ensure_foo_or_bar_called == 2

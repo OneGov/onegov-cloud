@@ -327,6 +327,53 @@ class Form(BaseForm):
 
         del self[fieldname]
 
+    def validate(self):
+        """ Adds support for 'ensurances' to the form. An ensurance is a
+        method which is called during validation when all the fields have
+        been populated. Therefore it is a good place to validate against
+        multiple fields.
+
+        All methods which start with 'ensure_' are ensurances. If and only if
+        an ensurance returns False it is considered to have failed. In this
+        case the validate method returns False as well. If None or '' or
+        any other falsy value is returned, no error is assumed! This avoids
+        having to return an extra True at the end of each ensurance.
+
+        When one ensurance fails, the others are still run. Also, there's no
+        error display mechanism. Showing an error is left to the ensurance
+        itself. It can do so by adding messages to the various error lists
+        of the form or by showing an alert through the request.
+
+        """
+        result = super().validate()
+
+        for ensurance in self.ensurances:
+            if ensurance() is False:
+                result = False
+
+        return result
+
+    @property
+    def ensurances(self):
+        """ Returns the ensurances that need to be checked when validating.
+
+        This property may be overridden if only a subset of all ensurances
+        should actually be enforced.
+
+        """
+
+        # inspect.getmembers is no good here as it triggers the properties
+        for name in dir(self):
+            if name.startswith('ensure_'):
+
+                if isinstance(getattr(type(self), name), property):
+                    continue
+
+                member = getattr(self, name)
+
+                if callable(member):
+                    yield member
+
 
 class Fieldset(object):
     """ Defines a fieldset with a list of fields. """
