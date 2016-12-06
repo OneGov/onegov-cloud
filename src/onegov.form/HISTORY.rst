@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.16.0 (2016-12-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to define ensure_* functions on forms which get called
   automatically by the validate function.
