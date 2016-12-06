@@ -92,8 +92,6 @@ class AttendeeForm(Form):
 
                 return False
 
-        return True
-
     def ensure_no_duplicate_booking(self):
         if not self.is_new:
             bookings = self.booking_collection
@@ -111,16 +109,12 @@ class AttendeeForm(Form):
 
                 return False
 
-        return True
-
     def ensure_active_period(self):
         if not self.model.period.active:
             self.attendee.errors.append(_(
                 "This occasion is outside the currently active period"
             ))
             return False
-
-        return True
 
     def ensure_within_prebooking_period(self):
         start, end = (
@@ -135,16 +129,12 @@ class AttendeeForm(Form):
             ))
             return False
 
-        return True
-
     def ensure_available_spots(self):
         if self.model.full and not self.model.period.wishlist_phase:
             self.attendee.errors.append(_(
                 "This occasion is already fully booked"
             ))
             return False
-
-        return True
 
     def ensure_not_over_limit(self):
         if self.is_new:
@@ -167,8 +157,6 @@ class AttendeeForm(Form):
 
                 return False
 
-        return True
-
     def ensure_one_booking_per_activity(self):
         if self.is_new:
             return True
@@ -190,13 +178,8 @@ class AttendeeForm(Form):
 
             return False
 
-        return True
-
     def ensure_no_conflict(self):
-        if self.is_new:
-            return True
-
-        if self.model.period.confirmed:
+        if not self.is_new and self.model.period.confirmed:
             bookings = self.booking_collection
 
             query = bookings.query()
@@ -209,25 +192,3 @@ class AttendeeForm(Form):
                         "This occasion overlaps with another booking"
                     ))
                     return False
-
-        return True
-
-    def validate(self):
-        result = super().validate()
-
-        ensurances = (
-            self.ensure_active_period,
-            self.ensure_within_prebooking_period,
-            self.ensure_no_duplicate_child,
-            self.ensure_no_duplicate_booking,
-            self.ensure_available_spots,
-            self.ensure_no_conflict,
-            self.ensure_not_over_limit,
-            self.ensure_one_booking_per_activity
-        )
-
-        for ensurance in ensurances:
-            if not ensurance():
-                result = False
-
-        return result

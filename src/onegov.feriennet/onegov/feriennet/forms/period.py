@@ -120,15 +120,6 @@ class PeriodForm(Form):
 
     @cached_property
     def conflicting_activites(self):
-        # the model needs to be set on the form before using it - one might
-        # be tempted to use a hidden field, but that might give the user the
-        # ability to change the period id
-        #
-        # XXX add a general way to attach the model to a form if necessary
-        #
-        # The model may be None, (for example in a new-period form)
-        assert hasattr(self, 'model')
-
         if not isinstance(self.model, Period):
             return None
 
@@ -165,8 +156,6 @@ class PeriodForm(Form):
             self.execution_end.errors.append(msg)
             return False
 
-        return True
-
     def ensure_valid_daterange_periods(self):
         fields = (
             self.prebooking_start,
@@ -190,10 +179,8 @@ class PeriodForm(Form):
 
             stack.append(field)
 
-        return True
-
     def ensure_no_payment_changes_after_confirmation(self):
-        if self.model and self.model.confirmed:
+        if isinstance(self.model, Period) and self.model.confirmed:
             preview = Bunch()
             self.populate_obj(preview)
 
@@ -210,20 +197,3 @@ class PeriodForm(Form):
                         "settings since the period has already been confirmed"
                     ))
                     return False
-
-        return True
-
-    def validate(self):
-        result = super().validate()
-
-        ensurances = (
-            self.ensure_valid_daterange_periods,
-            self.ensure_no_occasion_conflicts,
-            self.ensure_no_payment_changes_after_confirmation
-        )
-
-        for ensurance in ensurances:
-            if not ensurance():
-                result = False
-
-        return result

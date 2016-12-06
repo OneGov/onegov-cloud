@@ -113,9 +113,6 @@ def reinstate_occasion(self, request):
     template='enroll_form.pt')
 def book_occasion(self, request, form):
 
-    # pass the form model for extended validation if data was posted
-    form.model = request.POST and self or None
-
     if form.submitted(request):
         attendees = AttendeeCollection(request.app.session())
         user = form.user
