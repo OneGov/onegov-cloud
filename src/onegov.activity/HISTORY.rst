@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an 'outstanding' property to the invoice item collection.
+  [href]
+
 - Adds the ability to cancel an occasion.
   [href]
 

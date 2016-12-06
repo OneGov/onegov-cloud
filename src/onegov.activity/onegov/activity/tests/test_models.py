@@ -1445,6 +1445,9 @@ def test_invoice_items(session, owner):
     assert items.for_invoice("asdf").total is None
     assert items.total == 270.5
 
+    items.query().first().paid = True
+    assert items.outstanding == 270.5 - 100.0
+
 
 def test_confirm_period(session, owner):
 

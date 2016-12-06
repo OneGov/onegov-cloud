@@ -31,7 +31,7 @@ class InvoiceItem(Base, TimestampMixin):
     text = Column(Text, nullable=False)
 
     #: true if paid
-    paid = Column(Boolean, nullable=False, default=True)
+    paid = Column(Boolean, nullable=False, default=False)
 
     #: the transaction id if paid online
     tid = Column(Text, nullable=True)

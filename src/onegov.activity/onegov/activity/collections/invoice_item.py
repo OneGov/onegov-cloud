@@ -38,6 +38,14 @@ class InvoiceItemCollection(GenericCollection):
 
         return q.scalar()
 
+    @property
+    def outstanding(self):
+        q = self.query()
+        q = q.filter(InvoiceItem.paid == False)
+        q = q.with_entities(func.sum(InvoiceItem.amount))
+
+        return q.scalar()
+
     def add(self, user, invoice, group, text, unit, quantity):
         if isinstance(user, str):
             username = user
