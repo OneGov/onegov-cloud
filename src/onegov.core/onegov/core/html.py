@@ -62,5 +62,6 @@ def sanitize_svg(svg):
     assert 'javascript:' not in svg
     assert 'CDATA' not in svg
     assert '<script>' not in svg
+    assert 'Set-Cookie' not in svg
 
     return svg

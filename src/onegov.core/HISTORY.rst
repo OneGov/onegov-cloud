@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Disallow cookies in svg resources.
+  [href]
+
 0.33.0 (2016-12-06)
 ~~~~~~~~~~~~~~~~~~~
 

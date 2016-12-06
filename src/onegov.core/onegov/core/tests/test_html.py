@@ -19,3 +19,6 @@ def test_sanitize_svg():
 
     with pytest.raises(AssertionError):
         assert sanitize_svg('<script>')
+
+    with pytest.raises(AssertionError):
+        assert sanitize_svg("<meta http-equiv='Set-Cookie' content='a=b' />")
