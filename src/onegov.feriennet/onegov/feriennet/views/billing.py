@@ -20,6 +20,11 @@ def all_periods(request):
 def view_billing(self, request, form):
     layout = BillingCollectionLayout(self, request)
 
+    if form.submitted(request):
+        self.create_invoices(
+            all_inclusive_booking_text=request.translate(_("Passport"))
+        )
+
     return {
         'layout': layout,
         'title': _("Billing for ${title}", mapping={

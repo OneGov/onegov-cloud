@@ -9,11 +9,11 @@
                 <tal:block metal:use-macro="layout.macros.period_hints" />
 
                 <div class="hint hint-costs" i18n:translate tal:condition="bills">
-                    The total amount is <strong tal:content="total" i18n:name="amount" /> CHF.
+                    The total amount is <strong tal:content="'{:.2f}'.format(total)" i18n:name="amount" /> CHF.
                 </div>
 
                 <div class="hint hint-outstanding" i18n:translate tal:condition="bills">
-                    The outstanding amount is <strong tal:content="outstanding" i18n:name="amount" /> CHF.
+                    The outstanding amount is <strong tal:content="'{:.2f}'.format(outstanding)" i18n:name="amount" /> CHF.
                 </div>
             </div>
         </div>
