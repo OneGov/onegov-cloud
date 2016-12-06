@@ -1,5 +1,6 @@
 from cached_property import cached_property
-from onegov.activity import Period, PeriodCollection, OccasionCollection
+from onegov.activity import Period, PeriodCollection
+from onegov.activity import Occasion, OccasionCollection
 from onegov.feriennet import _
 from onegov.form import Form
 from sedate import replace_timezone
@@ -121,30 +122,32 @@ class OccasionForm(Form):
     def on_request(self):
         self.setup_period_choices()
 
-    def validate(self):
-        result = super().validate()
-
+    def ensure_end_date_after_start_date(self):
         if self.start.data and self.end.data:
             if self.start.data > self.end.data:
                 self.end.errors.append(_(
                     "The end date must be after the start date"
                 ))
-                result = False
+                return False
 
+    def ensure_max_age_after_min_age(self):
         if self.min_age.data and self.max_age.data:
             if self.min_age.data > self.max_age.data:
                 self.min_age.errors.append(_(
                     "The minium age cannot be higher than the maximum age"
                 ))
-                result = False
+                return False
 
+    def ensure_max_spots_after_min_spots(self):
         if self.min_spots.data and self.max_spots.data:
             if self.min_spots.data > self.max_spots.data:
                 self.min_spots.errors.append(_(
                     "The minium number of participants cannot be higher "
                     "than the maximum number of participants"
                 ))
-                result = False
+                return False
+
+    def ensure_inside_selected_period(self):
 
         if self.selected_period and self.start.data and self.end.data:
             execution_start = self.selected_period.execution_start
@@ -156,15 +159,22 @@ class OccasionForm(Form):
                 self.start.errors.append(_(
                     "The date is outside the selected period"
                 ))
-                result = False
+                return False
 
             if end < execution_start or execution_end < end:
                 self.end.errors.append(_(
                     "The date is outside the selected period"
                 ))
-                result = False
+                return False
 
-        return result
+    def ensure_max_spots_higher_than_accepted_bookings(self):
+        if isinstance(self.model, Occasion):
+            if len(self.model.accepted) > self.max_spots.data:
+                self.max_spots.errors.append(_(
+                    "The maximum number of spots is lower than the number "
+                    "of already accepted bookings."
+                ))
+                return False
 
     def populate_obj(self, model):
         super().populate_obj(model, exclude={

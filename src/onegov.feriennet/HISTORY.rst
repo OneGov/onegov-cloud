@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures that the number of spots on an occasion cannot be lower than
+  the number of already accepted bookings.
+
 - Adds the ability to cancel, reactivate and delete occasions.
   [href]
 

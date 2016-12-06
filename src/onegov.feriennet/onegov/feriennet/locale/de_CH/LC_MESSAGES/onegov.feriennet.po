@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-05 14:37+0100\n"
+"POT-Creation-Date: 2016-12-06 10:08+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -287,6 +287,11 @@ msgstr ""
 
 msgid "The date is outside the selected period"
 msgstr "Das Datum liegt ausserhalb der gewählten Periode"
+
+msgid ""
+"The maximum number of spots is lower than the number of already accepted "
+"bookings."
+msgstr "Die Anzahl Plätze ist tiefer als die Anzahl bereits angenommener Buchungen."
 
 #, python-format
 msgid "Ferienpass Summer ${year}"
@@ -768,7 +773,10 @@ msgstr "Durchführung Absagen"
 msgid ""
 "There are no accepted bookings associated with this occasion, though there "
 "might be cancelled/blocked bookings which will be deleted."
-msgstr "Es existieren keine angenommenen Buchungen zu dieser Duchrführung, aber es ist möglich dass abgesagte/blockierte Buchungen bestehen. Diese werden gelöscht."
+msgstr ""
+"Es existieren keine angenommenen Buchungen zu dieser Duchrführung, aber es "
+"ist möglich dass abgesagte/blockierte Buchungen bestehen. Diese werden "
+"gelöscht."
 
 msgid "Your booking was cancelled successfully"
 msgstr "Ihre Buchung wurde erfolgreich storniert"
