@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-06 13:24+0100\n"
+"POT-Creation-Date: 2016-12-06 14:52+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -216,6 +216,19 @@ msgstr "Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen"
 msgid "This occasion overlaps with another booking"
 msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
 
+msgid "Confirm billing:"
+msgstr "Fakturierung bestätigen:"
+
+msgid "I know that this stops all changes including cancellations."
+msgstr ""
+"Mir ist bewusst dass danach keine Buchungsänderungen mehr möglich sind."
+
+msgid "No, preview only"
+msgstr "Nein, nur Vorschau"
+
+msgid "Yes, confirm billing"
+msgstr "Ja, Fakturierung abschliessen"
+
 msgid "Children in the right age"
 msgstr "Kinder im passenden Alter"
 
@@ -233,9 +246,6 @@ msgstr "Zuteilung abschliessen:"
 
 msgid "I know the wishlist-phase ends as a result."
 msgstr "Mir ist bewusst dass die Wunschphase damit endet."
-
-msgid "No, preview only"
-msgstr "Nein, nur Vorschau"
 
 msgid "Yes, confirm matching"
 msgstr "Ja, Zuteilung abschliessen"
@@ -464,8 +474,26 @@ msgstr "Durchführungen"
 msgid "There are currently no occasions planned."
 msgstr "Es sind zur Zeit keine Durchführungen geplant."
 
+msgid "The total amount is ${amount} CHF."
+msgstr "Der Totalbetrag beläuft sich auf ${amount} CHF."
+
+msgid "The outstanding amount is ${amount} CHF."
+msgstr "Der ausstehende Betrag beläuft sich auf ${amount} CHF."
+
 msgid "No bills created yet."
 msgstr "Es wurden noch keine Rechnungen erstellt."
+
+msgid "The matching of this period has not been confirmed yet."
+msgstr "Die Zuteilung dieser Periode wurde noch nicht bestätigt."
+
+msgid ""
+"This period is not active. Bills may only be created for the active period."
+msgstr "Diese Periode ist inaktive. Rechnungen können nur für aktive Perioden erstellt werden."
+
+msgid ""
+"The billing for this period has been confirmed. You can still change the "
+"invoices manually but you can no longer generate them automatically."
+msgstr "Die Fakturierung für diese Periode wurde abgeschlossen. Sie können die Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
 
 msgid "No bookings in ${period}."
 msgstr "Keine Buchungen in ${period}."
@@ -793,6 +821,9 @@ msgstr ""
 #, python-format
 msgid "Billing for ${title}"
 msgstr "Fakturierung für ${title}"
+
+msgid "Create Bills"
+msgstr "Rechnungen Erstellen"
 
 msgid "Your booking was cancelled successfully"
 msgstr "Ihre Buchung wurde erfolgreich storniert"

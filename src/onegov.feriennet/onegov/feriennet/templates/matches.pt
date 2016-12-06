@@ -98,7 +98,7 @@
                 </tal:block>
             </div>
             <div class="columns small-12 medium-4">
-                <div class="page-content-panel matching-panel">
+                <div class="page-content-panel form-panel">
                     <h4 i18n:translate>Automatic Matching</h4>
 
                     <tal:block condition="period.active and period.wishlist_phase">
@@ -108,7 +108,7 @@
                         </a>
                     </tal:block>
 
-                    <tal:block condition="not period.active">
+                    <tal:block condition="not period.active and not period.confirmed">
                         <p>
                             <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
                             <span i18n:translate>
@@ -117,7 +117,7 @@
                         </p>
                     </tal:block>
 
-                    <tal:block condition="period.active and not period.wishlist_phase">
+                    <tal:block condition="period.confirmed">
                         <p>
                             <i class="fa fa-lock fa-fw" aria-hidden="true"></i>
                             <span i18n:translate>

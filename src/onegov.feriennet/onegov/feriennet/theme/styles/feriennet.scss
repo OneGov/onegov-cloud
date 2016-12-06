@@ -190,37 +190,15 @@ ul.tags {
         }
     }
 
-    .hint-prebooking:before {
-        @include icon('\f133');
-    }
-
-    .hint-max-activities:before {
-        @include icon('\f2c3');
-    }
-
-    .hint-costs:before {
-        @include icon('\f0d6');
-    }
-
-    .hint-favorites:before {
-        @include icon('\f005');
-    }
-
-    .hint-matching:before {
-        @include icon('\f12e');
-    }
-
-    .hint-fairness:before {
-        @include icon('\f24e');
-    }
-
-    .hint-happiness:before {
-        @include icon('\f118');
-    }
-
-    .hint-operability:before {
-        @include icon('\f058');
-    }
+    .hint-prebooking:before { @include icon('\f133'); }
+    .hint-max-activities:before { @include icon('\f2c3'); }
+    .hint-costs:before { @include icon('\f0d6'); }
+    .hint-favorites:before { @include icon('\f005'); }
+    .hint-matching:before { @include icon('\f12e'); }
+    .hint-fairness:before { @include icon('\f24e'); }
+    .hint-happiness:before { @include icon('\f118'); }
+    .hint-operability:before { @include icon('\f058'); }
+    .hint-outstanding:before { @include icon('\f200'); }
 
     .hint:last-child {
         @include hairline();
@@ -678,9 +656,9 @@ ul.tags {
 
 
 /*
-    Matches
+    Form panel on the right
 */
-.matching-panel {
+.form-panel {
     form {
         #confirm {
             margin-bottom: .5rem;
@@ -691,6 +669,10 @@ ul.tags {
             margin: 0 0 .5rem;
             padding: 0;
             text-align: left;
+        }
+
+        input[type="submit"] {
+            margin-bottom: 0;
         }
 
         fieldset {
@@ -707,6 +689,10 @@ ul.tags {
         .field-sure label {
             margin: 0 0 .5rem;
         }
+
+        + a {
+            padding-top: 1rem;
+        }
     }
 
     a {
@@ -718,6 +704,10 @@ ul.tags {
         margin: 0;
     }
 }
+
+/*
+    Matching view
+*/
 
 .matched-occasion {
     margin-bottom: 1rem;
