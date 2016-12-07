@@ -897,6 +897,7 @@ ul.tags {
 
         td:nth-child(2),
         th:nth-child(2) {
+            font-family: $font-family-monospace;
             text-align: right;
         }
 
@@ -909,7 +910,7 @@ ul.tags {
 
     &.paid {
         background-color: $green-pastel;
-        border: 1px solid $green;
+        border: 1px solid $green-pastel;
 
         > * {
             color: $green-dark;
@@ -921,13 +922,20 @@ ul.tags {
 
         button {
             background-color: $green-light;
-            color: $green-dark;
+            color: $white;
+            outline: 1px solid $green-light;
+        }
+
+        button.toggled,
+        button:hover {
+            background-color: $green-dark;
+            outline: 1px solid $green-dark;
         }
     }
 
     &.unpaid {
         background-color: $red-pastel;
-        border: 1px solid $red;
+        border: 1px solid $red-pastel;
         
         > * {
             color: $red-dark;
@@ -939,7 +947,14 @@ ul.tags {
 
         button {
             background-color: $red-light;
-            color: $red-dark;
+            color: $white;
+            outline: 1px solid $red-light;
+        }
+
+        button.toggled,
+        button:hover {
+            background-color: $red-dark;
+            outline: 1px solid $red-dark;
         }
     }
 
