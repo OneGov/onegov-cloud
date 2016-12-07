@@ -33,7 +33,7 @@
                         </button>
 
                         <table id="details-${details.index}" class="invoice-items" style="display: none;">
-                            <thead>
+                            <thead class="show-for-sr">
                                 <tr>
                                     <th i18n:translate>Booking Text</th>
                                     <th i18n:translate>Amount</th>
@@ -47,10 +47,6 @@
                                     <tr tal:repeat="item items">
                                         <td>${item.text}</td>
                                         <td>${'{:.2f}'.format(item.amount)}</td>
-                                    </tr>
-                                    <tr class="total">
-                                        <td i18n:translate>Total</td>
-                                        <td>${'{:.2f}'.format(details.total)}</td>
                                     </tr>
                                 </tal:block>
                             </tbody>

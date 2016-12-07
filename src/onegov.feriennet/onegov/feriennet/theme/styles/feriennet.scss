@@ -834,3 +834,123 @@ ul.tags {
         top: 0;
     }
 }
+
+/*
+    Billing View
+*/
+.bill {
+    border-radius: 2px;
+    margin-bottom: 1rem;
+    padding: 0;
+    position: relative;
+
+    h3 {
+        color: $red-dark;
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+        margin: .5rem .25rem .5rem .75rem;
+    }
+
+    button {
+        float: right;
+        height: 40px;
+        margin: 0;
+        padding: .25rem;
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 40px;
+    }
+
+    table {
+        margin: 1px 0 0;
+        position: relative;
+        width: 100%;
+
+        tr {
+            background-color: transparent;
+
+            &:hover {
+                background-color: $yellow-pastel !important;
+            }
+        }
+
+        td {
+            border: 0;
+            padding-bottom: .25rem;
+            padding-top: .25rem;
+        }
+
+        .group td {
+            padding-bottom: .75rem;
+            padding-top: .75rem;
+        }
+
+        &:after {
+            content: ' ';
+            display: block;
+            height: .75rem;
+            width: 100%;
+        }
+
+        td:nth-child(2),
+        th:nth-child(2) {
+            text-align: right;
+        }
+
+        .group td:first-child {
+            font-weight: bold;
+            text-decoration: underline;
+            text-decoration-color: $body-font-color;
+        }
+    }
+
+    &.paid {
+        background-color: $green-pastel;
+        border: 1px solid $green;
+
+        > * {
+            color: $green-dark;
+        }
+
+        > .total:before {
+            @include icon('\f05d');
+        }
+
+        button {
+            background-color: $green-light;
+            color: $green-dark;
+        }
+    }
+
+    &.unpaid {
+        background-color: $red-pastel;
+        border: 1px solid $red;
+        
+        > * {
+            color: $red-dark;
+        }
+
+        > .total:before {
+            @include icon('\f071');
+        }
+
+        button {
+            background-color: $red-light;
+            color: $red-dark;
+        }
+    }
+
+    > .total {
+        float: right;
+        line-height: 1.5rem;
+        margin: .5rem calc(48px + .5rem) .5rem 0;
+
+        &:before {
+            font-weight: normal;
+            margin-right: .5ex;
+        }
+    }
+}
