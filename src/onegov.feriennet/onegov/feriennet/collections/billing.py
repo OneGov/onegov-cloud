@@ -122,25 +122,34 @@ class BillingCollection(object):
             Booking.occasion_id,
             Booking.attendee_id,
         )
+        q = q.filter(Booking.state == 'accepted')
+
+        # keep track of the attendees which have at least one booking (even
+        # if said booking is free)
+        actual_attendees = set()
 
         for booking in q:
-            session.add(InvoiceItem(
-                username=booking.username,
-                invoice=invoice,
-                group=attendees[booking.attendee_id][0],
-                text=activities[booking.occasion_id],
-                unit=booking.cost,
-                quantity=1
-            ))
+            actual_attendees.add(booking.attendee_id)
+
+            if booking.cost:
+                session.add(InvoiceItem(
+                    username=booking.username,
+                    invoice=invoice,
+                    group=attendees[booking.attendee_id][0],
+                    text=activities[booking.occasion_id],
+                    unit=booking.cost,
+                    quantity=1
+                ))
 
         # add the all inclusive booking costs if necessary
         if period.all_inclusive and period.booking_cost:
-            for attendee, username in attendees.values():
-                session.add(InvoiceItem(
-                    username=username,
-                    invoice=invoice,
-                    group=attendee,
-                    text=activities[booking.occasion_id],
-                    unit=period.booking_cost,
-                    quantity=1
-                ))
+            for id, (attendee, username) in attendees.items():
+                if id in actual_attendees:
+                    session.add(InvoiceItem(
+                        username=username,
+                        invoice=invoice,
+                        group=attendee,
+                        text=all_inclusive_booking_text,
+                        unit=period.booking_cost,
+                        quantity=1
+                    ))
