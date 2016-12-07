@@ -1,8 +1,12 @@
-from collections import OrderedDict
-from itertools import groupby
+from collections import OrderedDict, namedtuple
 from decimal import Decimal
+from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion, InvoiceItem
 from onegov.activity import BookingCollection, InvoiceItemCollection
+from onegov.user import User
+
+
+Details = namedtuple('Details', ('index', 'items', 'paid', 'total', 'title'))
 
 
 class BillingCollection(object):
@@ -23,6 +27,33 @@ class BillingCollection(object):
     def for_period(self, period):
         return self.__class__(self.session, period)
 
+    def details(self, index, title, items):
+
+        total = Decimal("0.0")
+        paid = True
+
+        def tally(item):
+            nonlocal total, paid
+            total += item.amount
+
+            if paid and not item.paid:
+                paid = False
+
+            return item
+
+        items = {
+            group: tuple(groupitems) for group, groupitems
+            in groupby((tally(i) for i in items), lambda i: i.group)
+        }
+
+        return Details(
+            index=index,
+            items=items,
+            paid=paid,
+            total=total,
+            title=title,
+        )
+
     @property
     def bills(self):
         q = self.invoice_items.query()
@@ -34,8 +65,13 @@ class BillingCollection(object):
 
         bills = OrderedDict()
 
-        for username, items in groupby(q, lambda i: i.username):
-            bills[username] = tuple(items)
+        titles = {
+            user.username: user.realname or user.username
+            for user in self.session.query(User.username, User.realname)
+        }
+
+        for ix, (user, items) in enumerate(groupby(q, lambda i: i.username)):
+            bills[user] = self.details(ix, titles[user], items)
 
         return bills
 

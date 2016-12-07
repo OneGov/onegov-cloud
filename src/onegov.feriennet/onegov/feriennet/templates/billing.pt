@@ -21,6 +21,42 @@
         <div class="row">
             <div class="columns small-12 medium-8">
                 <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
+
+                <div class="bills">
+                    <div class="bill ${details.paid and 'paid' or 'unpaid'}" tal:repeat="(username, details) bills.items()">
+                        <h3>${details.title}</h3>
+                        <strong class="total">${'{:.2f}'.format(details.total)}</strong>
+
+                        <button id="button-${details.index}" data-toggle="#details-${details.index}" class="untoggled">
+                            <span i18n:translate class="show-for-sr">Show Details</span>
+                            <i class="fa fa-angle-double-down" aria-hidden="true"></i>
+                        </button>
+
+                        <table id="details-${details.index}" class="invoice-items" style="display: none;">
+                            <thead>
+                                <tr>
+                                    <th i18n:translate>Booking Text</th>
+                                    <th i18n:translate>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tal:block repeat="(group, items) details.items.items()">
+                                    <tr class="group">
+                                        <td colspan="2">${group}</td>
+                                    </tr>
+                                    <tr tal:repeat="item items">
+                                        <td>${item.text}</td>
+                                        <td>${'{:.2f}'.format(item.amount)}</td>
+                                    </tr>
+                                    <tr class="total">
+                                        <td i18n:translate>Total</td>
+                                        <td>${'{:.2f}'.format(details.total)}</td>
+                                    </tr>
+                                </tal:block>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <div class="columns small-12 medium-4">
                 <div class="page-content-panel form-panel">
