@@ -3,7 +3,9 @@ from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion, InvoiceItem
 from onegov.activity import BookingCollection, InvoiceItemCollection
+from onegov.core.utils import normalize_for_url
 from onegov.user import User
+from sortedcontainers import SortedDict
 
 
 Details = namedtuple('Details', ('index', 'items', 'paid', 'total', 'title'))
@@ -63,12 +65,15 @@ class BillingCollection(object):
             InvoiceItem.text
         )
 
-        bills = OrderedDict()
+        titles = OrderedDict(
+            (user.username, user.realname or user.username) for user
+            in self.session.query(User.username, User.realname).order_by(
+                User.title
+            )
+        )
 
-        titles = {
-            user.username: user.realname or user.username
-            for user in self.session.query(User.username, User.realname)
-        }
+        bills = SortedDict(
+            lambda username: normalize_for_url(titles[username]))
 
         for ix, (user, items) in enumerate(groupby(q, lambda i: i.username)):
             bills[user] = self.details(ix, titles[user], items)
