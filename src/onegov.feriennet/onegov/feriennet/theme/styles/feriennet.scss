@@ -883,29 +883,54 @@ ul.tags {
             padding-top: .25rem;
         }
 
+        .total td,
         .group td {
             padding-bottom: .75rem;
             padding-top: .75rem;
         }
 
-        &:after {
-            content: ' ';
-            display: block;
-            height: .75rem;
-            width: 100%;
+        .actions {
+            width: 1%;
         }
 
-        td:nth-child(2),
-        th:nth-child(2) {
+        .amount {
             font-family: $font-family-monospace;
             padding-top: .5rem;
             text-align: right;
         }
 
+        .total .amount {
+            padding-top: 1rem;
+        }
+
+        .circle.button {
+            background-color: $yellow-pastel;
+            border: 1px solid $yellow;
+            border-radius: 100px;
+            color: $body-font-color;
+            float: right;
+            font-size: 12px;
+            height: 24px;
+            line-height: 12px;
+            margin: 0;
+            padding: 5px;
+            width: 24px;
+
+            &:hover {
+                background-color: $yellow;
+            }
+        }
+
+        .total td,
         .group td:first-child {
             font-weight: bold;
             text-decoration: underline;
             text-decoration-color: $body-font-color;
+        }
+
+        .f-dropdown li a {
+            font-size: .8rem;
+            font-weight: normal;
         }
     }
 
@@ -937,7 +962,7 @@ ul.tags {
     &.unpaid {
         background-color: $red-pastel;
         border: 1px solid $red-pastel;
-        
+
         > * {
             color: $red-dark;
         }
