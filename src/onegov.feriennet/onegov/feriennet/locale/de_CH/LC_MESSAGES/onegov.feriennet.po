@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-06 14:52+0100\n"
+"POT-Creation-Date: 2016-12-08 16:30+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -483,17 +483,45 @@ msgstr "Der ausstehende Betrag beläuft sich auf ${amount} CHF."
 msgid "No bills created yet."
 msgstr "Es wurden noch keine Rechnungen erstellt."
 
+msgid "Paid"
+msgstr ""
+
+msgid "${amount} unpaid"
+msgstr ""
+
+msgid "Actions"
+msgstr ""
+
+msgid "Show Details"
+msgstr "Details Anzeigen"
+
+msgid "Booking Text"
+msgstr ""
+
+msgid "Amount"
+msgstr ""
+
+msgid "Unpaid"
+msgstr ""
+
+msgid "Total"
+msgstr "Total"
+
 msgid "The matching of this period has not been confirmed yet."
 msgstr "Die Zuteilung dieser Periode wurde noch nicht bestätigt."
 
 msgid ""
 "This period is not active. Bills may only be created for the active period."
-msgstr "Diese Periode ist inaktive. Rechnungen können nur für aktive Perioden erstellt werden."
+msgstr ""
+"Diese Periode ist inaktive. Rechnungen können nur für aktive Perioden "
+"erstellt werden."
 
 msgid ""
 "The billing for this period has been confirmed. You can still change the "
 "invoices manually but you can no longer generate them automatically."
-msgstr "Die Fakturierung für diese Periode wurde abgeschlossen. Sie können die Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
+msgstr ""
+"Die Fakturierung für diese Periode wurde abgeschlossen. Sie können die "
+"Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
 
 msgid "No bookings in ${period}."
 msgstr "Keine Buchungen in ${period}."
@@ -518,9 +546,6 @@ msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."
 
 msgid "Passport"
 msgstr "Ferienpass"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Users"
 msgstr "Benutzer"
@@ -665,9 +690,6 @@ msgstr "Jahre"
 
 msgid "Bookings"
 msgstr "Buchungen"
-
-msgid "Show Details"
-msgstr "Details Anzeigen"
 
 msgid "State"
 msgstr "Status"
@@ -824,6 +846,18 @@ msgstr "Fakturierung für ${title}"
 
 msgid "Create Bills"
 msgstr "Rechnungen Erstellen"
+
+msgid "Mark as unpaid"
+msgstr "Buchung als unbezahlt markieren"
+
+msgid "Mark as paid"
+msgstr "Buchung als bezahlt markieren"
+
+msgid "Mark whole bill as unpaid"
+msgstr "Rechnung als unbezahlt markieren"
+
+msgid "Mark whole bill as paid"
+msgstr "Rechnung als bezahlt markieren"
 
 msgid "Your booking was cancelled successfully"
 msgstr "Ihre Buchung wurde erfolgreich storniert"

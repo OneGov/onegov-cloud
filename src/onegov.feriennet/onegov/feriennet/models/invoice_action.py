@@ -59,7 +59,9 @@ class InvoiceAction(object):
     def execute_mark_paid(self, targets):
         for target in targets:
             target.paid = True
+            assert not target.tid, "item was paid online"
 
     def execute_mark_unpaid(self, targets):
         for target in targets:
             target.paid = False
+            assert not target.tid, "item was paid online"

@@ -36,7 +36,7 @@
                                 <span i18n:translate class="show-for-sr">Actions</span>
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                             </a>
-                            <ul id="item-dropdown-${details.id}" class="tiny f-dropdown" data-dropdown-content>
+                            <ul id="item-dropdown-${details.id}" class="small f-dropdown" data-dropdown-content>
                               <li tal:repeat="link invoice_actions(details)">
                                   <tal:block replace="structure link(request)" />
                               </li>
@@ -78,7 +78,7 @@
                                                 <span i18n:translate class="show-for-sr">Actions</span>
                                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                                             </a>
-                                            <ul id="item-dropdown-${details.id}-${groupid}-${repeat.item.index}" class="tiny f-dropdown" data-dropdown-content>
+                                            <ul id="item-dropdown-${details.id}-${groupid}-${repeat.item.index}" class="small f-dropdown" data-dropdown-content>
                                                 <li tal:repeat="link item_actions(item)">
                                                     <tal:block replace="structure link(request)" />
                                                 </li>

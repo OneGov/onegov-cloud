@@ -887,6 +887,10 @@ ul.tags {
         }
     }
 
+    .f-dropdown {
+        max-width: 250px;
+    }
+
     table {
         margin: 1px 0 0;
         position: relative;
@@ -959,6 +963,16 @@ ul.tags {
                 padding-right: 0;
             }
         }
+    }
+
+    .mark-paid:before {
+        @include icon('\f058');
+        margin-right: 1ex;
+    }
+
+    .mark-unpaid:before {
+        @include icon('\f071');
+        margin-right: 1ex;
     }
 
     &.paid {
