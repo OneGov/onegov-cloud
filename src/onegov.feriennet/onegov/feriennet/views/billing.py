@@ -1,5 +1,8 @@
+import json
+
 from onegov.activity import Period, PeriodCollection
 from onegov.core.security import Secret
+from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.forms import BillingForm
@@ -89,7 +92,7 @@ def view_billing(self, request, form):
         'outstanding': self.outstanding,
         'button_text': _("Create Bills"),
         'invoice_actions': invoice_actions,
-        'item_actions': item_actions,
+        'item_actions': item_actions
     }
 
 
@@ -100,3 +103,10 @@ def view_billing(self, request, form):
 def execute_invoice_action(self, request):
     request.assert_valid_csrf_token()
     self.execute()
+
+    @request.after
+    def trigger_bill_update(response):
+        response.headers.add('X-IC-Trigger', 'reload-from')
+        response.headers.add('X-IC-Trigger-Data', json.dumps({
+            'selector': '#' + normalize_for_url(self.item.username)
+        }))

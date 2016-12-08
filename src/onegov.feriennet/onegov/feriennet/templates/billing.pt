@@ -23,7 +23,7 @@
                 <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
 
                 <div class="bills">
-                    <div class="bill ${details.paid and 'paid' or 'unpaid'}" tal:repeat="(username, details) bills.items()" data-load-from="${request.link(model.for_username(username).for_expand(True))}" data-load-from-selector=".bill">
+                    <div class="bill ${details.paid and 'paid' or 'unpaid'}" id="${details.id}" tal:repeat="(username, details) bills.items()" data-reload-from="${request.link(model.for_username(username))}" data-reload-from-selector=".bill">
                         <h3>${details.title}</h3>
 
                         <strong class="outstanding">
@@ -32,23 +32,23 @@
                                 <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
                             </tal:block>
 
-                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.index}">
+                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.id}">
                                 <span i18n:translate class="show-for-sr">Actions</span>
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                             </a>
-                            <ul id="item-dropdown-${details.index}" class="tiny f-dropdown" data-dropdown-content>
+                            <ul id="item-dropdown-${details.id}" class="tiny f-dropdown" data-dropdown-content>
                               <li tal:repeat="link invoice_actions(details)">
                                   <tal:block replace="structure link(request)" />
                               </li>
                             </ul>
                         </strong>
 
-                        <button id="button-${details.index}" data-toggle="#details-${details.index}" class="${model.expand and 'toggled' or 'untoggled'}">
+                        <button id="button-${details.id}" data-toggle="#details-${details.id}" class="${model.expand and 'toggled' or 'untoggled'}">
                             <span i18n:translate class="show-for-sr">Show Details</span>
                             <i class="fa fa-angle-double-down" aria-hidden="true"></i>
                         </button>
 
-                        <table id="details-${details.index}" class="invoice-items" style="${not model.expand and 'display: none;'}">
+                        <table id="details-${details.id}" class="invoice-items" style="${not model.expand and 'display: none;'}">
                             <thead class="show-for-sr">
                                 <tr>
                                     <th i18n:translate>Paid</th>
@@ -74,11 +74,11 @@
                                         <td>${item.text}</td>
                                         <td class="amount">${'{:.2f}'.format(item.amount)}</td>
                                         <td class="actions">
-                                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.index}-${groupid}-${repeat.item.index}">
+                                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.id}-${groupid}-${repeat.item.index}">
                                                 <span i18n:translate class="show-for-sr">Actions</span>
                                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                                             </a>
-                                            <ul id="item-dropdown-${details.index}-${groupid}-${repeat.item.index}" class="tiny f-dropdown" data-dropdown-content>
+                                            <ul id="item-dropdown-${details.id}-${groupid}-${repeat.item.index}" class="tiny f-dropdown" data-dropdown-content>
                                                 <li tal:repeat="link item_actions(item)">
                                                     <tal:block replace="structure link(request)" />
                                                 </li>

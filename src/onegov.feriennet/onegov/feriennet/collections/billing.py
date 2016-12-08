@@ -9,7 +9,7 @@ from sortedcontainers import SortedDict
 
 
 Details = namedtuple('Details', (
-    'index', 'items', 'paid', 'total', 'title', 'first', 'outstanding'
+    'id', 'items', 'paid', 'total', 'title', 'first', 'outstanding'
 ))
 
 
@@ -66,7 +66,7 @@ class BillingCollection(object):
         }
 
         return Details(
-            index=index,
+            id=normalize_for_url(first.username),
             first=first,
             items=items,
             paid=paid,

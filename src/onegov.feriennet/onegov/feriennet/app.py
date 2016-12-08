@@ -4,6 +4,7 @@ from onegov.feriennet.request import FeriennetRequest
 from onegov.feriennet.theme import FeriennetTheme
 from onegov.org import OrgApp
 from onegov.org.app import get_i18n_localedirs as get_org_i18n_localedirs
+from onegov.org.app import get_common_asset as get_org_common_asset
 
 
 class FeriennetApp(OrgApp):
@@ -48,3 +49,14 @@ def get_theme():
 @FeriennetApp.static_directory()
 def get_static_directory():
     return 'static'
+
+
+@FeriennetApp.webasset_path()
+def get_js_path():
+    return 'assets/js'
+
+
+@FeriennetApp.webasset('common')
+def get_common_asset():
+    yield from get_org_common_asset()
+    yield 'reloadfrom.js'
