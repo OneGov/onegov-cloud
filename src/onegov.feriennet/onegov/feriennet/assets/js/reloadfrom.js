@@ -12,6 +12,9 @@ var handle_reload_from = function(_e, data) {
         url.query.expand = '1';
     }
 
+    // Nobody likes you IE
+    url.query.ie_cache_workaround = new Date().getTime();
+
     el.load(url.toString() + ' ' + url_selector, function() {
         var loaded = $(this);
         loaded = $(loaded.children(':first').unwrap());
