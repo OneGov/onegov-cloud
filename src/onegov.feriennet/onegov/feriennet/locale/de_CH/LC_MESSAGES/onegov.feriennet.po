@@ -484,25 +484,25 @@ msgid "No bills created yet."
 msgstr "Es wurden noch keine Rechnungen erstellt."
 
 msgid "Paid"
-msgstr ""
+msgstr "Bezahlt"
 
 msgid "${amount} unpaid"
-msgstr ""
+msgstr "${amount} offen"
 
 msgid "Actions"
-msgstr ""
+msgstr "Aktionen"
 
 msgid "Show Details"
 msgstr "Details Anzeigen"
 
 msgid "Booking Text"
-msgstr ""
+msgstr "Buchungstext"
 
 msgid "Amount"
-msgstr ""
+msgstr "Betrag"
 
 msgid "Unpaid"
-msgstr ""
+msgstr "Unbezahlt"
 
 msgid "Total"
 msgstr "Total"
