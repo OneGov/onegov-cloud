@@ -28,6 +28,14 @@
 
                         <strong class="total">
                             ${'{:.2f}'.format(details.total)}
+
+                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.index}">
+                                <span i18n:translate class="show-for-sr">Actions</span>
+                                <i class="fa fa-wrench" aria-hidden="true"></i>
+                            </a>
+                            <ul id="item-dropdown-${details.index}" class="tiny f-dropdown" data-dropdown-content>
+                              <li><a href="#">Mark whole bill as paid</a></li>
+                            </ul>
                         </strong>
 
                         <button id="button-${details.index}" data-toggle="#details-${details.index}" class="untoggled">
@@ -44,40 +52,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tal:block repeat="(group, items) details.items.items()">
+                                <tal:block repeat="(group, groupitems) details.items.items()">
                                     <tr class="group">
-                                        <td colspan="2">${group}</td>
+                                        <td colspan="3">${group}</td>
                                     </tr>
-                                    <tr tal:repeat="item items">
+                                    <tr tal:repeat="item groupitems" tal:define="groupid hash(groupitems)">
                                         <td>${item.text}</td>
                                         <td class="amount">${'{:.2f}'.format(item.amount)}</td>
                                         <td class="actions">
-                                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.index}-${repeat.item.index}">
+                                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.index}-${groupid}-${repeat.item.index}">
                                                 <span i18n:translate class="show-for-sr">Actions</span>
                                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                                             </a>
-                                            <ul id="item-dropdown-${details.index}-${repeat.item.index}" class="tiny f-dropdown" data-dropdown-content>
-                                              <li><a href="#">Mark as paid</a></li>
+                                            <ul id="item-dropdown-${details.index}-${groupid}-${repeat.item.index}" class="tiny f-dropdown" data-dropdown-content>
+                                              <li><a href="#">Mark position as paid</a></li>
                                             </ul>
                                         </td>
                                     </tr>
                                 </tal:block>
-
-                                <tr class="total">
-                                    <td i18n:translate="">Total</td>
-                                    <td class="amount">
-                                        ${'{:.2f}'.format(details.total)}
-                                    </td>
-                                    <td class="actions">
-                                        <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.index}">
-                                            <span i18n:translate class="show-for-sr">Actions</span>
-                                            <i class="fa fa-wrench" aria-hidden="true"></i>
-                                        </a>
-                                        <ul id="item-dropdown-${details.index}" class="tiny f-dropdown" data-dropdown-content>
-                                          <li><a href="#">Mark as paid</a></li>
-                                        </ul>
-                                    </td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
