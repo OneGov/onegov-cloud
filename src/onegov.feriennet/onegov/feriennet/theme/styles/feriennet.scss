@@ -955,12 +955,20 @@ ul.tags {
                 color: $red-dark;
                 padding-right: 0;
             }
+
+            .amount {
+                color: $red-dark;
+            }
         }
 
         .paid {
             .payment-status {
                 color: $green-dark;
                 padding-right: 0;
+            }
+
+            .amount {
+                color: $green-dark;
             }
         }
     }
