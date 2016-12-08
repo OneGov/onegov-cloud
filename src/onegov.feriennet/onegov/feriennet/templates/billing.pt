@@ -23,29 +23,35 @@
                 <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
 
                 <div class="bills">
-                    <div class="bill ${details.paid and 'paid' or 'unpaid'}" tal:repeat="(username, details) bills.items()">
+                    <div class="bill ${details.paid and 'paid' or 'unpaid'}" tal:repeat="(username, details) bills.items()" data-load-from="${request.link(model.for_username(username).for_expand(True))}" data-load-from-selector=".bill">
                         <h3>${details.title}</h3>
 
-                        <strong class="total">
-                            ${'{:.2f}'.format(details.total)}
+                        <strong class="outstanding">
+                            <tal:block condition="details.paid" i18n:translate>Paid</tal:block>
+                            <tal:block condition="not: details.paid" i18n:translate>
+                                <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
+                            </tal:block>
 
                             <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.index}">
                                 <span i18n:translate class="show-for-sr">Actions</span>
                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                             </a>
                             <ul id="item-dropdown-${details.index}" class="tiny f-dropdown" data-dropdown-content>
-                              <li><a href="#">Mark whole bill as paid</a></li>
+                              <li tal:repeat="link invoice_actions(details)">
+                                  <tal:block replace="structure link(request)" />
+                              </li>
                             </ul>
                         </strong>
 
-                        <button id="button-${details.index}" data-toggle="#details-${details.index}" class="untoggled">
+                        <button id="button-${details.index}" data-toggle="#details-${details.index}" class="${model.expand and 'toggled' or 'untoggled'}">
                             <span i18n:translate class="show-for-sr">Show Details</span>
                             <i class="fa fa-angle-double-down" aria-hidden="true"></i>
                         </button>
 
-                        <table id="details-${details.index}" class="invoice-items" style="display: none;">
+                        <table id="details-${details.index}" class="invoice-items" style="${not model.expand and 'display: none;'}">
                             <thead class="show-for-sr">
                                 <tr>
+                                    <th i18n:translate>Paid</th>
                                     <th i18n:translate>Booking Text</th>
                                     <th i18n:translate>Amount</th>
                                     <th i18n:translate>Actions</th>
@@ -54,9 +60,17 @@
                             <tbody>
                                 <tal:block repeat="(group, groupitems) details.items.items()">
                                     <tr class="group">
-                                        <td colspan="3">${group}</td>
+                                        <td colspan="4">${group}</td>
                                     </tr>
-                                    <tr tal:repeat="item groupitems" tal:define="groupid hash(groupitems)">
+                                    <tr class="${item.paid and 'paid' or 'unpaid'}" tal:repeat="item groupitems" tal:define="groupid hash(groupitems)">
+                                        <td class="payment-status" tal:condition="not item.paid">
+                                            <span i18n:translate class="show-for-sr">Unpaid</span>
+                                            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                        </td>
+                                        <td class="payment-status" tal:condition="item.paid">
+                                            <span i18n:translate class="show-for-sr">Paid</span>
+                                            <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                        </td>
                                         <td>${item.text}</td>
                                         <td class="amount">${'{:.2f}'.format(item.amount)}</td>
                                         <td class="actions">
@@ -65,11 +79,20 @@
                                                 <i class="fa fa-wrench" aria-hidden="true"></i>
                                             </a>
                                             <ul id="item-dropdown-${details.index}-${groupid}-${repeat.item.index}" class="tiny f-dropdown" data-dropdown-content>
-                                              <li><a href="#">Mark position as paid</a></li>
+                                                <li tal:repeat="link item_actions(item)">
+                                                    <tal:block replace="structure link(request)" />
+                                                </li>
                                             </ul>
                                         </td>
                                     </tr>
                                 </tal:block>
+                                <tr class="total">
+                                    <td i18n:translate colspan="2">Total</td>
+                                    <td class="amount">
+                                        ${'{:.2f}'.format(details.total)}
+                                    </td>
+                                    <td></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

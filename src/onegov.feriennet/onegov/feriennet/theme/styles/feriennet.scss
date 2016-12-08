@@ -911,8 +911,18 @@ ul.tags {
             padding-top: .75rem;
         }
 
+        .payment-status,
         .actions {
             width: 1%;
+        }
+
+        .total .amount {
+            padding-top: .75rem;
+        }
+
+        .total td {
+            padding-bottom: .5rem;
+            padding-top: .5rem;
         }
 
         .amount {
@@ -921,10 +931,33 @@ ul.tags {
             text-align: right;
         }
 
+        .total td,
         .group td:first-child {
             font-weight: bold;
             text-decoration: underline;
             text-decoration-color: $body-font-color;
+        }
+
+        tbody tr:nth-last-child(2) td {
+            // make sure the backgrounds of all item lines cover the same
+            // height, here we mask the extended height of the row with
+            // a white box-shadow
+            box-shadow: 0 -.75rem $white inset;
+            padding-bottom: 1rem;
+        }
+
+        .unpaid {
+            .payment-status {
+                color: $red-dark;
+                padding-right: 0;
+            }
+        }
+
+        .paid {
+            .payment-status {
+                color: $green-dark;
+                padding-right: 0;
+            }
         }
     }
 
@@ -934,10 +967,6 @@ ul.tags {
 
         > * {
             color: $green-dark;
-        }
-
-        > .total:before {
-            @include icon('\f05d');
         }
 
         button {
@@ -951,6 +980,13 @@ ul.tags {
             background-color: $green-dark;
             outline: 1px solid $green-dark;
         }
+
+        .total td {
+            background-color: $green-pastel;
+            color: $green-dark;
+            font-size: 1rem;
+            text-decoration: none;
+        }
     }
 
     &.unpaid {
@@ -959,10 +995,6 @@ ul.tags {
 
         > * {
             color: $red-dark;
-        }
-
-        > .total:before {
-            @include icon('\f071');
         }
 
         button {
@@ -976,20 +1008,22 @@ ul.tags {
             background-color: $red-dark;
             outline: 1px solid $red-dark;
         }
+
+        .total td {
+            background-color: $red-pastel;
+            color: $red-dark;
+            font-size: 1rem;
+            text-decoration: none;
+        }
     }
 
-    > .total {
+    > .outstanding {
         float: right;
         line-height: 1.5rem;
         margin: .5rem calc(48px + .5rem) .5rem 0;
 
         .button {
             margin-left: 1rem;
-        }
-
-        &:before {
-            font-weight: normal;
-            margin-right: .5ex;
         }
     }
 }

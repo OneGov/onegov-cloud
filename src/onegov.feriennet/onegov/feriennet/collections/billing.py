@@ -8,17 +8,22 @@ from onegov.user import User
 from sortedcontainers import SortedDict
 
 
-Details = namedtuple('Details', ('index', 'items', 'paid', 'total', 'title'))
+Details = namedtuple('Details', (
+    'index', 'items', 'paid', 'total', 'title', 'first', 'outstanding'
+))
 
 
 class BillingCollection(object):
 
-    def __init__(self, session, period):
+    def __init__(self, session, period, username=None, expand=False):
         self.session = session
         self.period = period
+        self.username = username
+        self.expand = expand
 
         self.invoice_items = InvoiceItemCollection(
             session=session,
+            username=username,
             invoice=self.period.id.hex
         )
 
@@ -27,19 +32,31 @@ class BillingCollection(object):
         return self.period.id
 
     def for_period(self, period):
-        return self.__class__(self.session, period)
+        return self.__class__(self.session, period, self.username, self.expand)
+
+    def for_username(self, username):
+        return self.__class__(self.session, self.period, username, self.expand)
+
+    def for_expand(self, expand):
+        return self.__class__(self.session, self.period, self.username, expand)
 
     def details(self, index, title, items):
 
         total = Decimal("0.0")
+        outstanding = Decimal("0.0")
         paid = True
+        first = None
 
         def tally(item):
-            nonlocal total, paid
+            nonlocal total, paid, first, outstanding
             total += item.amount
 
-            if paid and not item.paid:
+            if not item.paid:
                 paid = False
+                outstanding += item.amount
+
+            if not first:
+                first = item
 
             return item
 
@@ -50,10 +67,12 @@ class BillingCollection(object):
 
         return Details(
             index=index,
+            first=first,
             items=items,
             paid=paid,
             total=total,
             title=title,
+            outstanding=outstanding
         )
 
     @property

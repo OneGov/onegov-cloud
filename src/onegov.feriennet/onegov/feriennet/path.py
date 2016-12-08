@@ -6,7 +6,7 @@ from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.converters import age_range_converter
-from onegov.feriennet.models import VacationActivity
+from onegov.feriennet.models import InvoiceAction, VacationActivity
 from uuid import UUID
 
 
@@ -128,7 +128,7 @@ def get_matches(request, app, period_id):
     model=BillingCollection,
     path='/rechnungen',
     converters=dict(period_id=UUID))
-def get_billing(request, app, period_id):
+def get_billing(request, app, period_id, username=None, expand=False):
     # the default period is the active period or the first we can find
     periods = PeriodCollection(app.session())
 
@@ -140,4 +140,18 @@ def get_billing(request, app, period_id):
     if not period:
         return None
 
-    return BillingCollection(app.session(), period)
+    return BillingCollection(app.session(), period, username, expand)
+
+
+@FeriennetApp.path(
+    model=InvoiceAction,
+    path='/rechnungsaktion/{id}/{action}',
+    converters=dict(id=UUID))
+def get_invoice_action(request, app, id, action, extend_to=None):
+    action = InvoiceAction(
+        session=app.session(),
+        id=id,
+        action=action,
+        extend_to=extend_to
+    )
+    return action.valid and action or None
