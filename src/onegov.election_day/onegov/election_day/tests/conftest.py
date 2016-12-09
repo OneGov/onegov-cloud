@@ -39,7 +39,7 @@ def create_app(postgres_dsn, temporary_directory, election_day_password,
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
-    app.filestorage.setcontents('principal.yml', textwrap.dedent("""
+    app.filestorage.settext('principal.yml', textwrap.dedent("""
         name: Kanton Govikon
         logo: logo.jpg
         canton: {}

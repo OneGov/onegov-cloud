@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for PyFilesystem 2.x and Chameleon 3.x.
+  [href]
+
 - Shows the number of SMS subscribers in the manage view.
   [msom]
 
