@@ -322,6 +322,9 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         * ``candidate_votes``:
             The number of votes this candidate got.
 
+        * ``panachage_votes_from_list_XX``:
+            The number of votes the list got from the given list.
+
         """
 
         session = object_session(self)
@@ -397,24 +400,30 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         # We need to collect the panachage results per list
         list_ids = session.query(List.id, List.list_id)
         list_ids = list_ids.filter(List.election_id == self.id)
-        panachage_results = session.query(PanachageResult)
-        panachage_results = panachage_results.filter(
-            PanachageResult.target_list_id.in_((id[0] for id in list_ids))
-        )
 
-        panachage_lists = session.query(List.list_id)
-        panachage_lists = panachage_lists.filter(List.election_id == self.id)
-        panachage_lists = [t[0] for t in panachage_lists]
-        panachage_lists = sorted(
-            set(panachage_lists) |
-            set([r.source_list_id for r in panachage_results])
-        )
+        panachage_lists = []
+        panachage = {}
+        if self.has_panachage_data:
+            panachage_results = session.query(PanachageResult)
+            panachage_results = panachage_results.filter(
+                PanachageResult.target_list_id.in_((id[0] for id in list_ids))
+            )
 
-        list_lookup = {id[0]: id[1] for id in list_ids}
-        panachage = {id: {} for id in panachage_lists}
-        for result in panachage_results:
-            key = list_lookup.get(result.target_list_id)
-            panachage[key][result.source_list_id] = result.votes
+            panachage_lists = session.query(List.list_id)
+            panachage_lists = panachage_lists.filter(
+                List.election_id == self.id
+            )
+            panachage_lists = [t[0] for t in panachage_lists]
+            panachage_lists = sorted(
+                set(panachage_lists) |
+                set([r.source_list_id for r in panachage_results])
+            )
+
+            list_lookup = {id[0]: id[1] for id in list_ids}
+            panachage = {id: {} for id in panachage_lists}
+            for result in panachage_results:
+                key = list_lookup.get(result.target_list_id)
+                panachage[key][result.source_list_id] = result.votes
 
         rows = []
         for result in results:
