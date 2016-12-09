@@ -6,7 +6,7 @@ Unreleased
 1.1.1 (2016-12-09)
 ~~~~~~~~~~~~~~~~~~~
 
-- Improve the election export.
+- Improves the election export.
   [msom]
 
 1.1.0 (2016-11-30)
