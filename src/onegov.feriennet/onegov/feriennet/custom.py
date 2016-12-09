@@ -57,7 +57,7 @@ def get_template_variables(request):
 
         front.append(Link(
             text=_("Invoices"),
-            url=request.class_link(BookingCollection),
+            url=request.link(invoice_items),
             classes=('count', 'alert'),
             attributes=attributes
         ))

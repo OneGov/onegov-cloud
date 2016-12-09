@@ -1,6 +1,7 @@
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
+from onegov.activity import InvoiceItemCollection
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
@@ -155,3 +156,19 @@ def get_invoice_action(request, app, id, action, extend_to=None):
         extend_to=extend_to
     )
     return action.valid and action or None
+
+
+@FeriennetApp.path(
+    model=InvoiceItemCollection,
+    path='/meine-rechnungen')
+def get_my_invoies(request, app, username=None):
+
+    # only admins can actually specify the username
+    if not request.is_admin:
+        username = request.current_username
+
+    # the default username is the current user
+    if not username:
+        username = request.current_username
+
+    return InvoiceItemCollection(app.session(), username)

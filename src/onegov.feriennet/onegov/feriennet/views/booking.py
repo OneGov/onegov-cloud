@@ -11,9 +11,8 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
-from onegov.feriennet.views.shared import all_periods
+from onegov.feriennet.views.shared import all_periods, all_users
 from onegov.org.elements import ConfirmLink, DeleteLink
-from onegov.user import UserCollection, User
 from sqlalchemy.orm import contains_eager
 
 
@@ -42,12 +41,6 @@ def all_bookings(collection):
     query = query.order_by(Occasion.start)
 
     return query.all()
-
-
-def all_users(request):
-    u = UserCollection(request.app.session()).query()
-    u = u.order_by(User.title)
-    return u.all()
 
 
 def group_bookings_by_attendee(bookings):
@@ -166,7 +159,7 @@ def view_my_bookings(self, request):
         users, user = None, None
 
     if user is None or user.username == request.current_username:
-        title = period.wishlist_phase and _("My Wishlist") or _("My Bookings")
+        title = period.wishlist_phase and _("Wishlist") or _("Bookings")
     elif period.wishlist_phase:
         title = _("Wishlist of ${user}", mapping={
             'user': user.title
