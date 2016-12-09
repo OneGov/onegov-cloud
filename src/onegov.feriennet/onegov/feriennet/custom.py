@@ -1,5 +1,7 @@
 from itertools import chain
-from onegov.activity import BookingCollection, PeriodCollection
+from onegov.activity import BookingCollection
+from onegov.activity import PeriodCollection
+from onegov.activity import InvoiceItemCollection
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.layout import DefaultLayout
@@ -19,11 +21,14 @@ def get_template_variables(request):
 
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
-        period = PeriodCollection(request.app.session()).active()
-        bookings = BookingCollection(request.app.session())
+        session = request.app.session()
+        username = request.current_username
+
+        period = PeriodCollection(session).active()
+        bookings = BookingCollection(session)
 
         if period:
-            count = bookings.booking_count(request.current_username)
+            count = bookings.booking_count(username)
 
             if count:
                 attributes = {'data-count': str(count)}
@@ -31,16 +36,31 @@ def get_template_variables(request):
                 attributes = {}
 
             front.append(Link(
-                text=period.confirmed and _("My Bookings") or _("My Wishlist"),
+                text=period.confirmed and _("Bookings") or _("Wishlist"),
                 url=request.link(bookings),
                 classes=('count', period.confirmed and 'success' or 'alert'),
                 attributes=attributes
             ))
         else:
             front.append(Link(
-                text=_("My Bookings"),
+                text=_("Bookings"),
                 url=request.link(bookings)
             ))
+
+        invoice_items = InvoiceItemCollection(session, username)
+        unpaid = invoice_items.count_unpaid_invoices()
+
+        if unpaid:
+            attributes = {'data-count': str(unpaid)}
+        else:
+            attributes = {}
+
+        front.append(Link(
+            text=_("Invoices"),
+            url=request.class_link(BookingCollection),
+            classes=('count', 'alert'),
+            attributes=attributes
+        ))
 
     layout = DefaultLayout(request.app.org, request)
     links = chain(front, layout.top_navigation)

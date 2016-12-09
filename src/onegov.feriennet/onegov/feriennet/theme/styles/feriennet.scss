@@ -14,7 +14,8 @@
 
 @media #{$medium-up} {
     .is-logged-in .top-bar-section {
-        li:nth-child(2) {
+        li:nth-child(2),
+        li:nth-child(3) {
             float: right;
 
             a {

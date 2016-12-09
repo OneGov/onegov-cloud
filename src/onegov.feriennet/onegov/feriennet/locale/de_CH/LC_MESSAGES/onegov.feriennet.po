@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-09 14:20+0100\n"
+"POT-Creation-Date: 2016-12-09 14:45+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -15,11 +15,14 @@ msgstr ""
 msgid "Activities"
 msgstr "Angebote"
 
-msgid "My Bookings"
-msgstr "Meine Buchungen"
+msgid "Invoices"
+msgstr "Rechnungen"
 
-msgid "My Wishlist"
-msgstr "Meine Wunschliste"
+msgid "Bookings"
+msgstr "Buchungen"
+
+msgid "Wishlist"
+msgstr "Wunschliste"
 
 msgid "Register a new account"
 msgstr "Ein neues Konto eröffnen"
@@ -586,9 +589,6 @@ msgstr "Abgesagt"
 msgid "${count} spots available"
 msgstr "Noch ${count} Plätze frei"
 
-msgid "${count} attendees"
-msgstr "${count} Teilnehmer"
-
 msgid "Age"
 msgstr "Alter"
 
@@ -600,6 +600,9 @@ msgstr "${min_spots} - ${max_spots} Teilnehmer"
 
 msgid "up to ${max_spots} participants"
 msgstr "bis zu ${max_spots} Teilnehmer"
+
+msgid "${count} attendees"
+msgstr "${count} Teilnehmer"
 
 msgid "${cost} CHF"
 msgstr "${cost} CHF"
@@ -693,9 +696,6 @@ msgstr "Teilnehmer"
 
 msgid "Years"
 msgstr "Jahre"
-
-msgid "Bookings"
-msgstr "Buchungen"
 
 msgid "State"
 msgstr "Status"
@@ -868,6 +868,9 @@ msgstr "Rechnung als bezahlt markieren"
 msgid "Your booking was cancelled successfully"
 msgstr "Ihre Buchung wurde erfolgreich storniert"
 
+msgid "My Bookings"
+msgstr "Meine Buchungen"
+
 #, python-format
 msgid "Wishlist of ${user}"
 msgstr "Wunschliste von ${user}"
@@ -883,6 +886,9 @@ msgstr ""
 
 msgid "The period is not in the wishlist-phase"
 msgstr "Die Periode befindet sich nicht in der Wunschphase"
+
+msgid "My Wishlist"
+msgstr "Meine Wunschliste"
 
 msgid "Remove"
 msgstr "Entfernen"

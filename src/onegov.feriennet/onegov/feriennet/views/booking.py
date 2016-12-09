@@ -110,7 +110,7 @@ def actions_by_booking(layout, period, booking):
             classes=('confirm', ),
             target='#booking-{}'.format(booking.id)
         ))
-    elif not period.wishlist_phase and booking.state == 'accepted':
+    elif period.booking_phase and booking.state == 'accepted':
         actions.append(ConfirmLink(
             text=_("Cancel Booking"),
             url=layout.csrf_protected_url(
