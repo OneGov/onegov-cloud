@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for PyFilesystem 2.x and Chameleon 3.x.
+  [href]
+
 0.1.5 (2016-12-01)
 ~~~~~~~~~~~~~~~~~~~
 

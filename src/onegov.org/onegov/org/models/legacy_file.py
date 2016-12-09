@@ -6,6 +6,7 @@ forward, onegov.file and onegov.org.models.file is used.
 import base64
 
 from onegov.core.filestorage import FilestorageFile
+from onegov.core import utils
 
 
 class LegacyFileCollection(object):
@@ -14,7 +15,7 @@ class LegacyFileCollection(object):
         assert app.has_filestorage
 
         self.path_prefix = 'files/'
-        self.file_storage = app.filestorage.makeopendir('files')
+        self.file_storage = utils.makeopendir(app.filestorage, 'files')
 
     def get_file_by_filename(self, filename):
         if self.file_storage.exists(filename):
@@ -27,7 +28,7 @@ class LegacyImageCollection(object):
         assert app.has_filestorage
 
         self.path_prefix = 'images/'
-        self.file_storage = app.filestorage.makeopendir('images')
+        self.file_storage = utils.makeopendir(app.filestorage, 'images')
 
     def get_file_by_filename(self, filename):
         if self.file_storage.exists(filename):
