@@ -899,8 +899,12 @@ ul.tags {
         tr {
             background-color: transparent;
 
-            &:hover {
-                background-color: $yellow-pastel !important;
+            &.paid:hover {
+                background-color: $green-pastel !important;
+            }
+
+            &.unpaid:hover {
+                background-color: $red-pastel !important;
             }
         }
 
@@ -916,7 +920,10 @@ ul.tags {
         }
 
         .payment-status,
+        .amount,
         .actions {
+            padding-left: 0;
+            padding-right: 0;
             width: 1%;
         }
 
@@ -924,9 +931,22 @@ ul.tags {
             padding-top: .75rem;
         }
 
+        .actions,
+        .amount {
+            padding-right: .5rem;
+        }
+
+        .payment-status {
+            padding-right: 1.5rem;
+        }
+
         .total td {
             padding-bottom: .5rem;
             padding-top: .5rem;
+        }
+
+        .total td:last-child {
+            padding-right: .75rem;
         }
 
         .amount {
@@ -953,7 +973,7 @@ ul.tags {
         .unpaid {
             .payment-status {
                 color: $red-dark;
-                padding-right: 0;
+                text-align: left;
             }
 
             .amount {
@@ -964,7 +984,7 @@ ul.tags {
         .paid {
             .payment-status {
                 color: $green-dark;
-                padding-right: 0;
+                text-align: left;
             }
 
             .amount {

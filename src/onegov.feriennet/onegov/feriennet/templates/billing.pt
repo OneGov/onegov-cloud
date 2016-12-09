@@ -51,9 +51,9 @@
                         <table id="details-${details.id}" class="invoice-items" style="${not model.expand and 'display: none;'}">
                             <thead class="show-for-sr">
                                 <tr>
-                                    <th i18n:translate>Paid</th>
                                     <th i18n:translate>Booking Text</th>
                                     <th i18n:translate>Amount</th>
+                                    <th i18n:translate>Paid</th>
                                     <th i18n:translate>Actions</th>
                                 </tr>
                             </thead>
@@ -63,6 +63,8 @@
                                         <td colspan="4">${group}</td>
                                     </tr>
                                     <tr class="${item.paid and 'paid' or 'unpaid'}" tal:repeat="item groupitems" tal:define="groupid hash(groupitems)">
+                                        <td>${item.text}</td>
+                                        <td class="amount">${'{:.2f}'.format(item.amount)}</td>
                                         <td class="payment-status" tal:condition="not item.paid">
                                             <span i18n:translate class="show-for-sr">Unpaid</span>
                                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
@@ -71,8 +73,6 @@
                                             <span i18n:translate class="show-for-sr">Paid</span>
                                             <i class="fa fa-check-circle" aria-hidden="true"></i>
                                         </td>
-                                        <td>${item.text}</td>
-                                        <td class="amount">${'{:.2f}'.format(item.amount)}</td>
                                         <td class="actions">
                                             <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.id}-${groupid}-${repeat.item.index}">
                                                 <span i18n:translate class="show-for-sr">Actions</span>
@@ -87,11 +87,10 @@
                                     </tr>
                                 </tal:block>
                                 <tr class="total">
-                                    <td i18n:translate colspan="2">Total</td>
-                                    <td class="amount">
+                                    <td i18n:translate>Total</td>
+                                    <td class="amount" colspan="3">
                                         ${'{:.2f}'.format(details.total)}
                                     </td>
-                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
