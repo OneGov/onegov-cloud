@@ -123,7 +123,7 @@
                     <span i18n:translate>Rescinded</span>
                 </div>
 
-                <div class="available-spots" tal:condition="show_stats and not occasion.cancelled and not occasion.full">
+                <div class="available-spots" tal:condition="show_stats and not occasion.cancelled and not occasion.full and not period.finalized">
                     <span i18n:translate><tal:block i18n:name="count" replace="occasion.available_spots" /> spots available</span>
                 </div>
 
@@ -142,7 +142,7 @@
                     </span>
                 </div>
 
-                <div class="spots">
+                <div class="spots" tal:condition="not period.finalized">
                     <span i18n:translate class="show-for-sr">Participants</span>
 
                     <span i18n:translate tal:condition="occasion.spots.lower">
@@ -157,6 +157,10 @@
                         <tal:block replace="occasion.spots.upper - 1" i18n:name='max_spots' />
                         participants
                     </span>
+                </div>
+
+                <div class="spots" tal:condition="show_stats and not occasion.cancelled and period.finalized">
+                    <span i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</span>
                 </div>
 
                 <div class="cost">
@@ -191,7 +195,7 @@
             </div>
         </div>
 
-        <div class="call-to-action" tal:condition="show_enroll and occasion.active and not occasion.cancelled and (period.wishlist_phase or not occasion.full)">
+        <div class="call-to-action" tal:condition="show_enroll and occasion.active and not occasion.cancelled and (period.wishlist_phase or not occasion.full) and not period.finalized">
             <tal:block switch="age_bracket(occasion.age)">
                 <span tal:case="'young'" i18n:translate>
                     Enroll your young child now.
@@ -234,8 +238,12 @@
             Prebooking is now active until <strong tal:content="layout.format_date(period.prebooking_end, 'date_long')" i18n:name="date" />.
         </div>
 
-        <div class="hint hint-prebooking" tal:condition="today > period.prebooking_end or (period.prebooking_start <= today and not period.wishlist_phase)" i18n:translate>
+        <div class="hint hint-prebooking" tal:condition="today > period.prebooking_end or (period.prebooking_start <= today and not period.wishlist_phase) and not period.finalized" i18n:translate>
             Prebooking has ended.
+        </div>
+
+        <div class="hint hint-finalized" tal:condition="period.finalized" i18n:translate>
+            There cannot be any more bookings.
         </div>
 
         <div class="hint hint-max-activities" tal:condition="period.all_inclusive and period.max_bookings_per_attendee" i18n:translate>

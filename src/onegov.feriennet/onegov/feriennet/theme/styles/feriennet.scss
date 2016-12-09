@@ -199,6 +199,7 @@ ul.tags {
     .hint-happiness:before { @include icon('\f118'); }
     .hint-operability:before { @include icon('\f058'); }
     .hint-outstanding:before { @include icon('\f200'); }
+    .hint-finalized:before{ @include icon('\f256'); }
 
     .hint:last-child {
         @include hairline();

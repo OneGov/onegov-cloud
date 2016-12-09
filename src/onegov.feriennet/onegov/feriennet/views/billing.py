@@ -27,10 +27,13 @@ def view_billing(self, request, form):
     layout = BillingCollectionLayout(self, request)
     session = request.app.session
 
-    if form.submitted(request):
+    if form.submitted(request) and not self.period.finalized:
         self.create_invoices(
             all_inclusive_booking_text=request.translate(_("Passport"))
         )
+
+        if form.finalize_period:
+            self.period.finalized = True
 
     # we can generate many links here, so we need this to be
     # as quick as possible, which is why we only use one token
@@ -46,38 +49,39 @@ def view_billing(self, request, form):
         return actions(item, item.paid)
 
     def actions(item, paid, extend_to=None):
-        if paid:
-            yield Link(
-                text=(
-                    extend_to and
-                    _("Mark whole bill as unpaid") or
-                    _("Mark as unpaid")
-                ),
-                classes=('mark-unpaid', ),
-                request_method='POST',
-                url=insert_csrf(request.link(InvoiceAction(
-                    session=session,
-                    id=item.id,
-                    action='mark-unpaid',
-                    extend_to=extend_to
-                )))
-            )
-        else:
-            yield Link(
-                text=(
-                    extend_to and
-                    _("Mark whole bill as paid") or
-                    _("Mark as paid")
-                ),
-                classes=('mark-paid', ),
-                request_method='POST',
-                url=insert_csrf(request.link(InvoiceAction(
-                    session=session,
-                    id=item.id,
-                    action='mark-paid',
-                    extend_to=extend_to
-                )))
-            )
+        if self.period.finalized:
+            if paid:
+                yield Link(
+                    text=(
+                        extend_to and
+                        _("Mark whole bill as unpaid") or
+                        _("Mark as unpaid")
+                    ),
+                    classes=('mark-unpaid', ),
+                    request_method='POST',
+                    url=insert_csrf(request.link(InvoiceAction(
+                        session=session,
+                        id=item.id,
+                        action='mark-unpaid',
+                        extend_to=extend_to
+                    )))
+                )
+            else:
+                yield Link(
+                    text=(
+                        extend_to and
+                        _("Mark whole bill as paid") or
+                        _("Mark as paid")
+                    ),
+                    classes=('mark-paid', ),
+                    request_method='POST',
+                    url=insert_csrf(request.link(InvoiceAction(
+                        session=session,
+                        id=item.id,
+                        action='mark-paid',
+                        extend_to=extend_to
+                    )))
+                )
 
     return {
         'layout': layout,

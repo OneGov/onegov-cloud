@@ -175,7 +175,7 @@ def view_activity(self, request):
             o.localized_end
         )
 
-        if o.cancelled:
+        if o.cancelled and not o.period.finalized:
             yield ConfirmLink(
                 text=_("Reinstate"),
                 url=layout.csrf_protected_url(
@@ -191,7 +191,7 @@ def view_activity(self, request):
                 yes_button_text=_("Reinstate Occasion"),
                 classes=('confirm', )
             )
-        elif o.id in occasion_ids_with_bookings:
+        elif o.id in occasion_ids_with_bookings and not o.period.finalized:
             yield ConfirmLink(
                 text=_("Rescind"),
                 url=layout.csrf_protected_url(request.link(o, name='cancel')),
@@ -209,7 +209,7 @@ def view_activity(self, request):
                 yes_button_text=_("Rescind Occasion"),
                 classes=('confirm', )
             )
-        else:
+        elif o.id not in occasion_ids_with_bookings:
             yield DeleteLink(
                 text=_("Delete"),
                 url=layout.csrf_protected_url(request.link(o)),

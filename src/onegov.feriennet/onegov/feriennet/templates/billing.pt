@@ -32,15 +32,17 @@
                                 <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
                             </tal:block>
 
-                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.id}">
-                                <span i18n:translate class="show-for-sr">Actions</span>
-                                <i class="fa fa-wrench" aria-hidden="true"></i>
-                            </a>
-                            <ul id="item-dropdown-${details.id}" class="small f-dropdown" data-dropdown-content>
-                              <li tal:repeat="link invoice_actions(details)">
-                                  <tal:block replace="structure link(request)" />
-                              </li>
-                            </ul>
+                            <tal:block tal:define="actions tuple(invoice_actions(details))" tal:condition="actions">
+                                <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.id}">
+                                    <span i18n:translate class="show-for-sr">Actions</span>
+                                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                                </a>
+                                <ul id="item-dropdown-${details.id}" class="small f-dropdown" data-dropdown-content>
+                                  <li tal:repeat="link actions">
+                                      <tal:block replace="structure link(request)" />
+                                  </li>
+                                </ul>
+                            </tal:block>
                         </strong>
 
                         <button id="button-${details.id}" data-toggle="#details-${details.id}" class="${model.expand and 'toggled' or 'untoggled'}">
@@ -74,23 +76,34 @@
                                             <i class="fa fa-check-circle" aria-hidden="true"></i>
                                         </td>
                                         <td class="actions">
-                                            <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.id}-${groupid}-${repeat.item.index}">
-                                                <span i18n:translate class="show-for-sr">Actions</span>
-                                                <i class="fa fa-wrench" aria-hidden="true"></i>
-                                            </a>
-                                            <ul id="item-dropdown-${details.id}-${groupid}-${repeat.item.index}" class="small f-dropdown" data-dropdown-content>
-                                                <li tal:repeat="link item_actions(item)">
-                                                    <tal:block replace="structure link(request)" />
-                                                </li>
-                                            </ul>
+                                            <tal:block tal:define="actions tuple(item_actions(item))" tal:condition="actions">
+                                                <a href="#" class="tiny button circle" data-dropdown="item-dropdown-${details.id}-${groupid}-${repeat.item.index}">
+                                                    <span i18n:translate class="show-for-sr">Actions</span>
+                                                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                                                </a>
+                                                <ul id="item-dropdown-${details.id}-${groupid}-${repeat.item.index}" class="small f-dropdown" data-dropdown-content>
+                                                    <li tal:repeat="link actions">
+                                                        <tal:block replace="structure link(request)" />
+                                                    </li>
+                                                </ul>
+                                            </tal:block>
                                         </td>
                                     </tr>
                                 </tal:block>
                                 <tr class="total">
                                     <td i18n:translate>Total</td>
-                                    <td class="amount" colspan="3">
+                                    <td class="amount">
                                         ${'{:.2f}'.format(details.total)}
                                     </td>
+                                    <td class="payment-status" tal:condition="not details.paid">
+                                        <span i18n:translate class="show-for-sr">Unpaid</span>
+                                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                                    </td>
+                                    <td class="payment-status" tal:condition="details.paid">
+                                        <span i18n:translate class="show-for-sr">Paid</span>
+                                        <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                    </td>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
