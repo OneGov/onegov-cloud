@@ -4,6 +4,9 @@ Changelog
 - Disallow cookies in svg resources.
   [href]
 
+- Temporarily pin older versions of chameleon and fs.
+  [msom]
+
 0.33.0 (2016-12-06)
 ~~~~~~~~~~~~~~~~~~~
 
