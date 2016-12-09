@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+1.1.1 (2016-12-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Improve the election export.
   [msom]
