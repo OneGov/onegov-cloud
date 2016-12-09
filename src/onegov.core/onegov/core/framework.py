@@ -349,6 +349,11 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         if 'filestorage' in cfg:
             filestorage_class = load_class(cfg.get('filestorage'))
             filestorage_options = cfg.get('filestorage_options', {})
+
+            # legacy support for pyfilesystem 1.x parameters
+            if 'dir_mode' in filestorage_options:
+                filestorage_options['create_mode'] \
+                    = filestorage_options.pop('dir_mode')
         else:
             filestorage_class = None
 
@@ -679,7 +684,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
             from onegov.core import filestorage
 
             filename = filestorage.random_filename()
-            app.filestorage.setcontents(filename, 'Lorem Ipsum')
+            app.filestorage.settext(filename, 'Lorem Ipsum')
 
             # returns either an url like '/files/4ec56cc005c594880a...'
             # or maybe 'https://amazonaws.com/onegov-cloud/32746/220592/q...'
@@ -689,7 +694,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         if self._global_file_storage is None:
             return None
 
-        return self._global_file_storage.makeopendir(self.schema)
+        return utils.makeopendir(self._global_file_storage, self.schema)
 
     @property
     def themestorage(self):
@@ -703,7 +708,7 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         if self._global_file_storage is None:
             return None
 
-        return self._global_file_storage.makeopendir('global-theme')
+        return utils.makeopendir(self._global_file_storage, 'global-theme')
 
     @property
     def theme_options(self):

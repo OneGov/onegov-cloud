@@ -127,7 +127,7 @@ def compile(storage, theme, options={}, force=False):
         return filename
 
     log.info("Compiling theme {}, v{}".format(theme.name, theme.version))
-    storage.setcontents(filename, theme.compile(options).encode('utf-8'))
+    storage.setbytes(filename, theme.compile(options).encode('utf-8'))
 
     return filename
 

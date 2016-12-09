@@ -7,7 +7,7 @@ See :attr:`onegov.core.framework.Framework.filestorage` for more information.
 
 """
 
-from fs.errors import BackReferenceError
+from fs.errors import IllegalBackReference
 from onegov.core.framework import Framework
 from onegov.core.crypto import random_token
 from onegov.core.utils import render_file
@@ -50,7 +50,7 @@ def get_filestorage_file(app, absorb):
     try:
         if app.filestorage.exists(absorb):
             return FilestorageFile(absorb)
-    except BackReferenceError:
+    except IllegalBackReference:
         return None
 
 

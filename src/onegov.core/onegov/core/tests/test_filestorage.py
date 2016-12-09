@@ -21,16 +21,19 @@ def test_independence(temporary_directory):
     app.namespace = 'tests'
 
     app.set_application_id('tests/foo')
-    app.filestorage.setcontents('document.txt', 'foo')
-    assert app.filestorage.getcontents('document.txt') == b'foo'
+    app.filestorage.settext('document.txt', 'foo')
+    assert app.filestorage.getbytes('document.txt') == b'foo'
+    assert app.filestorage.gettext('document.txt') == 'foo'
 
     app.set_application_id('tests/bar')
     assert not app.filestorage.exists('document.txt')
-    app.filestorage.setcontents('document.txt', 'bar')
-    assert app.filestorage.getcontents('document.txt') == b'bar'
+    app.filestorage.settext('document.txt', 'bar')
+    assert app.filestorage.getbytes('document.txt') == b'bar'
+    assert app.filestorage.gettext('document.txt') == 'bar'
 
     app.set_application_id('tests/foo')
-    assert app.filestorage.getcontents('document.txt') == b'foo'
+    assert app.filestorage.getbytes('document.txt') == b'foo'
+    assert app.filestorage.gettext('document.txt') == 'foo'
 
     assert os.path.isdir(os.path.join(temporary_directory, 'tests-foo'))
     assert os.path.isdir(os.path.join(temporary_directory, 'tests-bar'))
@@ -86,8 +89,8 @@ def test_filestorage(temporary_directory):
     )
     app.namespace = 'tests'
     app.set_application_id('tests/foo')
-    app.filestorage.setcontents('test.txt', 'asdf')
-    app.filestorage.setcontents('readme', 'readme')
+    app.filestorage.settext('test.txt', 'asdf')
+    app.filestorage.settext('readme', 'readme')
 
     client = Client(app)
     assert client.get('/?file=test.txt').text\

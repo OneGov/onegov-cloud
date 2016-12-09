@@ -183,10 +183,8 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
         if not app.filestorage.exists(path):
             return None
 
-        url = app.filestorage.getpathurl(path, allow_none=True)
-
-        if url:
-            return url
+        if app.filestorage.hasurl(path):
+            return app.filestorage.geturl(path)
         else:
             return self.link(app.modules.filestorage.FilestorageFile(path))
 

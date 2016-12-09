@@ -430,3 +430,12 @@ def get_unique_hstore_keys(session, column):
 
     keys = session.execute(query).scalar()
     return set(keys) if keys else set()
+
+
+def makeopendir(fs, directory):
+    """ Creates and opens the given directory in the given PyFilesystem. """
+
+    if not fs.isdir(directory):
+        fs.makedir(directory)
+
+    return fs.opendir(directory)

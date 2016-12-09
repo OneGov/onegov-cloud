@@ -180,6 +180,7 @@ def render_macro(macro, request, content):
     variables.setdefault('__translate', variables['translate'])
     variables.setdefault('__convert', variables['translate'])
     variables.setdefault('__decode', decode_string)
+    variables.setdefault('target_language', None)
     variables['repeat'] = RepeatDict({})
     variables.update(content)
 
