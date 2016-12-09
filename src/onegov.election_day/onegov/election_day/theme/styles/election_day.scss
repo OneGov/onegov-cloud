@@ -453,6 +453,7 @@ footer {
 .tabs {
     background-color: $snow;
     border-bottom: 4px solid $gainsboro;
+    margin-bottom: 2em !important;
 
     .tab-title > a {
         background-color: transparent;
@@ -463,11 +464,22 @@ footer {
     }
 }
 
+@media #{$small-only} {
+    .tabs {
+        li {
+            width: 100%;
+        }
+
+        .tab-title a {
+            padding-left: 1em;
+        }
+    }
+}
+
 ul.breadcrumbs {
     background: $white;
     border: 0;
     margin-bottom: 2em;
-    margin-top: 1em;
     padding-left: 0;
 }
 

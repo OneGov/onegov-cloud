@@ -1,14 +1,16 @@
 from onegov.ballot import Candidate, Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.layout import DefaultLayout, ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import handle_headerless_params
+from onegov.election_day.views.election import get_candidates_results
 from sqlalchemy import desc
 from sqlalchemy.orm import object_session
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='candidates')
-def view_election_candidates(self, request):
+@ElectionDayApp.json(model=Election, permission=Public, name='candidates-data')
+def view_election_candidates_data(self, request):
     """" View the candidates as JSON. Used to for the candidates bar chart. """
 
     session = object_session(self)
@@ -32,11 +34,14 @@ def view_election_candidates(self, request):
         majority = self.absolute_majority
 
     return {
-        'results': [{
-            'text': '{} {}'.format(candidate[0], candidate[1]),
-            'value': candidate[3],
-            'class': 'active' if candidate[2] else 'inactive'
-        } for candidate in candidates.all()],
+        'results': [
+            {
+                'text': '{} {}'.format(candidate[0], candidate[1]),
+                'value': candidate[3],
+                'class': 'active' if candidate[2] else 'inactive'
+            } for candidate in candidates.all()
+            if self.type == 'majorz' or self.type == 'proporz' and candidate[2]
+        ],
         'majority': majority,
         'title': self.title
     }
@@ -58,6 +63,23 @@ def view_election_candidates_chart(self, request):
         'model': self,
         'layout': DefaultLayout(self, request),
         'data': {
-            'bar': request.link(self, name='candidates')
+            'bar': request.link(self, name='candidates-data')
         }
+    }
+
+
+@ElectionDayApp.html(model=Election, template='election/candidates.pt',
+                     name='candidates', permission=Public)
+def view_election_candidates(self, request):
+    """" The main view. """
+
+    request.include('bar_chart')
+    request.include('tablesorter')
+
+    handle_headerless_params(request)
+
+    return {
+        'election': self,
+        'layout': ElectionsLayout(self, request, 'candidates'),
+        'candidates': get_candidates_results(self, object_session(self)).all()
     }

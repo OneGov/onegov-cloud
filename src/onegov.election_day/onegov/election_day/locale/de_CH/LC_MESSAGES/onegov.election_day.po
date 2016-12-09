@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-10 13:50+0100\n"
+"POT-Creation-Date: 2016-12-09 15:47+0100\n"
 "PO-Revision-Date: 2016-11-10 13:46+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -13,6 +13,21 @@ msgstr ""
 "Generated-By: Lingua 3.12\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 1.8.11\n"
+
+msgid "Lists"
+msgstr "Listen"
+
+msgid "Candidates"
+msgstr "Kandidierende"
+
+msgid "Electoral Districts"
+msgstr "Wahlkreise"
+
+msgid "List connections"
+msgstr "Listenverbindungen"
+
+msgid "Election statistics"
+msgstr "Wahlstatistik"
 
 msgid "Votes"
 msgstr "Abstimmungen"
@@ -180,14 +195,8 @@ msgstr "Dateiformat"
 msgid "Results"
 msgstr "Resultate"
 
-msgid "List connections"
-msgstr "Listenverbindungen"
-
 msgid "Elected Candidates"
 msgstr "Gewählte Kandidierende"
-
-msgid "Election statistics"
-msgstr "Wahlstatistik"
 
 msgid "Complete"
 msgstr "Komplett ausgezählt"
@@ -301,94 +310,6 @@ msgstr "JA %"
 msgid "No %"
 msgstr "NEIN %"
 
-msgid "Not yet counted."
-msgstr "Noch nicht ausgezählt."
-
-msgid "Format Description"
-msgstr "Formatbeschreibung"
-
-msgid "Turnout"
-msgstr "Wahlbeteiligung"
-
-msgid "Elegible Voters"
-msgstr "Stimmberechtigte"
-
-msgid "Received Ballots"
-msgstr "Abgegebene Wahlzettel"
-
-msgid "Counted"
-msgstr "Ausgezählt"
-
-msgid "Download"
-msgstr "Herunterladen"
-
-msgid "Embed"
-msgstr "Einbetten"
-
-msgid "Download"
-msgstr "Herunterladen"
-
-msgid "Embed"
-msgstr "Einbetten"
-
-msgid "Candidates"
-msgstr "Kandidierende"
-
-msgid "Candidate"
-msgstr "Kandidierende"
-
-#. Default: Votes
-msgid "single_votes"
-msgstr "Stimmen"
-
-msgid "List"
-msgstr "Liste"
-
-msgid "Elected"
-msgstr "Gewählt"
-
-msgid "Yes"
-msgstr "Ja"
-
-msgid "No"
-msgstr "Nein"
-
-msgid "All candidates"
-msgstr "Alle Kandidierende"
-
-msgid "Elected candidates only"
-msgstr "Nur gewählte Kandidierende"
-
-msgid "List connection"
-msgstr "Listenverbindung"
-
-msgid "Sublist connection"
-msgstr "Unterlistenverbindung"
-
-msgid "Subtotal"
-msgstr "Zwischensumme"
-
-msgid "Total"
-msgstr "Total"
-
-msgid "Electoral Districts"
-msgstr "Wahlkreise"
-
-msgid "Electoral District"
-msgstr "Wahlkreis"
-
-msgid "Accounted Ballots"
-msgstr "Gültige Wahlzettel"
-
-msgid "Blank Ballots"
-msgstr "Leere Wahlzettel"
-
-msgid "Invalid Ballots"
-msgstr "Ungültige Wahlzettel"
-
-msgid "Accounted Votes"
-msgstr "Gültige Stimmen"
-
 msgid "Yay"
 msgstr "JA"
 
@@ -444,6 +365,9 @@ msgstr "Nächste Seite"
 msgid "You are here"
 msgstr "Aktuelle Seite"
 
+msgid "Not yet counted."
+msgstr "Noch nicht ausgezählt."
+
 msgid "Last change"
 msgstr "Aktualisiert"
 
@@ -462,6 +386,21 @@ msgstr "SMS-Benachrichtigung abonnieren"
 
 msgid "Stop SMS subscription"
 msgstr "SMS-Abonnement beenden"
+
+msgid "Format Description"
+msgstr "Formatbeschreibung"
+
+msgid "Turnout"
+msgstr "Wahlbeteiligung"
+
+msgid "Elegible Voters"
+msgstr "Stimmberechtigte"
+
+msgid "Received Ballots"
+msgstr "Abgegebene Wahlzettel"
+
+msgid "Counted"
+msgstr "Ausgezählt"
 
 msgid "New Election"
 msgstr "Neue Wahl"
@@ -575,14 +514,93 @@ msgstr "NEIN Stimmen"
 msgid "Cast Ballots"
 msgstr "Eingegangene Stimmzettel"
 
+msgid "Download"
+msgstr "Herunterladen"
+
+msgid "Embed"
+msgstr "Einbetten"
+
+msgid "Electoral District"
+msgstr "Wahlkreis"
+
 msgid "Empty"
 msgstr "Leer"
 
 msgid "Invalid"
 msgstr "Ungültig"
 
+msgid "Total"
+msgstr "Total"
+
+msgid "Candidate"
+msgstr "Kandidierende"
+
+#. Default: Votes
+msgid "single_votes"
+msgstr "Stimmen"
+
+msgid "List"
+msgstr "Liste"
+
+msgid "Elected"
+msgstr "Gewählt"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "No"
+msgstr "Nein"
+
+msgid "All candidates"
+msgstr "Alle Kandidierende"
+
+msgid "Elected candidates only"
+msgstr "Nur gewählte Kandidierende"
+
+msgid "List connection"
+msgstr "Listenverbindung"
+
+msgid "Sublist connection"
+msgstr "Unterlistenverbindung"
+
+msgid "Subtotal"
+msgstr "Zwischensumme"
+
+msgid "Accounted Ballots"
+msgstr "Gültige Wahlzettel"
+
+msgid "Blank Ballots"
+msgstr "Leere Wahlzettel"
+
+msgid "Invalid Ballots"
+msgstr "Ungültige Wahlzettel"
+
+msgid "Accounted Votes"
+msgstr "Gültige Stimmen"
+
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"
+
+msgid ""
+"Successfully subscribed to the SMS services. You will receive an SMS every "
+"time new results are published."
+msgstr ""
+"Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine SMS, "
+"sobald neue Resultate publiziert wurden."
+
+msgid ""
+"You will receive an SMS as soon as new results have been published. The SMS "
+"service is free of charge. You can unsubscribe at any time."
+msgstr ""
+"Sie erhalten eine SMS, sobald neue Resultate publiziert wurden. Der SMS "
+"Service ist kostenlos. Sie können sich jederzeit vom Service abmelden."
+
+msgid ""
+"Successfully unsubscribed from the SMS services. You will no longer receive "
+"SMS when new results are published."
+msgstr ""
+"Die SMS-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine SMS "
+"mehr."
 
 #, python-format
 msgid "Do you really want to delete \"${election}\"?"
@@ -605,27 +623,6 @@ msgstr "Möchten Sie die Abstimmung \"${vote}\" wirklich löschen?"
 
 msgid "Delete vote"
 msgstr "Abstimmung löschen"
-
-msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
-"time new results are published."
-msgstr ""
-"Die SMS-Benachrichtigung wurde abonniert. Sie erhalten in Zukunft eine SMS, "
-"sobald neue Resultate publiziert wurden."
-
-msgid ""
-"You will receive an SMS as soon as new results have been published. The SMS "
-"service is free of charge. You can unsubscribe at any time."
-msgstr ""
-"Sie erhalten eine SMS, sobald neue Resultate publiziert wurden. Der SMS "
-"Service ist kostenlos. Sie können sich jederzeit vom Service abmelden."
-
-msgid ""
-"Successfully unsubscribed from the SMS services. You will no longer receive "
-"SMS when new results are published."
-msgstr ""
-"Die SMS-Benachrichtigung wurde beendet. Sie erhalten in Zukunft keine SMS "
-"mehr."
 
 #, python-format
 msgid "The year ${year} is not yet supported"

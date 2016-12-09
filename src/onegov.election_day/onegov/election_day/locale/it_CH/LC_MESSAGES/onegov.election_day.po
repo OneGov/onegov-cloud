@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-10 13:50+0100\n"
+"POT-Creation-Date: 2016-12-09 15:47+0100\n"
 "PO-Revision-Date: 2016-11-11 14:00+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -13,6 +13,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 1.8.11\n"
+
+msgid "Lists"
+msgstr "Liste"
+
+msgid "Candidates"
+msgstr "Candidati"
+
+msgid "Electoral Districts"
+msgstr "Distretti elettorali"
+
+msgid "List connections"
+msgstr "Elenca i collegamenti"
+
+msgid "Election statistics"
+msgstr "Statistiche delle elezioni"
 
 msgid "Votes"
 msgstr "Votazioni"
@@ -180,14 +195,8 @@ msgstr "Formato del file"
 msgid "Results"
 msgstr "Risultati"
 
-msgid "List connections"
-msgstr "Elenca i collegamenti"
-
 msgid "Elected Candidates"
 msgstr "Candidati eletti"
-
-msgid "Election statistics"
-msgstr "Statistiche delle elezioni"
 
 msgid "Complete"
 msgstr "Completo"
@@ -301,94 +310,6 @@ msgstr "Sì %"
 msgid "No %"
 msgstr "NO %"
 
-msgid "Not yet counted."
-msgstr "Non ancora conteggiato."
-
-msgid "Format Description"
-msgstr "Descrizione del formato"
-
-msgid "Turnout"
-msgstr "Partecipazione al voto"
-
-msgid "Elegible Voters"
-msgstr "Aventi diritto di voto"
-
-msgid "Received Ballots"
-msgstr "Schede ricevute"
-
-msgid "Counted"
-msgstr "Contati"
-
-msgid "Download"
-msgstr "Scarica"
-
-msgid "Embed"
-msgstr "Incorporare"
-
-msgid "Download"
-msgstr "Scarica"
-
-msgid "Embed"
-msgstr "Incorporare"
-
-msgid "Candidates"
-msgstr "Candidati"
-
-msgid "Candidate"
-msgstr "Candidato"
-
-#. Default: Votes
-msgid "single_votes"
-msgstr "Voti"
-
-msgid "List"
-msgstr "Lista"
-
-msgid "Elected"
-msgstr "Eletto"
-
-msgid "Yes"
-msgstr "Si"
-
-msgid "No"
-msgstr "No"
-
-msgid "All candidates"
-msgstr "Tutti i candidati"
-
-msgid "Elected candidates only"
-msgstr "Solo i candidati eletti"
-
-msgid "List connection"
-msgstr "Collegamenti tra liste"
-
-msgid "Sublist connection"
-msgstr "Collegamenti tra sottoliste"
-
-msgid "Subtotal"
-msgstr "Subtotale"
-
-msgid "Total"
-msgstr "Totale"
-
-msgid "Electoral Districts"
-msgstr "Distretti elettorali"
-
-msgid "Electoral District"
-msgstr "Circondario elettorale"
-
-msgid "Accounted Ballots"
-msgstr "Schede valide"
-
-msgid "Blank Ballots"
-msgstr "Schede bianche"
-
-msgid "Invalid Ballots"
-msgstr "Schede nulle"
-
-msgid "Accounted Votes"
-msgstr "Voti validi"
-
 msgid "Yay"
 msgstr "SÌ"
 
@@ -444,6 +365,9 @@ msgstr "Pagina successiva"
 msgid "You are here"
 msgstr "Tu sei qui"
 
+msgid "Not yet counted."
+msgstr "Non ancora conteggiato."
+
 msgid "Last change"
 msgstr "Aggiornato"
 
@@ -461,7 +385,22 @@ msgid "Get SMS alerts"
 msgstr "Ottieni SMS Alert"
 
 msgid "Stop SMS subscription"
-msgstr "Interrompi abbonamento SMS\r"
+msgstr "Interrompi abbonamento SMS"
+
+msgid "Format Description"
+msgstr "Descrizione del formato"
+
+msgid "Turnout"
+msgstr "Partecipazione al voto"
+
+msgid "Elegible Voters"
+msgstr "Aventi diritto di voto"
+
+msgid "Received Ballots"
+msgstr "Schede ricevute"
+
+msgid "Counted"
+msgstr "Contati"
 
 msgid "New Election"
 msgstr "Nuova elezione"
@@ -574,14 +513,93 @@ msgstr "Voti contrari"
 msgid "Cast Ballots"
 msgstr "Schede rientrate"
 
+msgid "Download"
+msgstr "Scarica"
+
+msgid "Embed"
+msgstr "Incorporare"
+
+msgid "Electoral District"
+msgstr "Circondario elettorale"
+
 msgid "Empty"
 msgstr "Bianche"
 
 msgid "Invalid"
 msgstr "Nulle"
 
+msgid "Total"
+msgstr "Totale"
+
+msgid "Candidate"
+msgstr "Candidato"
+
+#. Default: Votes
+msgid "single_votes"
+msgstr "Voti"
+
+msgid "List"
+msgstr "Lista"
+
+msgid "Elected"
+msgstr "Eletto"
+
+msgid "Yes"
+msgstr "Si"
+
+msgid "No"
+msgstr "No"
+
+msgid "All candidates"
+msgstr "Tutti i candidati"
+
+msgid "Elected candidates only"
+msgstr "Solo i candidati eletti"
+
+msgid "List connection"
+msgstr "Collegamenti tra liste"
+
+msgid "Sublist connection"
+msgstr "Collegamenti tra sottoliste"
+
+msgid "Subtotal"
+msgstr "Subtotale"
+
+msgid "Accounted Ballots"
+msgstr "Schede valide"
+
+msgid "Blank Ballots"
+msgstr "Schede bianche"
+
+msgid "Invalid Ballots"
+msgstr "Schede nulle"
+
+msgid "Accounted Votes"
+msgstr "Voti validi"
+
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"
+
+msgid ""
+"Successfully subscribed to the SMS services. You will receive an SMS every "
+"time new results are published."
+msgstr ""
+"Ti sei iscritto con successo al servizio SMS. Riceverai un SMS ogni volta "
+"che un nuovo risultato verrà pubblicato."
+
+msgid ""
+"You will receive an SMS as soon as new results have been published. The SMS "
+"service is free of charge. You can unsubscribe at any time."
+msgstr ""
+"Riceverai un SMS appena un nuovo risultato verrà pubblicato. Il servizio SMS "
+"è gratuito. Puoi eliminare il tuo abbonamento in ogni momento."
+
+msgid ""
+"Successfully unsubscribed from the SMS services. You will no longer receive "
+"SMS when new results are published."
+msgstr ""
+"Il tuo abbonamento al servizio SMS è stato annullato con successo. Non "
+"riceverai più SMS quando nuovi risultati saranno pubblicati."
 
 #, python-format
 msgid "Do you really want to delete \"${election}\"?"
@@ -606,27 +624,6 @@ msgstr "Desidera davvero cancellare la votazione \"${vote}\"?"
 
 msgid "Delete vote"
 msgstr "Cancellare votazione"
-
-msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
-"time new results are published."
-msgstr ""
-"Ti sei iscritto con successo al servizio SMS. Riceverai un SMS ogni volta "
-"che un nuovo risultato verrà pubblicato."
-
-msgid ""
-"You will receive an SMS as soon as new results have been published. The SMS "
-"service is free of charge. You can unsubscribe at any time."
-msgstr ""
-"Riceverai un SMS appena un nuovo risultato verrà pubblicato. Il servizio SMS "
-"è gratuito. Puoi eliminare il tuo abbonamento in ogni momento."
-
-msgid ""
-"Successfully unsubscribed from the SMS services. You will no longer receive "
-"SMS when new results are published."
-msgstr ""
-"Il tuo abbonamento al servizio SMS è stato annullato con successo. Non "
-"riceverai più SMS quando nuovi risultati saranno pubblicati.\r"
 
 #, python-format
 msgid "The year ${year} is not yet supported"

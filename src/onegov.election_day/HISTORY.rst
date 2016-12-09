@@ -1,17 +1,17 @@
 Changelog
 ---------
 
-- Adds support for PyFilesystem 2.x and Chameleon 3.x.
-  [href]
+- Uses tabs instead of foldable sections.
+  [msom]
 
 - Shows the number of SMS subscribers in the manage view.
   [msom]
 
-- Uses onegov.ballot 1.0.3.
-  [msom]
-
 - Uses fading effects on sankey charts instead of hover.
   [msom]
+
+- Adds support for PyFilesystem 2.x and Chameleon 3.x.
+  [href]
 
 1.3.5 (2016-11-23)
 ~~~~~~~~~~~~~~~~~~~

@@ -529,7 +529,10 @@ def test_view_headerless(election_day_app):
     for path in (
         '/',
         '/archive/2013',
-        '/election/majorz-election',
+        '/election/majorz-election/lists',
+        '/election/majorz-election/candidates',
+        '/election/majorz-election/connections',
+        '/election/majorz-election/statistics',
         '/vote/vote',
     ):
         assert 'frame_resizer' not in client.get(path)
@@ -540,13 +543,13 @@ def test_view_headerless(election_day_app):
 
     for path in (
         '/archive/2013/json',
-        '/election/majorz-election/candidates',
-        '/election/majorz-election/connections',
+        '/election/majorz-election/candidates-data',
+        '/election/majorz-election/connections-data',
         '/election/majorz-election/data-csv',
         '/election/majorz-election/data-json',
         '/election/majorz-election/data-xlsx',
         '/election/majorz-election/json',
-        '/election/majorz-election/lists',
+        '/election/majorz-election/lists-data',
         '/election/majorz-election/summary',
         '/json',
         '/ballot/{}/by-entity'.format(ballot),

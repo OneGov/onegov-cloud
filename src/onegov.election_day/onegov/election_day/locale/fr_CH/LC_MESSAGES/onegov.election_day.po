@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-10 13:50+0100\n"
+"POT-Creation-Date: 2016-12-09 15:47+0100\n"
 "PO-Revision-Date: 2016-11-11 13:53+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -13,6 +13,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 1.8.11\n"
+
+msgid "Lists"
+msgstr "Listes"
+
+msgid "Candidates"
+msgstr "Candidats"
+
+msgid "Electoral Districts"
+msgstr "Circonscriptions électorales"
+
+msgid "List connections"
+msgstr "Connexions de listes"
+
+msgid "Election statistics"
+msgstr "Statistiques des élections"
 
 msgid "Votes"
 msgstr "Votes"
@@ -180,14 +195,8 @@ msgstr "Format de fichier"
 msgid "Results"
 msgstr "Résultats"
 
-msgid "List connections"
-msgstr "Connexions de listes"
-
 msgid "Elected Candidates"
 msgstr "Candidats élus"
-
-msgid "Election statistics"
-msgstr "Statistiques des élections"
 
 msgid "Complete"
 msgstr "Terminé"
@@ -301,94 +310,6 @@ msgstr "Oui %"
 msgid "No %"
 msgstr "Non %"
 
-msgid "Not yet counted."
-msgstr "Pas encore compté."
-
-msgid "Format Description"
-msgstr "Description du format"
-
-msgid "Turnout"
-msgstr "Participation"
-
-msgid "Elegible Voters"
-msgstr "Electeurs valides"
-
-msgid "Received Ballots"
-msgstr "Votes reçus"
-
-msgid "Counted"
-msgstr "Compté"
-
-msgid "Download"
-msgstr "Télécharger"
-
-msgid "Embed"
-msgstr "Intégration"
-
-msgid "Download"
-msgstr "Télécharger"
-
-msgid "Embed"
-msgstr "Intégration"
-
-msgid "Candidates"
-msgstr "Candidats"
-
-msgid "Candidate"
-msgstr "Candidat"
-
-#. Default: Votes
-msgid "single_votes"
-msgstr "Votes"
-
-msgid "List"
-msgstr "Liste"
-
-msgid "Elected"
-msgstr "Élus"
-
-msgid "Yes"
-msgstr "Oui"
-
-msgid "No"
-msgstr "Non"
-
-msgid "All candidates"
-msgstr "Tous les candidats"
-
-msgid "Elected candidates only"
-msgstr "Candidats élus seulement"
-
-msgid "List connection"
-msgstr "Connexion de listes"
-
-msgid "Sublist connection"
-msgstr "Connexion de sous-listes"
-
-msgid "Subtotal"
-msgstr "Sous-total"
-
-msgid "Total"
-msgstr "Total"
-
-msgid "Electoral Districts"
-msgstr "Circonscriptions électorales"
-
-msgid "Electoral District"
-msgstr "District électoral"
-
-msgid "Accounted Ballots"
-msgstr "Bulletins de vote comptabilisés"
-
-msgid "Blank Ballots"
-msgstr "Bulletins de vote vierges"
-
-msgid "Invalid Ballots"
-msgstr "Bulletins de vote non valides"
-
-msgid "Accounted Votes"
-msgstr "Votes comptés"
-
 msgid "Yay"
 msgstr "Oui"
 
@@ -445,6 +366,9 @@ msgstr "Page suivante"
 msgid "You are here"
 msgstr "Vous êtes ici"
 
+msgid "Not yet counted."
+msgstr "Pas encore compté."
+
 msgid "Last change"
 msgstr "Actualisé"
 
@@ -463,6 +387,21 @@ msgstr "Recevoir des alertes SMS"
 
 msgid "Stop SMS subscription"
 msgstr "Arrêter l'abonnement SMS"
+
+msgid "Format Description"
+msgstr "Description du format"
+
+msgid "Turnout"
+msgstr "Participation"
+
+msgid "Elegible Voters"
+msgstr "Electeurs valides"
+
+msgid "Received Ballots"
+msgstr "Votes reçus"
+
+msgid "Counted"
+msgstr "Compté"
 
 msgid "New Election"
 msgstr "Nouveau election"
@@ -575,45 +514,79 @@ msgstr "Non"
 msgid "Cast Ballots"
 msgstr "Suffrages exprimés"
 
+msgid "Download"
+msgstr "Télécharger"
+
+msgid "Embed"
+msgstr "Intégration"
+
+msgid "Electoral District"
+msgstr "District électoral"
+
 msgid "Empty"
 msgstr "Vide"
 
 msgid "Invalid"
 msgstr "Invalide"
 
+msgid "Total"
+msgstr "Total"
+
+msgid "Candidate"
+msgstr "Candidat"
+
+#. Default: Votes
+msgid "single_votes"
+msgstr "Votes"
+
+msgid "List"
+msgstr "Liste"
+
+msgid "Elected"
+msgstr "Élus"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "No"
+msgstr "Non"
+
+msgid "All candidates"
+msgstr "Tous les candidats"
+
+msgid "Elected candidates only"
+msgstr "Candidats élus seulement"
+
+msgid "List connection"
+msgstr "Connexion de listes"
+
+msgid "Sublist connection"
+msgstr "Connexion de sous-listes"
+
+msgid "Subtotal"
+msgstr "Sous-total"
+
+msgid "Accounted Ballots"
+msgstr "Bulletins de vote comptabilisés"
+
+msgid "Blank Ballots"
+msgstr "Bulletins de vote vierges"
+
+msgid "Invalid Ballots"
+msgstr "Bulletins de vote non valides"
+
+msgid "Accounted Votes"
+msgstr "Votes comptés"
+
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"
-
-#, python-format
-msgid "Do you really want to delete \"${election}\"?"
-msgstr "Voulez-vous vraiment supprimer \"$ {election}\"?"
-
-msgid "Delete election"
-msgstr "Supprimer l'élection"
-
-msgid ""
-"There are no changes since the last time the notifications have been "
-"triggered!"
-msgstr ""
-"Il n'y a pas eu de changements depuis la dernière fois que les "
-"notifications ont été activées !"
-
-msgid "Do you really want to retrigger the notfications?"
-msgstr "Voulez-vous vraiment réactiver les notifications ?"
-
-#, python-format
-msgid "Do you really want to delete \"${vote}\"?"
-msgstr "Souhaitez-vous vraiment supprimer \"${vote}\"?"
-
-msgid "Delete vote"
-msgstr "Supprimer le vote"
 
 msgid ""
 "Successfully subscribed to the SMS services. You will receive an SMS every "
 "time new results are published."
 msgstr ""
-"Inscription réussie aux services SMS. Vous recevrez un SMS à chaque fois "
-"que de nouveaux résultats seront publiés."
+"Inscription réussie aux services SMS. Vous recevrez un SMS à chaque fois que "
+"de nouveaux résultats seront publiés."
 
 msgid ""
 "You will receive an SMS as soon as new results have been published. The SMS "
@@ -626,8 +599,32 @@ msgid ""
 "Successfully unsubscribed from the SMS services. You will no longer receive "
 "SMS when new results are published."
 msgstr ""
-"Désabonnement aux services SMS réussi. Vous ne recevrez plus de SMS quand "
-"de nouveaux résultats seront publiés."
+"Désabonnement aux services SMS réussi. Vous ne recevrez plus de SMS quand de "
+"nouveaux résultats seront publiés."
+
+#, python-format
+msgid "Do you really want to delete \"${election}\"?"
+msgstr "Voulez-vous vraiment supprimer \"$ {election}\"?"
+
+msgid "Delete election"
+msgstr "Supprimer l'élection"
+
+msgid ""
+"There are no changes since the last time the notifications have been "
+"triggered!"
+msgstr ""
+"Il n'y a pas eu de changements depuis la dernière fois que les notifications "
+"ont été activées !"
+
+msgid "Do you really want to retrigger the notfications?"
+msgstr "Voulez-vous vraiment réactiver les notifications ?"
+
+#, python-format
+msgid "Do you really want to delete \"${vote}\"?"
+msgstr "Souhaitez-vous vraiment supprimer \"${vote}\"?"
+
+msgid "Delete vote"
+msgstr "Supprimer le vote"
 
 #, python-format
 msgid "The year ${year} is not yet supported"

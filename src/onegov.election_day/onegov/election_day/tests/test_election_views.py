@@ -10,19 +10,36 @@ def test_view_election(election_day_app_gr):
     client.get('/locale/de_CH').follow()
 
     login(client)
-    upload_majorz_election(client)
-    upload_proporz_election(client)
 
-    response = client.get('/election/majorz-election')
+    upload_majorz_election(client)
+
+    response = client.get('/election/majorz-election').follow()
     assert all((expected in response for expected in (
-        "Engler", "Stefan", "20", "Schmid", "Martin", "18", "Mutten",
-        "Brusio", "Noch nicht ausgezählt"
+        "Engler", "Stefan", "20", "Schmid", "Martin", "18",
+        "Noch nicht ausgezählt"
     )))
 
-    response = client.get('/election/proporz-election')
+    response = client.get('/election/majorz-election/districts')
     assert all((expected in response for expected in (
-        "Casanova", "Angela", "56", "Caluori", "Corina", "32", "CVP", "FDP",
         "Mutten", "Brusio", "Noch nicht ausgezählt"
+    )))
+
+    upload_proporz_election(client)
+
+    response = client.get('/election/proporz-election').follow()
+    assert all((expected in response for expected in (
+        "56", "32", "CVP", "FDP", "Noch nicht ausgezählt"
+    )))
+
+    response = client.get('/election/proporz-election/candidates')
+    assert all((expected in response for expected in (
+        "Casanova", "Angela", "Caluori", "Corina", "56", "32", "CVP", "FDP",
+        "Noch nicht ausgezählt"
+    )))
+
+    response = client.get('/election/proporz-election/statistics')
+    assert all((expected in response for expected in (
+        "56", "32", "Mutten", "Brusio", "Noch nicht ausgezählt"
     )))
 
 
@@ -59,21 +76,28 @@ def test_view_election_lists(election_day_app_gr):
 
     login(client)
     upload_majorz_election(client)
-    upload_proporz_election(client)
 
-    lists = client.get('/election/majorz-election/lists')
+    main = client.get('/election/majorz-election/lists')
+    assert '<h3>Listen</h3>' not in main
+
+    lists = client.get('/election/majorz-election/lists-data')
     assert lists.json['results'] == []
 
     chart = client.get('/election/majorz-election/lists-chart')
     assert chart.status_code == 200
     assert '/election/majorz-election/lists' in chart
 
-    lists = client.get('/election/proporz-election/lists')
+    upload_proporz_election(client)
+
+    main = client.get('/election/proporz-election/lists')
+    assert '<h3>Listen</h3>' in main
+
+    lists = client.get('/election/proporz-election/lists-data')
     assert all((expected in lists for expected in ("FDP", "8", "CVP", "5")))
 
     chart = client.get('/election/proporz-election/lists-chart')
     assert chart.status_code == 200
-    assert '/election/proporz-election/lists' in chart
+    assert '/election/proporz-election/lists-data' in chart
 
 
 def test_view_election_connections(election_day_app_gr):
@@ -82,15 +106,22 @@ def test_view_election_connections(election_day_app_gr):
 
     login(client)
     upload_majorz_election(client)
-    upload_proporz_election(client)
 
-    assert client.get('/election/majorz-election/connections').json == {}
+    main = client.get('/election/majorz-election/connections')
+    assert '<h3>Listenverbindungen</h3>' not in main
+
+    assert client.get('/election/majorz-election/connections-data').json == {}
 
     chart = client.get('/election/majorz-election/connections-chart')
     assert chart.status_code == 200
-    assert '/election/majorz-election/connections' in chart
+    assert '/election/majorz-election/connections-data' in chart
 
-    data = client.get('/election/proporz-election/connections').json
+    upload_proporz_election(client)
+
+    main = client.get('/election/proporz-election/connections')
+    assert '<h3>Listenverbindungen</h3>' in main
+
+    data = client.get('/election/proporz-election/connections-data').json
 
     nodes = [node['name'] for node in data['nodes']]
     assert 'FDP' in nodes
@@ -104,7 +135,7 @@ def test_view_election_connections(election_day_app_gr):
 
     chart = client.get('/election/proporz-election/connections-chart')
     assert chart.status_code == 200
-    assert '/election/proporz-election/connections' in chart
+    assert '/election/proporz-election/connections-data' in chart
 
 
 def test_view_election_json(election_day_app_gr):

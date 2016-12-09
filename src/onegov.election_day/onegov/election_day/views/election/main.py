@@ -1,185 +1,22 @@
-from onegov.ballot import (
-    Candidate,
-    CandidateResult,
-    Election,
-    ElectionResult,
-    List,
-    ListConnection
-)
+import morepath
+
+from onegov.ballot import Election
 from onegov.core.security import Public
-from onegov.core.utils import groupbylist
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
-from onegov.election_day.utils import handle_headerless_params
+from onegov.election_day.views.election import get_candidates_results
+from onegov.election_day.views.election import get_connection_results
 from onegov.election_day.views.election.lists import get_list_results
-from sqlalchemy import desc
 from sqlalchemy.orm import object_session
 
 
-def to_int(value):
-    try:
-        return int(value)
-    except ValueError:
-        return value
-
-
-def get_missing_entities(election, request, session):
-    result = []
-
-    all_ = request.app.principal.entities[election.date.year]
-
-    used = session.query(ElectionResult.entity_id)
-    used = used.filter(ElectionResult.election_id == election.id)
-    used = used.distinct()
-    used = [item[0] for item in used]
-
-    for id in set(all_.keys()) - set(used):
-        result.append(all_[id]['name'])
-
-    return result
-
-
-def get_candidates_results(election, session):
-    """ Returns the aggregated candidates results as list. """
-
-    result = session.query(
-        Candidate.family_name,
-        Candidate.first_name,
-        Candidate.elected,
-        Candidate.votes,
-        List.name,
-        List.list_id
-    )
-    result = result.outerjoin(List)
-    result = result.order_by(
-        List.list_id,
-        desc(Candidate.elected),
-        desc(Candidate.votes),
-        Candidate.family_name,
-        Candidate.first_name
-    )
-    result = result.filter(Candidate.election_id == election.id)
-
-    return result
-
-
-def get_candidate_electoral_results(election, session):
-    """ Returns the aggregated candidates results per entity as list. """
-
-    if election.type != 'majorz':
-        return []
-
-    result = session.query(ElectionResult.group, CandidateResult.votes)
-    result = result.outerjoin(CandidateResult, Candidate)
-    result = result.order_by(
-        ElectionResult.group,
-        Candidate.candidate_id
-    )
-    result = result.filter(ElectionResult.election_id == election.id)
-    result = groupbylist(result, lambda x: x[0])
-
-    return result
-
-
-def get_connection_results(election, session):
-    """ Returns the aggregated list connection results as list. """
-
-    if election.type != 'proporz':
-        return []
-
-    parents = session.query(
-        ListConnection.id,
-        ListConnection.connection_id,
-        ListConnection.votes
-    )
-    parents = parents.filter(
-        ListConnection.election_id == election.id,
-        ListConnection.parent_id == None
-    )
-    parents = parents.order_by(ListConnection.connection_id)
-
-    children = session.query(
-        ListConnection.parent_id,
-        ListConnection.connection_id,
-        ListConnection.votes,
-        ListConnection.id
-    )
-    children = children.filter(
-        ListConnection.election_id == election.id,
-        ListConnection.parent_id != None
-    )
-    children = children.order_by(
-        ListConnection.parent_id,
-        ListConnection.connection_id
-    )
-    children = dict(groupbylist(children, lambda x: str(x[0])))
-
-    sublists = session.query(
-        List.connection_id,
-        List.name,
-        List.votes,
-        List.list_id
-    )
-    sublists = sublists.filter(
-        List.connection_id != None,
-        List.election_id == election.id
-    )
-    sublists = sublists.order_by(List.connection_id)
-    sublists = dict(groupbylist(sublists, lambda x: str(x[0])))
-
-    result = []
-    for parent in parents:
-        id = str(parent[0])
-        subconnections = [(
-            child[1],
-            to_int(child[2]),
-            [(l[1], l[2], l[3]) for l in sorted(
-                sublists.get(str(child[3]), []),
-                key=lambda x: to_int(x[3])
-            )]
-        ) for child in children.get(id, [])]
-
-        connection = [
-            parent[1],
-            to_int(parent[2] or 0),
-            [(list[1], list[2], list[3]) for list in sublists.get(id, [])],
-            subconnections
-        ]
-        connection[1] += sum([c[1] for c in connection[3]])
-        result.append(connection)
-
-    return result
-
-
-@ElectionDayApp.html(model=Election, template='election.pt', permission=Public)
+@ElectionDayApp.html(model=Election, permission=Public)
 def view_election(self, request):
     """" The main view. """
 
-    request.include('bar_chart')
-    request.include('sankey_chart')
-    request.include('tablesorter')
-
-    handle_headerless_params(request)
-
-    session = object_session(self)
-
-    candidates = get_candidates_results(self, session).all()
-
-    return {
-        'election': self,
-        'layout': DefaultLayout(self, request),
-        'majorz': self.type == 'majorz',
-        'has_results': True if self.results.first() else False,
-        'candidates': candidates,
-        'number_of_candidates': len(candidates),
-        'electoral': get_candidate_electoral_results(self, session),
-        'connections': get_connection_results(self, session),
-        'missing_entities': get_missing_entities(
-            self, request, session
-        ),
-    }
+    return morepath.redirect(ElectionsLayout(self, request).main_view)
 
 
 @ElectionDayApp.json(model=Election, permission=Public, name='json')

@@ -1,0 +1,69 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="before-content">
+        <div metal:use-macro="layout.macros['election_header']" />
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change election.last_result_change; counted layout.counted" />
+
+        <tal:block tal:condition="layout.visible()">
+
+            <h2 i18n:translate="">Results</h2>
+
+            <div metal:use-macro="layout.macros['election_factoids']" />
+
+            <div metal:use-macro="layout.macros['tab_menu']"/>
+
+            <h3 tal:content="layout.title()" />
+
+            <div class="row">
+                <div class="small-12 small-centered large-10 columns">
+                    <div class="sankey-chart" i18n:attributes="data-download-link; data-embed-link"
+                        data-dataurl="${request.link(election, name='connections-data')}"
+                        data-download-link="Download"
+                        data-embed-link="Embed"
+                        data-embed-source="${request.link(election, name='connections-chart')}">
+                    </div>
+                </div>
+            </div>
+
+            <tal:block tal:repeat="connection connections">
+                <table class="ballot-results">
+                    <thead>
+                        <tr>
+                            <th><span i18n:translate="">List connection</span> ${connection[0]}</th>
+                            <th i18n:translate="single_votes" class="right-aligned">Votes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr tal:repeat="list connection[2]">
+                            <td>${list[0]}</td>
+                            <td class="right-aligned">${layout.format_number(list[1])}</td>
+                        </tr>
+                        <tal:block tal:repeat="subconnection connection[3]">
+                            <tr>
+                                <td><span i18n:translate="">Sublist connection</span> ${subconnection[0]}</td>
+                                <td></td>
+                            </tr>
+                            <tr tal:repeat="list subconnection[2]">
+                                <td>${list[0]}</td>
+                                <td class="right-aligned">${layout.format_number(int(list[1]))}</td>
+                            </tr>
+                            <tr class="subtotal">
+                                <td i18n:translate="">Subtotal</td>
+                                <td class="right-aligned">${layout.format_number(int(subconnection[1]))}</td>
+                            </tr>
+                        </tal:block>
+                        <tr class="total">
+                            <td i18n:translate="">Total</td>
+                            <td class="right-aligned">${layout.format_number(int(connection[1]))}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </tal:block>
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['related_link']" tal:define="meta election.meta" />
+
+    </tal:block>
+</div>

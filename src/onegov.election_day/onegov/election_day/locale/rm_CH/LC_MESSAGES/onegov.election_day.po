@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-10 13:50+0100\n"
+"POT-Creation-Date: 2016-12-09 15:47+0100\n"
 "PO-Revision-Date: 2016-11-18 09:16+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -12,6 +12,21 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: xls-to-po 1.0\n"
 "X-Generator: Poedit 1.8.11\n"
+
+msgid "Lists"
+msgstr "Glistas"
+
+msgid "Candidates"
+msgstr "Candidatas e candidats"
+
+msgid "Electoral Districts"
+msgstr "Circuls electorals"
+
+msgid "List connections"
+msgstr "Colliaziuns da glistas"
+
+msgid "Election statistics"
+msgstr "Statistica electorala"
 
 msgid "Votes"
 msgstr "Votaziuns"
@@ -166,14 +181,8 @@ msgstr "Format da la datoteca"
 msgid "Results"
 msgstr "Resultats"
 
-msgid "List connections"
-msgstr "Colliaziuns da glistas"
-
 msgid "Elected Candidates"
 msgstr "Candidat(a)s elegid(a)s"
-
-msgid "Election statistics"
-msgstr "Statistica electorala"
 
 msgid "Complete"
 msgstr "Resultat eruì cumplettamain"
@@ -287,94 +296,6 @@ msgstr "% GEA"
 msgid "No %"
 msgstr "% NA"
 
-msgid "Not yet counted."
-msgstr "Anc betg eruì il resultat."
-
-msgid "Format Description"
-msgstr "descripziun dal format"
-
-msgid "Turnout"
-msgstr "Participaziun a las elecziuns"
-
-msgid "Elegible Voters"
-msgstr "Persunas cun dretg da votar"
-
-msgid "Received Ballots"
-msgstr "Cedels electorals consegnads"
-
-msgid "Counted"
-msgstr "Dumbrà ora"
-
-msgid "Download"
-msgstr "telechargiar"
-
-msgid "Embed"
-msgstr "incorporar"
-
-msgid "Download"
-msgstr "telechargiar"
-
-msgid "Embed"
-msgstr "incorporar"
-
-msgid "Candidates"
-msgstr "Candidatas e candidats"
-
-msgid "Candidate"
-msgstr "Persuna che candidescha"
-
-#. Default: Votes
-msgid "single_votes"
-msgstr "Vuschs"
-
-msgid "List"
-msgstr "Glista"
-
-msgid "Elected"
-msgstr "Elegida/elegì"
-
-msgid "Yes"
-msgstr "Gea"
-
-msgid "No"
-msgstr "Na"
-
-msgid "All candidates"
-msgstr "Tut las candidatas e candidats"
-
-msgid "Elected candidates only"
-msgstr "Mo candidat(a)s elegid(a)s"
-
-msgid "List connection"
-msgstr "Colliaziun da glistas"
-
-msgid "Sublist connection"
-msgstr "Sutcolliaziun da glistas"
-
-msgid "Subtotal"
-msgstr "Summa intermediara"
-
-msgid "Total"
-msgstr "Total"
-
-msgid "Electoral Districts"
-msgstr "Circuls electorals"
-
-msgid "Electoral District"
-msgstr "Circul electoral"
-
-msgid "Accounted Ballots"
-msgstr "Cedels valaivels"
-
-msgid "Blank Ballots"
-msgstr "Cedels electorals vids"
-
-msgid "Invalid Ballots"
-msgstr "Cedels electorals nunvalaivels"
-
-msgid "Accounted Votes"
-msgstr "Vuschs valaivlas"
-
 msgid "Yay"
 msgstr "GEA"
 
@@ -467,6 +388,9 @@ msgstr "Proxima pagina"
 msgid "You are here"
 msgstr "Pagina actuala"
 
+msgid "Not yet counted."
+msgstr "Anc betg eruì il resultat."
+
 msgid "Last change"
 msgstr "Actualisà"
 
@@ -485,6 +409,21 @@ msgstr "Abunar la communicaziun per SMS"
 
 msgid "Stop SMS subscription"
 msgstr "Terminar l'abunament dad SMS"
+
+msgid "Format Description"
+msgstr "descripziun dal format"
+
+msgid "Turnout"
+msgstr "Participaziun a las elecziuns"
+
+msgid "Elegible Voters"
+msgstr "Persunas cun dretg da votar"
+
+msgid "Received Ballots"
+msgstr "Cedels electorals consegnads"
+
+msgid "Counted"
+msgstr "Dumbrà ora"
 
 msgid "New Election"
 msgstr "Nova elecziun"
@@ -597,16 +536,96 @@ msgstr "Vuschs negativas"
 msgid "Cast Ballots"
 msgstr "Cedels da votar entrads"
 
+msgid "Download"
+msgstr "telechargiar"
+
+msgid "Embed"
+msgstr "incorporar"
+
+msgid "Electoral District"
+msgstr "Circul electoral"
+
 msgid "Empty"
 msgstr "Vid"
 
 msgid "Invalid"
 msgstr "Nunvalaivel"
 
+msgid "Total"
+msgstr "Total"
+
+msgid "Candidate"
+msgstr "Persuna che candidescha"
+
+#. Default: Votes
+msgid "single_votes"
+msgstr "Vuschs"
+
+msgid "List"
+msgstr "Glista"
+
+msgid "Elected"
+msgstr "Elegida/elegì"
+
+msgid "Yes"
+msgstr "Gea"
+
+msgid "No"
+msgstr "Na"
+
+msgid "All candidates"
+msgstr "Tut las candidatas e candidats"
+
+msgid "Elected candidates only"
+msgstr "Mo candidat(a)s elegid(a)s"
+
+msgid "List connection"
+msgstr "Colliaziun da glistas"
+
+msgid "Sublist connection"
+msgstr "Sutcolliaziun da glistas"
+
+msgid "Subtotal"
+msgstr "Summa intermediara"
+
+msgid "Accounted Ballots"
+msgstr "Cedels valaivels"
+
+msgid "Blank Ballots"
+msgstr "Cedels electorals vids"
+
+msgid "Invalid Ballots"
+msgstr "Cedels electorals nunvalaivels"
+
+msgid "Accounted Votes"
+msgstr "Vuschs valaivlas"
+
 msgid "Wrong username or password"
 msgstr ""
 "Il num da l'utilisadra u da l'utilisader n'è betg enconuschent u il pled-"
 "clav è sbaglià"
+
+msgid ""
+"Successfully subscribed to the SMS services. You will receive an SMS every "
+"time new results are published."
+msgstr ""
+"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
+"SMS, uschespert che novs resultats èn vegnids publitgads."
+
+msgid ""
+"You will receive an SMS as soon as new results have been published. The SMS "
+"service is free of charge. You can unsubscribe at any time."
+msgstr ""
+"Vus survegnis in SMS, uschespert che novs resultats èn vegnids publitgads. "
+"Quest servetsch dad SMS è gratuit. Vus pudais terminar da tut temp il "
+"servetsch dad SMS."
+
+msgid ""
+"Successfully unsubscribed from the SMS services. You will no longer receive "
+"SMS when new results are published."
+msgstr ""
+"La communicaziun per SMS è vegnida terminada. A partir d'ussa na survegnis "
+"Vus pli nagins SMS en chaussa."
 
 #, python-format
 msgid "Do you really want to delete \"${election}\"?"
@@ -631,28 +650,6 @@ msgstr "Vulais Vus propi stizzar la votaziun \"${vote}\"?"
 
 msgid "Delete vote"
 msgstr "Stizzar la votaziun"
-
-msgid ""
-"Successfully subscribed to the SMS services. You will receive an SMS every "
-"time new results are published."
-msgstr ""
-"La communicaziun per SMS è vegnida abunada. A partir d'ussa survegnis Vus in "
-"SMS, uschespert che novs resultats èn vegnids publitgads."
-
-msgid ""
-"You will receive an SMS as soon as new results have been published. The SMS "
-"service is free of charge. You can unsubscribe at any time."
-msgstr ""
-"Vus survegnis in SMS, uschespert che novs resultats èn vegnids publitgads. "
-"Quest servetsch dad SMS è gratuit. Vus pudais terminar da tut temp il "
-"servetsch dad SMS."
-
-msgid ""
-"Successfully unsubscribed from the SMS services. You will no longer receive "
-"SMS when new results are published."
-msgstr ""
-"La communicaziun per SMS è vegnida terminada. A partir d'ussa na survegnis "
-"Vus pli nagins SMS en chaussa."
 
 #, python-format
 msgid "The year ${year} is not yet supported"

@@ -162,13 +162,13 @@
     </nav>
 </metal:breadcrumbs>
 
-<metal:manage_menu define-macro="manage_menu">
+<metal:tab_menu define-macro="tab_menu">
     <ul class="tabs" tal:condition="layout.menu">
         <tal:block repeat="item layout.menu">
             <li class="tab-title ${item[2]}"><a href="${item[1]}">${item[0]}</a></li>
         </tal:block>
     </ul>
-</metal:manage_menu>
+</metal:tab_menu>
 
 <metal:temporary_results_callout define-macro="temporary_results_callout" i18n:domain="onegov.election_day">
     <div class="panel callout radius" tal:condition="not:counted">
@@ -192,5 +192,53 @@
         </div>
     </div>
 </metal:subscription_links>
+
+<metal:election_header define-macro="election_header" i18n:domain="onegov.election_day">
+    <h1>
+        <small i18n:translate="" tal:condition="not: election.counted">Not yet counted.</small>
+        ${election.title}
+    </h1>
+    <div class="download-results">
+        <a data-dropdown="download-dropdown" data-options="align:left" aria-controls="download-dropdown" aria-expanded="false"><i class="fa fa-download"></i></a>
+        <ul id="download-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
+            <li><a href="${request.link(election, 'data-json')}">JSON</a></li>
+            <li><a href="${request.link(election, 'data-csv')}">CSV</a></li>
+            <li><a href="${request.link(election, 'data-xlsx')}">XLSX</a></li>
+            <li><a href="${layout.opendata_link}"><em i18n:translate="">Format Description</em></a></li>
+        </ul>
+    </div>
+    <hr />
+</metal:election_header>
+
+<metal:election_factoids define-macro="election_factoids" i18n:domain="onegov.election_day">
+    <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+        <li>
+            <span i18n:translate="">Turnout</span>
+            <strong>${'{0:.2f}'.format(election.turnout)} %</strong>
+        </li>
+        <li>
+            <span i18n:translate="">Elegible Voters</span>
+            <strong>${layout.format_number(election.elegible_voters)}</strong>
+        </li>
+        <li>
+            <span i18n:translate="">Received Ballots</span>
+            <strong>${layout.format_number(election.received_ballots)}</strong>
+        </li>
+        <li>
+            <span i18n:translate="">Counted</span>
+            <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" /></strong>
+        </li>
+    </ul>
+    <ul class="small-block-grid-1 medium-block-grid-4 factoids">
+        <li>
+            <span i18n:translate="">Mandates</span>
+            <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress (election.allocated_mandates, election.number_of_mandates)" /></strong>
+        </li>
+        <li tal:condition="layout.majorz">
+            <span i18n:translate="">Absolute majority</span>
+            <strong tal:condition="election.absolute_majority">${layout.format_number(election.absolute_majority or 0)}</strong>
+        </li>
+    </ul>
+</metal:election_factoids>
 
 </body>

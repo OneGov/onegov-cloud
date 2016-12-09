@@ -77,12 +77,18 @@ def test_upload_election_sesam_majorz(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "125 von 125", "2 von 2", "137'126", "55'291", "40.32 %",
-        "48'778", "5'365", "1'148", "84'046",
-        # candidates
+        "125 von 125", "2 von 2", "137'126", "55'291", "40.32 %"
+    )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "48'778", "5'365", "1'148", "84'046"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
         "39'608", "35'926"
     )))
     assert archive.query().one().progress == (125, 125)
@@ -94,12 +100,18 @@ def test_upload_election_sesam_majorz(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "125 von 125", "2 von 2", "137'126", "55'291", "40.32 %",
-        "48'778", "5'365", "1'148", "84'046",
-        # candidates
+        "125 von 125", "2 von 2", "137'126", "55'291", "40.32 %"
+    )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "48'778", "5'365", "1'148", "84'046"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
         "39'608", "35'926"
     )))
 
@@ -133,15 +145,24 @@ def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "125 von 125", "5 von 5", "137'126", "63'053", "45.98 %", "145",
-        "2'314", "60'594", "300'743",
-        # list connections
+        "125 von 125", "5 von 5", "137'126", "63'053", "45.98 %"
+    )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "145", "2'314", "60'594", "300'743"
+    )))
+
+    results = client.get('/election/election/connections')
+    assert all((expected in results for expected in (
         "20'610", "33'950", "41'167", "23'673",
-        "39'890", "52'992", "76'665",
-        # candidates
+        "39'890", "52'992", "76'665"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
         "1'788", "1'038", "520"
     )))
     assert archive.query().one().progress == (125, 125)
@@ -153,15 +174,25 @@ def test_upload_election_sesam_proporz(election_day_app_gr, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
         # totals
-        "125 von 125", "5 von 5", "137'126", "63'053", "45.98 %", "145",
-        "2'314", "60'594", "300'743",
-        # list connections
+        "125 von 125", "5 von 5", "137'126", "63'053", "45.98 %"
+    )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "145", "2'314", "60'594", "300'743"
+    )))
+
+    results = client.get('/election/election/connections')
+    assert all((expected in results for expected in (
         "20'610", "33'950", "41'167", "23'673",
-        "39'890", "52'992", "76'665",
-        # candidates
+        "39'890", "52'992", "76'665"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
         "1'788", "1'038", "520"
     )))
 
@@ -363,13 +394,21 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "144'529", "942", "223", "145'694",
-        # candidates
-        "53'308", "36'282", "54'616",
+        "47.79 %", "304'850", "145'694"
     )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "144'529", "942", "223", "145'694"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
+        "53'308", "36'282", "54'616"
+    )))
+
     assert archive.query().one().progress == (85, 0)
 
     elected = "ID,Name,Vorname\n3,Rechsteiner,Paul".encode('utf-8')
@@ -382,13 +421,19 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "1 von 1", "304'850", "47.79 %", "85 von 85", "144'529", "942", "223",
-        "145'694",
-        # candidates
-        "53'308", "36'282", "54'616",
+        "1 von 1", "304'850", "47.79 %", "85 von 85"
+    )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "144'529", "942", "223", "145'694"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
+        "53'308", "36'282", "54'616"
     )))
 
     upload = client.get('/election/election/upload')
@@ -400,13 +445,19 @@ def test_upload_election_wabsti_majorz(election_day_app_sg, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "1 von 1", "304'850", "47.79 %", "85 von 85", "144'529", "942", "223",
-        "145'694",
-        # candidates
-        "53'308", "36'282", "54'616",
+        "1 von 1", "304'850", "47.79 %", "85 von 85"
+    )))
+    results = client.get('/election/election/statistics')
+
+    assert all((expected in results for expected in (
+        "144'529", "942", "223", "145'694"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
+        "53'308", "36'282", "54'616"
     )))
 
 
@@ -590,9 +641,8 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election/candidates')
     assert all((expected in results for expected in (
-        # candidates
         "3'240", "10'174", "17'034"
     )))
     assert archive.query().one().progress == (11, 0)
@@ -607,16 +657,23 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
-
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "11 von 11", "74'803", "40'200", "53.74 %", "39'067", "118", "1'015",
-        "116'689",
-        # connections
-        "30'532", "4'178", "807",
-        "25'528", "20'584", "35'543",
-        # candidates
+        "11 von 11", "74'803", "40'200", "53.74 %"
+    )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "39'067", "118", "1'015", "116'689",
+    )))
+
+    results = client.get('/election/election/connections')
+    assert all((expected in results for expected in (
+        "30'532", "4'178", "807", "25'528", "20'584", "35'543"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
         "3'240", "10'174", "17'034"
     )))
 
@@ -634,14 +691,23 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %", "39'067",
-        "118", "1'015", "116'689",
-        # connections
-        "30'532", "4'178", "807",
-        # candidates
+        "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %"
+    )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "39'067", "118", "1'015", "116'689",
+    )))
+
+    results = client.get('/election/election/connections')
+    assert all((expected in results for expected in (
+        "30'532", "4'178", "807"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
         "3'240", "10'174", "17'034"
     )))
 
@@ -656,14 +722,23 @@ def test_upload_election_wabsti_proporz(election_day_app, tar_file):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    results = client.get('/election/election')
+    results = client.get('/election/election').follow()
     assert all((expected in results for expected in (
-        # totals
-        "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %", "39'067",
-        "118", "1'015", "116'689",
-        # connections
-        "30'532", "4'178", "807",
-        # candidates
+        "11 von 11", "3 von 3", "74'803", "40'200", "53.74 %"
+    )))
+
+    results = client.get('/election/election/statistics')
+    assert all((expected in results for expected in (
+        "39'067", "118", "1'015", "116'689",
+    )))
+
+    results = client.get('/election/election/connections')
+    assert all((expected in results for expected in (
+        "30'532", "4'178", "807"
+    )))
+
+    results = client.get('/election/election/candidates')
+    assert all((expected in results for expected in (
         "3'240", "10'174", "17'034"
     )))
 
@@ -961,7 +1036,7 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
     anonymous = Client(election_day_app_gr)
     anonymous.get('/locale/de_CH').follow()
 
-    assert "1'013" in anonymous.get('/election/election')
+    assert "1'013" in anonymous.get('/election/election').follow()
 
     csv = csv.replace('1013', '1015')
 
@@ -974,8 +1049,8 @@ def test_upload_election_invalidate_cache(election_day_app_gr):
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
 
-    assert "1'013" not in anonymous.get('/election/election')
-    assert "1'015" in anonymous.get('/election/election')
+    assert "1'013" not in anonymous.get('/election/election').follow()
+    assert "1'015" in anonymous.get('/election/election').follow()
 
 
 def test_upload_election_temporary_results_majorz(election_day_app):
@@ -1375,7 +1450,7 @@ def test_upload_communal_election(election_day_app_kriens):
     assert "erfolgreich hochgeladen" in upload.form.submit()
     assert archive.query().one().progress == (1, 1)
 
-    result = client.get('/election/election')
+    result = client.get('/election/election').follow()
     assert '36.16' in result
     assert 'Wahlkreise' not in result
     assert '<td>Total' not in result
@@ -1451,7 +1526,9 @@ def test_upload_communal_election_districts(election_day_app_bern):
     assert "erfolgreich hochgeladen" in upload.form.submit()
     assert archive.query().one().progress == (6, 6)
 
-    result = client.get('/election/election')
+    result = client.get('/election/election').follow()
     assert '35.49' in result
+
+    result = client.get('/election/election/statistics')
     assert 'Wahlkreise' in result
     assert '<td>Total' in result

@@ -106,6 +106,98 @@ class DefaultLayout(Layout):
     pass
 
 
+class ElectionsLayout(Layout):
+
+    @cached_property
+    def all_tabs(self):
+        return (
+            'lists',
+            'candidates',
+            'districts',
+            'connections',
+            'statistics'
+        )
+
+    def title(self, tab=None):
+        tab = self.tab if tab is None else tab
+
+        if tab == 'lists':
+            return _("Lists")
+        if tab == 'candidates':
+            return _("Candidates")
+        if tab == 'districts':
+            return _("Electoral Districts")
+        if tab == 'connections':
+            return _("List connections")
+        if tab == 'statistics':
+            return _("Election statistics")
+
+        return ''
+
+    def visible(self, tab=None):
+        if not self.has_results:
+            return False
+
+        tab = self.tab if tab is None else tab
+
+        if tab == 'lists':
+            return self.proporz
+        if tab == 'districts':
+            return self.majorz and self.summarize
+        if tab == 'connections':
+            return self.proporz and self.model.list_connections.first()
+
+        return True
+
+    @cached_property
+    def has_results(self):
+        if self.model.results.first():
+            return True
+        return False
+
+    @cached_property
+    def majorz(self):
+        if self.model.type == 'majorz':
+            return True
+        return False
+
+    @cached_property
+    def proporz(self):
+        if self.model.type == 'proporz':
+            return True
+        return False
+
+    @cached_property
+    def counted(self):
+        if self.has_results and self.model.counted:
+            return True
+        return False
+
+    @cached_property
+    def summarize(self):
+        return self.model.total_entities != 1
+
+    @cached_property
+    def main_view(self):
+        if self.proporz:
+            return self.request.link(self.model, 'lists')
+        return self.request.link(self.model, 'candidates')
+
+    @cached_property
+    def menu(self):
+        return (
+            (
+                self.title(tab),
+                self.request.link(self.model, tab),
+                'active' if self.tab == tab else ''
+            ) for tab in self.all_tabs if self.visible(tab)
+        )
+
+    def __init__(self, model, request, tab=None):
+        super().__init__(model, request)
+        self.tab = tab
+
+
 class ManageLayout(DefaultLayout):
 
     @cached_property

@@ -1,0 +1,51 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="before-content">
+        <div metal:use-macro="layout.macros['election_header']" />
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change election.last_result_change; counted layout.counted" />
+
+        <tal:block tal:condition="layout.visible()">
+
+            <h2 i18n:translate="">Results</h2>
+
+            <div metal:use-macro="layout.macros['election_factoids']" />
+
+            <div metal:use-macro="layout.macros['tab_menu']"/>
+
+            <h3 tal:content="layout.title()" />
+
+            <table class="ballot-results stackable sortable">
+                <thead>
+                    <tr>
+                        <th i18n:translate="">Electoral District</th>
+                        <th tal:repeat="candidate election.candidates" class="right-aligned">${candidate.family_name} ${candidate.first_name}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="total static">
+                        <td i18n:translate="">Total</td>
+                        <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
+                    </tr>
+                    <tr tal:repeat="result electoral">
+                        <td>${result[0]}</td>
+                        <td tal:repeat="candidate result[1]" class="right-aligned">${layout.format_number(candidate[1])}</td>
+                    </tr>
+                    <tr tal:repeat="entity missing_entities">
+                        <td>${entity}</td>
+                        <td i18n:translate="" tal:attributes="colspan number_of_candidates">Not yet counted.</td>
+                    </tr>
+                    <tr class="total static">
+                        <td i18n:translate="">Total</td>
+                        <td tal:repeat="candidate election.candidates" class="right-aligned">${layout.format_number(candidate.votes)}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['related_link']" tal:define="meta election.meta" />
+
+    </tal:block>
+</div>
