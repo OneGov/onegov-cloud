@@ -46,6 +46,13 @@ class InvoiceItemCollection(GenericCollection):
 
         return q.scalar()
 
+    def count_unpaid_invoices(self):
+        q = self.query()
+        q = q.with_entities(func.count(func.distinct(InvoiceItem.invoice)))
+        q = q.filter(InvoiceItem.paid == False)
+
+        return q.scalar()
+
     def add(self, user, invoice, group, text, unit, quantity):
         if isinstance(user, str):
             username = user
