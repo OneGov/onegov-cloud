@@ -39,7 +39,7 @@ setup(
         'bcrypt',
         'bleach',
         'cached_property',
-        'chameleon',
+        'chameleon<3.0.0',
         'click',
         'dill',
         'dogpile.cache',
