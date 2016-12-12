@@ -27,7 +27,7 @@
                 </div>
             </div>
 
-            <table class="ballot-results stackable collapsible collapsed sortable">
+            <table class="ballot-results stackable sortable">
                 <thead>
                     <tr>
                         <th i18n:translate="">List</th>
