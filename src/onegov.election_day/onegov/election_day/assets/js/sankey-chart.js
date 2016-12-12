@@ -79,7 +79,7 @@ var init_sankey_chart = function(el) {
                 .style("font-family", "sans-serif")
                 .style("pointer-events", "none");
 
-            offset = d3.max(name[0], function(d) {return d.getBBox().width;});
+            offset = d3.max(name[0], function(d) {return d.getBBox().width;}) || 0;
             scale.domain([0, width]).range([offset+offsetMargin, width-2*offsetMargin]);
 
             node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
