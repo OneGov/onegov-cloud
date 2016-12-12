@@ -4,7 +4,9 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
 
-    <div class="row">
+    <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
+
+    <div class="row" tal:condition="bills">
         <div class="columns small-12 medium-8 end">
             <div class="bills">
                 <div class="bill ${details.paid and 'paid' or 'unpaid'}" id="${details.id}" tal:repeat="(title, details) bills.items()">

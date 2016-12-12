@@ -14,19 +14,21 @@ from sortedcontainers import SortedDict
     permission=Personal)
 def view_my_invoices(self, request):
 
-    periods = {p.id.hex: p for p in all_periods(request)}
+    periods = {p.id.hex: p for p in all_periods(request) if p.finalized}
     bills = SortedDict(lambda period: period.execution_start)
 
-    q = self.query()
-    q = q.order_by(
-        InvoiceItem.invoice,
-        InvoiceItem.group,
-        InvoiceItem.text
-    )
+    if periods:
+        q = self.query()
+        q = q.order_by(
+            InvoiceItem.invoice,
+            InvoiceItem.group,
+            InvoiceItem.text
+        )
+        q = q.filter(InvoiceItem.invoice.in_(periods.keys()))
 
-    for period_hex, items in groupby(q, lambda i: i.invoice):
-        billing_period = periods[period_hex]
-        bills[billing_period] = BillingDetails(billing_period.title, items)
+        for period_hex, items in groupby(q, lambda i: i.invoice):
+            billing_period = periods[period_hex]
+            bills[billing_period] = BillingDetails(billing_period.title, items)
 
     users = all_users(request)
     user = next(u for u in users if u.username == self.username)
