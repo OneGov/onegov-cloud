@@ -2,9 +2,8 @@ import json
 
 from onegov.activity import Period, PeriodCollection
 from onegov.core.security import Secret
-from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
-from onegov.feriennet.collections import BillingCollection
+from onegov.feriennet.collections import BillingCollection, BillingDetails
 from onegov.feriennet.forms import BillingForm
 from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.models import InvoiceAction
@@ -112,5 +111,5 @@ def execute_invoice_action(self, request):
     def trigger_bill_update(response):
         response.headers.add('X-IC-Trigger', 'reload-from')
         response.headers.add('X-IC-Trigger-Data', json.dumps({
-            'selector': '#' + normalize_for_url(self.item.username)
+            'selector': '#' + BillingDetails.item_id(self.item)
         }))

@@ -1,4 +1,6 @@
-from collections import OrderedDict, namedtuple
+import hashlib
+
+from collections import OrderedDict
 from decimal import Decimal
 from itertools import groupby
 from onegov.activity import Activity, Attendee, Booking, Occasion, InvoiceItem
@@ -8,9 +10,42 @@ from onegov.user import User
 from sortedcontainers import SortedDict
 
 
-Details = namedtuple('Details', (
-    'id', 'items', 'paid', 'total', 'title', 'first', 'outstanding'
-))
+class BillingDetails(object):
+
+    __slots__ = (
+        'id', 'items', 'paid', 'total', 'title', 'outstanding', 'first'
+    )
+
+    def __init__(self, title, items):
+        self.title = title
+        self.total = Decimal()
+        self.outstanding = Decimal()
+        self.paid = True
+        self.first = None
+
+        def tally(item):
+            self.total += item.amount
+
+            if not item.paid:
+                self.paid = False
+                self.outstanding += item.amount
+
+            if self.first is None:
+                self.first = item
+
+            return item
+
+        self.items = {
+            group: tuple(groupitems) for group, groupitems
+            in groupby((tally(i) for i in items), lambda i: i.group)
+        }
+
+        self.id = self.item_id(self.first)
+
+    @staticmethod
+    def item_id(item):
+        components = (item.invoice, item.username)
+        return hashlib.md5('/'.join(components).encode('utf-8')).digest().hex()
 
 
 class BillingCollection(object):
@@ -40,41 +75,6 @@ class BillingCollection(object):
     def for_expand(self, expand):
         return self.__class__(self.session, self.period, self.username, expand)
 
-    def details(self, index, title, items):
-
-        total = Decimal("0.0")
-        outstanding = Decimal("0.0")
-        paid = True
-        first = None
-
-        def tally(item):
-            nonlocal total, paid, first, outstanding
-            total += item.amount
-
-            if not item.paid:
-                paid = False
-                outstanding += item.amount
-
-            if not first:
-                first = item
-
-            return item
-
-        items = {
-            group: tuple(groupitems) for group, groupitems
-            in groupby((tally(i) for i in items), lambda i: i.group)
-        }
-
-        return Details(
-            id=normalize_for_url(first.username),
-            first=first,
-            items=items,
-            paid=paid,
-            total=total,
-            title=title,
-            outstanding=outstanding
-        )
-
     @property
     def bills(self):
         q = self.invoice_items.query()
@@ -94,8 +94,8 @@ class BillingCollection(object):
         bills = SortedDict(
             lambda username: normalize_for_url(titles[username]))
 
-        for ix, (user, items) in enumerate(groupby(q, lambda i: i.username)):
-            bills[user] = self.details(ix, titles[user], items)
+        for user, items in groupby(q, lambda i: i.username):
+            bills[user] = BillingDetails(titles[user], items)
 
         return bills
 
