@@ -777,8 +777,8 @@ def test_booking_view(feriennet_app):
     def count(page):
         return len(page.pyquery('.attendee-bookings > ul > li'))
 
-    c1_bookings = c1.get('/').click('Meine Wunschliste')
-    c2_bookings = c2.get('/').click('Meine Wunschliste')
+    c1_bookings = c1.get('/').click('Wunschliste')
+    c2_bookings = c2.get('/').click('Wunschliste')
 
     assert count(c1_bookings) == 4
     assert count(c2_bookings) == 1
@@ -812,7 +812,7 @@ def test_booking_view(feriennet_app):
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    m1_bookings = admin.get('/').click('Meine Wunschliste')\
+    m1_bookings = admin.get('/').click('Wunschliste')\
         .click('m1@example.org')
 
     assert count(m1_bookings) == 4
