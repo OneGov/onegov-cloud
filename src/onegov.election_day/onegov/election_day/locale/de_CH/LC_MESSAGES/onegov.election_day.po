@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-09 15:47+0100\n"
+"POT-Creation-Date: 2016-12-12 14:53+0100\n"
 "PO-Revision-Date: 2016-11-10 13:46+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -28,6 +28,18 @@ msgstr "Listenverbindungen"
 
 msgid "Election statistics"
 msgstr "Wahlstatistik"
+
+msgid "Open Data"
+msgstr "Open Data"
+
+msgid "Proposal"
+msgstr "Initiative"
+
+msgid "Counter Proposal"
+msgstr "Gegenentwurf"
+
+msgid "Tie-Breaker"
+msgstr "Stichfrage"
 
 msgid "Votes"
 msgstr "Abstimmungen"
@@ -204,14 +216,8 @@ msgstr "Komplett ausgezählt"
 msgid "Absolute majority"
 msgstr "Absolutes Mehr"
 
-msgid "Proposal"
-msgstr "Initiative"
-
 msgid "Counter-Proposal"
 msgstr "Gegenentwurf"
-
-msgid "Tie-Breaker"
-msgstr "Stichfrage"
 
 msgid "Vote number"
 msgstr "Vorlagen-Nummer"
@@ -323,9 +329,6 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Zurück zu den aktuellen Wahlen &amp; Abstimmungen"
 
-msgid "Open Data"
-msgstr "Open Data"
-
 msgid "Login"
 msgstr "Anmelden"
 
@@ -340,9 +343,6 @@ msgstr "Angenommen"
 
 msgid "Rejected"
 msgstr "Abgelehnt"
-
-msgid "Counter Proposal"
-msgstr "Gegenentwurf"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} von ${total}"
@@ -387,8 +387,26 @@ msgstr "SMS-Benachrichtigung abonnieren"
 msgid "Stop SMS subscription"
 msgstr "SMS-Abonnement beenden"
 
-msgid "Format Description"
-msgstr "Formatbeschreibung"
+msgid "Proposal and counter proposal rejected"
+msgstr "Initative und Gegenvorschlag abgelehnt"
+
+msgid "Proposal accepted"
+msgstr "Initiative angenommen"
+
+msgid "Counter proposal accepted"
+msgstr "Gegenvorschlag angenommen"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Stichfrage zugunsten der Initiative"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Stichfrage zugunsten des Gegenvorschlages"
+
+msgid "Yeas"
+msgstr "JA Stimmen"
+
+msgid "Nays"
+msgstr "NEIN Stimmen"
 
 msgid "Turnout"
 msgstr "Wahlbeteiligung"
@@ -401,6 +419,9 @@ msgstr "Abgegebene Wahlzettel"
 
 msgid "Counted"
 msgstr "Ausgezählt"
+
+msgid "Cast Ballots"
+msgstr "Eingegangene Stimmzettel"
 
 msgid "New Election"
 msgstr "Neue Wahl"
@@ -456,6 +477,9 @@ msgstr "Resultate hochladen"
 msgid "Please use the following format:"
 msgstr "Bitte verwenden Sie das folgende Format:"
 
+msgid "Format Description"
+msgstr "Formatbeschreibung"
+
 msgid "Your results were uploaded successfully."
 msgstr "Ihre Resultate wurden erfolgreich hochgeladen."
 
@@ -490,47 +514,11 @@ msgstr "Keine Fehler in der Stichfrage"
 msgid "Errors found in tie-breaker"
 msgstr "Fehler in der Stichfrage"
 
-msgid "Proposal and counter proposal rejected"
-msgstr "Initative und Gegenvorschlag abgelehnt"
-
-msgid "Proposal accepted"
-msgstr "Initiative angenommen"
-
-msgid "Counter proposal accepted"
-msgstr "Gegenvorschlag angenommen"
-
-msgid "Tie breaker in favor of the proposal"
-msgstr "Stichfrage zugunsten der Initiative"
-
-msgid "Tie breaker in favor of the counter proposal"
-msgstr "Stichfrage zugunsten des Gegenvorschlages"
-
-msgid "Yeas"
-msgstr "JA Stimmen"
-
-msgid "Nays"
-msgstr "NEIN Stimmen"
-
-msgid "Cast Ballots"
-msgstr "Eingegangene Stimmzettel"
-
 msgid "Download"
 msgstr "Herunterladen"
 
 msgid "Embed"
 msgstr "Einbetten"
-
-msgid "Electoral District"
-msgstr "Wahlkreis"
-
-msgid "Empty"
-msgstr "Leer"
-
-msgid "Invalid"
-msgstr "Ungültig"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Candidate"
 msgstr "Kandidierende"
@@ -566,6 +554,12 @@ msgstr "Unterlistenverbindung"
 msgid "Subtotal"
 msgstr "Zwischensumme"
 
+msgid "Total"
+msgstr "Total"
+
+msgid "Electoral District"
+msgstr "Wahlkreis"
+
 msgid "Accounted Ballots"
 msgstr "Gültige Wahlzettel"
 
@@ -577,6 +571,12 @@ msgstr "Ungültige Wahlzettel"
 
 msgid "Accounted Votes"
 msgstr "Gültige Stimmen"
+
+msgid "Empty"
+msgstr "Leer"
+
+msgid "Invalid"
+msgstr "Ungültig"
 
 msgid "Wrong username or password"
 msgstr "Unbekannter Benutzername oder falsches Passwort"

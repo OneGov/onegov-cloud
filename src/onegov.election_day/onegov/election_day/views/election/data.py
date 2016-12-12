@@ -5,7 +5,22 @@ from onegov.core.csv import convert_list_of_dicts_to_xlsx
 from onegov.core.security import Public
 from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
+from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import handle_headerless_params
+
+
+@ElectionDayApp.html(model=Election, template='election/data.pt',
+                     name='data', permission=Public)
+def view_election_data(self, request):
+    """" The main view. """
+
+    handle_headerless_params(request)
+
+    return {
+        'election': self,
+        'layout': ElectionsLayout(self, request, 'data')
+    }
 
 
 @ElectionDayApp.json(model=Election, name='data-json', permission=Public)

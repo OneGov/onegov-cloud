@@ -1,69 +1,6 @@
 <div metal:use-macro="layout.base" i18n:domain="onegov.election_day" tal:define="counted layout.counted">
     <tal:block metal:fill-slot="before-content">
-
-        <h1>
-            <small i18n:translate="" tal:condition="not:counted">Not yet counted.</small>
-            <small tal:condition="vote.answer">
-                <div tal:condition="not: vote.counter_proposal" metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/>
-                <div tal:condition="vote.counter_proposal">
-                    <tal:block tal:define="proposal vote.proposal.accepted;
-                                           counter_proposal vote.counter_proposal.accepted;
-                                           tie_breaker vote.tie_breaker.accepted">
-                        <span tal:condition="python: not proposal and not counter_proposal" class="answer rejected" i18n:translate="">
-                            Proposal and counter proposal rejected
-                        </span>
-                        <span tal:condition="python: proposal and not counter_proposal" class="answer accepted" i18n:translate="">
-                            Proposal accepted
-                        </span>
-                        <span tal:condition="python: not proposal and counter_proposal" class="answer accepted" i18n:translate="">
-                            Counter proposal accepted
-                        </span>
-                        <tal:block tal:condition="python: proposal and counter_proposal">
-                            <span tal:condition="tie_breaker" class="answer accepted" i18n:translate="">
-                                Tie breaker in favor of the proposal
-                            </span>
-                            <span tal:condition="not: tie_breaker" class="answer rejected" i18n:translate="">
-                                Tie breaker in favor of the counter proposal
-                            </span>
-                        </tal:block>
-                    </tal:block>
-                </div>
-            </small>
-            ${vote.title}
-        </h1>
-
-        <div class="download-results">
-            <a data-dropdown="download-dropdown" data-options="align:left" aria-controls="download-dropdown" aria-expanded="false"><i class="fa fa-download"></i></a>
-            <ul id="download-dropdown" class="f-dropdown" data-dropdown-content aria-hidden="true" tabindex="-1">
-                <li><a href="${request.link(vote, 'data-json')}">JSON</a></li>
-                <li><a href="${request.link(vote, 'data-csv')}">CSV</a></li>
-                <li><a href="${request.link(vote, 'data-xlsx')}">XLSX</a></li>
-                <li><a href="${layout.opendata_link}"><em i18n:translate="">Format Description</em></a></li>
-            </ul>
-        </div>
-
-        <div class="clearfix"></div>
-
-        <div class="row percentages">
-            <div class="columns small-6">
-                <dl>
-                    <dt i18n:translate="">Yeas</dt>
-                    <dd class="accepted" >${'{0:.2f}'.format(vote.yeas_percentage)}%</dd>
-                </dl>
-            </div>
-            <div class="columns small-6 end">
-                <dl style="text-align: right;">
-                    <dt i18n:translate="">Nays</dt>
-                    <dd class="rejected" >${'{0:.2f}'.format(vote.nays_percentage)}%</dd>
-                </dl>
-            </div>
-        </div>
-
-        <div class="percentage">
-            <div class="yeas"></div>
-            <div class="nays right" style="width:${'{0:.2f}'.format(vote.nays_percentage)}%"></div>
-        </div>
-
+        <div metal:use-macro="layout.macros['vote_header']" />
     </tal:block>
     <tal:block metal:fill-slot="content" tal:define="ballot layout.ballot">
 
@@ -73,24 +10,7 @@
 
             <h2 i18n:translate="">Results</h2>
 
-            <ul class="small-block-grid-1 medium-block-grid-4 factoids">
-                <li>
-                    <span i18n:translate="">Turnout</span>
-                    <strong>${'{0:.2f}'.format(ballot.turnout)} %</strong>
-                </li>
-                <li>
-                    <span i18n:translate="">Elegible Voters</span>
-                    <strong>${layout.format_number(ballot.elegible_voters)}</strong>
-                </li>
-                <li>
-                    <span i18n:translate="">Cast Ballots</span>
-                    <strong>${layout.format_number(ballot.cast_ballots)}</strong>
-                </li>
-                <li>
-                    <span i18n:translate="">Counted</span>
-                    <strong><span metal:use-macro="layout.macros['progress']" tal:define="progress ballot.progress" /></strong>
-                </li>
-            </ul>
+            <div metal:use-macro="layout.macros['vote_factoids']" />
 
             <div metal:use-macro="layout.macros['tab_menu']"/>
 

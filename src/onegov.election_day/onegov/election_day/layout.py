@@ -115,7 +115,8 @@ class ElectionsLayout(Layout):
             'candidates',
             'districts',
             'connections',
-            'statistics'
+            'statistics',
+            'data'
         )
 
     def title(self, tab=None):
@@ -131,6 +132,8 @@ class ElectionsLayout(Layout):
             return _("List connections")
         if tab == 'statistics':
             return _("Election statistics")
+        if tab == 'data':
+            return _("Open Data")
 
         return ''
 
@@ -203,12 +206,14 @@ class VotesLayout(Layout):
     def title(self, tab=None):
         tab = self.tab if tab is None else tab
 
-        if tab == 'proposal' and self.counter_proposal:
+        if tab == 'proposal':
             return _("Proposal")
         if tab == 'counter-proposal':
             return _("Counter Proposal")
         if tab == 'tie-breaker':
             return _("Tie-Breaker")
+        if tab == 'data':
+            return _("Open Data")
 
         return ''
 
@@ -228,8 +233,10 @@ class VotesLayout(Layout):
 
         if tab == 'proposal':
             return True
-        else:
+        if self.tab == 'counter-proposal' or self.tab == 'tie-breaker':
             return self.counter_proposal
+
+        return True
 
     @cached_property
     def has_results(self):
@@ -251,8 +258,21 @@ class VotesLayout(Layout):
 
     @cached_property
     def menu(self):
-        if not self.counter_proposal:
+        if not self.has_results:
             return []
+
+        if not self.counter_proposal:
+            return (
+                (
+                    self.title('proposal'),
+                    self.request.link(self.model),
+                    'active' if self.tab == 'proposal' else ''
+                ), (
+                    self.title('data'),
+                    self.request.link(self.model, 'data'),
+                    'active' if self.tab == 'data' else ''
+                )
+            )
 
         return (
             (
@@ -267,6 +287,10 @@ class VotesLayout(Layout):
                 self.title('tie-breaker'),
                 self.request.link(self.model, 'tie-breaker'),
                 'active' if self.tab == 'tie-breaker' else ''
+            ), (
+                self.title('data'),
+                self.request.link(self.model, 'data'),
+                'active' if self.tab == 'data' else ''
             )
         )
 

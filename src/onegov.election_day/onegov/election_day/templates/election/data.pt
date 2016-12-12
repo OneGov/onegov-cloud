@@ -1,0 +1,34 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+    <tal:block metal:fill-slot="before-content">
+        <div metal:use-macro="layout.macros['election_header']" />
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+
+        <div metal:use-macro="layout.macros['temporary_results_callout']" tal:define="last_change election.last_result_change; counted layout.counted" />
+
+        <tal:block tal:condition="layout.visible()">
+
+            <h2 i18n:translate="">Results</h2>
+
+            <div metal:use-macro="layout.macros['election_factoids']" />
+
+            <div metal:use-macro="layout.macros['tab_menu']"/>
+
+            <h3 tal:content="layout.title()" />
+
+            <p>
+                <ul class="opendata-download">
+                    <li><a href="${request.link(election, 'data-json')}">JSON</a></li>
+                    <li><a href="${request.link(election, 'data-csv')}">CSV</a></li>
+                    <li><a href="${request.link(election, 'data-xlsx')}">XLSX</a></li>
+                </ul>
+            </p>
+
+            <p><a href="${layout.opendata_link}"><em i18n:translate="">Format Description</em></a></p>
+
+        </tal:block>
+
+        <div metal:use-macro="layout.macros['related_link']" tal:define="meta election.meta" />
+
+    </tal:block>
+</div>

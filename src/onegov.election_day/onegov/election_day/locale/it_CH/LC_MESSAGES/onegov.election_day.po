@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-09 15:47+0100\n"
+"POT-Creation-Date: 2016-12-12 14:53+0100\n"
 "PO-Revision-Date: 2016-11-11 14:00+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -28,6 +28,18 @@ msgstr "Elenca i collegamenti"
 
 msgid "Election statistics"
 msgstr "Statistiche delle elezioni"
+
+msgid "Open Data"
+msgstr "Dati aperti"
+
+msgid "Proposal"
+msgstr "Iniziativa"
+
+msgid "Counter Proposal"
+msgstr "Controprogetto"
+
+msgid "Tie-Breaker"
+msgstr "Domanda eventuale"
 
 msgid "Votes"
 msgstr "Votazioni"
@@ -204,14 +216,8 @@ msgstr "Completo"
 msgid "Absolute majority"
 msgstr "Maggioranza assoluta"
 
-msgid "Proposal"
-msgstr "Iniziativa"
-
 msgid "Counter-Proposal"
 msgstr "Controprogetto"
-
-msgid "Tie-Breaker"
-msgstr "Domanda eventuale"
 
 msgid "Vote number"
 msgstr "Numero di voti"
@@ -323,9 +329,6 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Ritorna alle elezioni &amp; votazioni attuali"
 
-msgid "Open Data"
-msgstr "Dati aperti"
-
 msgid "Login"
 msgstr "Login"
 
@@ -340,9 +343,6 @@ msgstr "Accolto"
 
 msgid "Rejected"
 msgstr "Respinto"
-
-msgid "Counter Proposal"
-msgstr "Controprogetto"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} di ${total}"
@@ -387,8 +387,26 @@ msgstr "Ottieni SMS Alert"
 msgid "Stop SMS subscription"
 msgstr "Interrompi abbonamento SMS"
 
-msgid "Format Description"
-msgstr "Descrizione del formato"
+msgid "Proposal and counter proposal rejected"
+msgstr "Iniziativa e controprogetto sono state rifiutate"
+
+msgid "Proposal accepted"
+msgstr "Iniziativa accettata"
+
+msgid "Counter proposal accepted"
+msgstr "Controprogetto accettata"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Spareggio a favore della iniziativa"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Spareggio a favore della controprogetto"
+
+msgid "Yeas"
+msgstr "Voti favorevoli"
+
+msgid "Nays"
+msgstr "Voti contrari"
 
 msgid "Turnout"
 msgstr "Partecipazione al voto"
@@ -401,6 +419,9 @@ msgstr "Schede ricevute"
 
 msgid "Counted"
 msgstr "Contati"
+
+msgid "Cast Ballots"
+msgstr "Schede rientrate"
 
 msgid "New Election"
 msgstr "Nuova elezione"
@@ -456,6 +477,9 @@ msgstr "Caricare risultati"
 msgid "Please use the following format:"
 msgstr "Utilizzi per favore il formato seguente:"
 
+msgid "Format Description"
+msgstr "Descrizione del formato"
+
 msgid "Your results were uploaded successfully."
 msgstr "I Suoi risultati sono stati caricati correttamente."
 
@@ -489,47 +513,11 @@ msgstr "Nessun errore nella domanda eventuale"
 msgid "Errors found in tie-breaker"
 msgstr "Errori nella domanda eventuale"
 
-msgid "Proposal and counter proposal rejected"
-msgstr "Iniziativa e controprogetto sono state rifiutate"
-
-msgid "Proposal accepted"
-msgstr "Iniziativa accettata"
-
-msgid "Counter proposal accepted"
-msgstr "Controprogetto accettata"
-
-msgid "Tie breaker in favor of the proposal"
-msgstr "Spareggio a favore della iniziativa"
-
-msgid "Tie breaker in favor of the counter proposal"
-msgstr "Spareggio a favore della controprogetto"
-
-msgid "Yeas"
-msgstr "Voti favorevoli"
-
-msgid "Nays"
-msgstr "Voti contrari"
-
-msgid "Cast Ballots"
-msgstr "Schede rientrate"
-
 msgid "Download"
 msgstr "Scarica"
 
 msgid "Embed"
 msgstr "Incorporare"
-
-msgid "Electoral District"
-msgstr "Circondario elettorale"
-
-msgid "Empty"
-msgstr "Bianche"
-
-msgid "Invalid"
-msgstr "Nulle"
-
-msgid "Total"
-msgstr "Totale"
 
 msgid "Candidate"
 msgstr "Candidato"
@@ -565,6 +553,12 @@ msgstr "Collegamenti tra sottoliste"
 msgid "Subtotal"
 msgstr "Subtotale"
 
+msgid "Total"
+msgstr "Totale"
+
+msgid "Electoral District"
+msgstr "Circondario elettorale"
+
 msgid "Accounted Ballots"
 msgstr "Schede valide"
 
@@ -576,6 +570,12 @@ msgstr "Schede nulle"
 
 msgid "Accounted Votes"
 msgstr "Voti validi"
+
+msgid "Empty"
+msgstr "Bianche"
+
+msgid "Invalid"
+msgstr "Nulle"
 
 msgid "Wrong username or password"
 msgstr "Nome utente sconosciuto o password errata"

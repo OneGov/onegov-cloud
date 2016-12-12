@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-09 15:47+0100\n"
+"POT-Creation-Date: 2016-12-12 14:53+0100\n"
 "PO-Revision-Date: 2016-11-11 13:53+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -28,6 +28,18 @@ msgstr "Connexions de listes"
 
 msgid "Election statistics"
 msgstr "Statistiques des élections"
+
+msgid "Open Data"
+msgstr "Ouvrir les données"
+
+msgid "Proposal"
+msgstr "Proposition"
+
+msgid "Counter Proposal"
+msgstr "Contre-proposition"
+
+msgid "Tie-Breaker"
+msgstr "Jeu décisif"
 
 msgid "Votes"
 msgstr "Votes"
@@ -204,14 +216,8 @@ msgstr "Terminé"
 msgid "Absolute majority"
 msgstr "Majorité absolue"
 
-msgid "Proposal"
-msgstr "Proposition"
-
 msgid "Counter-Proposal"
 msgstr "Contre-proposition"
-
-msgid "Tie-Breaker"
-msgstr "Jeu décisif"
 
 msgid "Vote number"
 msgstr "Numéro de votation"
@@ -324,9 +330,6 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Retour aux dernières élections et votes"
 
-msgid "Open Data"
-msgstr "Ouvrir les données"
-
 msgid "Login"
 msgstr "Se connecter"
 
@@ -341,9 +344,6 @@ msgstr "Accepté"
 
 msgid "Rejected"
 msgstr "Refusé"
-
-msgid "Counter Proposal"
-msgstr "Contre-proposition"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} de ${total}"
@@ -388,8 +388,26 @@ msgstr "Recevoir des alertes SMS"
 msgid "Stop SMS subscription"
 msgstr "Arrêter l'abonnement SMS"
 
-msgid "Format Description"
-msgstr "Description du format"
+msgid "Proposal and counter proposal rejected"
+msgstr "Proposition et contre-proposition rejetées"
+
+msgid "Proposal accepted"
+msgstr "Proposition acceptée"
+
+msgid "Counter proposal accepted"
+msgstr "Contre-proposition acceptée"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Jeu décisif en faveur de la proposition"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Jeu décisif en faveur de la contre-proposition"
+
+msgid "Yeas"
+msgstr "Oui"
+
+msgid "Nays"
+msgstr "Non"
 
 msgid "Turnout"
 msgstr "Participation"
@@ -402,6 +420,9 @@ msgstr "Votes reçus"
 
 msgid "Counted"
 msgstr "Compté"
+
+msgid "Cast Ballots"
+msgstr "Suffrages exprimés"
 
 msgid "New Election"
 msgstr "Nouveau election"
@@ -457,6 +478,9 @@ msgstr "Mettre à jour les résultats"
 msgid "Please use the following format:"
 msgstr "Veuillez utiliser le format suivant:"
 
+msgid "Format Description"
+msgstr "Description du format"
+
 msgid "Your results were uploaded successfully."
 msgstr "Vos résultats ont été correctement mis à jour."
 
@@ -490,47 +514,11 @@ msgstr "Pas d'erreurs trouvées dans le jeu décisif."
 msgid "Errors found in tie-breaker"
 msgstr "Erreurs trouvées dans le jeu décisif."
 
-msgid "Proposal and counter proposal rejected"
-msgstr "Proposition et contre-proposition rejetées"
-
-msgid "Proposal accepted"
-msgstr "Proposition acceptée"
-
-msgid "Counter proposal accepted"
-msgstr "Contre-proposition acceptée"
-
-msgid "Tie breaker in favor of the proposal"
-msgstr "Jeu décisif en faveur de la proposition"
-
-msgid "Tie breaker in favor of the counter proposal"
-msgstr "Jeu décisif en faveur de la contre-proposition"
-
-msgid "Yeas"
-msgstr "Oui"
-
-msgid "Nays"
-msgstr "Non"
-
-msgid "Cast Ballots"
-msgstr "Suffrages exprimés"
-
 msgid "Download"
 msgstr "Télécharger"
 
 msgid "Embed"
 msgstr "Intégration"
-
-msgid "Electoral District"
-msgstr "District électoral"
-
-msgid "Empty"
-msgstr "Vide"
-
-msgid "Invalid"
-msgstr "Invalide"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Candidate"
 msgstr "Candidat"
@@ -566,6 +554,12 @@ msgstr "Connexion de sous-listes"
 msgid "Subtotal"
 msgstr "Sous-total"
 
+msgid "Total"
+msgstr "Total"
+
+msgid "Electoral District"
+msgstr "District électoral"
+
 msgid "Accounted Ballots"
 msgstr "Bulletins de vote comptabilisés"
 
@@ -577,6 +571,12 @@ msgstr "Bulletins de vote non valides"
 
 msgid "Accounted Votes"
 msgstr "Votes comptés"
+
+msgid "Empty"
+msgstr "Vide"
+
+msgid "Invalid"
+msgstr "Invalide"
 
 msgid "Wrong username or password"
 msgstr "Mauvais nom d'utilisateur ou mot de passe"

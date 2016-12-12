@@ -93,7 +93,7 @@ def test_elections_layout():
     layout = ElectionsLayout(None, DummyRequest())
 
     assert layout.all_tabs == (
-        'lists', 'candidates', 'districts', 'connections', 'statistics'
+        'lists', 'candidates', 'districts', 'connections', 'statistics', 'data'
     )
 
     assert layout.title() == ''
@@ -103,6 +103,7 @@ def test_elections_layout():
     assert layout.title('districts') == 'Electoral Districts'
     assert layout.title('connections') == 'List connections'
     assert layout.title('statistics') == 'Election statistics'
+    assert layout.title('data') == 'Open Data'
 
     layout = ElectionsLayout(Election(type='majorz'), DummyRequest())
     assert layout.majorz
@@ -124,11 +125,12 @@ def test_elections_layout():
 def test_votes_layout():
     layout = VotesLayout(Vote(), DummyRequest())
 
-    assert layout.title() == ''
+    assert layout.title() == 'Proposal'
     assert layout.title('undefined') == ''
-    assert layout.title('proposal') == ''
+    assert layout.title('proposal') == 'Proposal'
     assert layout.title('counter-proposal') == 'Counter Proposal'
     assert layout.title('tie-breaker') == 'Tie-Breaker'
+    assert layout.title('data') == 'Open Data'
 
     assert not layout.has_results
     assert not layout.counted

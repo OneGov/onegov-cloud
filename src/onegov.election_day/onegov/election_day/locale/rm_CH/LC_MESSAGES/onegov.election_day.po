@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-09 15:47+0100\n"
+"POT-Creation-Date: 2016-12-12 14:53+0100\n"
 "PO-Revision-Date: 2016-11-18 09:16+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -27,6 +27,18 @@ msgstr "Colliaziuns da glistas"
 
 msgid "Election statistics"
 msgstr "Statistica electorala"
+
+msgid "Open Data"
+msgstr "Open Data"
+
+msgid "Proposal"
+msgstr "Iniziativa"
+
+msgid "Counter Proposal"
+msgstr "Cuntraproposta"
+
+msgid "Tie-Breaker"
+msgstr "Dumonda decisiva"
 
 msgid "Votes"
 msgstr "Votaziuns"
@@ -190,14 +202,8 @@ msgstr "Resultat eruì cumplettamain"
 msgid "Absolute majority"
 msgstr "Maioritad absoluta"
 
-msgid "Proposal"
-msgstr "Iniziativa"
-
 msgid "Counter-Proposal"
 msgstr "Cuntraproposta"
-
-msgid "Tie-Breaker"
-msgstr "Dumonda decisiva"
 
 msgid "Vote number"
 msgstr "Numer dal project"
@@ -310,9 +316,6 @@ msgstr ""
 msgid "Back to the latest elections &amp; votes"
 msgstr "Enavos a las elecziuns &amp; votaziuns actualas"
 
-msgid "Open Data"
-msgstr "Open Data"
-
 msgid "Login"
 msgstr "Annunziar"
 
@@ -327,9 +330,6 @@ msgstr "Acceptà"
 
 msgid "Rejected"
 msgstr "Refusà"
-
-msgid "Counter Proposal"
-msgstr "Cuntraproposta"
 
 msgid "${counted} of ${total}"
 msgstr "${counted} da ${total}"
@@ -410,8 +410,26 @@ msgstr "Abunar la communicaziun per SMS"
 msgid "Stop SMS subscription"
 msgstr "Terminar l'abunament dad SMS"
 
-msgid "Format Description"
-msgstr "descripziun dal format"
+msgid "Proposal and counter proposal rejected"
+msgstr "Refusà l'iniziativa e la cuntraproposta"
+
+msgid "Proposal accepted"
+msgstr "Acceptà l'iniziativa"
+
+msgid "Counter proposal accepted"
+msgstr "Acceptà la cuntraproposta"
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Dumonda decisiva a favur da l'iniziativa"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Dumonda decisiva a favur da la cuntraproposta"
+
+msgid "Yeas"
+msgstr "Vuschs affirmativas"
+
+msgid "Nays"
+msgstr "Vuschs negativas"
 
 msgid "Turnout"
 msgstr "Participaziun a las elecziuns"
@@ -424,6 +442,9 @@ msgstr "Cedels electorals consegnads"
 
 msgid "Counted"
 msgstr "Dumbrà ora"
+
+msgid "Cast Ballots"
+msgstr "Cedels da votar entrads"
 
 msgid "New Election"
 msgstr "Nova elecziun"
@@ -479,6 +500,9 @@ msgstr "Chargiar si resultats"
 msgid "Please use the following format:"
 msgstr "Duvrai per plaschair il suandant format:"
 
+msgid "Format Description"
+msgstr "descripziun dal format"
+
 msgid "Your results were uploaded successfully."
 msgstr "Voss resultats èn vegnids chargiads si cun success."
 
@@ -512,47 +536,11 @@ msgstr "Chattà nagins sbagls en la dumonda decisiva"
 msgid "Errors found in tie-breaker"
 msgstr "Chattà sbagls en la dumonda decisiva"
 
-msgid "Proposal and counter proposal rejected"
-msgstr "Refusà l'iniziativa e la cuntraproposta"
-
-msgid "Proposal accepted"
-msgstr "Acceptà l'iniziativa"
-
-msgid "Counter proposal accepted"
-msgstr "Acceptà la cuntraproposta"
-
-msgid "Tie breaker in favor of the proposal"
-msgstr "Dumonda decisiva a favur da l'iniziativa"
-
-msgid "Tie breaker in favor of the counter proposal"
-msgstr "Dumonda decisiva a favur da la cuntraproposta"
-
-msgid "Yeas"
-msgstr "Vuschs affirmativas"
-
-msgid "Nays"
-msgstr "Vuschs negativas"
-
-msgid "Cast Ballots"
-msgstr "Cedels da votar entrads"
-
 msgid "Download"
 msgstr "telechargiar"
 
 msgid "Embed"
 msgstr "incorporar"
-
-msgid "Electoral District"
-msgstr "Circul electoral"
-
-msgid "Empty"
-msgstr "Vid"
-
-msgid "Invalid"
-msgstr "Nunvalaivel"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "Candidate"
 msgstr "Persuna che candidescha"
@@ -588,6 +576,12 @@ msgstr "Sutcolliaziun da glistas"
 msgid "Subtotal"
 msgstr "Summa intermediara"
 
+msgid "Total"
+msgstr "Total"
+
+msgid "Electoral District"
+msgstr "Circul electoral"
+
 msgid "Accounted Ballots"
 msgstr "Cedels valaivels"
 
@@ -599,6 +593,12 @@ msgstr "Cedels electorals nunvalaivels"
 
 msgid "Accounted Votes"
 msgstr "Vuschs valaivlas"
+
+msgid "Empty"
+msgstr "Vid"
+
+msgid "Invalid"
+msgstr "Nunvalaivel"
 
 msgid "Wrong username or password"
 msgstr ""

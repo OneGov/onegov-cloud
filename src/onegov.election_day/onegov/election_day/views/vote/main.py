@@ -7,7 +7,7 @@ from onegov.election_day.utils import get_vote_summary
 from onegov.election_day.utils import handle_headerless_params
 
 
-@ElectionDayApp.html(model=Vote, template='vote.pt', permission=Public)
+@ElectionDayApp.html(model=Vote, template='vote/ballot.pt', permission=Public)
 def view_vote_proposal(self, request):
     """" The main view. """
 
@@ -23,7 +23,7 @@ def view_vote_proposal(self, request):
     }
 
 
-@ElectionDayApp.html(model=Vote, template='vote.pt', permission=Public,
+@ElectionDayApp.html(model=Vote, template='vote/ballot.pt', permission=Public,
                      name='counter-proposal')
 def view_vote_counter_proposal(self, request):
     """" The main view. """
@@ -40,7 +40,7 @@ def view_vote_counter_proposal(self, request):
     }
 
 
-@ElectionDayApp.html(model=Vote, template='vote.pt', permission=Public,
+@ElectionDayApp.html(model=Vote, template='vote/ballot.pt', permission=Public,
                      name='tie-breaker')
 def view_vote_tie_breaker(self, request):
     """" The main view. """
