@@ -1,6 +1,6 @@
 from onegov.activity.models import InvoiceItem
 from onegov.core.collection import GenericCollection
-from sqlalchemy import func
+from sqlalchemy import func, not_
 
 
 class InvoiceItemCollection(GenericCollection):
@@ -46,10 +46,13 @@ class InvoiceItemCollection(GenericCollection):
 
         return q.scalar()
 
-    def count_unpaid_invoices(self):
+    def count_unpaid_invoices(self, exclude_invoices=None):
         q = self.query()
         q = q.with_entities(func.count(func.distinct(InvoiceItem.invoice)))
         q = q.filter(InvoiceItem.paid == False)
+
+        if exclude_invoices:
+            q = q.filter(not_(InvoiceItem.invoice.in_(exclude_invoices)))
 
         return q.scalar()
 

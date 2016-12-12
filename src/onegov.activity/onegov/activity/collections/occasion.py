@@ -21,7 +21,7 @@ class OccasionCollection(GenericCollection):
         return NumericRange(lower, upper + 1, bounds='[)')
 
     def add(self, activity, period, start, end, timezone,
-            location=None, age=None, spots=None, note=None):
+            location=None, age=None, spots=None, note=None, cost=0):
 
         start = standardize_date(start, timezone)
         end = standardize_date(end, timezone)
@@ -35,5 +35,6 @@ class OccasionCollection(GenericCollection):
             spots=spots and self.to_half_open_interval(*spots),
             note=note,
             activity_id=activity.id,
-            period_id=period.id
+            period_id=period.id,
+            cost=cost,
         )
