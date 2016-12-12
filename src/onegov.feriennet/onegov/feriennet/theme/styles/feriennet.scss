@@ -200,7 +200,7 @@ ul.tags {
     .hint-happiness:before { @include icon('\f118'); }
     .hint-operability:before { @include icon('\f058'); }
     .hint-outstanding:before { @include icon('\f200'); }
-    .hint-finalized:before{ @include icon('\f256'); }
+    .hint-finalized:before { @include icon('\f256'); }
 
     .hint:last-child {
         @include hairline();
@@ -1069,5 +1069,63 @@ ul.tags {
         .button {
             margin-left: 1rem;
         }
+    }
+}
+
+/*
+    Invoices View
+*/
+
+.paid .invoice-items-list {
+    border-bottom: 1px solid $green-pastel;
+}
+
+.unpaid .invoice-items-list {
+    border-bottom: 1px solid $red-pastel;
+}
+
+.invoice-items-list {
+    background: $white;
+    padding: 1rem 3.5rem 1rem 1.5rem;
+    position: relative;
+    top: 1px;
+
+    ul {
+        color: $body-font-color;
+        list-style: none;
+        margin: 0;
+    }
+
+    .item-group,
+    .item-total {
+        margin-top: 1rem;
+    }
+
+    .item-group:first-child {
+        margin-top: 0;
+    }
+
+    .item-amount {
+        display: relative;
+        float: right;
+        font-family: $font-family-monospace;
+    }
+
+    li.paid .item-amount:after {
+        @include icon('\f05d');
+        color: $green-dark;
+        font-weight: normal;
+        margin-top: -2px;
+        position: absolute;
+        right: 33px;
+    }
+
+    li.unpaid .item-amount:after {
+        @include icon('\f06a');
+        color: $red-dark;
+        font-weight: normal;
+        margin-top: -2px;
+        position: absolute;
+        right: 33px;
     }
 }

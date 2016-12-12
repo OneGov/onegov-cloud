@@ -3,5 +3,46 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
+
+    <div class="row">
+        <div class="columns small-12 medium-8 end">
+            <div class="bills">
+                <div class="bill ${details.paid and 'paid' or 'unpaid'}" id="${details.id}" tal:repeat="(title, details) bills.items()">
+                    <h3>${details.title}</h3>
+
+                    <strong class="outstanding">
+                        <tal:block condition="details.paid" i18n:translate>Paid</tal:block>
+                        <tal:block condition="not: details.paid" i18n:translate>
+                            <tal:block i18n:name="amount" tal:replace="'{:.2f}'.format(details.outstanding)" /> unpaid
+                        </tal:block>
+                    </strong>
+
+                    <button id="button-${details.id}" data-toggle="#details-${details.id}" class="untoggled">
+                        <span i18n:translate class="show-for-sr">Show Details</span>
+                        <i class="fa fa-angle-double-down" aria-hidden="true"></i>
+                    </button>
+
+                    <div id="details-${details.id}" class="invoice-items-list" style="display: none;">
+                        <ul>
+                            <tal:block repeat="(group, groupitems) details.items.items()">
+                                <li class="item-group">
+                                    <strong>${group}</strong>
+                                </li>
+                                <li tal:repeat="item groupitems" class="${item.paid and 'paid' or 'unpaid'}">
+                                    <span class="item-text">${item.text}</span>
+                                    <span class="item-amount" tal:content="'{:.2f}'.format(item.amount)"></span>
+                                </li>
+                            </tal:block>
+                            <li class="item-total ${details.paid and 'paid' or 'unpaid'}">
+                                <strong i18n:translate="">Total</strong>
+                                <strong class="item-amount" tal:content="'{:.2f}'.format(details.total)"></strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     </tal:block>
 </div>

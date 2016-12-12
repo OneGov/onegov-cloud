@@ -1,8 +1,10 @@
+from itertools import groupby
 from onegov.activity import InvoiceItem, InvoiceItemCollection
 from onegov.core.security import Personal
 from onegov.feriennet import FeriennetApp, _
+from onegov.feriennet.collections import BillingDetails
 from onegov.feriennet.layout import InvoiceLayout
-from onegov.feriennet.views.shared import all_users
+from onegov.feriennet.views.shared import all_periods, all_users
 from sortedcontainers import SortedDict
 
 
@@ -12,6 +14,9 @@ from sortedcontainers import SortedDict
     permission=Personal)
 def view_my_invoices(self, request):
 
+    periods = {p.id.hex: p for p in all_periods(request)}
+    bills = SortedDict(lambda period: period.execution_start)
+
     q = self.query()
     q = q.order_by(
         InvoiceItem.invoice,
@@ -19,7 +24,9 @@ def view_my_invoices(self, request):
         InvoiceItem.text
     )
 
-    bills = SortedDict(lambda period: period.execution_start)
+    for period_hex, items in groupby(q, lambda i: i.invoice):
+        billing_period = periods[period_hex]
+        bills[billing_period] = BillingDetails(billing_period.title, items)
 
     users = all_users(request)
     user = next(u for u in users if u.username == self.username)
