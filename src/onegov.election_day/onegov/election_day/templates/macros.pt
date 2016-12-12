@@ -28,18 +28,6 @@
     </tal:block>
 </metal:navigation>
 
-<metal:navigation define-macro="ballot-type" i18n:domain="onegov.election_day">
-    <span tal:condition="ballot_type == 'proposal'" i18n:translate="">
-        Proposal
-    </span>
-    <span tal:condition="ballot_type == 'counter-proposal'" i18n:translate="">
-        Counter-Proposal
-    </span>
-    <span tal:condition="ballot_type == 'tie-breaker'" i18n:translate="">
-        Tie-Breaker
-    </span>
-</metal:navigation>
-
 <metal:archive define-macro="archive" i18n:domain="onegov.election_day">
     <div class="row archive" tal:define="years layout.archive.get_years()" tal:condition="years">
         <div class="columns small-12 small-centered">

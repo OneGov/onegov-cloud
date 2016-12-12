@@ -126,12 +126,6 @@ var init_bar_chart = function(el) {
             if (embed_link && embed_source) {
                 append_embed_code(el, '100%', 24 * data.results.length + 50, embed_source, embed_link);
             }
-
-            if ($(el).is('.foldable.folded .foldable-svg-panel .bar-chart')) {
-                $(el).closest('.foldable-svg-panel').each(function() {
-                    $(this).hide();
-                });
-            }
         }
     });
 

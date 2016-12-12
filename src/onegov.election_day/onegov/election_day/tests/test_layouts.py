@@ -4,6 +4,7 @@ from onegov.election_day.layout import Layout
 from onegov.election_day.layout import ManageElectionsLayout
 from onegov.election_day.layout import ManageLayout
 from onegov.election_day.layout import ManageVotesLayout
+from onegov.election_day.layout import VotesLayout
 from onegov.election_day.tests import DummyRequest
 
 
@@ -115,6 +116,20 @@ def test_elections_layout():
     assert not layout.majorz
     assert layout.proporz
     assert layout.main_view == 'Election/lists'
+    assert not layout.has_results
+    assert not layout.counted
+    assert list(layout.menu) == []
+
+
+def test_votes_layout():
+    layout = VotesLayout(Vote(), DummyRequest())
+
+    assert layout.title() == ''
+    assert layout.title('undefined') == ''
+    assert layout.title('proposal') == ''
+    assert layout.title('counter-proposal') == 'Counter Proposal'
+    assert layout.title('tie-breaker') == 'Tie-Breaker'
+
     assert not layout.has_results
     assert not layout.counted
     assert list(layout.menu) == []

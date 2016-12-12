@@ -198,6 +198,83 @@ class ElectionsLayout(Layout):
         self.tab = tab
 
 
+class VotesLayout(Layout):
+
+    def title(self, tab=None):
+        tab = self.tab if tab is None else tab
+
+        if tab == 'proposal' and self.counter_proposal:
+            return _("Proposal")
+        if tab == 'counter-proposal':
+            return _("Counter Proposal")
+        if tab == 'tie-breaker':
+            return _("Tie-Breaker")
+
+        return ''
+
+    @cached_property
+    def ballot(self):
+        if self.tab == 'counter-proposal':
+            return self.model.counter_proposal
+        if self.tab == 'tie-breaker':
+            return self.model.tie_breaker
+        return self.model.proposal
+
+    def visible(self, tab=None):
+        if not self.has_results:
+            return False
+
+        tab = self.tab if tab is None else tab
+
+        if tab == 'proposal':
+            return True
+        else:
+            return self.counter_proposal
+
+    @cached_property
+    def has_results(self):
+        if self.model.ballots.first():
+            return True
+        return False
+
+    @cached_property
+    def counter_proposal(self):
+        return self.model.counter_proposal
+
+    @cached_property
+    def counted(self):
+        return self.has_results and self.model.counted
+
+    @cached_property
+    def summarize(self):
+        return self.ballot.results.count() != 1
+
+    @cached_property
+    def menu(self):
+        if not self.counter_proposal:
+            return []
+
+        return (
+            (
+                self.title('proposal'),
+                self.request.link(self.model),
+                'active' if self.tab == 'proposal' else ''
+            ), (
+                self.title('counter-proposal'),
+                self.request.link(self.model, 'counter-proposal'),
+                'active' if self.tab == 'counter-proposal' else ''
+            ), (
+                self.title('tie-breaker'),
+                self.request.link(self.model, 'tie-breaker'),
+                'active' if self.tab == 'tie-breaker' else ''
+            )
+        )
+
+    def __init__(self, model, request, tab='proposal'):
+        super().__init__(model, request)
+        self.tab = tab
+
+
 class ManageLayout(DefaultLayout):
 
     @cached_property

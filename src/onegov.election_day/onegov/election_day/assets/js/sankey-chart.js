@@ -145,12 +145,6 @@ var init_sankey_chart = function(el) {
             if (embed_link && embed_source) {
                 append_embed_code(el, '100%', height + 50, embed_source, embed_link);
             }
-
-            if ($(el).is('.foldable.folded .foldable-svg-panel .sankey-chart')) {
-                $(el).closest('.foldable-svg-panel').each(function() {
-                    $(this).hide();
-                });
-            }
         }
     });
 

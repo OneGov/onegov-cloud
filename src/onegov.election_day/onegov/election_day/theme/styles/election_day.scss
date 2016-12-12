@@ -690,46 +690,6 @@ form {
     }
 }
 
-/*
-    Foldable sections
-*/
-
-.foldable {
-
-    margin-bottom: 2rem;
-
-    .foldable-title {
-        background-color: $snow;
-        border-top: 5px solid $primary-color;
-        cursor: pointer;
-        margin-top: 2rem;
-        padding: .5em 0;
-
-        &::before {
-            color: $aluminum;
-            content: '\f056';
-            font-family: 'FontAwesome';
-            font-size: .625em;
-            margin: 0 .625em;
-            vertical-align: middle;
-        }
-    }
-
-    .foldable-panel {
-        margin-bottom: 2rem;
-    }
-
-    &.folded {
-        .foldable-title {
-            border-top: 5px solid $base;
-
-            &::before {
-                content: '\f055';
-            }
-        }
-    }
-}
-
 
 /*
     Related Links
@@ -789,8 +749,7 @@ form {
     .row.header,
     a.svg-download,
     ul.locales,
-    .foldable.folded,
-    .foldable-title::before,
+    ul.tabs,
     .subscription-links,
     .onegov-link,
     .open-data-link,

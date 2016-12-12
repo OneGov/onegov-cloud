@@ -378,7 +378,13 @@ def test_view_last_modified(election_day_app):
             '/'
             '/archive/2013',
             '/election/election',
+            '/election/election/lists',
+            '/election/election/candidates',
+            '/election/election/statistics',
+            '/election/election/districts',
             '/vote/vote/',
+            '/vote/vote/counter-proposal',
+            '/vote/vote/tie-breaker',
         ):
             assert 'Last-Modified' not in client.get(path).headers
 

@@ -597,10 +597,19 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
     assert "Gegenentwurf" in results
     assert "Stichfrage" in results
     assert "answer rejected" in results
+
     assert "37.27" in results
     assert "62.73" in results
     assert "53.00" in results
     assert "47.00" in results
+
+    results = client.get('/vote/complex-vote/counter-proposal')
+    assert "<h3>Gegenentwurf</h3>" in results
+    assert "53.00" in results
+    assert "47.00" in results
+
+    results = client.get('/vote/complex-vote/tie-breaker')
+    assert "<h3>Stichfrage</h3>" in results
     assert "45.96" in results
     assert "54.04" in results
 

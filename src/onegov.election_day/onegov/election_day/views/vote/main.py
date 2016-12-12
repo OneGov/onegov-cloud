@@ -1,14 +1,14 @@
 from onegov.ballot import Vote
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.layout import VotesLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
 from onegov.election_day.utils import handle_headerless_params
 
 
 @ElectionDayApp.html(model=Vote, template='vote.pt', permission=Public)
-def view_vote(self, request):
+def view_vote_proposal(self, request):
     """" The main view. """
 
     request.include('ballot_map')
@@ -18,8 +18,42 @@ def view_vote(self, request):
 
     return {
         'vote': self,
-        'layout': DefaultLayout(self, request),
-        'counted': self.counted
+        'layout': VotesLayout(self, request),
+        'use_maps': request.app.principal.use_maps
+    }
+
+
+@ElectionDayApp.html(model=Vote, template='vote.pt', permission=Public,
+                     name='counter-proposal')
+def view_vote_counter_proposal(self, request):
+    """" The main view. """
+
+    request.include('ballot_map')
+    request.include('tablesorter')
+
+    handle_headerless_params(request)
+
+    return {
+        'vote': self,
+        'layout': VotesLayout(self, request, 'counter-proposal'),
+        'use_maps': request.app.principal.use_maps
+    }
+
+
+@ElectionDayApp.html(model=Vote, template='vote.pt', permission=Public,
+                     name='tie-breaker')
+def view_vote_tie_breaker(self, request):
+    """" The main view. """
+
+    request.include('ballot_map')
+    request.include('tablesorter')
+
+    handle_headerless_params(request)
+
+    return {
+        'vote': self,
+        'layout': VotesLayout(self, request, 'tie-breaker'),
+        'use_maps': request.app.principal.use_maps
     }
 
 
