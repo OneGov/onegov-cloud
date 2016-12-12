@@ -7,7 +7,7 @@ Changelog
 - Shows the number of SMS subscribers in the manage view.
   [msom]
 
-- Uses fading effects on sankey charts instead of hover.
+- Uses fading effects on charts.
   [msom]
 
 - Adds support for PyFilesystem 2.x and Chameleon 3.x.

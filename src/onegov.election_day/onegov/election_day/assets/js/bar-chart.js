@@ -116,6 +116,19 @@ var init_bar_chart = function(el) {
                     .style("stroke-dasharray", ("4, 4"));
             }
 
+            // Fade-Effect on mouseover
+            bar.on("mouseover", function(d) {
+            	bar.filter(function(s) { return s != d; })
+                    .transition()
+                    .duration(700)
+            		.style("opacity", .1);
+            });
+            bar.on("mouseout", function(d) {
+                bar.transition()
+                    .duration(700)
+            		.style("opacity", 1)
+            });
+
             var download_link = $(el).data('download-link');
             if (download_link) {
                 append_svg_download_link(el, $(el).html(), data.title, download_link);
