@@ -5,42 +5,22 @@ from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_proporz_election
 
 
-def test_view_election(election_day_app_gr):
+def test_view_election_redirect(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
 
     login(client)
 
     upload_majorz_election(client)
-
-    response = client.get('/election/majorz-election').follow()
-    assert all((expected in response for expected in (
-        "Engler", "Stefan", "20", "Schmid", "Martin", "18",
-        "Noch nicht ausgezählt"
-    )))
-
-    response = client.get('/election/majorz-election/districts')
-    assert all((expected in response for expected in (
-        "Mutten", "Brusio", "Noch nicht ausgezählt"
-    )))
-
     upload_proporz_election(client)
 
-    response = client.get('/election/proporz-election').follow()
-    assert all((expected in response for expected in (
-        "56", "32", "CVP", "FDP", "Noch nicht ausgezählt"
-    )))
+    response = client.get('/election/majorz-election')
+    assert response.status == '302 Found'
+    assert 'majorz-election/candidates' in response.headers['Location']
 
-    response = client.get('/election/proporz-election/candidates')
-    assert all((expected in response for expected in (
-        "Casanova", "Angela", "Caluori", "Corina", "56", "32", "CVP", "FDP",
-        "Noch nicht ausgezählt"
-    )))
-
-    response = client.get('/election/proporz-election/statistics')
-    assert all((expected in response for expected in (
-        "56", "32", "Mutten", "Brusio", "Noch nicht ausgezählt"
-    )))
+    response = client.get('/election/proporz-election')
+    assert response.status == '302 Found'
+    assert 'proporz-election/lists' in response.headers['Location']
 
 
 def test_view_election_candidates(election_day_app_gr):
@@ -68,6 +48,44 @@ def test_view_election_candidates(election_day_app_gr):
     chart = client.get('/election/proporz-election/candidates-chart')
     assert chart.status_code == 200
     assert '/election/proporz-election/candidates' in chart
+
+
+def test_view_election_districts(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+    upload_proporz_election(client)
+
+    districts = client.get('/election/majorz-election/districts')
+    assert all((expected in districts for expected in (
+        "Engler Stefan", "20", "Schmid Martin", "18", "Grüsch"
+    )))
+
+    districts = client.get('/election/proporz-election/districts')
+    assert not any((expected in districts for expected in (
+        "Caluori Corina", "Casanova Angela"
+    )))
+
+
+def test_view_election_statistics(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+    upload_proporz_election(client)
+
+    statistics = client.get('/election/majorz-election/statistics')
+    assert all((expected in statistics for expected in (
+        "Grüsch", "56", "25", "21", "41"
+    )))
+
+    statistics = client.get('/election/proporz-election/statistics')
+    assert all((expected in statistics for expected in (
+        "Grüsch", "56", "32", "31", "154"
+    )))
 
 
 def test_view_election_lists(election_day_app_gr):

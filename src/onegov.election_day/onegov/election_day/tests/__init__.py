@@ -10,8 +10,9 @@ class DummyPrincipal(object):
 
 
 class DummyApp(object):
-    def __init__(self, session=None):
+    def __init__(self, session=None, application_id='application_id'):
         self._session = session
+        self.application_id = application_id
 
     def session(self):
         return self._session
@@ -21,9 +22,13 @@ class DummyApp(object):
 
 class DummyRequest(object):
 
-    def __init__(self, session=None, app=None):
+    def __init__(self, session=None, app=None, locale='de',
+                 is_logged_in=False):
+        self.includes = []
         self.session = session
         self._app = app
+        self.locale = locale
+        self.is_logged_in = is_logged_in
         if app and session:
             app.session = Mock(return_value=session)
 
@@ -38,6 +43,10 @@ class DummyRequest(object):
 
     def translate(self, text):
         return text.interpolate()
+
+    def include(self, resource):
+        self.includes.append(resource)
+        self.includes = list(set(self.includes))
 
 
 def login(client):
