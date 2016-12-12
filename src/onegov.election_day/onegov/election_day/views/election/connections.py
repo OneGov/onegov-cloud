@@ -91,7 +91,8 @@ def view_election_connections_chart(self, request):
         'model': self,
         'layout': DefaultLayout(self, request),
         'data': {
-            'sankey': request.link(self, name='connections-data')
+            'sankey': request.link(self, name='connections-data'),
+            'inverse': 'true'
         }
     }
 

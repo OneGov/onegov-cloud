@@ -18,6 +18,7 @@ var init_sankey_chart = function(el) {
     var node = null;
     var link = null;
     var path = null;
+    var inverse = $(el).data('inverse') || false;
 
     $.ajax({ url: dataurl }).done(function(data) {
 
@@ -72,20 +73,29 @@ var init_sankey_chart = function(el) {
                 .text(function(d) { return d.name; })
                 .attr("x", 0)
                 .attr("y", function(d) { return d.dy / 2; })
-                .attr("dx", -offsetMargin)
+                .attr("dx", inverse ? offsetMargin + sankey.nodeWidth() : -offsetMargin)
                 .attr("dy", ".35em")
-                .attr("text-anchor", "end")
+                .attr("text-anchor", inverse ? "start" : "end")
                 .style("font-size", "14px")
                 .style("font-family", "sans-serif")
                 .style("pointer-events", "none");
 
             offset = d3.max(name[0], function(d) {return d.getBBox().width;}) || 0;
-            scale.domain([0, width]).range([offset+offsetMargin, width-2*offsetMargin]);
+
+            scale.domain([0, width])
+                 .range([
+                     inverse ? width-offsetMargin-2*sankey.nodeWidth()-offset : offset+offsetMargin,
+                     inverse ? 0 : width-2*offsetMargin
+                 ]);
 
             node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
 
             // Add the links
-            path = sankey.link(scale);
+            path = sankey.link(
+                scale,
+                inverse ? -sankey.nodeWidth() : 0,
+                inverse ? sankey.nodeWidth() : 0
+            );
             link = svg.append("g").selectAll(".link")
                 .data(data.links)
                 .enter().append("path")
@@ -153,10 +163,18 @@ var init_sankey_chart = function(el) {
             // Resize
             width = $(el).width();
             scale.range([offset+offsetMargin, width-2*offsetMargin]);
+            scale.range([
+                inverse ? width-offsetMargin-2*sankey.nodeWidth()-offset : offset+offsetMargin,
+                inverse ? 0 : width-2*offsetMargin
+            ]);
 
             svg.attr('width', width);
             node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
-            path = sankey.link(scale);
+            path = sankey.link(
+                scale,
+                inverse ? -sankey.nodeWidth() : 0,
+                inverse ? sankey.nodeWidth() : 0
+            );
             link.attr("d", path);
         }
     });

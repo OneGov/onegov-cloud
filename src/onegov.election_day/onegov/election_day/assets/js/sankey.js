@@ -50,12 +50,12 @@ d3.sankey = function() {
     return sankey;
   };
 
-  sankey.link = function(scale) {
+  sankey.link = function(scale, dx1, dx2) {
     var curvature = 0.5;
 
     function link(d) {
-      var x0 = scale(d.source.x) + d.source.dx,
-          x1 = scale(d.target.x),
+      var x0 = scale(d.source.x) + d.source.dx + dx1,
+          x1 = scale(d.target.x) + dx2,
           xi = d3.interpolateNumber(x0, x1),
           x2 = xi(curvature),
           x3 = xi(1 - curvature),

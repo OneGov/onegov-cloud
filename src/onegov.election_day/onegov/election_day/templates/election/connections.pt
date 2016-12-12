@@ -20,6 +20,7 @@
                 <div class="small-12 small-centered large-10 columns">
                     <div class="sankey-chart" i18n:attributes="data-download-link; data-embed-link"
                         data-dataurl="${request.link(election, name='connections-data')}"
+                        data-inverse="true"
                         data-download-link="Download"
                         data-embed-link="Embed"
                         data-embed-source="${request.link(election, name='connections-chart')}">

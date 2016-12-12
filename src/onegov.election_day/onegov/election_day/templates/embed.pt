@@ -29,7 +29,7 @@
                       sankey_url data.get('sankey');
                       map_url data.get('map')">
         <div tal:condition="bar_url" class="bar-chart" data-dataurl="${bar_url}" />
-        <div tal:condition="sankey_url" class="sankey-chart" data-dataurl="${sankey_url}" />
+        <div tal:condition="sankey_url" class="sankey-chart" data-dataurl="${sankey_url}" data-inverse="${data.get('inverse')}"/>
 
         <div tal:condition="map_url" class="ballot-map"
             data-type="${model.type}"
