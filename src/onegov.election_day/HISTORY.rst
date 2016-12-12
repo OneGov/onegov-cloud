@@ -10,6 +10,9 @@ Changelog
 - Uses fading effects on charts.
   [msom]
 
+- Changes direction of the list connections sankey chart.
+  [msom]
+
 - Adds support for PyFilesystem 2.x and Chameleon 3.x.
   [href]
 
