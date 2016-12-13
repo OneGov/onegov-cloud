@@ -806,7 +806,7 @@ def test_booking_view(feriennet_app):
     assert "maximal drei Favoriten" in result.headers.get('X-IC-Trigger-Data')
 
     # users may switch between other periods
-    assert "Keine Buchungen in 2017" in c1_bookings.click('2017')
+    assert "Keine Buchungen" in c1_bookings.click('2017')
 
     # admins may switch between other users
     admin = Client(feriennet_app)
@@ -1309,7 +1309,7 @@ def test_billing(feriennet_app):
 
     # occsaions with the same title (here the same activity) is not defined
     assert '1000.00 Ausstehend' in page.pyquery('.outstanding').text() or\
-        '100.00 Ausstehend' in page.py.query('.outstanding').text()
+        '100.00 Ausstehend' in page.pyquery('.outstanding').text()
 
     admin.post(get_post_url(page, 'mark-unpaid'))
 
