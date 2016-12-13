@@ -1,8 +1,12 @@
 Changelog
 ---------
 
+- Adds the ability to create invoices and to mark them as paid
+  [href]
+
 - Ensures that the number of spots on an occasion cannot be lower than
   the number of already accepted bookings.
+  [jref]
 
 - Adds the ability to cancel, reactivate and delete occasions.
   [href]
