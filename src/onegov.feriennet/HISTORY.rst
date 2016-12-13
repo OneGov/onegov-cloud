@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.3 (2016-12-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to create invoices and to mark them as paid
   [href]
 
