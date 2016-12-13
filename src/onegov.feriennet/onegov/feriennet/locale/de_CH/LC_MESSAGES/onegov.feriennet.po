@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-09 16:01+0100\n"
+"POT-Creation-Date: 2016-12-13 11:19+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -193,6 +193,9 @@ msgstr "Anderer"
 
 msgid "This occasion is outside the currently active period"
 msgstr "Diese Durchführung liegt ausserhalb der aktiven Periode"
+
+msgid "This period has already been finalized"
+msgstr "Diese Periode wurde bereits abgeschlossen"
 
 msgid "Cannot create a booking outside the prebooking period"
 msgstr "Anmeldungen können nur während der Wunschphase gemacht werden"
@@ -526,9 +529,6 @@ msgstr ""
 "Die Fakturierung für diese Periode wurde abgeschlossen. Sie können die "
 "Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
 
-msgid "No bookings."
-msgstr "Keine Buchungen."
-
 msgid "Mark up to three occasions per child as favorites."
 msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren."
 
@@ -541,6 +541,9 @@ msgstr ""
 "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
 "eingeteilt wird."
 
+msgid "No bookings."
+msgstr "Keine Buchungen."
+
 msgid "Free of charge"
 msgstr "Kostenlos"
 
@@ -550,11 +553,11 @@ msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."
 msgid "Passport"
 msgstr "Ferienpass"
 
-msgid "Users"
-msgstr "Benutzer"
-
 msgid "For ${user}"
 msgstr "Für ${user}"
+
+msgid "Users"
+msgstr "Benutzer"
 
 msgid "Edit contact info"
 msgstr "Kontakt ändern"
@@ -699,9 +702,6 @@ msgstr "Jahre"
 
 msgid "State"
 msgstr "Status"
-
-msgid "No bookings."
-msgstr "Keine Buchungen."
 
 msgid "Automatic Matching"
 msgstr "Automatische Zuteilung"
