@@ -45,7 +45,7 @@ class BillingDetails(object):
     @staticmethod
     def item_id(item):
         components = (item.invoice, item.username)
-        return hashlib.md5('/'.join(components).encode('utf-8')).digest().hex()
+        return hashlib.md5('/'.join(components).encode('utf-8')).hexdigest()
 
 
 class BillingCollection(object):

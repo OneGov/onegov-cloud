@@ -116,7 +116,17 @@ class AttendeeForm(Form):
             ))
             return False
 
+    def ensure_not_finalized(self):
+        if self.model.period.finalized:
+            self.attendee.errors.append(_(
+                "This period has already been finalized"
+            ))
+            return False
+
     def ensure_within_prebooking_period(self):
+        if self.model.period.confirmed:
+            return
+
         start, end = (
             self.model.period.prebooking_start,
             self.model.period.prebooking_end
