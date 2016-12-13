@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2016-12-13)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an 'outstanding' property to the invoice item collection.
   [href]
 
