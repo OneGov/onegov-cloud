@@ -108,18 +108,7 @@
                 </div>
                 <div class="columns small-12 medium-4">
                     <tal:block metal:use-macro="layout.macros.periods" />
-
-                    <div class="row other-users" tal:condition="request.is_admin and users">
-                        <div class="columns small-12">
-                            <h2 i18n:translate>Users</h2>
-                            <ul>
-                                <li tal:repeat="u users">
-                                    <a tal:condition="u.id != user.id" href="${request.link(model.for_username(u.username))}">${u.title}</a>
-                                    <strong i18n:translate tal:condition="u.id == user.id">${u.title}</strong>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                    <tal:block metal:use-macro="layout.macros.users" />
                 </div>
             </div>
         </div>

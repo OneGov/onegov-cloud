@@ -44,5 +44,7 @@ def view_my_invoices(self, request):
         'title': title,
         'layout': InvoiceLayout(self, request, title),
         'users': users,
-        'bills': bills
+        'user': user,
+        'bills': bills,
+        'model': self
     }

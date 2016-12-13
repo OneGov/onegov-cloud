@@ -7,7 +7,7 @@
     <tal:block condition="not: bills" i18n:translate>No bills created yet.</tal:block>
 
     <div class="row" tal:condition="bills">
-        <div class="columns small-12 medium-8 end">
+        <div class="columns small-12 medium-8">
             <div class="bills">
                 <div class="bill ${details.paid and 'paid' or 'unpaid'}" id="${details.id}" tal:repeat="(title, details) bills.items()">
                     <h3>${details.title}</h3>
@@ -43,6 +43,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="columns small-12 medium-4">
+            <tal:block metal:use-macro="layout.macros.users" />
         </div>
     </div>
 
