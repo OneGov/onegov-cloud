@@ -526,8 +526,8 @@ msgstr ""
 "Die Fakturierung für diese Periode wurde abgeschlossen. Sie können die "
 "Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
 
-msgid "No bookings in ${period}."
-msgstr "Keine Buchungen in ${period}."
+msgid "No bookings."
+msgstr "Keine Buchungen."
 
 msgid "Mark up to three occasions per child as favorites."
 msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren."
