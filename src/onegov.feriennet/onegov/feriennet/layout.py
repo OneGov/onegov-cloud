@@ -4,6 +4,7 @@ from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
+from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
 from onegov.org.layout import DefaultLayout as BaseLayout
@@ -27,16 +28,18 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
     @cached_property
     def editbar_links(self):
-        links = []
+        if not self.request.is_organiser:
+            return None
 
-        if self.request.is_organiser:
-            links.append(
-                Link(
-                    text=_("Submit Activity"),
-                    url=self.request.link(self.model, name='neu'),
-                    classes=('new-activity', )
-                )
+        has_period = self.app.session().query(Period.id).first()
+
+        links = [
+            Link(
+                text=_("Submit Activity"),
+                url=self.request.link(self.model, name='neu'),
+                classes=('new-activity', )
             )
+        ]
 
         if self.request.is_admin:
             links.append(
@@ -47,7 +50,7 @@ class VacationActivityCollectionLayout(DefaultLayout):
                 )
             )
 
-            if self.app.session().query(Period.id).first():
+            if has_period:
                 links.append(
                     Link(
                         text=_("Matching"),
@@ -63,6 +66,15 @@ class VacationActivityCollectionLayout(DefaultLayout):
                         classes=('manage-billing', )
                     )
                 )
+
+        if has_period:
+            links.append(
+                Link(
+                    text=_("Attendees"),
+                    url=self.request.class_link(OccasionAttendeeCollection),
+                    classes=('show-attendees', )
+                )
+            )
 
         return links
 
@@ -284,4 +296,18 @@ class InvoiceLayout(DefaultLayout):
         return (
             Link(_("Homepage"), self.homepage_url),
             Link(self.title, '#')
+        )
+
+
+class OccasionAttendeeLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(_("Attendees"), '#')
         )

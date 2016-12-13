@@ -5,6 +5,7 @@ from onegov.activity import InvoiceItemCollection
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
+from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.converters import age_range_converter
 from onegov.feriennet.models import InvoiceAction, VacationActivity
@@ -172,3 +173,28 @@ def get_my_invoies(request, app, username=None):
         username = request.current_username
 
     return InvoiceItemCollection(app.session(), username)
+
+
+@FeriennetApp.path(
+    model=OccasionAttendeeCollection,
+    path='/teilnehmer',
+    converters=dict(period_id=UUID))
+def get_occasion_attendee_collection(request, app, period_id=None):
+
+    periods = PeriodCollection(app.session())
+
+    if not period_id:
+        period = periods.active() or periods.query().first()
+    else:
+        period = periods.by_id(period_id)
+
+    if not period:
+        return None
+
+    # non-admins are automatically limited to the activites they own
+    if request.is_admin:
+        username = None
+    else:
+        username = request.current_username
+
+    return OccasionAttendeeCollection(app.session(), period, username)
