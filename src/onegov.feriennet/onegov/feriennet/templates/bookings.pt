@@ -27,7 +27,7 @@
                     </div>
 
                     <p tal:condition="not:has_bookings" i18n:translate>
-                        No bookings.
+                        No bookings yet.
                     </p>
 
                     <div class="row" tal:repeat="attendee attendees" tal:condition="has_bookings">
