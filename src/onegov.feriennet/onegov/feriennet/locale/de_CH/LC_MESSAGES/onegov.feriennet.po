@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-14 10:50+0100\n"
+"POT-Creation-Date: 2016-12-14 15:25+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -207,7 +207,8 @@ msgid "This occasion is already fully booked"
 msgstr "Diese Durchüfhrung ist bereits ausgebucht"
 
 msgid "The attendee already has a booking for this activity"
-msgstr "Der Teilnehmer hat bereits eine andere Durchführung dieses Angebots gebucht"
+msgstr ""
+"Der Teilnehmer hat bereits eine andere Durchführung dieses Angebots gebucht"
 
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
@@ -392,11 +393,20 @@ msgstr "Falls anders als Benutzername"
 msgid "Phone"
 msgstr "Telefon"
 
+msgid "Emergency Contact"
+msgstr "Kontakt im Notfall"
+
+msgid "012 345 67 89 (Peter Muster)"
+msgstr "012 345 67 89 (Peter Muster)"
+
 msgid "Website"
 msgstr "Webseite"
 
 msgid "Website address including http:// or https://"
 msgstr "Webseiten-Adresse inklusive http:// oder https://"
+
+msgid "Please enter both a number and a name"
+msgstr "Bitte geben Sie eine Nummer und einen Namen an"
 
 msgid "Activity"
 msgstr "Angebot"
@@ -531,6 +541,26 @@ msgid ""
 msgstr ""
 "Die Fakturierung für diese Periode wurde abgeschlossen. Sie können die "
 "Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
+
+msgid ""
+"You haven't added an emergency contact to your profile yet. Please add this "
+"information in your userprofile so we can reach you in an emergency!"
+msgstr ""
+"Sie haben noch keinen Notfallkontakt erfasst. Bitte fügen Sie diesen Kontakt "
+"hinzu damit wir sie im Notfall erreichen können!"
+
+msgid "Add in Userprofile"
+msgstr "Im Benutzerprofil ergänzen"
+
+msgid ""
+"This is your emergency contact. Please change it in the user profile if it "
+"is not up to date anymore:"
+msgstr ""
+"Dies ist Ihr Notfallkontakt: Bitte stellen Sie sicher dass dieser aktuell "
+"ist:"
+
+msgid "Change in Userprofile"
+msgstr "Im Benutzerprofil anpassen"
 
 msgid "Mark up to three occasions per child as favorites."
 msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren."
@@ -725,14 +755,11 @@ msgstr ""
 "Die Zuteilung kann nur noch manuell über Buchungen/Stornierungen gemacht "
 "werden."
 
-msgid "Legal guardian:"
-msgstr "Erzeihungsberechtigte/r:"
+msgid "Emergency Contact:"
+msgstr "Notfall:"
 
 msgid "Missing!"
 msgstr "Fehlt!"
-
-msgid "Phone:"
-msgstr "Telefon:"
 
 msgid ""
 "The following activites contain occasions which are in conflict with the "
@@ -1012,3 +1039,9 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
+
+#~ msgid "Legal guardian:"
+#~ msgstr "Erzeihungsberechtigte/r:"
+
+#~ msgid "Phone:"
+#~ msgstr "Telefon:"

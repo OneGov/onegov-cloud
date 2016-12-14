@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an emergency contact to the userprofile.
+  [href]
+
 - Fixes cancelled bookings blocking new bookings.
   [href]
 

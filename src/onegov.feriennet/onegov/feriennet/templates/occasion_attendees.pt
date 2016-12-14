@@ -14,16 +14,9 @@
                 <li tal:repeat="details occasions[occasion]">
                     <strong>${details.attendee.name} (${details.attendee.age})</strong>
                     <div>
-                        <div tal:define="guardian details.contact.realname|details.contact.email|details.attendee.username">
-                            <span i18n:translate>Legal guardian:</span>
-                            <strong tal:condition="guardian">${guardian}</strong>
-                            <strong i18n:translate tal:condition="not:guardian">Missing!</strong>
-                        </div>
-                        <div tal:define="phone details.contact.phone|nothing">
-                            <span i18n:translate>Phone:</span>
-                            <strong tal:condition="phone">${phone}</strong>
-                            <strong i18n:translate tal:condition="not:phone">Missing!</strong>
-                        </div>
+                        <span i18n:translate>Emergency Contact:</span>
+                        <span tal:condition="details.contact">${details.contact}</span>
+                        <strong i18n:translate tal:condition="not:details.contact">Missing!</strong>
                     </div>
                 </li>
             </ul>

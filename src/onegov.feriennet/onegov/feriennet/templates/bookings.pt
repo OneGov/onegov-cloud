@@ -3,6 +3,25 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
+        <tal:block condition="show_emergency_info">
+            <div class="emergency-contact-missing emergency-contact" tal:condition="not:has_emergency_contact">
+                <div i18n:translate>
+                    You haven't added an emergency contact to your profile yet.
+                    Please add this information in your userprofile so we can reach you in an emergency!
+                </div>
+                <a i18n:translate href="${request.return_here(request.link(request.app.org, 'benutzerprofil'))}">Add in Userprofile</a>
+            </div>
+            <div class="emergency-contact" tal:condition="has_emergency_contact">
+                <div i18n:translate>
+                    This is your emergency contact. Please change it in the user profile if it is not up to date anymore:
+                </div>
+                <div>
+                    <strong>${user.data.emergency}</strong>
+                </div>
+                <a i18n:translate href="${request.return_here(request.link(request.app.org, 'benutzerprofil'))}">Change in Userprofile</a>
+            </div>
+        </tal:block>
+
         <div class="my-bookings">
             <h2>${period.title}</h2>
 

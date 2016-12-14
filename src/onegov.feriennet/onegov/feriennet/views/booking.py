@@ -156,9 +156,9 @@ def view_my_bookings(self, request):
         users = all_users(request)
         user = next(u for u in users if u.username == self.username)
     else:
-        users, user = None, None
+        users, user = None, request.current_user
 
-    if user is None or user.username == request.current_username:
+    if user.username == request.current_username:
         title = period.wishlist_phase and _("Wishlist") or _("Bookings")
     elif period.wishlist_phase:
         title = _("Wishlist of ${user}", mapping={
@@ -179,6 +179,8 @@ def view_my_bookings(self, request):
             base_cost = 0 if period.all_inclusive else period.booking_cost
             return (booking.occasion.cost or 0) + (base_cost or 0)
 
+    has_emergency_contact = user.data and user.data.get('emergency')
+    show_emergency_info = user.username == request.current_username
     layout = BookingCollectionLayout(self, request, title)
 
     return {
@@ -196,6 +198,8 @@ def view_my_bookings(self, request):
         'user': user,
         'users': users,
         'title': title,
+        'has_emergency_contact': has_emergency_contact,
+        'show_emergency_info': show_emergency_info
     }
 
 

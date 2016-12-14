@@ -1152,3 +1152,25 @@ ul.tags {
         }
     }
 }
+
+
+/*
+    Emergency contact
+*/
+
+.emergency-contact {
+    @include panel;
+    margin-bottom: 1.5rem;
+    max-width: rem-calc(1000) / 12 * 8 - rem-calc(30);
+
+    div {
+        margin-bottom: .5rem;
+        max-width: $max-line-width;
+    }
+}
+
+.emergency-contact-missing {
+    div:first-child {
+        font-weight: bold;
+    }
+}

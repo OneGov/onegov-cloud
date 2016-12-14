@@ -1,14 +1,16 @@
+import string
+
 from onegov.feriennet import _
 from onegov.form import Form
 from wtforms import StringField, TextAreaField
 from wtforms.fields.html5 import URLField
-from wtforms.validators import Optional, URL
+from wtforms.validators import Optional, URL, ValidationError, InputRequired
 
 
 class UserProfileForm(Form):
     """ Custom userprofile form for feriennet """
 
-    extra_fields = ('address', 'email', 'phone', 'website')
+    extra_fields = ('address', 'email', 'phone', 'website', 'emergency')
 
     realname = StringField(
         label=_("Name"),
@@ -29,11 +31,28 @@ class UserProfileForm(Form):
         label=_("Phone")
     )
 
+    emergency = StringField(
+        label=_("Emergency Contact"),
+        description=_("012 345 67 89 (Peter Muster)"),
+        validators=[InputRequired()]
+    )
+
     website = URLField(
         label=_("Website"),
         description=_("Website address including http:// or https://"),
         validators=[Optional(), URL()]
     )
+
+    def validate_emergency(self, field):
+        if field.data:
+            characters = tuple(c for c in field.data if c.strip())
+
+            numbers = sum(1 for c in characters if c in string.digits)
+            chars = sum(1 for c in characters if c in string.ascii_letters)
+
+            if numbers < 9 and chars < 5:
+                raise ValidationError(
+                    _("Please enter both a number and a name"))
 
     def populate_obj(self, model):
         super().populate_obj(model)
