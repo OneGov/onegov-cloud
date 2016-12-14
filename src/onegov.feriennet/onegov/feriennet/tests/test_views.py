@@ -696,7 +696,7 @@ def test_enroll_child(feriennet_app):
     enroll = client.get('/angebot/another-retreat').click("Anmelden", index=1)
     enroll = enroll.form.submit()
 
-    assert "bereits eine Durchführung dieses Angebots gebucht" in enroll
+    assert "bereits eine andere Durchführung dieses Angebots gebucht" in enroll
 
 
 def test_booking_view(feriennet_app):
@@ -806,7 +806,7 @@ def test_booking_view(feriennet_app):
     assert "maximal drei Favoriten" in result.headers.get('X-IC-Trigger-Data')
 
     # users may switch between other periods
-    assert "Keine Buchungen" in c1_bookings.click('2017')
+    assert "Noch keine Buchungen" in c1_bookings.click('2017')
 
     # admins may switch between other users
     admin = Client(feriennet_app)
@@ -1322,3 +1322,107 @@ def test_billing(feriennet_app):
     assert 'Bezahlt' in page.pyquery('.outstanding').text()
 
     assert not member.get('/').pyquery('.invoices-count').attr['data-count']
+
+
+def test_reactivate_cancelled_booking(feriennet_app):
+
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    foobar = activities.add("Foobar", username='admin@example.org')
+    foobar.propose().accept()
+
+    occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        age=(0, 10),
+        spots=(0, 2),
+        timezone="Europe/Zurich",
+        activity=foobar,
+        period=period,
+        cost=100,
+    )
+
+    occasions.add(
+        start=datetime(2016, 11, 25, 17),
+        end=datetime(2016, 11, 25, 20),
+        age=(0, 10),
+        spots=(0, 2),
+        timezone="Europe/Zurich",
+        activity=foobar,
+        period=period,
+        cost=1000,
+    )
+
+    attendees.add(owner, 'Dustin', date(2000, 1, 1))
+
+    transaction.commit()
+
+    client = Client(feriennet_app)
+    client.login_admin()
+
+    # by default we block conflicting bookings
+    page = client.get('/angebot/foobar').click('Anmelden', index=0)
+    page = page.form.submit().follow()
+
+    assert "Wunschliste hinzugefügt" in page
+
+    page = client.get('/angebot/foobar').click('Anmelden', index=0)
+    assert "bereits für diese Durchführung angemeldet" in page.form.submit()
+
+    page = client.get('/angebot/foobar').click('Anmelden', index=1)
+    assert "eine andere Durchführung" in page.form.submit()
+
+    # unless they are cancelled
+    bookings.query().first().state = 'cancelled'
+    transaction.commit()  # can be done by cancelling the whole event in UI
+
+    page = client.get('/angebot/foobar').click('Anmelden', index=0)
+    assert "Wunschliste hinzugefügt" in page.form.submit().follow()
+
+    # this also works between multiple occasions of the same activity
+    bookings.query().first().state = 'cancelled'
+    transaction.commit()  # can be done by cancelling the whole event in UI
+
+    page = client.get('/angebot/foobar').click('Anmelden', index=1)
+    assert "Wunschliste hinzugefügt" in page.form.submit().follow()
+
+    # and even if we confirm the period
+    page = client.get('/angebote').click('Zuteilung')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page.form.submit()
+
+    page = client.get('/meine-buchungen')
+    client.post(get_post_url(page, 'confirm'))  # cancel the booking
+
+    page = client.get('/angebot/foobar').click('Anmelden', index=0)
+    assert "war erfolgreic" in page.form.submit().follow()
+
+    page = client.get('/meine-buchungen')
+    client.post(get_post_url(page, 'confirm'))  # cancel the booking
+
+    page = client.get('/angebot/foobar').click('Anmelden', index=1)
+    assert "war erfolgreic" in page.form.submit().follow()

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes cancelled bookings blocking new bookings.
+  [href]
+
 0.1.3 (2016-12-13)
 ~~~~~~~~~~~~~~~~~~~
 

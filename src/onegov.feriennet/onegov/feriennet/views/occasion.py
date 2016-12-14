@@ -1,5 +1,5 @@
 from onegov.activity import AttendeeCollection
-from onegov.activity import BookingCollection
+from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
@@ -131,11 +131,37 @@ def book_occasion(self, request, form):
         assert not (self.full and self.period.confirmed)
 
         bookings = BookingCollection(request.app.session())
-        booking = bookings.add(
-            user=user,
-            attendee=attendee,
-            occasion=self
-        )
+
+        # if there's a cancelled booking blocking the way, reactivate it
+        booking = None
+
+        if not form.is_new:
+            o = OccasionCollection(request.app.session()).query()
+            o = o.with_entities(Occasion.id)
+            o = o.filter(Occasion.activity_id == self.activity_id)
+            o = o.filter(Occasion.period_id == self.period_id)
+
+            q = bookings.query()
+            q = q.filter(Booking.username == user.username)
+            q = q.filter(Booking.attendee == attendee)
+            q = q.filter(Booking.occasion_id.in_(o.subquery()))
+            q = q.filter(Booking.state == 'cancelled')
+
+            # somewhat unnecessary, but let's be extra sure
+            q = q.filter(Booking.period_id == self.period_id)
+
+            booking = q.first()
+
+            if booking:
+                booking.state = 'open'
+                booking.occasion_id = self.id
+
+        if booking is None:
+            booking = bookings.add(
+                user=user,
+                attendee=attendee,
+                occasion=self
+            )
 
         if self.period.confirmed:
             bookings.accept_booking(booking)

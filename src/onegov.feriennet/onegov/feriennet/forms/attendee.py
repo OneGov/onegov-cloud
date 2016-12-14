@@ -98,6 +98,7 @@ class AttendeeForm(Form):
 
             query = bookings.by_occasion(self.model)
             query = query.filter(Booking.attendee_id == self.attendee.data)
+            query = query.filter(Booking.state != 'cancelled')
 
             booking = query.first()
 
@@ -180,6 +181,9 @@ class AttendeeForm(Form):
             .subquery()
         ))
         query = query.filter(Booking.attendee_id == self.attendee.data)
+        query = query.filter(Booking.period_id == self.model.period_id)
+        query = query.filter(Booking.occasion_id != self.model.id)
+        query = query.filter(Booking.state != 'cancelled')
 
         if query.first():
             self.attendee.errors.append(

@@ -207,7 +207,7 @@ msgid "This occasion is already fully booked"
 msgstr "Diese Durchüfhrung ist bereits ausgebucht"
 
 msgid "The attendee already has a booking for this activity"
-msgstr "Der Teilnehmer hat bereits eine Durchführung dieses Angebots gebucht"
+msgstr "Der Teilnehmer hat bereits eine andere Durchführung dieses Angebots gebucht"
 
 msgid "You already entered a child with this name"
 msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
