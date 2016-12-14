@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-14 11:28+0100\n"
+"POT-Creation-Date: 2016-12-14 14:05+0100\n"
 "PO-Revision-Date: 2016-12-14 11:31+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -28,6 +28,9 @@ msgstr "Elenca i collegamenti"
 
 msgid "Election statistics"
 msgstr "Statistiche delle elezioni"
+
+msgid "Panachage"
+msgstr ""
 
 msgid "Open Data"
 msgstr "Dati aperti"

@@ -2,11 +2,12 @@ from collections import OrderedDict
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.layout import DefaultLayout
+from onegov.election_day.layout import DefaultLayout, ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import handle_headerless_params
 
 
-@ElectionDayApp.json(model=Election, permission=Public, name='panachage')
+@ElectionDayApp.json(model=Election, permission=Public, name='panachage-data')
 def view_election_panachage_data(self, request):
     """" View the panachage data as JSON. Used to for the panachage sankey
     chart.
@@ -75,6 +76,22 @@ def view_election_panachage_chart(self, request):
         'model': self,
         'layout': DefaultLayout(self, request),
         'data': {
-            'sankey': request.link(self, name='panachage')
+            'sankey': request.link(self, name='panachage-data')
         }
+    }
+
+
+@ElectionDayApp.html(model=Election, template='election/panachage.pt',
+                     name='panachage', permission=Public)
+def view_election_panachage(self, request):
+    """" The main view. """
+
+    request.include('sankey_chart')
+    request.include('tablesorter')
+
+    handle_headerless_params(request)
+
+    return {
+        'election': self,
+        'layout': ElectionsLayout(self, request, 'panachage')
     }

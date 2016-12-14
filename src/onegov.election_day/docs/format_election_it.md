@@ -223,6 +223,7 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 - **candidate_first_name**: Nome del candidato.
 - **candidate_elected**: Vero, se il candidato è stato eletto.
 - **candidate_votes**: Numero di voti per il candidato nel Comune.
+- **panachage_votes_from_list_XX** The number of votes the list got from the given list.
 
 ### Risultati temporanei
 

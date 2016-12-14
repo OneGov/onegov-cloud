@@ -4,7 +4,8 @@ from onegov.ballot import (
     ElectionResult,
     List,
     ListConnection,
-    ListResult
+    ListResult,
+    PanachageResult
 )
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
@@ -114,6 +115,32 @@ def parse_list_result(line, errors):
         )
 
 
+def parse_panachage_headers(csv):
+    headers = {}
+    for header in csv.headers:
+        if header.startswith('panachage_votes_from_list_'):
+            parts = header.split('panachage_votes_from_list_')
+            if len(parts) > 1:
+                try:
+                    number = int(parts[1])
+                    headers[csv.as_valid_identifier(header)] = number
+                except ValueError:
+                    pass
+    return headers
+
+
+def parse_panachage_results(line, errors, panachage):
+    try:
+        target = int(line.list_id or 0)
+        if target not in panachage:
+            panachage[target] = {}
+            for name, index in panachage['headers'].items():
+                panachage[target][index] = int(getattr(line, name))
+
+    except ValueError:
+        errors.append(_("Invalid list results"))
+
+
 def parse_candidate(line, errors):
     try:
         id = int(line.candidate_id or 0)
@@ -190,6 +217,7 @@ def import_file(entities, election, file, mimetype):
     connections = {}
     subconnections = {}
     results = {}
+    panachage = {'headers': parse_panachage_headers(csv)}
 
     # This format has one candiate per entity per line
     counted = 0
@@ -207,6 +235,7 @@ def import_file(entities, election, file, mimetype):
             list_ = parse_list(line, line_errors)
             list_result = parse_list_result(line, line_errors)
             connection, subconnection = parse_connection(line, line_errors)
+            parse_panachage_results(line, line_errors, panachage)
 
         # Pass the errors and continue to next line
         if line_errors:
@@ -272,6 +301,12 @@ def import_file(entities, election, file, mimetype):
             session.delete(list_)
         for list_ in lists.values():
             election.lists.append(list_)
+
+            if list_.list_id in panachage:
+                for source, votes in panachage[list_.list_id].items():
+                    list_.panachage_results.append(
+                        PanachageResult(source_list_id=source, votes=votes)
+                    )
 
         for candidate in election.candidates:
             session.delete(candidate)

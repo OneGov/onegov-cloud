@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds panachage charts.
+  [msom]
+
 - Uses tabs instead of foldable sections.
   [msom]
 

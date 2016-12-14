@@ -156,6 +156,42 @@ def test_view_election_connections(election_day_app_gr):
     assert '/election/proporz-election/connections-data' in chart
 
 
+def test_view_election_panachage(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+
+    main = client.get('/election/majorz-election/panachage')
+    assert '<h3>Panaschierstatistik</h3>' not in main
+
+    assert client.get('/election/majorz-election/panachage-data').json == {}
+
+    chart = client.get('/election/majorz-election/panachage-chart')
+    assert chart.status_code == 200
+    assert '/election/majorz-election/panachage-data' in chart
+
+    upload_proporz_election(client)
+
+    main = client.get('/election/proporz-election/panachage')
+    assert '<h3>Panaschierstatistik</h3>' in main
+
+    data = client.get('/election/proporz-election/panachage-data').json
+
+    nodes = [node['name'] for node in data['nodes']]
+    assert '-' in nodes
+    assert 'FDP' in nodes
+    assert 'CVP' in nodes
+
+    links = [link['value'] for link in data['links']]
+    assert all((i in links for i in (1, 2, 3, 7)))
+
+    chart = client.get('/election/proporz-election/connections-chart')
+    assert chart.status_code == 200
+    assert '/election/proporz-election/connections-data' in chart
+
+
 def test_view_election_json(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()

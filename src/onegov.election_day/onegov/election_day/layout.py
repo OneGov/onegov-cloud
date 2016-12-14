@@ -116,6 +116,7 @@ class ElectionsLayout(Layout):
             'districts',
             'connections',
             'statistics',
+            'panachage',
             'data'
         )
 
@@ -132,6 +133,8 @@ class ElectionsLayout(Layout):
             return _("List connections")
         if tab == 'statistics':
             return _("Election statistics")
+        if tab == 'panachage':
+            return _("Panachage")
         if tab == 'data':
             return _("Open Data")
 
@@ -149,6 +152,8 @@ class ElectionsLayout(Layout):
             return self.majorz and self.summarize
         if tab == 'connections':
             return self.proporz and self.model.list_connections.first()
+        if tab == 'panachage':
+            return self.proporz and self.model.has_panachage_data
 
         return True
 

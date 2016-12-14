@@ -71,6 +71,7 @@ def view_election_json(self, request):
         'embed': [
             request.link(self, 'lists-chart'),
             request.link(self, 'connections-chart'),
+            request.link(self, 'panachage-chart'),
         ] if self.type == 'proporz' else [
             request.link(self, 'candidates-chart'),
         ]

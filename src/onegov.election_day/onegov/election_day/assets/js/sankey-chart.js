@@ -1,18 +1,32 @@
+var adjust_scale = function(scale, width, offset, nodeWidth, inverse) {
+    scale.range([
+        offset.left + offset.margin,
+        width - offset.right - offset.margin - nodeWidth
+    ]);
+    if (inverse) {
+        scale.range([
+            width - offset.left - offset.margin - nodeWidth,
+            offset.right + offset.margin
+        ]);
+    }
+};
+
 var init_sankey_chart = function(el) {
 
-    var offsetMargin = 6;
     var dataurl = $(el).data('dataurl');
     var width = $(el).width();
     var height = 600;
     var svg = d3.select(el).append('svg')
         .attr('width', width)
-        .attr('height', height + 15)
+        .attr('height', height + 40)
         .attr('xmlns', "http://www.w3.org/2000/svg")
-        .attr('version', '1.1');
-    var offset = width * 0.25;
-    var scale = d3.scale.linear();
+        .attr('version', '1.1')
+        .style('padding-top', '20px');
+    var offset = {left: 0, right: 0, margin: 6};
+    var scale = d3.scale.linear().domain([0, width]);
+    var nodeWidth = 25;
     var sankey = d3.sankey()
-        .nodeWidth(25)
+        .nodeWidth(nodeWidth)
         .nodePadding(15)
         .size([width, height]);
     var node = null;
@@ -49,7 +63,7 @@ var init_sankey_chart = function(el) {
             // ... the bar
             var bar = node.append("rect")
                 .attr("height", function(d) { return d.dy; })
-                .attr("width", sankey.nodeWidth())
+                .attr("width", nodeWidth)
                 .style("cursor", "move")
                 .style("fill", "#999")
                 .style("shape-rendering", "crispEdges");
@@ -71,34 +85,49 @@ var init_sankey_chart = function(el) {
                 .style("fill", "#fff")
                 .style("pointer-events", "none");
 
-            // Add the node names to the left of the bars
+            // Add the node names to the left and right of the bars
             var name = node.filter(function(d) { return d.name; })
                 .append("text")
                 .text(function(d) { return d.name; })
                 .attr("x", 0)
                 .attr("y", function(d) { return d.dy / 2; })
-                .attr("dx", inverse ? offsetMargin + sankey.nodeWidth() : -offsetMargin)
                 .attr("dy", ".35em")
-                .attr("text-anchor", inverse ? "start" : "end")
+                .attr("class", "left")
+                .style("pointer-events", "none")
                 .style("font-size", "14px")
-                .style("font-family", "sans-serif")
-                .style("pointer-events", "none");
+                .style("font-family", "sans-serif");
+            var name_left = name.filter(function(d) { return d.x < width / 2;})
+                .attr("class", "name name-left")
+                .attr("text-anchor", "end")
+                .attr("dx", -offset.margin);
+            var name_right = name.filter(function(d) { return d.x > width / 2;})
+                .attr("class", "name name-right")
+                .attr("text-anchor", "start")
+                .attr("dx", nodeWidth + offset.margin);
+            if (inverse) {
+                name_left.attr("text-anchor", "start")
+                    .attr("dx", nodeWidth + offset.margin);
+                name_right.attr("text-anchor", "end")
+                    .attr("dx", -offset.margin);
+            }
 
-            offset = d3.max(name[0], function(d) {return d.getBBox().width;}) || 0;
-
-            scale.domain([0, width])
-                 .range([
-                     inverse ? width-offsetMargin-2*sankey.nodeWidth()-offset : offset+offsetMargin,
-                     inverse ? 0 : width-2*offsetMargin
-                 ]);
+            // Rescale the sankey diagram to leave place to the left and right
+            // for the node names
+            //
+            // NAME | <-- offset.margin --> SANKEY <-- offset.margin --> | NAME
+            //      ^- offset.left                         offset.right -^
+            //
+            offset.left = d3.max(name_left[0], function(d) { return d.getBBox().width;}) || 0;
+            offset.right = d3.max(name_right[0], function(d) { return d.getBBox().width;}) || 0;
+            adjust_scale(scale, width, offset, nodeWidth, inverse);
 
             node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
 
             // Add the links
             path = sankey.link(
                 scale,
-                inverse ? -sankey.nodeWidth() : 0,
-                inverse ? sankey.nodeWidth() : 0
+                inverse ? -nodeWidth : 0,
+                inverse ? nodeWidth : 0
             );
             link = svg.append("g").selectAll(".link")
                 .data(data.links)
@@ -159,18 +188,14 @@ var init_sankey_chart = function(el) {
         if (node && link && path) {
             // Resize
             width = $(el).width();
-            scale.range([offset+offsetMargin, width-2*offsetMargin]);
-            scale.range([
-                inverse ? width-offsetMargin-2*sankey.nodeWidth()-offset : offset+offsetMargin,
-                inverse ? 0 : width-2*offsetMargin
-            ]);
-
             svg.attr('width', width);
+
+            adjust_scale(scale, width, offset, nodeWidth, inverse);
             node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
             path = sankey.link(
                 scale,
-                inverse ? -sankey.nodeWidth() : 0,
-                inverse ? sankey.nodeWidth() : 0
+                inverse ? -nodeWidth : 0,
+                inverse ? nodeWidth : 0
             );
             link.attr("d", path);
         }

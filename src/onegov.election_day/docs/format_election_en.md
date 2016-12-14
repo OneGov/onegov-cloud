@@ -226,6 +226,7 @@ The following columns will be evaluated and should exist:
 - **candidate_first_name**: First name of the candidate.
 - **candidate_elected**: True, if the candidate was elected.
 - **candidate_votes**: Number of candidate votes in municipality.
+- **panachage_votes_from_list_XX** The number of votes the list got from the given list.
 
 ### Temporary results
 

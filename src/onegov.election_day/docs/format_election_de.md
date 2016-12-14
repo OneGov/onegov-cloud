@@ -225,6 +225,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **candidate_first_name**: Vorname des Kandidaten.
 - **candidate_elected**: True, falls der Kandidierenden gewählt wurde.
 - **candidate_votes**: Anzahl Kandidierendenstimmen in der Gemeinde.
+- **panachage_votes_from_list_XX** Anzahl Stimmen von der entsprechenden Liste.
 
 ### Temporäre Resultate
 

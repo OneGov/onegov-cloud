@@ -226,6 +226,7 @@ Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 - **candidate_first_name**: Prenum da la candidata u dal candidat.
 - **candidate_elected**: True, sche la candidata u il candidat è vegnì elegì.
 - **candidate_votes**: Dumber da vuschs da candidat en la vischnanca.
+- **panachage_votes_from_list_XX** The number of votes the list got from the given list.
 
 ### Resultats temporars
 
