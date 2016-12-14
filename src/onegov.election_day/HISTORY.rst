@@ -35,13 +35,13 @@ Changelog
 ~~~~~~~~~~~~~~~~~~~
 
 - Update translations.
-[msom]
+  [msom]
 
 1.3.2 (2016-11-16)
 ~~~~~~~~~~~~~~~~~~~
 
 - Update translations.
-[msom]
+  [msom]
 
 1.3.1 (2016-11-16)
 ~~~~~~~~~~~~~~~~~~~
