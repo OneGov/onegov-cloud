@@ -121,12 +121,12 @@ var init_bar_chart = function(el) {
             	bar.filter(function(s) { return s != d; })
                     .transition()
                     .duration(700)
-            		.style("opacity", .1);
+            		.style("opacity", 0.1);
             });
             bar.on("mouseout", function(d) {
                 bar.transition()
                     .duration(700)
-            		.style("opacity", 1)
+            		.style("opacity", 1);
             });
 
             var download_link = $(el).data('download-link');

@@ -39,7 +39,11 @@ var init_sankey_chart = function(el) {
                     d3.behavior.drag()
                         .origin(function(d) { return d; })
                         .on("dragstart", function() { this.parentNode.appendChild(this); })
-                        .on("drag", dragmove)
+                        .on("drag", function(d) {
+                            d3.select(this).attr("transform", "translate(" + scale(d.x) + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
+                            sankey.relayout();
+                            link.attr("d", path);
+                        })
                 );
 
             // ... the bar
@@ -48,7 +52,7 @@ var init_sankey_chart = function(el) {
                 .attr("width", sankey.nodeWidth())
                 .style("cursor", "move")
                 .style("fill", "#999")
-                .style("shape-rendering", "crispEdges")
+                .style("shape-rendering", "crispEdges");
             bar.append("title")
                 .text(function(d) { return d.value; });
             bar.filter(function(d) { return d.active; })
@@ -107,18 +111,11 @@ var init_sankey_chart = function(el) {
             link.append("title")
                 .text(function(d) { return d.value; });
 
-            function dragmove(d) {
-                d3.select(this).attr("transform", "translate(" + scale(d.x) + "," + (d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
-                sankey.relayout();
-                link.attr("d", path);
-            }
-
-
             // Fade-Effect on mouseover
             node.on("mouseover", function(d) {
             	link.transition()
                     .duration(700)
-            		.style("opacity", .1);
+            		.style("opacity", 0.1);
             	link.filter(function(s) { return d.id == s.source.id; })
                     .transition()
                     .duration(700)
@@ -131,18 +128,18 @@ var init_sankey_chart = function(el) {
             node.on("mouseout", function(d) {
                 link.transition()
                     .duration(700)
-            		.style("opacity", 1)
+            		.style("opacity", 1);
             });
             link.on("mouseover", function(d) {
             	link.filter(function(s) { return s != d; })
                     .transition()
                     .duration(700)
-            		.style("opacity", .1);
+            		.style("opacity", 0.1);
             });
             link.on("mouseout", function(d) {
                 link.transition()
                     .duration(700)
-            		.style("opacity", 1)
+            		.style("opacity", 1);
             });
 
             var download_link = $(el).data('download-link');
