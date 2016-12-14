@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 14:53+0100\n"
-"PO-Revision-Date: 2016-11-18 09:16+0100\n"
+"POT-Creation-Date: 2016-12-14 11:28+0100\n"
+"PO-Revision-Date: 2016-12-14 11:30+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: rm_CH\n"
@@ -72,6 +72,12 @@ msgstr "La datoteca CSV/XLS/XLSX è vida."
 
 msgid "The file contains an empty line."
 msgstr "La datoteca cuntegna ina lingia vida."
+
+msgid "Not a valid xls/xlsx file."
+msgstr "Nagina datoteca XLS/XLSX valaivla."
+
+msgid "The xls/xlsx file contains unsupported cells."
+msgstr ""
 
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"

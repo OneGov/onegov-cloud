@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 14:53+0100\n"
-"PO-Revision-Date: 2016-11-10 13:46+0100\n"
+"POT-Creation-Date: 2016-12-14 11:28+0100\n"
+"PO-Revision-Date: 2016-12-14 11:29+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -72,6 +72,12 @@ msgstr "Die CSV/XLS/XLSX Date ist leer."
 
 msgid "The file contains an empty line."
 msgstr "Die Datei enthält eine leere Zeile."
+
+msgid "Not a valid xls/xlsx file."
+msgstr "Keine gültige XLS/XLSX Datei."
+
+msgid "The xls/xlsx file contains unsupported cells."
+msgstr "Die XLS/XLSX Datei enthält nicht unterstütze Zellen."
 
 msgid "Invalid election values"
 msgstr "Ungültige Wahldaten"

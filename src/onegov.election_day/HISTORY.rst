@@ -13,6 +13,9 @@ Changelog
 - Changes direction of the list connections sankey chart.
   [msom]
 
+- Improves handling of invalid (excel) files.
+  [msom]
+
 - Adds support for PyFilesystem 2.x and Chameleon 3.x.
   [href]
 

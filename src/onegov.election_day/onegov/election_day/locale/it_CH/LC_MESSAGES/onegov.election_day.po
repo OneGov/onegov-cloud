@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 14:53+0100\n"
-"PO-Revision-Date: 2016-11-11 14:00+0100\n"
+"POT-Creation-Date: 2016-12-14 11:28+0100\n"
+"PO-Revision-Date: 2016-12-14 11:31+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: it_CH\n"
@@ -72,6 +72,12 @@ msgstr "Il file CSV/XLS/XLSX è vuoto."
 
 msgid "The file contains an empty line."
 msgstr "Il file contiene una riga vuota."
+
+msgid "Not a valid xls/xlsx file."
+msgstr "Nessun file XLS/XLSX valido."
+
+msgid "The xls/xlsx file contains unsupported cells."
+msgstr ""
 
 msgid "Invalid election values"
 msgstr "Valori dell'elezione non validi"
