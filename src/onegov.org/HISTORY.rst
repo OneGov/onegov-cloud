@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Make sure the userprofile honors the return-to parameter.
+  [href]
+
 0.1.6 (2016-12-13)
 ~~~~~~~~~~~~~~~~~~~
 

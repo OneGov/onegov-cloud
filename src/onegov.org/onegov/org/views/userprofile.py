@@ -27,6 +27,10 @@ def handle_user_profile(self, request, form):
     if form.submitted(request):
         form.populate_obj(user)
         request.success(_("Your changes were saved"))
+
+        if 'return-to' in request.GET:
+            return request.redirect(request.link(self, 'benutzerprofil'))
+
     elif not request.POST:
         form.process(obj=user)
 
