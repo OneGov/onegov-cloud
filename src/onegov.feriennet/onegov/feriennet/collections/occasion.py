@@ -37,7 +37,8 @@ class OccasionAttendeeCollection(OccasionCollection):
         }
 
         contacts = {
-            u.username: u.data.get('phone') for u in self.session.query(
+            u.username: u.data
+            for u in self.session.query(
                 User.username, User.data
             )
         }
@@ -47,7 +48,10 @@ class OccasionAttendeeCollection(OccasionCollection):
                 OccasionAttendee(
                     attendees[b.attendee_id],
                     contacts[b.username]
-                ) for b in o.accepted
+                ) for b in sorted(
+                    o.accepted,
+                    key=lambda b: attendees[b.attendee_id].name
+                )
             ]
 
         return occasions

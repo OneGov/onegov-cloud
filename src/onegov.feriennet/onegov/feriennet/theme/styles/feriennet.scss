@@ -1130,3 +1130,25 @@ ul.tags {
         right: 33px;
     }
 }
+
+/*
+    Occassion-Attendee View
+*/
+
+.occasion-attendance {
+
+    .attendance-header {
+        padding-bottom: .5rem;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+    }
+
+    .attendees {
+        font-size: .9em;  // em for correct scaling in print
+
+        li {
+            margin-bottom: .5rem;
+            page-break-inside: avoid;
+        }
+    }
+}

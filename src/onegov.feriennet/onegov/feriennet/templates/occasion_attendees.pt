@@ -3,18 +3,28 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <div class="occasion-attendance" tal:repeat="occasion occasions">
+        <div class="occasion-attendance" tal:repeat="occasion occasions" id="${occasion.id.hex}">
             <div class="attendance-header">
                 <h3>${occasion.activity.title}</h3>
-                <div>${layout.format_date_range(occasion.localized_start, occasion.localized_end)}</div>
+                <div>${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</div>
                 <div i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</div>
             </div>
 
             <ul class="attendees">
                 <li tal:repeat="details occasions[occasion]">
                     <strong>${details.attendee.name} (${details.attendee.age})</strong>
-                    <div i18n:translate tal:condition="details.contact">Contact: <tal:block i18n:name="phone" replace="details.contact" /></div>
-                    <div><strong i18n:translate tal:condition="not: details.contact">No contact</strong></div>
+                    <div>
+                        <div tal:define="guardian details.contact.realname|details.contact.email|details.attendee.username">
+                            <span i18n:translate>Legal guardian:</span>
+                            <strong tal:condition="guardian">${guardian}</strong>
+                            <strong i18n:translate tal:condition="not:guardian">Missing!</strong>
+                        </div>
+                        <div tal:define="phone details.contact.phone|nothing">
+                            <span i18n:translate>Phone:</span>
+                            <strong tal:condition="phone">${phone}</strong>
+                            <strong i18n:translate tal:condition="not:phone">Missing!</strong>
+                        </div>
+                    </div>
                 </li>
             </ul>
         </div>
