@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds a model for party results.
+  [msom]
+
 1.1.1 (2016-12-09)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -12,7 +16,7 @@ Unreleased
 1.1.0 (2016-11-30)
 ~~~~~~~~~~~~~~~~~~~
 
-- Adds model for panachage results.
+- Adds a model for panachage results.
   [msom]
 
 1.0.3 (2016-11-28)

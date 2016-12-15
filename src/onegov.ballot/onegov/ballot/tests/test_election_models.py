@@ -8,7 +8,8 @@ from onegov.ballot import (
     List,
     ListConnection,
     ListResult,
-    PanachageResult
+    PanachageResult,
+    PartyResult
 )
 from uuid import uuid4
 
@@ -63,6 +64,15 @@ def test_election_create_all_models(session):
     session.add(candidate)
     session.flush()
 
+    party_result = PartyResult(
+        election_id=election.id,
+        number_of_mandates=0,
+        name='Libertarian'
+    )
+
+    session.add(party_result)
+    session.flush()
+
     election_result = ElectionResult(
         election_id=election.id,
         group='group',
@@ -108,6 +118,7 @@ def test_election_create_all_models(session):
     assert election.list_connections.one() == connection
     assert election.lists.one() == list
     assert election.candidates.one() == candidate
+    assert election.party_results.one() == party_result
     assert election.results.one() == election_result
 
     assert connection.election == election
@@ -127,6 +138,8 @@ def test_election_create_all_models(session):
     assert candidate.results.one() == candidate_result
     assert candidate.election == election
     assert candidate.list == list
+
+    assert party_result.election == election
 
     assert election_result.list_results.one() == list_result
     assert election_result.candidate_results.one() == candidate_result
@@ -470,6 +483,14 @@ def test_election_results(session):
     election.lists.append(list_3)
     election.lists.append(list_4)
 
+    # Add party results
+    election.party_results.append(
+        PartyResult(name='Republican Party', number_of_mandates=1)
+    )
+    election.party_results.append(
+        PartyResult(name='Democratic Party', number_of_mandates=1)
+    )
+
     # Add panachage results
     list_1.panachage_results.append(
         PanachageResult(target_list_id=list_1.id, source_list_id=2, votes=1)
@@ -696,6 +717,10 @@ def test_election_results(session):
     votes = session.query(ListConnection.votes, ListConnection.connection_id)
     votes = votes.order_by(ListConnection.votes)
     assert [int(vote[0]) for vote in votes] == [26, 111, 540]
+
+    parties = session.query(PartyResult.name, PartyResult.number_of_mandates)
+    parties = parties.order_by(PartyResult.name)
+    assert parties.all() == [('Democratic Party', 1), ('Republican Party', 1)]
 
 
 def test_election_export(session):

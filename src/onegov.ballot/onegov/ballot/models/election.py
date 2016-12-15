@@ -160,6 +160,14 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         order_by="ElectionResult.group",
     )
 
+    #: An election may contains n party results
+    party_results = relationship(
+        "PartyResult",
+        cascade="all, delete-orphan",
+        backref=backref("election"),
+        lazy="dynamic",
+    )
+
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
         return sum(getattr(result, attribute) for result in self.results)
@@ -178,7 +186,9 @@ class Election(Base, TimestampMixin, DerivedAttributes,
     @property
     def last_result_change(self):
         """ Gets the latest created/modified date of the election or amongst
-        the results of this election.
+        the results of this election. This does not include changes made to
+        candidates, lists, list connections and children of election results
+        (such as candidate results, list results, ...).
 
         """
         last_changes = []
@@ -219,7 +229,9 @@ class Election(Base, TimestampMixin, DerivedAttributes,
         This is meant as a base for json/csv/excel exports. The result is
         therefore a flat list of dictionaries with repeating values to avoid
         the nesting of values. Each record in the resulting list is a single
-        candidate result for each political entity.
+        candidate result for each political entity. Party results are not
+        included in the export (since they are not really connected with the
+        lists).
 
         Each entry in the list (row) has the following format:
 
@@ -789,3 +801,21 @@ class CandidateResult(Base, TimestampMixin):
 
     #: the canidate this result belongs to
     candidate_id = Column(UUID, ForeignKey(Candidate.id), nullable=False)
+
+
+class PartyResult(Base, TimestampMixin):
+    """ The election result of a party in an election. """
+
+    __tablename__ = 'party_results'
+
+    #: identifies the party result
+    id = Column(UUID, primary_key=True, default=uuid4)
+
+    #: the election this result belongs to
+    election_id = Column(Text, ForeignKey(Election.id), nullable=False)
+
+    # number of mandates
+    number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
+
+    #: name of the list
+    name = Column(Text, nullable=False)

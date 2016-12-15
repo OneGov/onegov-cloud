@@ -14,7 +14,8 @@ from onegov.ballot.models.election import (
     List,
     ListConnection,
     ListResult,
-    PanachageResult
+    PanachageResult,
+    PartyResult
 )
 from onegov.ballot.models.vote import Ballot, BallotResult, Vote
 from sqlalchemy.event import listens_for
@@ -31,6 +32,7 @@ __all__ = [
     'ListConnection',
     'ListResult',
     'PanachageResult',
+    'PartyResult',
     'Vote',
 ]
 
