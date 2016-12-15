@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Prevent empty pages from being printed.
+  [href]
+
 - Make sure the userprofile honors the return-to parameter.
   [href]
 

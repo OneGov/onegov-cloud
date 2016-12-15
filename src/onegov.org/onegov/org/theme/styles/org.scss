@@ -3008,6 +3008,11 @@ ul.search-results {
         border-radius: 3px;
     }
 
+    html,
+    body {
+        height: 99%; // avoids blank pages at the end
+    }
+
     body {
         font-size: 12px !important;
     }
