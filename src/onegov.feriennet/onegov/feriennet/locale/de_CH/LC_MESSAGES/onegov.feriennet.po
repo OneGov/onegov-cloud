@@ -556,7 +556,7 @@ msgid ""
 "This is your emergency contact. Please change it in the user profile if it "
 "is not up to date anymore:"
 msgstr ""
-"Dies ist Ihr Notfallkontakt: Bitte stellen Sie sicher dass dieser aktuell "
+"Dies ist Ihr Notfallkontakt. Bitte stellen Sie sicher dass dieser aktuell "
 "ist:"
 
 msgid "Change in Userprofile"
