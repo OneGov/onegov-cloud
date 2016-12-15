@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.4 (2016-12-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds an emergency contact to the userprofile.
   [href]
 
