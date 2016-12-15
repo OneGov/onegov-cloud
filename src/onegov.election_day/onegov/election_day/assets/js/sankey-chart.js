@@ -1,4 +1,45 @@
+var ellipse_text = function(text, maximum) {
+    // Ellipse the text with '...' if its longer than the given maximum
+    text.each(function(d) {
+        var self = d3.select(this);
+        var text = d.name;
+        self.text(text);
+        var textLength = this.getComputedTextLength();
+        while (textLength > maximum && (text.length > 0)) {
+            text = text.slice(0, -1);
+            self.text(text + '...');
+            console.log(text);
+            textLength = this.getComputedTextLength();
+        }
+    });
+};
+
+var adjust_offset = function(name, offset, width) {
+    // Calculate the text widths (offsets) and limit them to a maximum
+    if (!offset.initial) {
+        // Compute and store the full text widths once
+        offset.left = d3.max(name.left[0], function(d) { return d.getBBox().width;}) || 0;
+        offset.right = d3.max(name.right[0], function(d) { return d.getBBox().width;}) || 0;
+        offset.initial = {};
+        offset.initial.left = offset.left;
+        offset.initial.right = offset.right;
+    }
+    offset.left = offset.initial.left;
+    offset.right = offset.initial.right;
+    var maximum = Math.round(width / (2 + (offset.left ? 1 : 0) + (offset.right ? 1 : 0)));
+    if (offset.left > maximum) {
+        offset.left = maximum;
+    }
+    if (offset.right > maximum) {
+        offset.right = maximum;
+    }
+    ellipse_text(name.left, offset.left);
+    ellipse_text(name.right, offset.left);
+};
+
 var adjust_scale = function(scale, width, offset, nodeWidth, inverse) {
+    // Adjusts the scale to fit the sankey diagram within the new limits
+    // (width - offsets - margins)
     scale.range([
         offset.left + offset.margin,
         width - offset.right - offset.margin - nodeWidth
@@ -23,6 +64,7 @@ var init_sankey_chart = function(el) {
         .attr('version', '1.1')
         .style('padding-top', '20px');
     var offset = {left: 0, right: 0, margin: 6};
+    var name = {};
     var scale = d3.scale.linear().domain([0, width]);
     var nodeWidth = 25;
     var sankey = d3.sankey()
@@ -86,7 +128,7 @@ var init_sankey_chart = function(el) {
                 .style("pointer-events", "none");
 
             // Add the node names to the left and right of the bars
-            var name = node.filter(function(d) { return d.name; })
+            name.all = node.filter(function(d) { return d.name; })
                 .append("text")
                 .text(function(d) { return d.name; })
                 .attr("x", 0)
@@ -96,18 +138,18 @@ var init_sankey_chart = function(el) {
                 .style("pointer-events", "none")
                 .style("font-size", "14px")
                 .style("font-family", "sans-serif");
-            var name_left = name.filter(function(d) { return d.x < width / 2;})
+            name.left = name.all.filter(function(d) { return d.x < width / 2;})
                 .attr("class", "name name-left")
                 .attr("text-anchor", "end")
                 .attr("dx", -offset.margin);
-            var name_right = name.filter(function(d) { return d.x > width / 2;})
+            name.right = name.all.filter(function(d) { return d.x > width / 2;})
                 .attr("class", "name name-right")
                 .attr("text-anchor", "start")
                 .attr("dx", nodeWidth + offset.margin);
             if (inverse) {
-                name_left.attr("text-anchor", "start")
+                name.left.attr("text-anchor", "start")
                     .attr("dx", nodeWidth + offset.margin);
-                name_right.attr("text-anchor", "end")
+                name.right.attr("text-anchor", "end")
                     .attr("dx", -offset.margin);
             }
 
@@ -117,8 +159,7 @@ var init_sankey_chart = function(el) {
             // NAME | <-- offset.margin --> SANKEY <-- offset.margin --> | NAME
             //      ^- offset.left                         offset.right -^
             //
-            offset.left = d3.max(name_left[0], function(d) { return d.getBBox().width;}) || 0;
-            offset.right = d3.max(name_right[0], function(d) { return d.getBBox().width;}) || 0;
+            adjust_offset(name, offset, width);
             adjust_scale(scale, width, offset, nodeWidth, inverse);
 
             node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
@@ -190,6 +231,7 @@ var init_sankey_chart = function(el) {
             width = $(el).width();
             svg.attr('width', width);
 
+            adjust_offset(name, offset, width);
             adjust_scale(scale, width, offset, nodeWidth, inverse);
             node.attr("transform", function(d) { return "translate(" + scale(d.x) + "," + d.y + ")"; });
             path = sankey.link(
