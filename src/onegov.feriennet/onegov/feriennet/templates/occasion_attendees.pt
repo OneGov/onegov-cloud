@@ -39,7 +39,10 @@
                             <div>
                                 <span i18n:translate>Emergency Contact:</span>
                                 <span tal:condition="details.contact">${details.contact}</span>
-                                <strong i18n:translate tal:condition="not:details.contact">Missing!</strong>
+                                <span tal:condition="not:details.contact">
+                                    <strong i18n:translate>Missing!</strong>
+                                    <span i18n:translate>(User: <a i18n:name="user" href="mailto:${details.attendee.username}">${details.attendee.username}</a>)</span>
+                                </span>
                             </div>
                         </li>
                     </ul>

@@ -762,7 +762,7 @@ msgid "No occasions defined yet."
 msgstr "Es wurden noch keine Durchführungen definiert."
 
 msgid "This period has not been confirmed yet."
-msgstr "Diese Periode wurde noch nicht zugeteilt."
+msgstr "In dieser Periode wurde noch keine Zuteilung gemacht."
 
 msgid "Print"
 msgstr "Drucken"
@@ -772,6 +772,9 @@ msgstr "Notfall:"
 
 msgid "Missing!"
 msgstr "Fehlt!"
+
+msgid "(User: ${user})"
+msgstr "(Benutzer: ${user})"
 
 msgid ""
 "The following activites contain occasions which are in conflict with the "
