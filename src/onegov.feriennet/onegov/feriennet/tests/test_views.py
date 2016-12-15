@@ -1426,4 +1426,101 @@ def test_reactivate_cancelled_booking(feriennet_app):
     client.post(get_post_url(page, 'confirm'))  # cancel the booking
 
     page = client.get('/angebot/foobar').click('Anmelden', index=1)
-    assert "war erfolgreic" in page.form.submit().follow()
+    assert "war erfolgreich" in page.form.submit().follow()
+
+
+def test_occasion_attendance_collection(feriennet_app):
+
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    foo = activities.add("Foo", username='admin@example.org')
+    foo.propose().accept()
+
+    bar = activities.add("Bar", username='editor@example.org')
+    bar.propose().accept()
+
+    o1 = occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        age=(0, 10),
+        spots=(0, 2),
+        timezone="Europe/Zurich",
+        activity=foo,
+        period=period,
+    )
+
+    o2 = occasions.add(
+        start=datetime(2016, 11, 25, 17),
+        end=datetime(2016, 11, 25, 20),
+        age=(0, 10),
+        spots=(0, 2),
+        timezone="Europe/Zurich",
+        activity=bar,
+        period=period,
+    )
+
+    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    a2 = attendees.add(owner, 'Mike', date(2000, 1, 1))
+
+    bookings.add(owner, a1, o1).state = 'accepted'
+    bookings.add(owner, a2, o2).state = 'accepted'
+
+    transaction.commit()
+
+    # anonymous has no access
+    anon = Client(feriennet_app)
+    assert anon.get('/teilnehmer', status=403)
+
+    # if the period is unconfirmed the attendees are not shown
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    page = admin.get('/teilnehmer')
+    assert "noch keine Zuteilung" in page
+    assert "Dustin" not in page
+
+    # organisers only see their own occasions
+    periods.active().confirmed = True
+    transaction.commit()
+
+    editor = Client(feriennet_app)
+    editor.login_editor()
+
+    page = editor.get('/teilnehmer')
+    assert "Dustin" not in page
+    assert "Mike" in page
+
+    # admins seel all the occasions
+    page = admin.get('/teilnehmer')
+    assert "Dustin" in page
+    assert "Mike" in page
+
+    # if the emergency info is given, it is shown
+    page = admin.get('/benutzerprofil')
+    page.form['emergency'] = '123456789 Admin'
+    page.form.submit()
+
+    assert "123456789 Admin" in admin.get('/teilnehmer')

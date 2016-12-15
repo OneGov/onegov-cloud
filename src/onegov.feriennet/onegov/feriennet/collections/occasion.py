@@ -23,6 +23,8 @@ class OccasionAttendeeCollection(OccasionCollection):
     def query(self):
         q = super().query()
         q = q.join(Occasion.activity)
+
+        # this will implicitly filter out all occasions without attendees:
         q = q.join(Occasion.accepted)
 
         q = q.filter(Occasion.period_id == self.period_id)

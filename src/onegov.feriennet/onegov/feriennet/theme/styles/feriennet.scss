@@ -1207,11 +1207,12 @@ ul.tags {
     }
 
     .print {
+        color: transparent;
         display: inline-block;
-        visibility: hidden;
     }
 
     .print:before {
+        color: $anchor-font-color;
         margin-left: 1ex;
         visibility: visible;
     }
