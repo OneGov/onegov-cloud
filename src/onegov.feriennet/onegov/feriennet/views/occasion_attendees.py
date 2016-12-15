@@ -2,6 +2,7 @@ from onegov.core.security import Private
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.layout import OccasionAttendeeLayout
+from onegov.feriennet.views.shared import all_periods
 
 
 @FeriennetApp.html(
@@ -16,5 +17,7 @@ def view_occasion_attendees(self, request):
             'period': self.period.title
         }),
         'occasions': self.occasions(),
+        'periods': all_periods(request),
+        'period': self.period,
         'model': self
     }
