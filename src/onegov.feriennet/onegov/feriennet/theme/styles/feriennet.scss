@@ -1172,10 +1172,18 @@ ul.tags {
     Occassion-Attendee View
 */
 
+.print {
+    display: block;
+    font-size: .9em;
+    margin-bottom: .5rem;
+    margin-top: -.5rem;
+}
+
 .print-all {
     display: block;
-    font-weight: bold;
-    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    margin-bottom: .75rem;
+    margin-top: -.75rem;
 }
 
 .occasion-attendance {
@@ -1188,7 +1196,6 @@ ul.tags {
         page-break-inside: avoid;
 
         h2 {
-            display: inline-block;
             font-size: $h3-font-size - $h3-font-reduction;
         }
 
@@ -1204,17 +1211,6 @@ ul.tags {
             margin-bottom: .5rem;
             page-break-inside: avoid;
         }
-    }
-
-    .print {
-        color: transparent;
-        display: inline-block;
-    }
-
-    .print:before {
-        color: $anchor-font-color;
-        margin-left: 1ex;
-        visibility: visible;
     }
 }
 
