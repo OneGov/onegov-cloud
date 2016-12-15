@@ -1,32 +1,10 @@
-from morepath.authentication import NO_IDENTITY
 from onegov.activity import Activity, ActivityCollection, Booking, Occasion
 from onegov.core.security import Public, Private, Personal
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.feriennet import FeriennetApp
+from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
+from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.org.models import ImageFileCollection, SiteCollection
-from sqlalchemy import or_
-
-
-#: Describes the states which are visible to the given role (not taking
-# ownership in account!)
-VISIBLE_ACTIVITY_STATES = {
-    'admin': (
-        'preview',
-        'proposed',
-        'accepted',
-        'denied',
-        'archived'
-    ),
-    'editor': (
-        'accepted',
-    ),
-    'member': (
-        'accepted',
-    ),
-    'anonymous': (
-        'accepted',
-    )
-}
 
 
 def is_owner(username, activity):
@@ -38,48 +16,6 @@ def is_owner(username, activity):
         return False
 
     return username == activity.username
-
-
-class ActivityQueryPolicy(object):
-    """ Limits activity queries depending on the current user. """
-
-    def __init__(self, username, role):
-        self.username = username
-        self.role = role
-
-    @classmethod
-    def for_identity(cls, identity):
-        if identity is None or identity is NO_IDENTITY:
-            return cls(None, None)
-        else:
-            return cls(identity.userid, identity.role)
-
-    def granted_subset(self, query):
-        """ Limits the given activites query for the given user. """
-
-        if self.username is None or self.role not in ('admin', 'editor'):
-            return self.public_subset(query)
-        else:
-            return self.private_subset(query)
-
-    def public_subset(self, query):
-        """ Limits the given query to activites meant for the public. """
-        return query.filter(
-            Activity.state.in_(VISIBLE_ACTIVITY_STATES['anonymous'])
-        )
-
-    def private_subset(self, query):
-        """ Limits the given query to activites meant for admins/owners.
-
-        Admins see all the states and owners see the states of their own.
-        """
-
-        assert self.role and self.username
-
-        return query.filter(or_(
-            Activity.state.in_(VISIBLE_ACTIVITY_STATES[self.role]),
-            Activity.username == self.username
-        ))
 
 
 @FeriennetApp.permission_rule(model=object, permission=Private)
@@ -162,16 +98,6 @@ def has_public_permission_not_logged_in(app, identity, model, permission):
     return model.state in VISIBLE_ACTIVITY_STATES['anonymous']
 
 
-@FeriennetApp.permission_rule(model=Booking, permission=Personal)
-def has_personal_permission_booking(app, identity, model, permission):
-    """ Ensure that logged in users may only change their own bookings. """
-
-    if identity.role == 'admin':
-        return True
-
-    return model.username == identity.userid
-
-
 @FeriennetApp.permission_rule(model=Activity, permission=Public)
 def has_public_permission_logged_in(app, identity, model, permission):
     """ Only make activites accessible with certain states (or if owner). """
@@ -184,3 +110,26 @@ def has_public_permission_logged_in(app, identity, model, permission):
 
     return is_owner(identity.userid, model) \
         or model.state in VISIBLE_ACTIVITY_STATES[identity.role]
+
+
+@FeriennetApp.permission_rule(model=Booking, permission=Personal)
+def has_personal_permission_booking(app, identity, model, permission):
+    """ Ensure that logged in users may only change their own bookings. """
+
+    if identity.role == 'admin':
+        return True
+
+    return model.username == identity.userid
+
+
+@FeriennetApp.permission_rule(
+    model=OccasionAttendeeCollection,
+    permission=Private)
+def has_private_permission_occasion_attendee_collection(
+        app, identity, model, permission):
+    """ Ensure that organisators have access to the attendee colleciton. """
+
+    if identity.role in ('admin', 'editor'):
+        return True
+
+    return has_permission_logged_in(app, identity, model, permission)

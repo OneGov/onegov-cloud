@@ -17,6 +17,9 @@ class OccasionAttendeeCollection(OccasionCollection):
     def period_id(self):
         return self.period.id
 
+    def for_period(self, period):
+        return self.__class__(self.session, period, self.username)
+
     def query(self):
         q = super().query()
         q = q.join(Occasion.activity)

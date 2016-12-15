@@ -114,6 +114,10 @@ svg #background {
     @include generic-icon('\f1ae');
 }
 
+.print-icon {
+    @include generic-icon('\f02f');
+}
+
 /*
     editbar icons
 */
@@ -1168,6 +1172,12 @@ ul.tags {
     Occassion-Attendee View
 */
 
+.print-all {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+}
+
 .occasion-attendance {
 
     .attendance-header {
@@ -1175,8 +1185,13 @@ ul.tags {
         page-break-after: avoid;
         page-break-inside: avoid;
 
+        h2 {
+            display: inline-block;
+            font-size: $h3-font-size - $h3-font-reduction;
+        }
+
         div {
-            font-size: .9rem;
+            font-size: .9em;  // em for correct scaling in print
         }
     }
 
@@ -1188,8 +1203,17 @@ ul.tags {
             page-break-inside: avoid;
         }
     }
-}
 
+    .print {
+        display: inline-block;
+        visibility: hidden;
+    }
+
+    .print:before {
+        margin-left: 1ex;
+        visibility: visible;
+    }
+}
 
 /*
     Emergency contact

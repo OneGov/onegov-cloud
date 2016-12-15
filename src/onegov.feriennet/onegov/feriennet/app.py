@@ -60,3 +60,5 @@ def get_js_path():
 def get_common_asset():
     yield from get_org_common_asset()
     yield 'reloadfrom.js'
+    yield 'printthis.js'
+    yield 'print.js'

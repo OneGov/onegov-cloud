@@ -12,6 +12,9 @@ def view_occasion_attendees(self, request):
 
     return {
         'layout': OccasionAttendeeLayout(self, request),
-        'title': _("Attendees"),
-        'occasions': self.occasions()
+        'title': _("Attendees for ${period}", mapping={
+            'period': self.period.title
+        }),
+        'occasions': self.occasions(),
+        'model': self
     }

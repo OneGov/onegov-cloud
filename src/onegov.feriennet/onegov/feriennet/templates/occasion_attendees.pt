@@ -3,9 +3,30 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <div class="occasion-attendance" tal:repeat="occasion occasions" id="${occasion.id.hex}">
+        <a href="#" class="print print-all print-icon before hide-for-print" tal:condition="occasions and model.period.confirmed"
+            data-print-selector=".occasion-attendance" data-print-title="${title}"
+            i18n:translate>
+            Print All
+        </a>
+
+        <div tal:condition="not:occasions" i18n:translate>
+            No occasions defined yet.
+        </div>
+
+        <div tal:condition="occasions and not model.period.confirmed" i18n:translate>
+            This period has not been confirmed yet.
+        </div>
+
+        <div class="occasion-attendance" tal:repeat="occasion occasions" id="${occasion.id.hex}" tal:condition="model.period.confirmed">
             <div class="attendance-header">
-                <h3>${occasion.activity.title}</h3>
+                <h2>${occasion.activity.title}</h2>
+
+                <a href="#" class="print print-icon before hide-for-print"
+                    data-print-selector="#${occasion.id.hex}" data-print-title="${title}"
+                    i18n:translate>
+                    Print
+                </a>
+
                 <div class="calendar-icon before fixed-width">${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</div>
                 <div class="child-icon before fixed-width" i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</div>
             </div>

@@ -1,5 +1,5 @@
 from onegov.activity import ActivityCollection
-from onegov.feriennet.security import ActivityQueryPolicy
+from onegov.feriennet.policy import ActivityQueryPolicy
 
 
 class VacationActivityCollection(ActivityCollection):
