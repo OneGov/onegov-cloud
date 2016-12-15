@@ -1217,6 +1217,16 @@ ul.tags {
     }
 }
 
+@media print {
+    .print {
+        display: none !important;
+    }
+
+    h2 {
+        border-bottom: 0;
+    }
+}
+
 /*
     Emergency contact
 */

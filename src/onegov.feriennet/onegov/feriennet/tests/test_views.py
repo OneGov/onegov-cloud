@@ -416,6 +416,7 @@ def test_organiser_info(feriennet_app):
     contact.form['email'] = 'editors-association@example.org'
     contact.form['phone'] = '+41 23 456 789'
     contact.form['website'] = 'https://www.example.org'
+    contact.form['emergency'] = '+01 234 56 78 (Peter)'
     contact.form.submit()
 
     activity = editor.get('/angebot/play-with-legos')
