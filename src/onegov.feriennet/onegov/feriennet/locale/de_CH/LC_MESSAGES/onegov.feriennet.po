@@ -1005,7 +1005,7 @@ msgstr "Die Durchführung wurde zu ${name}'s Wunschliste hinzugefügt"
 
 #, python-format
 msgid "Attendees for ${period}"
-msgstr "Teilnehmer für ${period}"
+msgstr "Teilnehmer ${period}"
 
 msgid "The period was activated successfully"
 msgstr "Die Periode wurde erfolgreich aktiviert"
