@@ -6,8 +6,8 @@
         <div class="occasion-attendance" tal:repeat="occasion occasions" id="${occasion.id.hex}">
             <div class="attendance-header">
                 <h3>${occasion.activity.title}</h3>
-                <div>${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</div>
-                <div i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</div>
+                <div class="calendar-icon before fixed-width">${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</div>
+                <div class="child-icon before fixed-width" i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</div>
             </div>
 
             <ul class="attendees">

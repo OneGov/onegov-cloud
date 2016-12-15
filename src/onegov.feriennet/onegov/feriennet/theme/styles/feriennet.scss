@@ -82,6 +82,39 @@ svg #background {
 }
 
 /*
+    Generic icons (experimental, might replace other approaches in the future)
+*/
+@mixin generic-icon($icon) {
+    &.before::before,
+    &.after::after {
+        @include icon($icon);
+    }
+}
+
+.fixed-width::before,
+.fixed-width::after {
+    display: inline-block;
+    text-align: center;
+    width: 1.5ex;
+}
+
+.before::before {
+    margin-right: 1ex;
+}
+
+.after::after {
+    margin-left: 1ex;
+}
+
+.calendar-icon {
+    @include generic-icon('\f133');
+}
+
+.child-icon {
+    @include generic-icon('\f1ae');
+}
+
+/*
     editbar icons
 */
 
@@ -1141,6 +1174,10 @@ ul.tags {
         padding-bottom: .5rem;
         page-break-after: avoid;
         page-break-inside: avoid;
+
+        div {
+            font-size: .9rem;
+        }
     }
 
     .attendees {
