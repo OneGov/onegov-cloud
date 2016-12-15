@@ -18,7 +18,7 @@
                 <div tal:condition="occasions and not model.period.confirmed" i18n:translate>
                     This period has not been confirmed yet.
                 </div>
-            
+
                 <div class="occasion-attendance" tal:repeat="occasion occasions" id="${occasion.id.hex}" tal:condition="model.period.confirmed">
                     <div class="attendance-header">
                         <h2>${occasion.activity.title}</h2>

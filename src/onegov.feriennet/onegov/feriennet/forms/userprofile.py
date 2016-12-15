@@ -50,9 +50,9 @@ class UserProfileForm(Form):
             numbers = sum(1 for c in characters if c in string.digits)
             chars = sum(1 for c in characters if c in string.ascii_letters)
 
-            if numbers < 9 and chars < 5:
+            if numbers < 9 or chars < 5:
                 raise ValidationError(
-                    _("Please enter both a number and a name"))
+                    _("Please enter both a phone number and a name"))
 
     def populate_obj(self, model):
         super().populate_obj(model)
