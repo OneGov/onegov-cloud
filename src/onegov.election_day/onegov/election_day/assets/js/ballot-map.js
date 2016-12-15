@@ -58,7 +58,12 @@ var init_ballot_map = function(el) {
 
     var tooltip = d3.tip()
         .attr('class', 'd3-tip')
-        .offset([-10, 0])
+        .direction(function(d) {
+            var b = this.getBBox();
+            var p = this.parentNode.getBBox();
+            return ((b.y - p.y > p.y + p.height - b.y - b.height) ? 'n' : 's') +
+                   ((b.x - p.x > p.x + p.width - b.x - b.width) ? 'w' : 'e');
+        })
         .html(function(d) {
 
             if (_.isUndefined(d.properties.result.yeas_percentage)) {

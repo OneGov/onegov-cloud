@@ -16,6 +16,9 @@ Changelog
 - Changes direction of the list connections sankey chart.
   [msom]
 
+- Displays tooltips inside the map.
+  [msom]
+
 - Improves handling of invalid (excel) files.
   [msom]
 
