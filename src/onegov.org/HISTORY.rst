@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.7 (2016-12-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Prevent empty pages from being printed.
   [href]
 
