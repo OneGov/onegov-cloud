@@ -68,7 +68,7 @@ var init_sankey_chart = function(el) {
                 .style("fill", "#999")
                 .style("shape-rendering", "crispEdges");
             bar.append("title")
-                .text(function(d) { return d.value; });
+                .text(function(d) { return d.name ? d.name + '\n' + d.value : d.value; });
             bar.filter(function(d) { return d.active; })
                 .style("fill", "#0571b0");
 
