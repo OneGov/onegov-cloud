@@ -67,6 +67,7 @@ def test_election_create_all_models(session):
     party_result = PartyResult(
         election_id=election.id,
         number_of_mandates=0,
+        votes=0,
         name='Libertarian'
     )
 
@@ -485,10 +486,10 @@ def test_election_results(session):
 
     # Add party results
     election.party_results.append(
-        PartyResult(name='Republican Party', number_of_mandates=1)
+        PartyResult(name='Republican Party', number_of_mandates=1, votes=10)
     )
     election.party_results.append(
-        PartyResult(name='Democratic Party', number_of_mandates=1)
+        PartyResult(name='Democratic Party', number_of_mandates=1, votes=20)
     )
 
     # Add panachage results
@@ -718,9 +719,16 @@ def test_election_results(session):
     votes = votes.order_by(ListConnection.votes)
     assert [int(vote[0]) for vote in votes] == [26, 111, 540]
 
-    parties = session.query(PartyResult.name, PartyResult.number_of_mandates)
+    parties = session.query(
+        PartyResult.name,
+        PartyResult.votes,
+        PartyResult.number_of_mandates
+    )
     parties = parties.order_by(PartyResult.name)
-    assert parties.all() == [('Democratic Party', 1), ('Republican Party', 1)]
+    assert parties.all() == [
+        ('Democratic Party', 20, 1),
+        ('Republican Party', 10, 1)
+    ]
 
 
 def test_election_export(session):

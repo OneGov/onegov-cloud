@@ -817,5 +817,8 @@ class PartyResult(Base, TimestampMixin):
     # number of mandates
     number_of_mandates = Column(Integer, nullable=False, default=lambda: 0)
 
-    #: name of the list
+    # votes
+    votes = Column(Integer, nullable=False, default=lambda: 0)
+
+    #: name of the party
     name = Column(Text, nullable=False)
