@@ -246,7 +246,7 @@ msgid "Prefer the following children:"
 msgstr "Folgende Kinder bevorzugen:"
 
 msgid "Children of organisers"
-msgstr "Kinder von Organisatoren"
+msgstr "Kinder von Veranstaltern"
 
 msgid "Children of administrators"
 msgstr "Kinder von Administratoren"
