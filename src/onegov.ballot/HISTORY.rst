@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+1.2.0 (2016-12-19)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a model for party results.
   [msom]
