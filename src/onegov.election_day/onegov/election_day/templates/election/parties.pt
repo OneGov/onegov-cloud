@@ -18,12 +18,19 @@
 
             <div class="row">
                 <div class="small-12 small-centered large-10 columns">
-                    <div class="grouped-bar-chart" i18n:attributes="data-download-link; data-embed-link"
-                        data-dataurl="${request.link(election, name='parties-data')}"
-                        data-download-link="Download"
-                        data-embed-link="Embed"
-                        data-embed-source="${request.link(election, name='parties-chart')}">
-                    </div>
+                    <figure>
+                        <div class="grouped-bar-chart" i18n:attributes="data-download-link; data-embed-link"
+                            data-dataurl="${request.link(election, name='parties-data')}"
+                            data-download-link="Download"
+                            data-embed-link="Embed"
+                            data-embed-source="${request.link(election, name='parties-chart')}">
+                        </div>
+                        <figcaption i18n:translate="">
+                            The diagram shows the votes and mandates of the parties. The rimmed bars
+                            (left scale) correspond to the number of seats, the colored bars (right scale)
+                            to the voices (percentages). The results of earlier elections are grayed out.
+                        </figcaption>
+                    </figure>
                 </div>
             </div>
 

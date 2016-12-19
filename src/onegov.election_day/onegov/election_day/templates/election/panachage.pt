@@ -18,13 +18,21 @@
 
             <div class="row">
                 <div class="small-12 small-centered large-10 columns">
-                    <div class="sankey-chart" i18n:attributes="data-download-link; data-embed-link"
-                        data-dataurl="${request.link(election, name='panachage-data')}"
-                        data-inverse="false"
-                        data-download-link="Download"
-                        data-embed-link="Embed"
-                        data-embed-source="${request.link(election, name='panachage-chart')}">
-                    </div>
+                    <figure>
+                        <div class="sankey-chart" i18n:attributes="data-download-link; data-embed-link"
+                            data-dataurl="${request.link(election, name='panachage-data')}"
+                            data-inverse="false"
+                            data-download-link="Download"
+                            data-embed-link="Embed"
+                            data-embed-source="${request.link(election, name='panachage-chart')}">
+                        </div>
+                        <figcaption i18n:translate="">
+                            The diagram shows the origin of the list votes. The bars on the left correspond
+                            to the unchanged list votes (including the blank list), the bars on the right
+                            side to the final list results. The width of the bars and connections is
+                            proportional to the votes.
+                        </figcaption>
+                    </figure>
                 </div>
             </div>
         </tal:block>
