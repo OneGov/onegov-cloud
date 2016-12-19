@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-14 14:05+0100\n"
-"PO-Revision-Date: 2016-12-14 14:05+0100\n"
+"POT-Creation-Date: 2016-12-19 13:06+0100\n"
+"PO-Revision-Date: 2016-12-16 11:13+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
 "Language: de_CH\n"
@@ -25,6 +25,9 @@ msgstr "Wahlkreise"
 
 msgid "List connections"
 msgstr "Listenverbindungen"
+
+msgid "Parties"
+msgstr "Parteien"
 
 msgid "Election statistics"
 msgstr "Wahlstatistik"
@@ -82,6 +85,9 @@ msgstr "Keine gültige XLS/XLSX Datei."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr "Die XLS/XLSX Datei enthält nicht unterstütze Zellen."
 
+msgid "Invalid values"
+msgstr "Ungültige Werte"
+
 msgid "Invalid election values"
 msgstr "Ungültige Wahldaten"
 
@@ -119,9 +125,6 @@ msgstr "BFS Nummer ${id} ist unbekannt"
 
 msgid "Unknown candidate"
 msgstr "Unbekannter Kandidierender"
-
-msgid "Invalid values"
-msgstr "Ungültige Werte"
 
 msgid "Missing municipality/district"
 msgstr "Fehlende Bezeichnung"
@@ -218,6 +221,9 @@ msgstr "Resultate"
 
 msgid "Elected Candidates"
 msgstr "Gewählte Kandidierende"
+
+msgid "Party results"
+msgstr "Parteiresultate"
 
 msgid "Complete"
 msgstr "Komplett ausgezählt"
@@ -568,6 +574,9 @@ msgstr "Total"
 
 msgid "Electoral District"
 msgstr "Wahlkreis"
+
+msgid "Party"
+msgstr "Partei"
 
 msgid "Accounted Ballots"
 msgstr "Gültige Wahlzettel"

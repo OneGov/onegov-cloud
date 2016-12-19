@@ -363,17 +363,12 @@ table {
 }
 
 /*
-    Bar Chart
+    Charts
 */
-.bar-chart {
-    margin-bottom: 2rem;
-    margin-top: 2rem;
-}
-
-/*
-    Sankey Chart
-*/
-.sankey-chart {
+.bar-chart,
+.grouped-bar-chart,
+.sankey-chart,
+ {
     margin-bottom: 2rem;
     margin-top: 2rem;
 }

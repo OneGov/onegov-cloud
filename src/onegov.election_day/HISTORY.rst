@@ -4,6 +4,9 @@ Changelog
 - Adds panachage charts.
   [msom]
 
+- Adds party results and (comparative) visualisation.
+  [msom]
+
 - Uses tabs instead of foldable sections.
   [msom]
 

@@ -26,9 +26,11 @@
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
     </head>
     <body tal:define="bar_url data.get('bar');
+                      grouped_bar_url data.get('grouped_bar');
                       sankey_url data.get('sankey');
                       map_url data.get('map')">
         <div tal:condition="bar_url" class="bar-chart" data-dataurl="${bar_url}" />
+        <div tal:condition="grouped_bar_url" class="grouped-bar-chart" data-dataurl="${grouped_bar_url}" />
         <div tal:condition="sankey_url" class="sankey-chart" data-dataurl="${sankey_url}" data-inverse="${data.get('inverse')}"/>
 
         <div tal:condition="map_url" class="ballot-map"

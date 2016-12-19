@@ -9,6 +9,7 @@ from onegov.ballot import (
 )
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
+from onegov.election_day.formats.election import parse_party_results_file
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -194,7 +195,8 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_file(entities, election, file, mimetype):
+def import_file(entities, election, file, mimetype,
+                parties_file=None, parties_mimetype=None):
     """ Tries to import the given file (sesam format).
 
     :return: A dictionary containing the status and a list of errors if any.
@@ -276,6 +278,10 @@ def import_file(entities, election, file, mimetype):
         if not majorz:
             candidate.list_id = list_.id
 
+    party_results = parse_party_results_file(
+        parties_file, parties_mimetype, errors
+    )
+
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
@@ -320,5 +326,10 @@ def import_file(entities, election, file, mimetype):
             for list_result in list_results.get(id, {}).values():
                 result.list_results.append(list_result)
             election.results.append(result)
+
+        for result in election.party_results:
+            session.delete(result)
+        for result in party_results:
+            election.party_results.append(result)
 
     return {'status': 'ok', 'errors': errors}

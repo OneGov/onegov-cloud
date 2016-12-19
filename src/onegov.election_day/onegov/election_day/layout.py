@@ -115,6 +115,7 @@ class ElectionsLayout(Layout):
             'candidates',
             'districts',
             'connections',
+            'parties',
             'statistics',
             'panachage',
             'data'
@@ -131,6 +132,8 @@ class ElectionsLayout(Layout):
             return _("Electoral Districts")
         if tab == 'connections':
             return _("List connections")
+        if tab == 'parties':
+            return _("Parties")
         if tab == 'statistics':
             return _("Election statistics")
         if tab == 'panachage':
@@ -148,6 +151,8 @@ class ElectionsLayout(Layout):
 
         if tab == 'lists':
             return self.proporz
+        if tab == 'parties':
+            return self.proporz and self.model.party_results.first()
         if tab == 'districts':
             return self.majorz and self.summarize
         if tab == 'connections':

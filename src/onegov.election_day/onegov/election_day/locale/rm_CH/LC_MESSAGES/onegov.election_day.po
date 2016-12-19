@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-14 14:05+0100\n"
+"POT-Creation-Date: 2016-12-19 13:06+0100\n"
 "PO-Revision-Date: 2016-12-14 11:30+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -24,6 +24,9 @@ msgstr "Circuls electorals"
 
 msgid "List connections"
 msgstr "Colliaziuns da glistas"
+
+msgid "Parties"
+msgstr ""
 
 msgid "Election statistics"
 msgstr "Statistica electorala"
@@ -82,6 +85,9 @@ msgstr "Nagina datoteca XLS/XLSX valaivla."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr ""
 
+msgid "Invalid values"
+msgstr "Valurs nunvalaivlas"
+
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
 
@@ -119,9 +125,6 @@ msgstr "Il numer UST ${id} n'è betg enconuschent"
 
 msgid "Unknown candidate"
 msgstr "Candidat(a) nunenconuschent(a)"
-
-msgid "Invalid values"
-msgstr "Valurs nunvalaivlas"
 
 msgid "Missing municipality/district"
 msgstr "Lieu che manca"
@@ -204,6 +207,9 @@ msgstr "Resultats"
 
 msgid "Elected Candidates"
 msgstr "Candidat(a)s elegid(a)s"
+
+msgid "Party results"
+msgstr ""
 
 msgid "Complete"
 msgstr "Resultat eruì cumplettamain"
@@ -590,6 +596,9 @@ msgstr "Total"
 
 msgid "Electoral District"
 msgstr "Circul electoral"
+
+msgid "Party"
+msgstr ""
 
 msgid "Accounted Ballots"
 msgstr "Cedels valaivels"

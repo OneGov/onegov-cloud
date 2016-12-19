@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-14 14:05+0100\n"
-"PO-Revision-Date: 2016-12-14 11:32+0100\n"
+"POT-Creation-Date: 2016-12-19 13:06+0100\n"
+"PO-Revision-Date: 2016-12-19 13:16+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
 "Language: fr_CH\n"
@@ -25,6 +25,9 @@ msgstr "Circonscriptions électorales"
 
 msgid "List connections"
 msgstr "Connexions de listes"
+
+msgid "Parties"
+msgstr "Partis"
 
 msgid "Election statistics"
 msgstr "Statistiques des élections"
@@ -82,6 +85,9 @@ msgstr "Fichier xls/xlsx non valide."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr ""
 
+msgid "Invalid values"
+msgstr "Valeurs non valides"
+
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
 
@@ -119,9 +125,6 @@ msgstr "référence de municipalité ${id} inconnue"
 
 msgid "Unknown candidate"
 msgstr "Candidat inconnu"
-
-msgid "Invalid values"
-msgstr "Valeurs non valides"
 
 msgid "Missing municipality/district"
 msgstr "Municipalité manquante/District manquant"
@@ -218,6 +221,9 @@ msgstr "Résultats"
 
 msgid "Elected Candidates"
 msgstr "Candidats élus"
+
+msgid "Party results"
+msgstr "Résultats des partis"
 
 msgid "Complete"
 msgstr "Terminé"
@@ -568,6 +574,9 @@ msgstr "Total"
 
 msgid "Electoral District"
 msgstr "District électoral"
+
+msgid "Party"
+msgstr "Parti"
 
 msgid "Accounted Ballots"
 msgstr "Bulletins de vote comptabilisés"

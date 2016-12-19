@@ -222,6 +222,14 @@ def get_bar_chart_asset():
     yield 'bar-chart.js'
 
 
+@ElectionDayApp.webasset('grouped_bar_chart')
+def get_grouped_bar_chart_asset():
+    yield 'jquery.js'
+    yield 'd3'
+    yield 'chart-common.js'
+    yield 'grouped-bar-chart.js'
+
+
 @ElectionDayApp.webasset('sankey_chart')
 def get_sankey_chart_asset():
     yield 'jquery.js'

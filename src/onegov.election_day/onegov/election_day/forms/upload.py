@@ -76,6 +76,15 @@ class UploadElectionForm(Form):
         render_kw=dict(force_simple=True)
     )
 
+    parties = UploadField(
+        label=_("Party results"),
+        validators=[
+            WhitelistedMimeType(ALLOWED_MIME_TYPES),
+            FileSizeLimit(MAX_FILE_SIZE)
+        ],
+        render_kw=dict(force_simple=True)
+    )
+
     complete = BooleanField(
         label=_("Complete"),
         depends_on=('file_format', 'wabsti'),
@@ -95,11 +104,13 @@ class UploadElectionForm(Form):
         if model.type == 'majorz':
             self.connections.render_kw['data-depends-on'] = 'file_format/none'
             self.statistics.render_kw['data-depends-on'] = 'file_format/none'
+            self.parties.render_kw['data-depends-on'] = 'file_format/none'
         else:
             self.connections.render_kw['data-depends-on'] = \
                 'file_format/wabsti'
             self.statistics.render_kw['data-depends-on'] = 'file_format/wabsti'
             self.majority.render_kw = {'data-depends-on': 'file_format/none'}
+            self.parties.render_kw.pop('data-depends-on', None)
 
 
 class UploadVoteForm(Form):

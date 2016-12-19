@@ -156,9 +156,17 @@ def upload_proporz_election(client, create=True):
     )
     csv = csv.encode('utf-8')
 
+    csv_parties = (
+        "Partei,Sitze,Stimmen\n"
+        "BDP,1,60387\n"
+        "CVP,1,49117\n"
+        "FDP,0,35134\n"
+    ).encode('utf-8')
+
     upload = client.get('/election/proporz-election/upload')
     upload.form['file_format'] = 'sesam'
     upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+    upload.form['parties'] = Upload('parties.csv', csv_parties, 'text/plain')
     upload = upload.form.submit()
 
     assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload

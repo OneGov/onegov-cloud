@@ -50,19 +50,24 @@ def view_upload(self, request, form):
             }
         else:
             entities = principal.entities[self.date.year]
+            parties = len(form.parties.data)
             if form.file_format.data == 'internal':
                 result = import_onegov_file(
                     entities,
                     self,
                     form.results.raw_data[0].file,
-                    form.results.data['mimetype']
+                    form.results.data['mimetype'],
+                    form.parties.raw_data[0].file if parties else None,
+                    form.parties.data['mimetype'] if parties else None
                 )
             elif form.file_format.data == 'sesam':
                 result = import_sesam_file(
                     entities,
                     self,
                     form.results.raw_data[0].file,
-                    form.results.data['mimetype']
+                    form.results.data['mimetype'],
+                    form.parties.raw_data[0].file if parties else None,
+                    form.parties.data['mimetype'] if parties else None
                 )
                 if self.type == 'majorz':
                     self.absolute_majority = form.majority.data
@@ -80,7 +85,9 @@ def view_upload(self, request, form):
                     form.elected.raw_data[0].file if elected else None,
                     form.elected.data['mimetype'] if elected else None,
                     form.statistics.raw_data[0].file if stats else None,
-                    form.statistics.data['mimetype'] if stats else None
+                    form.statistics.data['mimetype'] if stats else None,
+                    form.parties.raw_data[0].file if parties else None,
+                    form.parties.data['mimetype'] if parties else None
                 )
                 if self.type == 'majorz':
                     self.absolute_majority = form.majority.data

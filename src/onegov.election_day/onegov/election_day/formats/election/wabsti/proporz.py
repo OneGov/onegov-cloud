@@ -9,6 +9,7 @@ from onegov.ballot import (
 )
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
+from onegov.election_day.formats.election import parse_party_results_file
 from sqlalchemy.orm import object_session
 from uuid import uuid4
 
@@ -178,7 +179,8 @@ def import_file(municipalities, election, file, mimetype,
                 connections_file=None,
                 connections_mimetype=None,
                 elected_file=None, elected_mimetype=None,
-                statistics_file=None, statistics_mimetype=None):
+                statistics_file=None, statistics_mimetype=None,
+                parties_file=None, parties_mimetype=None):
     errors = []
     candidates = {}
     lists = {}
@@ -334,6 +336,10 @@ def import_file(municipalities, election, file, mimetype,
                         results[id].invalid_ballots = invalid_ballots
                         results[id].blank_votes = blank_votes
 
+    party_results = parse_party_results_file(
+        parties_file, parties_mimetype, errors
+    )
+
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
@@ -376,5 +382,10 @@ def import_file(municipalities, election, file, mimetype,
             for list_result in list_results.get(id, {}).values():
                 result.list_results.append(list_result)
             election.results.append(result)
+
+        for result in election.party_results:
+            session.delete(result)
+        for result in party_results:
+            election.party_results.append(result)
 
     return {'status': 'ok', 'errors': errors}

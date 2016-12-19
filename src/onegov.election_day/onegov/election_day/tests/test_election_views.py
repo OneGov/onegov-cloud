@@ -118,6 +118,40 @@ def test_view_election_lists(election_day_app_gr):
     assert '/election/proporz-election/lists-data' in chart
 
 
+def test_view_election_parties(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+    upload_majorz_election(client)
+
+    main = client.get('/election/majorz-election/parties')
+    assert '<h3>Parteien</h3>' not in main
+
+    parties = client.get('/election/majorz-election/parties-data')
+    assert parties.json['results'] == []
+
+    chart = client.get('/election/majorz-election/parties-chart')
+    assert chart.status_code == 200
+    assert '/election/majorz-election/parties' in chart
+
+    upload_proporz_election(client)
+
+    main = client.get('/election/proporz-election/parties')
+    assert '<h3>Parteien</h3>' in main
+
+    parties = client.get('/election/proporz-election/parties-data').json
+    assert parties['groups'] == ['BDP', 'CVP', 'FDP']
+    assert parties['labels'] == ['2015']
+    assert parties['maximum']['back'] == 100
+    assert parties['maximum']['front'] == 5
+    assert parties['results']
+
+    chart = client.get('/election/proporz-election/parties-chart')
+    assert chart.status_code == 200
+    assert '/election/proporz-election/parties-data' in chart
+
+
 def test_view_election_connections(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
