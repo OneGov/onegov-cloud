@@ -34,7 +34,7 @@
                 </div>
             </div>
 
-            <table class="ballot-results">
+            <table class="ballot-results stackable sortable">
                 <thead>
                     <tr>
                         <th i18n:translate="">Party</th>
