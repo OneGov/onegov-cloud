@@ -365,17 +365,18 @@ table {
 /*
     Charts
 */
-.bar-chart,
-.grouped-bar-chart,
-.sankey-chart,
- {
-    margin-bottom: 2rem;
+.map-container {
+    margin-bottom: 4rem;
     margin-top: 2rem;
+}
+
+figure {
+    margin: 4rem 0 2rem;
 }
 
 figcaption {
     font-size: .9rem;
-    margin-bottom: 2rem;
+    margin-top: 2rem;
 }
 
 /*

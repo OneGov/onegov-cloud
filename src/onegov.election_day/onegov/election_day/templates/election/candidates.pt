@@ -18,12 +18,14 @@
 
             <div class="row">
                 <div class="small-12 small-centered large-10 columns">
-                    <div class="bar-chart" i18n:attributes="data-download-link; data-embed-link"
-                        data-dataurl="${request.link(election, name='candidates-data')}"
-                        data-download-link="Download"
-                        data-embed-link="Embed"
-                        data-embed-source="${request.link(election, name='candidates-chart')}">
-                    </div>
+                    <figure>
+                        <div class="bar-chart" i18n:attributes="data-download-link; data-embed-link"
+                            data-dataurl="${request.link(election, name='candidates-data')}"
+                            data-download-link="Download"
+                            data-embed-link="Embed"
+                            data-embed-source="${request.link(election, name='candidates-chart')}">
+                        </div>
+                    </figure>
                 </div>
             </div>
 

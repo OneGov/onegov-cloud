@@ -17,7 +17,7 @@
             <h3 tal:content="layout.title()" tal:condition="layout.title()" />
 
             <div class="row" tal:condition="use_maps">
-                <div class="small-12 small-centered medium-8 large-6 columns">
+                <div class="small-12 small-centered medium-8 large-6 columns map-container">
                     <div class="ballot-map" i18n:attributes="data-download-link; data-embed-link"
                         data-type="${ballot.type}"
                         data-canton="${layout.app.principal.canton}"
