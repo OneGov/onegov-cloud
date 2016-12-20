@@ -1624,6 +1624,43 @@ def test_reserve_session_bound(org_app):
     assert client.get(finalize_url).follow().status_code == 200
 
 
+def test_delete_reservation_anonymous(org_app):
+    client = Client(org_app)
+
+    # prepate the required data
+    resources = ResourceCollection(org_app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(org_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28), datetime(2015, 8, 28)),
+        whole_day=True,
+        quota=4,
+        quota_limit=4
+    )
+
+    reserve = bound_reserve(client, allocations[0])
+    transaction.commit()
+
+    # create a reservation
+    assert reserve(quota=4).json == {'success': True}
+
+    # get the delete url
+    reservations = client.get('/ressource/tageskarte/reservations').json
+    url = reservations[0]['delete']
+
+    # the url does not have csrf (anonymous does not)
+    assert url.endswith('?csrf-token=')
+
+    # other clients still can't use the link
+    assert Client(org_app).delete(url, status=403)
+    assert len(client.get('/ressource/tageskarte/reservations').json) == 1
+
+    # only the original client can
+    client.delete(url)
+    assert len(client.get('/ressource/tageskarte/reservations').json) == 0
+
+
 def test_reserve_in_parallel(org_app):
 
     # prepate the required data

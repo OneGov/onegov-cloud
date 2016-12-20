@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes reservation delete not working for anonymous users.
+  [href]
+
 0.1.7 (2016-12-15)
 ~~~~~~~~~~~~~~~~~~~
 
