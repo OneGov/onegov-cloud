@@ -10,6 +10,7 @@ from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.converters import age_range_converter
 from onegov.feriennet.models import InvoiceAction, VacationActivity
+from onegov.feriennet.models import NotificationTemplate
 from uuid import UUID
 
 
@@ -206,3 +207,11 @@ def get_occasion_attendee_collection(request, app, period_id=None):
     path='/mitteilungen')
 def get_notification_template_collection(request, app):
     return NotificationTemplateCollection(app.session())
+
+
+@FeriennetApp.path(
+    model=NotificationTemplate,
+    path='/mitteilung/{id}',
+    converters=dict(id=UUID))
+def get_notification_template(request, app, id):
+    return NotificationTemplateCollection(app.session()).by_id(id)

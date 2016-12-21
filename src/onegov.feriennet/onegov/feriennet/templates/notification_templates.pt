@@ -3,13 +3,27 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <ul class="dense notifications">
-            <li tal:repeat="notification notifications">
+        <p i18n:translate tal:condition="notifications">
+            No notification templates yet.
+        </p>
+
+        <ul class="dense notifications" tal:condition="notifications">
+            <li tal:repeat="notification notifications" id="${notification.id.hex}">
                 <h3>${notification.subject}</h3>
 
-                <div tal:condition="notification.last_sent" i18n:translate>sent <tal:block i18n:name="time_ago">${layout.format_date(notification.last_sent)}</tal:block></div>
+                <div class="last-sent">
+                    <tal:block condition="notification.last_sent" i18n:translate>
+                        sent <tal:block i18n:name="time_ago">${layout.format_date(notification.last_sent)}</tal:block>
+                    </tal:block>
 
-                <div tal:condition="not:notification.last_sent" i18n:translate>Not sent yet</div>
+                    <tal:block condition="not:notification.last_sent" i18n:translate>
+                        Not sent yet
+                    </tal:block>
+                </div>
+
+                <div class="text-links">
+                    <tal:block repeat="link get_links(notification)" replace="structure link(request)" />
+                </div>
             </li>
         </ul>
     </tal:block>
