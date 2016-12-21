@@ -3,13 +3,13 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <p i18n:translate tal:condition="notifications">
+        <p i18n:translate tal:condition="not:notifications">
             No notification templates yet.
         </p>
 
         <ul class="dense notifications" tal:condition="notifications">
             <li tal:repeat="notification notifications" id="${notification.id.hex}">
-                <h3>${notification.subject}</h3>
+                <h2>${notification.subject}</h2>
 
                 <div class="last-sent">
                     <tal:block condition="notification.last_sent" i18n:translate>

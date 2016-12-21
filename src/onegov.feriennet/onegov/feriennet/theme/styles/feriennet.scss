@@ -1246,3 +1246,29 @@ ul.tags {
         font-weight: bold;
     }
 }
+
+/*
+    Notifications view
+*/
+.notifications li {
+    margin-bottom: .5rem;
+
+    &:before {
+        @include icon('\f003');
+        display: inline-block;
+        font-size: 1.1rem;
+        margin-right: .5rem;
+        width: 1rem;
+    }
+
+    h2 {
+        display: inline-block;
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+
+    div {
+        font-size: .9rem;
+        margin-left: 1.75rem;
+    }
+}

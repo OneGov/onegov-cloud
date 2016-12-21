@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-21 14:25+0100\n"
+"POT-Creation-Date: 2016-12-21 15:43+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -52,16 +52,19 @@ msgid "Attendees"
 msgstr "Teilnehmer"
 
 msgid "Notification Templates"
-msgstr "Mitteilungs-Vorlagen"
+msgstr "Nachrichten-Vorlagen"
 
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
+
+msgid "New Notification Template"
+msgstr "Neue Nachrichten-Vorlage"
 
 msgid "Periods"
 msgstr "Perioden"
 
 msgid "Notifications"
-msgstr "Mitteilungen"
+msgstr "Nachrichten"
 
 msgid "Edit Activity"
 msgstr "Angebot Bearbeiten"
@@ -767,6 +770,9 @@ msgstr ""
 "Die Zuteilung kann nur noch manuell über Buchungen/Stornierungen gemacht "
 "werden."
 
+msgid "No notification templates yet."
+msgstr "Es wurden noch keine Nachrichten-Vorlagen erfasst."
+
 msgid "sent ${time_ago}"
 msgstr "gesendet ${time_ago}"
 
@@ -1010,11 +1016,14 @@ msgstr "Die Zuteilung wurde erfoglreich abgeschlossen"
 msgid "The matching run executed successfully"
 msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
 
-msgid "New Notification Template"
-msgstr "Neue Nachrichten-Vorlage"
+msgid "Edit Notification Template"
+msgstr "Nachrichten-Vorlage Bearbeiten"
 
 msgid "Successfully added a new notification template"
 msgstr "Die Nachrichten-Vorlage wurde erfolgreich hinzugefügt"
+
+msgid "Delete Notification Template"
+msgstr "Nachrichten-Vorlage Löschen"
 
 msgid "Enroll Attendee"
 msgstr "Teilnehmer Anmelden"
