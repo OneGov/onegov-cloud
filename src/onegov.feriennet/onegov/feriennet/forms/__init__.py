@@ -6,10 +6,15 @@ from onegov.feriennet.forms.period import PeriodForm
 from onegov.feriennet.forms.userprofile import UserProfileForm
 from onegov.feriennet.forms.match import MatchForm
 
+from onegov.feriennet.forms.notification_template import (
+    NotificationTemplateForm
+)
+
 __all__ = [
     'AttendeeForm',
     'BillingForm',
     'MatchForm',
+    'NotificationTemplateForm',
     'OccasionForm',
     'PeriodForm',
     'UserProfileForm',

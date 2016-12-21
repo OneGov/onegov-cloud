@@ -4,6 +4,7 @@ from onegov.feriennet import _
 from onegov.feriennet import security
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
+from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
@@ -73,6 +74,16 @@ class VacationActivityCollectionLayout(DefaultLayout):
                     text=_("Attendees"),
                     url=self.request.class_link(OccasionAttendeeCollection),
                     classes=('show-attendees', )
+                )
+            )
+
+            links.append(
+                Link(
+                    text=_("Notifications"),
+                    url=self.request.class_link(
+                        NotificationTemplateCollection
+                    ),
+                    classes=('show-notifications', )
                 )
             )
 
@@ -311,3 +322,40 @@ class OccasionAttendeeLayout(DefaultLayout):
             ),
             Link(_("Attendees"), '#')
         )
+
+
+class NotificationTemplateLayout(DefaultLayout):
+
+    def __init__(self, model, request, subtitle=None):
+        super().__init__(model, request)
+        self.subtitle = subtitle
+
+    @cached_property
+    def breadcrumbs(self):
+        links = [
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(
+                _("Notification Templates"),
+                self.request.class_link(NotificationTemplateCollection)
+            )
+        ]
+
+        if self.subtitle:
+            links.append(Link(self.subtitle, '#'))
+
+        return links
+
+    @cached_property
+    def editbar_links(self):
+        if not self.subtitle:
+            return (
+                Link(
+                    _("New Notification Template"),
+                    self.request.link(self.model, 'neu'),
+                    classes=('new-notification', )
+                ),
+            )

@@ -1,0 +1,16 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <ul class="dense notifications">
+            <li tal:repeat="notification notifications">
+                <h3>${notification.subject}</h3>
+
+                <div tal:condition="notification.last_sent" i18n:translate>sent <tal:block i18n:name="time_ago">${layout.format_date(notification.last_sent)}</tal:block></div>
+
+                <div tal:condition="not:notification.last_sent" i18n:translate>Not sent yet</div>
+            </li>
+        </ul>
+    </tal:block>
+</div>

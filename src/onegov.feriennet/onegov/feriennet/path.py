@@ -1,10 +1,11 @@
 from onegov.activity import Booking, BookingCollection
+from onegov.activity import InvoiceItemCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
-from onegov.activity import InvoiceItemCollection
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
+from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.converters import age_range_converter
@@ -198,3 +199,10 @@ def get_occasion_attendee_collection(request, app, period_id=None):
         username = request.current_username
 
     return OccasionAttendeeCollection(app.session(), period, username)
+
+
+@FeriennetApp.path(
+    model=NotificationTemplateCollection,
+    path='/mitteilungen')
+def get_notification_template_collection(request, app):
+    return NotificationTemplateCollection(app.session())

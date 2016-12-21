@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-15 13:58+0100\n"
+"POT-Creation-Date: 2016-12-21 14:25+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -51,11 +51,17 @@ msgstr "Fakturierung"
 msgid "Attendees"
 msgstr "Teilnehmer"
 
+msgid "Notification Templates"
+msgstr "Mitteilungs-Vorlagen"
+
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
 
 msgid "Periods"
 msgstr "Perioden"
+
+msgid "Notifications"
+msgstr "Mitteilungen"
 
 msgid "Edit Activity"
 msgstr "Angebot Bearbeiten"
@@ -260,6 +266,12 @@ msgstr "Mir ist bewusst dass die Wunschphase damit endet."
 msgid "Yes, confirm matching"
 msgstr "Ja, Zuteilung abschliessen"
 
+msgid "Subject"
+msgstr "Betreff"
+
+msgid "Message"
+msgstr "Mitteilung"
+
 msgid "Period"
 msgstr "Periode"
 
@@ -458,6 +470,9 @@ msgstr ""
 msgid "Archive Activity"
 msgstr "Angebot Archivieren"
 
+msgid "Passport"
+msgstr "Ferienpass"
+
 msgid "No activites found."
 msgstr "Keine Angebote gefunden."
 
@@ -582,9 +597,6 @@ msgstr "Kostenlos"
 
 msgid "This occasion does not have enough attendees yet."
 msgstr "Diese Durchführung hat noch nicht genügend Teilnehmer."
-
-msgid "Passport"
-msgstr "Ferienpass"
 
 msgid "For ${user}"
 msgstr "Für ${user}"
@@ -755,14 +767,20 @@ msgstr ""
 "Die Zuteilung kann nur noch manuell über Buchungen/Stornierungen gemacht "
 "werden."
 
+msgid "sent ${time_ago}"
+msgstr "gesendet ${time_ago}"
+
+msgid "Not sent yet"
+msgstr "Noch nie gesendet"
+
 msgid "Print All"
 msgstr "Alle drucken"
 
-msgid "No occasions defined yet."
-msgstr "Es wurden noch keine Durchführungen definiert."
-
 msgid "This period has not been confirmed yet."
 msgstr "In dieser Periode wurde noch keine Zuteilung gemacht."
+
+msgid "No occasions defined yet."
+msgstr "Es wurden noch keine Durchführungen definiert."
 
 msgid "Print"
 msgstr "Drucken"
@@ -992,6 +1010,12 @@ msgstr "Die Zuteilung wurde erfoglreich abgeschlossen"
 msgid "The matching run executed successfully"
 msgstr "Der Zuteilungs-Lauf wurde erfolgreich durchgeführt"
 
+msgid "New Notification Template"
+msgstr "Neue Nachrichten-Vorlage"
+
+msgid "Successfully added a new notification template"
+msgstr "Die Nachrichten-Vorlage wurde erfolgreich hinzugefügt"
+
 msgid "Enroll Attendee"
 msgstr "Teilnehmer Anmelden"
 
@@ -1058,12 +1082,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "Please enter both a number and a name"
-#~ msgstr "Bitte geben Sie eine Nummer und einen Namen an"
-
-#~ msgid "Legal guardian:"
-#~ msgstr "Erzeihungsberechtigte/r:"
-
-#~ msgid "Phone:"
-#~ msgstr "Telefon:"

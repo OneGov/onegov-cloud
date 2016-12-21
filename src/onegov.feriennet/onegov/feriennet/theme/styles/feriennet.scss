@@ -136,6 +136,8 @@ svg #background {
     .manage-matches:before { @include icon('\f24e'); }
     .manage-billing:before { @include icon('\f155'); }
     .show-attendees:before { @include icon('\f0c0'); }
+    .show-notifications:before { @include icon('\f003'); }
+    .new-notification:before { @include icon('\f003'); }
 }
 
 /*
