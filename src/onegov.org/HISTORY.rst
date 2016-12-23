@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.1.8 (2016-12-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds support for Webob 1.7.
   [href]
 
