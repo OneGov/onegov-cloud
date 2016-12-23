@@ -1,10 +1,10 @@
+import dectate
 import morepath
 
 from onegov.core.utils import Bunch, scan_morepath_modules
 from io import BytesIO
 from PIL import Image
 from random import randint
-from unittest.mock import patch
 from uuid import uuid4
 
 
@@ -27,18 +27,14 @@ def assert_explicit_permissions(module, app_class):
     morepath.autoscan()
     app_class.commit()
 
-    with patch('morepath.view.ViewRegistry.register_view') as register_view:
-
-        # make sure that all registered views have an explicit permission
-        for call in register_view.call_args_list:
-            view = call[0][1]
-            permission = call[0][4]
-
-            if view.__module__.startswith('onegov'):
-
-                assert permission is not None, (
-                    'view {}.{} has no permission'.format(
-                        module, view.__name__))
+    for action, fn in dectate.Query('view')(app_class):
+        if fn.__module__.startswith('onegov'):
+            assert action.permission is not None, (
+                '{}.{} has no permission'.format(
+                    fn.__module__,
+                    fn.__name__
+                )
+            )
 
 
 def random_namespace():
