@@ -28,6 +28,21 @@ class NotificationTemplate(Base, ContentMixin, TimestampMixin):
     last_sent = Column(UTCDateTime, nullable=True)
 
 
+def as_paragraphs(text):
+    paragraph = []
+
+    for line in text.splitlines():
+        if line.strip() == '':
+            if paragraph:
+                yield '<p>{}</p>'.format(' '.join(paragraph))
+                del paragraph[:]
+        else:
+            paragraph.append(line)
+
+    if paragraph:
+        yield '<p>{}</p>'.format(' '.join(paragraph))
+
+
 class TemplateVariables(object):
 
     def __init__(self, request, period):
@@ -61,15 +76,26 @@ class TemplateVariables(object):
             if token in text:
                 text = text.replace(token, method())
 
-        return text
+        paragraphs = tuple(as_paragraphs(text))
+
+        if len(paragraphs) <= 1:
+            return text
+        else:
+            return '\n'.join(as_paragraphs(text))
 
     def period_title(self):
         return self.period.title
 
     def bookings_link(self):
-        return self.request.class_link(BookingCollection, {
-            'period_id': self.period.id
-        })
+        return '<a href="{}">{}</a>'.format(
+            self.request.class_link(BookingCollection, {
+                'period_id': self.period.id
+            }),
+            self.request.translate(_("Bookings"))
+        )
 
     def invoices_link(self):
-        return self.request.class_link(InvoiceItemCollection)
+        return '<a href="{}">{}</a>'.format(
+            self.request.class_link(InvoiceItemCollection),
+            self.request.translate(_("Invoices"))
+        )

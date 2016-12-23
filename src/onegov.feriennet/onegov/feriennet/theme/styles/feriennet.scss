@@ -1298,3 +1298,39 @@ ul.tags {
         font-size: .875rem;
     }
 }
+
+/*
+    Notification Mailing
+*/
+
+.notification-preview {
+    background: $white-smoke;
+    margin-bottom: 1rem;
+    max-width: $max-line-width + 7rem;
+    padding: .75rem 1rem;
+    position: relative;
+
+    h3 {
+        border-bottom: 1px solid $jet;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        margin-bottom: .75rem;
+        max-width: $max-line-width;
+    }
+
+    p:last-child {
+        margin-bottom: 0;
+    }
+
+    a.control {
+        bottom: 1rem;
+        display: inline-block;
+        font-weight: bold;
+        position: absolute;
+        right: 1rem;
+    }
+}

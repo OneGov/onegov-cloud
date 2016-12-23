@@ -5,7 +5,9 @@ from onegov.core.security import Private
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.forms import NotificationTemplateForm
+from onegov.feriennet.forms import NotificationTemplateSendForm
 from onegov.feriennet.layout import NotificationTemplateLayout
+from onegov.feriennet.layout import NotificationTemplateCollectionLayout
 from onegov.feriennet.models import NotificationTemplate
 from onegov.feriennet.models.notification_template import TemplateVariables
 from onegov.org.elements import DeleteLink, Link
@@ -26,9 +28,14 @@ def get_variables(request):
     template='notification_templates.pt')
 def view_notification_templates(self, request):
 
-    layout = NotificationTemplateLayout(self, request)
+    layout = NotificationTemplateCollectionLayout(self, request)
 
     def get_links(notification):
+        yield Link(
+            text=_("Mailing"),
+            url=request.link(notification, 'versand')
+        )
+
         yield Link(
             text=_("Edit"),
             url=request.link(notification, 'bearbeiten')
@@ -73,7 +80,7 @@ def view_notification_template_form(self, request, form):
 
     return {
         'title': title,
-        'layout': NotificationTemplateLayout(self, request, title),
+        'layout': NotificationTemplateCollectionLayout(self, request, title),
         'form': form,
         'variables': get_variables(request),
     }
@@ -96,11 +103,10 @@ def edit_notification(self, request, form):
     elif not request.POST:
         form.process(obj=self)
 
-    title = _("Edit Notification Template")
-    layout = NotificationTemplateLayout(self, request, title)
+    layout = NotificationTemplateLayout(self, request)
 
     return {
-        'title': title,
+        'title': _("Edit"),
         'layout': layout,
         'form': form,
         'variables': get_variables(request)
@@ -119,3 +125,28 @@ def delete_notification(self, request):
     @request.after
     def remove_target(response):
         response.headers.add('X-IC-Remove', 'true')
+
+
+@FeriennetApp.form(
+    model=NotificationTemplate,
+    permission=Private,
+    template='notification_template_send_form.pt',
+    name='versand',
+    form=NotificationTemplateSendForm)
+def handle_send_notification(self, request, form):
+
+    period = PeriodCollection(request.app.session()).active()
+    variables = TemplateVariables(request, period)
+
+    title = _("Mailing")
+    layout = NotificationTemplateLayout(self, request, title)
+
+    return {
+        'title': title,
+        'layout': layout,
+        'form': form,
+        'preview_subject': variables.render(self.subject),
+        'preview_body': variables.render(self.text),
+        'edit_link': request.return_here(request.link(self, 'bearbeiten')),
+        'button_text': _("Send")
+    }

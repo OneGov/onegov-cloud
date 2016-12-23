@@ -16,3 +16,7 @@ class NotificationTemplateForm(Form):
         validators=[InputRequired()],
         render_kw={'rows': 8}
     )
+
+
+class NotificationTemplateSendForm(Form):
+    pass

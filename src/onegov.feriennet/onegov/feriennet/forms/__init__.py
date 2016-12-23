@@ -7,7 +7,8 @@ from onegov.feriennet.forms.userprofile import UserProfileForm
 from onegov.feriennet.forms.match import MatchForm
 
 from onegov.feriennet.forms.notification_template import (
-    NotificationTemplateForm
+    NotificationTemplateForm,
+    NotificationTemplateSendForm
 )
 
 __all__ = [
@@ -15,6 +16,7 @@ __all__ = [
     'BillingForm',
     'MatchForm',
     'NotificationTemplateForm',
+    'NotificationTemplateSendForm',
     'OccasionForm',
     'PeriodForm',
     'UserProfileForm',

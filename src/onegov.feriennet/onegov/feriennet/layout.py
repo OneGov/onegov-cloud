@@ -324,7 +324,7 @@ class OccasionAttendeeLayout(DefaultLayout):
         )
 
 
-class NotificationTemplateLayout(DefaultLayout):
+class NotificationTemplateCollectionLayout(DefaultLayout):
 
     def __init__(self, model, request, subtitle=None):
         super().__init__(model, request)
@@ -359,3 +359,29 @@ class NotificationTemplateLayout(DefaultLayout):
                     classes=('new-notification', )
                 ),
             )
+
+
+class NotificationTemplateLayout(DefaultLayout):
+
+    def __init__(self, model, request, subtitle=None):
+        super().__init__(model, request)
+        self.subtitle = subtitle
+
+    @cached_property
+    def breadcrumbs(self):
+        links = [
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(
+                self.model.subject,
+                self.request.link(self.model)
+            )
+        ]
+
+        if self.subtitle:
+            links.append(Link(self.subtitle, '#'))
+
+        return links
