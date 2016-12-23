@@ -43,30 +43,23 @@ class HtmlHandleFormAction(HtmlAction):
         super().__init__(model, render, template, permission, internal,
                          **predicates)
 
-    def perform(self, obj, view_registry):
+    def perform(self, obj, *args, **kwargs):
+        obj = wrap_with_generic_form_handler(obj, self.form)
 
-        keys = self.key_dict()
+        # if a request method is given explicitly, we honor it
+        if 'request_method' in self.predicates:
+            return super().perform(obj, *args, **kwargs)
 
-        wrapped = wrap_with_generic_form_handler(obj, self.form)
+        # otherwise we register ourselves twice, once for each method
+        predicates = self.predicates.copy()
 
-        if 'request_method' not in keys:
+        self.predicates['request_method'] = 'GET'
+        super().perform(obj, *args, **kwargs)
 
-            keys['request_method'] = 'GET'
-            view_registry.register_view(
-                keys, wrapped,
-                self.render, self.template,
-                self.permission, self.internal)
+        self.predicates['request_method'] = 'POST'
+        super().perform(obj, *args, **kwargs)
 
-            keys['request_method'] = 'POST'
-            view_registry.register_view(
-                keys, wrapped,
-                self.render, self.template,
-                self.permission, self.internal)
-        else:
-            view_registry.register_view(
-                keys, wrapped,
-                self.render, self.template,
-                self.permission, self.internal)
+        self.predicates = predicates
 
 
 def fetch_form_class(form_class, model, request):
