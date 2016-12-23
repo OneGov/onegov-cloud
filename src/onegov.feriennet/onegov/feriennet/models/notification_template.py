@@ -35,12 +35,25 @@ class TemplateVariables(object):
         self.period = period
 
         self.bound = {}
-        self.bind(_("Passport"), self.pass_title)
-        self.bind(_("Invoices"), self.invoices_link)
-        self.bind(_("Bookings"), self.bookings_link)
+        self.bind(
+            _("Period"),
+            _("Title of the period."),
+            self.pass_title,
+        )
+        self.bind(
+            _("Invoices"),
+            _("Link to the user's invoices."),
+            self.invoices_link,
+        )
+        self.bind(
+            _("Bookings"),
+            _("Link to the user's bookings."),
+            self.bookings_link
+        )
 
-    def bind(self, name, method):
+    def bind(self, name, description, method):
         token = TOKEN.format(self.request.translate(name))
+        method.__func__.__doc__ = self.request.translate(description)
         self.bound[token] = method
 
     def render(self, text):

@@ -1,10 +1,23 @@
+from collections import OrderedDict
+
+from onegov.activity import PeriodCollection
 from onegov.core.security import Private
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.forms import NotificationTemplateForm
 from onegov.feriennet.layout import NotificationTemplateLayout
 from onegov.feriennet.models import NotificationTemplate
+from onegov.feriennet.models.notification_template import TemplateVariables
 from onegov.org.elements import DeleteLink, Link
+
+
+def get_variables(request):
+    period = PeriodCollection(request.app.session()).active()
+    variables = TemplateVariables(request, period).bound
+
+    return OrderedDict(
+        (token, variables[token].__doc__) for token in sorted(variables)
+    )
 
 
 @FeriennetApp.html(
@@ -42,7 +55,7 @@ def view_notification_templates(self, request):
 @FeriennetApp.form(
     model=NotificationTemplateCollection,
     permission=Private,
-    template='form.pt',
+    template='notification_template_form.pt',
     name='neu',
     form=NotificationTemplateForm)
 def view_notification_template_form(self, request, form):
@@ -58,19 +71,18 @@ def view_notification_template_form(self, request, form):
         request.success(_("Successfully added a new notification template"))
         return request.redirect(request.link(self))
 
-    layout = NotificationTemplateLayout(self, request, title)
-
     return {
         'title': title,
-        'layout': layout,
+        'layout': NotificationTemplateLayout(self, request, title),
         'form': form,
+        'variables': get_variables(request),
     }
 
 
 @FeriennetApp.form(
     model=NotificationTemplate,
     permission=Private,
-    template='form.pt',
+    template='notification_template_form.pt',
     name='bearbeiten',
     form=NotificationTemplateForm)
 def edit_notification(self, request, form):
@@ -90,7 +102,8 @@ def edit_notification(self, request, form):
     return {
         'title': title,
         'layout': layout,
-        'form': form
+        'form': form,
+        'variables': get_variables(request)
     }
 
 
