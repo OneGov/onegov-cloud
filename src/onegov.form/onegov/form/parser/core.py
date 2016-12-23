@@ -247,6 +247,7 @@ Just like radiobuttons, checkboxes may be nested to created dependencies::
 import pyparsing as pp
 import yaml
 
+from cgi import escape
 from onegov.core.utils import Bunch
 from onegov.form.core import (
     FieldDependency,
@@ -715,6 +716,11 @@ class WTFormsClassBuilder(object):
     def add_field(self, field_class, label, required,
                   dependency=None, **kwargs):
         validators = kwargs.pop('validators', [])
+
+        # labels in wtforms are not escaped correctly - for safety we make sure
+        # that the label is properly html escaped. See also:
+        # https://github.com/wtforms/wtforms/issues/315
+        label = escape(label)
 
         if required:
 
