@@ -24,9 +24,9 @@ def test_template_variables():
     assert sorted(t.bound.keys()) == [
         "[BOOKINGS]",
         "[INVOICES]",
-        "[PASSPORT]",
+        "[PERIOD]",
     ]
 
-    assert t.render("Welcome to [PASSPORT]") == "Welcome to Foobar Pass"
+    assert t.render("Welcome to [PERIOD]") == "Welcome to Foobar Pass"
     assert t.render("Go to [INVOICES]") == "Go to InvoiceItemCollection"
     assert t.render("Go to [BOOKINGS]") == "Go to BookingCollection"

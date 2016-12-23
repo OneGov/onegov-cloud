@@ -38,7 +38,7 @@ class TemplateVariables(object):
         self.bind(
             _("Period"),
             _("Title of the period."),
-            self.pass_title,
+            self.period_title,
         )
         self.bind(
             _("Invoices"),
@@ -63,7 +63,7 @@ class TemplateVariables(object):
 
         return text
 
-    def pass_title(self):
+    def period_title(self):
         return self.period.title
 
     def bookings_link(self):
