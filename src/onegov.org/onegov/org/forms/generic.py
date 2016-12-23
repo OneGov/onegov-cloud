@@ -1,5 +1,3 @@
-import json
-
 from morepath.request import Response
 from onegov.form import Form
 from onegov.org import _
@@ -68,7 +66,7 @@ class ExportForm(Form):
 
         if self.format == 'json':
             return Response(
-                json.dumps(results),
+                json_body=results,
                 content_type='application/json'
             )
 

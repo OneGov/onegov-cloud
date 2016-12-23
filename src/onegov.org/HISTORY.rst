@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds support for Webob 1.7.
+  [href]
+
 - Fixes reservation delete not working for anonymous users.
   [href]
 
