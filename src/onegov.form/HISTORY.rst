@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.16.1 (2016-12-23)
+~~~~~~~~~~~~~~~~~~~
 
 - HTML escapes labels in the dynamic formbuilder for security.
   [href]
