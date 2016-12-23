@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.35.1 (2016-12-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Upgrade to Morepath 0.17.
   [href]
