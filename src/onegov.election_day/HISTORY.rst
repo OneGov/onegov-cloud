@@ -10,9 +10,6 @@ Changelog
 - Uses tabs instead of foldable sections.
   [msom]
 
-- Shows the number of SMS subscribers in the manage view.
-  [msom]
-
 - Uses fading effects on charts.
   [msom]
 
@@ -23,6 +20,12 @@ Changelog
   [msom]
 
 - Improves handling of invalid (excel) files.
+  [msom]
+
+- Adds (partial) support for 2017.
+  [msom]
+
+- Shows the number of SMS subscribers in the manage view.
   [msom]
 
 - Adds support for PyFilesystem 2.x and Chameleon 3.x.
