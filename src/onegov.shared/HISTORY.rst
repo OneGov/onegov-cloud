@@ -4,7 +4,11 @@ Changelog
 - Adds support for group-labels.
   [href]
 
-0.2.0 (2016-06-10)
+
+Unreleased
+~~~~~~~~~~
+0.2.1 (2016-12-27)
+~~~~~~~~~~~~~~~~~~~ (2016-06-10)
 ~~~~~~~~~~~~~~~~~~~
 
 - Supports the new field dependency options of onegov.form.
