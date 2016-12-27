@@ -1,0 +1,450 @@
+{
+    "3503": {
+        "district": "Viamala",
+        "name": "Mutten"
+    },
+    "3506": {
+        "district": "Albula",
+        "name": "Vaz/Obervaz"
+    },
+    "3513": {
+        "district": "Albula",
+        "name": "Lantsch/Lenz"
+    },
+    "3514": {
+        "district": "Albula",
+        "name": "Schmitten (GR)"
+    },
+    "3521": {
+        "district": "Albula",
+        "name": "Berg\u00fcn/Bravuogn"
+    },
+    "3522": {
+        "district": "Albula",
+        "name": "Filisur"
+    },
+    "3542": {
+        "district": "Albula",
+        "name": "Albula/Alvra"
+    },
+    "3543": {
+        "district": "Albula",
+        "name": "Surses"
+    },
+    "3551": {
+        "district": "Bernina",
+        "name": "Brusio"
+    },
+    "3561": {
+        "district": "Bernina",
+        "name": "Poschiavo"
+    },
+    "3572": {
+        "district": "Surselva",
+        "name": "Falera"
+    },
+    "3575": {
+        "district": "Surselva",
+        "name": "Laax"
+    },
+    "3581": {
+        "district": "Surselva",
+        "name": "Sagogn"
+    },
+    "3582": {
+        "district": "Surselva",
+        "name": "Schluein"
+    },
+    "3603": {
+        "district": "Surselva",
+        "name": "Vals"
+    },
+    "3611": {
+        "district": "Surselva",
+        "name": "Andiast"
+    },
+    "3616": {
+        "district": "Surselva",
+        "name": "Waltensburg/Vuorz"
+    },
+    "3618": {
+        "district": "Surselva",
+        "name": "Lumnezia"
+    },
+    "3619": {
+        "district": "Surselva",
+        "name": "Ilanz/Glion"
+    },
+    "3633": {
+        "district": "Viamala",
+        "name": "F\u00fcrstenau"
+    },
+    "3637": {
+        "district": "Viamala",
+        "name": "Rothenbrunnen"
+    },
+    "3638": {
+        "district": "Viamala",
+        "name": "Scharans"
+    },
+    "3640": {
+        "district": "Viamala",
+        "name": "Sils im Domleschg"
+    },
+    "3661": {
+        "district": "Viamala",
+        "name": "Cazis"
+    },
+    "3662": {
+        "district": "Viamala",
+        "name": "Flerden"
+    },
+    "3663": {
+        "district": "Viamala",
+        "name": "Masein"
+    },
+    "3668": {
+        "district": "Viamala",
+        "name": "Thusis"
+    },
+    "3669": {
+        "district": "Viamala",
+        "name": "Tschappina"
+    },
+    "3670": {
+        "district": "Viamala",
+        "name": "Urmein"
+    },
+    "3672": {
+        "district": "Surselva",
+        "name": "Safiental"
+    },
+    "3673": {
+        "district": "Viamala",
+        "name": "Domleschg"
+    },
+    "3681": {
+        "district": "Viamala",
+        "name": "Avers"
+    },
+    "3691": {
+        "district": "Viamala",
+        "name": "Hinterrhein"
+    },
+    "3693": {
+        "district": "Viamala",
+        "name": "Nufenen"
+    },
+    "3694": {
+        "district": "Viamala",
+        "name": "Spl\u00fcgen"
+    },
+    "3695": {
+        "district": "Viamala",
+        "name": "Sufers"
+    },
+    "3701": {
+        "district": "Viamala",
+        "name": "Andeer"
+    },
+    "3703": {
+        "district": "Viamala",
+        "name": "Casti-Wergenstein"
+    },
+    "3705": {
+        "district": "Viamala",
+        "name": "Donat"
+    },
+    "3707": {
+        "district": "Viamala",
+        "name": "Lohn (GR)"
+    },
+    "3708": {
+        "district": "Viamala",
+        "name": "Mathon"
+    },
+    "3711": {
+        "district": "Viamala",
+        "name": "Rongellen"
+    },
+    "3712": {
+        "district": "Viamala",
+        "name": "Zillis-Reischen"
+    },
+    "3713": {
+        "district": "Viamala",
+        "name": "Ferrera"
+    },
+    "3721": {
+        "district": "Imboden",
+        "name": "Bonaduz"
+    },
+    "3722": {
+        "district": "Imboden",
+        "name": "Domat/Ems"
+    },
+    "3723": {
+        "district": "Imboden",
+        "name": "Rh\u00e4z\u00fcns"
+    },
+    "3731": {
+        "district": "Imboden",
+        "name": "Felsberg"
+    },
+    "3732": {
+        "district": "Imboden",
+        "name": "Flims"
+    },
+    "3733": {
+        "district": "Imboden",
+        "name": "Tamins"
+    },
+    "3734": {
+        "district": "Imboden",
+        "name": "Trin"
+    },
+    "3746": {
+        "district": "Engiadina B./Val M\u00fcstair",
+        "name": "Zernez"
+    },
+    "3752": {
+        "district": "Engiadina B./Val M\u00fcstair",
+        "name": "Samnaun"
+    },
+    "3762": {
+        "district": "Engiadina B./Val M\u00fcstair",
+        "name": "Scuol"
+    },
+    "3764": {
+        "district": "Engiadina B./Val M\u00fcstair",
+        "name": "Valsot"
+    },
+    "3781": {
+        "district": "Maloja",
+        "name": "Bever"
+    },
+    "3782": {
+        "district": "Maloja",
+        "name": "Celerina/Schlarigna"
+    },
+    "3783": {
+        "district": "Maloja",
+        "name": "Madulain"
+    },
+    "3784": {
+        "district": "Maloja",
+        "name": "Pontresina"
+    },
+    "3785": {
+        "district": "Maloja",
+        "name": "La Punt-Chamues-ch"
+    },
+    "3786": {
+        "district": "Maloja",
+        "name": "Samedan"
+    },
+    "3787": {
+        "district": "Maloja",
+        "name": "St. Moritz"
+    },
+    "3788": {
+        "district": "Maloja",
+        "name": "S-chanf"
+    },
+    "3789": {
+        "district": "Maloja",
+        "name": "Sils im Engadin/Segl"
+    },
+    "3790": {
+        "district": "Maloja",
+        "name": "Silvaplana"
+    },
+    "3791": {
+        "district": "Maloja",
+        "name": "Zuoz"
+    },
+    "3792": {
+        "district": "Maloja",
+        "name": "Bregaglia"
+    },
+    "3804": {
+        "district": "Moesa",
+        "name": "Buseno"
+    },
+    "3805": {
+        "district": "Moesa",
+        "name": "Castaneda"
+    },
+    "3808": {
+        "district": "Moesa",
+        "name": "Rossa"
+    },
+    "3810": {
+        "district": "Moesa",
+        "name": "Santa Maria in Calanca"
+    },
+    "3821": {
+        "district": "Moesa",
+        "name": "Lostallo"
+    },
+    "3822": {
+        "district": "Moesa",
+        "name": "Mesocco"
+    },
+    "3823": {
+        "district": "Moesa",
+        "name": "Soazza"
+    },
+    "3831": {
+        "district": "Moesa",
+        "name": "Cama"
+    },
+    "3832": {
+        "district": "Moesa",
+        "name": "Grono"
+    },
+    "3834": {
+        "district": "Moesa",
+        "name": "Roveredo (GR)"
+    },
+    "3835": {
+        "district": "Moesa",
+        "name": "San Vittore"
+    },
+    "3837": {
+        "district": "Moesa",
+        "name": "Calanca"
+    },
+    "3847": {
+        "district": "Engiadina B./Val M\u00fcstair",
+        "name": "Val M\u00fcstair"
+    },
+    "3851": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Davos"
+    },
+    "3861": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Fideris"
+    },
+    "3862": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Furna"
+    },
+    "3863": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Jenaz"
+    },
+    "3871": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Klosters-Serneus"
+    },
+    "3881": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Conters im Pr\u00e4ttigau"
+    },
+    "3882": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "K\u00fcblis"
+    },
+    "3891": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Luzein"
+    },
+    "3901": {
+        "district": "Plessur",
+        "name": "Chur"
+    },
+    "3911": {
+        "district": "Plessur",
+        "name": "Churwalden"
+    },
+    "3921": {
+        "district": "Plessur",
+        "name": "Arosa"
+    },
+    "3926": {
+        "district": "Plessur",
+        "name": "Maladers"
+    },
+    "3932": {
+        "district": "Plessur",
+        "name": "Tschiertschen-Praden"
+    },
+    "3941": {
+        "district": "Plessur",
+        "name": "Haldenstein"
+    },
+    "3945": {
+        "district": "Landquart",
+        "name": "Trimmis"
+    },
+    "3946": {
+        "district": "Landquart",
+        "name": "Untervaz"
+    },
+    "3947": {
+        "district": "Landquart",
+        "name": "Zizers"
+    },
+    "3951": {
+        "district": "Landquart",
+        "name": "Fl\u00e4sch"
+    },
+    "3952": {
+        "district": "Landquart",
+        "name": "Jenins"
+    },
+    "3953": {
+        "district": "Landquart",
+        "name": "Maienfeld"
+    },
+    "3954": {
+        "district": "Landquart",
+        "name": "Malans"
+    },
+    "3955": {
+        "district": "Landquart",
+        "name": "Landquart"
+    },
+    "3961": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Gr\u00fcsch"
+    },
+    "3962": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Schiers"
+    },
+    "3972": {
+        "district": "Pr\u00e4ttigau / Davos",
+        "name": "Seewis im Pr\u00e4ttigau"
+    },
+    "3981": {
+        "district": "Surselva",
+        "name": "Breil/Brigels"
+    },
+    "3982": {
+        "district": "Surselva",
+        "name": "Disentis/Must\u00e9r"
+    },
+    "3983": {
+        "district": "Surselva",
+        "name": "Medel (Lucmagn)"
+    },
+    "3985": {
+        "district": "Surselva",
+        "name": "Sumvitg"
+    },
+    "3986": {
+        "district": "Surselva",
+        "name": "Tujetsch"
+    },
+    "3987": {
+        "district": "Surselva",
+        "name": "Trun"
+    },
+    "3988": {
+        "district": "Surselva",
+        "name": "Obersaxen Mundaun"
+    }
+}
