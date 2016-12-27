@@ -32,7 +32,7 @@
       if (typeof settings.myClass !== 'undefined') $stacktable.addClass(settings.myClass);
       var markup = '';
 
-      
+
       $table.addClass('stacktable large-only');
       $caption = $table.find("caption").clone();
       $topRow = $table.find('tr').eq(0);
@@ -157,7 +157,7 @@
       $table.addClass('stacktable large-only');
       var tb = $('<tbody></tbody>');
       var col_i = 1; //col index starts at 0 -> start copy at second column.
-      
+
       while (col_i < num_cols) {
         $table.find('tr').each(function(index,value) {
           var tem = $('<tr></tr>'); // todo opt. copy styles of $this; todo check if parent is thead or tfoot to handle accordingly

@@ -11,6 +11,9 @@ $('.collapsible .more, .collapsible .less').click(function() {
     $(this).parents('table').children('tbody').children('tr:not(.total):not(.sticky)').toggle();
 });
 
+// sort tables wishing to be sorted
+$('table.sortable').tablesorter({widgets: ['staticRow']});
+
 // force all dropdowns to be rendered in the direction specified in the
 // options of said dropdown (so if we say align:left, *always* align left)
 Foundation.libs.dropdown.small = function() { return false; };

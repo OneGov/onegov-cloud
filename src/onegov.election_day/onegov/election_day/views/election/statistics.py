@@ -12,8 +12,6 @@ from sqlalchemy.orm import object_session
 def view_election_statistics(self, request):
     """" The main view. """
 
-    request.include('tablesorter')
-
     handle_headerless_params(request)
 
     return {

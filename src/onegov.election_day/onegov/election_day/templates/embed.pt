@@ -29,18 +29,28 @@
                       grouped_bar_url data.get('grouped_bar');
                       sankey_url data.get('sankey');
                       map_url data.get('map')">
-        <div tal:condition="bar_url" class="bar-chart" data-dataurl="${bar_url}" />
-        <div tal:condition="grouped_bar_url" class="grouped-bar-chart" data-dataurl="${grouped_bar_url}" />
-        <div tal:condition="sankey_url" class="sankey-chart" data-dataurl="${sankey_url}" data-inverse="${data.get('inverse')}"/>
-
+        <div tal:condition="bar_url" class="bar-chart"
+            data-dataurl="${bar_url}"
+            >
+        </div>
+        <div tal:condition="grouped_bar_url" class="grouped-bar-chart"
+            data-dataurl="${grouped_bar_url}"
+            >
+        </div>
+        <div tal:condition="sankey_url" class="sankey-chart"
+            data-dataurl="${sankey_url}"
+            data-inverse="${data.get('inverse')}"
+            >
+        </div>
         <div tal:condition="map_url" class="ballot-map"
             data-type="${model.type}"
             data-canton="${layout.app.principal.canton}"
             data-mapurl="${layout.get_topojson_link(layout.app.principal.canton, model.vote.date.year)}"
             data-dataurl="${map_url}"
+            data-left-hand="Yay"
+            data-right-hand="Nay"
+            i18n:attributes="data-left-hand; data-right-hand"
             >
-
-            <div class="legend" data-left-hand="Yay" data-right-hand="Nay" i18n:attributes="data-left-hand; data-right-hand"></div>
         </div>
     </body>
 </html>

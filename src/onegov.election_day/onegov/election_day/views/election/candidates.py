@@ -56,8 +56,7 @@ def view_election_candidates_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    request.include('bar_chart')
-    request.include('frame_resizer')
+    request.include('charts')
 
     return {
         'model': self,
@@ -73,8 +72,7 @@ def view_election_candidates_chart(self, request):
 def view_election_candidates(self, request):
     """" The main view. """
 
-    request.include('bar_chart')
-    request.include('tablesorter')
+    request.include('charts')
 
     handle_headerless_params(request)
 

@@ -69,8 +69,7 @@ def view_election_panachage_chart(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
-    request.include('sankey_chart')
-    request.include('frame_resizer')
+    request.include('charts')
 
     return {
         'model': self,
@@ -86,8 +85,7 @@ def view_election_panachage_chart(self, request):
 def view_election_panachage(self, request):
     """" The main view. """
 
-    request.include('sankey_chart')
-    request.include('tablesorter')
+    request.include('charts')
 
     handle_headerless_params(request)
 

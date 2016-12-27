@@ -9,9 +9,6 @@ def handle_headerless_params(request):
         if request.browser_session.has('headerless'):
             del request.browser_session['headerless']
 
-    if request.browser_session.get('headerless'):
-        request.include('frame_resizer')
-
 
 def add_last_modified_header(response, last_modified):
     """ Adds the give date to the response as Last-Modified header. """

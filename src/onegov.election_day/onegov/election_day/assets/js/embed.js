@@ -1,4 +1,4 @@
-var append_svg_download_link = function(target, data, title, text) {
+var appendSvgDownloadLink = function(target, data, title, text) {
     if (data) {
         $(target).append(
             $('<a>')
@@ -15,7 +15,7 @@ var append_svg_download_link = function(target, data, title, text) {
     }
 };
 
-var append_embed_code = function(target, width, height, source, title) {
+var appendEmbedCode = function(target, width, height, source, title) {
     var id = 'embed_code_' + Math.floor(Math.random() * 100) + 1;
     $(target).append(
         $('<div>')

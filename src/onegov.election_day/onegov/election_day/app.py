@@ -201,11 +201,6 @@ def get_webasset_output():
     return 'assets/bundles'
 
 
-@ElectionDayApp.webasset('d3')
-def get_d3_asset():
-    yield 'd3.js'
-
-
 @ElectionDayApp.webasset('form')
 def get_form_asset():
     yield 'jquery.datetimepicker.css'
@@ -214,62 +209,39 @@ def get_form_asset():
     yield 'form_dependencies.js'
 
 
-@ElectionDayApp.webasset('bar_chart')
+@ElectionDayApp.webasset('charts')
 def get_bar_chart_asset():
+    yield 'd3.js'
+    yield 'd3.sankey.js'
+    yield 'd3.chart.bar.js'
+    yield 'd3.chart.grouped.js'
+    yield 'd3.chart.sankey.js'
     yield 'jquery.js'
-    yield 'd3'
-    yield 'chart-common.js'
-    yield 'bar-chart.js'
-
-
-@ElectionDayApp.webasset('grouped_bar_chart')
-def get_grouped_bar_chart_asset():
-    yield 'jquery.js'
-    yield 'd3'
-    yield 'chart-common.js'
-    yield 'grouped-bar-chart.js'
-
-
-@ElectionDayApp.webasset('sankey_chart')
-def get_sankey_chart_asset():
-    yield 'jquery.js'
-    yield 'd3'
-    yield 'chart-common.js'
-    yield 'sankey.js'
-    yield 'sankey-chart.js'
+    yield 'embed.js'
+    yield 'charts.js'
 
 
 @ElectionDayApp.webasset('ballot_map')
 def get_ballot_map_asset():
     yield 'jquery.js'
-    yield 'd3'
-    yield 'd3tip.js'
+    yield 'd3.js'
+    yield 'd3.tip.js'
+    yield 'd3.chart.map.js'
     yield 'topojson.js'
-    yield 'chart-common.js'
+    yield 'embed.js'
+    # yield 'ballot-map.js'
     yield 'ballot-map.js'
-    yield 'bar-chart.js'
-
-
-@ElectionDayApp.webasset('frame_resizer')
-def get_resizer_asset():
-    yield 'iframeResizer.contentWindow.js'
-
-
-@ElectionDayApp.webasset('tablesorter')
-def get_tablesorter_asset():
-    yield 'jquery.js'
-    yield 'jquery.tablesorter.js'
-    yield 'widget-staticRow.js'
-    yield 'tablesorter.js'
 
 
 @ElectionDayApp.webasset('common')
 def get_common_asset():
     yield 'modernizr.js'
     yield 'jquery.js'
+    yield 'jquery.tablesorter.js'
+    yield 'jquery.tablesorter.staticRow.js'
     yield 'fastclick.js'
     yield 'foundation.js'
     yield 'underscore.js'
-    yield 'stackable.js'
+    yield 'stacktable.js'
     yield 'iframeResizer.contentWindow.js'
     yield 'common.js'

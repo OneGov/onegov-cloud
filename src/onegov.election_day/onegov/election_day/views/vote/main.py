@@ -12,7 +12,6 @@ def view_vote_proposal(self, request):
     """" The main view. """
 
     request.include('ballot_map')
-    request.include('tablesorter')
 
     handle_headerless_params(request)
 
@@ -29,7 +28,6 @@ def view_vote_counter_proposal(self, request):
     """" The main view. """
 
     request.include('ballot_map')
-    request.include('tablesorter')
 
     handle_headerless_params(request)
 
@@ -46,7 +44,6 @@ def view_vote_tie_breaker(self, request):
     """" The main view. """
 
     request.include('ballot_map')
-    request.include('tablesorter')
 
     handle_headerless_params(request)
 

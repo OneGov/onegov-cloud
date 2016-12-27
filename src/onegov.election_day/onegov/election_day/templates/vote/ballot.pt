@@ -25,9 +25,11 @@
                         data-dataurl="${request.link(ballot, name='by-municipality')}"
                         data-download-link="Download"
                         data-embed-link="Embed"
-                        data-embed-source="${request.link(ballot, name='map')}">
-
-                        <div class="legend" data-left-hand="Yay" data-right-hand="Nay" i18n:attributes="data-left-hand; data-right-hand"></div>
+                        data-embed-source="${request.link(ballot, name='map')}"
+                        data-left-hand="Yay"
+                        data-right-hand="Nay"
+                        i18n:attributes="data-left-hand; data-right-hand"
+                        >
                     </div>
                 </div>
             </div>
