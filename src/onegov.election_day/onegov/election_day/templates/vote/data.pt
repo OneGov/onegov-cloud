@@ -16,15 +16,7 @@
 
             <h3 tal:content="layout.title()" tal:condition="layout.title()" />
 
-            <p>
-                <ul class="opendata-download">
-                    <li><a href="${request.link(vote, 'data-json')}">JSON</a></li>
-                    <li><a href="${request.link(vote, 'data-csv')}">CSV</a></li>
-                    <li><a href="${request.link(vote, 'data-xlsx')}">XLSX</a></li>
-                </ul>
-            </p>
-
-            <p><a href="${layout.opendata_link}"><em i18n:translate="">Format Description</em></a></p>
+            <div metal:use-macro="layout.macros['open_data_download']" tal:define="model vote"/>
 
         </tal:block>
 

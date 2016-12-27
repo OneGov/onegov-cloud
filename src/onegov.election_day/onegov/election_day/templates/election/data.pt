@@ -16,15 +16,15 @@
 
             <h3 tal:content="layout.title()" />
 
-            <p>
-                <ul class="opendata-download">
-                    <li><a href="${request.link(election, 'data-json')}">JSON</a></li>
-                    <li><a href="${request.link(election, 'data-csv')}">CSV</a></li>
-                    <li><a href="${request.link(election, 'data-xlsx')}">XLSX</a></li>
-                </ul>
-            </p>
+            <div metal:use-macro="layout.macros['open_data_download']" tal:define="model election"/>
 
-            <p><a href="${layout.opendata_link}"><em i18n:translate="">Format Description</em></a></p>
+            <tal:block tal:condition="layout.visible('parties')">
+                <h4 i18n:translate="">Party results</h4>
+                <p>
+                    <span i18n:translate="">The raw data is available as:</span> <a href="${request.link(election, 'data-parties')}">CSV</a>.
+                    <span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.
+                </p>
+            </tal:block>
 
         </tal:block>
 

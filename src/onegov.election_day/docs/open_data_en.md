@@ -58,7 +58,7 @@ Returns the data of the main view in a structured form.
 URL: /election/{id}/{data-format}
 ```
 
-The raw data used to display the results of votes is available in the following formats:
+The raw data used to display the results of elections is available in the following formats:
 
 Format|URL
 ---|---
@@ -101,6 +101,20 @@ candidate_elected|True if the candidate has been elected.
 candidate_votes|The number of votes this candidate got.
 
 Not yet counted municipalities are not included.
+
+### Party results
+
+```
+URL: /election/{id}/{data-parties}
+```
+
+The raw data is available as CSV. The following fields are included:
+
+Name|Description
+---|---
+name|The name of the party.
+mandates|The number of mandates.
+votes|The number of votes.
 
 ## Vote results
 

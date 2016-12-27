@@ -57,7 +57,7 @@ Retourne les données de la vue principale sous une forme structurée.
 URL: /election/{id}/{data-format}
 ```
 
-Les données brutes utilisées pour afficher les résultats de votes sont disponibles dans les formats suivants:
+Les données brutes utilisées pour afficher les résultats de élections sont disponibles dans les formats suivants:
 
 Format|URL
 ---|---
@@ -100,6 +100,20 @@ candidate_elected|Vrai si le candidat a été élu.
 candidate_votes|Le nombre de voix que ce candidat a obtenu.
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
+
+### Party results
+
+```
+URL: /election/{id}/{data-parties}
+```
+
+The raw data is available as CSV. The following fields are included:
+
+Name|Description
+---|---
+name|The name of the party.
+mandates|The number of mandates.
+votes|The number of votes.
 
 ## Les résultats de la votation
 

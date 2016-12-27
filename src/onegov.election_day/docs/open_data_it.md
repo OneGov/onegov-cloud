@@ -101,6 +101,20 @@ candidate_votes|Numero di voti ricevuti da questo candidato.
 
 I comuni non ancora contati non sono inclusi.
 
+### Party results
+
+```
+URL: /election/{id}/{data-parties}
+```
+
+The raw data is available as CSV. The following fields are included:
+
+Name|Description
+---|---
+name|The name of the party.
+mandates|The number of mandates.
+votes|The number of votes.
+
 ## Risultati della votazione
 
 ### Risultati elaborati

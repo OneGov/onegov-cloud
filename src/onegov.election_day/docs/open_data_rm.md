@@ -101,6 +101,19 @@ candidate_votes|Il dumber da las vuschs da candidat(a) da la vischnanca/dal lieu
 
 Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas.
 
+### Party results
+
+```
+URL: /election/{id}/{data-parties}
+```
+
+The raw data is available as CSV. The following fields are included:
+
+Name|Description
+---|---
+name|The name of the party.
+mandates|The number of mandates.
+votes|The number of votes.
 ## Resultats da la votaziun
 
 ### Resultats elavurads

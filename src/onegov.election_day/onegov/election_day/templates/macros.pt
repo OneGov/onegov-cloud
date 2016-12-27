@@ -101,7 +101,7 @@
 </metal:fields>
 
 <metal:related_link define-macro="related_link" i18n:domain="onegov.election_day">
-    <div class="row" tal:condition="meta.get('related_link', '')|nothing">
+    <div class="row related" tal:condition="meta.get('related_link', '')|nothing">
         <div class="columns small-12">
             <h2 i18n:translate="">Related link</h2>
             <p tal:define="link meta.get('related_link', '')">
@@ -296,5 +296,17 @@
         </li>
     </ul>
 </metal:vote_factoids>
+
+<metal:open_data_download define-macro="open_data_download" i18n:domain="onegov.election_day">
+    <p i18n:translate="">The raw data used to display the results is available in the following formats:</p>
+    <p>
+        <ul>
+            <li><a href="${request.link(model, 'data-json')}">JSON</a></li>
+            <li><a href="${request.link(model, 'data-csv')}">CSV</a></li>
+            <li><a href="${request.link(model, 'data-xlsx')}">XLSX</a></li>
+        </ul>
+    </p>
+    <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
+</metal:open_data_download>
 
 </body>

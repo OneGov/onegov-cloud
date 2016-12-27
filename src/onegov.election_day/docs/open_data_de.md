@@ -101,6 +101,20 @@ candidate_votes|Die Anzahl Kandidierendenstimmen der Gemeinde.
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 
+### Parteiresultate
+
+```
+URL: /election/{id}/{data-parties}
+```
+
+Die Rohdaten sind als CSV verfügbar. Die folgenden Felder sind enthalten:
+
+Name|Description
+---|---
+name|Der Name der Partei.
+mandates|Die Anzahl gewonnener Sitze.
+votes|Die Anzahl erhaltener Stimmen.
+
 ## Abstimmungsresultate
 
 ### Aufbereitete Ergebnisse

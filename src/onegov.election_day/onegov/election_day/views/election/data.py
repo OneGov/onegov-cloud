@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.csv import convert_list_of_dicts_to_csv
@@ -62,3 +63,23 @@ def view_election_data_as_xlsx(self, request):
             normalize_for_url(self.title)
         )
     )
+
+
+@ElectionDayApp.view(model=Election, name='data-parties', permission=Public)
+def view_election_parties_data_as_csv(self, request):
+    """ View the raw parties data as CSV. """
+
+    @request.after
+    def add_last_modified(response):
+        add_last_modified_header(response, self.last_result_change)
+
+    self.party_results
+    rows = []
+    for result in self.party_results:
+        row = OrderedDict()
+        row['name'] = result.name
+        row['votes'] = result.votes
+        row['mandates'] = result.number_of_mandates
+        rows.append(row)
+
+    return convert_list_of_dicts_to_csv(rows)
