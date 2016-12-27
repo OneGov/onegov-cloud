@@ -17,8 +17,8 @@
         </div>
 
         <h2 i18n:translate>Send</h2>
-        <div tal:condition="form.has_recipients" metal:use-macro="layout.macros['form']" />
-        <div tal:condition="not:form.has_recipients" i18n:translate>
+        <div tal:condition="form.has_choices" metal:use-macro="layout.macros['form']" />
+        <div tal:condition="not:form.has_choices" i18n:translate>
             There are no available recipients for your user account.
         </div>
 

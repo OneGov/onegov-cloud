@@ -1,8 +1,13 @@
-from onegov.activity import Activity, Occasion, OccasionCollection, Period
+from onegov.activity import Activity
+from onegov.activity import Booking, BookingCollection
+from onegov.activity import Occasion, OccasionCollection
+from onegov.activity import Period
 from onegov.feriennet import _
 from onegov.feriennet.layout import DefaultLayout
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
+from onegov.user import User, UserCollection
+from sqlalchemy import distinct
 from wtforms.fields import StringField, TextAreaField, RadioField
 from wtforms.validators import InputRequired
 
@@ -44,19 +49,33 @@ class NotificationTemplateSendForm(Form):
         depends_on=('send_to', 'by_role')
     )
 
-    occasions = MultiCheckboxField(
+    occasion = MultiCheckboxField(
         label=_("Occasion"),
         choices=None,
         depends_on=('send_to', 'by_occasion')
     )
 
     def on_request(self):
-        self.populate_occasions()
+        self.populate_occasion()
         self.limit_send_to_choices_for_organisers()
 
     @property
-    def has_recipients(self):
-        return self.request.is_admin or bool(self.occasions.choices)
+    def has_choices(self):
+        return self.request.is_admin or bool(self.occasion.choices)
+
+    @property
+    def recipients(self):
+        if self.request.is_organiser_only and self.send_to.data == 'by_role':
+            return None
+
+        if self.send_to.data == 'by_role':
+            return self.recipients_by_role(self.roles.data)
+
+        elif self.send_to.data == 'by_occasion':
+            return self.recipients_by_occasion(self.occasion.data)
+
+        else:
+            raise NotImplementedError
 
     def limit_send_to_choices_for_organisers(self):
         if self.request.is_organiser_only:
@@ -68,7 +87,28 @@ class NotificationTemplateSendForm(Form):
             ]
             self.send_to.data = 'by_occasion'
 
-    def populate_occasions(self):
+    def recipients_by_role(self, roles):
+        users = UserCollection(self.request.app.session())
+
+        q = users.by_roles(*roles)
+        q = q.with_entities(User.username)
+
+        return tuple(u.username for u in q)
+
+    def recipients_by_occasion(self, occasions):
+        bookings = BookingCollection(self.request.app.session())
+
+        q = bookings.query()
+        q = q.join(Period)
+        q = q.filter(Booking.occasion_id.in_(occasions))
+        q = q.filter(Booking.state == 'accepted')
+        q = q.filter(Period.active == True)
+        q = q.filter(Period.confirmed == True)
+        q = q.with_entities(distinct(Booking.username).label('username'))
+
+        return tuple(b.username for b in q)
+
+    def populate_occasion(self):
         q = OccasionCollection(self.request.app.session()).query()
         q = q.join(Activity)
         q = q.join(Period)
@@ -81,7 +121,7 @@ class NotificationTemplateSendForm(Form):
         layout = DefaultLayout(self.model, self.request)
 
         def choice(occasion):
-            return str(occasion.id), self.request.translate(_(
+            return occasion.id.hex, self.request.translate(_(
                 '${title} <small>${date}, ${count} Attendees</small>',
                 mapping={
                     'title': occasion.activity.title,
@@ -93,5 +133,5 @@ class NotificationTemplateSendForm(Form):
                 }
             ))
 
-        assert not self.occasions.choices
-        self.occasions.choices = tuple(choice(o) for o in q)
+        assert not self.occasion.choices
+        self.occasion.choices = tuple(choice(o) for o in q)
