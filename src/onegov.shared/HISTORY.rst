@@ -1,8 +1,9 @@
 Changelog
 ---------
 
-Unreleased
-~~~~~~~~~~
+- Adds support for group-labels.
+  [href]
+
 0.2.0 (2016-06-10)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -105,11 +105,11 @@ var evaluate_dependencies = function(form, input, dependencies) {
     });
     if (visible) {
         input.show();
-        input.closest('label').show().siblings('.error').show();
+        input.closest('label, .group-label').show().siblings('.error').show();
     } else {
         input.hide();
         if (hide_label) {
-            input.closest('label').hide().siblings('.error').hide();
+            input.closest('label, .group-label').hide().siblings('.error').hide();
         }
     }
 };
