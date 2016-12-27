@@ -2,8 +2,10 @@ from onegov.activity import Activity, ActivityCollection, Booking, Occasion
 from onegov.core.security import Public, Private, Personal
 from onegov.core.security.rules import has_permission_logged_in
 from onegov.feriennet import FeriennetApp
-from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
+from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
+from onegov.feriennet.const import VISIBLE_ACTIVITY_STATES
+from onegov.feriennet.models import NotificationTemplate
 from onegov.org.models import ImageFileCollection, SiteCollection
 
 
@@ -89,6 +91,30 @@ def has_private_permission_occasions(app, identity, model, permission):
         return has_permission_logged_in(app, identity, model, permission)
 
     return is_owner(identity.userid, model.activity)
+
+
+@FeriennetApp.permission_rule(
+    model=NotificationTemplateCollection,
+    permission=Private)
+def has_private_permission_notifications(app, identity, model, permission):
+    """ Give the editor private permission for notification templates. """
+
+    # only overries the editor role
+    if identity.role != 'editor':
+        return has_permission_logged_in(app, identity, model, permission)
+
+    return True
+
+
+@FeriennetApp.permission_rule(model=NotificationTemplate, permission=Private)
+def has_private_permission_notification(app, identity, model, permission):
+    """ Give the editor private permission for notification templates. """
+
+    # only overries the editor role
+    if identity.role != 'editor':
+        return has_permission_logged_in(app, identity, model, permission)
+
+    return True
 
 
 @FeriennetApp.permission_rule(model=Activity, permission=Public, identity=None)

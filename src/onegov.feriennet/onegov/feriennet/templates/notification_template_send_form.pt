@@ -5,6 +5,10 @@
 
     <tal:block metal:fill-slot="content">
 
+        <div class="panel callout">
+            Clicking "Send" will send the e-mail below to all selected recipients.
+        </div>
+
         <h2 i18n:translate>Preview</h2>
         <div class="notification-preview">
             <h3 tal:content="structure preview_subject" />
@@ -13,7 +17,10 @@
         </div>
 
         <h2 i18n:translate>Send</h2>
-        <div metal:use-macro="layout.macros['form']" />
+        <div tal:condition="form.has_recipients" metal:use-macro="layout.macros['form']" />
+        <div tal:condition="not:form.has_recipients" i18n:translate>
+            There are no available recipients for your user account.
+        </div>
 
     </tal:block>
 </div>

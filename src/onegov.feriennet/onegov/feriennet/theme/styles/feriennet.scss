@@ -75,6 +75,15 @@ svg #background {
 }
 
 /*
+    Hints in forms
+*/
+form small {
+    color: $form-label-font-color;
+    display: block;
+    font-size: .8rem;
+}
+
+/*
     Strikethrough text
 */
 .strikethrough {

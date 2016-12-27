@@ -3,7 +3,6 @@ from onegov.activity import Activity, ActivityCollection
 from onegov.activity.models import DAYS
 from onegov.core.templates import render_macro
 from onegov.feriennet import _
-from onegov.feriennet.layout import DefaultLayout
 from onegov.org.elements import Link, ConfirmLink
 from onegov.org.models.extensions import CoordinatesExtension
 from onegov.search import ORMSearchable
@@ -99,6 +98,7 @@ class VacationActivityHandler(Handler):
         return None
 
     def get_summary(self, request):
+        from onegov.feriennet.layout import DefaultLayout
         layout = DefaultLayout(self.activity, request)
 
         return render_macro(

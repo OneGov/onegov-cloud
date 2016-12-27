@@ -376,6 +376,10 @@ class NotificationTemplateLayout(DefaultLayout):
                 self.request.class_link(VacationActivityCollection)
             ),
             Link(
+                _("Notification Templates"),
+                self.request.class_link(NotificationTemplateCollection)
+            ),
+            Link(
                 self.model.subject,
                 self.request.link(self.model)
             )

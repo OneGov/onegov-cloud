@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-23 16:25+0100\n"
+"POT-Creation-Date: 2016-12-27 14:26+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -274,6 +274,30 @@ msgstr "Betreff"
 
 msgid "Message"
 msgstr "Mitteilung"
+
+msgid "Send to"
+msgstr "Empfänger"
+
+msgid "Role"
+msgstr "Rolle"
+
+msgid "Occasion"
+msgstr "Durchführung"
+
+msgid "All users of a given role"
+msgstr "Alle Benutzer mit einer bestimmten Rolle"
+
+msgid "All attendees of a given occasion in the current period"
+msgstr "Alle Teilnehmer einer Durchführung in der aktuellen Periode"
+
+msgid "Administrators"
+msgstr "Administratoren"
+
+msgid "Organisers"
+msgstr "Veranstalter"
+
+msgid "Members"
+msgstr "Mitglieder"
 
 msgid "Period"
 msgstr "Periode"
@@ -782,8 +806,14 @@ msgstr ""
 msgid "Variables"
 msgstr "Variablen"
 
+msgid "Edit"
+msgstr "Bearbeiten"
+
 msgid "Send"
 msgstr "Senden"
+
+msgid "There are no available recipients for your user account."
+msgstr "Es bestehen keine verfügbaren Empfänger für Ihren Benutzer"
 
 msgid "No notification templates yet."
 msgstr "Es wurden noch keine Nachrichten-Vorlagen erfasst."
@@ -875,9 +905,6 @@ msgstr "Ihr Angebot wurde abgelehnt"
 
 msgid "Your activity has been archived"
 msgstr "Ihr Angebot wurde archiviert"
-
-msgid "Edit"
-msgstr "Bearbeiten"
 
 msgid "Delete"
 msgstr "Löschen"

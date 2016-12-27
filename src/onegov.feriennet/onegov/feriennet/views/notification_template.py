@@ -137,12 +137,10 @@ def handle_send_notification(self, request, form):
 
     period = PeriodCollection(request.app.session()).active()
     variables = TemplateVariables(request, period)
-
-    title = _("Mailing")
-    layout = NotificationTemplateLayout(self, request, title)
+    layout = NotificationTemplateLayout(self, request)
 
     return {
-        'title': title,
+        'title': _("Mailing"),
         'layout': layout,
         'form': form,
         'preview_subject': variables.render(self.subject),
