@@ -68,7 +68,9 @@ def test_virtual_host_request():
         return request.link(self) + ' - blog'
 
     app = App()
-    app.configure_application()
+    app.namespace = 'foo'
+    app.configure_application(disable_memcached=True)
+    app.set_application_id('foo/bar')
 
     c = Client(app)
 

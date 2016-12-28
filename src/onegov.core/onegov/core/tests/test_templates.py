@@ -88,7 +88,12 @@ def test_chameleon_with_translation(temporary_directory):
 
     utils.scan_morepath_modules(App)
 
-    client = Client(App())
+    app = App()
+    app.namespace = 'foo'
+    app.configure_application(disable_memcached=True)
+    app.set_application_id('foo/bar')
+
+    client = Client(app)
     assert '<b>Willkommen</b>' in client.get('/').text
     assert '<b>Wir denken, wir denken!</b>' in client.get('/').text
     assert '<i>Makro</i>' in client.get('/').text
@@ -154,13 +159,23 @@ def test_inject_default_vars(temporary_directory):
 
     morepath.commit(Child, Parent)
 
-    parent_page = Client(Parent()).get('/')
+    parent = Parent()
+    parent.namespace = 'foo'
+    parent.configure_application(disable_memcached=True)
+    parent.set_application_id('foo/parent')
+
+    child = Child()
+    child.namespace = 'foo'
+    child.configure_application(disable_memcached=True)
+    child.set_application_id('foo/child')
+
+    parent_page = Client(parent).get('/')
     assert 'parent' in parent_page
     assert 'child' not in parent_page
     assert 'padre' in parent_page
     assert 'niño' not in parent_page
 
-    child_page = Client(Child()).get('/')
+    child_page = Client(child).get('/')
     assert 'parent' not in child_page
     assert 'child' in child_page
     assert 'padre' in child_page
@@ -250,7 +265,12 @@ def test_macro_lookup(temporary_directory):
 
     morepath.commit(Child, Parent)
 
-    page = Client(Child()).get('/')
+    child = Child()
+    child.namespace = 'foo'
+    child.configure_application(disable_memcached=True)
+    child.set_application_id('foo/child')
+
+    page = Client(child).get('/')
     assert 'Foo' in page
     assert 'Bar' in page
     assert 'Child' in page
