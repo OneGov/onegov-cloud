@@ -71,9 +71,9 @@ class Layout(ChameleonLayout):
     @cached_property
     def default_map_view(self):
         return self.org.default_map_view or {
-            'lat': 8.30576869173879,
-            'lon': 47.05183585,
-            'zoom': 10
+            'lon': 8.30576869173879,
+            'lat': 47.05183585,
+            'zoom': 12
         }
 
     @cached_property
