@@ -4,7 +4,7 @@ name = 'onegov.shared'
 description = (
     'Assets and other things shared between multiple onegov applications'
 )
-version = '0.2.1'
+version = '0.2.2'
 
 
 def get_long_description():
