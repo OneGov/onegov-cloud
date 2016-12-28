@@ -56,39 +56,84 @@ def test_person_link_extension():
     class TopicForm(Form):
         pass
 
+    class Request(object):
+
+        def translate(self, text):
+            return text
+
     topic = Topic()
     assert topic.people is None
 
-    form_class = topic.with_content_extensions(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=Request())
     form = form_class()
 
-    assert 'people_troy_barnes' in form._fields
-    assert 'people_troy_barnes_function' in form._fields
-    assert 'people_abed_nadir' in form._fields
-    assert 'people_abed_nadir_function' in form._fields
+    assert 'people_6d120102d90344868eb32614cf3acb1a' in form._fields
+    assert 'people_6d120102d90344868eb32614cf3acb1a_function' in form._fields
+    assert 'people_adad98ff74e2497a9e1dfbba0a6bbe96' in form._fields
+    assert 'people_adad98ff74e2497a9e1dfbba0a6bbe96_function' in form._fields
 
-    form.people_troy_barnes.data = True
+    form.people_6d120102d90344868eb32614cf3acb1a.data = True
     form.update_model(topic)
 
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', None)
     ]
 
-    form.people_troy_barnes_function.data = 'The Truest Repairman'
+    form.people_6d120102d90344868eb32614cf3acb1a_function.data \
+        = 'The Truest Repairman'
+
     form.update_model(topic)
 
     assert topic.content['people'] == [
         ('6d120102d90344868eb32614cf3acb1a', 'The Truest Repairman')
     ]
 
-    form_class = topic.with_content_extensions(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=Request())
     form = form_class()
     form.apply_model(topic)
 
-    assert form.people_troy_barnes.data is True
-    assert form.people_troy_barnes_function.data == 'The Truest Repairman'
-    assert not form.people_abed_nadir.data
-    assert not form.people_abed_nadir_function.data
+    assert form.people_6d120102d90344868eb32614cf3acb1a.data is True
+    assert form.people_6d120102d90344868eb32614cf3acb1a_function.data \
+        == 'The Truest Repairman'
+    assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96.data
+    assert not form.people_adad98ff74e2497a9e1dfbba0a6bbe96_function.data
+
+
+def test_person_link_extension_duplicate_name():
+
+    class Topic(PersonLinkExtension):
+        content = {}
+
+        def get_selectable_people(self, request):
+            return [
+                Bunch(
+                    id=UUID('6d120102-d903-4486-8eb3-2614cf3acb1a'),
+                    title='Foo'
+                ),
+                Bunch(
+                    id=UUID('adad98ff-74e2-497a-9e1d-fbba0a6bbe96'),
+                    title='Foo'
+                )
+            ]
+
+    class TopicForm(Form):
+        pass
+
+    class Request(object):
+
+        def translate(self, text):
+            return text
+
+    topic = Topic()
+    assert topic.people is None
+
+    form_class = topic.with_content_extensions(TopicForm, request=Request())
+    form = form_class()
+
+    assert 'people_6d120102d90344868eb32614cf3acb1a' in form._fields
+    assert 'people_6d120102d90344868eb32614cf3acb1a_function' in form._fields
+    assert 'people_adad98ff74e2497a9e1dfbba0a6bbe96' in form._fields
+    assert 'people_adad98ff74e2497a9e1dfbba0a6bbe96_function' in form._fields
 
 
 def test_person_link_extension_order():
@@ -116,15 +161,20 @@ def test_person_link_extension_order():
                 )
             ]
 
+    class Request(object):
+
+        def translate(self, text):
+            return text
+
     class TopicForm(Form):
         pass
 
     topic = Topic()
-    form_class = topic.with_content_extensions(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=Request())
     form = form_class()
 
-    form.people_troy_barnes.data = True
-    form.people_britta_perry.data = True
+    form.people_6d120102d90344868eb32614cf3acb1a.data = True
+    form.people_f0281b558a5f43f6ac81589d79538a87.data = True
     form.update_model(topic)
 
     # the people are kept sorted by lastname, firstname by default
@@ -133,7 +183,7 @@ def test_person_link_extension_order():
         ('f0281b558a5f43f6ac81589d79538a87', None)   # Britta _P_erry
     ]
 
-    form.people_annie_edison.data = True
+    form.people_aa37e9cc40ab402ea70b0d2b4d672de3.data = True
     form.update_model(topic)
 
     assert topic.content['people'] == [
@@ -167,7 +217,7 @@ def test_person_link_extension_order():
         ('6d120102d90344868eb32614cf3acb1a', None),  # Troy _B_arnes
     ]
 
-    form.people_abed_nadir.data = True
+    form.people_adad98ff74e2497a9e1dfbba0a6bbe96.data = True
     form.update_model(topic)
 
     assert topic.content['people'] == [
@@ -195,18 +245,23 @@ def test_person_link_move_function():
                 ),
             ]
 
+    class Request(object):
+        def translate(self, text):
+            return text
+
     class TopicForm(Form):
         pass
 
     topic = Topic()
-    form_class = topic.with_content_extensions(TopicForm, request=object())
+    form_class = topic.with_content_extensions(TopicForm, request=Request())
     form = form_class()
 
-    form.people_barack_obama.data = True
-    form.people_barack_obama_function.data = "President"
+    form.people_6d120102d90344868eb32614cf3acb1a.data = True
+    form.people_6d120102d90344868eb32614cf3acb1a_function.data = "President"
 
-    form.people_joe_biden.data = True
-    form.people_joe_biden_function.data = "Vice-President"
+    form.people_aa37e9cc40ab402ea70b0d2b4d672de3.data = True
+    form.people_aa37e9cc40ab402ea70b0d2b4d672de3_function.data = \
+        "Vice-President"
 
     form.update_model(topic)
 

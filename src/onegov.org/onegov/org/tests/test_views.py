@@ -22,6 +22,7 @@ from onegov.org.testing import extract_href
 from onegov.org.testing import get_message
 from onegov.org.testing import select_checkbox
 from onegov.page import PageCollection
+from onegov.people import Person
 from onegov.testing import utils
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection
@@ -826,16 +827,25 @@ def test_with_people(org_app):
     assert 'Gordon Flash' in new_page
     assert 'Ming Merciless' in new_page
 
+    gordon = org_app.session().query(Person)\
+        .filter(Person.last_name == 'Gordon')\
+        .one()
+
+    ming = org_app.session().query(Person)\
+        .filter(Person.last_name == 'Ming')\
+        .one()
+
     new_page.form['title'] = 'About Flash'
-    new_page.form['people_gordon_flash'] = True
-    new_page.form['people_gordon_flash_function'] = 'Astronaut'
+    new_page.form['people_' + gordon.id.hex] = True
+    new_page.form['people_' + gordon.id.hex + '_function'] = 'Astronaut'
     edit_page = new_page.form.submit().follow().click('Bearbeiten')
 
-    assert edit_page.form['people_gordon_flash'].value == 'y'
-    assert edit_page.form['people_gordon_flash_function'].value == 'Astronaut'
+    assert edit_page.form['people_' + gordon.id.hex].value == 'y'
+    assert edit_page.form['people_' + gordon.id.hex + '_function'].value \
+        == 'Astronaut'
 
-    assert edit_page.form['people_ming_merciless'].value is None
-    assert edit_page.form['people_ming_merciless_function'].value == ''
+    assert edit_page.form['people_' + ming.id.hex].value is None
+    assert edit_page.form['people_' + ming.id.hex + '_function'].value == ''
 
 
 def test_delete_linked_person_issue_149(org_app):
@@ -849,10 +859,14 @@ def test_delete_linked_person_issue_149(org_app):
     new_person.form['last_name'] = 'Gordon'
     new_person.form.submit()
 
+    gordon = org_app.session().query(Person)\
+        .filter(Person.last_name == 'Gordon')\
+        .one()
+
     new_page = client.get('/themen/organisation').click('Thema')
     new_page.form['title'] = 'About Flash'
-    new_page.form['people_gordon_flash'] = True
-    new_page.form['people_gordon_flash_function'] = 'Astronaut'
+    new_page.form['people_' + gordon.id.hex] = True
+    new_page.form['people_' + gordon.id.hex + '_function'] = 'Astronaut'
     edit_page = new_page.form.submit().follow().click('Bearbeiten')
 
     person = client.get('/personen').click('Gordon Flash')

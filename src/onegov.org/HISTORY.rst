@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Multiple people with the same name no longer cause an error in the page form.
+  [href]
+
 - Fixes custom primary color not being used for e-mails.
   [href]
 

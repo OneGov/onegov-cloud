@@ -360,13 +360,15 @@ class PersonLinkExtension(ContentExtension):
                 field_class=BooleanField,
                 label=person.title,
                 required=False,
-                id=person.id
+                id=person.id,
+                field_id=fieldset_id + '_' + person.id.hex
             )
             builder.add_field(
                 field_class=StringField,
-                label=_("Function"),
+                label=request.translate(_("Function")),
                 required=False,
-                dependency=FieldDependency(field_id, 'y')
+                dependency=FieldDependency(field_id, 'y'),
+                field_id=field_id + '_function'
             )
 
         return builder.form_class
