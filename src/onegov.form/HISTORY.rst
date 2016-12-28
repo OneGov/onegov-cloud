@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds the ability to supply a custom field_id to the formbuilder.
+  [href]
+
 0.16.1 (2016-12-23)
 ~~~~~~~~~~~~~~~~~~~
 

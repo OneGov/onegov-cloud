@@ -714,7 +714,7 @@ class WTFormsClassBuilder(object):
         self.current_fieldset = label
 
     def add_field(self, field_class, label, required,
-                  dependency=None, **kwargs):
+                  dependency=None, field_id=None, **kwargs):
         validators = kwargs.pop('validators', [])
 
         # labels in wtforms are not escaped correctly - for safety we make sure
@@ -745,12 +745,14 @@ class WTFormsClassBuilder(object):
         # try to find a smart field_id that contains the dependency or the
         # current fieldset name - if all fails, an error will be thrown,
         # as field_ids *need* to be unique
-        if dependency:
-            field_id = dependency.field_id + '_' + label_to_field_id(label)
-        elif self.current_fieldset:
-            field_id = label_to_field_id(self.current_fieldset + ' ' + label)
-        else:
-            field_id = label_to_field_id(label)
+        if field_id is None:
+            if dependency:
+                field_id = dependency.field_id + '_' + label_to_field_id(label)
+            elif self.current_fieldset:
+                field_id = label_to_field_id(
+                    self.current_fieldset + ' ' + label)
+            else:
+                field_id = label_to_field_id(label)
 
         if hasattr(self.form_class, field_id):
             raise errors.DuplicateLabelError(label=label)
