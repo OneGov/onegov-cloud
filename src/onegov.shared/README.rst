@@ -38,8 +38,8 @@ Coverage
   :target: https://coveralls.io/r/OneGov/onegov.shared?branch=master
   :alt: Project Coverage
 
-Latests PyPI Release
---------------------
+Latest PyPI Release
+-------------------
 .. image:: https://img.shields.io/pypi/v/onegov.shared.svg
   :target: https://pypi.python.org/pypi/onegov.shared
   :alt: Latest PyPI Release
