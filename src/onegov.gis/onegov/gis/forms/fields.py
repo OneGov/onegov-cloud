@@ -17,7 +17,7 @@ class CoordinatesField(StringField):
 
         =>
 
-        {'lat': 8.30576869173879, 'lon': 47.05183585, 'zoom': 10}
+        {'lon': 8.30576869173879, 'lat': 47.05183585, 'zoom': 10}
 
     For verification: This points to the Seantis office in Lucerne.
 
