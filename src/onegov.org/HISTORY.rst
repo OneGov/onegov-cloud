@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes custom primary color not being used for e-mails.
+  [href]
+
 - Fixes e-mail sending not working for onegov.onboarding.
   [href]
 

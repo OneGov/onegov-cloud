@@ -66,7 +66,7 @@ class Layout(ChameleonLayout):
     @property
     def primary_color(self):
         return self.org.theme_options.get(
-            'primary_color', user_options['primary-color'])
+            'primary-color', user_options['primary-color'])
 
     @cached_property
     def default_map_view(self):
