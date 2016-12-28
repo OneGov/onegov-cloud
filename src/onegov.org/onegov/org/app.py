@@ -155,9 +155,10 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
         """
 
-        assert 'reply_to' in self.org.meta
+        reply_to = self.org.meta.get('reply_to', kwargs.pop('reply_to', None))
+        assert reply_to, "Cannot send an email without a reply-to address"
 
-        reply_to = "{} <{}>".format(self.org.name, self.org.meta['reply_to'])
+        reply_to = "{} <{}>".format(self.org.name, reply_to)
 
         return super().send_email(reply_to=reply_to, **kwargs)
 

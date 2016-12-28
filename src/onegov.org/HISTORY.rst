@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes e-mail sending not working for onegov.onboarding.
+  [href]
+
 0.1.9 (2016-12-28)
 ~~~~~~~~~~~~~~~~~~~
 
