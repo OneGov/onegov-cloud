@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.0 (2016-12-28)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds panachage charts.
   [msom]
