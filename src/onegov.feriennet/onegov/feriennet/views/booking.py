@@ -92,6 +92,9 @@ def get_booking_title(layout, booking):
 def actions_by_booking(layout, period, booking):
     actions = []
 
+    if not period:
+        return actions
+
     if period.wishlist_phase or booking.state in DELETABLE_STATES:
         actions.append(DeleteLink(
             text=_("Remove"),
@@ -150,7 +153,9 @@ def view_my_bookings(self, request):
     bookings_by_attendee = group_bookings_by_attendee(bookings)
 
     periods = all_periods(request)
-    period = next(p for p in periods if p.id == self.period_id)
+    period = next((p for p in periods if p.id == self.period_id), None)
+
+    wishlist_phase = not period or period.wishlist_phase
 
     if request.is_admin:
         users = all_users(request)
@@ -159,8 +164,8 @@ def view_my_bookings(self, request):
         users, user = None, request.current_user
 
     if user.username == request.current_username:
-        title = period.wishlist_phase and _("Wishlist") or _("Bookings")
-    elif period.wishlist_phase:
+        title = wishlist_phase and _("Wishlist") or _("Bookings")
+    elif wishlist_phase:
         title = _("Wishlist of ${user}", mapping={
             'user': user.title
         })

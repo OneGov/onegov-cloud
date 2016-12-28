@@ -53,7 +53,7 @@ def get_template_variables(request):
             ))
         else:
             front.append(Link(
-                text=_("Bookings"),
+                text=_("Wishlist"),
                 url=request.link(bookings)
             ))
 
