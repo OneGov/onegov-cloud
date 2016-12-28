@@ -1524,3 +1524,47 @@ def test_occasion_attendance_collection(feriennet_app):
     page.form.submit()
 
     assert "123456789 Admin" in admin.get('/teilnehmer')
+
+
+def test_send_email(feriennet_app):
+
+    client = Client(feriennet_app)
+    client.login_admin()
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    periods = PeriodCollection(feriennet_app.session())
+    periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    transaction.commit()
+
+    page = client.get('/mitteilungen').click('Neue Mitteilungs-Vorlage')
+    page.form['subject'] = '[Periode] subject'
+    page.form['text'] = '[Periode] body'
+    page = page.form.submit().follow()
+
+    page = page.click('Versand')
+    assert "Ferienpass 2016 subject" in page
+    assert "Ferienpass 2016 body" in page
+    assert "keine Emfpänger gefunden" in page.form.submit()
+
+    page.form['roles'] = ['admin', 'editor']
+    assert "an 2 Empfänger gesendet" in page.form.submit().follow()
+    assert len(feriennet_app.smtp.outbox) == 2
+
+    message = get_message(feriennet_app, 0)
+    assert "Ferienpass 2016 subject" in feriennet_app.smtp.outbox[0]['subject']
+    assert "Ferienpass 2016 body" in message

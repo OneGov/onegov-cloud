@@ -52,19 +52,19 @@ msgid "Attendees"
 msgstr "Teilnehmer"
 
 msgid "Notification Templates"
-msgstr "Nachrichten-Vorlagen"
+msgstr "Mitteilungs-Vorlagen"
 
 msgid "Submit Activity"
 msgstr "Angebot erfassen"
 
 msgid "New Notification Template"
-msgstr "Neue Nachrichten-Vorlage"
+msgstr "Neue Mitteilungs-Vorlage"
 
 msgid "Periods"
 msgstr "Perioden"
 
 msgid "Notifications"
-msgstr "Nachrichten"
+msgstr "Mitteilungen"
 
 msgid "Edit Activity"
 msgstr "Angebot Bearbeiten"
@@ -822,7 +822,7 @@ msgid ""
 "list."
 msgstr ""
 "Wenn Sie auf \"Senden\" klicken, wird eine E-Mail an alle ausgewählten "
-"Empfänger gesendet. Sie erhalten eine Kopie des E-mails, falls Sie nicht "
+"Empfänger gesendet. Sie erhalten eine Kopie des E-Mails, falls Sie nicht "
 "bereits auf der Empfängerliste stehen."
 
 msgid "Edit"
@@ -835,7 +835,7 @@ msgid "There are no available recipients for your user account."
 msgstr "Es bestehen keine verfügbaren Empfänger für Ihren Benutzer"
 
 msgid "No notification templates yet."
-msgstr "Es wurden noch keine Nachrichten-Vorlagen erfasst."
+msgstr "Es wurden noch keine Mitteilungs-Vorlagen erfasst."
 
 msgid "sent ${time_ago}"
 msgstr "gesendet ${time_ago}"
@@ -1081,7 +1081,7 @@ msgid "Mailing"
 msgstr "Versand"
 
 msgid "Successfully added a new notification template"
-msgstr "Die Nachrichten-Vorlage wurde erfolgreich hinzugefügt"
+msgstr "Die Mitteilungs-Vorlage wurde erfolgreich hinzugefügt"
 
 msgid "There are no recipients matching the selection"
 msgstr "Es wurden keine Emfpänger gefunden welche dieser Auswahl entsprechen"
@@ -1091,7 +1091,7 @@ msgid "Successfully sent the e-mail to ${count} recipients"
 msgstr "Das E-Mail wurde erfolgreich an ${count} Empfänger gesendet"
 
 msgid "Delete Notification Template"
-msgstr "Nachrichten-Vorlage Löschen"
+msgstr "Mitteilungs-Vorlage Löschen"
 
 msgid "Enroll Attendee"
 msgstr "Teilnehmer Anmelden"

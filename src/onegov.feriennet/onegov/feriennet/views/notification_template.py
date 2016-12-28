@@ -176,6 +176,9 @@ def handle_send_notification(self, request, form):
                 }
             ))
 
+            return request.redirect(
+                request.class_link(NotificationTemplateCollection))
+
     return {
         'title': _("Mailing"),
         'layout': layout,
