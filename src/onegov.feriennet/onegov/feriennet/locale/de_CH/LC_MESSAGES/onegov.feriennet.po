@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2016-12-27 16:44+0100\n"
+"POT-Creation-Date: 2016-12-28 10:06+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -18,11 +18,11 @@ msgstr "Angebote"
 msgid "Invoices"
 msgstr "Rechnungen"
 
-msgid "Bookings"
-msgstr "Buchungen"
-
 msgid "Wishlist"
 msgstr "Wunschliste"
+
+msgid "Bookings"
+msgstr "Buchungen"
 
 msgid "Register a new account"
 msgstr "Ein neues Konto eröffnen"
@@ -510,6 +510,12 @@ msgstr "Link zu den Rechnungen des Benutzers."
 msgid "Link to the user's bookings."
 msgstr "Link zu den Buchungen des Benutzers."
 
+msgid "Link to the activities."
+msgstr "Link zu den Aktivitäten."
+
+msgid "Link to the homepage."
+msgstr "Link zur Startseite."
+
 msgid "No activites found."
 msgstr "Keine Angebote gefunden."
 
@@ -614,6 +620,9 @@ msgstr ""
 msgid "Change in Userprofile"
 msgstr "Im Benutzerprofil anpassen"
 
+msgid "No bookings yet."
+msgstr "Noch keine Buchungen."
+
 msgid "Mark up to three occasions per child as favorites."
 msgstr "Sie können bis zu drei Angebote pro Kind als Favorit markieren."
 
@@ -625,9 +634,6 @@ msgid "We cannot guarantee that everyone gets into their favorite activity."
 msgstr ""
 "Wir können nicht garantieren dass jedes Kind in sein Lieblingsangebot "
 "eingeteilt wird."
-
-msgid "No bookings yet."
-msgstr "Noch keine Buchungen."
 
 msgid "Free of charge"
 msgstr "Kostenlos"
@@ -809,6 +815,15 @@ msgstr ""
 
 msgid "Variables"
 msgstr "Variablen"
+
+msgid ""
+"Clicking \"Send\" will send the e-mail below to all selected recipients. You "
+"will receive a copy of the e-mail if you are not already on the recipients "
+"list."
+msgstr ""
+"Wenn Sie auf \"Senden\" klicken, wird eine E-Mail an alle ausgewählten "
+"Empfänger gesendet. Sie erhalten eine Kopie des E-mails, falls Sie nicht "
+"bereits auf der Empfängerliste stehen."
 
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -1067,6 +1082,13 @@ msgstr "Versand"
 
 msgid "Successfully added a new notification template"
 msgstr "Die Nachrichten-Vorlage wurde erfolgreich hinzugefügt"
+
+msgid "There are no recipients matching the selection"
+msgstr "Es wurden keine Emfpänger gefunden welche dieser Auswahl entsprechen"
+
+#, python-format
+msgid "Successfully sent the e-mail to ${count} recipients"
+msgstr "Das E-Mail wurde erfolgreich an ${count} Empfänger gesendet"
 
 msgid "Delete Notification Template"
 msgstr "Nachrichten-Vorlage Löschen"

@@ -5,13 +5,14 @@
 
     <tal:block metal:fill-slot="content">
 
-        <div class="panel callout">
-            Clicking "Send" will send the e-mail below to all selected recipients.
+        <div class="panel callout" i18n:translate>
+            Clicking "Send" will send the e-mail below to all selected recipients. You will receive a copy of the e-mail if you are not already on the recipients list.
         </div>
 
         <h2 i18n:translate>Preview</h2>
         <div class="notification-preview">
-            <h3 tal:content="structure preview_subject" />
+            <!-- the preview subject doesn't use the "structure" keyword as it won't be rendered as html -->
+            <h3 tal:content="preview_subject" />
             <div tal:content="structure preview_body" />
             <a class="control" href="${edit_link}" i18n:translate>Edit</a>
         </div>

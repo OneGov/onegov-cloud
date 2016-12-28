@@ -13,7 +13,7 @@
 
                 <div class="last-sent">
                     <tal:block condition="notification.last_sent" i18n:translate>
-                        sent <tal:block i18n:name="time_ago">${layout.format_date(notification.last_sent)}</tal:block>
+                        sent <tal:block i18n:name="time_ago">${layout.format_date(notification.last_sent, 'relative')}</tal:block>
                     </tal:block>
 
                     <tal:block condition="not:notification.last_sent" i18n:translate>

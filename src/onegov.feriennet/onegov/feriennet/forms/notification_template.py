@@ -22,7 +22,7 @@ class NotificationTemplateForm(Form):
     text = TextAreaField(
         label=_("Message"),
         validators=[InputRequired()],
-        render_kw={'rows': 8}
+        render_kw={'rows': 12}
     )
 
 
@@ -88,12 +88,15 @@ class NotificationTemplateSendForm(Form):
             self.send_to.data = 'by_occasion'
 
     def recipients_by_role(self, roles):
+        if not roles:
+            return None
+
         users = UserCollection(self.request.app.session())
 
         q = users.by_roles(*roles)
         q = q.with_entities(User.username)
 
-        return tuple(u.username for u in q)
+        return list(u.username for u in q)
 
     def recipients_by_occasion(self, occasions):
         bookings = BookingCollection(self.request.app.session())
@@ -106,7 +109,7 @@ class NotificationTemplateSendForm(Form):
         q = q.filter(Period.confirmed == True)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
-        return tuple(b.username for b in q)
+        return list(b.username for b in q)
 
     def populate_occasion(self):
         q = OccasionCollection(self.request.app.session()).query()

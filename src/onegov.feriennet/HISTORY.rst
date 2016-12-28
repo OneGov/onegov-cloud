@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to send e-mails manually to different sets of people.
+  [href]
+
 0.1.4 (2016-12-15)
 ~~~~~~~~~~~~~~~~~~~
 

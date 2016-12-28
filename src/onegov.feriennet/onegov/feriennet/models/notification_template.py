@@ -1,4 +1,5 @@
 from onegov.activity import BookingCollection, InvoiceItemCollection
+from onegov.feriennet.collections import VacationActivityCollection
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID, UTCDateTime
@@ -65,6 +66,16 @@ class TemplateVariables(object):
             _("Link to the user's bookings."),
             self.bookings_link
         )
+        self.bind(
+            _("Activities"),
+            _("Link to the activities."),
+            self.activities_link
+        )
+        self.bind(
+            _("Homepage"),
+            _("Link to the homepage."),
+            self.homepage_link
+        )
 
     def bind(self, name, description, method):
         token = TOKEN.format(self.request.translate(name))
@@ -98,4 +109,16 @@ class TemplateVariables(object):
         return '<a href="{}">{}</a>'.format(
             self.request.class_link(InvoiceItemCollection),
             self.request.translate(_("Invoices"))
+        )
+
+    def activities_link(self):
+        return '<a href="{}">{}</a>'.format(
+            self.request.class_link(VacationActivityCollection),
+            self.request.translate(_("Activities"))
+        )
+
+    def homepage_link(self):
+        return '<a href="{}">{}</a>'.format(
+            self.request.link(self.request.app.org),
+            self.request.translate(_("Homepage"))
         )

@@ -2,15 +2,18 @@ from collections import OrderedDict
 
 from onegov.activity import PeriodCollection
 from onegov.core.security import Private
+from onegov.core.templates import render_template
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.forms import NotificationTemplateForm
 from onegov.feriennet.forms import NotificationTemplateSendForm
-from onegov.feriennet.layout import NotificationTemplateLayout
 from onegov.feriennet.layout import NotificationTemplateCollectionLayout
+from onegov.feriennet.layout import NotificationTemplateLayout
 from onegov.feriennet.models import NotificationTemplate
 from onegov.feriennet.models.notification_template import TemplateVariables
 from onegov.org.elements import DeleteLink, Link
+from onegov.org.layout import DefaultMailLayout
+from sedate import utcnow
 
 
 def get_variables(request):
@@ -138,6 +141,40 @@ def handle_send_notification(self, request, form):
     period = PeriodCollection(request.app.session()).active()
     variables = TemplateVariables(request, period)
     layout = NotificationTemplateLayout(self, request)
+
+    if form.submitted(request):
+        recipients = form.recipients
+
+        if not recipients:
+            request.alert(_("There are no recipients matching the selection"))
+        else:
+            current = request.current_username
+
+            if current not in recipients:
+                recipients.append(current)
+
+            subject = variables.render(self.subject)
+            content = render_template('mail_notification.pt', request, {
+                'layout': DefaultMailLayout(self, request),
+                'title': subject,
+                'notification': variables.render(self.text)
+            })
+
+            for recipient in recipients:
+                request.app.send_email(
+                    receivers=(recipient, ),
+                    subject=subject,
+                    content=content,
+                )
+
+            self.last_sent = utcnow()
+
+            request.success(_(
+                "Successfully sent the e-mail to ${count} recipients",
+                mapping={
+                    'count': len(recipients)
+                }
+            ))
 
     return {
         'title': _("Mailing"),
