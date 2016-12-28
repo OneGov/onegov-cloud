@@ -14,6 +14,7 @@ Sono accettati come formati di file CSV, XLS o XLSX generati dai programmi elett
 
 [OneGov](#onegov)
 
+[Party results](#party-results)
 
 ## SESAM Sistema Maggioritario
 
@@ -77,6 +78,12 @@ Saranno prese in considerazione le seguenti colonne e almeno queste devono esser
 - **Vorname** (Nome)
 - **Stimmen Total aus Wahlzettel** (Totale voto da scrutinio)
 - **Anzahl Gemeinden** (Numero di comuni)
+
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- "**{List number} {List name}**": The number of votes the list got from the list with the given `Listen-Nr`. A `Listen-Nr` with the value `00` (`00 OHNE`) marks the votes from the blank list.
 
 ### Risultati temporanei
 
@@ -151,6 +158,12 @@ Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei da
 - **Kand_StimmenTotal**
 - **Liste_ParteistimmenTotal**
 
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- "**{List ID}.{List code}**": The number of votes the list got from the list with the given `Liste_ID`. A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
+
 ### Colonne esportazione di dati di statistica
 
 Il file con le statistiche dei singoli comuni devono contenere le seguenti colonne:
@@ -223,7 +236,12 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 - **candidate_first_name**: Nome del candidato.
 - **candidate_elected**: Vero, se il candidato è stato eletto.
 - **candidate_votes**: Numero di voti per il candidato nel Comune.
-- **panachage_votes_from_list_XX** The number of votes the list got from the given list.
+
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- **panachage_votes_from_list_XX**: The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 ### Risultati temporanei
 
@@ -237,3 +255,17 @@ I comuni non ancora completamente scrutinati non sono inclusi nei file.
 [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
 
 [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
+
+## Party results
+
+Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
+
+The following columns will be evaluated and should exist:
+
+- **Partei**: The name of the party.
+- **Stimmen**: The number of votes.
+- **Sitze**: The number of mandates.
+
+### Template
+
+[election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)

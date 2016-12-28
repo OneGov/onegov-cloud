@@ -16,6 +16,7 @@ Ina "vischnanca" po er esser in district, in circul electoral e.u.v.
 
 [OneGov](#onegov)
 
+[Party results](#party-results)
 
 ## SESAM Maiorz
 
@@ -80,6 +81,12 @@ Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
 - **Stimmen Total aus Wahlzettel** (Total da vuschs dals cedels electorals)
 - **Anzahl Gemeinden** (Dumber da vischnancas)
 - **Ungueltige Stimmen** (Vuschs nunvalaivlas)
+
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- "**{List number} {List name}**": The number of votes the list got from the list with the given `Listen-Nr`. A `Listen-Nr` with the value `00` (`00 OHNE`) marks the votes from the blank list.
 
 ### Resultats temporars
 
@@ -154,6 +161,12 @@ En l'export da datas datti ina lingia per candidata u candidat e per vischnanca.
 - **Kand_StimmenTotal**
 - **Liste_ParteistimmenTotal**
 
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- "**{List ID}.{List code}**": The number of votes the list got from the list with the given `Liste_ID`. A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
+
 ### Colonnas "Export da datas da la statistica"
 
 La datoteca cun las statisticas tar las singulas vischnancas duess cuntegnair las suandantas colonnas:
@@ -226,7 +239,13 @@ Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 - **candidate_first_name**: Prenum da la candidata u dal candidat.
 - **candidate_elected**: True, sche la candidata u il candidat è vegnì elegì.
 - **candidate_votes**: Dumber da vuschs da candidat en la vischnanca.
-- **panachage_votes_from_list_XX** The number of votes the list got from the given list.
+
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- **panachage_votes_from_list_XX**: The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+
 
 ### Resultats temporars
 
@@ -239,3 +258,17 @@ Las vischnancas che n'èn anc betg dumbradas ora n'èn betg cuntegnidas en las d
 [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
 
 [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
+
+## Party results
+
+Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
+
+The following columns will be evaluated and should exist:
+
+- **Partei**: The name of the party.
+- **Stimmen**: The number of votes.
+- **Sitze**: The number of mandates.
+
+### Template
+
+[election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)

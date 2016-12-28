@@ -98,6 +98,7 @@ candidate_first_name|Le prénom du candidat.
 candidate_id|L'identifiant du candidat.
 candidate_elected|Vrai si le candidat a été élu.
 candidate_votes|Le nombre de voix que ce candidat a obtenu.
+panachage_votes_from_list_XX|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 Les municipalités qui n’ont pas encore été comptées ne sont pas incluses.
 

@@ -98,6 +98,7 @@ candidate_first_name|Der Vorname des Kandidaten.
 candidate_id|Die ID des Kandidierenden.
 candidate_elected|True, falls der Kandidierenden gewählt wurde.
 candidate_votes|Die Anzahl Kandidierendenstimmen der Gemeinde.
+panachage_votes_from_list_XX|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 Noch nicht ausgezählte Gemeinden sind nicht enthalten.
 

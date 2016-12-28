@@ -24,6 +24,8 @@ and vote results on a different site:
 -   `{path_to_election}/candidates-chart`: The candidates bar chart.
 -   `{path_to_election}/lists-chart`: The lists bar chart.
 -   `{path_to_election}/connections-chart`: The connections sankey chart.
+-   `{path_to_election}/panachage-chart`: The panachage sankey chart.
+-   `{path_to_election}/parties-chart`: The party results bar chart.
 
 Furthermore, the web app can be called in a headerless mode by browsing
 `{root_path}?headerless`. In headerless mode, both the header and footer are

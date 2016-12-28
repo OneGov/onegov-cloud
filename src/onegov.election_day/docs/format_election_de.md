@@ -16,6 +16,7 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
 [OneGov](#onegov)
 
+[Parteiresultate](#parteiresultate)
 
 ## SESAM Majorz
 
@@ -79,6 +80,12 @@ Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 - **Vorname**
 - **Stimmen Total aus Wahlzettel**
 - **Anzahl Gemeinden**
+
+#### Panaschierdaten
+
+Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
+
+- "**{Listennummer} {Listenname}**":  Die Anzahl Stimmen von der Liste mit `Listen-Nr`. Die `Listen-Nr` mit dem Wert `00` (`00 OHNE`) steht für die Blankoliste.
 
 ### Temporäre Resultate
 
@@ -153,6 +160,12 @@ Im Datenexport gibt es eine Zeile pro Kandidat und Gemeinde. Es werden folgende 
 - **Kand_StimmenTotal**
 - **Liste_ParteistimmenTotal**
 
+#### Panaschierdaten
+
+Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
+
+- "**{List ID}.{List Code}**":  Die Anzahl Stimmen von der Liste mit `Liste_ID`. Die `Liste_ID` mit dem Wert `99` (`99.WoP`) steht für die Blankoliste.
+
 ### Spalten Datenexport der Statistik
 
 Die Datei mit den Statistiken zu den einzelnen Gemeinden sollte folgende Spalten enthalten:
@@ -225,7 +238,12 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **candidate_first_name**: Vorname des Kandidaten.
 - **candidate_elected**: True, falls der Kandidierenden gewählt wurde.
 - **candidate_votes**: Anzahl Kandidierendenstimmen in der Gemeinde.
-- **panachage_votes_from_list_XX** Anzahl Stimmen von der entsprechenden Liste.
+
+#### Panaschierdaten
+
+Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
+
+- **panachage_votes_from_list_XX** Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 ### Temporäre Resultate
 
@@ -239,3 +257,17 @@ Noch nicht ausgezählte Gemeinden sind nicht in den Daten enthalten.
 [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
 
 [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
+
+## Parteiresultate
+
+Jede Proporzwahl kann Parteiresultate enthalten. Diese sind unabhängig von den anderen Resultaten und beinhalten typischerweise die aggregierten Resultate der verschiedenen Listen einer einzelnen Partei.
+
+Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
+
+- **Partei**: Der Name der Partei.
+- **Stimmen**: Die Anzahl Stimmen.
+- **Sitze**: Die Anzahl Sitze.
+
+### Template
+
+[election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)

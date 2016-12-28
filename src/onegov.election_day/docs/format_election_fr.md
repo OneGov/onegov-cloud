@@ -14,6 +14,7 @@ En ce qui concerne les formats de fichiers, les fichiers XLS et XLSX sont accept
 
 [OneGov](#onegov)
 
+[Party results](#party-results)
 
 ## SESAM Majorz
 
@@ -77,6 +78,12 @@ Les colonnes suivantes seront évaluées et on devrait avoir au moins celles-ci 
 - **Vorname** (Prénom)
 - **Stimmen Total aus Wahlzettel** (Total de votes provenant du bulletin)
 - **Anzahl Gemeinden** (Nombre de municipalités)
+
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- "**{List number} {List name}**": The number of votes the list got from the list with the given `Listen-Nr`. A `Listen-Nr` with the value `00` (`00 OHNE`) marks the votes from the blank list.
 
 ### Résultats temporaires
 
@@ -151,6 +158,12 @@ Une ligne est présente par candidat et municipalité dans l'exportation des don
 - **Kand_StimmenTotal** (Nombre de votes de candidats dans la municipalité)
 - **Liste_ParteistimmenTotal** (Nombre total de votes de liste.)
 
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- "**{List ID}.{List code}**": The number of votes the list got from the list with the given `Liste_ID`. A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
+
 ### Exportation des données de statistiques pour les colonnes
 
 Le fichier avec les statistiques des municipalités individuelles devrait contenir les colonnes suivantes :
@@ -223,7 +236,12 @@ Les colonnes suivantes seront évaluées et devraient exister :
 - **candidate_first_name**: Prénom du candidat.
 - **candidate_elected**: Vrai, si le candidat a été élu.
 - **candidate_votes**: Nombre de votes de candidats dans la municipalité.
-- **panachage_votes_from_list_XX** The number of votes the list got from the given list.
+
+#### Panachage results
+
+The results may contain panachage results by adding one column per list:
+
+- **panachage_votes_from_list_XX**: The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 ### Résultats temporaires
 
@@ -237,3 +255,17 @@ Les municipalités pas encore entièrement comptées ne sont pas incluses dans l
 [election_onegov_majorz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_majorz.csv)
 
 [election_onegov_proporz.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_onegov_proporz.csv)
+
+## Party results
+
+Each (proporz) election may contain party results. These results are independent of the other results and typically contain the already aggregated results of the different lists of a party.
+
+The following columns will be evaluated and should exist:
+
+- **Partei**: The name of the party.
+- **Stimmen**: The number of votes.
+- **Sitze**: The number of mandates.
+
+### Template
+
+[election_party_results.csv](https://raw.githubusercontent.com/OneGov/onegov.election_day/master/docs/templates/election_party_results.csv)
