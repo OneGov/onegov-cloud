@@ -4,7 +4,7 @@ name = 'onegov.feriennet'
 description = (
     'Ferienpass Management for Pro Juventute'
 )
-version = '0.1.4'
+version = '0.1.5'
 
 
 def get_long_description():
