@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Honor the return-to parameter in the usermanagement view.
+  [href]
+
 0.1.8 (2016-12-23)
 ~~~~~~~~~~~~~~~~~~~
 

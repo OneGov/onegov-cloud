@@ -1,5 +1,3 @@
-import morepath
-
 from collections import defaultdict
 from onegov.core.crypto import random_password
 from onegov.core.directives import query_form_class
@@ -55,7 +53,7 @@ def handle_manage_user(self, request, form):
         form.populate_obj(self)
         request.success(_("Your changes were saved"))
 
-        return morepath.redirect(request.class_link(UserCollection))
+        return request.redirect(request.class_link(UserCollection))
     else:
         form.process(obj=self)
 
