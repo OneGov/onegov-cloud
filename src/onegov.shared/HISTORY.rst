@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the form-dependencies performance by pausing form-rendering.
+  [href]
+
 0.2.1 (2016-12-27)
 ~~~~~~~~~~~~~~~~~~~ 
 

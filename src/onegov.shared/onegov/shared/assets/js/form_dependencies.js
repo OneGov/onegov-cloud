@@ -104,6 +104,11 @@ var evaluate_dependencies = function(form, input, dependencies) {
 var setup_depends_on = function(form) {
     var inputs = form.find('*[data-depends-on]');
 
+    // our dependency evaluation is *much* faster if we don't trigger any
+    // rendering reflows -> at even a moderate number of items this can take
+    // seconds if we don't hide the form
+    form.hide();
+
     _.each(_.map(inputs, $), function(input) {
         var dependencies = get_dependencies(input);
         evaluate_dependencies(form, input, dependencies);
@@ -114,6 +119,8 @@ var setup_depends_on = function(form) {
             });
         });
     });
+
+    form.show();
 };
 
 /*
