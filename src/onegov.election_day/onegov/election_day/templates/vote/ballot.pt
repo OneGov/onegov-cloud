@@ -34,8 +34,7 @@
                 </div>
             </div>
 
-            <h3 tal:condition="not:vote.counter_proposal" i18n:translate="">Electoral Districts</h3>
-            <h4 tal:condition="vote.counter_proposal" i18n:translate="">Electoral Districts</h4>
+            <h4 tal:condition="use_maps" i18n:translate="">Electoral Districts</h4>
             <table class="ballot-results stackable sortable">
                 <thead>
                     <tr>
