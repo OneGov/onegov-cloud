@@ -1,8 +1,10 @@
+from datetime import date
 from freezegun import freeze_time
-from webtest import TestApp as Client
 from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_proporz_election
+from webtest import TestApp as Client
+from webtest.forms import Upload
 
 
 def test_view_election_redirect(election_day_app_gr):
@@ -121,8 +123,8 @@ def test_view_election_lists(election_day_app_gr):
 def test_view_election_parties(election_day_app_gr):
     client = Client(election_day_app_gr)
     client.get('/locale/de_CH').follow()
-
     login(client)
+
     upload_majorz_election(client)
 
     main = client.get('/election/majorz-election/parties')
@@ -150,6 +152,82 @@ def test_view_election_parties(election_day_app_gr):
     chart = client.get('/election/proporz-election/parties-chart')
     assert chart.status_code == 200
     assert '/election/proporz-election/parties-data' in chart
+
+    export = client.get('/election/proporz-election/data-parties').text
+    assert export == (
+        'name,votes,mandates\r\nBDP,60387,1\r\nCVP,49117,1\r\nFDP,35134,0\r\n'
+    )
+
+
+def test_view_election_parties_historical(election_day_app_gr):
+    client = Client(election_day_app_gr)
+    client.get('/locale/de_CH').follow()
+    login(client)
+
+    for id, year, domain, mandates, results in (
+        ('e1', 2014, 'federation', 5, 'BDP,2000,5\r\nCVP,1000,0\r\n'),
+        ('e2', 2015, 'federation', 5, 'BDP,2001,4\r\nCVP,1001,1\r\n'),
+        ('e3', 2016, 'federation', 5, 'BDP,2002,3\r\nCVP,1002,2\r\n'),
+        ('e4', 2013, 'federation', 4, 'BDP,2003,2\r\nCVP,1003,2\r\n'),
+        ('e5', 2012, 'canton', 5, 'BDP,2004,3\r\nCVP,1004,2\r\n')
+    ):
+        new = client.get('/manage/elections/new-election')
+        new.form['election_de'] = id
+        new.form['date'] = date(year, 1, 1)
+        new.form['mandates'] = mandates
+        new.form['election_type'] = 'proporz'
+        new.form['domain'] = domain
+        new.form.submit()
+
+        csv = (
+            "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
+            "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Listen-Nr,"
+            "Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,Anzahl Sitze Liste,"
+            "Unveränderte Wahlzettel Liste,Veränderte Wahlzettel Liste,"
+            "Kandidatenstimmen unveränderte Wahlzettel,"
+            "Zusatzstimmen unveränderte Wahlzettel,"
+            "Kandidatenstimmen veränderte Wahlzettel,"
+            "Zusatzstimmen veränderte Wahlzettel,Kandidaten-Nr,Gewählt,Name,"
+            "Vorname,Stimmen unveränderte Wahlzettel,"
+            "Stimmen veränderte Wahlzettel,Stimmen Total aus Wahlzettel,"
+            "01 FDP,02 CVP, Anzahl Gemeinden\n"
+            "{},3503,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
+            "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
+            "{},3503,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
+            "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n".format(
+                mandates, mandates
+            )
+        ).encode('utf-8')
+        csv_parties = ("Partei,Stimmen,Sitze\n" + results).encode('utf-8')
+
+        mime = 'text/plain'
+        upload = client.get('/election/{}/upload'.format(id))
+        upload.form['file_format'] = 'sesam'
+        upload.form['results'] = Upload('data.csv', csv, mime)
+        upload.form['parties'] = Upload('parties.csv', csv_parties, mime)
+        upload = upload.form.submit()
+
+        assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+        export = client.get('/election/{}/data-parties'.format(id)).text
+        assert results in export
+
+    e1 = client.get('/election/e1/parties-data').json
+    e2 = client.get('/election/e2/parties-data').json
+    e3 = client.get('/election/e3/parties-data').json
+    e4 = client.get('/election/e4/parties-data').json
+    e5 = client.get('/election/e5/parties-data').json
+
+    assert e1['groups'] == ['BDP', 'CVP']
+    assert e2['groups'] == ['BDP', 'CVP']
+    assert e3['groups'] == ['BDP', 'CVP']
+    assert e4['groups'] == ['BDP', 'CVP']
+    assert e5['groups'] == ['BDP', 'CVP']
+
+    assert e1['labels'] == ['2014']
+    assert e2['labels'] == ['2014', '2015']
+    assert e3['labels'] == ['2014', '2015', '2016']
+    assert e4['labels'] == ['2013']
+    assert e5['labels'] == ['2012']
 
 
 def test_view_election_connections(election_day_app_gr):
