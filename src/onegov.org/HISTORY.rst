@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Show the exact creation date on each ticket.
+  [href]
+
 - Multiple people with the same name no longer cause an error in the page form.
   [href]
 

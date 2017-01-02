@@ -56,6 +56,13 @@
                             </div>
                         </div>
 
+                        <div class="field-display-block">
+                            <div class="field-display-label" i18n:translate>Created</div>
+                            <div class="field-display-data ticket-date" tal:define="created layout.to_timezone(ticket.created, layout.timezone)">
+                                ${layout.format_date(created, 'weekday_long')}, ${layout.format_date(created, 'datetime')}
+                            </div>
+                        </div>
+
                         <div class="field-display-block" tal:condition="ticket.reaction_time">
                             <div class="field-display-label" i18n:translate>Reaction Time</div>
                             <div class="field-display-data ticket-date">
