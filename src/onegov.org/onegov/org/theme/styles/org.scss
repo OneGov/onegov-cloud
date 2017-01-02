@@ -2297,9 +2297,11 @@ button {
     }
 }
 
-.date-range-selector-result {
-    margin-bottom: 1em;
+.date-range-selector-results {
+    margin-bottom: 1rem;
+}
 
+.date-range-selector-result {
     span:first-child {
         font-size: 1.6em;
         font-weight: bold;

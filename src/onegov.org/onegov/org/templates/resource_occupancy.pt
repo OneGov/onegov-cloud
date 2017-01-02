@@ -43,9 +43,15 @@
                 </div>
             </div>
             <div class="small-12 medium-4 columns">
-                <div class="date-range-selector-result">
-                    <span>${count}</span>
-                    <span i18n:translate>Reservations</span>
+                <div class="date-range-selector-results">
+                    <div class="date-range-selector-result">
+                        <span>${count}</span>
+                        <span i18n:translate>Reservations</span>
+                    </div>
+                    <div class="date-range-selector-result">
+                        <span>${'{:.0f}'.format(utilisation)}%</span>
+                        <span i18n:translate>Utilised</span>
+                    </div>
                 </div>
                 <metal:block tal:define="start start.isoformat(); end end.isoformat()" use-macro="layout.macros['date-range-selector']" />
             </div>

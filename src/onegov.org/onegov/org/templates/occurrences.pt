@@ -20,9 +20,11 @@
 
             <div class="large-4 medium-4 columns">
 
-                <div class="date-range-selector-result">
-                    <span>${number_of_occurrences}</span>
-                    <span i18n:translate="">Events</span>
+                <div class="date-range-selector-results">
+                    <div class="date-range-selector-result">
+                        <span>${number_of_occurrences}</span>
+                        <span i18n:translate="">Events</span>
+                    </div>
                 </div>
 
                 <div class="occurrences-filter-tags">

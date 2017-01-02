@@ -300,6 +300,10 @@ def view_occupancy(self, request):
     layout.breadcrumbs.append(Link(_("Occupancy"), '#'))
     layout.editbar_links = None
 
+    utilisation = 100 - self.scheduler.queries.availability_by_range(
+        start, end, (self.id, )
+    )
+
     return {
         'layout': layout,
         'title': _("Occupancy"),
@@ -308,6 +312,7 @@ def view_occupancy(self, request):
         'start': sedate.to_timezone(start, self.timezone).date(),
         'end': sedate.to_timezone(end, self.timezone).date(),
         'count': count,
+        'utilisation': utilisation
     }
 
 

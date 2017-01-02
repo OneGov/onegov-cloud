@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Show utilisation on resource occupancy view.
+  [href]
+
 - On tablets, show the reservation selection next to the calendar.
   [href]
 
