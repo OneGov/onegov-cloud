@@ -8,7 +8,7 @@
                 <tr>
                     <th colspan="6">
                         <div class="row ticket-filters">
-                            <div class="columns small-12 medium-8">
+                            <div class="columns small-12 medium-6">
                                 <dl class="sub-nav">
                                     <dt class="show-for-sr" i18n:translate>State:</dt>
                                     <tal:block repeat="link filters">
@@ -18,17 +18,34 @@
                                     </tal:block>
                                 </dl>
                             </div>
-                            <div class="columns small-12 medium-4">
-                                <button href="#" data-dropdown="handlers" aria-controls="handlers" aria-expanded="false" class="${has_handler_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'}">
-                                    <tal:block repeat="link handlers">
-                                        <tal:block condition="link.active">
-                                            <span i18n:translate class="show-for-sr">Kind:</span> <span class="${' '.join(link.classes)}">${link.text}</span>
-                                        </tal:block>
-                                    </tal:block>
-                                </button>
-                                <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
-                                    <li tal:repeat="link handlers"><tal:block replace="structure link(request)"></tal:block></li>
-                                </ul>
+                            <div class="columns small-12 medium-6">
+                                <span>
+                                    <button href="#" data-dropdown="owners" aria-controls="owners" aria-expanded="false" class="${has_owner_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-owner">
+                                        <span i18n:translate class="show-for-sr">Owner:</span>
+                                        <span>${owner.text}</span>
+                                    </button>
+                                    <ul id="owners" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
+                                        <li tal:repeat="link owners">
+                                            <a href="${link.url}" class="${not repeat.link.start and 'ticket-group-filter' or 'ALL-link'}">
+                                                <tal:block condition="link.model|nothing">
+                                                    <metal:identicon use-macro="layout.macros.identicon" tal:define="initials link.model.initials; username link.model.username" />
+                                                </tal:block>
+
+                                                ${link.text}
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </span>
+
+                                <span>
+                                    <button href="#" data-dropdown="handlers" aria-controls="handlers" aria-expanded="false" class="${has_handler_filter and 'tiny primary radius button dropdown' or 'tiny secondary radius button dropdown'} selected-handler">
+                                        <span i18n:translate class="show-for-sr">Kind:</span> 
+                                        <span class="${' '.join(handler.classes)}">${handler.text}</span>
+                                    </button>
+                                    <ul id="handlers" data-dropdown-content class="f-dropdown disable-scroll" aria-hidden="true">
+                                        <li tal:repeat="link handlers"><tal:block replace="structure link(request)"></tal:block></li>
+                                    </ul>
+                                </span>
                             </div>
                         </div>
                     </th>
@@ -64,9 +81,7 @@
                             </tal:block>
                         </td>
                         <td class="ticket-user" tal:condition="ticket.state != 'open'">
-                            <div class="user-initials-small" title="${ticket.user.title}" style="background-color: ${layout.get_user_color(ticket.user.username)}">
-                                ${ticket.user.initials}
-                            </div>
+                            <metal:identicon use-macro="layout.macros.identicon" tal:define="initials ticket.user.initials; username ticket.user.username" />
                         </td>
                     </tr>
                 </tal:block>

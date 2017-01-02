@@ -8,7 +8,7 @@ from onegov.ticket import handlers as ticket_handlers
 from onegov.ticket.errors import InvalidStateChange
 from onegov.org import _, OrgApp
 from onegov.org.mail import send_html_mail
-from onegov.user import UserCollection
+from onegov.user import User, UserCollection
 
 
 @OrgApp.html(model=Ticket, template='ticket.pt', permission=Private)
@@ -174,7 +174,7 @@ def view_tickets(self, request):
             handlers.append((key, request.translate(handler.handler_title)))
 
         handlers.sort(key=lambda item: item[1])
-        handlers.insert(0, ('ALL', _("All")))
+        handlers.insert(0, ('ALL', _("All Tickets")))
 
         for id, text in handlers:
             groups = id != 'ALL' and tuple(get_groups(id))
@@ -190,6 +190,26 @@ def view_tickets(self, request):
 
             if parent:
                 yield from groups
+
+    def get_owners():
+
+        users = UserCollection(request.app.session())
+        users = users.by_roles('admin', 'editor')
+        users = users.order_by(User.title)
+
+        yield Link(
+            text=_("All Users"),
+            url=request.link(self.for_owner('*')),
+            active=self.owner == '*'
+        )
+
+        for user in users:
+            yield Link(
+                text=user.title,
+                url=request.link(self.for_owner(user.id)),
+                active=self.owner == user.id.hex,
+                model=user
+            )
 
     def get_groups(handler):
         base = self.for_handler(handler)
@@ -213,13 +233,24 @@ def view_tickets(self, request):
     else:
         raise NotImplementedError
 
+    handlers = tuple(get_handlers())
+    owners = tuple(get_owners())
+    filters = tuple(get_filters())
+
+    handler = next((h for h in handlers if h.active), None)
+    owner = next((o for o in owners if o.active), None)
+
     return {
         'title': _("Tickets"),
         'layout': TicketsLayout(self, request),
         'tickets': self.batch,
-        'filters': tuple(get_filters()),
-        'handlers': tuple(get_handlers()),
+        'filters': filters,
+        'handlers': handlers,
+        'owners': owners,
         'tickets_title': tickets_title,
         'tickets_state': self.state,
-        'has_handler_filter': self.handler != 'ALL'
+        'has_handler_filter': self.handler != 'ALL',
+        'has_owner_filter': self.owner != '*',
+        'handler': handler,
+        'owner': owner
     }

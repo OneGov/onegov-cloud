@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-02 14:30+0100\n"
+"POT-Creation-Date: 2017-01-02 16:41+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1448,6 +1448,9 @@ msgstr ""
 msgid "State:"
 msgstr "Status:"
 
+msgid "Owner:"
+msgstr ""
+
 msgid "Kind:"
 msgstr "Art:"
 
@@ -1796,11 +1799,14 @@ msgstr "Ihr Anliegen wurde abgeschlossen"
 msgid "All"
 msgstr "Alle"
 
+msgid "All Tickets"
+msgstr "Alle Tickets"
+
 msgid "Closed Tickets"
 msgstr "Abgeschlossene Tickets"
 
-msgid "All Tickets"
-msgstr "Alle Tickets"
+msgid "All Users"
+msgstr "Alle Benutzer"
 
 msgid "User Management"
 msgstr "Benutzerverwaltung"

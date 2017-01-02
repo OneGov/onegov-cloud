@@ -632,3 +632,12 @@
         <tal:block case="'member'" i18n:translate>Members</tal:block>
     </tal:block>
 </metal:role_plural>
+
+
+<metal:identicon define-macro="identicon" i18n:domain="onegov.org">
+    <tal:block define="identicon_size size|'small'">
+        <span class="user-initials-${identicon_size}" style="background-color: ${layout.get_user_color(username)}">
+            ${initials}
+        </span>
+    </tal:block>
+</metal:identicon>

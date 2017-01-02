@@ -16,7 +16,7 @@ class HiddenElementMixin(object):
         ``model`` to ``__init__`` to have this work automatically.
 
         """
-        if self.model and self.model.is_hidden_from_public:
+        if getattr(self.model, 'is_hidden_from_public', None):
             return True
         else:
             return False

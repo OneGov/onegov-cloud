@@ -1877,6 +1877,18 @@ button {
     }
 }
 
+.selected-owner {
+    margin-left: 1rem !important;
+
+    &.secondary {
+        ::before {
+            @include icon($all-handler-icon);
+            display: inline-block;
+            margin-right: 1ex;
+        }
+    }
+}
+
 /*
     Sub navigation
 */
@@ -2682,6 +2694,8 @@ ul.search-results {
 .user-initials-large {
     background-color: $gainsboro;
     border-radius: 50px;
+    color: $body-font-color;
+    display: inline-block;
     text-align: center;
 }
 

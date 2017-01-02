@@ -18,9 +18,7 @@
         <div class="field-display">
             <div class="field-display-label" i18n:translate>Identicon</div>
             <div class="field-display-data">
-                <div class="user-initials-large" style="background-color: ${layout.get_user_color(username)}">
-                    ${initials}
-                </div>
+                <metal:identicon use-macro="layout.macros.identicon" tal:define="size 'large'" />
             </div>
         </div>
         <div class="field-display">

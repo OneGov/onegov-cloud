@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter tickets by owners.
+  [href]
+
 - Show utilisation on resource occupancy view.
   [href]
 
