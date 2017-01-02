@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- On tablets, show the reservation selection next to the calendar.
+  [href]
+
 - Show the exact creation date on each ticket.
   [href]
 

@@ -2834,7 +2834,7 @@ ul.search-results {
     Reservation selection responsive
 */
 
-@media #{$large-up} {
+@media #{$medium-up} {
     .reservation-selection {
         float: right;
         width: 20%;
@@ -2849,14 +2849,15 @@ ul.search-results {
 
 @media #{$medium-only} {
     .reservation-selection {
-        float: none;
-        padding: 0;
-        width: 100%;
+        width: 25%;
+
+        .button {
+            padding: 1rem 1.5rem;
+        }
     }
 
     .fc-view-container {
-        display: block;
-        width: 100%;
+        width: 75%;
     }
 }
 
