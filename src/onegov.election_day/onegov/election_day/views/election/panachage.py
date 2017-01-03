@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from onegov.ballot import Election
 from onegov.core.security import Public
+from onegov.election_day import _
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import DefaultLayout, ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
@@ -23,7 +24,7 @@ def view_election_panachage_data(self, request):
         return {}
 
     nodes = OrderedDict()
-    nodes['left.999'] = {'name': '-'}
+    nodes['left.999'] = {'name': request.translate(_("Blank list"))}
     for list_ in self.lists:
         nodes['left.{}'.format(list_.list_id)] = {'name': list_.name}
     for list_ in self.lists:
