@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.0 (2017-01-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to filter the tickets by owner.
   [href]
 
