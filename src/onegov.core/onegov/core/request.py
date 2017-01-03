@@ -201,7 +201,8 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
 
         force = self.app.always_compile_theme or (
             self.app.allow_shift_f5_compile and
-            self.headers.get('cache-control') == 'no-cache')
+            self.headers.get('cache-control') == 'no-cache' and
+            self.headers.get('x-requested-with') != 'XMLHttpRequest')
 
         filename = self.app.modules.theme.compile(
             self.app.themestorage, theme, self.app.theme_options,
