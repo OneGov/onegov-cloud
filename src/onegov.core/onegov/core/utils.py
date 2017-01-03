@@ -22,9 +22,6 @@ from unidecode import unidecode
 from uuid import UUID
 from webob import static
 
-# XXX keep around for a while for backwards compatibility
-from onegov.core.html import sanitize_html  # noqa
-
 
 # http://stackoverflow.com/a/13500078
 _unwanted_url_chars = re.compile(r'[\.\(\)\\/\s<>\[\]{},:;?!@&=+$#@%|\*"\'`]+')
