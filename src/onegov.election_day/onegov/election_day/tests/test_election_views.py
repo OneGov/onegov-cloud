@@ -292,7 +292,7 @@ def test_view_election_panachage(election_day_app_gr):
     data = client.get('/election/proporz-election/panachage-data').json
 
     nodes = [node['name'] for node in data['nodes']]
-    assert '-' in nodes
+    assert 'Blankoliste' in nodes
     assert 'FDP' in nodes
     assert 'CVP' in nodes
 
