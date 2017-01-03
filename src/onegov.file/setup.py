@@ -34,6 +34,7 @@ setup(
     install_requires=[
         'onegov.core>=0.4.0',
         'filedepot',
+        'lxml',
         'more.transaction',
         'pillow',
         'python-magic',
