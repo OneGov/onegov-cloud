@@ -1,7 +1,6 @@
-from onegov.core.html import sanitize_html
 from onegov.form import Form
 from onegov.org import _
-from onegov.org.utils import annotate_html
+from onegov.org.forms.fields import HtmlField
 from wtforms import StringField, TextAreaField, validators
 from wtforms.fields.html5 import URLField
 
@@ -26,12 +25,11 @@ class LinkForm(PageBaseForm):
 
 class PageForm(PageBaseForm):
     """ Defines the form for pages with the 'page' trait. """
+
     lead = TextAreaField(
         label=_("Lead"),
         description=_("Describes what this page is about"),
         render_kw={'rows': 4})
 
-    text = TextAreaField(
-        label=_("Text"),
-        render_kw={'class_': 'editor'},
-        filters=[sanitize_html, annotate_html])
+    text = HtmlField(
+        label=_("Text"))

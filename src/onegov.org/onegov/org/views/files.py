@@ -53,11 +53,21 @@ def view_get_image_collection(self, request):
 
     layout = DefaultLayout(self, request)
 
+    default = ('256', '256')
+
+    def get_thumbnail_size(image):
+        if 'thumbnail_small' in image.reference:
+            return image.reference.thumbnail_small['size']
+        else:
+            return default
+
     images = view_get_image_collection_json(
         self, request, produce_image=lambda image: Img(
             src=request.class_link(File, {'id': image.id}, 'thumbnail'),
             url=request.class_link(File, {'id': image.id}),
             alt=(image.note or '').strip(),
+            width=get_thumbnail_size(image)[0],
+            height=get_thumbnail_size(image)[1],
             extra=layout.csrf_protected_url(request.link(image, 'note'))
         )
     )

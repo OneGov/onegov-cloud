@@ -13,20 +13,20 @@
         <div tal:repeat="image imageset.files" tal:condition="imageset.view == 'full'" class="page-text full-imageset">
             <!--! the first three images are loaded conventionally, the rest are loaded lazily -->
             <p class="has-img" tal:condition="repeat.image.number <= 3">
-                <img src="${request.link(image)}" alt="${image.note}" />
+                <img src="${request.link(image)}" alt="${image.note}" width="${image.reference.size[0]}" height="${image.reference.size[1]}" />
             </p>
             <p class="has-img" tal:condition="repeat.image.number > 3">
-                <img data-src="${request.link(image)}" class="lazyload" alt="${image.note}" />
+                <img data-src="${request.link(image)}" class="lazyload" alt="${image.note}" width="${image.reference.size[0]}" height="${image.reference.size[1]}" />
             </p>
         </div>
 
         <div tal:condition="imageset.view == 'grid'" class="page-text grid-imageset">
             <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
                 <li tal:repeat="image imageset.files" class="image-box">
-                    <a href="${request.link(image)}">
+                    <a href="${request.link(image)}" tal:define="width image.reference.thumbnail_small.size[0]|image.reference.size[0]; height image.reference.thumbnail_small.size[1]|image.reference.size[1]">
                         <!--! the first eight images are loaded conventionally, the rest are loaded lazily -->
-                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" tal:condition="repeat.image.number <= 8" />
-                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" class="lazyload" tal:condition="repeat.image.number > 8" />
+                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" tal:condition="repeat.image.number <= 8" />
+                        <img src="${request.link(image, 'thumbnail')}" alt="${image.note}" width="${width}" height="${height}" class="lazyload" tal:condition="repeat.image.number > 8" />
                     </a>
                 </li>
             </ul>

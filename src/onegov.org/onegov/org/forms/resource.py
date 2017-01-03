@@ -1,10 +1,9 @@
-from onegov.core.html import sanitize_html
 from onegov.form import Form, merge_forms
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
+from onegov.org.forms.fields import HtmlField
 from onegov.org.forms.generic import DateRangeForm, ExportForm
 from onegov.org.forms.reservation import RESERVED_FIELDS
-from onegov.org.utils import annotate_html
 from wtforms import StringField, TextAreaField, validators
 
 
@@ -22,10 +21,8 @@ class ResourceForm(Form):
         description=_("Used to group the resource in the overview")
     )
 
-    text = TextAreaField(
-        label=_("Text"),
-        render_kw={'class_': 'editor'},
-        filters=[sanitize_html, annotate_html])
+    text = HtmlField(
+        label=_("Text"))
 
     definition = TextAreaField(
         label=_("Extra Fields Definition"),

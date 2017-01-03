@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Make sure all image elements have the width and height set.
+  [href]
+
 - Adds the ability to filter tickets by owners.
   [href]
 

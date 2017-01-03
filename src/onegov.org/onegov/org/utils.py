@@ -1,4 +1,5 @@
 import colorsys
+import re
 import sedate
 
 from datetime import datetime, time
@@ -7,6 +8,7 @@ from isodate import parse_date, parse_datetime
 from itertools import groupby
 from libres.modules import errors as libres_errors
 from lxml.html import fragments_fromstring, tostring
+from onegov.file import File, FileCollection
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link
 from onegov.ticket import TicketCollection
@@ -75,7 +77,7 @@ def add_class_to_node(node, classname):
         node.attrib['class'] = classname
 
 
-def annotate_html(html):
+def annotate_html(html, request=None):
     """ Takes the given html and annotates the following elements for some
     advanced styling:
 
@@ -92,6 +94,7 @@ def annotate_html(html):
         return html
 
     fragments = fragments_fromstring(html)
+    images = []
 
     # we perform a root xpath lookup, which will result in all paragraphs
     # being looked at - so we don't need to loop over all elements (yah, it's
@@ -128,8 +131,36 @@ def annotate_html(html):
 
         for img in element.xpath('//img'):
             img.set('class', 'lazyload-alt')
+            images.append(img)
+
+    if request:
+        set_image_sizes(images, request)
 
     return ''.join(tostring(e).decode('utf-8') for e in fragments)
+
+
+def set_image_sizes(images, request):
+    internal_src = re.compile(r'.*/storage/([a-z0-9]+)')
+
+    def get_image_id(img):
+        match = internal_src.match(img.get('src', ''))
+
+        if match and match.groups():
+            return match.group(1)
+
+    images = {get_image_id(img): img for img in images}
+
+    if images:
+        q = FileCollection(request.app.session(), type='image').query()
+        q = q.with_entities(File.id, File.reference)
+        q = q.filter(File.id.in_(images))
+
+        sizes = {i.id: i.reference for i in q}
+
+        for id, image in images.items():
+            if id in sizes:
+                image.set('width', sizes[id].size[0])
+                image.set('height', sizes[id].size[1])
 
 
 def parse_fullcalendar_request(request, timezone):

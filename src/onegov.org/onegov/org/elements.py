@@ -183,9 +183,10 @@ class ConfirmLink(DeleteLink):
 class Img(object):
     """ Represents an img element. """
 
-    __slots__ = ['src', 'alt', 'title', 'url', 'extra']
+    __slots__ = ['src', 'alt', 'title', 'url', 'extra', 'width', 'height']
 
-    def __init__(self, src, alt=None, title=None, url=None, extra=None):
+    def __init__(self, src, alt=None, title=None, url=None, extra=None,
+                 width=None, height=None):
         #: The src of the image
         self.src = src
 
@@ -197,6 +198,12 @@ class Img(object):
 
         #: The target of this image
         self.url = url
+
+        #: The width of the image in pixel
+        self.width = width
+
+        #: The height of the image in pixel
+        self.height = height
 
         #: Extra parameters
         self.extra = extra

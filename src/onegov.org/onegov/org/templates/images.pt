@@ -25,8 +25,8 @@
                     <ul class="small-block-grid-1 medium-block-grid-2 large-block-grid-4">
                         <li tal:repeat="image group['images']" id="image-${repeat.image.index}" class="image-box">
                             <a href="${image.url}" tal:condition="image" class="editable-alt" data-note-update-url="${image.extra}">
-                                <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" />
-                                <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" />
+                                <img tal:condition="image.alt" data-src="${image.src}" class="lazyload static-alt" alt="${image.alt}" width="${image.width}" height="${image.height}" />
+                                <img tal:condition="not:image.alt" data-src="${image.src}" class="lazyload missing-alt static-alt" alt="Click to add a description" i18n:attributes="alt" width="${image.width}" height="${image.height}"/>
                             </a>
                             <a class="delete confirm"
                                ic-delete-from="${image.url}?csrf-token=${layout.csrf_token}"

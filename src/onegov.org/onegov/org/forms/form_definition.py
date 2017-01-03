@@ -1,8 +1,7 @@
-from onegov.core.html import sanitize_html
 from onegov.form import Form
 from onegov.form.validators import ValidFormDefinition
 from onegov.org import _
-from onegov.org.utils import annotate_html
+from onegov.org.forms.fields import HtmlField
 from wtforms import StringField, TextAreaField, validators
 
 
@@ -16,10 +15,8 @@ class FormDefinitionBaseForm(Form):
         description=_("Describes what this form is about"),
         render_kw={'rows': 4})
 
-    text = TextAreaField(
-        label=_("Text"),
-        render_kw={'class_': 'editor'},
-        filters=[sanitize_html, annotate_html])
+    text = HtmlField(
+        label=_("Text"))
 
 
 class CustomDefinitionForm(FormDefinitionBaseForm):
