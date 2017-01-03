@@ -83,12 +83,13 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
             if entity_id not in municipalities:
                 if line.gemeinde.strip() == 'Auslandschweizer':
                     # https://github.com/OneGov/onegov.election_day/issues/40
-                    continue
-
-                line_errors.append(
-                    _("municipality id ${id} is unknown", mapping={
-                        'id': entity_id
-                    }))
+                    entity_id = 0
+                    added_entity_ids.add(entity_id)
+                else:
+                    line_errors.append(
+                        _("municipality id ${id} is unknown", mapping={
+                            'id': entity_id
+                        }))
             else:
                 added_entity_ids.add(entity_id)
 
