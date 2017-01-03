@@ -235,15 +235,10 @@ def test_upload_election_form():
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    ff = lambda x: 'file_format/{}'.format(x)
+    def ff(x):
+        return 'file_format/{}'.format(x)
 
     form = UploadElectionForm()
-    assert form.connections.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.statistics.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
-    assert form.majority.render_kw['data-depends-on'] == ff('!internal')
-
     form.apply_model(Election(type='majorz'))
     assert form.connections.render_kw['data-depends-on'] == ff('none')
     assert form.statistics.render_kw['data-depends-on'] == ff('none')

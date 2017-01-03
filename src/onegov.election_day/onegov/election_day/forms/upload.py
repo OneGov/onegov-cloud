@@ -101,17 +101,20 @@ class UploadElectionForm(Form):
     )
 
     def apply_model(self, model):
-        ff = lambda x: 'file_format/{}'.format(x)
         if model.type == 'majorz':
-            self.connections.render_kw['data-depends-on'] = ff('none')
-            self.statistics.render_kw['data-depends-on'] = ff('none')
-            self.parties.render_kw['data-depends-on'] = ff('none')
-            self.majority.render_kw['data-depends-on'] = ff('!internal')
+            self.connections.render_kw['data-depends-on'] = 'file_format/none'
+            self.statistics.render_kw['data-depends-on'] = 'file_format/none'
+            self.parties.render_kw['data-depends-on'] = 'file_format/none'
+            self.majority.render_kw['data-depends-on'] = (
+                'file_format/!internal'
+            )
         else:
-            self.connections.render_kw['data-depends-on'] = ff('wabsti')
-            self.statistics.render_kw['data-depends-on'] = ff('wabsti')
+            self.connections.render_kw['data-depends-on'] = (
+                'file_format/wabsti'
+            )
+            self.statistics.render_kw['data-depends-on'] = 'file_format/wabsti'
             self.parties.render_kw.pop('data-depends-on', None)
-            self.majority.render_kw['data-depends-on'] = ff('none')
+            self.majority.render_kw['data-depends-on'] = 'file_format/none'
 
 
 class UploadVoteForm(Form):

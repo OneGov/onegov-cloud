@@ -185,15 +185,9 @@ def test_principal_districts():
     )
 
     assert principal.districts == {
-        2009: {1059: {'name': 'Kriens'}},
-        2010: {1059: {'name': 'Kriens'}},
-        2011: {1059: {'name': 'Kriens'}},
-        2012: {1059: {'name': 'Kriens'}},
-        2013: {1059: {'name': 'Kriens'}},
-        2014: {1059: {'name': 'Kriens'}},
-        2015: {1059: {'name': 'Kriens'}},
-        2016: {1059: {'name': 'Kriens'}},
-        2017: {1059: {'name': 'Kriens'}},
+        year: {1059: {'name': 'Kriens'}} for year in range(
+            2009, date.today().year + 2
+        )
     }
 
     principal = Principal(
