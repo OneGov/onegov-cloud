@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.2 (2017-01-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes cropped labels in panachage charts.
   [msom]
