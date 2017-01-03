@@ -5,7 +5,7 @@ from depot.io import utils
 from depot.io.interfaces import FileStorage
 from depot.io.utils import INMEMORY_FILESIZE
 from onegov.core.html import sanitize_svg
-from onegov.file.utils import IMAGE_MIME_TYPES
+from onegov.file.utils import IMAGE_MIME_TYPES, get_svg_size, get_image_size
 from PIL import Image
 from tempfile import SpooledTemporaryFile
 from io import BytesIO
@@ -16,7 +16,19 @@ IMAGE_QUALITY = 90
 CHECKSUM_FUNCTION = hashlib.md5
 
 
-def limit_image_size(file, content, content_type):
+def get_svg_size_or_default(content):
+    width, height = get_svg_size(content)
+
+    width = width if width is not None else '{}px'.format(IMAGE_MAX_SIZE)
+    height = height if height is not None else '{}px'.format(IMAGE_MAX_SIZE)
+
+    return width, height
+
+
+def limit_and_store_image_size(file, content, content_type):
+
+    if content_type == 'image/svg+xml':
+        file.size = get_svg_size_or_default(content)
 
     if content_type not in IMAGE_MIME_TYPES:
         return None
@@ -27,6 +39,9 @@ def limit_image_size(file, content, content_type):
         image.thumbnail((IMAGE_MAX_SIZE, IMAGE_MAX_SIZE), Image.LANCZOS)
         content = SpooledTemporaryFile(INMEMORY_FILESIZE)
         image.save(content, image.format, quality=IMAGE_QUALITY)
+
+    # the file size is stored in pixel as string (for browser usage)
+    file.size = get_image_size(image)
 
     return content
 
@@ -54,7 +69,11 @@ def sanitize_svg_images(file, content, content_type):
 
 class ProcessedUploadedFile(UploadedFile):
 
-    processors = (store_checksum, limit_image_size, sanitize_svg_images)
+    processors = (
+        store_checksum,
+        limit_and_store_image_size,
+        sanitize_svg_images
+    )
 
     def process_content(self, content, filename=None, content_type=None):
         filename, content_type = FileStorage.fileinfo(content)[1:]

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Record the image dimensions when storing an image.
+  [href]
+
 0.2.3 (2016-09-28)
 ~~~~~~~~~~~~~~~~~~~
 

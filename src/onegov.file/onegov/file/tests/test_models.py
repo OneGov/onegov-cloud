@@ -127,6 +127,12 @@ def test_max_image_size(session):
     assert Image.open(limited.reference.file).size == (1024, 1023)
     assert Image.open(unchanged.reference.file).size == (1024, 1024)
 
+    assert unchanged.reference.size == ['1024px', '1024px']
+    assert limited.reference.size == ['1024px', '1023px']
+
+    assert unchanged.reference.thumbnail_small['size'] == ['256px', '256px']
+    assert limited.reference.thumbnail_small['size'] == ['256px', '255px']
+
 
 def test_checksum(session):
     session.add(File(name='readme.txt', reference=b'README'))
@@ -140,3 +146,41 @@ def test_checksum(session):
 
     readme = session.query(File).one()
     assert readme.checksum == 'c122d482328c0e832610dd2c8d65db8b'
+
+
+def test_determine_svg_size(session, temporary_path):
+    with (temporary_path / 'logo.svg').open('wb') as f:
+        f.write((
+            b'<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
+            b'<svg width="281px" height="99px" '
+            b'version="1.1" xmlns="http://www.w3.org/2000/svg" '
+            b'xmlns:xlink="http://www.w3.org/1999/xlink">\n'
+            b'</svg>'
+        ))
+
+    with (temporary_path / 'logo.svg').open('rb') as f:
+        session.add(File(name='logo.svg', reference=f))
+
+    transaction.commit()
+
+    logo = session.query(File).order_by(File.name).one()
+    assert logo.reference.size == ['281px', '99px']
+
+
+def test_determine_unknown_svg_size(session, temporary_path):
+    with (temporary_path / 'logo.svg').open('wb') as f:
+        f.write((
+            b'<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n'
+            b'<svg version="1.1" xmlns="http://www.w3.org/2000/svg" '
+            b'xmlns:xlink="http://www.w3.org/1999/xlink">\n'
+            b'</svg>'
+        ))
+
+    with (temporary_path / 'logo.svg').open('rb') as f:
+        session.add(File(name='logo.svg', reference=f))
+
+    transaction.commit()
+
+    # use the default max size as the size if we can't determine one
+    logo = session.query(File).order_by(File.name).one()
+    assert logo.reference.size == ['1024px', '1024px']

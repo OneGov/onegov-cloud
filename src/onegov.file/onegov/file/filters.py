@@ -1,6 +1,6 @@
 from depot.fields.interfaces import FileFilter
 from depot.io.utils import file_from_content
-from onegov.file.utils import IMAGE_MIME_TYPES
+from onegov.file.utils import IMAGE_MIME_TYPES, get_image_size
 from PIL import Image
 from io import BytesIO
 
@@ -77,5 +77,6 @@ class WithThumbnailFilter(FileFilter):
 
         uploaded_file[name] = {
             'id': id,
-            'path': path
+            'path': path,
+            'size': get_image_size(thumbnail)
         }

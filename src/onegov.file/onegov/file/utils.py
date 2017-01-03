@@ -4,6 +4,7 @@ import os.path
 
 from depot.io.utils import FileIntent
 from io import IOBase, BytesIO
+from lxml import etree
 from PIL import Image
 
 
@@ -84,6 +85,18 @@ def get_supported_image_mime_types():
         supported_types.add(mime)
 
     return supported_types
+
+
+def get_svg_size(svg):
+    # note, the svg size may not be in pixel, it can include the same units
+    # the browser uses for styling, so we need to pass this information down
+    # to the browser, instead of using it internally
+    root = etree.parse(svg).getroot()
+    return root.get('width'), root.get('height')
+
+
+def get_image_size(image):
+    return tuple('{}px'.format(d) for d in image.size)
 
 
 # we don't support *all* the image types PIL supports
