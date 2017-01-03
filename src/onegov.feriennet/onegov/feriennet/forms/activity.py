@@ -1,9 +1,8 @@
-from onegov.core.html import sanitize_html
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import _
 from onegov.form import Form
 from onegov.form.fields import OrderedMultiCheckboxField
-from onegov.org.utils import annotate_html
+from onegov.org.forms.fields import HtmlField
 from onegov.user import User, UserCollection
 from wtforms import TextField, TextAreaField, SelectField
 from wtforms.validators import InputRequired
@@ -46,10 +45,8 @@ class VacationActivityForm(Form):
         validators=[InputRequired()],
         render_kw={'rows': 4})
 
-    text = TextAreaField(
-        label=_("Text"),
-        render_kw={'class_': 'editor'},
-        filters=[sanitize_html, annotate_html])
+    text = HtmlField(
+        label=_("Text"))
 
     tags = OrderedMultiCheckboxField(
         label=_("Tags"),
