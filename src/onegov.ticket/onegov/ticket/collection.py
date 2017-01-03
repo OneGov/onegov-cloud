@@ -6,18 +6,20 @@ from onegov.ticket import handlers as global_handlers
 from onegov.ticket.model import Ticket
 from sqlalchemy import desc, distinct, func
 from sqlalchemy.orm import joinedload, undefer
+from uuid import UUID
 
 
 class TicketCollectionPagination(Pagination):
 
     def __init__(self, session, page=0, state='open', handler='ALL',
-                 group=None, extra_parameters=None):
+                 group=None, owner='*', extra_parameters=None):
         self.session = session
         self.page = page
         self.state = state
         self.handler = handler
         self.handlers = global_handlers
         self.group = group
+        self.owner = owner
 
         if self.handler != 'ALL':
             self.extra_parameters = extra_parameters or {}
@@ -39,6 +41,9 @@ class TicketCollectionPagination(Pagination):
         if self.group != None:
             query = query.filter(Ticket.group == self.group)
 
+        if self.owner != '*':
+            query = query.filter(Ticket.user_id == self.owner)
+
         if self.handler != 'ALL':
             query = query.filter(Ticket.handler_code == self.handler)
 
@@ -57,7 +62,7 @@ class TicketCollectionPagination(Pagination):
     def page_by_index(self, index):
         return self.__class__(
             self.session, index, self.state, self.handler, self.group,
-            self.extra_parameters
+            self.owner, self.extra_parameters
         )
 
     def available_groups(self, handler='*'):
@@ -71,19 +76,28 @@ class TicketCollectionPagination(Pagination):
 
     def for_state(self, state):
         return self.__class__(
-            self.session, 0, state, self.handler, self.group,
+            self.session, 0, state, self.handler, self.group, self.owner,
             self.extra_parameters
         )
 
     def for_handler(self, handler):
         return self.__class__(
-            self.session, 0, self.state, handler, self.group,
+            self.session, 0, self.state, handler, self.group, self.owner,
             self.extra_parameters
         )
 
     def for_group(self, group):
         return self.__class__(
-            self.session, 0, self.state, self.handler, group,
+            self.session, 0, self.state, self.handler, group, self.owner,
+            self.extra_parameters
+        )
+
+    def for_owner(self, owner):
+        if isinstance(owner, UUID):
+            owner = owner.hex
+
+        return self.__class__(
+            self.session, 0, self.state, self.handler, self.group, owner,
             self.extra_parameters
         )
 
