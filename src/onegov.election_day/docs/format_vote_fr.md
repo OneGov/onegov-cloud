@@ -20,8 +20,8 @@ There is generally one CSV/Excel file per referendum proposal. However, should t
 Each line contains the result of a single municipality, provided that this has been counted in full. The following columns are expected in the order listed here:
 
 - **Bezirk**: The district in which the municipality is located. If the municipality is not located in a district, this field can be left empty.
-- **BFS-Nummer**: The municipality number (BFS number) at the time of the vote.
-- **Gemeinde**: The name of the municipality.
+- **ID**: The municipality number (BFS number) at the time of the vote. A value of `0` can be used for expats.
+- **Name**: The name of the municipality.
 - **Ja Stimmen**: The number of “yes” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
 - **Nein Stimmen**: The number of “no” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
 - **Stimmberechtigte**: The number of persons eligible to vote. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
@@ -46,8 +46,8 @@ The format of the "Wabsti Elections and Referenda (VRSG)" election program consi
 Les colonnes suivantes seront évaluées et devraient exister :
 
 - **Vorlage-Nr.**: A sequential number for each proposal/referendum. Must be specified at the upload dialog.
-- **Gemeinde**: The name of the municipality
-- **BfS-Nr.**: The municipality number (BFS number).
+- **Name**: The name of the municipality
+- **BfS-Nr.**: The municipality number (BFS number). If `name = Auslandschweizer`, any value can be used for exapts.
 - **Stimmberechtigte**: The number of persons eligible to vote.
 - **leere SZ**: The number of blank ballot papers.
 - **ungültige SZ**: The number of spoilt ballot papers.
@@ -80,7 +80,7 @@ Les colonnes suivantes seront évaluées et devraient exister :
 
 - **type** `proposal`, `counter-proposal` or `tie-breaker`.
 - **group** Where the result comes from. This can be the region and municipality (separated by a forward slash), the name of the city and name of the district (likewise separated by a forward slash) or a simple municipality name. This all depends on the respective canton.
-- **municipality_id** The municipality number (BFS number).
+- **entity_id** The municipality number (BFS number). A value of `0` can be used for expats.
 - **counted** `true` if the municipality has been counted.
 - **yeas** The number of “yes” votes.
 - **nays** The number of “no” votes.

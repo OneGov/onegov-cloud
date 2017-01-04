@@ -4,6 +4,9 @@ Changelog
 - Harmonize the usage of the groups in the various formats.
   [msom]
 
+- Allow to list expats as separate entity (but not using SESAM format).
+  [msom]
+
 1.4.2 (2017-01-03)
 ~~~~~~~~~~~~~~~~~~~
 

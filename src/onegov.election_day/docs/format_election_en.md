@@ -106,7 +106,7 @@ The file format needs two individual charts: the data export and the list of ele
 In the data export, there is a row for each municipality, candidates are arranged in columns. The following columns will be evaluated and should exist:
 
 - **AnzMandate**
-- **BFS**
+- **BFS** (The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.)
 - **EinheitBez**
 - **StimmBer**
 - **StimmAbgegeben**
@@ -154,7 +154,7 @@ The file format needs four individual charts: the data export of the results, th
 
 There is a line per candidate and municipality in the data export. The following columns will be evaluated and should exist:
 
-- **Einheit_BFS**
+- **Einheit_BFS** (The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.)
 - **Einheit_Name**
 - **Kand_Nachname**
 - **Kand_Vorname**
@@ -175,6 +175,7 @@ The results may contain panachage results by adding one column per list:
 The file with the statistics of the individual municipalities should contain the following columns:
 
 - **Einheit_BFS**
+- **Einheit_Name**
 - **StimBerTotal**
 - **WZEingegangen**
 - **WZLeer**
@@ -225,7 +226,7 @@ The following columns will be evaluated and should exist:
 - **election_absolute_majority**: Absolute majority of the election, only if Majorz election.
 - **election_counted_entities**: Number of counted municipalities. If `election_counted_entities = election_total_entities`, then the election is considered completely counted.
 - **election_total_entities**: Total number of municipalities. If no definite information about the status of the election is possible (because the election was imported by Wabsti), then this value is `0`.
-- **entity_id**: BFS number of the municipality.
+- **entity_id**: BFS number of the municipality. A value of `0` can be used for expats.
 - **entity_name**: The name of the municipality.
 - **entity_elegible_voters**: Number of persons entitled to vote in municipality.
 - **entity_received_ballots**: Number of submitted ballots in municipality.

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-04 08:52+0100\n"
+"POT-Creation-Date: 2017-01-04 09:24+0100\n"
 "PO-Revision-Date: 2016-12-14 11:30+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -115,13 +115,6 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 
 msgid "No data found"
 msgstr "Chattà naginas datas"
-
-msgid "Invalid municipality values"
-msgstr "Datas nunvalaivlas da vischnancas"
-
-#, python-format
-msgid "municipality id ${id} is unknown"
-msgstr "Il numer UST ${id} n'è betg enconuschent"
 
 msgid "Unknown candidate"
 msgstr "Candidat(a) nunenconuschent(a)"

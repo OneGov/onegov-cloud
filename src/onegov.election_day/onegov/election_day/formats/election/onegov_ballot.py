@@ -71,7 +71,7 @@ def parse_election_result(line, errors, entities):
     except ValueError:
         errors.append(_("Invalid entity values"))
     else:
-        if entity_id not in entities:
+        if entity_id and entity_id not in entities:
             errors.append(_(
                 "${name} is unknown",
                 mapping={'name': entity_id}

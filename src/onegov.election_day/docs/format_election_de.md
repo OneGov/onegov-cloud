@@ -106,7 +106,7 @@ Das Datenformat benötig zwei einzelne Tabellen: den Datenexport und die Liste d
 Im Datenexport gibt es für jede Gemeinde eine Zeile, Kandidaten sind in Spalten angeordnet. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
 - **AnzMandate**
-- **BFS**
+- **BFS** (Die BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.)
 - **EinheitBez**
 - **StimmBer**
 - **StimmAbgegeben**
@@ -154,7 +154,7 @@ Das Datenformat benötig vier einzelne Tabellen: den Datenexport der Resultate, 
 
 Im Datenexport gibt es eine Zeile pro Kandidat und Gemeinde. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-- **Einheit_BFS**
+- **Einheit_BFS** (Die BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.)
 - **Einheit_Name**
 - **Kand_Nachname**
 - **Kand_Vorname**
@@ -175,6 +175,7 @@ Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hi
 Die Datei mit den Statistiken zu den einzelnen Gemeinden sollte folgende Spalten enthalten:
 
 - **Einheit_BFS**
+- **Einheit_Name**
 - **StimBerTotal**
 - **WZEingegangen**
 - **WZLeer**
@@ -225,7 +226,7 @@ Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 - **election_absolute_majority**: Absolutes Mehr der Wahl, nur falls Majorzwahl.
 - **election_counted_entities**: Anzahl ausgezählter Gemeinden. Falls `election_counted_entities = election_total_entities` ist, gilt die Wahl als fertig ausgezählt.
 - **election_total_entities**: Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert `0`.
-- **entity_id**: BFS Nummer der Gemeinde.
+- **entity_id**: BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
 - **entity_name**: Der Name der Gemeinde.
 - **entity_elegible_voters**: Anzahl Stimmberechtigte der Gemeinde.
 - **entity_received_ballots**: Anzahl abgegebene Stimmzettel der Gemeinde.

@@ -54,7 +54,7 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
             continue
 
         if not float(line.stimmbet or 0):
-            skipped += skipped
+            skipped += 1
             continue
 
         line_errors = []
@@ -75,22 +75,21 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
         except ValueError:
             line_errors.append(_("Invalid id"))
         else:
+            if entity_id not in entities and group.lower() == \
+                    'auslandschweizer':
+                entity_id = 0
+
             if entity_id in added_entity_ids:
                 line_errors.append(
                     _("${name} was found twice", mapping={
                         'name': entity_id
                     }))
 
-            if entity_id not in entities:
-                if line.gemeinde.strip() == 'Auslandschweizer':
-                    # https://github.com/OneGov/onegov.election_day/issues/40
-                    entity_id = 0
-                    added_entity_ids.add(entity_id)
-                else:
-                    line_errors.append(
-                        _("${name} is unknown", mapping={
-                            'name': entity_id
-                        }))
+            if entity_id and entity_id not in entities:
+                line_errors.append(
+                    _("${name} is unknown", mapping={
+                        'name': entity_id
+                    }))
             else:
                 added_entity_ids.add(entity_id)
 

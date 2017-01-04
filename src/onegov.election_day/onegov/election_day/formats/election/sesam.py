@@ -15,7 +15,7 @@ from uuid import uuid4
 
 
 HEADERS_COMMON = [
-    # Municipality
+    # Entity
     'Anzahl Sitze',
     'Wahlkreis-Nr',
     'Wahlkreisbezeichnung',
@@ -33,7 +33,7 @@ HEADERS_COMMON = [
 ]
 
 HEADERS_MAJORZ = [
-    # Municipality
+    # Entity
     'Ungueltige Stimmen',
     # Candidate
     'Stimmen',
@@ -74,7 +74,7 @@ def parse_election(line, errors):
     return mandates, counted, total
 
 
-def parse_election_result(line, errors, municipalities):
+def parse_election_result(line, errors, entities):
     try:
         group = line.wahlkreisbezeichnung.strip()
         entity_id = int(line.wahlkreis_nr or 0)
@@ -92,12 +92,11 @@ def parse_election_result(line, errors, municipalities):
         except AttributeError:
             invalid_votes = 0  # proporz
     except ValueError:
-        errors.append(_("Invalid municipality values"))
+        errors.append(_("Invalid entity values"))
     else:
-        if entity_id not in municipalities:
+        if entity_id not in entities:
             errors.append(_(
-                "municipality id ${id} is unknown",
-                mapping={'id': entity_id}
+                _("${name} is unknown", mapping={'name': entity_id})
             ))
         else:
             return ElectionResult(
@@ -234,7 +233,7 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_file(municipalities, election, file, mimetype,
+def import_file(entities, election, file, mimetype,
                 parties_file=None, parties_mimetype=None):
     """ Tries to import the given file (sesam format).
 
@@ -267,7 +266,7 @@ def import_file(municipalities, election, file, mimetype,
     results = {}
     panachage = {'headers': parse_panachage_headers(csv)}
 
-    # This format has one candiate per municipality per line
+    # This format has one candiate per entity per line
     mandates = 0
     counted = 0
     total = 0
@@ -276,7 +275,7 @@ def import_file(municipalities, election, file, mimetype,
 
         # Parse the line
         mandates, counted, total = parse_election(line, line_errors)
-        result = parse_election_result(line, line_errors, municipalities)
+        result = parse_election_result(line, line_errors, entities)
         candidate = parse_candidate(line, line_errors)
         candidate_result = parse_candidate_result(line, line_errors)
         if not majorz:

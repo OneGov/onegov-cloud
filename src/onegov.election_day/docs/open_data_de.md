@@ -77,7 +77,7 @@ election_absolute_majority|Das absolute Mehr. Nur bei Majorzwahlen.
 election_counted_entities|Die Anzahl ausgezählter Gemeinden.
 election_total_entities|Die Gesamtanzahl an Gemeinden.
 entity_name|Der Name der Gemeinde
-entity_id|Die ID der Gemeinde.
+entity_id|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
 entity_elegible_voters|Die Anzahl Stimmberechtigter der Gemeinde.
 entity_received_ballots|Die Anzahl abgegebener Stimmzettel der Gemeinde.
 entity_blank_ballots|Die Anzahl leerer Stimmzettel der Gemeinde.
@@ -150,7 +150,7 @@ shortcode|Internes Kürzel (definiert die Reihenfolge von mehreren Abstimmungen 
 domain|`federation` für Nationale Abstimmungen, `canton` für Kantonale Abstimmungen
 type|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
 group|Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
-entity_id|Die ID der Gemeinde.
+entity_id|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
 counted|Wahr wenn das Resultat ausgezählt wurde. Falsch wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 yeas|Die Anzahl Ja Stimmen
 nays|Die Anzahl Nein Stimmen

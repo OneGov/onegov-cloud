@@ -15,7 +15,7 @@ from uuid import uuid4
 
 
 HEADERS = [
-    # Municipality
+    # Entity
     'Einheit_BFS',
     'Einheit_Name',
     # Candidate
@@ -41,6 +41,7 @@ HEADERS_RESULT = [
 
 HEADERS_STATS = [
     'Einheit_BFS',
+    'Einheit_Name',
     'StimBerTotal',
     'WZEingegangen',
     'WZLeer',
@@ -49,17 +50,19 @@ HEADERS_STATS = [
 ]
 
 
-def parse_election_result(line, errors, municipalities):
+def parse_election_result(line, errors, entities):
     try:
         group = line.einheit_name.strip()
         entity_id = int(line.einheit_bfs or 0)
     except ValueError:
-        errors.append(_("Invalid municipality values"))
+        errors.append(_("Invalid entity values"))
     else:
-        if entity_id not in municipalities:
+        if entity_id not in entities and group.lower() == 'auslandschweizer':
+            entity_id = 0
+
+        if entity_id and entity_id not in entities:
             errors.append(_(
-                "municipality id ${id} is unknown",
-                mapping={'id': entity_id}
+                _("${name} is unknown", mapping={'name': entity_id})
             ))
         else:
             return ElectionResult(
@@ -177,7 +180,7 @@ def parse_connection(line, errors):
         return id, connection, subconnection
 
 
-def import_file(municipalities, election, file, mimetype,
+def import_file(entities, election, file, mimetype,
                 connections_file=None,
                 connections_mimetype=None,
                 elected_file=None, elected_mimetype=None,
@@ -191,7 +194,7 @@ def import_file(municipalities, election, file, mimetype,
     subconnections = {}
     results = {}
 
-    # This format has one candiate per municipality per line
+    # This format has one candiate per entity per line
     csv, error = load_csv(
         file, mimetype, expected_headers=HEADERS
     )
@@ -203,7 +206,7 @@ def import_file(municipalities, election, file, mimetype,
             line_errors = []
 
             # Parse the line
-            result = parse_election_result(line, line_errors, municipalities)
+            result = parse_election_result(line, line_errors, entities)
             candidate = parse_candidate(line, line_errors)
             candidate_result = parse_candidate_result(line, line_errors)
             list = parse_list(line, line_errors)
@@ -317,7 +320,8 @@ def import_file(municipalities, election, file, mimetype,
         else:
             for line in csv.lines:
                 try:
-                    id = int(line.einheit_bfs or 0)
+                    group = line.einheit_name.strip()
+                    entity_id = int(line.einheit_bfs or 0)
                     elegible_voters = int(line.stimbertotal or 0)
                     received_ballots = int(line.wzeingegangen or 0)
                     blank_ballots = int(line.wzleer or 0)
@@ -331,12 +335,16 @@ def import_file(municipalities, election, file, mimetype,
                         )
                     )
                 else:
-                    if id in results:
-                        results[id].elegible_voters = elegible_voters
-                        results[id].received_ballots = received_ballots
-                        results[id].blank_ballots = blank_ballots
-                        results[id].invalid_ballots = invalid_ballots
-                        results[id].blank_votes = blank_votes
+                    if entity_id not in entities and group.lower() == \
+                            'auslandschweizer':
+                        entity_id = 0
+
+                    if entity_id in results:
+                        results[entity_id].elegible_voters = elegible_voters
+                        results[entity_id].received_ballots = received_ballots
+                        results[entity_id].blank_ballots = blank_ballots
+                        results[entity_id].invalid_ballots = invalid_ballots
+                        results[entity_id].blank_votes = blank_votes
 
     party_results = parse_party_results_file(
         parties_file, parties_mimetype, errors

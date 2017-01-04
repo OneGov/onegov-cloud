@@ -77,7 +77,7 @@ election_absolute_majority|La maggioranza assoluta. Rilevante solo per le elezio
 election_counted_entities|Il numero di comuni già contati.
 election_total_entities|Il numero totale dei comuni.
 entity_name|Nome del comune.
-entity_id|Identificativo del comune.
+entity_id|Identificativo del comune. A value `0` represents the expats.
 entity_elegible_voters|Numero degli aventi diritto al voto di questo comune.
 entity_received_ballots|Numero di schede ricevute per questo comune.
 entity_blank_ballots|Numero di schede bianche per questo comune.
@@ -150,7 +150,7 @@ shortcode|Abbreviazione interna (definisce l'ordine di diverse votazioni in un g
 domain|`federation` per votazioni federali, `canton` per votazioni cantonali
 type|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
 group|Da dove viene il risultato. Si può trattare del distretto e del comune, separati da una barra, del nome della città e del nome del circolo, anch'essi separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal rispettivo Cantone.
-entity_id|ID del comune/dell'ubicazione.
+entity_id|ID del comune/dell'ubicazione. A value `0` represents the expats.
 counted|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
 yeas|Numero di voti favorevoli
 nays|Numero di voti contrari

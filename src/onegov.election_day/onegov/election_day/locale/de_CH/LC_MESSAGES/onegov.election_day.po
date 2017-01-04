@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-04 08:52+0100\n"
+"POT-Creation-Date: 2017-01-04 09:24+0100\n"
 "PO-Revision-Date: 2017-01-03 09:48+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -115,13 +115,6 @@ msgstr "Ungültige Listenverbindungsdaten"
 
 msgid "No data found"
 msgstr "Keine Daten gefunden"
-
-msgid "Invalid municipality values"
-msgstr "Ungültige Gemeindedaten"
-
-#, python-format
-msgid "municipality id ${id} is unknown"
-msgstr "BFS Nummer ${id} ist unbekannt"
 
 msgid "Unknown candidate"
 msgstr "Unbekannter Kandidierender"

@@ -74,7 +74,7 @@ def import_file(entities, vote, file, mimetype):
                         'name': entity_id
                     }))
 
-            if entity_id not in entities:
+            if entity_id and entity_id not in entities:
                 line_errors.append(
                     _("${name} is unknown", mapping={
                         'name': entity_id

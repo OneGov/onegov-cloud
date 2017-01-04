@@ -115,7 +115,7 @@ def import_file(entities, vote, ballot_type, file, mimetype):
                     _("${name} was found twice", mapping={'name': entity_id})
                 )
 
-            if entity_id not in entities:
+            if entity_id and entity_id not in entities:
                 line_errors.append(
                     _("${name} is unknown", mapping={'name': entity_id})
                 )

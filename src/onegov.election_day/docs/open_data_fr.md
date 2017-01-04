@@ -77,7 +77,7 @@ election_absolute_majority|La majorité absolue. Uniquement valable pour les él
 election_counted_entities|Le nombre de municipalités déjà comptées.
 election_total_entities|Le nombre total de municipalités.
 entity_name|Le nom de la municipalité.
-entity_id|L'identifiant de la municipalité.
+entity_id|L'identifiant de la municipalité. A value `0` represents the expats.
 entity_elegible_voters|Le nombre de personnes éligible à voter pour cette municipalité.
 entity_received_ballots|Le nombre de bulletins de vote reçus pour cette municipalité.
 entity_blank_ballots|Le nombre de bulletins blancs pour cette municipalité.
@@ -150,7 +150,7 @@ shortcode|Shortcode interne (définit l'ordre des votes ayant lieu le même jour
 domain|`federation` pour fédéral, `canton` for les votes cantonaux.
 type|`proposal` (proposition), `counter-proposal` (contre-proposition) ou `tie-breaker` (jeu décisif).
 group|La désignation du résultat. Peut être le district, le nom de la ville divisé par un slash, le nom de la ville et le district de la ville divisés par un slash ou simplement le nom de la ville. Cela dépend entièrement du canton.
-entity_id|La référence de la municipalité/localité.
+entity_id|La référence de la municipalité/localité. A value `0` represents the expats.
 counted|Vrai si le résultat a été compté, faux si le résultat n'est pas encore connu (le compte des votes n'est pas encore fini).
 yeas|Nombre de votes oui
 nays|Nombre de votes non

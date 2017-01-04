@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-04 08:52+0100\n"
+"POT-Creation-Date: 2017-01-04 09:24+0100\n"
 "PO-Revision-Date: 2016-12-19 13:10+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -115,13 +115,6 @@ msgstr "Valori della lista delle connessioni non validi"
 
 msgid "No data found"
 msgstr "Nessun dato trovato"
-
-msgid "Invalid municipality values"
-msgstr "Valori del comune non validi"
-
-#, python-format
-msgid "municipality id ${id} is unknown"
-msgstr "Il numero UST ${id} è sconosciuto"
 
 msgid "Unknown candidate"
 msgstr "Candidato non conosciuto"

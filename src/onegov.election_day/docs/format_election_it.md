@@ -104,7 +104,7 @@ Il formato del file ha bisogno di due tabelle separate: l'esportazione dei dati 
 Nell'esportazione dei dati, è presente una riga per ogni comune, i candidati sono disposti in colonne. Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 
 - **AnzMandate**
-- **BFS**
+- **BFS** (The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.)
 - **EinheitBez**
 - **StimmBer**
 - **StimmAbgegeben**
@@ -152,7 +152,7 @@ Il formato di file ha bisogno di quattro tabelle separate: l'esportazione dei da
 
 È presente una linea per candidato e comune nell'esportazione dei dati. Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 
-- **Einheit_BFS**
+- **Einheit_BFS** (The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.)
 - **Einheit_Name**
 - **Kand_Nachname**
 - **Kand_Vorname**
@@ -173,6 +173,7 @@ The results may contain panachage results by adding one column per list:
 Il file con le statistiche dei singoli comuni devono contenere le seguenti colonne:
 
 - **Einheit_BFS**
+- **Einheit_Name**
 - **StimBerTotal**
 - **WZEingegangen**
 - **WZLeer**
@@ -223,7 +224,7 @@ Saranno prese in considerazione le seguenti colonne e devono essere presenti:
 - **election_absolute_majority**: Maggioranza assoluta delle elezioni, solo se elezione con sistema maggioritario.
 - **election_counted_entities**: Numero di comuni scrutinati. Se `election_counted_entities = election_total_entities`, allora l'elezione è considerata completamente scrutinata.
 - **election_total_entities**: Numero totale dei comuni. Se non sono disponibili notizie certe sullo stato dell'elezione (perché l'elezione è stata importata da Wabsti) allora questo valore è `0`.
-- **entity_id**: Numero BFS del comune.
+- **entity_id**: Numero BFS del comune. A value of `0` can be used for expats.
 - **entity_name**: The name of the municipality.
 - **entity_elegible_voters**: Numero di aventi diritto al voto nel Comune.
 - **entity_received_ballots**: Numero di schede presentate nel Comune.
