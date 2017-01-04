@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to swipe through the images in the photoalbum.
+  [href]
+
 - Make sure all image elements have the width and height set.
   [href]
 

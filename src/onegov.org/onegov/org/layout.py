@@ -1136,6 +1136,10 @@ class ImageSetCollectionLayout(DefaultLayout):
 
 class ImageSetLayout(DefaultLayout):
 
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.request.include('photoswipe')
+
     @property
     def collection(self):
         return ImageSetCollection(self.request.app.session())

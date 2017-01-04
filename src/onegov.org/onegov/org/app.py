@@ -326,6 +326,15 @@ def get_editalttext_asset():
     yield 'editalttext.js'
 
 
+@OrgApp.webasset('photoswipe')
+def get_photoswipe_asset():
+    yield 'photoswipe.css'
+    yield 'photoswipe-skin.css'
+    yield 'photoswipe.js'
+    yield 'photoswipe-ui.js'
+    yield 'photoswipe-custom.js'
+
+
 @OrgApp.webasset('common')
 def get_common_asset():
     yield 'global.js'
