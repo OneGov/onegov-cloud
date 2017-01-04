@@ -1359,7 +1359,7 @@ msgstr ""
 "Entfernt alle nicht-reservierten Einteilungen zwischen Start- und End-Datum"
 
 msgid "Utilised"
-msgstr "Ausgelasted"
+msgstr "Ausgelastet"
 
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
