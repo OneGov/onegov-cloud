@@ -20,3 +20,7 @@ class OrgRequest(CoreRequest):
         """
 
         return self.has_role('admin')
+
+    @property
+    def current_username(self):
+        return self.identity and self.identity.userid or None

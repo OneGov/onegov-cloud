@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Stop sending e-mails to admins/editors if they create tickets for themselves.
+  [href]
+
 - Adds the ability to swipe through the images in the photoalbum.
   [href]
 

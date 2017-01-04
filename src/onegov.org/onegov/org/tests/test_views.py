@@ -3142,3 +3142,96 @@ def test_homepage(org_app):
 
     assert '<b>0xdeadbeef</b>' in homepage
     assert '<h2>Veranstaltungen</h2>' in homepage
+
+
+def test_send_ticket_email(org_app):
+    anon = Client(org_app)
+
+    admin = Client(org_app)
+    admin.login_admin()
+
+    # make sure submitted event emails are sent to everyone, unless the
+    # logged-in user is the same as the user responsible for the event
+    def submit_event(client, email):
+        start = date.today() + timedelta(days=1)
+
+        page = client.get('/veranstaltungen').click("Veranstaltung melden")
+        page.form['email'] = email
+        page.form['title'] = "My Event"
+        page.form['description'] = "My event is an event."
+        page.form['organizer'] = "The Organizer"
+        page.form['location'] = "A place"
+        page.form['start_date'] = start.isoformat()
+        page.form['start_time'] = "18:00"
+        page.form['end_time'] = "22:00"
+
+        page.form.submit().follow().form.submit()
+
+    del org_app.smtp.outbox[:]
+
+    submit_event(admin, 'admin@example.org')
+    assert len(org_app.smtp.outbox) == 0
+
+    submit_event(admin, 'someone-else@example.org')
+    assert len(org_app.smtp.outbox) == 1
+    assert 'someone-else@example.org' == org_app.smtp.outbox[0]['To']
+
+    submit_event(anon, 'admin@example.org')
+    assert len(org_app.smtp.outbox) == 2
+    assert 'admin@example.org' == org_app.smtp.outbox[1]['To']
+
+    # make sure the same holds true for forms
+    collection = FormCollection(org_app.session())
+    collection.definitions.add('Profile', definition=textwrap.dedent("""
+        Name * = ___
+        E-Mail * = @@@
+    """), type='custom')
+    transaction.commit()
+
+    def submit_form(client, email):
+        page = client.get('/formulare').click('Profile')
+        page.form['name'] = 'foobar'
+        page.form['e_mail'] = email
+        page.form.submit().follow().form.submit()
+
+    del org_app.smtp.outbox[:]
+
+    submit_form(admin, 'admin@example.org')
+    assert len(org_app.smtp.outbox) == 0
+
+    submit_form(admin, 'someone-else@example.org')
+    assert len(org_app.smtp.outbox) == 1
+    assert 'someone-else@example.org' == org_app.smtp.outbox[0]['To']
+
+    # and for reservations
+    resources = ResourceCollection(org_app.libres_context)
+    resource = resources.by_name('tageskarte')
+    scheduler = resource.get_scheduler(org_app.libres_context)
+
+    allocations = scheduler.allocate(
+        dates=(datetime(2015, 8, 28, 10), datetime(2015, 8, 28, 14)),
+        whole_day=False,
+        partly_available=True,
+        quota=10
+    )
+
+    reserve = bound_reserve(admin, allocations[0])
+    transaction.commit()
+
+    def submit_reservation(client, email):
+        assert reserve('10:00', '12:00').json == {'success': True}
+
+        # fill out the form
+        formular = client.get('/ressource/tageskarte/formular')
+        formular.form['email'] = email
+
+        formular.form.submit().follow().click("Abschliessen").follow()
+
+    del org_app.smtp.outbox[:]
+
+    submit_reservation(admin, 'admin@example.org')
+    assert len(org_app.smtp.outbox) == 0
+
+    submit_reservation(admin, 'someone-else@example.org')
+    assert len(org_app.smtp.outbox) == 1
+    assert 'someone-else@example.org' == org_app.smtp.outbox[0]['To']

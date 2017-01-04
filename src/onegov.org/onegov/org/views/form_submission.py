@@ -151,15 +151,16 @@ def handle_complete_submission(self, request):
                     handler_code='FRM', handler_id=self.id.hex
                 )
 
-            send_html_mail(
-                request=request,
-                template='mail_ticket_opened.pt',
-                subject=_("A ticket has been opened"),
-                receivers=(self.email, ),
-                content={
-                    'model': ticket
-                }
-            )
+            if self.email != request.current_username:
+                send_html_mail(
+                    request=request,
+                    template='mail_ticket_opened.pt',
+                    subject=_("A ticket has been opened"),
+                    receivers=(self.email, ),
+                    content={
+                        'model': ticket
+                    }
+                )
 
             request.success(_("Thank you for your submission!"))
             request.app.update_ticket_count()

@@ -57,7 +57,7 @@ def publish_event(self, request):
         'title': self.title
     }))
 
-    if self.meta.get('submitter_email'):
+    if self.meta['submitter_email'] != request.current_username:
 
         session = request.app.session()
         ticket = TicketCollection(session).by_handler_id(self.id.hex)
@@ -66,7 +66,7 @@ def publish_event(self, request):
             request=request,
             template='mail_event_accepted.pt',
             subject=_("Your event was accepted"),
-            receivers=(self.meta.get('submitter_email'), ),
+            receivers=(self.meta['submitter_email'], ),
             content={
                 'model': self,
                 'ticket': ticket
@@ -156,15 +156,16 @@ def view_event(self, request):
                 handler_code='EVN', handler_id=self.id.hex
             )
 
-        send_html_mail(
-            request=request,
-            template='mail_ticket_opened.pt',
-            subject=_("A ticket has been opened"),
-            receivers=(self.meta.get('submitter_email'), ),
-            content={
-                'model': ticket
-            }
-        )
+        if self.meta['submitter_email'] != request.current_username:
+            send_html_mail(
+                request=request,
+                template='mail_ticket_opened.pt',
+                subject=_("A ticket has been opened"),
+                receivers=(self.meta['submitter_email'], ),
+                content={
+                    'model': ticket
+                }
+            )
 
         request.success(_("Thank you for your submission!"))
         request.app.update_ticket_count()
@@ -228,12 +229,12 @@ def handle_delete_event(self, request):
     if ticket:
         ticket.create_snapshot(request)
 
-    if self.meta.get('submitter_email'):
+    if self.meta['submitter_email'] != request.current_username:
         send_html_mail(
             request=request,
             template='mail_event_rejected.pt',
             subject=_("Your event was rejected"),
-            receivers=(self.meta.get('submitter_email'), ),
+            receivers=(self.meta['submitter_email'], ),
             content={
                 'model': self,
                 'ticket': ticket

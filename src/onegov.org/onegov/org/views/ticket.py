@@ -71,15 +71,16 @@ def close_ticket(self, request):
 
     email = self.snapshot.get('email') or self.handler.email
 
-    send_html_mail(
-        request=request,
-        template='mail_ticket_closed.pt',
-        subject=_("Your ticket has been closed"),
-        receivers=(email, ),
-        content={
-            'model': self
-        }
-    )
+    if email != request.current_username:
+        send_html_mail(
+            request=request,
+            template='mail_ticket_closed.pt',
+            subject=_("Your ticket has been closed"),
+            receivers=(email, ),
+            content={
+                'model': self
+            }
+        )
 
     request.app.update_ticket_count()
 
@@ -105,15 +106,16 @@ def reopen_ticket(self, request):
 
     email = self.snapshot.get('email') or self.handler.email
 
-    send_html_mail(
-        request=request,
-        template='mail_ticket_reopened.pt',
-        subject=_("Your ticket has been reopened"),
-        receivers=(email, ),
-        content={
-            'model': self
-        }
-    )
+    if email != request.current_username:
+        send_html_mail(
+            request=request,
+            template='mail_ticket_reopened.pt',
+            subject=_("Your ticket has been reopened"),
+            receivers=(email, ),
+            content={
+                'model': self
+            }
+        )
 
     request.app.update_ticket_count()
 

@@ -310,15 +310,16 @@ def finalize_reservation(self, request):
                 handler_code='RSV', handler_id=token
             )
 
-        send_html_mail(
-            request=request,
-            template='mail_ticket_opened.pt',
-            subject=_("A ticket has been opened"),
-            receivers=(reservations[0].email, ),
-            content={
-                'model': ticket
-            }
-        )
+        if reservations[0].email != request.current_username:
+            send_html_mail(
+                request=request,
+                template='mail_ticket_opened.pt',
+                subject=_("A ticket has been opened"),
+                receivers=(reservations[0].email, ),
+                content={
+                    'model': ticket
+                }
+            )
 
         request.success(_("Thank you for your reservation!"))
         request.app.update_ticket_count()
@@ -333,17 +334,18 @@ def accept_reservation(self, request):
         reservations = resource.scheduler.reservations_by_token(self.token)
         reservations = reservations.order_by(Reservation.start)
 
-        send_html_mail(
-            request=request,
-            template='mail_reservation_accepted.pt',
-            subject=_("Your reservations were accepted"),
-            receivers=(self.email, ),
-            content={
-                'model': self,
-                'resource': resource,
-                'reservations': reservations
-            }
-        )
+        if self.email != request.current_username:
+            send_html_mail(
+                request=request,
+                template='mail_reservation_accepted.pt',
+                subject=_("Your reservations were accepted"),
+                receivers=(self.email, ),
+                content={
+                    'model': self,
+                    'resource': resource,
+                    'reservations': reservations
+                }
+            )
 
         for reservation in reservations:
             reservation.data = reservation.data or {}
@@ -377,17 +379,18 @@ def reject_reservation(self, request):
     forms = FormCollection(request.app.session())
     submission = forms.submissions.by_id(token)
 
-    send_html_mail(
-        request=request,
-        template='mail_reservation_rejected.pt',
-        subject=_("The following reservations were rejected"),
-        receivers=(self.email, ),
-        content={
-            'model': self,
-            'resource': resource,
-            'reservations': targeted
-        }
-    )
+    if self.email != request.current_username:
+        send_html_mail(
+            request=request,
+            template='mail_reservation_rejected.pt',
+            subject=_("The following reservations were rejected"),
+            receivers=(self.email, ),
+            content={
+                'model': self,
+                'resource': resource,
+                'reservations': targeted
+            }
+        )
 
     # create a snapshot of the ticket to keep the useful information
     if len(excluded) == 0:
