@@ -19,6 +19,7 @@ HEADERS = [
     'election_counted_entities',
     'election_total_entities',
     'entity_id',
+    'entity_name',
     'entity_elegible_voters',
     'entity_received_ballots',
     'entity_blank_ballots',
@@ -55,6 +56,7 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, entities):
     try:
+        group = line.entity_name.strip()
         entity_id = int(line.entity_id or 0)
         elegible_voters = int(line.entity_elegible_voters or 0)
         received_ballots = int(line.entity_received_ballots or 0)
@@ -77,7 +79,7 @@ def parse_election_result(line, errors, entities):
         else:
             return ElectionResult(
                 id=uuid4(),
-                group=entities[entity_id]['name'],
+                group=group,
                 entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,

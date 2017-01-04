@@ -1,6 +1,7 @@
 from onegov.ballot import Ballot, BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
+from onegov.election_day.formats.vote import guessed_group
 from sqlalchemy.orm import object_session
 
 
@@ -21,7 +22,7 @@ HEADERS = [
 ]
 
 
-def import_file(municipalities, vote, file, mimetype, vote_number, complex):
+def import_file(entities, vote, file, mimetype, vote_number, complex):
     """ Tries to import the given csv, xls or xlsx file.
 
     :return: A dictionary of dictionaries containing the status and a list of
@@ -58,37 +59,37 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
 
         line_errors = []
 
-        # the name of the municipality
+        # the name of the entity
         group = line.gemeinde.strip()
         if not group:
-            line_errors.append(_("Missing municipality"))
+            line_errors.append(_("Missing municipality/district"))
         if group in added_groups:
             line_errors.append(_("${group} was found twice", mapping={
                 'group': group
             }))
         added_groups.add(group)
 
-        # the id of the municipality
+        # the id of the entity
         try:
             entity_id = int(line.bfs_nr_ or 0)
         except ValueError:
-            line_errors.append(_("Invalid municipality id"))
+            line_errors.append(_("Invalid id"))
         else:
             if entity_id in added_entity_ids:
                 line_errors.append(
-                    _("municipality id ${id} was found twice", mapping={
-                        'id': entity_id
+                    _("${name} was found twice", mapping={
+                        'name': entity_id
                     }))
 
-            if entity_id not in municipalities:
+            if entity_id not in entities:
                 if line.gemeinde.strip() == 'Auslandschweizer':
                     # https://github.com/OneGov/onegov.election_day/issues/40
                     entity_id = 0
                     added_entity_ids.add(entity_id)
                 else:
                     line_errors.append(
-                        _("municipality id ${id} is unknown", mapping={
-                            'id': entity_id
+                        _("${name} is unknown", mapping={
+                            'name': entity_id
                         }))
             else:
                 added_entity_ids.add(entity_id)
@@ -183,13 +184,13 @@ def import_file(municipalities, vote, file, mimetype, vote_number, complex):
 
     for ballot_type in used_ballot_types:
         remaining = (
-            municipalities.keys() - added_entity_ids
+            entities.keys() - added_entity_ids
         )
         for id in remaining:
-            municipality = municipalities[id]
+            entity = entities[id]
             ballot_results[ballot_type].append(
                 BallotResult(
-                    group=municipality['name'],
+                    group=guessed_group(entity, ballot_results[ballot_type]),
                     counted=False,
                     entity_id=id
                 )

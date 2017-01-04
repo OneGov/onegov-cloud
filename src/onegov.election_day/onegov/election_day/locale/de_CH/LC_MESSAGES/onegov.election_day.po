@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 09:51+0100\n"
+"POT-Creation-Date: 2017-01-03 15:39+0100\n"
 "PO-Revision-Date: 2017-01-03 09:48+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -160,19 +160,9 @@ msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 msgid "Invalid ballot type"
 msgstr "Ungültige Abstimmungsart"
 
-msgid "Missing municipality"
-msgstr "Fehlender Ort"
-
 #, python-format
 msgid "${group} was found twice"
 msgstr "${group} kommt zweimal vor"
-
-msgid "Invalid municipality id"
-msgstr "Ungültige BFS Nummer"
-
-#, python-format
-msgid "municipality id ${id} was found twice"
-msgstr "BFS Nummer ${id} kommt zweimal vor"
 
 msgid "Election (German)"
 msgstr "Wahl (Deutsch)"
@@ -701,6 +691,3 @@ msgstr "Das Jahr ${year} wird noch nicht unterstützt"
 
 msgid "This ballot has fewer results than the others"
 msgstr "Diese Vorlage hat weniger Resultate als die Anderen"
-
-#~ msgid "The raw data of the available as"
-#~ msgstr "Die Rohdaten sind in folgendem Format verfügbar:"

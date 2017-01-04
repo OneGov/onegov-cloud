@@ -17,6 +17,7 @@ from uuid import uuid4
 HEADERS = [
     # Municipality
     'Einheit_BFS',
+    'Einheit_Name',
     # Candidate
     'Liste_KandID',
     'Kand_Nachname',
@@ -50,6 +51,7 @@ HEADERS_STATS = [
 
 def parse_election_result(line, errors, municipalities):
     try:
+        group = line.einheit_name.strip()
         entity_id = int(line.einheit_bfs or 0)
     except ValueError:
         errors.append(_("Invalid municipality values"))
@@ -62,7 +64,7 @@ def parse_election_result(line, errors, municipalities):
         else:
             return ElectionResult(
                 id=uuid4(),
-                group=municipalities[entity_id]['name'],
+                group=group,
                 entity_id=entity_id,
             )
 

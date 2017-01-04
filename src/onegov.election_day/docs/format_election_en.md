@@ -28,6 +28,7 @@ The following columns will be evaluated and should exist at the least:
 
 - **Anzahl Sitze** (Number seats)
 - **Wahlkreis-Nr** (Electoral district number)
+- **Wahlkreisbezeichnung** (Electoral district name)
 - **Anzahl Gemeinden** (Number municipalities)
 - **Stimmberechtigte** (Entitled to vote)
 - **Wahlzettel** (Ballots)
@@ -59,6 +60,7 @@ The following columns will be evaluated and should exist at the least:
 
 - **Anzahl Sitze** (Number seats)
 - **Wahlkreis-Nr** (Electoral district number)
+- **Wahlkreisbezeichnung** (Electoral district name)
 - **Stimmberechtigte** (Entitled to vote)
 - **Wahlzettel** (Ballots)
 - **Ungültige Wahlzettel** (Invalid ballots)
@@ -105,6 +107,7 @@ In the data export, there is a row for each municipality, candidates are arrange
 
 - **AnzMandate**
 - **BFS**
+- **EinheitBez**
 - **StimmBer**
 - **StimmAbgegeben**
 - **StimmLeer**
@@ -152,6 +155,7 @@ The file format needs four individual charts: the data export of the results, th
 There is a line per candidate and municipality in the data export. The following columns will be evaluated and should exist:
 
 - **Einheit_BFS**
+- **Einheit_Name**
 - **Kand_Nachname**
 - **Kand_Vorname**
 - **Liste_KandID**
@@ -222,6 +226,7 @@ The following columns will be evaluated and should exist:
 - **election_counted_entities**: Number of counted municipalities. If `election_counted_entities = election_total_entities`, then the election is considered completely counted.
 - **election_total_entities**: Total number of municipalities. If no definite information about the status of the election is possible (because the election was imported by Wabsti), then this value is `0`.
 - **entity_id**: BFS number of the municipality.
+- **entity_name**: The name of the municipality.
 - **entity_elegible_voters**: Number of persons entitled to vote in municipality.
 - **entity_received_ballots**: Number of submitted ballots in municipality.
 - **entity_blank_ballots**: Number empty ballots in municipality.

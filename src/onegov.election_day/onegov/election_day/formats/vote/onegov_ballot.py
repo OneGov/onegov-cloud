@@ -1,7 +1,7 @@
 from onegov.ballot import Ballot, BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
-from onegov.election_day.formats.vote import BALLOT_TYPES
+from onegov.election_day.formats.vote import BALLOT_TYPES, guessed_group
 from sqlalchemy.orm import object_session
 
 
@@ -181,10 +181,7 @@ def import_file(entities, vote, file, mimetype):
             entity = entities[id]
             ballot_results[ballot_type].append(
                 BallotResult(
-                    group='/'.join(p for p in (
-                        entity.get('district'),
-                        entity['name']
-                    ) if p is not None),
+                    group=guessed_group(entity, ballot_results[ballot_type]),
                     counted=False,
                     entity_id=id
                 )

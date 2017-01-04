@@ -12,6 +12,7 @@ from uuid import uuid4
 HEADERS = [
     'AnzMandate',
     'BFS',
+    'EinheitBez',
     'StimmBer',
     'StimmAbgegeben',
     'StimmLeer',
@@ -37,6 +38,7 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, municipalities):
     try:
+        group = line.einheitbez.strip()
         entity_id = int(line.bfs or 0)
         elegible_voters = int(line.stimmber or 0)
         received_ballots = int(line.stimmabgegeben or 0)
@@ -75,7 +77,7 @@ def parse_election_result(line, errors, municipalities):
         else:
             return ElectionResult(
                 id=uuid4(),
-                group=municipalities[entity_id]['name'],
+                group=group,
                 entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,

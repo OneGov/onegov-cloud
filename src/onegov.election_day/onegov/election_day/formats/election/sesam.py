@@ -18,6 +18,7 @@ HEADERS_COMMON = [
     # Municipality
     'Anzahl Sitze',
     'Wahlkreis-Nr',
+    'Wahlkreisbezeichnung',
     'Stimmberechtigte',
     'Wahlzettel',
     'Ungültige Wahlzettel',
@@ -75,6 +76,7 @@ def parse_election(line, errors):
 
 def parse_election_result(line, errors, municipalities):
     try:
+        group = line.wahlkreisbezeichnung.strip()
         entity_id = int(line.wahlkreis_nr or 0)
         elegible_voters = int(line.stimmberechtigte or 0)
         received_ballots = int(line.wahlzettel or 0)
@@ -100,7 +102,7 @@ def parse_election_result(line, errors, municipalities):
         else:
             return ElectionResult(
                 id=uuid4(),
-                group=municipalities[entity_id]['name'],
+                group=group,
                 entity_id=entity_id,
                 elegible_voters=elegible_voters,
                 received_ballots=received_ballots,

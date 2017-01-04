@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 09:51+0100\n"
+"POT-Creation-Date: 2017-01-03 15:39+0100\n"
 "PO-Revision-Date: 2016-12-14 11:30+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -159,6 +159,10 @@ msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
+
+#, python-format
+msgid "${group} was found twice"
+msgstr "${group} è avant maun duas giadas"
 
 msgid "Election (German)"
 msgstr "Elecziun (tudestg)"

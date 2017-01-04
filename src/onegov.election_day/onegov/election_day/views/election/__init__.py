@@ -26,8 +26,22 @@ def get_missing_entities(election, request, session):
     used = used.distinct()
     used = [item[0] for item in used]
 
-    for id in set(all_.keys()) - set(used):
-        result.append(all_[id]['name'])
+    # guess the grouping
+    tester = session.query(ElectionResult.group)
+    tester = tester.filter(ElectionResult.election_id == election.id)
+    tester = tester.first()
+
+    for id_ in set(all_.keys()) - set(used):
+        group = all_[id_]['name']
+        if tester and '/' in tester[0]:
+            group = '/'.join(
+                p for p in (
+                    all_[id_].get('district'),
+                    all_[id_].get('name')
+                ) if p is not None
+            )
+
+        result.append(group)
 
     return result
 

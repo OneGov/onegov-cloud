@@ -24,17 +24,36 @@ def test_upload_election_year_unavailable(election_day_app_gr):
     new.form.submit()
 
     csv = (
-        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
-        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Listen-Nr,"
-        "Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,Anzahl Sitze Liste,"
-        "Unveränderte Wahlzettel Liste,Veränderte Wahlzettel Liste,"
+        "Anzahl Sitze,"
+        "Wahlkreis-Nr,"
+        "Wahlkreisbezeichnung,"
+        "Stimmberechtigte,"
+        "Wahlzettel,"
+        "Ungültige Wahlzettel,"
+        "Leere Wahlzettel,"
+        "Leere Stimmen,"
+        "Listen-Nr,"
+        "Partei-ID,"
+        "Parteibezeichnung,"
+        "HLV-Nr,"
+        "ULV-Nr,"
+        "Anzahl Sitze Liste,"
+        "Unveränderte Wahlzettel Liste,"
+        "Veränderte Wahlzettel Liste,"
         "Kandidatenstimmen unveränderte Wahlzettel,"
         "Zusatzstimmen unveränderte Wahlzettel,"
         "Kandidatenstimmen veränderte Wahlzettel,"
-        "Zusatzstimmen veränderte Wahlzettel,Kandidaten-Nr,Gewählt,Name,"
-        "Vorname,Stimmen unveränderte Wahlzettel,"
-        "Stimmen veränderte Wahlzettel,Stimmen Total aus Wahlzettel,"
-        "01 FDP,02 CVP, Anzahl Gemeinden\n"
+        "Zusatzstimmen veränderte Wahlzettel,"
+        "Kandidaten-Nr,"
+        "Gewählt,"
+        "Name,"
+        "Vorname,"
+        "Stimmen unveränderte Wahlzettel,"
+        "Stimmen veränderte Wahlzettel,"
+        "Stimmen Total aus Wahlzettel,"
+        "01 FDP,"
+        "02 CVP,"
+        " Anzahl Gemeinden\n"
     )
     csv = csv.encode('utf-8')
 
@@ -215,6 +234,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
     headers = [
         'Anzahl Sitze',
         'Wahlkreis-Nr',
+        'Wahlkreisbezeichnung',
         'Stimmberechtigte',
         'Wahlzettel',
         'Ungültige Wahlzettel',
@@ -261,6 +281,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
         ','.join((
             'five',
             '1234',
+            'Abc',
             '56',
             '32',
             '1',
@@ -310,6 +331,7 @@ def test_upload_election_sesam_fail(election_day_app_gr):
             '5',
             'xyzb',
             '56',
+            'abcd',
             '32',
             '1',
             '0',
@@ -480,6 +502,7 @@ def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
     headers_result = [
         'AnzMandate',
         'BFS',
+        'EinheitBez',
         'StimmBer',
         'StimmAbgegeben',
         'StimmLeer',
@@ -527,6 +550,7 @@ def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
         ','.join((
             'one',
             'onetwothree',
+            'abc',
             '100',
             '90',
             '1',
@@ -548,6 +572,7 @@ def test_upload_election_wabsti_majorz_fail(election_day_app_gr):
         ','.join((
             '1',
             '1234',
+            'abc',
             '100',
             '90',
             '1',
@@ -1072,14 +1097,26 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     # SESAM: "Anzahl Gemeinden" + missing lines
     csv = '\n'.join((
         (
-            'Anzahl Sitze,Anzahl Gemeinden,Wahlkreis-Nr,Stimmberechtigte,'
-            'Wahlzettel,Leere Wahlzettel,Ungültige Wahlzettel,Leere Stimmen,'
-            'Ungueltige Stimmen,Kandidaten-Nr,Name,Vorname,Stimmen,Gewaehlt'
+            'Anzahl Sitze,'
+            'Anzahl Gemeinden,'
+            'Wahlkreis-Nr,'
+            'Wahlkreisbezeichnung,'
+            'Stimmberechtigte,'
+            'Wahlzettel,'
+            'Leere Wahlzettel,'
+            'Ungültige Wahlzettel,'
+            'Leere Stimmen,'
+            'Ungueltige Stimmen,'
+            'Kandidaten-Nr,'
+            'Name,'
+            'Vorname,'
+            'Stimmen,'
+            'Gewaehlt'
         ),
-        '7,2 von 11,1701,13567,40,0,0,18,0,1,Hegglin,Peter,36,FALSE',
-        '7,2 von 11,1701,13567,40,0,0,18,0,2,Hürlimann,Urs,25,FALSE',
-        '7,2 von 11,1702,9620,41,0,1,6,0,1,Hegglin,Peter,34,FALSE',
-        '7,2 von 11,1702,9620,41,0,1,6,0,2,Hürlimann,Urs,28,FALSE',
+        '7,2 von 11,1701,Baar,13567,40,0,0,18,0,1,Hegglin,Peter,36,FALSE',
+        '7,2 von 11,1701,Baar,13567,40,0,0,18,0,2,Hürlimann,Urs,25,FALSE',
+        '7,2 von 11,1702,Cham,9620,41,0,1,6,0,1,Hegglin,Peter,34,FALSE',
+        '7,2 von 11,1702,Cham,9620,41,0,1,6,0,2,Hürlimann,Urs,28,FALSE',
     )).encode('utf-8')
     upload = client.get('/election/election/upload')
     upload.form['file_format'] = 'sesam'
@@ -1095,20 +1132,44 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     # Wabsti: form value + (optionally) missing lines
     csv = '\n'.join((
         (
-            'AnzMandate,BFS,StimmBer,StimmAbgegeben,StimmLeer,StimmUngueltig,'
-            'StimmGueltig,KandID_1,KandName_1,KandVorname_1,Stimmen_1,'
-            'KandResultArt_1,KandID_2,KandName_2,KandVorname_2,Stimmen_2,'
-            'KandResultArt_2,KandID_3,KandName_3,KandVorname_3,Stimmen_3,'
-            'KandResultArt_3,KandID_4,KandName_4,KandVorname_4,Stimmen_4,'
+            'AnzMandate,'
+            'BFS,'
+            'EinheitBez,'
+            'StimmBer,'
+            'StimmAbgegeben,'
+            'StimmLeer,'
+            'StimmUngueltig,'
+            'StimmGueltig,'
+            'KandID_1,'
+            'KandName_1,'
+            'KandVorname_1,'
+            'Stimmen_1,'
+            'KandResultArt_1,'
+            'KandID_2,'
+            'KandName_2,'
+            'KandVorname_2,'
+            'Stimmen_2,'
+            'KandResultArt_2,'
+            'KandID_3,'
+            'KandName_3,'
+            'KandVorname_3,'
+            'Stimmen_3,'
+            'KandResultArt_3,'
+            'KandID_4,'
+            'KandName_4,'
+            'KandVorname_4,'
+            'Stimmen_4,'
             'KandResultArt_4'
         ),
         (
-            '7,1701,13567,40,0,0,40,1,Hegglin,Peter,36,2,2,Hürlimann,Urs,25,'
-            '2,1000,Leere Zeilen,,18,9,1001,Ungültige Stimmen,,0,9'
+            '7,1701,Baar,13567,40,0,0,40,1,Hegglin,Peter,36,2,2,'
+            'Hürlimann,Urs,25,2,1000,Leere Zeilen,,18,9,1001,'
+            'Ungültige Stimmen,,0,9'
         ),
         (
-            '7,1702,9620,41,0,1,40,1,Hegglin,Peter,34,2,2,Hürlimann,Urs,28,2,'
-            '1000,Leere Zeilen,,6,9,1001,Ungültige Stimmen,,0,9'
+            '7,1702,Cham,9620,41,0,1,40,1,Hegglin,Peter,34,2,2,'
+            'Hürlimann,Urs,28,2,1000,Leere Zeilen,,6,9,1001,'
+            'Ungültige Stimmen,,0,9'
         )
     )).encode('utf-8')
     upload = client.get('/election/election/upload')
@@ -1134,17 +1195,34 @@ def test_upload_election_temporary_results_majorz(election_day_app):
     # Onegov internal: misssing and number of municpalities
     csv = '\n'.join((
         (
-            'election_title,election_date,election_type,election_mandates,'
-            'election_absolute_majority,election_counted_entities,'
-            'election_total_entities,entity_name,'
-            'entity_id,entity_elegible_voters,'
-            'entity_received_ballots,entity_blank_ballots,'
-            'entity_invalid_ballots,entity_unaccounted_ballots,'
-            'entity_accounted_ballots,entity_blank_votes,'
-            'entity_invalid_votes,entity_accounted_votes,'
-            'list_name,list_id,list_number_of_mandates,list_votes,'
-            'list_connection,list_connection_parent,candidate_family_name,'
-            'candidate_first_name,candidate_id,candidate_elected,'
+            'election_title,'
+            'election_date,'
+            'election_type,'
+            'election_mandates,'
+            'election_absolute_majority,'
+            'election_counted_entities,'
+            'election_total_entities,'
+            'entity_name,'
+            'entity_id,'
+            'entity_elegible_voters,'
+            'entity_received_ballots,'
+            'entity_blank_ballots,'
+            'entity_invalid_ballots,'
+            'entity_unaccounted_ballots,'
+            'entity_accounted_ballots,'
+            'entity_blank_votes,'
+            'entity_invalid_votes,'
+            'entity_accounted_votes,'
+            'list_name,'
+            'list_id,'
+            'list_number_of_mandates,'
+            'list_votes,'
+            'list_connection,'
+            'list_connection_parent,'
+            'candidate_family_name,'
+            'candidate_first_name,'
+            'candidate_id,'
+            'candidate_elected,'
             'candidate_votes'
         ),
         (
@@ -1194,30 +1272,45 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     # SESAM: "Anzahl Gemeinden" + missing lines
     csv = '\n'.join((
         (
-            'Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,'
-            'Leere Wahlzettel,Ungültige Wahlzettel,Leere Stimmen,Listen-Nr,'
-            'Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,'
+            'Anzahl Sitze,'
+            'Wahlkreis-Nr,'
+            'Wahlkreisbezeichnung,'
+            'Stimmberechtigte,'
+            'Wahlzettel,'
+            'Leere Wahlzettel,'
+            'Ungültige Wahlzettel,'
+            'Leere Stimmen,'
+            'Listen-Nr,'
+            'Partei-ID,'
+            'Parteibezeichnung,'
+            'HLV-Nr,'
+            'ULV-Nr,'
             'Kandidatenstimmen unveränderte Wahlzettel,'
             'Kandidatenstimmen veränderte Wahlzettel,'
             'Zusatzstimmen unveränderte Wahlzettel,'
-            'Zusatzstimmen veränderte Wahlzettel,Anzahl Sitze Liste,'
-            'Kandidaten-Nr,Gewählt,Name,Vorname,'
-            'Stimmen Total aus Wahlzettel,Anzahl Gemeinden'
+            'Zusatzstimmen veränderte Wahlzettel,'
+            'Anzahl Sitze Liste,'
+            'Kandidaten-Nr,'
+            'Gewählt,'
+            'Name,'
+            'Vorname,'
+            'Stimmen Total aus Wahlzettel,'
+            'Anzahl Gemeinden'
         ),
         (
-            '2,1701,14119,7462,77,196,122,1,1,ALG,,,1435,0,0,0,0,101,FALSE,'
-            'Lustenberger,Andreas,948,2 von 11'
+            '2,1701,Baar,14119,7462,77,196,122,1,1,ALG,,,1435,0,0,0,0,101,'
+            'FALSE,Lustenberger,Andreas,948,2 von 11'
         ),
         (
-            '2,1701,14119,7462,77,196,122,1,1,ALG,,,1435,0,0,0,0,102,FALSE,'
-            'Schriber-Neiger,Hanni,208,2 von 11'
+            '2,1701,Baar,14119,7462,77,196,122,1,1,ALG,,,1435,0,0,0,0,102,'
+            'FALSE,Schriber-Neiger,Hanni,208,2 von 11'
         ),
         (
-            '2,1702,9926,4863,0,161,50,1,1,ALG,,,533,0,0,0,0,101,FALSE,'
+            '2,1702,Cham,9926,4863,0,161,50,1,1,ALG,,,533,0,0,0,0,101,FALSE,'
             'Lustenberger,Andreas,290,2 von 11'
         ),
         (
-            '2,1702,9926,4863,0,161,50,1,1,ALG,,,533,0,0,0,0,102,FALSE,'
+            '2,1702,Cham,9926,4863,0,161,50,1,1,ALG,,,533,0,0,0,0,102,FALSE,'
             'Schriber-Neiger,Hanni,105,2 von 11'
         ),
     )).encode('utf-8')
@@ -1235,13 +1328,20 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     # Wabsti: form value + (optionally) missing lines
     csv = '\n'.join((
         (
-            'Einheit_BFS,Kand_Nachname,Kand_Vorname,Liste_KandID,Liste_ID,'
-            'Liste_Code,Kand_StimmenTotal,Liste_ParteistimmenTotal'
+            'Einheit_BFS,'
+            'Einheit_Name,'
+            'Kand_Nachname,'
+            'Kand_Vorname,'
+            'Liste_KandID,'
+            'Liste_ID,'
+            'Liste_Code,'
+            'Kand_StimmenTotal,'
+            'Liste_ParteistimmenTotal'
         ),
-        '1701,Lustenberger,Andreas,101,1,ALG,948,1435',
-        '1701,Schriber-Neiger,Hanni,102,1,ALG,208,1435',
-        '1702,Lustenberger,Andreas,101,1,ALG,290,533',
-        '1702,Schriber-Neiger,Hanni,102,1,ALG,105,533',
+        '1701,Baar,Lustenberger,Andreas,101,1,ALG,948,1435',
+        '1701,Baar,Schriber-Neiger,Hanni,102,1,ALG,208,1435',
+        '1702,Cham,Lustenberger,Andreas,101,1,ALG,290,533',
+        '1702,Cham,Schriber-Neiger,Hanni,102,1,ALG,105,533',
     )).encode('utf-8')
     csv_stat = '\n'.join((
         (
@@ -1276,17 +1376,34 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     # Onegov internal: misssing and number of municpalities
     csv = '\n'.join((
         (
-            'election_title,election_date,election_type,election_mandates,'
-            'election_absolute_majority,election_counted_entities,'
-            'election_total_entities,entity_name,'
-            'entity_id,entity_elegible_voters,'
-            'entity_received_ballots,entity_blank_ballots,'
-            'entity_invalid_ballots,entity_unaccounted_ballots,'
-            'entity_accounted_ballots,entity_blank_votes,'
-            'entity_invalid_votes,entity_accounted_votes,'
-            'list_name,list_id,list_number_of_mandates,list_votes,'
-            'list_connection,list_connection_parent,candidate_family_name,'
-            'candidate_first_name,candidate_id,candidate_elected,'
+            'election_title,'
+            'election_date,'
+            'election_type,'
+            'election_mandates,'
+            'election_absolute_majority,'
+            'election_counted_entities,'
+            'election_total_entities,'
+            'entity_name,'
+            'entity_id,'
+            'entity_elegible_voters,'
+            'entity_received_ballots,'
+            'entity_blank_ballots,'
+            'entity_invalid_ballots,'
+            'entity_unaccounted_ballots,'
+            'entity_accounted_ballots,'
+            'entity_blank_votes,'
+            'entity_invalid_votes,'
+            'entity_accounted_votes,'
+            'list_name,'
+            'list_id,'
+            'list_number_of_mandates,'
+            'list_votes,'
+            'list_connection,'
+            'list_connection_parent,'
+            'candidate_family_name,'
+            'candidate_first_name,'
+            'candidate_id,'
+            'candidate_elected,'
             'candidate_votes'
         ),
         (
@@ -1415,6 +1532,7 @@ def test_upload_communal_election(election_day_app_kriens):
         'election_counted_entities',
         'election_total_entities',
         'entity_id',
+        'entity_name',
         'entity_elegible_voters',
         'entity_received_ballots',
         'entity_blank_ballots',
@@ -1438,10 +1556,22 @@ def test_upload_communal_election(election_day_app_kriens):
 
     csv = '\r\n'.join((
         ','.join(headers),
-        '3294,1,1,1059,18699,6761,124,51,0,0,,,,,,,Koch,Patrick,1,False,1621',
-        '3294,1,1,1059,18699,6761,124,51,0,0,,,,,,,Konrad,Simon,2,False,1707',
-        '3294,1,1,1059,18699,6761,124,51,0,0,,,,,,,Faé,Franco,3,False,3176',
-        '3294,1,1,1059,18699,6761,124,51,0,0,,,,,,,Vereinzelte,,4,False,82',
+        (
+            '3294,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+            'Koch,Patrick,1,False,1621'
+        ),
+        (
+            '3294,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+            'Konrad,Simon,2,False,1707'
+        ),
+        (
+            '3294,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+            'Faé,Franco,3,False,3176'
+        ),
+        (
+            '3294,1,1,1059,Kriens,18699,6761,124,51,0,0,,,,,,,'
+            'Vereinzelte,,4,False,82'
+        ),
     )).encode('utf-8')
 
     upload = client.get('/election/election/upload')
@@ -1477,6 +1607,7 @@ def test_upload_communal_election_districts(election_day_app_bern):
         'election_counted_entities',
         'election_total_entities',
         'entity_id',
+        'entity_name',
         'entity_elegible_voters',
         'entity_received_ballots',
         'entity_blank_ballots',
@@ -1500,24 +1631,78 @@ def test_upload_communal_election_districts(election_day_app_bern):
 
     csv = '\r\n'.join((
         ','.join(headers),
-        '12606,6,6,1,15159,5522,265,503,0,0,,,,,,,V1,N1,1,True,3596',
-        '12606,6,6,2,9399,3342,161,333,0,0,,,,,,,V1,N1,1,True,2139',
-        '12606,6,6,3,12599,4439,184,441,0,0,,,,,,,V1,N1,1,True,2827',
-        '12606,6,6,4,18461,6487,289,624,0,0,,,,,,,V1,N1,1,True,3647',
-        '12606,6,6,5,13880,4985,205,466,0,0,,,,,,,V1,N1,1,True,3192',
-        '12606,6,6,6,12999,4506,170,430,0,0,,,,,,,V1,N1,1,True,2227',
-        '12606,6,6,1,15159,5522,265,503,0,0,,,,,,,V2,N2,2,False,608',
-        '12606,6,6,2,9399,3342,161,333,0,0,,,,,,,V2,N2,2,False,352',
-        '12606,6,6,3,12599,4439,184,441,0,0,,,,,,,V2,N2,2,False,466',
-        '12606,6,6,4,18461,6487,289,624,0,0,,,,,,,V2,N2,2,False,943',
-        '12606,6,6,5,13880,4985,205,466,0,0,,,,,,,V2,N2,2,False,489',
-        '12606,6,6,6,12999,4506,170,430,0,0,,,,,,,V2,N2,2,False,489',
-        '12606,6,6,1,15159,5522,265,503,0,0,,,,,,,V3,N3,3,False,550',
-        '12606,6,6,2,9399,3342,161,333,0,0,,,,,,,V3,N3,3,False,357',
-        '12606,6,6,3,12599,4439,184,441,0,0,,,,,,,V3,N3,3,False,521',
-        '12606,6,6,4,18461,6487,289,624,0,0,,,,,,,V3,N3,3,False,984',
-        '12606,6,6,5,13880,4985,205,466,0,0,,,,,,,V3,N3,3,False,633',
-        '12606,6,6,6,12999,4506,170,430,0,0,,,,,,,V3,N3,3,False,1190',
+        (
+            '12606,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,,'
+            'V1,N1,1,True,3596'
+        ),
+        (
+            '12606,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,,'
+            'V1,N1,1,True,2139'
+        ),
+        (
+            '12606,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,,'
+            'V1,N1,1,True,2827'
+        ),
+        (
+            '12606,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,,'
+            'V1,N1,1,True,3647'
+        ),
+        (
+            '12606,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,,'
+            'V1,N1,1,True,3192'
+        ),
+        (
+            '12606,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,,'
+            'V1,N1,1,True,2227'
+        ),
+        (
+            '12606,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,,'
+            'V2,N2,2,False,608'
+        ),
+        (
+            '12606,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,,'
+            'V2,N2,2,False,352'
+        ),
+        (
+            '12606,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,,'
+            'V2,N2,2,False,466'
+        ),
+        (
+            '12606,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,,'
+            'V2,N2,2,False,943'
+        ),
+        (
+            '12606,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,,'
+            'V2,N2,2,False,489'
+        ),
+        (
+            '12606,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,,'
+            'V2,N2,2,False,489'
+        ),
+        (
+            '12606,6,6,1,Innere Stadt,15159,5522,265,503,0,0,,,,,,,'
+            'V3,N3,3,False,550'
+        ),
+        (
+            '12606,6,6,2,Länggasse/Felsenau,9399,3342,161,333,0,0,,,,,,,'
+            'V3,N3,3,False,357'
+        ),
+        (
+            '12606,6,6,3,Mattenhof/Weissenbühl,12599,4439,184,441,0,0,,,,,,,'
+            'V3,N3,3,False,521'
+        ),
+        (
+            '12606,6,6,4,Kirchenfeld/Schosshalde,18461,6487,289,624,0,0,,,,,,,'
+            'V3,N3,3,False,984'
+        ),
+        (
+            '12606,6,6,5,Breitenrain/Lorraine,13880,4985,205,466,0,0,,,,,,,'
+            'V3,N3,3,False,633'
+        ),
+        (
+            '12606,6,6,6,Bümpliz/Bethlehem,12999,4506,170,430,0,0,,,,,,,'
+            'V3,N3,3,False,1190'
+        ),
     )).encode('utf-8')
 
     upload = client.get('/election/election/upload')

@@ -18,6 +18,21 @@ HEADERS = [
 ]
 
 
+def guessed_group(entity, other):
+    result = entity['name']
+
+    if other:
+        if '/' in other[0].group:
+            result = '/'.join(
+                p for p in (
+                    entity.get('district'),
+                    entity.get('name')
+                ) if p is not None
+            )
+
+    return result
+
+
 def import_file(entities, vote, ballot_type, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.
@@ -175,15 +190,13 @@ def import_file(entities, vote, ballot_type, file, mimetype):
         errors.append(FileImportError(_("No data found")))
 
     if not errors:
+        # Add the missing entities as uncounted results, try to guess the
+        # used grouping
         for id in (entities.keys() - added_entity_ids):
             entity = entities[id]
-
             ballot_results.append(
                 BallotResult(
-                    group='/'.join(p for p in (
-                        entity.get('district'),
-                        entity['name']
-                    ) if p is not None),
+                    group=guessed_group(entity, ballot_results),
                     counted=False,
                     entity_id=id
                 )

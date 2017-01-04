@@ -101,17 +101,40 @@ def upload_majorz_election(client, create=True, zg=False):
         new.form.submit()
 
     csv = (
-        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
-        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,"
-        "Ungueltige Stimmen,Kandidaten-Nr,Gewaehlt,Name,Vorname,Stimmen,"
+        "Anzahl Sitze,"
+        "Wahlkreis-Nr,"
+        "Wahlkreisbezeichnung,"
+        "Stimmberechtigte,"
+        "Wahlzettel,"
+        "Ungültige Wahlzettel,"
+        "Leere Wahlzettel,"
+        "Leere Stimmen,"
+        "Ungueltige Stimmen,"
+        "Kandidaten-Nr,"
+        "Gewaehlt,"
+        "Name,"
+        "Vorname,"
+        "Stimmen,"
         "Anzahl Gemeinden\n"
     )
     if zg:
-        csv += "2,1711,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 125\n"
-        csv += "2,1710,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 125\n"
+        csv += (
+            "2,1711,Zug,56,25,0,4,1,0,1,Gewaehlt,"
+            "Engler,Stefan,20,1 von 125\n"
+        )
+        csv += (
+            "2,1710,Walchwil,56,25,0,4,1,0,2,Gewaehlt,"
+            "Schmid,Martin,18,1 von 125\n"
+        )
     else:
-        csv += "2,3503,56,25,0,4,1,0,1,Gewaehlt,Engler,Stefan,20,1 von 125\n"
-        csv += "2,3503,56,25,0,4,1,0,2,Gewaehlt,Schmid,Martin,18,1 von 125\n"
+        csv += (
+            "2,3503,Mutten,56,25,0,4,1,0,1,Gewaehlt,"
+            "Engler,Stefan,20,1 von 125\n"
+        )
+        csv += (
+            "2,3503,Mutten,56,25,0,4,1,0,2,Gewaehlt,"
+            "Schmid,Martin,18,1 von 125\n"
+        )
     csv = csv.encode('utf-8')
 
     upload = client.get('/election/majorz-election/upload')
@@ -134,24 +157,43 @@ def upload_proporz_election(client, create=True):
         new.form.submit()
 
     csv = (
-        "Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,"
-        "Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Listen-Nr,"
-        "Partei-ID,Parteibezeichnung,HLV-Nr,ULV-Nr,Anzahl Sitze Liste,"
-        "Unveränderte Wahlzettel Liste,Veränderte Wahlzettel Liste,"
+        "Anzahl Sitze,"
+        "Wahlkreis-Nr,"
+        "Wahlkreisbezeichnung,"
+        "Stimmberechtigte,"
+        "Wahlzettel,"
+        "Ungültige Wahlzettel,"
+        "Leere Wahlzettel,"
+        "Leere Stimmen,"
+        "Listen-Nr,"
+        "Partei-ID,"
+        "Parteibezeichnung,"
+        "HLV-Nr,"
+        "ULV-Nr,"
+        "Anzahl Sitze Liste,"
+        "Unveränderte Wahlzettel Liste,"
+        "Veränderte Wahlzettel Liste,"
         "Kandidatenstimmen unveränderte Wahlzettel,"
         "Zusatzstimmen unveränderte Wahlzettel,"
         "Kandidatenstimmen veränderte Wahlzettel,"
-        "Zusatzstimmen veränderte Wahlzettel,Kandidaten-Nr,Gewählt,Name,"
-        "Vorname,Stimmen unveränderte Wahlzettel,"
-        "Stimmen veränderte Wahlzettel,Stimmen Total aus Wahlzettel,"
-        "01 FDP,02 CVP, Anzahl Gemeinden\n"
+        "Zusatzstimmen veränderte Wahlzettel,"
+        "Kandidaten-Nr,"
+        "Gewählt,"
+        "Name,"
+        "Vorname,"
+        "Stimmen unveränderte Wahlzettel,"
+        "Stimmen veränderte Wahlzettel,"
+        "Stimmen Total aus Wahlzettel,"
+        "01 FDP,"
+        "02 CVP,"
+        "Anzahl Gemeinden\n"
     )
     csv += (
-        "5,3503,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
+        "5,3503,Mutten,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
         "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
     )
     csv += (
-        "5,3503,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
+        "5,3503,Mutten,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
         "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n"
     )
     csv = csv.encode('utf-8')

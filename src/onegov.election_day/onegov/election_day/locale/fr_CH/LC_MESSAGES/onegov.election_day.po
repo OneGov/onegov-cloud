@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 09:51+0100\n"
+"POT-Creation-Date: 2017-01-03 15:39+0100\n"
 "PO-Revision-Date: 2016-12-19 13:16+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -160,19 +160,9 @@ msgstr "Plus de votes que d'électeurs"
 msgid "Invalid ballot type"
 msgstr "Type de scrutin invalide"
 
-msgid "Missing municipality"
-msgstr "Municipalité manquante"
-
 #, python-format
 msgid "${group} was found twice"
 msgstr "${group} a été trouvé en double"
-
-msgid "Invalid municipality id"
-msgstr "Mauvaise référence de municipalité"
-
-#, python-format
-msgid "municipality id ${id} was found twice"
-msgstr "référence de municipalité ${id} trouvées deux fois"
 
 msgid "Election (German)"
 msgstr "Election (allemand)"

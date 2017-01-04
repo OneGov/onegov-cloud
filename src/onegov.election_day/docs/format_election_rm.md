@@ -28,6 +28,7 @@ Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
 
 - **Anzahl Sitze** (Dumber dals sezs)
 - **Wahlkreis-Nr** (Nr. dal circul electoral)
+- **Wahlkreisbezeichnung** (Electoral district name)
 - **Anzahl Gemeinden** (Dumber da vischnancas)
 - **Stimmberechtigte** (Persunas cun dretg da votar)
 - **Wahlzettel** (Cedels electorals)
@@ -59,6 +60,7 @@ Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
 
 - **Anzahl Sitze** (Dumber dals sezs)
 - **Wahlkreis-Nr** (Nr. dal circul electoral)
+- **Wahlkreisbezeichnung** (Electoral district name)
 - **Stimmberechtigte** (Persunas cun dretg da votar)
 - **Wahlzettel** (Cedels electorals)
 - **Ungültige Wahlzettel** (Cedels electorals nunvalaivels)
@@ -106,6 +108,7 @@ En l'export da datas datti ina lingia per mintga vischnanca, las candidatas ed i
 
 - **AnzMandate**
 - **BFS**
+- **EinheitBez**
 - **StimmBer**
 - **StimmAbgegeben**
 - **StimmLeer**
@@ -172,6 +175,7 @@ The results may contain panachage results by adding one column per list:
 La datoteca cun las statisticas tar las singulas vischnancas duess cuntegnair las suandantas colonnas:
 
 - **Einheit_BFS**
+- **Einheit_Name**
 - **StimBerTotal**
 - **WZEingegangen**
 - **WZLeer**
@@ -222,13 +226,14 @@ Las suandantas colonnas vegnan evaluadas e duessan esser avant maun:
 - **election_absolute_majority**: Maioritad absoluta da l'elecziun, mo tar elecziuns da maiorz.
 - **election_counted_municipalites**: Dumber da las vischnancas ch'èn dumbradas ora. Sche `election_counted_municipalites = election_total_municipalites`, vala l'elecziun sco dumbrada ora cumplettamain.
 - **election_total_municipalites**: Dumber total da vischnancas. Sch'i na po betg vegnir dada ina infurmaziun exacta davart il status da l'elecziun (damai che Wahlt è vegnì importà da Wabsti), è questa valur `0`.
-- **municipality_bfs_number**: Numer UST da la vischnanca.
-- **municipality_elegible_voters**: Dumber da persunas cun dretg da votar da la vischnanca.
-- **municipality_received_ballots**: Dumber da cedels da votar consegnads da la vischnanca.
-- **municipality_blank_ballots**: Dumber da cedels da votar vids da la vischnanca.
-- **municipality_invalid_ballots**: Dumber da cedels da votar nunvalaivels da la vischnanca.
-- **municipality_blank_votes**: Dumber da vuschs vidas da la vischnanca.
-- **municipality_invalid_votes**: Dumber da vuschs nunvalaivlas da la vischnanca. Nulla en cas d'ina elecziun da proporz.
+- **entity_bfs_number**: Numer UST da la vischnanca.
+- **entity_name**: The name of the municipality.
+- **entity_elegible_voters**: Dumber da persunas cun dretg da votar da la vischnanca.
+- **entity_received_ballots**: Dumber da cedels da votar consegnads da la vischnanca.
+- **entity_blank_ballots**: Dumber da cedels da votar vids da la vischnanca.
+- **entity_invalid_ballots**: Dumber da cedels da votar nunvalaivels da la vischnanca.
+- **entity_blank_votes**: Dumber da vuschs vidas da la vischnanca.
+- **entity_invalid_votes**: Dumber da vuschs nunvalaivlas da la vischnanca. Nulla en cas d'ina elecziun da proporz.
 - **list_name**: Num da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
 - **list_id**: ID da la glista da la candidata u dal candidat. Mo tar elecziuns da proporz.
 - **list_number_of_mandates**: Dumber total da mandats da la glista. Mo tar elecziuns da proporz.
