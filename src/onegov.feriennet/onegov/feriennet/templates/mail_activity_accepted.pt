@@ -4,7 +4,7 @@
     </tal:block>
     <tal:block metal:fill-slot="body">
         <p i18n:translate>Dear Sir or Madam,</p>
-        <p i18n:translate>Your activity has been accepted:</p>
+        <p i18n:translate>Your activity has been published:</p>
         <br>
         <p><b>${model.title}</b></p>
         <p>${model.lead}</p>

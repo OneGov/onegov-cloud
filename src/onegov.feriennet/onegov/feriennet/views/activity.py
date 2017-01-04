@@ -336,15 +336,16 @@ def propose_activity(self, request):
             handler_code='FER', handler_id=self.id.hex
         )
 
-    send_html_mail(
-        request=request,
-        template='mail_ticket_opened.pt',
-        subject=_("A ticket has been opened"),
-        receivers=(request.current_username, ),
-        content={
-            'model': ticket
-        }
-    )
+    if request.is_organiser_only or request.current_username != self.username:
+        send_html_mail(
+            request=request,
+            template='mail_ticket_opened.pt',
+            subject=_("A ticket has been opened"),
+            receivers=(self.username, ),
+            content={
+                'model': ticket
+            }
+        )
 
     request.success(_("Thank you for your proposal!"))
     request.app.update_ticket_count()
@@ -369,7 +370,7 @@ def accept_activity(self, request):
         request=request,
         action='accept',
         template='mail_activity_accepted.pt',
-        subject=_("Your activity has been accepted")
+        subject=_("Your activity has been published")
     )
 
 
@@ -412,16 +413,17 @@ def administer_activity(model, request, action, template, subject):
     # execute state change
     getattr(model, action)()
 
-    send_html_mail(
-        request=request,
-        template=template,
-        subject=subject,
-        receivers=(request.current_username, ),
-        content={
-            'model': model,
-            'ticket': ticket
-        }
-    )
+    if request.current_username != model.username:
+        send_html_mail(
+            request=request,
+            template=template,
+            subject=subject,
+            receivers=(model.username, ),
+            content={
+                'model': model,
+                'ticket': ticket
+            }
+        )
 
     @request.after
     def redirect_intercooler(response):

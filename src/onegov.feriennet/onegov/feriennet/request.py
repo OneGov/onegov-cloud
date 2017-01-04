@@ -41,7 +41,3 @@ class FeriennetRequest(OrgRequest):
         if self.identity:
             return UserCollection(self.app.session()).by_username(
                 self.identity.userid)
-
-    @property
-    def current_username(self):
-        return self.identity and self.identity.userid or None

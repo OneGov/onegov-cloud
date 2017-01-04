@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer send e-mails to admins if they are publishing their own activites.
+  [href]
+
 0.1.5 (2016-12-28)
 ~~~~~~~~~~~~~~~~~~~
 

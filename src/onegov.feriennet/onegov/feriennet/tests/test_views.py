@@ -125,7 +125,7 @@ def test_activity_communication(feriennet_app):
     admin.post(get_post_url(ticket, 'accept-activity'))
     assert len(feriennet_app.smtp.outbox) == 4
     message = get_message(feriennet_app, 3)
-    assert "wurde angenommen" in message
+    assert "wurde veröffentlicht" in message
     assert "Learn Python" in message
     assert "Using a Raspberry Pi we will learn Python" in message
 
