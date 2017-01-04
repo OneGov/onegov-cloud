@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 15:39+0100\n"
+"POT-Creation-Date: 2017-01-04 08:52+0100\n"
 "PO-Revision-Date: 2016-12-14 11:30+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -160,10 +160,6 @@ msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
 
-#, python-format
-msgid "${group} was found twice"
-msgstr "${group} è avant maun duas giadas"
-
 msgid "Election (German)"
 msgstr "Elecziun (tudestg)"
 
@@ -221,9 +217,6 @@ msgstr "Resultat eruì cumplettamain"
 msgid "Absolute majority"
 msgstr "Maioritad absoluta"
 
-msgid "Counter-Proposal"
-msgstr "Cuntraproposta"
-
 msgid "Vote number"
 msgstr "Numer dal project"
 
@@ -264,14 +257,14 @@ msgstr "Votaziun (rumantsch)"
 msgid "New results are available on ${url}"
 msgstr "Novs resultats disponibels sin ${url}"
 
-msgid "federal"
-msgstr "federal"
+msgid "Federal"
+msgstr "Sin plaun naziunal"
 
-msgid "cantonal"
-msgstr "chantunal"
+msgid "Cantonal"
+msgstr "Sin plaun chantunal"
 
-msgid "communal"
-msgstr "communal"
+msgid "Communal"
+msgstr "Sin plaun communal"
 
 msgid "Elections &amp; Votes"
 msgstr "Elecziuns &amp; votaziuns"
@@ -485,25 +478,16 @@ msgstr "I n'èn registradas anc naginas elecziuns."
 msgid "Actions"
 msgstr "Acziuns"
 
-msgid "Federal"
-msgstr "Sin plaun naziunal"
-
-msgid "Cantonal"
-msgstr "Sin plaun chantunal"
-
-msgid "Communal"
-msgstr "Sin plaun communal"
-
 msgid "View"
 msgstr "Mussar"
 
 msgid "Edit"
 msgstr "Modifitgar"
 
-msgid "Upload Results"
+msgid "Upload results"
 msgstr "Chargiar si resultats"
 
-msgid "Trigger Notifications"
+msgid "Trigger notifications"
 msgstr "Trametter communicaziuns als abunents"
 
 msgid "Delete"
@@ -523,9 +507,6 @@ msgstr "Nova votaziun"
 
 msgid "No votes yet."
 msgstr "I n'èn registradas anc naginas votaziuns."
-
-msgid "Upload results"
-msgstr "Chargiar si resultats"
 
 msgid "Please use the following format:"
 msgstr "Duvrai per plaschair il suandant format:"

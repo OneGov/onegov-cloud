@@ -64,8 +64,8 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
         if not group:
             line_errors.append(_("Missing municipality/district"))
         if group in added_groups:
-            line_errors.append(_("${group} was found twice", mapping={
-                'group': group
+            line_errors.append(_("${name} was found twice", mapping={
+                'name': group
             }))
         added_groups.add(group)
 

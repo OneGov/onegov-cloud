@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 15:39+0100\n"
+"POT-Creation-Date: 2017-01-04 08:52+0100\n"
 "PO-Revision-Date: 2017-01-03 09:48+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -160,10 +160,6 @@ msgstr "Mehr eingelegte Stimmen als Stimmberechtigte"
 msgid "Invalid ballot type"
 msgstr "Ungültige Abstimmungsart"
 
-#, python-format
-msgid "${group} was found twice"
-msgstr "${group} kommt zweimal vor"
-
 msgid "Election (German)"
 msgstr "Wahl (Deutsch)"
 
@@ -221,9 +217,6 @@ msgstr "Komplett ausgezählt"
 msgid "Absolute majority"
 msgstr "Absolutes Mehr"
 
-msgid "Counter-Proposal"
-msgstr "Gegenentwurf"
-
 msgid "Vote number"
 msgstr "Vorlagen-Nummer"
 
@@ -264,14 +257,14 @@ msgstr "Abstimmung (Rumantsch)"
 msgid "New results are available on ${url}"
 msgstr "Neue Resultate verfügbar auf ${url}"
 
-msgid "federal"
-msgstr "national"
+msgid "Federal"
+msgstr "National"
 
-msgid "cantonal"
-msgstr "kantonal"
+msgid "Cantonal"
+msgstr "Kantonal"
 
-msgid "communal"
-msgstr "kommunal"
+msgid "Communal"
+msgstr "Kommunal"
 
 msgid "Elections &amp; Votes"
 msgstr "Wahlen &amp; Abstimmungen"
@@ -450,25 +443,16 @@ msgstr "Noch keine Wahlen erfasst."
 msgid "Actions"
 msgstr "Aktionen"
 
-msgid "Federal"
-msgstr "National"
-
-msgid "Cantonal"
-msgstr "Kantonal"
-
-msgid "Communal"
-msgstr "Kommunal"
-
 msgid "View"
 msgstr "Anzeigen"
 
 msgid "Edit"
 msgstr "Bearbeiten"
 
-msgid "Upload Results"
-msgstr "Resultate Hochladen"
+msgid "Upload results"
+msgstr "Resultate hochladen"
 
-msgid "Trigger Notifications"
+msgid "Trigger notifications"
 msgstr "Benachrichtigungen auslösen"
 
 msgid "Delete"
@@ -488,9 +472,6 @@ msgstr "Neue Abstimmung"
 
 msgid "No votes yet."
 msgstr "Noch keine Abstimmungen erfasst."
-
-msgid "Upload results"
-msgstr "Resultate hochladen"
 
 msgid "Please use the following format:"
 msgstr "Bitte verwenden Sie das folgende Format:"

@@ -118,7 +118,7 @@ def trigger_notifications(self, request, form):
 
     callout = None
     message = ''
-    title = _("Trigger Notifications")
+    title = _("Trigger notifications")
     button_class = 'primary'
 
     if notifications.by_vote(self):

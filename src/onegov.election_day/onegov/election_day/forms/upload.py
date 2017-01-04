@@ -156,7 +156,7 @@ class UploadVoteForm(Form):
     )
 
     counter_proposal = UploadField(
-        label=_("Counter-Proposal"),
+        label=_("Counter Proposal"),
         validators=[
             DataRequired(),
             WhitelistedMimeType(ALLOWED_MIME_TYPES),

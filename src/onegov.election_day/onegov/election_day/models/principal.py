@@ -87,10 +87,10 @@ class Principal(object):
     def available_domains(self):
         """ the usable domains of influence """
         result = OrderedDict()
-        result['federation'] = _("federal")
-        result['canton'] = _("cantonal")
+        result['federation'] = _("Federal")
+        result['canton'] = _("Cantonal")
         if self.domain == 'municipality':
-            result['municipality'] = _("communal")
+            result['municipality'] = _("Communal")
         return result
 
     @cached_property

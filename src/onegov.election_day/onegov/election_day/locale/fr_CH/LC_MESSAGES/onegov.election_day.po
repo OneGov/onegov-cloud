@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-03 15:39+0100\n"
+"POT-Creation-Date: 2017-01-04 08:52+0100\n"
 "PO-Revision-Date: 2016-12-19 13:16+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -160,10 +160,6 @@ msgstr "Plus de votes que d'électeurs"
 msgid "Invalid ballot type"
 msgstr "Type de scrutin invalide"
 
-#, python-format
-msgid "${group} was found twice"
-msgstr "${group} a été trouvé en double"
-
 msgid "Election (German)"
 msgstr "Election (allemand)"
 
@@ -221,9 +217,6 @@ msgstr "Terminé"
 msgid "Absolute majority"
 msgstr "Majorité absolue"
 
-msgid "Counter-Proposal"
-msgstr "Contre-proposition"
-
 msgid "Vote number"
 msgstr "Numéro de votation"
 
@@ -264,14 +257,14 @@ msgstr "Vote (roumain)"
 msgid "New results are available on ${url}"
 msgstr "Les nouveaux résultats sont disponibles sur ${url}"
 
-msgid "federal"
-msgstr "fédéral"
+msgid "Federal"
+msgstr "Fédéral"
 
-msgid "cantonal"
-msgstr "cantonal"
+msgid "Cantonal"
+msgstr "Cantonal"
 
-msgid "communal"
-msgstr "municipal"
+msgid "Communal"
+msgstr "Municipal"
 
 msgid "Elections &amp; Votes"
 msgstr "Elections et votes: données ouvertes"
@@ -449,25 +442,16 @@ msgstr "Pas de elections actuellement"
 msgid "Actions"
 msgstr "Actions"
 
-msgid "Federal"
-msgstr "Fédéral"
-
-msgid "Cantonal"
-msgstr "Cantonal"
-
-msgid "Communal"
-msgstr "Municipal"
-
 msgid "View"
 msgstr "Voir"
 
 msgid "Edit"
 msgstr "Editer"
 
-msgid "Upload Results"
+msgid "Upload results"
 msgstr "Mettre à jour les résultats"
 
-msgid "Trigger Notifications"
+msgid "Trigger notifications"
 msgstr "Activer les notifications"
 
 msgid "Delete"
@@ -487,9 +471,6 @@ msgstr "Nouveau vote"
 
 msgid "No votes yet."
 msgstr "Pas de votes actuellement"
-
-msgid "Upload results"
-msgstr "Mettre à jour les résultats"
 
 msgid "Please use the following format:"
 msgstr "Veuillez utiliser le format suivant:"
