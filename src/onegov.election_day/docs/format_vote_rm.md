@@ -21,14 +21,16 @@ There is generally one CSV/Excel file per referendum proposal. However, should t
 
 Each line contains the result of a single municipality, provided that this has been counted in full. The following columns are expected in the order listed here:
 
-- **Bezirk**: The district in which the municipality is located. If the municipality is not located in a district, this field can be left empty.
-- **ID**: The municipality number (BFS number) at the time of the vote. A value of `0` can be used for expats.
-- **Name**: The name of the municipality.
-- **Ja Stimmen**: The number of “yes” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
-- **Nein Stimmen**: The number of “no” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
-- **Stimmberechtigte**: The number of persons eligible to vote. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
-- **Leere Stimmzettel**: The number of blank ballot papers. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
-- **Ungültige Stimmzettel**: The number of spoilt ballot papers. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
+Num|Descripziun
+---|---
+`Bezirk`|The district in which the municipality is located. If the municipality is not located in a district, this field can be left empty.
+`ID`|The municipality number (BFS number) at the time of the vote. A value of `0` can be used for expats.
+`Name`|The name of the municipality.
+`Ja Stimmen`|The number of “yes” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
+`Nein Stimmen`|The number of “no” votes. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
+`Stimmberechtigte`|The number of persons eligible to vote. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
+`Leere Stimmzettel`|The number of blank ballot papers. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
+`Ungültige Stimmzettel`|The number of spoilt ballot papers. If the word `unbekannt` is entered, the line will be ignored (not yet counted).
 
 ### Resultats temporars
 
@@ -47,19 +49,21 @@ The format of the "Wabsti Elections and Referenda (VRSG)" election program consi
 
 Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
 
-- **Vorlage-Nr.**: A sequential number for each proposal/referendum. Must be specified at the upload dialog.
-- **Name**: The name of the municipality
-- **BfS-Nr.**: The municipality number (BFS number). If `name = Auslandschweizer`, any value can be used for exapts.
-- **Stimmberechtigte**: The number of persons eligible to vote.
-- **leere SZ**: The number of blank ballot papers.
-- **ungültige SZ**: The number of spoilt ballot papers.
-- **Ja**: The number of “yes” votes.
-- **Nein**: The number of “no” votes.
-- **GegenvJa**: The number who voted “yes” to the counter-proposal.
-- **GegenvNein**: The number who voted “no” to the counter-proposal.
-- **StichfrJa**: The number who voted “yes” to the tie-breaker.
-- **StichfrNein**: The number who voted “no” to the tie-breaker.
-- **StimmBet**: The turnout as a percentage. Is used to decide whether the municipality has already been counted. If the turnout is `0`, the line is ignored (not yet counted).
+Num|Descripziun
+---|---
+`Vorlage-Nr.`|A sequential number for each proposal/referendum. Must be specified at the upload dialog.
+`Name`|The name of the municipality
+`BfS-Nr.`|The municipality number (BFS number). If `name = Auslandschweizer`, any value can be used for exapts.
+`Stimmberechtigte`|The number of persons eligible to vote.
+`leere SZ`|The number of blank ballot papers.
+`ungültige SZ`|The number of spoilt ballot papers.
+`Ja`|The number of “yes” votes.
+`Nein`|The number of “no” votes.
+`GegenvJa`|The number who voted “yes” to the counter-proposal.
+`GegenvNein`|The number who voted “no” to the counter-proposal.
+`StichfrJa`|The number who voted “yes” to the tie-breaker.
+`StichfrNein`|The number who voted “no” to the tie-breaker.
+`StimmBet`|The turnout as a percentage. Is used to decide whether the municipality has already been counted. If the turnout is `0`, the line is ignored (not yet counted).
 
 ### Resultats temporars
 
@@ -80,15 +84,18 @@ The format used by the web application for the export consists of one single fil
 
 Las suandantas colonnas vegnan evaluadas e ston almain esser avant maun:
 
-- **type** `proposal`, `counter-proposal` or `tie-breaker`.
-- **group** Where the result comes from. This can be the region and municipality (separated by a forward slash), the name of the city and name of the district (likewise separated by a forward slash) or a simple municipality name. This all depends on the respective canton.
-- **entity_id** The municipality number (BFS number). A value of `0` can be used for expats.
-- **counted** `true` if the municipality has been counted.
-- **yeas** The number of “yes” votes.
-- **nays** The number of “no” votes.
-- **invalid** The number of spoilt votes.
-- **empty** The number of blank votes.
-- **elegible_voters** The number of persons eligible to vote.
+Num|Descripziun
+---|---
+`type`|`proposal` (proposta), `counter-proposal` (cuntraproposta) or "tie-breaker" (dumonda decisiva).
+`group`|La derivanza dal resultat. Quai po esser il district e la vischnanca, separads cun in stritg diagonal, il num da la citad ed il num dal circul, er separads cun in stritg diagonal, u simplamain il num da la vischnanca. Quai dependa dal chantun respectiv.
+`entity_id`|La ID da la vischnanca/dal lieu. A value `0` represents the expats.
+`counted`|Gist, sch'il resultat è vegnì eruì. Fauss, sch'il resultat n'è anc betg enconuschent (las valurs n'èn anc betg correctas).
+`yeas`|Il dumber da las vuschs affirmativas
+`nays`|Il dumber da las vuschs negativas
+`invalid`|Il dumber da las vuschs nunvalaivlas
+`empty`|Il dumber da las vuschs vidas
+`elegible_voters`|Il dumber da las persunas cun dretg da votar
+
 
 ### Resultats temporars
 

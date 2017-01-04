@@ -23,14 +23,16 @@ Jede Zeile enthält das Resultat einer einzelnen Gemeinde, sofern diese
 vollständig ausgezählt wurde. Folgende Spalten werden dabei in der hier
 aufgelisteten Reihenfolge erwartet:
 
-- **Bezirk**: Der Bezirk in der sich die Gemeinde befindet. Ist die Gemeinde in keinem Bezirk, darf dieses Feld leer sein.
-- **ID**: Die BFS-Nummer der Gemeinde zum Zeitpunkt der Abstimmung. Der Wert `0` kann für Auslandslebende verwendet werden.
-- **Name**: Der Name der Gemeinde.
-- **Ja Stimmen**: Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-- **Nein Stimmen**: Die Anzahl Nein Stimmen der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-- **Stimmberechtigte**: Die Anzahl Stimmberechtigter. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-- **Leere Stimmzettel**: Die Anzahl leer eingelegter Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
-- **Ungültige Stimmzettel**: Die Anzahl ungültiger Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+Name|Beschreibung
+---|---
+`Bezirk`|Der Bezirk in der sich die Gemeinde befindet. Ist die Gemeinde in keinem Bezirk, darf dieses Feld leer sein.
+`ID`|Die BFS-Nummer der Gemeinde zum Zeitpunkt der Abstimmung. Der Wert `0` kann für Auslandslebende verwendet werden.
+`Name`|Der Name der Gemeinde.
+`Ja Stimmen`|Die Anzahl Ja Stimmen zu der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Nein Stimmen`|Die Anzahl Nein Stimmen der Abstimmung. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Stimmberechtigte`|Die Anzahl Stimmberechtigter. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Leere Stimmzettel`|Die Anzahl leer eingelegter Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
+`Ungültige Stimmzettel`|Die Anzahl ungültiger Stimmzettel. Ist der Text `unbekannt` eingetragen, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 ### Temporäre Resultate
 
@@ -49,19 +51,21 @@ Das Format des Wahlprogrammen "Wabsti Wahlen und Abstimmungen (VRSG)" besteht au
 
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-- **Vorlage-Nr.**: Eine fortlaufende Nummer für jede Vorlage/Abstimmung. Muss beim Upload Dialog angegeben werden.
-- **Name**: Der Name der Gemeinde
-- **BfS-Nr.**: Die BFS-Nummer der Gemeinde. Es kann jeder beliebige Werte für Auslandschweizer verwendet werden, falls `Name = Auslandschweizer`.
-- **Stimmberechtigte**: Die Anzahl Stimmberechtigter.
-- **leere SZ**: Die Anzahl leer eingelegter Stimmzettel.
-- **ungültige SZ**: Die Anzahl ungültiger Stimmzettel.
-- **Ja**: Die Anzahl Ja Stimmen.
-- **Nein**: Die Anzahl Nein Stimmen.
-- **GegenvJa**: Die Anzahl Ja Stimmen zum Gegenvorschlag.
-- **GegenvNein**:  Die Anzahl Nein Stimmen zum Gegenvorschlag.
-- **StichfrJa**: Die Anzahl Ja Stimmen zur Stichfrage.
-- **StichfrNein**: Die Anzahl Nein Stimmen zur Stichfrage.
-- **StimmBet**: Die Stimmbeteilgung in Prozent. Wird verwendet, um zu entscheiden, ob die Gemeinde bereits ausgezählt wurde. Ist die Stimmbeteilgung `0`, wird die Zeile ignoriert (noch nicht ausgezählt).
+Name|Beschreibung
+---|---
+`Vorlage-Nr.`|Eine fortlaufende Nummer für jede Vorlage/Abstimmung. Muss beim Upload Dialog angegeben werden.
+`Name`|Der Name der Gemeinde
+`BfS-Nr.`|Die BFS-Nummer der Gemeinde. Es kann jeder beliebige Werte für Auslandschweizer verwendet werden, falls `Name = Auslandschweizer`.
+`Stimmberechtigte`|Die Anzahl Stimmberechtigter.
+`leere SZ`|Die Anzahl leer eingelegter Stimmzettel.
+`ungültige SZ`|Die Anzahl ungültiger Stimmzettel.
+`Ja`|Die Anzahl Ja Stimmen.
+`Nein`|Die Anzahl Nein Stimmen.
+`GegenvJa`|Die Anzahl Ja Stimmen zum Gegenvorschlag.
+`GegenvNein`| Die Anzahl Nein Stimmen zum Gegenvorschlag.
+`StichfrJa`|Die Anzahl Ja Stimmen zur Stichfrage.
+`StichfrNein`|Die Anzahl Nein Stimmen zur Stichfrage.
+`StimmBet`|Die Stimmbeteilgung in Prozent. Wird verwendet, um zu entscheiden, ob die Gemeinde bereits ausgezählt wurde. Ist die Stimmbeteilgung `0`, wird die Zeile ignoriert (noch nicht ausgezählt).
 
 ### Temporäre Resultate
 
@@ -82,15 +86,18 @@ Das Format, welche von der Web-Applikation für den Export verwendet wird, beste
 
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-- **type** `proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
-- **group** Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
-- **entity_id** Die BFS-Nummer der Gemeinde. Der Wert `0` kann für Auslandschweizer verwendet werden.
-- **counted** `true`, falls die Gemeinde ausgezählt ist.
-- **yeas** Die Anzahl Ja Stimmen.
-- **nays** Die Anzahl Nein Stimmen.
-- **invalid** Die Anzahl ungültiger Stimmen.
-- **empty** Die Anzahl leerer Stimmen.
-- **elegible_voters** Die Anzahl Stimmberechtigter.
+Name|Beschreibung
+---|---
+`type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
+`group`|Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
+`entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
+`counted`|Wahr wenn das Resultat ausgezählt wurde. Falsch wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
+`yeas`|Die Anzahl Ja Stimmen
+`nays`|Die Anzahl Nein Stimmen
+`invalid`|Die Anzahl ungültiger Stimmen
+`empty`|Die Anzahl leerer Stimmen
+`elegible_voters`|Die Anzahl Stimmberechtigter
+
 
 ### Temporäre Resultate
 

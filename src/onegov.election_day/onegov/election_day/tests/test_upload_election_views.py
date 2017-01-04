@@ -33,7 +33,6 @@ def test_upload_election_year_unavailable(election_day_app_gr):
         "Leere Wahlzettel,"
         "Leere Stimmen,"
         "Listen-Nr,"
-        "Partei-ID,"
         "Parteibezeichnung,"
         "HLV-Nr,"
         "ULV-Nr,"
@@ -241,7 +240,6 @@ def test_upload_election_sesam_fail(election_day_app_gr):
         'Leere Wahlzettel',
         'Leere Stimmen',
         'Listen-Nr',
-        'Partei-ID',
         'Parteibezeichnung',
         'HLV-Nr',
         'ULV-Nr',
@@ -288,7 +286,6 @@ def test_upload_election_sesam_fail(election_day_app_gr):
             '0',
             '1',
             'list one',
-            '19',
             'FDP',
             '1',
             '1',
@@ -337,7 +334,6 @@ def test_upload_election_sesam_fail(election_day_app_gr):
             '0',
             '1',
             '1',
-            '19',
             'FDP',
             '1',
             '1',
@@ -1281,7 +1277,6 @@ def test_upload_election_temporary_results_proporz(election_day_app):
             'Ungültige Wahlzettel,'
             'Leere Stimmen,'
             'Listen-Nr,'
-            'Partei-ID,'
             'Parteibezeichnung,'
             'HLV-Nr,'
             'ULV-Nr,'
@@ -1298,19 +1293,19 @@ def test_upload_election_temporary_results_proporz(election_day_app):
             'Anzahl Gemeinden'
         ),
         (
-            '2,1701,Baar,14119,7462,77,196,122,1,1,ALG,,,1435,0,0,0,0,101,'
+            '2,1701,Baar,14119,7462,77,196,122,1,ALG,,,1435,0,0,0,0,101,'
             'FALSE,Lustenberger,Andreas,948,2 von 11'
         ),
         (
-            '2,1701,Baar,14119,7462,77,196,122,1,1,ALG,,,1435,0,0,0,0,102,'
+            '2,1701,Baar,14119,7462,77,196,122,1,ALG,,,1435,0,0,0,0,102,'
             'FALSE,Schriber-Neiger,Hanni,208,2 von 11'
         ),
         (
-            '2,1702,Cham,9926,4863,0,161,50,1,1,ALG,,,533,0,0,0,0,101,FALSE,'
+            '2,1702,Cham,9926,4863,0,161,50,1,ALG,,,533,0,0,0,0,101,FALSE,'
             'Lustenberger,Andreas,290,2 von 11'
         ),
         (
-            '2,1702,Cham,9926,4863,0,161,50,1,1,ALG,,,533,0,0,0,0,102,FALSE,'
+            '2,1702,Cham,9926,4863,0,161,50,1,ALG,,,533,0,0,0,0,102,FALSE,'
             'Schriber-Neiger,Hanni,105,2 von 11'
         ),
     )).encode('utf-8')

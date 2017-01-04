@@ -26,21 +26,23 @@ The SESAM export format directly contains all the required data. There is one li
 
 The following columns will be evaluated and should exist at the least:
 
-- **Anzahl Sitze** (Number seats)
-- **Wahlkreis-Nr** (Electoral district number)
-- **Wahlkreisbezeichnung** (Electoral district name)
-- **Anzahl Gemeinden** (Number municipalities)
-- **Stimmberechtigte** (Entitled to vote)
-- **Wahlzettel** (Ballots)
-- **Ungültige Wahlzettel** (Invalid ballots)
-- **Leere Wahlzettel** (Empty ballots)
-- **Leere Stimmen** (Empty votes)
-- **Ungueltige Stimmen** (Invalid votes)
-- **Kandidaten-Nr** (Candidate number)
-- **Gewaehlt** (Elected)
-- **Name** (Name)
-- **Vorname** (First name)
-- **Stimmen** (Votes)
+Name|Description
+---|---
+`Anzahl Sitze`|Number seats
+`Wahlkreis-Nr`|Electoral district number
+`Wahlkreisbezeichnung`|Electoral district name
+`Anzahl Gemeinden`|Number municipalities
+`Stimmberechtigte`|Entitled to vote
+`Wahlzettel`|Ballots
+`Ungültige Wahlzettel`|Invalid ballots
+`Leere Wahlzettel`|Empty ballots
+`Leere Stimmen`|Empty votes
+`Ungueltige Stimmen`|Invalid votes
+`Kandidaten-Nr`|Candidate number
+`Gewaehlt`|Elected
+`Name`|Name
+`Vorname`|First name
+`Stimmen`|Votes
 
 ### Temporary results
 
@@ -58,36 +60,39 @@ The SESAM export format directly contains all the required data. There is one li
 
 The following columns will be evaluated and should exist at the least:
 
-- **Anzahl Sitze** (Number seats)
-- **Wahlkreis-Nr** (Electoral district number)
-- **Wahlkreisbezeichnung** (Electoral district name)
-- **Stimmberechtigte** (Entitled to vote)
-- **Wahlzettel** (Ballots)
-- **Ungültige Wahlzettel** (Invalid ballots)
-- **Leere Wahlzettel** (Empty ballots)
-- **Leere Stimmen** (Empty votes)
-- **Listen-Nr** (List number)
-- **Partei-ID** (Party ID)
-- **Parteibezeichnung** (Party description)
-- **HLV-Nr**
-- **ULV-Nr**
-- **Anzahl Sitze Liste** (Number seats list)
-- **Kandidatenstimmen unveränderte Wahlzettel** (Candidate votes unchanged ballot, part of list vote)
-- **Zusatzstimmen unveränderte Wahlzettel** (Additional votes unchanged ballot, part of list vote)
-- **Kandidatenstimmen veränderte Wahlzettel** (Candidate vote changed ballot, part of list vote)
-- **Zusatzstimmen veränderte Wahlzettel** (Additional votes changed ballot, part of list vote)
-- **Kandidaten-Nr** (Candidate number)
-- **Gewählt** (Elected)
-- **Name** (Name)
-- **Vorname** (First name)
-- **Stimmen Total aus Wahlzettel** (Vote total from ballot)
-- **Anzahl Gemeinden** (Number municipalities)
+Name|Description
+---|---
+`Anzahl Sitze`|Number seats
+`Wahlkreis-Nr`|Electoral district number
+`Wahlkreisbezeichnung`|Electoral district name
+`Stimmberechtigte`|Entitled to vote
+`Wahlzettel`|Ballots
+`Ungültige Wahlzettel`|Invalid ballots
+`Leere Wahlzettel`|Empty ballots
+`Leere Stimmen`|Empty votes
+`Listen-Nr`|List number
+`Parteibezeichnung`|Party description
+`HLV-Nr`|
+`ULV-Nr`|
+`Anzahl Sitze Liste`|Number seats list
+`Kandidatenstimmen unveränderte Wahlzettel`|Candidate votes unchanged ballot, part of list vote
+`Zusatzstimmen unveränderte Wahlzettel`|Additional votes unchanged ballot, part of list vote
+`Kandidatenstimmen veränderte Wahlzettel`|Candidate vote changed ballot, part of list vote
+`Zusatzstimmen veränderte Wahlzettel`|Additional votes changed ballot, part of list vote
+`Kandidaten-Nr`|Candidate number
+`Gewählt`|Elected
+`Name`|Name
+`Vorname`|First name
+`Stimmen Total aus Wahlzettel`|Vote total from ballot
+`Anzahl Gemeinden`|Number municipalities
 
 #### Panachage results
 
 The results may contain panachage results by adding one column per list:
 
-- "**{List number} {List name}**": The number of votes the list got from the list with the given `Listen-Nr`. A `Listen-Nr` with the value `00` (`00 OHNE`) marks the votes from the blank list.
+Name|Description
+---|---
+``{List number} {List name}`|The number of votes the list got from the list with the given `Listen-Nr`. A `Listen-Nr` with the value `00` (`00 OHNE`) marks the votes from the blank list.
 
 ### Temporary results
 
@@ -105,34 +110,40 @@ The file format needs two individual charts: the data export and the list of ele
 
 In the data export, there is a row for each municipality, candidates are arranged in columns. The following columns will be evaluated and should exist:
 
-- **AnzMandate**
-- **BFS** (The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.)
-- **EinheitBez**
-- **StimmBer**
-- **StimmAbgegeben**
-- **StimmLeer**
-- **StimmUngueltig**
-- **StimmGueltig**
+Name|Description
+---|---
+`AnzMandate`|
+`BFS`|The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.
+`EinheitBez`|
+`StimmBer`|
+`StimmAbgegeben`|
+`StimmLeer`|
+`StimmUngueltig`|
+`StimmGueltig`|
 
 As well as for each candidate:
 
-- **KandID_`x`**
-- **KandName_`x`**
-- **KandVorname_`x`**
-- **Stimmen_`x`**
+Name|Description
+---|---
+`KandID_{XX}`|
+`KandName_{XX}`|
+`KandVorname_{XX}`|
+`Stimmen_{XX}`|
 
 Additionally the empty and invalid votes as well as candidates will be captured by the following candidate names:
 
-- **KandName_`x` = 'Leere Zeilen'** (Empty votes)
-- **KandName_`x` = 'Ungültige Stimmen'** (Invalid votes)
+- `KandName_{XX} = 'Leere Zeilen'**` (Empty votes)
+- `KandName_{XX} = 'Ungültige Stimmen'**` (Invalid votes)
 
 ### Columns candidate results
 
 Because the file format does not supply any information on the elected candidate, those must be included in a second column. Each row consists of one elected candidate with the following columns:
 
-- **ID : ID of the candidate (`KandID_x`).**
-- **Name : The surname of the candidate.**
-- **Vorname : The first name of the candidate.**
+Name|Description
+---|---
+`ID`|ID of the candidate (`KandID_{XX}`).
+`Name`|The surname of the candidate.
+`Vorname`|The first name of the candidate.
 
 ### Temporary results
 
@@ -154,49 +165,59 @@ The file format needs four individual charts: the data export of the results, th
 
 There is a line per candidate and municipality in the data export. The following columns will be evaluated and should exist:
 
-- **Einheit_BFS** (The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.)
-- **Einheit_Name**
-- **Kand_Nachname**
-- **Kand_Vorname**
-- **Liste_KandID**
-- **Liste_ID**
-- **Liste_Code**
-- **Kand_StimmenTotal**
-- **Liste_ParteistimmenTotal**
+Name|Description
+---|---
+`Einheit_BFS`|The municipality number (BFS number) at the time of the election. A value of `0` can be used for expats.
+`Einheit_Name`|
+`Kand_Nachname`|
+`Kand_Vorname`|
+`Liste_KandID`|
+`Liste_ID`|
+`Liste_Code`|
+`Kand_StimmenTotal`|
+`Liste_ParteistimmenTotal`|
 
 #### Panachage results
 
 The results may contain panachage results by adding one column per list:
 
-- "**{List ID}.{List code}**": The number of votes the list got from the list with the given `Liste_ID`. A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
+Name|Description
+---|---
+`{List ID}.{List code}`|The number of votes the list got from the list with the given `Liste_ID`. A `Liste_ID` with the value `99` (`99.WoP`) marks the votes from the blank list.
 
 ### Columns data export of the statistic
 
 The file with the statistics of the individual municipalities should contain the following columns:
 
-- **Einheit_BFS**
-- **Einheit_Name**
-- **StimBerTotal**
-- **WZEingegangen**
-- **WZLeer**
-- **WZUngueltig**
-- **StmWZVeraendertLeerAmtlLeer**
+Name|Description
+---|---
+`Einheit_BFS`|
+`Einheit_Name`|
+`StimBerTotal`|
+`WZEingegangen`|
+`WZLeer`|
+`WZUngueltig`|
+`StmWZVeraendertLeerAmtlLeer`|
 
 ### Columns list connections
 
 The file with list connections should contain the following columns:
 
-- **Liste**
-- **LV**
-- **LUV**
+Name|Description
+---|---
+`Liste`|
+`LV`|
+`LUV`|
 
 ### Columns candidate results
 
 Because the file format does not supply any information on the elected candidate, those must be included in a second column. Each row consists of one elected candidate with the following columns:
 
-- **ID** : ID of the candidate (`Liste_KandID`).
-- **Name** : The surname of the candidate.
-- **Vorname** : The first name of the candidate.
+Name|Description
+---|---
+`ID`|ID of the candidate (`Liste_KandID`).
+`Name`|The surname of the candidate.
+`Vorname`|The first name of the candidate.
 
 ### Temporary results
 
@@ -223,33 +244,37 @@ The format, which will be used by the web application for the export, consists o
 
 The following columns will be evaluated and should exist:
 
-- **election_absolute_majority**: Absolute majority of the election, only if Majorz election.
-- **election_counted_entities**: Number of counted municipalities. If `election_counted_entities = election_total_entities`, then the election is considered completely counted.
-- **election_total_entities**: Total number of municipalities. If no definite information about the status of the election is possible (because the election was imported by Wabsti), then this value is `0`.
-- **entity_id**: BFS number of the municipality. A value of `0` can be used for expats.
-- **entity_name**: The name of the municipality.
-- **entity_elegible_voters**: Number of persons entitled to vote in municipality.
-- **entity_received_ballots**: Number of submitted ballots in municipality.
-- **entity_blank_ballots**: Number empty ballots in municipality.
-- **entity_invalid_ballots**: Number invalid ballots in municipality.
-- **entity_blank_votes**: Number empty votes in municipality.
-- **entity_invalid_votes**: Number invalid votes in municipality. Zero if Proporz election.
-- **list_name**: Name of list of candidate. Only with Proporz elections.
-- **list_id**: ID of the list of the candidate. Only with Proporz elections.
-- **list_number_of_mandates**: Total number of mandates of the list. Only with Proporz elections.
-- **list_votes**: Total number if list votes. Only with Proporz elections.
-- **list_connection**: ID of the list connection. Only with Proporz elections.
-- **list_connection_parent**: ID of the superordinate list connection. Only with Proporz elections and if it is a sub-list connection.
-- **candidate_family_name**: Surname of the candidate.
-- **candidate_first_name**: First name of the candidate.
-- **candidate_elected**: True, if the candidate was elected.
-- **candidate_votes**: Number of candidate votes in municipality.
+Name|Description
+---|---
+`election_absolute_majority`|Absolute majority of the election, only if Majorz election.
+`election_counted_entities`|Number of counted municipalities. If `election_counted_entities = election_total_entities`, then the election is considered completely counted.
+`election_total_entities`|Total number of municipalities. If no definite information about the status of the election is possible (because the election was imported by Wabsti), then this value is `0`.
+`entity_id`|BFS number of the municipality. A value of `0` can be used for expats.
+`entity_name`|The name of the municipality.
+`entity_elegible_voters`|Number of persons entitled to vote in municipality.
+`entity_received_ballots`|Number of submitted ballots in municipality.
+`entity_blank_ballots`|Number empty ballots in municipality.
+`entity_invalid_ballots`|Number invalid ballots in municipality.
+`entity_blank_votes`|Number empty votes in municipality.
+`entity_invalid_votes`|Number invalid votes in municipality. Zero if Proporz election.
+`list_name`|Name of list of candidate. Only with Proporz elections.
+`list_id`|ID of the list of the candidate. Only with Proporz elections.
+`list_number_of_mandates`|Total number of mandates of the list. Only with Proporz elections.
+`list_votes`|Total number if list votes. Only with Proporz elections.
+`list_connection`|ID of the list connection. Only with Proporz elections.
+`list_connection_parent`|ID of the superordinate list connection. Only with Proporz elections and if it is a sub-list connection.
+`candidate_family_name`|Surname of the candidate.
+`candidate_first_name`|First name of the candidate.
+`candidate_elected`|True, if the candidate was elected.
+`candidate_votes`|Number of candidate votes in municipality.
 
 #### Panachage results
 
 The results may contain panachage results by adding one column per list:
 
-- **panachage_votes_from_list_XX**: The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+Name|Description
+---|---
+`panachage_votes_from_list_{XX}`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 ### Temporary results
 
@@ -269,9 +294,11 @@ Each (proporz) election may contain party results. These results are independent
 
 The following columns will be evaluated and should exist:
 
-- **Partei**: The name of the party.
-- **Stimmen**: The number of votes.
-- **Sitze**: The number of mandates.
+Name|Description
+---|---
+`Partei`|The name of the party.
+`Stimmen`|The number of votes.
+`Sitze`|The number of mandates.
 
 ### Template
 

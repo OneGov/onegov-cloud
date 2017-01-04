@@ -26,20 +26,20 @@ Il riepilogo dei risultati visualizzato sulla pagina iniziale (solo i risultati 
 
 Nome|Descrizione
 ---|---
-type|`election` per elezioni, `vote` per votazioni.
-title|Un oggetto contenente i titoli tradotti.
-date|La data (ISO 8601).
-domain|Il dominio di influenza (federazione, cantone, ...).
-url|Un collegamento alla visualizzazione dettagliata.
-progess|Un oggetto contenente il numero dei comuni già contati (`counted`) e il numero totale di comuni (`total`).
+`type`|`election` per elezioni, `vote` per votazioni.
+`title`|Un oggetto contenente i titoli tradotti.
+`date`|La data (ISO 8601).
+`domain`|Il dominio di influenza (federazione, cantone, ...).
+`url`|Un collegamento alla visualizzazione dettagliata.
+`progess`|Un oggetto contenente il numero dei comuni già contati (`counted`) e il numero totale di comuni (`total`).
 
 I risultati della votazione contengono le seguenti informazioni aggiuntive:
 
 Nome|Descrizione
 ---|---
-answer|La risposta del voto: `accepted` (accettato), `rejected` (respinto), `proposal` o `counter-proposal` (controproposta).
-yeas_percentage|Percentuale voti favorevoli.
-nays_percentage|Percentuale voti contrari.
+`answer`|La risposta del voto: `accepted` (accettato), `rejected` (respinto), `proposal` o `counter-proposal` (controproposta).
+`yeas_percentage`|Percentuale voti favorevoli.
+`nays_percentage`|Percentuale voti contrari.
 
 ## Risultati dell'elezione
 
@@ -69,36 +69,36 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
-election_title|Titolo dell'elezione.
-election_date|Data dell'elezione (stringa data in formato ISO 8601)
-election_type|`proporz` per il sistema proporzionale, `majorz` per il sistema maggioritario.
-election_mandates|Numero di mandati.
-election_absolute_majority|La maggioranza assoluta. Rilevante solo per le elezioni basate sul sistema di maggioranza.
-election_counted_entities|Il numero di comuni già contati.
-election_total_entities|Il numero totale dei comuni.
-entity_name|Nome del comune.
-entity_id|Identificativo del comune. A value `0` represents the expats.
-entity_elegible_voters|Numero degli aventi diritto al voto di questo comune.
-entity_received_ballots|Numero di schede ricevute per questo comune.
-entity_blank_ballots|Numero di schede bianche per questo comune.
-entity_invalid_ballots|Numero di schede nulle per questo comune.
-entity_unaccounted_ballots|Numero di schede non valide per questo comune.
-entity_accounted_ballots|Numero di schede valide per questo comune.
-entity_blank_votes|Numero di voti nulli in questo comune.
-entity_invalid_votes|Numero di voti non validi in questo comune. Zero per elezioni basate sul sistema proporzionale.
-entity_accounted_votes|Numero di voti validi in questo comune.
-list_name|Nome della lista alla quale appartiene questo candidato. Valido solo per elezioni basate sul sistema proporzionale.
-list_id|L'identificativo della lista su cui questo candidato compare. Rilevante solo per le elezioni basate sul metodo proporzionale.
-list_number_of_mandates|Il numero di mandati ottenuti da questa lista. Rilevante solo per le elezioni basate sul metodo proporzionale.
-list_votes|Numero di voti ricevuti da questa lista. Valido solo per elezioni basate sul sistema proporzionale.
-list_connection|L'identificato del collegamento della lista a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
-list_connection_parent|L'identificativo del collegamento della lista padre a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
-candidate_family_name|Cognome del candidato.
-candidate_first_name|Nome del candidato.
-candidate_id|L'identificativo del candidato.
-candidate_elected|Vero se il candidato è stato eletto.
-candidate_votes|Numero di voti ricevuti da questo candidato.
-panachage_votes_from_list_XX|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
+`election_title`|Titolo dell'elezione.
+`election_date`|Data dell'elezione (stringa data in formato ISO 8601)
+`election_type`|`proporz` per il sistema proporzionale, `majorz` per il sistema maggioritario.
+`election_mandates`|Numero di mandati.
+`election_absolute_majority`|La maggioranza assoluta. Rilevante solo per le elezioni basate sul sistema di maggioranza.
+`election_counted_entities`|Il numero di comuni già contati.
+`election_total_entities`|Il numero totale dei comuni.
+`entity_name`|Nome del comune.
+`entity_id`|Identificativo del comune. A value `0` represents the expats.
+`entity_elegible_voters`|Numero degli aventi diritto al voto di questo comune.
+`entity_received_ballots`|Numero di schede ricevute per questo comune.
+`entity_blank_ballots`|Numero di schede bianche per questo comune.
+`entity_invalid_ballots`|Numero di schede nulle per questo comune.
+`entity_unaccounted_ballots`|Numero di schede non valide per questo comune.
+`entity_accounted_ballots`|Numero di schede valide per questo comune.
+`entity_blank_votes`|Numero di voti nulli in questo comune.
+`entity_invalid_votes`|Numero di voti non validi in questo comune. Zero per elezioni basate sul sistema proporzionale.
+`entity_accounted_votes`|Numero di voti validi in questo comune.
+`list_name`|Nome della lista alla quale appartiene questo candidato. Valido solo per elezioni basate sul sistema proporzionale.
+`list_id`|L'identificativo della lista su cui questo candidato compare. Rilevante solo per le elezioni basate sul metodo proporzionale.
+`list_number_of_mandates`|Il numero di mandati ottenuti da questa lista. Rilevante solo per le elezioni basate sul metodo proporzionale.
+`list_votes`|Numero di voti ricevuti da questa lista. Valido solo per elezioni basate sul sistema proporzionale.
+`list_connection`|L'identificato del collegamento della lista a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
+`list_connection_parent`|L'identificativo del collegamento della lista padre a cui questa lista è collegata. Valido solo per elezioni basate sul sistema proporzionale.
+`candidate_family_name`|Cognome del candidato.
+`candidate_first_name`|Nome del candidato.
+`candidate_id`|L'identificativo del candidato.
+`candidate_elected`|Vero se il candidato è stato eletto.
+`candidate_votes`|Numero di voti ricevuti da questo candidato.
+`panachage_votes_from_list_XX`|The number of votes the list got from the list with `list_id = XX`. A `list_id` with the value `999` marks the votes from the blank list.
 
 I comuni non ancora contati non sono inclusi.
 
@@ -112,9 +112,9 @@ The raw data is available as CSV. The following fields are included:
 
 Name|Description
 ---|---
-name|The name of the party.
-mandates|The number of mandates.
-votes|The number of votes.
+`name`|The name of the party.
+`mandates`|The number of mandates.
+`votes`|The number of votes.
 
 ## Risultati della votazione
 
@@ -144,16 +144,16 @@ I seguenti campi sono contenuti in tutti i formati:
 
 Nome|Descrizione
 ---|---
-title|Titolo della votazione.
-date|Data della votazione (una stringa ISO 8601).
-shortcode|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
-domain|`federation` per votazioni federali, `canton` per votazioni cantonali
-type|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
-group|Da dove viene il risultato. Si può trattare del distretto e del comune, separati da una barra, del nome della città e del nome del circolo, anch'essi separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal rispettivo Cantone.
-entity_id|ID del comune/dell'ubicazione. A value `0` represents the expats.
-counted|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
-yeas|Numero di voti favorevoli
-nays|Numero di voti contrari
-invalid|Numero di voti nulli
-empty|Numero di voti in bianco
-elegible_voters|Numero di aventi diritto di voto
+`title`|Titolo della votazione.
+`date`|Data della votazione (una stringa ISO 8601).
+`shortcode`|Abbreviazione interna (definisce l'ordine di diverse votazioni in un giorno).
+`domain`|`federation` per votazioni federali, `canton` per votazioni cantonali
+`type`|`proposal` (progetto), `counter-proposal` (controprogetto) or `tie-breaker` (domanda eventuale).
+`group`|Da dove viene il risultato. Si può trattare del distretto e del comune, separati da una barra, del nome della città e del nome del circolo, anch'essi separati da una barra, o del semplice nome di un comune. Tutto ciò dipende dal rispettivo Cantone.
+`entity_id`|ID del comune/dell'ubicazione. A value `0` represents the expats.
+`counted`|Vero, se lo spoglio è stato completato. Falso, se il risultato non è ancora noto (i valori non sono ancora corretti).
+`yeas`|Numero di voti favorevoli
+`nays`|Numero di voti contrari
+`invalid`|Numero di voti nulli
+`empty`|Numero di voti in bianco
+`elegible_voters`|Numero di aventi diritto di voto

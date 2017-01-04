@@ -42,7 +42,6 @@ HEADERS_MAJORZ = [
 HEADERS_PROPORZ = [
     # List
     'Listen-Nr',
-    'Partei-ID',
     'Parteibezeichnung',
     'HLV-Nr',
     'ULV-Nr',

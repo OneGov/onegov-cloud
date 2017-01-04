@@ -1,2 +1,2 @@
-Anzahl Sitze,Wahlkreis-Nr,Stimmberechtigte,Wahlzettel,Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Ungueltige Stimmen,Kandidaten-Nr,Gewaehlt,Name,Vorname,Stimmen,Anzahl Gemeinden
-2,1234,56,25,0,4,1,0,1,Gewaehlt,Muster,Hans,20,1 von 2
+Anzahl Sitze,Wahlkreis-Nr,Wahlkreisbezeichnung,Stimmberechtigte,Wahlzettel,Ungültige Wahlzettel,Leere Wahlzettel,Leere Stimmen,Ungueltige Stimmen,Kandidaten-Nr,Gewaehlt,Name,Vorname,Stimmen,Anzahl Gemeinden
+2,3402,Flawil,56,25,0,4,1,0,1,Gewaehlt,Muster,Hans,20,1 von 2

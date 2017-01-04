@@ -166,7 +166,6 @@ def upload_proporz_election(client, create=True):
         "Leere Wahlzettel,"
         "Leere Stimmen,"
         "Listen-Nr,"
-        "Partei-ID,"
         "Parteibezeichnung,"
         "HLV-Nr,"
         "ULV-Nr,"
@@ -189,11 +188,11 @@ def upload_proporz_election(client, create=True):
         "Anzahl Gemeinden\n"
     )
     csv += (
-        "5,3503,Mutten,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
+        "5,3503,Mutten,56,32,1,0,1,1,FDP,1,1,0,0,0,0,0,8,0,101,"
         "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
     )
     csv += (
-        "5,3503,Mutten,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
+        "5,3503,Mutten,56,32,1,0,1,2,CVP,1,2,0,1,0,5,0,0,0,201,"
         "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n"
     )
     csv = csv.encode('utf-8')

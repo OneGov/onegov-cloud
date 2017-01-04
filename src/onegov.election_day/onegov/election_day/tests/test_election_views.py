@@ -189,7 +189,6 @@ def test_view_election_parties_historical(election_day_app_gr):
             "Leere Wahlzettel,"
             "Leere Stimmen,"
             "Listen-Nr,"
-            "Partei-ID,"
             "Parteibezeichnung,"
             "HLV-Nr,"
             "ULV-Nr,"
@@ -210,9 +209,9 @@ def test_view_election_parties_historical(election_day_app_gr):
             "01 FDP,"
             "02 CVP,"
             " Anzahl Gemeinden\n"
-            "{},3503,Mutten,56,32,1,0,1,1,19,FDP,1,1,0,0,0,0,0,8,0,101,"
+            "{},3503,Mutten,56,32,1,0,1,1,FDP,1,1,0,0,0,0,0,8,0,101,"
             "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
-            "{},3503,Mutten,56,32,1,0,1,2,20,CVP,1,2,0,1,0,5,0,0,0,201,"
+            "{},3503,Mutten,56,32,1,0,1,2,CVP,1,2,0,1,0,5,0,0,0,201,"
             "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n".format(
                 mandates, mandates
             )

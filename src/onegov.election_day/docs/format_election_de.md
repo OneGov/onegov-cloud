@@ -26,21 +26,23 @@ Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kand
 
 Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
-- **Anzahl Sitze**
-- **Wahlkreis-Nr**
-- **Wahlkreisbezeichnung**
-- **Anzahl Gemeinden**
-- **Stimmberechtigte**
-- **Wahlzettel**
-- **Ungültige Wahlzettel**
-- **Leere Wahlzettel**
-- **Leere Stimmen**
-- **Ungueltige Stimmen**
-- **Kandidaten-Nr**
-- **Gewaehlt**
-- **Name**
-- **Vorname**
-- **Stimmen**
+Name|Beschreibung
+---|---
+`Anzahl Sitze`|Anzahl Sitze.
+`Wahlkreis-Nr`|BFS Nummer der Gemeinde.
+`Wahlkreisbezeichnung`|Der Name der Gemeinde.
+`Anzahl Gemeinden`|Anzahl ausgezählter Gemeinden (z.B. `2 von 50`).
+`Stimmberechtigte`|Anzahl Stimmberechtigte der Gemeinde.
+`Wahlzettel`|Anzahl abgegebene Stimmzettel der Gemeinde.
+`Ungültige Wahlzettel`|Anzahl ungültige Stimmzettel der Gemeinde.
+`Leere Wahlzettel`|Anzahl leere Stimmzettel der Gemeinde.
+`Leere Stimmen`|Anzahl leerer Stimmen der Gemeinde.
+`Ungueltige Stimmen`|Anzahl ungültige Stimmen der Gemeinde.
+`Kandidaten-Nr`|ID des Kandidaten.
+`Gewaehlt`|True, falls der Kandidierenden gewählt wurde.
+`Name`|Nachnahme des Kandidierenden.
+`Vorname`|Vorname des Kandidaten.
+`Stimmen`|Anzahl Kandidierendenstimmen in der Gemeinde.
 
 ### Temporäre Resultate
 
@@ -58,36 +60,39 @@ Das SESAM-Export-Format enthält direkt alle benötigten Daten. Es gibt pro Kand
 
 Folgende Spalten werden ausgewertet und sollten mindestens vorhanden sein:
 
-- **Anzahl Sitze**
-- **Wahlkreis-Nr**
-- **Wahlkreisbezeichnung**
-- **Stimmberechtigte**
-- **Wahlzettel**
-- **Ungültige Wahlzettel**
-- **Leere Wahlzettel**
-- **Leere Stimmen**
-- **Listen-Nr**
-- **Partei-ID**
-- **Parteibezeichnung**
-- **HLV-Nr**
-- **ULV-Nr**
-- **Anzahl Sitze Liste**
-- **Kandidatenstimmen unveränderte Wahlzettel** (Teil der Listenstimmen)
-- **Zusatzstimmen unveränderte Wahlzettel** (Teil der Listenstimmen)
-- **Kandidatenstimmen veränderte Wahlzettel** (Teil der Listenstimmen)
-- **Zusatzstimmen veränderte Wahlzettel** (Teil der Listenstimmen)
-- **Kandidaten-Nr**
-- **Gewählt**
-- **Name**
-- **Vorname**
-- **Stimmen Total aus Wahlzettel**
-- **Anzahl Gemeinden**
+Name|Beschreibung
+---|---
+`Anzahl Sitze`|Anzahl Sitze.
+`Wahlkreis-Nr`|BFS Nummer der Gemeinde.
+`Wahlkreisbezeichnung`|Der Name der Gemeinde.
+`Anzahl Gemeinden`|Anzahl ausgezählter Gemeinden (z.B. `2 von 50`).
+`Stimmberechtigte`|Anzahl Stimmberechtigte der Gemeinde.
+`Wahlzettel`|Anzahl abgegebene Stimmzettel der Gemeinde.
+`Ungültige Wahlzettel`|Anzahl ungültige Stimmzettel der Gemeinde.
+`Leere Wahlzettel`|Anzahl leere Stimmzettel der Gemeinde.
+`Leere Stimmen`|Anzahl leerer Stimmen der Gemeinde.
+`Listen-Nr`|ID der Liste des Kandidierenden.
+`Parteibezeichnung`|Name der Liste des Kandidierenden.
+`HLV-Nr`|Hauptlistenverbindungsnummer.
+`ULV-Nr`|Unterlistenverbindungsnummer.
+`Anzahl Sitze Liste`|Gesamte Anzahl der Mandate der Liste.
+`Kandidatenstimmen unveränderte Wahlzettel`|(Teil der Listenstimmen)
+`Zusatzstimmen unveränderte Wahlzettel`|(Teil der Listenstimmen)
+`Kandidatenstimmen veränderte Wahlzettel`|(Teil der Listenstimmen)
+`Zusatzstimmen veränderte Wahlzettel`|(Teil der Listenstimmen)
+`Kandidaten-Nr`|ID des Kandidaten.
+`Gewählt`|True, falls der Kandidierenden gewählt wurde.
+`Name`|Nachnahme des Kandidierenden.
+`Vorname`|Vorname des Kandidaten.
+`Stimmen Total aus Wahlzettel`|Anzahl Kandidierendenstimmen in der Gemeinde.
 
 #### Panaschierdaten
 
 Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
 
-- "**{Listennummer} {Listenname}**":  Die Anzahl Stimmen von der Liste mit `Listen-Nr`. Die `Listen-Nr` mit dem Wert `00` (`00 OHNE`) steht für die Blankoliste.
+Name|Beschreibung
+---|---
+`{Listennummer} {Listenname}`|Die Anzahl Stimmen von der Liste mit `Listen-Nr`. Die `Listen-Nr` mit dem Wert `00` (`00 OHNE`) steht für die Blankoliste.
 
 ### Temporäre Resultate
 
@@ -105,34 +110,40 @@ Das Datenformat benötig zwei einzelne Tabellen: den Datenexport und die Liste d
 
 Im Datenexport gibt es für jede Gemeinde eine Zeile, Kandidaten sind in Spalten angeordnet. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-- **AnzMandate**
-- **BFS** (Die BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.)
-- **EinheitBez**
-- **StimmBer**
-- **StimmAbgegeben**
-- **StimmLeer**
-- **StimmUngueltig**
-- **StimmGueltig**
+Name|Beschreibung
+---|---
+`AnzMandate`|
+`BFS`|Die BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
+`EinheitBez`|
+`StimmBer`|
+`StimmAbgegeben`|
+`StimmLeer`|
+`StimmUngueltig`|
+`StimmGueltig`|
 
 Sowie für jeden Kandidaten:
 
-- **KandID_`x`**
-- **KandName_`x`**
-- **KandVorname_`x`**
-- **Stimmen_`x`**
+Name|Beschreibung
+---|---
+`KandID_{XX}`|
+`KandName_{XX}`|
+`KandVorname_{XX}`|
+`Stimmen_{XX}`|
 
 Zudem werden die leeren und ungültigen Stimmen auch als Kandidaten erfasst mittels der folgenden Kandidatennamen:
 
-- **KandName_`x` = 'Leere Zeilen'**
-- **KandName_`x` = 'Ungültige Stimmen'**
+- `KandName_{XX} = 'Leere Zeilen'`
+- `KandName_{XX} = 'Ungültige Stimmen'`
 
 ### Spalten Kandidatenresultate
 
 Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
 
-- **ID** : Die ID des Kandidaten (`KandID_x`).
-- **Name** : Der Familienname des Kandidaten.
-- **Vorname** : Der Vorname des Kandidaten.
+Name|Beschreibung
+---|---
+`ID`|Die ID des Kandidaten (`KandID_{XX}`).
+`Name`|Der Familienname des Kandidaten.
+`Vorname`|Der Vorname des Kandidaten.
 
 ### Temporäre Resultate
 
@@ -154,49 +165,59 @@ Das Datenformat benötig vier einzelne Tabellen: den Datenexport der Resultate, 
 
 Im Datenexport gibt es eine Zeile pro Kandidat und Gemeinde. Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-- **Einheit_BFS** (Die BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.)
-- **Einheit_Name**
-- **Kand_Nachname**
-- **Kand_Vorname**
-- **Liste_KandID**
-- **Liste_ID**
-- **Liste_Code**
-- **Kand_StimmenTotal**
-- **Liste_ParteistimmenTotal**
+Name|Beschreibung
+---|---
+`Einheit_BFS`|Die BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
+`Einheit_Name`|
+`Kand_Nachname`|
+`Kand_Vorname`|
+`Liste_KandID`|
+`Liste_ID`|
+`Liste_Code`|
+`Kand_StimmenTotal`|
+`Liste_ParteistimmenTotal`|
 
 #### Panaschierdaten
 
 Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
 
-- "**{List ID}.{List Code}**":  Die Anzahl Stimmen von der Liste mit `Liste_ID`. Die `Liste_ID` mit dem Wert `99` (`99.WoP`) steht für die Blankoliste.
+Name|Beschreibung
+---|---
+`{List ID}.{List Code}`|Die Anzahl Stimmen von der Liste mit `Liste_ID`. Die `Liste_ID` mit dem Wert `99` (`99.WoP`) steht für die Blankoliste.
 
 ### Spalten Datenexport der Statistik
 
 Die Datei mit den Statistiken zu den einzelnen Gemeinden sollte folgende Spalten enthalten:
 
-- **Einheit_BFS**
-- **Einheit_Name**
-- **StimBerTotal**
-- **WZEingegangen**
-- **WZLeer**
-- **WZUngueltig**
-- **StmWZVeraendertLeerAmtlLeer**
+Name|Beschreibung
+---|---
+`Einheit_BFS`|
+`Einheit_Name`|
+`StimBerTotal`|
+`WZEingegangen`|
+`WZLeer`|
+`WZUngueltig`|
+`StmWZVeraendertLeerAmtlLeer`|
 
 ### Spalten Listenverbindungen
 
 Die Datei mit den Listenverbindungen sollte folgende Spalten enthalten:
 
-- **Liste**
-- **LV**
-- **LUV**
+Name|Beschreibung
+---|---
+`Liste`|
+`LV`|
+`LUV`|
 
 ### Spalten Kandidatenresultate
 
 Da das Datenformat keine Informationen über die gewählten Kandidaten liefert, müssen diese in einer zweiten Tabelle mitgeliefert werden. Jede Zeile enthält dabei eine gewählten Kandidaten mit den folgenden Spalten:
 
-- **ID**: Die ID des Kandidaten (`Liste_KandID`).
-- **Name**: Der Familienname des Kandidaten.
-- **Vorname**: Der Vorname des Kandidaten.
+Name|Beschreibung
+---|---
+`ID`|Die ID des Kandidaten (`Liste_KandID`).
+`Name`|Der Familienname des Kandidaten.
+`Vorname`|Der Vorname des Kandidaten.
 
 ### Temporäre Resultate
 
@@ -223,33 +244,37 @@ Das Format, welche von der Web-Applikation für den Export verwendet wird, beste
 
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-- **election_absolute_majority**: Absolutes Mehr der Wahl, nur falls Majorzwahl.
-- **election_counted_entities**: Anzahl ausgezählter Gemeinden. Falls `election_counted_entities = election_total_entities` ist, gilt die Wahl als fertig ausgezählt.
-- **election_total_entities**: Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert `0`.
-- **entity_id**: BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
-- **entity_name**: Der Name der Gemeinde.
-- **entity_elegible_voters**: Anzahl Stimmberechtigte der Gemeinde.
-- **entity_received_ballots**: Anzahl abgegebene Stimmzettel der Gemeinde.
-- **entity_blank_ballots**: Anzahl leere Stimmzettel der Gemeinde.
-- **entity_invalid_ballots**: Anzahl ungültige Stimmzettel der Gemeinde.
-- **entity_blank_votes**: Anzahl leerer Stimmen der Gemeinde.
-- **entity_invalid_votes**: Anzahl ungültige Stimmen der Gemeinde. Null falls Proporzwahl.
-- **list_name**: Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
-- **list_id**: ID der Liste des Kandidierenden. Nur bei Proporzwahlen.
-- **list_number_of_mandates**: Gesamte Anzahl der Mandate der Liste. Nur bei Proporzwahlen.
-- **list_votes**: Gesamte Anzahl der Listenstimmen. Nur bei Proporzwahlen.
-- **list_connection**: ID der Listenverbindung. Nur bei Proporzwahlen.
-- **list_connection_parent**: ID der übergeordneten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.
-- **candidate_family_name**: Nachnahme des Kandidierenden.
-- **candidate_first_name**: Vorname des Kandidaten.
-- **candidate_elected**: True, falls der Kandidierenden gewählt wurde.
-- **candidate_votes**: Anzahl Kandidierendenstimmen in der Gemeinde.
+Name|Beschreibung
+---|---
+`election_absolute_majority`|Absolutes Mehr der Wahl, nur falls Majorzwahl.
+`election_counted_entities`|Anzahl ausgezählter Gemeinden. Falls `election_counted_entities = election_total_entities` ist, gilt die Wahl als fertig ausgezählt.
+`election_total_entities`|Totale Anzahl Gemeinden. Falls keine eindeutige Auskunft über den Status der Wahl möglich ist (da die Wahl von Wabsti importiert wurde), ist dieser Wert `0`.
+`entity_id`|BFS Nummer der Gemeinde. Der Wert `0` kann für Auslandslebende verwendet werden.
+`entity_name`|Der Name der Gemeinde.
+`entity_elegible_voters`|Anzahl Stimmberechtigte der Gemeinde.
+`entity_received_ballots`|Anzahl abgegebene Stimmzettel der Gemeinde.
+`entity_blank_ballots`|Anzahl leere Stimmzettel der Gemeinde.
+`entity_invalid_ballots`|Anzahl ungültige Stimmzettel der Gemeinde.
+`entity_blank_votes`|Anzahl leerer Stimmen der Gemeinde.
+`entity_invalid_votes`|Anzahl ungültige Stimmen der Gemeinde. Null falls Proporzwahl.
+`list_name`|Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
+`list_id`|ID der Liste des Kandidierenden. Nur bei Proporzwahlen.
+`list_number_of_mandates`|Gesamte Anzahl der Mandate der Liste. Nur bei Proporzwahlen.
+`list_votes`|Gesamte Anzahl der Listenstimmen. Nur bei Proporzwahlen.
+`list_connection`|ID der Listenverbindung. Nur bei Proporzwahlen.
+`list_connection_parent`|ID der übergeordneten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.
+`candidate_family_name`|Nachnahme des Kandidierenden.
+`candidate_first_name`|Vorname des Kandidaten.
+`candidate_elected`|True, falls der Kandidierenden gewählt wurde.
+`candidate_votes`|Anzahl Kandidierendenstimmen in der Gemeinde.
 
 #### Panaschierdaten
 
 Die Resultaten können Panaschierdaten enthlaten, indem pro Liste eine Spalte hinzugefügt wird:
 
-- **panachage_votes_from_list_XX** Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
+Name|Beschreibung
+---|---
+`panachage_votes_from_list_{XX}`|Die Anzahl Stimmen von der Liste mit `list_id = XX`. Die `list_id` mit dem Wert `999` steht für die Blankoliste.
 
 ### Temporäre Resultate
 
@@ -270,9 +295,11 @@ Jede Proporzwahl kann Parteiresultate enthalten. Diese sind unabhängig von den 
 
 Es werden folgende Spalten ausgewertet und sollten vorhanden sein:
 
-- **Partei**: Der Name der Partei.
-- **Stimmen**: Die Anzahl Stimmen.
-- **Sitze**: Die Anzahl Sitze.
+Name|Beschreibung
+---|---
+`Partei`|Der Name der Partei.
+`Stimmen`|Die Anzahl Stimmen.
+`Sitze`|Die Anzahl Sitze.
 
 ### Template
 
