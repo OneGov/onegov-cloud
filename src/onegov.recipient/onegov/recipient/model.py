@@ -1,5 +1,5 @@
-from onegov.core.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm import Base
+from onegov.core.orm.mixins import ContentMixin, TimestampMixin
 from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from sqlalchemy import Column, Enum, Text
@@ -7,10 +7,10 @@ from sqlalchemy_utils import observes
 from uuid import uuid4
 
 
-class Recipient(Base, ContentMixin, TimestampMixin):
+class GenericRecipient(Base, ContentMixin, TimestampMixin):
     """ A generic recipient class with polymorphic support. """
 
-    __tablename__ = 'recipients'
+    __tablename__ = 'generic_recipients'
 
     #: the internal id of the recipient
     id = Column(UUID, primary_key=True, default=uuid4)
@@ -45,4 +45,4 @@ class Recipient(Base, ContentMixin, TimestampMixin):
 
     @observes('name')
     def name_observer(self, name):
-        self.order = normalize_for_url(name + '-' + self.medium)
+        self.order = normalize_for_url(name)

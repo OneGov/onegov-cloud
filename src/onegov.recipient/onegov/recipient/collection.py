@@ -1,8 +1,8 @@
 from onegov.core.collection import GenericCollection
-from onegov.recipient.model import Recipient
+from onegov.recipient.model import GenericRecipient
 
 
-class RecipientCollection(GenericCollection):
+class GenericRecipientCollection(GenericCollection):
 
     def __init__(self, session, type):
         super().__init__(session)
@@ -10,4 +10,5 @@ class RecipientCollection(GenericCollection):
 
     @property
     def model_class(self):
-        return Recipient.get_polymorphic_class(self.type, Recipient)
+        return GenericRecipient.get_polymorphic_class(
+            self.type, GenericRecipient)

@@ -1,5 +1,5 @@
-from onegov.recipient.collection import RecipientCollection
-from onegov.recipient.model import Recipient
+from onegov.recipient.collection import GenericRecipientCollection
+from onegov.recipient.model import GenericRecipient
 
 
-__all__ = ['Recipient', 'RecipientCollection']
+__all__ = ['GenericRecipient', 'GenericRecipientCollection']
