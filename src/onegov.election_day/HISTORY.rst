@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.4.3 (2017-01-04)
+~~~~~~~~~~~~~~~~~~~
 
 - Harmonize the usage of the groups in the various formats.
   [msom]
