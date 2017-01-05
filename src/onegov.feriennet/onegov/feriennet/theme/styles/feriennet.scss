@@ -46,27 +46,6 @@ svg #background {
 }
 
 /*
-    Links in simple text style (side by side)
-*/
-.text-links a:first-child:before {
-    content: '';
-}
-
-.text-links a:before {
-    color: $body-font-color;
-    content: ' | ';
-}
-
-/*
-    Dense lists
-*/
-.dense {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-/*
     Small font
 */
 .small {
