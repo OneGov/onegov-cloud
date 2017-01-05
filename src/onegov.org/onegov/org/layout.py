@@ -22,6 +22,7 @@ from onegov.org.models import (
     News,
     PageMove,
     PersonMove,
+    ResourceRecipientCollection,
     Search,
     SiteCollection,
 )
@@ -726,6 +727,11 @@ class ResourcesLayout(DefaultLayout):
     def editbar_links(self):
         if self.request.is_manager:
             return [
+                Link(
+                    text=_("Recipients"),
+                    url=self.request.class_link(ResourceRecipientCollection),
+                    classes=('manage-recipients', )
+                ),
                 LinkGroup(
                     title=_("Add"),
                     links=[
@@ -748,6 +754,66 @@ class ResourcesLayout(DefaultLayout):
                     ]
                 ),
             ]
+
+
+class ResourceRecipientsLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(
+                _("Homepage"), self.homepage_url
+            ),
+            Link(
+                _("Reservations"), self.request.class_link(ResourceCollection)
+            ),
+            Link(
+                _("Notifications"), self.request.link(self.model)
+            )
+        ]
+
+    @cached_property
+    def editbar_links(self):
+        if self.request.is_manager:
+            return [
+                LinkGroup(
+                    title=_("Add"),
+                    links=[
+                        Link(
+                            text=_("E-Mail Recipient"),
+                            url=self.request.link(
+                                self.model,
+                                name='neuer-empfaenger'
+                            ),
+                            classes=('new-email-recipient', )
+                        ),
+                    ]
+                ),
+            ]
+
+
+class ResourceRecipientsFormLayout(DefaultLayout):
+
+    def __init__(self, model, request, title):
+        super().__init__(model, request)
+        self.title = title
+
+    @cached_property
+    def breadcrumbs(self):
+        return [
+            Link(
+                _("Homepage"), self.homepage_url
+            ),
+            Link(
+                _("Reservations"), self.request.class_link(ResourceCollection)
+            ),
+            Link(
+                _("Notifications"), self.request.class_link(
+                    ResourceRecipientCollection
+                )
+            ),
+            Link(self.title, '#')
+        ]
 
 
 class ResourceLayout(DefaultLayout):

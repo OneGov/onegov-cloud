@@ -15,6 +15,7 @@ from onegov.org.forms.reset_password import RequestPasswordResetForm
 from onegov.org.forms.resource import ResourceCleanupForm
 from onegov.org.forms.resource import ResourceExportForm
 from onegov.org.forms.resource import ResourceForm
+from onegov.org.forms.resource_recipient import ResourceRecipientForm
 from onegov.org.forms.settings import SettingsForm
 from onegov.org.forms.signup import SignupForm
 from onegov.org.forms.user import ManageUserForm, NewUserForm
@@ -42,6 +43,7 @@ __all__ = [
     'ResourceCleanupForm',
     'ResourceExportForm',
     'ResourceForm',
+    'ResourceRecipientForm',
     'RoomAllocationEditForm',
     'RoomAllocationForm',
     'SettingsForm',

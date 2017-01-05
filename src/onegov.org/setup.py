@@ -49,6 +49,7 @@ setup(
         'onegov.newsletter>=0.1.0',
         'onegov.page>=0.1.0',
         'onegov.people>=0.0.7',
+        'onegov.recipient',
         'onegov.search>=0.6.2',
         'onegov.shared',
         'onegov.ticket>=0.4.1',

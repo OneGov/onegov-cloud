@@ -164,6 +164,27 @@ footer {
 }
 
 /*
+    Links in simple text style (side by side)
+*/
+.text-links a:first-child:before {
+    content: '';
+}
+
+.text-links a:before {
+    color: $body-font-color;
+    content: ' | ';
+}
+
+/*
+    Dense lists
+*/
+.dense {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/*
     Default Coat of Arms
 */
 #coat-of-arms-left {
@@ -757,8 +778,10 @@ $export-link-icon: '\f019';
 $file-link-icon: '\f0c6';
 $image-link-icon: '\f03e';
 $internal-link-icon: '\f0c1';
+$manage-recipients: '\f003';
 $manage-subscribers: '\f0c0';
 $new-daypass-icon: '\f145';
+$new-recipient: '\f1fa';
 $new-form-icon: '\f044';
 $new-link-icon: '\f0c1';
 $new-news-icon: '\f1ea';
@@ -813,8 +836,10 @@ $upload-icon: '\f0ee';
     .file-url:before { @include icon($file-link-icon); }
     .image-url:before { @include icon($image-link-icon); }
     .internal-url:before { @include icon($internal-link-icon); }
+    .manage-recipients:before { @include icon($manage-recipients); }
     .manage-subscribers:before { @include icon($manage-subscribers); }
     .new-daypass:before { @include icon($new-daypass-icon); }
+    .new-recipient:before { @include icon($new-recipient); }
     .new-form:before { @include icon($new-form-icon); }
     .new-link:before { @include icon($new-link-icon); }
     .new-news:before { @include icon($new-news-icon); }
@@ -3187,4 +3212,32 @@ ul.search-results {
 */
 .photoswipe img {
     cursor: pointer;
+}
+
+/*
+    Resource recipients
+*/
+
+ul.recipients {
+    h2 {
+        font-size: 1.25rem;
+        margin-bottom: 0;
+    }
+
+    div {
+        font-size: .875rem;
+
+        &:nth-child(2) {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        &:last-child {
+            margin-top: .25rem;
+        }
+    }
+
+    li + li {
+        margin-top: 1rem;
+    }
 }

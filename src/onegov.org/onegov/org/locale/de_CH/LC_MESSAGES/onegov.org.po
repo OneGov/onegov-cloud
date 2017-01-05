@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-02 16:41+0100\n"
+"POT-Creation-Date: 2017-01-05 10:39+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -85,6 +85,9 @@ msgstr "Tickets"
 msgid "Reservations"
 msgstr "Reservationen"
 
+msgid "Notifications"
+msgstr "Mitteilungen"
+
 msgid "Edit allocation"
 msgstr "Einteilung bearbeiten"
 
@@ -133,6 +136,9 @@ msgstr "Möchten Sie die Person wirklich löschen?"
 
 msgid "Delete person"
 msgstr "Person löschen"
+
+msgid "Recipients"
+msgstr "Empfänger"
 
 msgid "Do you really want to delete this resource?"
 msgstr "Möchten Sie diese Reservations-Ressource wirklich löschen?"
@@ -210,6 +216,9 @@ msgstr "Raum"
 
 msgid "Daypass"
 msgstr "Tagskarte"
+
+msgid "E-Mail Recipient"
+msgstr "E-Mail Empfänger"
 
 msgid "Photo Album"
 msgstr "Fotoalbum"
@@ -522,9 +531,6 @@ msgstr "Aktuelles"
 msgid "Selected News / Events"
 msgstr "Ausgewählte Nachrichten und Veranstaltungen"
 
-msgid "Recipients"
-msgstr "Empfänger"
-
 msgid "Please select at least one recipient"
 msgstr "Bitte wählen Sie mindestens einen Empfänger"
 
@@ -582,14 +588,20 @@ msgstr "Dient zur Gruppierung in der Übersicht"
 msgid "Extra Fields Definition"
 msgstr "Extra-Felder Definition"
 
-msgid "E-Mail Reply Address"
-msgstr "E-Mail Antwort Adresse"
-
 msgid "Name"
 msgstr "Name"
 
+msgid "Send on"
+msgstr "Senden am"
+
+msgid "Resources"
+msgstr "Reservationen"
+
 msgid "General"
 msgstr "Allgemein"
+
+msgid "E-Mail Reply Address"
+msgstr "E-Mail Antwort Adresse"
 
 msgid "Logo"
 msgstr "Logo"
@@ -1104,6 +1116,18 @@ msgstr "Administrator"
 msgid "Administrators"
 msgstr "Administratoren"
 
+msgid "Close (Esc)"
+msgstr "Schliessen (Esc)"
+
+msgid "Share"
+msgstr "Teilen"
+
+msgid "Toggle fullscreen"
+msgstr "Vollbild"
+
+msgid "Zoom in/out"
+msgstr "Zoom"
+
 msgid "Dear Sir or Madam,"
 msgstr "Guten Tag"
 
@@ -1361,6 +1385,17 @@ msgstr ""
 msgid "Utilised"
 msgstr "Ausgelastet"
 
+msgid ""
+"The following recipients receive a daily e-mail sent at 06:00 containing the "
+"reservation data for all reservations of the day."
+msgstr "Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den Reservationen des Tages."
+
+msgid "No recipients defined yet."
+msgstr "Es wurden noch keine Empfänger definiert."
+
+msgid "${count} resources"
+msgstr "${count} Ressourcen"
+
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
 
@@ -1449,7 +1484,7 @@ msgid "State:"
 msgstr "Status:"
 
 msgid "Owner:"
-msgstr ""
+msgstr "Besitzer:"
 
 msgid "Kind:"
 msgstr "Art:"
@@ -1481,7 +1516,7 @@ msgid "Identicon"
 msgstr "Identicon"
 
 msgid "Password"
-msgstr ""
+msgstr "Passwort"
 
 msgid "New allocation"
 msgstr "Neue Einteilung"
@@ -1569,11 +1604,11 @@ msgstr "Vielen Dank für Ihre Eingabe!"
 msgid "Your event was accepted"
 msgstr "Ihre Veranstaltung wurde angenommen"
 
-msgid "A ticket has been opened"
-msgstr "Ein neues Ticket wurde für Sie eröffnet"
-
 msgid "Your event was rejected"
 msgstr "Ihre Veranstaltung wurde abgelehnt"
+
+msgid "A ticket has been opened"
+msgstr "Ein neues Ticket wurde für Sie eröffnet"
 
 msgid "Access Denied"
 msgstr "Zugriff verweigert"
@@ -1680,14 +1715,14 @@ msgstr "Die Reservationen wurden angenommen"
 msgid "The reservations have already been accepted"
 msgstr "Die Reservationen wurden bereits angenommen"
 
-msgid "The following reservations were rejected"
-msgstr "Die folgenden Reservationen wurden abgelehnt"
-
 msgid "The reservations were rejected"
 msgstr "Die Reservationen wurden abgelehnt"
 
 msgid "The reservation was rejected"
 msgstr "Die Reservation wurde abgesagt"
+
+msgid "The following reservations were rejected"
+msgstr "Die folgenden Reservationen wurden abgelehnt"
 
 msgid "Your reservations were accepted"
 msgstr "Ihre Reservationen wurden angenommen"
@@ -1727,6 +1762,22 @@ msgstr "Exportiert alle Reservationen zwischen Start- und End-Datum."
 msgid "Successfully removed ${count} unused allocations"
 msgstr "${count} Einteilungen wurden erfolgreich entfernt"
 
+msgid "New Recipient"
+msgstr "Neuer Empfänger"
+
+msgid "Edit Recipient"
+msgstr "Empfänger Bearbeiten"
+
+msgid "Added a new recipient"
+msgstr "Ein neuer Empfänger wurde hinzugefügt"
+
+#, python-format
+msgid "Do you really want to delete \"${name}\"?"
+msgstr "Möchten Sie \"${name}\" wirklich löschen?"
+
+msgid "Delete Recipient"
+msgstr "Empfänger Löschen"
+
 #, python-format
 msgid "Search through ${count} indexed documents"
 msgstr "Durchsuchen Sie ${count} indizierte Dokumente"
@@ -1740,9 +1791,6 @@ msgstr "Suche Nicht Verfügbar"
 
 msgid "Topics"
 msgstr "Themen"
-
-msgid "Resources"
-msgstr "Reservationen"
 
 #, python-format
 msgid "the subscription for ${address} was successfully confirmed"

@@ -25,6 +25,10 @@ from onegov.org.models.person_move import (
     PersonMove,
     ResourcePersonMove,
 )
+from onegov.org.models.recipient import (
+    ResourceRecipient,
+    ResourceRecipientCollection
+)
 from onegov.org.models.resource import DaypassResource
 from onegov.org.models.search import Search
 from onegov.org.models.sitecollection import SiteCollection
@@ -68,6 +72,8 @@ __all__ = [
     'PersonLinkExtension',
     'PersonMove',
     'ResourcePersonMove',
+    'ResourceRecipient',
+    'ResourceRecipientCollection',
     'Search',
     'SiteCollection',
     'Topic',

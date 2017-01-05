@@ -43,6 +43,8 @@ from onegov.org.models import (
     PageMove,
     PagePersonMove,
     ResourcePersonMove,
+    ResourceRecipient,
+    ResourceRecipientCollection,
     Search,
     SiteCollection,
     Topic,
@@ -354,3 +356,18 @@ def get_image_sets(app):
 @OrgApp.path(model=ImageSet, path='/fotoalbum/{id}')
 def get_image_set(app, id):
     return ImageSetCollection(app.session()).by_id(id)
+
+
+@OrgApp.path(
+    model=ResourceRecipientCollection,
+    path='/ressourcen-empfang')
+def get_resource_recipient_collection(app):
+    return ResourceRecipientCollection(app.session())
+
+
+@OrgApp.path(
+    model=ResourceRecipient,
+    path='/ressourcen-empfaenger/{id}',
+    converters=dict(id=UUID))
+def get_resource_recipient(app, id):
+    return ResourceRecipientCollection(app.session()).by_id(id)
