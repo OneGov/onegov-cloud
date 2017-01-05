@@ -35,17 +35,29 @@ def test_recipient_collection(session):
     class FooRecipient(GenericRecipient):
         __mapper_args__ = {'polymorphic_identity': 'foo'}
 
-    recipients = GenericRecipientCollection(session, type='foo')
+    class BarRecipient(GenericRecipient):
+        __mapper_args__ = {'polymorphic_identity': 'bar'}
 
-    foo = recipients.add(
+    bar_recipients = GenericRecipientCollection(session, type='bar')
+    bar_recipients.add(
+        name="Hidden recipient",
+        medium="phone",
+        address="+12 345 67 89"
+    )
+
+    foo_recipients = GenericRecipientCollection(session, type='foo')
+    foo = foo_recipients.add(
         name="Peter's Cellphone",
         medium="phone",
         address="+12 345 67 89"
     )
 
-    for obj in (foo, recipients.query().first()):
+    assert foo_recipients.query().count() == 1
+    assert bar_recipients.query().count() == 1
+
+    for obj in (foo, foo_recipients.query().first()):
         assert obj.type == 'foo'
         assert isinstance(obj, FooRecipient)
 
-    recipients.delete(foo)
-    assert recipients.query().count() == 0
+    foo_recipients.delete(foo)
+    assert foo_recipients.query().count() == 0
