@@ -15,6 +15,11 @@ Limit the tests to a specific python version::
 
     tox -e py27
 
+Install jest and run it::
+
+    npm install
+    npm t
+
 Conventions
 -----------
 
