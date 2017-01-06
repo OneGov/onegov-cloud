@@ -12,10 +12,13 @@ addons:
 
 install:
     - pip install tox
+    - nvm install node
+    - npm install
     - if [ "$TOXENV" = 'py34' ]; then pip install coveralls; fi
 
 script:
     - tox -e $TOXENV
+    - npm t
 
 after_success:
     - if [ "$TOXENV" = 'py34' ]; then coveralls; fi
