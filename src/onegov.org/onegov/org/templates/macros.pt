@@ -291,11 +291,11 @@
                     <div class="field-display-data" tal:define="downloadable request.is_manager and field.type == 'UploadField'">
                         <tal:block condition="downloadable">
                             <a href="${layout.field_download_link(field)}">
-                                <tal:block replace="structure layout.render_field(field)" />
+                                <tal:block replace="structure rendered" />
                             </a>
                         </tal:block>
                         <tal:block condition="not:downloadable">
-                            <tal:block replace="structure layout.render_field(field)" />
+                            <tal:block replace="structure rendered" />
                         </tal:block>
                     </div>
                 </div>

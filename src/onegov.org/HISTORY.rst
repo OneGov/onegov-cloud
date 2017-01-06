@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds the ability to send daily e-mails to interested parties about scheduled
+  reservations.
+  [href]
+
 - Stop sending e-mails to admins/editors if they create tickets for themselves.
   [href]
 

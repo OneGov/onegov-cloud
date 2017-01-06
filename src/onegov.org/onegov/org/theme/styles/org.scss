@@ -884,6 +884,12 @@ $upload-icon: '\f0ee';
         font-size: .875rem;
     }
 
+    input[type="radio"] {
+        float: none;
+        position: relative;
+        top: -2px;
+    }
+
     .label-text {
         color: $form-label-font-color;
         display: inline-block;

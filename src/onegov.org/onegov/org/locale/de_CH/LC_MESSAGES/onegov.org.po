@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-05 10:39+0100\n"
+"POT-Creation-Date: 2017-01-06 09:50+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -15,6 +15,13 @@ msgstr ""
 #, python-format
 msgid "${org} OneGov Cloud Status"
 msgstr "${org} OneGov Cloud Status"
+
+msgid "General"
+msgstr "Allgemein"
+
+#, python-format
+msgid "${org} Reservation Overview"
+msgstr "${org} Reservations-Übersicht"
 
 msgid "Logout"
 msgstr "Logout"
@@ -596,9 +603,6 @@ msgstr "Senden am"
 
 msgid "Resources"
 msgstr "Reservationen"
-
-msgid "General"
-msgstr "Allgemein"
 
 msgid "E-Mail Reply Address"
 msgstr "E-Mail Antwort Adresse"
@@ -1183,6 +1187,21 @@ msgstr "Das OneGov Cloud Team"
 msgid "Good morning,"
 msgstr "Guten Morgen"
 
+msgid "The following reservations are scheduled for today."
+msgstr "Die folgenden Reservationen sind für heute geplant."
+
+msgid "No reservations today."
+msgstr "Heute keine Reservationen."
+
+msgid "Have a great day!"
+msgstr "Wir wünschen Ihnen einen schönen Tag!"
+
+msgid ""
+"This is the daily reservation overview for ${organisation}. If you no longer "
+"want to receive this e-mail please contact an administrator so they can "
+"remove you from the recipients list."
+msgstr "Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem Administrator damit dieser Sie von der Empfängerliste streichen kann."
+
 msgid "This is what happend on the ${org} website yesterday:"
 msgstr "Folgendes ist gestern auf der ${org} Webseite geschehen:"
 
@@ -1222,9 +1241,6 @@ msgstr "Ticket ist in Bearbeitung."
 
 msgid "Have a great week!"
 msgstr "Wir wünschen Ihnen eine schöne Woche!"
-
-msgid "Have a great day!"
-msgstr "Wir wünschen Ihnen einen schönen Tag!"
 
 msgid ""
 "This is the daily OneGov Cloud status e-mail. If you don't want to receive "
@@ -1388,13 +1404,12 @@ msgstr "Ausgelastet"
 msgid ""
 "The following recipients receive a daily e-mail sent at 06:00 containing the "
 "reservation data for all reservations of the day."
-msgstr "Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den Reservationen des Tages."
+msgstr ""
+"Die folgenden Empfänger erhalten jeden Tag um 06:00 eine E-Mail mit den "
+"Reservationen des Tages."
 
 msgid "No recipients defined yet."
 msgstr "Es wurden noch keine Empfänger definiert."
-
-msgid "${count} resources"
-msgstr "${count} Ressourcen"
 
 msgid "No reservation resources defined yet."
 msgstr "Es wurden noch keine Ressourcen hinzugefügt."
