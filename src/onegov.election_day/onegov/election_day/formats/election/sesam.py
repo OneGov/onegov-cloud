@@ -236,7 +236,9 @@ def import_file(entities, election, file, mimetype,
                 parties_file=None, parties_mimetype=None):
     """ Tries to import the given file (sesam format).
 
-    :return: A dictionary containing the status and a list of errors if any.
+    :return:
+        A dictionary containing the status and a list of errors if any.
+
     For example::
 
         {'status': 'ok', 'errors': []}

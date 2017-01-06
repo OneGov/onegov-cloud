@@ -22,21 +22,21 @@ class Principal(object):
 
     If the principal is canton:
     * the ``canton`` shortcut must be set to a valid canton shortcut
-      (e.g. ``be``)
+    (e.g. ``be``)
     * the available domains are ``federation`` and ``canton``
     * use_maps is always true
     * ``muncipalities``/``entities`` returns the BFS numbers of the
-      municipalties
+    municipalties
     * there should be static data (BFS numbers and map data) for each canton
-      for a bunch of years
+    for a bunch of years
 
     If the principal is a municipality:
     * the ``municipality`` shortcut must be set to a valid BFS number
-      (e.g. ``351``)
+    (e.g. ``351``)
     * the available domains are ``federation``, ``canton`` and ``municipality``
     * use_maps can be set to enable / display maps in the application
     * ``districts``/``entities`` returns the the districts of the muncipality,
-      if there are any defined
+    if there are any defined
     * there can optionally be static data (districts and map data)
 
     """

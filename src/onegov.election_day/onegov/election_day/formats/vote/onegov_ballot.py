@@ -21,8 +21,9 @@ HEADERS = [
 def import_file(entities, vote, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
-    :return: A dictionary of dictionaries containing the status and a list of
-    errors if any.
+    :return:
+        A dictionary of dictionaries containing the status and a list of
+        errors if any.
 
     For example::
 
