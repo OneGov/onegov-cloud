@@ -56,4 +56,16 @@ target/
 onegov/election_day/assets/bundles
 onegov/election_day/assets/.webassets-cache
 
+# OS X
 .DS_Store
+
+# Pip
+pip-selfcheck.json
+
+# Virtualenv
+bin/
+include/
+
+# Node
+node_modules/
+share/
