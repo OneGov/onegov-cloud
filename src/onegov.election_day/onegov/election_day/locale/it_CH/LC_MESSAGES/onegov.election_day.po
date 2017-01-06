@@ -96,7 +96,7 @@ msgstr "Valori non validi"
 
 #, python-format
 msgid "${name} is unknown"
-msgstr "${id} è sconosciuto"
+msgstr "${name} è sconosciuto"
 
 msgid "Invalid list values"
 msgstr "Valori della lista non validi"
@@ -266,7 +266,7 @@ msgid "There are no elections or votes defined yet."
 msgstr "Non sono ancora state inserite elezioni o votazioni."
 
 msgid "Elections and votes on ${date}"
-msgstr "Elezioni e votazioni su $ {data}"
+msgstr "Elezioni e votazioni su ${date}"
 
 msgid "Federal Elections"
 msgstr "Elezioni federali"

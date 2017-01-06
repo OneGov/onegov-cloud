@@ -96,7 +96,7 @@ msgstr "Valeurs non valides"
 
 #, python-format
 msgid "${name} is unknown"
-msgstr "${id} inconnue"
+msgstr "${name} inconnue"
 
 msgid "Invalid list values"
 msgstr "Valeurs de la liste non valides"
@@ -266,7 +266,7 @@ msgid "There are no elections or votes defined yet."
 msgstr "Il n'y a pas de élections ou votes définis actuellement"
 
 msgid "Elections and votes on ${date}"
-msgstr "Elections et votes sur $ {date}"
+msgstr "Elections et votes sur ${date}"
 
 msgid "Federal Elections"
 msgstr "Elections fédéraux"
@@ -637,7 +637,7 @@ msgstr "Liste vierge"
 
 #, python-format
 msgid "Do you really want to delete \"${election}\"?"
-msgstr "Voulez-vous vraiment supprimer \"$ {election}\"?"
+msgstr "Voulez-vous vraiment supprimer \"${election}\"?"
 
 msgid "Delete election"
 msgstr "Supprimer l'élection"

@@ -96,7 +96,7 @@ msgstr "Datas nunvalaivlas"
 
 #, python-format
 msgid "${name} is unknown"
-msgstr "${id} n'è betg enconuschent"
+msgstr "${name} n'è betg enconuschent"
 
 msgid "Invalid list values"
 msgstr "Datas da glista nunvalaivlas"
