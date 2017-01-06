@@ -15,5 +15,10 @@
   "devDependencies": {
     "jest": "18.1.0",
     "jsdom": "9.9.1"
+  },
+  "jest": {
+    "testPathDirs": [
+      "onegov"
+    ]
   }
 }
