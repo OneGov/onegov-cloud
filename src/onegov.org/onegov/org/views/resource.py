@@ -239,7 +239,7 @@ def predict_next_reservation(resource, request, reservations):
     if not allocation:
         return None
 
-    whole_day = sedate.is_whole_day(*prediction, resource.timezone)
+    whole_day = sedate.is_whole_day(*prediction, timezone=resource.timezone)
     quota = utils.predict_next_value(tuple(r.quota for r in reservations)) or 1
 
     if whole_day:
