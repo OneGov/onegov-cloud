@@ -1667,12 +1667,14 @@ def test_delete_reservation_anonymous(org_app):
     assert url.endswith('?csrf-token=')
 
     # other clients still can't use the link
+    reservations_url = '/ressource/tageskarte/reservations'
+
     assert Client(org_app).delete(url, status=403)
-    assert len(client.get('/ressource/tageskarte/reservations').json) == 1
+    assert len(client.get(reservations_url).json['reservations']) == 1
 
     # only the original client can
     client.delete(url)
-    assert len(client.get('/ressource/tageskarte/reservations').json) == 0
+    assert len(client.get(reservations_url).json['reservations']) == 0
 
 
 def test_reserve_in_parallel(org_app):
@@ -1849,13 +1851,13 @@ def test_reserve_session_separation(org_app):
     assert resource.scheduler.managed_reserved_slots().count() == 1
 
     result = c1.get('/ressource/meeting-room/reservations'.format(room)).json
-    assert len(result) == 0
+    assert len(result['reservations']) == 0
 
     result = c1.get('/ressource/gym/reservations'.format(room)).json
-    assert len(result) == 1
+    assert len(result['reservations']) == 1
 
     result = c2.get('/ressource/meeting-room/reservations'.format(room)).json
-    assert len(result) == 1
+    assert len(result['reservations']) == 1
 
     result = c2.get('/ressource/gym/reservations'.format(room)).json
     assert len(result) == 1
