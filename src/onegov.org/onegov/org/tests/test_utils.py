@@ -1,3 +1,4 @@
+from datetime import date, datetime
 from onegov.org import utils
 
 
@@ -38,3 +39,39 @@ def test_annotate_html():
     )
     assert '<p class="has-img has-video">' in utils.annotate_html(html)
     assert 'class="has-video"></a>' in utils.annotate_html(html)
+
+
+def test_predict_next_value():
+    assert utils.predict_next_value((1, )) is None
+    assert utils.predict_next_value((1, 1)) is None
+    assert utils.predict_next_value((1, 1, 1)) == 1
+    assert utils.predict_next_value((2, 1, 2, 1)) == 2
+    assert utils.predict_next_value((1, 2, 1, 2)) == 1
+    assert utils.predict_next_value((2, 2, 2, 1)) is None
+    assert utils.predict_next_value((2, 4, 6)) == 8
+    assert utils.predict_next_value((1, 2, 3)) == 4
+    assert utils.predict_next_value((1, 2, 3, 5)) is None
+    assert utils.predict_next_value((1, 2, 3, 5, 6), min_probability=0) == 7
+    assert utils.predict_next_value((1, 2, 3, 5, 6), min_probability=.5) == 7
+    assert utils.predict_next_value(
+        (1, 2, 3, 5, 6), min_probability=.6) is None
+
+
+def test_predict_next_daterange():
+    assert utils.predict_next_daterange((
+        (date(2017, 1, 1), date(2017, 1, 1)),
+        (date(2017, 1, 2), date(2017, 1, 2)),
+        (date(2017, 1, 3), date(2017, 1, 3)),
+    )) == (date(2017, 1, 4), date(2017, 1, 4))
+
+    assert utils.predict_next_daterange((
+        (date(2017, 1, 1), date(2017, 1, 1)),
+        (date(2017, 1, 3), date(2017, 1, 3)),
+        (date(2017, 1, 5), date(2017, 1, 5)),
+    )) == (date(2017, 1, 7), date(2017, 1, 7))
+
+    assert utils.predict_next_daterange((
+        (datetime(2017, 1, 1, 10), datetime(2017, 1, 1, 12)),
+        (datetime(2017, 1, 3, 10), datetime(2017, 1, 3, 12)),
+        (datetime(2017, 1, 5, 10), datetime(2017, 1, 5, 12)),
+    )) == (datetime(2017, 1, 7, 10), datetime(2017, 1, 7, 12))

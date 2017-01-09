@@ -2,6 +2,7 @@ import colorsys
 import re
 import sedate
 
+from collections import defaultdict, Counter
 from datetime import datetime, time
 from functools import lru_cache
 from isodate import parse_date, parse_datetime
@@ -480,3 +481,77 @@ def show_libres_error(e, request):
 
     """
     request.alert(get_libres_error(e, request))
+
+
+def predict_next_daterange(dateranges, min_probability=0.8):
+    """ Takes a list of dateranges (start, end) and tries to predict the next
+    daterange in the list.
+
+    See :func:`predict_next_value` for more information.
+
+    """
+
+    return predict_next_value(
+        values=dateranges,
+        min_probability=min_probability,
+        compute_delta=lambda x, y: y[0] - x[0],
+        add_delta=lambda x, d: (x[0] + d, x[1] + d)
+    )
+
+
+def predict_next_value(values, min_probability=0.8,
+                       compute_delta=lambda x, y: y - x,
+                       add_delta=lambda x, d: x + d):
+    """ Takes a list of values and tries to predict the next value in the
+    series.
+
+    Meant to work on a small set of ranges (with first predictions
+    appearing with only three values), this algorithm will look at all
+    possible deltas between the values and keep track of the probability
+    of delta y following delta x.
+
+    If the delta between the second last and last value has a high
+    probability of being followed by some delta p, then delta p is used to
+    predict the next range.
+
+    If the probability is too low (signified by min_probability), then None
+    is returned.
+
+    For large ranges better statistical models should be used. Here we are
+    concerned with small series of data to answer the question "if a user
+    selected three values, what will his fourth be?"
+
+    If we for example know that the user selected 1, 2 and 3, then 4 is the
+    next probable value in the series.
+
+    """
+
+    if len(values) < 3:
+        return None
+
+    deltas = defaultdict(list)
+
+    previous = values[0]
+    previous_delta = None
+
+    for current in values[1:]:
+        delta = compute_delta(previous, current)
+
+        if previous_delta is not None:
+            deltas[previous_delta].append(delta)
+
+        previous = current
+        previous_delta = delta
+
+    next_deltas = deltas[previous_delta]
+
+    if not next_deltas:
+        return None
+
+    predicted_delta, count = Counter(next_deltas).most_common(1)[0]
+    probability = count / len(next_deltas)
+
+    if probability >= min_probability:
+        return add_delta(values[-1], predicted_delta)
+    else:
+        return None

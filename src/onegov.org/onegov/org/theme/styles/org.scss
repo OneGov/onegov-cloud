@@ -881,11 +881,8 @@ $upload-icon: '\f0ee';
     }
 
     input[type="radio"] {
-        font-size: .875rem;
-    }
-
-    input[type="radio"] {
         float: none;
+        font-size: .875rem;
         position: relative;
         top: -2px;
     }
@@ -2512,7 +2509,9 @@ button {
         }
     }
 
-    &.error.top {
+    &.error.top,
+    &.error.right,
+    &.error.left {
         background-color: $alert-color;
         border-color: $red-dark;
         color: $white;
@@ -2803,7 +2802,8 @@ ul.search-results {
         font-size: .875rem;
     }
 
-    ul {
+    ul,
+    .prediction {
         font-size: .8rem;
         list-style: none;
         margin: 0;
@@ -2832,6 +2832,16 @@ ul.search-results {
     .reservation-date {
         display: block;
         font-weight: bold;
+
+        a {
+            color: $body-font-color;
+            display: inline-block;
+            margin: 0;
+
+            &:hover {
+                color: $anchor-font-color-hover;
+            }
+        }
 
         &::before {
             background-color: transparentize($primary-color, .8);
@@ -2875,8 +2885,25 @@ ul.search-results {
             margin-left: 2.3rem;
         }
     }
-}
 
+    .prediction {
+        background-color: $smoke;
+        margin-top: 1rem !important;
+        padding: .2rem 0 .35rem .3rem;
+
+        a {
+            margin-left: .2rem;
+            margin-top: .25rem;
+
+            &:before {
+                @include icon('\f0d0');
+                color: $body-font-color;
+                margin-right: 1ex;
+            }
+        }
+    }
+
+}
 /*
     Reservation selection responsive
 */

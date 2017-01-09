@@ -300,6 +300,16 @@ rc.post = function(calendar, url) {
     rc.request(calendar, url, 'ic-post-to');
 };
 
+rc.reserve = function(calendar, url, start, end, quota, wholeDay) {
+    url = new Url(url);
+    url.query.start = start;
+    url.query.end = end;
+    url.query.quota = quota;
+    url.query.whole_day = wholeDay && '1' || '0';
+
+    rc.post(calendar, url.toString());
+};
+
 // popup handler implementation
 rc.showActionsPopup = function(calendar, element, event) {
     var wrapper = $('<div class="reservation-actions">');
@@ -311,14 +321,14 @@ rc.showActionsPopup = function(calendar, element, event) {
     }
 
     ReservationForm.render(reservation.get(0), event, rc.previousReservationState, function(state) {
-        var url = new Url(event.reserveurl);
-        url.query.start = state.start;
-        url.query.end = state.end;
-        url.query.quota = state.quota;
-        url.query.whole_day = state.wholeDay && '1' || '0';
-
-        rc.post(calendar, url.toString());
-
+        rc.reserve(
+            calendar,
+            event.reserveurl,
+            state.start,
+            state.end,
+            state.quota,
+            state.wholeDay
+        );
         $(this).closest('.popup').popup('hide');
     });
 
@@ -470,7 +480,7 @@ rc.setupReservationSelect = function(fcOptions) {
         calendar.on('rc-reservation-error', function(_e, data, _calendar, target) {
             var event = calendar.find('.has-popup');
 
-            if (!target) {
+            if (!target || target.length === 0) {
                 if (event.length !== 0) {
                     target = event;
                 } else {
@@ -483,9 +493,16 @@ rc.setupReservationSelect = function(fcOptions) {
         });
 
         calendar.on('rc-reservations-changed', function() {
-            $.getJSON(fcOptions.reservations + '&ie-cache=' + (new Date()).getTime(), function(reservations) {
-                ReservationSelection.render(selection.get(0), calendar, reservations, fcOptions.reservationform);
-                rc.loadPreviousReservationState(reservations);
+            $.getJSON(fcOptions.reservations + '&ie-cache=' + (new Date()).getTime(), function(data) {
+                ReservationSelection.render(
+                    selection.get(0),
+                    calendar,
+                    data.reservations,
+                    data.prediction,
+                    fcOptions.reservationform
+                );
+
+                rc.loadPreviousReservationState(data.reservations);
             });
         });
 
@@ -727,8 +744,25 @@ ReservationSelection = React.createClass({
             window.location = this.props.reservationform;
         }
     },
+    handleGotoDate: function(date) {
+        this.props.calendar.fullCalendar('gotoDate', date);
+    },
+    handleReservePrediction: function() {
+        if (this.props.prediction) {
+            rc.reserve(
+                this.props.calendar,
+                this.props.prediction.url,
+                moment(this.props.prediction.start).format('HH:mm'),
+                moment(this.props.prediction.end).format('HH:mm'),
+                this.props.prediction.quota,
+                this.props.prediction.wholeDay
+            );
+        }
+    },
     render: function() {
         var self = this;
+        var prediction_date = this.props.prediction && moment(this.props.prediction.start).locale(window.locale.language);
+        var boundGotoPredictionDate = this.props.prediction && self.handleGotoDate.bind(self, this.props.prediction.start);
 
         return (
             <div className="reservation-selection-inner">
@@ -743,9 +777,14 @@ ReservationSelection = React.createClass({
                             _.map(this.props.reservations, function(r, ix) {
                                 var boundClick = self.handleClick.bind(self, r);
                                 var date = moment(r.date).locale(window.locale.language);
+                                var boundGotoDate = self.handleGotoDate.bind(self, date);
                                 return (
                                     <li key={ix} className="reservation">
-                                        <span className="reservation-date" data-quota={r.quota}>{date.format('ddd LL')}</span>
+                                        <span className="reservation-date" data-quota={r.quota}>
+                                            <a onClick={boundGotoDate} title={locale('Goto date')}>
+                                                {date.format('ddd LL')}
+                                            </a>
+                                        </span>
                                         <span className="reservation-time">{r.time}</span>
                                         <a className="delete" onClick={boundClick}>{locale('Remove')}</a>
                                     </li>
@@ -756,13 +795,33 @@ ReservationSelection = React.createClass({
                 <a onClick={self.handleSubmit} className={this.props.reservations.length === 0 && 'disabled button secondary' || 'button'}>
                     {locale("Reserve")}
                 </a>
+
+                {
+                    this.props.prediction &&
+                        <div className="prediction reservation">
+                            <span className="reservation-date" data-quota={this.props.prediction.quota}>
+                                <a onClick={boundGotoPredictionDate} title={locale('Goto date')}>
+                                    {prediction_date.format('ddd LL')}
+                                </a>
+                            </span>
+                            <span className="reservation-time">{this.props.prediction.time}</span>
+                            <a className="reserve" onClick={self.handleReservePrediction}>{locale('Add Suggestion')}</a>
+                        </div>
+                }
             </div>
         );
     }
 });
 
-ReservationSelection.render = function(element, calendar, reservations, reservationform) {
-    ReactDOM.render(<ReservationSelection calendar={calendar} reservations={reservations} reservationform={reservationform} />, element);
+ReservationSelection.render = function(element, calendar, reservations, prediction, reservationform) {
+    ReactDOM.render(
+        <ReservationSelection
+            calendar={calendar}
+            reservations={reservations}
+            reservationform={reservationform}
+            prediction={prediction}
+        />,
+    element);
 };
 
 /*

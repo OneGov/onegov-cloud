@@ -11,7 +11,9 @@ var locales = {
         "Select allocations in the calendar to reserve them": "Wählen Sie die gewünschten Termine im Kalender aus",
         "Until": "Bis",
         "Whole day": "Ganztägig",
-        "Yes": "Ja"
+        "Yes": "Ja",
+        "Add Suggestion": "Vorschlag Hinzufügen",
+        "Goto date": "Zu Datum springen"
     }
 };
 

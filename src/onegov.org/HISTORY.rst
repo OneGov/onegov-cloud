@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds a simple prediction/suggestion to the calendar if multiple reservations
+  are apparently repeating.
+  [href]
+
 - Adds the ability to send daily e-mails to interested parties about scheduled
   reservations.
   [href]

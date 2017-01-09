@@ -55,7 +55,7 @@ def get_resource_form(self, request, type=None):
 
 
 def get_grouped_resources(resources, request, transform=None, emptygroup=None):
-    resources = resources.query().order_by(nullsfirst(Resource.group)).all()
+    resources = resources.query().order_by(nullsfirst(Resource.group))
     resources = request.exclude_invisible(resources)
 
     grouped = OrderedDict()
@@ -225,12 +225,51 @@ def handle_cleanup_allocations(self, request, form):
     }
 
 
+def predict_next_reservation(resource, request, reservations):
+
+    prediction = utils.predict_next_daterange(
+        tuple((r.display_start(), r.display_end()) for r in reservations)
+    )
+
+    if not prediction:
+        return None
+
+    allocation = resource.scheduler.allocations_in_range(*prediction).first()
+
+    if not allocation:
+        return None
+
+    whole_day = sedate.is_whole_day(*prediction, resource.timezone)
+    quota = utils.predict_next_value(tuple(r.quota for r in reservations)) or 1
+
+    if whole_day:
+        time = request.translate(_("Whole day"))
+    else:
+        time = utils.render_time_range(*prediction)
+
+    return {
+        'url': request.link(allocation, name='reserve'),
+        'start': prediction[0].isoformat(),
+        'end': prediction[1].isoformat(),
+        'quota': quota,
+        'wholeDay': whole_day,
+        'time': time
+    }
+
+
 @OrgApp.json(model=Resource, name='reservations', permission=Public)
 def get_reservations(self, request):
-    return [
-        utils.ReservationInfo(reservation, request).as_dict() for reservation
-        in self.bound_reservations(request).all()
-    ]
+
+    reservations = tuple(self.bound_reservations(request))
+    prediction = predict_next_reservation(self, request, reservations)
+
+    return {
+        'reservations': [
+            utils.ReservationInfo(reservation, request).as_dict()
+            for reservation in reservations
+        ],
+        'prediction': prediction
+    }
 
 
 def get_date(text, default):
@@ -388,7 +427,7 @@ def run_export(resource, request, start, end, nested, formatter):
     # update me: reused outside this function
     constant_fields = ('start', 'end', 'quota', 'email', 'ticket', 'title')
 
-    for record in query.all():
+    for record in query:
         result = OrderedDict()
 
         start = sedate.to_timezone(record[0], resource.timezone)
