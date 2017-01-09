@@ -1,7 +1,6 @@
 (function (root, factory) {
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = function(d3) {
-      d3 = require('d3');
       d3.sankey = factory(d3);
       return d3.sankey;
     };
