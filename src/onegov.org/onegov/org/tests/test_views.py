@@ -1860,7 +1860,62 @@ def test_reserve_session_separation(org_app):
     assert len(result['reservations']) == 1
 
     result = c2.get('/ressource/gym/reservations'.format(room)).json
-    assert len(result) == 1
+    assert len(result['reservations']) == 1
+
+
+def test_reserve_reservation_prediction(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    new = client.get('/ressourcen').click('Raum')
+    new.form['title'] = 'Gym'
+    new.form.submit()
+
+    resource = org_app.libres_resources.by_name('gym')
+
+    a1 = resource.scheduler.allocate(
+        dates=(datetime(2017, 1, 1, 12, 0), datetime(2017, 1, 1, 13, 0)),
+        whole_day=False
+    )[0]
+    a2 = resource.scheduler.allocate(
+        dates=(datetime(2017, 1, 2, 12, 0), datetime(2017, 1, 2, 13, 0)),
+        whole_day=False
+    )[0]
+
+    reserve_a1 = bound_reserve(client, a1)
+    reserve_a2 = bound_reserve(client, a2)
+
+    transaction.commit()
+
+    reserve_a1()
+    reserve_a2()
+
+    reservations_url = '/ressource/gym/reservations'
+    assert not client.get(reservations_url).json['prediction']
+
+    resource = org_app.libres_resources.by_name('gym')
+    a3 = resource.scheduler.allocate(
+        dates=(datetime(2017, 1, 3, 12, 0), datetime(2017, 1, 3, 13, 0)),
+        whole_day=False
+    )[0]
+    resource.scheduler.allocate(
+        dates=(datetime(2017, 1, 4, 12, 0), datetime(2017, 1, 4, 13, 0)),
+        whole_day=False
+    )
+
+    reserve_a3 = bound_reserve(client, a3)
+    transaction.commit()
+
+    reserve_a3()
+
+    prediction = client.get(reservations_url).json['prediction']
+
+    assert prediction['start'] == '2017-01-04T12:00:00+01:00'
+    assert prediction['end'] == '2017-01-04T13:00:00+01:00'
+    assert prediction['quota'] == 1
+    assert prediction['time'] == '12:00 - 13:00'
+    assert prediction['url'].endswith('/reserve')
+    assert prediction['wholeDay'] is False
 
 
 def test_reserve_multiple_allocations(org_app):
