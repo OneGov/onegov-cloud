@@ -16,7 +16,7 @@ def view_archive(self, request):
     handle_headerless_params(request)
 
     results, last_modified = self.by_date()
-    results = self.group_items(results)
+    results = self.group_items(results, request)
 
     return {
         'layout': DefaultLayout(self, request),
@@ -51,7 +51,7 @@ def view_principal(self, request):
 
     archive = ArchivedResultCollection(request.app.session())
     latest, last_modified = archive.latest()
-    latest = archive.group_items(latest, reverse=True)
+    latest = archive.group_items(latest, request)
 
     return {
         'layout': DefaultLayout(self, request),

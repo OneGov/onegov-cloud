@@ -4,6 +4,10 @@ Changelog
 - Updates translations.
   [msom]
 
+- Changes the order of the result groups in the overview such that communal
+  elections and votes are displayed first for communal instances.
+  [msom]
+
 1.4.3 (2017-01-04)
 ~~~~~~~~~~~~~~~~~~~
 

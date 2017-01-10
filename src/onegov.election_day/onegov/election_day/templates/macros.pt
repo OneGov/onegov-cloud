@@ -244,7 +244,6 @@
     </div>
 </metal:vote_header>
 
-
 <metal:election_factoids define-macro="election_factoids" i18n:domain="onegov.election_day">
     <ul class="small-block-grid-1 medium-block-grid-4 factoids">
         <li>

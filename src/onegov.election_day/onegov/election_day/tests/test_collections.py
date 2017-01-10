@@ -64,7 +64,7 @@ def test_archive(session):
         items, modified = archive.by_year(str(year))
         assert item in items
 
-        groups = archive.group_items(items)
+        groups = archive.group_items(items, DummyRequest())
         assert groups[date(year, 1, 1)]['federation']['election'] == [item]
 
     for year in (2007, 2011, 2015, 2016):
@@ -79,8 +79,73 @@ def test_archive(session):
         items, modified = archive.by_year(str(year))
         assert item in items
 
-        groups = archive.group_items(items)
+        groups = archive.group_items(items, DummyRequest())
         assert groups[date(year, 1, 1)]['federation']['vote'] == [item]
+
+
+def test_archive_grouping(session):
+    for domain in ('federation', 'canton', 'municipality'):
+        session.add(
+            Election(
+                title="{} election 1".format(domain),
+                domain=domain,
+                type='majorz',
+                date=date(2017, 2, 12)
+            )
+        )
+        session.add(
+            Vote(
+                title="{} vote 1".format(domain),
+                domain=domain,
+                date=date(2017, 2, 12)
+            )
+        )
+
+        session.add(
+            Election(
+                title="{} election 2".format(domain),
+                domain=domain,
+                type='majorz',
+                date=date(2017, 5, 21)
+            )
+        )
+        session.add(
+            Vote(
+                title="{} vote 2".format(domain),
+                domain=domain,
+                date=date(2017, 5, 21)
+            )
+        )
+
+    session.flush()
+
+    archive = ArchivedResultCollection(session).for_date(2017)
+
+    request = DummyRequest()
+    archive.update_all(request)
+
+    items, last_modified = archive.by_date()
+
+    request.app.principal.domain = 'federation'
+    expected = ['federation', 'canton', 'municipality']
+
+    grouped = archive.group_items(items, request)
+    assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
+    assert all([list(group) == expected for group in grouped.values()])
+
+    request.app.principal.domain = 'canton'
+
+    grouped = archive.group_items(items, request)
+    grouped = archive.group_items(items, request)
+    assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
+    assert all([list(group) == expected for group in grouped.values()])
+
+    request.app.principal.domain = 'municipality'
+    expected = ['municipality', 'federation', 'canton']
+
+    grouped = archive.group_items(items, request)
+    assert list(grouped) == [date(2017, 2, 12), date(2017, 5, 21)]
+    assert all([list(group) == expected for group in grouped.values()])
 
 
 def test_archived_results(session):

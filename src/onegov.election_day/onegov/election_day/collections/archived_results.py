@@ -7,14 +7,6 @@ from time import mktime, strptime
 from onegov.ballot import Election, ElectionCollection, Vote, VoteCollection
 
 
-def domain_sortfunc(item):
-    if item.domain == 'federation':
-        return 0
-    if item.domain == 'canton':
-        return 1
-    return 2
-
-
 def groupbydict(items, keyfunc, sortfunc=None):
     return OrderedDict(
         (key, list(group))
@@ -47,16 +39,22 @@ class ArchivedResultCollection(object):
 
         return list(r[0] for r in query.all())
 
-    def group_items(self, items, reverse=False):
+    def group_items(self, items, request):
         """ Groups a list of elections/votes. """
 
         if not items:
             return None
 
         dates = groupbydict(items, lambda i: i.date)
+        order = ('federation', 'canton', 'municipality')
+        if request.app.principal.domain == 'municipality':
+            order = ('municipality', 'federation', 'canton')
+
         for date_, items_by_date in dates.items():
             domains = groupbydict(
-                items_by_date, lambda i: i.domain, domain_sortfunc
+                items_by_date,
+                lambda i: i.domain,
+                lambda i: order.index(i.domain) if i.domain in order else 99
             )
             for domain, items_by_domain in domains.items():
                 types = groupbydict(

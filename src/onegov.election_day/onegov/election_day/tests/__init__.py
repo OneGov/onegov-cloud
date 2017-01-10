@@ -7,6 +7,7 @@ class DummyPrincipal(object):
     name = 'name'
     webhooks = []
     sms_notification = None
+    domain = 'canton'
 
 
 class DummyApp(object):
