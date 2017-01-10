@@ -611,6 +611,9 @@ msgstr ""
 msgid "Party"
 msgstr ""
 
+msgid "Difference"
+msgstr "Differenza"
+
 msgid "Accounted Ballots"
 msgstr "Cedels valaivels"
 

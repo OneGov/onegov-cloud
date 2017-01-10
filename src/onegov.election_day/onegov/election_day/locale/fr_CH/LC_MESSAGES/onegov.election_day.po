@@ -590,6 +590,9 @@ msgstr ""
 msgid "Party"
 msgstr "Parti"
 
+msgid "Difference"
+msgstr "Différence"
+
 msgid "Accounted Ballots"
 msgstr "Bulletins de vote comptabilisés"
 

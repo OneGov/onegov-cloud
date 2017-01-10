@@ -165,11 +165,11 @@ def test_view_election_parties_historical(election_day_app_gr):
     login(client)
 
     for id, year, domain, mandates, results in (
-        ('e1', 2014, 'federation', 5, 'BDP,2000,5\r\nCVP,1000,0\r\n'),
-        ('e2', 2015, 'federation', 5, 'BDP,2001,4\r\nCVP,1001,1\r\n'),
-        ('e3', 2016, 'federation', 5, 'BDP,2002,3\r\nCVP,1002,2\r\n'),
-        ('e4', 2013, 'federation', 4, 'BDP,2003,2\r\nCVP,1003,2\r\n'),
-        ('e5', 2012, 'canton', 5, 'BDP,2004,3\r\nCVP,1004,2\r\n')
+        ('e1', 2014, 'federation', 5, 'BDP,153,5\r\nCVP,1,0\r\n'),
+        ('e2', 2015, 'federation', 5, 'BDP,123,4\r\nCVP,31,1\r\n'),
+        ('e3', 2016, 'federation', 5, 'BDP,92,3\r\nCVP,62,2\r\n'),
+        ('e4', 2013, 'federation', 4, 'BDP,62,2\r\nCVP,62,2\r\n'),
+        ('e5', 2012, 'canton', 5, 'BDP,92,3\r\nCVP,62,2\r\n')
     ):
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = id
@@ -246,6 +246,23 @@ def test_view_election_parties_historical(election_day_app_gr):
     assert e3['labels'] == ['2014', '2015', '2016']
     assert e4['labels'] == ['2013']
     assert e5['labels'] == ['2012']
+
+    e1 = client.get('/election/e1/parties')
+    e2 = client.get('/election/e2/parties')
+    e3 = client.get('/election/e3/parties')
+    e4 = client.get('/election/e4/parties')
+    e5 = client.get('/election/e5/parties')
+
+    assert 'Differenz' not in e1
+    assert 'Differenz' in e2
+    assert 'Differenz' in e3
+    assert 'Differenz' not in e4
+    assert 'Differenz' not in e5
+
+    assert '-19.5%' in e2
+    assert '19.5%' in e2
+    assert '-20.2%' in e3
+    assert '20.2%' in e3
 
 
 def test_view_election_connections(election_day_app_gr):

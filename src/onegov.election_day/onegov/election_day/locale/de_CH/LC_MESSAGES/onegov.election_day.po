@@ -592,6 +592,9 @@ msgstr ""
 msgid "Party"
 msgstr "Partei"
 
+msgid "Difference"
+msgstr "Differenz"
+
 msgid "Accounted Ballots"
 msgstr "Gültige Wahlzettel"
 

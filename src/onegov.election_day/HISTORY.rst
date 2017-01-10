@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Adds a column to the party results with the difference of the last two
+  percent values.
+  [msom]
+
 - Updates translations.
   [msom]
 

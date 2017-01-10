@@ -39,8 +39,11 @@
                     <tr>
                         <th i18n:translate="">Party</th>
                         <tal:block tal:repeat="year years">
-                            <th class="right-aligned"><tal:block i18n:translate="">Mandates</tal:block> (${year})</th>
-                            <th class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block> (${year})</th>
+                            <th class="right-aligned"><tal:block i18n:translate="">Mandates</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                            <th class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                        </tal:block>
+                        <tal:block tal:condition="deltas">
+                            <th class="right-aligned" i18n:translate="">Difference</th>
                         </tal:block>
                     </tr>
                 </thead>

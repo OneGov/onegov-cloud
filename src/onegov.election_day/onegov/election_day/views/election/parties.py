@@ -130,11 +130,13 @@ def view_election_parties(self, request):
     handle_headerless_params(request)
 
     years, parties = get_party_results(self)
+    deltas = len(years) > 1
     results = []
-    for party in sorted(parties.keys()):
-        result = [party]
+    for key in sorted(parties.keys()):
+        result = [key]
+        party = parties[key]
         for year in years:
-            values = parties[party].get(year)
+            values = party.get(year)
             if values:
                 result.append(values.get('mandates', ''))
                 permille = values.get('votes', {}).get('permille')
@@ -145,11 +147,24 @@ def view_election_parties(self, request):
             else:
                 result.append('')
                 result.append('')
+
+        if deltas:
+            now = party.get(years[-1])
+            then = party.get(years[-2])
+            if now and then:
+                result.append('{}%'.format(
+                    ((now.get('votes', {}).get('permille', 0) or 0) -
+                     (then.get('votes', {}).get('permille', 0) or 0)) / 10
+                ))
+            else:
+                result.append('')
+
         results.append(result)
 
     return {
         'election': self,
         'layout': ElectionsLayout(self, request, 'parties'),
         'results': results,
-        'years': years
+        'years': years,
+        'deltas': deltas
     }
