@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an IBAN account to the settings.
+  [href]
+
 0.2.0 (2017-01-10)
 ~~~~~~~~~~~~~~~~~~~
 

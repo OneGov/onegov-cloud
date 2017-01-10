@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-06 09:50+0100\n"
+"POT-Creation-Date: 2017-01-10 16:34+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -619,6 +619,12 @@ msgstr "Antowrten an automatisch generierte E-Mails gehen an diese Adresse."
 msgid "Primary Color"
 msgstr "Primärfarbe"
 
+msgid "Bank Account (IBAN)"
+msgstr "Bankkonto (IBAN)"
+
+msgid "Payment"
+msgstr "Zahlungen"
+
 msgid "Contact"
 msgstr "Kontakt"
 
@@ -1200,7 +1206,10 @@ msgid ""
 "This is the daily reservation overview for ${organisation}. If you no longer "
 "want to receive this e-mail please contact an administrator so they can "
 "remove you from the recipients list."
-msgstr "Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem Administrator damit dieser Sie von der Empfängerliste streichen kann."
+msgstr ""
+"Dies ist die tägliche Reservations-Übersicht für ${organisation}. Falls Sie "
+"dieses E-Mail nicht mehr bekommen möchten, melden Sie sich bitte bei einem "
+"Administrator damit dieser Sie von der Empfängerliste streichen kann."
 
 msgid "This is what happend on the ${org} website yesterday:"
 msgstr "Folgendes ist gestern auf der ${org} Webseite geschehen:"

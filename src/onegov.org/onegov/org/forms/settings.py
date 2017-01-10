@@ -3,6 +3,7 @@ import re
 from lxml import etree
 from onegov.form import Form
 from onegov.form.core import with_options
+from onegov.form.validators import Stdnum
 from onegov.gis import CoordinatesField
 from onegov.org import _
 from onegov.org.forms.fields import HtmlField
@@ -42,6 +43,11 @@ class SettingsForm(Form):
     primary_color = ColorField(
         label=_("Primary Color"),
         fieldset=_("General")
+    )
+    bank_account = StringField(
+        label=_("Bank Account (IBAN)"),
+        fieldset=_("Payment"),
+        validators=[Stdnum(format='iban')]
     )
     contact = TextAreaField(
         label=_("Contact"),
@@ -131,7 +137,6 @@ class SettingsForm(Form):
         render_kw={'rows': 10},
         fieldset=_("Advanced")
     )
-
     # the footer height is determined by javascript, see org.scss and
     # common.js for more information (search for footer)
     footer_height = HiddenField()
