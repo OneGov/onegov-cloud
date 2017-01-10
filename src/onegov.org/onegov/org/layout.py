@@ -785,7 +785,7 @@ class ResourceRecipientsLayout(DefaultLayout):
                                 self.model,
                                 name='neuer-empfaenger'
                             ),
-                            classes=('new-email-recipient', )
+                            classes=('new-recipient', )
                         ),
                     ]
                 ),
