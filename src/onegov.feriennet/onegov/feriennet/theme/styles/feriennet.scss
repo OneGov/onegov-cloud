@@ -33,8 +33,14 @@
 /*
     background color of default logo
 */
-svg #background {
-    fill: lighten($primary-color, 25%);
+svg {
+    .background {
+        fill: lighten($primary-color, 5%);
+    }
+
+    .foreground {
+        fill: $primary-color;
+    }
 }
 
 /*
