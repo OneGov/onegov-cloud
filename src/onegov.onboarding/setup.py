@@ -36,8 +36,8 @@ setup(
         'onegov.core>=0.28.0',
         'onegov.foundation',
         'onegov.libres',
-        'onegov.org>=0.1.0',
-        'onegov.town>=1.11.9',
+        'onegov.org>=0.2.0',
+        'onegov.town>=1.11.10',
         'python-simple-hipchat',
     ],
     extras_require=dict(
