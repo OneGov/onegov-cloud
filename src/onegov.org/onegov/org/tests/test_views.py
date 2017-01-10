@@ -1660,15 +1660,15 @@ def test_delete_reservation_anonymous(org_app):
     assert reserve(quota=4).json == {'success': True}
 
     # get the delete url
-    reservations = client.get('/ressource/tageskarte/reservations').json
+    reservations_url = '/ressource/tageskarte/reservations'
+
+    reservations = client.get(reservations_url).json['reservations']
     url = reservations[0]['delete']
 
     # the url does not have csrf (anonymous does not)
     assert url.endswith('?csrf-token=')
 
     # other clients still can't use the link
-    reservations_url = '/ressource/tageskarte/reservations'
-
     assert Client(org_app).delete(url, status=403)
     assert len(client.get(reservations_url).json['reservations']) == 1
 
@@ -1835,10 +1835,10 @@ def test_reserve_session_separation(org_app):
 
     for room in ('meeting-room', 'gym'):
         result = c1.get('/ressource/{}/reservations'.format(room)).json
-        assert len(result) == 1
+        assert len(result['reservations']) == 1
 
         result = c2.get('/ressource/{}/reservations'.format(room)).json
-        assert len(result) == 1
+        assert len(result['reservations']) == 1
 
     formular = c1.get('/ressource/meeting-room/formular')
     formular.form['email'] = 'info@example.org'
