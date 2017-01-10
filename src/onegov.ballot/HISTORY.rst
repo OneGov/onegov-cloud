@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Report empty votes as being uncounted.
+  [msom]
+
 1.2.0 (2016-12-19)
 ~~~~~~~~~~~~~~~~~~~
 

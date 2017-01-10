@@ -124,7 +124,7 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
 
     @property
     def counted(self):
-        if not self.ballots:
+        if not self.ballots.first():
             return False
 
         for ballot in self.ballots:
