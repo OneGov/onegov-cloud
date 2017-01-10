@@ -400,16 +400,24 @@ msgid "Nays"
 msgstr "Voti contrari"
 
 msgid "Turnout"
-msgstr "Partecipazione al voto"
+msgstr "Partecipazione elettorale"
 
 msgid "Elegible Voters"
-msgstr "Aventi diritto di voto"
+msgstr "Elettores"
 
 msgid "Received Ballots"
 msgstr "Schede ricevute"
 
 msgid "Counted"
 msgstr "Contati"
+
+#. Default: Voter turnout
+msgid "turnout_vote"
+msgstr "Partecipazione alla votazione"
+
+#. Default: Elegible Voters
+msgid "elegible_voters_vote"
+msgstr "Aventi diritto di voto"
 
 msgid "Cast Ballots"
 msgstr "Schede rientrate"

@@ -440,13 +440,21 @@ msgid "Turnout"
 msgstr "Participaziun a las elecziuns"
 
 msgid "Elegible Voters"
-msgstr "Persunas cun dretg da votar"
+msgstr "Persunas cun dretg d’eleger"
 
 msgid "Received Ballots"
 msgstr "Cedels electorals consegnads"
 
 msgid "Counted"
 msgstr "Dumbrà ora"
+
+#. Default: Voter turnout
+msgid "turnout_vote"
+msgstr "Participaziun a la votaziun"
+
+#. Default: Elegible Voters
+msgid "elegible_voters_vote"
+msgstr "Persunas cun dretg da votar"
 
 msgid "Cast Ballots"
 msgstr "Cedels da votar entrads"

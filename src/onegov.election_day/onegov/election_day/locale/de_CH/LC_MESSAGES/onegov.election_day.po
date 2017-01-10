@@ -403,13 +403,21 @@ msgid "Turnout"
 msgstr "Wahlbeteiligung"
 
 msgid "Elegible Voters"
-msgstr "Stimmberechtigte"
+msgstr "Wahlberechtigte"
 
 msgid "Received Ballots"
 msgstr "Abgegebene Wahlzettel"
 
 msgid "Counted"
 msgstr "Ausgezählt"
+
+#. Default: Voter turnout
+msgid "turnout_vote"
+msgstr "Stimmbeteilgung"
+
+#. Default: Elegible Voters
+msgid "elegible_voters_vote"
+msgstr "Stimmberechtigte"
 
 msgid "Cast Ballots"
 msgstr "Eingegangene Stimmzettel"

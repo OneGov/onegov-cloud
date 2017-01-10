@@ -401,16 +401,24 @@ msgid "Nays"
 msgstr "Non"
 
 msgid "Turnout"
-msgstr "Participation"
+msgstr "Participation électorale"
 
 msgid "Elegible Voters"
-msgstr "Electeurs valides"
+msgstr "Electeurs"
 
 msgid "Received Ballots"
 msgstr "Votes reçus"
 
 msgid "Counted"
 msgstr "Compté"
+
+#. Default: Voter turnout
+msgid "turnout_vote"
+msgstr "Participation au vote"
+
+#. Default: Elegible Voters
+msgid "elegible_voters_vote"
+msgstr "Electeurs"
 
 msgid "Cast Ballots"
 msgstr "Suffrages exprimés"

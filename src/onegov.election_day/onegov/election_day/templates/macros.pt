@@ -278,11 +278,11 @@
 <metal:vote_factoids define-macro="vote_factoids" i18n:domain="onegov.election_day">
     <ul class="small-block-grid-1 medium-block-grid-4 factoids">
         <li>
-            <span i18n:translate="">Turnout</span>
+            <span i18n:translate="turnout_vote">Voter turnout</span>
             <strong>${'{0:.2f}'.format(ballot.turnout)} %</strong>
         </li>
         <li>
-            <span i18n:translate="">Elegible Voters</span>
+            <span i18n:translate="elegible_voters_vote">Elegible Voters</span>
             <strong>${layout.format_number(ballot.elegible_voters)}</strong>
         </li>
         <li>
