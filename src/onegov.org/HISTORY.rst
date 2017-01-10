@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2017-01-10)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a simple prediction/suggestion to the calendar if multiple reservations
   are apparently repeating.
   [href]
