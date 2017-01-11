@@ -96,6 +96,36 @@ class OrgTheme(BaseTheme):
         return options
 
     @property
+    def foundation_components(self):
+        return (
+            'grid',
+            'alert-boxes',
+            'block-grid',
+            'breadcrumbs',
+            'button-groups',
+            'buttons',
+            'dropdown',
+            'dropdown-buttons',
+            'forms',
+            'inline-lists',
+            'labels',
+            'pagination',
+            'panels',
+            'progress-bars',
+            'reveal',
+            'side-nav',
+            'split-buttons',
+            'sub-nav',
+            'tables',
+            'tabs',
+            'thumbs',
+            'tooltips',
+            'top-bar',
+            'type',
+            'visibility',
+        )
+
+    @property
     def pre_imports(self):
         return [
             'foundation-mods'
