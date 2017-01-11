@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2017-01-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to limit the number of used foundation components.
   [href]
 
