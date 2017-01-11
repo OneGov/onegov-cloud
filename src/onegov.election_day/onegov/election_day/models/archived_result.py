@@ -1,3 +1,4 @@
+from copy import deepcopy
 from onegov.ballot.models.common import DomainOfInfluenceMixin, MetaMixin
 from onegov.core.orm import Base, translation_hybrid
 from onegov.core.orm.mixins import TimestampMixin
@@ -107,6 +108,52 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
             self.meta = {}
         self.meta['counted'] = value
 
+    @property
+    def has_local_results(self):
+        return 'local' in (self.meta or {})
+
+    @property
+    def local_answer(self):
+        if self.has_local_results:
+            return (self.meta['local'] or {}).get('answer', '')
+        return self.answer
+
+    @local_answer.setter
+    def local_answer(self, value):
+        if self.meta is None:
+            self.meta = {}
+        if not self.meta.get('local'):
+            self.meta['local'] = {}
+        self.meta['local']['answer'] = value
+
+    @property
+    def local_nays_percentage(self):
+        if self.has_local_results:
+            return (self.meta['local'] or {}).get('nays_percentage', 0.0)
+        return self.nays_percentage
+
+    @local_nays_percentage.setter
+    def local_nays_percentage(self, value):
+        if self.meta is None:
+            self.meta = {}
+        if not self.meta.get('local'):
+            self.meta['local'] = {}
+        self.meta['local']['nays_percentage'] = value
+
+    @property
+    def local_yeas_percentage(self):
+        if self.has_local_results:
+            return (self.meta['local'] or {}).get('yeas_percentage', 0.0)
+        return self.yeas_percentage
+
+    @local_yeas_percentage.setter
+    def local_yeas_percentage(self, value):
+        if self.meta is None:
+            self.meta = {}
+        if not self.meta.get('local'):
+            self.meta['local'] = {}
+        self.meta['local']['yeas_percentage'] = value
+
     def copy_from(self, source):
         self.date = source.date
         self.last_result_change = source.last_result_change
@@ -116,8 +163,8 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
         self.total_entities = source.total_entities
         self.counted_entities = source.counted_entities
         self.url = source.url
-        self.title_translations = source.title_translations
+        self.title_translations = deepcopy(dict(source.title_translations))
         self.title = source.title
         self.shortcode = source.shortcode
         self.domain = source.domain
-        self.meta = source.meta
+        self.meta = deepcopy(dict(source.meta))

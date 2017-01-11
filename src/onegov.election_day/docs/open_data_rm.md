@@ -40,6 +40,8 @@ Num|Descripziun
 `answer`|Il resultat da la votaziun: acceptà (`accepted`), refusà (`rejected`), iniziativa (`proposal`) u cuntraproposta (`counter-proposal`).
 `yeas_percentage`|Vuschs affirmativas en pertschients.
 `nays_percentage`|Vuschs negativas en pertschients.
+`local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
+
 
 ## Resultats da las elecziuns
 

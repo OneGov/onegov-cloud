@@ -55,7 +55,7 @@ def get_vote_summary(vote, request, url=None):
     if last_modified:
         last_modified = last_modified.isoformat()
 
-    return {
+    summary = {
         'answer': vote.answer or "",
         'date': vote.date.isoformat(),
         'domain': vote.domain,
@@ -70,6 +70,13 @@ def get_vote_summary(vote, request, url=None):
         'url': url or request.link(vote),
         'yeas_percentage': vote.yeas_percentage,
     }
+    if getattr(vote, 'has_local_results', False):
+        summary['local'] = {
+            'answer': vote.local_answer or "",
+            'nays_percentage': vote.local_nays_percentage,
+            'yeas_percentage': vote.local_yeas_percentage,
+        }
+    return summary
 
 
 def get_summary(item, request):
@@ -108,3 +115,74 @@ def get_archive_links(archive, request):
         str(year): request.link(archive.for_date(year))
         for year in archive.get_years()
     }
+
+
+def add_local_results(source, target, principal, session):
+    """ Adds the result of the principal.
+
+    Municipalities are interested in their own result rather than the
+    cantonal end result of votes. We query the result of the municipality
+    within the given vote (source) and add it to the target.
+
+    """
+
+    def accepted(ballot):
+        return ballot.yeas > ballot.nays
+
+    adjust = (
+        principal.domain == 'municipality' and
+        principal.municipality and
+        source.type == 'vote' and
+        'id' in (source.meta or {})
+    )
+    if adjust:
+        entity_id = principal.municipality
+        vote = session.query(Vote).filter(Vote.id == source.meta['id']).first()
+        if vote and vote.proposal:
+            yeas = None
+            nays = None
+            answer = None
+
+            proposal = vote.proposal.results
+            proposal = proposal.filter_by(entity_id=entity_id)
+            proposal = proposal.first()
+
+            if proposal and proposal.counted:
+                if vote.counter_proposal and vote.tie_breaker:
+                    counter = vote.counter_proposal.results
+                    counter = counter.filter_by(entity_id=entity_id)
+                    counter = counter.first()
+
+                    tie = vote.tie_breaker.results
+                    tie = tie.filter_by(entity_id=entity_id)
+                    tie = tie.first()
+
+                    if counter and counter.counted and tie and tie.counted:
+                        if accepted(proposal) and accepted(counter):
+                            if accepted(tie):
+                                answer = 'proposal'
+                            else:
+                                answer = 'counter-proposal'
+                        elif accepted(proposal):
+                            answer = 'proposal'
+                        elif accepted(counter):
+                            answer = 'counter-proposal'
+                        else:
+                            answer = 'rejected'
+
+                        if answer == 'counter-proposal':
+                            yeas = counter.yeas
+                            nays = counter.nays
+                        else:
+                            yeas = proposal.yeas
+                            nays = proposal.nays
+                else:
+                    yeas = proposal.yeas
+                    nays = proposal.nays
+                    answer = 'accepted' if accepted(proposal) else 'rejected'
+
+            if yeas and nays and answer:
+                yeas = yeas / ((yeas + nays) or 1) * 100
+                target.local_answer = answer
+                target.local_yeas_percentage = yeas
+                target.local_nays_percentage = 100 - yeas

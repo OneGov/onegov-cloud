@@ -40,6 +40,10 @@ Name|Beschreibung
 `answer`|Das Abstimmungsresultat: `accepted` (angenommen), `rejected` (abgelehnt), `proposal` (Initiative) oder `counter-proposal` (Gegenvorschlag).
 `yeas_percentage`|Ja-Stimmen in Prozent.
 `nays_percentage`|Nein-Stimmen in Prozent.
+`local` (*optional*)|Eidgenössische und kantonale Abstimmungen innerhalb kommunaler Instanzen können zusätzlich die Resultate dieser Gemeinde enthalten als zusätzliches Objekt mit den Feldern `answer`, `yeas_percentage` and `nays_percentage`.
+
+
+Kantonale und
 
 ## Wahlresultate
 

@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Show the results of the municipality instead of the overall results for
+  federal and cantonal votes in communal instances.
+  [msom]
+
 - Adds a column to the party results with the difference of the last two
   percent values.
   [msom]

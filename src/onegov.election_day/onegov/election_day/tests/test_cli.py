@@ -2,6 +2,8 @@ import os
 import yaml
 
 from click.testing import CliRunner
+from datetime import date, datetime, timezone
+from onegov.ballot import Ballot, BallotResult, Vote
 from onegov.election_day.cli import cli
 from onegov.election_day.models import ArchivedResult
 from unittest.mock import patch
@@ -221,7 +223,73 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
         get_session(entity).flush()
         transaction.commit()
 
-    assert get_session('be').query(ArchivedResult).count() == 3
+    results = (
+        ('be', 'canton', 'vote-3', 0, False, False),
+        ('be', 'canton', 'vote-4', 0, False, False),
+        ('be', 'canton', 'vote-5', 0, True, False),
+        ('be', 'canton', 'vote-6', 1, False, False),
+        ('be', 'canton', 'vote-7', 1, True, False),
+        ('be', 'canton', 'vote-8', 1, True, True),
+        ('be', 'canton', 'vote-9', 2, False, False),
+        ('be', 'canton', 'vote-10', 2, True, False),
+        ('be', 'canton', 'vote-11', 2, True, True),
+    )
+    for entity, domain, title, vote_type, with_id, with_result in results:
+        id = '{}-{}-{}'.format(entity, domain, title)
+        then = date(2010, 1, 1)
+
+        vote = None
+        if vote_type:
+            vote = Vote(id=id, title=title, domain=domain, date=then)
+            vote.ballots.append(Ballot(type='proposal'))
+
+            if with_result:
+                vote.proposal.results.append(
+                    BallotResult(
+                        group='Bern', entity_id=351,
+                        counted=True, yeas=30, nays=10, empty=0, invalid=0
+                    )
+                )
+
+            if vote_type > 1:
+                vote.ballots.append(Ballot(type='counter-proposal'))
+                vote.ballots.append(Ballot(type='tie-breaker'))
+
+                if with_result:
+                    vote.counter_proposal.results.append(
+                        BallotResult(
+                            group='Bern', entity_id=351,
+                            counted=True, yeas=35, nays=5, empty=0, invalid=0
+                        )
+                    )
+                    vote.tie_breaker.results.append(
+                        BallotResult(
+                            group='Bern', entity_id=351,
+                            counted=True, yeas=0, nays=40, empty=0, invalid=0
+                        )
+                    )
+
+            get_session(entity).add(vote)
+            get_session(entity).flush()
+            transaction.commit()
+
+        get_session(entity).add(
+            ArchivedResult(
+                date=then,
+                last_result_change=last_result_change,
+                schema=get_schema(entity),
+                url='{}/{}/{}'.format(entity, domain, title),
+                title=title,
+                domain=domain,
+                name=entity,
+                type='vote',
+                meta={'id': id} if with_id else None
+            )
+        )
+        get_session(entity).flush()
+        transaction.commit()
+
+    assert get_session('be').query(ArchivedResult).count() == 12
     assert get_session('bern').query(ArchivedResult).count() == 5
     assert get_session('thun').query(ArchivedResult).count() == 4
 
@@ -231,7 +299,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
     ])
     assert result.exit_code == 0
 
-    assert get_session('be').query(ArchivedResult).count() == 3 + 4
+    assert get_session('be').query(ArchivedResult).count() == 12 + 4
     assert get_session('bern').query(ArchivedResult).count() == 5
     assert get_session('thun').query(ArchivedResult).count() == 4
 
@@ -241,9 +309,28 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
     ])
     assert result.exit_code == 0
 
-    assert get_session('be').query(ArchivedResult).count() == 3 + 4
-    assert get_session('bern').query(ArchivedResult).count() == 5 + 3
+    assert get_session('be').query(ArchivedResult).count() == 12 + 4
+    assert get_session('bern').query(ArchivedResult).count() == 5 + 12
     assert get_session('thun').query(ArchivedResult).count() == 4
+
+    meta = {
+        r.meta['id']: r.meta
+        for r in get_session('bern').query(ArchivedResult)
+        if r.meta and 'id' in r.meta
+    }
+    assert sorted(meta.keys()) == [
+        'be-canton-vote-{}'.format(i) for i in (10, 11, 5, 7, 8)
+    ]
+    assert meta['be-canton-vote-8']['local'] == {
+        'answer': 'accepted',
+        'yeas_percentage': 75.0,
+        'nays_percentage': 25.0
+    }
+    assert meta['be-canton-vote-11']['local'] == {
+        'answer': 'counter-proposal',
+        'yeas_percentage': 87.5,
+        'nays_percentage': 12.5
+    }
 
     result = runner.invoke(cli, [
         '--config', cfg_path, '--select', '/onegov_election_day/thun',
@@ -251,8 +338,8 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
     ])
     assert result.exit_code == 0
 
-    assert get_session('be').query(ArchivedResult).count() == 3 + 4
-    assert get_session('bern').query(ArchivedResult).count() == 5 + 3
+    assert get_session('be').query(ArchivedResult).count() == 12 + 4
+    assert get_session('bern').query(ArchivedResult).count() == 5 + 12
     assert get_session('thun').query(ArchivedResult).count() == 4
 
 

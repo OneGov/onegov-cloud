@@ -367,6 +367,53 @@ def test_archived_result(session):
     assert copied.shortcode == 'shortcode'
 
 
+def test_archived_result_local_results(session):
+    result = ArchivedResult()
+
+    assert not result.has_local_results
+    assert result.local_answer == ''
+    assert result.local_nays_percentage == 0.0
+    assert result.local_yeas_percentage == 0.0
+
+    result.answer = 'accepted'
+    result.yeas_percentage = 79.5
+    result.nays_percentage = 20.5
+
+    assert not result.has_local_results
+    assert result.local_answer == 'accepted'
+    assert result.local_yeas_percentage == 79.5
+    assert result.local_nays_percentage == 20.5
+
+    assert result.meta == {
+        'answer': 'accepted',
+        'nays_percentage': 20.5,
+        'yeas_percentage': 79.5,
+    }
+
+    result.local_answer = 'rejected'
+    result.local_yeas_percentage = 40.0
+    result.local_nays_percentage = 60.0
+
+    assert result.has_local_results
+    assert result.answer == 'accepted'
+    assert result.yeas_percentage == 79.5
+    assert result.nays_percentage == 20.5
+    assert result.local_answer == 'rejected'
+    assert result.local_yeas_percentage == 40.0
+    assert result.local_nays_percentage == 60.0
+
+    assert result.meta == {
+        'answer': 'accepted',
+        'yeas_percentage': 79.5,
+        'nays_percentage': 20.5,
+        'local': {
+            'answer': 'rejected',
+            'yeas_percentage': 40.0,
+            'nays_percentage': 60.0,
+        }
+    }
+
+
 def test_notification(session):
     notification = Notification()
     notification.action = 'action'

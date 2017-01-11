@@ -40,6 +40,8 @@ Nom|Description
 `answer`|La réponse de la votation : `accepted` (acceptée), `rejected` (rejetée), `proposal` (proposition) ou `counter-proposal` (contre-proposition).
 `yeas_percentage`|Pourcentage de oui.
 `nays_percentage`|Pourcentage de non.
+`local` (*optional*)|Federal and cantonal votes within a communal instance may contain additionally the results of the municipality in the form of an object with `answer`, `yeas_percentage` and `nays_percentage`.
+
 
 ## Résultats des élections
 

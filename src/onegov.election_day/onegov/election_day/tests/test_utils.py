@@ -2,11 +2,13 @@ from datetime import date, datetime
 from freezegun import freeze_time
 from io import BytesIO
 from mock import Mock
-from onegov.ballot import Election, Vote
+from onegov.ballot import Election, Vote, Ballot, BallotResult
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import load_csv
+from onegov.election_day.models import ArchivedResult, Principal
 from onegov.election_day.tests import DummyRequest
 from onegov.election_day.utils import add_last_modified_header
+from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils import get_archive_links
 from onegov.election_day.utils import get_election_summary
 from onegov.election_day.utils import get_summaries
@@ -100,6 +102,17 @@ def test_get_vote_summary(session):
             'yeas_percentage': 0.0,
         }
         assert expected == get_vote_summary(vote, request)
+        assert expected == get_vote_summary(result, None, request.link(vote))
+
+        result.local_answer = 'accepted'
+        result.local_yeas_percentage = 60.0
+        result.local_nays_percentage = 40.0
+
+        expected['local'] = {
+            'answer': 'accepted',
+            'nays_percentage': 40.0,
+            'yeas_percentage': 60.0,
+        }
         assert expected == get_vote_summary(result, None, request.link(vote))
 
 
@@ -231,3 +244,155 @@ def test_get_archive_links(session):
 
     assert set(get_archive_links(archive, request).keys()) == \
         set(['2016', '2015', '2014', '2011', '2009', '2007'])
+
+
+def test_add_local_results(session):
+    target = ArchivedResult(meta={})
+
+    be = Principal(name='BE', canton='be', logo=None, color=None)
+    bern = Principal(name='Bern', municipality='351', logo=None, color=None)
+
+    # wrong principal domain
+    add_local_results(ArchivedResult(), target, be, session)
+    assert not target.has_local_results
+
+    # wrong type
+    add_local_results(ArchivedResult(type='election'), target, bern, session)
+    assert not target.has_local_results
+
+    # missing ID
+    add_local_results(ArchivedResult(type='vote'), target, bern, session)
+    assert not target.has_local_results
+
+    # no vote
+    source = ArchivedResult(type='vote', meta={'id': 'id'})
+    add_local_results(source, target, bern, session)
+    assert not target.has_local_results
+
+    # no proposal
+    session.add(Vote(title="Vote", domain='federation', date=date(2011, 1, 1)))
+    session.flush()
+    vote = session.query(Vote).one()
+
+    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    add_local_results(source, target, bern, session)
+    assert not target.has_local_results
+
+    # no results
+    vote.ballots.append(Ballot(type="proposal"))
+    session.flush()
+
+    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    add_local_results(source, target, bern, session)
+    assert not target.has_local_results
+
+    # not yet counted
+    vote.proposal.results.append(
+        BallotResult(
+            group='Bern', entity_id=351,
+            counted=False, yeas=1000, nays=3000, empty=0, invalid=0
+        )
+    )
+    session.flush()
+    proposal = session.query(BallotResult).one()
+
+    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    add_local_results(source, target, bern, session)
+    assert not target.has_local_results
+
+    # simple vote
+    proposal.counted = True
+
+    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    add_local_results(source, target, bern, session)
+    assert target.has_local_results
+    assert target.local_answer == 'rejected'
+    assert target.local_yeas_percentage == 25.0
+    assert target.local_nays_percentage == 75.0
+
+    proposal.yeas = 7000
+
+    add_local_results(source, target, bern, session)
+    assert target.has_local_results
+    assert target.local_answer == 'accepted'
+    assert target.local_yeas_percentage == 70.0
+    assert target.local_nays_percentage == 30.0
+
+    # complex vote
+    # no results
+    target = ArchivedResult(meta={})
+    vote.ballots.append(Ballot(type="counter-proposal"))
+    vote.ballots.append(Ballot(type="tie-breaker"))
+    session.flush()
+
+    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    add_local_results(source, target, bern, session)
+    assert not target.has_local_results
+
+    # not yet counted
+    vote.counter_proposal.results.append(
+        BallotResult(
+            group='Bern', entity_id=351,
+            counted=False, yeas=4000, nays=6000, empty=0, invalid=0
+        )
+    )
+    vote.tie_breaker.results.append(
+        BallotResult(
+            group='Bern', entity_id=351,
+            counted=False, yeas=2000, nays=8000, empty=0, invalid=0
+        )
+    )
+    session.flush()
+    counter = vote.counter_proposal.results.one()
+    tie = vote.tie_breaker.results.one()
+
+    source = ArchivedResult(type='vote', meta={'id': vote.id})
+    add_local_results(source, target, bern, session)
+    assert not target.has_local_results
+
+    # complex vote
+    counter.counted = True
+    tie.counted = True
+
+    # p: y, c: n, t:p
+    add_local_results(source, target, bern, session)
+    assert target.has_local_results
+    assert target.local_answer == 'proposal'
+    assert target.local_yeas_percentage == 70.0
+    assert target.local_nays_percentage == 30.0
+
+    # p: y, c: y, t:c
+    counter.yeas = 9000
+    counter.nays = 1000
+
+    add_local_results(source, target, bern, session)
+    assert target.local_answer == 'counter-proposal'
+    assert target.local_yeas_percentage == 90.0
+    assert target.local_nays_percentage == 10.0
+
+    # p: y, c: y, t:p
+    tie.yeas = 8000
+    tie.nays = 2000
+
+    add_local_results(source, target, bern, session)
+    assert target.local_answer == 'proposal'
+    assert target.local_yeas_percentage == 70.0
+    assert target.local_nays_percentage == 30.0
+
+    # p: n, c: y, t:p
+    proposal.yeas = 3000
+    proposal.nays = 7000
+
+    add_local_results(source, target, bern, session)
+    assert target.local_answer == 'counter-proposal'
+    assert target.local_yeas_percentage == 90.0
+    assert target.local_nays_percentage == 10.0
+
+    # p: n, c: n, t:p
+    counter.yeas = 1000
+    counter.nays = 9000
+
+    add_local_results(source, target, bern, session)
+    assert target.local_answer == 'rejected'
+    assert target.local_yeas_percentage == 30.0
+    assert target.local_nays_percentage == 70.0

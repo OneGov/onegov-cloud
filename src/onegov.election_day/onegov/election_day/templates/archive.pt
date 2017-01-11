@@ -1,4 +1,6 @@
-<div metal:use-macro="layout.base" i18n:domain="onegov.election_day">
+<div metal:use-macro="layout.base"
+     i18n:domain="onegov.election_day"
+     tal:define="communal_instance layout.principal.domain == 'municipality'">
     <tal:block metal:fill-slot="before-content">
         <h1>
             <small>${layout.app.principal.name}</small>
@@ -32,7 +34,7 @@
                             <thead>
                                 <tr>
                                     <th i18n:translate="">Election</th>
-                                    <th i18n:translate="" class="right-aligned">Reported</th>
+                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Reported</th>
                                     <th i18n:translate="" class="right-aligned">Updated</th>
                                 </tr>
                             </thead>
@@ -41,7 +43,7 @@
                                     <td tal:define="prefix election.title_prefix(request)">
                                         <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
                                     </td>
-                                    <td class="right-aligned">
+                                    <td class="right-aligned" tal:condition="not: communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress election.progress" />
                                     </td>
                                     <td class="right-aligned">
@@ -58,7 +60,7 @@
                                     <th i18n:translate="">Result</th>
                                     <th i18n:translate="" class="right-aligned">Yes %</th>
                                     <th i18n:translate="" class="right-aligned">No %</th>
-                                    <th i18n:translate="" class="right-aligned">Reported</th>
+                                    <th i18n:translate="" class="right-aligned" tal:condition="not: communal_instance">Reported</th>
                                     <th i18n:translate="" class="right-aligned">Updated</th>
                                 </tr>
                             </thead>
@@ -68,19 +70,19 @@
                                         <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
                                     </td>
                                     <td>
-                                        <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer" />
+                                        <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.local_answer" />
                                     </td>
                                     <td class="right-aligned">
                                         <tal:block tal:condition="vote.counted">
-                                            ${layout.format_number(vote.yeas_percentage)}
+                                            ${layout.format_number(vote.local_yeas_percentage)}
                                         </tal:block>
                                     </td>
                                     <td class="right-aligned">
                                         <tal:block tal:condition="vote.counted">
-                                            ${layout.format_number(vote.nays_percentage)}
+                                            ${layout.format_number(vote.local_nays_percentage)}
                                         </tal:block>
                                     </td>
-                                    <td class="right-aligned">
+                                    <td class="right-aligned" tal:condition="not: communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />
                                     </td>
                                     <td class="right-aligned">
