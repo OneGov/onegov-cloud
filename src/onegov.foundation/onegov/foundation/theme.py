@@ -2,6 +2,7 @@ import os.path
 
 from collections import OrderedDict
 from csscompressor import compress
+from itertools import chain
 from scss.compiler import Compiler
 
 
@@ -72,11 +73,60 @@ class BaseTheme(object):
         return []
 
     @property
+    def foundation_components(self):
+        """ All used foundation components. """
+        return (
+            'grid',
+            'accordion',
+            'alert-boxes',
+            'block-grid',
+            'breadcrumbs',
+            'button-groups',
+            'buttons',
+            'clearing',
+            'dropdown',
+            'dropdown-buttons',
+            'flex-video',
+            'forms',
+            'icon-bar',
+            'inline-lists',
+            'joyride',
+            'keystrokes',
+            'labels',
+            'magellan',
+            'orbit',
+            'pagination',
+            'panels',
+            'pricing-tables',
+            'progress-bars',
+            'range-slider',
+            'reveal',
+            'side-nav',
+            'split-buttons',
+            'sub-nav',
+            'switches',
+            'tables',
+            'tabs',
+            'thumbs',
+            'tooltips',
+            'top-bar',
+            'type',
+            'offcanvas',
+            'visibility',
+        )
+
+    @property
     def imports(self):
         """ All imports, including the foundation ones. Override with care. """
-        return self.pre_imports\
-            + ['normalize', 'foundation']\
-            + self.post_imports
+        return chain(
+            self.pre_imports,
+            ('normalize', ),
+            (
+                'foundation/components/{}'.format(component)
+                for component in self.foundation_components
+            ),
+            self.post_imports
+        )
 
     @property
     def post_imports(self):
