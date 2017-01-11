@@ -39,7 +39,7 @@ msgid "Open Data"
 msgstr "Dati aperti"
 
 msgid "Proposal"
-msgstr "Iniziativa"
+msgstr "Oggetto della votazione"
 
 msgid "Counter Proposal"
 msgstr "Controprogetto"

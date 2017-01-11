@@ -37,7 +37,7 @@ msgstr "Statistica da panaschar"
 msgid "Open Data"
 msgstr "Open Data"
 
-msgid "Proposal"
+msgid "Project da votaziun"
 msgstr "Iniziativa"
 
 msgid "Counter Proposal"

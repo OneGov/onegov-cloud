@@ -39,7 +39,7 @@ msgid "Open Data"
 msgstr "Open Data"
 
 msgid "Proposal"
-msgstr "Initiative"
+msgstr "Vorlage"
 
 msgid "Counter Proposal"
 msgstr "Gegenentwurf"
@@ -229,7 +229,7 @@ msgid "Simple Vote"
 msgstr "Einfache Vorlage"
 
 msgid "Vote with Counter-Proposal"
-msgstr "Vorlage mit Gegenvorschlag"
+msgstr "Vorlage mit Gegenentwurf"
 
 msgid "Not a valid phone number."
 msgstr "Ungültige Telefonnummer."
@@ -379,19 +379,19 @@ msgid "Stop SMS subscription"
 msgstr "SMS-Abonnement beenden"
 
 msgid "Proposal and counter proposal rejected"
-msgstr "Initative und Gegenvorschlag abgelehnt"
+msgstr "Initative und Gegenentwurf abgelehnt"
 
 msgid "Proposal accepted"
 msgstr "Initiative angenommen"
 
 msgid "Counter proposal accepted"
-msgstr "Gegenvorschlag angenommen"
+msgstr "Gegenentwurf angenommen"
 
 msgid "Tie breaker in favor of the proposal"
 msgstr "Stichfrage zugunsten der Initiative"
 
 msgid "Tie breaker in favor of the counter proposal"
-msgstr "Stichfrage zugunsten des Gegenvorschlages"
+msgstr "Stichfrage zugunsten des Gegenentwurfs"
 
 msgid "Yeas"
 msgstr "JA Stimmen"
@@ -494,16 +494,16 @@ msgid "Line"
 msgstr "Zeile"
 
 msgid "No errors found in proposal"
-msgstr "Keine Fehler im Vorschlag"
+msgstr "Keine Fehler in der Vorlage"
 
 msgid "Errors found in proposal"
-msgstr "Fehler im Vorschlag"
+msgstr "Fehler in der Vorlage"
 
 msgid "No errors found in counter proposal"
-msgstr "Keine Fehler im Gegenvorschlag"
+msgstr "Keine Fehler im Gegenentwurf"
 
 msgid "Errors found in counter proposal"
-msgstr "Fehler im Gegenvorschlag"
+msgstr "Fehler im Gegenentwurf"
 
 msgid "No errors found in tie-breaker"
 msgstr "Keine Fehler in der Stichfrage"

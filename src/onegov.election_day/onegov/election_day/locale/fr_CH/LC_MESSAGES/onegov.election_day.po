@@ -39,7 +39,7 @@ msgid "Open Data"
 msgstr "Ouvrir les données"
 
 msgid "Proposal"
-msgstr "Proposition"
+msgstr "Objet de la votation"
 
 msgid "Counter Proposal"
 msgstr "Contre-projet"
@@ -380,16 +380,16 @@ msgid "Stop SMS subscription"
 msgstr "Arrêter l'abonnement SMS"
 
 msgid "Proposal and counter proposal rejected"
-msgstr "Proposition et contre-projet rejetées"
+msgstr "Initiative et contre-projet rejetées"
 
 msgid "Proposal accepted"
-msgstr "Proposition acceptée"
+msgstr "Initiative acceptée"
 
 msgid "Counter proposal accepted"
 msgstr "Contre-projet accepté"
 
 msgid "Tie breaker in favor of the proposal"
-msgstr "Jeu décisif en faveur de la proposition"
+msgstr "Jeu décisif en faveur de l'initiative"
 
 msgid "Tie breaker in favor of the counter proposal"
 msgstr "Jeu décisif en faveur de le contre-projet"
@@ -494,10 +494,10 @@ msgid "Line"
 msgstr "Ligne"
 
 msgid "No errors found in proposal"
-msgstr "Pas d'erreurs trouvées dans la proposition."
+msgstr "Pas d'erreurs trouvées dans l'initiative."
 
 msgid "Errors found in proposal"
-msgstr "Erreurs trouvées dans la proposition."
+msgstr "Erreurs trouvées dans l'initiative."
 
 msgid "No errors found in counter proposal"
 msgstr "Pas d'erreurs trouvées dans le contre-projet."
