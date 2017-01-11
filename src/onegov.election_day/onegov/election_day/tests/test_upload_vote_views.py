@@ -65,8 +65,8 @@ def test_upload_vote_all_or_nothing(election_day_app):
     )
     upload = upload.form.submit()
 
-    assert "Keine Fehler im Vorschlag" in upload
-    assert "Keine Fehler im Gegenvorschlag" in upload
+    assert "Keine Fehler in der Vorlage" in upload
+    assert "Keine Fehler im Gegenentwurf" in upload
     assert "Fehler in der Stichfrage" in upload
     assert "Ungültige ID" in upload
     assert '<span class="error-line"><span>Zeile</span>2</span>' in upload
