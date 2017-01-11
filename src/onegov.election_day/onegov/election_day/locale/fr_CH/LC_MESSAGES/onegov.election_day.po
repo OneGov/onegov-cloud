@@ -229,7 +229,7 @@ msgid "Simple Vote"
 msgstr "Vote simple"
 
 msgid "Vote with Counter-Proposal"
-msgstr "Vote avec contre-proposition"
+msgstr "Vote avec contre-projet"
 
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
@@ -380,19 +380,19 @@ msgid "Stop SMS subscription"
 msgstr "Arrêter l'abonnement SMS"
 
 msgid "Proposal and counter proposal rejected"
-msgstr "Proposition et contre-proposition rejetées"
+msgstr "Proposition et contre-projet rejetées"
 
 msgid "Proposal accepted"
 msgstr "Proposition acceptée"
 
 msgid "Counter proposal accepted"
-msgstr "Contre-proposition acceptée"
+msgstr "Contre-projet accepté"
 
 msgid "Tie breaker in favor of the proposal"
 msgstr "Jeu décisif en faveur de la proposition"
 
 msgid "Tie breaker in favor of the counter proposal"
-msgstr "Jeu décisif en faveur de la contre-proposition"
+msgstr "Jeu décisif en faveur de le contre-projet"
 
 msgid "Yeas"
 msgstr "Oui"
@@ -500,10 +500,10 @@ msgid "Errors found in proposal"
 msgstr "Erreurs trouvées dans la proposition."
 
 msgid "No errors found in counter proposal"
-msgstr "Pas d'erreurs trouvées dans la contre-proposition."
+msgstr "Pas d'erreurs trouvées dans le contre-projet."
 
 msgid "Errors found in counter proposal"
-msgstr "Erreurs trouvées dans la contre-proposition."
+msgstr "Erreurs trouvées dans le contre-projet."
 
 msgid "No errors found in tie-breaker"
 msgstr "Pas d'erreurs trouvées dans le jeu décisif."
