@@ -296,7 +296,7 @@ msgid "Updated"
 msgstr "Actualisà"
 
 msgid "Vote"
-msgstr "Project"
+msgstr "Votaziun"
 
 msgid "Result"
 msgstr "Resultat"

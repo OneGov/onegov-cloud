@@ -42,13 +42,13 @@ msgid "Proposal"
 msgstr "Proposition"
 
 msgid "Counter Proposal"
-msgstr "Contre-proposition"
+msgstr "Contre-projet"
 
 msgid "Tie-Breaker"
-msgstr "Jeu décisif"
+msgstr "Question subsidiaire"
 
 msgid "Votes"
-msgstr "Votes"
+msgstr "Votations"
 
 msgid "Elections"
 msgstr "Elections"
@@ -260,10 +260,10 @@ msgid "Communal"
 msgstr "Municipal"
 
 msgid "Elections &amp; Votes"
-msgstr "Elections et votes: données ouvertes"
+msgstr "Elections et votations: données ouvertes"
 
 msgid "There are no elections or votes defined yet."
-msgstr "Il n'y a pas de élections ou votes définis actuellement"
+msgstr "Il n'y a pas de élections ou votations définis actuellement"
 
 msgid "Elections and votes on ${date}"
 msgstr "Elections et votes sur ${date}"
@@ -278,13 +278,13 @@ msgid "Communal Elections"
 msgstr "Elections communales"
 
 msgid "Federal Votes"
-msgstr "Votes fédéraux"
+msgstr "Votations fédérales"
 
 msgid "Cantonal Votes"
-msgstr "Votes cantonaux"
+msgstr "Votations  cantonales"
 
 msgid "Communal Votes"
-msgstr "Votes communaux"
+msgstr "Votations communales"
 
 msgid "Election"
 msgstr "Election"
@@ -319,7 +319,7 @@ msgstr ""
 "en rouge."
 
 msgid "Back to the latest elections &amp; votes"
-msgstr "Retour aux dernières élections et votes"
+msgstr "Retour aux dernières élections et votations"
 
 msgid "Login"
 msgstr "Se connecter"
@@ -470,10 +470,10 @@ msgid "Locale"
 msgstr "Locaux"
 
 msgid "New Vote"
-msgstr "Nouveau vote"
+msgstr "Nouvelle votation"
 
 msgid "No votes yet."
-msgstr "Pas de votes actuellement"
+msgstr "Pas de votations actuellement"
 
 msgid "Please use the following format:"
 msgstr "Veuillez utiliser le format suivant:"
@@ -668,7 +668,7 @@ msgid "Do you really want to delete \"${vote}\"?"
 msgstr "Souhaitez-vous vraiment supprimer \"${vote}\"?"
 
 msgid "Delete vote"
-msgstr "Supprimer le vote"
+msgstr "Supprimer la votation"
 
 #, python-format
 msgid "The year ${year} is not yet supported"

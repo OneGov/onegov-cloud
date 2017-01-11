@@ -45,7 +45,7 @@ msgid "Counter Proposal"
 msgstr "Controprogetto"
 
 msgid "Tie-Breaker"
-msgstr "Domanda eventuale"
+msgstr "Domanda risolutiva"
 
 msgid "Votes"
 msgstr "Votazioni"
@@ -229,7 +229,7 @@ msgid "Simple Vote"
 msgstr "Progetto semplice"
 
 msgid "Vote with Counter-Proposal"
-msgstr "Progetto con controprogetto"
+msgstr "Votazione con controprogetto"
 
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
