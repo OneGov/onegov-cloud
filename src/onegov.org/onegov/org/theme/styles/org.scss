@@ -25,7 +25,7 @@
 
 @mixin hairline() {
     border: 0;
-    border-bottom: 1px solid $smoke;
+    border-bottom: 1px solid $gray;
 }
 
 @mixin smooth-edges() {
@@ -698,14 +698,21 @@ input[type=color] {
 */
 
 .homepage-tile {
-    line-height: 1rem;
-    margin-bottom: 1.375em;
+    border: 1px solid $gray;
+    display: block;
+    margin-bottom: 2rem;
     overflow: hidden;
     text-overflow: ellipsis;
 
     h3 {
         font-size: 1rem;
-        margin-bottom: 0;
+        font-weight: 500;
+        margin: 1rem;
+    }
+
+    .child-links {
+        margin-top: -.5rem;
+        padding: 0 1rem 1rem;
     }
 
     .tile-sub-link {
@@ -717,11 +724,11 @@ input[type=color] {
     }
 
     .tile-sub-link:after {
-        color: transparentize($primary-color, .8);
-        content: ' | ';
+        color: $body-font-color;
+        content: ' / ';
         display: inline-block;
-        margin-left: .6ex;
-        margin-right: .6ex;
+        margin-left: .7ex;
+        margin-right: .7ex;
     }
 
     .tile-sub-link:last-child:after {
@@ -729,12 +736,10 @@ input[type=color] {
     }
 
     .tile-image {
-        @include smooth-edges;
-
         background-position: center center;
         background-size: cover;
         display: block;
-        height: 5rem;
+        height: 7rem;
         width: 100%;
     }
 
@@ -791,11 +796,12 @@ ul.panel-links {
 
 .side-panel {
     border: 1px solid $gray;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 
     h2 {
         border-bottom: 2px solid $primary-color;
         font-size: .875rem;
+        margin-top: 0;
         padding: .75rem 1rem;
         text-transform: uppercase;
     }
@@ -1271,6 +1277,7 @@ div#redactor-droparea {
 
 .main-title {
     margin-top: -.5rem;
+    margin-bottom: 1rem;
 }
 
 /*
