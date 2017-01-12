@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.0 (2017-01-12)
+~~~~~~~~~~~~~~~~~~~
 
 - Show the results of the municipality instead of the overall results for
   federal and cantonal votes in communal instances.
