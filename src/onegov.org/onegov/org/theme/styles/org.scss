@@ -831,6 +831,17 @@ ul.panel-links {
         font-size: .875rem;
     }
 
+    > .field-display {
+        font-size: .875rem;
+        margin-bottom: .5em;
+        padding: 1rem 1.25rem 0;
+    }
+
+    .field-display-data,
+    .field-display-data * {
+        font-size: .875rem !important;
+    }
+
     .marker-map {
         border-bottom: 1rem solid $white;
         box-sizing: content-box;
@@ -841,7 +852,6 @@ ul.panel-links {
         }
     }
 }
-
 
 .homepage .side-panel:first-child,
 .side-panel.highlighted {
