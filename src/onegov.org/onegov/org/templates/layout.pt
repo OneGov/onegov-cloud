@@ -158,6 +158,7 @@
             </ul>
           </div>
         </div>
+
         <div class="row footer-links">
           <div class="small-12 columns">
             <div metal:use-macro="layout.macros['bottom-links']"></div>

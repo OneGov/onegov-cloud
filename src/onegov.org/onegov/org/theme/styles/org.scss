@@ -82,20 +82,16 @@ h6,
 }
 
 /*
-    get rid of the jump that is introduced when switching from a site with
+    Get rid of the jump that is introduced when switching from a site with
     scrollbar to a site without (or vice versa)
 
-    (100vw includes the scrollbar, 100% does not)
+    As a side-effect, this disables horizontal scrolling, but we don't have
+    that anyway because of our mobile-first design.
 */
 html {
     @media not print {
-        margin-left: calc(100vw - 100%);
-
-        /* override the redactor style set on the body, which leads to
-           jumpy modal dialogs
-        */
-        overflow: auto !important;
-        padding-right: 0 !important;
+        overflow-x: hidden;
+        width: 100vw;
     }
 }
 
@@ -151,16 +147,108 @@ body {
 // we need to use exact pixel measurements for the footer or we end up with
 // incosistent results across browsers, which might mean the difference between
 // showing a scrollbar and not showing one
-footer {
+$footer-header-color: $charcoal;
+$footer-text-color: $steel;
+$footer-font-size: 13px;
+$footer-border-width: 0;
 
-    h2 {
-        margin-bottom: 13px;
+footer {
+    background-color: $topbar-bg-color;
+
+    // accomplish the border with a box-shadow, as the border messes with
+    // our fixed footer script height calculation
+    box-shadow: 0 -2px 0 $primary-color;
+    max-width: 100% !important;
+
+    // please do not add a margin here, it will mess up the sticky footer!
+    // instead add a margin-bottom to whatever is rendered before the footer.
+    padding: 0;
+
+    > .columns > .row {
+        margin: 0 auto;
+        max-width: $row-width;
     }
 
     * {
-        font-size: 13px;
-        line-height: 19px;
+        background-color: $topbar-bg-color;
+        color: $footer-text-color;
+        font-size: $footer-font-size;
+        line-height: 25px;
     }
+
+    h2 {
+        color: $footer-header-color;
+        font-weight: 500;
+        letter-spacing: 1px;
+        margin-bottom: 13px;
+        text-transform: uppercase;
+    }
+
+    .bottom-links {
+        margin-bottom: .25rem;
+        padding: .25rem 0;
+        text-align: right;
+    }
+
+    .footer-columns {
+        padding-bottom: 1.25rem;
+        padding-top: 1.25rem;
+    }
+}
+
+@media #{$small-only} {
+    footer .columns > div {
+        margin-bottom: 1rem;
+    }
+}
+
+/*
+    links at the absoulte bottom
+*/
+.bottom-links {
+    color: $bottom-links-color;
+    list-style: none;
+    margin-left: 0;
+
+    a {
+        color: $bottom-links-color;
+        font-size: $bottom-links-size;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+
+    li {
+        color: $bottom-links-color;
+        display: inline;
+        font-size: $bottom-links-size;
+    }
+
+    li:after {
+        content: '|';
+    }
+
+    li:last-child:after {
+        content: '';
+    }
+}
+
+/*
+    social media links in the footer
+*/
+
+@media #{$medium-up} {
+    // ligns the footer values up with sidebar on the right (index)
+    .footer-columns > div:last-child {
+        padding-left: 1.3rem;
+    }
+}
+
+.social-media-links {
+    font-size: 1em;
+    list-style-type: none;
+    margin: 0;
 }
 
 /*
@@ -564,55 +652,6 @@ input[type=color] {
     display: block;
     margin-bottom: 1rem;
     padding: 0;
-}
-
-/*
-    links at the absoulte bottom
-*/
-.bottom-links {
-    color: $bottom-links-color;
-    list-style: none;
-    margin-left: 0;
-
-    a {
-        color: $bottom-links-color;
-        font-size: $bottom-links-size;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-
-    li {
-        color: $bottom-links-color;
-        display: inline;
-        font-size: $bottom-links-size;
-    }
-
-    li:after {
-        content: '|';
-    }
-
-    li:last-child:after {
-        content: '';
-    }
-}
-
-/*
-    social media links in the footer
-*/
-
-@media #{$medium-up} {
-    // ligns the footer values up with sidebar on the right (index)
-    .footer-columns > div:last-child {
-        padding-left: 1.3rem;
-    }
-}
-
-.social-media-links {
-    font-size: 1em;
-    list-style-type: none;
-    margin: 0;
 }
 
 /*
@@ -1367,49 +1406,6 @@ div#redactor-droparea {
 */
 .content {
     margin-bottom: 1rem;
-}
-
-/*
-    sticky footer
-*/
-
-.footer {
-    // please do not add a margin here, it will mess up the sticky footer!
-    // instead add a margin-bottom to whatever is rendered before the footer.
-
-    padding: 0 1rem;
-
-    h2,
-    div {
-        color: $topbar-link-color;
-        font-size: $topbar-link-font-size;
-    }
-
-    h2 {
-        font-weight: bold;
-    }
-
-    .bottom-links {
-        margin-bottom: .25rem;
-        padding: .25rem 0;
-        text-align: right;
-    }
-
-    .footer-links > div {
-        padding-right: 0;
-    }
-
-    .footer-columns {
-        background-color: $topbar-bg-color;
-        padding-bottom: 1rem;
-        padding-top: 1rem;
-    }
-}
-
-@media #{$small-only} {
-    .footer .columns > div {
-        margin-bottom: 1rem;
-    }
 }
 
 /*
