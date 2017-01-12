@@ -113,6 +113,18 @@ body {
     height: 100%;
 }
 
+/*
+    The global tools header
+*/
+$global-tools-margin: .75rem;
+
+#global-tools {
+    background-color: $primary-color;
+    height: 2rem;
+    margin-bottom: $global-tools-margin;
+    width: 100%;
+}
+
 #inner-body {
     margin: 0 auto -$footer-height;
 
@@ -125,6 +137,7 @@ body {
     // the header is fixed and the logo in it tries to fill it out
     // therefore an svg logo should be used!
     height: 7em;
+    margin-bottom: $global-tools-margin;
 
     img {
         height: 7em;

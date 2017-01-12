@@ -30,6 +30,8 @@
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
 
     <div id="inner-body">
+      <div id="global-tools"></div>
+
       <div class="row header">
         <div class="small-12 medium-8 columns logo">
           <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
