@@ -314,14 +314,20 @@ footer {
 
 .main-navigation {
     background-color: $topbar-bg-color;
-    border-bottom: $top-bar-border-size solid $primary-color;
     margin-bottom: .1rem;
 }
 
 .top-bar {
-
     &.expanded {
         box-shadow: none;
+    }
+
+    ul li a {
+        color: $body-font-color;
+        font-size: .8rem;
+        font-weight: normal;
+        text-transform: uppercase;
+        padding: .1rem 1.25rem !important;
     }
 }
 
