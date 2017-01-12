@@ -32,7 +32,7 @@ class ColumnWidget(object):
 class PanelWidget(object):
     template = """
         <xsl:template match="panel">
-            <div class="homepage-panel">
+            <div class="side-panel">
                 <xsl:apply-templates select="node()"/>
             </div>
         </xsl:template>

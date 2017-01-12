@@ -260,13 +260,13 @@
             </div>
             <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel">
                 <div metal:define-slot="before-panels"></div>
-                <div class="page-content-panel contact-panel" tal:condition="contact or coordinates">
+                <div class="side-panel highlighted without-title" tal:condition="contact or coordinates">
                     <tal:block condition="contact" content="structure contact" />
                     <br tal:condition="coordinates and contact" />
                     <h2 i18n:translate tal:condition="not contact">Map</h2>
                     <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
                 </div>
-                <div class="page-content-panel people-panel" tal:condition="people">
+                <div class="side-panel people-panel" tal:condition="people">
                     <h2 i18n:translate>People</h2>
                     <ul class="panel-links" data-sortable data-sortable-url="${layout.move_person_url_template}">
                         <li tal:repeat="person people" data-sortable-id="${request.is_manager and person.id}">
@@ -406,7 +406,7 @@
 </metal:ticket_status>
 
 <metal:ticket_callout define-macro="ticket_callout" i18n:domain="onegov.org">
-    <div class="page-content-panel" tal:condition="ticket">
+    <div class="side-panel" tal:condition="ticket">
         <div class="field-display ticket-status-page">
             <div class="field-display-block">
                 <div class="field-display-label" i18n:translate="">Ticket Number</div>

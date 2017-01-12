@@ -125,7 +125,7 @@ $global-tools-margin: .75rem;
 
 #global-tools {
     @include primary-color-background;
-    height: 2rem;
+    height: 2.5rem;
     margin-bottom: $global-tools-margin;
     width: 100%;
 }
@@ -789,45 +789,95 @@ ul.panel-links {
     }
 }
 
-.homepage-panel,
-.page-content-panel {
-    background-color: $topbar-bg-color;
-    margin-bottom: 1.5em;
-    padding: 1em;
+.side-panel {
+    border: 1px solid $gray;
+    margin-bottom: 1.5rem;
 
-    /* add dots for oveflowing links */
+    h2 {
+        border-bottom: 2px solid $primary-color;
+        font-size: .875rem;
+        padding: .75rem 1rem;
+        text-transform: uppercase;
+    }
+
+    > ul {
+        list-style-type: none;
+        margin: 0;
+        padding: .5rem 1rem .75rem;
+
+        li {
+            font-size: .875rem;
+
+            + li {
+                margin-top: .25rem;
+            }
+        }
+    }
+
+    .panel-links li + li {
+        margin-top: .75rem;
+    }
+
     a {
         display: block;
+        font-size: .875rem;
+        font-weight: bold;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
-    h2 {
-        font-size: 1em;
-        font-weight: normal;
-        margin-top: 0;
+    small {
+        font-size: .875rem;
     }
 
-    &.contact-panel {
+    .marker-map {
+        border-bottom: 1rem solid $white;
+        box-sizing: content-box;
+        margin: 0 1rem 1rem;
+
         a {
-            font-weight: bold;
+            font-size: 10px;
         }
+    }
+}
 
-        ul {
-            list-style-type: none;
-            margin: 0;
-        }
 
-        li:first-child {
-            font-weight: bold;
-        }
+.homepage .side-panel:first-child,
+.sidepanel.highlighted {
+    background-color: $topbar-bg-color;
+    border: 0;
 
-        li {
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 0;
-            min-height: 1rem;
+    .marker-map {
+        border-bottom: 1rem solid $topbar-bg-color;
+    }
+
+    h2 {
+        @include primary-color-background;
+        border-bottom: 0;
+        padding: .75rem 1rem;
+        text-transform: uppercase;
+    }
+
+    &.without-title {
+        > ul {
+            padding: 0;
+
+            li:first-child {
+                @include primary-color-background;
+                margin-bottom: 1rem;
+                padding: .75rem 1rem;
+                text-transform: uppercase;
+            }
+
+            li {
+                min-height: .5rem;
+                padding: 0 1rem;
+
+                + li {
+                    margin-top: .25rem;
+                }
+            }
         }
     }
 }
@@ -3125,9 +3175,15 @@ ul.search-results {
         display: none;
     }
 
-    .page-content-panel {
+    .side-panel {
         border: 1px solid $tuatara;
         border-radius: 3px;
+        margin-bottom: .5rem;
+
+        .field-display-block {
+            float: left;
+            margin-right: 1.5rem;
+        }
     }
 
     html,
@@ -3137,16 +3193,6 @@ ul.search-results {
 
     body {
         font-size: 12px !important;
-    }
-
-    // tickets status panel
-    .page-content-panel {
-        margin-bottom: .5rem;
-
-        .field-display-block {
-            float: left;
-            margin-right: 1.5rem;
-        }
     }
 
     .field-display-block * {

@@ -19,7 +19,7 @@
             <!--! -->
 
             <div class="columns small-12 medium-4">
-                <div class="page-content-panel">
+                <div class="side-panel">
                     <div class="field-display ticket-status-page">
                         <div class="field-display-block">
                             <div class="field-display-label" i18n:translate>Ticket Number</div>
