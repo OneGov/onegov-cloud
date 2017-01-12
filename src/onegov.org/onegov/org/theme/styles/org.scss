@@ -25,7 +25,7 @@
 
 @mixin hairline() {
     border: 0;
-    border-bottom: 1px solid transparentize($primary-color, .8);
+    border-bottom: 1px solid $smoke;
 }
 
 @mixin smooth-edges() {
@@ -47,6 +47,11 @@
     -moz-#{$prop}: #{$val};
     -ms-#{$prop}: #{$val};
     #{$prop}: #{$val};
+}
+
+@mixin primary-color-background {
+    background-color: $primary-color;
+    color: $white;
 }
 
 /*
@@ -119,7 +124,7 @@ body {
 $global-tools-margin: .75rem;
 
 #global-tools {
-    background-color: $primary-color;
+    @include primary-color-background;
     height: 2rem;
     margin-bottom: $global-tools-margin;
     width: 100%;
@@ -326,8 +331,12 @@ footer {
         color: $body-font-color;
         font-size: .8rem;
         font-weight: normal;
-        text-transform: uppercase;
         padding: .1rem 1.25rem !important;
+        text-transform: uppercase;
+
+        &:hover {
+            @include primary-color-background;
+        }
     }
 }
 
@@ -856,10 +865,26 @@ $send-link-icon: '\f1d9';
 $occupancy-link-icon: '\f022';
 $upload-icon: '\f0ee';
 
+$editbar-bg-color: $topbar-link-bg-hover;
+
 .edit-bar {
-    background-color: $primary-color;
+    background-color: $editbar-bg-color;
     margin-bottom: 2px;
     margin-top: -2px;
+
+    .button,
+    button {
+        background-color: $editbar-bg-color;
+        color: $body-font-color;
+
+        &.dropdown::after {
+            border-color: $body-font-color transparent transparent;
+        }
+
+        &:hover {
+            @include primary-color-background;
+        }
+    }
 
     button.tiny {
         font-size: .8rem;
@@ -1875,18 +1900,24 @@ tr.ticket:hover {
 }
 
 .f-dropdown {
-    border-radius: 3px;
     max-height: 400px;
     max-width: 275px;
     overflow-x: hidden;
     overflow-y: auto;
 
+    li:hover {
+        @include primary-color-background;
+    }
+
     a {
         font-size: .875rem;
-        font-weight: bold;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+
+        &:hover {
+            color: $white;
+        }
 
         ::before {
             font-weight: normal;
