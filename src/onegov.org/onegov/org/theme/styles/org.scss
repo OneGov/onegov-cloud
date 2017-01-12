@@ -834,7 +834,7 @@ ul.panel-links {
     .marker-map {
         border-bottom: 1rem solid $white;
         box-sizing: content-box;
-        margin: 0 1rem 1rem;
+        margin: -1rem 1rem 1rem;
 
         a {
             font-size: 10px;
@@ -844,7 +844,7 @@ ul.panel-links {
 
 
 .homepage .side-panel:first-child,
-.sidepanel.highlighted {
+.side-panel.highlighted {
     background-color: $topbar-bg-color;
     border: 0;
 
@@ -861,7 +861,7 @@ ul.panel-links {
 
     &.without-title {
         > ul {
-            padding: 0;
+            padding: 0 0 1rem;
 
             li:first-child {
                 @include primary-color-background;
