@@ -33,7 +33,7 @@ msgid "Election statistics"
 msgstr "Statistiche delle elezioni"
 
 msgid "Panachage"
-msgstr "Voto disgiunto"
+msgstr "Panachage"
 
 msgid "Open Data"
 msgstr "Dati aperti"
