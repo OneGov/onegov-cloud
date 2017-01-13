@@ -4,6 +4,9 @@ from onegov.newsletter import NewsletterCollection
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link, LinkGroup
 from onegov.org.layout import EventBaseLayout
+from onegov.org.models import ImageSet, ImageFile
+from onegov.file.models.fileset import file_to_set_associations
+from sqlalchemy import func
 
 
 @OrgApp.homepage_widget(tag='row')
@@ -234,3 +237,61 @@ class HrWidget(object):
             <hr />
         </xsl:template>
     """
+
+
+@OrgApp.homepage_widget(tag='slider')
+class SliderWidget(object):
+    template = """
+        <xsl:template match="slider">
+            <div metal:use-macro="layout.macros.slider" />
+        </xsl:template>
+    """
+
+    def get_images_from_sets(self, layout):
+        session = layout.app.session()
+
+        sets = session.query(ImageSet)
+        sets = sets.with_entities(ImageSet.id, ImageSet.meta)
+        sets = tuple(
+            s.id for s in sets
+            if s.meta.get('show_images_on_homepage') and not
+            s.meta.get('is_hidden_from_public')
+        )
+
+        if not sets:
+            return
+
+        files = session.query(file_to_set_associations)
+        files = files.with_entities(file_to_set_associations.c.file_id)
+        files = files.filter(file_to_set_associations.c.fileset_id.in_(
+            sets
+        ))
+
+        images = session.query(ImageFile)
+        images = images.filter(ImageFile.id.in_(files.subquery()))
+        images = images.order_by(func.random())
+        images = images.limit(6)
+
+        for image in images:
+            yield {
+                'note': image.note,
+                'src': layout.request.link(image)
+            }
+
+    def get_images_from_theme(self, layout):
+        for key, value in layout.org.theme_options.items():
+            if key.startswith('tile-image'):
+                yield {
+                    'note': None,
+                    'src': value.strip('"\'')
+                }
+
+    def get_variables(self, layout):
+        # if we don't have an album used for images, we use the images
+        # shown on the homepage anyway to avoid having to show nothing
+        images = tuple(self.get_images_from_sets(layout)) \
+            or tuple(self.get_images_from_theme(layout))
+
+        return {
+            'images': images
+        }

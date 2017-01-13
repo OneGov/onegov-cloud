@@ -1,6 +1,7 @@
 from onegov.form import Form
 from onegov.org import _
-from wtforms import RadioField, StringField, TextAreaField, validators
+from wtforms import BooleanField, RadioField, StringField, TextAreaField
+from wtforms import validators
 
 
 class ImageSetForm(Form):
@@ -18,3 +19,6 @@ class ImageSetForm(Form):
             ('full', _("Full size images")),
             ('grid', _("Grid layout"))
         ])
+
+    show_images_on_homepage = BooleanField(
+        label=_("Show images on homepage"))

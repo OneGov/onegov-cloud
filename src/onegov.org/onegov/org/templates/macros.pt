@@ -675,7 +675,7 @@
                 </div>
 
                 <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                    <div class="pswp__share-tooltip"></div> 
+                    <div class="pswp__share-tooltip"></div>
                 </div>
 
                 <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
@@ -692,3 +692,14 @@
         </div>
     </div>
 </metal:photoswipe>
+
+
+<metal:slider define-macro="slider" i18n:domain="onegov.org">
+    <ul class="slider" data-orbit="" data-options="slide_number:false; bullets:false; pause_on_hover:false; timer_speed: 7500;">
+        <li tal:repeat="image images" style="background: url('${image.src}') no-repeat center;">
+            <div class="orbit-caption" tal:condition="image.note">
+                ${image.note}
+            </div>
+        </li>
+    </ul>
+</metal:slider>

@@ -47,6 +47,7 @@ class OrgTheme(BaseTheme):
             'forms',
             'inline-lists',
             'labels',
+            'orbit',
             'pagination',
             'panels',
             'progress-bars',

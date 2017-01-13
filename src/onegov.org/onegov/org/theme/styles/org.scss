@@ -3410,3 +3410,39 @@ ul.recipients {
         margin-top: 1rem;
     }
 }
+
+/*
+    Homepage slider
+*/
+.orbit-container {
+    margin-bottom: 2rem;
+
+    .orbit-timer {
+        display: none;
+    }
+
+    .orbit-prev,
+    .orbit-next {
+        display: none;
+    }
+
+    &:hover {
+        .orbit-prev,
+        .orbit-next {
+            display: block;
+        }
+    }
+}
+
+.slider {
+    height: 333px;
+
+    li {
+        @include smooth-edges;
+
+        background-position: center center !important;
+        background-size: cover !important;
+
+        height: 333px;
+    }
+}

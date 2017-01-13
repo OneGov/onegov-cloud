@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-10 16:34+0100\n"
+"POT-Creation-Date: 2017-01-13 15:19+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -516,6 +516,9 @@ msgstr "Beschreibt kurz um was es bei dem Fotoalbum geht"
 
 msgid "View"
 msgstr "Ansicht"
+
+msgid "Show images on homepage"
+msgstr "Bilder auf der Startseite zeigen"
 
 msgid "Full size images"
 msgstr "Grosse Bilder"

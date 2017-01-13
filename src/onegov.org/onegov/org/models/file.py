@@ -146,6 +146,8 @@ class ImageSet(FileSet, HiddenFromPublicExtension, ORMSearchable):
     lead = meta_property('lead')
     view = meta_property('view')
 
+    show_images_on_homepage = meta_property('show_images_on_homepage')
+
 
 class ImageSetCollection(FileSetCollection):
 
