@@ -884,6 +884,10 @@ ul.panel-links {
             font-size: 10px;
         }
     }
+
+    h2 + .marker-map {
+        margin: 1rem 1rem 0;
+    }
 }
 
 .homepage .side-panel:first-child,

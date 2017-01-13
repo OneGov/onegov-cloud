@@ -260,9 +260,9 @@
                 <div class="page-text" tal:condition="text" tal:content="structure text" />
                 <div metal:define-slot="after-text"></div>
             </div>
-            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel">
+            <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
-                <div class="side-panel highlighted without-title" tal:condition="contact or coordinates">
+                <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates">
                     <tal:block condition="contact" content="structure contact" />
                     <br tal:condition="coordinates and contact" />
                     <h2 i18n:translate tal:condition="not contact">Map</h2>
