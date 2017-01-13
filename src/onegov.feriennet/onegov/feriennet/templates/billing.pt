@@ -111,7 +111,7 @@
                 </div>
             </div>
             <div class="columns small-12 medium-4">
-                <div class="page-content-panel form-panel">
+                <div class="side-panel form-panel">
                     <h4 i18n:translate>Billing</h4>
 
                     <tal:block condition="period.active and period.booking_phase">

@@ -44,14 +44,6 @@ svg {
 }
 
 /*
-    plain panels
-*/
-.plain-panel {
-    background: none;
-    padding: 0 10px;
-}
-
-/*
     Small font
 */
 .small {
@@ -196,6 +188,16 @@ ul.tags {
     }
 }
 
+.side-panel {
+    .organiser {
+        padding: .5rem 1rem 1rem;
+
+        * {
+            font-weight: normal;
+        }
+    }
+}
+
 .activity-status-panel {
 
     .field-display-label {
@@ -285,20 +287,14 @@ ul.tags {
     Organiser contact
 */
 
-.activity-organiser-panel > small {
-    display: inline-block;
-    font-size: .8rem;
-    margin-top: .75rem;
-}
-
 .organiser {
+    a::before {
+        width: 2ex;
+    }
+
     ul {
         list-style: none;
         margin: 0;
-    }
-
-    .organiser-name {
-        font-weight: bold;
     }
 
     .organiser-address {
