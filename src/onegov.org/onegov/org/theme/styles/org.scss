@@ -331,7 +331,7 @@ footer {
         color: $body-font-color;
         font-size: .8rem;
         font-weight: normal;
-        padding: .1rem 1.25rem !important;
+        padding: .1rem 1.2rem !important;
         text-transform: uppercase;
 
         &:hover {
@@ -705,7 +705,6 @@ input[type=color] {
         > h2 {
             font-size: $h2-font-size - $h2-font-reduction;
             margin-bottom: .75rem;
-            margin-top: .3rem;
         }
 
         > .panel-links > li > a {
@@ -1349,7 +1348,7 @@ div#redactor-droparea {
 */
 
 .page-text {
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
 
     blockquote {
         background-color: $topbar-bg-color;
