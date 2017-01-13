@@ -22,16 +22,26 @@ def create_new_organisation(app, name, reply_to=None, forms=None):
     org.reply_to = reply_to
     org.homepage_structure = textwrap.dedent("""\
         <row>
+            <column span="12">
+                <slider />
+            </column>
+        </row>
+        <row>
             <column span="8">
+                <row>
+                    <column span="6">
+                        <news />
+                    </column>
+                    <column span="6">
+                        <events />
+                    </column>
+                </row>
+                <line />
                 <homepage-tiles />
-                <news />
             </column>
             <column span="4">
                 <panel>
                     <services />
-                </panel>
-                <panel>
-                    <events />
                 </panel>
                 <panel>
                     <directories />

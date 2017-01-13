@@ -35,3 +35,46 @@ def install_default_homepage_structure(context):
             </column>
         </row>
     """)
+
+
+@upgrade_task('Install updated homepage structure')
+def install_updated_homepage_structure(context):
+
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    # not a town
+    if '<services />' not in org.meta['homepage_structure']:
+        return
+
+    org.meta['homepage_structure'] = textwrap.dedent("""\
+        <row>
+            <column span="12">
+                <slider />
+            </column>
+        </row>
+        <row>
+            <column span="8">
+                <row>
+                    <column span="6">
+                        <news />
+                    </column>
+                    <column span="6">
+                        <events />
+                    </column>
+                </row>
+                <line />
+                <homepage-tiles />
+            </column>
+            <column span="4">
+                <panel>
+                    <services />
+                </panel>
+                <panel>
+                    <directories />
+                </panel>
+            </column>
+        </row>
+    """)
