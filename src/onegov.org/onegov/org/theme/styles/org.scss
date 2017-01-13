@@ -362,10 +362,10 @@ $warning-icon: '\f071';
     &::before {
         font-size: 1.3rem;
         line-height: .8;
-        vertical-align: middle;
         padding-right: .5rem;
         position: relative;
         top: -1px;
+        vertical-align: middle;
     }
 
     &.alert::before { @include icon($alert-icon); }
@@ -693,7 +693,34 @@ input[type=color] {
 .homepage {
     small {
         display: block;
-        font-size: .8em;
+        font-size: .875em;
+    }
+
+    hr {
+        margin-bottom: 2rem;
+    }
+
+    .newslist,
+    .columns {
+        > h2 {
+            font-size: $h2-font-size - $h2-font-reduction;
+            margin-bottom: .75rem;
+            margin-top: .3rem;
+        }
+
+        > .panel-links > li > a {
+            font-size: $h4-font-size - $h4-font-reduction;
+            font-weight: normal;
+            margin-bottom: .25rem;
+
+            &.more-link {
+                font-size: .875rem;
+            }
+        }
+
+        > .panel-links li + li {
+            margin-top: 1rem;
+        }
     }
 }
 
@@ -720,7 +747,7 @@ input[type=color] {
     }
 
     .tile-sub-link {
-        font-size: $bottom-links-size;
+        font-size: .875rem;
     }
 
     .tile-sub-link:after {
@@ -782,7 +809,7 @@ ul.panel-links {
 
     small {
         display: block;
-        font-size: .8rem;
+        font-size: .875rem;
     }
 
     li {
@@ -1277,8 +1304,8 @@ div#redactor-droparea {
 */
 
 .main-title {
-    margin-top: -.5rem;
     margin-bottom: 1rem;
+    margin-top: -.5rem;
 }
 
 /*
@@ -1531,8 +1558,8 @@ div#redactor-droparea {
     a h2,
     a h3 {
         color: $anchor-font-color;
-        font-size: $h3-font-size - $h3-font-reduction;
-        margin-bottom: .5rem;
+        font-size: $h4-font-size - $h4-font-reduction;
+        margin-bottom: .45rem;
     }
 
     a:hover h2,
@@ -1541,13 +1568,12 @@ div#redactor-droparea {
     }
 
     .news-date {
-        color: $monsoon;
         font-size: $bottom-links-size;
         margin-bottom: .5rem;
     }
 
-    .news-lead,
-    .news-continue {
+    .news-lead {
+        font-size: .875rem;
         margin-bottom: .5rem;
         max-width: $max-line-width;
     }
@@ -1568,7 +1594,7 @@ div#redactor-droparea {
 }
 
 .all-news {
-    font-size: 1em;
+    font-size: .875rem;
 
     a {
         display: inline-block;
@@ -1579,7 +1605,7 @@ div#redactor-droparea {
     color: $primary-color;
     content: $more-link-icon;
     font-family: 'FontAwesome';
-    font-size: 1em;
+    font-size: .875rem;
     margin-right: 1ex;
 }
 
