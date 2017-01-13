@@ -32,6 +32,10 @@ $yellow-pastel: #fff4cc;
 /*
     Zurb Overrides
 */
+
+$anchor-font-color: $primary-color;
+$anchor-font-color-hover: scale-color($anchor-font-color, $lightness: -20%);
+
 $alert-color: $red-dark;
 $body-font-color: #333;
 $bottom-links-color: #777;

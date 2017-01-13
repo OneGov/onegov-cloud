@@ -723,10 +723,6 @@ input[type=color] {
         font-size: $bottom-links-size;
     }
 
-    .tile-sub-link:hover {
-        text-decoration: underline;
-    }
-
     .tile-sub-link:after {
         color: $body-font-color;
         content: ' / ';
@@ -747,8 +743,8 @@ input[type=color] {
         width: 100%;
     }
 
-    .tile-link:hover h2 {
-        color: $anchor-font-color;
+    .tile-link:hover h3 {
+        color: $anchor-font-color-hover;
     }
 
     .tile-link:hover .tile-image {
@@ -1534,14 +1530,14 @@ div#redactor-droparea {
 
     a h2,
     a h3 {
-        color: $side-nav-link-color;
+        color: $anchor-font-color;
         font-size: $h3-font-size - $h3-font-reduction;
         margin-bottom: .5rem;
     }
 
     a:hover h2,
     a:hover h3 {
-        color: $side-nav-link-color-hover;
+        color: $anchor-font-color-hover;
     }
 
     .news-date {
