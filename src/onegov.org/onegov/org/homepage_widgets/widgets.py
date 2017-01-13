@@ -224,3 +224,12 @@ class TilesWidget(object):
                 )
             else:
                 raise NotImplementedError
+
+
+@OrgApp.homepage_widget(tag='line')
+class HrWidget(object):
+    template = """
+        <xsl:template match="line">
+            <hr />
+        </xsl:template>
+    """
