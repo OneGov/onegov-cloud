@@ -29,7 +29,7 @@
 
                 <div class="occurrences-filter-tags">
                     <tal:block tal:repeat="tag tags">
-                        <span class="occurrence-tag ${tag.active and 'active' or ''}">
+                        <span class="blank-label ${tag.active and 'active' or ''}">
                             <tal:block replace="structure tag(request)"></tal:block>
                         </span>
                     </tal:block>

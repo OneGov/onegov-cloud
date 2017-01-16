@@ -39,7 +39,6 @@ $info-color: $blue-dark;
 $success-color: $green-dark;
 $warning-color: $orange-dark;
 
-
 /*
     Anchors
 */
@@ -61,6 +60,11 @@ $callout-panel-border-color: $yellow;
 */
 $label-padding: rem-calc(6 10 6);
 $label-radius: 1px;
+
+/*
+    Round corners
+*/
+$global-radius: 1px;
 
 $body-font-color: #333;
 $bottom-links-color: #777;

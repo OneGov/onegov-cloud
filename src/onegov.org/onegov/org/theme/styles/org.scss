@@ -162,6 +162,24 @@ $global-tools-margin: .75rem;
     height: auto;
 }
 
+/*
+    blank (uncolored) labels
+*/
+.blank-label {
+    @include label($bg: $white);
+    border: 1px solid $gray;
+    margin: 0 4px 6px 0;
+
+    &.active {
+        @include primary-color-background;
+        border: 1px solid $primary-color;
+    }
+
+    a {
+        color: inherit;
+    }
+}
+
 // we need to use exact pixel measurements for the footer or we end up with
 // incosistent results across browsers, which might mean the difference between
 // showing a scrollbar and not showing one
@@ -2459,21 +2477,6 @@ button {
     margin-bottom: 2rem;
 }
 
-.occurrence-tag {
-    @include label($bg: $white);
-    border: 1px solid $gray;
-    margin: 0 4px 4px 0;
-
-    &.active {
-        @include primary-color-background;
-        border: 1px solid $primary-color;
-    }
-
-    a {
-        color: inherit;
-    }
-}
-
 .date-range-selector-results {
     border-bottom: 2px solid $primary-color;
     font-size: 1.2rem;
@@ -2517,13 +2520,28 @@ button {
     margin-bottom: 1.5em;
 
     h2 {
-        font-size: 1rem;
+        display: block;
+        font-size: .875rem;
+        margin-bottom: .875rem;
     }
 }
 
 .occurrence-occurrences {
     h2 {
+        border-bottom: 2px solid $primary-color;
         font-size: 1rem;
+        margin-bottom: .6rem;
+        padding-bottom: .5rem;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0;
+
+        li {
+            font-size: .875rem;
+            margin-bottom: .4rem;
+        }
     }
 }
 
@@ -3115,7 +3133,6 @@ ul.search-results {
     Resources view
 */
 .resource-group {
-    @include label($bg: $secondary-color);
     font-size: 1rem;
     margin-bottom: 1rem;
 }

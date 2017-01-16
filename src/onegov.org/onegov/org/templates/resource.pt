@@ -4,7 +4,7 @@
     </tal:block>
     <tal:block metal:fill-slot="content">
 
-        <div tal:condition="resource.group" class="resource-group">${resource.group}</div>
+        <div tal:condition="resource.group" class="resource-group blank-label">${resource.group}</div>
 
         <tal:block tal:define="item resource|nothing">
             <metal:hint use-macro="layout.macros['hidden_from_public_hint_long']" />
