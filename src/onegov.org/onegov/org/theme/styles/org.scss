@@ -997,9 +997,16 @@ $editbar-bg-color: $topbar-link-bg-hover;
     button {
         background-color: $editbar-bg-color;
         color: $body-font-color;
+        padding-left: 1rem;
+        padding-right: 1rem;
 
-        &.dropdown::after {
-            border-color: $body-font-color transparent transparent;
+        &.dropdown {
+            padding-right: 2rem;
+
+            &::after {
+                border-color: $body-font-color transparent transparent;
+                right: .875rem;
+            }
         }
 
         &:hover {
