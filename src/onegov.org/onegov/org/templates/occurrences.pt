@@ -47,7 +47,7 @@
                     <dl>
                         <dt>
                             <a href="${add_link}">
-                                <i class="fa fa-chevron-right"></i> <h2 i18n:translate="">Submit your event</h2>
+                                <h2 i18n:translate="">Submit your event</h2>
                             </a>
                         </dt>
                         <dd i18n:translate="">Submit your own event</dd>

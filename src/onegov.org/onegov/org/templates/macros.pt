@@ -549,15 +549,15 @@
 </metal:atoz>
 
 <metal:calendar_day define-macro="calendar-day" i18n:domain="onegov.org">
-    <h2 class="calendar-day-box">
+    <h2 class="calendar-day">
         <metal:block use-macro="layout.macros['calendar-day-content']" />
     </h2>
 </metal:calendar_day>
 
 <metal:calendar_day_box define-macro="calendar-day-content" i18n:domain="onegov.org">
-    <span>${layout.format_date(date, 'weekday_long')}</span>
-    <span class="day">${date.day}</span><span class="dot">.</span>
-    <span>${layout.format_date(date, 'month_long')}</span>
+    <div class="day">${date.day}<span class="show-for-sr">.</span></div>
+    <div class="month">${layout.format_date(date, 'month_long')}</div>
+    <div class="weekday">${layout.format_date(date, 'weekday_long')}</div>
 </metal:calendar_day_box>
 
 <metal:occurrences define-macro="occurrences" i18n:domain="onegov.org">
@@ -572,10 +572,10 @@
                         <div class="show-for-large-up" style="width: 100%; height: 1px;"></div>
                     </div>
                     <div class="large-9 medium-12 small-12 columns">
-                        <div class="occurrence-date show-for-large-up">${layout.format_date(occurrence.localized_start, 'date')}</div>
                         <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
-                        <div>${occurrence.location}</div>
-                        <div>${layout.format_date(occurrence.localized_start, 'time')}-${layout.format_date(occurrence.localized_end, 'time')}</div>
+                        <div class="occurrence-date show-for-large-up">${layout.format_date(occurrence.localized_start, 'date')}</div>
+                        <div class="occurrence-location">${occurrence.location}</div>
+                        <div class="occurrence-time">${layout.format_date(occurrence.localized_start, 'time')} - ${layout.format_date(occurrence.localized_end, 'time')}</div>
                         <div><span tal:repeat="tag occurrence.tags" class="occurrence-tag" i18n:translate="">${tag}</span></div>
                     </div>
                     <div class="clearfix"></div>

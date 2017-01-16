@@ -1771,8 +1771,7 @@ $ticket-number-bg: $yellow-light;
     @include label(
         $padding: .25rem .5rem .1rem,
         $text-size: 1rem,
-        $bg: $ticket-number-bg,
-        $radius:4px
+        $bg: $ticket-number-bg
     );
     font-family: $font-family-monospace;
 }
@@ -1785,8 +1784,7 @@ $ticket-number-bg: $yellow-light;
     @include label(
         $padding: .25rem .5rem,
         $text-size: 1rem,
-        $bg: $open-ticket-bg,
-        $radius:4px
+        $bg: $open-ticket-bg
     );
 }
 
@@ -1794,8 +1792,7 @@ $ticket-number-bg: $yellow-light;
     @include label(
         $padding: .25rem .5rem,
         $text-size: 1rem,
-        $bg: $pending-ticket-bg,
-        $radius:4px
+        $bg: $pending-ticket-bg
     );
 }
 
@@ -1803,8 +1800,7 @@ $ticket-number-bg: $yellow-light;
     @include label(
         $padding: .25rem .5rem,
         $text-size: 1rem,
-        $bg: $closed-ticket-bg,
-        $radius:4px
+        $bg: $closed-ticket-bg
     );
 }
 
@@ -2406,45 +2402,32 @@ button {
 }
 
 /*
-    A box rendering the following structure as a calendar-like box:
-
-    <h2 class="calendar-day-box">
-        <span>Wednesday</span>
-        <span class="day">11</span>
-        <span>March</span>
-    </h2>
+    Calendar day display
 */
-.calendar-day-box {
+.calendar-day {
+    background-color: $topbar-bg-color;
+    padding: .75rem 0 0;
     width: 100%;
 
-    @media #{$small-up} {
-        font-weight: bold;
-        padding: 0;
-
-        span {
-            font-size: 1.3rem;
-        }
+    > div {
+        text-align: center;
     }
 
-    @media #{$large-up} {
-        background-color: $white-smoke;
-        font-weight: normal;
-        padding: .5em 0;
+    .day {
+        font-size: 2.75rem;
+        font-weight: bold;
+    }
 
-        span {
-            display: block;
-            font-size: 1rem;
-            text-align: center;
+    .month {
+        font-size: .875rem;
+        padding: .5rem 0 1rem;
+    }
 
-            &.dot {
-                display: none;
-            }
-
-            &.day {
-                font-size: 3rem;
-                font-weight: bold;
-            }
-        }
+    .weekday {
+        @include primary-color-background;
+        font-size: .7rem;
+        padding: .5rem 0;
+        text-transform: uppercase;
     }
 }
 
@@ -2453,10 +2436,22 @@ button {
 */
 
 .occurrence {
-    margin-bottom: 2rem;
+    margin-bottom: 2.25rem;
 
-    h2 {
-        font-size: $h3-font-size - $h3-font-reduction;
+    h3 {
+        font-size: $h4-font-size - $h4-font-reduction;
+    }
+
+    .occurrence-date {
+        font-size: .8rem;
+        margin-bottom: .75rem;
+        margin-top: .75rem;
+    }
+
+    .occurrence-location,
+    .occurrence-time {
+        font-size: .875em;
+        margin-bottom: .5rem;
     }
 }
 
@@ -2465,15 +2460,13 @@ button {
 }
 
 .occurrence-tag {
-    @include label(
-        $bg: $secondary-color,
-        $radius: 4px
-    );
+    @include label($bg: $white);
+    border: 1px solid $gray;
+    margin: 0 4px 4px 0;
 
     &.active {
-        @include label(
-            $radius: 4px
-        );
+        @include primary-color-background;
+        border: 1px solid $primary-color;
     }
 
     a {
@@ -2482,19 +2475,15 @@ button {
 }
 
 .date-range-selector-results {
+    border-bottom: 2px solid $primary-color;
+    font-size: 1.2rem;
     margin-bottom: 1rem;
-}
-
-.date-range-selector-result {
-    span:first-child {
-        font-size: 1.6em;
-        font-weight: bold;
-    }
+    padding-bottom: .5rem;
 }
 
 .occurrences-filter-tags,
 .date-range-selector {
-    margin-bottom: 1em;
+    margin-bottom: .5em;
 }
 
 .occurrences-add-box {
@@ -2519,10 +2508,6 @@ button {
 
 .occurrence-description {
     max-width: $max-line-width;
-}
-
-.occurrence-date {
-    font-size: .8em;
 }
 
 .occurrence-exports {
@@ -3130,10 +3115,7 @@ ul.search-results {
     Resources view
 */
 .resource-group {
-    @include label(
-        $bg: $secondary-color,
-        $radius: 4px
-    );
+    @include label($bg: $secondary-color);
     font-size: 1rem;
     margin-bottom: 1rem;
 }
