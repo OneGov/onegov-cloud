@@ -9,7 +9,7 @@
             <div class="columns small-12 medium-7">
                 <tal:block repeat="group resources">
                     <h2 tal:condition="group">${group}</h2>
-                    <ul>
+                    <ul class="with-lead">
                         <li tal:repeat="resource resources[group]">
                             <a class="list-title" tal:attributes="href request.link(resource)">${resource.title}</a><metal:hint use-macro="layout.macros['hidden-from-public-hint']" tal:define="item resource" />
                             <div class="list-lead">${resource.meta.get('lead')}</div>

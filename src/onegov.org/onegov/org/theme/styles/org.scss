@@ -684,13 +684,19 @@ form {
 /*
     simple listed content
 */
-.list-title {
-    font-weight: bold;
-}
+.with-lead {
+    li + li {
+        margin-top: .5rem;
+    }
 
-.list-lead {
-    margin-bottom: .2em;
-    max-width: $max-line-width;
+    .list-title {
+        font-weight: bold;
+    }
+
+    .list-lead {
+        margin-bottom: .2em;
+        max-width: $max-line-width;
+    }
 }
 
 /*
