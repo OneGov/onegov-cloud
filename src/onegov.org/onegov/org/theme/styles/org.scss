@@ -1769,7 +1769,7 @@ $ticket-number-bg: $yellow-light;
 
 .ticket-number {
     @include label(
-        $padding: .25rem .5rem .1rem,
+        $padding: .25rem .5rem .25rem,
         $text-size: 1rem,
         $bg: $ticket-number-bg
     );
