@@ -11,7 +11,7 @@
                 <ul class="tags" tal:condition="taglinks">
                     <li tal:repeat="link taglinks" 
                         tal:content="structure link(request)" 
-                        class="${link.active and 'active'}" />
+                        class="${link.active and 'active'} blank-label" />
                 </ul>
             </div>
         </div>

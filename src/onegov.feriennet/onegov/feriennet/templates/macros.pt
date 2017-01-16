@@ -18,7 +18,7 @@
 
         <div metal:fill-slot="after-lead" tal:condition="activity.tags">
             <ul class="tags">
-                <li tal:repeat="tag activity.ordered_tags(request)">
+                <li class="blank-label" tal:repeat="tag activity.ordered_tags(request)">
                     ${request.translate(tag)}
                 </li>
             </ul>
