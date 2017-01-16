@@ -831,6 +831,10 @@ ul.panel-links {
         margin-top: 0;
         padding: .75rem 1rem;
         text-transform: uppercase;
+
+        + .marker-map {
+            margin: 1rem 1rem 0;
+        }
     }
 
     > ul {
@@ -883,10 +887,6 @@ ul.panel-links {
         a {
             font-size: 10px;
         }
-    }
-
-    h2 + .marker-map {
-        margin: 1rem 1rem 0;
     }
 }
 
@@ -1572,7 +1572,7 @@ div#redactor-droparea {
 
     .news-date {
         font-size: $bottom-links-size;
-        margin-bottom: .5rem;
+        margin-bottom: .325rem;
     }
 
     .news-lead {
