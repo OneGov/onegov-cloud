@@ -40,6 +40,9 @@
     content: $icon;
     font-family: 'FontAwesome';
     font-weight: normal;
+    margin-right: 1ex;
+    width: 1.5ex;
+    display: inline-block;
 }
 
 @mixin prefix ($prop, $val) {
@@ -122,12 +125,53 @@ body {
     The global tools header
 */
 $global-tools-margin: .75rem;
+$global-tools-height: 2.5rem;
 
 #global-tools {
     @include primary-color-background;
-    height: 2.5rem;
+    height: $global-tools-height;
     margin-bottom: $global-tools-margin;
     width: 100%;
+
+    .row > .columns > ul {
+        list-style: none;
+        margin: 0 auto;
+
+        > li {
+            display: inline-block;
+            float: right;
+
+            + li::after {
+                content: '|';
+                display: inline-block;
+                margin-right: 5px;
+            }
+
+            > a {
+                color: $primary-fg-color;
+                display: inline-block;
+                font-size: .875rem;
+                height: $global-tools-height;
+                line-height: $global-tools-height;
+                padding: 0 .5rem;
+
+                &:hover {
+                    background-color: $button-bg-hover;
+                }
+            }
+        }
+    }
+
+    .login:before { @include icon('\f090') };
+    .logout:before { @include icon('\f08b') };
+    .register:before { @include icon('\f234') };
+    .user:before { @include icon('\f2bd') };
+    .users:before { @include icon('\f0c0') };
+    .profile:before { @include icon('\f2c3') };
+    .management:before { @include icon('\f013') };
+    .images:before { @include icon('\f03e') };
+    .files:before { @include icon('\f016') };
+    .settings:before { @include icon('\f1de') };
 }
 
 #inner-body {
@@ -220,53 +264,20 @@ footer {
         text-transform: uppercase;
     }
 
-    .bottom-links {
-        margin-bottom: .25rem;
-        padding: .25rem 0;
-        text-align: right;
-    }
-
     .footer-columns {
         padding-bottom: 1.25rem;
         padding-top: 1.25rem;
+    }
+
+    .footer-links {
+        padding-bottom: .5rem;
+        text-align: center;
     }
 }
 
 @media #{$small-only} {
     footer .columns > div {
         margin-bottom: 1rem;
-    }
-}
-
-/*
-    links at the absoulte bottom
-*/
-.bottom-links {
-    color: $bottom-links-color;
-    list-style: none;
-    margin-left: 0;
-
-    a {
-        color: $bottom-links-color;
-        font-size: $bottom-links-size;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
-
-    li {
-        color: $bottom-links-color;
-        display: inline;
-        font-size: $bottom-links-size;
-    }
-
-    li:after {
-        content: '|';
-    }
-
-    li:last-child:after {
-        content: '';
     }
 }
 
@@ -1602,7 +1613,7 @@ div#redactor-droparea {
     }
 
     .news-date {
-        font-size: $bottom-links-size;
+        font-size: .8rem;
         margin-bottom: .325rem;
     }
 
@@ -3217,7 +3228,6 @@ ul.search-results {
 */
 @media print {
     .alert-box,
-    .bottom-links,
     .date-range-selector,
     .date-range-selector-result,
     .edit-bar,

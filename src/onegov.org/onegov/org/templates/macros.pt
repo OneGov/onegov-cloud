@@ -63,15 +63,6 @@
     </nav>
 </metal:breadcrumbs>
 
-<metal:bottom_links define-macro="bottom-links">
-    <ul class="bottom-links" tal:condition="bottom_links|nothing">
-        <li tal:repeat="link bottom_links">
-            <tal:block replace="structure link(request)"/>
-        </li>
-    </ul>
-</metal:bottom_links>
-
-
 <metal:panel-links define-macro="panel-links">
     <ul class="panel-links">
         <li tal:repeat="link panel.links">
@@ -80,7 +71,6 @@
         </li>
     </ul>
 </metal:panel-links>
-
 
 <metal:panel define-macro="events-panel">
     <h2 i18n:translate>Events</h2>

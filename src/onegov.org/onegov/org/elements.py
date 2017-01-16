@@ -212,10 +212,12 @@ class Img(object):
 class LinkGroup(HiddenElementMixin):
     """ Represents a list of links. """
 
-    __slots__ = ['title', 'links', 'model', 'right_side']
+    __slots__ = ['title', 'links', 'model', 'right_side', 'classes']
 
-    def __init__(self, title, links, model=None, right_side=True):
+    def __init__(self, title, links,
+                 model=None, right_side=True, classes=None):
         self.title = title
         self.links = links
         self.model = model
         self.right_side = right_side
+        self.classes = classes

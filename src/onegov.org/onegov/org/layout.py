@@ -132,14 +132,6 @@ class Layout(ChameleonLayout):
         return None
 
     @cached_property
-    def bottom_links(self):
-        """ A list of links shown at the absolute bottom. Use this for
-        links like administration, statistics, source-code.
-
-        """
-        return None
-
-    @cached_property
     def editbar_links(self):
         """ A of :class:`onegov.org.elements.LinkGroup` classes. Each of them
         will be shown in the top editbar, with the group title being the

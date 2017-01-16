@@ -30,7 +30,29 @@
     <a class="show-for-sr" href="#content" i18n:translate>Skip navigation</a>
 
     <div id="inner-body">
-      <div id="global-tools"></div>
+      <div id="global-tools">
+        <div class="row">
+          <div class="columns small-12">
+            <ul tal:condition="global_tools|nothing">
+                <li tal:repeat="tool global_tools">
+                    <tal:block condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
+                          <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}">
+                              ${tool.title}
+                          </a>
+                          <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
+                              <li tal:repeat="link tool.links">
+                                  <tal:block replace="structure link(request)" />
+                              </li>
+                          </ul>
+                    </tal:block>
+                    <tal:block condition="tool.url|nothing" define="link tool">
+                        <tal:block replace="structure link(request)" />
+                    </tal:block>
+                </li>
+            </ul>
+          </div>
+        </div>
+      </div>
 
       <div class="row header">
         <div class="small-12 medium-8 columns logo">
@@ -155,15 +177,17 @@
           <div class="small-12 medium-4 columns">
             <h2 i18n:translate="" tal:condition="facebook or twitter">Social Media</h2>
             <ul class="social-media-links" tal:condition="facebook or twitter">
-                <li tal:condition="facebook"><a tal:attributes="href facebook"><i class="fa fa-facebook-official"></i> Facebook</a></li>
-                <li tal:condition="twitter"><a tal:attributes="href twitter"><i class="fa fa-twitter"></i> Twitter</a></li>
+                <li tal:condition="facebook"><a tal:attributes="href facebook"><i class="fa fa-facebook-official fa-fw"></i> Facebook</a></li>
+                <li tal:condition="twitter"><a tal:attributes="href twitter"><i class="fa fa-twitter fa-fw"></i> Twitter</a></li>
             </ul>
           </div>
         </div>
 
         <div class="row footer-links">
           <div class="small-12 columns">
-            <div metal:use-macro="layout.macros['bottom-links']"></div>
+            <a href="https://www.onegovcloud.ch">OneGov Cloud</a>
+            by
+            <a href="https://www.seantis.ch">Seantis GmbH</a>
           </div>
         </div>
       </div>
