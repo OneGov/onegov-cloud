@@ -168,18 +168,21 @@ ul.tags {
     li {
         @include label(
             $text-size: .8rem,
-            $radius: 15px,
-            $bg: $secondary-color,
-            $padding: 4px 12px
+            $padding: 4px 12px,
+            $bg: $white
         );
+        border: 1px solid $gray;
+
+        margin: 0 4px 4px 0;
 
         &.active {
             @include label(
                 $text-size: .8rem,
-                $radius: 15px,
                 $bg: $primary-color,
                 $padding: 4px 12px
             );
+
+            border: 1px solid $primary-color;
         }
 
         a {
