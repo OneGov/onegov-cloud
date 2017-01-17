@@ -129,7 +129,7 @@ $global-tools-height: 2.5rem;
 
 #global-tools {
     @include primary-color-background;
-    height: $global-tools-height;
+    min-height: $global-tools-height;
     margin-bottom: $global-tools-margin;
     width: 100%;
 
@@ -142,6 +142,7 @@ $global-tools-height: 2.5rem;
             float: right;
 
             + li::after {
+                color: $primary-fg-color;
                 content: '|';
                 display: inline-block;
                 margin-right: 5px;
@@ -172,6 +173,30 @@ $global-tools-height: 2.5rem;
     .images:before { @include icon('\f03e') };
     .files:before { @include icon('\f016') };
     .settings:before { @include icon('\f1de') };
+
+    .open-tickets::before,
+    .pending-tickets::before {
+        background-color: $alert-color;
+        border: 1px solid $primary-fg-color;
+        border-radius: 1000px;
+        box-shadow: 0 0 2px $primary-fg-color;
+        box-sizing: content-box;
+        color: $white;
+        content: attr(data-count);
+        display: inline-block;
+        font-size: .75rem;
+        height: 1.25rem;
+        line-height: 1.25rem;
+        margin-right: 1.75ex;
+        min-width: 1.25rem;
+        position: relative;
+        text-align: center;
+        top: -1px;
+    }
+
+    .pending-tickets::before {
+        background-color: $info-color;
+    }
 }
 
 #inner-body {
@@ -265,12 +290,12 @@ footer {
     }
 
     .footer-columns {
-        padding-bottom: 1.25rem;
+        padding-bottom: .5rem;
         padding-top: 1.25rem;
     }
 
     .footer-links {
-        padding-bottom: .5rem;
+        padding: .5rem 0;
         text-align: center;
     }
 }
@@ -2108,82 +2133,6 @@ button {
     line-height: 1.7rem;
 }
 
-
-/*
-    Ticket counter in header
-*/
-
-.ticket-count {
-    margin-bottom: .875rem;
-    margin-top: .875rem;
-    text-align: right;
-
-    a:hover .text {
-        text-decoration: underline;
-    }
-
-    * {
-        color: $steel;
-    }
-
-    div,
-    span {
-        display: inline-block;
-        font-size: .875rem;
-        line-height: .875rem;
-    }
-
-    > div {
-        margin-left: .25em;
-
-        :first-child {
-            margin-left: 0;
-        }
-
-        .number {
-            background-color: $white-smoke;
-            border-radius: 50px;
-            height: 1.3em;
-            line-height: 1.3em;
-            min-width: 1.3em;
-            padding: 0 4px;
-            text-align: center;
-        }
-    }
-
-    .ticket-count-open {
-        &.highlight {
-            .number {
-                background-color: $alert-color;
-                color: $white;
-            }
-
-            .text {
-                color: $black;
-            }
-        }
-    }
-
-    .ticket-count-pending {
-        &.highlight {
-            .number {
-                background-color: $blue-dark;
-                color: $white;
-            }
-
-            .text {
-                color: $black;
-            }
-        }
-    }
-}
-
-@media #{$small-only} {
-    .ticket-count {
-        text-align: center;
-    }
-}
-
 /*
     Reservations Form
 */
@@ -2734,10 +2683,6 @@ button {
     .header .searchbox {
         margin-top: 2.25rem;
     }
-
-    .is-manager .searchbox {
-        margin-top: 0;
-    }
 }
 
 /*
@@ -3238,7 +3183,6 @@ ul.search-results {
     .page-links,
     .searchbox,
     .side-nav,
-    .ticket-count,
     div.push,
     .top-bar {
         display: none;

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-16 17:13+0100\n"
+"POT-Creation-Date: 2017-01-17 10:13+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -23,14 +23,14 @@ msgstr "Allgemein"
 msgid "${org} Reservation Overview"
 msgstr "${org} Reservations-Übersicht"
 
+msgid "Pending tickets"
+msgstr "Tickets in Bearbeitung"
+
+msgid "Open tickets"
+msgstr "Offene Tickets"
+
 msgid "Login"
 msgstr "Login"
-
-msgid "Management"
-msgstr "Verwaltung"
-
-msgid "Register"
-msgstr "Registrierung"
 
 msgid "Files"
 msgstr "Dateien"
@@ -38,11 +38,23 @@ msgstr "Dateien"
 msgid "Images"
 msgstr "Bilder"
 
+msgid "Management"
+msgstr "Verwaltung"
+
+msgid "Pending ticket"
+msgstr "Ticket in Bearbeitung"
+
+msgid "Open ticket"
+msgstr "Offenes Ticket"
+
+msgid "Register"
+msgstr "Registrierung"
+
 msgid "Settings"
 msgstr "Einstellungen"
 
-msgid "Usermanagement"
-msgstr "Benutzerverwaltung"
+msgid "Users"
+msgstr "Benutzer"
 
 msgid "User Profile"
 msgstr "Benutzerprofil"
@@ -116,6 +128,9 @@ msgstr "Abonnenten"
 
 msgid "Photo Albums"
 msgstr "Fotoalben"
+
+msgid "Usermanagement"
+msgstr "Benutzerverwaltung"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -1010,18 +1025,6 @@ msgstr "Navigation überspringen"
 msgid "Back to the homepage"
 msgstr "Zurück zur Startseite"
 
-msgid "Open Ticket"
-msgstr "Offenes Ticket"
-
-msgid "Open Tickets"
-msgstr "Offene Tickets"
-
-msgid "Pending Ticket"
-msgstr "Ticket in Bearbeitung"
-
-msgid "Pending Tickets"
-msgstr "Tickets in Bearbeitung"
-
 msgid "Search"
 msgstr "Suche"
 
@@ -1842,6 +1845,9 @@ msgstr "${address} konnte nicht abgemeldet werden - falsches Token"
 msgid "Your request has been submitted"
 msgstr "Anfrage eingereicht"
 
+msgid "Open Tickets"
+msgstr "Offene Tickets"
+
 #, python-format
 msgid "You have accepted ticket ${number}"
 msgstr "Sie haben das Ticket ${number} angenommen"
@@ -1859,6 +1865,9 @@ msgstr "Ihr Anliegen wird zur Zeit bearbeitet"
 
 msgid "Ticket Status"
 msgstr "Ticket Status"
+
+msgid "Pending Tickets"
+msgstr "Tickets in Bearbeitung"
 
 msgid "The ticket cannot be accepted because it's not open"
 msgstr "Das Ticket kann nicht angenommen werden da es nicht offen ist"
@@ -1900,3 +1909,9 @@ msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."
+
+#~ msgid "Open Ticket"
+#~ msgstr "Offenes Ticket"
+
+#~ msgid "Pending Ticket"
+#~ msgstr "Ticket in Bearbeitung"

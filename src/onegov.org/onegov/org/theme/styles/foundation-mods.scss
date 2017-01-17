@@ -114,5 +114,8 @@ $primary-fg-color: $white;
     $anchor-font-color: scale-color($anchor-font-color, $lightness: -40%, $saturation: +10%);
     $crumb-font-color: scale-color($crumb-font-color, $lightness: -40%, $saturation: +10%);
     $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -40%, $saturation: +10%);
+}
+
+@if lightness($primary-color) >= 75% {
     $primary-fg-color: $body-font-color;
 }
