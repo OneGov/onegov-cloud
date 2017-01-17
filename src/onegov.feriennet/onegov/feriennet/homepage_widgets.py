@@ -5,7 +5,7 @@ from onegov.feriennet import FeriennetApp, _
 class RegistrationWidget(object):
     template = """
         <xsl:template match="registration">
-            <div tal:condition="not:request.is_logged_in">
+            <div tal:condition="not:request.is_logged_in" class="register">
                 <a href="./auth/register" class="button">
                     ${register_text}
                 </a>
@@ -13,7 +13,7 @@ class RegistrationWidget(object):
                     ${login_text}
                 </a>
             </div>
-            <div tal:condition="request.is_logged_in">
+            <div tal:condition="request.is_logged_in" class="register">
                 <a href="./benutzerprofil" class="button secondary">
                     ${profile_text}
                 </a>

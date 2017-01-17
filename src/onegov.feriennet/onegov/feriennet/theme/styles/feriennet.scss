@@ -1,7 +1,6 @@
 /*
     hide the news in the topbar
 */
-
 .top-bar-section {
     ul {
         width: 100%;
@@ -10,6 +9,13 @@
     li:last-child {
         display: none;
     }
+}
+
+/*
+    registration on homepage
+*/
+.homepage .register {
+    margin-bottom: .5rem;
 }
 
 /*
@@ -167,6 +173,8 @@ ul.tags {
 
 .activity-status-panel {
 
+    padding: 1rem 1rem 0;
+
     .field-display-label {
         font-weight: normal;
     }
@@ -258,14 +266,6 @@ ul.tags {
         display: block;
         padding: 0 1rem 1rem;
     }
-}
-
-.form-panel {
-    padding: .5rem 1rem 1rem;
-}
-
-.activity-status-panel {
-    padding: 1rem 1rem 0;
 }
 
 /*
@@ -653,6 +653,8 @@ ul.tags {
     Form panel on the right
 */
 .form-panel {
+    padding: .5rem 1rem 1rem;
+
     form {
         #confirm {
             margin-bottom: .5rem;

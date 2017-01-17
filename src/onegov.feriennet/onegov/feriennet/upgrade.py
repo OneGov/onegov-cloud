@@ -2,3 +2,53 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+import textwrap
+
+from onegov.core.upgrade import upgrade_task
+from onegov.org.models import Organisation
+
+
+@upgrade_task('Install the default feriennet page structure 2')
+def install_default_feriennet_page_structure(context):
+
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    # not a feriennet
+    if '<registration />' not in org.meta['homepage_structure']:
+        return
+
+    org.meta['homepage_structure'] = textwrap.dedent("""\
+        <row>
+            <column span="8">
+                <slider />
+                <news />
+            </column>
+            <column span="4">
+                <registration />
+
+                <panel>
+                    <links>
+                        <link url="./personen"
+                            description="Personen">
+                            Team
+                        </link>
+                        <link url="./formular/kontakt"
+                            description="Anfragen">
+                            Kontakt
+                        </link>
+                        <link url="./aktuelles"
+                            description="Neuigkeiten">
+                            Aktuelles
+                        </link>
+                        <link url="./fotoalben"
+                            description="Impressionen">
+                            Fotoalben
+                        </link>
+                    </links>
+                </panel>
+            </column>
+        </row>
+    """)

@@ -7,14 +7,6 @@ from onegov.page import PageCollection
 
 def create_new_organisation(app, name):
     org = Organisation(name=name)
-    org.homepage_cover = textwrap.dedent("""
-        <p class="has-img">
-            <img src="./static/images/balloons.jpg" />
-        </p>
-        <p>
-            <a href="./angebote">Zu den Angeboten</a>
-        </p>
-    """.format(name=name))
     org.homepage_structure = textwrap.dedent("""\
         <row>
             <column span="8">
