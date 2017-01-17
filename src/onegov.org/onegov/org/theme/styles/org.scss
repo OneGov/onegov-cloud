@@ -1692,6 +1692,12 @@ div#redactor-droparea {
 
     a {
         display: inline-block;
+
+        + a::before {
+            color: $body-font-color;
+            content: '/ ';
+            font-weight: normal;
+        }
     }
 }
 

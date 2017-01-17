@@ -195,7 +195,6 @@
 
         <h3 class="all-news" tal:condition="show_all_news_link|nothing">
             <a href="${layout.news_url}" i18n:translate>All news</a>
-            /
             <a href="${layout.newsletter_url}" i18n:translate>Newsletter</a>
         </h3>
     </div>
