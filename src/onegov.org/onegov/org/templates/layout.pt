@@ -36,9 +36,7 @@
             <ul tal:condition="global_tools|nothing">
                 <li tal:repeat="tool global_tools">
                     <tal:block condition="tool.links|nothing" define="dropdown_id 'global-dropdown-{}'.format(repeat.tool.number)">
-                          <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">
-                              ${tool.title}
-                          </a>
+                          <a href="#" data-dropdown="${dropdown_id}" class="dropdown ${' '.join(tool.classes or '')}" tal:attributes="data-count tool.attributes['data-count']|nothing">${tool.title}</a>
                           <ul id="${dropdown_id}" data-dropdown-content class="f-dropdown disable-scroll">
                               <li tal:repeat="link tool.links">
                                   <tal:block replace="structure link(request)" />
