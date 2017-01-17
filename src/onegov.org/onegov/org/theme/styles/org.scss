@@ -129,8 +129,8 @@ $global-tools-height: 2.5rem;
 
 #global-tools {
     @include primary-color-background;
-    min-height: $global-tools-height;
     margin-bottom: $global-tools-margin;
+    min-height: $global-tools-height;
     width: 100%;
 
     .row > .columns > ul {
@@ -173,9 +173,11 @@ $global-tools-height: 2.5rem;
     .images:before { @include icon('\f03e') };
     .files:before { @include icon('\f016') };
     .settings:before { @include icon('\f1de') };
+    .no-tickets:before { @include icon('\f145') };
 
     .open-tickets::before,
-    .pending-tickets::before {
+    .pending-tickets::before,
+    .closed-tickets::before {
         background-color: $alert-color;
         border: 1px solid $primary-fg-color;
         border-radius: 1000px;
@@ -187,8 +189,9 @@ $global-tools-height: 2.5rem;
         font-size: .75rem;
         height: 1.25rem;
         line-height: 1.25rem;
-        margin-right: 1.75ex;
-        min-width: 1.25rem;
+        margin-right: 1.25ex;
+        min-width: .75rem;
+        padding: 0 .25rem;
         position: relative;
         text-align: center;
         top: -1px;
@@ -196,6 +199,11 @@ $global-tools-height: 2.5rem;
 
     .pending-tickets::before {
         background-color: $info-color;
+    }
+
+    .closed-tickets::before {
+        background-color: $secondary-color;
+        color: $body-font-color;
     }
 }
 

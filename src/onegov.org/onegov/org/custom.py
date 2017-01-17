@@ -73,25 +73,47 @@ def get_global_tools(request):
     # Tickets
     if request.is_manager:
         ticket_count = request.app.ticket_count
+        screen_count = ticket_count.open or ticket_count.pending
 
-        pending_label = ticket_count.pending == 1 \
-            and _("Pending ticket") or _("Pending tickets")
+        if screen_count:
+            css = ticket_count.open and 'open-tickets' or 'pending-tickets'
+        else:
+            css = 'no-tickets'
 
-        yield Link(
-            pending_label, classes=('pending-tickets', ),
-            url=request.class_link(
-                TicketCollection, {'handler': 'ALL', 'state': 'pending'}
-            ),
-            attributes={'data-count': str(ticket_count.pending)}
+        links = []
+
+        links.append(
+            Link(
+                _("Open Tickets"), classes=('open-tickets', ),
+                url=request.class_link(
+                    TicketCollection, {'handler': 'ALL', 'state': 'open'}
+                ),
+                attributes={'data-count': str(ticket_count.open)}
+            )
         )
 
-        open_label = ticket_count.open == 1 \
-            and _("Open ticket") or _("Open tickets")
+        links.append(
+            Link(
+                _("Pending Tickets"), classes=('pending-tickets', ),
+                url=request.class_link(
+                    TicketCollection, {'handler': 'ALL', 'state': 'pending'}
+                ),
+                attributes={'data-count': str(ticket_count.pending)}
+            )
+        )
 
-        yield Link(
-            open_label, classes=('open-tickets', ),
-            url=request.class_link(
-                TicketCollection, {'handler': 'ALL', 'state': 'open'}
-            ),
-            attributes={'data-count': str(ticket_count.open)}
+        links.append(
+            Link(
+                _("Closed Tickets"), classes=('closed-tickets', ),
+                url=request.class_link(
+                    TicketCollection, {'handler': 'ALL', 'state': 'closed'}
+                ),
+                attributes={'data-count': str(ticket_count.closed)}
+            )
+        )
+
+        yield LinkGroup(
+            screen_count == 1 and _("Ticket") or _("Tickets"), classes=(css, ),
+            links=links,
+            attributes={'data-count': str(screen_count)}
         )
