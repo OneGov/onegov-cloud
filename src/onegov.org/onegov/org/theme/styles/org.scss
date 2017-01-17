@@ -164,6 +164,7 @@ $global-tools-height: 2.5rem;
 
     a::before {
         margin-right: 1ex;
+        text-align: center;
     }
 
     .login:before { @include icon('\f090') };
