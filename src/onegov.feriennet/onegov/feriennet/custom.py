@@ -1,24 +1,92 @@
-from itertools import chain
 from onegov.activity import BookingCollection
 from onegov.activity import PeriodCollection, Period
 from onegov.activity import InvoiceItemCollection
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import VacationActivityCollection
+from onegov.feriennet.collections import OccasionAttendeeCollection
+from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.layout import DefaultLayout
-from onegov.org.elements import Link
+from onegov.org.elements import Link, LinkGroup
+from onegov.org.custom import get_global_tools as get_base_tools
+from onegov.feriennet.collections import MatchCollection
+from onegov.feriennet.collections import BillingCollection
+from sqlalchemy import desc
 
 
 @FeriennetApp.template_variables()
 def get_template_variables(request):
+    return {
+        'global_tools': tuple(get_global_tools(request)),
+        'top_navigation': tuple(get_top_navigation(request))
+    }
 
-    front = []
 
-    # inject an activites link in front of all top navigation links
-    front.append(Link(
-        text=_("Activities"),
-        url=request.class_link(VacationActivityCollection)
-    ))
+def get_global_tools(request):
+    yield from get_base_tools(request)
+    yield from get_personal_tools(request)
+    yield from get_admin_tools(request)
 
+
+def get_admin_tools(request):
+    if request.is_admin:
+        period = request.app.session().query(Period.title, Period.active)
+        period = period.order_by(desc(Period.active)).first()
+
+        links = []
+
+        if request.is_admin:
+            links.append(
+                Link(
+                    text=_("Periods"),
+                    url=request.class_link(PeriodCollection),
+                    classes=('manage-periods', )
+                )
+            )
+
+            if period:
+                links.append(
+                    Link(
+                        text=_("Matching"),
+                        url=request.class_link(MatchCollection),
+                        classes=('manage-matches', )
+                    )
+                )
+
+                links.append(
+                    Link(
+                        text=_("Billing"),
+                        url=request.class_link(BillingCollection),
+                        classes=('manage-billing', )
+                    )
+                )
+
+        if period:
+            links.append(
+                Link(
+                    text=_("Attendees"),
+                    url=request.class_link(OccasionAttendeeCollection),
+                    classes=('show-attendees', )
+                )
+            )
+
+            links.append(
+                Link(
+                    text=_("Notifications"),
+                    url=request.class_link(
+                        NotificationTemplateCollection
+                    ),
+                    classes=('show-notifications', )
+                )
+            )
+
+        yield LinkGroup(
+            period and period.active and period.title or _("No active period"),
+            links=links,
+            classes=('feriennet-management', )
+        )
+
+
+def get_personal_tools(request):
     # for logged-in users show the number of open bookings
     if request.is_logged_in:
         session = request.app.session()
@@ -31,52 +99,60 @@ def get_template_variables(request):
         periods = tuple(p)
         period = next((p for p in periods if p.active), None)
 
-        bookings = BookingCollection(session)
-
-        if period:
-            count = bookings.booking_count(username)
-
-            if count:
-                attributes = {'data-count': str(count)}
-            else:
-                attributes = {}
-
-            front.append(Link(
-                text=period.confirmed and _("Bookings") or _("Wishlist"),
-                url=request.link(bookings),
-                classes=(
-                    'count',
-                    period.confirmed and 'success' or 'alert',
-                    'bookings-count'
-                ),
-                attributes=attributes
-            ))
-        else:
-            front.append(Link(
-                text=_("Wishlist"),
-                url=request.link(bookings)
-            ))
-
         invoice_items = InvoiceItemCollection(session, username)
         unpaid = invoice_items.count_unpaid_invoices(
             exclude_invoices={p.id.hex for p in periods if not p.finalized}
         )
 
         if unpaid:
+            classes = ('with-count', 'alert')
             attributes = {'data-count': str(unpaid)}
         else:
-            attributes = {}
+            classes = ('with-count', 'secondary')
+            attributes = {'data-count': '0'}
 
-        front.append(Link(
+        yield Link(
             text=_("Invoices"),
             url=request.link(invoice_items),
-            classes=('count', 'alert', 'invoices-count'),
+            classes=classes,
             attributes=attributes
-        ))
+        )
+
+        bookings = BookingCollection(session)
+
+        if period:
+            count = bookings.booking_count(username)
+
+            if count:
+                classes = (
+                    'with-count', period.confirmed and 'success' or 'info')
+                attributes = {'data-count': str(count)}
+            else:
+                classes = ('with-count', 'secondary')
+                attributes = {'data-count': '0'}
+
+            yield Link(
+                text=period.confirmed and _("Bookings") or _("Wishlist"),
+                url=request.link(bookings),
+                classes=classes,
+                attributes=attributes
+            )
+        else:
+            yield Link(
+                text=_("Wishlist"),
+                url=request.link(bookings),
+                classes=('with-count', 'secondary'),
+                attributes={'data-count': '0'}
+            )
+
+
+def get_top_navigation(request):
+
+    # inject an activites link in front of all top navigation links
+    yield Link(
+        text=_("Activities"),
+        url=request.class_link(VacationActivityCollection)
+    )
 
     layout = DefaultLayout(request.app.org, request)
-    links = chain(front, layout.top_navigation)
-
-    return {
-        'top_navigation': links
-    }
+    yield from layout.top_navigation

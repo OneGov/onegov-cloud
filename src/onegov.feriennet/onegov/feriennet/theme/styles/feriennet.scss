@@ -12,24 +12,6 @@
     }
 }
 
-@media #{$medium-up} {
-    .is-logged-in .top-bar-section {
-        li:nth-child(2),
-        li:nth-child(3) {
-            float: right;
-
-            a {
-                background-color: $gainsboro;
-                box-shadow: 0 4px 0 $charcoal;
-            }
-
-            a:hover {
-                background-color: $iron;
-            }
-        }
-    }
-}
-
 /*
     background color of default logo
 */
@@ -105,25 +87,27 @@ form small {
 }
 
 /*
-    editbar icons
+    global/editbar icons
 */
 
+#global-tools,
 .edit-bar {
-    .new-activity:before { @include icon('\f135'); }
-    .request-publication:before { @include icon('\f087'); }
     .accept-activity:before { @include icon('\f087'); }
-    .reject-activity:before { @include icon('\f088'); }
     .archive-activity:before { @include icon('\f187'); }
-    .new-occasion:before { @include icon('\f133'); }
-    .manage-periods:before { @include icon('\f02d'); }
-    .new-period:before { @include icon('\f055'); }
-    .run-matching:before { @include icon('\f0d0'); }
-    .reset-matching:before { @include icon('\f12d'); }
-    .manage-matches:before { @include icon('\f24e'); }
+    .feriennet-management:before { @include icon('\f274'); }
     .manage-billing:before { @include icon('\f155'); }
+    .manage-matches:before { @include icon('\f24e'); }
+    .manage-periods:before { @include icon('\f02d'); }
+    .new-activity:before { @include icon('\f135'); }
+    .new-notification:before { @include icon('\f003'); }
+    .new-occasion:before { @include icon('\f133'); }
+    .new-period:before { @include icon('\f055'); }
+    .reject-activity:before { @include icon('\f088'); }
+    .request-publication:before { @include icon('\f087'); }
+    .reset-matching:before { @include icon('\f12d'); }
+    .run-matching:before { @include icon('\f0d0'); }
     .show-attendees:before { @include icon('\f0c0'); }
     .show-notifications:before { @include icon('\f003'); }
-    .new-notification:before { @include icon('\f003'); }
 }
 
 /*
@@ -487,33 +471,10 @@ ul.tags {
 
 
 /*
-    My bookings count
-*/
-
-// use px in this block as rem is buggy in pseud-elements in IE 11
-.count[data-count]:after {
-    background-color: $alert-color;
-    border-radius: 100px;
-    color: $white;
-    content: attr(data-count);
-    display: inline-block;
-    font-size: 13px;
-    font-weight: bold;
-    height: 23px;
-    line-height: 23px;
-    margin: 0 0 0 7px;
-    min-width: 23px;
-    text-align: center;
-}
-
-/*
     My bookings
 */
 
 .my-bookings {
-    .panel {
-        max-width: 77ex;
-    }
 
     .attendee-bookings {
         .alert-box {
@@ -953,6 +914,11 @@ ul.tags {
 
         .payment-status {
             padding-right: 1.5rem;
+
+            i.fa {
+                position: relative;
+                top: 2px;
+            }
         }
 
         .total td {
@@ -1128,7 +1094,6 @@ ul.tags {
         @include icon('\f05d');
         color: $green-dark;
         font-weight: normal;
-        margin-top: -2px;
         position: absolute;
         right: 33px;
     }
@@ -1137,7 +1102,6 @@ ul.tags {
         @include icon('\f06a');
         color: $red-dark;
         font-weight: normal;
-        margin-top: -2px;
         position: absolute;
         right: 33px;
     }
@@ -1206,7 +1170,7 @@ ul.tags {
 .emergency-contact {
     @include panel;
     margin-bottom: 1.5rem;
-    max-width: rem-calc(1000) / 12 * 8 - rem-calc(30);
+    max-width: rem-calc(1050) / 12 * 8 - rem-calc(30);
 
     div {
         margin-bottom: .5rem;

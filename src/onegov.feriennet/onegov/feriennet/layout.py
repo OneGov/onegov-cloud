@@ -1,11 +1,8 @@
 from cached_property import cached_property
-from onegov.activity import Activity, PeriodCollection, Period
+from onegov.activity import Activity, PeriodCollection
 from onegov.feriennet import _
 from onegov.feriennet import security
-from onegov.feriennet.collections import BillingCollection
-from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import NotificationTemplateCollection
-from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
 from onegov.org.layout import DefaultLayout as BaseLayout
@@ -32,62 +29,13 @@ class VacationActivityCollectionLayout(DefaultLayout):
         if not self.request.is_organiser:
             return None
 
-        has_period = self.app.session().query(Period.id).first()
-
-        links = [
+        return [
             Link(
                 text=_("Submit Activity"),
                 url=self.request.link(self.model, name='neu'),
                 classes=('new-activity', )
             )
         ]
-
-        if self.request.is_admin:
-            links.append(
-                Link(
-                    text=_("Periods"),
-                    url=self.request.class_link(PeriodCollection),
-                    classes=('manage-periods', )
-                )
-            )
-
-            if has_period:
-                links.append(
-                    Link(
-                        text=_("Matching"),
-                        url=self.request.class_link(MatchCollection),
-                        classes=('manage-matches', )
-                    )
-                )
-
-                links.append(
-                    Link(
-                        text=_("Billing"),
-                        url=self.request.class_link(BillingCollection),
-                        classes=('manage-billing', )
-                    )
-                )
-
-        if has_period:
-            links.append(
-                Link(
-                    text=_("Attendees"),
-                    url=self.request.class_link(OccasionAttendeeCollection),
-                    classes=('show-attendees', )
-                )
-            )
-
-            links.append(
-                Link(
-                    text=_("Notifications"),
-                    url=self.request.class_link(
-                        NotificationTemplateCollection
-                    ),
-                    classes=('show-notifications', )
-                )
-            )
-
-        return links
 
 
 class BookingCollectionLayout(DefaultLayout):
