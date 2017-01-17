@@ -96,7 +96,7 @@ h6,
     that anyway because of our mobile-first design.
 */
 html {
-    @media not print {
+    @media not print and #{$medium-up} {
         overflow-x: hidden;
         width: 100vw;
     }
@@ -399,15 +399,20 @@ footer {
         box-shadow: none;
     }
 
-    ul li a {
-        color: $body-font-color;
-        font-size: .8rem;
-        font-weight: normal;
-        padding: .1rem 1.2rem !important;
-        text-transform: uppercase;
+    ul li {
+        a {
+            color: $body-font-color;
+            font-size: .8rem;
+            font-weight: normal;
+            text-transform: uppercase;
 
-        &:hover {
-            @include primary-color-background;
+            @media #{$medium-up} {
+                padding: .1rem 1.2rem !important;
+                
+                &:hover {
+                    @include primary-color-background;
+                }
+            }
         }
     }
 }
