@@ -27,7 +27,7 @@
                 <a href="./request-password" i18n:translate>Reset password</a>
             </div>
         </div>
-        <div class="field-display userprofile-settings" tal:condition="role in ('admin', 'editor')">
+        <div class="field-display userprofile-settings">
             <div class="field-display-label" i18n:translate>Settings</div>
             <div class="field-display-data">
                 <div class="row">
