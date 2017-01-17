@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer use custom page structure and cover page content.
+  [href]
+
 - No longer send e-mails to admins if they are publishing their own activites.
   [href]
 
