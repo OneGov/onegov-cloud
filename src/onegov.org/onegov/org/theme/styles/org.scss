@@ -175,21 +175,17 @@ $global-tools-height: 2.5rem;
     .settings:before { @include icon('\f1de') };
     .no-tickets:before { @include icon('\f145') };
 
-    .open-tickets::before,
-    .pending-tickets::before,
-    .closed-tickets::before {
-        background-color: $alert-color;
+    .with-count::before {
         border: 1px solid $primary-fg-color;
         border-radius: 1000px;
         box-shadow: 0 0 2px $primary-fg-color;
         box-sizing: content-box;
-        color: $white;
         content: attr(data-count);
         display: inline-block;
         font-size: .75rem;
         height: 1.25rem;
         line-height: 1.25rem;
-        margin-right: 1.25ex;
+        margin-right: 1ex;
         min-width: .75rem;
         padding: 0 .25rem;
         position: relative;
@@ -197,11 +193,22 @@ $global-tools-height: 2.5rem;
         top: -1px;
     }
 
-    .pending-tickets::before {
-        background-color: $info-color;
+    .alert.with-count::before {
+        background-color: $alert-color;
+        color: $white;
     }
 
-    .closed-tickets::before {
+    .success.with-count::before {
+        background-color: $success-color;
+        color: $white;
+    }
+
+    .info.with-count::before {
+        background-color: $info-color;
+        color: $white;
+    }
+
+    .secondary.with-count::before {
         background-color: $secondary-color;
         color: $body-font-color;
     }

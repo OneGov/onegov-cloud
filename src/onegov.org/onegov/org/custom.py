@@ -75,16 +75,11 @@ def get_global_tools(request):
         ticket_count = request.app.ticket_count
         screen_count = ticket_count.open or ticket_count.pending
 
-        if screen_count:
-            css = ticket_count.open and 'open-tickets' or 'pending-tickets'
-        else:
-            css = 'no-tickets'
-
         links = []
 
         links.append(
             Link(
-                _("Open Tickets"), classes=('open-tickets', ),
+                _("Open Tickets"), classes=('with-count', 'alert'),
                 url=request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'open'}
                 ),
@@ -94,7 +89,7 @@ def get_global_tools(request):
 
         links.append(
             Link(
-                _("Pending Tickets"), classes=('pending-tickets', ),
+                _("Pending Tickets"), classes=('with-count', 'info'),
                 url=request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'pending'}
                 ),
@@ -104,7 +99,7 @@ def get_global_tools(request):
 
         links.append(
             Link(
-                _("Closed Tickets"), classes=('closed-tickets', ),
+                _("Closed Tickets"), classes=('with-count', 'secondary'),
                 url=request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'closed'}
                 ),
@@ -112,8 +107,14 @@ def get_global_tools(request):
             )
         )
 
+        if screen_count:
+            css = ticket_count.open and 'alert' or 'info'
+        else:
+            css = 'no-tickets'
+
         yield LinkGroup(
-            screen_count == 1 and _("Ticket") or _("Tickets"), classes=(css, ),
+            screen_count == 1 and _("Ticket") or _("Tickets"),
+            classes=('with-count', css),
             links=links,
             attributes={'data-count': str(screen_count)}
         )
