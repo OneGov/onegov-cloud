@@ -18,7 +18,7 @@ def create_new_organisation(app, name):
     org.homepage_structure = textwrap.dedent("""\
         <row>
             <column span="8">
-                <homepage-cover />
+                <slider />
                 <news />
             </column>
             <column span="4">
