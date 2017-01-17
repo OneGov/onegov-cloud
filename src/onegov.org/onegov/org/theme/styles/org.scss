@@ -3443,4 +3443,11 @@ ul.recipients {
 
         height: 333px;
     }
+
+    &.no-images {
+        background-color: $tuatara;
+        color: $white;
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
 }
