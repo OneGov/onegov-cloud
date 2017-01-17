@@ -207,6 +207,10 @@ class Layout(ChameleonLayout):
     def news_url(self):
         return self.request.class_link(News, {'absorb': ''})
 
+    @cached_property
+    def newsletter_url(self):
+        return self.request.class_link(NewsletterCollection)
+
     def login_to_url(self, to, skip=False):
         auth = Auth.from_request(self.request, to=to, skip=skip)
         return self.request.link(auth, 'login')

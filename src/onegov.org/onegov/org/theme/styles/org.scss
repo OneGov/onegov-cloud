@@ -797,6 +797,7 @@ input[type=color] {
 
             &.more-link {
                 font-size: .875rem;
+                font-weight: 500;
             }
         }
 
@@ -879,12 +880,11 @@ ul.panel-links {
 
         &.more-link {
             font-size: .875rem;
-            font-weight: normal;
+            font-weight: 500;
 
             &::before {
                 @include icon($more-link-icon);
                 font-size: .875rem;
-                margin-right: 1ex;
             }
         }
     }
@@ -1688,6 +1688,7 @@ div#redactor-droparea {
 
 .all-news {
     font-size: .875rem;
+    font-weight: 500;
 
     a {
         display: inline-block;
@@ -1699,7 +1700,7 @@ div#redactor-droparea {
     content: $more-link-icon;
     font-family: 'FontAwesome';
     font-size: .875rem;
-    margin-right: 1ex;
+    margin-right: .25ex;
 }
 
 /*
@@ -1914,21 +1915,25 @@ $all-ticket-icon: '\f055';
 
 .ticket-filter-open::before {
     @include icon($open-ticket-icon);
+    margin-right: 1ex;
     padding-right: .8ex;
 }
 
 .ticket-filter-pending::before {
     @include icon($pending-ticket-icon);
+    margin-right: 1ex;
     padding-right: .8ex;
 }
 
 .ticket-filter-closed::before {
     @include icon($closed-ticket-icon);
+    margin-right: 1ex;
     padding-right: .8ex;
 }
 
 .ticket-filter-all::before {
     @include icon($all-ticket-icon);
+    margin-right: 1ex;
     padding-right: .8ex;
 }
 
