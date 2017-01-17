@@ -40,7 +40,6 @@
     content: $icon;
     font-family: 'FontAwesome';
     font-weight: normal;
-    margin-right: 1ex;
     width: 1.5ex;
     display: inline-block;
 }
@@ -161,6 +160,10 @@ $global-tools-height: 2.5rem;
                 }
             }
         }
+    }
+
+    a::before {
+        margin-right: 1ex;
     }
 
     .login:before { @include icon('\f090') };
