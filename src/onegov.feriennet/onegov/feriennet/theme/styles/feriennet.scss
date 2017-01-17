@@ -251,6 +251,24 @@ ul.tags {
 }
 
 /*
+    Sidepanels
+*/
+.organiser-panel {
+    small:last-child {
+        display: block;
+        padding: 0 1rem 1rem;
+    }
+}
+
+.form-panel {
+    padding: .5rem 1rem 1rem;
+}
+
+.activity-status-panel {
+    padding: 1rem 1rem 0;
+}
+
+/*
     Organiser contact
 */
 
