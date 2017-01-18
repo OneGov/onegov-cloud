@@ -1,6 +1,8 @@
 import textwrap
 
+from onegov.core.utils import module_path
 from onegov.form import FormCollection
+from onegov.org.initial_content import add_filesets
 from onegov.org.models import Organisation
 from onegov.page import PageCollection
 
@@ -82,6 +84,10 @@ def create_new_organisation(app, name):
             Mitteilung *= ...[12]
         """),
         type='builtin'
+    )
+
+    add_filesets(
+        session, name, module_path('onegov.feriennet', 'content/de.yaml')
     )
 
     return org

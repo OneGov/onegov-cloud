@@ -1,0 +1,17 @@
+---
+filesets:
+  - title: Startseiten-Bilder
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Diese Bilder werden auf der Startseite angezeigt.
+      view: grid
+    files:
+      - path: images/1zr3wnstnvy-aaron-burden.jpg
+        note: "Ein Teilnehmer beim Malen"
+      - path: images/hn5ytnkwuxw-markus-spiske.jpg
+        note: "Der stets beliebte Fotografiekurs"
+      - path: images/rx2vjcjqtxi-elissa-algora.jpg
+        note: "Skifahren im Winterlager des {organisation}"
+      - path: images/sahbl2upxco-ashton-bingham.jpg
+        note: "Faszination Wasser"

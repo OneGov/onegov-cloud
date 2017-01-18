@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-04 11:42+0100\n"
+"POT-Creation-Date: 2017-01-18 15:01+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -15,11 +15,29 @@ msgstr ""
 msgid "Activities"
 msgstr "Angebote"
 
+msgid "No active period"
+msgstr "Keine aktive Periode"
+
 msgid "Invoices"
 msgstr "Rechnungen"
 
+msgid "Periods"
+msgstr "Perioden"
+
+msgid "Attendees"
+msgstr "Teilnehmer"
+
+msgid "Notifications"
+msgstr "Mitteilungen"
+
 msgid "Wishlist"
 msgstr "Wunschliste"
+
+msgid "Matching"
+msgstr "Zuteilungen"
+
+msgid "Billing"
+msgstr "Fakturierung"
 
 msgid "Bookings"
 msgstr "Buchungen"
@@ -45,12 +63,6 @@ msgstr "Neue Periode"
 msgid "Matches"
 msgstr "Zuteilungen"
 
-msgid "Billing"
-msgstr "Fakturierung"
-
-msgid "Attendees"
-msgstr "Teilnehmer"
-
 msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
 
@@ -60,17 +72,8 @@ msgstr "Angebot erfassen"
 msgid "New Notification Template"
 msgstr "Neue Mitteilungs-Vorlage"
 
-msgid "Periods"
-msgstr "Perioden"
-
-msgid "Notifications"
-msgstr "Mitteilungen"
-
 msgid "Edit Activity"
 msgstr "Angebot Bearbeiten"
-
-msgid "Matching"
-msgstr "Zuteilungen"
 
 msgid "Request Publication"
 msgstr "Publikation Beantragen"
