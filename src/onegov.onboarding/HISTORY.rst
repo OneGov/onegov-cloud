@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Limit colors to a few hand-selected options.
+  [href]
+
 0.2.15 (2017-01-10)
 ~~~~~~~~~~~~~~~~~~~
 
