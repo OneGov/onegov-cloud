@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds a temporary workaround for an arrow translation typo.
+  [href]
+
 0.35.1 (2016-12-23)
 ~~~~~~~~~~~~~~~~~~~
 

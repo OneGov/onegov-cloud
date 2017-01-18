@@ -11,6 +11,13 @@ from purl import URL
 from pytz import timezone
 
 
+# I introduced a bug with arrow that should be fixed in a future release, this
+# here is a workaround, until this is merged:
+# https://github.com/crsmithdev/arrow/pull/410
+from arrow.locales import SwissLocale
+SwissLocale.timeframes['days'] = '{0} Tagen'
+
+
 class Layout(object):
     """ Contains useful methods related to rendering pages in html. Think of it
     as an API that you can rely on in your templates.
