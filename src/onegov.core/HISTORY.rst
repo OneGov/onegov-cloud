@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.35.2 (2017-01-18)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a temporary workaround for an arrow translation typo.
   [href]
