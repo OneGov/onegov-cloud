@@ -1,0 +1,17 @@
+---
+filesets:
+  - title: Startseiten-Bilder
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Diese Bilder werden auf der Startseite angezeigt.
+      view: grid
+    files:
+      - path: images/38hrjv7gg2w-eric-jan-van-dorp.jpg
+        note: "{organisation} im Winter"
+      - path: images/himwr1n0dzq-martin-sattler.jpg
+        note: "Über dem {organisation}-See"
+      - path: images/bhnxfaencti-eddy-klaus.jpg
+        note: "Am Kunstmarkt in {organisation}"
+      - path: images/p0sruan6cfi-samuel-zeller.jpg
+        note: "Die Schifffahrt hat in {organisation} Tradition"

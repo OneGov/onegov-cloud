@@ -6,7 +6,7 @@ from onegov.core.utils import module_path
 from onegov.event import EventCollection
 from onegov.libres import ResourceCollection
 from onegov.org.initial_content import (
-    add_builtin_forms, builtin_form_definitions)
+    add_builtin_forms, builtin_form_definitions, add_filesets)
 from onegov.org.models import Organisation
 from onegov.page import PageCollection
 from sedate import as_datetime
@@ -60,6 +60,7 @@ def create_new_organisation(app, name, reply_to=None, forms=None):
     add_resources(app.libres_context)
     add_events(session, name)
     add_welcome_page(session)
+    add_filesets(session, name, module_path('onegov.town', 'content/de.yaml'))
 
     session.flush()
 
