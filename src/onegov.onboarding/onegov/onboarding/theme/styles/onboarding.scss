@@ -2,9 +2,7 @@
     the default layout's header
 */
 .header {
-    // background-color: $white-smoke;
-    // border-bottom: 1px solid $gainsboro;
-
+    border-top: 2.5rem solid $primary-color;
     padding: 1em 0 0;
 
     img {
@@ -20,21 +18,23 @@
 }
 
 /*
-    get rid of the jump that is introduced when switching from a site with
+    Get rid of the jump that is introduced when switching from a site with
     scrollbar to a site without (or vice versa)
 
-    (100vw includes the scrollbar, 100% does not)
+    As a side-effect, this disables horizontal scrolling, but we don't have
+    that anyway because of our mobile-first design.
 */
 html {
-    @media not print {
-        margin-left: calc(100vw - 100%);
+    @media #{$medium-up} {
+        overflow-x: hidden;
+        width: 100vw;
     }
 }
 
 /*
     footer pinned to the bottom
 */
-$footer-height: 185px;
+$footer-height: 210px;
 
 html,
 body {
@@ -49,7 +49,7 @@ body {
     }
 }
 
-.footer,
+footer,
 .push {
     height: $footer-height;
 }
@@ -57,28 +57,57 @@ body {
 /*
     footer content
 */
-.footer > div {
-    background-color: $white-smoke;
-    padding: 1em 0;
+footer {
+    background-color: $gray-light;
+
+    // accomplish the border with a box-shadow, as the border messes with
+    // our fixed footer script height calculation
+    box-shadow: 0 -2px 0 $primary-color;
+    max-width: 100% !important;
+
+    // please do not add a margin here, it will mess up the sticky footer!
+    // instead add a margin-bottom to whatever is rendered before the footer.
+    padding: 0;
+
+    > .columns > .row {
+        margin: 0 auto;
+        max-width: $row-width;
+    }
+
+    * {
+        background-color: $gray-light;
+        color: $steel;
+        font-size: 13px;
+        line-height: 25px;
+    }
 
     h2 {
-        font-size: .8rem;
-        font-weight: bold;
+        color: $charcoal;
+        font-weight: 500;
+        letter-spacing: 1px;
+        margin-bottom: 13px;
+        text-transform: uppercase;
+    }
+
+    .footer-columns {
+        padding-bottom: .5rem;
+        padding-top: 1.25rem;
+    }
+
+    .footer-links {
+        padding: .5rem 0;
+        text-align: center;
     }
 
     ul {
         list-style-type: none;
         margin: 0;
-        padding: 0;
+    }
+}
 
-        li {
-            font-size: .8rem;
-            line-height: 1.5;
-        }
-
-        .empty {
-            height: .875rem;
-        }
+@media #{$small-only} {
+    footer .columns > div {
+        margin-bottom: 1rem;
     }
 }
 

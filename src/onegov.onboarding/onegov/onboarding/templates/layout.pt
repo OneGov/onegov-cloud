@@ -46,34 +46,36 @@ metal:define-macro="layout">
 
         <div class="push"></div>
     </div>
-    <div class="footer">
-        <div class="row">
-            <div class="columns small-12 medium-4">
-                <h2 i18n:translate>Contact</h2>
-                <ul>
-                    <li>OneGov.ch</li>
-                    <li>Unter der Egg 5</li>
-                    <li>CH-6004 Luzern</li>
-                    <li class="empty"></li>
-                    <li><i class="fa fa-phone"></i> +41 41 511 22 50</li>
-                    <li><i class="fa fa-envelope-o"></i> <a href="mailto:onegov@seantis.ch">onegov@seantis.ch</a></li>
-                </ul>
-            </div>
-            <div class="columns small-12 medium-4">
-                <h2 i18n:translate>Open Source</h2>
-                <ul>
-                    <li><i class="fa fa-github"></i> <a href="https://github.com/OneGov">github.com/OneGov</a></li>
-                    <li><i class="fa fa-book"></i> <a href="http://onegov.readthedocs.org">onegov.readthedocs.org</a></li>
-                </ul>
-            </div>
-            <div class="columns small-12 medium-4">
-                <h2 i18n:translate>About Us</h2>
-                <ul>
-                    <li><a href="http://www.onegov.ch/">Verein OneGov</a></li>
-                    <li><i class="fa fa-twitter"></i> <a href="http://www.twitter.com/OneGovBox">@OneGovBox</a></li>
-                </ul>
+    <footer class="row footer">
+        <div class="small-12 columns">
+            <div class="row footer-columns">
+                <div class="columns small-12 medium-4">
+                    <h2 i18n:translate>Contact</h2>
+                    <ul>
+                        <li>OneGov.ch</li>
+                        <li>Unter der Egg 5</li>
+                        <li>CH-6004 Luzern</li>
+                        <li class="empty"></li>
+                        <li><i class="fa fa-phone"></i> +41 41 511 22 50</li>
+                        <li><i class="fa fa-envelope-o"></i> <a href="mailto:onegov@seantis.ch">onegov@seantis.ch</a></li>
+                    </ul>
+                </div>
+                <div class="columns small-12 medium-4">
+                    <h2 i18n:translate>Open Source</h2>
+                    <ul>
+                        <li><i class="fa fa-github"></i> <a href="https://github.com/OneGov">github.com/OneGov</a></li>
+                        <li><i class="fa fa-book"></i> <a href="http://onegov.readthedocs.org">onegov.readthedocs.org</a></li>
+                    </ul>
+                </div>
+                <div class="columns small-12 medium-4">
+                    <h2 i18n:translate>About Us</h2>
+                    <ul>
+                        <li><a href="http://www.onegov.ch/">Verein OneGov</a></li>
+                        <li><i class="fa fa-twitter"></i> <a href="http://www.twitter.com/OneGovBox">@OneGovBox</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
+    </footer>
 </body>
 </html>
