@@ -1,11 +1,12 @@
 from hipchat import HipChat
 from onegov.core import Framework, utils
+from onegov.file import DepotApp
 from onegov.libres import LibresIntegration
 from onegov.onboarding import log
 from onegov.onboarding.theme import OnboardingTheme
 
 
-class OnboardingApp(Framework, LibresIntegration):
+class OnboardingApp(Framework, LibresIntegration, DepotApp):
 
     serve_static_files = True
 

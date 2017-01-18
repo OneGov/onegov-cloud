@@ -132,13 +132,17 @@ class TownAssistant(Assistant):
         password = random_password(16)
 
         try:
-            self.app.session_manager.set_current_schema(self.get_schema(name))
+            schema = self.get_schema(name)
+            custom_config = self.config['configuration']
+
+            self.app.session_manager.set_current_schema(schema)
             session = self.app.session_manager.session()
 
             if session.query(Organisation).first():
                 raise AlreadyExistsError
 
-            create_new_organisation(self.app, name=name, reply_to=user)
+            with self.app.temporary_depot(schema, **custom_config):
+                create_new_organisation(self.app, name=name, reply_to=user)
 
             org = session.query(Organisation).first()
             org.theme_options['primary-color'] = color
