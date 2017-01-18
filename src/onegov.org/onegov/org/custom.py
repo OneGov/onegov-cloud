@@ -79,7 +79,8 @@ def get_global_tools(request):
 
         links.append(
             Link(
-                _("Open Tickets"), classes=('with-count', 'alert'),
+                _("Open Tickets"),
+                classes=('with-count', 'alert', 'open-tickets'),
                 url=request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'open'}
                 ),
@@ -89,7 +90,8 @@ def get_global_tools(request):
 
         links.append(
             Link(
-                _("Pending Tickets"), classes=('with-count', 'info'),
+                _("Pending Tickets"),
+                classes=('with-count', 'info', 'pending-tickets'),
                 url=request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'pending'}
                 ),
@@ -99,7 +101,8 @@ def get_global_tools(request):
 
         links.append(
             Link(
-                _("Closed Tickets"), classes=('with-count', 'secondary'),
+                _("Closed Tickets"),
+                classes=('with-count', 'secondary', 'closed-tickets'),
                 url=request.class_link(
                     TicketCollection, {'handler': 'ALL', 'state': 'closed'}
                 ),
