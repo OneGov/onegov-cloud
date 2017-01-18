@@ -2088,7 +2088,7 @@ tr.ticket:hover {
     }
 
     &:hover::before {
-        @incude icon($close-ticket-icon-hover);
+        @include icon($close-ticket-icon-hover);
         margin-right: 1ex;
     }
 }
