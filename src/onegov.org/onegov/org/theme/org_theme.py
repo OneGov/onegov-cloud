@@ -56,7 +56,6 @@ class OrgTheme(BaseTheme):
             'split-buttons',
             'sub-nav',
             'tables',
-            'tabs',
             'thumbs',
             'tooltips',
             'top-bar',
