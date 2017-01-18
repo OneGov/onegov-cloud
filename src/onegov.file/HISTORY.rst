@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.1 (2017-01-18)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to temporarily switch depot engines.
   [href]
 
