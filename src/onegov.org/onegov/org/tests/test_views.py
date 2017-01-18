@@ -162,7 +162,7 @@ def test_view_images(org_app):
 def test_login(org_app):
     client = Client(org_app)
 
-    links = client.get('/').pyquery('.bottom-links li:first-child a')
+    links = client.get('/').pyquery('#global-tools a.login')
     assert links.text() == 'Login'
 
     login_page = client.get(links.attr('href'))
@@ -185,20 +185,20 @@ def test_login(org_app):
     index_page = login_page.form.submit().follow()
     assert "Sie wurden eingeloggt" in index_page.text
 
-    links = index_page.pyquery('.bottom-links li:first-child a')
+    links = index_page.pyquery('#global-tools a.logout')
     assert links.text() == 'Logout'
 
     index_page = client.get(links.attr('href')).follow()
     assert "Sie wurden ausgeloggt" in index_page.text
 
-    links = index_page.pyquery('.bottom-links li:first-child a')
+    links = index_page.pyquery('#global-tools a.login')
     assert links.text() == 'Login'
 
 
 def test_reset_password(org_app):
     client = Client(org_app)
 
-    links = client.get('/').pyquery('.bottom-links li:first-child a')
+    links = client.get('/').pyquery('#global-tools a.login')
     assert links.text() == 'Login'
     login_page = client.get(links.attr('href'))
 
@@ -883,12 +883,20 @@ def test_tickets(org_app):
     assert client.get(
         '/tickets/ALL/open', expect_errors=True).status_code == 403
 
-    assert len(client.get('/').pyquery('.ticket-count')) == 0
+    assert len(client.get('/').pyquery(
+        '.open-tickets, .pending-tickets, .closed-tickets'
+    )) == 0
 
     client.login_editor()
 
-    assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offene Tickets 0 Tickets in Bearbeitung'
+    page = client.get('/')
+    assert len(page.pyquery(
+        '.open-tickets, .pending-tickets, .closed-tickets'
+    )) == 3
+
+    assert page.pyquery('.open-tickets').attr('data-count') == '0'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
     form_page = client.get('/formulare/neu')
     form_page.form['title'] = "Newsletter"
@@ -918,8 +926,10 @@ def test_tickets(org_app):
 
     client.login_editor()
 
-    assert client.get('/').pyquery('.ticket-count div').text()\
-        == '1 Offenes Ticket 0 Tickets in Bearbeitung'
+    page = client.get('/')
+    assert page.pyquery('.open-tickets').attr('data-count') == '1'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
     tickets_page = client.get('/tickets/ALL/open')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
@@ -930,8 +940,10 @@ def test_tickets(org_app):
     tickets_page = client.get('/tickets/ALL/pending')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
 
-    assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offene Tickets 1 Ticket in Bearbeitung'
+    page = client.get('/')
+    assert page.pyquery('.open-tickets').attr('data-count') == '0'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '1'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
     assert 'editor@example.org' in ticket_page
     assert 'Newsletter' in ticket_page
@@ -942,8 +954,10 @@ def test_tickets(org_app):
     ticket_url = ticket_page.request.path
     ticket_page = ticket_page.click('Ticket abschliessen').follow()
 
-    assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offene Tickets 0 Tickets in Bearbeitung'
+    page = client.get('/')
+    assert page.pyquery('.open-tickets').attr('data-count') == '0'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '1'
 
     assert len(org_app.smtp.outbox) == 2
 
@@ -967,8 +981,10 @@ def test_tickets(org_app):
     tickets_page = client.get('/tickets/ALL/pending')
     assert len(tickets_page.pyquery('tr.ticket')) == 1
 
-    assert client.get('/').pyquery('.ticket-count div').text()\
-        == '0 Offene Tickets 1 Ticket in Bearbeitung'
+    page = client.get('/')
+    assert page.pyquery('.open-tickets').attr('data-count') == '0'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '1'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
     message = org_app.smtp.outbox[2]
     message = message.get_payload(0).get_payload(decode=True)
@@ -2178,7 +2194,7 @@ def test_view_occurrences(org_app):
 
     def tags(query=''):
         page = client.get('/veranstaltungen/?{}'.format(query))
-        tags = [tag.text.strip() for tag in page.pyquery('.occurrence-tag')]
+        tags = [tag.text.strip() for tag in page.pyquery('.blank-label')]
         return list(set([tag for tag in tags if tag]))
 
     assert total_events() == 12
@@ -2335,8 +2351,10 @@ def test_submit_event(org_app):
     # Accept ticket
     client.login_editor()
 
-    assert client.get('/').pyquery('.ticket-count div').text()\
-        == "1 Offenes Ticket 0 Tickets in Bearbeitung"
+    page = client.get('/')
+    assert page.pyquery('.open-tickets').attr('data-count') == '1'
+    assert page.pyquery('.pending-tickets').attr('data-count') == '0'
+    assert page.pyquery('.closed-tickets').attr('data-count') == '0'
 
     ticket_page = client.get('/tickets/ALL/open').click("Annehmen").follow()
     assert ticket_nr in ticket_page
@@ -3126,7 +3144,7 @@ def test_add_new_user(org_app):
 
     org_app.settings.org.enable_yubikey = True
 
-    new = client.get('/benutzerverwaltung').click('Benutzer', index=0)
+    new = client.get('/benutzerverwaltung').click('Benutzer', index=2)
     new.form['username'] = 'admin@example.org'
 
     assert "existiert bereits" in new.form.submit()
@@ -3154,7 +3172,7 @@ def test_edit_user_settings(org_app):
 
     org_app.settings.org.enable_yubikey = False
 
-    new = client.get('/benutzerverwaltung').click('Benutzer', index=0)
+    new = client.get('/benutzerverwaltung').click('Benutzer', index=2)
     new.form['username'] = 'new@example.org'
     new.form['role'] = 'member'
     new.form.submit()
