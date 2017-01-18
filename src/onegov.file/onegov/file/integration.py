@@ -1,6 +1,7 @@
 import morepath
 import os.path
 
+from contextlib import contextmanager
 from depot.manager import DepotManager
 from depot.middleware import FileServeApp
 from more.transaction.main import transaction_tween_factory
@@ -23,6 +24,8 @@ class DepotApp(App):
     :class:`onegov.core.framework.Framework` based applications.
 
     """
+
+    custom_depot_id = None
 
     def configure_files(self, **cfg):
         """ Configures the file/depot integration. The following configuration
@@ -56,7 +59,7 @@ class DepotApp(App):
 
     @property
     def bound_depot_id(self):
-        return self.schema
+        return self.custom_depot_id or self.schema
 
     @property
     def bound_depot(self):
@@ -65,7 +68,7 @@ class DepotApp(App):
 
     @property
     def bound_storage_path(self):
-        return Path(self.depot_storage_path) / self.schema
+        return Path(self.depot_storage_path) / self.bound_depot_id
 
     def create_depot(self):
         config = {
@@ -94,7 +97,34 @@ class DepotApp(App):
         if self.bound_depot_id not in DepotManager._depots:
             self.create_depot()
 
-        DepotManager.set_default(self.schema)
+        DepotManager.set_default(self.bound_depot_id)
+
+    def clear_depot_cache(self):
+        DepotManager._aliases.clear()
+        DepotManager._default_depot = None
+        DepotManager._depots.clear()
+
+    @contextmanager
+    def temporary_depot(self, depot_id, **configuration):
+        """ Temporarily use another depot. """
+
+        depot_backend = self.depot_backend
+        depot_storage_path = self.depot_storage_path
+
+        self.custom_depot_id = depot_id
+        self.clear_depot_cache()
+        self.configure_files(**configuration)
+        self.bind_depot()
+
+        yield
+
+        self.custom_depot_id = None
+        self.clear_depot_cache()
+        self.configure_files(**{
+            'depot_backend': depot_backend,
+            'depot_storage_path': depot_storage_path
+        })
+        self.bind_depot()
 
 
 @DepotApp.tween_factory(over=transaction_tween_factory)
