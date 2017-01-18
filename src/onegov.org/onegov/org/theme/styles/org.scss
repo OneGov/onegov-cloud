@@ -812,6 +812,17 @@ input[type=color] {
         margin-bottom: 2rem;
     }
 
+    .newslist .news-list-item {
+        a h2,
+        a h3 {
+            font-weight: normal;
+        }
+
+        .news-lead {
+            font-size: .875rem;
+        }
+    }
+
     .newslist,
     .columns {
         > h2 {
@@ -1681,6 +1692,7 @@ div#redactor-droparea {
     a h3 {
         color: $anchor-font-color;
         font-size: $h4-font-size - $h4-font-reduction;
+        font-weight: bold;
         margin-bottom: .45rem;
     }
 
@@ -1690,12 +1702,12 @@ div#redactor-droparea {
     }
 
     .news-date {
-        font-size: .8rem;
-        margin-bottom: .325rem;
+        font-size: .875rem;
+        margin-bottom: .25rem;
     }
 
     .news-lead {
-        font-size: .875rem;
+        font-size: 1rem;
         margin-bottom: .5rem;
         max-width: $max-line-width;
     }
@@ -2494,18 +2506,23 @@ button {
 
     h3 {
         font-size: $h4-font-size - $h4-font-reduction;
+        font-weight: bold;
     }
 
     .occurrence-date {
-        font-size: .8rem;
-        margin-bottom: .75rem;
+        font-size: .875rem;
+        margin-bottom: .5rem;
         margin-top: .75rem;
     }
 
     .occurrence-location,
     .occurrence-time {
-        font-size: .875em;
-        margin-bottom: .5rem;
+        font-size: 1rem;
+        margin-bottom: .25rem;
+    }
+
+    .occurrence-time {
+        margin-bottom: .6rem;
     }
 }
 
