@@ -1,0 +1,15 @@
+---
+filesets:
+  - title: Startseiten-Bilder
+    type: image
+    meta:
+      show_images_on_homepage: true
+      lead: Diese Bilder werden auf der Startseite angezeigt.
+      view: grid
+    files:
+      - path: images/3bearyu-muo-daiga-ellaby.jpg
+        note: "{organisation} Grillfest"
+      - path: images/hzgs56ze49s-anthony-delanoix.jpg
+        note: "{organisation} Benefiz Konzert"
+      - path: images/jwimshwif14-jeff-sheldon.jpg
+        note: "Lebenslanges Lernen mit {organisation}"

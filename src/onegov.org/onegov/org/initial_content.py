@@ -1,24 +1,25 @@
 import codecs
 import os
 import textwrap
+import yaml
 
 from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
+from onegov.file import FileSetCollection, FileCollection
 from onegov.form import FormCollection
 from onegov.libres import ResourceCollection
-from onegov.page import PageCollection
 from onegov.org.models import Organisation
+from onegov.page import PageCollection
 from sedate import as_datetime
 
 
 def create_new_organisation(app, name):
-
     org = Organisation(name=name)
     org.homepage_structure = textwrap.dedent("""
         <row>
             <column span="8">
-                <homepage-cover />
+                <slider />
                 <news />
             </column>
             <column span="4">
@@ -64,6 +65,7 @@ def create_new_organisation(app, name):
     add_builtin_forms(session)
     add_events(session, name)
     add_resources(app.libres_context)
+    add_filesets(session, name)
 
     return org
 
@@ -75,7 +77,7 @@ def add_root_pages(session):
         "Organisation",
         name='organisation',
         type='topic',
-        meta={'trait': 'page'}
+        meta={'trait': 'page'},
     )
     pages.add_root(
         "Themen",
@@ -155,6 +157,54 @@ def add_resources(libres_context):
         type='room',
         name='konferenzraum'
     )
+
+
+def resolve_path(path):
+    return path or module_path('onegov.org', 'content/de.yaml')
+
+
+def load_path(path):
+    with open(path, 'r') as f:
+        return yaml.load(f)
+
+
+def absolute_path(path, base):
+    if path.startswith('/'):
+        return path
+    if path.startswith('~'):
+        return os.path.expanduser(path)
+
+    return os.path.join(base, path)
+
+
+def add_filesets(session, organisation_name, path=None):
+    path = resolve_path(path)
+    base = os.path.dirname(path)
+
+    for fileset in load_path(path).get('filesets', tuple()):
+
+        fs = FileSetCollection(session, fileset['type']).add(
+            title=fileset['title'],
+            meta=fileset.get('meta', None),
+            content=fileset.get('content', None)
+        )
+
+        files = FileCollection(session, fileset['type'])
+
+        for file in fileset.get('files'):
+            filepath = absolute_path(file['path'], base)
+
+            with open(filepath, 'rb') as f:
+
+                fs.files.append(
+                    files.add(
+                        filename=os.path.basename(file['path']),
+                        content=f,
+                        note=file.get('note', '').format(
+                            organisation=organisation_name
+                        )
+                    )
+                )
 
 
 def add_events(session, name):

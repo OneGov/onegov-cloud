@@ -59,6 +59,7 @@ setup(
         'python-dateutil',
         'python-magic>=0.4.12',
         'pytz',
+        'PyYAML',
         'rjsmin',
         'sedate',
         'translationstring',
