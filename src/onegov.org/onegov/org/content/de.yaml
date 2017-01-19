@@ -1,4 +1,65 @@
----
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
+      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
+      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+    </p>
+
+    <p>
+      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
+      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
+      in dem einem gebratene Satzteile in den Mund fliegen.
+    </p>
+
+    <p>
+      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
+      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
+      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
+      hinaus zu gehen in die weite Grammatik.
+    </p>
+
+pages:
+  - title: Organisation
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird die Organisation beschrieben.
+  - title: Themen
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website werden die Kernthemen der Organisation
+        ausgeführt.
+  - title: Kontakt
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird beschrieben wie die Organisation zu
+        erreichen ist.
+  - title: Aktuelles
+    type: news
+    meta:
+      trait: news
+  - title: Wir haben eine neue Webseite!
+    parent: aktuelles
+    type: news
+    meta:
+      trait: news
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Die neue Webseite läuft auf der Platform der OneGov Cloud.
+
 filesets:
   - title: Startseiten-Bilder
     type: image
@@ -13,3 +74,65 @@ filesets:
         note: "{organisation} Benefiz Konzert"
       - path: images/jwimshwif14-jeff-sheldon.jpg
         note: "Lebenslanges Lernen mit {organisation}"
+
+organisation:
+  theme_options:
+    footer-height: 235px
+  meta:
+    contact: |
+      Fabian Reinhard
+      Unter der Egg 5
+      6004 Luzern
+      +41 41 511 22 50
+      fabian.reinhard@seantis.ch
+    contact_html: >
+      Fabian Reinhard<br>
+      Unter der Egg 5<br>
+      6004 Luzern<br>
+      +41 41 511 22 50<br>
+      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+    opening_hours: Montag - Freitag 09:00 - 17:00
+    opening_hours_html: Montag - Freitag 09:00 - 17:00
+    twitter_url: https://twitter.com/seantis
+    homepage_structure: |
+      <row>
+        <column span="8">
+          <slider />
+          <news />
+        </column>
+        <column span="4">
+          <panel>
+            <links title="Dienstleistungen">
+              <link url="./formulare"
+                    description="Anfragen &amp; Rückmeldungen">
+                    Formulare
+              </link>
+              <link url="./ressourcen"
+                    description="Räume &amp; Tageskarten">
+                    Reservationen
+              </link>
+            </links>
+          </panel>
+
+          <panel>
+            <events />
+          </panel>
+
+          <panel>
+            <links title="Verzeichnisse">
+              <link url="./personen"
+                    description="Alle Kontakte">
+                Personen
+              </link>
+              <link url="./fotoalben"
+                    description="Impressionen">
+                Fotoalben
+              </link>
+              <link url="./a-z"
+                    description="Kataolg A-Z">
+                Themen
+              </link>
+            </links>
+          </panel>
+        </column>
+      </row>

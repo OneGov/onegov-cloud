@@ -1,6 +1,5 @@
 import codecs
 import os
-import textwrap
 import yaml
 
 from datetime import datetime, timedelta
@@ -12,91 +11,62 @@ from onegov.libres import ResourceCollection
 from onegov.org.models import Organisation
 from onegov.page import PageCollection
 from sedate import as_datetime
+from functools import lru_cache
 
 
-def create_new_organisation(app, name):
-    org = Organisation(name=name)
-    org.homepage_structure = textwrap.dedent("""
-        <row>
-            <column span="8">
-                <slider />
-                <news />
-            </column>
-            <column span="4">
-                <panel>
-                    <links title="Dienstleistungen">
-                        <link url="./formulare"
-                            description="Anfragen &amp; Rückmeldungen">
-                            Formulare
-                        </link>
-                        <link url="./ressourcen"
-                            description="Räume &amp; Tageskarten">
-                            Reservationen
-                        </link>
-                    </links>
-                </panel>
-                <panel>
-                    <events />
-                </panel>
-                <panel>
-                    <links title="Verzeichnisse">
-                        <link url="./personen"
-                            description="Alle Kontakte">
-                            Personen
-                        </link>
-                        <link url="./fotoalben"
-                            description="Impressionen">
-                            Fotoalben
-                        </link>
-                        <link url="./a-z"
-                            description="Kataolg A-Z">
-                            Themen
-                        </link>
-                    </links>
-                </panel>
-            </column>
-        </row>
-    """)
+@lru_cache(maxsize=1)
+def load_content(path):
+    with open(path, 'r') as f:
+        return yaml.load(f)
+
+
+def absolute_path(path, base):
+    if path.startswith('/'):
+        return path
+    if path.startswith('~'):
+        return os.path.expanduser(path)
+
+    return os.path.join(base, path)
+
+
+def create_new_organisation(app, name, create_files=True, path=None):
+    path = path or module_path('onegov.org', 'content/de.yaml')
+    content = load_content(path)
+
+    org = Organisation(name=name, **content['organisation'])
 
     session = app.session()
     session.add(org)
 
-    add_root_pages(session)
+    add_pages(session, path)
     add_builtin_forms(session)
     add_events(session, name)
     add_resources(app.libres_context)
-    add_filesets(session, name)
+
+    if create_files:
+        add_filesets(session, name, path)
 
     return org
 
 
-def add_root_pages(session):
+def add_pages(session, path):
     pages = PageCollection(session)
 
-    pages.add_root(
-        "Organisation",
-        name='organisation',
-        type='topic',
-        meta={'trait': 'page'},
-    )
-    pages.add_root(
-        "Themen",
-        name='themen',
-        type='topic',
-        meta={'trait': 'page'}
-    )
-    pages.add_root(
-        "Kontakt",
-        name='kontakt',
-        type='topic',
-        meta={'trait': 'page'}
-    )
-    pages.add_root(
-        "Aktuelles",
-        name='aktuelles',
-        type='news',
-        meta={'trait': 'news'}
-    )
+    for ix, page in enumerate(load_content(path).get('pages')):
+        if 'parent' in page:
+            parent = pages.by_path(page['parent'])
+        else:
+            parent = None
+
+        pages.add(
+            parent=parent,
+            title=page['title'],
+            type=page['type'],
+            name=page.get('name', None),
+            meta=page.get('meta', None),
+            content=page.get('content', None),
+            order=ix
+        )
 
 
 def add_builtin_forms(session, definitions=None):
@@ -159,29 +129,10 @@ def add_resources(libres_context):
     )
 
 
-def resolve_path(path):
-    return path or module_path('onegov.org', 'content/de.yaml')
-
-
-def load_path(path):
-    with open(path, 'r') as f:
-        return yaml.load(f)
-
-
-def absolute_path(path, base):
-    if path.startswith('/'):
-        return path
-    if path.startswith('~'):
-        return os.path.expanduser(path)
-
-    return os.path.join(base, path)
-
-
-def add_filesets(session, organisation_name, path=None):
-    path = resolve_path(path)
+def add_filesets(session, organisation_name, path):
     base = os.path.dirname(path)
 
-    for fileset in load_path(path).get('filesets', tuple()):
+    for fileset in load_content(path).get('filesets', tuple()):
 
         fs = FileSetCollection(session, fileset['type']).add(
             title=fileset['title'],

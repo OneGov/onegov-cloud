@@ -28,7 +28,7 @@ def create_org_app(request, use_elasticsearch):
     app = create_app(OrgApp, request, use_elasticsearch=use_elasticsearch)
     session = app.session()
 
-    org = create_new_organisation(app, name="Govikon")
+    org = create_new_organisation(app, name="Govikon", create_files=False)
     org.meta['reply_to'] = 'mails@govikon.ch'
 
     # usually we don't want to create the users directly, anywhere else you
