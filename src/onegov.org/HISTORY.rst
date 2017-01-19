@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.1 (2017-01-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes initial content not being loaed with the right encoding.
   [href]
 
