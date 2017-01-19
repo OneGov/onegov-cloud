@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Improves the general look of the site through a limited redesign.
+  [href]
+
+- Adds better initial content.
+  [href]
+
 - Adds an IBAN account to the settings.
   [href]
 
