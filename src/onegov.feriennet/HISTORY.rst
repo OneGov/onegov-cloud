@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.2.0 (2017-01-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Improve design, moving all global tools to the top.
   [href]
 
