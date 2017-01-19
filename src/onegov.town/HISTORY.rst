@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Update to latest onegov.org release (with improved design).
+  [href]
+
+- Improves the initial content.
+  [href]
+
 1.11.10 (2017-01-10)
 ~~~~~~~~~~~~~~~~~~~~
 
