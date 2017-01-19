@@ -1579,11 +1579,20 @@ div#redactor-droparea {
 }
 
 @media #{$small-only} {
-    .breadcrumbs li {
-        float: none;
+    .breadcrumbs {
+        padding-left: 0;
 
-        &::before {
-            margin-left: 0;
+        li {
+            float: none;
+            padding-left: 0;
+
+            + li {
+                margin-top: .5rem;
+            }
+
+            &::before {
+                display: none;
+            }
         }
     }
 }
