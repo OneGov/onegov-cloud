@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2017-01-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Improves the general look of the site through a limited redesign.
   [href]
 
