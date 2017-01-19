@@ -311,7 +311,8 @@ def test_pages(org_app):
     page = new_page.form.submit().follow()
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Swell"
-    assert page.pyquery('h2').text() == "Living in Govikon is Really Great"
+    assert page.pyquery('h2:first').text() \
+        == "Living in Govikon is Really Great"
     assert page.pyquery('i').text().startswith("Experts say it's the fact")
 
     edit_page = page.click("Bearbeiten")
@@ -328,7 +329,7 @@ def test_pages(org_app):
     page = edit_page.form.submit().follow()
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
-    assert page.pyquery('h2').text() == "Living in Govikon Really Sucks"
+    assert page.pyquery('h2:first').text() == "Living in Govikon Really Sucks"
     assert page.pyquery('i').text().startswith("Experts say hiring more")
     assert "<script>alert('yes')</script>" not in page
     assert "&lt;script&gt;alert('yes')&lt;/script&gt;" in page
@@ -339,7 +340,7 @@ def test_pages(org_app):
     assert len(root_page.pyquery('.edit-bar')) == 0
 
     assert page.pyquery('.main-title').text() == "Living in Govikon is Awful"
-    assert page.pyquery('h2').text() == "Living in Govikon Really Sucks"
+    assert page.pyquery('h2:first').text() == "Living in Govikon Really Sucks"
     assert page.pyquery('i').text().startswith("Experts say hiring more")
 
 

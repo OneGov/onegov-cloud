@@ -17,6 +17,7 @@ def test_initial_content(org_app):
         'themen': 'Themen',
         'kontakt': 'Kontakt',
         'aktuelles': 'Aktuelles',
+        'wir-haben-eine-neue-webseite': 'Wir haben eine neue Webseite!'
     }
 
     forms = FormCollection(org_app.session()).definitions.query().all()

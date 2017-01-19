@@ -237,6 +237,7 @@ def test_sitecollection(org_app):
 
     assert {o.name for o in objects['news']} == {
         'aktuelles',
+        'wir-haben-eine-neue-webseite'
     }
 
     builtin_forms_path = module_path('onegov.org', 'forms/builtin')

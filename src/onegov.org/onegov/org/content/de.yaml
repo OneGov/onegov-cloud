@@ -78,6 +78,7 @@ filesets:
 organisation:
   theme_options:
     footer-height: 235px
+    primary-color: '#006fba'
   meta:
     contact: |
       Fabian Reinhard
