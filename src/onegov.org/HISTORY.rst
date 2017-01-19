@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.2 (2017-01-19)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes faulty css rules resulting in style issues.
   [href]
 
