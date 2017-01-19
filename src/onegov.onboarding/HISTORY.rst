@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Upgrade to latest onegov.org/onegov.town releases.
+  [href]
+
+- Aligns the design with the new design of onegov.org.
+  [href]
+
 - Limit colors to a few hand-selected options.
   [href]
 
