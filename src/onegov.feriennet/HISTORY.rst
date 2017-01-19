@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Improve design, moving all global tools to the top.
+  [href]
+
+- Improves the initial content.
+  [href]
+
 - No longer use custom page structure and cover page content.
   [href]
 
