@@ -106,7 +106,7 @@ def test_town_create(onboarding_app, temporary_directory, smtp):
     c = Client(town)
     p = c.get('/')
 
-    assert "Willkommen bei OneGov" in p
+    assert "Willkommen bei der OneGov Cloud" in p
     assert "New York" in p
 
     p = c.get('/auth/login')

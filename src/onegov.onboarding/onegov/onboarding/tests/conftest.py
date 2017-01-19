@@ -29,10 +29,12 @@ def onboarding_app(postgres_dsn, temporary_directory, smtp):
         onboarding={
             'onegov.town': {
                 'namespace': 'town_' + uuid4().hex,
-                'domain': 'example.org'
+                'domain': 'example.org',
+                'configuration': {
+                    'depot_backend': 'depot.io.memory.MemoryFileStorage'
+                }
             }
         },
-
     )
     app.set_application_id(app.namespace + '/' + 'test')
 
