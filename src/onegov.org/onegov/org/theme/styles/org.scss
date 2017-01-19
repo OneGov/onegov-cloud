@@ -194,17 +194,17 @@ $global-tools-height: 2.5rem;
         text-align: center;
     }
 
-    .login:before { @include icon('\f090') };
-    .logout:before { @include icon('\f08b') };
-    .register:before { @include icon('\f234') };
-    .user:before { @include icon('\f2bd') };
-    .users:before { @include icon('\f0c0') };
-    .profile:before { @include icon('\f2c3') };
-    .management:before { @include icon('\f013') };
-    .images:before { @include icon('\f03e') };
-    .files:before { @include icon('\f016') };
-    .settings:before { @include icon('\f1de') };
-    .no-tickets:before { @include icon('\f145') };
+    .login:before { @include icon('\f090'); }
+    .logout:before { @include icon('\f08b'); }
+    .register:before { @include icon('\f234'); }
+    .user:before { @include icon('\f2bd'); }
+    .users:before { @include icon('\f0c0'); }
+    .profile:before { @include icon('\f2c3'); }
+    .management:before { @include icon('\f013'); }
+    .images:before { @include icon('\f03e'); }
+    .files:before { @include icon('\f016'); }
+    .settings:before { @include icon('\f1de'); }
+    .no-tickets:before { @include icon('\f145'); }
 
     .with-count::before {
         border: 1px solid $primary-fg-color;
@@ -3494,7 +3494,7 @@ ul.recipients {
     }
 
     .slider .orbit-caption {
-        background-color: rgba(50, 50, 50, 0.5);
+        background-color: rgba(50, 50, 50, .5);
     }
 }
 
