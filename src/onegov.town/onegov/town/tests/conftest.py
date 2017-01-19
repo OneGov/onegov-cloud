@@ -38,7 +38,8 @@ def create_town_app(request, use_elasticsearch):
     session = app.session()
 
     forms = request.getfixturevalue('forms')
-    create_new_organisation(app, 'Govikon', 'mails@govikon.ch', forms)
+    create_new_organisation(
+        app, 'Govikon', 'mails@govikon.ch', forms, create_files=False)
 
     # usually we don't want to create the users directly, anywhere else you
     # *need* to go through the UserCollection. Here however, we can improve

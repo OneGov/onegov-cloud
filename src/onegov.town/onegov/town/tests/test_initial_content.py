@@ -14,12 +14,12 @@ def test_initial_content(town_app):
 
     assert pages == {
         'leben-wohnen': 'Leben & Wohnen',
-        'kultur-freizeit': 'Kultur & Freizeit',
         'bildung-gesellschaft': 'Bildung & Gesellschaft',
-        'gewerbe-tourismus': 'Gewerbe & Tourismus',
         'politik-verwaltung': 'Politik & Verwaltung',
+        'freizeit-tourismus': 'Freizeit & Tourismus',
+        'portraet-wirtschaft': 'Porträt & Wirtschaft',
         'aktuelles': 'Aktuelles',
-        'willkommen-bei-onegov': 'Willkommen bei OneGov'
+        'willkommen-bei-der-onegov-cloud': 'Willkommen bei der OneGov Cloud'
     }
 
     forms = FormCollection(town_app.session()).definitions.query().all()

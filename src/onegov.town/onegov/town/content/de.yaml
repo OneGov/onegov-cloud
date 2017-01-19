@@ -1,4 +1,179 @@
----
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
+      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
+      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+    </p>
+
+    <p>
+      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
+      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
+      in dem einem gebratene Satzteile in den Mund fliegen.
+    </p>
+
+    <p>
+      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
+      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
+      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
+      hinaus zu gehen in die weite Grammatik.
+    </p>
+
+pages:
+  - title: Leben & Wohnen
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website werden Themen und Dienststellen der
+        Verwaltung aufgezeigt, die sich dem Alltag und Wohnen in der Gemeinde
+        widmen.
+
+  - title: Bildung & Gesellschaft
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Unsere Bürger sind das Kapital unserer Gemeinde. Die Gemeinde Govikon
+        verfügt über ein aktuelles Bildungsangebot und ein vielfältiges Netzwerk
+        an Sozialdiensten.
+
+  - title: Politik & Verwaltung
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Dieser Bereich der Website dient dazu, die politische Gemeinde und die
+        Verwaltung vorzustellen.
+
+  - title: Freizeit & Tourismus
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird auf Freizeitangebote, Vereine,
+        Sportanlagen, die kulturelle und touristische Attraktivität hingewiesen.
+
+  - title: Porträt & Wirtschaft
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird die Gemeinde (Geschichte, Brauchtum,
+        Ortsplan etc.) und die Wirtschaft in der Gemeinde vorgestellt.
+
+  - title: Aktuelles
+    type: news
+    meta:
+      trait: news
+
+  - title: Willkommen bei der OneGov Cloud
+    parent: aktuelles
+    type: news
+    meta:
+      trait: news
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Der Online Schalter für Ihre Gemeinde kann ab sofort genutzt
+        werden. Um erste Schritte, mehr Informationen und eine kurze Übersicht
+        zu erhalten klicken Sie einfach auf den Titel dieser Nachricht.
+      text: >
+        <h2>Erste Schritte</h2>
+        <p>
+              Die folgenden Vorschläge helfen Ihnen sich in der OneGov Cloud zurecht
+              zu finden. Falls Sie das lieber auf eigene Faust tun, können Sie diese
+              Schritte gerne überspringen.
+        </p>
+
+        <h3>Melden Sie sich an</h3>
+
+        <p>
+          Sie können sich ab sofort mit Ihrer E-Mail Adresse anmelden. Sie haben
+          das Passwort vergessen? Kein Problem,
+          <a href="/request-password">setzen Sie es zurück</a>.
+        </p>
+
+        <h3>Passen Sie das Aussehen Ihren Bedürfnissen an</h3>
+
+        <p>
+          Die OneGov Cloud lässt sich nach Ihrem Gusto einrichten. Sie können das
+          Logo, die Bilder auf der Startseite und mehr in den
+          <a href="/einstellungen">Einstellungen</a> ändern.
+        </p>
+
+        <h3>Stellen Sie Ihre Gemeinde vor</h3>
+
+        <p>
+          Klicken Sie auf <strong>Leben & Wohnen</strong> in der Navigation und
+          anschliessend auf <strong>Hinzufügen > Thema</strong> gleich unterhalb der
+          Hauptnavigation. Sie sehen <strong>Hinzufügen</strong> nicht? Dann müssen Sie sich
+          erst noch anmelden.        
+        </p>
+
+        <h3>Füllen Sie ein Formular aus</h3>
+
+        <p>
+          Im <a href="/formulare">Online-Schalter</a> gibt es eine ganze Reihe von
+          Formularen die Bürger ausfüllen können. Füllen Sie ein Formular aus
+          und ein Ticket wird geöffnet.
+        </p>
+
+        <p>
+          In den <a href="/tickets/ALL/open">Tickets</a> können Sie das Ticket
+          anschliessend bearbeiten. Übrigens: Sie können jederzeit eigene
+          Formulare hinzufügen. Die mitgelieferten Formulare sind lediglich
+          Vorschläge.
+        </p>
+
+        <h3>Über Ihre OneGov Cloud Instanz</h3>
+
+        <p>
+          Es gibt noch viel mehr zu entdecken - wir möchten an dieser Stelle
+          nicht schon alles verraten.
+        </p>        
+
+        <p>
+          Ihre OneGov Cloud Instanz läuft auf einer Testumgebung, welche
+          frühestens nach zwei Wochen verfällt. Sie können OneGov Cloud also
+          in aller Ruhe testen.
+        </p>
+
+        <p>
+          Zwar ist die Testinstanz für alle Personen zugänglich, wir stellen aber
+          sicher dass sie nicht von Suchmaschinen gefunden wird.
+        </p>
+
+        <p>
+          Sollten Sie Fragen haben, können Sie sich jederzeit an uns wenden:
+        </p>
+
+        <p>
+          <strong>Fabian Reinhard</strong><br>
+          Unter der Egg 5 <br>
+          6004 Luzern <br>
+          +41 41 511 22 50 <br>
+          <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+        </p>
+
+        <h3>Wie weiter</h3>
+
+        <p>
+          Falls wir Sie überzeugen können melden Sie sich bei uns und wir können
+          Ihre Testumgebung in eine produktive Umgebung überführen. Wir
+          würden uns sehr freuen!
+        </p>
+
 filesets:
   - title: Startseiten-Bilder
     type: image
@@ -15,3 +190,52 @@ filesets:
         note: "Am Kunstmarkt in {organisation}"
       - path: images/p0sruan6cfi-samuel-zeller.jpg
         note: "Die Schifffahrt hat in {organisation} Tradition"
+
+organisation:
+  theme_options:
+    footer-height: 235px
+    primary-color: '#006fba'
+  meta:
+    contact: |
+      Fabian Reinhard
+      Unter der Egg 5
+      6004 Luzern
+      +41 41 511 22 50
+      fabian.reinhard@seantis.ch
+    contact_html: >
+      Fabian Reinhard<br>
+      Unter der Egg 5<br>
+      6004 Luzern<br>
+      +41 41 511 22 50<br>
+      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+    opening_hours: Montag - Freitag 09:00 - 17:00
+    opening_hours_html: Montag - Freitag 09:00 - 17:00
+    twitter_url: https://twitter.com/seantis
+    homepage_structure: |
+      <row>
+        <column span="12">
+          <slider />
+        </column>
+      </row>
+      <row>
+        <column span="8">
+            <row>
+                <column span="6">
+                    <news />
+                </column>
+                <column span="6">
+                    <events />
+                </column>
+            </row>
+            <line />
+            <homepage-tiles />
+        </column>
+        <column span="4">
+          <panel>
+            <services />
+          </panel>
+          <panel>
+            <directories />
+          </panel>
+        </column>
+      </row>
