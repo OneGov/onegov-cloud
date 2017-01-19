@@ -424,7 +424,6 @@ def test_organiser_info(feriennet_app):
     assert "Editors Association" in activity
     assert "Washington" in activity
     assert "editors-association@example.org" in activity
-    assert "editor@example.org" not in activity
     assert "+41 23 456 789" in activity
     assert "https://www.example.org" in activity
 
@@ -1281,9 +1280,9 @@ def test_billing(feriennet_app):
 
     assert 'mark-paid' not in page
 
-    # as long as the period is not finalized, the invoices are hidden
-    assert not member.get('/').pyquery('.invoices-count').attr['data-count']
-    assert not admin.get('/').pyquery('.invoices-count').attr['data-count']
+    # as long as the period is not finalized, there are no invoices
+    assert member.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
+    assert admin.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
     assert "noch keine Rechnungen" in member.get('/meine-rechnungen')
     assert "noch keine Rechnungen" in admin.get('/meine-rechnungen')
 
@@ -1322,7 +1321,7 @@ def test_billing(feriennet_app):
     page = admin.get('/rechnungen?username=member@example.org')
     assert 'Bezahlt' in page.pyquery('.outstanding').text()
 
-    assert not member.get('/').pyquery('.invoices-count').attr['data-count']
+    assert member.get('/').pyquery('.invoices-count').attr['data-count'] == '0'
 
 
 def test_reactivate_cancelled_booking(feriennet_app):

@@ -1,4 +1,64 @@
----
+page-default: &lorem-ipsum
+  text: |
+    <p>
+      Weit hinten, hinter den Wortbergen, fern der Länder Vokalien und
+      Konsonantien leben die Blindtexte. Abgeschieden wohnen sie in
+      Buchstabhausen an der Küste des Semantik, eines grossen Sprachozeans.
+    </p>
+
+    <p>
+      Ein kleines Bächlein namens Duden fließt durch ihren Ort und versorgt
+      sie mit den nötigen Regelialien. Es ist ein paradiesmatisches Land,
+      in dem einem gebratene Satzteile in den Mund fliegen.
+    </p>
+
+    <p>
+      Nicht einmal von der allmächtigen Interpunktion werden die Blindtexte
+      beherrscht – ein geradezu unorthographisches Leben. Eines Tages aber
+      beschloss eine kleine Zeile Blindtext, ihr Name war Lorem Ipsum,
+      hinaus zu gehen in die weite Grammatik.
+    </p>
+
+pages:
+  - title: Organisation
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website wird die Organisation beschrieben.
+  - title: Teilnahmebedingungen
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website werden die Teilnahmebedingungen ausgeführt.
+  - title: Sponsoren
+    type: topic
+    meta:
+      trait: page
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        In diesem Bereich der Website werden bestehende Sponsoren genannt und
+        mögliche neue Sponsoren informiert.
+  - title: Aktuelles
+    type: news
+    meta:
+      trait: news
+  - title: Wir haben eine neue Webseite!
+    parent: aktuelles
+    type: news
+    meta:
+      trait: news
+    content:
+      <<: *lorem-ipsum
+      lead: >
+        Die neue Webseite läuft auf der Platform der OneGov Cloud.
+
 filesets:
   - title: Startseiten-Bilder
     type: image
@@ -15,3 +75,55 @@ filesets:
         note: "Skifahren im Winterlager des {organisation}"
       - path: images/sahbl2upxco-ashton-bingham.jpg
         note: "Faszination Wasser"
+
+organisation:
+  theme_options:
+    footer-height: 235px
+    primary-color: '#006fba'
+  meta:
+    contact: |
+      Fabian Reinhard
+      Unter der Egg 5
+      6004 Luzern
+      +41 41 511 22 50
+      fabian.reinhard@seantis.ch
+    contact_html: >
+      Fabian Reinhard<br>
+      Unter der Egg 5<br>
+      6004 Luzern<br>
+      +41 41 511 22 50<br>
+      <a href="mailto:fabian.reinhard@seantis.ch">fabian.reinhard@seantis.ch</a>
+    opening_hours: Montag - Freitag 09:00 - 17:00
+    opening_hours_html: Montag - Freitag 09:00 - 17:00
+    twitter_url: https://twitter.com/seantis
+    homepage_structure: |
+      <row>
+        <column span="8">
+          <slider />
+          <news />
+        </column>
+        <column span="4">
+          <registration />
+
+          <panel>
+            <links>
+                <link url="./personen"
+                    description="Personen">
+                    Team
+                </link>
+                <link url="./formular/kontakt"
+                    description="Anfragen">
+                    Kontakt
+                </link>
+                <link url="./aktuelles"
+                    description="Neuigkeiten">
+                    Aktuelles
+                </link>
+                <link url="./fotoalben"
+                    description="Impressionen">
+                    Fotoalben
+                </link>
+            </links>
+          </panel>
+        </column>
+      </row>

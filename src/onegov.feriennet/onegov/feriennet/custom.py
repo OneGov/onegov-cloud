@@ -105,10 +105,10 @@ def get_personal_tools(request):
         )
 
         if unpaid:
-            classes = ('with-count', 'alert')
+            classes = ('with-count', 'alert', 'invoices-count')
             attributes = {'data-count': str(unpaid)}
         else:
-            classes = ('with-count', 'secondary')
+            classes = ('with-count', 'secondary', 'invoices-count')
             attributes = {'data-count': '0'}
 
         yield Link(

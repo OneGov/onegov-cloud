@@ -25,7 +25,7 @@ def create_feriennet_app(request, use_elasticsearch):
 
     session = app.session()
 
-    org = create_new_organisation(app, name="Govikon")
+    org = create_new_organisation(app, name="Govikon", create_files=False)
     org.meta['reply_to'] = 'mails@govikon.ch'
 
     # usually we don't want to create the users directly, anywhere else you
