@@ -34,7 +34,7 @@ setup(
     install_requires=[
         'faker',
         'onegov.activity',
-        'onegov.org>=0.3.0',
+        'onegov.org>=0.3.1',
     ],
     extras_require=dict(
         test=[
