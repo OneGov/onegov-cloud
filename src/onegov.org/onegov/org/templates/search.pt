@@ -43,6 +43,13 @@
                         <li class="search-result-${result.es_type_name}" tal:repeat="result model.batch.load()">
                             <tal:block switch="result.__tablename__">
 
+                                <tal:block case="'users'">
+                                    <a href="${request.return_here(request.link(result))}">${result.title}</a>
+                                    <ul>
+                                        <li>${translate(result.role.capitalize())}</li>
+                                    </ul>
+                                </tal:block>
+
                                 <tal:block case="'tickets'">
                                     <a href="${request.link(result)}">${result.number}</a>
                                     <ul>

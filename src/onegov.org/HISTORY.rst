@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows users in the search results.
+  [href]
+
 - Adds the removal of the depot directory to the delete command.
   [href]
 
