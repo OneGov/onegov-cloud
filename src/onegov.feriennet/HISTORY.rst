@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows the management menu for organisers again.
+  [href]
+
 0.2.2 (2017-01-19)
 ~~~~~~~~~~~~~~~~~~~
 

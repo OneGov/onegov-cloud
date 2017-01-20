@@ -28,7 +28,7 @@ def get_global_tools(request):
 
 
 def get_admin_tools(request):
-    if request.is_admin:
+    if request.is_organiser:
         period = request.app.session().query(Period.title, Period.active)
         period = period.order_by(desc(Period.active)).first()
 
@@ -79,11 +79,15 @@ def get_admin_tools(request):
                 )
             )
 
-        yield LinkGroup(
-            period and period.active and period.title or _("No active period"),
-            links=links,
-            classes=('feriennet-management', )
-        )
+        if links:
+            title = period and period.active and period.title
+            title = title or _("No active period")
+
+            yield LinkGroup(
+                title=title,
+                links=links,
+                classes=('feriennet-management', )
+            )
 
 
 def get_personal_tools(request):
