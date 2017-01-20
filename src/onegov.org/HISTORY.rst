@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves the look of events on tablets.
+  [href]
+
 0.3.2 (2017-01-19)
 ~~~~~~~~~~~~~~~~~~~
 

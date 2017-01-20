@@ -558,13 +558,13 @@
         <tal:block repeat="occurrence occurrences">
             <div class="row">
                 <div class="occurrence">
-                    <div class="large-3 columns">
+                    <div class="medium-3 small-12 columns">
                         <tal:block tal:condition="layout.format_date(occurrence.localized_start, 'date') != lastdaydate">
                             <metal:block tal:define="date occurrence.localized_start" use-macro="layout.macros['calendar-day']" />
                         </tal:block>
-                        <div class="show-for-large-up" style="width: 100%; height: 1px;"></div>
+                        <div style="width: 100%; height: 1px;"></div>
                     </div>
-                    <div class="large-9 medium-12 small-12 columns">
+                    <div class="medium-9 small-12 columns">
                         <h3><a href="${request.link(occurrence)}">${occurrence.title}</a></h3>
                         <div class="occurrence-date show-for-sr">${layout.format_date(occurrence.localized_start, 'date')}</div>
                         <div class="occurrence-location">${occurrence.location}</div>
