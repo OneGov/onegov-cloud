@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Makes the user model searchable.
+  [href]
+
 0.8.4 (2016-11-25)
 ~~~~~~~~~~~~~~~~~~~
 

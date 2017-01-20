@@ -3,6 +3,7 @@ from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import JSON, UUID
 from onegov.core.utils import remove_repeated_spaces
+from onegov.search import ORMSearchable
 from onegov.user.utils import is_valid_yubikey_format
 from onegov.user.utils import yubikey_otp_to_serial
 from sqlalchemy import Boolean, Column, Text, func
@@ -11,10 +12,21 @@ from sqlalchemy.orm import deferred
 from uuid import uuid4
 
 
-class User(Base, TimestampMixin):
+class User(Base, TimestampMixin, ORMSearchable):
     """ Defines a generic user. """
 
     __tablename__ = 'users'
+
+    es_language = 'de'  # XXX add to database in the future
+    es_properties = {
+        'username': {'type': 'string'},
+        'realname': {'type': 'string'},
+    }
+    es_public = False
+
+    @property
+    def es_suggestion(self):
+        return (self.realname or self.username, self.username)
 
     #: the user id is a uuid because that's more secure (no id guessing)
     id = Column(UUID, nullable=False, primary_key=True, default=uuid4)
