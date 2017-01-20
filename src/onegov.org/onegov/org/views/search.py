@@ -16,7 +16,12 @@ def search(self, request):
     layout.breadcrumbs.append(Link(_("Search"), '#'))
 
     try:
-        request.app.es_client.ping()
+        searchlabel = _("Search through ${count} indexed documents", mapping={
+            'count': self.available_documents
+        })
+        resultslabel = _("${count} Results", mapping={
+            'count': self.subset_count
+        })
     except TransportError:
         log.warning("Elasticsearch cluster is offline")
         return {
@@ -36,12 +41,8 @@ def search(self, request):
         'model': self,
         'layout': layout,
         'hide_search_header': True,
-        'searchlabel': _("Search through ${count} indexed documents", mapping={
-            'count': self.available_documents
-        }),
-        'resultslabel': _("${count} Results", mapping={
-            'count': self.subset_count
-        }),
+        'searchlabel': searchlabel,
+        'resultslabel': resultslabel,
         'connection': True
     }
 

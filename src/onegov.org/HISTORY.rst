@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Shows a warning when the elasticsearch cluster is down.
+  [href]
+
 - Improves the look of events on tablets.
   [href]
 
