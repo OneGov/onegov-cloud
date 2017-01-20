@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the removal of the depot directory to the delete command.
+  [href]
+
 - Shows a warning when the elasticsearch cluster is down.
   [href]
 

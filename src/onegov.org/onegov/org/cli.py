@@ -67,11 +67,15 @@ def delete(group_context):
         if app.has_filestorage:
             click.echo("Removing File Storage")
 
-            for item in app.filestorage.listdir():
+            for item in app.filestorage.listdir('.'):
                 if app.filestorage.isdir(item):
                     app.filestorage.removedir(item, recursive=True, force=True)
                 else:
                     app.filestorage.remove(item)
+
+        if app.depot_storage_path and app.bound_storage_path:
+            click.echo("Removing Depot Storage")
+            shutil.rmtree(str(app.bound_storage_path.absolute()))
 
         if app.has_database_connection:
             click.echo("Dropping Database Schema")
