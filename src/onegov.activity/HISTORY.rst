@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a code field to the invoice items for online banking reference.
+  [href]
+
 0.2.0 (2016-12-13)
 ~~~~~~~~~~~~~~~~~~~
 

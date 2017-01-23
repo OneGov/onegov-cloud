@@ -2,8 +2,9 @@
 upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
+import hashlib
 
-from onegov.activity import Booking, Period, Occasion
+from onegov.activity import Booking, Period, Occasion, InvoiceItem
 from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
@@ -12,6 +13,7 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
+from sqlalchemy import Text
 from sqlalchemy.orm import joinedload
 
 
@@ -159,3 +161,23 @@ def add_cancelled_flag_to_occasion(context):
 
     context.session.flush()
     context.operations.alter_column('occasions', 'cancelled', nullable=False)
+
+
+@upgrade_task('Add code field to invoice items')
+def add_code_field_to_invoice_items(context):
+    context.operations.add_column('invoice_items', Column(
+        'code', Text, nullable=True
+    ))
+
+    for i in context.session.query(InvoiceItem):
+        i.code = ''.join((
+            hashlib.sha1((
+                i.invoice + i.username).encode('utf-8')
+            ).hexdigest()[:5],
+            hashlib.sha1(
+                i.username.encode('utf-8')
+            ).hexdigest()[:5]
+        ))
+
+    context.session.flush()
+    context.operations.alter_column('invoice_items', 'code', nullable=False)
