@@ -47,6 +47,7 @@ class Organisation(Base, TimestampMixin):
     default_map_view = meta_property('default_map_view')
     homepage_structure = meta_property('homepage_structure')
     homepage_cover = meta_property('homepage_cover')
+    bank_account = meta_property('bank_account')
 
     @contact.setter
     def contact(self, value):
