@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes wrong font for generic logo.
+  [href]
+
 - Shows the management menu for organisers again.
   [href]
 
