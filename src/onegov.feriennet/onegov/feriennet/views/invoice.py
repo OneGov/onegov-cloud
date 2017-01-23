@@ -6,6 +6,7 @@ from onegov.feriennet.collections import BillingDetails
 from onegov.feriennet.layout import InvoiceLayout
 from onegov.feriennet.views.shared import all_periods, all_users
 from sortedcontainers import SortedDict
+from stdnum import iban
 
 
 @FeriennetApp.html(
@@ -40,11 +41,15 @@ def view_my_invoices(self, request):
             'user': user.title
         })
 
+    account = request.app.org.bank_account
+    account = account and iban.format(account)
+
     return {
         'title': title,
         'layout': InvoiceLayout(self, request, title),
         'users': users,
         'user': user,
         'bills': bills,
-        'model': self
+        'model': self,
+        'account': account
     }

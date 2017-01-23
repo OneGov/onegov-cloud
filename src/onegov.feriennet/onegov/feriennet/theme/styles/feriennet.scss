@@ -1127,6 +1127,37 @@ ul.tags {
     }
 }
 
+.toggled + .invoice-items-list + .invoice-items-payment > div {
+    border-top: 1px dashed $red-pastel;
+}
+
+.invoice-items-payment {
+    padding: 0 calc(1rem - 1px);
+
+    > div {
+        background-color: lighten($red-pastel, 8%);
+        padding: 1rem .5rem 1.25rem;
+        position: relative;
+    }
+
+    h4 {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    ul {
+        color: $body-font-color;
+        font-size: 1rem;
+        list-style: none;
+        margin: 0;
+
+        li span:first-child {
+            display: inline-block;
+            min-width: 6rem;
+        }
+    }
+}
+
 /*
     Occassion-Attendee View
 */

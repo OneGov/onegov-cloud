@@ -41,6 +41,28 @@
                             </li>
                         </ul>
                     </div>
+
+                    <div class="invoice-items-payment" tal:condition="account and not details.paid">
+                        <div class="row">
+                            <div class="columns small-12">
+                                <h4 i18n:translate>Bank Transfer</h4>
+                                <ul>
+                                    <li>
+                                        <span i18n:translate>Account</span>
+                                        <span>${account}</span>
+                                    </li>
+                                    <li>
+                                        <span i18n:translate>Amount</span>
+                                        <span>${'{:.2f}'.format(details.outstanding)} CHF</span>
+                                    </li>
+                                    <li>
+                                        <span i18n:translate>Notice</span>
+                                        <span>${details.first.code[:5].upper()}-${details.first.code[5:].upper()}</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
