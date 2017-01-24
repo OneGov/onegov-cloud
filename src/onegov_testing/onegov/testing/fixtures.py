@@ -6,7 +6,7 @@ import subprocess
 import tempfile
 import transaction
 
-from _pytest.monkeypatch import monkeypatch
+from _pytest.monkeypatch import MonkeyPatch
 from elasticsearch import Elasticsearch
 from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
@@ -29,7 +29,7 @@ class HTTPExecutor(HTTPExecutorBase):
 
 @pytest.yield_fixture(scope='session')
 def monkeysession(request):
-    mp = monkeypatch(request)
+    mp = MonkeyPatch()
     yield mp
     mp.undo()
 

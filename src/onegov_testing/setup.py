@@ -38,7 +38,7 @@ setup(
         'onegov.core',
         'Pillow',
         'port-for',
-        'pytest>=3.0',
+        'pytest>=3.0.6',
         'sqlalchemy',
         'testing.postgresql'
     ],
