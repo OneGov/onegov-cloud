@@ -4,7 +4,7 @@ from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
-from onegov.core.utils import Bunch
+from onegov.core.utils import Bunch, module_path
 from onegov.user import UserCollection
 from pytest import fixture
 
@@ -96,3 +96,12 @@ def inactive_period(collections):
         execution=(s, e),
         active=False
     )
+
+
+@fixture(scope='session')
+def postfinance_xml():
+    xml = 'camt.053_P_CH0309000000250090342_380000000_0_2016053100163801.xml'
+    xml_path = module_path('onegov.activity', '/tests/fixtures/' + xml)
+
+    with open(xml_path, 'r') as f:
+        yield f.read()

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a simple ISO20022 parser to process payments.
+  [href]
+
 - Adds a code field to the invoice items for online banking reference.
   [href]
 
