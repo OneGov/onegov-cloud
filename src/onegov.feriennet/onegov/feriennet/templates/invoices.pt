@@ -55,9 +55,9 @@
                                         <span i18n:translate>Amount</span>
                                         <span>${'{:.2f}'.format(details.outstanding)} CHF</span>
                                     </li>
-                                    <li>
+                                    <li tal:define="code details.first.code.upper()">
                                         <span i18n:translate>Notice</span>
-                                        <span>${details.first.code[:5].upper()}-${details.first.code[5:].upper()}</span>
+                                        <span>${code[:1]}-${code[1:6]}-${code[6:]}</span>
                                     </li>
                                 </ul>
                             </div>
