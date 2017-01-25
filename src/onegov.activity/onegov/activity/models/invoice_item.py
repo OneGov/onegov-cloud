@@ -62,9 +62,9 @@ class InvoiceItem(Base, TimestampMixin):
         # we can solve this by introducing a separate invoice record in the
         # future
         #
-        # the Q at the beginning is used as a marker for regular expressions
-        # (so it's a Q, followed by [a-z0-9]{8})
-        self.code = 'Q' + ''.join((
+        # the "q" at the beginning is used as a marker for regular expressions
+        # (so it's a "q", followed by [a-z0-9]{8})
+        self.code = 'q' + ''.join((
             hashlib.sha1((invoice + username).encode('utf-8')).hexdigest()[:5],
             hashlib.sha1(username.encode('utf-8')).hexdigest()[:5]
         ))

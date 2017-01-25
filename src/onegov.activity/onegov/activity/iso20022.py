@@ -1,6 +1,6 @@
 import re
 
-from collections import defaultdict, namedtuple
+from collections import defaultdict, namedtuple, Counter
 from datetime import date
 from decimal import Decimal
 from itertools import groupby
@@ -34,6 +34,7 @@ class Transaction(object):
         'valuta_date',
         'username',
         'confidence',
+        'duplicate'
     )
 
     def __init__(self, **kwargs):
@@ -42,9 +43,14 @@ class Transaction(object):
 
         self.username = None
         self.confidence = 0
+        self.duplicate = False
 
     def __repr__(self):
         return pformat({key: getattr(self, key) for key in self.__slots__})
+
+    @property
+    def code(self):
+        return extract_code(self.note)
 
 
 def extract_transactions(xml):
@@ -110,12 +116,12 @@ def extract_code(text):
     match = CODE_EX.search(text)
 
     if match:
-        return match.string.lower()
+        return match.group().lower()
     else:
         return None
 
 
-def match_camt_053_to_usernames(xml, collection, invoice):
+def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
     """ Takes an ISO20022 camt.053 file and matches it with the invoice
     items in the :class:`~onegov.activity.collections.InvoiceItemCollection`.
 
@@ -129,15 +135,14 @@ def match_camt_053_to_usernames(xml, collection, invoice):
     """
 
     # Get the items matching the given invoice
-    q = collection.query()
+    q = collection.for_invoice(invoice).query()
     q = q.with_entities(
         InvoiceItem.username,
         InvoiceItem.code,
         InvoiceItem.amount
     )
     q = q.filter(
-        InvoiceItem.paid == False,
-        InvoiceItem.invoice == invoice
+        InvoiceItem.paid == False
     )
     q = q.order_by(
         InvoiceItem.username
@@ -171,27 +176,48 @@ def match_camt_053_to_usernames(xml, collection, invoice):
         by_amount[round(invoice.amount)].append(invoice)
 
     # go through the transactions, comparing amount and code for a match
-    for transaction in extract_transactions(xml):
-        code = extract_code(transaction.note)
-        amnt = round(transaction.amount)
+    transactions = tuple(extract_transactions(xml))
 
-        code_usernames = {i.username for i in by_code.get(code, tuple())}
-        amnt_usernames = {i.username for i in by_amount.get(amnt, tuple())}
+    codes = Counter(t.code for t in transactions if t.code)
+    refs = Counter(t.reference for t in transactions if t.reference)
 
-        if code_usernames and amnt_usernames:
+    for transaction in transactions:
+        if not transaction.credit:
+            yield transaction
+            continue
+
+        if transaction.currency != currency:
+            yield transaction
+            continue
+
+        # duplicate codes/references are marked as such, but not matched
+        if codes[transaction.code] > 1:
+            transaction.duplicate = True
+            yield transaction
+            continue
+
+        if refs[transaction.reference] > 1:
+            transaction.duplicate = True
+            yield transaction
+            continue
+
+        if transaction.credit and transaction.currency == currency:
+            code = transaction.code
+            amnt = round(transaction.amount)
+
+            code_usernames = {i.username for i in by_code.get(code, tuple())}
+            amnt_usernames = {i.username for i in by_amount.get(amnt, tuple())}
+
             combined = code_usernames & amnt_usernames
 
             if len(combined) == 1:
                 transaction.username = next(u for u in combined)
-                transaction.confidence == 1
-            else:
-                transaction.username = next(u for u in combined)
-                transaction.confidence == 0.5
-        elif code_usernames:
-            transaction.username = next(u for u in code_usernames)
-            transaction.confidence == 0.5
-        elif amnt_usernames:
-            transaction.username = next(u for u in amnt_usernames)
-            transaction.confidence == 0.5
+                transaction.confidence = 1.0
+            elif len(code_usernames) == 1:
+                transaction.username = next(u for u in code_usernames)
+                transaction.confidence = 0.5
+            elif len(amnt_usernames) == 1:
+                transaction.username = next(u for u in amnt_usernames)
+                transaction.confidence = 0.5
 
         yield transaction
