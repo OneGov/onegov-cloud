@@ -68,3 +68,14 @@ class InvoiceItem(Base, TimestampMixin):
             hashlib.sha1((invoice + username).encode('utf-8')).hexdigest()[:5],
             hashlib.sha1(username.encode('utf-8')).hexdigest()[:5]
         ))
+
+    @property
+    def display_code(self):
+        """ The item's code, formatted in a human readable format. """
+        code = self.code.upper()
+
+        return '-'.join((
+            code[:1],
+            code[1:6],
+            code[6:]
+        ))
