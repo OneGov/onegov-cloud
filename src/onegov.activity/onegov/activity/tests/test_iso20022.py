@@ -1,6 +1,6 @@
 from datetime import date
 from decimal import Decimal
-from onegov.activity.iso20022 import extract_transactions
+from onegov.activity.iso20022 import extract_transactions, extract_code
 
 
 def test_extract_transactions(postfinance_xml):
@@ -85,3 +85,15 @@ def test_extract_transactions(postfinance_xml):
         "MUSTER MITTEILUNG 3",
         "MUSTER MITTEILUNG 4",
     ])
+
+
+def test_extract_code():
+    assert extract_code('') is None
+    assert extract_code('\n asdf') is None
+    assert extract_code('Q-70171-292FA') == 'q70171292fa'
+    assert extract_code('B-70171-292FA') is None
+    assert extract_code('Q-7o171-292FA') == 'q70171292fa'
+    assert extract_code('Q-7o171-292FA') == 'q70171292fa'
+    assert extract_code('Q-   7o171292FA') == 'q70171292fa'
+    assert extract_code('Q-   7o171  29  ---- 2FA') == 'q70171292fa'
+    assert extract_code('Q\n7o171\n292FA') == 'q70171292fa'
