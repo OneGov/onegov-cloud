@@ -40,3 +40,41 @@ def merge_ranges(ranges):
             merged.append(tuple(r))
 
     return merged
+
+
+def generate_checksum(number):
+    """ Generates the modulo 10 checksum as required by Postfinance.
+
+    :return: The checksum as integer.
+
+    """
+
+    table = (0, 9, 4, 6, 8, 2, 7, 1, 3, 5)
+    carry = 0
+
+    for n in str(number):
+        carry = table[(carry + int(n)) % 10]
+
+    return (10 - carry) % 10
+
+
+def append_checksum(number):
+    """ Adds the Postfinance modulo 10 checksum to the given number.
+
+    :return: The given number as string with the checksum appended.
+
+    """
+    number = str(number)
+    return number + str(generate_checksum(number))
+
+
+def is_valid_checksum(number):
+    """ Takes the given number and verifys the checksum which is assumed to
+    be the last digit in the given number.
+
+    :return: True if the checksum digit matches the numbers before it.
+
+    """
+
+    number = str(number)
+    return number[-1] == str(generate_checksum(number[:-1]))
