@@ -57,12 +57,14 @@ class InvoiceItem(Base, TimestampMixin):
     def invoice_username_observer(self, invoice, username):
         # there's no guarantee that this code is unique for an invoice, though
         # the chance of it overlapping is very very small -> any algorithm
-        # doing some kind of matching has to account for this fact (probably
-        # by throwing an error)
+        # doing some kind of matching has to account for this fact
         #
         # we can solve this by introducing a separate invoice record in the
         # future
-        self.code = ''.join((
+        #
+        # the Q at the beginning is used as a marker for regular expressions
+        # (so it's a Q, followed by [a-z0-9]{8})
+        self.code = 'Q' + ''.join((
             hashlib.sha1((invoice + username).encode('utf-8')).hexdigest()[:5],
             hashlib.sha1(username.encode('utf-8')).hexdigest()[:5]
         ))
