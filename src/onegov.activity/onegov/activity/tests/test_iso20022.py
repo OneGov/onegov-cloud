@@ -35,7 +35,7 @@ def test_extract_transactions(postfinance_xml):
 
     t = next(transactions)
     assert t.amount == Decimal('100.00')
-    assert t.reference == '20160526531801000100274'
+    assert t.reference == "000000000002015110002913192"
 
     t = next(transactions)
     assert t.amount == Decimal('50.00')
@@ -51,6 +51,7 @@ def test_extract_transactions(postfinance_xml):
     t = next(transactions)
     assert t.amount == Decimal('100.00')
     assert t.credit is True
+    assert t.reference == "000000000002016030000535990"
 
     t = next(transactions)
     assert t.amount == Decimal('200.00')
@@ -68,7 +69,6 @@ def test_extract_transactions(postfinance_xml):
 
     t = next(transactions)
     assert t.amount == Decimal('100.00')
-    assert t.reference == "160527CH00T99EBW"
 
     t = next(transactions)
     assert t.amount == Decimal('50.00')

@@ -77,7 +77,7 @@ def extract_transactions(xml):
                 booking_text=booking_text,
                 amount=as_decimal(first(d, 'Amt/text()')),
                 currency=first(d, 'Amt/@Ccy'),
-                reference=first(d, 'Refs/Prtry/Ref/text()'),
+                reference=first(d, 'RmtInf/Strd/CdtrRefInf/Ref/text()'),
                 note=joined(d, 'RmtInf/Ustrd/text()'),
                 credit=first(d, 'CdtDbtInd/text()') == 'CRDT',
                 debitor=first(d, 'RltdPties/Dbtr/Nm/text()'),
