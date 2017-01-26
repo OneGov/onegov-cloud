@@ -1,10 +1,15 @@
 import json
 
-from onegov.activity import Period, PeriodCollection
+from base64 import b64decode
+from gzip import GzipFile
+from io import BytesIO
+from onegov.activity import Period, PeriodCollection, InvoiceItemCollection
+from onegov.activity.iso20022 import match_camt_053_to_usernames
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingCollection, BillingDetails
-from onegov.feriennet.forms import BillingForm
+from onegov.feriennet.forms import BillingForm, BankStatementImportForm
+from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.models import InvoiceAction
 from onegov.org.elements import Link
@@ -113,3 +118,54 @@ def execute_invoice_action(self, request):
         response.headers.add('X-IC-Trigger-Data', json.dumps({
             'selector': '#' + BillingDetails.item_id(self.item)
         }))
+
+
+@FeriennetApp.form(
+    model=BillingCollection,
+    form=BankStatementImportForm,
+    permission=Secret,
+    name='import',
+    template='billing_import.pt',
+)
+def view_billing_import(self, request, form):
+    uploaded = 'account-statement' in request.browser_session
+
+    if form.submitted(request):
+        request.browser_session['account-statement'] = {
+            'invoice': form.period.data,
+            'data': form.xml.data['data']
+        }
+        uploaded = True
+    elif not request.POST and uploaded:
+        del request.browser_session['account-statement']
+        uploaded = False
+
+    if uploaded:
+        cache = request.browser_session['account-statement']
+
+        binary = BytesIO(b64decode(cache['data']))
+        xml = GzipFile(filename='', mode='r', fileobj=binary).read()
+        xml = xml.decode('utf-8')
+
+        invoice = cache['invoice']
+        invoices = InvoiceItemCollection(request.app.session())
+
+        transactions = tuple(
+            match_camt_053_to_usernames(xml, invoices, invoice))
+
+        if not transactions:
+            del request.browser_session['account-statement']
+            request.alert(_("No transactions were found in the given file"))
+            uploaded = False
+            form.xml.data = None
+    else:
+        transactions = None
+
+    return {
+        'layout': BillingCollectionImportLayout(self, request),
+        'title': _("Import Bank Statement"),
+        'form': form,
+        'button_text': _("Preview"),
+        'transactions': transactions,
+        'uploaded': uploaded
+    }

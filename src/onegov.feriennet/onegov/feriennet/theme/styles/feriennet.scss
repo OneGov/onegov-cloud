@@ -101,6 +101,7 @@ form small {
     .accept-activity:before { @include icon('\f087'); }
     .archive-activity:before { @include icon('\f187'); }
     .feriennet-management:before { @include icon('\f274'); }
+    .import:before { @include icon('\f093'); }
     .manage-billing:before { @include icon('\f155'); }
     .manage-matches:before { @include icon('\f24e'); }
     .manage-periods:before { @include icon('\f02d'); }

@@ -243,6 +243,31 @@ class BillingCollectionLayout(DefaultLayout):
             Link(_("Billing"), '#')
         )
 
+    @cached_property
+    def editbar_links(self):
+        return (
+            Link(
+                _("Import Bank Statement"),
+                self.request.link(self.model, 'import'),
+                classes=('import', )
+            ),
+        )
+
+
+class BillingCollectionImportLayout(DefaultLayout):
+
+    @cached_property
+    def breadcrumbs(self):
+        return (
+            Link(_("Homepage"), self.homepage_url),
+            Link(
+                _("Activities"),
+                self.request.class_link(VacationActivityCollection)
+            ),
+            Link(_("Billing"), self.request.link(self.model)),
+            Link(_("Import Bank Statement"), '#')
+        )
+
 
 class InvoiceLayout(DefaultLayout):
 

@@ -1,0 +1,51 @@
+<div metal:use-macro="layout.base" i18n:domain="onegov.feriennet">
+    <tal:block metal:fill-slot="title">
+        ${title}
+    </tal:block>
+    <tal:block metal:fill-slot="content">
+        <div class="panel" tal:condition="not:layout.app.org.bank_account" i18n:translate>
+            No bank account defined. Please define a bank account in the <a href="${request.return_here('/einstellungen')}" i18n:name="link" i18n:translate>settings</a> first.
+        </div>
+
+        <div class="row" tal:condition="layout.app.org.bank_account and not uploaded">
+            <div class="columns small-12 medium-8">
+                <div metal:use-macro="layout.macros['form']"/>
+            </div>
+            <div class="columns small-12 medium-4">
+                <div class="panel">
+                    <p i18n:translate>
+                        To import a bank statement you need an account with one of the following banks:
+                    </p>
+                    <ul>
+                        <li><a rel="noreferrer" href="https://postfinance.ch">Postfinance</a></li>
+                    </ul>
+                    <p i18n:translate>
+                        Your statement is required to be in "ISO-20022 format (without picture)". Banks may also refer to it as "camt.053". Be sure to ask your bank to switch your account to this format or to select this format in
+                        your online banking profile.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" tal:condition="uploaded">
+            <div class="columns small-12">
+                <ul class="transactions">
+                    <li tal:repeat="transaction transactions">
+                        <div>amount: ${transaction.amount} ${transaction.currency}</div>
+                        <div>date: ${transaction.booking_date}</div>
+                        <div>booking text: ${transaction.booking_text}</div>
+                        <div>debitor: ${transaction.debitor}</div>
+                        <div>debitor account: ${transaction.debitor_account}</div>
+                        <div>duplicate: ${transaction.duplicate}</div>
+                        <div>note: ${transaction.note}</div>
+                        <div>paid: ${transaction.paid}</div>
+                        <div>reference: ${transaction.reference}</div>
+                        <div>tid: ${transaction.tid}</div>
+                        <div>username: ${transaction.username}</div>
+                        <div>confidence: ${transaction.confidence}</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </tal:block>
+</div>

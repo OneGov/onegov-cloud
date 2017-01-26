@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-23 16:19+0100\n"
+"POT-Creation-Date: 2017-01-26 11:35+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -62,6 +62,9 @@ msgstr "Neue Periode"
 
 msgid "Matches"
 msgstr "Zuteilungen"
+
+msgid "Import Bank Statement"
+msgstr "Import Bankauszug"
 
 msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
@@ -603,6 +606,28 @@ msgstr ""
 "Die Fakturierung für diese Periode wurde abgeschlossen. Sie können die "
 "Rechnungen immer noch manuell ändern aber nicht mehr automatisch generieren."
 
+#. Used in sentence: "No bank account defined. Please define a bank account in
+#. the ${link} first."
+msgid "settings"
+msgstr "Einstellungen"
+
+#. Canonical text for ${link} is: "settings"
+msgid ""
+"No bank account defined. Please define a bank account in the ${link} first."
+msgstr "Es wurde noch kein Bankkonto definiert. Bitte definieren Sie ein Bankkonto in den ${link}."
+
+msgid ""
+"To import a bank statement you need an account with one of the following "
+"banks:"
+msgstr "Um ein Kontoauszug zu importieren benötigen Sie ein Konto mit einer der folgenden Banken:"
+
+msgid ""
+"Your statement is required to be in \"ISO-20022 format (without picture)\". "
+"Banks may also refer to it as \"camt.053\". Be sure to ask your bank to "
+"switch your account to this format or to select this format in your online "
+"banking profile."
+msgstr "Der Auszug wird im \"ISO-20022 Format (ohne Bild)\" benötigt. Gewisse Banken kennen das Format auch als \"camt.053\". Bitten Sie Ihre Bank darum Ihr Konto auf dieses Format umzustellen oder wählen Sie dieses Format in Ihrem Online-Banking Profil aus."
+
 msgid ""
 "You haven't added an emergency contact to your profile yet. Please add this "
 "information in your userprofile so we can reach you in an emergency!"
@@ -661,12 +686,6 @@ msgstr "Konto"
 
 msgid "Notice"
 msgstr "Bemerkung"
-
-msgid "Credit-Card Payment"
-msgstr "Kreditkarten Zahlung"
-
-msgid "Pay now"
-msgstr "Jetzt bezahlen"
 
 msgid "Edit contact info"
 msgstr "Kontakt ändern"
@@ -1177,3 +1196,9 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
+
+#~ msgid "Credit-Card Payment"
+#~ msgstr "Kreditkarten Zahlung"
+
+#~ msgid "Pay now"
+#~ msgstr "Jetzt bezahlen"
