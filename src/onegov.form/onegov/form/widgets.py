@@ -79,7 +79,7 @@ class UploadWidget(FileInput):
         force_simple = kwargs.pop('force_simple', False)
         input_html = super().__call__(field, **kwargs)
 
-        if force_simple or not field.data:
+        if force_simple or field.errors or not field.data:
             return HTMLString("""
                 <div class="upload-widget without-data">
                     {}

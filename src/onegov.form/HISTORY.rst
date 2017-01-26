@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Stops the upload widget from looking successful when there are errors.
+  [href]
+
 0.16.2 (2016-12-28)
 ~~~~~~~~~~~~~~~~~~~
 
