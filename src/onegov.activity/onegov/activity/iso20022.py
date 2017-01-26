@@ -32,6 +32,7 @@ class Transaction(object):
         'debitor_account',
         'duplicate',
         'note',
+        'paid',
         'reference',
         'tid',
         'username',
@@ -45,6 +46,7 @@ class Transaction(object):
         self.username = None
         self.confidence = 0
         self.duplicate = False
+        self.paid = False
 
     def __repr__(self):
         return pformat({key: getattr(self, key) for key in self.__slots__})
@@ -136,6 +138,17 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
 
     """
 
+    # Get all paid transaction ids to be mark transactions which were paid
+    q = collection.for_invoice(None).query()
+    q = q.with_entities(InvoiceItem.tid, InvoiceItem.username)
+    q = q.group_by(InvoiceItem.tid, InvoiceItem.username)
+    q = q.filter(
+        InvoiceItem.paid == True,
+        InvoiceItem.source == 'xml'
+    )
+
+    paid_transaction_ids = {i.tid: i.username for i in q}
+
     # Get the items matching the given invoice
     q = collection.for_invoice(invoice).query()
     q = q.with_entities(
@@ -180,8 +193,14 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
     # go through the transactions, comparing amount and code for a match
     transactions = tuple(extract_transactions(xml))
 
-    codes = Counter(t.code for t in transactions if t.code)
-    refs = Counter(t.reference for t in transactions if t.reference)
+    codes = Counter(
+        t.code for t in transactions
+        if t.code and t.tid not in paid_transaction_ids
+    )
+    refs = Counter(
+        t.reference for t in transactions
+        if t.reference and t.tid not in paid_transaction_ids
+    )
 
     for transaction in transactions:
         if not transaction.credit:
@@ -189,6 +208,13 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
             continue
 
         if transaction.currency != currency:
+            yield transaction
+            continue
+
+        if transaction.tid in paid_transaction_ids:
+            transaction.paid = True
+            transaction.username = paid_transaction_ids[transaction.tid]
+            transaction.confidence = 1
             yield transaction
             continue
 

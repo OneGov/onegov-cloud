@@ -13,7 +13,10 @@ def generate_xml(payments):
         'note': ''
     }
 
-    for payment in payments:
+    for ix, payment in enumerate(payments):
+
+        if 'tid' not in payment:
+            payment['tid'] = 'T{}'.format(ix)
 
         if payment['amount'].startswith('-'):
             payment['credit'] = 'DBIT'
@@ -29,6 +32,9 @@ def generate_xml(payments):
 
         transactions.append("""
         <TxDtls>
+            <Refs>
+                <AcctSvcrRef>{tid}</AcctSvcrRef>
+            </Refs>
             <Amt Ccy="{currency}">{amount}</Amt>
             <CdtDbtInd>{credit}</CdtDbtInd>
             <RmtInf>
@@ -303,3 +309,25 @@ def test_invoice_matching_without_esr(session, owner, member):
     assert transactions[0].username is None
     assert transactions[0].confidence == 0
     assert transactions[0].duplicate is True
+
+    # make sure paid transactions are matched as well (here we basically send
+    # a separate bill which completes the outstanding amount)
+    i1.paid = True
+    i1.tid = 'foobar'
+    i1.source = 'xml'
+
+    xml = generate_xml([
+        dict(amount='250 CHF', note=i1.code, tid='foobar'),
+        dict(amount='250 CHF', note=i1.code, tid=None),
+    ])
+
+    transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
+    assert len(transactions) == 2
+
+    assert transactions[0].tid == 'foobar'
+    assert transactions[0].username == owner.username
+    assert transactions[0].paid is True
+
+    assert transactions[1].username == owner.username
+    assert transactions[1].confidence == 1.0
+    assert transactions[1].paid is False
