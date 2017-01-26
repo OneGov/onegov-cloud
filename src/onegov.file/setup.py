@@ -33,7 +33,7 @@ setup(
     platforms='any',
     install_requires=[
         'onegov.core>=0.4.0',
-        'filedepot',
+        'filedepot>=0.4.1',
         'lxml',
         'more.transaction',
         'pillow',
