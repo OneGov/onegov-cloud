@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.2 (2017-01-26)
+~~~~~~~~~~~~~~~~~~~
+
 - Upgrades to the latest filedepot release, removing our hack.
   [href]
 
