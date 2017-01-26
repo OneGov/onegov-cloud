@@ -594,6 +594,10 @@ form {
         }
     }
 
+    .upload-widget.without-data {
+        margin-bottom: .5rem;
+    }
+
     .upload-widget p {
         color: $success-color;
         font-size: $form-label-font-size;
