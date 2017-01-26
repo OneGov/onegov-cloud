@@ -39,8 +39,11 @@ class InvoiceItem(Base, TimestampMixin):
     #: true if paid
     paid = Column(Boolean, nullable=False, default=False)
 
-    #: the transaction id if paid online
+    #: the transaction id if paid through a bank or online transaction
     tid = Column(Text, nullable=True)
+
+    #: the source of the transaction id, e.g. stripe, xml
+    source = Column(Text, nullable=True)
 
     #: the unit to pay..
     unit = Column(Numeric(precision=8, scale=2), nullable=True)

@@ -25,16 +25,17 @@ class Transaction(object):
         'amount',
         'booking_date',
         'booking_text',
+        'confidence',
         'credit',
         'currency',
         'debitor',
         'debitor_account',
+        'duplicate',
         'note',
         'reference',
-        'valuta_date',
+        'tid',
         'username',
-        'confidence',
-        'duplicate'
+        'valuta_date',
     )
 
     def __init__(self, **kwargs):
@@ -81,6 +82,7 @@ def extract_transactions(xml):
                 booking_date=booking_date,
                 valuta_date=valuta_date,
                 booking_text=booking_text,
+                tid=first(d, 'Refs/AcctSvcrRef/text()'),
                 amount=as_decimal(first(d, 'Amt/text()')),
                 currency=first(d, 'Amt/@Ccy'),
                 reference=first(d, 'RmtInf/Strd/CdtrRefInf/Ref/text()'),

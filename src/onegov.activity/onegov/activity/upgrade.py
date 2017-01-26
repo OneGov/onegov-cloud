@@ -181,3 +181,10 @@ def add_code_field_to_invoice_items(context):
 
     context.session.flush()
     context.operations.alter_column('invoice_items', 'code', nullable=False)
+
+
+@upgrade_task('Add source field to invoice items')
+def add_source_field_to_invoice_items(context):
+    context.operations.add_column('invoice_items', Column(
+        'source', Text, nullable=True
+    ))

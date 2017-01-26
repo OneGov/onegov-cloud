@@ -74,6 +74,7 @@ def test_extract_transactions(postfinance_xml):
 
     t = next(transactions)
     assert t.amount == Decimal('328.75')
+    assert t.tid == "20160430001001080060699000901107"
 
     t = next(transactions)
     assert t.amount == Decimal('200.80')
@@ -106,6 +107,7 @@ def test_extract_transactions(postfinance_xml):
     assert t.amount == Decimal('100.00')
     assert t.credit is True
     assert t.reference == "000000000002016030000535990"
+    assert t.tid == "160527CH00T3L0NC"
 
     t = next(transactions)
     assert t.amount == Decimal('200.00')
@@ -133,12 +135,21 @@ def test_extract_transactions(postfinance_xml):
 
     t = next(transactions)
     assert t.amount == Decimal('100.00')
+    assert t.tid == "160527CH00T3HDBA"
     assert t.note == '\n'.join([
         "MUSTER MITTEILUNG 1",
         "MUSTER MITTEILUNG 2",
         "MUSTER MITTEILUNG 3",
         "MUSTER MITTEILUNG 4",
     ])
+
+
+def test_unique_transaction_ids(postfinance_xml):
+    seen = set()
+
+    for transaction in extract_transactions(postfinance_xml):
+        assert transaction.tid not in seen
+        seen.add(transaction.tid)
 
 
 def test_extract_code():
