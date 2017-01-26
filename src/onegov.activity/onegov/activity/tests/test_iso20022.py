@@ -202,7 +202,7 @@ def test_invoice_matching_without_esr(session, owner, member):
     assert transactions[1].note == i3.code
     assert transactions[1].confidence == 0.5
 
-    # match against debits
+    # debit transactions are simply ignored
     xml = generate_xml([
         dict(amount='-500.00 CHF', note=i1.code),
         dict(amount='-500.00 CHF', note=i3.code)
@@ -210,13 +210,7 @@ def test_invoice_matching_without_esr(session, owner, member):
 
     transactions = list(match_camt_053_to_usernames(xml, items, '2017'))
 
-    assert len(transactions) == 2
-    assert transactions[0].amount == Decimal(500.00)
-    assert transactions[0].credit is False
-    assert transactions[0].username is None
-    assert transactions[1].amount == Decimal(500.00)
-    assert transactions[1].credit is False
-    assert transactions[1].username is None
+    assert len(transactions) == 0
 
     # match against a code with extra information
     xml = generate_xml([
