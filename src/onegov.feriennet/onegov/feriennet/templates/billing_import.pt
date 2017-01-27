@@ -104,7 +104,7 @@
             </div>
             <div class="columns small-12 medium-4">
                 <div>
-                    <a href="#" class="button expand" i18n:translate>Import <tal:block i18n:name="count">${success_count}</tal:block> payments</a>
+                    <a ic-post-to="${post_url}" redirect-after="${request.link(model)}" class="button expand" i18n:translate>Import <tal:block i18n:name="count">${success_count}</tal:block> payments</a>
                 </div>
                 <div class="side-panel">
                     <h2 i18n:translate>Legend</h2>

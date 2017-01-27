@@ -64,7 +64,7 @@ msgid "Matches"
 msgstr "Zuteilungen"
 
 msgid "Import Bank Statement"
-msgstr "Import Kontoauszug"
+msgstr "Kontoauszug Importieren"
 
 msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
@@ -738,7 +738,7 @@ msgid "Bank Transfer"
 msgstr "Bank-Überweisung"
 
 msgid "Notice"
-msgstr "Bemerkung"
+msgstr "Mitteilung"
 
 msgid "Edit contact info"
 msgstr "Kontakt ändern"

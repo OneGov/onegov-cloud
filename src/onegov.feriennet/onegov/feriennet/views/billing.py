@@ -3,7 +3,8 @@ import json
 from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO
-from onegov.activity import Period, PeriodCollection, InvoiceItemCollection
+from onegov.activity import Period, PeriodCollection
+from onegov.activity import InvoiceItem, InvoiceItemCollection
 from onegov.activity.iso20022 import match_camt_053_to_usernames
 from onegov.core.security import Secret
 from onegov.feriennet import FeriennetApp, _
@@ -121,6 +122,53 @@ def execute_invoice_action(self, request):
         }))
 
 
+@FeriennetApp.view(
+    model=BillingCollection,
+    request_method='POST',
+    name='import-ausfuehren',
+    permission=Secret)
+def view_execute_import(self, request):
+    request.assert_valid_csrf_token()
+    cache = request.browser_session['account-statement']
+
+    binary = BytesIO(b64decode(cache['data']))
+    xml = GzipFile(filename='', mode='r', fileobj=binary).read()
+    xml = xml.decode('utf-8')
+
+    invoice = cache['invoice']
+    invoices = InvoiceItemCollection(request.app.session())
+
+    transactions = list(
+        match_camt_053_to_usernames(xml, invoices, invoice))
+
+    payments = {
+        t.username: t for t in transactions if t.state == 'success'
+    }
+
+    if payments:
+        invoices = InvoiceItemCollection(request.app.session())
+        invoices = invoices.for_invoice(cache['invoice'])
+        invoices = invoices.query()
+        invoices = invoices.filter(InvoiceItem.username.in_(payments.keys()))
+
+        for invoice in invoices:
+            invoice.tid = payments[invoice.username].tid
+            invoice.source = 'xml'
+            invoice.paid = True
+
+        request.success(_("Imported ${count} payments", mapping={
+            'count': len(payments)
+        }))
+    else:
+        request.alert(_("No payments could be imported"))
+
+    del request.browser_session['account-statement']
+
+    @request.after
+    def redirect_intercooler(response):
+        response.headers.add('X-IC-Redirect', request.link(self))
+
+
 @FeriennetApp.form(
     model=BillingCollection,
     form=BankStatementImportForm,
@@ -170,8 +218,10 @@ def view_billing_import(self, request, form):
         for u in users.query().with_entities(User.username, User.realname)
     }
 
+    layout = BillingCollectionImportLayout(self, request)
+
     return {
-        'layout': BillingCollectionImportLayout(self, request),
+        'layout': layout,
         'title': _("Import Bank Statement"),
         'form': form if not uploaded else None,
         'button_text': _("Preview"),
@@ -181,5 +231,11 @@ def view_billing_import(self, request, form):
         'user_link': lambda u: request.class_link(
             InvoiceItemCollection, {'username': u}
         ),
-        'success_count': sum(1 for t in transactions if t.confidence == 1)
+        'success_count': transactions and sum(
+            1 for t in transactions if t.state == 'success'
+        ),
+        'model': self,
+        'post_url': layout.csrf_protected_url(
+            URL(request.link(self, 'import-ausfuehren'))
+        )
     }
