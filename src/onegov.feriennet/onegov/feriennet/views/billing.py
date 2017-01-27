@@ -13,6 +13,7 @@ from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.models import InvoiceAction
 from onegov.org.elements import Link
+from onegov.user import UserCollection, User
 from purl import URL
 
 
@@ -150,7 +151,7 @@ def view_billing_import(self, request, form):
         invoice = cache['invoice']
         invoices = InvoiceItemCollection(request.app.session())
 
-        transactions = tuple(
+        transactions = list(
             match_camt_053_to_usernames(xml, invoices, invoice))
 
         if not transactions:
@@ -158,14 +159,27 @@ def view_billing_import(self, request, form):
             request.alert(_("No transactions were found in the given file"))
             uploaded = False
             form.xml.data = None
+        else:
+            transactions.sort(key=lambda t: t.order)
     else:
         transactions = None
+
+    users = UserCollection(request.app.session())
+    users = {
+        u.username: (u.realname or u.username)
+        for u in users.query().with_entities(User.username, User.realname)
+    }
 
     return {
         'layout': BillingCollectionImportLayout(self, request),
         'title': _("Import Bank Statement"),
-        'form': form,
+        'form': form if not uploaded else None,
         'button_text': _("Preview"),
         'transactions': transactions,
-        'uploaded': uploaded
+        'uploaded': uploaded,
+        'users': users,
+        'user_link': lambda u: request.class_link(
+            InvoiceItemCollection, {'username': u}
+        ),
+        'success_count': sum(1 for t in transactions if t.confidence == 1)
     }

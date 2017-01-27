@@ -28,23 +28,109 @@
         </div>
 
         <div class="row" tal:condition="uploaded">
-            <div class="columns small-12">
+            <div class="columns small-12 medium-8">
                 <ul class="transactions">
-                    <li tal:repeat="transaction transactions">
-                        <div>amount: ${transaction.amount} ${transaction.currency}</div>
-                        <div>date: ${transaction.booking_date}</div>
-                        <div>booking text: ${transaction.booking_text}</div>
-                        <div>debitor: ${transaction.debitor}</div>
-                        <div>debitor account: ${transaction.debitor_account}</div>
-                        <div>duplicate: ${transaction.duplicate}</div>
-                        <div>note: ${transaction.note}</div>
-                        <div>paid: ${transaction.paid}</div>
-                        <div>reference: ${transaction.reference}</div>
-                        <div>tid: ${transaction.tid}</div>
-                        <div>username: ${transaction.username}</div>
-                        <div>confidence: ${transaction.confidence}</div>
+                    <li tal:repeat="transaction transactions" class="transaction-${transaction.state}">
+                        <div class="transaction-header row collapse">
+                            <div class="columns small-4">
+                                <div class="show-for-sr" i18n:translate>
+                                    Amount
+                                </div>
+                                ${transaction.amount} ${transaction.currency}
+                            </div>
+                            <div class="columns small-8">
+                                <tal:block condition="transaction.username">
+                                    <div class="show-for-sr" i18n:translate>
+                                        Username
+                                    </div>
+                                    ${users[transaction.username]}<span tal:condition="transaction.confidence == 0.5">?</span>
+                                </tal:block>
+                                <tal:block condition="not transaction.username">
+                                    <div class="show-for-sr" i18n:translate>
+                                        Username
+                                    </div>
+                                    <span i18n:translate>Unknown</span>
+                                </tal:block>
+                            </div>
+                        </div>
+                        <div class="transaction-details row collapse">
+                            <div class="columns small-12 medium-6">
+                                <dl>
+                                    <tal:block condition="transaction.valuta_date">
+                                        <dt i18n:translate>Valuta Date</dt>
+                                        <dd>${layout.format_date(transaction.valuta_date, 'date')}</dd>
+                                    </tal:block>
+
+                                    <tal:block condition="transaction.debitor_account">
+                                        <dt i18n:translate>Account</dt>
+                                        <dd>${transaction.debitor_account}</dd>
+                                    </tal:block>
+
+                                    <tal:block condition="transaction.debitor">
+                                        <dt i18n:translate>Account Owner</dt>
+                                        <dd>${transaction.debitor}</dd>
+                                    </tal:block>
+
+                                    <tal:block condition="transaction.reference">
+                                        <dt i18n:translate>Reference Number</dt>
+                                        <dd>${transaction.reference}</dd>
+                                    </tal:block>
+                                </dl>
+                            </div>
+
+                            <div class="columns small-12 medium-6">
+                                <dl>
+                                    <tal:block condition="transaction.note">
+                                        <dt i18n:translate>Note</dt>
+                                        <dd>${transaction.note}</dd>
+                                    </tal:block>
+
+                                    <tal:block condition="transaction.booking_text">
+                                        <dt i18n:translate>Booking Text</dt>
+                                        <dd>${transaction.booking_text}</dd>
+                                    </tal:block>
+
+                                    <tal:block condition="transaction.username">
+                                        <dt i18n:translate>Investigate</dt>
+                                        <dd><a href="${user_link(transaction.username)}" i18n:translate>
+                                            Show <tal:block i18n:name="user" tal:replace="users[transaction.username]"/>'s bills.
+                                        </a></dd>
+                                    </tal:block>
+                                </dl>
+                            </div>
+                        </div>
                     </li>
                 </ul>
+            </div>
+            <div class="columns small-12 medium-4">
+                <div>
+                    <a href="#" class="button expand" i18n:translate>Import <tal:block i18n:name="count">${success_count}</tal:block> payments</a>
+                </div>
+                <div class="side-panel">
+                    <h2 i18n:translate>Legend</h2>
+                    <ul class="legend fa-ul">
+                        <li>
+                            <i class="fa-li fa fa-check-circle fa-fw green" aria-hidden="true"></i>
+                            <span i18n:translate>Payment detected.</span>
+                        </li>
+                        <li>
+                            <i class="fa-li fa fa-exclamation-triangle fa-fw orange" aria-hidden="true"></i>
+                            <span i18n:translate>The amount, note or reference is wrong.</span>
+                        </li>
+                        <li>
+                            <i class="fa-li fa fa-clone fa-fw blue" aria-hidden="true"></i>
+                            <span i18n:translate>The payment was found twice.</span>
+                        </li>
+                        <li>
+                            <i class="fa-li fa fa-check-circle-o gray-dark" aria-hidden="true"></i>
+                            <span i18n:translate>The payment has already been imported.</span>
+                        </li>
+                        <li>
+                            <i class="fa-li fa fa-question-circle fa-fw red" aria-hidden="true"></i>
+                            <span i18n:translate>Could not match the payment to a bill.</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </tal:block>

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-26 11:35+0100\n"
+"POT-Creation-Date: 2017-01-27 14:26+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -64,7 +64,7 @@ msgid "Matches"
 msgstr "Zuteilungen"
 
 msgid "Import Bank Statement"
-msgstr "Import Bankauszug"
+msgstr "Import Kontoauszug"
 
 msgid "Notification Templates"
 msgstr "Mitteilungs-Vorlagen"
@@ -241,6 +241,12 @@ msgstr "Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen"
 msgid "This occasion overlaps with another booking"
 msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
 
+msgid "Period"
+msgstr "Periode"
+
+msgid "ISO 20022 XML"
+msgstr "ISO 20022 XML"
+
 msgid "Confirm billing:"
 msgstr "Fakturierung bestätigen:"
 
@@ -308,9 +314,6 @@ msgstr "Mitglieder"
 #, python-format
 msgid "${title} <small>${date}, ${count} Attendees</small>"
 msgstr "${title} <small>${date}, ${count} Teilnehmer</small>"
-
-msgid "Period"
-msgstr "Periode"
 
 msgid "Start"
 msgstr "Start"
@@ -614,19 +617,72 @@ msgstr "Einstellungen"
 #. Canonical text for ${link} is: "settings"
 msgid ""
 "No bank account defined. Please define a bank account in the ${link} first."
-msgstr "Es wurde noch kein Bankkonto definiert. Bitte definieren Sie ein Bankkonto in den ${link}."
+msgstr ""
+"Es wurde noch kein Bankkonto definiert. Bitte definieren Sie ein Bankkonto "
+"in den ${link}."
 
 msgid ""
 "To import a bank statement you need an account with one of the following "
 "banks:"
-msgstr "Um ein Kontoauszug zu importieren benötigen Sie ein Konto mit einer der folgenden Banken:"
+msgstr ""
+"Um ein Kontoauszug zu importieren benötigen Sie ein Konto mit einer der "
+"folgenden Banken:"
 
 msgid ""
 "Your statement is required to be in \"ISO-20022 format (without picture)\". "
 "Banks may also refer to it as \"camt.053\". Be sure to ask your bank to "
 "switch your account to this format or to select this format in your online "
 "banking profile."
-msgstr "Der Auszug wird im \"ISO-20022 Format (ohne Bild)\" benötigt. Gewisse Banken kennen das Format auch als \"camt.053\". Bitten Sie Ihre Bank darum Ihr Konto auf dieses Format umzustellen oder wählen Sie dieses Format in Ihrem Online-Banking Profil aus."
+msgstr ""
+"Der Auszug wird im \"ISO-20022 Format (ohne Bild)\" benötigt. Gewisse Banken "
+"kennen das Format auch als \"camt.053\". Bitten Sie Ihre Bank darum Ihr "
+"Konto auf dieses Format umzustellen oder wählen Sie dieses Format in Ihrem "
+"Online-Banking Profil aus."
+
+msgid "Username"
+msgstr "Benutzername"
+
+msgid "Unknown"
+msgstr "Unbekannt"
+
+msgid "Valuta Date"
+msgstr "Valuta Datum"
+
+msgid "Account"
+msgstr "Konto"
+
+msgid "Account Owner"
+msgstr "Konto Besitzer"
+
+msgid "Reference Number"
+msgstr "Referenz-Nummer"
+
+msgid "Investigate"
+msgstr "Nachforschungen"
+
+msgid "Show ${user}'s bills."
+msgstr "${user}'s Rechnungen anzeigen."
+
+msgid "Import ${count} payments"
+msgstr "${count} Zahlungen importieren"
+
+msgid "Legend"
+msgstr "Legende"
+
+msgid "Payment detected."
+msgstr "Zahlung gefunden."
+
+msgid "The amount, note or reference is wrong."
+msgstr "Der Betrag, die Bemerkung oder die Referenz ist falsch."
+
+msgid "The payment was found twice."
+msgstr "Die Zahlung wurde zweimal gefunden."
+
+msgid "The payment has already been imported."
+msgstr "Die Zahlung wurde bereits importiert."
+
+msgid "Could not match the payment to a bill."
+msgstr "Die Zahlung konnte keiner Rechnung zugewiesen werden."
 
 msgid ""
 "You haven't added an emergency contact to your profile yet. Please add this "
@@ -680,9 +736,6 @@ msgstr "Benutzer"
 
 msgid "Bank Transfer"
 msgstr "Bank-Überweisung"
-
-msgid "Account"
-msgstr "Konto"
 
 msgid "Notice"
 msgstr "Bemerkung"
@@ -1028,6 +1081,9 @@ msgstr "Fakturierung für ${title}"
 
 msgid "Create Bills"
 msgstr "Rechnungen Erstellen"
+
+msgid "No transactions were found in the given file"
+msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
 
 msgid "Mark as unpaid"
 msgstr "Buchung als unbezahlt markieren"

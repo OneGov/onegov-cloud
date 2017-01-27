@@ -1323,3 +1323,138 @@ ul.tags {
         right: 1rem;
     }
 }
+
+/*
+    Transactions
+*/
+.transactions {
+    list-style: none;
+    margin: 0 0 1.5rem;
+
+    li + li {
+        margin-top: 1.5rem;
+    }
+}
+
+.transaction-header {
+    border-bottom: 2px solid $gray-dark;
+    display: block;
+    font-weight: bold;
+    padding-bottom: .5rem;
+
+    > div:first-child {
+        padding-left: 2rem !important;
+
+        &::before {
+            font-family: 'FontAwesome';
+            font-size: 1.5rem;
+            font-weight: normal;
+            left: .25rem;
+            line-height: 1.7rem;
+            position: absolute;
+        }
+    }
+
+    > div:last-child {
+        text-align: right;
+    }
+}
+
+.transaction-success {
+    .transaction-header {
+        border-color: $green;
+
+        > div:first-child::before {
+            color: $green;
+            content: '\f058';
+        }
+    }
+}
+
+.transaction-warning {
+    .transaction-header {
+        border-color: $orange;
+
+        > div:first-child::before {
+            color: $orange;
+            content: '\f071';
+        }
+    }
+}
+
+.transaction-paid {
+    .transaction-header {
+        border-color: $gray-dark;
+
+        > div:first-child::before {
+            color: $gray-dark;
+            content: '\f05d';
+        }
+    }
+}
+
+.transaction-duplicate {
+    .transaction-header {
+        border-color: $blue;
+
+        > div:first-child::before {
+            color: $blue;
+            content: '\f24d';
+        }
+    }
+}
+
+.transaction-unknown {
+    .transaction-header {
+        border-color: $red;
+
+        > div:first-child::before {
+            color: $red;
+            content: '\f059';
+        }
+
+        > div:last-child {
+            color: $gray-dark;
+        }
+    }
+}
+
+.transaction-details {
+    background-color: $gray-pastel;
+    border: 1px solid $gray;
+    border-top: 0;
+    padding: 1rem 1.5rem 1.25rem;
+
+    dl {
+        font-size: .8rem;
+        margin-bottom: 0;
+    }
+
+    dt {
+        margin-bottom: 0;
+    }
+
+    dd:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.green {
+    color: $green;
+}
+
+.red {
+    color: $red;
+}
+
+.orange {
+    color: $orange;
+}
+
+.gray-dark {
+    color: $gray-dark;
+}
+
+.blue {
+    color: $blue;
+}
