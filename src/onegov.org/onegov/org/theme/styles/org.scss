@@ -976,6 +976,14 @@ ul.panel-links {
                 margin-top: .25rem;
             }
         }
+
+        &.fa-ul {
+            margin-left: 1.25rem;
+
+            .fa-li {
+                margin-top: 1px;
+            }
+        }
     }
 
     .panel-links li + li {
