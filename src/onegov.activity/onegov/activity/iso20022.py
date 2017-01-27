@@ -182,13 +182,12 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
     # Hash the invoices by code (duplicates are technically possible)
     by_code = defaultdict(list)
 
-    # Hash the invoices by the rounded amount, to be tolerant of amounts
-    # which are slightly off.
+    # Hash the invoices by amount (dpulicates are probable)
     by_amount = defaultdict(list)
 
     for invoice in invoices:
         by_code[invoice.code].append(invoice)
-        by_amount[round(invoice.amount)].append(invoice)
+        by_amount[invoice.amount].append(invoice)
 
     # go through the transactions, comparing amount and code for a match
     transactions = tuple(extract_transactions(xml))
@@ -235,7 +234,7 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
 
         if transaction.credit and transaction.currency == currency:
             code = transaction.code
-            amnt = round(transaction.amount)
+            amnt = transaction.amount
 
             code_usernames = {i.username for i in by_code.get(code, tuple())}
             amnt_usernames = {i.username for i in by_amount.get(amnt, tuple())}
