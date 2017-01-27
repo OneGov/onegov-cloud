@@ -203,9 +203,6 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
 
     for transaction in transactions:
 
-        if 'Q-70171-292FA' in transaction.note:
-            import pdb; pdb.set_trace()
-
         # credit transactions are completely irrelevant for us
         if not transaction.credit:
             continue
