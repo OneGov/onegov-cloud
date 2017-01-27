@@ -282,11 +282,11 @@ def test_invoice_matching_without_esr(session, owner, member):
 
     transactions = list(match_camt_053_to_usernames(xml, items, '2018'))
     assert len(transactions) == 2
-    assert transactions[0].username is None
-    assert transactions[0].confidence == 0
+    assert transactions[0].username == member.username
+    assert transactions[0].confidence == 1.0
     assert transactions[0].duplicate is True
-    assert transactions[0].username is None
-    assert transactions[0].confidence == 0
+    assert transactions[0].username == member.username
+    assert transactions[0].confidence == 1.0
     assert transactions[0].duplicate is True
 
     # match against split bookings

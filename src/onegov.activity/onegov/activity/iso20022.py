@@ -65,16 +65,16 @@ class Transaction(object):
         ) * - 1
 
         if state == 'success':
-            return 0, date
+            return 0, date, self.username
 
         if state == 'paid':
-            return 1, date
+            return 1, date, self.username
 
         if state == 'duplicate':
-            return 2, date
+            return 2, date, self.username
 
         if state == 'warning':
-            return 3, date
+            return 3, date, self.username
 
         return 4, date
 
@@ -258,15 +258,8 @@ def match_camt_053_to_usernames(xml, collection, invoice, currency='CHF'):
             continue
 
         # duplicate codes/references are marked as such, but not matched
-        if codes[transaction.code] > 1:
+        if codes[transaction.code] > 1 or refs[transaction.reference] > 1:
             transaction.duplicate = True
-            yield transaction
-            continue
-
-        if refs[transaction.reference] > 1:
-            transaction.duplicate = True
-            yield transaction
-            continue
 
         if transaction.credit and transaction.currency == currency:
             code = transaction.code
