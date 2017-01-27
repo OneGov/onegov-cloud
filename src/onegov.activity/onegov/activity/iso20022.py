@@ -55,6 +55,45 @@ class Transaction(object):
     def code(self):
         return extract_code(self.note)
 
+    @property
+    def order(self):
+        state = self.state
+        date = (
+            self.valuta_date.year * 10000 +
+            self.valuta_date.month * 100 +
+            self.valuta_date.day
+        ) * - 1
+
+        if state == 'success':
+            return 0, date
+
+        if state == 'paid':
+            return 1, date
+
+        if state == 'duplicate':
+            return 2, date
+
+        if state == 'warning':
+            return 3, date
+
+        return 4, date
+
+    @property
+    def state(self):
+        if self.paid:
+            return 'paid'
+
+        if self.duplicate:
+            return 'duplicate'
+
+        if self.confidence == 1:
+            return 'success'
+
+        if self.confidence == 0.5:
+            return 'warning'
+
+        return 'unknown'
+
 
 def extract_transactions(xml):
     root = etree.fromstring(normalize_xml(xml).encode('utf-8'))
