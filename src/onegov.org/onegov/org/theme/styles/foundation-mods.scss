@@ -108,14 +108,10 @@ $crumb-font-color: $primary-color;
 $side-nav-link-color: $primary-color;
 $side-nav-link-color-active: #333;
 $side-nav-link-color-hover: #333;
-$primary-fg-color: $white;
+$primary-fg-color: if(lightness($primary-color) >= 50%, $body-font-color, $white);
 
 @if lightness($primary-color) >= 50% {
     $anchor-font-color: scale-color($anchor-font-color, $lightness: -40%, $saturation: +10%);
     $crumb-font-color: scale-color($crumb-font-color, $lightness: -40%, $saturation: +10%);
     $side-nav-link-color: scale-color($side-nav-link-color, $lightness: -40%, $saturation: +10%);
-}
-
-@if lightness($primary-color) >= 75% {
-    $primary-fg-color: $body-font-color;
 }
