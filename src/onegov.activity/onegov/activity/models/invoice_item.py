@@ -82,3 +82,11 @@ class InvoiceItem(Base, TimestampMixin):
             code[1:6],
             code[6:]
         ))
+
+    @property
+    def discourage_changes(self):
+        return self.source == 'xml'
+
+    @property
+    def disable_changes(self):
+        return self.source and self.source != 'xml'
