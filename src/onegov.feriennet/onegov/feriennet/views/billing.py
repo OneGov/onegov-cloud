@@ -13,7 +13,7 @@ from onegov.feriennet.forms import BillingForm, BankStatementImportForm
 from onegov.feriennet.layout import BillingCollectionImportLayout
 from onegov.feriennet.layout import BillingCollectionLayout
 from onegov.feriennet.models import InvoiceAction
-from onegov.org.elements import Link
+from onegov.org.elements import Link, ConfirmLink
 from onegov.user import UserCollection, User
 from purl import URL
 
@@ -49,45 +49,85 @@ def view_billing(self, request, form):
         return URL(url).query_param('csrf-token', csrf_token).as_string()
 
     def invoice_actions(details):
-        return actions(details.first, details.paid, 'invoice')
+        return actions(
+            details.first,
+            details.paid,
+            details.discourage_changes,
+            details.disable_changes,
+            'invoice'
+        )
 
     def item_actions(item):
-        return actions(item, item.paid)
+        return actions(
+            item,
+            item.paid,
+            item.discourage_changes,
+            item.disable_changes
+        )
 
-    def actions(item, paid, extend_to=None):
-        if self.period.finalized:
-            if paid:
-                yield Link(
-                    text=(
-                        extend_to and
-                        _("Mark whole bill as unpaid") or
-                        _("Mark as unpaid")
-                    ),
-                    classes=('mark-unpaid', ),
-                    request_method='POST',
-                    url=insert_csrf(request.link(InvoiceAction(
-                        session=session,
-                        id=item.id,
-                        action='mark-unpaid',
-                        extend_to=extend_to
-                    )))
-                )
-            else:
-                yield Link(
-                    text=(
-                        extend_to and
-                        _("Mark whole bill as paid") or
-                        _("Mark as paid")
-                    ),
-                    classes=('mark-paid', ),
-                    request_method='POST',
-                    url=insert_csrf(request.link(InvoiceAction(
-                        session=session,
-                        id=item.id,
-                        action='mark-paid',
-                        extend_to=extend_to
-                    )))
-                )
+    def actions(item, paid, discourage_changes, disable_changes,
+                extend_to=None):
+
+        if not self.period.finalized:
+            return
+
+        if paid:
+            action = 'mark-unpaid'
+            text = extend_to and\
+                _("Mark whole bill as unpaid") or\
+                _("Mark as unpaid")
+        else:
+            action = 'mark-paid'
+            text = extend_to and\
+                _("Mark whole bill as paid") or\
+                _("Mark as paid")
+
+        link_arguments = dict(
+            text=text,
+            classes=(action, ),
+            request_method='POST',
+            url=insert_csrf(request.link(InvoiceAction(
+                session=session,
+                id=item.id,
+                action=action,
+                extend_to=extend_to
+            )))
+        )
+
+        if not discourage_changes and not disable_changes:
+            yield Link(**link_arguments)
+        elif disable_changes:
+            link_arguments['classes'] += ('confirm', )
+            yield ConfirmLink(
+                confirm=extend_to and
+                _(
+                    "This bill or parts of it have been paid online. "
+                    "To change the state of the bill the payment needs to "
+                    "charged back."
+                ) or
+                _(
+                    "This position has been paid online. To change the "
+                    "the state of the position the payment needs to be "
+                    "charged back."
+                ),
+                **link_arguments
+            )
+        elif discourage_changes:
+            link_arguments['classes'] += ('confirm', )
+            yield ConfirmLink(
+                confirm=extend_to and
+                _(
+                    "This bill or parts of it have been confirmed by the "
+                    "bank, do you really want to change the payment "
+                    "status?"
+                ) or
+                _(
+                    "This position has been confirmed by the bank, do you "
+                    "really want to change the payment status?"
+                ),
+                yes_button_text=text,
+                **link_arguments
+            )
 
     return {
         'layout': layout,

@@ -13,7 +13,8 @@ from sortedcontainers import SortedDict
 class BillingDetails(object):
 
     __slots__ = (
-        'id', 'items', 'paid', 'total', 'title', 'outstanding', 'first'
+        'id', 'items', 'paid', 'total', 'title', 'outstanding', 'first',
+        'discourage_changes', 'disable_changes'
     )
 
     def __init__(self, title, items):
@@ -22,6 +23,8 @@ class BillingDetails(object):
         self.outstanding = Decimal()
         self.paid = True
         self.first = None
+        self.discourage_changes = False
+        self.disable_changes = False
 
         def tally(item):
             self.total += item.amount
@@ -30,7 +33,13 @@ class BillingDetails(object):
                 self.paid = False
                 self.outstanding += item.amount
 
-            if self.first is None:
+            if item.discourage_changes:
+                self.discourage_changes = True
+
+            if item.disable_changes:
+                self.disable_changes = True
+
+            if not self.first:
                 self.first = item
 
             return item

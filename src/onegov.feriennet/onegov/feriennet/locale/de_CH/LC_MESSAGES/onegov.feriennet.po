@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-01-27 14:26+0100\n"
+"POT-Creation-Date: 2017-01-30 11:52+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -1082,8 +1082,12 @@ msgstr "Fakturierung für ${title}"
 msgid "Create Bills"
 msgstr "Rechnungen Erstellen"
 
-msgid "No transactions were found in the given file"
-msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
+#, python-format
+msgid "Imported ${count} payments"
+msgstr "${count} Zahlungen wurden importiert"
+
+msgid "No payments could be imported"
+msgstr "Es konnten keine Zahlungen importiert werden"
 
 msgid "Mark as unpaid"
 msgstr "Buchung als unbezahlt markieren"
@@ -1091,11 +1095,34 @@ msgstr "Buchung als unbezahlt markieren"
 msgid "Mark as paid"
 msgstr "Buchung als bezahlt markieren"
 
+msgid "No transactions were found in the given file"
+msgstr "In der angegebenen Datei wurden keine Transaktionen gefunden"
+
 msgid "Mark whole bill as unpaid"
 msgstr "Rechnung als unbezahlt markieren"
 
 msgid "Mark whole bill as paid"
 msgstr "Rechnung als bezahlt markieren"
+
+msgid ""
+"This position has been paid online. To change the the state of the position "
+"the payment needs to be charged back."
+msgstr "Diese Position wurde online bezahlt. Um den Status zu ändern muss die Zahlung rückgebucht werden."
+
+msgid ""
+"This bill or parts of it have been paid online. To change the state of the "
+"bill the payment needs to charged back."
+msgstr "Diese Rechnung oder Teile davon wurden online bezahlt. Um den Status zu ändern muss die Zahlung rückgebucht werden."
+
+msgid ""
+"This position has been confirmed by the bank, do you really want to change "
+"the payment status?"
+msgstr "Diese Position wurde von der Bank bestätigt. Möchten Sie den Zahlungstatus wirkilch ändern?"
+
+msgid ""
+"This bill or parts of it have been confirmed by the bank, do you really want "
+"to change the payment status?"
+msgstr "Diese Rechnung oder Teile davon wurden von der Bank bestätigt. Möchten Sie den Zahlungstatus wirklich ändern?"
 
 msgid "Your booking was cancelled successfully"
 msgstr "Ihre Buchung wurde erfolgreich storniert"
