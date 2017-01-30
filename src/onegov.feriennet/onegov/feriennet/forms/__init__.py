@@ -14,6 +14,7 @@ from onegov.feriennet.forms.notification_template import (
 
 __all__ = [
     'AttendeeForm',
+    'BankStatementImportForm',
     'BillingForm',
     'MatchForm',
     'NotificationTemplateForm',
