@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2017-01-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a source field to the invoice items to note the source of the tid.
   [href]
 
