@@ -14,7 +14,7 @@ class TownTheme(OrgTheme):
 
     # don't touch this number, it's incremented using bumpversion, so every
     # release will automatically trigger a rebuild of the theme
-    version = '1.12.2'
+    version = '1.12.3'
 
     @property
     def post_imports(self):
