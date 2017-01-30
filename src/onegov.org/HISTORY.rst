@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.3 (2017-01-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Shows users in the search results.
   [href]
 
