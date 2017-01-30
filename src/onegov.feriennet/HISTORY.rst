@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.0 (2017-01-30)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes wrong font for generic logo.
   [href]
 
