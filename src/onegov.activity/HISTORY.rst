@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a source field to the invoice items to note the source of the tid.
+  [href]
+
 - Adds a simple ISO20022 parser to process payments.
   [href]
 
