@@ -7,11 +7,13 @@ from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
+from onegov.activity.utils import generate_xml
 from onegov.core.utils import Bunch
 from onegov.org.testing import Client, get_message, select_checkbox
 from onegov.testing import utils
 from onegov.user import UserCollection
 from psycopg2.extras import NumericRange
+from webtest import Upload
 
 
 def get_post_url(page, css_class):
@@ -1567,3 +1569,102 @@ def test_send_email(feriennet_app):
     message = get_message(feriennet_app, 0)
     assert "Ferienpass 2016 subject" in feriennet_app.smtp.outbox[0]['subject']
     assert "Ferienpass 2016 body" in message
+
+
+def test_import_account_statement(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    attendees = AttendeeCollection(feriennet_app.session())
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+    bookings = BookingCollection(feriennet_app.session())
+
+    owner = Bunch(username='admin@example.org')
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+    period.confirmed = True
+
+    foobar = activities.add("Foobar", username='admin@example.org')
+    foobar.propose().accept()
+
+    o = occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        age=(0, 10),
+        spots=(0, 2),
+        timezone="Europe/Zurich",
+        activity=foobar,
+        period=period,
+        cost=100,
+    )
+
+    a = attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    b = bookings.add(owner, a, o)
+    b.state = 'accepted'
+    b.cost = 100
+
+    transaction.commit()
+
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    page = admin.get('/').click('Fakturierung')
+    page.form['confirm'] = 'yes'
+    page.form['sure'] = 'yes'
+    page = page.form.submit()
+
+    page = page.click('Kontoauszug Importieren')
+    assert "kein Bankkonto" in page
+
+    settings = page.click('Einstellungen', index=1)
+    settings.form['bank_account'] = 'CH6309000000250097798'
+    settings = settings.form.submit()
+
+    page = page.click('Rechnungen')
+    code = page.pyquery('.invoice-items-payment li:last').text()
+
+    page = page.click('Fakturierung').click('Kontoauszug Importieren')
+    assert "kein Bankkonto" not in page
+
+    xml = generate_xml([
+        dict(amount='100.00 CHF', note=code)
+    ])
+
+    page.form['xml'] = Upload(
+        'account.xml',
+        xml.encode('utf-8'),
+        'application/xml'
+    )
+
+    page = page.form.submit()
+
+    assert "1 Zahlungen importieren" in page
+    admin.post(get_post_url(page, 'button'))
+
+    page = admin.get('/meine-rechnungen')
+    assert "1 Zahlungen wurden importiert" in page
+    assert "unpaid" not in page
+
+    page = page.click('Fakturierung').click('Kontoauszug Importieren')
+    page.form['xml'] = Upload(
+        'account.xml',
+        xml.encode('utf-8'),
+        'application/xml'
+    )
+    page = page.form.submit()
+
+    assert "0 Zahlungen importieren" in page
