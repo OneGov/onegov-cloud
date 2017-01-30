@@ -58,11 +58,15 @@ class Transaction(object):
     @property
     def order(self):
         state = self.state
-        date = (
-            self.valuta_date.year * 10000 +
-            self.valuta_date.month * 100 +
-            self.valuta_date.day
-        ) * - 1
+
+        if self.valuta_date:
+            date = self.valuta_date and (
+                self.valuta_date.year * 10000 +
+                self.valuta_date.month * 100 +
+                self.valuta_date.day
+            ) * - 1
+        else:
+            date = -1
 
         if state == 'success':
             return 0, date, self.username

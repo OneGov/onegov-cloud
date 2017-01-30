@@ -78,3 +78,63 @@ def is_valid_checksum(number):
 
     number = str(number)
     return number[-1] == str(generate_checksum(number[:-1]))
+
+
+def generate_xml(payments):
+    """ Creates an xml for import through ISO20022. Used for testing only. """
+
+    transactions = []
+
+    default = {
+        'reference': '',
+        'note': ''
+    }
+
+    for ix, payment in enumerate(payments):
+
+        if 'tid' not in payment:
+            payment['tid'] = 'T{}'.format(ix)
+
+        if payment['amount'].startswith('-'):
+            payment['credit'] = 'DBIT'
+        else:
+            payment['credit'] = 'CRDT'
+
+        payment['currency'] = payment['amount'][-3:]
+        payment['amount'] = payment['amount'].strip('-+')[:-3]
+
+        for key in default:
+            if key not in payment:
+                payment[key] = default[key]
+
+        transactions.append("""
+        <TxDtls>
+            <Refs>
+                <AcctSvcrRef>{tid}</AcctSvcrRef>
+            </Refs>
+            <Amt Ccy="{currency}">{amount}</Amt>
+            <CdtDbtInd>{credit}</CdtDbtInd>
+            <RmtInf>
+                <Strd>
+                    <CdtrRefInf>
+                        <Ref>{reference}</Ref>
+                    </CdtrRefInf>
+                </Strd>
+                <Ustrd>{note}</Ustrd>
+            </RmtInf>
+        </TxDtls>
+        """.format(**payment))
+
+    return """<?xml version="1.0" encoding="UTF-8"?>
+        <Document>
+            <BkToCstmrStmt>
+                <Stmt>
+                    <Ntry>
+                        <NtryDtls>
+                            {}
+                        </NtryDtls>
+                    </Ntry>
+                </Stmt>
+            </BkToCstmrStmt>
+        </Document>
+    """.format('\n'.join(transactions))

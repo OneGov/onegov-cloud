@@ -3,64 +3,7 @@ from decimal import Decimal
 from onegov.activity.collections import InvoiceItemCollection
 from onegov.activity.iso20022 import extract_transactions, extract_code
 from onegov.activity.iso20022 import match_camt_053_to_usernames
-
-
-def generate_xml(payments):
-    transactions = []
-
-    default = {
-        'reference': '',
-        'note': ''
-    }
-
-    for ix, payment in enumerate(payments):
-
-        if 'tid' not in payment:
-            payment['tid'] = 'T{}'.format(ix)
-
-        if payment['amount'].startswith('-'):
-            payment['credit'] = 'DBIT'
-        else:
-            payment['credit'] = 'CRDT'
-
-        payment['currency'] = payment['amount'][-3:]
-        payment['amount'] = payment['amount'].strip('-+')[:-3]
-
-        for key in default:
-            if key not in payment:
-                payment[key] = default[key]
-
-        transactions.append("""
-        <TxDtls>
-            <Refs>
-                <AcctSvcrRef>{tid}</AcctSvcrRef>
-            </Refs>
-            <Amt Ccy="{currency}">{amount}</Amt>
-            <CdtDbtInd>{credit}</CdtDbtInd>
-            <RmtInf>
-                <Strd>
-                    <CdtrRefInf>
-                        <Ref>{reference}</Ref>
-                    </CdtrRefInf>
-                </Strd>
-                <Ustrd>{note}</Ustrd>
-            </RmtInf>
-        </TxDtls>
-        """.format(**payment))
-
-    return """<?xml version="1.0" encoding="UTF-8"?>
-        <Document>
-            <BkToCstmrStmt>
-                <Stmt>
-                    <Ntry>
-                        <NtryDtls>
-                            {}
-                        </NtryDtls>
-                    </Ntry>
-                </Stmt>
-            </BkToCstmrStmt>
-        </Document>
-    """.format('\n'.join(transactions))
+from onegov.activity.utils import generate_xml
 
 
 def test_extract_transactions(postfinance_xml):
