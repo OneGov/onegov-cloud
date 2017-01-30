@@ -53,7 +53,7 @@
 
 @mixin primary-color-background {
     background-color: $primary-color;
-    color: $white;
+    color: $primary-fg-color;
 }
 
 /*
@@ -167,6 +167,10 @@ $global-tools-height: 2.5rem;
             display: inline-block;
             float: right;
 
+            &:hover {
+                @include primary-color-background;
+            }
+
             + li::after {
                 color: $primary-fg-color;
                 content: '|';
@@ -183,10 +187,14 @@ $global-tools-height: 2.5rem;
                 padding: 0 .5rem;
 
                 &:hover {
-                    background-color: $button-bg-hover;
+                    @include primary-color-background;
                 }
             }
         }
+    }
+
+    .f-dropdown a:hover {
+        @include primary-color-background;
     }
 
     a::before {

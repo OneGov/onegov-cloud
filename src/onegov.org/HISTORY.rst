@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Further improve the handling of light colors.
+  [href]
+
 0.3.3 (2017-01-30)
 ~~~~~~~~~~~~~~~~~~~
 
