@@ -602,8 +602,9 @@ def test_enroll_child(feriennet_app):
     enroll = client.get('/angebot/retreat').click("Anmelden")
     assert "Teilnehmer Anmelden" in enroll
 
-    enroll.form["name"] = "Tom Sawyer"
-    enroll.form["birth_date"] = "1876-01-01"
+    enroll.form['name'] = "Tom Sawyer"
+    enroll.form['birth_date'] = "1876-01-01"
+    enroll.form['gender'] = 'male'
     activity = enroll.form.submit().follow()
 
     assert "zu Tom Sawyer's Wunschliste hinzugefügt" in activity
@@ -615,7 +616,8 @@ def test_enroll_child(feriennet_app):
 
     enroll.form['attendee'] = 'other'
     enroll.form['name'] = "Tom Sawyer"
-    enroll.form["birth_date"] = "1876-01-01"
+    enroll.form['birth_date'] = "1876-01-01"
+    enroll.form['gender'] = 'male'
 
     # prevent adding two kids with the same name
     assert "Sie haben bereits ein Kind mit diesem Namen eingegeben"\
@@ -751,8 +753,8 @@ def test_booking_view(feriennet_app):
     m1 = users.add('m1@example.org', 'hunter2', 'member')
     m2 = users.add('m2@example.org', 'hunter2', 'member')
 
-    a1 = attendees.add(m1, 'Dustin', date(2000, 1, 1))
-    a2 = attendees.add(m2, 'Mike', date(2000, 1, 1))
+    a1 = attendees.add(m1, 'Dustin', date(2000, 1, 1), 'female')
+    a2 = attendees.add(m2, 'Mike', date(2000, 1, 1), 'female')
 
     # hookup a1 with all courses
     bookings.add(m1, a1, o[0])
@@ -862,8 +864,8 @@ def test_matching_view(feriennet_app):
             period=period
         ))
 
-    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1))
-    a2 = attendees.add(owner, 'Mike', date(2000, 1, 1))
+    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
+    a2 = attendees.add(owner, 'Mike', date(2000, 1, 1), 'female')
 
     # the first course has enough attendees
     bookings.add(owner, a1, o[0])
@@ -946,7 +948,7 @@ def test_confirmed_booking_view(feriennet_app):
         period=period
     )
 
-    a = attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    a = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
     bookings.add(owner, a, o)
 
     transaction.commit()
@@ -1046,8 +1048,8 @@ def test_direct_booking_and_storno(feriennet_app):
         period=period
     )
 
-    attendees.add(owner, 'Dustin', date(2000, 1, 1))
-    attendees.add(member, 'Mike', date(2000, 1, 1))
+    attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
+    attendees.add(member, 'Mike', date(2000, 1, 1), 'female')
 
     transaction.commit()
 
@@ -1138,8 +1140,8 @@ def test_cancel_occasion(feriennet_app):
         period=period
     )
 
-    attendees.add(owner, 'Dustin', date(2000, 1, 1))
-    attendees.add(member, 'Mike', date(2000, 1, 1))
+    attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
+    attendees.add(member, 'Mike', date(2000, 1, 1), 'female')
 
     transaction.commit()
 
@@ -1240,8 +1242,8 @@ def test_billing(feriennet_app):
         cost=1000,
     )
 
-    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1))
-    a2 = attendees.add(member, 'Mike', date(2000, 1, 1))
+    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
+    a2 = attendees.add(member, 'Mike', date(2000, 1, 1), 'female')
 
     b1 = bookings.add(owner, a1, o1)
     b2 = bookings.add(owner, a1, o2)
@@ -1378,7 +1380,7 @@ def test_reactivate_cancelled_booking(feriennet_app):
         cost=1000,
     )
 
-    attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
 
     transaction.commit()
 
@@ -1483,8 +1485,8 @@ def test_occasion_attendance_collection(feriennet_app):
         period=period,
     )
 
-    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1))
-    a2 = attendees.add(owner, 'Mike', date(2000, 1, 1))
+    a1 = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
+    a2 = attendees.add(owner, 'Mike', date(2000, 1, 1), 'female')
 
     bookings.add(owner, a1, o1).state = 'accepted'
     bookings.add(owner, a2, o2).state = 'accepted'
@@ -1612,7 +1614,7 @@ def test_import_account_statement(feriennet_app):
         cost=100,
     )
 
-    a = attendees.add(owner, 'Dustin', date(2000, 1, 1))
+    a = attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
     b = bookings.add(owner, a, o)
     b.state = 'accepted'
     b.cost = 100

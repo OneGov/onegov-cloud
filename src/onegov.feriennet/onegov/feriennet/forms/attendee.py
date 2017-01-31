@@ -29,6 +29,16 @@ class AttendeeForm(Form):
         validators=[InputRequired()],
         depends_on=('attendee', 'other'))
 
+    gender = RadioField(
+        label=_("Gender"),
+        choices=[
+            ('female', _("Girl")),
+            ('male', _("Boy")),
+        ],
+        validators=[InputRequired()],
+        depends_on=('attendee', 'other')
+    )
+
     @property
     def is_new(self):
         return self.attendee.data == 'other'

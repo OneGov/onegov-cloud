@@ -122,8 +122,8 @@ def test_notification_template_send_form(session):
     )
     o2.username = organiser.username
 
-    a1 = attendees.add(admin, 'Dustin', date(2000, 1, 1))
-    a2 = attendees.add(admin, 'Mike', date(2000, 1, 1))
+    a1 = attendees.add(admin, 'Dustin', date(2000, 1, 1), 'male')
+    a2 = attendees.add(admin, 'Mike', date(2000, 1, 1), 'female')
 
     bookings.add(admin, a1, o1).state = 'accepted'
     bookings.add(organiser, a2, o2).state = 'accepted'

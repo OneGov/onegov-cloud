@@ -121,7 +121,8 @@ def book_occasion(self, request, form):
             attendee = attendees.add(
                 user=user,
                 name=form.name.data,
-                birth_date=form.birth_date.data
+                birth_date=form.birth_date.data,
+                gender=form.gender.data
             )
         else:
             attendee = attendees.by_id(form.attendee.data)

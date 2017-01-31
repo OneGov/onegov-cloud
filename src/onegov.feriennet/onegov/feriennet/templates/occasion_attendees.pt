@@ -35,7 +35,7 @@
 
                     <ul class="attendees">
                         <li tal:repeat="details occasions[occasion]">
-                            <strong>${details.attendee.name} (${details.attendee.age})</strong>
+                            <strong class="${details.attendee.gender or ''}">${details.attendee.name} (${details.attendee.age})</strong>
                             <div>
                                 <span i18n:translate>Emergency Contact:</span>
                                 <span tal:condition="details.contact">${details.contact}</span>

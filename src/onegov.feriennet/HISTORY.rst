@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to enter the gender of an attendee.
+  [href]
+
 - Fixes wrong operability calculation.
   [href]
 

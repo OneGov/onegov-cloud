@@ -1197,6 +1197,16 @@ ul.tags {
             margin-bottom: .5rem;
             page-break-inside: avoid;
         }
+
+        strong.male::after {
+            @include icon('\f222');
+            margin-left: 1ex;
+        }
+
+        strong.female::after {
+            @include icon('\f221');
+            margin-left: 1ex;
+        }
     }
 }
 
