@@ -89,12 +89,13 @@ class MatchCollection(object):
             .filter(Booking.state == 'accepted')\
             .subquery().lateral()
 
-        o = self.session.query(Occasion, accepted.c.count)
+        o = self.session.query(Occasion.spots, accepted.c.count)
+        o = o.filter(Occasion.period_id == self.period_id)
 
         bits = []
 
-        for occasion, count in o:
-            bits.append(count >= occasion.spots.lower and 1 or 0)
+        for spots, count in o:
+            bits.append(count >= spots.lower and 1 or 0)
 
         if not bits:
             return 0

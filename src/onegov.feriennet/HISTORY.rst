@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes wrong operability calculation.
+  [href]
+
 0.3.0 (2017-01-30)
 ~~~~~~~~~~~~~~~~~~~
 
