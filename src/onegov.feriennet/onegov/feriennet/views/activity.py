@@ -94,7 +94,7 @@ def view_activities(self, request):
     if request.is_organiser:
         periods = PeriodCollection(request.app.session()).query().all()
     else:
-        periods = [PeriodCollection(request.app.session()).active()]
+        periods = None
 
     if periods:
         taglinks.extend(

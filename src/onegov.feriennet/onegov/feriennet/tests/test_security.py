@@ -71,6 +71,7 @@ def test_activity_query_policy(session):
 
     # once an activity is accepted, it becomes public
     activities[0].accept()
+    activities[0].durations = 1
 
     policy = ActivityQueryPolicy("Steven", 'admin')
     assert policy.granted_subset(collection.query()).count() == 2

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hide activites without an occasion in the active period from anonymous users.
+  [href]
+
 - Adds the ability to enter the gender of an attendee.
   [href]
 

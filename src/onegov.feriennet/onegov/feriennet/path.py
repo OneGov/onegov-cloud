@@ -33,6 +33,10 @@ def get_vacation_activities(request, app, page=0,
                             owners=None,
                             period_ids=None):
 
+    if not request.current_username:
+        period = PeriodCollection(app.session()).active()
+        period_ids = period and [period.id] or None
+
     return VacationActivityCollection(
         session=app.session(),
         page=page,
