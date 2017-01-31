@@ -311,7 +311,8 @@ def test_no_orphan_bookings(session, owner):
     dustin = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2002, 9, 8)
+        birth_date=date(2002, 9, 8),
+        gender='male'
     )
 
     bookings.add(owner, dustin, tournament)
@@ -348,7 +349,8 @@ def test_no_orphan_occasions(session, owner):
     dustin = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2002, 9, 8)
+        birth_date=date(2002, 9, 8),
+        gender='male'
     )
 
     bookings.add(owner, dustin, tournament)
@@ -643,8 +645,8 @@ def test_attendee_age(session, owner):
         return date.today().replace(year=date.today().year - years)
 
     attendees = AttendeeCollection(session)
-    d = attendees.add(owner, "Dustin Henderson", age(13))
-    m = attendees.add(owner, "Mike Wheeler", age(14))
+    d = attendees.add(owner, "Dustin Henderson", age(13), 'male')
+    m = attendees.add(owner, "Mike Wheeler", age(14), 'male')
 
     assert d.age == 13
     assert m.age == 14
@@ -677,7 +679,8 @@ def test_booking_collection(session, owner):
     dustin = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2002, 9, 8)
+        birth_date=date(2002, 9, 8),
+        gender='male'
     )
 
     bookings.add(owner, dustin, tournament)
@@ -724,7 +727,8 @@ def test_star_booking(session, owner):
     dustin = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2002, 9, 8)
+        birth_date=date(2002, 9, 8),
+        gender='male'
     )
 
     b1 = bookings.add(owner, dustin, s1)
@@ -763,7 +767,8 @@ def test_booking_period_id_reference(session, owner):
     dustin = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2002, 9, 8)
+        birth_date=date(2002, 9, 8),
+        gender='male'
     )
 
     bookings.add(owner, dustin, tournament)
@@ -831,7 +836,8 @@ def test_happiness(session, owner):
     dustin = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2002, 9, 8)
+        birth_date=date(2002, 9, 8),
+        gender='male'
     )
 
     transaction.commit()
@@ -960,13 +966,15 @@ def test_attendees_count(session, owner):
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2002, 9, 8)
+        birth_date=date(2002, 9, 8),
+        gender='male'
     )
 
     a2 = attendees.add(
         user=owner,
         name="Mike Wheeler",
-        birth_date=date(2002, 8, 8)
+        birth_date=date(2002, 8, 8),
+        gender='male'
     )
 
     transaction.commit()
@@ -1057,19 +1065,22 @@ def test_accept_booking(session, owner):
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2000, 1, 1)
+        birth_date=date(2000, 1, 1),
+        gender='male'
     )
 
     a2 = attendees.add(
         user=owner,
         name="Mike Wheeler",
-        birth_date=date(2000, 1, 1)
+        birth_date=date(2000, 1, 1),
+        gender='male'
     )
 
     a3 = attendees.add(
         user=owner,
         name="Eleven",
-        birth_date=date(2000, 1, 1)
+        birth_date=date(2000, 1, 1),
+        gender='female'
     )
 
     transaction.commit()
@@ -1218,19 +1229,22 @@ def test_cancel_booking(session, owner):
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2000, 1, 1)
+        birth_date=date(2000, 1, 1),
+        gender='male'
     )
 
     a2 = attendees.add(
         user=owner,
         name="Mike Wheeler",
-        birth_date=date(2000, 1, 1)
+        birth_date=date(2000, 1, 1),
+        gender='male'
     )
 
     a3 = attendees.add(
         user=owner,
         name="Eleven",
-        birth_date=date(2000, 1, 1)
+        birth_date=date(2000, 1, 1),
+        gender='female'
     )
 
     transaction.commit()
@@ -1479,12 +1493,14 @@ def test_confirm_period(session, owner):
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2000, 1, 1))
+        birth_date=date(2000, 1, 1),
+        gender='male')
 
     a2 = attendees.add(
         user=owner,
         name="Mike Wheeler",
-        birth_date=date(2000, 1, 1))
+        birth_date=date(2000, 1, 1),
+        gender='male')
 
     transaction.commit()
 
@@ -1549,12 +1565,14 @@ def test_cancel_occasion(session, owner):
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2000, 1, 1))
+        birth_date=date(2000, 1, 1),
+        gender='male')
 
     a2 = attendees.add(
         user=owner,
         name="Mike Wheeler",
-        birth_date=date(2000, 1, 1))
+        birth_date=date(2000, 1, 1),
+        gender='male')
 
     transaction.commit()
 

@@ -1,3 +1,5 @@
+import random
+
 from datetime import date, timedelta
 from freezegun import freeze_time
 from functools import partial
@@ -44,7 +46,8 @@ def new_attendee(collections, name=None, birth_date=None, user=None):
     return collections.attendees.add(
         name=name or uuid4().hex,
         birth_date=birth_date or date(2000, 1, 1),
-        user=user or Bunch(username="owner@example.org"))
+        user=user or Bunch(username="owner@example.org"),
+        gender=random.choice(('male', 'female')))
 
 
 def test_simple_match(session, owner, collections, prebooking_period):
