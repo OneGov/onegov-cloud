@@ -9,6 +9,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import validates
 from sqlalchemy_utils import observes
 from uuid import uuid4
 
@@ -71,6 +72,11 @@ class InvoiceItem(Base, TimestampMixin):
             hashlib.sha1((invoice + username).encode('utf-8')).hexdigest()[:5],
             hashlib.sha1(username.encode('utf-8')).hexdigest()[:5]
         ))
+
+    @validates('source')
+    def validate_source(self, key, value):
+        assert value in (None, 'xml', 'stripe')
+        return value
 
     @property
     def display_code(self):
