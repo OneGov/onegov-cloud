@@ -188,3 +188,10 @@ def add_source_field_to_invoice_items(context):
     context.operations.add_column('invoice_items', Column(
         'source', Text, nullable=True
     ))
+
+
+@upgrade_task('Add gender field to attendees')
+def add_gender_field_to_attendees(context):
+    context.operations.add_column('attendees', Column(
+        'gender', Text, nullable=True
+    ))

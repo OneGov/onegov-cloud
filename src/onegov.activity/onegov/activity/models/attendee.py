@@ -6,7 +6,7 @@ from onegov.core.orm.types import UUID
 from sqlalchemy import Column, Date, Index, Text, ForeignKey, Float, Numeric
 from sqlalchemy import case, cast, func, select, and_, type_coerce
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from uuid import uuid4
 
 
@@ -35,6 +35,15 @@ class Attendee(Base, TimestampMixin):
 
     #: birth date of the attendee for the age calculation
     birth_date = Column(Date, nullable=False)
+
+    #: we use text for possible gender fluidity in the future ;)
+    gender = Column(Text, nullable=True)
+
+    @validates('gender')
+    def validate_gender(self, field, value):
+        # for now we stay old-fashioned
+        assert value in (None, 'male', 'female')
+        return value
 
     @hybrid_property
     def age(self):

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a gender field to the attendees.
+  [href]
+
 0.3.0 (2017-01-30)
 ~~~~~~~~~~~~~~~~~~~
 

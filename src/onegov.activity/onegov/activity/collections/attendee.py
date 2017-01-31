@@ -14,10 +14,11 @@ class AttendeeCollection(GenericCollection):
     def by_username(self, username):
         return self.query().filter(self.model_class.username == username)
 
-    def add(self, user, name, birth_date):
+    def add(self, user, name, birth_date, gender):
 
         return super().add(
             username=user.username,
             name=name,
-            birth_date=birth_date
+            birth_date=birth_date,
+            gender=gender
         )
