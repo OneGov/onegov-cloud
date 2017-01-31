@@ -9,11 +9,6 @@ from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import relationship
 from uuid import uuid4
 
-# attendees without a booking have a happiness of 0.5 as each new
-# booking has the possibility to make them happier if its accepted
-# or unhappier if not. 0.5 is in the middle of that.
-INITIAL_HAPPINESS = 0.5
-
 
 class Attendee(Base, TimestampMixin):
     """ Attendees are linked to zero to many bookings. Each booking
