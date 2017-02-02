@@ -1,13 +1,22 @@
+from onegov.core.orm.cache import orm_cached
 from onegov.core.orm.session_manager import SessionManager
-from sqlalchemy import inspect
+from sqlalchemy import event, inspect
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import object_session
 from sqlalchemy_utils import TranslationHybrid
+from zope.sqlalchemy import mark_changed
+
 
 MISSING = object()
 
 
 #: The base for all OneGov Core ORM Models
 class ModelBase(object):
+
+    #: set by :class:`onegov.core.orm.cache.OrmCacheDescriptor`, this attribute
+    #: indicates if the current model was loaded from cache
+    is_cached = False
+
     def __getstate__(self):
         """ Makes sure the session manager attached to the model is not
         pickled (stored in memcached). Not only does it not make sense to
@@ -76,4 +85,27 @@ def find_models(base, is_match):
             yield cls
 
 
-__all__ = ['Base', 'SessionManager', 'translation_hybrid', 'find_models']
+def configure_listener(cls, key, instance):
+    """ The zope.sqlalchemy transaction mechanism doesn't recognize changes to
+    cached objects. The following code intercepts all object changes and marks
+    the transaction as changed if there was a change to a cached object.
+
+    """
+
+    def mark_as_changed(obj, *args, **kwargs):
+        if obj.is_cached:
+            mark_changed(object_session(obj))
+
+    event.listen(instance, 'append', mark_as_changed)
+    event.listen(instance, 'remove', mark_as_changed)
+    event.listen(instance, 'set', mark_as_changed)
+    event.listen(instance, 'init_collection', mark_as_changed)
+    event.listen(instance, 'dispose_collection', mark_as_changed)
+
+
+event.listen(ModelBase, 'attribute_instrument', configure_listener)
+
+
+__all__ = [
+    'Base', 'SessionManager', 'translation_hybrid', 'find_models', 'orm_cached'
+]

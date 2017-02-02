@@ -1,5 +1,10 @@
 Changelog
 ---------
+
+- Adds an experimental cache descriptor to greatly ease the use of cached
+  orm objects/queries.
+  [href]
+
 0.35.2 (2017-01-18)
 ~~~~~~~~~~~~~~~~~~~
 

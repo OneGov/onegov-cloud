@@ -7,6 +7,7 @@ import transaction
 import uuid
 
 from datetime import datetime
+from dogpile.cache.api import NO_VALUE
 from onegov.core.framework import Framework
 from onegov.core.orm import (
     ModelBase, SessionManager, translation_hybrid, find_models
@@ -15,6 +16,7 @@ from onegov.core.orm.abstract import AdjacencyList
 from onegov.core.orm.mixins import (
     meta_property, content_property, ContentMixin, TimestampMixin
 )
+from onegov.core.orm import orm_cached
 from onegov.core.orm.types import HSTORE, JSON, UTCDateTime, UUID
 from onegov.core.security import Private
 from onegov.core.utils import scan_morepath_modules
@@ -25,6 +27,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm.exc import DetachedInstanceError
 from sqlalchemy_utils import aggregated
 from threading import Thread
 from webob.exc import HTTPUnauthorized, HTTPConflict
@@ -48,7 +51,7 @@ def test_is_valid_schema(postgres_dsn):
 
 
 def test_independent_sessions(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'document'
@@ -74,7 +77,7 @@ def test_independent_sessions(postgres_dsn):
 
 
 def test_independent_managers(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'document'
@@ -105,7 +108,7 @@ def test_independent_managers(postgres_dsn):
 
 
 def test_create_schema(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'document'
@@ -147,7 +150,7 @@ def test_create_schema(postgres_dsn):
 
 
 def test_schema_bound_session(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -178,7 +181,7 @@ def test_schema_bound_session(postgres_dsn):
 
 
 def test_session_scope(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     mgr = SessionManager(postgres_dsn, Base)
 
@@ -205,7 +208,7 @@ def test_session_scope(postgres_dsn):
 def test_orm_scenario(postgres_dsn):
     # test a somewhat complete ORM scenario in which create and read data
     # for different applications
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
         pass
@@ -299,7 +302,7 @@ def test_orm_scenario(postgres_dsn):
 
 
 def test_i18n_with_request(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
         pass
@@ -352,7 +355,7 @@ def test_i18n_with_request(postgres_dsn):
 
 
 def test_json_type(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -391,7 +394,7 @@ def test_json_type(postgres_dsn):
 
 
 def test_session_manager_sharing(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -415,7 +418,7 @@ def test_session_manager_sharing(postgres_dsn):
 
 
 def test_session_manager_i18n(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -457,7 +460,7 @@ def test_session_manager_i18n(postgres_dsn):
 
 
 def test_uuid_type(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -479,7 +482,7 @@ def test_uuid_type(postgres_dsn):
 
 
 def test_utc_datetime_naive(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -501,7 +504,7 @@ def test_utc_datetime_naive(postgres_dsn):
 
 
 def test_utc_datetime_aware(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Test(Base):
         __tablename__ = 'test'
@@ -527,7 +530,7 @@ def test_utc_datetime_aware(postgres_dsn):
 
 
 def test_timestamp_mixin(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Test(Base, TimestampMixin):
         __tablename__ = 'test'
@@ -564,7 +567,7 @@ def test_timestamp_mixin(postgres_dsn):
 
 
 def test_content_mixin(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Test(Base, ContentMixin):
         __tablename__ = 'test'
@@ -588,7 +591,7 @@ def test_content_mixin(postgres_dsn):
 
 
 def test_extensions_schema(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Data(Base):
         __tablename__ = 'data'
@@ -623,7 +626,7 @@ def test_extensions_schema(postgres_dsn):
 
 def test_serialization_failure(postgres_dsn):
 
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Data(Base):
         __tablename__ = 'data'
@@ -677,7 +680,7 @@ def test_serialization_failure(postgres_dsn):
 @pytest.mark.parametrize("number_of_retries", range(1, 10))
 def test_application_retries(postgres_dsn, number_of_retries):
 
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class App(Framework):
         pass
@@ -785,7 +788,7 @@ def test_application_retries(postgres_dsn, number_of_retries):
 
 
 def test_orm_signals_independence(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -821,7 +824,7 @@ def test_orm_signals_independence(postgres_dsn):
 
 
 def test_orm_signals_schema(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -850,7 +853,7 @@ def test_orm_signals_schema(postgres_dsn):
 
 
 def test_scoped_signals(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -878,7 +881,7 @@ def test_scoped_signals(postgres_dsn):
 
 
 def test_orm_signals_data_flushed(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -929,7 +932,7 @@ def test_pickle_model(postgres_dsn):
 
 
 def test_orm_signals(postgres_dsn):
-    Base = declarative_base()
+    Base = declarative_base(cls=ModelBase)
 
     class Document(Base):
         __tablename__ = 'documents'
@@ -1229,3 +1232,118 @@ def test_sqlalchemy_aggregate(postgres_dsn):
 
     with pytest.raises(AssertionError):
         session.query(Comment).update({'content': 'foobar'})
+
+
+def test_orm_cache(postgres_dsn):
+
+    Base = declarative_base(cls=ModelBase)
+
+    class App(Framework):
+
+        @orm_cached(policy='on-table-change:documents')
+        def documents(self):
+            return self.session().query(Document)
+
+        @orm_cached(policy='on-table-change:documents')
+        def untitled_documents(self):
+            q = self.session().query(Document)
+            q = q.with_entities(Document.id, Document.title)
+            q = q.filter(Document.title == None)
+
+            return q.all()
+
+        @orm_cached(policy='on-table-change:documents')
+        def first_document(self):
+            q = self.session().query(Document)
+            q = q.with_entities(Document.id, Document.title)
+
+            return q.first()
+
+        @orm_cached(policy=lambda o: o.title == 'Secret')
+        def secret_document(self):
+            q = self.session().query(Document)
+            q = q.filter(Document.title == 'Secret')
+
+            return q.first()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=True)
+        body = Column(Text, nullable=True)
+
+    # this is required for the transactions to actually work, usually this
+    # would be onegov.server's job
+    scan_morepath_modules(App)
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        disable_memcached=True)
+    app.namespace = 'foo'
+    app.set_application_id('foo/bar')
+
+    # ensure that no results work
+    app.clear_request_cache()
+    assert app.documents == tuple()
+    assert app.untitled_documents == []
+    assert app.first_document is None
+    assert app.secret_document is None
+
+    assert app.request_cache == {
+        'test_orm_cache.<locals>.App.documents': tuple(),
+        'test_orm_cache.<locals>.App.first_document': None,
+        'test_orm_cache.<locals>.App.secret_document': None,
+        'test_orm_cache.<locals>.App.untitled_documents': []
+    }
+
+    assert app.cache.get('test_orm_cache.<locals>.App.documents') == tuple()
+    assert app.cache.get('test_orm_cache.<locals>.App.first_document') is None
+    assert app.cache.get('test_orm_cache.<locals>.App.secret_document') is None
+    assert app.cache.get('test_orm_cache.<locals>.App.untitled_documents')\
+        == []
+
+    # if we add a non-secret document all caches update except for the last one
+    app.session().add(Document(id=1, title='Public', body='Lorem Ipsum'))
+    transaction.commit()
+
+    assert app.cache.get('test_orm_cache.<locals>.App.documents') is NO_VALUE
+    assert app.cache.get('test_orm_cache.<locals>.App.first_document')\
+        is NO_VALUE
+    assert app.cache.get('test_orm_cache.<locals>.App.untitled_documents')\
+        is NO_VALUE
+    assert app.cache.get('test_orm_cache.<locals>.App.secret_document') is None
+
+    assert app.request_cache == {
+        'test_orm_cache.<locals>.App.secret_document': None,
+    }
+
+    assert app.secret_document is None
+    assert app.first_document.title == 'Public'
+    assert app.untitled_documents == []
+    assert app.documents[0].body == 'Lorem Ipsum'
+
+    # if we add a secret document all caches change
+    app.session().add(Document(id=2, title='Secret', body='Geheim'))
+    transaction.commit()
+
+    assert app.request_cache == {}
+    assert app.secret_document.body == "Geheim"
+    assert app.first_document.title == 'Public'
+    assert app.untitled_documents == []
+    assert len(app.documents) == 2
+
+    # if we change something in a cached object it is reflected, the caveat
+    # here is though that the secret_document cache won't change because of
+    # it's policy
+    app.secret_document.title = None
+    assert app.untitled_documents == []
+    transaction.commit()
+
+    assert 'test_orm_cache.<locals>.App.secret_document' in app.request_cache
+    assert app.untitled_documents[0].title is None
+
+    with pytest.raises(DetachedInstanceError):
+        assert app.secret_document.title is None

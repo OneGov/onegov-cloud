@@ -39,6 +39,7 @@ from onegov.core import directives
 from onegov.core.datamanager import MailDataManager
 from onegov.core.mail import email, Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
+from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.request import CoreRequest
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
@@ -49,7 +50,7 @@ from uuid import uuid4 as new_uuid
 from webob.exc import HTTPConflict
 
 
-class Framework(TransactionApp, WebassetsApp, ServerApplication):
+class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
     """ Baseclass for Morepath OneGov applications. """
 
     request_class = CoreRequest
@@ -67,11 +68,15 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
     static_directory = directive(directives.StaticDirectoryAction)
     template_variables = directive(directives.TemplateVariablesAction)
 
+    #: the request cache is initialised/emptied before each request
+    request_cache = None
+
     @morepath.reify
     def __call__(self):
         """ Intercept all wsgi calls so we can attach debug tools. """
 
         fn = super().__call__
+        fn = self.with_request_cache(fn)
 
         if getattr(self, 'sql_query_report', False):
             fn = self.with_query_report(fn)
@@ -98,6 +103,17 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
                 return fn(*args, **kwargs)
 
         return with_profiler_wrapper
+
+    def with_request_cache(self, fn):
+
+        def with_request_cache_wrapper(*args, **kwargs):
+            self.clear_request_cache()
+            return fn(*args, **kwargs)
+
+        return with_request_cache_wrapper
+
+    def clear_request_cache(self):
+        self.request_cache = {}
 
     @cached_property
     def modules(self):
@@ -393,8 +409,12 @@ class Framework(TransactionApp, WebassetsApp, ServerApplication):
         # then, replace the '/' with a '-' so the only dash left will be
         # the dash between namespace and id
         self.schema = application_id.replace('-', '_').replace('/', '-')
+
         if self.has_database_connection:
             self.session_manager.set_current_schema(self.schema)
+
+            if not self.is_orm_cache_setup:
+                self.setup_orm_cache()
 
     def get_cache(self, namespace, expiration_time=None, backend=None,
                   backend_args=None):
