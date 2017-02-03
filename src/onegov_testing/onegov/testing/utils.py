@@ -68,6 +68,7 @@ def create_app(app_class, request, use_elasticsearch=False):
     )
 
     app.set_application_id(app.namespace + '/test')
+    app.clear_request_cache()
     app.bind_depot()
 
     # cronjobs leave lingering sessions open, in real life this is not a
