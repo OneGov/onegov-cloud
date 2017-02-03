@@ -195,8 +195,8 @@ class ActivityCollection(Pagination):
         """
         name = normalize_for_url(name)
 
-        existing = Activity.name.like('{}%'.format(name))
-        existing = self.query().filter(existing)
+        existing = self.session.query(self.model_class)
+        existing = existing.filter(Activity.name.like('{}%'.format(name)))
         existing = existing.with_entities(Activity.name)
         existing = set(r[0] for r in existing.all())
 
