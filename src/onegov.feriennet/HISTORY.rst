@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Start caching some often used data using the orm cache descriptor.
+  [href]
+
 - Hide activites without an occasion in the active period from anonymous users.
   [href]
 

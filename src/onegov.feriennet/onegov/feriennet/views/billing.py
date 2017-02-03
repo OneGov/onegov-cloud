@@ -3,7 +3,6 @@ import json
 from base64 import b64decode
 from gzip import GzipFile
 from io import BytesIO
-from onegov.activity import Period, PeriodCollection
 from onegov.activity import InvoiceItem, InvoiceItemCollection
 from onegov.activity.iso20022 import match_camt_053_to_usernames
 from onegov.core.security import Secret
@@ -16,12 +15,6 @@ from onegov.feriennet.models import InvoiceAction
 from onegov.org.elements import Link, ConfirmLink
 from onegov.user import UserCollection, User
 from purl import URL
-
-
-def all_periods(request):
-    p = PeriodCollection(request.app.session()).query()
-    p = p.order_by(Period.execution_start)
-    return p.all()
 
 
 @FeriennetApp.form(
@@ -136,7 +129,7 @@ def view_billing(self, request, form):
         }),
         'model': self,
         'period': self.period,
-        'periods': all_periods(request),
+        'periods': request.app.periods,
         'total': self.total,
         'form': form,
         'outstanding': self.outstanding,

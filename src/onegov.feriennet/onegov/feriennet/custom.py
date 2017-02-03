@@ -1,16 +1,15 @@
 from onegov.activity import BookingCollection
-from onegov.activity import PeriodCollection, Period
 from onegov.activity import InvoiceItemCollection
+from onegov.activity import PeriodCollection
 from onegov.feriennet import _, FeriennetApp
-from onegov.feriennet.collections import VacationActivityCollection
-from onegov.feriennet.collections import OccasionAttendeeCollection
-from onegov.feriennet.collections import NotificationTemplateCollection
-from onegov.feriennet.layout import DefaultLayout
-from onegov.org.elements import Link, LinkGroup
-from onegov.org.custom import get_global_tools as get_base_tools
-from onegov.feriennet.collections import MatchCollection
 from onegov.feriennet.collections import BillingCollection
-from sqlalchemy import desc
+from onegov.feriennet.collections import MatchCollection
+from onegov.feriennet.collections import NotificationTemplateCollection
+from onegov.feriennet.collections import OccasionAttendeeCollection
+from onegov.feriennet.collections import VacationActivityCollection
+from onegov.feriennet.layout import DefaultLayout
+from onegov.org.custom import get_global_tools as get_base_tools
+from onegov.org.elements import Link, LinkGroup
 
 
 @FeriennetApp.template_variables()
@@ -29,8 +28,7 @@ def get_global_tools(request):
 
 def get_admin_tools(request):
     if request.is_organiser:
-        period = request.app.session().query(Period.title, Period.active)
-        period = period.order_by(desc(Period.active)).first()
+        period = request.app.active_period
 
         links = []
 
@@ -96,12 +94,8 @@ def get_personal_tools(request):
         session = request.app.session()
         username = request.current_username
 
-        p = PeriodCollection(session).query()
-        p = p.with_entities(
-            Period.id, Period.confirmed, Period.active, Period.finalized)
-
-        periods = tuple(p)
-        period = next((p for p in periods if p.active), None)
+        period = request.app.active_period
+        periods = request.app.periods
 
         invoice_items = InvoiceItemCollection(session, username)
         unpaid = invoice_items.count_unpaid_invoices(

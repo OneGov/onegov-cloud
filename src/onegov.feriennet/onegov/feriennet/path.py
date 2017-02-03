@@ -34,7 +34,7 @@ def get_vacation_activities(request, app, page=0,
                             period_ids=None):
 
     if not request.current_username:
-        period = PeriodCollection(app.session()).active()
+        period = app.active_period
         period_ids = period and [period.id] or None
 
     return VacationActivityCollection(
@@ -96,8 +96,7 @@ def get_my_bookings(request, app, period_id=None, username=None):
 
     # the default period is the active period or the first we can find
     if not period_id:
-        periods = PeriodCollection(app.session())
-        period = periods.active() or periods.query().first()
+        period = app.active_period or app.periods[0]
 
         if period:
             period_id = period.id
@@ -119,12 +118,10 @@ def get_booking(request, app, id):
     converters=dict(period_id=UUID))
 def get_matches(request, app, period_id):
     # the default period is the active period or the first we can find
-    periods = PeriodCollection(app.session())
-
     if not period_id:
-        period = periods.active() or periods.query().first()
+        period = app.active_period or app.periods[0]
     else:
-        period = periods.by_id(period_id)
+        period = PeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None
@@ -138,12 +135,10 @@ def get_matches(request, app, period_id):
     converters=dict(period_id=UUID))
 def get_billing(request, app, period_id, username=None, expand=False):
     # the default period is the active period or the first we can find
-    periods = PeriodCollection(app.session())
-
     if not period_id:
-        period = periods.active() or periods.query().first()
+        period = app.active_period or app.periods[0]
     else:
-        period = periods.by_id(period_id)
+        period = PeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None
@@ -186,13 +181,11 @@ def get_my_invoies(request, app, username=None):
     path='/teilnehmer',
     converters=dict(period_id=UUID))
 def get_occasion_attendee_collection(request, app, period_id=None):
-
-    periods = PeriodCollection(app.session())
-
+    # the default period is the active period or the first we can find
     if not period_id:
-        period = periods.active() or periods.query().first()
+        period = app.active_period or app.periods[0]
     else:
-        period = periods.by_id(period_id)
+        period = PeriodCollection(app.session()).by_id(period_id)
 
     if not period:
         return None

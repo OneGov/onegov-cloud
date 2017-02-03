@@ -4,7 +4,7 @@ from onegov.core.security import Personal
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.collections import BillingDetails
 from onegov.feriennet.layout import InvoiceLayout
-from onegov.feriennet.views.shared import all_periods, all_users
+from onegov.feriennet.views.shared import all_users
 from sortedcontainers import SortedDict
 from stdnum import iban
 
@@ -15,7 +15,7 @@ from stdnum import iban
     permission=Personal)
 def view_my_invoices(self, request):
 
-    periods = {p.id.hex: p for p in all_periods(request) if p.finalized}
+    periods = {p.id.hex: p for p in request.app.periods if p.finalized}
     bills = SortedDict(lambda period: period.execution_start)
 
     if periods:

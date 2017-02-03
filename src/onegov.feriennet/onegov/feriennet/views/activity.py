@@ -348,7 +348,6 @@ def propose_activity(self, request):
         )
 
     request.success(_("Thank you for your proposal!"))
-    request.app.update_ticket_count()
 
     @request.after
     def redirect_intercooler(response):

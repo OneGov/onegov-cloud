@@ -1,3 +1,5 @@
+from onegov.activity import Period, PeriodCollection
+from onegov.core.orm import orm_cached
 from onegov.core import utils
 from onegov.feriennet.initial_content import create_new_organisation
 from onegov.feriennet.request import FeriennetRequest
@@ -13,6 +15,17 @@ class FeriennetApp(OrgApp):
 
     def es_may_use_private_search(self, request):
         return request.is_admin
+
+    @orm_cached(policy='on-table-change:periods')
+    def active_period(self):
+        return PeriodCollection(self.session()).active()
+
+    @orm_cached(policy='on-table-change:periods')
+    def periods(self):
+        p = PeriodCollection(self.session()).query()
+        p = p.order_by(Period.execution_start)
+
+        return p
 
 
 @FeriennetApp.template_directory()

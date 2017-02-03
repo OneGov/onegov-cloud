@@ -11,7 +11,7 @@ from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
 from onegov.feriennet.layout import BookingCollectionLayout
-from onegov.feriennet.views.shared import all_periods, all_users
+from onegov.feriennet.views.shared import all_users
 from onegov.org.elements import ConfirmLink, DeleteLink
 from sqlalchemy.orm import contains_eager
 
@@ -152,7 +152,7 @@ def view_my_bookings(self, request):
     bookings = all_bookings(self)
     bookings_by_attendee = group_bookings_by_attendee(bookings)
 
-    periods = all_periods(request)
+    periods = request.app.periods
     period = next((p for p in periods if p.id == self.period_id), None)
 
     wishlist_phase = not period or period.wishlist_phase

@@ -340,7 +340,7 @@ msgid "Cost"
 msgstr "Kosten"
 
 msgid "The amount paid to the organiser"
-msgstr "Der Betrag welcher dem Organisator gezahlt wird"
+msgstr "Der Betrag welcher dem Veranstalter gezahlt wird"
 
 msgid "Minimum Number of Participants"
 msgstr "Mindestteilnehmerzahl"
