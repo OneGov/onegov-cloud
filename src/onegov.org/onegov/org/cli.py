@@ -405,6 +405,4 @@ def import_digirez(accessdb, min_date, ignore_booking_conflicts):
                 booking_conflicts
             ))
 
-        app.update_ticket_count()
-
     return run_import

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Use onegov.core's orm cache descriptor for better, easier caching.
+  [href]
+
 - Further improve the handling of light colors.
   [href]
 

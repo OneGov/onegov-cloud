@@ -38,7 +38,7 @@ setup(
         'elasticsearch',
         'isodate',
         'lxml',
-        'onegov.core>=0.35.0',
+        'onegov.core>=0.36.0',
         'onegov.event>=0.5.0',
         'onegov.file>=0.2.1',
         'onegov.form>=0.9.0',

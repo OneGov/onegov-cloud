@@ -21,7 +21,6 @@ def delete_page(self, request):
         raise exc.HTTPMethodNotAllowed()
 
     PageCollection(request.app.session()).delete(self)
-    request.app.update_homepage_pages()
     request.success(self.trait_messages[self.trait]['delete_message'])
 
 

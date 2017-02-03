@@ -3193,23 +3193,22 @@ def test_edit_user_settings(org_app):
 
 
 def test_homepage(org_app):
-    with org_app.update_org() as org:
-        org.meta['homepage_cover'] = "<b>0xdeadbeef</b>"
-        org.meta['homepage_structure'] = """
-            <row>
-                <column span="8">
-                    <homepage-cover />
-                </column>
-                <column span="4">
-                    <panel>
-                        <news />
-                    </panel>
-                    <panel>
-                        <events />
-                    </panel>
-                </column>
-            </row>
-        """
+    org_app.org.meta['homepage_cover'] = "<b>0xdeadbeef</b>"
+    org_app.org.meta['homepage_structure'] = """
+        <row>
+            <column span="8">
+                <homepage-cover />
+            </column>
+            <column span="4">
+                <panel>
+                    <news />
+                </panel>
+                <panel>
+                    <events />
+                </panel>
+            </column>
+        </row>
+    """
 
     transaction.commit()
 

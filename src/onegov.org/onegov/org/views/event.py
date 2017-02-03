@@ -168,7 +168,6 @@ def view_event(self, request):
             )
 
         request.success(_("Thank you for your submission!"))
-        request.app.update_ticket_count()
 
         return morepath.redirect(request.link(ticket, 'status'))
 

@@ -22,9 +22,8 @@ def handle_settings(self, request, form):
     request.include('check_contrast')
 
     if form.submitted(request):
-        with request.app.update_org() as org:
-            form.populate_obj(org, exclude={'primary_color', 'footer-height'})
-            org.theme_options = form.theme_options
+        form.populate_obj(self, exclude={'primary_color', 'footer-height'})
+        self.theme_options = form.theme_options
 
         request.success(_("Your changes were saved"))
 

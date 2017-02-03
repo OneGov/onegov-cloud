@@ -49,8 +49,6 @@ def handle_new_page(self, request, form, src=None):
         )
         form.populate_obj(page)
 
-        request.app.update_homepage_pages()
-
         request.success(page.trait_messages[page.trait]['new_page_added'])
         return morepath.redirect(request.link(page))
 
@@ -70,9 +68,7 @@ def handle_new_page(self, request, form, src=None):
 def handle_edit_page(self, request, form):
     if form.submitted(request):
         form.populate_obj(self.page)
-
         request.success(_("Your changes were saved"))
-        request.app.update_homepage_pages()
 
         return morepath.redirect(request.link(self.page))
     elif not request.POST:

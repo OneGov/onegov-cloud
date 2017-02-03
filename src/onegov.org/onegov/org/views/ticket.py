@@ -50,8 +50,6 @@ def accept_ticket(self, request):
             'number': self.number
         }))
 
-    request.app.update_ticket_count()
-
     return morepath.redirect(request.link(self))
 
 
@@ -81,8 +79,6 @@ def close_ticket(self, request):
                 'model': self
             }
         )
-
-    request.app.update_ticket_count()
 
     return morepath.redirect(
         request.link(TicketCollection(request.app.session())))
@@ -116,8 +112,6 @@ def reopen_ticket(self, request):
                 'model': self
             }
         )
-
-    request.app.update_ticket_count()
 
     return morepath.redirect(request.link(self))
 

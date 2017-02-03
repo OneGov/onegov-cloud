@@ -322,7 +322,6 @@ def finalize_reservation(self, request):
             )
 
         request.success(_("Thank you for your reservation!"))
-        request.app.update_ticket_count()
 
         return morepath.redirect(request.link(ticket, 'status'))
 

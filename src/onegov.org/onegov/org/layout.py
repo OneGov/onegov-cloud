@@ -28,12 +28,10 @@ from onegov.org.models import (
 )
 from onegov.org.theme.org_theme import user_options
 from onegov.newsletter import NewsletterCollection, RecipientCollection
-from onegov.page import Page, PageCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection
 from sedate import to_timezone
-from sqlalchemy import desc
 
 
 class Layout(ChameleonLayout):
@@ -346,11 +344,7 @@ class DefaultLayout(Layout):
 
     @cached_property
     def root_pages(self):
-        query = PageCollection(self.app.session()).query(ordered=False)
-        query = query.order_by(desc(Page.type), Page.order)
-        query = query.filter(Page.parent_id == None)
-
-        return self.request.exclude_invisible(query.all())
+        return self.request.exclude_invisible(self.app.root_pages)
 
     @cached_property
     def top_navigation(self):

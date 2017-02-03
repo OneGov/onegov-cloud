@@ -2,9 +2,9 @@
 
 from chameleon import PageTemplate
 from collections import defaultdict
-from contextlib import contextmanager
 from dectate import directive
 from onegov.core import Framework, utils
+from onegov.core.orm import orm_cached
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
 from onegov.libres import LibresIntegration
@@ -14,10 +14,10 @@ from onegov.org.initial_content import create_new_organisation
 from onegov.org.models import Topic, Organisation
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
-from onegov.page import PageCollection
+from onegov.page import Page, PageCollection
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
-from sqlalchemy.orm.attributes import flag_modified
+from sqlalchemy import desc
 
 
 class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
@@ -68,85 +68,55 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
                 if s.startswith(schema_prefix)
             )
 
-    @property
+    @orm_cached(policy='on-table-change:organisations')
     def org(self):
-        """ Returns the cached version of the organisation. Since the it rarely
-        ever changes, it makes sense to not hit the database for it every
-        time.
-
-        As a consequence, changes to the organisation object are not
-        propagated, unless you use :meth:`update_org` or use the ORM directly.
-
-        """
-        org = self.cache.get_or_create(
-            'org',
-            creator=self.load_org,
-            should_cache_fn=lambda org: org is not None
-        )
-
-        if org is not None:
-            return self.session().merge(org, load=False)
-
-    def load_org(self):
-        """ Loads the org from the SQL database. """
         return self.session().query(Organisation).first()
 
-    @contextmanager
-    def update_org(self):
-        """ Yields the current org for an update. Use this instead of
-        updating the org directly, because caching is involved. It's rather
-        easy to otherwise update it wrongly.
+    @orm_cached(policy='on-table-change:pages')
+    def root_pages(self):
+        query = PageCollection(self.session()).query(ordered=False)
+        query = query.order_by(desc(Page.type), Page.order)
+        query = query.filter(Page.parent_id == None)
 
-        Example::
-            with app.update_org() as org:
-                org.name = 'New Name'
+        return tuple(query)
 
-        """
-
-        session = self.session()
-
-        org = session.merge(self.org)
-        yield org
-
-        # nested entries in the meta json field are not detected as modified
-        flag_modified(org, 'meta')
-
-        session.flush()
-
-        self.update_homepage_template()
-        self.cache.delete('org')
-
-    @property
+    @orm_cached(policy='on-table-change:organisations')
     def homepage_template(self):
-        """ Returns the homepage template built from the homepage content
-        setting which contains a simplified and limited xml to define the
-        homepage.
+        structure = self.org.meta.get('homepage_structure')
 
-        """
-        return self.cache.get_or_create(
-            'homepage_template', self.load_homepage_template)
-
-    def load_homepage_template(self):
-        homepage_structure = self.org.meta.get('homepage_structure')
-
-        if homepage_structure:
-            return PageTemplate(
-                transform_homepage_structure(self, homepage_structure))
+        if structure:
+            return PageTemplate(transform_homepage_structure(self, structure))
         else:
             return PageTemplate('')
 
-    def update_homepage_template(self):
-        self.cache.delete('homepage_template')
-
-    @property
+    @orm_cached(policy='on-table-change:tickets')
     def ticket_count(self):
-        return self.cache.get_or_create('ticket_count', self.load_ticket_count)
-
-    def load_ticket_count(self):
         return TicketCollection(self.session()).get_count()
 
-    def update_ticket_count(self):
-        return self.cache.delete('ticket_count')
+    @orm_cached(policy='on-table-change:pages')
+    def homepage_pages(self):
+        pages = PageCollection(self.session()).query()
+        pages = pages.filter(Topic.type == 'topic')
+
+        # XXX use JSON/JSONB for this (the attribute is not there if it's
+        # false, so this is not too bad speed-wise but it's still awful)
+        pages = pages.filter(Topic.meta.contains(
+            'is_visible_on_homepage'
+        ))
+
+        result = defaultdict(list)
+
+        for page in pages.all():
+            if page.is_visible_on_homepage:
+                result[page.root.id].append(page)
+
+        for key in result:
+            result[key] = list(sorted(
+                result[key],
+                key=lambda p: utils.normalize_for_url(p.title)
+            ))
+
+        return result
 
     def send_email(self, **kwargs):
         """ Wraps :meth:`onegov.core.framework.Framework.send_email`, setting
@@ -165,37 +135,6 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
     @property
     def theme_options(self):
         return self.org.theme_options or {}
-
-    @property
-    def homepage_pages(self):
-        return self.cache.get_or_create(
-            'homepage_pages', self.load_homepage_pages)
-
-    def load_homepage_pages(self):
-        pages = PageCollection(self.session()).query()
-        pages = pages.filter(Topic.type == 'topic')
-
-        # XXX use JSON/JSONB for this (the attribute is not there if it's
-        # false, so this is not too bad speed-wise but it's still awful)
-        pages = pages.filter(Topic.meta.contains(
-            'is_visible_on_homepage'
-        ))
-
-        result = defaultdict(list)
-        for page in pages.all():
-            if page.is_visible_on_homepage:
-                result[page.root.id].append(page)
-
-        for key in result:
-            result[key] = list(sorted(
-                result[key],
-                key=lambda p: utils.normalize_for_url(p.title)
-            ))
-
-        return result
-
-    def update_homepage_pages(self):
-        return self.cache.delete('homepage_pages')
 
 
 @OrgApp.webasset_path()
