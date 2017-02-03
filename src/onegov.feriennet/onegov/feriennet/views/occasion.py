@@ -130,6 +130,7 @@ def book_occasion(self, request, form):
 
         # should be caught by the form
         assert not (self.full and self.period.confirmed)
+        assert self.activity.state == 'accepted'
 
         bookings = BookingCollection(request.app.session())
 

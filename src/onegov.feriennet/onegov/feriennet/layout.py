@@ -144,7 +144,7 @@ class VacationActivityLayout(DefaultLayout):
                 classes=('edit-link', )
             ))
 
-            if not PeriodCollection(self.app.session()).query().first():
+            if not self.request.app.periods:
                 links.append(ConfirmLink(
                     text=_("New Occasion"),
                     url='#',

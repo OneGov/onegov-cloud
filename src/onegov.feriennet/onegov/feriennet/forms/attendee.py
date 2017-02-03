@@ -157,6 +157,13 @@ class AttendeeForm(Form):
             ))
             return False
 
+    def ensure_correct_activity_state(self):
+        if not self.model.activity.state != 'approved':
+            self.attendee.errors.append(_(
+                "This is an unapproved activity"
+            ))
+            return False
+
     def ensure_not_over_limit(self):
         if self.is_new:
             return True

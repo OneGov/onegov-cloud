@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes users being able to book occasions of unapproved activites.
+  [href]
+
 - Start caching some often used data using the orm cache descriptor.
   [href]
 
