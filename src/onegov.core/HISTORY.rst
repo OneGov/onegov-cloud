@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.36.0 (2017-02-03)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds an experimental cache descriptor to greatly ease the use of cached
   orm objects/queries.
