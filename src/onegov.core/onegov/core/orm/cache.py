@@ -141,6 +141,12 @@ class OrmCacheDescriptor(object):
 
         """
 
+        # the records we merge back from the pickled state aren't always
+        # properly flushed if we they are marged into other queries, so
+        # before merging we must be sure that all state has been flushed
+        if session.dirty:
+            session.flush()
+
         if sqlalchemy.inspect(obj, raiseerr=False):
             obj = session.merge(obj, load=False)
             obj.is_cached = True

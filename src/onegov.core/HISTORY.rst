@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes an edge case where the orm cache would discard pending changes.
+  [href]
+
 0.36.0 (2017-02-03)
 ~~~~~~~~~~~~~~~~~~~
 
