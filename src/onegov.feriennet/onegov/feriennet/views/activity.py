@@ -234,11 +234,33 @@ def view_activity(self, request):
         else:
             return 'general'
 
+    def show_enroll(occasion):
+        if self.state != 'accepted':
+            return False
+
+        if not occasion.active:
+            return False
+
+        if occasion.cancelled:
+            return False
+
+        if occasion.full:
+            return False
+
+        if occasion.period.finalized:
+            return False
+
+        if occasion.period.phase not in ('wishlist', 'booking', 'execution'):
+            return False
+
+        return True
+
     return {
         'layout': layout,
         'title': self.title,
         'activity': self,
         'ticket': ticket,
+        'show_enroll': show_enroll,
         'occasion_links': occasion_links,
         'occasions_by_period': occasions_by_period(
             session=session,

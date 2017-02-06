@@ -52,7 +52,7 @@
                         <ul class="occasions">
                             <li tal:repeat="occasion occasions">
                                 <h4>${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</h4>
-                                <tal:block metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll occasion.active and not occasion.cancelled and (period.wishlist_phase or not occasion.full) and not period.finalized and activity.state == 'accepted'" />
+                                <tal:block metal:use-macro="layout.macros.occasion" tal:define="show_links True; show_enroll show_enroll(occasion)" />
                             </li>
                         </ul>
                     </div>

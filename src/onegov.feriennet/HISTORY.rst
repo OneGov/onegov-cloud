@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Do not show the booking button before the wishlist phase has started.
+  [href]
+
 - Adds a notes field to the attendee.
   [href]
 
