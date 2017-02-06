@@ -7,7 +7,7 @@ from onegov.feriennet import _
 from onegov.form import Form
 from onegov.user import UserCollection
 from purl import URL
-from wtforms.fields import RadioField, StringField
+from wtforms.fields import RadioField, StringField, TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
 
@@ -36,6 +36,12 @@ class AttendeeForm(Form):
             ('male', _("Boy")),
         ],
         validators=[InputRequired()],
+        depends_on=('attendee', 'other')
+    )
+
+    notes = TextAreaField(
+        label=_("Note"),
+        description=_("Allergies, Disabilities, Particulars"),
         depends_on=('attendee', 'other')
     )
 

@@ -44,6 +44,10 @@
                                     <span i18n:translate>(User: <a i18n:name="user" href="mailto:${details.attendee.username}">${details.attendee.username}</a>)</span>
                                 </span>
                             </div>
+                            <div tal:condition="details.attendee.notes">
+                                <span i18n:translate>Notes:</span>
+                                <span>${details.attendee.notes}</span>
+                            </div>
                         </li>
                     </ul>
                 </div>

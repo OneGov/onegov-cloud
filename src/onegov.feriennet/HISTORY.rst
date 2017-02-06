@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a notes field to the attendee.
+  [href]
+
 - Add organiser to the searchable attributes of activites.
   [href]
 

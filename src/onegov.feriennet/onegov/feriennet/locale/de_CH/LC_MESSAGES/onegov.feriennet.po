@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-06 14:48+0100\n"
+"POT-Creation-Date: 2017-02-06 15:37+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -209,6 +209,12 @@ msgstr "Geburtsdatum"
 msgid "Gender"
 msgstr "Geschlecht"
 
+msgid "Note"
+msgstr "Bemerkung"
+
+msgid "Allergies, Disabilities, Particulars"
+msgstr "Allergien, Behinderungen, Besonderheiten"
+
 msgid "Add a new attendee"
 msgstr "Neuen Teilnehmer erfassen"
 
@@ -335,9 +341,6 @@ msgstr "Ende"
 
 msgid "Location"
 msgstr "Ort"
-
-msgid "Note"
-msgstr "Bemerkung"
 
 msgid "Cost"
 msgstr "Kosten"
@@ -965,6 +968,9 @@ msgstr "Fehlt!"
 
 msgid "(User: ${user})"
 msgstr "(Benutzer: ${user})"
+
+msgid "Notes:"
+msgstr "Bemerkungen:"
 
 msgid ""
 "The following activites contain occasions which are in conflict with the "
