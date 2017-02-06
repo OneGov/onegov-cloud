@@ -1426,7 +1426,12 @@ def test_period_phases(session):
     assert period.phase == 'inactive'
 
     period.active = True
-    assert period.phase == 'wishlist'
+
+    with freeze_time('2016-08-31'):
+        assert period.phase == 'inactive'
+
+    with freeze_time('2016-09-01'):
+        assert period.phase == 'wishlist'
 
     period.confirmed = True
     assert period.phase == 'booking'

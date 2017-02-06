@@ -152,7 +152,9 @@ class Period(Base, TimestampMixin):
 
     @property
     def phase(self):
-        if not self.active:
+        today = date.today()
+
+        if not self.active or today < self.prebooking_start:
             return 'inactive'
 
         if not self.confirmed:
@@ -160,8 +162,6 @@ class Period(Base, TimestampMixin):
 
         if not self.finalized:
             return 'booking'
-
-        today = date.today()
 
         if today < self.execution_start:
             return 'payment'

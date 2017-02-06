@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Do not start the wishlist-phase before its start date.
+  [href]
+
 - Adds a notes field to the attendees.
   [href]
 
