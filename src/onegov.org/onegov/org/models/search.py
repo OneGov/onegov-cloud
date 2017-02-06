@@ -58,7 +58,7 @@ class Search(Pagination):
         match_rest = MultiMatch(query=query, fields=[
             'title', 'lead', 'text', 'email', 'function', 'number',
             'ticket_email', 'ticket_data', 'description', 'location',
-            'group', 'username', 'realname'
+            'group', 'username', 'realname', 'organiser'
         ], fuzziness='1')
 
         search = search.query(match_title | match_rest)

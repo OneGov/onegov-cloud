@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Add "organiser" to the search query.
+  [href]
+
 - Use onegov.core's orm cache descriptor for better, easier caching.
   [href]
 
