@@ -81,7 +81,7 @@ class AttendeeForm(Form):
         attendees = attendees.order_by(Attendee.name)
 
         self.attendee.choices = [(a.id.hex, a.name) for a in attendees.all()]
-        self.attendee.choices.append(('other', _("Other")))
+        self.attendee.choices.append(('other', _("Add a new attendee")))
 
         # override the default
         if self.attendee.data == '0xdeadbeef':
