@@ -18,7 +18,8 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
     es_properties = {
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
-        'text': {'type': 'localized_html'}
+        'text': {'type': 'localized_html'},
+        'organiser': {'type': 'string'}
     }
 
     @property
@@ -38,6 +39,13 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
         return {
             'input': (self.title.lower(), )
         }
+
+    @property
+    def organiser(self):
+        return [
+            self.user.username,
+            self.user.realname
+        ]
 
     def ordered_tags(self, request):
         tags = [request.translate(_(tag)) for tag in self.tags]

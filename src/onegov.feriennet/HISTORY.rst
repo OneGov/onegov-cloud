@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Add organiser to the searchable attributes of activites.
+  [href]
+
 - Fixes users being able to book occasions of unapproved activites.
   [href]
 
