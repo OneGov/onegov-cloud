@@ -190,8 +190,14 @@ def add_source_field_to_invoice_items(context):
     ))
 
 
-@upgrade_task('Add gender field to attendees')
-def add_gender_field_to_attendees(context):
-    context.operations.add_column('attendees', Column(
-        'gender', Text, nullable=True
-    ))
+@upgrade_task('Add gender/notes fields to attendees')
+def add_gender_notes_fields_to_attendees(context):
+    if not context.has_column('attendees', 'gender'):
+        context.operations.add_column('attendees', Column(
+            'gender', Text, nullable=True
+        ))
+
+    if not context.has_column('attendees', 'notes'):
+        context.operations.add_column('attendees', Column(
+            'notes', Text, nullable=True
+        ))

@@ -39,6 +39,9 @@ class Attendee(Base, TimestampMixin):
     #: we use text for possible gender fluidity in the future ;)
     gender = Column(Text, nullable=True)
 
+    #: notes about the attendee by the parents (e.g. allergies)
+    notes = Column(Text, nullable=True)
+
     @validates('gender')
     def validate_gender(self, field, value):
         # for now we stay old-fashioned

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a notes field to the attendees.
+  [href]
+
 - Adds a gender field to the attendees.
   [href]
 
