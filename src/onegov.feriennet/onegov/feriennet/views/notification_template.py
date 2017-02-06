@@ -1,7 +1,7 @@
 from collections import OrderedDict
 
 from onegov.activity import PeriodCollection
-from onegov.core.security import Private
+from onegov.core.security import Secret
 from onegov.core.templates import render_template
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import NotificationTemplateCollection
@@ -27,7 +27,7 @@ def get_variables(request):
 
 @FeriennetApp.html(
     model=NotificationTemplateCollection,
-    permission=Private,
+    permission=Secret,
     template='notification_templates.pt')
 def view_notification_templates(self, request):
 
@@ -64,7 +64,7 @@ def view_notification_templates(self, request):
 
 @FeriennetApp.form(
     model=NotificationTemplateCollection,
-    permission=Private,
+    permission=Secret,
     template='notification_template_form.pt',
     name='neu',
     form=NotificationTemplateForm)
@@ -91,7 +91,7 @@ def view_notification_template_form(self, request, form):
 
 @FeriennetApp.form(
     model=NotificationTemplate,
-    permission=Private,
+    permission=Secret,
     template='notification_template_form.pt',
     name='bearbeiten',
     form=NotificationTemplateForm)
@@ -118,7 +118,7 @@ def edit_notification(self, request, form):
 
 @FeriennetApp.view(
     model=NotificationTemplate,
-    permission=Private,
+    permission=Secret,
     request_method='DELETE')
 def delete_notification(self, request):
     request.assert_valid_csrf_token()
@@ -132,7 +132,7 @@ def delete_notification(self, request):
 
 @FeriennetApp.form(
     model=NotificationTemplate,
-    permission=Private,
+    permission=Secret,
     template='notification_template_send_form.pt',
     name='versand',
     form=NotificationTemplateSendForm)

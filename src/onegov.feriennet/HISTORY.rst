@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Revoke access to notifications for organisers.
+  [href]
+
 - Do not show the booking button before the wishlist phase has started.
   [href]
 

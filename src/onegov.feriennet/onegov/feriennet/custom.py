@@ -67,15 +67,16 @@ def get_admin_tools(request):
                 )
             )
 
-            links.append(
-                Link(
-                    text=_("Notifications"),
-                    url=request.class_link(
-                        NotificationTemplateCollection
-                    ),
-                    classes=('show-notifications', )
+            if request.is_admin:
+                links.append(
+                    Link(
+                        text=_("Notifications"),
+                        url=request.class_link(
+                            NotificationTemplateCollection
+                        ),
+                        classes=('show-notifications', )
+                    )
                 )
-            )
 
         if links:
             title = period and period.active and period.title
