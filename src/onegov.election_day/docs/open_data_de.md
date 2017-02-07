@@ -95,7 +95,7 @@ Name|Beschreibung
 `list_connection`|Die ID der Listenverbindung. Nur bei Proporzwahlen.
 `list_connection_parent`|Die ID der übergeorndeten Listenverbidnung. Nur bei Proporzwahlen und falls es sich um eine Unterlistenverbindung handelt.
 `candidate_family_name`|Der Nachnahme des Kandidierenden.
-`candidate_first_name`|Der Vorname des Kandidaten.
+`candidate_first_name`|Der Vorname des Kandidierenden.
 `candidate_id`|Die ID des Kandidierenden.
 `candidate_elected`|True, falls der Kandidierenden gewählt wurde.
 `candidate_votes`|Die Anzahl Kandidierendenstimmen der Gemeinde.
