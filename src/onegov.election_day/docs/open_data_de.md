@@ -31,7 +31,7 @@ Name|Beschreibung
 `date`|Das Datum (ISO 8601).
 `domain`|Einflussbereich (Bund, Kanton, ...).
 `url`|Ein Link zur Detailansicht.
-`progess`|Ein Objekt welches die Anzahl ausgezählter Gemeinden (`counted`) die Gesamtzahl an Gemeinden (`total`) enthält.
+`progess`|Ein Objekt welches die Anzahl ausgezählter Gemeinden (`counted`) und die Gesamtzahl an Gemeinden (`total`) enthält.
 
 Abstimmungsresultate enthalten die folgenden zusätzlichen Informationen:
 
