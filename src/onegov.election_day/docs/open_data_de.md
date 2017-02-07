@@ -42,9 +42,6 @@ Name|Beschreibung
 `nays_percentage`|Nein-Stimmen in Prozent.
 `local` (*optional*)|Eidgenössische und kantonale Abstimmungen innerhalb kommunaler Instanzen können zusätzlich die Resultate dieser Gemeinde enthalten als zusätzliches Objekt mit den Feldern `answer`, `yeas_percentage` and `nays_percentage`.
 
-
-Kantonale und
-
 ## Wahlresultate
 
 ### Aufbereitete Ergebnisse
