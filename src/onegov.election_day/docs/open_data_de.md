@@ -8,11 +8,11 @@ Eine "Gemeinde" kann auch ein Bezirk, ein Wahlkreis etc. sein.
 
 ## Inhalt
 
-1. [Ergebnissübersicht](#ergebnissübersicht)
+1. [Ergebnisübersicht](#ergebnisübersicht)
 2. [Wahlresultate](#wahlresultate)
 3. [Abstimmungsresultate](#abstimmungsresultate)
 
-## Ergebnissübersicht
+## Ergebnisübersicht
 
 ```
 URL (letzte): /json
