@@ -86,7 +86,7 @@ Name|Beschreibung
 `entity_unaccounted_ballots`|Die Anzahl der ungültigen oder leeren Stimmzettel der Gemeinde.
 `entity_accounted_ballots`|Die Anzahl gültiger Stimmzettel der Gemeinde.
 `entity_blank_votes`|Die Anzahl leerer Stimmen der Gemeinde.
-`entity_invalid_votes`|Die Anzahl ungültiger Stimmen der Gemeinde. Null falls Proporzwahl.
+`entity_invalid_votes`|Die Anzahl ungültiger Stimmen der Gemeinde. `null` falls Proporzwahl.
 `entity_accounted_votes`|Die Anzahl gültiger Stimmen der Gemeinde.
 `list_name`|Der Name der Liste des Kandidierenden. Nur bei Proporzwahlen.
 `list_id`|Die ID der Liste, für welche der Kandidierende kandidiert. Nur bei Proporzwahlen.
