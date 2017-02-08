@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fix typos in documentation.
+  [treinhard, freinhard]
+
 1.5.0 (2017-01-12)
 ~~~~~~~~~~~~~~~~~~~
 
