@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds (partial) support for 2017.
+  [msom]
+
 - Fix typos in documentation.
   [treinhard, freinhard]
 
