@@ -255,7 +255,7 @@ def test_principal_years_available():
         for year in range(2009, 2017):
             assert principal.is_year_available(year, map_required=False)
 
-        if canton in ['gr', 'sg', 'sz', 'zg']:
+        if canton in ['gr', 'sg', 'sz', 'so', 'zg']:
             assert principal.is_year_available(2017)
             assert principal.is_year_available(2017, map_required=False)
         else:
