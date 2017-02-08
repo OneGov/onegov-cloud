@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.5.1 (2017-02-08)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds (partial) support for 2017.
   [msom]
