@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.0 (2017-02-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Add "organiser" to the search query.
   [href]
 
