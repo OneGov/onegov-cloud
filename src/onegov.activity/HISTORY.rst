@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.0 (2017-02-09)
+~~~~~~~~~~~~~~~~~~~
+
 - Reworks the occasions database model to include multiple dates per occasion.
   [href]
 
