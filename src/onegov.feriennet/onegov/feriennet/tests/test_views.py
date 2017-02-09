@@ -305,7 +305,8 @@ def test_activity_filter_duration(feriennet_app):
     assert "Retreat" in many_day
 
     # shorten the retreat
-    occasions.by_id(reatreat_occasion_id).end -= timedelta(days=1)
+    occasions.by_id(reatreat_occasion_id).dates[0].end -= timedelta(days=1)
+
     transaction.commit()
 
     full_day = client.get('/angebote').click('Ganztägig')

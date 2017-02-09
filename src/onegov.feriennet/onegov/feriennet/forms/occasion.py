@@ -187,8 +187,8 @@ class OccasionForm(Form):
         })
 
         model.timezone = self.timezone
-        model.start = self.localized_start
-        model.end = self.localized_end
+        model.dates[0].start = self.localized_start
+        model.dates[0].end = self.localized_end
         model.age = OccasionCollection.to_half_open_interval(
             self.min_age.data, self.max_age.data)
         model.spots = OccasionCollection.to_half_open_interval(
@@ -197,8 +197,8 @@ class OccasionForm(Form):
     def process_obj(self, model):
         super().process_obj(model)
 
-        self.start.data = model.localized_start
-        self.end.data = model.localized_end
+        self.start.data = model.dates[0].localized_start
+        self.end.data = model.dates[0].localized_end
         self.min_age.data = model.age.lower
         self.max_age.data = model.age.upper - 1
         self.min_spots.data = model.spots.lower

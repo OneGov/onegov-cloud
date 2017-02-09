@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from itertools import groupby
-from onegov.activity import Activity, Booking, Attendee, Occasion
+from onegov.activity import Activity, Booking, Attendee, Occasion, OccasionDate
 from statistics import mean
 from sqlalchemy import func, literal_column, not_, distinct
 
@@ -20,25 +20,32 @@ class MatchCollection(object):
 
     @property
     def base(self):
+        d = self.session.query(OccasionDate)
+        d = d.with_entities(OccasionDate.id)
+        d = d.distinct(OccasionDate.occasion_id)
+        d = d.order_by(OccasionDate.occasion_id, OccasionDate.start)
+
         q = self.session.query(Booking)
         q = q.with_entities(
             Booking.state.label('booking_state'),
             Activity.title.label('activity_title'),
             Occasion.id.label('occasion_id'),
-            Occasion.start.label('occasion_start'),
-            Occasion.end.label('occasion_end'),
-            Occasion.timezone.label('occasion_timezone'),
+            OccasionDate.start.label('occasion_start'),
+            OccasionDate.end.label('occasion_end'),
+            OccasionDate.timezone.label('occasion_timezone'),
             Occasion.spots.label('occasion_spots'),
             Occasion.age.label('occasion_age'),
             Attendee.name.label('attendee_name'),
             Attendee.age.label('attendee_age')
         )
         q = q.filter(Booking.period_id == self.period.id)
+        q = q.filter(OccasionDate.id.in_(d.subquery()))
 
         q = q.order_by(Activity.name)
-        q = q.order_by(Occasion.start)
+        q = q.order_by(Occasion.order)
         q = q.order_by(Occasion.id)
         q = q.join(Occasion)
+        q = q.join(OccasionDate)
         q = q.join(Activity)
         q = q.join(Attendee)
 
@@ -48,9 +55,9 @@ class MatchCollection(object):
             literal_column('NULL').label('booking_state'),
             Activity.title.label('activity_title'),
             Occasion.id.label('occasion_id'),
-            Occasion.start.label('occasion_start'),
-            Occasion.end.label('occasion_end'),
-            Occasion.timezone.label('occasion_timezone'),
+            OccasionDate.start.label('occasion_start'),
+            OccasionDate.end.label('occasion_end'),
+            OccasionDate.timezone.label('occasion_timezone'),
             Occasion.spots.label('occasion_spots'),
             Occasion.age.label('occasion_age'),
             literal_column('NULL').label('attendee_name'),
@@ -64,6 +71,7 @@ class MatchCollection(object):
                 .subquery()
             )
         ))
+        e = e.filter(OccasionDate.id.in_(d.subquery()))
         e = e.join(Occasion.activity)
 
         return q.union(e).order_by('activity_title')

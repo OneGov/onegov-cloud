@@ -115,6 +115,12 @@
             <!--! the width of this column together with the next one doesn't add up to 12 by
             intention to make space for the icons rendered ::before the first column. -->
             <div class="small-12 medium-4 columns factoids">
+                <ul tal:condition="len(occasion.dates) > 1">
+                    <li tal:repeat="date occasion.dates[1:]">
+                        ${layout.format_datetime_range(date.localized_start, date.localized_end)}
+                    </li>
+                </ul>
+
                 <div class="full" tal:condition="show_stats and not occasion.cancelled and occasion.full">
                     <span i18n:translate>Fully booked</span>
                 </div>

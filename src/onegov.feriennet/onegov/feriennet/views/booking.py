@@ -38,7 +38,7 @@ def all_bookings(collection):
 
     query = query.order_by(Booking.attendee_id)
     query = query.order_by(Activity.name)
-    query = query.order_by(Occasion.start)
+    query = query.order_by(Occasion.order)
 
     return query.all()
 
@@ -85,8 +85,8 @@ def get_booking_title(layout, booking):
     return "{} - {}".format(
         booking.occasion.activity.title,
         layout.format_datetime_range(
-            booking.occasion.start,
-            booking.occasion.end))
+            booking.occasion.dates[0].start,
+            booking.occasion.dates[0].end))
 
 
 def actions_by_booking(layout, period, booking):

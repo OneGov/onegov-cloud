@@ -29,7 +29,13 @@
                             Print
                         </a>
 
-                        <div class="calendar-icon before fixed-width">${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</div>
+                        <div class="calendar-icon before fixed-width">
+                            <ul>
+                                <li tal:repeat="date occasion.dates">
+                                    ${layout.format_datetime_range(date.localized_start, date.localized_end)}
+                                </li>
+                            </ul>
+                        </div>
                         <div class="child-icon before fixed-width" i18n:translate><tal:block i18n:name="count" replace="occasion.attendee_count" /> attendees</div>
                     </div>
 

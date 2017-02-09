@@ -116,7 +116,7 @@ class NotificationTemplateSendForm(Form):
         q = q.join(Activity)
         q = q.join(Period)
         q = q.filter(Period.active == True)
-        q = q.order_by(Activity.name, Occasion.start)
+        q = q.order_by(Activity.name, Occasion.order)
 
         if self.request.is_organiser_only:
             q = q.filter(Activity.username == self.request.current_username)
@@ -125,12 +125,14 @@ class NotificationTemplateSendForm(Form):
 
         def choice(occasion):
             return occasion.id.hex, self.request.translate(_(
-                '${title} <small>${date}, ${count} Attendees</small>',
+                '${title} <small>${dates}, ${count} Attendees</small>',
                 mapping={
                     'title': occasion.activity.title,
-                    'date': layout.format_datetime_range(
-                        occasion.localized_start,
-                        occasion.localized_end
+                    'dates': ', '.join(
+                        layout.format_datetime_range(
+                            d.localized_start,
+                            d.localized_end
+                        ) for d in occasion.dates
                     ),
                     'count': occasion.attendee_count
                 }

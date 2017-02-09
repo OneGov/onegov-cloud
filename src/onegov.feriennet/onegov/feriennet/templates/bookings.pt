@@ -73,7 +73,11 @@
                                                     <h4>${booking.occasion.activity.title}</h4>
                                                 </a>
                                                 <div class="occasion">
-                                                    ${layout.format_datetime_range(booking.occasion.localized_start, booking.occasion.localized_end)}
+                                                    <ul>
+                                                        <li tal:repeat="date booking.occasion.dates">
+                                                            ${layout.format_datetime_range(date.localized_start, date.localized_end)}
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                                 <div class="cost">
                                                     <span class="${period.confirmed and booking.state != 'accepted' and 'strikethrough' or ''}" tal:define="cost booking_cost(booking)">

@@ -13,7 +13,7 @@
                 <h2>${occasion.activity.title}</h2>
 
                 <div class="occasions">
-                    <h3>${layout.format_datetime_range(occasion.localized_start, occasion.localized_end)}</h3>
+                    <h3>${layout.format_datetime_range(occasion.dates[0].localized_start, occasion.dates[0].localized_end)}</h3>
                     <tal:block metal:use-macro="layout.macros.occasion" />
                 </div>
 

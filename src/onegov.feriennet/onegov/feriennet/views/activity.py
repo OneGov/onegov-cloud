@@ -44,7 +44,7 @@ def occasions_by_period(session, activity, active_only):
     query = query.order_by(
         desc(Period.active),
         Period.execution_start,
-        Occasion.start)
+        Occasion.order)
 
     return tuple(
         (title, tuple(occasions)) for title, occasions in
@@ -150,8 +150,8 @@ def view_activity(self, request):
             text=_("Delete"), url=layout.csrf_protected_url(request.link(o)),
             confirm=_('Do you really want to delete "${title}"?', mapping={
                 'title': layout.format_datetime_range(
-                    o.localized_start,
-                    o.localized_end
+                    o.dates[0].localized_start,
+                    o.dates[0].localized_end
                 ),
             }),
             redirect_after=request.link(self),
@@ -171,8 +171,8 @@ def view_activity(self, request):
         yield Link(text=_("Edit"), url=request.link(o, name='bearbeiten'))
 
         title = layout.format_datetime_range(
-            o.localized_start,
-            o.localized_end
+            o.dates[0].localized_start,
+            o.dates[0].localized_end
         )
 
         if o.cancelled and not o.period.finalized:

@@ -32,7 +32,7 @@ class OccasionAttendeeCollection(OccasionCollection):
         if self.username:
             q = q.filter(Activity.username == self.username)
 
-        return q.order_by(Activity.title, Occasion.start, Occasion.id)
+        return q.order_by(Activity.title, Occasion.order, Occasion.id)
 
     def occasions(self):
         occasions = OrderedDict()

@@ -1,6 +1,6 @@
 from cached_property import cached_property
 from datetime import datetime
-from onegov.activity import Activity, Period, Occasion, OccasionCollection
+from onegov.activity import Activity, Period, Occasion, OccasionDate
 from onegov.core.utils import Bunch
 from onegov.feriennet import _
 from onegov.form import Form
@@ -119,7 +119,7 @@ class PeriodForm(Form):
             self.single_booking_cost.data = model.booking_cost
 
     @cached_property
-    def conflicting_activites(self):
+    def conflicting_activities(self):
         if not isinstance(self.model, Period):
             return None
 
@@ -129,28 +129,31 @@ class PeriodForm(Form):
         maxdate = self.execution_end.data
 
         # turn naive utc to aware utc to local timezone
-        occasion_start = Occasion.start.op('AT TIME ZONE')(literal('UTC'))
-        occasion_start = occasion_start.op('AT TIME ZONE')(Occasion.timezone)
-        occasion_end = Occasion.end.op('AT TIME ZONE')(literal('UTC'))
-        occasion_end = occasion_end.op('AT TIME ZONE')(Occasion.timezone)
+        start = OccasionDate.start.op('AT TIME ZONE')(literal('UTC'))
+        start = start.op('AT TIME ZONE')(OccasionDate.timezone)
+        end = OccasionDate.end.op('AT TIME ZONE')(literal('UTC'))
+        end = end.op('AT TIME ZONE')(OccasionDate.timezone)
 
-        query = OccasionCollection(session).query()
-        query = query.with_entities(distinct(Occasion.activity_id))
-        query = query.filter(Occasion.period == self.model)
-        query = query.filter(or_(
-            func.date_trunc('day', occasion_start) < mindate,
-            func.date_trunc('day', occasion_start) > maxdate,
-            func.date_trunc('day', occasion_end) < mindate,
-            func.date_trunc('day', occasion_end) > maxdate
+        qd = session.query(OccasionDate)
+        qd = qd.with_entities(OccasionDate.occasion_id)
+        qd = qd.filter(or_(
+            func.date_trunc('day', start) < mindate,
+            func.date_trunc('day', start) > maxdate,
+            func.date_trunc('day', end) < mindate,
+            func.date_trunc('day', end) > maxdate
         ))
 
-        query = session.query(Activity).filter(
-            Activity.id.in_(query.subquery()))
+        q = session.query(OccasionDate).join(Occasion)
+        q = q.with_entities(distinct(Occasion.activity_id))
+        q = q.filter(Occasion.period == self.model)
+        q = q.filter(Occasion.id.in_(qd.subquery()))
 
-        return query.all()
+        return tuple(
+            session.query(Activity).filter(Activity.id.in_(q.subquery()))
+        )
 
     def ensure_no_occasion_conflicts(self):
-        if self.conflicting_activites:
+        if self.conflicting_activities:
             msg = _("The execution phase conflicts with existing occasions")
             self.execution_start.errors.append(msg)
             self.execution_end.errors.append(msg)

@@ -3,14 +3,14 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
-        <tal:block condition="form.conflicting_activites|nothing">
+        <tal:block condition="form.conflicting_activities|nothing">
             <div class="panel callout">
                 <p i18n:translate>
                 The following activites contain occasions which are in conflict
                 with the given execution phase:
                 </p>
                 <ul>
-                    <li tal:repeat="activity form.conflicting_activites">
+                    <li tal:repeat="activity form.conflicting_activities">
                         <a href="${request.link(activity)}">${activity.title}</a>
                     </li>
                 </ul>

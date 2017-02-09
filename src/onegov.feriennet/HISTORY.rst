@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Supports multiple dates for occasions.
+  [href]
+
 - Revoke access to notifications for organisers.
   [href]
 
