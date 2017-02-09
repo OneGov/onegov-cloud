@@ -209,3 +209,33 @@ def test_prefer_admin_children(session, owner, member, collections,
 
     assert b1.state == 'accepted'
     assert b2.state == 'open'
+
+
+def test_multiple_overlapping_dates(session, owner, collections,
+                                    prebooking_period):
+
+    o1 = new_occasion(collections, prebooking_period, 0, 1)
+    collections.occasions.add_date(
+        o1,
+        o1.dates[0].end + timedelta(days=2, seconds=1),
+        o1.dates[0].end + timedelta(days=3),
+        o1.dates[0].timezone
+    )
+
+    o2 = new_occasion(collections, prebooking_period, 2, 1)
+    collections.occasions.add_date(
+        o2,
+        o2.dates[0].end + timedelta(days=3, seconds=1),
+        o2.dates[0].end + timedelta(days=4),
+        o2.dates[0].timezone
+    )
+
+    a1 = new_attendee(collections, user=owner)
+
+    b1 = collections.bookings.add(owner, a1, o1, priority=1)
+    b2 = collections.bookings.add(owner, a1, o2, priority=0)
+
+    match(session, prebooking_period.id)
+
+    assert b1.state == 'accepted'
+    assert b2.state == 'blocked'

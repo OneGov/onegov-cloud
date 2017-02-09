@@ -2,20 +2,19 @@ import pytest
 import sqlalchemy
 import transaction
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from freezegun import freeze_time
 from onegov.activity import ActivityCollection
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
 from onegov.activity import BookingCollection
 from onegov.activity import InvoiceItemCollection
-from onegov.activity import Occasion
+from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
 from pytz import utc
-from sedate import replace_timezone
 from uuid import uuid4
 
 
@@ -169,9 +168,10 @@ def test_occasions(session, owner):
     transaction.commit()
 
     tournament = occasions.query().one()
-    assert tournament.start == datetime(2016, 10, 4, 11, tzinfo=utc)
-    assert tournament.end == datetime(2016, 10, 4, 12, tzinfo=utc)
-    assert tournament.timezone == "Europe/Zurich"
+    assert tournament.dates[0].start == datetime(2016, 10, 4, 11, tzinfo=utc)
+    assert tournament.dates[0].end == datetime(2016, 10, 4, 12, tzinfo=utc)
+    assert tournament.dates[0].timezone == "Europe/Zurich"
+    assert tournament.dates[0].duration_in_seconds == 3600
     assert tournament.location == "Lucerne"
     assert tournament.note == "Bring game-face"
     assert tournament.activity_id == activities.query().first().id
@@ -273,16 +273,24 @@ def test_profiles(session, owner):
     assert autumn_id in sport.period_ids
 
 
-def test_occasions_daterange_constraint(session, owner):
+def test_occasion_daterange_constraint(session, owner):
+    period = PeriodCollection(session).add(
+        title="Autumn 2016",
+        prebooking=(datetime(2000, 1, 1), datetime(2000, 1, 1)),
+        execution=(datetime(2001, 1, 1), datetime(2050, 12, 31))
+    )
+
     sport = ActivityCollection(session).add("Sport", username=owner.username)
-    sport.occasions.append(Occasion(
-        start=replace_timezone(datetime(2020, 10, 10), 'Europe/Zurich'),
-        end=replace_timezone(datetime(2010, 10, 10), 'Europe/Zurich'),
-        timezone='Europe/Zurich'
-    ))
+    occasions = OccasionCollection(session)
 
     with pytest.raises(sqlalchemy.exc.IntegrityError):
-        session.flush()
+        occasions.add(
+            activity=sport,
+            start=datetime(2020, 10, 10),
+            end=datetime(2010, 10, 10),
+            timezone='Europe/Zurich',
+            period=period
+        )
 
 
 def test_no_orphan_bookings(session, owner):
@@ -1164,7 +1172,7 @@ def test_accept_booking(session, owner):
     period.all_inclusive = True
     period.max_bookings_per_attendee = 1
 
-    assert o1.end < o3.start
+    assert o1.dates[0].end < o3.dates[0].start
     b1 = bookings.add(owner, a1, o1)
     b2 = bookings.add(owner, a1, o3)
 
@@ -1609,3 +1617,76 @@ def test_cancel_occasion(session, owner):
     assert b2.state == 'accepted'
     assert o1.cancelled
     assert not o2.cancelled
+
+
+def test_no_overlapping_dates(session, collections, prebooking_period, owner):
+    period = prebooking_period
+
+    o = collections.occasions.add(
+        start=period.execution_start,
+        end=period.execution_start + timedelta(hours=2),
+        timezone="Europe/Zurich",
+        activity=collections.activities.add("Sport", username=owner.username),
+        period=period
+    )
+
+    with pytest.raises(AssertionError):
+        collections.occasions.add_date(
+            occasion=o,
+            start=period.execution_start + timedelta(hours=1),
+            end=period.execution_start + timedelta(hours=3),
+            timezone="Europe/Zurich"
+        )
+
+
+def test_no_occasion_orphans(session, collections, prebooking_period, owner):
+    period = prebooking_period
+
+    collections.occasions.add(
+        start=period.execution_start,
+        end=period.execution_start + timedelta(hours=2),
+        timezone="Europe/Zurich",
+        activity=collections.activities.add("Sport", username=owner.username),
+        period=period
+    )
+
+    transaction.commit()
+
+    assert collections.occasions.query().count() == 1
+    assert session.query(OccasionDate).count() == 1
+
+    collections.occasions.delete(collections.occasions.query().first())
+    transaction.commit()
+
+    assert collections.occasions.query().count() == 0
+    assert session.query(OccasionDate).count() == 0
+
+
+def test_date_changes(session, collections, prebooking_period, owner):
+    period = prebooking_period
+
+    collections.occasions.add(
+        start=period.execution_start,
+        end=period.execution_start + timedelta(hours=2),
+        timezone="Europe/Zurich",
+        activity=collections.activities.add("Sport", username=owner.username),
+        period=period
+    )
+
+    transaction.commit()
+
+    o = collections.occasions.query().first()
+    assert DAYS.has(o.durations, DAYS.half)
+    assert not DAYS.has(o.durations, DAYS.full)
+    assert not DAYS.has(o.durations, DAYS.many)
+
+    o.dates[0].end += timedelta(hours=6)
+    assert DAYS.has(o.durations, DAYS.half)
+    assert not DAYS.has(o.durations, DAYS.full)
+    assert not DAYS.has(o.durations, DAYS.many)
+
+    session.flush()
+
+    assert not DAYS.has(o.durations, DAYS.half)
+    assert DAYS.has(o.durations, DAYS.full)
+    assert not DAYS.has(o.durations, DAYS.many)

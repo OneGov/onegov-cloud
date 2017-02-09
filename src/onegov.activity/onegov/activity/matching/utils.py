@@ -1,6 +1,5 @@
-import sedate
-
 from onegov.activity import log
+from onegov.activity.utils import dates_overlap
 from sortedcontainers import SortedSet
 
 
@@ -9,9 +8,9 @@ def overlaps(booking, other):
 
     assert booking != other
 
-    return sedate.overlaps(
-        booking.start, booking.end,
-        other.start, other.end
+    return dates_overlap(
+        tuple((b.start, b.end) for b in booking.dates),
+        tuple((o.start, o.end) for o in other.dates),
     )
 
 

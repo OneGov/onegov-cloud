@@ -201,3 +201,28 @@ def add_gender_notes_fields_to_attendees(context):
         context.operations.add_column('attendees', Column(
             'notes', Text, nullable=True
         ))
+
+
+@upgrade_task('Support multiple dates per occasion')
+def support_multiple_dates_per_occasion(context):
+    context.operations.drop_constraint('start_before_end', 'occasions')
+
+    for name in ('durations', 'order'):
+        context.operations.add_column(
+            'occasions', Column(name, Integer, server_default="0"))
+        context.operations.alter_column(
+            'occasions', name, server_default=None)
+
+    context.session.execute("""
+        INSERT INTO occasion_dates ("timezone", "start", "end", "occasion_id")
+        SELECT "timezone", "start", "end", "id" FROM occasions
+    """)
+
+    context.session.flush()
+
+    # update dates
+    for occasion in context.session.query(Occasion):
+        occasion.on_date_change()
+
+    for name in ('start', 'end', 'timezone'):
+        context.operations.drop_column('occasions', name)

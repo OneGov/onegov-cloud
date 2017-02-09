@@ -1,4 +1,4 @@
-from onegov.activity.models import Occasion
+from onegov.activity.models import Occasion, OccasionDate
 from onegov.core.collection import GenericCollection
 from psycopg2.extras import NumericRange
 from sedate import standardize_date
@@ -26,10 +26,7 @@ class OccasionCollection(GenericCollection):
         start = standardize_date(start, timezone)
         end = standardize_date(end, timezone)
 
-        return super().add(
-            start=start,
-            end=end,
-            timezone=timezone,
+        occasion = super().add(
             location=location,
             age=age and self.to_half_open_interval(*age),
             spots=spots and self.to_half_open_interval(*spots),
@@ -38,3 +35,43 @@ class OccasionCollection(GenericCollection):
             period_id=period.id,
             cost=cost,
         )
+
+        self.add_date(occasion, start, end, timezone)
+
+        return occasion
+
+    def add_date(self, occasion, start, end, timezone):
+
+        start = standardize_date(start, timezone)
+        end = standardize_date(end, timezone)
+
+        date = OccasionDate(
+            start=start,
+            end=end,
+            timezone=timezone
+        )
+
+        occasion.dates.append(date)
+        self.session.flush()
+
+        return date
+
+    def find_date(self, occasion, start, end, timezone):
+        start = standardize_date(start, timezone)
+        end = standardize_date(end, timezone)
+
+        q = self.session.query(OccasionDate)
+        q = q.filter(OccasionDate.start == start)
+        q = q.filter(OccasionDate.end == end)
+        q = q.filter(OccasionDate.timezone == timezone)
+
+        return q.first()
+
+    def remove_date(self, date):
+        q = self.session.query(OccasionDate)
+        q = q.filter(OccasionDate.id == date.id)
+
+        date = q.first()
+
+        if date:
+            self.session.delete(date)

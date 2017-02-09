@@ -66,7 +66,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     @aggregated('occasions', Column(Integer, default=0))
     def durations(self):
-        return func.sum(distinct(Occasion.duration))
+        return func.sum(distinct(Occasion.durations))
 
     @aggregated('occasions', Column(ARRAY(IntRangeType), default=list))
     def ages(self):
@@ -79,7 +79,7 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: The occasions linked to this activity
     occasions = relationship(
         'Occasion',
-        order_by='Occasion.start',
+        order_by='Occasion.order',
         backref='activity'
     )
 

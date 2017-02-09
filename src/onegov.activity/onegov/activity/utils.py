@@ -1,3 +1,4 @@
+import sedate
 import string
 
 from random import SystemRandom
@@ -138,3 +139,19 @@ def generate_xml(payments):
             </BkToCstmrStmt>
         </Document>
     """.format('\n'.join(transactions))
+
+
+def dates_overlap(a, b):
+    """ Returns true if any time tuple in the list of tuples in a overlaps
+    with a time tuple in b.
+
+    """
+    # this can be done with an O(n log n) algorithm but since we are
+    # operating on a very small n the constant factors dominate and there
+    # are fewer constant factors in this approach:
+    for s, e in a:
+        for os, oe in b:
+            if sedate.overlaps(s, e, os, oe):
+                return True
+
+    return False

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reworks the occasions database model to include multiple dates per occasion.
+  [href]
+
 - Do not start the wishlist-phase before its start date.
   [href]
 

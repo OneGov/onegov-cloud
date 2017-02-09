@@ -1,12 +1,10 @@
-from enum import IntEnum
+import sedate
+
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
-from onegov.core.orm.types import UTCDateTime, UUID
+from onegov.core.orm.types import UUID
 from psycopg2.extras import NumericRange
-from sedate import to_timezone
 from sqlalchemy import Boolean
-from sqlalchemy import case
-from sqlalchemy import CheckConstraint
 from sqlalchemy import column
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -16,19 +14,9 @@ from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.dialects.postgresql import INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import relationship, object_session
-from sqlalchemy_utils import aggregated
+from sqlalchemy.orm import relationship, object_session, validates
+from sqlalchemy_utils import aggregated, observes
 from uuid import uuid4
-
-
-class DAYS(IntEnum):
-    half = 2**1
-    full = 2**2
-    many = 2**3
-
-    @staticmethod
-    def has(value, mask):
-        return value & mask > 0 if value else False
 
 
 class Occasion(Base, TimestampMixin):
@@ -46,15 +34,6 @@ class Occasion(Base, TimestampMixin):
 
     #: the public id of this occasion
     id = Column(UUID, primary_key=True, default=uuid4)
-
-    #: Timezone of the occasion
-    timezone = Column(Text, nullable=False)
-
-    #: Start date and time of the occasion
-    start = Column(UTCDateTime, nullable=False)
-
-    #: End date and time of the event (of the first event if recurring)
-    end = Column(UTCDateTime, nullable=False)
 
     #: Describes the location of the activity
     location = Column(Text, nullable=True)
@@ -86,6 +65,12 @@ class Occasion(Base, TimestampMixin):
     #: True if the occasion has been cancelled
     cancelled = Column(Boolean, nullable=False, default=False)
 
+    #: The durations defined by the associated dates
+    durations = Column(Integer, default=0)
+
+    #: The default order
+    order = Column(Integer, default=0)
+
     @aggregated('period', Column(Boolean, default=False))
     def active(self):
         return column('active')
@@ -101,29 +86,51 @@ class Occasion(Base, TimestampMixin):
         backref='occasion'
     )
 
+    #: The dates associated with this occasion (loaded eagerly)
+    dates = relationship(
+        'OccasionDate',
+        cascade='all,delete',
+        order_by='OccasionDate.start',
+        backref='occasion',
+        lazy='joined',
+    )
+
     accepted = relationship(
         'Booking',
         primaryjoin=("""and_(
             Booking.occasion_id == Occasion.id,
             Booking.state == 'accepted'
         )"""),
-        viewonly=True)
-
-    __table_args__ = (
-        CheckConstraint('"start" <= "end"', name='start_before_end'),
+        viewonly=True
     )
 
-    @property
-    def localized_start(self):
-        """ The localized version of the start date/time. """
+    def on_date_change(self):
+        """ Date changes are not properly propagated to the observer for
+        some reason, so we do this manually with a hook.
 
-        return to_timezone(self.start, self.timezone)
+        It's a bit of a hack, but multiple dates per occasion had to be
+        added at the last minute..
 
-    @property
-    def localized_end(self):
-        """ The localized version of the end date/time. """
+        """
+        self.observe_dates(self.dates)
 
-        return to_timezone(self.end, self.timezone)
+    @observes('dates')
+    def observe_dates(self, dates):
+        if dates:
+            self.durations = sum(set(d.duration for d in dates))
+            self.order = int(min(d.start for d in dates).timestamp())
+        else:
+            self.durations = 0
+            self.order = -1
+
+    @validates('dates')
+    def validate_dates(self, key, date):
+        for o in self.dates:
+            if o.id != date.id:
+                assert not sedate.overlaps(
+                    date.start, date.end, o.start, o.end)
+
+        return date
 
     @hybrid_property
     def operable(self):
@@ -140,35 +147,6 @@ class Occasion(Base, TimestampMixin):
     @property
     def max_spots(self):
         return self.spots.upper - 1
-
-    @hybrid_property
-    def duration(self):
-        hours = self.duration_in_seconds / 3600
-
-        # defined here and in the expression below!
-        if hours <= 6:
-            return DAYS.half
-        elif hours <= 24:
-            return DAYS.full
-        else:
-            return DAYS.many
-
-    @duration.expression
-    def duration(self):
-
-        # defined here and in the property above!
-        return case((
-            (Occasion.duration_in_seconds <= (6 * 3600), int(DAYS.half)),
-            (Occasion.duration_in_seconds <= (24 * 3600), int(DAYS.full)),
-        ), else_=int(DAYS.many))
-
-    @hybrid_property
-    def duration_in_seconds(self):
-        return (self.end - self.start).total_seconds()
-
-    @duration_in_seconds.expression
-    def duration_in_seconds(self):
-        return func.extract('epoch', self.end - self.start)
 
     def cancel(self):
         from onegov.activity.collections import BookingCollection

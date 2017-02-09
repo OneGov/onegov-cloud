@@ -1,7 +1,5 @@
-import sedate
-
 from onegov.activity.models.occasion import Occasion
-from onegov.activity.utils import random_group_code
+from onegov.activity.utils import random_group_code, dates_overlap
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -147,12 +145,15 @@ class Booking(Base, TimestampMixin):
         self.priority = 0
 
     @property
-    def start(self):
-        return self.occasion.start
+    def dates(self):
+        return self.occasion.dates
 
     @property
-    def end(self):
-        return self.occasion.end
+    def order(self):
+        return self.occasion.order
 
     def overlaps(self, other):
-        return sedate.overlaps(self.start, self.end, other.start, other.end)
+        return dates_overlap(
+            tuple((d.start, d.end) for d in self.dates),
+            tuple((o.start, o.end) for o in other.dates),
+        )

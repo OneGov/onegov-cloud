@@ -76,7 +76,7 @@ class Period(Base, TimestampMixin):
     #: The occasions linked to this period
     occasions = relationship(
         'Occasion',
-        order_by='Occasion.start',
+        order_by='Occasion.order',
         backref='period'
     )
 

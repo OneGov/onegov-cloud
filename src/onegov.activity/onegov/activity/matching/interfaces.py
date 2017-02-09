@@ -75,10 +75,5 @@ class MatchableBooking(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def start(self):
-        """ Returns the start-time of the booking. """
-
-    @property
-    @abstractmethod
-    def end(self):
-        """ Returns the start-time of the booking. """
+    def dates(self):
+        """ Returns the dates of the booking. """

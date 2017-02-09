@@ -29,14 +29,13 @@ def days(n):
 
 class Booking(MatchableBooking):
 
-    def __init__(self, occasion, attendee, state, priority, start, end):
+    def __init__(self, occasion, attendee, state, priority, dates):
         self.occasion = occasion
         self.attendee = attendee
         self._id = next(keycount)
         self._state = state
         self._priority = priority
-        self._start = start
-        self._end = end
+        self._dates = dates
 
     def __eq__(self, other):
         return self._id == other._id
@@ -65,21 +64,16 @@ class Booking(MatchableBooking):
         return self._priority
 
     @property
-    def start(self):
-        return self._start
-
-    @property
-    def end(self):
-        return self._end
+    def dates(self):
+        return [Bunch(start=s, end=e) for s, e in self._dates]
 
 
 class Occasion(MatchableOccasion):
 
-    def __init__(self, name, start, end, max_spots=10):
+    def __init__(self, name, dates, max_spots=10):
         self.name = name
         self._max_spots = max_spots
-        self.start = start
-        self.end = end
+        self._dates = dates
 
     @property
     def id(self):
@@ -90,16 +84,19 @@ class Occasion(MatchableOccasion):
         return self._max_spots
 
     def booking(self, attendee, state, priority):
-        return Booking(
-            self.id, attendee, state, priority, self.start, self.end)
+        return Booking(self.id, attendee, state, priority, self._dates)
+
+    @property
+    def dates(self):
+        return [Bunch(start=s, end=e) for s, e in self._dates]
 
 
 def test_overlapping_bookings():
 
     # the algorithm will block other bookings, favoring higher priorities
-    o1 = Occasion("Daytrip", today(), today())
-    o2 = Occasion("Camp", today(), today() + days(1))
-    o3 = Occasion("Zoo", today() + days(1), today() + days(2))
+    o1 = Occasion("Daytrip", [[today(), today()]])
+    o2 = Occasion("Camp", [[today(), today() + days(1)]])
+    o3 = Occasion("Zoo", [[today() + days(1), today() + days(2)]])
 
     bookings = [
         o1.booking("Justin", 'open', 1),
@@ -164,9 +161,33 @@ def test_overlapping_bookings():
     assert result.blocked == {bookings[1]}
 
 
+def test_overlapping_bookings_with_multiple_dates():
+
+    o1 = Occasion("Daytrip", [
+        [today(), today()],
+        [today() + days(1), today() + days(1)]
+    ])
+
+    o2 = Occasion("Camp", [
+        [today() + days(1), today() + days(1)],
+        [today() + days(2), today() + days(2)]
+    ])
+
+    bookings = [
+        o1.booking("Justin", 'open', 1),
+        o2.booking("Justin", 'open', 0)
+    ]
+
+    result = match(bookings, (o1, o2))
+
+    assert not result.open
+    assert result.accepted == {bookings[0]}
+    assert result.blocked == {bookings[1]}
+
+
 def test_accept_highest_priority():
 
-    o = Occasion("Best Activity Ever", today(), today(), max_spots=2)
+    o = Occasion("Best Activity Ever", [[today(), today()]], max_spots=2)
     bookings = [
         o.booking("Tick", 'open', 0),
         o.booking("Trick", 'open', 1),
@@ -183,7 +204,7 @@ def test_accept_highest_priority():
     # to be predictable we need to change all the set and dictionaries to
     # their ordered counterparts which is something we want to avoid for
     # performance/memory usage reasons
-    o = Occasion("Best Activity Ever", today(), today(), max_spots=2)
+    o = Occasion("Best Activity Ever", [[today(), today()]], max_spots=2)
     bookings = [
         o.booking("Tick", 'open', 0),
         o.booking("Trick", 'open', 0),
@@ -299,10 +320,10 @@ def test_serialize_scoring(session):
 
 def test_booking_limit():
 
-    o1 = Occasion(1, today(), today())
-    o2 = Occasion(2, today() + days(1), today() + days(1))
-    o3 = Occasion(3, today() + days(2), today() + days(2))
-    o4 = Occasion(4, today() + days(3), today() + days(3))
+    o1 = Occasion(1, [[today(), today()]])
+    o2 = Occasion(2, [[today() + days(1), today() + days(1)]])
+    o3 = Occasion(3, [[today() + days(2), today() + days(2)]])
+    o4 = Occasion(4, [[today() + days(3), today() + days(3)]])
 
     bookings = [
         o1.booking("Tom", 'open', 0),

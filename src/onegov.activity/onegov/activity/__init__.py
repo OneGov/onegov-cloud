@@ -8,6 +8,7 @@ from onegov.activity.models import (
     Booking,
     InvoiceItem,
     Occasion,
+    OccasionDate,
     Period
 )
 from onegov.activity.collections import (
@@ -26,6 +27,7 @@ __all__ = [
     'Booking',
     'InvoiceItem',
     'Occasion',
+    'OccasionDate',
     'Period',
     'ActivityCollection',
     'AttendeeCollection',
