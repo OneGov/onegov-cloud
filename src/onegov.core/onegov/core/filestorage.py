@@ -48,7 +48,7 @@ class FilestorageFile(object):
 @Framework.path(model=FilestorageFile, path='/files', absorb=True)
 def get_filestorage_file(app, absorb):
     try:
-        if app.filestorage.exists(absorb):
+        if app.filestorage.isfile(absorb):
             return FilestorageFile(absorb)
     except IllegalBackReference:
         return None

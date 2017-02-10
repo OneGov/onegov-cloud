@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes file-urls pointing to directories resulting in a 503 instead of a 404.
+  [href]
+
 0.36.1 (2017-02-03)
 ~~~~~~~~~~~~~~~~~~~
 
