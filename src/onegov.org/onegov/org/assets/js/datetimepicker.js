@@ -95,10 +95,11 @@ var attach_button = function(input) {
     });
 };
 
-var setup_datetimepicker = function(type) {
+var setup_datetimepicker = function(type, selector) {
     var locale = get_locale();
     var i18n_options = datetimepicker_i18n[locale];
-    var selector = 'input[type=' + type + ']';
+
+    selector = selector || 'input[type=' + type + ']';
 
     var type_specific = {
         date: {
@@ -143,6 +144,20 @@ var setup_datetimepicker = function(type) {
         },
         onSelectDate: function(_current_time, $input) {
             $input.data('visible', false);
+
+            // triger a change event that react can catch
+            var event = new Event('input', {bubbles: true});
+            $input.get(0).dispatchEvent(event);
+
+            // there's a bug where the placeholder stays in the input field
+            // even though an input is already being shown. This is the sledge-
+            // hammer method of working around that issue:
+            if (type === 'datetime') {
+                $input.hide();
+                _.defer(function() {
+                    $input.show();
+                });
+            }
         },
         onClose: function(_current_time, $input) {
             // we have to delay setting the visible flag slightly, otherwise
@@ -156,6 +171,10 @@ var setup_datetimepicker = function(type) {
 
     $(selector).each(function() {
         var input = $(this);
+
+        if (input.data('is-attached') === true) {
+            return;
+        }
 
         attach_button(input);
 
@@ -171,6 +190,8 @@ var setup_datetimepicker = function(type) {
         // remove all default on-focus events, to only show the picker when
         // clicking on the button
         input.unbind();
+
+        input.data('is-attached', true);
     });
 
     $('form').submit(function() {
@@ -194,12 +215,12 @@ var setup_datetimepicker = function(type) {
 
 // load the datepicker for date inputs if the browser does not support it
 if (!Modernizr.inputtypes.date) {
-    setup_datetimepicker('date');
+    setup_datetimepicker('date', null);
 }
 
 // load the datetimepicker for date inputs if the browser does not support it
 if (!Modernizr.inputtypes.datetime) {
-    setup_datetimepicker('datetime');
+    setup_datetimepicker('datetime', null);
 }
 
 // for time fields we only add time parsing
