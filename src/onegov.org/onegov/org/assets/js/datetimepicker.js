@@ -187,6 +187,9 @@ var setup_datetimepicker = function(type, selector) {
         input.attr('placeholder', type_specific.placeholder);
         input.val(type_specific.server_to_client(input.val()));
 
+        // keep the date format around
+        input.data('dateformat', i18n_options.datetimeformat_momentjs);
+
         // remove all default on-focus events, to only show the picker when
         // clicking on the button
         input.unbind();
@@ -195,20 +198,25 @@ var setup_datetimepicker = function(type, selector) {
     });
 
     $('form').submit(function() {
-        $(this).find(selector).each(function() {
-            var field = $(this);
-            var oldval = field.val();
+        if ($(this).data('submitted') !== true) {
+            $(this).data('submitted', true);
 
-            field.val(type_specific.client_to_server(oldval));
+            $(this).find(selector).each(function() {
+                var field = $(this);
+                var oldval = field.val();
 
-            // reset the value after submitting it, which helps with certain
-            // browsers that will otherwise retain this value when pressing
-            // the back button (Safari + Firefox)
-            _.defer(function() {
-                field.val(oldval);
+                field.val(type_specific.client_to_server(oldval));
+
+                // reset the value after submitting it, which helps with certain
+                // browsers that will otherwise retain this value when pressing
+                // the back button (Safari + Firefox)
+                _.defer(function() {
+                    field.val(oldval);
+                });
+                return true;
             });
-            return true;
-        });
+        }
+
         return true;
     });
 };
