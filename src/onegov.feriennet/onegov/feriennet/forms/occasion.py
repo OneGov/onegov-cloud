@@ -1,13 +1,17 @@
+import isodate
+import json
+
 from cached_property import cached_property
-from onegov.activity import Period, PeriodCollection
+from collections import namedtuple
 from onegov.activity import Occasion, OccasionCollection
+from onegov.activity import Period, PeriodCollection
 from onegov.feriennet import _
 from onegov.form import Form
-from sedate import replace_timezone
-from wtforms.fields import StringField, TextAreaField, SelectField
-from wtforms.fields.html5 import DecimalField, DateTimeField, IntegerField
-from wtforms.validators import InputRequired, NumberRange, Optional
+from sedate import to_timezone, standardize_date
 from sqlalchemy import desc
+from wtforms.fields import StringField, TextAreaField, SelectField
+from wtforms.fields.html5 import DecimalField, IntegerField
+from wtforms.validators import InputRequired, NumberRange, Optional
 
 
 class OccasionForm(Form):
@@ -19,14 +23,9 @@ class OccasionForm(Form):
         validators=[InputRequired()],
         default='0xdeadbeef')
 
-    start = DateTimeField(
-        label=_("Start"),
-        validators=[InputRequired()]
-    )
-
-    end = DateTimeField(
-        label=_("End"),
-        validators=[InputRequired()]
+    dates = StringField(
+        label=_("Dates"),
+        render_kw={'class_': 'many many-datetime-ranges'}
     )
 
     location = StringField(
@@ -83,24 +82,31 @@ class OccasionForm(Form):
         fieldset=_("Participants")
     )
 
-    @property
-    def localized_start(self):
-        return replace_timezone(
-            self.start.data,
-            self.timezone
-        )
-
-    @property
-    def localized_end(self):
-        return replace_timezone(
-            self.end.data,
-            self.timezone
-        )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.date_errors = {}
 
     @cached_property
     def selected_period(self):
         return PeriodCollection(self.request.app.session()).by_id(
             self.period_id.data)
+
+    @cached_property
+    def parsed_dates(self):
+        result = []
+
+        DateRange = namedtuple('DateRange', ['start', 'end'])
+
+        for date in json.loads(self.dates.data or '{}').get('values', []):
+            start = isodate.parse_datetime(date['start'])
+            end = isodate.parse_datetime(date['end'])
+
+            result.append(DateRange(
+                start=standardize_date(start, self.timezone),
+                end=standardize_date(end, self.timezone)
+            ))
+
+        return result
 
     def setup_period_choices(self):
         query = PeriodCollection(self.request.app.session()).query()
@@ -121,14 +127,41 @@ class OccasionForm(Form):
 
     def on_request(self):
         self.setup_period_choices()
+        self.dates.data = self.dates_to_json(self.parsed_dates)
 
-    def ensure_end_date_after_start_date(self):
-        if self.start.data and self.end.data:
-            if self.start.data > self.end.data:
-                self.end.errors.append(_(
-                    "The end date must be after the start date"
+    def ensure_at_least_one_date(self):
+        if not self.parsed_dates:
+            self.date_errors[0] = self.request.translate(
+                _("Must specify at least one date")
+            )
+            return False
+
+    def ensure_valid_dates(self):
+        valid = True
+
+        min_start = self.selected_period.execution_start
+        min_end = self.selected_period.execution_end
+
+        for index, d in enumerate(self.parsed_dates):
+            if d.start > d.end:
+                self.date_errors[index] = self.request.translate(_(
+                    "The end date bust be after the start date"
                 ))
-                return False
+                valid = False
+
+            if d.start.date() < min_start or min_end < d.start.date():
+                self.date_errors[index] = self.request.translate(_(
+                    "The date is outside the selected period"
+                ))
+                valid = False
+
+            if d.end.date() < min_start or min_end < d.end.date():
+                self.date_errors[index] = self.request.translate(_(
+                    "The date is outside the selected period"
+                ))
+                valid = False
+
+        return valid
 
     def ensure_max_age_after_min_age(self):
         if self.min_age.data and self.max_age.data:
@@ -147,26 +180,6 @@ class OccasionForm(Form):
                 ))
                 return False
 
-    def ensure_inside_selected_period(self):
-
-        if self.selected_period and self.start.data and self.end.data:
-            execution_start = self.selected_period.execution_start
-            execution_end = self.selected_period.execution_end
-            start = self.start.data.date()
-            end = self.end.data.date()
-
-            if start < execution_start or execution_end < start:
-                self.start.errors.append(_(
-                    "The date is outside the selected period"
-                ))
-                return False
-
-            if end < execution_start or execution_end < end:
-                self.end.errors.append(_(
-                    "The date is outside the selected period"
-                ))
-                return False
-
     def ensure_max_spots_higher_than_accepted_bookings(self):
         if isinstance(self.model, Occasion):
             if len(self.model.accepted) > self.max_spots.data:
@@ -176,30 +189,61 @@ class OccasionForm(Form):
                 ))
                 return False
 
+    def dates_to_json(self, dates=None):
+        dates = dates or []
+
+        def as_json_date(date):
+            return to_timezone(date, self.timezone)\
+                .replace(tzinfo=None).isoformat()
+
+        return json.dumps({
+            'labels': {
+                'start': self.request.translate(_("Start")),
+                'end': self.request.translate(_("End")),
+                'add': self.request.translate(_("Add")),
+                'remove': self.request.translate(_("Remove")),
+            },
+            'values': [
+                {
+                    'start': as_json_date(d.start),
+                    'end': as_json_date(d.end),
+                    'error': self.date_errors.get(ix, "")
+                } for ix, d in enumerate(dates)
+            ]
+        })
+
     def populate_obj(self, model):
         super().populate_obj(model, exclude={
-            'start',
-            'end',
+            'dates',
             'max_spots',
             'min_spots',
             'min_age',
             'max_age'
         })
 
-        model.timezone = self.timezone
-        model.dates[0].start = self.localized_start
-        model.dates[0].end = self.localized_end
+        assert self.parsed_dates, "should have been caught earlier"
+
+        occasions = OccasionCollection(self.request.app.session())
+        occasions.clear_dates(model)
+
+        print(self.parsed_dates)
+
+        for date in sorted(self.parsed_dates):
+            occasions.add_date(model, date.start, date.end, self.timezone)
+
         model.age = OccasionCollection.to_half_open_interval(
             self.min_age.data, self.max_age.data)
+
         model.spots = OccasionCollection.to_half_open_interval(
             self.min_spots.data, self.max_spots.data)
 
     def process_obj(self, model):
         super().process_obj(model)
 
-        self.start.data = model.dates[0].localized_start
-        self.end.data = model.dates[0].localized_end
+        self.dates.data = self.dates_to_json(model.dates)
+
         self.min_age.data = model.age.lower
         self.max_age.data = model.age.upper - 1
+
         self.min_spots.data = model.spots.lower
         self.max_spots.data = model.spots.upper - 1

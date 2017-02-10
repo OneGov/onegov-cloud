@@ -1463,3 +1463,19 @@ ul.tags {
 .blue {
     color: $blue;
 }
+
+/*
+    Multiple dates in form
+*/
+
+.field-button {
+    height: 27px;
+    margin-top: 27px;
+    padding: 5px;
+    text-align: center;
+    width: 27px;
+
+    + .field-button {
+        margin-left: 10px;
+    }
+}
