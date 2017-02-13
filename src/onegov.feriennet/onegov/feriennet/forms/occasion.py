@@ -99,8 +99,8 @@ class OccasionForm(Form):
 
         for date in json.loads(self.dates.data or '{}').get('values', []):
             try:
-                start = isodate.parse_datetime(date['start'])
-                end = isodate.parse_datetime(date['end'])
+                start = isodate.parse_datetime(date['start'].replace(' ', 'T'))
+                end = isodate.parse_datetime(date['end'].replace(' ', 'T'))
             except isodate.isoerror.ISO8601Error:
                 continue
 
@@ -134,9 +134,7 @@ class OccasionForm(Form):
 
     def ensure_at_least_one_date(self):
         if not self.parsed_dates:
-            self.date_errors[0] = self.request.translate(
-                _("Must specify at least one date")
-            )
+            self.dates.errors = [_("Must specify at least one date")]
             return False
 
     def ensure_valid_dates(self):
@@ -146,19 +144,22 @@ class OccasionForm(Form):
         min_end = self.selected_period.execution_end
 
         for index, d in enumerate(self.parsed_dates):
+            start_date = to_timezone(d.start, self.timezone).date()
+            end_date = to_timezone(d.end, self.timezone).date()
+
             if d.start > d.end:
                 self.date_errors[index] = self.request.translate(_(
                     "The end date must be after the start date"
                 ))
                 valid = False
 
-            if d.start.date() < min_start or min_end < d.start.date():
+            if start_date < min_start or min_end < start_date:
                 self.date_errors[index] = self.request.translate(_(
                     "The date is outside the selected period"
                 ))
                 valid = False
 
-            if d.end.date() < min_start or min_end < d.end.date():
+            if end_date < min_start or min_end < end_date:
                 self.date_errors[index] = self.request.translate(_(
                     "The date is outside the selected period"
                 ))

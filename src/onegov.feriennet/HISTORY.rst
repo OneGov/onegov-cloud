@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Supports multiple dates for occasions.
+- Adds the ability to work with multiple dates per occasion.
   [href]
 
 - Revoke access to notifications for organisers.

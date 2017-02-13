@@ -29,9 +29,9 @@
                             Print
                         </a>
 
-                        <div class="calendar-icon before fixed-width">
+                        <div class="occasion-dates">
                             <ul>
-                                <li tal:repeat="date occasion.dates">
+                                <li tal:repeat="date occasion.dates" class="calendar-icon before fixed-width">
                                     ${layout.format_datetime_range(date.localized_start, date.localized_end)}
                                 </li>
                             </ul>

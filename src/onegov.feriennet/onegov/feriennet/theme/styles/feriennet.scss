@@ -372,6 +372,23 @@ ul.tags {
             }
         }
 
+        > ul {
+            font-size: .875rem;
+            list-style-type: none;
+            margin-bottom: .25rem;
+            margin-left: 0;
+            margin-top: -.25rem;
+
+            li::before {
+                @include icon('\f055');
+
+                display: inline-block;
+                margin-right: .5ex;
+                text-align: center;
+                width: 2ex;
+            }
+        }
+
         .text-links {
             margin-top: .5rem;
         }
@@ -589,6 +606,16 @@ ul.tags {
     .occasion {
         font-size: .875rem;
         margin-bottom: .1rem;
+
+        
+        > ul {
+            margin-bottom: .25rem;
+
+            li {
+                font-size: .875rem;
+                margin-bottom: 0;
+            }
+        }
     }
 
     .operability-warning {
@@ -1170,6 +1197,13 @@ ul.tags {
     font-size: 1.1rem;
     margin-bottom: .75rem;
     margin-top: -.75rem;
+}
+
+.occasion-dates ul {
+    font-size: 1em;
+    list-style: none;
+    margin-left: 0;
+    margin-bottom: .75em;
 }
 
 .occasion-attendance {

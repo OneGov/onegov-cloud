@@ -1,3 +1,4 @@
+import json
 import onegov.feriennet
 import transaction
 
@@ -467,8 +468,12 @@ def test_occasions_form(feriennet_app):
     assert "keine Durchführungen" in activity
 
     occasion = activity.click("Neue Durchführung")
-    occasion.form['start'] = '2016-10-04 10:00:00'
-    occasion.form['end'] = '2016-10-04 12:00:00'
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-10-04 10:00:00',
+            'end': '2016-10-04 12:00:00'
+        }]
+    })
     occasion.form['location'] = "Franz Karl Weber"
     occasion.form['note'] = "No griefers"
     occasion.form['min_age'] = 10
@@ -491,6 +496,69 @@ def test_occasions_form(feriennet_app):
 
     editor.delete(get_delete_link(activity, index=1))
     assert "keine Durchführungen" in editor.get('/angebot/play-with-legos')
+
+
+def test_multiple_dates_occasion(feriennet_app):
+
+    editor = Client(feriennet_app)
+    editor.login_editor()
+
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    new = editor.get('/angebote').click("Angebot erfassen")
+    new.form['title'] = "Play with Legos"
+    new.form['lead'] = "Like Minecraft, but in the real world"
+    new.form.submit().follow()
+
+    periods = admin.get('/angebote').click("Perioden")
+
+    period = periods.click("Neue Periode")
+    period.form['title'] = "Vacation Program 2016"
+    period.form['prebooking_start'] = '2016-09-01'
+    period.form['prebooking_end'] = '2016-09-30'
+    period.form['execution_start'] = '2016-10-01'
+    period.form['execution_end'] = '2016-10-31'
+    period.form.submit()
+
+    activity = editor.get('/angebote').click("Play with Legos")
+    assert "keine Durchführungen" in activity
+
+    occasion = activity.click("Neue Durchführung")
+    occasion.form['location'] = "Franz Karl Weber"
+    occasion.form['note'] = "No griefers"
+    occasion.form['min_age'] = 10
+    occasion.form['max_age'] = 20
+    occasion.form['min_spots'] = 30
+    occasion.form['max_spots'] = 40
+
+    occasion.form['dates'] = ""
+    assert "mindestens ein Datum" in occasion.form.submit()
+
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-10-04 10:00:00',
+            'end': '2016-10-04 12:00:00'
+        }, {
+            'start': '2016-10-04 10:00:00',
+            'end': '2016-10-04 12:00:00'
+        }]
+    })
+    assert "mit einem anderen Datum" in occasion.form.submit()
+
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-10-01 10:00:00',
+            'end': '2016-10-01 12:00:00'
+        }, {
+            'start': '2016-10-02 10:00:00',
+            'end': '2016-10-02 12:00:00'
+        }]
+    })
+
+    activity = occasion.form.submit().follow()
+    assert "1. Oktober 10:00" in activity
+    assert "2. Oktober 10:00" in activity
 
 
 def test_execution_period(feriennet_app):
@@ -519,16 +587,28 @@ def test_execution_period(feriennet_app):
     occasion.form['min_spots'] = 30
     occasion.form['max_spots'] = 40
 
-    occasion.form['start'] = '2016-10-01 00:00:00'
-    occasion.form['end'] = '2016-10-02 23:59:59'
-    assert "ausserhalb der gewählten Periode" in occasion.form.submit()
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-10-01 00:00:00',
+            'end': '2016-10-02 23:59:59'
+        }]
+    })
+    assert "Datum liegt ausserhalb" in occasion.form.submit()
 
-    occasion.form['start'] = '2016-09-30 00:00:00'
-    occasion.form['end'] = '2016-10-01 23:59:59'
-    assert "ausserhalb der gewählten Periode" in occasion.form.submit()
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-09-30 00:00:00',
+            'end': '2016-10-01 23:59:59'
+        }]
+    })
+    assert "Datum liegt ausserhalb" in occasion.form.submit()
 
-    occasion.form['start'] = '2016-10-01 00:00:00'
-    occasion.form['end'] = '2016-10-01 23:59:59'
+    occasion.form['dates'] = json.dumps({
+        'values': [{
+            'start': '2016-10-01 00:00:00',
+            'end': '2016-10-01 23:59:59'
+        }]
+    })
     assert "Änderungen wurden gespeichert" in occasion.form.submit().follow()
 
     period = admin.get('/perioden').click("Bearbeiten")
