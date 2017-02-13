@@ -96,17 +96,17 @@ var ManyDateTimes = React.createClass({
                             <div className="small-2 columns">
                                 {
                                     index === (values.length - 1) &&
-                                        <button className="button round field-button" onClick={onAdd}>
+                                        <a href="#" className="button round field-button" onClick={onAdd}>
                                             <i className="fa fa-plus" aria-hidden="true"></i>
                                             <span className="show-for-sr">{data.labels.add}</span>
-                                        </button>
+                                        </a>
                                 }
                                 {
                                     index > 0 && index === (values.length - 1) &&
-                                        <button className="button round secondary field-button" onClick={onRemove}>
+                                        <a href="#" className="button round secondary field-button" onClick={onRemove}>
                                             <i className="fa fa-minus" aria-hidden="true"></i>
                                             <span className="show-for-sr">{data.labels.remove}</span>
-                                        </button>
+                                        </a>
                                 }
                             </div>
                         </div>
