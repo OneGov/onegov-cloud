@@ -98,8 +98,11 @@ class OccasionForm(Form):
         DateRange = namedtuple('DateRange', ['start', 'end'])
 
         for date in json.loads(self.dates.data or '{}').get('values', []):
-            start = isodate.parse_datetime(date['start'])
-            end = isodate.parse_datetime(date['end'])
+            try:
+                start = isodate.parse_datetime(date['start'])
+                end = isodate.parse_datetime(date['end'])
+            except isodate.isoerror.ISO8601Error:
+                continue
 
             result.append(DateRange(
                 start=standardize_date(start, self.timezone),
@@ -145,7 +148,7 @@ class OccasionForm(Form):
         for index, d in enumerate(self.parsed_dates):
             if d.start > d.end:
                 self.date_errors[index] = self.request.translate(_(
-                    "The end date bust be after the start date"
+                    "The end date must be after the start date"
                 ))
                 valid = False
 
@@ -168,6 +171,9 @@ class OccasionForm(Form):
                             "The date overlaps with another in this occasion"
                         ))
                         valid = False
+
+        if not valid and not self.dates.errors:
+            self.dates.errors = [_("Date validation failed")]
 
         return valid
 
@@ -204,6 +210,9 @@ class OccasionForm(Form):
             return to_timezone(date, self.timezone)\
                 .replace(tzinfo=None).isoformat()
 
+        if self.parsed_dates:
+            self.ensure_valid_dates()  # XXX fills the error values
+
         return json.dumps({
             'labels': {
                 'start': self.request.translate(_("Start")),
@@ -233,8 +242,6 @@ class OccasionForm(Form):
 
         occasions = OccasionCollection(self.request.app.session())
         occasions.clear_dates(model)
-
-        print(self.parsed_dates)
 
         for date in sorted(self.parsed_dates):
             occasions.add_date(model, date.start, date.end, self.timezone)

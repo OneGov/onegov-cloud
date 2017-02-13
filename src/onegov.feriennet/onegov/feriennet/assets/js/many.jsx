@@ -63,7 +63,6 @@ var ManyDateTimes = React.createClass({
     },
     componentWillUpdate: function(props, state) {
         props.onChange(state);
-        console.log(state);
     },
     render: function() {
         var data = this.props.data;
@@ -78,37 +77,47 @@ var ManyDateTimes = React.createClass({
                     var onAdd = self.handleAdd.bind(self, index);
 
                     return (
-                        <div className="row" key={index}>
-                            <div className="small-5 columns">
-                                <DateTimeField required
-                                    label={data.labels.start}
-                                    defaultValue={value.start}
-                                    onChange={onStartChange}
-                                />
+                        <div key={index}>
+                            <div className={"row " + (value.error && 'error' || '')}>
+                                <div className="small-5 columns">
+                                    <DateTimeField required
+                                        label={data.labels.start}
+                                        defaultValue={value.start}
+                                        onChange={onStartChange}
+                                    />
+                                </div>
+                                <div className="small-5 columns">
+                                    <DateTimeField required
+                                        label={data.labels.end}
+                                        defaultValue={value.end}
+                                        onChange={onEndChange}
+                                    />
+                                </div>
+                                <div className="small-2 columns">
+                                    {
+                                        index === (values.length - 1) &&
+                                            <a href="#" className="button round field-button" onClick={onAdd}>
+                                                <i className="fa fa-plus" aria-hidden="true"></i>
+                                                <span className="show-for-sr">{data.labels.add}</span>
+                                            </a>
+                                    }
+                                    {
+                                        index > 0 && index === (values.length - 1) &&
+                                            <a href="#" className="button round secondary field-button" onClick={onRemove}>
+                                                <i className="fa fa-minus" aria-hidden="true"></i>
+                                                <span className="show-for-sr">{data.labels.remove}</span>
+                                            </a>
+                                    }
+                                </div>
                             </div>
-                            <div className="small-5 columns">
-                                <DateTimeField required
-                                    label={data.labels.end}
-                                    defaultValue={value.end}
-                                    onChange={onEndChange}
-                                />
-                            </div>
-                            <div className="small-2 columns">
-                                {
-                                    index === (values.length - 1) &&
-                                        <a href="#" className="button round field-button" onClick={onAdd}>
-                                            <i className="fa fa-plus" aria-hidden="true"></i>
-                                            <span className="show-for-sr">{data.labels.add}</span>
-                                        </a>
-                                }
-                                {
-                                    index > 0 && index === (values.length - 1) &&
-                                        <a href="#" className="button round secondary field-button" onClick={onRemove}>
-                                            <i className="fa fa-minus" aria-hidden="true"></i>
-                                            <span className="show-for-sr">{data.labels.remove}</span>
-                                        </a>
-                                }
-                            </div>
+                            {
+                                value.error &&
+                                    <div className="row date-error">
+                                        <div className="small-10 columns end">
+                                            <small className="error">{value.error}</small>
+                                        </div>
+                                    </div>
+                            }
                         </div>
                     );
                 })
@@ -128,8 +137,11 @@ var DateTimeField = React.createClass({
         this.renderDateTimeButton();
     },
     renderDateTimeButton: function() {
+        var onChange = this.props.onChange;
         if (!Modernizr.inputtypes.datetime) {
-            setup_datetimepicker('datetime', '#' + this.id);
+            setup_datetimepicker('datetime', '#' + this.id, function(e) {
+                onChange(e);
+            });
         }
     },
     render: function() {
@@ -169,6 +181,7 @@ jQuery.fn.many = function() {
         var data = JSON.parse(target.val());
 
         var label = target.closest('label');
+        var errors = label.siblings('.error');
 
         // straight-up hiding the element prevents it from getting update
         // with the target.val call below
@@ -177,6 +190,7 @@ jQuery.fn.many = function() {
             'position': 'absolute'
         });
         label.hide();
+        errors.hide();
 
         var el = $('<div class="many-wrapper" />');
         el.appendTo(label.parent());

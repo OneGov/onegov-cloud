@@ -33,8 +33,8 @@ def new_occasion(self, request, form):
 
         form.populate_obj(occasions.add(
             activity=self,
-            start=form.start.data,
-            end=form.end.data,
+            start=form.parsed_dates[0].start,
+            end=form.parsed_dates[0].end,
             timezone=form.timezone,
             period=periods.by_id(form.period_id.data)
         ))
