@@ -126,6 +126,25 @@ var setup_datetimepicker = function(type, selector) {
         }
     }[type];
 
+    var onSelect = function(_current_time, $input) {
+        $input.data('visible', false);
+
+        // triger a change event that react can catch
+        var event = new Event('input', {bubbles: true});
+        $input.get(0).dispatchEvent(event);
+
+        // there's a bug where the placeholder stays in the input field
+        // even though an input is already being shown. This is the sledge-
+        // hammer method of working around that issue:
+        if (type === 'datetime') {
+            var placeholder = $input.attr('placeholder');
+            $input.attr('placeholder', '');
+            _.defer(function() {
+                $input.attr('placeholder', placeholder);
+            });
+        }
+    };
+
     var general = {
         allowBlank: true,
         lazyInit: false,
@@ -142,23 +161,8 @@ var setup_datetimepicker = function(type, selector) {
                 $('.xdsoft_datetimepicker').trigger('afterOpen.xdsoft');
             }, 50);
         },
-        onSelectDate: function(_current_time, $input) {
-            $input.data('visible', false);
-
-            // triger a change event that react can catch
-            var event = new Event('input', {bubbles: true});
-            $input.get(0).dispatchEvent(event);
-
-            // there's a bug where the placeholder stays in the input field
-            // even though an input is already being shown. This is the sledge-
-            // hammer method of working around that issue:
-            if (type === 'datetime') {
-                $input.hide();
-                _.defer(function() {
-                    $input.show();
-                });
-            }
-        },
+        onSelectDate: onSelect,
+        onSelectTime: onSelect,
         onClose: function(_current_time, $input) {
             // we have to delay setting the visible flag slightly, otherwise
             // clicking on the button when the picker is visible leads to
