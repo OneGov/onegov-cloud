@@ -128,7 +128,7 @@ var DateTimeField = React.createClass({
         this.renderDateTimeButton();
     },
     renderDateTimeButton: function() {
-        if (!Modernizr.inputtypes.date) {
+        if (!Modernizr.inputtypes.datetime) {
             setup_datetimepicker('datetime', '#' + this.id);
         }
     },
