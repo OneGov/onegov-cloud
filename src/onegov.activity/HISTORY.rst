@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to clear all dates of an occasion.
+  [href]
+
 0.4.0 (2017-02-09)
 ~~~~~~~~~~~~~~~~~~~
 

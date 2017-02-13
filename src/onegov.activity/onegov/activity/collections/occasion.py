@@ -75,3 +75,13 @@ class OccasionCollection(GenericCollection):
 
         if date:
             self.session.delete(date)
+
+    def clear_dates(self, occasion):
+        q = self.session.query(OccasionDate)
+        q = q.filter(OccasionDate.occasion_id == occasion.id)
+
+        for date in q:
+            self.session.delete(date)
+
+        occasion.dates = []
+        self.session.flush()
