@@ -7,7 +7,7 @@ from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
 from onegov.feriennet import _
 from onegov.form import Form
-from sedate import to_timezone, standardize_date
+from sedate import to_timezone, standardize_date, overlaps
 from sqlalchemy import desc
 from wtforms.fields import StringField, TextAreaField, SelectField
 from wtforms.fields.html5 import DecimalField, IntegerField
@@ -160,6 +160,14 @@ class OccasionForm(Form):
                     "The date is outside the selected period"
                 ))
                 valid = False
+
+            for subindex, subd in enumerate(self.parsed_dates):
+                if index != subindex:
+                    if overlaps(d.start, d.end, subd.start, subd.end):
+                        self.date_errors[index] = self.request.translate(_(
+                            "The date overlaps with another in this occasion"
+                        ))
+                        valid = False
 
         return valid
 
