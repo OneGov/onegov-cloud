@@ -95,10 +95,11 @@ var attach_button = function(input) {
     });
 };
 
-var setup_datetimepicker = function(type, selector) {
+var setup_datetimepicker = function(type, selector, onChange) {
     var locale = get_locale();
     var i18n_options = datetimepicker_i18n[locale];
 
+    onChange = onChange || function() {};
     selector = selector || 'input[type=' + type + ']';
 
     var type_specific = {
@@ -129,9 +130,12 @@ var setup_datetimepicker = function(type, selector) {
     var onSelect = function(_current_time, $input) {
         $input.data('visible', false);
 
-        // triger a change event that react can catch
-        var event = new Event('input', {bubbles: true});
-        $input.get(0).dispatchEvent(event);
+        // send a mock-event to the given onchange handler (used for react
+        // integration)
+        onChange({
+            target: $input.get(0),
+            preventDefault: function() {}
+        });
 
         // there's a bug where the placeholder stays in the input field
         // even though an input is already being shown. This is the sledge-
