@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.1 (2017-02-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes ticket badges rendering wrongly in IE 10.
   [href]
 
