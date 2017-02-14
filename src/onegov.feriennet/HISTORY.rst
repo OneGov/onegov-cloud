@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.1 (2017-02-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to work with multiple dates per occasion.
   [href]
 
