@@ -359,8 +359,8 @@ def test_activity_filter_age_ranges(feriennet_app):
 
     client = Client(feriennet_app)
 
-    preschool = client.get('/angebote').click('Vorschule')
-    highschool = client.get('/angebote').click('Oberstufe')
+    preschool = client.get('/angebote').click('3 - 6 Jahre')
+    highschool = client.get('/angebote').click('14 - 17 Jahre')
 
     assert "Retreat" in preschool
     assert "Meeting" in preschool
@@ -372,7 +372,7 @@ def test_activity_filter_age_ranges(feriennet_app):
     occasions.by_id(meeting_occasion_id).age = NumericRange(15, 20)
     transaction.commit()
 
-    preschool = client.get('/angebote').click('Vorschule')
+    preschool = client.get('/angebote').click('3 - 6 Jahre')
 
     assert "Retreat" in preschool
     assert "Meeting" not in preschool

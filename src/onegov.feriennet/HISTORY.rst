@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes schoolclass-references from the age filters.
+  [href]
+
 - Adds the ability to print all bookings or a specific one.
   [href]
 

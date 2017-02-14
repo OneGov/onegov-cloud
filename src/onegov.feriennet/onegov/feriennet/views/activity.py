@@ -80,14 +80,14 @@ def view_activities(self, request):
 
     taglinks.extend(
         Link(
-            text=request.translate(text) + ' ({} - {})'.format(*age_range),
+            text=request.translate(text),
             active=self.contains_age_range(age_range),
             url=request.link(self.for_filter(age_range=age_range))
         ) for text, age_range in (
-            (_("Preschool"), (3, 6)),
-            (_("Lower grades"), (7, 10)),
-            (_("Junior high"), (11, 13)),
-            (_("High school"), (14, 17))
+            (_(" 3 - 6 years"), (3, 6)),
+            (_(" 7 - 10 years"), (7, 10)),
+            (_("11 - 13 years"), (11, 13)),
+            (_("14 - 17 years"), (14, 17))
         )
     )
 
