@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds age to activities view.
+  [href]
+
 - Removes schoolclass-references from the age filters.
   [href]
 

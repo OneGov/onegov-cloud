@@ -356,76 +356,83 @@ ul.tags {
     .call-to-action {
         margin-bottom: 1.5rem;
     }
+}
 
-    .factoids {
-        margin: 0 0 .75rem;
+/*
+    Factoids
+*/
+.factoids {
+    margin: 0 0 .75rem;
 
-        > div {
-            margin-left: 1.5rem;
+    span {
+        font-size: .875rem;
+    }
 
-            &:before {
-                display: inline-block;
-                left: 1rem;
-                position: absolute;
-                text-align: center;
-                width: 1rem;
-            }
+    > div {
+        margin-left: 1.5rem;
+
+        &:before {
+            display: inline-block;
+            left: 1rem;
+            position: absolute;
+            text-align: center;
+            width: 1rem;
         }
+    }
 
-        > ul {
-            font-size: .875rem;
-            list-style-type: none;
-            margin-bottom: .25rem;
-            margin-left: 0;
-            margin-top: -.25rem;
+    > ul {
+        font-size: .875rem;
+        list-style-type: none;
+        margin-bottom: .25rem;
+        margin-left: 0;
+        margin-top: -.25rem;
 
-            li::before {
-                @include icon('\f055');
+        li::before {
+            @include icon('\f055');
 
-                display: inline-block;
-                margin-right: .5ex;
-                text-align: center;
-                width: 2ex;
-            }
+            display: inline-block;
+            margin-right: .5ex;
+            text-align: center;
+            width: 2ex;
         }
+    }
 
-        .text-links {
-            margin-top: .5rem;
-        }
+    .text-links {
+        margin-top: .5rem;
+    }
 
-        .available-spots,
-        .full {
-            font-weight: bold;
-            margin-bottom: .4rem;
-        }
+    .available-spots,
+    .full {
+        font-weight: bold;
+        margin-bottom: .4rem;
+    }
 
-        .full:before {
-            @include icon('\f00d');
-        }
+    .full:before {
+        @include icon('\f00d');
+    }
 
-        .available-spots:before {
-            @include icon('\f00c');
-        }
+    .available-spots:before {
+        @include icon('\f00c');
+    }
 
-        .location:before {
-            @include icon('\f041');
-        }
+    .location:before {
+        @include icon('\f041');
+    }
 
-        .age:before {
-            @include icon('\f1ae');
-        }
+    .age:before {
+        @include icon('\f1ae');
+    }
 
-        .spots:before {
-            @include icon('\f105');
-        }
+    .spots:before {
+        @include icon('\f105');
+    }
 
-        .cost:before {
-            @include icon('\f155');
-        }
+    .cost:before {
+        @include icon('\f155');
+    }
 
-        .text-links:before {
-            @include icon('\f192');
-        }
+    .text-links:before {
+        @include icon('\f192');
     }
 }
 

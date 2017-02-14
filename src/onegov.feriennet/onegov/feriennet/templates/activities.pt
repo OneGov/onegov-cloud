@@ -23,6 +23,25 @@
         <div class="activity-list-item" tal:repeat="activity activities">
             <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
             <p class="page-lead">${activity.lead}</p>
+
+            <div class="row">
+                <div class="small-12 medium-4 columns factoids">
+                    <tal:block condition="activity.ages">
+                        <div class="age" tal:define="
+                            min_age min(a.lower for a in activity.ages);
+                            max_age max(a.upper - 1 for a in activity.ages);
+                        ">
+                            <span i18n:translate class="show-for-sr">Age</span>
+                            <span i18n:translate>
+                                <tal:block replace="min_age" i18n:name='min_age' />
+                                -
+                                <tal:block replace="max_age" i18n:name='max_age' />
+                                years old
+                            </span>
+                        </div>
+                    </tal:block>
+                </div>
+            </div>
         </div>
 
         <div class="pagination-centered">
