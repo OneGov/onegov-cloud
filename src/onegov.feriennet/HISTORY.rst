@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to print all bookings or a specific one.
+  [href]
+
 0.3.1 (2017-02-14)
 ~~~~~~~~~~~~~~~~~~~
 

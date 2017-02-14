@@ -1,4 +1,5 @@
 import json
+import morepath
 
 from decimal import Decimal
 from itertools import groupby
@@ -14,6 +15,7 @@ from onegov.feriennet.layout import BookingCollectionLayout
 from onegov.feriennet.views.shared import all_users
 from onegov.org.elements import ConfirmLink, DeleteLink
 from sqlalchemy.orm import contains_eager
+from uuid import UUID
 
 
 DELETABLE_STATES = ('open', 'cancelled', 'denied', 'blocked')
@@ -262,3 +264,34 @@ def toggle_star(self, request):
 
     layout = BookingCollectionLayout(self, request, None)
     return render_macro(layout.macros['star'], request, {'booking': self})
+
+
+def render_css(content, request):
+    response = morepath.Response(content)
+    response.content_type = 'text/css'
+    return response
+
+
+@FeriennetApp.view(
+    model=BookingCollection,
+    name='mask',
+    permission=Personal,
+    render=render_css)
+def view_mask(self, request):
+    # hackish way to get the single attendee print to work -> mask all the
+    # attendees, except for the one given by param
+
+    try:
+        attendee = UUID(request.params.get('id', None)).hex
+    except (ValueError, TypeError):
+        return ""
+
+    return """
+        .attendee-bookings-row {
+            display: none;
+        }
+
+        #attendee-%s {
+            display: block;
+        }
+    """ % attendee

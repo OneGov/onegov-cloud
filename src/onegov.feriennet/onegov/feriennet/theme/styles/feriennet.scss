@@ -512,9 +512,19 @@ ul.tags {
 
 .my-bookings {
 
+    > .print-icon {
+        margin-top: -5px;
+    }
+
     .attendee-bookings {
         .alert-box {
             margin-bottom: 0;
+        }
+
+        .print-icon {
+            position: absolute;
+            right: 32px;
+            top: 24px;
         }
 
         h3 {
@@ -607,7 +617,7 @@ ul.tags {
         font-size: .875rem;
         margin-bottom: .1rem;
 
-        
+
         > ul {
             margin-bottom: .25rem;
 
@@ -676,6 +686,73 @@ ul.tags {
     }
 }
 
+/*
+    My Bookings Print View
+*/
+@media print {
+    .my-bookings {
+        .panel {
+            display: none;
+        }
+
+        h2 {
+            margin-bottom: 1em;
+        }
+
+        .attendee-bookings {
+            box-shadow: none;
+
+            ul {
+                box-shadow: none !important;
+            }
+
+            h3 {
+                font-size: 1.4em;
+                line-height: 1.4em;
+                padding: .25em 1em;
+            }
+
+            > ul > li {
+                margin-left: 1em;
+
+                // hide the favorite icon
+                > div > div:first-child {
+                    display: none;
+                }
+            }
+
+            h4 {
+                font-size: .9em;
+            }
+
+            .occasion > ul li {
+                font-size: .8em;
+            }
+
+            .total-costs {
+                display: none;
+            }
+
+            .cost {
+                display: none;
+            }
+
+            .state {
+                background-color: $white !important;
+                border: 1px solid $gainsboro !important;
+                color: $body-font-color !important;
+            }
+        }
+
+        .other-users {
+            display: none;
+        }
+
+        .other-periods {
+            display: none;
+        }
+    }
+}
 
 /*
     Form panel on the right
@@ -1202,8 +1279,8 @@ ul.tags {
 .occasion-dates ul {
     font-size: 1em;
     list-style: none;
-    margin-left: 0;
     margin-bottom: .75em;
+    margin-left: 0;
 }
 
 .occasion-attendance {

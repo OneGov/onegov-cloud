@@ -29,6 +29,11 @@
         <div class="my-bookings" tal:condition="period">
             <h2>${period.title}</h2>
 
+            <a class="print print-all print-icon before hide-for-print" data-print-selector="html" data-print-title="${title}" i18n:translate>
+                Print All
+            </a>
+
+
             <div class="row">
                 <div class="columns small-12 medium-8">
                     <div class="callout panel">
@@ -53,10 +58,17 @@
                         No bookings yet.
                     </p>
 
-                    <div class="row" tal:repeat="attendee attendees" tal:condition="has_bookings">
+                    <div class="row attendee-bookings-row" tal:repeat="attendee attendees" tal:condition="has_bookings" id="attendee-${attendee.id.hex}">
                         <div class="columns small-12">
                             <div class="attendee-bookings">
                                 <h3>${attendee.name}</h3>
+
+                                <a class="print print-icon before hide-for-print"
+                                    data-print-selector="html" data-print-title="${title}"
+                                    data-print-css="${request.link(model, 'mask') + '&id=' + attendee.id.hex}"
+                                    i18n:translate>
+                                    Print
+                                </a>
 
                                 <div id="alert-boxes-for-${attendee.id}"></div>
 
