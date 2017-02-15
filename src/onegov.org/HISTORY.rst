@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Shows realname in user-management view alongside the username.
+  [href]
+
+- Makes e-mail address in user-management view clickable.
+  [href]
+
 0.4.1 (2017-02-14)
 ~~~~~~~~~~~~~~~~~~~
 

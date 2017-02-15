@@ -8,7 +8,7 @@
             <tal:block repeat="role ('admin', 'editor', 'member')">
                 <tbody tal:condition="users.get(role)" tal:define="enable_yubikey request.app.settings.org.enable_yubikey">
                     <tr class="subheader">
-                        <td colspan="${enable_yubikey and '2' or '3'}">
+                        <td colspan="${enable_yubikey and '3' or '4'}">
                             <tal:block metal:use-macro="layout.macros['role-plural']" />
                             (${len(users.get(role))})
                         </td>
@@ -17,7 +17,8 @@
                         </td>
                     </tr>
                     <tr tal:repeat="user users[role]" class="${user.active and 'user-active' or 'user-inactive'}">
-                        <td>${user.username}</td>
+                        <td><a href="mailto:${user.username}">${user.username}</a></td>
+                        <td>${user.realname}</td>
                         <td i18n:translate tal:condition="user.active">Active</td>
                         <td i18n:translate tal:condition="not:user.active">Inactive</td>
 
