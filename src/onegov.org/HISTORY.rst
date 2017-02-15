@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes typeahead autofocus being too eager.
+  [href]
+
 - Shows realname in user-management view alongside the username.
   [href]
 
