@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-15 11:11+0100\n"
+"POT-Creation-Date: 2017-02-15 15:03+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -215,6 +215,9 @@ msgstr "Bemerkung"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
 
+msgid "Ignore Age Restriction"
+msgstr "Altersbeschränkung Ignorieren"
+
 msgid "Add a new attendee"
 msgstr "Neuen Teilnehmer erfassen"
 
@@ -236,6 +239,12 @@ msgstr "Dies ist ein unbestätigtes Angebot"
 msgid "The attendee already has a booking for this activity"
 msgstr ""
 "Der Teilnehmer hat bereits eine andere Durchführung dieses Angebots gebucht"
+
+msgid "The attendee is too old"
+msgstr "Der Teilnehmer ist zu alt"
+
+msgid "The attendee is too young"
+msgstr "Der Teilnehmer ist zu jung"
 
 msgid "Girl"
 msgstr "Mädchen"
@@ -278,14 +287,11 @@ msgstr "Nein, nur Vorschau"
 msgid "Yes, confirm billing"
 msgstr "Ja, Fakturierung abschliessen"
 
-msgid "Children in the right age"
-msgstr "Kinder im passenden Alter"
+msgid "Children of organisers"
+msgstr "Kinder von Veranstaltern"
 
 msgid "Prefer the following children:"
 msgstr "Folgende Kinder bevorzugen:"
-
-msgid "Children of organisers"
-msgstr "Kinder von Veranstaltern"
 
 msgid "Children of administrators"
 msgstr "Kinder von Administratoren"
@@ -1070,6 +1076,19 @@ msgstr "Möchten Sie \"${title}\" wirklich löschen?"
 msgid "Delete Occasion"
 msgstr "Durchführung Löschen"
 
+msgid "Reinstate"
+msgstr "Reaktivieren"
+
+#, python-format
+msgid "Do you really want to reinstate \"${title}\"?"
+msgstr "Möchten Sie \"${title}\" wirklich reaktivieren?"
+
+msgid "Previous attendees need to re-apply"
+msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
+
+msgid "Reinstate Occasion"
+msgstr "Durchführung Reaktivieren"
+
 msgid " 3 - 6 years"
 msgstr " 3 - 6 Jahre"
 
@@ -1084,19 +1103,6 @@ msgstr "14 - 17 Jahre"
 
 msgid "Own"
 msgstr "Eigene"
-
-msgid "Reinstate"
-msgstr "Reaktivieren"
-
-#, python-format
-msgid "Do you really want to reinstate \"${title}\"?"
-msgstr "Möchten Sie \"${title}\" wirklich reaktivieren?"
-
-msgid "Previous attendees need to re-apply"
-msgstr "Vorherige Teilnehmer müssen sich neu anmelden"
-
-msgid "Reinstate Occasion"
-msgstr "Durchführung Reaktivieren"
 
 msgid "Rescind"
 msgstr "Absagen"
@@ -1329,27 +1335,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "Preschool"
-#~ msgstr "Vorschule"
-
-#~ msgid "Lower grades"
-#~ msgstr "Unterstufe"
-
-#~ msgid "Junior high"
-#~ msgstr "Mittelstufe"
-
-#~ msgid "High school"
-#~ msgstr "Oberstufe"
-
-#~ msgid "${title} <small>${date}, ${count} Attendees</small>"
-#~ msgstr "${title} <small>${date}, ${count} Teilnehmer</small>"
-
-#~ msgid "Other"
-#~ msgstr "Anderer"
-
-#~ msgid "Credit-Card Payment"
-#~ msgstr "Kreditkarten Zahlung"
-
-#~ msgid "Pay now"
-#~ msgstr "Jetzt bezahlen"

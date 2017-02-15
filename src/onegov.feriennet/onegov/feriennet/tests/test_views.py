@@ -741,7 +741,7 @@ def test_enroll_child(feriennet_app):
     assert "Teilnehmer Anmelden" in enroll
 
     enroll.form['name'] = "Tom Sawyer"
-    enroll.form['birth_date'] = "1876-01-01"
+    enroll.form['birth_date'] = "2012-01-01"
     enroll.form['gender'] = 'male'
     activity = enroll.form.submit().follow()
 
@@ -754,7 +754,7 @@ def test_enroll_child(feriennet_app):
 
     enroll.form['attendee'] = 'other'
     enroll.form['name'] = "Tom Sawyer"
-    enroll.form['birth_date'] = "1876-01-01"
+    enroll.form['birth_date'] = "2011-01-01"
     enroll.form['gender'] = 'male'
 
     # prevent adding two kids with the same name
@@ -839,6 +839,60 @@ def test_enroll_child(feriennet_app):
     enroll = enroll.form.submit()
 
     assert "bereits eine andere Durchführung dieses Angebots gebucht" in enroll
+
+
+def test_enroll_age_mismatch(feriennet_app):
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    retreat = activities.add("Retreat", username='admin@example.org')
+    retreat.propose().accept()
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    occasions.add(
+        start=datetime(2016, 10, 8, 8),
+        end=datetime(2016, 10, 9, 16),
+        age=(5, 10),
+        timezone="Europe/Zurich",
+        activity=retreat,
+        period=periods.add(
+            title="2016",
+            prebooking=prebooking,
+            execution=execution,
+            active=True
+        )
+    )
+
+    UserCollection(feriennet_app.session()).add(
+        'member@example.org', 'hunter2', 'member')
+
+    transaction.commit()
+
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    page = admin.get('/angebot/retreat').click("Anmelden")
+    page.form['name'] = "Tom Sawyer"
+    page.form['gender'] = 'male'
+
+    page.form['birth_date'] = "1900-01-01"
+    assert "zu alt" in page.form.submit()
+
+    page.form['birth_date'] = "2015-01-01"
+    assert "zu jung" in page.form.submit()
+
+    page.form['ignore_age'] = True
+    assert "Wunschliste hinzugefügt" in page.form.submit().follow()
 
 
 def test_booking_view(feriennet_app):
@@ -1186,8 +1240,8 @@ def test_direct_booking_and_storno(feriennet_app):
         period=period
     )
 
-    attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    attendees.add(member, 'Mike', date(2000, 1, 1), 'female')
+    attendees.add(owner, 'Dustin', date(2008, 1, 1), 'female')
+    attendees.add(member, 'Mike', date(2008, 1, 1), 'female')
 
     transaction.commit()
 
@@ -1278,8 +1332,8 @@ def test_cancel_occasion(feriennet_app):
         period=period
     )
 
-    attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
-    attendees.add(member, 'Mike', date(2000, 1, 1), 'female')
+    attendees.add(owner, 'Dustin', date(2008, 1, 1), 'female')
+    attendees.add(member, 'Mike', date(2008, 1, 1), 'female')
 
     transaction.commit()
 
@@ -1518,7 +1572,7 @@ def test_reactivate_cancelled_booking(feriennet_app):
         cost=1000,
     )
 
-    attendees.add(owner, 'Dustin', date(2000, 1, 1), 'female')
+    attendees.add(owner, 'Dustin', date(2008, 1, 1), 'female')
 
     transaction.commit()
 

@@ -1,5 +1,4 @@
 from onegov.activity.matching.score import PreferAdminChildren
-from onegov.activity.matching.score import PreferInAgeBracket
 from onegov.activity.matching.score import PreferOrganiserChildren
 from onegov.activity.matching.score import Scoring
 from onegov.feriennet import _
@@ -8,11 +7,6 @@ from wtforms.fields import BooleanField, RadioField
 
 
 class MatchForm(Form):
-
-    prefer_in_age_bracket = BooleanField(
-        label=_("Children in the right age"),
-        fieldset=_("Prefer the following children:"),
-        default=False)
 
     prefer_organiser = BooleanField(
         label=_("Children of organisers"),
@@ -42,10 +36,6 @@ class MatchForm(Form):
     def scoring(self, session):
         scoring = Scoring()
 
-        if self.prefer_in_age_bracket.data:
-            scoring.criteria.append(
-                PreferInAgeBracket.from_session(session))
-
         if self.prefer_organiser.data:
             scoring.criteria.append(
                 PreferOrganiserChildren.from_session(session))
@@ -62,6 +52,5 @@ class MatchForm(Form):
 
     def process_scoring(self, scoring):
         classes = {criterium.__class__ for criterium in scoring.criteria}
-        self.prefer_in_age_bracket.data = PreferInAgeBracket in classes
         self.prefer_organiser.data = PreferOrganiserChildren in classes
         self.prefer_admins.data = PreferAdminChildren in classes

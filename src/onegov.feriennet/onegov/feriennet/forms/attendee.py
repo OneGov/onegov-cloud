@@ -7,7 +7,10 @@ from onegov.feriennet import _
 from onegov.form import Form
 from onegov.user import UserCollection
 from purl import URL
-from wtforms.fields import RadioField, StringField, TextAreaField
+from wtforms.fields import BooleanField
+from wtforms.fields import RadioField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
 
@@ -43,6 +46,12 @@ class AttendeeForm(Form):
         label=_("Note"),
         description=_("Allergies, Disabilities, Particulars"),
         depends_on=('attendee', 'other')
+    )
+
+    ignore_age = BooleanField(
+        label=_("Ignore Age Restriction"),
+        fieldset=_("Administration"),
+        default=False
     )
 
     @property
@@ -95,6 +104,9 @@ class AttendeeForm(Form):
 
     def on_request(self):
         self.populate_attendees()
+
+        if not self.request.is_admin:
+            self.delete_field('ignore_age')
 
     def ensure_no_duplicate_child(self):
         if self.is_new:
@@ -229,3 +241,21 @@ class AttendeeForm(Form):
                         "This occasion overlaps with another booking"
                     ))
                     return False
+
+    def ensure_correct_age(self):
+        if self.request.is_admin and self.ignore_age.data is True:
+            return True
+
+        if self.is_new:
+            birth_date = self.birth_date.data
+        else:
+            attendees = AttendeeCollection(self.request.app.session())
+            birth_date = attendees.by_id(self.attendee.data).birth_date
+
+        if self.model.is_too_old(birth_date):
+            self.attendee.errors.append(_("The attendee is too old"))
+            return False
+
+        if self.model.is_too_young(birth_date):
+            self.attendee.errors.append(_("The attendee is too young"))
+            return False

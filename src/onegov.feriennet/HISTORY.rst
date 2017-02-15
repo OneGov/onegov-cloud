@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds up-front age validation for enrollments.
+  [href]
+
 - Hides the activities to non-organisers/admins if there's no active period.
   [href]
 
