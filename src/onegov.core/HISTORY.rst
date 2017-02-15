@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.36.2 (2017-02-15)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds the ability to influence the batch query in pagination classes.
   [href]
