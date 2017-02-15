@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.3.3 (2017-02-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Decreases the likelihood of scrolling triggering a zoom on a map.
   [href]
 
