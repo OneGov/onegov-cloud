@@ -44,6 +44,28 @@ def test_activity_permissions(es_feriennet_app):
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     new.form.submit()
 
+    periods = PeriodCollection(es_feriennet_app.session())
+    activities = ActivityCollection(es_feriennet_app.session())
+    occasions = OccasionCollection(es_feriennet_app.session())
+
+    # for the overview we need an active period and existing occasions
+    # (at least for anonymous)
+    period = periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        active=True
+    )
+    for activity in activities.query():
+        occasions.add(
+            activity, period,
+            datetime(2016, 1, 1, 10),
+            datetime(2016, 1, 1, 18),
+            'Europe/Zurich'
+        )
+
+    transaction.commit()
+
     url = '/angebot/learn-how-to-program'
 
     assert "Learn How to Program" in editor.get('/angebote')
@@ -184,10 +206,17 @@ def test_activity_search(es_feriennet_app):
 
 def test_activity_filter_tags(feriennet_app):
 
+    periods = PeriodCollection(feriennet_app.session())
+    activities = ActivityCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
     anon = Client(feriennet_app)
 
     editor = Client(feriennet_app)
     editor.login_editor()
+
+    admin = Client(feriennet_app)
+    admin.login_admin()
 
     new = editor.get('/angebote').click("Angebot erfassen")
     new.form['title'] = "Learn How to Program"
@@ -212,31 +241,59 @@ def test_activity_filter_tags(feriennet_app):
 
     transaction.commit()
 
-    activities = anon.get('/angebote')
-    assert "Learn How to Cook" in activities
-    assert "Learn How to Program" in activities
+    page = anon.get('/angebote')
+    assert "Keine Angebote" in page
 
-    activities = activities.click('Computer')
-    assert "Learn How to Cook" not in activities
-    assert "Learn How to Program" in activities
+    # only show activites to anonymous if there's an active period..
+    periods.add(
+        title="2016",
+        prebooking=(datetime(2015, 1, 1), datetime(2015, 12, 31)),
+        execution=(datetime(2016, 1, 1), datetime(2016, 12, 31)),
+        active=True
+    )
+    transaction.commit()
 
-    activities = activities.click('Computer')
-    assert "Learn How to Cook" in activities
-    assert "Learn How to Program" in activities
+    page = anon.get('/angebote')
+    assert "Keine Angebote" in page
 
-    activities = activities.click('Kochen')
-    assert "Learn How to Cook" in activities
-    assert "Learn How to Program" not in activities
+    # ..and if there are any occasions for those activities
+    period = periods.active()
 
-    activities = activities.click('Computer')
-    assert "Learn How to Cook" in activities
-    assert "Learn How to Program" in activities
+    for activity in activities.query():
+        occasions.add(
+            activity, period,
+            datetime(2016, 1, 1, 10),
+            datetime(2016, 1, 1, 18),
+            'Europe/Zurich'
+        )
 
-    activities = activities.click('Computer')
-    activities = activities.click('Kochen')
-    activities = activities.click('Wissenschaft')
-    assert "Learn How to Cook" in activities
-    assert "Learn How to Program" in activities
+    transaction.commit()
+
+    page = anon.get('/angebote')
+    assert "Learn How to Cook" in page
+    assert "Learn How to Program" in page
+
+    page = page.click('Computer')
+    assert "Learn How to Cook" not in page
+    assert "Learn How to Program" in page
+
+    page = page.click('Computer')
+    assert "Learn How to Cook" in page
+    assert "Learn How to Program" in page
+
+    page = page.click('Kochen')
+    assert "Learn How to Cook" in page
+    assert "Learn How to Program" not in page
+
+    page = page.click('Computer')
+    assert "Learn How to Cook" in page
+    assert "Learn How to Program" in page
+
+    page = page.click('Computer')
+    page = page.click('Kochen')
+    page = page.click('Wissenschaft')
+    assert "Learn How to Cook" in page
+    assert "Learn How to Program" in page
 
     # the state filter works for editors
     new = editor.get('/angebote').click("Angebot erfassen")
@@ -250,10 +307,10 @@ def test_activity_filter_tags(feriennet_app):
     # anonymous does not
     assert "Vorschau" not in anon.get('/angebote')
 
-    activities = editor.get('/angebote').click('Vorschau')
-    assert "Learn How to Cook" not in activities
-    assert "Learn How to Program" not in activities
-    assert "Learn How to Dance" in activities
+    page = editor.get('/angebote').click('Vorschau')
+    assert "Learn How to Cook" not in page
+    assert "Learn How to Program" not in page
+    assert "Learn How to Dance" in page
 
 
 def test_activity_filter_duration(feriennet_app):

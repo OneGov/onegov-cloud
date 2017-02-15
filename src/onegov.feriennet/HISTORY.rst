@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides the activities to non-organisers/admins if there's no active period.
+  [href]
+
 - Shows the ages, costs and number of occasions on the activities view.
   [href]
 

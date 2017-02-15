@@ -56,81 +56,88 @@ def occasions_by_period(session, activity, active_only):
     template='activities.pt',
     permission=Public)
 def view_activities(self, request):
+    active_period = request.app.active_period
+    show_activities = bool(active_period or request.is_organiser)
 
-    taglinks = [
-        Link(
-            text=request.translate(_(tag)),
-            active=tag in self.tags,
-            url=request.link(self.for_filter(tag=tag))
-        ) for tag in self.used_tags
-    ]
+    taglinks = []
 
-    taglinks.extend(
-        Link(
-            text=request.translate(text),
-            active=duration in self.durations,
-            url=request.link(self.for_filter(duration=duration))
-        ) for text, duration in (
-            (_("Half day"), DAYS.half),
-            (_("Full day"), DAYS.full),
-            (_("Multiple days"), DAYS.many),
-        )
-    )
+    if show_activities:
+        taglinks = [
+            Link(
+                text=request.translate(_(tag)),
+                active=tag in self.tags,
+                url=request.link(self.for_filter(tag=tag))
+            ) for tag in self.used_tags
+        ]
 
-    taglinks.extend(
-        Link(
-            text=request.translate(text),
-            active=self.contains_age_range(age_range),
-            url=request.link(self.for_filter(age_range=age_range))
-        ) for text, age_range in (
-            (_(" 3 - 6 years"), (3, 6)),
-            (_(" 7 - 10 years"), (7, 10)),
-            (_("11 - 13 years"), (11, 13)),
-            (_("14 - 17 years"), (14, 17))
-        )
-    )
-
-    if request.is_organiser:
-        periods = request.app.periods
-    else:
-        periods = None
-
-    if periods:
         taglinks.extend(
             Link(
-                text=period.title,
-                active=period.id in self.period_ids,
-                url=request.link(self.for_filter(period_id=period.id))
-            ) for period in periods if period
-        )
-
-    if request.is_organiser:
-
-        taglinks.append(
-            Link(
-                text=request.translate(_("Own")),
-                active=request.current_username in self.owners,
-                url=request.link(
-                    self.for_filter(owner=request.current_username))
+                text=request.translate(text),
+                active=duration in self.durations,
+                url=request.link(self.for_filter(duration=duration))
+            ) for text, duration in (
+                (_("Half day"), DAYS.half),
+                (_("Full day"), DAYS.full),
+                (_("Multiple days"), DAYS.many),
             )
         )
 
         taglinks.extend(
             Link(
-                text=request.translate(_(state.capitalize())),
-                active=state in self.states,
-                url=request.link(self.for_filter(state=state))
-            ) for state in ACTIVITY_STATES
+                text=request.translate(text),
+                active=self.contains_age_range(age_range),
+                url=request.link(self.for_filter(age_range=age_range))
+            ) for text, age_range in (
+                (_(" 3 - 6 years"), (3, 6)),
+                (_(" 7 - 10 years"), (7, 10)),
+                (_("11 - 13 years"), (11, 13)),
+                (_("14 - 17 years"), (14, 17))
+            )
         )
 
-    taglinks.sort(key=lambda link: link.text)
-    period = request.app.active_period
+        if request.is_organiser:
+            periods = request.app.periods
+        else:
+            periods = None
+
+        if periods:
+            taglinks.extend(
+                Link(
+                    text=period.title,
+                    active=period.id in self.period_ids,
+                    url=request.link(self.for_filter(period_id=period.id))
+                ) for period in periods if period
+            )
+
+        if request.is_organiser:
+
+            taglinks.append(
+                Link(
+                    text=request.translate(_("Own")),
+                    active=request.current_username in self.owners,
+                    url=request.link(
+                        self.for_filter(owner=request.current_username))
+                )
+            )
+
+            taglinks.extend(
+                Link(
+                    text=request.translate(_(state.capitalize())),
+                    active=state in self.states,
+                    url=request.link(self.for_filter(state=state))
+                ) for state in ACTIVITY_STATES
+            )
+
+        taglinks.sort(key=lambda link: link.text)
 
     def get_period_bound_occasions(activity):
-        if not period:
+        if not active_period:
             return []
 
-        return [o for o in activity.occasions if o.period_id == period.id]
+        return [
+            o for o in activity.occasions
+            if o.period_id == active_period.id
+        ]
 
     def get_ages(a):
         return tuple(o.age for o in get_period_bound_occasions(a))
@@ -144,15 +151,19 @@ def view_activities(self, request):
         if not occasions:
             return None
 
-        extra = 0 if period.all_inclusive else period.booking_cost or 0
+        if active_period.all_inclusive:
+            extra = 0
+        else:
+            extra = active_period.booking_cost or 0
+
         return min((o.cost or 0) + extra for o in occasions)
 
     return {
-        'activities': self.batch,
+        'activities': self.batch if show_activities else None,
         'layout': VacationActivityCollectionLayout(self, request),
         'title': _("Activities"),
         'taglinks': taglinks,
-        'period': period,
+        'period': active_period,
         'get_ages': get_ages,
         'get_min_cost': get_min_cost,
         'get_occasion_count': get_occasion_count,
