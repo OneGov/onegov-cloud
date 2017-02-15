@@ -14,6 +14,7 @@ from onegov.activity import OccasionCollection
 from onegov.activity import PeriodCollection
 from onegov.activity.models import DAYS
 from onegov.core.utils import Bunch
+from psycopg2.extras import NumericRange
 from pytz import utc
 from uuid import uuid4
 
@@ -1578,13 +1579,13 @@ def test_cancel_occasion(session, owner):
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
-        birth_date=date(2000, 1, 1),
+        birth_date=date(2008, 1, 1),
         gender='male')
 
     a2 = attendees.add(
         user=owner,
         name="Mike Wheeler",
-        birth_date=date(2000, 1, 1),
+        birth_date=date(2008, 1, 1),
         gender='male')
 
     transaction.commit()
@@ -1690,3 +1691,30 @@ def test_date_changes(session, collections, prebooking_period, owner):
     assert not DAYS.has(o.durations, DAYS.half)
     assert DAYS.has(o.durations, DAYS.full)
     assert not DAYS.has(o.durations, DAYS.many)
+
+
+def test_is_permitted_birth_date():
+    o = Occasion(age=NumericRange(6, 9), dates=[
+        OccasionDate(
+            start=datetime(2017, 7, 26, 10),
+            end=datetime(2017, 7, 26, 16),
+            timezone='Europe/Zurich'
+        ),
+        OccasionDate(
+            start=datetime(2017, 7, 26, 17),
+            end=datetime(2017, 7, 26, 20),
+            timezone='Europe/Zurich'
+        )
+    ])
+
+    assert o.is_permitted_birth_date(date(2012, 7, 26), wiggle_room=366)
+    assert not o.is_permitted_birth_date(date(2012, 7, 26), wiggle_room=365)
+
+    assert not o.is_too_young(date(2012, 7, 26), wiggle_room=366)
+    assert o.is_too_young(date(2012, 7, 26), wiggle_room=365)
+
+    assert o.is_permitted_birth_date(date(2008, 7, 26), wiggle_room=365)
+    assert not o.is_permitted_birth_date(date(2008, 7, 26), wiggle_room=364)
+
+    assert not o.is_too_old(date(2008, 7, 26), wiggle_room=365)
+    assert o.is_too_old(date(2008, 7, 26), wiggle_room=364)

@@ -169,3 +169,34 @@ class Occasion(Base, TimestampMixin):
             cancel(booking)
 
         self.cancelled = True
+
+    def is_permitted_birth_date(self, birth_date, wiggle_room=365):
+        """ Returns true if the given birth date is considered to be in
+        the age range of this occasion.
+
+        The date inspected is the date of the first occurrence. In addition
+        there's a wiggle room of x days which is applied to the exact age.
+
+        By default attendees may be one year too young or too old.
+
+        """
+
+        if self.is_too_young(birth_date, wiggle_room):
+            return False
+
+        if self.is_too_old(birth_date, wiggle_room):
+            return False
+
+        return True
+
+    def is_too_old(self, birth_date, wiggle_room=365):
+        age = (self.dates[0].start.date() - birth_date).days
+        max_age = (self.age.upper - 1) * 365.25 + wiggle_room
+
+        return age > max_age
+
+    def is_too_young(self, birth_date, wiggle_room=365):
+        age = (self.dates[0].start.date() - birth_date).days
+        min_age = self.age.lower * 365.25 - wiggle_room
+
+        return age < min_age

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a helper method to verify a given birth date's age for an occasion.
+  [href]
+
 0.4.1 (2017-02-14)
 ~~~~~~~~~~~~~~~~~~~
 
