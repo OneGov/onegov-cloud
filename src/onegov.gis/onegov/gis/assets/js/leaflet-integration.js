@@ -212,7 +212,7 @@ function addGeocoder(map) {
     L.Control.geocoder({
         position: 'topright',
         placeholder: '',
-        errorMessage: '',
+        errorMessage: ''
     }).addTo(map);
 }
 
@@ -236,7 +236,11 @@ function spawnDefaultMap(element, lat, lon, zoom, includeZoomControls) {
     element.css('height', $(element).data('map-height') || $(element).width() / 1.618 + 'px');
 
     var options = {
-        zoomControl: false
+        zoomControl: false,
+        sleepNote: false,
+        sleepTime: 500,
+        wakeTime: 500,
+        sleepOpacity: 1.0
     };
 
     var map = L.map(element[0], options)

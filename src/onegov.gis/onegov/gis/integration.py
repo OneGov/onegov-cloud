@@ -50,6 +50,7 @@ def get_leaflet_asset():
     yield 'leaflet-control-geocoder.css'
     yield 'leaflet-integration.css'
     yield 'leaflet.js'
+    yield 'leaflet-sleep.js'
     yield 'leaflet-easybutton.js'
     yield 'leaflet-control-geocoder.js'
     yield 'leaflet-integration.js'
