@@ -24,12 +24,16 @@
             <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
             <p class="page-lead">${activity.lead}</p>
 
-            <div class="row">
-                <div class="small-12 medium-4 columns factoids">
-                    <tal:block condition="activity.ages">
-                        <div class="age" tal:define="
-                            min_age min(a.lower for a in activity.ages);
-                            max_age max(a.upper - 1 for a in activity.ages);
+            <div class="row" tal:define="
+                ages get_ages(activity);
+                min_cost get_min_cost(activity);
+                occasion_count get_occasion_count(activity);
+            ">
+                <div class="small-12 columns factoids">
+                    <tal:block condition="ages">
+                        <span class="age" tal:define="
+                            min_age min(age.lower for age in ages);
+                            max_age max(age.upper - 1 for age in ages);
                         ">
                             <span i18n:translate class="show-for-sr">Age</span>
                             <span i18n:translate>
@@ -38,7 +42,31 @@
                                 <tal:block replace="max_age" i18n:name='max_age' />
                                 years old
                             </span>
-                        </div>
+                        </span>
+                    </tal:block>
+                    <tal:block condition="min_cost is not None">
+                        <span class="cost">
+                            <span i18n:translate class="show-for-sr">Cost</span>
+
+                            <span i18n:translate>
+                                starting at <tal:block i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:block> CHF
+                            </span>
+                        </span>
+                    </tal:block>
+                    <tal:block>
+                        <span class="occasion-count">
+                            <span i18n:translate class="show-for-sr">Occasions</span>
+
+                            <span i18n:translate tal:condition="not occasion_count">
+                                No occasions
+                            </span>
+                            <span i18n:translate tal:condition="occasion_count == 1">
+                                1 Occasion
+                            </span>
+                            <span i18n:translate tal:condition="occasion_count > 1">
+                                <tal:block i18n:name="count">${occasion_count}</tal:block> Occasions
+                            </span>
+                        </span>
                     </tal:block>
                 </div>
             </div>

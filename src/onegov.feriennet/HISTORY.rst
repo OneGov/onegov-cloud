@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Adds age to activities view.
+- Shows the ages, costs and number of occasions on the activities view.
   [href]
 
 - Removes schoolclass-references from the age filters.

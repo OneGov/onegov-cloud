@@ -3,7 +3,6 @@ from onegov.activity import Booking
 from onegov.activity import Occasion
 from onegov.activity import OccasionCollection
 from onegov.activity import Period
-from onegov.activity import PeriodCollection
 from onegov.activity.models import ACTIVITY_STATES, DAYS
 from onegov.core.security import Private
 from onegov.core.security import Public
@@ -92,7 +91,7 @@ def view_activities(self, request):
     )
 
     if request.is_organiser:
-        periods = PeriodCollection(request.app.session()).query().all()
+        periods = request.app.periods
     else:
         periods = None
 
@@ -125,12 +124,38 @@ def view_activities(self, request):
         )
 
     taglinks.sort(key=lambda link: link.text)
+    period = request.app.active_period
+
+    def get_period_bound_occasions(activity):
+        if not period:
+            return []
+
+        return [o for o in activity.occasions if o.period_id == period.id]
+
+    def get_ages(a):
+        return tuple(o.age for o in get_period_bound_occasions(a))
+
+    def get_occasion_count(a):
+        return len(get_period_bound_occasions(a))
+
+    def get_min_cost(a):
+        occasions = get_period_bound_occasions(a)
+
+        if not occasions:
+            return None
+
+        extra = 0 if period.all_inclusive else period.booking_cost or 0
+        return min((o.cost or 0) + extra for o in occasions)
 
     return {
         'activities': self.batch,
         'layout': VacationActivityCollectionLayout(self, request),
         'title': _("Activities"),
-        'taglinks': taglinks
+        'taglinks': taglinks,
+        'period': period,
+        'get_ages': get_ages,
+        'get_min_cost': get_min_cost,
+        'get_occasion_count': get_occasion_count,
     }
 
 
@@ -267,7 +292,7 @@ def view_activity(self, request):
             activity=self,
             active_only=not request.is_organiser
         ),
-        'age_bracket': age_bracket
+        'age_bracket': age_bracket,
     }
 
 

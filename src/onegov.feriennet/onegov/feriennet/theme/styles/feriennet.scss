@@ -131,6 +131,29 @@ form small {
     ul.tags {
         margin-bottom: .75rem;
     }
+
+    .factoids > span {
+        font-size: .875rem;
+        line-height: .875rem;
+
+        + span {
+            margin-left: 3ex;
+        }
+
+        &::before {
+            display: inline-block;
+            position: relative;
+        }
+
+        &.age::before {
+            top: -1px;
+        }
+
+        &.occasion-count::before {
+            margin-right: .5ex;
+            top: -1px;
+        }
+    }
 }
 
 .activity-list-search {
@@ -433,6 +456,10 @@ ul.tags {
 
     .text-links:before {
         @include icon('\f192');
+    }
+
+    .occasion-count:before {
+        @include icon('\f133');
     }
 }
 
