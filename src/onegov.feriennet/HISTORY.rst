@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds four new categories.
+  [href]
+
 - Adds up-front age validation for enrollments.
   [href]
 
