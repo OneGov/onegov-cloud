@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to influence the batch query in pagination classes.
+  [href]
+
 - Fixes file-urls pointing to directories resulting in a 503 instead of a 404.
   [href]
 

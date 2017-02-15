@@ -76,6 +76,15 @@ class Pagination(object):
         """
         raise NotImplementedError
 
+    def transform_batch_query(self, query):
+        """ Allows subclasses to transform the given query before it is
+        used to retrieve the batch. This is a good place to add additional
+        loading that should only apply to the batch (say joining other
+        values to the batch which are then not loaded by the whole query).
+
+        """
+        return query
+
     @cached_property
     def subset_count(self):
         """ Returns the total number of elements this pagination represents.
@@ -92,7 +101,7 @@ class Pagination(object):
         query = self.cached_subset.slice(
             self.offset, self.offset + self.batch_size
         )
-        return query.all()
+        return self.transform_batch_query(query).all()
 
     @property
     def offset(self):
