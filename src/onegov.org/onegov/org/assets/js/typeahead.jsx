@@ -121,7 +121,11 @@ var TypeAhead = function(form) {
             return;
         }
 
-        if (event.keyCode >= 48 && $(':focus').is('a') || !$(':focus').length) {
+        if (event.keyCode <= 48) {
+            return;
+        }
+
+        if ($(':focus').is('a') || !$(':focus').length) {
             $(subject).val('');
             $(subject)[0].focus();
         }
