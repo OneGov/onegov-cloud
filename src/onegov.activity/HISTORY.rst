@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to enforce time between occasions during matching.
+  [href]
+
 - Fixes stability check not working correctly with cascades.
   [href]
 

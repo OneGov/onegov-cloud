@@ -29,12 +29,13 @@ class AttendeeAgent(hashable('id')):
 
     __slots__ = ('id', 'wishlist', 'accepted', 'blocked')
 
-    def __init__(self, id, bookings, limit=None):
+    def __init__(self, id, bookings, limit=None, minutes_between=0):
         self.id = id
         self.limit = limit
         self.wishlist = SortedSet(bookings, key=booking_order)
         self.accepted = set()
         self.blocked = set()
+        self.minutes_between = minutes_between
 
     def accept(self, booking):
         """ Accepts the given booking. """
@@ -45,7 +46,10 @@ class AttendeeAgent(hashable('id')):
         if self.limit and len(self.accepted) >= self.limit:
             self.blocked |= self.wishlist
         else:
-            self.blocked |= {b for b in self.wishlist if overlaps(booking, b)}
+            self.blocked |= {
+                b for b in self.wishlist
+                if overlaps(booking, b, self.minutes_between)
+            }
 
         self.wishlist -= self.blocked
 
@@ -72,7 +76,7 @@ class AttendeeAgent(hashable('id')):
 
         """
         for a, b in product(self.accepted, self.accepted):
-            if a != b and overlaps(a, b):
+            if a != b and overlaps(a, b, self.minutes_between):
                 return False
 
         return True
@@ -209,7 +213,8 @@ def deferred_acceptance(bookings, occasions,
                         validity_check=True,
                         stability_check=False,
                         hard_budget=True,
-                        limit=None):
+                        limit=None,
+                        minutes_between=0):
     """ Matches bookings with occasions.
 
     :score_function:
@@ -253,7 +258,12 @@ def deferred_acceptance(bookings, occasions,
     }
 
     attendees = {
-        aid: AttendeeAgent(aid, limit=limit, bookings=bookings)
+        aid: AttendeeAgent(
+            aid,
+            limit=limit,
+            bookings=bookings,
+            minutes_between=minutes_between
+        )
         for aid, bookings in groupby(bookings, key=lambda b: b.attendee_id)
     }
 

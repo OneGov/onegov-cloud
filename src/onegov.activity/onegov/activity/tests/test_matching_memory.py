@@ -188,6 +188,60 @@ def test_overlapping_bookings_with_multiple_dates():
     assert result.blocked == {bookings[1]}
 
 
+def test_overlapping_bookings_with_minutes_between():
+
+    o1 = Occasion("A", [[
+        datetime(2017, 2, 16, 10),
+        datetime(2017, 2, 16, 11),
+    ]])
+
+    o2 = Occasion("B", [[
+        datetime(2017, 2, 16, 11),
+        datetime(2017, 2, 16, 12),
+    ]])
+
+    o3 = Occasion("C", [[
+        datetime(2017, 2, 16, 12),
+        datetime(2017, 2, 16, 13),
+    ]])
+
+    bookings = [
+        o1.booking("Justin", 'open', 2),
+        o2.booking("Justin", 'open', 1),
+        o3.booking("Justin", 'open', 0),
+    ]
+
+    result = match(bookings, (o1, o2, o3))
+    assert not result.open
+    assert result.accepted == {bookings[0], bookings[1], bookings[2]}
+
+    result = match(bookings, (o1, o2, o3), minutes_between=1)
+    assert not result.open
+    assert result.accepted == {bookings[0], bookings[2]}
+    assert result.blocked == {bookings[1]}
+
+    result = match(bookings, (o1, o2, o3), minutes_between=60)
+    assert not result.open
+    assert result.accepted == {bookings[0], bookings[2]}
+    assert result.blocked == {bookings[1]}
+
+    result = match(bookings, (o1, o2, o3), minutes_between=61)
+    assert not result.open
+    assert result.accepted == {bookings[0]}
+    assert result.blocked == {bookings[1], bookings[2]}
+
+    bookings = [
+        o1.booking("Justin", 'open', 1),
+        o2.booking("Justin", 'open', 2),
+        o3.booking("Justin", 'open', 0),
+    ]
+
+    result = match(bookings, (o1, o2, o3), minutes_between=1)
+    assert not result.open
+    assert result.accepted == {bookings[1]}
+    assert result.blocked == {bookings[0], bookings[2]}
+
+
 def test_is_stable():
 
     o1 = Occasion("A", [[
