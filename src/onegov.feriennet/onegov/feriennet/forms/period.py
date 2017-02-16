@@ -84,6 +84,16 @@ class PeriodForm(Form):
         depends_on=('pass_system', 'no')
     )
 
+    minutes_between = IntegerField(
+        label=_("Required minutes between boookings"),
+        fieldset=_("Execution Settings"),
+        validators=[
+            InputRequired(),
+            NumberRange(0, 90)
+        ],
+        default=0
+    )
+
     @property
     def prebooking(self):
         return (self.prebooking_start.data, self.prebooking_end.data)

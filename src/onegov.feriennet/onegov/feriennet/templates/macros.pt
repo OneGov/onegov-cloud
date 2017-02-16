@@ -114,7 +114,7 @@
         <div class="row" tal:define="show_stats not period.wishlist_phase">
             <!--! the width of this column together with the next one doesn't add up to 12 by
             intention to make space for the icons rendered ::before the first column. -->
-            <div class="small-12 medium-4 columns factoids">
+            <div class="small-12 medium-6 columns factoids">
                 <ul tal:condition="len(occasion.dates) > 1">
                     <li tal:repeat="date occasion.dates[1:]">
                         ${layout.format_datetime_range(date.localized_start, date.localized_end)}
@@ -190,13 +190,17 @@
                     </tal:block>
                 </div>
 
+                <div class="overlap-check" tal:condition="occasion.exclude_from_overlap_check">
+                    <span i18n:translate>Independent of other occasions</span>
+                </div>
+
                 <div class="text-links" tal:condition="show_links and (request.is_admin or layout.is_owner)">
                     <tal:block repeat="link occasion_links(occasion)">
                         <tal:block replace="structure link(request)" />
                     </tal:block>
                 </div>
             </div>
-            <div class="small-12 medium-7 columns">
+            <div class="small-12 medium-6 columns">
                 <p tal:condition="occasion.note">${occasion.note}</p>
             </div>
         </div>
@@ -258,6 +262,10 @@
 
         <div class="hint hint-costs" tal:condition="period.all_inclusive and period.booking_cost" i18n:translate>
             The passport costs <tal:block i18n:name="amount" tal:replace="period.booking_cost" /> CHF per child. Individual activities may incur additional charges.
+        </div>
+
+        <div class="hint hint-minutes" tal:condition="period.minutes_between" i18n:translate>
+            Between each booking we enforce <tal:block i18n:name="minutes" tal:replace="period.minutes_between" /> minutes of block-time in which no other booking is permitted.
         </div>
     </tal:block>
 </metal:hints>

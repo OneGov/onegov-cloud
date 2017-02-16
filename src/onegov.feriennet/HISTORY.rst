@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Adds the ability to set the minimum time between bookings.
+  [href]
+
+- Adds the ability to exclude occasions from the overlap check.
+  [href]
+
 - Adds four new categories.
   [href]
 

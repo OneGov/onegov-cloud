@@ -9,7 +9,10 @@ from onegov.feriennet import _
 from onegov.form import Form
 from sedate import to_timezone, standardize_date, overlaps
 from sqlalchemy import desc
-from wtforms.fields import StringField, TextAreaField, SelectField
+from wtforms.fields import BooleanField
+from wtforms.fields import SelectField
+from wtforms.fields import StringField
+from wtforms.fields import TextAreaField
 from wtforms.fields.html5 import DecimalField, IntegerField
 from wtforms.validators import InputRequired, NumberRange, Optional
 
@@ -80,6 +83,12 @@ class OccasionForm(Form):
             NumberRange(0, 99)
         ],
         fieldset=_("Participants")
+    )
+
+    exclude_from_overlap_check = BooleanField(
+        label=_("Bookings to this occasion may overlap with other bookings"),
+        fieldset=_("Advanced"),
+        default=False
     )
 
     def __init__(self, *args, **kwargs):

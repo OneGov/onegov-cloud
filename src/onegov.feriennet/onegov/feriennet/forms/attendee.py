@@ -229,6 +229,9 @@ class AttendeeForm(Form):
 
     def ensure_no_conflict(self):
         if not self.is_new and self.model.period.confirmed:
+            if self.model.exclude_from_overlap_check:
+                return
+
             bookings = self.booking_collection
 
             query = bookings.query()
