@@ -317,11 +317,19 @@ def is_stable(attendees, occasions):
                 if booking in occasion.bookings:
                     continue
 
+                # if the current occasion prefers the given booking..
                 over = occasion.preferred(booking)
 
                 if over:
                     for o in occasions:
-                        if o != occasion and o.preferred(over):
+                        if o == occasion:
+                            continue
+
+                        # ..and another occasion prefers the loser..
+                        switch = o.preferred(over)
+
+                        # .. we have an unstable matching
+                        if switch and occasion.preferred(switch):
                             return False
 
     return True

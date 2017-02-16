@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes stability check not working correctly with cascades.
+  [href]
+
 0.4.2 (2017-02-15)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,4 +1,6 @@
-from datetime import date, timedelta
+import sys
+
+from datetime import date, timedelta, datetime
 from functools import partial
 from itertools import count
 from onegov.activity.matching import deferred_acceptance
@@ -9,6 +11,7 @@ from onegov.activity.matching import PreferInAgeBracket
 from onegov.activity.matching import PreferMotivated
 from onegov.activity.matching import PreferOrganiserChildren
 from onegov.activity.matching import Scoring
+from onegov.activity.matching.core import is_stable, OccasionAgent
 from onegov.core.utils import Bunch
 
 
@@ -183,6 +186,90 @@ def test_overlapping_bookings_with_multiple_dates():
     assert not result.open
     assert result.accepted == {bookings[0]}
     assert result.blocked == {bookings[1]}
+
+
+def test_is_stable():
+
+    o1 = Occasion("A", [[
+        datetime(2017, 2, 16, 10),
+        datetime(2017, 2, 16, 11),
+    ]])
+
+    o2 = Occasion("B", [[
+        datetime(2017, 2, 16, 11),
+        datetime(2017, 2, 16, 12),
+    ]])
+
+    o3 = Occasion("C", [[
+        datetime(2017, 2, 16, 13),
+        datetime(2017, 2, 16, 14),
+    ]])
+
+    bookings = [
+        o1.booking("Justin", 'open', 1),
+        o2.booking("Justin", 'open', 0)
+    ]
+
+    result = match(bookings, (o1, o2))
+
+    attendees = [Bunch(accepted=result.accepted)]
+
+    def preferred(b):
+        call_frame = sys._getframe(1)
+        occasion = call_frame.f_locals['self']
+        return b.preferred_occasion == occasion.id and 1 or 0
+
+    # if no bookings prefer another occasion which prefers them -> stable
+    occasions = [OccasionAgent(o, preferred) for o in (o1, o2)]
+    occasions[0].bookings.add(bookings[0])
+    occasions[1].bookings.add(bookings[1])
+
+    bookings[0].preferred_occasion = 'A'
+    bookings[1].preferred_occasion = 'B'
+
+    assert is_stable(attendees, occasions)
+
+    # if there are bookings which would like to be swapped -> unstable
+    occasions = [OccasionAgent(o, preferred) for o in (o1, o2)]
+
+    occasions[0].bookings.add(bookings[0])
+    occasions[1].bookings.add(bookings[1])
+
+    bookings[0].preferred_occasion = 'B'
+    bookings[1].preferred_occasion = 'A'
+
+    assert not is_stable(attendees, occasions)
+
+    # if there are multiple bookings where some would like to be swapped,
+    # but not vice versa (here the priority creates a cascade) -> stable
+    bookings = [
+        o1.booking("Justin", 'open', 2),
+        o2.booking("Justin", 'open', 1),
+        o3.booking("Justin", 'open', 0)
+    ]
+
+    result = match(bookings, (o1, o2, o3))
+    attendees = [Bunch(accepted=result.accepted)]
+
+    occasions = [OccasionAgent(o, lambda b: b.priority) for o in (o1, o2, o3)]
+    occasions[0].bookings.add(bookings[0])
+    occasions[1].bookings.add(bookings[1])
+    occasions[2].bookings.add(bookings[2])
+
+    assert is_stable(attendees, occasions)
+
+    # multiple bookings which like to be swapped (but not all) -> unstable
+
+    occasions = [OccasionAgent(o, preferred) for o in (o1, o2, o3)]
+    occasions[0].bookings.add(bookings[0])
+    occasions[1].bookings.add(bookings[1])
+    occasions[2].bookings.add(bookings[2])
+
+    bookings[0].preferred_occasion = 'A'
+    bookings[1].preferred_occasion = 'C'
+    bookings[2].preferred_occasion = 'B'
+
+    assert not is_stable(attendees, occasions)
 
 
 def test_accept_highest_priority():
