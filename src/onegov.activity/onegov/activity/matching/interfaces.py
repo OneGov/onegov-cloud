@@ -19,6 +19,14 @@ class MatchableOccasion(metaclass=ABCMeta):
     def max_spots(self):
         """ The maximum number of available spots. """
 
+    @property
+    @abstractmethod
+    def exclude_from_overlap_check(self):
+        """ True if bookings of this occasion are ignored during overlap
+        checks.
+
+        """
+
 
 class MatchableBooking(metaclass=ABCMeta):
     """ Describes the interface required by the booking class used by

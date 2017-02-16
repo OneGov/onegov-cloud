@@ -1,6 +1,7 @@
 import sedate
 import string
 
+from datetime import timedelta
 from random import SystemRandom
 
 
@@ -141,7 +142,7 @@ def generate_xml(payments):
     """.format('\n'.join(transactions))
 
 
-def dates_overlap(a, b):
+def dates_overlap(a, b, minutes_between=0, cut_end=True):
     """ Returns true if any time tuple in the list of tuples in a overlaps
     with a time tuple in b.
 
@@ -149,9 +150,19 @@ def dates_overlap(a, b):
     # this can be done with an O(n log n) algorithm but since we are
     # operating on a very small n the constant factors dominate and there
     # are fewer constant factors in this approach:
+
+    offset = timedelta(seconds=minutes_between / 2 * 60)
+    ms = cut_end and timedelta(microseconds=1) or timedelta()
+
+    # make sure that 11:00 - 12:00 and 12:00 - 13:00 are not overlapping
+    ms = timedelta(microseconds=1)
+
     for s, e in a:
         for os, oe in b:
-            if sedate.overlaps(s, e, os, oe):
+            if sedate.overlaps(
+                s - offset, e + offset - ms,
+                os - offset, oe + offset - ms
+            ):
                 return True
 
     return False

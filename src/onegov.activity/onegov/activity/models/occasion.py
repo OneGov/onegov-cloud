@@ -71,6 +71,9 @@ class Occasion(Base, TimestampMixin):
     #: The default order
     order = Column(Integer, default=0)
 
+    #: Pretend like this occasion doesn't use any time
+    exclude_from_overlap_check = Column(Boolean, nullable=False, default=False)
+
     @aggregated('period', Column(Boolean, default=False))
     def active(self):
         return column('active')

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to exclude certain occasions from overlapping with others.
+  [href]
+
 - Adds the ability to enforce time between occasions during matching.
   [href]
 

@@ -52,7 +52,7 @@ class Booking(MatchableBooking):
 
     @property
     def occasion_id(self):
-        return self.occasion
+        return self.occasion.id
 
     @property
     def attendee_id(self):
@@ -73,10 +73,11 @@ class Booking(MatchableBooking):
 
 class Occasion(MatchableOccasion):
 
-    def __init__(self, name, dates, max_spots=10):
+    def __init__(self, name, dates, max_spots=10, no_overlap_check=False):
         self.name = name
         self._max_spots = max_spots
         self._dates = dates
+        self._no_overlap_check = no_overlap_check
 
     @property
     def id(self):
@@ -87,11 +88,15 @@ class Occasion(MatchableOccasion):
         return self._max_spots
 
     def booking(self, attendee, state, priority):
-        return Booking(self.id, attendee, state, priority, self._dates)
+        return Booking(self, attendee, state, priority, self._dates)
 
     @property
     def dates(self):
         return [Bunch(start=s, end=e) for s, e in self._dates]
+
+    @property
+    def exclude_from_overlap_check(self):
+        return self._no_overlap_check
 
 
 def test_overlapping_bookings():
@@ -186,6 +191,20 @@ def test_overlapping_bookings_with_multiple_dates():
     assert not result.open
     assert result.accepted == {bookings[0]}
     assert result.blocked == {bookings[1]}
+
+
+def test_overlap_exclusion():
+
+    o1 = Occasion("A", [[today(), today()]])
+    o2 = Occasion("B", [[today(), today()]], no_overlap_check=True)
+
+    bookings = [
+        o1.booking("Justin", 'open', 1),
+        o2.booking("Justin", 'open', 0)
+    ]
+
+    result = match(bookings, (o1, o2))
+    assert result.accepted == {bookings[0], bookings[1]}
 
 
 def test_overlapping_bookings_with_minutes_between():

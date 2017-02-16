@@ -226,3 +226,20 @@ def support_multiple_dates_per_occasion(context):
 
     for name in ('start', 'end', 'timezone'):
         context.operations.drop_column('occasions', name)
+
+
+@upgrade_task('Adds minutes_between to period')
+def adds_minutes_between_to_period(context):
+    context.operations.add_column('periods', Column(
+        'minutes_between', Integer, nullable=True, server_default='0'))
+    context.operations.alter_column(
+        'periods', 'minutes_between', server_default=None)
+
+
+@upgrade_task('Adds exclude_from_overlap_check to period')
+def adds_exclude_from_overlap_check_to_period(context):
+    context.operations.add_column('occasions', Column(
+        'exclude_from_overlap_check', Boolean, nullable=False,
+        server_default='FALSE'))
+    context.operations.alter_column(
+        'occasions', 'exclude_from_overlap_check', server_default=None)

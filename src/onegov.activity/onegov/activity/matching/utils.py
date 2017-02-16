@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from onegov.activity import log
 from onegov.activity.utils import dates_overlap
 from sortedcontainers import SortedSet
@@ -10,14 +8,16 @@ def overlaps(booking, other, minutes_between=0):
 
     assert booking != other
 
-    offset = timedelta(seconds=minutes_between / 2 * 60)
+    if booking.occasion.exclude_from_overlap_check:
+        return False
 
-    # make sure that 11:00 - 12:00 and 12:00 - 13:00 are not overlapping
-    ms = timedelta(microseconds=1)
+    if other.occasion.exclude_from_overlap_check:
+        return False
 
     return dates_overlap(
-        tuple((b.start - offset, b.end + offset - ms) for b in booking.dates),
-        tuple((o.start - offset, o.end + offset - ms) for o in other.dates),
+        tuple((b.start, b.end) for b in booking.dates),
+        tuple((o.start, o.end) for o in other.dates),
+        minutes_between=minutes_between
     )
 
 

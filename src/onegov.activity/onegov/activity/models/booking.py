@@ -153,7 +153,24 @@ class Booking(Base, TimestampMixin):
         return self.occasion.order
 
     def overlaps(self, other):
+
+        # even if exclude_from_overlap_check is active we consider a booking
+        # to overlap itself (this protects against double bookings)
+        if self.id == other.id:
+            return True
+
+        if self.occasion.exclude_from_overlap_check:
+            return False
+
+        # in some places 'other' only contains a start/end, so we can't
+        # check for the overlap exclusion (those places are supposed to
+        # do this on their own)
+        if hasattr(other, 'occasion'):
+            if other.occasion.exclude_from_overlap_check:
+                return False
+
         return dates_overlap(
             tuple((d.start, d.end) for d in self.dates),
             tuple((o.start, o.end) for o in other.dates),
+            minutes_between=self.period.minutes_between
         )

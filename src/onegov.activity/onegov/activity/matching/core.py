@@ -188,7 +188,8 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
         limit = None
 
     bookings = deferred_acceptance(
-        bookings=b, occasions=o, limit=limit, **kwargs)
+        bookings=b, occasions=o, limit=limit,
+        minutes_between=period.minutes_between, **kwargs)
 
     # write the changes to the database
     def update_states(bookings, state):

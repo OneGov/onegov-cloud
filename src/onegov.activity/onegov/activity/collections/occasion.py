@@ -21,7 +21,8 @@ class OccasionCollection(GenericCollection):
         return NumericRange(lower, upper + 1, bounds='[)')
 
     def add(self, activity, period, start, end, timezone,
-            location=None, age=None, spots=None, note=None, cost=0):
+            location=None, age=None, spots=None, note=None, cost=0,
+            exclude_from_overlap_check=False):
 
         start = standardize_date(start, timezone)
         end = standardize_date(end, timezone)
@@ -34,6 +35,7 @@ class OccasionCollection(GenericCollection):
             activity_id=activity.id,
             period_id=period.id,
             cost=cost,
+            exclude_from_overlap_check=exclude_from_overlap_check
         )
 
         self.add_date(occasion, start, end, timezone)
