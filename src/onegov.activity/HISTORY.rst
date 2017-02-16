@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.0 (2017-02-16)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to exclude certain occasions from overlapping with others.
   [href]
 
