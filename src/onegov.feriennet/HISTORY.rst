@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Show a description about the process instead of the content in the activity
+  ticket view.
+  [href]
+
 - Adds the ability to set the minimum time between bookings.
   [href]
 

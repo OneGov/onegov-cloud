@@ -109,11 +109,16 @@ class VacationActivityHandler(Handler):
         from onegov.feriennet.layout import DefaultLayout
         layout = DefaultLayout(self.activity, request)
 
+        a = ActivityCollection(request.app.session())
+        a = a.by_username(self.activity.username)
+
         return render_macro(
             layout.macros['activity_ticket_summary'], request, {
                 'activity': self.activity,
                 'layout': layout,
-                'show_ticket_panel': False
+                'show_ticket_panel': False,
+                'ticket': self.ticket,
+                'is_first': a.count() == 1
             }
         )
 
