@@ -112,14 +112,29 @@ class VacationActivityLayout(DefaultLayout):
             links = []
 
             if self.model.state == 'preview':
-                links.append(ConfirmLink(
-                    text=_("Request Publication"),
-                    url=self.request.link(self.model, name='beantragen'),
-                    confirm=_("Do you really want to request publication?"),
-                    extra_information=_("This cannot be undone."),
-                    classes=('confirm', 'request-publication'),
-                    yes_button_text=_("Request Publication")
-                ))
+
+                if self.model.occasions:
+                    links.append(ConfirmLink(
+                        text=_("Request Publication"),
+                        url=self.request.link(self.model, name='beantragen'),
+                        confirm=_(
+                            "Do you really want to request publication?"
+                        ),
+                        extra_information=_("This cannot be undone."),
+                        classes=('confirm', 'request-publication'),
+                        yes_button_text=_("Request Publication")
+                    ))
+                else:
+                    links.append(ConfirmLink(
+                        text=_("Request Publication"),
+                        url=self.request.link(self.model, name='beantragen'),
+                        confirm=_(
+                            "Please add at least one occasion "
+                            "before requesting publication."
+                        ),
+                        classes=('confirm', 'request-publication'),
+                    ))
+
                 links.append(DeleteLink(
                     text=_("Discard Activity"),
                     url=self.csrf_protected_url(
