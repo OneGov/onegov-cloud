@@ -555,6 +555,20 @@ ul.tags {
         margin-top: -5px;
     }
 
+    .icon-male::before {
+        @include icon('\f222');
+        
+        left: 2.25rem;
+        position: absolute;
+    }
+
+    .icon-female::before {
+        @include icon('\f221');
+        
+        left: 2.25rem;
+        position: absolute;
+    }
+
     .attendee-bookings {
         .alert-box {
             margin-bottom: 0;

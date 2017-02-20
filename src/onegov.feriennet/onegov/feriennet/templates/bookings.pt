@@ -61,7 +61,7 @@
                     <div class="row attendee-bookings-row" tal:repeat="attendee attendees" tal:condition="has_bookings" id="attendee-${attendee.id.hex}">
                         <div class="columns small-12">
                             <div class="attendee-bookings">
-                                <h3>${attendee.name}</h3>
+                                <h3 class="${attendee.gender == 'male' and 'icon-male' or 'icon-female'}"><a href="${request.link(attendee)}">${attendee.name}</a></h3>
 
                                 <a class="print print-icon before hide-for-print"
                                     data-print-selector="html" data-print-title="${title}"

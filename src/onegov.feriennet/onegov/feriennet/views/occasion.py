@@ -5,7 +5,7 @@ from onegov.activity import PeriodCollection
 from onegov.core.security import Private, Personal, Public
 from onegov.feriennet import _
 from onegov.feriennet import FeriennetApp
-from onegov.feriennet.forms import AttendeeForm, OccasionForm
+from onegov.feriennet.forms import AttendeeSignupForm, OccasionForm
 from onegov.feriennet.layout import OccasionFormLayout
 from onegov.feriennet.models import VacationActivity
 from onegov.user import User, UserCollection
@@ -107,7 +107,7 @@ def reinstate_occasion(self, request):
 
 @FeriennetApp.form(
     model=Occasion,
-    form=AttendeeForm,
+    form=AttendeeSignupForm,
     permission=Personal,
     name='anmelden',
     template='enroll_form.pt')

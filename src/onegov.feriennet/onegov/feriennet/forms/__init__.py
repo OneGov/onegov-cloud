@@ -1,5 +1,5 @@
 from onegov.feriennet.forms.activity import VacationActivityForm
-from onegov.feriennet.forms.attendee import AttendeeForm
+from onegov.feriennet.forms.attendee import AttendeeForm, AttendeeSignupForm
 from onegov.feriennet.forms.bank_statement import BankStatementImportForm
 from onegov.feriennet.forms.billing import BillingForm
 from onegov.feriennet.forms.occasion import OccasionForm
@@ -14,6 +14,7 @@ from onegov.feriennet.forms.notification_template import (
 
 __all__ = [
     'AttendeeForm',
+    'AttendeeSignupForm',
     'BankStatementImportForm',
     'BillingForm',
     'MatchForm',

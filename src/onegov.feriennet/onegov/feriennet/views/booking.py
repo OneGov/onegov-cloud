@@ -157,24 +157,11 @@ def view_my_bookings(self, request):
     periods = request.app.periods
     period = next((p for p in periods if p.id == self.period_id), None)
 
-    wishlist_phase = not period or period.wishlist_phase
-
     if request.is_admin:
         users = all_users(request)
         user = next(u for u in users if u.username == self.username)
     else:
         users, user = None, request.current_user
-
-    if user.username == request.current_username:
-        title = wishlist_phase and _("Wishlist") or _("Bookings")
-    elif wishlist_phase:
-        title = _("Wishlist of ${user}", mapping={
-            'user': user.title
-        })
-    else:
-        title = _("Bookings of ${user}", mapping={
-            'user': user.title
-        })
 
     def get_total(attendee):
         return total_by_bookings(period, bookings_by_attendee.get(attendee))
@@ -188,7 +175,8 @@ def view_my_bookings(self, request):
 
     has_emergency_contact = user.data and user.data.get('emergency')
     show_emergency_info = user.username == request.current_username
-    layout = BookingCollectionLayout(self, request, title)
+
+    layout = BookingCollectionLayout(self, request)
 
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),
@@ -204,7 +192,7 @@ def view_my_bookings(self, request):
         'periods': periods,
         'user': user,
         'users': users,
-        'title': title,
+        'title': layout.title,
         'has_emergency_contact': has_emergency_contact,
         'show_emergency_info': show_emergency_info
     }
@@ -262,7 +250,7 @@ def toggle_star(self, request):
         show_error_on_attendee(request, self.attendee, _(
             "The period is not in the wishlist-phase"))
 
-    layout = BookingCollectionLayout(self, request, None)
+    layout = BookingCollectionLayout(self, request)
     return render_macro(layout.macros['star'], request, {'booking': self})
 
 

@@ -17,6 +17,51 @@ from wtforms.validators import InputRequired
 
 class AttendeeForm(Form):
 
+    name = StringField(
+        label=_("Full Name"),
+        validators=[InputRequired()])
+
+    birth_date = DateField(
+        label=_("Birthdate"),
+        validators=[InputRequired()])
+
+    gender = RadioField(
+        label=_("Gender"),
+        choices=[
+            ('female', _("Girl")),
+            ('male', _("Boy")),
+        ],
+        validators=[InputRequired()]
+    )
+
+    notes = TextAreaField(
+        label=_("Note"),
+        description=_("Allergies, Disabilities, Particulars"),
+    )
+
+    @cached_property
+    def username(self):
+        if not self.request.is_admin:
+            return self.request.current_username
+
+        return self.request.params.get(
+            'username', self.request.current_username)
+
+    def ensure_no_duplicate_child(self):
+        attendees = AttendeeCollection(self.request.app.session())
+        query = attendees.by_username(self.username)
+        query = query.filter(Attendee.name == self.name.data.strip())
+        query = query.filter(Attendee.id != self.model.id)
+
+        if query.first():
+            self.name.errors.append(
+                _("You already entered a child with this name"))
+
+            return False
+
+
+class AttendeeSignupForm(Form):
+
     attendee = RadioField(
         label=_("Attendee"),
         validators=[InputRequired()],

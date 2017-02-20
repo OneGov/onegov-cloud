@@ -2,6 +2,7 @@ from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceItemCollection
 from onegov.activity import Occasion, OccasionCollection
 from onegov.activity import Period, PeriodCollection
+from onegov.activity import Attendee, AttendeeCollection
 from onegov.feriennet import FeriennetApp
 from onegov.feriennet.collections import BillingCollection
 from onegov.feriennet.collections import MatchCollection
@@ -110,6 +111,14 @@ def get_my_bookings(request, app, period_id=None, username=None):
     converters=dict(id=UUID))
 def get_booking(request, app, id):
     return BookingCollection(app.session()).by_id(id)
+
+
+@FeriennetApp.path(
+    model=Attendee,
+    path='/teilnehmer/{id}',
+    converters=dict(id=UUID))
+def get_attendee(request, app, id):
+    return AttendeeCollection(app.session()).by_id(id)
 
 
 @FeriennetApp.path(
