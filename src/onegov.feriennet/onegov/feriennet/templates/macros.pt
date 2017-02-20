@@ -11,17 +11,17 @@
 
     <span class="page-lead" tal:condition="activity.lead" tal:content="activity.lead" />
 
-    <div class="panel callout">
-        <p i18n:translate>
-            <tal:block i18n:name="user">${activity.user.title}</tal:block>'s activity was created
-            <tal:block i18n:name="created">${layout.format_date(activity.created, 'relative')}</tal:block> and
-            it was submitted for publication <tal:block i18n:name="submitted">${layout.format_date(ticket.created, 'relative')}</tal:block>.
-        </p>
+    <p>
+        <strong><a href="${request.link(activity)}" i18n:translate>Go to activity.</a></strong>
+    </p>
 
-        <p>
-            <strong><a href="${request.link(activity)}" i18n:translate>Go to activity.</a></strong>
-        </p>
+    <p>
+        <span i18n:translate>Activity State</span>: <strong><metal:block use-macro="layout.macros.activity_state_text" /></strong>
+        <br>
+        <span i18n:translate>Organiser</span>: <strong>${activity.user.title}</strong>
+    </p>
 
+    <div>
         <p>
             <span i18n:translate tal:condition="is_first">
                 This is <tal:block i18n:name="user">${activity.user.title}</tal:block>'s first activity.
@@ -75,7 +75,7 @@
 
                 <dl>
                     <dt i18n:translate>
-                        Status
+                        Activity State
                     </dt>
                     <dd>
                         <metal:block use-macro="layout.macros.activity_state" />

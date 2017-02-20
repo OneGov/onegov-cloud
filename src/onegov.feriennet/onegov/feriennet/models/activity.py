@@ -126,7 +126,7 @@ class VacationActivityHandler(Handler):
 
         links = []
 
-        if self.activity.state == 'proposed':
+        if self.activity.state in ('proposed', 'denied', 'archived'):
             links.append(ConfirmLink(
                 text=_("Publish"),
                 url=request.link(self.activity, name='annehmen'),
@@ -135,6 +135,7 @@ class VacationActivityHandler(Handler):
                 classes=('confirm', 'accept-activity'),
                 yes_button_text=_("Publish Activity")
             ))
+        if self.activity.state == 'proposed':
             links.append(ConfirmLink(
                 text=_("Reject"),
                 url=request.link(self.activity, name='ablehnen'),
@@ -143,7 +144,7 @@ class VacationActivityHandler(Handler):
                 classes=('confirm', 'reject-activity'),
                 yes_button_text=_("Reject Activity")
             ))
-        elif self.activity.state == 'accepted':
+        if self.activity.state in ('accepted', 'denied'):
             links.append(ConfirmLink(
                 text=_("Archive"),
                 url=request.link(self.activity, name='archivieren'),

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-20 13:24+0100\n"
+"POT-Creation-Date: 2017-02-20 13:51+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -108,7 +108,9 @@ msgid "Do you really want to request publication?"
 msgstr "Möchten Sie die Publikation wirklich beantragen?"
 
 msgid "Please add at least one occasion before requesting publication."
-msgstr "Bitte fügen Sie mindestens eine Durchführung hinzu bevor Sie die Publikation beantragen."
+msgstr ""
+"Bitte fügen Sie mindestens eine Durchführung hinzu bevor Sie die Publikation "
+"beantragen."
 
 msgid "Editor"
 msgstr "Veranstalter"
@@ -825,15 +827,18 @@ msgstr "Bank-Überweisung"
 msgid "Notice"
 msgstr "Mitteilung"
 
+msgid "Go to activity."
+msgstr "Zum Angebot."
+
+msgid "Activity State"
+msgstr "Angebotsstatus"
+
 msgid ""
 "${user}'s activity was created ${created} and it was submitted for "
 "publication ${submitted}."
 msgstr ""
 "${user}'s Angebot wurde ${created} erstellt und ${submitted} zur Publikation "
 "eingereicht."
-
-msgid "Go to activity."
-msgstr "Zum Angebot."
 
 msgid "This is ${user}'s first activity."
 msgstr "Dies ist ${user}'s erstes Angebot."
@@ -858,9 +863,6 @@ msgstr ""
 
 msgid "Edit contact info"
 msgstr "Kontakt ändern"
-
-msgid "Status"
-msgstr "Status"
 
 msgid "Ticket"
 msgstr "Ticket"
@@ -1089,6 +1091,9 @@ msgstr "Ausführungs-Phase"
 
 msgid "Administrative Costs"
 msgstr "Administrative Kosten"
+
+msgid "Status"
+msgstr "Status"
 
 msgid "Completed"
 msgstr "Abgeschlossen"
@@ -1401,6 +1406,9 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
+
+#~ msgid "Activity State: ${state}"
+#~ msgstr "Angebotsstatus: ${state}"
 
 #~ msgid ""
 #~ "After reviewing the activity it can either be published or denied. "
