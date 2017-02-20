@@ -29,7 +29,7 @@
                         </div>
 
                         <div class="field-display-block">
-                            <div class="field-display-label" i18n:translate>State</div>
+                            <div class="field-display-label" i18n:translate>Ticket State</div>
                             <div class="field-display-data ticket-state">
                                 <tal:block metal:use-macro="layout.macros['ticket_status']" />
                             </div>
