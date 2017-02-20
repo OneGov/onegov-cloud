@@ -125,19 +125,16 @@ class Activity(Base, ContentMixin, TimestampMixin):
         return self
 
     def accept(self):
-        assert self.state == 'proposed'
         self.state = 'accepted'
 
         return self
 
     def deny(self):
-        assert self.state == 'proposed'
         self.state = 'denied'
 
         return self
 
     def archive(self):
-        assert self.state == 'accepted'
         self.state = 'archived'
 
         return self
