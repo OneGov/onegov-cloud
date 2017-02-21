@@ -1,8 +1,9 @@
 import string
 
 from onegov.feriennet import _
+from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
-from wtforms import StringField, TextAreaField
+from wtforms import StringField, TextAreaField, RadioField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import Optional, URL, ValidationError, InputRequired
 
@@ -10,16 +11,54 @@ from wtforms.validators import Optional, URL, ValidationError, InputRequired
 class UserProfileForm(Form):
     """ Custom userprofile form for feriennet """
 
-    extra_fields = ('address', 'email', 'phone', 'website', 'emergency')
+    extra_fields = (
+        'salutation',
+        'organisation',
+        'address',
+        'zip_code',
+        'place',
+        'email',
+        'phone',
+        'website',
+        'emergency'
+    )
 
-    realname = StringField(
-        label=_("Name"),
-        description=_("Personal-, Society- or Company-Name")
+    salutation = RadioField(
+        label=_("Salutation"),
+        choices=[
+            ('mr', _("Mr.")),
+            ('ms', _("Ms.")),
+        ],
+        validators=[InputRequired()]
+    )
+
+    first_name = StringField(
+        label=_("First Name"),
+        validators=[InputRequired()]
+    )
+
+    last_name = StringField(
+        label=_("Last Name"),
+        validators=[InputRequired()]
+    )
+
+    organisation = StringField(
+        label=_("Organisation"),
     )
 
     address = TextAreaField(
         label=_("Address"),
         render_kw={'rows': 4},
+    )
+
+    zip_code = StringField(
+        label=_("Zip Code"),
+        validators=[InputRequired()]
+    )
+
+    place = StringField(
+        label=_("Place"),
+        validators=[InputRequired()]
     )
 
     email = StringField(
@@ -43,6 +82,14 @@ class UserProfileForm(Form):
         validators=[Optional(), URL()]
     )
 
+    @property
+    def name(self):
+        return encode_name(self.first_name.data, self.last_name.data).strip()
+
+    @name.setter
+    def name(self, value):
+        self.first_name.data, self.last_name.data = decode_name(value)
+
     def validate_emergency(self, field):
         if field.data:
             characters = tuple(c for c in field.data if c.strip())
@@ -58,7 +105,7 @@ class UserProfileForm(Form):
         super().populate_obj(model)
 
         model.data = model.data or {}
-        model.realname = self.realname.data
+        model.realname = self.name
 
         for key in self.extra_fields:
             model.data[key] = self.data.get(key)
@@ -67,7 +114,7 @@ class UserProfileForm(Form):
         super().process_obj(model)
 
         modeldata = model.data or {}
-        self.realname.data = model.realname
+        self.name = model.realname
 
         for key in self.extra_fields:
             getattr(self, key).data = modeldata.get(key)

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds more fields to the user form.
+  [href]
+
 - Splits attendee name into first/last name.
   [href]
 

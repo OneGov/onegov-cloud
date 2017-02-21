@@ -8,7 +8,10 @@ def encode_name(first_name, last_name):
 
 
 def decode_name(fullname):
-    names = fullname.split(NAME_SEPARATOR)
+    if fullname:
+        names = fullname.split(NAME_SEPARATOR)
+    else:
+        names = None
 
     if not names:
         return None, None

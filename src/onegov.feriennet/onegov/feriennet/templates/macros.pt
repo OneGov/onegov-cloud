@@ -7,38 +7,39 @@
 <body>
 
 <metal:activity_ticket_summary define-macro="activity_ticket_summary" i18n:domain="onegov.feriennet">
-    <h2>${activity.title}</h2>
+    <tal:block define="user activity.user.data.organisation or activity.user.title|activity.user.title">
+        <h2>${activity.title}</h2>
 
-    <span class="page-lead" tal:condition="activity.lead" tal:content="activity.lead" />
+        <span class="page-lead" tal:condition="activity.lead" tal:content="activity.lead" />
 
-    <p>
-        <strong><a href="${request.link(activity)}" i18n:translate>Go to activity.</a></strong>
-    </p>
-
-    <p>
-        <span i18n:translate>Activity State</span>: <strong><metal:block use-macro="layout.macros.activity_state_text" /></strong>
-        <br>
-        <span i18n:translate>Organiser</span>: <strong>${activity.user.title}</strong>
-    </p>
-
-    <div>
         <p>
-            <span i18n:translate tal:condition="is_first">
-                This is <tal:block i18n:name="user">${activity.user.title}</tal:block>'s first activity.
-            </span>
-            <span i18n:translate tal:condition="not is_first">
-                <tal:block i18n:name="user">${activity.user.title}</tal:block> has submitted activities before.
-            </span>
-            <span i18n:translate>After reviewing the activity it can either be published or denied.</span>
+            <strong><a href="${request.link(activity)}" i18n:translate>Go to activity.</a></strong>
         </p>
 
-        <p i18n:translate>
-            Published activites with active occasions show up in the respective
-            periods. Published activities can be archived to make them invisible
-            to the public and be reactivated at a later time.
+        <p>
+            <span i18n:translate>Activity State</span>: <strong><metal:block use-macro="layout.macros.activity_state_text" /></strong>
+            <br>
+            <span i18n:translate>Organiser</span>: <strong>${user}</strong>
         </p>
-    </div>
 
+        <div>
+            <p>
+                <span i18n:translate tal:condition="is_first">
+                    This is <tal:block i18n:name="user">${user}</tal:block>'s first activity.
+                </span>
+                <span i18n:translate tal:condition="not is_first">
+                    <tal:block i18n:name="user">${user}</tal:block> has submitted activities before.
+                </span>
+                <span i18n:translate>After reviewing the activity it can either be published or denied.</span>
+            </p>
+
+            <p i18n:translate>
+                Published activites with active occasions show up in the respective
+                periods. Published activities can be archived to make them invisible
+                to the public and be reactivated at a later time.
+            </p>
+        </div>
+    </tal:block>
 </metal:activity_ticket_summary>
 
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
@@ -119,12 +120,20 @@
     <div class="organiser">
         <ul>
             <li class="organiser-name"
+                tal:condition="organiser.data.organisation|nothing"
+                tal:content="organiser.data.organisation">
+            </li>
+            <li class="organiser-name"
                 tal:condition="organiser.realname|nothing"
                 tal:content="organiser.realname">
             </li>
             <li class="organiser-address"
-                tal:condition="organiser.data.address|nothing"
-                tal:content="organiser.data.address">
+                tal:condition="organiser.data.address|organiser.data.zip_code|organiser.data.place|nothing">
+                <span class="newlines" tal:condition="organiser.data.address|nothing">${organiser.data.address}</span>
+                <div tal:condition="organiser.data.zip_code|organiser.data.place|nothing">
+                    <span tal:condition="organiser.data.zip_code|nothing">${organiser.data.zip_code}</span>
+                    <span tal:condition="organiser.data.place|nothing">${organiser.data.place}</span>
+                </div>
             </li>
             <li class="organiser-email" tal:define="email organiser.data.email or organiser.username|organiser.username">
                 <a href="mailto:${email}">${email}</a>

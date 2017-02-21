@@ -472,8 +472,13 @@ def test_organiser_info(feriennet_app):
 
     # owner changes are reflected on the activity
     contact = editor.get('/angebot/play-with-legos').click('Kontakt ändern')
-    contact.form['realname'] = 'Editors Association'
-    contact.form['address'] = 'Washington'
+    contact.form['salutation'] = 'mr'
+    contact.form['first_name'] = 'Ed'
+    contact.form['last_name'] = 'Itor'
+    contact.form['organisation'] = 'Editors Association'
+    contact.form['address'] = 'K Street'
+    contact.form['zip_code'] = '20001'
+    contact.form['place'] = 'Washington'
     contact.form['email'] = 'editors-association@example.org'
     contact.form['phone'] = '+41 23 456 789'
     contact.form['website'] = 'https://www.example.org'
@@ -483,14 +488,17 @@ def test_organiser_info(feriennet_app):
     activity = editor.get('/angebot/play-with-legos')
 
     assert "Editors Association" in activity
+    assert "Ed\u00A0Itor" in activity
     assert "Washington" in activity
+    assert "20001" in activity
+    assert "K Street" in activity
     assert "editors-association@example.org" in activity
     assert "+41 23 456 789" in activity
     assert "https://www.example.org" in activity
 
     # admin changes are reflected on the activity
     contact = admin.get('/angebot/play-with-legos').click('Kontakt ändern')
-    contact.form['realname'] = 'Admins Association'
+    contact.form['organisation'] = 'Admins Association'
     contact.form.submit()
 
     activity = editor.get('/angebot/play-with-legos')
@@ -1720,6 +1728,11 @@ def test_occasion_attendance_collection(feriennet_app):
 
     # if the emergency info is given, it is shown
     page = admin.get('/benutzerprofil')
+    page.form['salutation'] = 'mr'
+    page.form['first_name'] = 'foo'
+    page.form['last_name'] = 'bar'
+    page.form['zip_code'] = '123'
+    page.form['place'] = 'abc'
     page.form['emergency'] = '123456789 Admin'
     page.form.submit()
 

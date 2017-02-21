@@ -56,6 +56,14 @@ form small {
 }
 
 /*
+    Render newlines
+*/
+.newlines {
+    white-space: pre-line;
+    word-break: break-all;
+}
+
+/*
     Generic icons (experimental, might replace other approaches in the future)
 */
 @mixin generic-icon($icon) {
@@ -307,9 +315,8 @@ ul.tags {
         margin: 0;
     }
 
-    .organiser-address {
-        white-space: pre-line;
-        word-break: break-all;
+    .organiser-name:first-child {
+        font-weight: bold;
     }
 
     .organiser-email {

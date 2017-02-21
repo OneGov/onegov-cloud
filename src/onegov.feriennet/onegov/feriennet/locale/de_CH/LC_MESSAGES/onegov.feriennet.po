@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-20 13:51+0100\n"
+"POT-Creation-Date: 2017-02-21 14:22+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -53,6 +53,14 @@ msgstr "Benutzerprofil"
 
 msgid "Homepage"
 msgstr "Startseite"
+
+#, python-format
+msgid "Wishlist of ${user}"
+msgstr "Wunschliste von ${user}"
+
+#, python-format
+msgid "Bookings of ${user}"
+msgstr "Buchungen von ${user}"
 
 msgid "Manage Periods"
 msgstr "Perioden"
@@ -214,11 +222,11 @@ msgstr "Theater"
 msgid "Trade"
 msgstr "Handwerk"
 
-msgid "Attendee"
-msgstr "Teilnehmer"
+msgid "First Name"
+msgstr "Vornane"
 
-msgid "Full Name"
-msgstr "Vollständiger Name"
+msgid "Last Name"
+msgstr "Nachname"
 
 msgid "Birthdate"
 msgstr "Geburtsdatum"
@@ -232,8 +240,14 @@ msgstr "Bemerkung"
 msgid "Allergies, Disabilities, Particulars"
 msgstr "Allergien, Behinderungen, Besonderheiten"
 
+msgid "Attendee"
+msgstr "Teilnehmer"
+
 msgid "Ignore Age Restriction"
 msgstr "Altersbeschränkung Ignorieren"
+
+msgid "You already entered a child with this name"
+msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
 
 msgid "Add a new attendee"
 msgstr "Neuen Teilnehmer erfassen"
@@ -268,9 +282,6 @@ msgstr "Mädchen"
 
 msgid "Boy"
 msgstr "Junge"
-
-msgid "You already entered a child with this name"
-msgstr "Sie haben bereits ein Kind mit diesem Namen eingegeben"
 
 #, python-format
 msgid "This occasion has already been booked by ${name}"
@@ -490,14 +501,20 @@ msgstr ""
 "Es ist nicht mehr möglich die Ausführungs-Einstellungen zu verändern da die "
 "Periode bereits bestätigt wurde."
 
-msgid "Name"
-msgstr "Name"
+msgid "Salutation"
+msgstr "Anrede"
 
-msgid "Personal-, Society- or Company-Name"
-msgstr "Persönlicher, Vereins- oder Firmen-Name"
+msgid "Organisation"
+msgstr "Organisation"
 
 msgid "Address"
 msgstr "Adresse"
+
+msgid "Zip Code"
+msgstr "PLZ"
+
+msgid "Place"
+msgstr "Ort"
 
 msgid "Public E-Mail Address"
 msgstr "Öffentliche E-Mail Adresse"
@@ -519,6 +536,12 @@ msgstr "Webseite"
 
 msgid "Website address including http:// or https://"
 msgstr "Webseiten-Adresse inklusive http:// oder https://"
+
+msgid "Mr."
+msgstr "Herr"
+
+msgid "Ms."
+msgstr "Frau"
 
 msgid "Please enter both a phone number and a name"
 msgstr "Bitte geben Sie eine Telefonnummer und einen Namen ein"
@@ -833,13 +856,6 @@ msgstr "Zum Angebot."
 msgid "Activity State"
 msgstr "Angebotsstatus"
 
-msgid ""
-"${user}'s activity was created ${created} and it was submitted for "
-"publication ${submitted}."
-msgstr ""
-"${user}'s Angebot wurde ${created} erstellt und ${submitted} zur Publikation "
-"eingereicht."
-
 msgid "This is ${user}'s first activity."
 msgstr "Dies ist ${user}'s erstes Angebot."
 
@@ -999,6 +1015,9 @@ msgstr "${operability} aller Durchführungen haben genug Teilnehmer."
 
 msgid "Years"
 msgstr "Jahre"
+
+msgid "Name"
+msgstr "Name"
 
 msgid "State"
 msgstr "Status"
@@ -1197,6 +1216,9 @@ msgstr ""
 "ist möglich dass abgesagte/blockierte Buchungen bestehen. Diese werden "
 "gelöscht."
 
+msgid "Edit Attendee"
+msgstr "Teilnehmer Bearbeiten"
+
 #, python-format
 msgid "Billing for ${title}"
 msgstr "Fakturierung für ${title}"
@@ -1256,14 +1278,6 @@ msgstr ""
 
 msgid "Your booking was cancelled successfully"
 msgstr "Ihre Buchung wurde erfolgreich storniert"
-
-#, python-format
-msgid "Wishlist of ${user}"
-msgstr "Wunschliste von ${user}"
-
-#, python-format
-msgid "Bookings of ${user}"
-msgstr "Buchungen von ${user}"
 
 msgid "Only open, cancelled, denied or blocked bookings may be deleted"
 msgstr ""
@@ -1406,19 +1420,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "Activity State: ${state}"
-#~ msgstr "Angebotsstatus: ${state}"
-
-#~ msgid ""
-#~ "After reviewing the activity it can either be published or denied. "
-#~ "Published activites with active occasions show up in the respective "
-#~ "periods. Published activities can be archived to make them invisible to "
-#~ "the public and be reactivated at a later time."
-#~ msgstr ""
-#~ "Nach der Überprüfung des Angebots kann es entweder veröffentlicht oder "
-#~ "abgelehnt werden. Veröffentlichte Angebote mit aktiven Durchführungen "
-#~ "werden in den entsprechenden Perioden angezeigt. Veröffentlichte Angebote "
-#~ "können archiviert werden um sie von der Öffentlichkeit zu verstecken. "
-#~ "Archivierte Angebote können zu einem späteren Zeitpunkt reaktiviert "
-#~ "werden."
