@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Ensures that the user's status/role can always be changed.
+  [href]
+
 - Fixes typeahead autofocus being too eager.
   [href]
 

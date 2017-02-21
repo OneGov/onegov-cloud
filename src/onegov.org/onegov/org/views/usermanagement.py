@@ -1,4 +1,5 @@
 from collections import defaultdict
+from copy import copy
 from onegov.core.crypto import random_password
 from onegov.core.directives import query_form_class
 from onegov.core.security import Secret
@@ -9,6 +10,7 @@ from onegov.org.forms import ManageUserForm, NewUserForm
 from onegov.org.layout import UserManagementLayout
 from onegov.user import User, UserCollection
 from onegov.user.errors import ExistingUserError
+from wtforms.validators import Optional
 
 
 @OrgApp.html(model=UserCollection, template='usermanagement.pt',
@@ -34,7 +36,31 @@ def get_manage_user_form(self, request):
     userprofile_form = query_form_class(request, self, name='benutzerprofil')
     assert userprofile_form
 
-    return merge_forms(ManageUserForm, userprofile_form)
+    class OptionalUserprofile(userprofile_form):
+
+        hooked = False
+
+        def submitted(self, request):
+            # fields only present on the userprofile_form are made optional
+            # to make sure that we can always change the active/inactive state
+            # of the user and the role the user has
+            if not self.hooked:
+                for name, field in self._fields.items():
+                    if not hasattr(userprofile_form, name):
+                        continue
+
+                    if not field.validators:
+                        continue
+
+                    # be careful not to change the class itself
+                    field.validators = copy(field.validators)
+                    field.validators.insert(0, Optional())
+
+                self.hooked = True
+
+            return super().submitted(request)
+
+    return merge_forms(ManageUserForm, OptionalUserprofile)
 
 
 @OrgApp.form(model=User, template='form.pt', form=get_manage_user_form,
