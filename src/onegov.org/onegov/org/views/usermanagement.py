@@ -54,7 +54,8 @@ def handle_manage_user(self, request, form):
         request.success(_("Your changes were saved"))
 
         return request.redirect(request.class_link(UserCollection))
-    else:
+
+    elif not request.POST:
         form.process(obj=self)
 
     layout = UserManagementLayout(self, request)
