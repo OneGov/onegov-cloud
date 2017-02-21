@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.0 (2017-02-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds more fields to the user form.
   [href]
 
