@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hide pagination if there are no accessible activities.
+  [href]
+
 0.4.0 (2017-02-21)
 ~~~~~~~~~~~~~~~~~~~
 

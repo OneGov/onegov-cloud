@@ -72,7 +72,7 @@
             </div>
         </div>
 
-        <div class="pagination-centered">
+        <div class="pagination-centered" tal:condition="activities">
             <div metal:use-macro="layout.macros['pagination']" tal:define="
             collection layout.model; current_page layout.model;" />
         </div>
