@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.2 (2017-02-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Ensures that the user's status/role can always be changed.
   [href]
 
