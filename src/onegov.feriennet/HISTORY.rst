@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Splits attendee name into first/last name.
+  [href]
+
 - Show a description about the process instead of the content in the activity
   ticket view.
   [href]

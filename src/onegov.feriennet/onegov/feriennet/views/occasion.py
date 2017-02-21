@@ -120,7 +120,7 @@ def book_occasion(self, request, form):
         if form.is_new:
             attendee = attendees.add(
                 user=user,
-                name=form.name.data,
+                name=form.name,
                 birth_date=form.birth_date.data,
                 gender=form.gender.data,
                 notes=form.notes.data

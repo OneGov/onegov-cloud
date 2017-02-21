@@ -4,6 +4,7 @@ from onegov.activity import Attendee, AttendeeCollection
 from onegov.activity import Booking, BookingCollection
 from onegov.activity import Occasion
 from onegov.feriennet import _
+from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
 from onegov.user import UserCollection
 from purl import URL
@@ -15,10 +16,53 @@ from wtforms.fields.html5 import DateField
 from wtforms.validators import InputRequired
 
 
-class AttendeeForm(Form):
+class AttendeeBase(Form):
 
-    name = StringField(
-        label=_("Full Name"),
+    @property
+    def name(self):
+        return encode_name(self.first_name.data, self.last_name.data).strip()
+
+    @name.setter
+    def name(self, value):
+        self.first_name.data, self.last_name.data = decode_name(value)
+
+    def populate_obj(self, model):
+        super().populate_obj(model)
+        model.name = self.name
+
+    def process_obj(self, model):
+        super().process_obj(model)
+        self.name = model.name
+
+    @cached_property
+    def username(self):
+        if not self.request.is_admin:
+            return self.request.current_username
+
+        return self.request.params.get(
+            'username', self.request.current_username)
+
+    def ensure_no_duplicate_child(self):
+        attendees = AttendeeCollection(self.request.app.session())
+        query = attendees.by_username(self.username)
+        query = query.filter(Attendee.name == self.name)
+        query = query.filter(Attendee.id != self.model.id)
+
+        if query.first():
+            self.last_name.errors.append(
+                _("You already entered a child with this name"))
+
+            return False
+
+
+class AttendeeForm(AttendeeBase):
+
+    first_name = StringField(
+        label=_("First Name"),
+        validators=[InputRequired()])
+
+    last_name = StringField(
+        label=_("Last Name"),
         validators=[InputRequired()])
 
     birth_date = DateField(
@@ -39,36 +83,21 @@ class AttendeeForm(Form):
         description=_("Allergies, Disabilities, Particulars"),
     )
 
-    @cached_property
-    def username(self):
-        if not self.request.is_admin:
-            return self.request.current_username
 
-        return self.request.params.get(
-            'username', self.request.current_username)
-
-    def ensure_no_duplicate_child(self):
-        attendees = AttendeeCollection(self.request.app.session())
-        query = attendees.by_username(self.username)
-        query = query.filter(Attendee.name == self.name.data.strip())
-        query = query.filter(Attendee.id != self.model.id)
-
-        if query.first():
-            self.name.errors.append(
-                _("You already entered a child with this name"))
-
-            return False
-
-
-class AttendeeSignupForm(Form):
+class AttendeeSignupForm(AttendeeBase):
 
     attendee = RadioField(
         label=_("Attendee"),
         validators=[InputRequired()],
         default='0xdeadbeef')
 
-    name = StringField(
-        label=_("Full Name"),
+    first_name = StringField(
+        label=_("First Name"),
+        validators=[InputRequired()],
+        depends_on=('attendee', 'other'))
+
+    last_name = StringField(
+        label=_("Last Name"),
         validators=[InputRequired()],
         depends_on=('attendee', 'other'))
 
@@ -108,14 +137,6 @@ class AttendeeSignupForm(Form):
         return len(self.attendee.choices) == 1 and 'hide-attendee'
 
     @cached_property
-    def username(self):
-        if not self.request.is_admin:
-            return self.request.current_username
-
-        return self.request.params.get(
-            'username', self.request.current_username)
-
-    @cached_property
     def user(self):
         users = UserCollection(self.request.app.session())
         return users.by_username(self.username)
@@ -152,18 +173,6 @@ class AttendeeSignupForm(Form):
 
         if not self.request.is_admin:
             self.delete_field('ignore_age')
-
-    def ensure_no_duplicate_child(self):
-        if self.is_new:
-            attendees = AttendeeCollection(self.request.app.session())
-            query = attendees.by_username(self.username)
-            query = query.filter(Attendee.name == self.name.data.strip())
-
-            if query.first():
-                self.name.errors.append(
-                    _("You already entered a child with this name"))
-
-                return False
 
     def ensure_no_duplicate_booking(self):
         if not self.is_new:

@@ -740,20 +740,22 @@ def test_enroll_child(feriennet_app):
     enroll = client.get('/angebot/retreat').click("Anmelden")
     assert "Teilnehmer Anmelden" in enroll
 
-    enroll.form['name'] = "Tom Sawyer"
+    enroll.form['first_name'] = "Tom"
+    enroll.form['last_name'] = "Sawyer"
     enroll.form['birth_date'] = "2012-01-01"
     enroll.form['gender'] = 'male'
     activity = enroll.form.submit().follow()
 
-    assert "zu Tom Sawyer's Wunschliste hinzugefügt" in activity
+    assert "zu Tom\u00A0Sawyer's Wunschliste hinzugefügt" in activity
 
     # prevent double-subscriptions
     enroll = activity.click("Anmelden")
-    assert "Tom Sawyer hat sich bereits für diese Durchführung angemeldet"\
+    assert "Tom\u00A0Sawyer hat sich bereits für diese Durchführung"\
         in enroll.form.submit()
 
     enroll.form['attendee'] = 'other'
-    enroll.form['name'] = "Tom Sawyer"
+    enroll.form['first_name'] = "Tom"
+    enroll.form['last_name'] = "Sawyer"
     enroll.form['birth_date'] = "2011-01-01"
     enroll.form['gender'] = 'male'
 
@@ -765,7 +767,8 @@ def test_enroll_child(feriennet_app):
     periods.query().first().active = False
     transaction.commit()
 
-    enroll.form['name'] = "Huckleberry Finn"
+    enroll.form['first_name'] = "Huckleberry"
+    enroll.form['last_name'] = "Finn"
     assert "Diese Durchführung liegt ausserhalb der aktiven Periode"\
         in enroll.form.submit()
 
@@ -786,10 +789,11 @@ def test_enroll_child(feriennet_app):
 
     transaction.commit()
 
-    enroll.form['name'] = "Huckleberry Finn"
+    enroll.form['first_name'] = "Huckleberry"
+    enroll.form['last_name'] = "Finn"
     activity = enroll.form.submit().follow()
 
-    assert "zu Huckleberry Finn's Wunschliste hinzugefügt" in activity
+    assert "zu Huckleberry\u00A0Finn's Wunschliste hinzugefügt" in activity
 
     # prevent booking over the limit
     period = periods.query().first()
@@ -882,7 +886,8 @@ def test_enroll_age_mismatch(feriennet_app):
     admin.login_admin()
 
     page = admin.get('/angebot/retreat').click("Anmelden")
-    page.form['name'] = "Tom Sawyer"
+    page.form['first_name'] = "Tom"
+    page.form['last_name'] = "Sawyer"
     page.form['gender'] = 'male'
 
     page.form['birth_date'] = "1900-01-01"
