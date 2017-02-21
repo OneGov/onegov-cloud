@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.1 (2017-02-21)
+~~~~~~~~~~~~~~~~~~~
+
 - Enable state changes to all states except to the proposed state.
   [href]
 

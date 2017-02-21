@@ -4,7 +4,7 @@ name = 'onegov.activity'
 description = (
     'Summer activities by Pro Juventute for OneGov Cloud'
 )
-version = '0.5.0'
+version = '0.5.1'
 
 
 def get_long_description():
