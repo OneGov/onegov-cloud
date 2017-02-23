@@ -97,7 +97,7 @@ def get_my_bookings(request, app, period_id=None, username=None):
 
     # the default period is the active period or the first we can find
     if not period_id:
-        period = app.active_period or app.periods[0]
+        period = app.active_period or app.periods and app.periods[0]
 
         if period:
             period_id = period.id
@@ -128,7 +128,7 @@ def get_attendee(request, app, id):
 def get_matches(request, app, period_id):
     # the default period is the active period or the first we can find
     if not period_id:
-        period = app.active_period or app.periods[0]
+        period = app.active_period or app.periods and app.periods[0]
     else:
         period = PeriodCollection(app.session()).by_id(period_id)
 
@@ -145,7 +145,7 @@ def get_matches(request, app, period_id):
 def get_billing(request, app, period_id, username=None, expand=False):
     # the default period is the active period or the first we can find
     if not period_id:
-        period = app.active_period or app.periods[0]
+        period = app.active_period or app.periods and app.periods[0]
     else:
         period = PeriodCollection(app.session()).by_id(period_id)
 
@@ -192,7 +192,7 @@ def get_my_invoies(request, app, username=None):
 def get_occasion_attendee_collection(request, app, period_id=None):
     # the default period is the active period or the first we can find
     if not period_id:
-        period = app.active_period or app.periods[0]
+        period = app.active_period or app.periods and app.periods[0]
     else:
         period = PeriodCollection(app.session()).by_id(period_id)
 
