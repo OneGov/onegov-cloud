@@ -12,8 +12,8 @@ from wtforms.fields import BooleanField
 from wtforms.fields import RadioField
 from wtforms.fields import StringField
 from wtforms.fields import TextAreaField
-from wtforms.fields.html5 import DateField
-from wtforms.validators import InputRequired
+from wtforms.fields.html5 import DateField, IntegerField
+from wtforms.validators import InputRequired, NumberRange
 
 
 class AttendeeBase(Form):
@@ -240,19 +240,30 @@ class AttendeeSignupForm(AttendeeBase):
         if self.is_new:
             return True
 
-        if self.model.period.confirmed and self.model.period.booking_limit:
+        if self.model.period.confirmed:
+            if self.model.period.booking_limit:
+                limit = self.model.period.booking_limit
+            else:
+                limit = self.request.app.session().query(Attendee.limit)\
+                    .filter(Attendee.id == self.attendee.data)\
+                    .one()\
+                    .limit
+        else:
+            limit = None
+
+        if limit:
             bookings = self.booking_collection
 
             query = bookings.query().with_entities(Booking.id)
             query = query.filter(Booking.attendee_id == self.attendee.data)
             count = query.count()
 
-            if count >= self.model.period.booking_limit:
+            if count >= limit:
                 self.attendee.errors.append(_((
                     "The attendee already has already reached the maximum "
                     "number of ${count} bookings"
                 ), mapping={
-                    'count': self.model.period.booking_limit
+                    'count': limit
                 }))
 
                 return False
@@ -327,3 +338,12 @@ class AttendeeSignupForm(AttendeeBase):
         if date.today() >= self.model.deadline:
             self.attendee.errors.append(_("The deadline has passed"))
             return False
+
+
+class AttendeeLimitForm(Form):
+
+    limit = IntegerField(
+        label=_("Maximum number of bookings per period"),
+        validators=[
+            NumberRange(0, 1000)
+        ])

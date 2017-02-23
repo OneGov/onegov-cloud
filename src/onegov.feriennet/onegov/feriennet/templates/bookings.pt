@@ -72,6 +72,25 @@
 
                                 <div id="alert-boxes-for-${attendee.id}"></div>
 
+                                <div class="booking-limit">
+                                    <span i18n:translate tal:condition="period.all_inclusive and period.max_bookings_per_attendee">
+                                        Limited to
+                                            <tal:block i18n:name="number">${period.max_bookings_per_attendee}</tal:block>
+                                        bookings
+                                    </span>
+                                    <a i18n:translate tal:condition="not period.all_inclusive and attendee.limit" href="${request.link(attendee, 'limit')}">
+                                        Limited to
+                                            <tal:block i18n:name="number">${attendee.limit or 100}</tal:block>
+                                        bookings
+                                    </a>
+                                    <span i18n:translate tal:condition="period.all_inclusive and not period.max_bookings_per_attendee">
+                                        Unlimited bookings
+                                    </span>
+                                    <a i18n:translate tal:condition="not period.all_inclusive and not attendee.limit" href="${request.link(attendee, 'limit')}">
+                                        Unlimited bookings
+                                    </a>
+                                </div>
+
                                 <ul>
                                     <li tal:repeat="booking bookings_by_attendee(attendee)" id="booking-${booking.id}">
                                         <div class="row ${booking.occasion.operable and 'operable' or 'non-operable'} collapse">

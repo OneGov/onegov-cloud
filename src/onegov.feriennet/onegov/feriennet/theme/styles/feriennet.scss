@@ -602,6 +602,14 @@ ul.tags {
             padding: .75rem 1rem .75rem 8.3333%;
         }
 
+        .booking-limit {
+            background-color: lighten($yellow-pastel, 5%);
+            border: 1px solid $gainsboro;
+            font-size: .875rem;
+            line-height: .875rem;
+            padding: .5rem 3.5rem;
+        }
+
         ul {
             list-style: none;
             margin: 0;

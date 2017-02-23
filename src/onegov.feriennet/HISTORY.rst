@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to define attendee-based limits.
+  [href]
+
 - Adds the ability to set a booking deadline on the period.
   [href]
 
