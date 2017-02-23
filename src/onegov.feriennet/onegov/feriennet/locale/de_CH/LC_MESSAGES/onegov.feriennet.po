@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-21 14:22+0100\n"
+"POT-Creation-Date: 2017-02-23 13:34+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -277,6 +277,9 @@ msgstr "Der Teilnehmer ist zu alt"
 msgid "The attendee is too young"
 msgstr "Der Teilnehmer ist zu jung"
 
+msgid "The deadline has passed"
+msgstr "Der Anmeldeschluss wurde erreicht"
+
 msgid "Girl"
 msgstr "Mädchen"
 
@@ -477,6 +480,18 @@ msgstr "Die administrativen Kosten einer einzelnen Buchung"
 msgid "Required minutes between boookings"
 msgstr "Blockzeit zwischen Buchungen in Minuten"
 
+msgid "Stop accepting bookings"
+msgstr "Die Annahme von Buchungen stoppen"
+
+msgid "Deadline Settings"
+msgstr "Teilnahmeschluss Einstellungen"
+
+msgid "Fixed day"
+msgstr "Stichtag"
+
+msgid "X Days Before"
+msgstr "X Tage vorher"
+
 msgid "The execution phase conflicts with existing occasions"
 msgstr "Konflikt mit bestehenden Durchführungen"
 
@@ -486,6 +501,12 @@ msgstr "Jeder Teilnehmer kann soviele Angebote buchen we er möchte"
 msgid "Each attendee may attend a fixed number of activites"
 msgstr ""
 "Jeder Teilnehmer kann an einer limitierten Anzahl von Angeboten teilnehmen"
+
+msgid "On a fixed day"
+msgstr "An einem Stichtag"
+
+msgid "X days before each occasion"
+msgstr "X Tage vor jeder Durchführung"
 
 msgid ""
 "The prebooking period must start before the exeuction period and each period "
@@ -954,6 +975,13 @@ msgstr "Die Wunschphase wurde abgeschlossen."
 
 msgid "There cannot be any more bookings."
 msgstr "Es können keine weiteren Buchungen mehr vorgenommen werden."
+
+msgid "The deadline for last-minute bookings is the ${date}."
+msgstr "Der Anmeldeschluss ist der ${date}."
+
+msgid "Last-minute bookings are possible up to ${days} before each occasion."
+msgstr ""
+"Anmeldungen sind bis zu ${days} Tage vor der jeweiligen Durchführung möglich."
 
 msgid ""
 "Each child is assigned up to ${count} activities. To ensure a good matching "

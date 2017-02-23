@@ -94,6 +94,33 @@ class PeriodForm(Form):
         default=0
     )
 
+    deadline = RadioField(
+        label=_("Stop accepting bookings"),
+        fieldset=_("Deadline Settings"),
+        choices=[
+            ('fix', _("On a fixed day")),
+            ('rel', _("X days before each occasion")),
+        ],
+        default='fix',
+    )
+
+    deadline_date = DateField(
+        label=_("Fixed day"),
+        fieldset=_("Deadline Settings"),
+        validators=[InputRequired()],
+        depends_on=('deadline', 'fix')
+    )
+
+    deadline_days = IntegerField(
+        label=_("X Days Before"),
+        fieldset=_("Deadline Settings"),
+        validators=[
+            InputRequired(),
+            NumberRange(0, 360),
+        ],
+        depends_on=('deadline', 'rel')
+    )
+
     @property
     def prebooking(self):
         return (self.prebooking_start.data, self.prebooking_end.data)
@@ -105,7 +132,9 @@ class PeriodForm(Form):
     def populate_obj(self, model):
         super().populate_obj(model, exclude={
             'max_bookings_per_attendee',
-            'booking_cost'
+            'booking_cost',
+            'deadline_days',
+            'deadline_date',
         })
 
         if self.pass_system.data == 'yes':
@@ -117,6 +146,13 @@ class PeriodForm(Form):
             model.booking_cost = self.single_booking_cost.data
             model.all_inclusive = False
 
+        if self.deadline.data == 'fix':
+            model.deadline_date = self.deadline_date.data or None
+            model.deadline_days = None
+        else:
+            model.deadline_days = self.deadline_days.data or None
+            model.deadline_date = None
+
     def process_obj(self, model):
         super().process_obj(model)
 
@@ -127,6 +163,11 @@ class PeriodForm(Form):
         else:
             self.pass_system.data = 'no'
             self.single_booking_cost.data = model.booking_cost
+
+        if model.deadline_days is None:
+            self.deadline.data = 'fix'
+        else:
+            self.deadline.data = 'rel'
 
     @cached_property
     def conflicting_activities(self):

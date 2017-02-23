@@ -245,6 +245,7 @@ ul.tags {
     .hint-outstanding::before { @include icon('\f200'); }
     .hint-finalized::before { @include icon('\f256'); }
     .hint-minutes::before { @include icon('\f017'); }
+    .hint-deadline::before { @include icon('\f05a'); }
 
     .hint:last-child {
         @include hairline();

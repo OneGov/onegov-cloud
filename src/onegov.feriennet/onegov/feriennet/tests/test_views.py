@@ -527,6 +527,7 @@ def test_occasions_form(feriennet_app):
     period.form['prebooking_end'] = '2016-09-30'
     period.form['execution_start'] = '2016-10-01'
     period.form['execution_end'] = '2016-10-31'
+    period.form['deadline_date'] = '2016-10-01'
     period.form.submit()
 
     activity = editor.get('/angebote').click("Play with Legos")
@@ -584,6 +585,7 @@ def test_multiple_dates_occasion(feriennet_app):
     period.form['prebooking_end'] = '2016-09-30'
     period.form['execution_start'] = '2016-10-01'
     period.form['execution_end'] = '2016-10-31'
+    period.form['deadline_date'] = '2016-09-01'
     period.form.submit()
 
     activity = editor.get('/angebote').click("Play with Legos")
@@ -644,6 +646,7 @@ def test_execution_period(feriennet_app):
     period.form['prebooking_end'] = '2016-09-30'
     period.form['execution_start'] = '2016-10-01'
     period.form['execution_end'] = '2016-10-01'
+    period.form['deadline_date'] = '2016-09-01'
     period.form.submit()
 
     occasion = admin.get('/angebot/play-with-legos').click("Neue Durchführung")
@@ -719,7 +722,8 @@ def test_enroll_child(feriennet_app):
             title="2016",
             prebooking=prebooking,
             execution=execution,
-            active=True
+            active=True,
+            deadline_date=(datetime.utcnow() + timedelta(days=1)).date()
         )
     )
 
@@ -1232,7 +1236,8 @@ def test_direct_booking_and_storno(feriennet_app):
         title="Ferienpass 2016",
         prebooking=prebooking,
         execution=execution,
-        active=True
+        active=True,
+        deadline_date=(datetime.utcnow() + timedelta(days=1)).date()
     )
 
     member = UserCollection(feriennet_app.session()).add(
@@ -1880,3 +1885,67 @@ def test_import_account_statement(feriennet_app):
     page = page.form.submit()
 
     assert "0 Zahlungen importieren" in page
+
+
+def test_deadline(feriennet_app):
+
+    activities = ActivityCollection(feriennet_app.session(), type='vacation')
+    periods = PeriodCollection(feriennet_app.session())
+    occasions = OccasionCollection(feriennet_app.session())
+
+    prebooking = tuple(d.date() for d in (
+        datetime.now() - timedelta(days=1),
+        datetime.now() + timedelta(days=1)
+    ))
+
+    execution = tuple(d.date() for d in (
+        datetime.now() + timedelta(days=10),
+        datetime.now() + timedelta(days=12)
+    ))
+
+    period = periods.add(
+        title="Ferienpass 2016",
+        prebooking=prebooking,
+        execution=execution,
+        active=True
+    )
+
+    foo = activities.add("Foo", username='admin@example.org')
+    foo.propose().accept()
+
+    occasions.add(
+        start=datetime(2016, 11, 25, 8),
+        end=datetime(2016, 11, 25, 16),
+        age=(0, 10),
+        spots=(0, 2),
+        timezone="Europe/Zurich",
+        activity=foo,
+        period=period,
+    )
+
+    transaction.commit()
+
+    # show no 'enroll' for ordinary users past the deadline
+    period = periods.active()
+    period.deadline_date = datetime.utcnow().date() - timedelta(days=1)
+
+    transaction.commit()
+
+    anonymous = Client(feriennet_app)
+    assert "Anmelden" not in anonymous.get('/angebot/foo')
+
+    # do show it for admins though and allow signups
+    admin = Client(feriennet_app)
+    admin.login_admin()
+
+    assert "Anmelden" in admin.get('/angebot/foo')
+
+    page = admin.get('/angebot/foo').click("Anmelden")
+    assert "Der Anmeldeschluss wurde erreicht" not in page.form.submit()
+
+    # stop others, even if they get to the form
+    editor = Client(feriennet_app)
+    editor.login_editor()
+
+    page = editor.get(page.request.url.replace('http://localhost', ''))
+    assert "Der Anmeldeschluss wurde erreicht" in page.form.submit()

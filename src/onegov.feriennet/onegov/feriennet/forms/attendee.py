@@ -303,6 +303,9 @@ class AttendeeSignupForm(AttendeeBase):
         if self.request.is_admin and self.ignore_age.data is True:
             return True
 
+        if not self.birth_date.data:
+            return True  # will be caught by the required validator
+
         if self.is_new:
             birth_date = self.birth_date.data
         else:
@@ -315,4 +318,12 @@ class AttendeeSignupForm(AttendeeBase):
 
         if self.model.is_too_young(birth_date):
             self.attendee.errors.append(_("The attendee is too young"))
+            return False
+
+    def ensure_before_deadline(self):
+        if self.request.is_admin:
+            return True
+
+        if date.today() >= self.model.deadline:
+            self.attendee.errors.append(_("The deadline has passed"))
             return False

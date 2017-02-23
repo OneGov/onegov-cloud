@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to set a booking deadline on the period.
+  [href]
+
 - Hide pagination if there are no accessible activities.
   [href]
 

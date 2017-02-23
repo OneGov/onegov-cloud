@@ -1,3 +1,4 @@
+from datetime import date
 from itertools import groupby
 from onegov.activity import Booking
 from onegov.activity import Occasion
@@ -287,6 +288,9 @@ def view_activity(self, request):
             return False
 
         if occasion.period.phase not in ('wishlist', 'booking', 'execution'):
+            return False
+
+        if not request.is_admin and date.today() >= occasion.deadline:
             return False
 
         return True
