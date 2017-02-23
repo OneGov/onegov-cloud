@@ -19,8 +19,8 @@ class PeriodCollection(GenericCollection):
             execution_end=execution[1],
             minutes_between=minutes_between,
             active=active,
-            deadline_date=None,
-            deadline_days=None
+            deadline_date=deadline_date,
+            deadline_days=deadline_days
         )
 
     def active(self):
