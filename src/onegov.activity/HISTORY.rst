@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds attendee-based limits.
+  [href]
+
 - Adds a way to control the deadline to the period.
   [href]
 

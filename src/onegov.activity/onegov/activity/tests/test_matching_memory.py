@@ -492,25 +492,25 @@ def test_booking_limit():
         o4.booking("Tom", 'open', 0)
     ]
 
-    result = match(bookings, (o1, o2, o3, o4), limit=1)
+    result = match(bookings, (o1, o2, o3, o4), default_limit=1)
 
     assert not result.open
     assert result.accepted == {bookings[0]}
     assert result.blocked == {bookings[1], bookings[2], bookings[3]}
 
-    result = match(bookings, (o1, o2, o3, o4), limit=2)
+    result = match(bookings, (o1, o2, o3, o4), default_limit=2)
 
     assert not result.open
     assert result.accepted == {bookings[0], bookings[1]}
     assert result.blocked == {bookings[2], bookings[3]}
 
-    result = match(bookings, (o1, o2, o3, o4), limit=3)
+    result = match(bookings, (o1, o2, o3, o4), default_limit=3)
 
     assert not result.open
     assert result.accepted == {bookings[0], bookings[1], bookings[2]}
     assert result.blocked == {bookings[3]}
 
-    result = match(bookings, (o1, o2, o3, o4), limit=4)
+    result = match(bookings, (o1, o2, o3, o4), default_limit=4)
 
     assert not result.open
     assert len(result.accepted) == 4
@@ -523,7 +523,7 @@ def test_booking_limit():
         o4.booking("Tom", 'open', 0)
     ]
 
-    result = match(bookings, (o1, o2, o3, o4), limit=1)
+    result = match(bookings, (o1, o2, o3, o4), default_limit=1)
 
     assert not result.open
     assert result.accepted == {bookings[2]}
@@ -538,13 +538,13 @@ def test_booking_limit():
         o3.booking("Harry", 'open', 1),
     ]
 
-    result = match(bookings, (o1, o2, o3, o4), limit=1)
+    result = match(bookings, (o1, o2, o3, o4), default_limit=1)
 
     assert not result.open
     assert result.accepted == {bookings[0], bookings[4]}
     assert len(result.blocked) == 4
 
-    result = match(bookings, (o1, o2, o3, o4), limit=2)
+    result = match(bookings, (o1, o2, o3, o4), default_limit=2)
 
     assert not result.open
     assert result.accepted == {
@@ -554,3 +554,25 @@ def test_booking_limit():
         bookings[5]
     }
     assert len(result.blocked) == 2
+
+    bookings = [
+        o1.booking("Tom", 'open', 1),
+        o2.booking("Tom", 'open', 0),
+        o1.booking("Dick", 'open', 1),
+        o2.booking("Dick", 'open', 0),
+        o1.booking("Harry", 'open', 1),
+        o2.booking("Harry", 'open', 0),
+    ]
+
+    result = match(bookings, (o1, o2), default_limit=2, attendee_limits={
+        "Tom": 1,
+        "Dick": 1,
+    })
+
+    assert len(result.accepted) == 4
+    assert result.accepted == {
+        bookings[0],
+        bookings[2],
+        bookings[4],
+        bookings[5],
+    }

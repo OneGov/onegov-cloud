@@ -257,3 +257,11 @@ def adds_deadlines_to_period(context):
         context.operations.add_column('periods', Column(
             'deadline_days', Integer, nullable=True
         ))
+
+
+@upgrade_task('Adds limit to attendee')
+def adds_limit_to_attendee(context):
+    if not context.has_column('attendees', 'limit'):
+        context.operations.add_column('attendees', Column(
+            'limit', Integer, nullable=True
+        ))

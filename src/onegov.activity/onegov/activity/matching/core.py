@@ -5,7 +5,7 @@ quadratic runtime.
 
 """
 
-from onegov.activity import Booking, Occasion, Period
+from onegov.activity import Attendee, Booking, Occasion, Period
 from onegov.activity.matching.score import Scoring
 from onegov.activity.matching.utils import overlaps, LoopBudget, hashable
 from onegov.activity.matching.utils import booking_order, unblockable
@@ -183,12 +183,18 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
 
     period = session.query(Period).filter(Period.id == period_id).one()
     if period.all_inclusive and period.max_bookings_per_attendee:
-        limit = period.max_bookings_per_attendee
+        default_limit = period.max_bookings_per_attendee
+        attendee_limits = None
     else:
-        limit = None
+        default_limit = None
+        attendee_limits = {
+            a.id: a.limit for a in
+            session.query(Attendee.id, Attendee.limit)
+        }
 
     bookings = deferred_acceptance(
-        bookings=b, occasions=o, limit=limit,
+        bookings=b, occasions=o,
+        default_limit=default_limit, attendee_limits=attendee_limits,
         minutes_between=period.minutes_between, **kwargs)
 
     # write the changes to the database
@@ -214,7 +220,8 @@ def deferred_acceptance(bookings, occasions,
                         validity_check=True,
                         stability_check=False,
                         hard_budget=True,
-                        limit=None,
+                        default_limit=None,
+                        attendee_limits=None,
                         minutes_between=0):
     """ Matches bookings with occasions.
 
@@ -243,12 +250,17 @@ def deferred_acceptance(bookings, occasions,
 
         Feel free to proof that this can't happen and then remove the check ;)
 
-    :limit:
+    :default_limit:
         The maximum number of bookings which should be accepted for each
         attendee.
 
-    """
+    :attendee_limits:
+        The maximum number of bookings which should be accepted for each
+        attendee. Keyed by the attendee id, this dictionary contains
+        per-attendee limits. Those fall back to the default_limit.
 
+    """
+    attendee_limits = attendee_limits or {}
     score_function = eager_score(bookings, score_function or Scoring())
 
     bookings = [b for b in bookings]
@@ -261,7 +273,7 @@ def deferred_acceptance(bookings, occasions,
     attendees = {
         aid: AttendeeAgent(
             aid,
-            limit=limit,
+            limit=attendee_limits.get(aid, default_limit),
             bookings=bookings,
             minutes_between=minutes_between
         )

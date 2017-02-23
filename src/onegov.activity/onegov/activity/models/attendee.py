@@ -3,8 +3,15 @@ from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
-from sqlalchemy import Column, Date, Index, Text, ForeignKey, Float, Numeric
 from sqlalchemy import case, cast, func, select, and_, type_coerce
+from sqlalchemy import Column
+from sqlalchemy import Date
+from sqlalchemy import Float
+from sqlalchemy import ForeignKey
+from sqlalchemy import Index
+from sqlalchemy import Integer
+from sqlalchemy import Numeric
+from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import relationship, validates
 from uuid import uuid4
@@ -41,6 +48,9 @@ class Attendee(Base, TimestampMixin):
 
     #: notes about the attendee by the parents (e.g. allergies)
     notes = Column(Text, nullable=True)
+
+    #: the maximum number of bookings the attendee wishes to get in each period
+    limit = Column(Integer, nullable=True)
 
     @validates('gender')
     def validate_gender(self, field, value):
