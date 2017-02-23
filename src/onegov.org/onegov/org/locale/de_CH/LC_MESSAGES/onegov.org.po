@@ -635,7 +635,7 @@ msgid "URL pointing to the logo"
 msgstr "Link zum Logo"
 
 msgid "Replies to automated e-mails go to this address."
-msgstr "Antowrten an automatisch generierte E-Mails gehen an diese Adresse."
+msgstr "Antworten an automatisch generierte E-Mails gehen an diese Adresse."
 
 msgid "Primary Color"
 msgstr "Primärfarbe"
