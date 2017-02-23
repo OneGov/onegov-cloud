@@ -64,6 +64,13 @@ class Period(Base, TimestampMixin):
     #: Time between bookings in minutes
     minutes_between = Column(Integer, nullable=True, default=0)
 
+    #: Date after which no bookings are possible anymore
+    deadline_date = Column(Date, nullable=True)
+
+    #: Days between the occasion and the deadline (an alternative to
+    #: the deadline_date)
+    deadline_days = Column(Integer, nullable=True)
+
     __table_args__ = (
         CheckConstraint((
             '"prebooking_start" <= "prebooking_end" AND '

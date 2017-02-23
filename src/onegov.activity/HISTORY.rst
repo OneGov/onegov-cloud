@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a way to control the deadline to the period.
+  [href]
+
 0.5.1 (2017-02-21)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -1,5 +1,6 @@
 import sedate
 
+from datetime import timedelta
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UUID
@@ -150,6 +151,21 @@ class Occasion(Base, TimestampMixin):
     @property
     def max_spots(self):
         return self.spots.upper - 1
+
+    @property
+    def deadline(self):
+        """ The date until which this occasion may be booked. """
+        period = self.period
+
+        if period.deadline_date is not None:
+            return period.deadline_date
+
+        min_date = min(d.start for d in self.dates)
+
+        if period.deadline_days is not None:
+            return (min_date - timedelta(days=period.deadline_days)).date()
+
+        return min_date.date()
 
     def cancel(self):
         from onegov.activity.collections import BookingCollection

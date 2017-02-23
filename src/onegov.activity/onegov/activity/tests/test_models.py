@@ -1718,3 +1718,26 @@ def test_is_permitted_birth_date():
 
     assert not o.is_too_old(date(2008, 7, 26), wiggle_room=365)
     assert o.is_too_old(date(2008, 7, 26), wiggle_room=364)
+
+
+def test_deadline(session, collections, prebooking_period, owner):
+    period = prebooking_period
+
+    start, end = period.execution_start,\
+        period.execution_start + timedelta(hours=2)
+
+    occasion = collections.occasions.add(
+        start=start,
+        end=end,
+        timezone="Europe/Zurich",
+        activity=collections.activities.add("Sport", username=owner.username),
+        period=period
+    )
+
+    assert occasion.deadline == period.execution_start.date()
+    period.deadline_days = 1
+
+    assert occasion.deadline == (start - timedelta(days=1)).date()
+    period.deadline_date = date(2017, 2, 23)
+
+    assert occasion.deadline == date(2017, 2, 23)

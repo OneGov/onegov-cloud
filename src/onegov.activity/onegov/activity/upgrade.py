@@ -9,6 +9,7 @@ from onegov.core.orm.types import UUID, JSON
 from onegov.core.upgrade import upgrade_task
 from sqlalchemy import Boolean
 from sqlalchemy import Column
+from sqlalchemy import Date
 from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
@@ -185,9 +186,10 @@ def add_code_field_to_invoice_items(context):
 
 @upgrade_task('Add source field to invoice items')
 def add_source_field_to_invoice_items(context):
-    context.operations.add_column('invoice_items', Column(
-        'source', Text, nullable=True
-    ))
+    if not context.has_column('invoice_items', 'source'):
+        context.operations.add_column('invoice_items', Column(
+            'source', Text, nullable=True
+        ))
 
 
 @upgrade_task('Add gender/notes fields to attendees')
@@ -243,3 +245,15 @@ def adds_exclude_from_overlap_check_to_period(context):
         server_default='FALSE'))
     context.operations.alter_column(
         'occasions', 'exclude_from_overlap_check', server_default=None)
+
+
+@upgrade_task('Adds deadlines to period')
+def adds_deadlines_to_period(context):
+    if not context.has_column('periods', 'deadline_date'):
+        context.operations.add_column('periods', Column(
+            'deadline_date', Date, nullable=True
+        ))
+    if not context.has_column('periods', 'deadline_days'):
+        context.operations.add_column('periods', Column(
+            'deadline_days', Integer, nullable=True
+        ))
