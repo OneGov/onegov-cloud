@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Renames "Opening hours" into something more fitting to a Ferienpass.
+  [href]
+
 - Adds a favicon.
   [href]
 

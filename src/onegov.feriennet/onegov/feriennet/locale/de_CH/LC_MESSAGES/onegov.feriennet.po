@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-24 11:38+0100\n"
+"POT-Creation-Date: 2017-02-24 14:18+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -125,6 +125,18 @@ msgstr "Veranstalter"
 
 msgid "Editors"
 msgstr "Veranstalter"
+
+msgid "Opening Hours"
+msgstr "Termine"
+
+msgid "Opening Hours Link"
+msgstr "Termine Link"
+
+msgid "The opening hours of the municipality"
+msgstr "Wichtige Termine des Ferienpasses"
+
+msgid "URL pointing to an opening hours page"
+msgstr "URL der auf die Seite der Termine zeigt"
 
 msgid "Title"
 msgstr "Titel"
@@ -483,9 +495,6 @@ msgstr "Die administrativen Kosten einer einzelnen Buchung"
 msgid "Required minutes between bookings"
 msgstr "Blockzeit zwischen Buchungen in Minuten"
 
-msgid "Bookings"
-msgstr "Buchungen"
-
 msgid "Stop accepting bookings"
 msgstr "Die Annahme von Buchungen stoppen"
 
@@ -494,9 +503,6 @@ msgstr "Anmeldeschluss"
 
 msgid "Fixed day"
 msgstr "Stichtag"
-
-msgid "Deadline Settings"
-msgstr "Teilnahmeschluss Einstellungen"
 
 msgid "X Days Before"
 msgstr "X Tage vorher"
@@ -1466,3 +1472,6 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
+
+#~ msgid "Deadline Settings"
+#~ msgstr "Teilnahmeschluss Einstellungen"
