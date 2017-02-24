@@ -36,8 +36,8 @@ class Occasion(Base, TimestampMixin):
     #: the public id of this occasion
     id = Column(UUID, primary_key=True, default=uuid4)
 
-    #: Describes the location of the activity
-    location = Column(Text, nullable=True)
+    #: Describes the meeting point of the occasion
+    meeting_point = Column(Text, nullable=True)
 
     #: The expected age of participants
     age = Column(

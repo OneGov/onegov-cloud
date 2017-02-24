@@ -21,14 +21,14 @@ class OccasionCollection(GenericCollection):
         return NumericRange(lower, upper + 1, bounds='[)')
 
     def add(self, activity, period, start, end, timezone,
-            location=None, age=None, spots=None, note=None, cost=0,
+            meeting_point=None, age=None, spots=None, note=None, cost=0,
             exclude_from_overlap_check=False):
 
         start = standardize_date(start, timezone)
         end = standardize_date(end, timezone)
 
         occasion = super().add(
-            location=location,
+            meeting_point=meeting_point,
             age=age and self.to_half_open_interval(*age),
             spots=spots and self.to_half_open_interval(*spots),
             note=note,

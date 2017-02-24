@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a meeting point to the occasion, a location to the activity.
+  [href]
+
 - Adds the ability to filter the booking counts per username by state.
   [href]
 

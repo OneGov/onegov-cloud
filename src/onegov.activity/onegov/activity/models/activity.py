@@ -61,6 +61,9 @@ class Activity(Base, ContentMixin, TimestampMixin):
     #: this value may not change after initialisation)
     reporter = Column(Text, nullable=False)
 
+    #: Describes the location of the activity
+    location = Column(Text, nullable=True)
+
     #: Access the user linked to this activity
     user = relationship('User')
 

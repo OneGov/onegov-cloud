@@ -158,7 +158,7 @@ def test_occasions(session, owner):
         start=datetime(2016, 10, 4, 13),
         end=datetime(2016, 10, 4, 14),
         timezone="Europe/Zurich",
-        location="Lucerne",
+        meeting_point="Lucerne",
         age=(6, 9),
         spots=(2, 10),
         note="Bring game-face",
@@ -173,7 +173,7 @@ def test_occasions(session, owner):
     assert tournament.dates[0].end == datetime(2016, 10, 4, 12, tzinfo=utc)
     assert tournament.dates[0].timezone == "Europe/Zurich"
     assert tournament.dates[0].duration_in_seconds == 3600
-    assert tournament.location == "Lucerne"
+    assert tournament.meeting_point == "Lucerne"
     assert tournament.note == "Bring game-face"
     assert tournament.activity_id == activities.query().first().id
     assert tournament.period_id == periods.query().first().id

@@ -176,7 +176,7 @@ def deferred_acceptance_from_database(session, period_id, **kwargs):
     o = session.query(Occasion)
     o = o.filter(Occasion.period_id == period_id)
     o = o.options(
-        defer('location'),
+        defer('meeting_point'),
         defer('note'),
         defer('cost')
     )

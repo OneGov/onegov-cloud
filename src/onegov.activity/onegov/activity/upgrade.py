@@ -265,3 +265,14 @@ def adds_limit_to_attendee(context):
         context.operations.add_column('attendees', Column(
             'limit', Integer, nullable=True
         ))
+
+
+@upgrade_task('Introduce location/meeting_point')
+def introduce_location_meeting_point(context):
+    if not context.has_column('activities', 'location'):
+        context.operations.add_column('activities', Column(
+            'location', Text, nullable=True
+        ))
+    if not context.has_column('occasions', 'meeting_point'):
+        context.operations.alter_column(
+            'occasions', 'location', new_column_name='meeting_point')
