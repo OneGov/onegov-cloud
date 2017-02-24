@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-24 14:18+0100\n"
+"POT-Creation-Date: 2017-02-24 15:10+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -161,6 +161,12 @@ msgstr "Veranstalter"
 
 msgid "Administration"
 msgstr "Administration"
+
+msgid "Location"
+msgstr "Ort"
+
+msgid "Map"
+msgstr ""
 
 msgid "Adventure"
 msgstr "Abenteuer"
@@ -388,8 +394,8 @@ msgstr "${title} <small>${dates}, ${count} Teilnehmer</small>"
 msgid "Dates"
 msgstr "Daten"
 
-msgid "Location"
-msgstr "Ort"
+msgid "Meeting Point"
+msgstr "Treffpunkt"
 
 msgid "Cost"
 msgstr "Kosten"

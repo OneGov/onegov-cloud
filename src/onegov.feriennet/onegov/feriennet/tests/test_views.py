@@ -540,7 +540,7 @@ def test_occasions_form(feriennet_app):
             'end': '2016-10-04 12:00:00'
         }]
     })
-    occasion.form['location'] = "Franz Karl Weber"
+    occasion.form['meeting_point'] = "Franz Karl Weber"
     occasion.form['note'] = "No griefers"
     occasion.form['min_age'] = 10
     occasion.form['max_age'] = 20

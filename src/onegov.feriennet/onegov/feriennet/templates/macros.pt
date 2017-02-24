@@ -54,7 +54,7 @@
 <metal:activity_detailed define-macro="activity_detailed" i18n:domain="onegov.feriennet">
 
     <tal:block metal:use-macro="layout.macros.page_content"
-        tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None; show_side_panel True; highlight_contacts False;">
+        tal:define="lead activity.lead; text activity.text; coordinates activity.coordinates; people None; contact None; show_side_panel True; highlight_contacts False; location activity.location">
 
         <div metal:fill-slot="after-lead" tal:condition="activity.tags">
             <ul class="tags">
@@ -181,9 +181,9 @@
                     <span i18n:translate><tal:block i18n:name="count" replace="occasion.available_spots" /> spots available</span>
                 </div>
 
-                <div class="location" tal:condition="occasion.location">
-                    <span i18n:translate class="show-for-sr">Location</span>
-                    <span>${occasion.location}</span>
+                <div class="location" tal:condition="occasion.meeting_point">
+                    <span i18n:translate class="show-for-sr">Meeting Point</span>
+                    <span>${occasion.meeting_point}</span>
                 </div>
 
                 <div class="age">

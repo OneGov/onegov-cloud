@@ -62,6 +62,12 @@ class VacationActivityForm(Form):
         fieldset=_("Administration"),
         default='0xdeadbeef')
 
+    location = TextAreaField(
+        label=_("Location"),
+        fieldset=_("Map"),
+        render_kw={'rows': 4}
+    )
+
     @property
     def username_choices(self):
         assert self.request.is_admin  # safety net

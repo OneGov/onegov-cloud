@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a meeting point to the occasion, a location to the activity.
+  [href]
+
 - Renames "Opening hours" into something more fitting to a Ferienpass.
   [href]
 

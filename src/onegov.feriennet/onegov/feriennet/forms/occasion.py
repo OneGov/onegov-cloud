@@ -31,8 +31,8 @@ class OccasionForm(Form):
         render_kw={'class_': 'many many-datetime-ranges'}
     )
 
-    location = StringField(
-        label=_("Location")
+    meeting_point = StringField(
+        label=_("Meeting Point")
     )
 
     note = TextAreaField(
