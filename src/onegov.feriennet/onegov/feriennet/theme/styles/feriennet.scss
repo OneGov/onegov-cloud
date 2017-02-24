@@ -781,6 +781,14 @@ ul.tags {
                 padding: .25em 1em;
             }
 
+            h3::before {
+                display: none;
+            }
+
+            .booking-limit {
+                display: none;
+            }
+
             > ul > li {
                 margin-left: 1em;
 
