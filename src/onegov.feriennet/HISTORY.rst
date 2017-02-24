@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Hides the homepage images in the settings.
+  [href]
+
 - Improves period form descriptions.
   [href]
 
