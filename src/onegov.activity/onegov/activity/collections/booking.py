@@ -186,7 +186,11 @@ class BookingCollection(GenericCollection):
         blocked = {b for b in bookings if b.state == 'blocked'}
         unblocked = set()
 
-        limit = booking.period.booking_limit
+        if booking.period.all_inclusive:
+            limit = booking.period.booking_limit
+        else:
+            limit = booking.attendee.limit
+
         unblockable_bookings = unblockable(accepted, blocked, score_function)
 
         for cnt, booking in enumerate(unblockable_bookings, start=1):
