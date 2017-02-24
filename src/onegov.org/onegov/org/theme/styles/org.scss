@@ -1031,6 +1031,18 @@ ul.panel-links {
             font-size: 10px;
         }
     }
+
+    .location {
+        font-size: .875rem;
+        margin-bottom: 1rem;
+        margin-left: 1rem;
+        white-space: pre-line;
+        word-break: break-all;
+    }
+
+    h2 + .location {
+        margin-top: 1rem;
+    }
 }
 
 .homepage .side-panel:first-child,

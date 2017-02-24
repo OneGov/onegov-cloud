@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to show a location below the map.
+  [href]
+
 - Gives child-applications the ability to show a favicon.
   [href]
 

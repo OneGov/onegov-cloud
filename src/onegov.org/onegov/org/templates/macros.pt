@@ -239,8 +239,8 @@
 </metal:empty_lead_hint>
 
 <metal:page_content define-macro="page_content" i18n:domain="onegov.org">
-    <div class="row" tal:define="show_side_panel show_side_panel|False">
-        <tal:block condition="not: people or contact or coordinates or show_side_panel">
+    <div class="row" tal:define="show_side_panel show_side_panel|False; location location|False">
+        <tal:block condition="not: people or contact or coordinates or location or show_side_panel">
             <div class="small-12 columns page-content-main">
                 <span class="page-lead" tal:condition="lead" tal:content="lead" />
                 <div metal:define-slot="after-lead"></div>
@@ -259,11 +259,12 @@
             </div>
             <div class="small-12 medium-4 columns page-content-sidebar" tal:condition="people or contact or coordinates or show_side_panel" tal:define="highlight_contacts highlight_contacts|True">
                 <div metal:define-slot="before-panels"></div>
-                <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates">
+                <div class="side-panel without-title ${highlight_contacts and 'highlighted'}" tal:condition="contact or coordinates or location">
                     <tal:block condition="contact" content="structure contact" />
                     <br tal:condition="coordinates and contact" />
                     <h2 i18n:translate tal:condition="not contact">Map</h2>
                     <div tal:condition="coordinates" class="marker-map" data-map-type="thumbnail" data-lat="${coordinates.lat}" data-lon="${coordinates.lon}" data-zoom="${coordinates.zoom}"></div>
+                    <div class="location" tal:condition="location">${location}</div>
                 </div>
                 <div class="side-panel people-panel" tal:condition="people">
                     <h2 i18n:translate>People</h2>
