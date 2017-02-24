@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.1 (2017-02-24)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds a meeting point to the occasion, a location to the activity.
   [href]
 
