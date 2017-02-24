@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a favicon.
+  [href]
+
 - Limit the bookings count to open/accepted bookings.
   [href]
 
