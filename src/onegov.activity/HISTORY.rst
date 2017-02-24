@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter the booking counts per username by state.
+  [href]
+
 0.6.0 (2017-02-24)
 ~~~~~~~~~~~~~~~~~~~
 

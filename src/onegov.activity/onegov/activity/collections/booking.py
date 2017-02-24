@@ -54,7 +54,7 @@ class BookingCollection(GenericCollection):
 
         return query.count()
 
-    def booking_count(self, username):
+    def booking_count(self, username, states='*'):
         """ Returns the number of bookings in the active period. """
 
         periods = self.session.query(Period)
@@ -64,7 +64,7 @@ class BookingCollection(GenericCollection):
         return self.count(
             usernames=(username, ),
             periods=periods.subquery(),
-            states='*'
+            states=states
         )
 
     def by_user(self, user):
