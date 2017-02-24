@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.0 (2017-02-24)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds attendee-based limits.
   [href]
 
