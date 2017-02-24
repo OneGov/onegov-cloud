@@ -46,17 +46,23 @@ class PeriodForm(Form):
 
     pass_system = RadioField(
         label=_("Pass System"),
-        fieldset=_("Execution Settings"),
+        fieldset=_("Execution"),
         choices=[
-            ('no', _("Each attendee may book as many activites as he likes")),
-            ('yes', _("Each attendee may attend a fixed number of activites")),
+            ('no', _(
+                "Each attendee may book as many activites as he likes. "
+                "Each activity is billed separately."
+            )),
+            ('yes', _(
+                "Each attendee may attend a limited number of activites "
+                "for a fixed price."
+            )),
         ],
         default='no',
     )
 
     pass_system_limit = IntegerField(
         label=_("Maximum Number of Activities per Attendee"),
-        fieldset=_("Execution Settings"),
+        fieldset=_("Execution"),
         validators=[
             Optional(),
             NumberRange(0, 100)
@@ -66,7 +72,7 @@ class PeriodForm(Form):
 
     pass_system_cost = DecimalField(
         label=_("Cost of the Pass"),
-        fieldset=_("Execution Settings"),
+        fieldset=_("Execution"),
         validators=[
             Optional(),
             NumberRange(0.00, 10000.00)
@@ -76,7 +82,7 @@ class PeriodForm(Form):
 
     single_booking_cost = DecimalField(
         label=_("The administrative cost of each booking"),
-        fieldset=_("Execution Settings"),
+        fieldset=_("Execution"),
         validators=[
             Optional(),
             NumberRange(0.00, 10000.00)
@@ -85,8 +91,8 @@ class PeriodForm(Form):
     )
 
     minutes_between = IntegerField(
-        label=_("Required minutes between boookings"),
-        fieldset=_("Execution Settings"),
+        label=_("Required minutes between bookings"),
+        fieldset=_("Bookings"),
         validators=[
             InputRequired(),
             NumberRange(0, 90)
@@ -96,7 +102,7 @@ class PeriodForm(Form):
 
     deadline = RadioField(
         label=_("Stop accepting bookings"),
-        fieldset=_("Deadline Settings"),
+        fieldset=_("Deadline"),
         choices=[
             ('fix', _("On a fixed day")),
             ('rel', _("X days before each occasion")),
@@ -106,14 +112,14 @@ class PeriodForm(Form):
 
     deadline_date = DateField(
         label=_("Fixed day"),
-        fieldset=_("Deadline Settings"),
+        fieldset=_("Deadline"),
         validators=[InputRequired()],
         depends_on=('deadline', 'fix')
     )
 
     deadline_days = IntegerField(
         label=_("X Days Before"),
-        fieldset=_("Deadline Settings"),
+        fieldset=_("Deadline"),
         validators=[
             InputRequired(),
             NumberRange(0, 360),

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Improves period form descriptions.
+  [href]
+
 - Restrict cancellations after matching to admins only.
   [href]
 
