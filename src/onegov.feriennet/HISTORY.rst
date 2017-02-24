@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Limit the bookings count to open/accepted bookings.
+  [href]
+
 - Hides the homepage images in the settings.
   [href]
 

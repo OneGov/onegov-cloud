@@ -120,7 +120,7 @@ def get_personal_tools(request):
         bookings = BookingCollection(session)
 
         if period:
-            count = bookings.booking_count(username)
+            count = bookings.booking_count(username, ('open', 'accepted'))
 
             if count:
                 classes = (
