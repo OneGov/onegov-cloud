@@ -105,10 +105,13 @@ def actions_by_booking(layout, period, booking):
                 'title': get_booking_title(layout, booking)
             }),
             yes_button_text=_("Remove Booking"),
+            redirect_after=layout.request.link(layout.model),
             classes=('confirm', ),
             target='#booking-{}'.format(booking.id)
         ))
-    elif period.booking_phase and booking.state == 'accepted':
+    elif layout.request.is_admin \
+            and period.booking_phase and booking.state == 'accepted':
+
         actions.append(ConfirmLink(
             text=_("Cancel Booking"),
             url=layout.csrf_protected_url(
@@ -118,15 +121,11 @@ def actions_by_booking(layout, period, booking):
                 'title': get_booking_title(layout, booking)
             }),
             extra_information=_(
-                "This cannot be undone! Note that cancellations make it hard "
-                "for us to plan and conduct vacation activities. So please be "
-                "sure to cancel only if you absolutely have to! We will also "
-                "automatically try to accomodate your other wishes should "
-                "this cancellation make that possible. To avoid that, delete "
-                "your blocked and rejected bookings first."
+                "This cannot be undone! The empty spot is automatically "
+                "filled with the next best booking if possible."
             ),
             yes_button_text=_("Cancel Booking"),
-            redirect_after=layout.request.class_link(BookingCollection),
+            redirect_after=layout.request.link(layout.model),
             classes=('confirm', )
         ))
 
@@ -225,6 +224,9 @@ def delete_booking(self, request):
     request_method='POST')
 def cancel_booking(self, request):
     request.assert_valid_csrf_token()
+
+    assert self.period.wishlist_phase or request.is_admin
+
     BookingCollection(request.app.session()).cancel_booking(
         booking=self,
         score_function=self.period.scoring)

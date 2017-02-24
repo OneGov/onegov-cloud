@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Restrict cancellations after matching to admins only.
+  [href]
+
 - Adds the ability to define attendee-based limits.
   [href]
 
