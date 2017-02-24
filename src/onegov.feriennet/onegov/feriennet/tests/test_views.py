@@ -592,7 +592,7 @@ def test_multiple_dates_occasion(feriennet_app):
     assert "keine Durchführungen" in activity
 
     occasion = activity.click("Neue Durchführung")
-    occasion.form['location'] = "Franz Karl Weber"
+    occasion.form['meeting_point'] = "Franz Karl Weber"
     occasion.form['note'] = "No griefers"
     occasion.form['min_age'] = 10
     occasion.form['max_age'] = 20
