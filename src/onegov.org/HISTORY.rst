@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Gives child-applications the ability to show a favicon.
+  [href]
+
 - Fix button color being unreadable with light backgrounds.
   [href]
 

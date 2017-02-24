@@ -6,6 +6,10 @@
       i18n:domain="onegov.org">
 <body>
 
+<metal:block define-macro="favicon">
+    <!--! To be overridden by other applications -->
+</metal:block>
+
 <metal:navigation define-macro="top_navigation">
     <div class="main-navigation" tal:define="links top_navigation|layout.top_navigation">
         <nav class="top-bar" data-topbar role="navigation" tal:condition="links">

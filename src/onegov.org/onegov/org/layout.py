@@ -84,6 +84,9 @@ class Layout(ChameleonLayout):
         return self.request.link(
             StaticFile('font-awesome/css/font-awesome.min.css'))
 
+    def static_file_path(self, path):
+        return self.request.link(StaticFile(path))
+
     @cached_property
     def page_id(self):
         """ Returns the unique page id of the rendered page. Used to have

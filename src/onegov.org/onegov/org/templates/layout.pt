@@ -22,6 +22,8 @@
      -->
     <link rel="stylesheet" type="text/css" href="${request.theme_link}">
     <link rel="stylesheet" type="text/css" href="${layout.font_awesome_path}">
+
+    <tal:block metal:use-macro="layout.macros.favicon" />
 </head>
 
 <body id="${layout.page_id}" class="${' '.join(cls for cls in layout.body_classes)}" data-default-marker-color="${layout.primary_color}" data-default-lat="${layout.default_map_view.lat|nothing}" data-default-lon="${layout.default_map_view.lon|nothing}" data-default-zoom="${layout.default_map_view.zoom|nothing}">
