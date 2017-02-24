@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix button color being unreadable with light backgrounds.
+  [href]
+
 0.4.2 (2017-02-21)
 ~~~~~~~~~~~~~~~~~~~
 

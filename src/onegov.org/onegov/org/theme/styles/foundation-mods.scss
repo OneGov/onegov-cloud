@@ -109,6 +109,7 @@ $side-nav-link-color: $primary-color;
 $side-nav-link-color-active: #333;
 $side-nav-link-color-hover: #333;
 $primary-fg-color: if(lightness($primary-color) >= 60%, $body-font-color, $white);
+$button-font-color: $primary-fg-color;
 
 @if lightness($primary-color) >= 50% {
     $anchor-font-color: scale-color($anchor-font-color, $lightness: -45%, $saturation: +10%);
