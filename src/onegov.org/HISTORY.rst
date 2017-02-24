@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.3 (2017-02-24)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to show a location below the map.
   [href]
 
