@@ -28,7 +28,7 @@
 
         <tal:block condition="activity.state == 'archived'">
             <div class="panel callout" i18n:translate>
-                This activity has been archived and cannot be activated again.
+                This activity has been archived.
             </div>
         </tal:block>
 
