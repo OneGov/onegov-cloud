@@ -59,3 +59,24 @@ def add_id_to_archived_results(context):
             if election and election.id in result.url:
                 result.meta = result.meta or {}
                 result.meta['id'] = election.id
+
+
+@upgrade_task('Update vote progress')
+def update_vote_progress(context):
+
+    """ Recalculate the vote progress for the archived result.
+
+    """
+    session = context.session
+
+    results = session.query(ArchivedResult)
+    results = results.filter(
+        ArchivedResult.schema == context.app.schema,
+        ArchivedResult.type == 'vote'
+    )
+
+    for result in results:
+        vote_id = result.meta.get('id')
+        vote = session.query(Vote).filter_by(id=vote_id).first()
+        if vote:
+            result.counted_entities, result.total_entities = vote.progress

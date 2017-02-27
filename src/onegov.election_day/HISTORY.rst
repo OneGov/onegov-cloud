@@ -4,6 +4,9 @@ Changelog
 - Use colored answers.
   [msom]
 
+- Fix displaying the progess of complex votes.
+  [msom]
+
 1.5.2 (2017-02-08)
 ~~~~~~~~~~~~~~~~~~~
 
