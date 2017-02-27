@@ -24,6 +24,15 @@ from sqlalchemy.orm import contains_eager
 from webob import exc
 
 
+ACTIVITY_STATE_TRANSLATIONS = {
+    'preview': _("Preview"),
+    'proposed': _("Proposed"),
+    'accepted': _("Published"),  # users like the term 'Published' better
+    'denied': _("Denied"),
+    'archived': _("Archived")
+}
+
+
 def get_activity_form_class(model, request):
     if isinstance(model, VacationActivityCollection):
         model = VacationActivity()
@@ -123,7 +132,7 @@ def view_activities(self, request):
 
             taglinks.extend(
                 Link(
-                    text=request.translate(_(state.capitalize())),
+                    text=ACTIVITY_STATE_TRANSLATIONS[state],
                     active=state in self.states,
                     url=request.link(self.for_filter(state=state))
                 ) for state in ACTIVITY_STATES
