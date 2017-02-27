@@ -3,6 +3,8 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+1.2.2 (2017-02-27)
+~~~~~~~~~~~~~~~~~~~
 
 - Return the progress of a vote in relation to its entities, not ballot result
   groups.
