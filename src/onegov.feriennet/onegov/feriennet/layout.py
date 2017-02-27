@@ -44,7 +44,6 @@ class BookingCollectionLayout(DefaultLayout):
         super().__init__(model, request)
         self.user = user or request.current_user
 
-
     @cached_property
     def title(self):
         wishlist_phase = self.app.active_period \
