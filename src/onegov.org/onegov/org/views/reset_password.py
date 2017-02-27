@@ -51,7 +51,6 @@ def handle_password_reset_request(self, request, form):
         )
         return response
 
-
     return {
         'layout': layout,
         'title': _('Reset password'),

@@ -115,7 +115,7 @@ def handle_new_user(self, request, form):
                 'data': form.data['yubikey']
             }
         else:
-            second_factor=None
+            second_factor = None
 
         try:
             user = self.add(
