@@ -12,7 +12,7 @@ from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import object_session
+from sqlalchemy.orm import object_session, relationship
 from sqlalchemy_utils import aggregated
 from uuid import uuid4
 
@@ -92,6 +92,9 @@ class Booking(Base, TimestampMixin):
         ),
         Index('bookings_by_state', 'state', 'username')
     )
+
+    #: access the user linked to this booking
+    user = relationship('User')
 
     @hybrid_property
     def starred(self):

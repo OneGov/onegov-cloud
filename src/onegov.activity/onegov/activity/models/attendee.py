@@ -52,6 +52,9 @@ class Attendee(Base, TimestampMixin):
     #: the maximum number of bookings the attendee wishes to get in each period
     limit = Column(Integer, nullable=True)
 
+    #: access the user linked to this booking
+    user = relationship('User')
+
     @validates('gender')
     def validate_gender(self, field, value):
         # for now we stay old-fashioned
