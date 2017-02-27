@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.2 (2017-02-27)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds user reference to bookings and attendees.
   [href]
 
