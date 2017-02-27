@@ -3,6 +3,11 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Return the progress of a vote in relation to its entities, not ballot result
+  groups.
+  [msom]
+
 1.2.1 (2017-01-10)
 ~~~~~~~~~~~~~~~~~~~
 

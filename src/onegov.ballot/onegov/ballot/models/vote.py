@@ -189,8 +189,11 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     @property
     def progress(self):
         """ Returns a tuple with the first value being the number of counted
-        ballot result groups and the second value being the number of total
-        result groups related to this vote.
+        entities and the second value being the number of total entities.
+
+        If this is complex vote with proposal, counter-proposal and tie-breaker
+        it's assumed all three ballots are present/not present for one entity
+        (otherwise there might be a rounding error).
 
         """
 
@@ -204,8 +207,12 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
         query = query.filter(BallotResult.ballot_id.in_(ballot_ids))
 
         results = query.all()
+        divider = len(ballot_ids) or 1
 
-        return sum(1 for r in results if r[0]), len(results)
+        return (
+            int(sum(1 for r in results if r[0]) / divider),
+            int(len(results) / divider)
+        )
 
     def aggregate_results(self, attribute):
         """ Gets the sum of the given attribute from the results. """
