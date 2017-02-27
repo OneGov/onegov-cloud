@@ -269,7 +269,7 @@
                         <tr>
                             <td align="center">
                                 <p metal:define-slot="footer">
-                                    <tal:block replace="structure layout.contact_html|layout.org.name" />
+                                    <tal:block replace="structure layout.contact_html|layout.org.title" />
                                 </p>
                             </td>
                         </tr>

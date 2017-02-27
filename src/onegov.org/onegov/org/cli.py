@@ -58,7 +58,7 @@ def delete(group_context):
 
     def delete_org(request, app):
 
-        org = app.org.name
+        org = app.org.title
         confirmation = "Do you really want to DELETE {}?".format(org)
 
         if not click.confirm(confirmation):

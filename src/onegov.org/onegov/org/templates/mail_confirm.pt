@@ -6,7 +6,7 @@
         <p i18n:translate>Hello</p>
 
         <p i18n:translate>You are recieving this mail because you subscribed to the following newsletter:</p>
-        <p><a href="${request.link(newsletters)}">${layout.org.name}</a></p>
+        <p><a href="${request.link(newsletters)}">${layout.org.title}</a></p>
 
         <p i18n:translate>Plese click the following link to confirm your subscription:</p>
         <p><a class="btn-primary" href="${request.link(subscription, 'confirm')}" i18n:translate>Confirm subscription</a></p>

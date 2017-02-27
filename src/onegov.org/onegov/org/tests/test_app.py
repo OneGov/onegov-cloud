@@ -22,6 +22,7 @@ def test_send_email(smtp):
         def org(self):
             return Bunch(
                 name="Gemeinde Govikon",
+                title="Gemeinde Govikon",
                 meta=dict(reply_to='info@govikon.ch')
             )
 

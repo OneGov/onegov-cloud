@@ -106,7 +106,7 @@ def handle_newsletters(self, request, form):
 
             title = request.translate(
                 _("Welcome to the ${org} Newsletter", mapping={
-                    'org': request.app.org.name
+                    'org': request.app.org.title
                 })
             )
 

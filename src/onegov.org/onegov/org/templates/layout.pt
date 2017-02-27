@@ -57,7 +57,7 @@
       <div class="row header">
         <div class="small-12 medium-8 columns logo">
           <a href="${layout.homepage_url}" tal:define="logo_url layout.org.logo_url|nothing" aria-label="Back to the homepage" i18n:attributes="aria-label">
-            <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.name}" i18n:attributes="alt"/>
+            <img tal:condition="logo_url" src="${layout.org.logo_url}" alt="Logo" title="${layout.org.title}" i18n:attributes="alt"/>
             <div tal:condition="not:logo_url" metal:use-macro="layout.svg['default_logo']"></div>
           </a>
         </div>

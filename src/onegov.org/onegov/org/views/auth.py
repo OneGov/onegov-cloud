@@ -52,7 +52,7 @@ def handle_login(self, request, form):
         'register_link': request.link(self, name='register'),
         'may_register': request.app.settings.org.enable_user_registration,
         'title': _('Login to ${org}', mapping={
-            'org': request.app.org.name
+            'org': request.app.org.title
         }),
         'form': form
     }
@@ -79,7 +79,7 @@ def handle_registration(self, request, form):
 
             title = subject = request.translate(
                 _("Your ${org} Registration", mapping={
-                    'org': request.app.org.name
+                    'org': request.app.org.title
                 })
             )
 

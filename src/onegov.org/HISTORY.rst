@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Introduces a way to define the way an org name is split into two lines.
+  [href]
+
 0.4.3 (2017-02-24)
 ~~~~~~~~~~~~~~~~~~~
 

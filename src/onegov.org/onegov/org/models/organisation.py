@@ -58,3 +58,16 @@ class Organisation(Base, TimestampMixin):
     def opening_hours(self, value):
         self.meta['opening_hours'] = value
         self.meta['opening_hours_html'] = linkify(value).replace('\n', '<br>')
+
+    @property
+    def title(self):
+        return self.name.replace('|', ' ')
+
+    @property
+    def title_lines(self):
+        if '|' in self.name:
+            parts = self.name.split('|')
+        else:
+            parts = self.name.split(' ')
+
+        return ' '.join(parts[:-1]), parts[-1]

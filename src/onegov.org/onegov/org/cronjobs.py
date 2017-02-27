@@ -82,12 +82,12 @@ def send_daily_ticket_statistics(request):
     # render the email
     args['title'] = request.translate(
         _("${org} OneGov Cloud Status", mapping={
-            'org': request.app.org.name
+            'org': request.app.org.title
         })
     )
     args['layout'] = DefaultMailLayout(object(), request)
     args['is_monday'] = today.weekday() == MON
-    args['org'] = request.app.org.name
+    args['org'] = request.app.org.title
 
     # send one e-mail per user
     users = UserCollection(request.app.session()).query()
@@ -208,10 +208,10 @@ def send_daily_resource_usage_overview(request):
         'layout': DefaultMailLayout(object(), request),
         'title': request.translate(
             _("${org} Reservation Overview", mapping={
-                'org': request.app.org.name
+                'org': request.app.org.title
             })
         ),
-        'organisation': request.app.org.name,
+        'organisation': request.app.org.title,
         'resources': resources,
         'forms': forms
     }
