@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Use colored answers.
+  [msom]
+
 1.5.2 (2017-02-08)
 ~~~~~~~~~~~~~~~~~~~
 
