@@ -327,6 +327,18 @@ class Layout(ChameleonLayout):
     def format_seconds(self, seconds):
         return self.format_timedelta(timedelta(seconds=seconds))
 
+    def password_reset_url(self, user):
+        if not user:
+            return
+
+        return '{url}?token={token}'.format(
+            url=self.request.link(self.app.org, name='reset-password'),
+            token=self.request.new_url_safe_token({
+                'username': user.username,
+                'modified': user.modified.isoformat() if user.modified else ''
+            })
+        )
+
 
 class DefaultLayout(Layout):
     """ The defaut layout meant for the public facing parts of the site. """

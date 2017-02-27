@@ -3139,7 +3139,7 @@ def test_unique_yubikey(org_app):
     assert admin.form.submit().status_code == 302
 
 
-def test_add_new_user(org_app):
+def test_add_new_user_without_activation_email(org_app):
     client = Client(org_app)
     client.login_admin()
 
@@ -3156,6 +3156,7 @@ def test_add_new_user(org_app):
     assert "müssen zwingend einen YubiKey" in new.form.submit()
 
     new.form['role'] = 'member'
+    new.form['send_activation_email'] = False
     added = new.form.submit()
 
     assert "Passwort" in added
@@ -3164,6 +3165,35 @@ def test_add_new_user(org_app):
     login = Client(org_app).get('/auth/login')
     login.form['username'] = 'member@example.org'
     login.form['password'] = password
+    assert login.form.submit().status_code == 302
+
+
+def test_add_new_user_with_activation_email(org_app):
+    client = Client(org_app)
+    client.login_admin()
+
+    org_app.settings.org.enable_yubikey = False
+
+    new = client.get('/benutzerverwaltung').click('Benutzer', index=2)
+    new.form['username'] = 'member@example.org'
+    new.form['role'] = 'member'
+    new.form['send_activation_email'] = True
+    added = new.form.submit()
+
+    assert "Passwort" not in added
+    assert "Anmeldungs-Anleitung wurde an den Benutzer gesendet" in added
+
+    email = get_message(org_app, 0)
+    reset = re.search(r'(http://localhost/reset-password[^)]+)', email).group()
+
+    page = Client(org_app).get(reset)
+    page.form['email'] = 'member@example.org'
+    page.form['password'] = 'p@ssw0rd'
+    page.form.submit()
+
+    login = Client(org_app).get('/auth/login')
+    login.form['username'] = 'member@example.org'
+    login.form['password'] = 'p@ssw0rd'
     assert login.form.submit().status_code == 302
 
 

@@ -3,24 +3,32 @@
 import morepath
 
 from onegov.core.security import Public
+from onegov.org import _, log, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import RequestPasswordResetForm, PasswordResetForm
 from onegov.org.layout import DefaultLayout
-from onegov.org import _, log, OrgApp
 from onegov.org.mail import send_html_mail
 from onegov.org.models import Organisation
+from onegov.user import UserCollection
 
 
 @OrgApp.form(model=Organisation, name='request-password', template='form.pt',
              permission=Public, form=RequestPasswordResetForm)
 def handle_password_reset_request(self, request, form):
     """ Handles the GET and POST password reset requests. """
+    layout = DefaultLayout(self, request)
+    layout.breadcrumbs = [
+        Link(_("Homepage"), layout.homepage_url),
+        Link(_("Reset password"), request.link(self, name='request-password'))
+    ]
+
     if form.submitted(request):
-        user, token = form.get_token(request)
-        if user is not None and token is not None:
-            url = '{0}?token={1}'.format(
-                request.link(self, name='reset-password'), token
-            )
+
+        users = UserCollection(request.app.session())
+        user = users.by_username(form.email.data)
+        url = layout.password_reset_url(user)
+
+        if url:
             send_html_mail(
                 request=request,
                 template='mail_password_reset.pt',
@@ -43,11 +51,6 @@ def handle_password_reset_request(self, request, form):
         )
         return response
 
-    layout = DefaultLayout(self, request)
-    layout.breadcrumbs = [
-        Link(_("Homepage"), layout.homepage_url),
-        Link(_("Reset password"), request.link(self, name='request-password'))
-    ]
 
     return {
         'layout': layout,

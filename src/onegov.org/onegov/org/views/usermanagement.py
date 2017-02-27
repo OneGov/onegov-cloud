@@ -3,11 +3,12 @@ from copy import copy
 from onegov.core.crypto import random_password
 from onegov.core.directives import query_form_class
 from onegov.core.security import Secret
+from onegov.core.templates import render_template
 from onegov.form import merge_forms
 from onegov.org import _, OrgApp
 from onegov.org.elements import Link
 from onegov.org.forms import ManageUserForm, NewUserForm
-from onegov.org.layout import UserManagementLayout
+from onegov.org.layout import UserManagementLayout, DefaultMailLayout
 from onegov.user import User, UserCollection
 from onegov.user.errors import ExistingUserError
 from wtforms.validators import Optional
@@ -108,28 +109,56 @@ def handle_new_user(self, request, form):
     if form.submitted(request):
         password = random_password()
 
+        if form.data.get('yubikey'):
+            second_factor = {
+                'type': 'yubikey',
+                'data': form.data['yubikey']
+            }
+        else:
+            second_factor=None
+
         try:
-            self.add(
+            user = self.add(
                 username=form.username.data,
                 password=password,
                 role=form.role.data,
-                active=form.active.data
+                active=form.active.data,
+                second_factor=second_factor
             )
         except ExistingUserError:
             form.username.errors.append(
                 _("A user with this e-mail address already exists"))
         else:
+            if form.send_activation_email.data:
+                subject = _("An account was created for you")
+
+                content = render_template('mail_new_user.pt', request, {
+                    'user': user,
+                    'org': request.app.org,
+                    'layout': DefaultMailLayout(user, request),
+                    'title': subject
+                })
+
+                request.app.send_email(
+                    subject=subject,
+                    receivers=(user.username, ),
+                    content=content,
+                )
+
             request.info(_("The user was created successfully"))
 
             return {
                 'layout': layout,
                 'title': _("New User"),
                 'username': form.username.data,
-                'password': password
+                'password': password,
+                'sent_email': form.send_activation_email.data
             }
 
     return {
         'layout': layout,
         'title': _("New User"),
-        'form': form
+        'form': form,
+        'password': None,
+        'sent_email': False
     }

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-20 13:48+0100\n"
+"POT-Creation-Date: 2017-02-27 16:00+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -757,6 +757,9 @@ msgstr "YubiKey anschliessen und Knopf drücken."
 msgid "The users e-mail address (a.k.a. username)"
 msgstr "Die E-Mail Adresse des Benutzers (bzw. der Benutzername)"
 
+msgid "Send Activation E-Mail with Instructions"
+msgstr "Aktivierungs-Email mit Anmelde-Anleitung senden"
+
 msgid "Invalid Yubikey"
 msgstr "Ungültiger YubiKey"
 
@@ -1294,6 +1297,24 @@ msgstr "Ticket Status abfragen"
 msgid "Your event has unfortunately been rejected:"
 msgstr "Ihre Veranstaltung musste leider abgelehnt werden:"
 
+msgid "An administrator just created a new account on ${org} for you."
+msgstr ""
+"Ein Administrator hat soeben ein neues Konto auf ${org} für Sie eingerichtet."
+
+msgid "Your username is ${email}."
+msgstr "Ihr Benutzername ist ${email}."
+
+msgid "Click on the following link to set your account password:"
+msgstr "Bitte klicken Sie auf den folgenden Link um Ihr Passwort zu setzen:"
+
+msgid "Set Account Password"
+msgstr "Passwort Setzen"
+
+msgid "To use your account you need the Yubikey with the serial ${number}"
+msgstr ""
+"Um Ihr Konto zu verwenden benötigen Sie den YubiKey mit der Seriennummer "
+"${number}"
+
 msgid ""
 "You are receiving this e-mail because you signed up for the ${org} "
 "newsletter."
@@ -1365,6 +1386,13 @@ msgstr ""
 
 msgid "Password:"
 msgstr "Passwort:"
+
+msgid ""
+"The user ${username} was created successfully. An e-mail has been sent to "
+"the user with login instructions."
+msgstr ""
+"Der Benutzer ${username} wurde erfolgreich erstellt. Eine E-Mail mit einer "
+"Anmeldungs-Anleitung wurde an den Benutzer gesendet."
 
 msgid "Back to usermanagement"
 msgstr "Zurück zur Benutzerverwaltung"
@@ -1902,6 +1930,9 @@ msgstr "Benutzerverwaltung"
 
 msgid "New User"
 msgstr "Neuer Benutzer"
+
+msgid "An account was created for you"
+msgstr ""
 
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"

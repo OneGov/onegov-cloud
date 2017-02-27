@@ -12,23 +12,6 @@ class RequestPasswordResetForm(Form):
         [validators.InputRequired(), validators.Email()]
     )
 
-    def get_token(self, request):
-        """ Returns the user and a token for the given username to reset the
-        password. If the username is not found, (None, None) is returned.
-
-        """
-        users = UserCollection(request.app.session())
-        user = users.by_username(self.email.data)
-        token = None
-
-        if user is not None:
-            modified = user.modified.isoformat() if user.modified else ''
-            token = request.new_url_safe_token({
-                'username': user.username,
-                'modified': modified
-            })
-        return user, token
-
 
 class PasswordResetForm(Form):
     """ Defines the password reset form for onegov org. """

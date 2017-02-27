@@ -72,6 +72,11 @@ class PartialNewUserForm(Form):
         validators=[validators.InputRequired(), validators.Email()]
     )
 
+    send_activation_email = BooleanField(
+        label=_("Send Activation E-Mail with Instructions"),
+        default=True
+    )
+
     @property
     def current_username(self):
         return self.username.data
