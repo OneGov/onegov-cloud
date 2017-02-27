@@ -49,11 +49,13 @@ html {
         display: block;
         font-size: 1.3rem;
         font-weight: bold;
-        margin-bottom: 1.3rem;
+        margin-bottom: 1em;
+        margin-top: 1em;
     }
 
     dl dt {
         opacity: .5;
+        margin-bottom: 0;
     }
 
     dl dd {
@@ -645,6 +647,19 @@ form {
 /*
     Link back to canton site
 */
+.back-to-election-day {
+    display: inline-block;
+    font-size: .875rem;
+    font-weight: bold;
+    margin-bottom: .875rem;
+
+    &::before {
+        content: '\f100 ';
+        font-family: 'FontAwesome';
+        font-weight: normal;
+        margin-right: 1ex;
+    }
+}
 
 .back-to-base {
     display: inline-block;

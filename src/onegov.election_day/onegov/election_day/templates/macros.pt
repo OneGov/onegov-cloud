@@ -181,17 +181,23 @@
     </div>
 </metal:subscription_links>
 
+<metal:election_day_link define-macro="election_day_link" i18n:domain="onegov.election_day">
+    <div>
+        <a class="back-to-election-day" href="${request.link(layout.archive.for_date(date))}" tal:content="layout.format_date(date, 'date_long')" />
+    </div>
+</metal:election_day_link>
+
+
 <metal:election_header define-macro="election_header" i18n:domain="onegov.election_day">
-    <h1>
-        <small i18n:translate="" tal:condition="not: election.counted">Not yet counted.</small>
-        ${election.title}
-    </h1>
+    <div metal:use-macro="layout.macros['election_day_link']" tal:define="date election.date"/>
+    <h1>${election.title}</h1>
     <hr />
 </metal:election_header>
 
 <metal:vote_header define-macro="vote_header" i18n:domain="onegov.election_day">
+    <div metal:use-macro="layout.macros['election_day_link']" tal:define="date vote.date"/>
     <h1>
-        <small i18n:translate="" tal:condition="not:counted">Not yet counted.</small>
+        ${vote.title}
         <small tal:condition="vote.answer">
             <div tal:condition="not: vote.counter_proposal" metal:use-macro="layout.macros['answer']" tal:define="answer vote.answer"/>
             <div tal:condition="vote.counter_proposal">
@@ -218,7 +224,6 @@
                 </tal:block>
             </div>
         </small>
-        ${vote.title}
     </h1>
 
     <div class="clearfix"></div>

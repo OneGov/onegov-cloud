@@ -7,6 +7,9 @@ Changelog
 - Fix displaying the progess of complex votes.
   [msom]
 
+- Display the date of the election/vote on the detail view.
+  [msom]
+
 1.5.2 (2017-02-08)
 ~~~~~~~~~~~~~~~~~~~
 
