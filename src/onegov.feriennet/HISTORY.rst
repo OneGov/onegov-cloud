@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer send e-mails to inactive users.
+  [href]
+
 - Introduces a way to define the way an org name is split into two lines.
   [href]
 

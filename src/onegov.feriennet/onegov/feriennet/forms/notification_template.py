@@ -94,6 +94,7 @@ class NotificationTemplateSendForm(Form):
         users = UserCollection(self.request.app.session())
 
         q = users.by_roles(*roles)
+        q = q.filter(User.active == True)
         q = q.with_entities(User.username)
 
         return list(u.username for u in q)
