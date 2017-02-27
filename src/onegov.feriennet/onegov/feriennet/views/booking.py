@@ -175,7 +175,7 @@ def view_my_bookings(self, request):
     has_emergency_contact = user.data and user.data.get('emergency')
     show_emergency_info = user.username == request.current_username
 
-    layout = BookingCollectionLayout(self, request)
+    layout = BookingCollectionLayout(self, request, user)
 
     return {
         'actions_by_booking': lambda b: actions_by_booking(layout, period, b),

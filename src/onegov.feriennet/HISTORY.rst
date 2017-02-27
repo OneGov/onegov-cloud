@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Use dropdowns instead of lists for the period/username selection.
+  [href]
+
 0.4.1 (2017-02-24)
 ~~~~~~~~~~~~~~~~~~~
 

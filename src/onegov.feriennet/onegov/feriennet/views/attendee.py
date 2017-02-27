@@ -29,7 +29,7 @@ def edit_attendee(self, request, form):
 
     title = _("Edit Attendee")
 
-    layout = BookingCollectionLayout(bookings, request)
+    layout = BookingCollectionLayout(bookings, request, self.user)
     layout.breadcrumbs.append(Link(title, request.link(self)))
 
     return {
@@ -64,7 +64,7 @@ def edit_attendee_limit(self, request, form):
         'name': self.name
     })
 
-    layout = BookingCollectionLayout(bookings, request)
+    layout = BookingCollectionLayout(bookings, request, self.user)
     layout.breadcrumbs.append(Link(title, request.link(self)))
 
     return {

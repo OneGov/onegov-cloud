@@ -1019,14 +1019,17 @@ def test_booking_view(feriennet_app):
     assert "maximal drei Favoriten" in result.headers.get('X-IC-Trigger-Data')
 
     # users may switch between other periods
-    assert "Noch keine Buchungen" in c1_bookings.click('2017')
+    url = c1_bookings.pyquery('select option:last').val()
+    assert "Noch keine Buchungen" in c1.get(url)
 
     # admins may switch between other users
     admin = Client(feriennet_app)
     admin.login_admin()
 
-    m1_bookings = admin.get('/').click('Wunschliste')\
-        .click('m1@example.org')
+    page = admin.get('/').click('Wunschliste')
+    url = page.pyquery('select:last option:nth-child(3)').val()
+
+    m1_bookings = admin.get(url)
 
     assert count(m1_bookings) == 4
 
@@ -1294,7 +1297,9 @@ def test_direct_booking_and_storno(feriennet_app):
     assert "1 Plätze frei" in page
 
     # admins may do this for other members
-    page = page.click('Anmelden').click('member@example.org')
+    url = page.click('Anmelden').pyquery('select option:last').val()
+    page = client.get(url)
+
     other_url = page.request.url
     assert "Mike" in page
     assert "Für <strong>member@example.org</strong>" in page

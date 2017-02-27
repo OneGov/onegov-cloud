@@ -25,13 +25,12 @@
             </div>
             <div class="columns small-12 medium-6">
                 <tal:block condition="request.is_admin">
-                    <h2 i18n:translate>Users</h2>
-                    <ul>
-                        <li tal:repeat="user users">
-                            <a tal:condition="user.username != form.username" href="${form.for_username(user.username)}">${user.title}</a>
-                            <strong tal:condition="user.username == form.username">${user.title}</strong>
-                        </li>
-                    </ul>
+                    <h2 i18n:translate>User</h2>
+                    <select onchange="location = this.value;">
+                        <option tal:repeat="user users" value="${form.for_username(user.username)}" tal:attributes="selected user.username == form.username">
+                            ${user.title}
+                        </option>
+                    </select>
                 </tal:block>
             </div>
         </div>

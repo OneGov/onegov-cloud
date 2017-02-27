@@ -40,20 +40,25 @@ class VacationActivityCollectionLayout(DefaultLayout):
 
 class BookingCollectionLayout(DefaultLayout):
 
+    def __init__(self, model, request, user=None):
+        super().__init__(model, request)
+        self.user = user or request.current_user
+
+
     @cached_property
     def title(self):
         wishlist_phase = self.app.active_period \
             and self.app.active_period.wishlist_phase
 
-        if self.model.username == self.request.current_username:
+        if self.user.username == self.request.current_username:
             return wishlist_phase and _("Wishlist") or _("Bookings")
         elif wishlist_phase:
             return _("Wishlist of ${user}", mapping={
-                'user': self.request.current_user.title
+                'user': self.user.title
             })
         else:
             return _("Bookings of ${user}", mapping={
-                'user': self.request.current_user.title
+                'user': self.user.title
             })
 
     @cached_property
