@@ -96,10 +96,6 @@ class Booking(Base, TimestampMixin):
     #: access the user linked to this booking
     user = relationship('User')
 
-    @hybrid_property
-    def starred(self):
-        return self.priority != 0
-
     def provisional_booking_cost(self, period=None):
         """ The costs of the final booking, including the booking costs
         of the period (if not all-inclusive).
@@ -117,9 +113,35 @@ class Booking(Base, TimestampMixin):
 
         return cost or 0
 
+    def set_priority_bit(self, index, bit):
+        """ Changes the priority, setting the the nth bit from the right to
+        the value of ``bit`` (index/n begins at 0).
+
+        The first bit (index=0) is reserved for starring/unstarring.
+        The second bit (index=1) is reserved for nobble/unnobble.
+
+        As a result, starring is less influental than locking.
+
+        To give some context: Starring is used by the attendees to select
+        which bookings they favor. Nobbling is used by administrators to force
+        certain bookings to be preferred.
+
+        """
+
+        assert bit in (0, 1)
+        assert index in (0, 1)
+
+        mask = 1 << index
+
+        self.priority &= ~mask
+
+        if bit:
+            self.priority |= mask
+
     def star(self, max_stars=3):
-        """ Stars the current booking (giving it a priority of 1), up to
-        a limit per period and attendee.
+        """ Stars the current booking, up to a limit per period and attendee.
+
+        Starring sets the star-bit to 1.
 
         :return: True if successful (or already set), False if over limit.
 
@@ -135,17 +157,39 @@ class Booking(Base, TimestampMixin):
         q = q.filter(Booking.username == self.username)
         q = q.filter(Booking.period_id == self.period_id)
         q = q.filter(Booking.id != self.id)
-        q = q.filter(Booking.priority != 0)
+        q = q.filter(Booking.starred == True)
         q = q.limit(4)
 
         if q.count() < max_stars:
-            self.priority = 1
+            self.set_priority_bit(0, 1)
             return True
 
         return False
 
     def unstar(self):
-        self.priority = 0
+        self.set_priority_bit(0, 0)
+
+    def nobble(self):
+        self.set_priority_bit(1, 1)
+
+    def unnobble(self):
+        self.set_priority_bit(1, 0)
+
+    @hybrid_property
+    def starred(self):
+        return self.priority & 1 << 0 != 0
+
+    @starred.expression
+    def starred(self):
+        return self.priority.op('&')(1 << 0) != 0
+
+    @hybrid_property
+    def nobbled(self):
+        return self.priority & 1 << 1 != 0
+
+    @nobbled.expression
+    def nobbled(self):
+        return self.priority.op('&')(1 << 1) != 0
 
     @property
     def dates(self):

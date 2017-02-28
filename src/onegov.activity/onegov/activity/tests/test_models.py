@@ -7,7 +7,7 @@ from freezegun import freeze_time
 from onegov.activity import ActivityCollection
 from onegov.activity import Attendee
 from onegov.activity import AttendeeCollection
-from onegov.activity import BookingCollection
+from onegov.activity import Booking, BookingCollection
 from onegov.activity import InvoiceItemCollection
 from onegov.activity import Occasion, OccasionDate
 from onegov.activity import OccasionCollection
@@ -701,7 +701,7 @@ def test_booking_collection(session, owner):
     assert bookings.booking_count(owner.username) == 1
 
 
-def test_star_booking(session, owner):
+def test_star_nobble_booking(session, owner):
     activities = ActivityCollection(session)
     attendees = AttendeeCollection(session)
     periods = PeriodCollection(session)
@@ -733,6 +733,14 @@ def test_star_booking(session, owner):
         period=autumn
     )
 
+    s3 = occasions.add(
+        start=datetime(2016, 10, 4, 13),
+        end=datetime(2016, 10, 4, 14),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=autumn
+    )
+
     dustin = attendees.add(
         user=owner,
         name="Dustin Henderson",
@@ -742,12 +750,61 @@ def test_star_booking(session, owner):
 
     b1 = bookings.add(owner, dustin, s1)
     b2 = bookings.add(owner, dustin, s2)
+    b3 = bookings.add(owner, dustin, s3)
 
     assert b1.star(max_stars=1) is True
     assert b2.star(max_stars=1) is False
 
     assert b1.starred is True
     assert b2.starred is False
+
+    b1.nobble()
+    assert b1.starred is True
+    assert b1.nobbled is True
+
+    b1.unstar()
+    assert b1.starred is False
+    assert b1.nobbled is True
+
+    b1.unnobble()
+    assert b1.starred is False
+    assert b1.nobbled is False
+
+    b1.nobble()
+    b1.star()
+
+    b2.unstar()
+    b2.unnobble()
+
+    b3.nobble()
+    b3.unstar()
+
+    q = session.query(Booking)
+    assert q.filter(Booking.starred == True).count() == 1
+    assert q.filter(Booking.nobbled == True).count() == 2
+
+    b2.nobble()
+    b2.star()
+
+    assert q.filter(Booking.starred == True).count() == 2
+    assert q.filter(Booking.nobbled == True).count() == 3
+
+    b1.unstar()
+    b1.unnobble()
+
+    assert b1.priority == 0
+
+    b1.star()
+
+    assert b1.priority == 1
+
+    b1.nobble()
+
+    assert b1.priority == 3
+
+    b1.unstar()
+
+    assert b1.priority == 2
 
 
 def test_booking_period_id_reference(session, owner):
