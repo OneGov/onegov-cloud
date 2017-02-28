@@ -314,7 +314,7 @@ class AttendeeSignupForm(AttendeeBase):
         if self.request.is_admin and self.ignore_age.data is True:
             return True
 
-        if not self.birth_date.data:
+        if self.is_new and not self.birth_date.data:
             return True  # will be caught by the required validator
 
         if self.is_new:

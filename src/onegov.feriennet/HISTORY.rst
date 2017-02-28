@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes age check not working for existing attendees.
+  [href]
+
 - Adds the ability to selectivly incrase the priority of bookings.
   [href]
 
