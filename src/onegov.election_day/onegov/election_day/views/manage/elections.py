@@ -88,9 +88,9 @@ def delete_election(self, request, form):
 
     return {
         'message': _(
-            'Do you really want to delete "${election}"?',
+            'Do you really want to delete "${item}"?',
             mapping={
-                'election': self.title
+                'item': self.title
             }
         ),
         'layout': layout,

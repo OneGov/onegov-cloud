@@ -3,8 +3,10 @@ from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.layout import Layout
 from onegov.election_day.layout import ManageElectionsLayout
 from onegov.election_day.layout import ManageLayout
+from onegov.election_day.layout import ManageSubscribersLayout
 from onegov.election_day.layout import ManageVotesLayout
 from onegov.election_day.layout import VotesLayout
+from onegov.election_day.models import Subscriber
 from onegov.election_day.tests import DummyRequest
 
 
@@ -141,20 +143,20 @@ def test_votes_layout():
 
 
 def test_manage_layout():
+    # Votes
     layout = ManageLayout(Vote(), DummyRequest())
-
     assert layout.manage_model_link == 'Vote/None'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', '')
     ]
 
-    layout = ManageLayout(Election(), DummyRequest())
-
-    assert layout.manage_model_link == 'Election/None'
+    layout = ManageLayout(Vote(), DummyRequest())
+    layout.principal.sms_notification = 'http://example.com'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
-        ('Elections', 'ElectionCollection/archive', '')
+        ('Elections', 'ElectionCollection/archive', ''),
+        ('Subscribers', 'SubscriberCollection/archive', '')
     ]
 
     layout = ManageVotesLayout(Vote(), DummyRequest())
@@ -164,9 +166,43 @@ def test_manage_layout():
         ('Elections', 'ElectionCollection/archive', '')
     ]
 
+    # Elections
+    layout = ManageLayout(Election(), DummyRequest())
+    assert layout.manage_model_link == 'Election/None'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', ''),
+        ('Elections', 'ElectionCollection/archive', '')
+    ]
+
+    layout = ManageLayout(Election(), DummyRequest())
+    layout.principal.sms_notification = 'http://example.com'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', ''),
+        ('Elections', 'ElectionCollection/archive', ''),
+        ('Subscribers', 'SubscriberCollection/archive', '')
+    ]
+
     layout = ManageElectionsLayout(Election(), DummyRequest())
     assert layout.manage_model_link == 'ElectionCollection/archive'
     assert layout.menu == [
         ('Votes', 'VoteCollection/archive', ''),
         ('Elections', 'ElectionCollection/archive', 'active')
+    ]
+
+    # Subscribers
+    layout = ManageLayout(Subscriber(), DummyRequest())
+    layout.principal.sms_notification = 'http://example.com'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', ''),
+        ('Elections', 'ElectionCollection/archive', ''),
+        ('Subscribers', 'SubscriberCollection/archive', '')
+    ]
+
+    layout = ManageSubscribersLayout(Election(), DummyRequest())
+    layout.principal.sms_notification = 'http://example.com'
+    assert layout.manage_model_link == 'SubscriberCollection/archive'
+    assert layout.menu == [
+        ('Votes', 'VoteCollection/archive', ''),
+        ('Elections', 'ElectionCollection/archive', ''),
+        ('Subscribers', 'SubscriberCollection/archive', 'active')
     ]

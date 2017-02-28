@@ -622,3 +622,24 @@ def test_view_subscription(election_day_app):
     unsubscribe.form['phone_number'] = '0791112233'
     unsubscribe = unsubscribe.form.submit()
     assert "SMS-Benachrichtigung wurde beendet." in unsubscribe
+
+
+def test_view_manage_subscription(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    subscribe = client.get('/subscribe')
+    subscribe.form['phone_number'] = '0791112233'
+    subscribe = subscribe.form.submit()
+    assert "SMS-Benachrichtigung wurde abonniert" in subscribe
+    assert election_day_app.session().query(Subscriber).one().locale == 'de_CH'
+
+    login(client)
+    manage = client.get('/manage/subscribers')
+    assert '+41791112233' in manage
+
+    manage = manage.click('Löschen').click('Abbrechen')
+    assert '+41791112233' in manage
+
+    manage = manage.click('Löschen').form.submit()
+    assert '+41791112233' not in manage

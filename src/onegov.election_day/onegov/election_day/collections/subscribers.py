@@ -1,13 +1,36 @@
+from onegov.core.collection import Pagination
 from onegov.election_day.models import Subscriber
 
 
-class SubscriberCollection(object):
+class SubscriberCollectionPagination(Pagination):
 
-    def __init__(self, session):
+    def __init__(self, session, page=0):
         self.session = session
+        self.page = page
+
+    def __eq__(self, other):
+        return self.page == other.page
+
+    def subset(self):
+        return self.query().order_by(Subscriber.phone_number)
+
+    @property
+    def page_index(self):
+        return self.page
+
+    def page_by_index(self, index):
+        return self.__class__(self.session, index)
+
+
+class SubscriberCollection(SubscriberCollectionPagination):
 
     def query(self):
         return self.session.query(Subscriber)
+
+    def by_id(self, id):
+        """ Returns the subscriber by id. """
+
+        return self.query().filter(Subscriber.id == id).first()
 
     def subscribe(self, phone_number, locale):
         """ Subscribe with the given phone number and locale.

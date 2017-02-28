@@ -28,14 +28,26 @@
                         <tr>
                             <th i18n:translate>Phone number</th>
                             <th i18n:translate>Locale</th>
+                            <th i18n:translate>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                     <tr tal:repeat="subscriber subscribers">
                         <td>${subscriber.phone_number}</td>
                         <td>${subscriber.locale}</td>
+                        <td>
+                            <ul class="actions">
+                                <li>
+                                    <a i18n:translate class="action-delete" href="${request.link(subscriber, 'delete')}">Delete</a>
+                                </li>
+                            </ul>
+                        </td>
                     </tr>
                 </table>
+
+                <div class="pagination-centered">
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="collection layout.model; current_page layout.model;" />
+                </div>
 
             </div>
         </div>

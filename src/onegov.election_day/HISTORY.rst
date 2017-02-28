@@ -1,19 +1,22 @@
 Changelog
 ---------
 
-- Use colored answers.
+- Adds backend link, delete action and pagination for subscribers.
   [msom]
 
-- Fix displaying the progess of complex votes.
+- Displayes the date of the election and vote on the detail view.
   [msom]
 
-- Display the date of the election/vote on the detail view.
+- Uses colored answers.
+  [msom]
+
+- Fixes displaying the progess of complex votes.
   [msom]
 
 1.5.2 (2017-02-08)
 ~~~~~~~~~~~~~~~~~~~
 
-- Fix tests.
+- Fixes tests.
   [msom]
 
 1.5.1 (2017-02-08)
@@ -22,13 +25,13 @@ Changelog
 - Adds (partial) support for 2017.
   [msom]
 
-- Fix typos in documentation.
+- Fixes typos in documentation.
   [treinhard, freinhard]
 
 1.5.0 (2017-01-12)
 ~~~~~~~~~~~~~~~~~~~
 
-- Show the results of the municipality instead of the overall results for
+- Shows the results of the municipality instead of the overall results for
   federal and cantonal votes in communal instances.
   [msom]
 
@@ -46,10 +49,10 @@ Changelog
 1.4.3 (2017-01-04)
 ~~~~~~~~~~~~~~~~~~~
 
-- Harmonize the usage of the groups in the various formats.
+- Harmonizes the usage of the groups in the various formats.
   [msom]
 
-- Allow to list expats as separate entity (but not using SESAM format).
+- Allows to list expats as separate entity (but not using SESAM format).
   [msom]
 
 1.4.2 (2017-01-03)

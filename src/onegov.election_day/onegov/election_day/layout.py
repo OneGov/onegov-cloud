@@ -1,12 +1,14 @@
 from babel import Locale
 from cached_property import cached_property
 from datetime import datetime
-from onegov.ballot import ElectionCollection, VoteCollection
+from onegov.ballot import ElectionCollection
+from onegov.ballot import VoteCollection
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
+from onegov.election_day.collections import SubscriberCollection
 from onegov.user import Auth
 
 
@@ -328,6 +330,11 @@ class ManageLayout(DefaultLayout):
         class_ = 'active' if link == self.manage_model_link else ''
         menu.append((_("Elections"), link, class_))
 
+        if self.principal.sms_notification:
+            link = self.request.link(SubscriberCollection(session))
+            class_ = 'active' if link == self.manage_model_link else ''
+            menu.append((_("Subscribers"), link, class_))
+
         return menu
 
     def __init__(self, model, request):
@@ -365,4 +372,19 @@ class ManageVotesLayout(ManageLayout):
         super().__init__(model, request)
         self.breadcrumbs.append(
             (_("Votes"), request.link(self.model), ''),
+        )
+
+
+class ManageSubscribersLayout(ManageLayout):
+
+    @cached_property
+    def manage_model_link(self):
+        return self.request.link(
+            SubscriberCollection(self.request.app.session())
+        )
+
+    def __init__(self, model, request):
+        super().__init__(model, request)
+        self.breadcrumbs.append(
+            (_("Subscribers"), request.link(self.model), ''),
         )

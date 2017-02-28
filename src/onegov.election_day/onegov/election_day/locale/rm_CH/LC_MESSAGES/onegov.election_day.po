@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-04 09:24+0100\n"
+"POT-Creation-Date: 2017-02-28 09:27+0100\n"
 "PO-Revision-Date: 2016-12-14 11:30+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -37,8 +37,8 @@ msgstr "Statistica da panaschar"
 msgid "Open Data"
 msgstr "Open Data"
 
-msgid "Project da votaziun"
-msgstr "Iniziativa"
+msgid "Proposal"
+msgstr "Project da votaziun"
 
 msgid "Counter Proposal"
 msgstr "Cuntraproposta"
@@ -54,6 +54,9 @@ msgstr "Elecziuns"
 
 msgid "Manage"
 msgstr "Administrar"
+
+msgid "Subscribers"
+msgstr "Abunents"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -496,9 +499,6 @@ msgstr "Trametter communicaziuns als abunents"
 msgid "Delete"
 msgstr "Stizzar"
 
-msgid "Subscribers"
-msgstr "Abunents"
-
 msgid "No subscribers yet."
 msgstr "Anc nagins abunents."
 
@@ -688,8 +688,8 @@ msgid "Blank list"
 msgstr "Glista en blanco"
 
 #, python-format
-msgid "Do you really want to delete \"${election}\"?"
-msgstr "Vulais Vus propi stizzar l'elecziun \"${election}\"?"
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Vulais Vus propi stizzar \"${item}\"?"
 
 msgid "Delete election"
 msgstr "Stizzar l'elecziun"
@@ -704,9 +704,8 @@ msgstr ""
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Propi trametter danovamain communicaziuns als abunents?"
 
-#, python-format
-msgid "Do you really want to delete \"${vote}\"?"
-msgstr "Vulais Vus propi stizzar la votaziun \"${vote}\"?"
+msgid "Delete subscriber"
+msgstr "Stizzar l'abunent(a)"
 
 msgid "Delete vote"
 msgstr "Stizzar la votaziun"

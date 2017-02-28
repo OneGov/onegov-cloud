@@ -513,7 +513,7 @@ def test_webhook_notification(session):
             request = DummyRequest()
             request.app.principal.webhooks = {'http://abc.com/1': None}
 
-            notification.trigger(DummyRequest(), election)
+            notification.trigger(request, election)
             sleep(5)
             assert urlopen.called
 
@@ -532,7 +532,7 @@ def test_webhook_notification(session):
                 'url': 'Election/election'
             }
 
-            notification.trigger(DummyRequest(), vote)
+            notification.trigger(request, vote)
             sleep(5)
             assert urlopen.called
 

@@ -1,11 +1,12 @@
-from onegov.core.i18n import SiteLocale
-from onegov.ballot import Election, ElectionCollection
 from onegov.ballot import Ballot, BallotCollection
+from onegov.ballot import Election, ElectionCollection
 from onegov.ballot import Vote, VoteCollection
+from onegov.core.i18n import SiteLocale
 from onegov.election_day import ElectionDayApp
-from onegov.election_day.models import Principal
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import SubscriberCollection
+from onegov.election_day.models import Principal
+from onegov.election_day.models import Subscriber
 from onegov.user import Auth
 
 
@@ -30,8 +31,8 @@ def get_manage_votes(app, page=0):
 
 
 @ElectionDayApp.path(model=SubscriberCollection, path='/manage/subscribers')
-def get_manage_subscribers(app):
-    return SubscriberCollection(app.session())
+def get_manage_subscribers(app, page=0):
+    return SubscriberCollection(app.session(), page=page)
 
 
 @ElectionDayApp.path(model=Election, path='/election/{id}')
@@ -47,6 +48,11 @@ def get_vote(app, id):
 @ElectionDayApp.path(model=Ballot, path='/ballot/{id}')
 def get_ballot(app, id):
     return BallotCollection(app.session()).by_id(id)
+
+
+@ElectionDayApp.path(model=Subscriber, path='/subscriber/{id}')
+def get_subscriber(app, id):
+    return SubscriberCollection(app.session()).by_id(id)
 
 
 @ElectionDayApp.path(model=ArchivedResultCollection, path='/archive/{date}')

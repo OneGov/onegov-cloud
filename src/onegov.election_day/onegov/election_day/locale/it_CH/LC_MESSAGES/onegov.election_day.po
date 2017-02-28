@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-04 09:24+0100\n"
+"POT-Creation-Date: 2017-02-28 09:27+0100\n"
 "PO-Revision-Date: 2017-01-06 08:07+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -55,6 +55,9 @@ msgstr "Elezioni"
 
 msgid "Manage"
 msgstr "Amministrare"
+
+msgid "Subscribers"
+msgstr "Iscritti"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -459,9 +462,6 @@ msgstr "Attivazione delle notifiche"
 msgid "Delete"
 msgstr "Cancellare"
 
-msgid "Subscribers"
-msgstr "Iscritti"
-
 msgid "No subscribers yet."
 msgstr "Non ci sono ancora degli iscritti…"
 
@@ -646,8 +646,8 @@ msgid "Blank list"
 msgstr "Lista bianca"
 
 #, python-format
-msgid "Do you really want to delete \"${election}\"?"
-msgstr "Sei sicuro/a di voler eliminare \"${election}\"?"
+msgid "Do you really want to delete \"${item}\"?"
+msgstr "Sei sicuro/a di voler eliminare \"${item}\"?"
 
 msgid "Delete election"
 msgstr "Elimina elezione"
@@ -662,12 +662,11 @@ msgstr ""
 msgid "Do you really want to retrigger the notfications?"
 msgstr "Vuoi davvero riattivare le notifiche?"
 
-#, python-format
-msgid "Do you really want to delete \"${vote}\"?"
-msgstr "Desidera davvero cancellare la votazione \"${vote}\"?"
+msgid "Delete subscriber"
+msgstr "Elimina iscritto/a"
 
 msgid "Delete vote"
-msgstr "Cancellare votazione"
+msgstr "Elimina votazione"
 
 #, python-format
 msgid "The year ${year} is not yet supported"

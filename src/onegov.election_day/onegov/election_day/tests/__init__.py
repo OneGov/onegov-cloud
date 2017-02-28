@@ -4,21 +4,22 @@ from webtest.forms import Upload
 
 
 class DummyPrincipal(object):
-    name = 'name'
-    webhooks = []
-    sms_notification = None
-    domain = 'canton'
+
+    def __init__(self):
+        self.name = 'name'
+        self.webhooks = []
+        self.sms_notification = None
+        self.domain = 'canton'
 
 
 class DummyApp(object):
     def __init__(self, session=None, application_id='application_id'):
         self._session = session
         self.application_id = application_id
+        self.principal = DummyPrincipal()
 
     def session(self):
         return self._session
-
-    principal = DummyPrincipal()
 
 
 class DummyRequest(object):
@@ -27,20 +28,16 @@ class DummyRequest(object):
                  is_logged_in=False):
         self.includes = []
         self.session = session
-        self._app = app
+        self.app = app or DummyApp(session=self.session)
         self.locale = locale
         self.is_logged_in = is_logged_in
         if app and session:
-            app.session = Mock(return_value=session)
+            self.app.session = Mock(return_value=session)
 
     def link(self, model, name=''):
         return '{}/{}'.format(
             model.__class__.__name__, name or getattr(model, 'id', 'archive')
         )
-
-    @property
-    def app(self):
-        return self._app or DummyApp(session=self.session)
 
     def translate(self, text):
         return text.interpolate()
