@@ -158,7 +158,7 @@ class Booking(Base, TimestampMixin):
         q = q.filter(Booking.period_id == self.period_id)
         q = q.filter(Booking.id != self.id)
         q = q.filter(Booking.starred == True)
-        q = q.limit(4)
+        q = q.limit(max_stars + 1)
 
         if q.count() < max_stars:
             self.set_priority_bit(0, 1)
