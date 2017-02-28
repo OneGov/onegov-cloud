@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.3 (2017-02-28)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to nobble bookings.
   [href]
 
