@@ -331,6 +331,9 @@ class WsgiServer(FileSystemEventHandler):
         if 'onegov.sublime' in event.src_path:
             return
 
+        if '.cache' in event.src_path:
+            return
+
         print("changed: {}".format(event.src_path))
 
         self.restart()
