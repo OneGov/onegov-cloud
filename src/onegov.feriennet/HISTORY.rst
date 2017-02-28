@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes activities visibility for members.
+  [href]
+
 - No longer send e-mails to inactive users.
   [href]
 
