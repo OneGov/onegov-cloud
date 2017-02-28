@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to selectivly incrase the priority of bookings.
+  [href]
+
 - Fixes activities visibility for members.
   [href]
 

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-27 15:56+0100\n"
+"POT-Creation-Date: 2017-02-28 14:33+0100\n"
 "PO-Revision-Date: 2015-10-15 09:42+0200\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -241,7 +241,7 @@ msgid "Trade"
 msgstr "Handwerk"
 
 msgid "First Name"
-msgstr "Vornane"
+msgstr "Vorname"
 
 msgid "Last Name"
 msgstr "Nachname"
@@ -997,6 +997,12 @@ msgstr "Angebot als Favorit markieren"
 msgid "Unmark activity as favorite"
 msgstr "Angebot nicht mehr als Favorit markieren"
 
+msgid "Increase the bookings priority"
+msgstr "Priorität der Buchung erhöhen"
+
+msgid "Decrease the bookings priority"
+msgstr "Priorität der Buchung senken"
+
 msgid "Prebooking begins on ${date}."
 msgstr "Die Wunschphase beginnt am ${date}."
 
@@ -1073,6 +1079,9 @@ msgstr "Die durchschnittliche Zufriedenheit liegt bei ${happiness}."
 
 msgid "${operability} of all occasions have enough attendees."
 msgstr "${operability} aller Durchführungen haben genug Teilnehmer."
+
+msgid "Marking bookings increases their priority during the next matching run."
+msgstr "Markierte Buchungen erhalten beim nächsten Zuweisungslauf eine höhere Priorität."
 
 msgid "Years"
 msgstr "Jahre"

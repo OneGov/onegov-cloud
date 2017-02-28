@@ -249,6 +249,7 @@ ul.tags {
     .hint-fairness::before { @include icon('\f24e'); }
     .hint-happiness::before { @include icon('\f118'); }
     .hint-operability::before { @include icon('\f058'); }
+    .hint-nobble::before { @include icon('\f046'); }
     .hint-outstanding::before { @include icon('\f200'); }
     .hint-finalized::before { @include icon('\f256'); }
     .hint-minutes::before { @include icon('\f017'); }
@@ -572,14 +573,14 @@ ul.tags {
 
     .icon-male::before {
         @include icon('\f222');
-        
+
         left: 2.25rem;
         position: absolute;
     }
 
     .icon-female::before {
         @include icon('\f221');
-        
+
         left: 2.25rem;
         position: absolute;
     }
@@ -904,9 +905,9 @@ ul.tags {
     table {
         width: 100%;
 
-        td:first-child,
-        th:first-child {
-            width: 50%;
+        td:nth-child(2),
+        th:nth-child(2) {
+            width: 40%;
         }
 
         td {
@@ -927,6 +928,21 @@ ul.tags {
         td:before {
             content: '&nbsp;';
             visibility: hidden;
+        }
+
+        td:first-child {
+            padding-right: 0;
+            text-align: center;
+            width: 5px;
+
+            a {
+                color: $body-font-color;
+            }
+
+            &::before {
+                content: '';
+                display: none;
+            }
         }
     }
 

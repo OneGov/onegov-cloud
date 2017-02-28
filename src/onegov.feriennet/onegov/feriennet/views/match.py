@@ -1,5 +1,5 @@
 from onegov.core.security import Secret
-from onegov.activity import BookingCollection, Occasion
+from onegov.activity import Booking, BookingCollection, Occasion
 from onegov.activity.matching import deferred_acceptance_from_database
 from onegov.feriennet import _, FeriennetApp
 from onegov.feriennet.collections import MatchCollection
@@ -51,7 +51,10 @@ def handle_matches(self, request, form):
         'periods': request.app.periods,
         'form': form,
         'button_text': _("Run Matching"),
-        'model': self
+        'model': self,
+        'booking_link': lambda record, name=None: request.class_link(
+            Booking, {'id': record.booking_id}, name
+        )
     }
 
 

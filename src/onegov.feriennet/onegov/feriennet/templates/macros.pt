@@ -275,13 +275,27 @@
 </metal:occasion>
 
 <metal:star define-macro="star" i18n:domain="onegov.feriennet">
-    <tal:block condition="booking.priority == 0">
+    <tal:block condition="not booking.starred">
         <i id="star-${booking.id}" class="fa fa-star-o" aria-hidden="true"></i>
         <span class="show-for-sr" i18n:translate>Mark activity as favorite</span>
     </tal:block>
-    <tal:block condition="booking.priority != 0">
+    <tal:block condition="booking.starred">
         <i id="star-${booking.id}" class="fa fa-star" aria-hidden="true"></i>
         <span class="show-for-sr" i18n:translate>Unmark activity as favorite</span>
+    </tal:block>
+</metal:star>
+
+
+<metal:star define-macro="nobble" i18n:domain="onegov.feriennet">
+    <tal:block define="booking_id booking.id|record.booking_id; nobbled booking.nobbled|record.booking_nobbled">
+        <tal:block condition="not nobbled">
+            <i id="nobble-${booking_id}" class="fa fa-fw fa-square-o" aria-hidden="true"></i>
+            <span class="show-for-sr" i18n:translate>Increase the bookings priority</span>
+        </tal:block>
+        <tal:block condition="nobbled">
+            <i id="nobble-${booking_id}" class="fa fa-fw fa-check-square-o" aria-hidden="true"></i>
+            <span class="show-for-sr" i18n:translate>Decrease the bookings priority</span>
+        </tal:block>
     </tal:block>
 </metal:star>
 

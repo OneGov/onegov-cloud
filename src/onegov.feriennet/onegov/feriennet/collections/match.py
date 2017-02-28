@@ -27,7 +27,9 @@ class MatchCollection(object):
 
         q = self.session.query(Booking)
         q = q.with_entities(
+            Booking.id.label('booking_id'),
             Booking.state.label('booking_state'),
+            Booking.nobbled.label('booking_nobbled'),
             Activity.title.label('activity_title'),
             Occasion.id.label('occasion_id'),
             OccasionDate.start.label('occasion_start'),
@@ -52,7 +54,9 @@ class MatchCollection(object):
         # include the occasions for which there is no booking
         e = self.session.query(Occasion)
         e = e.with_entities(
+            literal_column('NULL').label('booking_id'),
             literal_column('NULL').label('booking_state'),
+            literal_column('NULL').label('booking_nobbled'),
             Activity.title.label('activity_title'),
             Occasion.id.label('occasion_id'),
             OccasionDate.start.label('occasion_start'),

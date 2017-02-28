@@ -7,7 +7,7 @@ from onegov.activity import Activity, AttendeeCollection
 from onegov.activity import Booking
 from onegov.activity import BookingCollection
 from onegov.activity import Occasion
-from onegov.core.security import Personal
+from onegov.core.security import Personal, Secret
 from onegov.core.templates import render_macro
 from onegov.core.utils import normalize_for_url
 from onegov.feriennet import FeriennetApp, _
@@ -254,6 +254,21 @@ def toggle_star(self, request):
 
     layout = BookingCollectionLayout(self, request)
     return render_macro(layout.macros['star'], request, {'booking': self})
+
+
+@FeriennetApp.view(
+    model=Booking,
+    name='toggle-nobble',
+    permission=Secret,
+    request_method='POST')
+def toggle_nobble(self, request):
+    if self.nobbled:
+        self.unnobble()
+    else:
+        self.nobble()
+
+    layout = BookingCollectionLayout(self, request)
+    return render_macro(layout.macros['nobble'], request, {'booking': self})
 
 
 def render_css(content, request):
