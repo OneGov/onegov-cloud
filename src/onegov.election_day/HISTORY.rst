@@ -10,6 +10,9 @@ Changelog
 - Uses colored answers.
   [msom]
 
+- Displays the percentages of intermediate results in the overview, too.
+  [msom]
+
 - Fixes displaying the progess of complex votes.
   [msom]
 

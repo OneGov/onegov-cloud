@@ -40,7 +40,7 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="election archive_items[date][domain][type]">
-                                    <td tal:define="prefix election.title_prefix(request)">
+                                    <td tal:define="prefix election.title_prefix">
                                         <a href="${election.url}"><span tal:condition="prefix">${prefix}: </span>${election.title}</a>
                                     </td>
                                     <td class="right-aligned" tal:condition="not: communal_instance">
@@ -66,21 +66,17 @@
                             </thead>
                             <tbody>
                                 <tr tal:repeat="vote archive_items[date][domain][type]">
-                                    <td tal:define="prefix vote.title_prefix(request)">
+                                    <td tal:define="prefix vote.title_prefix">
                                         <a href="${vote.url}"><span tal:condition="prefix">${prefix}: </span>${vote.title}</a>
                                     </td>
                                     <td>
-                                        <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.local_answer" />
+                                        <div metal:use-macro="layout.macros['answer']" tal:define="answer vote.display_answer(request)" />
                                     </td>
                                     <td class="right-aligned">
-                                        <tal:block tal:condition="vote.counted">
-                                            ${layout.format_number(vote.local_yeas_percentage)}
-                                        </tal:block>
+                                        ${layout.format_number(vote.display_yeas_percentage(request))}
                                     </td>
                                     <td class="right-aligned">
-                                        <tal:block tal:condition="vote.counted">
-                                            ${layout.format_number(vote.local_nays_percentage)}
-                                        </tal:block>
+                                        ${layout.format_number(vote.display_nays_percentage(request))}
                                     </td>
                                     <td class="right-aligned" tal:condition="not: communal_instance">
                                         <div metal:use-macro="layout.macros['progress']" tal:define="progress vote.progress" />

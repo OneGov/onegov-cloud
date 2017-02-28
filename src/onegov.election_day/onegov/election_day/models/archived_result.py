@@ -56,12 +56,10 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
     title_translations = Column(HSTORE, nullable=False)
     title = translation_hybrid(title_translations)
 
-    def title_prefix(self, request=None, session=None):
-        assert request or session
-        session = session or request.app.session()
-        if self.schema != session.info['schema']:
-            if self.domain == 'municipality':
-                return self.name
+    @property
+    def title_prefix(self):
+        if self.is_fetched and self.domain == 'municipality':
+            return self.name
 
         return ''
 
@@ -69,37 +67,135 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
     shortcode = Column(Text, nullable=True)
 
     @property
+    def is_fetched(self):
+        """ Returns True, if this results has been fetched from another
+        instance.
+
+        """
+        return self.schema != self.session_manager.current_schema
+
+    def is_fetched_by_municipality(self, request):
+        """ Returns True, if this results has been fetched from another
+        instance by a communal instance.
+
+        """
+        return (
+            self.is_fetched and request.app.principal.domain == 'municipality'
+        )
+
+    def ensure_meta(self):
+        """ Ensure that the meta dict is set. """
+
+        if self.meta is None:
+            self.meta = {}
+
+    def ensure_meta_local(self):
+        """ Ensure that the meta dict is set and contains the 'local' key. """
+
+        self.ensure_meta()
+        if 'local' not in self.meta:
+            self.meta['local'] = {}
+
+    @property
     def answer(self):
+        """ The answer of a vote (accepted, rejected, counter-proposal). """
+
         return (self.meta or {}).get('answer', '')
 
     @answer.setter
     def answer(self, value):
-        if self.meta is None:
-            self.meta = {}
+        self.ensure_meta()
         self.meta['answer'] = value
 
     @property
+    def local_answer(self):
+        """ The answer if this a fetched cantonal/federal result on a communal
+        instance.
+
+        """
+
+        return (self.meta or {}).get('local', {}).get('answer', '')
+
+    @local_answer.setter
+    def local_answer(self, value):
+        self.ensure_meta_local()
+        self.meta['local']['answer'] = value
+
+    def display_answer(self, request):
+        """ Returns the answer (depending on the current instance). """
+
+        if self.is_fetched_by_municipality(request):
+            return self.local_answer
+        return self.answer
+
+    @property
     def nays_percentage(self):
-        return (self.meta or {}).get('nays_percentage', 0.0)
+        """ The nays rate of a vote. """
+
+        return (self.meta or {}).get('nays_percentage', 100.0)
 
     @nays_percentage.setter
     def nays_percentage(self, value):
-        if self.meta is None:
-            self.meta = {}
+        self.ensure_meta()
         self.meta['nays_percentage'] = value
 
     @property
+    def local_nays_percentage(self):
+        """ The nays rate if this a fetched cantonal/federal result on a
+        communal instance.
+
+        """
+
+        return (self.meta or {}).get('local', {}).get('nays_percentage', 100.0)
+
+    @local_nays_percentage.setter
+    def local_nays_percentage(self, value):
+        self.ensure_meta_local()
+        self.meta['local']['nays_percentage'] = value
+
+    def display_nays_percentage(self, request):
+        """ Returns the nays rate (depending on the current instance). """
+
+        if self.is_fetched_by_municipality(request):
+            return self.local_nays_percentage
+        return self.nays_percentage
+
+    @property
     def yeas_percentage(self):
+        """ The yeas rate of a vote. """
+
         return (self.meta or {}).get('yeas_percentage', 0.0)
 
     @yeas_percentage.setter
     def yeas_percentage(self, value):
-        if self.meta is None:
-            self.meta = {}
+        self.ensure_meta()
         self.meta['yeas_percentage'] = value
 
     @property
+    def local_yeas_percentage(self):
+        """ The yeas rate if this a fetched cantonal/federal result on a
+        communal instance.
+
+        """
+
+        return (self.meta or {}).get('local', {}).get('yeas_percentage', 0.0)
+
+    @local_yeas_percentage.setter
+    def local_yeas_percentage(self, value):
+        self.ensure_meta_local()
+        self.meta['local']['yeas_percentage'] = value
+
+    def display_yeas_percentage(self, request):
+        """ Returns the yeas rate (depending on the current instance). """
+
+        if self.is_fetched_by_municipality(request):
+            return self.local_yeas_percentage
+        return self.yeas_percentage
+
+    @property
     def counted(self):
+        """ True, if the vote or election has been counted. """
+
         return (self.meta or {}).get('counted', False)
 
     @counted.setter
@@ -107,52 +203,6 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
         if self.meta is None:
             self.meta = {}
         self.meta['counted'] = value
-
-    @property
-    def has_local_results(self):
-        return 'local' in (self.meta or {})
-
-    @property
-    def local_answer(self):
-        if self.has_local_results:
-            return (self.meta['local'] or {}).get('answer', '')
-        return self.answer
-
-    @local_answer.setter
-    def local_answer(self, value):
-        if self.meta is None:
-            self.meta = {}
-        if not self.meta.get('local'):
-            self.meta['local'] = {}
-        self.meta['local']['answer'] = value
-
-    @property
-    def local_nays_percentage(self):
-        if self.has_local_results:
-            return (self.meta['local'] or {}).get('nays_percentage', 0.0)
-        return self.nays_percentage
-
-    @local_nays_percentage.setter
-    def local_nays_percentage(self, value):
-        if self.meta is None:
-            self.meta = {}
-        if not self.meta.get('local'):
-            self.meta['local'] = {}
-        self.meta['local']['nays_percentage'] = value
-
-    @property
-    def local_yeas_percentage(self):
-        if self.has_local_results:
-            return (self.meta['local'] or {}).get('yeas_percentage', 0.0)
-        return self.yeas_percentage
-
-    @local_yeas_percentage.setter
-    def local_yeas_percentage(self, value):
-        if self.meta is None:
-            self.meta = {}
-        if not self.meta.get('local'):
-            self.meta['local'] = {}
-        self.meta['local']['yeas_percentage'] = value
 
     def copy_from(self, source):
         self.date = source.date

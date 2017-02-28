@@ -254,20 +254,20 @@ def test_add_local_results(session):
 
     # wrong principal domain
     add_local_results(ArchivedResult(), target, be, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # wrong type
     add_local_results(ArchivedResult(type='election'), target, bern, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # missing ID
     add_local_results(ArchivedResult(type='vote'), target, bern, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # no vote
     source = ArchivedResult(type='vote', meta={'id': 'id'})
     add_local_results(source, target, bern, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # no proposal
     session.add(Vote(title="Vote", domain='federation', date=date(2011, 1, 1)))
@@ -276,7 +276,7 @@ def test_add_local_results(session):
 
     source = ArchivedResult(type='vote', meta={'id': vote.id})
     add_local_results(source, target, bern, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # no results
     vote.ballots.append(Ballot(type="proposal"))
@@ -284,7 +284,7 @@ def test_add_local_results(session):
 
     source = ArchivedResult(type='vote', meta={'id': vote.id})
     add_local_results(source, target, bern, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # not yet counted
     vote.proposal.results.append(
@@ -298,14 +298,14 @@ def test_add_local_results(session):
 
     source = ArchivedResult(type='vote', meta={'id': vote.id})
     add_local_results(source, target, bern, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # simple vote
     proposal.counted = True
 
     source = ArchivedResult(type='vote', meta={'id': vote.id})
     add_local_results(source, target, bern, session)
-    assert target.has_local_results
+    assert 'local' in target.meta
     assert target.local_answer == 'rejected'
     assert target.local_yeas_percentage == 25.0
     assert target.local_nays_percentage == 75.0
@@ -313,7 +313,7 @@ def test_add_local_results(session):
     proposal.yeas = 7000
 
     add_local_results(source, target, bern, session)
-    assert target.has_local_results
+    assert 'local' in target.meta
     assert target.local_answer == 'accepted'
     assert target.local_yeas_percentage == 70.0
     assert target.local_nays_percentage == 30.0
@@ -327,7 +327,7 @@ def test_add_local_results(session):
 
     source = ArchivedResult(type='vote', meta={'id': vote.id})
     add_local_results(source, target, bern, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # not yet counted
     vote.counter_proposal.results.append(
@@ -348,7 +348,7 @@ def test_add_local_results(session):
 
     source = ArchivedResult(type='vote', meta={'id': vote.id})
     add_local_results(source, target, bern, session)
-    assert not target.has_local_results
+    assert 'local' not in target.meta
 
     # complex vote
     counter.counted = True
@@ -356,7 +356,7 @@ def test_add_local_results(session):
 
     # p: y, c: n, t:p
     add_local_results(source, target, bern, session)
-    assert target.has_local_results
+    assert 'local' in target.meta
     assert target.local_answer == 'proposal'
     assert target.local_yeas_percentage == 70.0
     assert target.local_nays_percentage == 30.0
