@@ -59,47 +59,57 @@ def create_app(postgres_dsn, temporary_directory, election_day_password,
     return app
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def election_day_app(postgres_dsn, temporary_directory, election_day_password):
 
-    yield create_app(
+    app = create_app(
         postgres_dsn, temporary_directory, election_day_password, "zg"
     )
+    yield app
+    app.session_manager.dispose()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def election_day_app_gr(postgres_dsn, temporary_directory,
                         election_day_password):
 
-    yield create_app(
+    app = create_app(
         postgres_dsn, temporary_directory, election_day_password, "gr"
     )
+    yield app
+    app.session_manager.dispose()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def election_day_app_sg(postgres_dsn, temporary_directory,
                         election_day_password):
 
-    yield create_app(
+    app = create_app(
         postgres_dsn, temporary_directory, election_day_password, "sg"
     )
+    yield app
+    app.session_manager.dispose()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def election_day_app_bern(postgres_dsn, temporary_directory,
                           election_day_password):
 
-    yield create_app(
+    app = create_app(
         postgres_dsn, temporary_directory, election_day_password, "",
         "'351'", "true"
     )
+    yield app
+    app.session_manager.dispose()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def election_day_app_kriens(postgres_dsn, temporary_directory,
                             election_day_password):
 
-    yield create_app(
+    app = create_app(
         postgres_dsn, temporary_directory, election_day_password, "",
         "'1059'", "false"
     )
+    yield app
+    app.session_manager.dispose()
