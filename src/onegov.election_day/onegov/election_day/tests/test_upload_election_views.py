@@ -5,8 +5,73 @@ from datetime import date
 from onegov.core.utils import module_path
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.tests import login
+from time import sleep
+from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload
+
+
+HEADER_COLUMNS_INTERNAL = (
+    'election_title,'
+    'election_date,'
+    'election_type,'
+    'election_mandates,'
+    'election_absolute_majority,'
+    'election_counted_entities,'
+    'election_total_entities,'
+    'entity_name,'
+    'entity_id,'
+    'entity_elegible_voters,'
+    'entity_received_ballots,'
+    'entity_blank_ballots,'
+    'entity_invalid_ballots,'
+    'entity_unaccounted_ballots,'
+    'entity_accounted_ballots,'
+    'entity_blank_votes,'
+    'entity_invalid_votes,'
+    'entity_accounted_votes,'
+    'list_name,'
+    'list_id,'
+    'list_number_of_mandates,'
+    'list_votes,'
+    'list_connection,'
+    'list_connection_parent,'
+    'candidate_family_name,'
+    'candidate_first_name,'
+    'candidate_id,'
+    'candidate_elected,'
+    'candidate_votes'
+)
+
+HEADER_COLUMNS_SESAM_MAJORZ = (
+    'Anzahl Sitze,'
+    'Anzahl Gemeinden,'
+    'Wahlkreis-Nr,'
+    'Wahlkreisbezeichnung,'
+    'Stimmberechtigte,'
+    'Wahlzettel,'
+    'Leere Wahlzettel,'
+    'Ungültige Wahlzettel,'
+    'Leere Stimmen,'
+    'Ungueltige Stimmen,'
+    'Kandidaten-Nr,'
+    'Name,'
+    'Vorname,'
+    'Stimmen,'
+    'Gewaehlt'
+)
+
+HEADER_COLUMNS_WABSTI_PROPORZ = (
+    'Einheit_BFS,'
+    'Einheit_Name,'
+    'Kand_Nachname,'
+    'Kand_Vorname,'
+    'Liste_KandID,'
+    'Liste_ID,'
+    'Liste_Code,'
+    'Kand_StimmenTotal,'
+    'Liste_ParteistimmenTotal'
+)
 
 
 def test_upload_election_year_unavailable(election_day_app_gr):
@@ -1092,23 +1157,7 @@ def test_upload_election_temporary_results_majorz(election_day_app):
 
     # SESAM: "Anzahl Gemeinden" + missing lines
     csv = '\n'.join((
-        (
-            'Anzahl Sitze,'
-            'Anzahl Gemeinden,'
-            'Wahlkreis-Nr,'
-            'Wahlkreisbezeichnung,'
-            'Stimmberechtigte,'
-            'Wahlzettel,'
-            'Leere Wahlzettel,'
-            'Ungültige Wahlzettel,'
-            'Leere Stimmen,'
-            'Ungueltige Stimmen,'
-            'Kandidaten-Nr,'
-            'Name,'
-            'Vorname,'
-            'Stimmen,'
-            'Gewaehlt'
-        ),
+        HEADER_COLUMNS_SESAM_MAJORZ,
         '7,2 von 11,1701,Baar,13567,40,0,0,18,0,1,Hegglin,Peter,36,FALSE',
         '7,2 von 11,1701,Baar,13567,40,0,0,18,0,2,Hürlimann,Urs,25,FALSE',
         '7,2 von 11,1702,Cham,9620,41,0,1,6,0,1,Hegglin,Peter,34,FALSE',
@@ -1190,37 +1239,7 @@ def test_upload_election_temporary_results_majorz(election_day_app):
 
     # Onegov internal: misssing and number of municpalities
     csv = '\n'.join((
-        (
-            'election_title,'
-            'election_date,'
-            'election_type,'
-            'election_mandates,'
-            'election_absolute_majority,'
-            'election_counted_entities,'
-            'election_total_entities,'
-            'entity_name,'
-            'entity_id,'
-            'entity_elegible_voters,'
-            'entity_received_ballots,'
-            'entity_blank_ballots,'
-            'entity_invalid_ballots,'
-            'entity_unaccounted_ballots,'
-            'entity_accounted_ballots,'
-            'entity_blank_votes,'
-            'entity_invalid_votes,'
-            'entity_accounted_votes,'
-            'list_name,'
-            'list_id,'
-            'list_number_of_mandates,'
-            'list_votes,'
-            'list_connection,'
-            'list_connection_parent,'
-            'candidate_family_name,'
-            'candidate_first_name,'
-            'candidate_id,'
-            'candidate_elected,'
-            'candidate_votes'
-        ),
+        HEADER_COLUMNS_INTERNAL,
         (
             'majorz,2015-01-01,majorz,7,,2,11,Baar,1701,13567,40,0,0,0,40,18,'
             '0,262,,,,0,,,Hegglin,Peter,1,False,36'
@@ -1322,17 +1341,7 @@ def test_upload_election_temporary_results_proporz(election_day_app):
 
     # Wabsti: form value + (optionally) missing lines
     csv = '\n'.join((
-        (
-            'Einheit_BFS,'
-            'Einheit_Name,'
-            'Kand_Nachname,'
-            'Kand_Vorname,'
-            'Liste_KandID,'
-            'Liste_ID,'
-            'Liste_Code,'
-            'Kand_StimmenTotal,'
-            'Liste_ParteistimmenTotal'
-        ),
+        HEADER_COLUMNS_WABSTI_PROPORZ,
         '1701,Baar,Lustenberger,Andreas,101,1,ALG,948,1435',
         '1701,Baar,Schriber-Neiger,Hanni,102,1,ALG,208,1435',
         '1702,Cham,Lustenberger,Andreas,101,1,ALG,290,533',
@@ -1375,37 +1384,7 @@ def test_upload_election_temporary_results_proporz(election_day_app):
 
     # Onegov internal: misssing and number of municpalities
     csv = '\n'.join((
-        (
-            'election_title,'
-            'election_date,'
-            'election_type,'
-            'election_mandates,'
-            'election_absolute_majority,'
-            'election_counted_entities,'
-            'election_total_entities,'
-            'entity_name,'
-            'entity_id,'
-            'entity_elegible_voters,'
-            'entity_received_ballots,'
-            'entity_blank_ballots,'
-            'entity_invalid_ballots,'
-            'entity_unaccounted_ballots,'
-            'entity_accounted_ballots,'
-            'entity_blank_votes,'
-            'entity_invalid_votes,'
-            'entity_accounted_votes,'
-            'list_name,'
-            'list_id,'
-            'list_number_of_mandates,'
-            'list_votes,'
-            'list_connection,'
-            'list_connection_parent,'
-            'candidate_family_name,'
-            'candidate_first_name,'
-            'candidate_id,'
-            'candidate_elected,'
-            'candidate_votes'
-        ),
+        HEADER_COLUMNS_INTERNAL,
         (
             'election,2015-01-01,proporz,2,0,2,11,Baar,1701,14119,7462,77,196,'
             '273,7189,122,0,14256,ALG,1,0,1435,,,Lustenberger,Andreas,101,'
@@ -1851,17 +1830,7 @@ def test_upload_election_expats_proporz(election_day_app):
 
     # Wabsti:  Einheit_Name = Auslandschweizer, Einheit_BFS unknown
     csv = '\n'.join((
-        (
-            'Einheit_BFS,'
-            'Einheit_Name,'
-            'Kand_Nachname,'
-            'Kand_Vorname,'
-            'Liste_KandID,'
-            'Liste_ID,'
-            'Liste_Code,'
-            'Kand_StimmenTotal,'
-            'Liste_ParteistimmenTotal'
-        ),
+        HEADER_COLUMNS_WABSTI_PROPORZ,
         '1700,Auslandschweizer,Lustenberger,Andreas,101,1,ALG,948,1435',
     )).encode('utf-8')
     csv_stat = '\n'.join((
@@ -1883,37 +1852,7 @@ def test_upload_election_expats_proporz(election_day_app):
 
     # Onegov internal: entity_id = 0
     csv = '\n'.join((
-        (
-            'election_title,'
-            'election_date,'
-            'election_type,'
-            'election_mandates,'
-            'election_absolute_majority,'
-            'election_counted_entities,'
-            'election_total_entities,'
-            'entity_name,'
-            'entity_id,'
-            'entity_elegible_voters,'
-            'entity_received_ballots,'
-            'entity_blank_ballots,'
-            'entity_invalid_ballots,'
-            'entity_unaccounted_ballots,'
-            'entity_accounted_ballots,'
-            'entity_blank_votes,'
-            'entity_invalid_votes,'
-            'entity_accounted_votes,'
-            'list_name,'
-            'list_id,'
-            'list_number_of_mandates,'
-            'list_votes,'
-            'list_connection,'
-            'list_connection_parent,'
-            'candidate_family_name,'
-            'candidate_first_name,'
-            'candidate_id,'
-            'candidate_elected,'
-            'candidate_votes'
-        ),
+        HEADER_COLUMNS_INTERNAL,
         (
             'election,2015-01-01,proporz,2,0,1,12,Auslandschweizer,0,14119,'
             '7462,77,196,273,7189,122,0,14256,ALG,1,0,1435,,,'
@@ -1928,3 +1867,49 @@ def test_upload_election_expats_proporz(election_day_app):
     result_onegov = client.get('/election/election/data-csv').text
 
     assert result_onegov.replace('1,12', '1,0') == result_wabsti
+
+
+def test_upload_election_notify_hipchat(election_day_app):
+
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/elections/new-election')
+    new.form['election_de'] = 'election'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['mandates'] = 1
+    new.form['election_type'] = 'majorz'
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    csv = '\n'.join((
+        HEADER_COLUMNS_SESAM_MAJORZ,
+        '7,1 von 11,1701,Baar,13567,40,0,0,18,0,1,Hegglin,Peter,36,FALSE',
+    )).encode('utf-8')
+
+    with patch('urllib.request.urlopen') as urlopen:
+
+        # Hipchat not set
+        upload = client.get('/election/election/upload')
+        upload.form['file_format'] = 'sesam'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+        sleep(5)
+
+        assert not urlopen.called
+
+        election_day_app.hipchat_token = 'abcd'
+        election_day_app.hipchat_room_id = '1234'
+
+        upload = client.get('/election/election/upload')
+        upload.form['file_format'] = 'sesam'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+        sleep(5)
+
+        assert urlopen.called
+        assert 'api.hipchat.com' in urlopen.call_args[0][0].get_full_url()

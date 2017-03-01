@@ -6,9 +6,10 @@ from onegov.ballot import VoteCollection
 from onegov.core.utils import module_path
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.tests import login
+from time import sleep
+from unittest.mock import patch
 from webtest import TestApp as Client
 from webtest.forms import Upload
-
 
 COLUMNS = [
     'Bezirk',
@@ -953,3 +954,46 @@ def test_upload_vote_with_expats(election_day_app):
 
     result_wabsti = client.get('/vote/vote/data-csv').text
     assert result_standard == result_wabsti
+
+
+def test_upload_vote_notify_hipchat(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    new = client.get('/manage/votes/new-vote')
+    new.form['vote_de'] = 'vote'
+    new.form['date'] = date(2015, 1, 1)
+    new.form['domain'] = 'federation'
+    new.form.submit()
+
+    csv = '\n'.join((
+        ','.join(COLUMNS),
+        ',1706,Oberägeri,811,1298,3560,18,',
+    )).encode('utf-8')
+
+    with patch('urllib.request.urlopen') as urlopen:
+
+        # Hipchat not set
+        upload = client.get('/vote/vote/upload')
+        upload.form['type'] = 'simple'
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+        sleep(5)
+
+        assert not urlopen.called
+
+        election_day_app.hipchat_token = 'abcd'
+        election_day_app.hipchat_room_id = '1234'
+
+        upload = client.get('/vote/vote/upload')
+        upload.form['type'] = 'simple'
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
+
+        sleep(5)
+
+        assert urlopen.called
+        assert 'api.hipchat.com' in urlopen.call_args[0][0].get_full_url()

@@ -1,20 +1,15 @@
 import json
-import logging
-import urllib.request
 
 from onegov.ballot.models import Election, Vote
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
 from onegov.core.orm.types import UTCDateTime, UUID
+from onegov.core.utils import PostThread
 from onegov.election_day import _
 from onegov.election_day.models.subscriber import Subscriber
 from onegov.election_day.utils import get_summary
 from sqlalchemy import Column, ForeignKey, Text
-from threading import Thread
 from uuid import uuid4
-
-
-log = logging.getLogger('onegov.election_day')  # noqa
 
 
 class Notification(Base, TimestampMixin):
@@ -51,29 +46,6 @@ class Notification(Base, TimestampMixin):
         raise NotImplementedError
 
 
-class WebhookThread(Thread):
-
-    def __init__(self, url, data, headers, timeout=30):
-        Thread.__init__(self)
-        self.url = url
-        self.data = data
-        self.headers = headers
-        self.timeout = timeout
-
-    def run(self):
-        try:
-            request = urllib.request.Request(self.url)
-            for header in self.headers:
-                request.add_header(header[0], header[1])
-            urllib.request.urlopen(request, self.data, self.timeout)
-        except Exception as e:
-            log.error(
-                'Error while sending a POST request to {}: {}'.format(
-                    self.url, str(e)
-                )
-            )
-
-
 class WebhookNotification(Notification):
 
     def trigger(self, request, model):
@@ -98,7 +70,7 @@ class WebhookNotification(Notification):
                 headers = headers or {}
                 headers['Content-Type'] = 'application/json; charset=utf-8'
                 headers['Content-Length'] = len(data)
-                WebhookThread(
+                PostThread(
                     url,
                     data,
                     tuple((key, value) for key, value in headers.items())

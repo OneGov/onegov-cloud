@@ -111,6 +111,12 @@ def view_upload(self, request, form):
 
     if status == 'ok':
         request.app.pages_cache.invalidate()
+        request.app.send_hipchat(
+            request.app.principal.name,
+            'New results available: <a href="{}">{}</a>'.format(
+                request.link(self), self.title
+            )
+        )
 
     layout = ManageElectionsLayout(self, request)
 

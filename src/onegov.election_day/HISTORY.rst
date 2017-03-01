@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds hipchat integration.
+  [msom]
+
 - Adds backend link, delete action and pagination for subscribers.
   [msom]
 
