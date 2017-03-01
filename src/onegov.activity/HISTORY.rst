@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix age calcualation not being correct on some birthdays.
+  [href]
+
 - Fixes activity delete not working if there are attached occasions.
   [href]
 

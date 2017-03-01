@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date
 from onegov.activity.models.booking import Booking
 from onegov.core.orm import Base
 from onegov.core.orm.mixins import TimestampMixin
@@ -63,7 +63,11 @@ class Attendee(Base, TimestampMixin):
 
     @hybrid_property
     def age(self):
-        return (date.today() - self.birth_date) // timedelta(days=365.2425)
+        today = date.today()
+        birth = self.birth_date
+        extra = (today.month, today.day) < (birth.month, birth.day) and 1 or 0
+
+        return today.year - birth.year - extra
 
     @age.expression
     def age(self):
