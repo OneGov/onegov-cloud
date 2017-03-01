@@ -57,7 +57,7 @@ msgstr "Wir hatten Erfolg! Sehen Sie sich jetzt Ihre neue Webseite an!"
 
 msgid "Please write down your username and password before you continue. "
 msgstr ""
-"Bitte notieren Sie sich Ihren Benutzernamen und Ihr Passwort bevor sie "
+"Bitte notieren Sie sich Ihren Benutzernamen und Ihr Passwort bevor Sie "
 "weiterfahren."
 
 msgid "Username"
