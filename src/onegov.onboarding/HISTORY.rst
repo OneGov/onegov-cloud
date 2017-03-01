@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Use hipchat notification from onegov.core.
+  [msom]
+
 0.3.3 (2017-01-30)
 ~~~~~~~~~~~~~~~~~~~
 

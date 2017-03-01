@@ -65,7 +65,8 @@ class TownAssistant(Assistant):
                     "your town but you did not create it? Please contact us."
                 )
             else:
-                self.app.notify_hipchat(
+                self.app.send_hipchat(
+                    'Onboarding',
                     (
                         'A new OneGov Cloud instance was started by {}: '
                         '<a href="{}">{}</a>'
