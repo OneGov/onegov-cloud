@@ -227,5 +227,8 @@ class ActivityCollection(Pagination):
         return activity
 
     def delete(self, activity):
+        for occasion in activity.occasions:
+            self.session.delete(occasion)
+
         self.session.delete(activity)
         self.session.flush()

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes activity delete not working if there are attached occasions.
+  [href]
+
 0.6.3 (2017-02-28)
 ~~~~~~~~~~~~~~~~~~~
 
