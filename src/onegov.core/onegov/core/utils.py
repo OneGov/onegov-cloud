@@ -9,6 +9,7 @@ import morepath
 import os.path
 import re
 import sqlalchemy
+import urllib.request
 
 from collections import Iterable
 from contextlib import contextmanager
@@ -17,7 +18,9 @@ from datetime import datetime
 from functools import partial
 from importlib import import_module
 from itertools import groupby, tee
+from onegov.core import log
 from purl import URL
+from threading import Thread
 from unidecode import unidecode
 from uuid import UUID
 from webob import static
@@ -436,3 +439,46 @@ def makeopendir(fs, directory):
         fs.makedir(directory)
 
     return fs.opendir(directory)
+
+
+class PostThread(Thread):
+
+    """ POSTs the given data with the headers to the URL.
+
+    Example:
+
+        data = {'a': 1, 'b': 2}
+        data = json.dumps(data).encode('utf-8')
+        PostThread(
+            'https://example.com/post',
+            data,
+            (
+                ('Content-Type', 'application/json; charset=utf-8'),
+                ('Content-Length', len(data))
+            )
+        ).start()
+
+    This only works for external URLs! If posting to server itself is
+    needed, use a process instead of the thread!
+
+    """
+
+    def __init__(self, url, data, headers, timeout=30):
+        Thread.__init__(self)
+        self.url = url
+        self.data = data
+        self.headers = headers
+        self.timeout = timeout
+
+    def run(self):
+        try:
+            request = urllib.request.Request(self.url)
+            for header in self.headers:
+                request.add_header(header[0], header[1])
+            urllib.request.urlopen(request, self.data, self.timeout)
+        except Exception as e:
+            log.error(
+                'Error while sending a POST request to {}: {}'.format(
+                    self.url, str(e)
+                )
+            )

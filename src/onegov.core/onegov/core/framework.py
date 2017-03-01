@@ -19,6 +19,7 @@ Using the framework does not really differ from using Morepath::
 import dectate
 import hashlib
 import inspect
+import json
 import morepath
 import pylru
 
@@ -41,6 +42,7 @@ from onegov.core.mail import email, Postman, MaildirPostman
 from onegov.core.orm import Base, SessionManager, debug
 from onegov.core.orm.cache import OrmCacheApp
 from onegov.core.request import CoreRequest
+from onegov.core.utils import PostThread
 from onegov.server import Application as ServerApplication
 from onegov.server.utils import load_class
 from psycopg2.extensions import TransactionRollbackError
@@ -395,6 +397,10 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
         self.mail_use_directory = cfg.get('mail_use_directory', False)
         self.mail_directory = cfg.get('mail_directory', None)
 
+    def configure_hipchat(self, **cfg):
+        self.hipchat_token = cfg.get('hipchat_token', None)
+        self.hipchat_room_id = cfg.get('hipchat_room_id', None)
+
     def set_application_id(self, application_id):
         """ Set before the request is handled. Gets the schema from the
         application id and makes sure it exists, *if* a database connection
@@ -620,6 +626,44 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
 
         # send e-mails through the transaction machinery
         MailDataManager.send_email(self.postman, envelope)
+
+    def send_hipchat(self, message_from, message, message_format='html',
+                     color='green', notify=True):
+        """ Sends a hipchat message asynchronously.
+
+        We are using the room notification method of the hipchat API V2:
+        `<https://www.hipchat.com/docs/apiv2/method/send_room_notification/>`_
+
+        Make sure to generate a token for the room (Scope: Send Notifications)
+        and define it in the configuration.
+
+        Returns the thread object to allow waiting by calling join.
+
+        """
+
+        if self.hipchat_token and self.hipchat_room_id:
+            data = json.dumps({
+                'from': message_from,
+                'message': message,
+                'message_format': message_format,
+                'color': color,
+                'notify': notify
+            }).encode('utf-8')
+
+            headers = (
+                ('Authorization', 'Bearer {}'.format(self.hipchat_token)),
+                ('Content-Type', 'application/json; charset=utf-8'),
+                ('Content-Length', len(data)),
+            )
+
+            url = 'https://api.hipchat.com/v2/room/{}/notification'.format(
+                self.hipchat_room_id
+            )
+
+            thread = PostThread(url, data, headers)
+            thread.start()
+
+            return thread
 
     @cached_property
     def static_files(self):

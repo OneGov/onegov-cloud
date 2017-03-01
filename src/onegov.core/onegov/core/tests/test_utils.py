@@ -1,3 +1,4 @@
+import json
 import onegov.core
 import os.path
 import transaction
@@ -7,6 +8,7 @@ from onegov.core.orm import SessionManager
 from onegov.core.orm.types import HSTORE
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
+from unittest.mock import patch
 from uuid import uuid4
 
 
@@ -178,3 +180,23 @@ def test_remove_repeated_spaces():
     assert utils.remove_repeated_spaces('a b') == 'a b'
     assert utils.remove_repeated_spaces('a       b') == 'a b'
     assert utils.remove_repeated_spaces((' x  ')) == ' x '
+
+
+def test_post_thread(session):
+    with patch('urllib.request.urlopen') as urlopen:
+        url = 'https://example.com/post'
+        data = {'key': 'ä$j', 'b': 2}
+        data = json.dumps(data).encode('utf-8')
+        headers = (
+            ('Content-type', 'application/json; charset=utf-8'),
+            ('Content-length', len(data))
+        )
+
+        thread = utils.PostThread(url, data, headers)
+        thread.start()
+        thread.join()
+
+        assert urlopen.called
+        assert urlopen.call_args[0][0].get_full_url() == url
+        assert urlopen.call_args[0][1] == data
+        assert urlopen.call_args[0][0].headers == dict(headers)

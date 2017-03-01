@@ -13,6 +13,7 @@ from onegov.core.framework import Framework
 from onegov.core.upgrade import UpgradeState
 from onegov.core.mail import convert_to_plaintext
 from onegov.server import Config, Server
+from unittest.mock import patch
 from webtest import TestApp as Client
 from wtforms import Form, StringField
 
@@ -825,3 +826,63 @@ def test_send_email_plaintext_alternative(smtp):
     assert b64decode(content) == (
         b"<a href='http://example.org'>This e-mail is just a test</a>"
     )
+
+
+def test_send_hipchat(session):
+    with patch('urllib.request.urlopen') as urlopen:
+        app = Framework()
+        app.configure_application()
+
+        thread = app.send_hipchat('Tester', 'This is a <i>test message</i>')
+        assert thread is None
+
+        app.hipchat_token = 'abcd'
+        app.hipchat_room_id = '100'
+
+        thread = app.send_hipchat('Tester', 'This is a <i>test message</i>')
+        assert thread is not None
+        thread.join()
+
+        assert urlopen.called
+        url = urlopen.call_args[0][0].get_full_url()
+        data = json.loads(urlopen.call_args[0][1].decode('utf-8'))
+        headers = urlopen.call_args[0][0].headers
+
+        assert url == 'https://api.hipchat.com/v2/room/100/notification'
+        assert data == {
+            'color': 'green',
+            'from': 'Tester',
+            'message_format': 'html',
+            'message': 'This is a <i>test message</i>',
+            'notify': True,
+        }
+        assert headers == {
+            'Content-type': 'application/json; charset=utf-8',
+            'Authorization': 'Bearer abcd',
+            'Content-length': 122
+        }
+
+        thread = app.send_hipchat(
+            'Tester',
+            'This is a test message',
+            message_format='text',
+            color='gray',
+            notify=False
+        )
+
+        assert thread is not None
+        thread.join()
+
+        assert urlopen.called
+        url = urlopen.call_args[0][0].get_full_url()
+        data = json.loads(urlopen.call_args[0][1].decode('utf-8'))
+        headers = urlopen.call_args[0][0].headers
+
+        assert url == 'https://api.hipchat.com/v2/room/100/notification'
+        assert data == {
+            'color': 'gray',
+            'from': 'Tester',
+            'message_format': 'text',
+            'message': 'This is a test message',
+            'notify': False,
+        }
