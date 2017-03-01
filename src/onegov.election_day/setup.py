@@ -36,7 +36,7 @@ setup(
         'babel',
         'cached_property',
         'cssmin',
-        'onegov.core>=0.35.0',
+        'onegov.core>=0.37.0',
         'onegov.ballot>=1.2.2',
         'onegov.form>=0.12.0',
         'onegov.foundation>=0.0.4',
