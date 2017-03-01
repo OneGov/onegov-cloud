@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.37.0 (2017-03-01)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds a function to send hipchat notifications.
   [msom]
