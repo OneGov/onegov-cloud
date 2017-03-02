@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix wrong title on homepage.
+  [href]
+
 0.4.5 (2017-03-02)
 ~~~~~~~~~~~~~~~~~~~
 

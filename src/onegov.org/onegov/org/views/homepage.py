@@ -15,7 +15,7 @@ def view_org(self, request):
 
     default = {
         'layout': layout,
-        'title': self.name
+        'title': self.title
     }
 
     structure = self.meta.get('homepage_structure')
