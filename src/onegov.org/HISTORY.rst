@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.5 (2017-03-02)
+~~~~~~~~~~~~~~~~~~~
+
 - Adds the ability to send an instructional e-mail to new users.
   [href]
 
