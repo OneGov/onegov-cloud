@@ -93,7 +93,7 @@ def reopen_ticket(self, request):
         self.reopen_ticket(user)
     except InvalidStateChange:
         request.alert(
-            _("The ticket cannot be re-opened because it's not closed.")
+            _("The ticket cannot be re-opened because it's not closed")
         )
     else:
         request.success(_("You have reopened ticket ${number}", mapping={
