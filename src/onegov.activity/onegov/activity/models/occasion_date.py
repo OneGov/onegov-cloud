@@ -64,6 +64,11 @@ class OccasionDate(Base, TimestampMixin):
     def localized_end(self):
         return sedate.to_timezone(self.end, self.timezone)
 
+    @property
+    def active_days(self):
+        for dt in sedate.dtrange(self.localized_start, self.localized_end):
+            yield dt.date().toordinal()
+
     @hybrid_property
     def duration_in_seconds(self):
         return (self.end - self.start).total_seconds()

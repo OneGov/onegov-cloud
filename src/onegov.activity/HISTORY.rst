@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds active days to the activity/occasion models.
+  [href]
+
 - Fix age calcualation not being correct on some birthdays.
   [href]
 

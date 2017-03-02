@@ -1,3 +1,5 @@
+import sedate
+
 from onegov.activity.models import Activity
 from onegov.activity.utils import merge_ranges, overlaps
 from onegov.core.collection import Pagination
@@ -15,7 +17,8 @@ class ActivityCollection(Pagination):
                  durations=None,
                  age_ranges=None,
                  owners=None,
-                 period_ids=None):
+                 period_ids=None,
+                 dateranges=None):
         self.session = session
         self.type = type
         self.page = page
@@ -26,6 +29,7 @@ class ActivityCollection(Pagination):
             if age_ranges else set()
         self.owners = set(owners) if owners else set()
         self.period_ids = set(period_ids) if period_ids else set()
+        self.dateranges = set(dateranges) if dateranges else set()
 
     def __eq__(self, other):
         self.type == type and self.page == other.page
@@ -47,7 +51,8 @@ class ActivityCollection(Pagination):
             durations=self.durations,
             age_ranges=self.age_ranges,
             owners=self.owners,
-            period_ids=self.period_ids
+            period_ids=self.period_ids,
+            dateranges=self.dateranges
         )
 
     def contains_age_range(self, age_range):
@@ -117,6 +122,17 @@ class ActivityCollection(Pagination):
             query = query.filter(
                 model_class.period_ids.op('&&')(array(self.period_ids)))
 
+        if self.dateranges:
+            query = query.filter(
+                model_class.active_days.op('&&')(array(
+                    tuple(
+                        dt.toordinal()
+                        for start, end in self.dateranges
+                        for dt in sedate.dtrange(start, end)
+                    )
+                ))
+            )
+
         return query
 
     def for_filter(self,
@@ -125,15 +141,18 @@ class ActivityCollection(Pagination):
                    duration=None,
                    age_range=None,
                    owner=None,
-                   period_id=None):
+                   period_id=None,
+                   daterange=None):
         """ Returns a new collection instance.
 
         The given tag is excluded if already in the list, included if not
         yet in the list. Same goes for the given state.
 
-        """
+        Note that dateranges are excluded only if they match exactly. That is
+        we don't care about overlaps at all. If the same exact daterange is
+        found in the filter, it is excluded.
 
-        assert tag or state or duration or age_range or owner or period_id
+        """
 
         duration = int(duration) if duration is not None else None
 
@@ -153,7 +172,8 @@ class ActivityCollection(Pagination):
                 (self.durations, duration),
                 (self.age_ranges, age_range),
                 (self.owners, owner),
-                (self.period_ids, period_id)
+                (self.period_ids, period_id),
+                (self.dateranges, daterange)
             )
         )
 

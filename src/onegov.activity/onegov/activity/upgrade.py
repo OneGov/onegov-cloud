@@ -15,6 +15,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import joinedload
 
 
@@ -276,3 +277,39 @@ def introduce_location_meeting_point(context):
     if not context.has_column('occasions', 'meeting_point'):
         context.operations.alter_column(
             'occasions', 'location', new_column_name='meeting_point')
+
+
+@upgrade_task('Add active days')
+def add_active_days(context):
+    if context.has_column('activities', 'active_days'):
+        assert context.has_column('occasions', 'active_days')
+        return
+
+    context.session.execute(
+        'CREATE AGGREGATE "{}".array_cat_agg(anyarray) '
+        '(SFUNC=array_cat, STYPE=anyarray)'.format(
+            context.schema
+        )
+    )
+
+    context.operations.add_column('activities', Column(
+        'active_days', ARRAY(Integer), nullable=True
+    ))
+
+    context.operations.add_column('occasions', Column(
+        'active_days', ARRAY(Integer), nullable=True
+    ))
+
+    context.session.flush()
+
+    # update dates
+    for occasion in context.session.query(Occasion):
+        occasion.on_date_change()
+
+
+@upgrade_task('Add active days index')
+def add_active_days_index(context):
+    context.operations.create_index(
+        'inverted_active_days', 'activities', ['active_days'],
+        postgresql_using='gin'
+    )

@@ -203,6 +203,83 @@ def test_occasions(session, owner):
     assert occasions.query().first().active
 
 
+def test_activity_date_ranges(session, owner, collections):
+    sport = collections.activities.add("Sport", username=owner.username)
+    police = collections.activities.add("Police", username=owner.username)
+
+    period = collections.periods.add(
+        title="Spring 2017",
+        prebooking=(datetime(2017, 2, 1), datetime(2017, 2, 28)),
+        execution=(datetime(2017, 3, 1), datetime(2017, 3, 31)),
+        active=True
+    )
+
+    collections.occasions.add(
+        start=datetime(2017, 3, 1, 10),
+        end=datetime(2017, 3, 1, 12),
+        timezone="Europe/Zurich",
+        age=(6, 9),
+        spots=(2, 10),
+        activity=sport,
+        period=period
+    )
+
+    collections.occasions.add(
+        start=datetime(2017, 3, 1, 14),
+        end=datetime(2017, 3, 1, 16),
+        timezone="Europe/Zurich",
+        age=(6, 9),
+        spots=(2, 10),
+        activity=sport,
+        period=period
+    )
+
+    collections.occasions.add(
+        start=datetime(2017, 3, 4, 8),
+        end=datetime(2017, 3, 6, 16),
+        timezone="Europe/Zurich",
+        age=(6, 9),
+        spots=(2, 10),
+        activity=sport,
+        period=period
+    )
+
+    collections.occasions.add(
+        start=datetime(2017, 3, 6, 18),
+        end=datetime(2017, 3, 8, 18),
+        timezone="Europe/Zurich",
+        age=(6, 9),
+        spots=(2, 10),
+        activity=police,
+        period=period
+    )
+
+    transaction.commit()
+
+    a = collections.activities
+
+    # toggle daterange on
+    a = a.for_filter(daterange=(date(2017, 3, 1), date(2017, 3, 30)))
+    assert a.query().count() == 2
+
+    # toggle daterange off
+    a = a.for_filter(daterange=(date(2017, 3, 1), date(2017, 3, 30)))
+    assert a.query().count() == 2  # no filter -> show all
+    assert not a.dateranges
+
+    # only include the first activity
+    a = a.for_filter(daterange=(date(2017, 3, 1), date(2017, 3, 5)))
+    assert a.query().count() == 1
+
+    # include the second activity
+    a = a.for_filter(daterange=(date(2017, 3, 7), date(2017, 3, 8)))
+    assert a.query().count() == 2
+
+    # exlucde the first activity
+    a = a.for_filter(daterange=(date(2017, 3, 1), date(2017, 3, 5)))
+    assert a.query().count() == 1
+
+
 def test_profiles(session, owner):
 
     activities = ActivityCollection(session)

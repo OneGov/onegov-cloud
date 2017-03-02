@@ -13,7 +13,7 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import Numeric
 from sqlalchemy import Text
-from sqlalchemy.dialects.postgresql import INT4RANGE
+from sqlalchemy.dialects.postgresql import ARRAY, INT4RANGE
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship, object_session, validates
 from sqlalchemy_utils import aggregated, observes
@@ -75,6 +75,9 @@ class Occasion(Base, TimestampMixin):
     #: Pretend like this occasion doesn't use any time
     exclude_from_overlap_check = Column(Boolean, nullable=False, default=False)
 
+    #: Days on which this occasion is active
+    active_days = Column(ARRAY(Integer), nullable=False, default=list)
+
     @aggregated('period', Column(Boolean, default=False))
     def active(self):
         return column('active')
@@ -123,9 +126,15 @@ class Occasion(Base, TimestampMixin):
         if dates:
             self.durations = sum(set(d.duration for d in dates))
             self.order = int(min(d.start for d in dates).timestamp())
+            self.active_days = [
+                day
+                for date in dates
+                for day in date.active_days
+            ]
         else:
             self.durations = 0
             self.order = -1
+            self.active_days = []
 
     @validates('dates')
     def validate_dates(self, key, date):

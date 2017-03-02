@@ -10,7 +10,9 @@ from onegov.core.orm.types import UUID
 from onegov.core.utils import normalize_for_url
 from onegov.user import User
 from sqlalchemy import Column, Enum, Text, ForeignKey, Integer
+from sqlalchemy import event
 from sqlalchemy import func, distinct
+from sqlalchemy import Index
 from sqlalchemy.dialects.postgresql import HSTORE, ARRAY
 from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
@@ -79,6 +81,10 @@ class Activity(Base, ContentMixin, TimestampMixin):
     def period_ids(self):
         return func.array_agg(distinct(Occasion.period_id))
 
+    @aggregated('occasions', Column(ARRAY(Integer), default=list))
+    def active_days(self):
+        return func.array_cat_agg(distinct(Occasion.active_days))
+
     #: The occasions linked to this activity
     occasions = relationship(
         'Occasion',
@@ -103,6 +109,10 @@ class Activity(Base, ContentMixin, TimestampMixin):
         'polymorphic_on': 'type',
         'order_by': order,
     }
+
+    __table_args__ = (
+        Index('inverted_active_days', 'active_days', postgresql_using='gin'),
+    )
 
     @observes('title')
     def title_observer(self, title):
@@ -141,3 +151,17 @@ class Activity(Base, ContentMixin, TimestampMixin):
         self.state = 'archived'
 
         return self
+
+
+@event.listens_for(Activity.__table__, 'after_create')
+def receive_after_create(target, connection, **kw):
+    # we need as specialised aggregate function for the active_days column
+    # usually we wouldn't create our query using format, but sqlalchemy is
+    # not able to correctly create this statement and the schema is not
+    # user defined (and if it is, it's ensured to only have safe characters)
+    connection.execute(
+        'CREATE AGGREGATE "{}".array_cat_agg(anyarray) '
+        '(SFUNC=array_cat, STYPE=anyarray)'.format(
+            connection._execution_options['schema']
+        )
+    )
