@@ -110,7 +110,6 @@ form small {
 /*
     global/editbar icons
 */
-
 #global-tools,
 .edit-bar {
     .accept-activity:before { @include icon('\f087'); }
@@ -172,21 +171,46 @@ form small {
 }
 
 .activity-list-search {
-    @include hairline;
-    border-bottom-style: dashed;
-
-    margin: 1rem 0 !important;
-    padding-bottom: 1rem;
-
     h2 {
-        font-size: $h3-font-size - $h3-font-reduction;
+        border-bottom: 2px solid $primary-color;
+        font-size: $h4-font-size - $h4-font-reduction;
+        margin-bottom: 1rem;
+        margin-top: 0;
+        padding: 0 0 .75rem;
     }
 
     ul.tags {
-        margin: 0;
+        list-style: none;
+        margin: 0 0 .75rem;
+        padding: 0;
+
+        li {
+            display: inline-block;
+        }
+
+        a {
+            font-size: .8rem;
+            line-height: .8rem;
+        }
+
+        span {
+            margin-bottom: 0;
+        }
+    }
+
+    .filters ul + ul {
+        margin-top: .5rem;
     }
 }
 
+.filter-periods ul.tags li,
+.filter-weeks ul.tags li {
+    display: block;
+
+    &:first-child {
+        padding-top: 1px;
+    }
+}
 
 /*
     Activity view

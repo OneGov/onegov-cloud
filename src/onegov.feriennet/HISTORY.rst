@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Reorganises the activity filters.
+  [href]
+
 - Adds the ability to filter activities by period weeks.
   [href]
 

@@ -45,7 +45,6 @@ def date_range_decode(s):
 
     s, e = s.split(':')
 
-
     return (
         date(*tuple(int(p) for p in s.split('-'))),
         date(*tuple(int(p) for p in e.split('-')))

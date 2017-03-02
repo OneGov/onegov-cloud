@@ -15,6 +15,16 @@
     <meta name="theme-color" content="${layout.primary_color}">
 </metal:favicon>
 
+<metal:tags define-macro="tags">
+    <ul class="tags">
+        <li tal:repeat="link tags">
+            <span tal:content="structure link(request)" 
+                class="${link.active and 'active'} blank-label"
+            />
+        </li>
+    </ul>
+</metal:tags>
+
 <metal:activity_ticket_summary define-macro="activity_ticket_summary" i18n:domain="onegov.feriennet">
     <tal:block define="user activity.user.data.organisation or activity.user.title|activity.user.title">
         <h2>${activity.title}</h2>

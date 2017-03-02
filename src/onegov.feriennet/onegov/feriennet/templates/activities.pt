@@ -3,78 +3,106 @@
         ${title}
     </tal:block>
     <tal:block metal:fill-slot="content">
+        <div class="row">
+            <div class="columns medium-8">
+                <div class="activity-list-item" tal:condition="not:activities" i18n:translate>
+                    No activites found.
+                </div>
 
-        <div class="activity-list-search row collapse" tal:condition="taglinks">
-            <div class="columns small-12">
-                <h2 i18n:translate class="show-for-sr">Tags</h2>
+                <div class="activity-list-item" tal:repeat="activity activities">
+                    <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
+                    <p class="page-lead">${activity.lead}</p>
 
-                <ul class="tags">
-                    <li tal:repeat="link taglinks" 
-                        tal:content="structure link(request)" 
-                        class="${link.active and 'active'} blank-label" />
-                </ul>
-            </div>
-        </div>
+                    <div class="row" tal:define="
+                        ages get_ages(activity);
+                        min_cost get_min_cost(activity);
+                        occasion_count get_occasion_count(activity);
+                    ">
+                        <div class="small-12 columns factoids">
+                            <tal:block condition="ages">
+                                <span class="age" tal:define="
+                                    min_age min(age.lower for age in ages);
+                                    max_age max(age.upper - 1 for age in ages);
+                                ">
+                                    <span i18n:translate class="show-for-sr">Age</span>
+                                    <span i18n:translate>
+                                        <tal:block replace="min_age" i18n:name='min_age' />
+                                        -
+                                        <tal:block replace="max_age" i18n:name='max_age' />
+                                        years old
+                                    </span>
+                                </span>
+                            </tal:block>
+                            <tal:block condition="min_cost is not None">
+                                <span class="cost">
+                                    <span i18n:translate class="show-for-sr">Cost</span>
 
-        <div class="activity-list-item" tal:condition="not:activities" i18n:translate>
-            No activites found.
-        </div>
+                                    <span i18n:translate>
+                                        starting at <tal:block i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:block> CHF
+                                    </span>
+                                </span>
+                            </tal:block>
+                            <tal:block>
+                                <span class="occasion-count">
+                                    <span i18n:translate class="show-for-sr">Occasions</span>
 
-        <div class="activity-list-item" tal:repeat="activity activities">
-            <h3><a href="${request.link(activity)}">${activity.title}</a></h3>
-            <p class="page-lead">${activity.lead}</p>
+                                    <span i18n:translate tal:condition="not occasion_count">
+                                        No occasions
+                                    </span>
+                                    <span i18n:translate tal:condition="occasion_count == 1">
+                                        1 Occasion
+                                    </span>
+                                    <span i18n:translate tal:condition="occasion_count > 1">
+                                        <tal:block i18n:name="count">${occasion_count}</tal:block> Occasions
+                                    </span>
+                                </span>
+                            </tal:block>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="row" tal:define="
-                ages get_ages(activity);
-                min_cost get_min_cost(activity);
-                occasion_count get_occasion_count(activity);
-            ">
-                <div class="small-12 columns factoids">
-                    <tal:block condition="ages">
-                        <span class="age" tal:define="
-                            min_age min(age.lower for age in ages);
-                            max_age max(age.upper - 1 for age in ages);
-                        ">
-                            <span i18n:translate class="show-for-sr">Age</span>
-                            <span i18n:translate>
-                                <tal:block replace="min_age" i18n:name='min_age' />
-                                -
-                                <tal:block replace="max_age" i18n:name='max_age' />
-                                years old
-                            </span>
-                        </span>
-                    </tal:block>
-                    <tal:block condition="min_cost is not None">
-                        <span class="cost">
-                            <span i18n:translate class="show-for-sr">Cost</span>
-
-                            <span i18n:translate>
-                                starting at <tal:block i18n:name='price'>${'{:.2f}'.format(min_cost)}</tal:block> CHF
-                            </span>
-                        </span>
-                    </tal:block>
-                    <tal:block>
-                        <span class="occasion-count">
-                            <span i18n:translate class="show-for-sr">Occasions</span>
-
-                            <span i18n:translate tal:condition="not occasion_count">
-                                No occasions
-                            </span>
-                            <span i18n:translate tal:condition="occasion_count == 1">
-                                1 Occasion
-                            </span>
-                            <span i18n:translate tal:condition="occasion_count > 1">
-                                <tal:block i18n:name="count">${occasion_count}</tal:block> Occasions
-                            </span>
-                        </span>
-                    </tal:block>
+                <div class="pagination-centered" tal:condition="activities">
+                    <div metal:use-macro="layout.macros['pagination']" tal:define="
+                    collection layout.model; current_page layout.model;" />
                 </div>
             </div>
-        </div>
 
-        <div class="pagination-centered" tal:condition="activities">
-            <div metal:use-macro="layout.macros['pagination']" tal:define="
-            collection layout.model; current_page layout.model;" />
+            <div class="columns medium-4 activity-list-search">
+                <div tal:condition="filters['tags']|nothing" class="filter-tags">
+                    <h2 i18n:translate>Tags</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['tags']" />
+                </div>
+
+                <div tal:condition="filters['ages']|nothing" class="filter-ages">
+                    <h2 i18n:translate>Age</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['ages']" />
+                </div>
+
+                <div tal:condition="filters['durations']|nothing" class="filter-durations">
+                    <h2 i18n:translate>Duration</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['durations']" />
+                </div>
+
+                <div tal:condition="filters['weeks']|nothing" class="filter-weeks">
+                    <h2 i18n:translate>Weeks</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['weeks']" />
+                </div>
+
+                <div tal:condition="filters['states']|nothing" class="filter-states">
+                    <h2 i18n:translate>States</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['states']" />
+                </div>
+
+                <div tal:condition="filters['own']|nothing" class="filter-own">
+                    <h2 i18n:translate>Advanced</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['own']" />
+                </div>
+
+                <div tal:condition="filters['periods']|nothing" class="filter-periods">
+                    <h2 i18n:translate>Periods</h2>
+                    <div metal:use-macro="layout.macros['tags']" tal:define="tags filters['periods']" />
+                </div>
+            </div>
         </div>
     </tal:block>
 </div>

@@ -72,18 +72,19 @@ def view_activities(self, request):
     show_activities = bool(active_period or request.is_organiser)
     layout = VacationActivityCollectionLayout(self, request)
 
-    taglinks = []
+    filters = {}
 
     if show_activities:
-        taglinks = [
+        filters['tags'] = [
             Link(
                 text=request.translate(_(tag)),
                 active=tag in self.tags,
                 url=request.link(self.for_filter(tag=tag))
             ) for tag in self.used_tags
         ]
+        filters['tags'].sort(key=lambda l: l.text)
 
-        taglinks.extend(
+        filters['durations'] = tuple(
             Link(
                 text=request.translate(text),
                 active=duration in self.durations,
@@ -95,7 +96,7 @@ def view_activities(self, request):
             )
         )
 
-        taglinks.extend(
+        filters['ages'] = tuple(
             Link(
                 text=request.translate(text),
                 active=self.contains_age_range(age_range),
@@ -108,22 +109,8 @@ def view_activities(self, request):
             )
         )
 
-        if request.is_organiser:
-            periods = request.app.periods
-        else:
-            periods = None
-
-        if periods:
-            taglinks.extend(
-                Link(
-                    text=period.title,
-                    active=period.id in self.period_ids,
-                    url=request.link(self.for_filter(period_id=period.id))
-                ) for period in periods if period
-            )
-
         if active_period:
-            taglinks.extend(
+            filters['weeks'] = tuple(
                 Link(
                     text=_("${nth}. Week (${start} - ${end})", mapping={
                         'nth': nth,
@@ -142,25 +129,33 @@ def view_activities(self, request):
             )
 
         if request.is_organiser:
+            if request.app.periods:
+                filters['periods'] = [
+                    Link(
+                        text=period.title,
+                        active=period.id in self.period_ids,
+                        url=request.link(self.for_filter(period_id=period.id))
+                    ) for period in request.app.periods if period
+                ]
+                filters['periods'].sort(key=lambda l: l.text)
 
-            taglinks.append(
+            filters['own'] = (
                 Link(
                     text=request.translate(_("Own")),
                     active=request.current_username in self.owners,
                     url=request.link(
-                        self.for_filter(owner=request.current_username))
-                )
+                        self.for_filter(owner=request.current_username)
+                    )
+                ),
             )
 
-            taglinks.extend(
+            filters['states'] = tuple(
                 Link(
                     text=ACTIVITY_STATE_TRANSLATIONS[state],
                     active=state in self.states,
                     url=request.link(self.for_filter(state=state))
                 ) for state in ACTIVITY_STATES
             )
-
-        taglinks.sort(key=lambda link: link.text)
 
     def get_period_bound_occasions(activity):
         if not active_period:
@@ -194,7 +189,7 @@ def view_activities(self, request):
         'activities': self.batch if show_activities else None,
         'layout': layout,
         'title': _("Activities"),
-        'taglinks': taglinks,
+        'filters': filters,
         'period': active_period,
         'get_ages': get_ages,
         'get_min_cost': get_min_cost,
