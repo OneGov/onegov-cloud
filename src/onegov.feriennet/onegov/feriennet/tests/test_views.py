@@ -1789,7 +1789,7 @@ def test_send_email(feriennet_app):
     page = page.click('Versand')
     assert "Ferienpass 2016 subject" in page
     assert "Ferienpass 2016 body" in page
-    assert "keine Emfpänger gefunden" in page.form.submit()
+    assert "keine Empfänger gefunden" in page.form.submit()
 
     page.form['roles'] = ['admin', 'editor']
     assert "an 2 Empfänger gesendet" in page.form.submit().follow()
