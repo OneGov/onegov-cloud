@@ -1,3 +1,5 @@
+import sedate
+
 from datetime import date
 from itertools import groupby
 from onegov.activity import Booking
@@ -68,6 +70,7 @@ def occasions_by_period(session, activity, active_only):
 def view_activities(self, request):
     active_period = request.app.active_period
     show_activities = bool(active_period or request.is_organiser)
+    layout = VacationActivityCollectionLayout(self, request)
 
     taglinks = []
 
@@ -117,6 +120,25 @@ def view_activities(self, request):
                     active=period.id in self.period_ids,
                     url=request.link(self.for_filter(period_id=period.id))
                 ) for period in periods if period
+            )
+
+        if active_period:
+            taglinks.extend(
+                Link(
+                    text=_("${nth}. Week (${start} - ${end})", mapping={
+                        'nth': nth,
+                        'start': layout.format_date(daterange[0], 'date'),
+                        'end': layout.format_date(daterange[1], 'date')
+                    }),
+                    active=daterange in self.dateranges,
+                    url=request.link(self.for_filter(daterange=daterange))
+                ) for nth, daterange in enumerate(
+                    sedate.weekrange(
+                        active_period.execution_start,
+                        active_period.execution_end
+                    ),
+                    start=1
+                )
             )
 
         if request.is_organiser:
@@ -170,7 +192,7 @@ def view_activities(self, request):
 
     return {
         'activities': self.batch if show_activities else None,
-        'layout': VacationActivityCollectionLayout(self, request),
+        'layout': layout,
         'title': _("Activities"),
         'taglinks': taglinks,
         'period': active_period,

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to filter activities by period weeks.
+  [href]
+
 - Fixes age check not working for existing attendees.
   [href]
 

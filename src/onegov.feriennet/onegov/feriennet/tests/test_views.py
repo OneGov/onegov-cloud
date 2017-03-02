@@ -312,6 +312,13 @@ def test_activity_filter_tags(feriennet_app):
     assert "Learn How to Program" not in page
     assert "Learn How to Dance" in page
 
+    # anyone can filter by week
+    page = editor.get('/angebote').click('2. Woche', index=0)
+    assert "Keine Angebote" in page
+
+    page = editor.get('/angebote').click('1. Woche', index=0)
+    assert "Learn How to Cook" in page
+
 
 def test_activity_filter_duration(feriennet_app):
     activities = ActivityCollection(feriennet_app.session(), type='vacation')

@@ -10,6 +10,7 @@ from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import OccasionAttendeeCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.feriennet.converters import age_range_converter
+from onegov.feriennet.converters import date_range_converter
 from onegov.feriennet.models import InvoiceAction, VacationActivity
 from onegov.feriennet.models import NotificationTemplate
 from uuid import UUID
@@ -24,7 +25,8 @@ from uuid import UUID
         durations=[int],
         age_ranges=[age_range_converter],
         owners=[str],
-        period_ids=[UUID]
+        period_ids=[UUID],
+        dateranges=[date_range_converter]
     ))
 def get_vacation_activities(request, app, page=0,
                             tags=None,
@@ -32,7 +34,8 @@ def get_vacation_activities(request, app, page=0,
                             durations=None,
                             age_ranges=None,
                             owners=None,
-                            period_ids=None):
+                            period_ids=None,
+                            dateranges=None):
 
     if not request.is_organiser:
         period = app.active_period
@@ -47,7 +50,8 @@ def get_vacation_activities(request, app, page=0,
         durations=durations,
         age_ranges=age_ranges,
         owners=owners,
-        period_ids=period_ids
+        period_ids=period_ids,
+        dateranges=dateranges,
     )
 
 
