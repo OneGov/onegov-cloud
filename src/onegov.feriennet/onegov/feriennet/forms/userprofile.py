@@ -3,7 +3,7 @@ import string
 from onegov.feriennet import _
 from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
-from wtforms import StringField, TextAreaField, RadioField
+from wtforms import BooleanField, StringField, TextAreaField, RadioField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import Optional, URL, ValidationError, InputRequired
 
@@ -20,7 +20,8 @@ class UserProfileForm(Form):
         'email',
         'phone',
         'website',
-        'emergency'
+        'emergency',
+        'daily_ticket_statistics'
     )
 
     salutation = RadioField(
@@ -80,6 +81,10 @@ class UserProfileForm(Form):
         label=_("Website"),
         description=_("Website address including http:// or https://"),
         validators=[Optional(), URL()]
+    )
+
+    daily_ticket_statistics = BooleanField(
+        _("Send a daily status e-mail.")
     )
 
     @property

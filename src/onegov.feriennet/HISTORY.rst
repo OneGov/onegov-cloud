@@ -1,6 +1,15 @@
 Changelog
 ---------
 
+- Fixes the daily ticket status being sent to editors.
+  [href]
+
+- Fixes being unable to change the ticket status in the user profile.
+  [href]
+
+- Fixes the daily ticket being disabled when editing the user profile.
+  [href]
+
 0.5.0 (2017-03-02)
 ~~~~~~~~~~~~~~~~~~~
 

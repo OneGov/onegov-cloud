@@ -6,6 +6,7 @@ import textwrap
 
 from onegov.core.upgrade import upgrade_task
 from onegov.org.models import Organisation
+from onegov.user import UserCollection
 
 
 @upgrade_task('Install the default feriennet page structure 2')
@@ -52,3 +53,19 @@ def install_default_feriennet_page_structure(context):
             </column>
         </row>
     """)
+
+
+@upgrade_task('Reinstate daily ticket status e-mail')
+def reinstate_daily_ticket_status_email(context):
+    org = context.session.query(Organisation).first()
+
+    if org is None:
+        return
+
+    # not a feriennet
+    if '<registration />' not in org.meta['homepage_structure']:
+        return
+
+    for user in UserCollection(context.session).by_roles('admin'):
+        user.data = user.data or {}
+        user.data['daily_ticket_statistics'] = True

@@ -48,6 +48,11 @@ def get_create_new_organisation_factory():
     return create_new_organisation
 
 
+@FeriennetApp.setting(section='org', name='status_mail_roles')
+def get_status_mail_roles():
+    return ('admin', )
+
+
 @FeriennetApp.setting(section='i18n', name='localedirs')
 def get_i18n_localedirs():
     return [utils.module_path('onegov.feriennet', 'locale')] \
