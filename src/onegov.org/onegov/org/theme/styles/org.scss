@@ -444,7 +444,7 @@ footer {
 
             @media #{$medium-up} {
                 padding: .1rem 1.2rem !important;
-                
+
                 &:hover {
                     @include primary-color-background;
                 }
@@ -553,6 +553,10 @@ form {
 
     input[type="radio"] {
         margin: .29rem .4rem 0 0 !important;
+    }
+
+    input[type="checkbox"] + span {
+        padding-bottom: 1rem;
     }
 
     input.invalid,
@@ -970,6 +974,10 @@ ul.panel-links {
         + .marker-map {
             margin: 1rem 1rem 0;
         }
+
+        + .location {
+            margin-top: 1rem;
+        }
     }
 
     > ul {
@@ -1038,10 +1046,6 @@ ul.panel-links {
         margin-left: 1rem;
         white-space: pre-line;
         word-break: break-all;
-    }
-
-    h2 + .location {
-        margin-top: 1rem;
     }
 }
 

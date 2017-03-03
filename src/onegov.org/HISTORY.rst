@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes a minor style issues with boolean fields.
+  [href]
+
 - Adds a setting for the roles selected for the daily status e-mail.
   [href]
 
