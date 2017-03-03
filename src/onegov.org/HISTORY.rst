@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a setting for the roles selected for the daily status e-mail.
+  [href]
+
 - Fix wrong title on homepage.
   [href]
 

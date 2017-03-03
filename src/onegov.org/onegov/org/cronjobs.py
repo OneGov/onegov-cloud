@@ -47,9 +47,10 @@ def send_daily_ticket_statistics(request):
         return
 
     args = {}
+    app = request.app
 
     # get the current ticket count
-    collection = TicketCollection(request.app.session())
+    collection = TicketCollection(app.session())
     count = collection.get_count()
     args['currently_open'] = count.open
     args['currently_pending'] = count.pending
@@ -82,17 +83,17 @@ def send_daily_ticket_statistics(request):
     # render the email
     args['title'] = request.translate(
         _("${org} OneGov Cloud Status", mapping={
-            'org': request.app.org.title
+            'org': app.org.title
         })
     )
     args['layout'] = DefaultMailLayout(object(), request)
     args['is_monday'] = today.weekday() == MON
-    args['org'] = request.app.org.title
+    args['org'] = app.org.title
 
     # send one e-mail per user
-    users = UserCollection(request.app.session()).query()
+    users = UserCollection(app.session()).query()
     users = users.filter(User.active == True)
-    users = users.filter(User.role.in_(('admin', 'editor')))
+    users = users.filter(User.role.in_(app.settings.org.status_mail_roles))
     users = users.options(undefer('data'))
     users = users.all()
 
@@ -106,7 +107,7 @@ def send_daily_ticket_statistics(request):
             'mail_daily_ticket_statistics.pt', request, args
         )
 
-        request.app.send_email(
+        app.send_email(
             subject=args['title'],
             receivers=(user.username, ),
             content=content

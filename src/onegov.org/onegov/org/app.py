@@ -186,6 +186,11 @@ def get_create_new_organisation_factory():
     return create_new_organisation
 
 
+@OrgApp.setting(section='org', name='status_mail_roles')
+def get_status_mail_roles():
+    return ('admin', 'editor')
+
+
 @OrgApp.webasset_path()
 def get_js_path():
     return 'assets/js'
