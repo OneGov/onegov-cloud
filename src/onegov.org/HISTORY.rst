@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.6 (2017-03-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes a minor style issues with boolean fields.
   [href]
 
