@@ -122,7 +122,13 @@ def view_vote_json(self, request):
         'url': request.link(self),
         'embed': [
             request.link(ballot, 'map') for ballot in self.ballots
-        ]
+            if request.app.principal.use_maps
+        ],
+        'data': {
+            'json': request.link(self, 'data-json'),
+            'csv': request.link(self, 'data-csv'),
+            'xlsx': request.link(self, 'data-xlsx'),
+        }
     }
 
 

@@ -74,7 +74,12 @@ def view_election_json(self, request):
             request.link(self, 'panachage-chart'),
         ] if self.type == 'proporz' else [
             request.link(self, 'candidates-chart'),
-        ]
+        ],
+        'data': {
+            'json': request.link(self, 'data-json'),
+            'csv': request.link(self, 'data-csv'),
+            'xlsx': request.link(self, 'data-xlsx'),
+        }
     }
 
     session = object_session(self)

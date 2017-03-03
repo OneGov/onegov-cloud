@@ -10,6 +10,9 @@ Changelog
 - Displayes the date of the election and vote on the detail view.
   [msom]
 
+- Adds links to the raw data in the JSON results views of elections and votes.
+  [msom]
+
 - Uses colored answers.
   [msom]
 
