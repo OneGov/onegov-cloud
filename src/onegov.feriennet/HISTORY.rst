@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.5.1 (2017-03-03)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes the daily ticket status being sent to editors.
   [href]
 
