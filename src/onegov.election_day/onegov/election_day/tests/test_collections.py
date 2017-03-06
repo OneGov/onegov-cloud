@@ -230,6 +230,7 @@ def test_archived_results(session):
     assert result.total_entities == None
     assert result.progress == (0, 0)
     assert result.meta['id'] == 'election-2001'
+    assert result.meta['elected_candidates'] == []
 
     last_result_change = result.last_result_change
 

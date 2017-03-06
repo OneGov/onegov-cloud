@@ -10,6 +10,9 @@ Changelog
 - Displayes the date of the election and vote on the detail view.
   [msom]
 
+- Adds the elected candidates to the JSON summary of an election.
+  [msom]
+
 - Adds links to the raw data in the JSON results views of elections and votes.
   [msom]
 

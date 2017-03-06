@@ -31,6 +31,7 @@ def get_election_summary(election, request, url=None):
     return {
         'date': election.date.isoformat(),
         'domain': election.domain,
+        'elected': election.elected_candidates,
         'last_modified': last_modified,
         'progress': {
             'counted': election.counted_entities or 0,

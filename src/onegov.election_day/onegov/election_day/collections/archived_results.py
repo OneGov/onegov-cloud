@@ -153,6 +153,7 @@ class ArchivedResultCollection(object):
             result.type = 'election'
             result.counted_entities = item.counted_entities
             result.total_entities = item.total_entities
+            result.meta['elected_candidates'] = item.elected_candidates
 
         if isinstance(item, Vote):
             result.type = 'vote'

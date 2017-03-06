@@ -97,6 +97,17 @@ class ArchivedResult(Base, DomainOfInfluenceMixin, MetaMixin, TimestampMixin):
             self.meta['local'] = {}
 
     @property
+    def elected_candidates(self):
+        """ The names of the elected candidates. """
+
+        return (self.meta or {}).get('elected_candidates', [])
+
+    @elected_candidates.setter
+    def elected_candidates(self, value):
+        self.ensure_meta()
+        self.meta['elected_candidates'] = value
+
+    @property
     def answer(self):
         """ The answer of a vote (accepted, rejected, counter-proposal). """
 

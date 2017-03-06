@@ -306,6 +306,9 @@ def test_archived_result(session):
     result.counted_entities = 5
     assert result.progress == (5, 10)
 
+    result.elected_candidates = [('Joe', 'Quimby')]
+    assert result.elected_candidates == [('Joe', 'Quimby')]
+
     result.answer = 'rejected'
     assert result.answer == 'rejected'
 
@@ -337,6 +340,7 @@ def test_archived_result(session):
         'nays_percentage': 20.5,
         'yeas_percentage': 79.5,
         'counted': True,
+        'elected_candidates': [('Joe', 'Quimby')]
     }
 
     assert result.title == 'title'
@@ -377,6 +381,7 @@ def test_archived_result(session):
         'nays_percentage': 20.5,
         'yeas_percentage': 79.5,
         'counted': True,
+        'elected_candidates': [('Joe', 'Quimby')]
     }
     assert copied.shortcode == 'shortcode'
 
@@ -575,6 +580,7 @@ def test_webhook_notification(session):
             assert json.loads(data.decode('utf-8')) == {
                 'date': '2011-01-01',
                 'domain': 'federation',
+                'elected': [],
                 'last_modified': '2008-01-01T00:00:00+00:00',
                 'progress': {'counted': 0, 'total': 0},
                 'title': {'de_CH': 'Election'},

@@ -64,7 +64,7 @@ def add_id_to_archived_results(context):
 @upgrade_task('Update vote progress')
 def update_vote_progress(context):
 
-    """ Recalculate the vote progress for the archived result.
+    """ Recalculate the vote progress for the archived results.
 
     """
     session = context.session
@@ -80,3 +80,24 @@ def update_vote_progress(context):
         vote = session.query(Vote).filter_by(id=vote_id).first()
         if vote:
             result.counted_entities, result.total_entities = vote.progress
+
+
+@upgrade_task('Add elected candidates to archived results')
+def add_elected_candidates(context):
+
+    """ Adds the elected candidates to the archived results,
+
+    """
+    session = context.session
+
+    results = session.query(ArchivedResult)
+    results = results.filter(
+        ArchivedResult.schema == context.app.schema,
+        ArchivedResult.type == 'election'
+    )
+
+    for result in results:
+        election_id = result.meta.get('id')
+        election = session.query(Election).filter_by(id=election_id).first()
+        if election:
+            result.elected_candidates = election.elected_candidates

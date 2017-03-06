@@ -63,6 +63,7 @@ def test_get_election_summary(session):
         expected = {
             'date': '2011-01-01',
             'domain': 'federation',
+            'elected': [],
             'last_modified': '2014-01-01T12:00:00+00:00',
             'progress': {'counted': 0, 'total': 0},
             'title': {'de_CH': 'Election'},

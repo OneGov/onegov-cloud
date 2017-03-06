@@ -371,6 +371,7 @@ def test_view_election_summary(election_day_app_gr):
         assert client.get('/election/majorz-election/summary').json == {
             'date': '2015-01-01',
             'domain': 'federation',
+            'elected': [['Stefan', 'Engler'], ['Martin', 'Schmid']],
             'last_modified': '2014-01-01T12:00:00+00:00',
             'progress': {'counted': 1, 'total': 125},
             'title': {'de_CH': 'Majorz Election'},
@@ -380,6 +381,7 @@ def test_view_election_summary(election_day_app_gr):
         assert client.get('/election/proporz-election/summary').json == {
             'date': '2015-01-01',
             'domain': 'federation',
+            'elected': [],
             'last_modified': '2014-01-01T12:00:00+00:00',
             'progress': {'counted': 1, 'total': 125},
             'title': {'de_CH': 'Proporz Election'},
