@@ -25,6 +25,9 @@ Changelog
 - Fixes displaying the progess of complex votes.
   [msom]
 
+- Fixes displaing tooltips on iOS.
+  [msom]
+
 1.5.2 (2017-02-08)
 ~~~~~~~~~~~~~~~~~~~
 

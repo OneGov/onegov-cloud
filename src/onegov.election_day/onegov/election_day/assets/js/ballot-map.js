@@ -127,7 +127,8 @@ var init_ballot_map = function(el) {
                     }
                 })
                 .on('mouseover', tooltip.show)
-                .on('mouseout', tooltip.hide);
+                .on('mouseout', tooltip.hide)
+                .on('click', tooltip.show);
 
             if (mapdata.objects.lakes !== undefined) {
                 svg.append('g')
