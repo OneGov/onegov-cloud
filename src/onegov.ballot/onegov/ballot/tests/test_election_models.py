@@ -671,6 +671,7 @@ def test_election_results(session):
     assert sorted((c.votes for c in election.list_connections)) == []
 
     assert election.number_of_mandates == election.allocated_mandates
+    assert election.elected_candidates == [('Joe', 'Quimby')]
 
     assert sum(
         [p.votes for l in election.lists for p in l.panachage_results]

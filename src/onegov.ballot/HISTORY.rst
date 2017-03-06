@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Adds a function to get the names of the elected candidates.
+  [msom]
+
 1.2.2 (2017-02-27)
 ~~~~~~~~~~~~~~~~~~~
 

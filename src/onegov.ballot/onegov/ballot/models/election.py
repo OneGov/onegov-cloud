@@ -89,6 +89,7 @@ class Election(Base, TimestampMixin, DerivedAttributes,
     @property
     def allocated_mandates(self):
         """ Number of already allocated mandates/elected candidates. """
+
         results = object_session(self).query(
             func.count(
                 func.nullif(Candidate.elected, False)
@@ -209,6 +210,24 @@ class Election(Base, TimestampMixin, DerivedAttributes,
             return None
 
         return max(last_changes)
+
+    @property
+    def elected_candidates(self):
+        """ Returns the first and last names of the elected candidates. """
+
+        results = object_session(self).query(
+            Candidate.first_name,
+            Candidate.family_name
+        )
+        results = results.filter(
+            Candidate.election_id == self.id,
+            Candidate.elected == True
+        )
+        results = results.order_by(
+            Candidate.family_name,
+            Candidate.first_name
+        )
+        return results.all()
 
     @property
     def has_panachage_data(self):
