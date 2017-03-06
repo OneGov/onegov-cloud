@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.6.0 (2017-03-06)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds hipchat integration.
   [msom]
