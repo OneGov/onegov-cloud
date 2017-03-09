@@ -15,7 +15,6 @@ from collections import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
 from datetime import datetime
-from functools import partial
 from importlib import import_module
 from itertools import groupby, tee
 from onegov.core import log
@@ -261,38 +260,13 @@ def linkify(text, escape=True):
     if not text:
         return text
 
-    # do not parse email until this is fixed:
-    # https://github.com/jsocol/bleach/issues/154
-
-    # .. use a simple substitute instead
-    text = emailify(text)
-
-    linkified = bleach.linkify(text, parse_email=False)
+    linkified = bleach.linkify(text, parse_email=True)
 
     if not escape:
         return linkified
 
     return bleach.clean(
         linkified, tags=['a'], attributes={'a': ['href', 'rel']})
-
-
-def emailify(text):
-    # the link generating code below is not necessarily safe, so we need
-    # to clean the result of each generation
-    clean = partial(bleach.clean, tags=['a'], attributes={'a': ['href']})
-
-    emails = (
-        email[0] for email in re.findall(_email_regex, text)
-        if not email[0].startswith('//')
-    )
-
-    for email in emails:
-        link = '<a href="mailto:{email}">{email}</a>'.format(email=email)
-        link = clean(link)
-
-        text = text.replace(email, link)
-
-    return text
 
 
 def ensure_scheme(url, default='http'):

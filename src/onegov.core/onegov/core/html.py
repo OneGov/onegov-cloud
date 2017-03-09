@@ -1,4 +1,4 @@
-from bleach import clean as html_clean
+from bleach.sanitizer import Cleaner
 
 
 # html tags allowed by bleach
@@ -38,13 +38,19 @@ SANE_HTML_ATTRS = {
 }
 
 
+cleaner = Cleaner(
+    tags=SANE_HTML_TAGS,
+    attributes=SANE_HTML_ATTRS
+)
+
+
 def sanitize_html(html):
     """ Takes the given html and strips all but a whitelisted number of tags
     from it.
 
     """
 
-    return html_clean(html, tags=SANE_HTML_TAGS, attributes=SANE_HTML_ATTRS)
+    return cleaner.clean(html)
 
 
 def sanitize_svg(svg):
