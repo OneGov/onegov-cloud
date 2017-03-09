@@ -316,7 +316,7 @@ msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
 msgid ""
 "The attendee already has already reached the maximum number of ${count} "
 "bookings"
-msgstr "Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen"
+msgstr "Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen erreicht"
 
 msgid "This occasion overlaps with another booking"
 msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"

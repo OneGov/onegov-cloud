@@ -256,6 +256,7 @@ class AttendeeSignupForm(AttendeeBase):
 
             query = bookings.query().with_entities(Booking.id)
             query = query.filter(Booking.attendee_id == self.attendee.data)
+            query = query.filter(Booking.state == 'accepted')
             count = query.count()
 
             if count >= limit:

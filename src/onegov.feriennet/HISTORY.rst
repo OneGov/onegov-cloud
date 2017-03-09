@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Only count the accepted bookings when looking at the booking limit.
+  [href]
+
 - Fixes matching view omitting items at random.
   [href]
 
