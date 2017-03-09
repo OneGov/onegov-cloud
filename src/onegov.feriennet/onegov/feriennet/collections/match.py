@@ -23,7 +23,6 @@ class MatchCollection(object):
         d = self.session.query(OccasionDate)
         d = d.with_entities(OccasionDate.id)
         d = d.distinct(OccasionDate.occasion_id)
-        d = d.order_by(OccasionDate.occasion_id, OccasionDate.start)
 
         q = self.session.query(Booking)
         q = q.with_entities(
@@ -37,15 +36,13 @@ class MatchCollection(object):
             OccasionDate.timezone.label('occasion_timezone'),
             Occasion.spots.label('occasion_spots'),
             Occasion.age.label('occasion_age'),
+            Occasion.order.label('occasion_order'),
             Attendee.name.label('attendee_name'),
             Attendee.age.label('attendee_age')
         )
         q = q.filter(Booking.period_id == self.period.id)
         q = q.filter(OccasionDate.id.in_(d.subquery()))
 
-        q = q.order_by(Activity.name)
-        q = q.order_by(Occasion.order)
-        q = q.order_by(Occasion.id)
         q = q.join(Occasion)
         q = q.join(OccasionDate)
         q = q.join(Activity)
@@ -64,6 +61,7 @@ class MatchCollection(object):
             OccasionDate.timezone.label('occasion_timezone'),
             Occasion.spots.label('occasion_spots'),
             Occasion.age.label('occasion_age'),
+            Occasion.order.label('occasion_order'),
             literal_column('NULL').label('attendee_name'),
             literal_column('NULL').label('attendee_age'),
         )
@@ -76,9 +74,16 @@ class MatchCollection(object):
             )
         ))
         e = e.filter(OccasionDate.id.in_(d.subquery()))
+
+        e = e.join(Occasion.dates)
         e = e.join(Occasion.activity)
 
-        return q.union(e).order_by('activity_title')
+        return q.union(e).order_by(
+            'activity_title',
+            'occasion_order',
+            'occasion_id',
+            'attendee_name',
+        )
 
     @property
     def happiness(self):

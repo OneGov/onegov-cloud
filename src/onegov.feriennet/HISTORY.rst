@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes matching view omitting items at random.
+  [href]
+
 0.5.1 (2017-03-03)
 ~~~~~~~~~~~~~~~~~~~
 
