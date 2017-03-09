@@ -45,7 +45,7 @@ class PeriodForm(Form):
     )
 
     pass_system = RadioField(
-        label=_("Pass System"),
+        label=_("How are the activities conducted?"),
         fieldset=_("Execution"),
         choices=[
             ('no', _(
