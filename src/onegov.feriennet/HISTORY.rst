@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds an IBAN field to all user profiles.
+  [href]
+
 - Fix wishlist-count excluding blocked/denied bookings.
   [href]
 

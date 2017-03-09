@@ -3,6 +3,7 @@ import string
 from onegov.feriennet import _
 from onegov.feriennet.utils import encode_name, decode_name
 from onegov.form import Form
+from onegov.form.validators import Stdnum
 from wtforms import BooleanField, StringField, TextAreaField, RadioField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import Optional, URL, ValidationError, InputRequired
@@ -21,7 +22,8 @@ class UserProfileForm(Form):
         'phone',
         'website',
         'emergency',
-        'daily_ticket_statistics'
+        'daily_ticket_statistics',
+        'bank_account'
     )
 
     salutation = RadioField(
@@ -81,6 +83,11 @@ class UserProfileForm(Form):
         label=_("Website"),
         description=_("Website address including http:// or https://"),
         validators=[Optional(), URL()]
+    )
+
+    bank_account = StringField(
+        label=_("Bank Account (IBAN)"),
+        validators=[Stdnum(format='iban')]
     )
 
     daily_ticket_statistics = BooleanField(
