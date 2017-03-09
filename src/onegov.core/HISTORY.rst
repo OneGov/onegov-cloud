@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.38.0 (2017-03-09)
+~~~~~~~~~~~~~~~~~~~
 
 - Integrates the latest bleach release.
   [href]
