@@ -16,9 +16,9 @@
                     <div class="row" tal:define="
                         ages get_ages(activity);
                         min_cost get_min_cost(activity);
-                        occasion_count get_occasion_count(activity);
+                        available_spots get_available_spots(activity);
                     ">
-                        <div class="small-12 columns factoids">
+                        <div class="small-12 columns factoids activities-list">
                             <tal:block condition="ages">
                                 <span class="age" tal:define="
                                     min_age min(age.lower for age in ages);
@@ -43,17 +43,17 @@
                                 </span>
                             </tal:block>
                             <tal:block>
-                                <span class="occasion-count">
-                                    <span i18n:translate class="show-for-sr">Occasions</span>
+                                <span class="${available_spots and 'available-spots' or 'full'}">
+                                    <span i18n:translate class="show-for-sr">Free Spots</span>
 
-                                    <span i18n:translate tal:condition="not occasion_count">
-                                        No occasions
+                                    <span i18n:translate tal:condition="not available_spots">
+                                        No free spots
                                     </span>
-                                    <span i18n:translate tal:condition="occasion_count == 1">
-                                        1 Occasion
+                                    <span i18n:translate tal:condition="available_spots == 1">
+                                        1 free spot
                                     </span>
-                                    <span i18n:translate tal:condition="occasion_count > 1">
-                                        <tal:block i18n:name="count">${occasion_count}</tal:block> Occasions
+                                    <span i18n:translate tal:condition="available_spots > 1">
+                                        <tal:block i18n:name="count">${available_spots}</tal:block> free spots
                                     </span>
                                 </span>
                             </tal:block>

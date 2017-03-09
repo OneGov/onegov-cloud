@@ -170,9 +170,17 @@ form small {
             top: -1px;
         }
 
-        &.occasion-count::before {
-            margin-right: .5ex;
-            top: -1px;
+        &.available-spots,
+        &.full {
+            font-weight: normal;
+        }
+
+        &.full::before {
+            margin-right: 1px;
+        }
+
+        &.available-spots::before {
+            margin-right: 3px;
         }
     }
 }
@@ -504,10 +512,6 @@ ul.tags {
 
     .text-links::before {
         @include icon('\f192');
-    }
-
-    .occasion-count::before {
-        @include icon('\f133');
     }
 
     .overlap-check::before {

@@ -169,8 +169,18 @@ def view_activities(self, request):
     def get_ages(a):
         return tuple(o.age for o in get_period_bound_occasions(a))
 
-    def get_occasion_count(a):
-        return len(get_period_bound_occasions(a))
+    def get_available_spots(a):
+        if not active_period:
+            return 0
+
+        if not active_period.confirmed:
+            return sum(
+                o.max_spots for o in get_period_bound_occasions(a)
+            )
+        else:
+            return sum(
+                o.available_spots for o in get_period_bound_occasions(a)
+            )
 
     def get_min_cost(a):
         occasions = get_period_bound_occasions(a)
@@ -193,7 +203,7 @@ def view_activities(self, request):
         'period': active_period,
         'get_ages': get_ages,
         'get_min_cost': get_min_cost,
-        'get_occasion_count': get_occasion_count,
+        'get_available_spots': get_available_spots,
     }
 
 

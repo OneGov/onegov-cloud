@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Show the available spots in the activities list.
+  [href]
+
 - Moves the admin-only filters to the top of the activity-filters list.
   [href]
 

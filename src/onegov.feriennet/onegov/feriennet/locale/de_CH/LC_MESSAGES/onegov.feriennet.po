@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-03-02 11:30+0100\n"
+"POT-Creation-Date: 2017-03-09 13:28+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -316,7 +316,9 @@ msgstr "${name} hat sich bereits für diese Durchführung angemeldet"
 msgid ""
 "The attendee already has already reached the maximum number of ${count} "
 "bookings"
-msgstr "Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen erreicht"
+msgstr ""
+"Der Teilnehmer hat bereits die maximale Anzahl von ${count} Buchungen "
+"erreicht"
 
 msgid "This occasion overlaps with another booking"
 msgstr "Diese Durchführung wird von einer bestehenden Buchung überlappt"
@@ -550,6 +552,9 @@ msgstr ""
 "Es ist nicht mehr möglich die Ausführungs-Einstellungen zu verändern da die "
 "Periode bereits bestätigt wurde."
 
+msgid "Send a daily status e-mail."
+msgstr "Ein tägliches Status E-Mail senden."
+
 msgid "Salutation"
 msgstr "Anrede"
 
@@ -660,20 +665,11 @@ msgstr "Link zu den Aktivitäten."
 msgid "Link to the homepage."
 msgstr "Link zur Startseite."
 
-msgid "Age"
-msgstr "Alter"
-
-msgid "Duration"
-msgstr "Dauer"
-
-msgid "States"
-msgstr "Status"
-
-msgid "Weeks"
-msgstr "Wochen"
-
 msgid "No activites found."
 msgstr "Keine Angebote gefunden."
+
+msgid "Age"
+msgstr "Alter"
 
 msgid "${min_age} - ${max_age} years old"
 msgstr "${min_age} - ${max_age} Jahre alt"
@@ -681,17 +677,26 @@ msgstr "${min_age} - ${max_age} Jahre alt"
 msgid "starting at ${price} CHF"
 msgstr "ab ${price} CHF"
 
-msgid "Occasions"
-msgstr "Durchführungen"
+msgid "Free Spots"
+msgstr "Freie Plätze"
 
-msgid "No occasions"
-msgstr "Keine Durchführungen"
+msgid "No free spots"
+msgstr "Keine freien Plätze"
 
-msgid "1 Occasion"
-msgstr "1 Durchführung"
+msgid "1 free spot"
+msgstr "1 freier Platz"
 
-msgid "${count} Occasions"
-msgstr "${count} Durchführungen"
+msgid "${count} free spots"
+msgstr "${count} freie Plätze"
+
+msgid "States"
+msgstr "Status"
+
+msgid "Duration"
+msgstr "Dauer"
+
+msgid "Weeks"
+msgstr "Wochen"
 
 msgid ""
 "This is a preview. Please edit it until you are satisifed with the result "
@@ -718,6 +723,9 @@ msgstr "Dieses Angebot wurde von einem Administrator geprüft und abgelehnt."
 
 msgid "This activity has been archived."
 msgstr "Dieses Angebot wurde archiviert."
+
+msgid "Occasions"
+msgstr "Durchführungen"
 
 msgid "There are currently no occasions planned."
 msgstr "Es sind zur Zeit keine Durchführungen geplant."
@@ -1503,9 +1511,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid "Users"
-#~ msgstr "Benutzer"
-
-#~ msgid "Deadline Settings"
-#~ msgstr "Teilnahmeschluss Einstellungen"
