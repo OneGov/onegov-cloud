@@ -130,7 +130,9 @@ def handle_new_user(self, request, form):
                 _("A user with this e-mail address already exists"))
         else:
             if form.send_activation_email.data:
-                subject = _("An account was created for you")
+                subject = request.translate(
+                    _("An account was created for you")
+                )
 
                 content = render_template('mail_new_user.pt', request, {
                     'user': user,

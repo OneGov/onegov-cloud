@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix signup e-mail's subject not being translated.
+  [href]
+
 - Undoes the minor style fix for boolean fields - no good solution yet.
   [href]
 
