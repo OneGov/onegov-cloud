@@ -123,7 +123,7 @@ form small {
     .archive-activity:before { @include icon('\f187'); }
     .feriennet-management:before { @include icon('\f274'); }
     .import:before { @include icon('\f093'); }
-    .manage-billing:before { @include icon('\f155'); }
+    .manage-billing:before { @include icon('\f0d6'); }
     .manage-matches:before { @include icon('\f24e'); }
     .manage-periods:before { @include icon('\f02d'); }
     .new-activity:before { @include icon('\f135'); }
@@ -173,6 +173,10 @@ form small {
         &.available-spots,
         &.full {
             font-weight: normal;
+        }
+
+        &.cost::before {
+            margin-right: 6px;
         }
 
         &.full::before {
@@ -507,7 +511,7 @@ ul.tags {
     }
 
     .cost::before {
-        @include icon('\f155');
+        @include icon('\f0d6');
     }
 
     .text-links::before {
