@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Undoes the minor style fix for boolean fields - no good solution yet.
+  [href]
+
 0.4.6 (2017-03-03)
 ~~~~~~~~~~~~~~~~~~~
 

@@ -555,10 +555,6 @@ form {
         margin: .29rem .4rem 0 0 !important;
     }
 
-    input[type="checkbox"] + span {
-        padding-bottom: 1rem;
-    }
-
     input.invalid,
     input.invalid:focus {
         border-color: $alert-color;
