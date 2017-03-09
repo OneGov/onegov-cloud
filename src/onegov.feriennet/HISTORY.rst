@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Moves the admin-only filters to the top of the activity-filters list.
+  [href]
+
 - Only count the accepted bookings when looking at the booking limit.
   [href]
 
