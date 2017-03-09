@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fix wishlist-count excluding blocked/denied bookings.
+  [href]
+
 - Show the available spots in the activities list.
   [href]
 

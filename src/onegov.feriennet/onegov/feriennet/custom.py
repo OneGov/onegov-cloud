@@ -120,7 +120,13 @@ def get_personal_tools(request):
         bookings = BookingCollection(session)
 
         if period:
-            count = bookings.booking_count(username, ('open', 'accepted'))
+            if period.confirmed:
+                states = ('open', 'accepted')
+            else:
+                # exclude cancelled bookings even during the wish-phase
+                states = ('open', 'blocked', 'accepted', 'denied')
+
+            count = bookings.booking_count(username, states)
 
             if count:
                 classes = (
