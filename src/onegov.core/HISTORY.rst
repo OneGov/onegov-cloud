@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.38.1 (2017-03-10)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes orm cache entries being stale under certain conditions.
   [href]
