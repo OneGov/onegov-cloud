@@ -120,10 +120,7 @@ def actions_by_booking(layout, period, booking):
             confirm=_('Do you really want to cancel "${title}"?', mapping={
                 'title': get_booking_title(layout, booking)
             }),
-            extra_information=_(
-                "This cannot be undone! The empty spot is automatically "
-                "filled with the next best booking if possible."
-            ),
+            extra_information=_("This cannot be undone."),
             yes_button_text=_("Cancel Booking"),
             redirect_after=layout.request.link(layout.model),
             classes=('confirm', )
@@ -229,7 +226,8 @@ def cancel_booking(self, request):
 
     BookingCollection(request.app.session()).cancel_booking(
         booking=self,
-        score_function=self.period.scoring)
+        score_function=self.period.scoring,
+        cascade=False)
 
     request.success(_("Your booking was cancelled successfully"))
 

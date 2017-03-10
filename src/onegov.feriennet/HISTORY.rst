@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer cascades changes when cancelling a booking.
+  [href]
+
 - Adds an IBAN field to all user profiles.
   [href]
 
