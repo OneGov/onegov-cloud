@@ -114,8 +114,9 @@ class BookingCollection(GenericCollection):
                 .filter(Booking.id != booking.id)
         )
 
-        if booking.period.booking_limit:
-            limit = booking.period.booking_limit
+        limit = booking.attendee.limit or booking.period.booking_limit
+
+        if limit:
             accepted = sum(1 for b in bookings if b.state == 'accepted')
 
             if accepted >= limit:

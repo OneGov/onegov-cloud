@@ -1302,6 +1302,22 @@ def test_accept_booking(session, owner):
 
     transaction.abort()
 
+    # the custom limit overrides the period limit
+    a1 = attendees.query().filter(Attendee.name == "Dustin Henderson").one()
+    a1.limit = 1
+
+    period = periods.active()
+    period.max_bookings_per_attendee = 2
+
+    bookings.accept_booking(bookings.add(owner, a1, o1))
+
+    with pytest.raises(RuntimeError) as e:
+        bookings.accept_booking(bookings.add(owner, a1, o3))
+
+    assert "The booking limit has been reached" in str(e)
+
+    transaction.abort()
+
     # if accepting the booking leads to the booking limit, the rest is blocked
     period = periods.active()
     period.all_inclusive = True

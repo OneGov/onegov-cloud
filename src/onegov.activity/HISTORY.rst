@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Check the booking limit of the attendee when accepting a booking.
+  [href]
+
 0.7.0 (2017-03-02)
 ~~~~~~~~~~~~~~~~~~~
 
