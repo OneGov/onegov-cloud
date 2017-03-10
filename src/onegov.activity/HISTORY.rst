@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds the ability to cancel a booking without cascading changes.
+  [href]
+
 - Check the booking limit of the attendee when accepting a booking.
   [href]
 

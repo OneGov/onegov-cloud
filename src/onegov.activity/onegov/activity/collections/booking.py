@@ -140,13 +140,17 @@ class BookingCollection(GenericCollection):
         booking.state = 'accepted'
         booking.cost = booking.provisional_booking_cost()
 
-    def cancel_booking(self, booking, score_function=booking_order):
-        """ Cancels the given booking, setting all other bookings which
-        conflict only with this booking to 'open'.
+    def cancel_booking(self, booking,
+                       score_function=booking_order, cascade=True):
+        """ Cancels the given booking.
 
-        All denied bookings which have a chance of becoming accepted as a
-        result (because the occasion frees up) are accepted according to their
-        matching score (already accepted bookings are not touched).
+        If ``cascade`` is set to False, this amounts to a simple state change
+        and you can stop reading now.
+
+        If ``cascade`` is set to true, all denied bookings which have a chance
+        of becoming accepted as a result (because the occasion frees up) are
+        accepted according to their matching score (already accepted bookings
+        are not touched).
 
         All bookings which get unblocked for the current user are tried
         to be accepted as well, also with the highest score first. Contrary
@@ -168,8 +172,8 @@ class BookingCollection(GenericCollection):
         if not booking.period.confirmed:
             raise RuntimeError("The period has not yet been confirmed")
 
-        # if the booking wasn't accepted there's no extra work
-        if booking.state != 'accepted':
+        # if the booking wasn't accepted or if we don't cascade, this is quick
+        if not cascade or booking.state != 'accepted':
             booking.state = 'cancelled'
             return
 
