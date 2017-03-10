@@ -1003,6 +1003,16 @@ ul.tags {
         }
     }
 
+    .booking-none td {
+        font-style: italic;
+        padding-left: 2.75rem;
+        text-align: left !important;
+
+        span {
+            position: relative;
+        }
+    }
+
     .matching-details {
         display: inline-block;
         width: 75%;
