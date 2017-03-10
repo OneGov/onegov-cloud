@@ -1339,7 +1339,6 @@ def test_orm_cache(postgres_dsn):
     # here is though that the secret_document cache won't change because of
     # it's policy
     app.secret_document.title = None
-    assert app.untitled_documents == []
     transaction.commit()
 
     assert 'test_orm_cache.<locals>.App.secret_document' in app.request_cache
@@ -1347,3 +1346,53 @@ def test_orm_cache(postgres_dsn):
 
     with pytest.raises(DetachedInstanceError):
         assert app.secret_document.title is None
+
+
+def test_orm_cache_flush(postgres_dsn):
+
+    Base = declarative_base(cls=ModelBase)
+
+    class App(Framework):
+
+        @orm_cached(policy='on-table-change:documents')
+        def foo(self):
+            return self.session().query(Document).one()
+
+        @orm_cached(policy='on-table-change:documents')
+        def bar(self):
+            return self.session().query(Document)\
+                .with_entities(Document.title).one()
+
+    class Document(Base):
+        __tablename__ = 'documents'
+
+        id = Column(Integer, primary_key=True)
+        title = Column(Text, nullable=True)
+
+    scan_morepath_modules(App)
+
+    app = App()
+    app.configure_application(
+        dsn=postgres_dsn,
+        base=Base,
+        disable_memcached=True)
+    app.namespace = 'foo'
+    app.set_application_id('foo/bar')
+    app.clear_request_cache()
+
+    app.session().add(Document(id=1, title='Yo'))
+    transaction.commit()
+
+    # both instances get cached
+    assert app.foo.title == 'Yo'
+    assert app.bar.title == 'Yo'
+
+    # one instance changes without an explicit flush
+    app.foo.title = 'Sup'
+
+    # accessing the bar instance *first* fetches it from the cache which at
+    # this point would contain stale entries because we didn't flush eplicitly,
+    # but thanks to our autoflush mechanism this doesn't happen
+    assert app.session().dirty
+    assert app.bar.title == 'Sup'
+    assert app.foo.title == 'Sup'

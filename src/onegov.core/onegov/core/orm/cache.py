@@ -127,6 +127,7 @@ class OrmCacheDescriptor(object):
         more useful (e.g. queries are completely fetched).
 
         """
+
         result = self.creator(instance)
 
         if isinstance(result, Query):
@@ -141,12 +142,6 @@ class OrmCacheDescriptor(object):
 
         """
 
-        # the records we merge back from the pickled state aren't always
-        # properly flushed if we they are marged into other queries, so
-        # before merging we must be sure that all state has been flushed
-        if session.dirty:
-            session.flush()
-
         if sqlalchemy.inspect(obj, raiseerr=False):
             obj = session.merge(obj, load=False)
             obj.is_cached = True
@@ -158,6 +153,15 @@ class OrmCacheDescriptor(object):
         if instance is None:
             return self
 
+        session = instance.session()
+
+        # before accessing any cached values we need to make sure that all
+        # pending changes are properly flushed -> this leads to some extra cpu
+        # cycles spent but eliminates the chance of accessing a stale entry
+        # after a change
+        if session.dirty:
+            session.flush()
+
         # we use a secondary request cache for even more lookup speed and to
         # make sure that inside a request we always get the exact same instance
         # (otherwise we don't see changes reflected)
@@ -168,8 +172,6 @@ class OrmCacheDescriptor(object):
             key=self.cache_key,
             creator=lambda: self.create(instance)
         )
-
-        session = instance.session()
 
         # named tuples
         if isinstance(obj, tuple) and hasattr(obj.__class__, '_make'):
