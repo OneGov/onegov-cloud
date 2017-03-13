@@ -6,6 +6,7 @@ from onegov.feriennet.collections import NotificationTemplateCollection
 from onegov.feriennet.collections import VacationActivityCollection
 from onegov.org.elements import Link, ConfirmLink, DeleteLink
 from onegov.org.layout import DefaultLayout as BaseLayout
+from onegov.ticket import TicketCollection
 
 
 class DefaultLayout(BaseLayout):
@@ -123,6 +124,11 @@ class VacationActivityLayout(DefaultLayout):
         )
 
     @cached_property
+    def ticket(self):
+        return TicketCollection(self.request.app.session())\
+            .by_handler_id(self.model.id.hex)
+
+    @cached_property
     def editbar_links(self):
         if self.request.is_admin or self.is_owner:
             links = []
@@ -192,6 +198,13 @@ class VacationActivityLayout(DefaultLayout):
                     text=_("New Occasion"),
                     url=self.request.link(self.model, 'neue-durchfuehrung'),
                     classes=('new-occasion', )
+                ))
+
+            if self.request.is_admin and self.ticket:
+                links.append(Link(
+                    text=_("Show Ticket"),
+                    url=self.request.link(self.ticket),
+                    classes=('show-ticket', )
                 ))
 
             return links

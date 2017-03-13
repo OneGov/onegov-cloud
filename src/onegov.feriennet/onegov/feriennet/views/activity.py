@@ -214,7 +214,6 @@ def view_activities(self, request):
 def view_activity(self, request):
 
     session = request.app.session()
-    ticket = TicketCollection(session).by_handler_id(self.id.hex)
     layout = VacationActivityLayout(self, request)
 
     occasion_links = (
@@ -335,7 +334,6 @@ def view_activity(self, request):
         'layout': layout,
         'title': self.title,
         'activity': self,
-        'ticket': ticket,
         'show_enroll': show_enroll,
         'occasion_links': occasion_links,
         'occasions_by_period': occasions_by_period(

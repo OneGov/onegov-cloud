@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-03-13 10:04+0100\n"
+"POT-Creation-Date: 2017-03-13 14:47+0100\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -109,6 +109,9 @@ msgid ""
 msgstr ""
 "Es existieren zur Zeit keine Perioden. Mindestens eine Periode muss bestehen "
 "bevor Durchführungen erfasst werden können"
+
+msgid "Show Ticket"
+msgstr "Zum Ticket"
 
 msgid "Request Publication"
 msgstr "Publikation Beantragen"
@@ -615,8 +618,8 @@ msgstr "Ganztägig"
 msgid "Multiple days"
 msgstr "Mehrtägig"
 
-msgid "Edit activity"
-msgstr "Angebot bearbeiten"
+msgid "Show activity"
+msgstr "Zum Angebot"
 
 msgid "Publish"
 msgstr "Veröffentlichen"
@@ -925,38 +928,31 @@ msgstr "Bank-Überweisung"
 msgid "Notice"
 msgstr "Mitteilung"
 
-msgid "Go to activity."
-msgstr "Zum Angebot."
+msgid "The activity associated with this ticket belongs to ${user}."
+msgstr "Das mit diesem Ticket verbundene Angebot gehört ${user}."
+
+msgid "This is the user's first activity."
+msgstr "Dies ist das erste Angebot dieses Benutzers."
+
+msgid "The user has submitted activities before."
+msgstr "Dieser Benutzer hat bereits andere Angebote eingereicht."
 
 msgid "Activity State"
 msgstr "Angebotsstatus"
 
-msgid "This is ${user}'s first activity."
-msgstr "Dies ist ${user}'s erstes Angebot."
-
-msgid "${user} has submitted activities before."
-msgstr "${user} hat bereits andere Angebote eingereicht."
-
-msgid "After reviewing the activity it can either be published or denied."
-msgstr ""
-"Nach der Überprüfung des Angebots kann es entweder veröffentlicht oder "
-"abgelehnt werden."
+msgid "Please review the activity carefully before publishing it."
+msgstr "Bitte überprüfen Sie das Angebot sorgfältig, bevor Sie es veröffentlichen."
 
 msgid ""
-"Published activites with active occasions show up in the respective periods. "
-"Published activities can be archived to make them invisible to the public "
-"and be reactivated at a later time."
-msgstr ""
-"Veröffentlichte Angebote mit aktiven Durchführungen werden in den "
-"entsprechenden Perioden angezeigt. Veröffentlichte Angebote können "
-"archiviert werden um sie vor der Öffentlichkeit zu verstecken. Archivierte "
-"Angebote können zu einem späteren Zeitpunkt reaktiviert werden."
+"To remove this activity from the public part of the website, you can archive "
+"it."
+msgstr "Um die Angebot vom öffentlichen Teil der Webseite zu entfernen, können Sie es archivieren."
 
 msgid "Edit contact info"
 msgstr "Kontakt ändern"
 
-msgid "Ticket"
-msgstr "Ticket"
+msgid "Ticket State"
+msgstr "Ticketstatus"
 
 msgid "Preview"
 msgstr "Vorschau"
@@ -1108,9 +1104,6 @@ msgstr ""
 
 msgid "Years"
 msgstr "Jahre"
-
-msgid "<dynamic element>"
-msgstr ""
 
 msgid "Name"
 msgstr "Name"
@@ -1510,13 +1503,3 @@ msgstr ""
 
 msgid "Activate Period"
 msgstr "Periode Aktivieren"
-
-#~ msgid ""
-#~ "This cannot be undone! The empty spot is automatically filled with the "
-#~ "next best booking if possible."
-#~ msgstr ""
-#~ "Dies kann nicht rückgängig gemacht werden! Der frei werdende Platz wird "
-#~ "automatisch mit der nächst-besten offenen Buchung gefüllt, sofern möglich."
-
-#~ msgid "Pass System"
-#~ msgstr "Pass-System"

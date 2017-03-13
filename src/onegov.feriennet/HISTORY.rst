@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Further differentiates between ticket and activity.
+  [href]
+
 - Highlights the difference beteween a non-full occasion and a cancelled one.
   [href]
 

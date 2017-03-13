@@ -18,7 +18,7 @@
 <metal:tags define-macro="tags">
     <ul class="tags">
         <li tal:repeat="link tags">
-            <span tal:content="structure link(request)" 
+            <span tal:content="structure link(request)"
                 class="${link.active and 'active'} blank-label"
             />
         </li>
@@ -27,37 +27,37 @@
 
 <metal:activity_ticket_summary define-macro="activity_ticket_summary" i18n:domain="onegov.feriennet">
     <tal:block define="user activity.user.data.organisation or activity.user.title|activity.user.title">
+
+        <div class="panel callout">
+
+            <div i18n:translate>
+                The activity associated with this ticket belongs to <strong i18n:name="user">${user}</strong>.
+            </div>
+            <div i18n:translate tal:condition="is_first">
+                This is the user's first activity.
+            </div>
+            <div i18n:translate tal:condition="not is_first">
+                The user has submitted activities before.
+            </div>
+
+            <p>
+                <br>
+                <span i18n:translate>Activity State</span>: <strong><metal:block use-macro="layout.macros.activity_state_text" /></strong>
+            </p>
+
+            <p tal:condition="activity.state != 'accepted'" i18n:translate>
+                Please review the activity carefully before publishing it.
+            </p>
+
+            <p tal:condition="activity.state == 'accepted'" i18n:translate>
+                To remove this activity from the public part of the website, you can archive it.
+            </p>
+        </div>
+
         <h2>${activity.title}</h2>
 
         <span class="page-lead" tal:condition="activity.lead" tal:content="activity.lead" />
 
-        <p>
-            <strong><a href="${request.link(activity)}" i18n:translate>Go to activity.</a></strong>
-        </p>
-
-        <p>
-            <span i18n:translate>Activity State</span>: <strong><metal:block use-macro="layout.macros.activity_state_text" /></strong>
-            <br>
-            <span i18n:translate>Organiser</span>: <strong>${user}</strong>
-        </p>
-
-        <div>
-            <p>
-                <span i18n:translate tal:condition="is_first">
-                    This is <tal:block i18n:name="user">${user}</tal:block>'s first activity.
-                </span>
-                <span i18n:translate tal:condition="not is_first">
-                    <tal:block i18n:name="user">${user}</tal:block> has submitted activities before.
-                </span>
-                <span i18n:translate>After reviewing the activity it can either be published or denied.</span>
-            </p>
-
-            <p i18n:translate>
-                Published activites with active occasions show up in the respective
-                periods. Published activities can be archived to make them invisible
-                to the public and be reactivated at a later time.
-            </p>
-        </div>
     </tal:block>
 </metal:activity_ticket_summary>
 
@@ -101,15 +101,12 @@
                         <metal:block use-macro="layout.macros.activity_state" />
                     </dd>
 
-                    <tal:block condition="ticket|nothing">
+                    <tal:block condition="layout.ticket">
                         <dt i18n:translate>
-                            Ticket
+                            Ticket State
                         </dt>
-                        <dd>
-                            <span class="ticket-number">
-                                <a tal:condition="request.is_admin" href="${request.link(ticket)}">${ticket.number}</a>
-                                <a tal:condition="not:request.is_admin" href="${request.link(ticket, 'status')}">${ticket.number}</a>
-                            </span>
+                        <dd class="activity-ticket-state" tal:define="ticket layout.ticket">
+                            <metal:block use-macro="layout.macros.ticket_status" />
                         </dd>
                     </tal:block>
                 </dl>

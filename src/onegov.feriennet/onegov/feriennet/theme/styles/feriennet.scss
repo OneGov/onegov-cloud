@@ -119,23 +119,25 @@ form small {
 */
 #global-tools,
 .edit-bar {
-    .accept-activity:before { @include icon('\f087'); }
-    .archive-activity:before { @include icon('\f187'); }
-    .feriennet-management:before { @include icon('\f274'); }
-    .import:before { @include icon('\f093'); }
-    .manage-billing:before { @include icon('\f0d6'); }
-    .manage-matches:before { @include icon('\f24e'); }
-    .manage-periods:before { @include icon('\f02d'); }
-    .new-activity:before { @include icon('\f135'); }
-    .new-notification:before { @include icon('\f003'); }
-    .new-occasion:before { @include icon('\f133'); }
-    .new-period:before { @include icon('\f055'); }
-    .reject-activity:before { @include icon('\f088'); }
-    .request-publication:before { @include icon('\f087'); }
-    .reset-matching:before { @include icon('\f12d'); }
-    .run-matching:before { @include icon('\f0d0'); }
-    .show-attendees:before { @include icon('\f0c0'); }
-    .show-notifications:before { @include icon('\f003'); }
+    .accept-activity::before { @include icon('\f087'); }
+    .archive-activity::before { @include icon('\f187'); }
+    .feriennet-management::before { @include icon('\f274'); }
+    .import::before { @include icon('\f093'); }
+    .manage-billing::before { @include icon('\f0d6'); }
+    .manage-matches::before { @include icon('\f24e'); }
+    .manage-periods::before { @include icon('\f02d'); }
+    .new-activity::before { @include icon('\f135'); }
+    .new-notification::before { @include icon('\f003'); }
+    .new-occasion::before { @include icon('\f133'); }
+    .new-period::before { @include icon('\f055'); }
+    .reject-activity::before { @include icon('\f088'); }
+    .request-publication::before { @include icon('\f087'); }
+    .reset-matching::before { @include icon('\f12d'); }
+    .run-matching::before { @include icon('\f0d0'); }
+    .show-activity::before { @include icon('\f135'); }
+    .show-attendees::before { @include icon('\f0c0'); }
+    .show-notifications::before { @include icon('\f003'); }
+    .show-ticket::before { @include icon('\f145'); }
 }
 
 /*
@@ -251,6 +253,13 @@ ul.tags {
             font-weight: normal;
         }
     }
+}
+
+.activity-ticket-state > div {
+    background: none;
+    font-size: .875rem;
+    line-height: .875rem;
+    padding: 0;
 }
 
 .activity-status-panel {

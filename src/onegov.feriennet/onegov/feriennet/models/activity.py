@@ -158,9 +158,9 @@ class VacationActivityHandler(Handler):
             ))
 
         links.append(Link(
-            text=_('Edit activity'),
-            url=request.return_here(request.link(self.activity, 'bearbeiten')),
-            classes=('edit-link', )
+            text=_('Show activity'),
+            url=request.return_here(request.link(self.activity)),
+            classes=('show-activity', )
         ))
 
         return links
