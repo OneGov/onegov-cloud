@@ -53,21 +53,28 @@
                                 total len(records['accepted']) + len(records['other']);
                                 min_spots records['first'].occasion_spots.lower;
                                 max_spots records['first'].occasion_spots.upper - 1;
+                                cancelled records['first'].occasion_cancelled;
                         ">
-                            <div class="progress ${accepted >= min_spots and 'success' or 'alert'}"
-                            onclick="$('#button-${oid}').click();">
-                                <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
-                                <span class="meter-text">
-                                    ${accepted} / ${max_spots} <span i18n:translate>Attendees</span>
-                                </span>
-                            </div>
+                            <tal:block define="state cancelled and 'cancelled' or accepted >= min_spots and 'success' or 'alert'">
+                                <div class="progress ${state}" onclick="$('#button-${oid}').click();">
+                                    <span class="meter" style="width: ${accepted / max_spots * 100}%;"></span>
+                                    <span class="meter-text" tal:condition="state != 'cancelled'">
+                                        ${accepted} / ${max_spots} <span i18n:translate>Attendees</span>
+                                    </span>
+                                    <span class="meter-text" tal:condition="state == 'cancelled'">
+                                        <span class="meter-text-inner" i18n:translate>
+                                            Rescinded
+                                        </span>
+                                    </span>
+                                </div>
 
-                            <button id="button-${oid}" data-toggle="#details-${oid}" class="untoggled ${accepted >= min_spots and 'success' or 'alert'}">
-                                <span i18n:translate class="show-for-sr">Show Details</span>
-                                <i class="fa fa-angle-double-down" aria-hidden="true"></i>
-                            </button>
+                                <button id="button-${oid}" data-toggle="#details-${oid}" class="untoggled ${state}">
+                                    <span i18n:translate class="show-for-sr">Show Details</span>
+                                    <i class="fa fa-angle-double-down" aria-hidden="true"></i>
+                                </button>
 
-                            <div class="clearfix"></div>
+                                <div class="clearfix"></div>
+                            </tal:block>
 
                             <table id="details-${oid}" class="matches" style="display: none;" tal:condition="records['accepted'] or records['other']">
                                 <thead>

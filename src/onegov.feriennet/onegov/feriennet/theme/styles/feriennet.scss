@@ -1026,7 +1026,8 @@ ul.tags {
             padding: 0;
             width: 2.5rem;
 
-            &.alert {
+            &.alert,
+            &.cancelled {
                 background-color: $red-light;
 
                 &:hover,
@@ -1065,6 +1066,26 @@ ul.tags {
 
         &.alert .meter {
             background-color: $red-pastel;
+        }
+
+        &.cancelled {
+            background: repeating-linear-gradient(
+              45deg,
+              $red-pastel,
+              $red-pastel 15px,
+              $gray-pastel 15px,
+              $gray-pastel 30px
+            );
+
+            .meter-text::before {
+                @include icon('\f00d');
+                color: $red;
+                margin-right: 1ex;
+            }
+
+            .meter-text-inner {
+                color: $red-dark;
+            }
         }
 
         &.success .meter-text::before {

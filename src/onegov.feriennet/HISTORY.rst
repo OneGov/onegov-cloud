@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Highlights the difference beteween a non-full occasion and a cancelled one.
+  [href]
+
 - No longer cascades changes when cancelling a booking.
   [href]
 
