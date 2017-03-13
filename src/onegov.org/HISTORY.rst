@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Supports translation of ticket groups through the handler.
+  [href]
+
 - No longer throw an unrelated error when the database connection goes offline.
   [href]
 

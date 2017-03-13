@@ -37,8 +37,8 @@
 
                         <div class="field-display-block">
                             <div class="field-display-label" i18n:translate>Group</div>
-                            <div class="field-display-data ticket-group">
-                                 ${ticket.group}
+                            <div class="field-display-data ticket-group" tal:define="group handler.group|ticket.group">
+                                 ${group}
                             </div>
                         </div>
 
