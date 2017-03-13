@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- No longer throw an unrelated error when the database connection goes offline.
+  [href]
+
 - Fix signup e-mail's subject not being translated.
   [href]
 

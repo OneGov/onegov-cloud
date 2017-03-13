@@ -59,6 +59,7 @@ class OrgApp(Framework, LibresIntegration, ElasticsearchApp, MapboxApp,
 
     def configure_application(self, **cfg):
         super().configure_application(**cfg)
+        self.known_schemas = set()
 
         if self.has_database_connection:
             schema_prefix = self.namespace + '-'
