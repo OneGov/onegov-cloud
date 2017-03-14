@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.0 (2017-03-14)
+~~~~~~~~~~~~~~~~~~~
+
 - Removes the 'denied' state for activities.
   [href]
 
