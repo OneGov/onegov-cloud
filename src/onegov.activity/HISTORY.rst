@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes the 'denied' state for activities.
+  [href]
+
 - Adds the ability to cancel a booking without cascading changes.
   [href]
 

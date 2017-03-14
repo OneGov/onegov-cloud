@@ -313,3 +313,30 @@ def add_active_days_index(context):
         'inverted_active_days', 'activities', ['active_days'],
         postgresql_using='gin'
     )
+
+
+@upgrade_task('Removed denied activity state')
+def remove_denied_activity_state(context):
+
+    new_type = Enum(
+        'preview',
+        'proposed',
+        'accepted',
+        'archived',
+        name='activity_state'
+    )
+
+    op = context.operations
+
+    op.execute("""
+        ALTER TABLE activities ALTER COLUMN state TYPE Text;
+        UPDATE activities SET state = 'archived' WHERE state = 'denied';
+        DROP TYPE activity_state;
+    """)
+
+    new_type.create(op.get_bind())
+
+    op.execute("""
+        ALTER TABLE activities ALTER COLUMN state
+        TYPE activity_state USING state::text::activity_state;
+    """)

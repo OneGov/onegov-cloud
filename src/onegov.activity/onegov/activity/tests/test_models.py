@@ -88,8 +88,7 @@ def test_activity_states(session, owner):
     c.add("A", username=owner.username)
     c.add("B", username=owner.username).propose()
     c.add("C", username=owner.username).propose().accept()
-    c.add("D", username=owner.username).propose().deny()
-    c.add("E", username=owner.username).propose().accept().archive()
+    c.add("D", username=owner.username).propose().accept().archive()
 
     c.states = ('preview', )
     assert c.query().count() == 1
@@ -100,14 +99,11 @@ def test_activity_states(session, owner):
     c.states = ('preview', 'proposed', 'accepted')
     assert c.query().count() == 3
 
-    c.states = ('preview', 'proposed', 'accepted', 'denied')
+    c.states = ('preview', 'proposed', 'accepted', 'archived')
     assert c.query().count() == 4
 
-    c.states = ('preview', 'proposed', 'accepted', 'denied', 'archived')
-    assert c.query().count() == 5
-
     c.states = None
-    assert c.query().count() == 5
+    assert c.query().count() == 4
 
 
 def test_activity_used_tags(session, owner):

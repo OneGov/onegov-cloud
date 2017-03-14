@@ -21,7 +21,7 @@ from uuid import uuid4
 
 
 # Note, a database migration is needed if these states are changed
-ACTIVITY_STATES = ('preview', 'proposed', 'accepted', 'denied', 'archived')
+ACTIVITY_STATES = ('preview', 'proposed', 'accepted', 'archived')
 
 
 class Activity(Base, ContentMixin, TimestampMixin):
@@ -139,11 +139,6 @@ class Activity(Base, ContentMixin, TimestampMixin):
 
     def accept(self):
         self.state = 'accepted'
-
-        return self
-
-    def deny(self):
-        self.state = 'denied'
 
         return self
 
