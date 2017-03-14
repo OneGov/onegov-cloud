@@ -129,7 +129,7 @@ class ElasticsearchApp(morepath.App):
 
         # by default, do not include any fields (this will still include
         # the id and the type, which is enough for the orm querying)
-        search = search.fields([])
+        search = search.source(exclude=['*'])
 
         return search
 

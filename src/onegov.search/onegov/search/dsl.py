@@ -1,8 +1,6 @@
 from elasticsearch_dsl import Search as BaseSearch
-from elasticsearch_dsl.result import (
-    Response as BaseResponse,
-    Result as BaseResult
-)
+from elasticsearch_dsl.result import Result as BaseResult
+from elasticsearch_dsl.response import Response as BaseResponse
 
 
 class Search(BaseSearch):

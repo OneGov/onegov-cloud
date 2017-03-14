@@ -339,7 +339,7 @@ class IndexManager(object):
 
         result = set()
 
-        infos = self.es_client.indices.get_aliases(
+        infos = self.es_client.indices.get_alias(
             '{}-*'.format(self.normalized_hostname))
 
         for info in infos.values():
