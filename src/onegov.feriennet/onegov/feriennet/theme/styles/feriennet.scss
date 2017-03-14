@@ -275,22 +275,11 @@ ul.tags {
 }
 
 .hints {
-    padding: 0 0 1.25rem;
+    @include hairline();
+
+    margin: 0 0 .5rem;
+    padding: 0 0 .5rem;
     position: relative;
-
-    .hint {
-        margin-left: 1.5rem;
-        padding-bottom: .25rem;
-
-        &:before {
-            display: inline-block;
-            left: 0;
-            margin-top: -1px;
-            position: absolute;
-            text-align: center;
-            width: 1rem;
-        }
-    }
 
     .hint-prebooking::before { @include icon('\f133'); }
     .hint-max-activities::before { @include icon('\f2c3'); }
@@ -306,17 +295,28 @@ ul.tags {
     .hint-minutes::before { @include icon('\f017'); }
     .hint-deadline::before { @include icon('\f05a'); }
 
-    .hint:last-child {
-        @include hairline();
+    .hint {
+        margin-left: 1.5rem;
+        padding-bottom: .25rem;
+
+        &::before {
+            display: inline-block;
+            left: 0;
+            margin-top: -1px;
+            margin-right: 1ex;
+            position: absolute;
+            text-align: center;
+            width: 1rem;
+        }
     }
 }
 
 .panel .hints {
+    border: 0;
     margin: 0;
     padding: 0;
 
     .hint:last-child {
-        border: 0;
         padding-bottom: 0;
     }
 }
