@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Removes the 'denied' state for activities.
+  [href]
+
 - Further differentiates between ticket and activity.
   [href]
 

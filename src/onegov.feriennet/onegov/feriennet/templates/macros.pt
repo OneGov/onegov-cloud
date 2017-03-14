@@ -127,7 +127,6 @@
         <tal:block i18n:translate case="string:preview">Preview</tal:block>
         <tal:block i18n:translate case="string:proposed">Proposed</tal:block>
         <tal:block i18n:translate case="string:accepted">Published</tal:block>
-        <tal:block i18n:translate case="string:denied">Denied</tal:block>
         <tal:block i18n:translate case="string:archived">Archived</tal:block>
     </tal:block>
 </metal:activity_state_text>

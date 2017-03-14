@@ -113,27 +113,6 @@ def test_activity_communication(feriennet_app):
     editor.login_editor()
 
     new = editor.get('/angebote').click("Angebot erfassen")
-    new.form['title'] = "Learn PHP"
-    new.form['lead'] = "Using a Raspberry Pi we will learn PHP"
-    new.form.submit()
-
-    editor.post(get_post_url(
-        editor.get('/angebot/learn-php'), 'request-publication'))
-
-    assert len(feriennet_app.smtp.outbox) == 1
-    assert "Ein neues Ticket" in get_message(feriennet_app, 0)
-
-    ticket = admin.get('/tickets/ALL/open').click("Annehmen", index=0).follow()
-    assert "Learn PHP" in ticket
-
-    admin.post(get_post_url(ticket, 'reject-activity'))
-    assert len(feriennet_app.smtp.outbox) == 2
-    message = get_message(feriennet_app, 1)
-    assert "leider abgelehnt" in message
-    assert "Learn PHP" in message
-    assert "Using a Raspberry Pi we will learn PHP" in message
-
-    new = editor.get('/angebote').click("Angebot erfassen")
     new.form['title'] = "Learn Python"
     new.form['lead'] = "Using a Raspberry Pi we will learn Python"
     new.form.submit()
@@ -141,15 +120,15 @@ def test_activity_communication(feriennet_app):
     editor.post(get_post_url(
         editor.get('/angebot/learn-python'), 'request-publication'))
 
-    assert len(feriennet_app.smtp.outbox) == 3
-    assert "Ein neues Ticket" in get_message(feriennet_app, 2)
+    assert len(feriennet_app.smtp.outbox) == 1
+    assert "Ein neues Ticket" in get_message(feriennet_app, 0)
 
     ticket = admin.get('/tickets/ALL/open').click("Annehmen").follow()
     assert "Learn Python" in ticket
 
     admin.post(get_post_url(ticket, 'accept-activity'))
-    assert len(feriennet_app.smtp.outbox) == 4
-    message = get_message(feriennet_app, 3)
+    assert len(feriennet_app.smtp.outbox) == 2
+    message = get_message(feriennet_app, 1)
     assert "wurde veröffentlicht" in message
     assert "Learn Python" in message
     assert "Using a Raspberry Pi we will learn Python" in message

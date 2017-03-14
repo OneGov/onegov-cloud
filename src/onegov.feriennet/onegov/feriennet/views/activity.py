@@ -30,7 +30,6 @@ ACTIVITY_STATE_TRANSLATIONS = {
     'preview': _("Preview"),
     'proposed': _("Proposed"),
     'accepted': _("Published"),  # users like the term 'Published' better
-    'denied': _("Denied"),
     'archived': _("Archived")
 }
 
@@ -466,22 +465,6 @@ def accept_activity(self, request):
         action='accept',
         template='mail_activity_accepted.pt',
         subject=_("Your activity has been published")
-    )
-
-
-@FeriennetApp.view(
-    model=VacationActivity,
-    permission=Secret,
-    name='ablehnen',
-    request_method='POST')
-def reject_activity(self, request):
-
-    return administer_activity(
-        model=self,
-        request=request,
-        action='deny',
-        template='mail_activity_rejected.pt',
-        subject=_("Your activity has been rejected")
     )
 
 

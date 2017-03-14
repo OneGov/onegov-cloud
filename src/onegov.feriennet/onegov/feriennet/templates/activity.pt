@@ -20,12 +20,6 @@
             </div>
         </tal:block>
 
-        <tal:block condition="activity.state == 'denied' and request.is_organiser_only">
-            <div class="panel callout" i18n:translate>
-                This activity has been reviewed by an administrator and was denied.
-            </div>
-        </tal:block>
-
         <tal:block condition="activity.state == 'archived'">
             <div class="panel callout" i18n:translate>
                 This activity has been archived.

@@ -85,23 +85,6 @@ def test_activity_query_policy(session):
     policy = ActivityQueryPolicy(None, None)
     assert policy.granted_subset(collection.query()).count() == 1
 
-    # if an activity is denied, it remains visible to owners/editors
-    # unless the owner is not an editor or admin
-    activities[1].propose()
-    activities[1].deny()
-
-    policy = ActivityQueryPolicy("Leland", 'admin')
-    assert policy.granted_subset(collection.query()).count() == 2
-
-    policy = ActivityQueryPolicy("Leland", 'editor')
-    assert policy.granted_subset(collection.query()).count() == 2
-
-    policy = ActivityQueryPolicy("Leland", 'member')
-    assert policy.granted_subset(collection.query()).count() == 1
-
-    policy = ActivityQueryPolicy(None, None)
-    assert policy.granted_subset(collection.query()).count() == 1
-
     # if an activity is archived, it remains visible to owners/editors
     # unless the owner is not an editor or admin
     activities[0].archive()
@@ -155,25 +138,21 @@ def test_activity_permission():
     assert has_permission('owner', 'user', 'admin', 'preview')
     assert has_permission('owner', 'user', 'admin', 'proposed')
     assert has_permission('owner', 'user', 'admin', 'accepted')
-    assert has_permission('owner', 'user', 'admin', 'denied')
     assert has_permission('owner', 'user', 'admin', 'archived')
 
     # the owner has permission to all owned objects
     assert has_permission('owner', 'owner', 'admin', 'preview')
     assert has_permission('owner', 'owner', 'admin', 'proposed')
     assert has_permission('owner', 'owner', 'admin', 'accepted')
-    assert has_permission('owner', 'owner', 'admin', 'denied')
     assert has_permission('owner', 'owner', 'admin', 'archived')
 
     assert has_permission('owner', 'owner', 'editor', 'preview')
     assert has_permission('owner', 'owner', 'editor', 'proposed')
     assert has_permission('owner', 'owner', 'editor', 'accepted')
-    assert has_permission('owner', 'owner', 'editor', 'denied')
     assert has_permission('owner', 'owner', 'editor', 'archived')
 
     # ..unless the role is the one of a member (treated like anonymous)
     assert not has_permission('owner', 'owner', 'member', 'preview')
     assert not has_permission('owner', 'owner', 'member', 'proposed')
     assert has_permission('owner', 'owner', 'member', 'accepted')
-    assert not has_permission('owner', 'owner', 'member', 'denied')
     assert not has_permission('owner', 'owner', 'member', 'archived')

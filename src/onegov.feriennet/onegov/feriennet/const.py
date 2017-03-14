@@ -5,7 +5,6 @@ VISIBLE_ACTIVITY_STATES = {
         'preview',
         'proposed',
         'accepted',
-        'denied',
         'archived'
     ),
     'editor': (
