@@ -185,6 +185,9 @@ class PeriodForm(Form):
         mindate = self.execution_start.data
         maxdate = self.execution_end.data
 
+        if not (mindate and maxdate):
+            return None
+
         # turn naive utc to aware utc to local timezone
         start = OccasionDate.start.op('AT TIME ZONE')(literal('UTC'))
         start = start.op('AT TIME ZONE')(OccasionDate.timezone)
