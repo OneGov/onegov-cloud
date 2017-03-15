@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.4.7 (2017-03-15)
+~~~~~~~~~~~~~~~~~~~
+
 - Supports translation of ticket groups through the handler.
   [href]
 
