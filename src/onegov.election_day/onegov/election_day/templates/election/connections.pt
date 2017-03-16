@@ -26,7 +26,7 @@
                             data-embed-link="Embed"
                             data-embed-source="${request.link(election, name='connections-chart')}">
                         </div>
-                        <figcaption i18n:translate="">
+                        <figcaption i18n:translate="figcaption_connections">
                             The diagram shows the distribution of votes and seats on list and sublists.
                             The bars on the left correspond to the list connections, the bars in the
                             middle to the sublists, the bars to the right to the lists. The width of

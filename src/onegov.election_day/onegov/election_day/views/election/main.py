@@ -1,11 +1,13 @@
-import morepath
-
+from morepath import redirect
+from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.security import Public
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
+from onegov.election_day.utils import pdf_filename
 from onegov.election_day.views.election import get_candidates_results
 from onegov.election_day.views.election import get_connection_results
 from onegov.election_day.views.election.lists import get_list_results
@@ -16,7 +18,7 @@ from sqlalchemy.orm import object_session
 def view_election(self, request):
     """" The main view. """
 
-    return morepath.redirect(ElectionsLayout(self, request).main_view)
+    return redirect(ElectionsLayout(self, request).main_view)
 
 
 @ElectionDayApp.json(model=Election, permission=Public, name='json')
@@ -154,3 +156,29 @@ def view_election_summary(self, request):
         add_last_modified_header(response, self.last_result_change)
 
     return get_election_summary(self, request)
+
+
+@ElectionDayApp.view(model=Election, name='pdf', permission=Public)
+def view_election_pdf(self, request):
+    """ View the generated PDF. """
+
+    path = '{}/{}'.format(
+        request.app.configuration.get('pdf_directory', 'pdf'),
+        pdf_filename(self, request.locale)
+    )
+    if not request.app.filestorage.exists(path):
+        return Response(status='503 Service Unavailable')
+
+    content = None
+    with request.app.filestorage.open(path, 'rb') as f:
+        content = f.read()
+
+    return Response(
+        content,
+        content_type=(
+            'application/pdf'
+        ),
+        content_disposition='inline; filename={}.pdf'.format(
+            normalize_for_url(self.title)
+        )
+    )

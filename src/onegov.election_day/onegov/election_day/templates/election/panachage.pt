@@ -26,7 +26,7 @@
                             data-embed-link="Embed"
                             data-embed-source="${request.link(election, name='panachage-chart')}">
                         </div>
-                        <figcaption i18n:translate="">
+                        <figcaption i18n:translate="figcaption_panachage">
                             The diagram shows the origin of the list votes. The bars on the left correspond
                             to the unchanged list votes (including the blank list), the bars on the right
                             side to the final list results. The width of the bars and connections is

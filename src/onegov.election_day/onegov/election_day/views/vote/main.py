@@ -1,10 +1,13 @@
+from morepath.request import Response
 from onegov.ballot import Vote
 from onegov.core.security import Public
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import VotesLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_vote_summary
 from onegov.election_day.utils import handle_headerless_params
+from onegov.election_day.utils import pdf_filename
 
 
 @ElectionDayApp.html(model=Vote, template='vote/ballot.pt', permission=Public)
@@ -141,3 +144,29 @@ def view_vote_summary(self, request):
         add_last_modified_header(response, self.last_result_change)
 
     return get_vote_summary(self, request)
+
+
+@ElectionDayApp.view(model=Vote, name='pdf', permission=Public)
+def view_vote_pdf(self, request):
+    """ View the generated PDF. """
+
+    path = '{}/{}'.format(
+        request.app.configuration.get('pdf_directory', 'pdf'),
+        pdf_filename(self, request.locale)
+    )
+    if not request.app.filestorage.exists(path):
+        return Response(status='503 Service Unavailable')
+
+    content = None
+    with request.app.filestorage.open(path, 'rb') as f:
+        content = f.read()
+
+    return Response(
+        content,
+        content_type=(
+            'application/pdf'
+        ),
+        content_disposition='inline; filename={}.pdf'.format(
+            normalize_for_url(self.title)
+        )
+    )

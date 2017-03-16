@@ -55,6 +55,45 @@ def get_party_results(election):
     return sorted(set(years)), parties
 
 
+def get_party_deltas(election, years, parties):
+    """ Returns the aggregated party results with the differences to the
+    last elections.
+
+    """
+
+    deltas = len(years) > 1
+    results = []
+    for key in sorted(parties.keys()):
+        result = [key]
+        party = parties[key]
+        for year in years:
+            values = party.get(year)
+            if values:
+                result.append(values.get('mandates', ''))
+                result.append(values.get('votes', {}).get('total', ''))
+                permille = values.get('votes', {}).get('permille')
+                result.append('{}%'.format(permille / 10 if permille else ''))
+            else:
+                result.append('')
+                result.append('')
+                result.append('')
+
+        if deltas:
+            now = party.get(years[-1])
+            then = party.get(years[-2])
+            if now and then:
+                result.append('{}%'.format(
+                    ((now.get('votes', {}).get('permille', 0) or 0) -
+                     (then.get('votes', {}).get('permille', 0) or 0)) / 10
+                ))
+            else:
+                result.append('')
+
+        results.append(result)
+
+    return deltas, results
+
+
 @ElectionDayApp.json(model=Election, permission=Public,
                      name='parties-data')
 def view_election_parties_data(self, request):
@@ -130,36 +169,7 @@ def view_election_parties(self, request):
     handle_headerless_params(request)
 
     years, parties = get_party_results(self)
-    deltas = len(years) > 1
-    results = []
-    for key in sorted(parties.keys()):
-        result = [key]
-        party = parties[key]
-        for year in years:
-            values = party.get(year)
-            if values:
-                result.append(values.get('mandates', ''))
-                permille = values.get('votes', {}).get('permille')
-                result.append('{} / {}%'.format(
-                    values.get('votes', {}).get('total', ''),
-                    permille / 10 if permille else '',
-                ))
-            else:
-                result.append('')
-                result.append('')
-
-        if deltas:
-            now = party.get(years[-1])
-            then = party.get(years[-2])
-            if now and then:
-                result.append('{}%'.format(
-                    ((now.get('votes', {}).get('permille', 0) or 0) -
-                     (then.get('votes', {}).get('permille', 0) or 0)) / 10
-                ))
-            else:
-                result.append('')
-
-        results.append(result)
+    deltas, results = get_party_deltas(self, years, parties)
 
     return {
         'election': self,

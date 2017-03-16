@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-02-28 09:27+0100\n"
+"POT-Creation-Date: 2017-03-16 16:39+0100\n"
 "PO-Revision-Date: 2016-12-14 11:30+0100\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -57,6 +57,173 @@ msgstr "Administrar"
 
 msgid "Subscribers"
 msgstr "Abunents"
+
+msgid "Rejected"
+msgstr "Refusà"
+
+msgid "Accepted"
+msgstr "Acceptà"
+
+msgid "Proposal and counter proposal rejected"
+msgstr "Refusà l'iniziativa e la cuntraproposta"
+
+msgid "Proposal accepted"
+msgstr "Acceptà l'iniziativa"
+
+msgid "Counter proposal accepted"
+msgstr "Acceptà la cuntraproposta"
+
+msgid "Related link"
+msgstr "Ulteriuras infurmaziuns"
+
+#.
+#. Default: The diagram shows the distribution of votes and seats on list and
+#. sublists. The bars on the left correspond to the list connections, the bars
+#. in the middle to the sublists, the bars to the right to the lists. The width
+#. of the bars and connections is proportional to the votes, blue colored bars
+#. contain the number of mandates.
+msgid "figcaption_connections"
+msgstr ""
+"Il diagram mussa la repartiziun da las vuschs e dals sezs sin las "
+"colliaziuns e sutcolliaziuns da glistas. Las travs da la vart sanestra "
+"correspundan a las colliaziuns da glistas, las travs en il center a las "
+"sutglistas, las travs da la vart dretga a las glistas. La ladezza da las "
+"travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
+"cuntegnan il dumber da sezs."
+
+#.
+#. Default: The diagram shows the votes and mandates of the parties. The rimmed
+#. bars (left scale) correspond to the number of seats, the colored bars (right
+#. scale) to the voices (percentages). The results of earlier elections are
+#. grayed out.
+msgid "figcaption_parties"
+msgstr ""
+"Il diagram mussa las vuschs gudagnadas ed ils sezs da las partidas. Las "
+"travs cun ur (scala sanestra) correspundan al dumber da sezs, las travs "
+"coluradas (scala dretga) a las quotas da vuschs en pertschients. Ils "
+"resultats d'anteriuras elecziuns èn colurads en grischs."
+
+#.
+#. Default: The diagram shows the origin of the list votes. The bars on the
+#. left correspond to the unchanged list votes (including the blank list), the
+#. bars on the right side to the final list results. The width of the bars and
+#. connections is proportional to the votes.
+msgid "figcaption_panachage"
+msgstr ""
+"Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
+"pervia dal panaschar. Da la vart sanestra vegnan mussadas las vuschs betg "
+"midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
+"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
+"proporziunala a las vuschs."
+
+msgid "Tie breaker in favor of the proposal"
+msgstr "Dumonda decisiva a favur da l'iniziativa"
+
+msgid "Tie breaker in favor of the counter proposal"
+msgstr "Dumonda decisiva a favur da la cuntraproposta"
+
+msgid "Turnout"
+msgstr "Participaziun a las elecziuns"
+
+msgid "Elegible Voters"
+msgstr "Persunas cun dretg d’eleger"
+
+msgid "Received Ballots"
+msgstr "Cedels electorals consegnads"
+
+msgid "Mandates"
+msgstr "Sezs"
+
+#, python-format
+msgid "${counted} of ${total}"
+msgstr "${counted} da ${total}"
+
+#.
+#. Default: Votes
+msgid "single_votes"
+msgstr "Vuschs"
+
+msgid "Yay"
+msgstr "GEA"
+
+msgid "Nay"
+msgstr "NA"
+
+msgid "Absolute majority"
+msgstr "Maioritad absoluta"
+
+msgid "List connection"
+msgstr "Colliaziun da glistas"
+
+msgid "Sublist connection"
+msgstr "Sutcolliaziun da glistas"
+
+msgid "Party"
+msgstr "Partida"
+
+msgid "Total"
+msgstr "Total"
+
+#.
+#. Default: Voter turnout
+msgid "turnout_vote"
+msgstr "Participaziun a la votaziun"
+
+#.
+#. Default: Elegible Voters
+msgid "elegible_voters_vote"
+msgstr "Persunas cun dretg da votar"
+
+msgid "Cast Ballots"
+msgstr "Cedels da votar entrads"
+
+msgid "List"
+msgstr "Glista"
+
+msgid "Electoral District"
+msgstr "Circul electoral"
+
+msgid "Accounted Votes"
+msgstr "Vuschs valaivlas"
+
+msgid "Accounted Ballots"
+msgstr "Cedels valaivels"
+
+msgid "Blank Ballots"
+msgstr "Cedels electorals vids"
+
+msgid "Invalid Ballots"
+msgstr "Cedels electorals nunvalaivels"
+
+msgid "Candidate"
+msgstr "Persuna che candidescha"
+
+msgid "Elected"
+msgstr "Elegida/elegì"
+
+msgid "Result"
+msgstr "Resultat"
+
+msgid "Yes %"
+msgstr "% GEA"
+
+msgid "No %"
+msgstr "% NA"
+
+msgid "Empty"
+msgstr "Vid"
+
+msgid "Invalid"
+msgstr "Nunvalaivel"
+
+msgid "Yeas"
+msgstr "Vuschs affirmativas"
+
+msgid "Nays"
+msgstr "Vuschs negativas"
+
+msgid "Yes"
+msgstr "Gea"
 
 #, python-format
 msgid "Missing columns: '${cols}'"
@@ -174,17 +341,11 @@ msgstr "Scursanida"
 msgid "Date"
 msgstr "Data"
 
-msgid "Mandates"
-msgstr "Sezs"
-
 msgid "System"
 msgstr "Sistem"
 
 msgid "Type"
 msgstr "Gener"
-
-msgid "Related link"
-msgstr "Ulteriuras infurmaziuns"
 
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
@@ -209,9 +370,6 @@ msgstr "Resultats da las partidas"
 
 msgid "Complete"
 msgstr "Resultat eruì cumplettamain"
-
-msgid "Absolute majority"
-msgstr "Maioritad absoluta"
 
 msgid "Vote number"
 msgstr "Numer dal project"
@@ -301,21 +459,6 @@ msgstr "Actualisà"
 msgid "Vote"
 msgstr "Votaziun"
 
-msgid "Result"
-msgstr "Resultat"
-
-msgid "Yes %"
-msgstr "% GEA"
-
-msgid "No %"
-msgstr "% NA"
-
-msgid "Yay"
-msgstr "GEA"
-
-msgid "Nay"
-msgstr "NA"
-
 msgid "The form contains errors. Please check the fields marked in red."
 msgstr ""
 "Il formular cuntegna sbagls. Controllai per plaschair ils champs marcads cun "
@@ -332,15 +475,6 @@ msgstr "Vus essas annunziada/annunzià:"
 
 msgid "Logout"
 msgstr "Deconnectar"
-
-msgid "Accepted"
-msgstr "Acceptà"
-
-msgid "Rejected"
-msgstr "Refusà"
-
-msgid "${counted} of ${total}"
-msgstr "${counted} da ${total}"
 
 msgid "Archive"
 msgstr "Archiv"
@@ -418,49 +552,8 @@ msgstr "Abunar la communicaziun per SMS"
 msgid "Stop SMS subscription"
 msgstr "Terminar l'abunament dad SMS"
 
-msgid "Proposal and counter proposal rejected"
-msgstr "Refusà l'iniziativa e la cuntraproposta"
-
-msgid "Proposal accepted"
-msgstr "Acceptà l'iniziativa"
-
-msgid "Counter proposal accepted"
-msgstr "Acceptà la cuntraproposta"
-
-msgid "Tie breaker in favor of the proposal"
-msgstr "Dumonda decisiva a favur da l'iniziativa"
-
-msgid "Tie breaker in favor of the counter proposal"
-msgstr "Dumonda decisiva a favur da la cuntraproposta"
-
-msgid "Yeas"
-msgstr "Vuschs affirmativas"
-
-msgid "Nays"
-msgstr "Vuschs negativas"
-
-msgid "Turnout"
-msgstr "Participaziun a las elecziuns"
-
-msgid "Elegible Voters"
-msgstr "Persunas cun dretg d’eleger"
-
-msgid "Received Ballots"
-msgstr "Cedels electorals consegnads"
-
 msgid "Counted"
 msgstr "Dumbrà ora"
-
-#. Default: Voter turnout
-msgid "turnout_vote"
-msgstr "Participaziun a la votaziun"
-
-#. Default: Elegible Voters
-msgid "elegible_voters_vote"
-msgstr "Persunas cun dretg da votar"
-
-msgid "Cast Ballots"
-msgstr "Cedels da votar entrads"
 
 msgid ""
 "The raw data used to display the results is available in the following "
@@ -553,22 +646,6 @@ msgstr "telechargiar"
 msgid "Embed"
 msgstr "incorporar"
 
-msgid "Candidate"
-msgstr "Persuna che candidescha"
-
-#. Default: Votes
-msgid "single_votes"
-msgstr "Vuschs"
-
-msgid "List"
-msgstr "Glista"
-
-msgid "Elected"
-msgstr "Elegida/elegì"
-
-msgid "Yes"
-msgstr "Gea"
-
 msgid "No"
 msgstr "Na"
 
@@ -578,84 +655,14 @@ msgstr "Tut las candidatas e candidats"
 msgid "Elected candidates only"
 msgstr "Mo candidat(a)s elegid(a)s"
 
-msgid ""
-"The diagram shows the distribution of votes and seats on list and sublists. "
-"The bars on the left correspond to the list connections, the bars in the "
-"middle to the sublists, the bars to the right to the lists. The width of the "
-"bars and connections is proportional to the votes, blue colored bars contain "
-"the number of mandates."
-msgstr ""
-"Il diagram mussa la repartiziun da las vuschs e dals sezs sin las "
-"colliaziuns e sutcolliaziuns da glistas. Las travs da la vart sanestra "
-"correspundan a las colliaziuns da glistas, las travs en il center a las "
-"sutglistas, las travs da la vart dretga a las glistas. La ladezza da las "
-"travs e da las colliaziuns è proporziunala a las vuschs, las travs blauas "
-"cuntegnan il dumber da sezs."
-
-msgid "List connection"
-msgstr "Colliaziun da glistas"
-
-msgid "Sublist connection"
-msgstr "Sutcolliaziun da glistas"
-
 msgid "Subtotal"
 msgstr "Summa intermediara"
-
-msgid "Total"
-msgstr "Total"
 
 msgid "The raw data is available as:"
 msgstr "Las datas nunelavuradas èn disponiblas en il suandant format:"
 
-msgid "Electoral District"
-msgstr "Circul electoral"
-
-msgid ""
-"The diagram shows the origin of the list votes. The bars on the left "
-"correspond to the unchanged list votes (including the blank list), the bars "
-"on the right side to the final list results. The width of the bars and "
-"connections is proportional to the votes."
-msgstr ""
-"Il diagram mussa la derivanza da las vuschs da glista gudagnadas e perdidas "
-"pervia dal panaschar. Da la vart sanestra vegnan mussadas las vuschs betg "
-"midadas da las glistas inclusiv la glista en blanco, da la vart dretga las "
-"vuschs da glista panaschadas. La ladezza da las travs e da las colliaziuns è "
-"proporziunala a las vuschs."
-
-msgid ""
-"The diagram shows the votes and mandates of the parties. The rimmed bars "
-"(left scale) correspond to the number of seats, the colored bars (right "
-"scale) to the voices (percentages). The results of earlier elections are "
-"grayed out."
-msgstr ""
-"Il diagram mussa las vuschs gudagnadas ed ils sezs da las partidas. Las "
-"travs cun ur (scala sanestra) correspundan al dumber da sezs, las travs "
-"coluradas (scala dretga) a las quotas da vuschs en pertschients. Ils "
-"resultats d'anteriuras elecziuns èn colurads en grischs."
-
-msgid "Party"
-msgstr "Partida"
-
 msgid "Difference"
 msgstr "Differenza"
-
-msgid "Accounted Ballots"
-msgstr "Cedels valaivels"
-
-msgid "Blank Ballots"
-msgstr "Cedels electorals vids"
-
-msgid "Invalid Ballots"
-msgstr "Cedels electorals nunvalaivels"
-
-msgid "Accounted Votes"
-msgstr "Vuschs valaivlas"
-
-msgid "Empty"
-msgstr "Vid"
-
-msgid "Invalid"
-msgstr "Nunvalaivel"
 
 msgid "Wrong username or password"
 msgstr ""

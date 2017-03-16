@@ -25,7 +25,7 @@
                             data-embed-link="Embed"
                             data-embed-source="${request.link(election, name='parties-chart')}">
                         </div>
-                        <figcaption i18n:translate="">
+                        <figcaption i18n:translate="figcaption_parties">
                             The diagram shows the votes and mandates of the parties. The rimmed bars
                             (left scale) correspond to the number of seats, the colored bars (right scale)
                             to the voices (percentages). The results of earlier elections are grayed out.
@@ -40,6 +40,7 @@
                         <th i18n:translate="">Party</th>
                         <tal:block tal:repeat="year years">
                             <th class="right-aligned"><tal:block i18n:translate="">Mandates</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
+                            <th class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
                             <th class="right-aligned"><tal:block i18n:translate="single_votes">Votes</tal:block><tal:block tal:condition="deltas"> (${year})</tal:block></th>
                         </tal:block>
                         <tal:block tal:condition="deltas">

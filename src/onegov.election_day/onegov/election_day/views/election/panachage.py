@@ -23,8 +23,10 @@ def view_election_panachage_data(self, request):
     if not self.has_panachage_data:
         return {}
 
+    blank = request.translate(_("Blank list")) if request else '-'
+
     nodes = OrderedDict()
-    nodes['left.999'] = {'name': request.translate(_("Blank list"))}
+    nodes['left.999'] = {'name': blank}
     for list_ in self.lists:
         nodes['left.{}'.format(list_.list_id)] = {'name': list_.name}
     for list_ in self.lists:

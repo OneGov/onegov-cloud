@@ -1,12 +1,15 @@
 """ Provides commands used to initialize election day websites. """
 
 import click
+import fcntl
+import io
 import os
 
 from onegov.core.cli import command_group, pass_group_context
 from onegov.election_day.models import ArchivedResult
-from onegov.election_day.utils import add_local_results
+from onegov.election_day.pdf_generator import PdfGenerator
 from onegov.election_day.sms_processor import SmsQueueProcessor
+from onegov.election_day.utils import add_local_results
 
 
 cli = command_group()
@@ -99,3 +102,34 @@ def send_sms(username, password, sentry, originator):
             qp.send_messages()
 
     return send
+
+
+@cli.command('generate-pdf')
+@click.option('--force/--no-force', default=False)
+@click.option('--cleanup/--no-cleanup', default=True)
+def generate_pdf(force, cleanup):
+    """ Generates the PDF for the selected instances
+
+        onegov-election-day --select '/onegov_election_day/zg' generate-pdf
+
+    """
+    def generate(request, app):
+        if not app.principal or not app.configuration.get('d3-renderer'):
+            return
+
+        lockfilename = app.configuration.get(
+            'pdf_generation_lockfile', './pdf_generation_lockfile'
+        )
+        lockfile = open(lockfilename, 'w+')
+
+        try:
+            fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except io.BlockingIOError:
+            pass
+        else:
+            try:
+                PdfGenerator(app).run(force, cleanup)
+            finally:
+                fcntl.flock(lockfile, fcntl.LOCK_UN)
+
+    return generate
