@@ -36,20 +36,19 @@
 
         var chart = function(container) {
 
+            width = width || ($(container).width() - margin.left - margin.right);
+
             var svg = d3.select(container).append('svg')
                 .attr('xmlns', "http://www.w3.org/2000/svg")
                 .attr('version', '1.1')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
                 .style('shape-rendering', 'crispEdges');
 
-            width = width || ($(container).width() - margin.left - margin.right);
+            var canvas = svg.append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
             if (data.results) {
-
-                svg.attr('width', width + margin.left + margin.right)
-                    .attr('height', height + margin.top + margin.bottom);
-
-                var canvas = svg.append('g')
-                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
                 // Define 4 scales to position the bars:
                 // - one to get the x-center of a group

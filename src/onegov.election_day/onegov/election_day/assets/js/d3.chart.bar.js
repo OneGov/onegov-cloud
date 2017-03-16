@@ -11,6 +11,7 @@
 }(this, function(d3) {
     return function(params) {
         var data = {};
+        var margin = {top: 20, right: 10, bottom: 20, left: 10};
         var height = 0;
         var width = 0;
         var interactive = false;
@@ -26,41 +27,47 @@
 
         if (params) {
             if (params.data) data = params.data;
+            if (params.margin) margin = params.margin;
             if (params.interactive) interactive = params.interactive;
             if (params.width) width = params.width;
             if (params.options) options = params.options;
         }
 
-        var chart = function(container) {
+        var updateLabels = function(line) {
+            line.each(function() {
+                var box_width = this.childNodes[1].getBBox().width;
+                var label_left = this.childNodes[2].childNodes[0];
+                var label_right = this.childNodes[2].childNodes[1];
+                if ((box_width-10) < label_left.getBBox().width) {
+                    label_left.setAttribute('visibility', 'hidden');
+                    label_right.setAttribute('visibility', 'visible');
+                } else {
+                    label_left.setAttribute('visibility', 'visible');
+                    label_right.setAttribute('visibility', 'hidden');
+                }
+            });
+        };
 
-            width = width || $(container).width();
+        var chart = function(container) {
 
             var svg = d3.select(container).append('svg')
                 .attr('xmlns', 'http://www.w3.org/2000/svg')
                 .attr('version', '1.1');
 
+            width = width || ($(container).width() - margin.left - margin.right);
+
             if (data.results) {
 
-                var updateLabels = function(line) {
-                    line.each(function() {
-                        var box_width = this.childNodes[1].getBBox().width;
-                        var label_left = this.childNodes[2].childNodes[0];
-                        var label_right = this.childNodes[2].childNodes[1];
-                        if ((box_width-10) < label_left.getBBox().width) {
-                            label_left.setAttribute('visibility', 'hidden');
-                            label_right.setAttribute('visibility', 'visible');
-                        } else {
-                            label_left.setAttribute('visibility', 'visible');
-                            label_right.setAttribute('visibility', 'hidden');
-                        }
-                    });
-                };
-
                 height = options.barHeight * data.results.length;
-                svg.attr('width', width).attr('height', height);
+
+                svg.attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom);
+
+                var canvas = svg.append('g')
+                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
                 // Add a container for each line, which contains ...
-                var line = svg.selectAll('g')
+                var line = canvas.selectAll('g')
                     .data(data.results)
                     .enter().append('g')
                     .attr('class', 'line')
@@ -123,7 +130,7 @@
                 var majority_line = null;
                 if (data.majority) {
                     var majority = data.majority;
-                    majority_line = svg.append('line')
+                    majority_line = canvas.append('line')
                         .attr('x1', offset + 5 + scale(majority))
                         .attr('x2', offset + 5 + scale(majority))
                         .attr('y1', 0)
@@ -161,10 +168,10 @@
                     d3.select(window).on('resize.barchart', function() {
                         if (bar && label) {
                             // Resize
-                            width = $(container).width();
+                            width = ($(container).width() - margin.left - margin.right);
                             scale.range([0, width - offset - 8]);
 
-                            svg.attr('width', width);
+                            svg.attr('width', width + margin.left + margin.right);
                             bar.attr('width', function(d) { return scale(d.value); });
                             label.attr('transform', function(d) {
                               return 'translate(' + (offset + scale(d.value)) + ',' + ((options.barHeight - options.barMargin) / 2 + 4) + ')';

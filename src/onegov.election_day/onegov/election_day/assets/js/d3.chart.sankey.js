@@ -11,7 +11,8 @@
 }(this, function(d3) {
     return function(params) {
         var data = {};
-        var height = 720;
+        var margin = {top: 20, right: 10, bottom: 20, left: 10};
+        var height = 720 - margin.top - margin.bottom;
         var width = 0;
         var interactive = false;
         var inverse = false;
@@ -26,6 +27,7 @@
 
         if (params) {
             if (params.data) data = params.data;
+            if (params.margin) margin = params.margin;
             if (params.height) height = params.height;
             if (params.width) width = params.width;
             if (params.interactive) interactive = params.interactive;
@@ -33,76 +35,82 @@
             if (params.options) options = params.options;
         }
 
+        // We need some more margins to display the (vertically centered)
+        // node names
+        margin.top += 0.5 * parseInt(options.fontSize);
+        margin.bottom += 0.5 * parseInt(options.fontSize);
+
+        var ellipseText = function(text, maximum) {
+            // Ellipse the text with '...' if its longer than the given maximum
+            text.each(function(d) {
+                var self = d3.select(this);
+                var text = d.name;
+                self.text(text);
+                var textLength = this.getComputedTextLength();
+                while (textLength > maximum && (text.length > 0)) {
+                    text = text.slice(0, -1);
+                    self.text(text + '...');
+                    textLength = this.getComputedTextLength();
+                }
+            });
+        };
+
+        var adjustOffset = function(name, offset, width) {
+            // Calculate the text widths (offsets) and limit them to a maximum
+            if (!offset.initial) {
+                // Compute and store the full text widths once
+                offset.left = d3.max(name.left[0], function(d) { return d.getBBox().width;}) || 0;
+                offset.right = d3.max(name.right[0], function(d) { return d.getBBox().width;}) || 0;
+                offset.initial = {};
+                offset.initial.left = offset.left;
+                offset.initial.right = offset.right;
+            }
+            offset.left = offset.initial.left;
+            offset.right = offset.initial.right;
+            var maximum = Math.round(width / (2 + (offset.left ? 1 : 0) + (offset.right ? 1 : 0)));
+            if (offset.left > maximum) {
+                offset.left = maximum;
+            }
+            if (offset.right > maximum) {
+                offset.right = maximum;
+            }
+            ellipseText(name.left, offset.left);
+            ellipseText(name.right, offset.left);
+        };
+
+        var adjustScale = function(scale, width, offset, inverse) {
+            // Adjusts the scale to fit the sankey diagram within the new limits
+            // (width - offsets - margins)
+            scale.range([
+                offset.left + offset.margin,
+                width - offset.right - offset.margin - options.nodeWidth
+            ]);
+            if (inverse) {
+                scale.range([
+                    width - offset.left - offset.margin - options.nodeWidth,
+                    offset.right + offset.margin
+                ]);
+            }
+        };
+
         var chart = function(container) {
 
-            width = width || $(container).width();
+            width = width || ($(container).width() - margin.left - margin.right);
 
             var svg = d3.select(container).append('svg')
                 .attr('xmlns', 'http://www.w3.org/2000/svg')
                 .attr('version', '1.1')
-                .attr('width', width)
-                .attr('height', height + 40)
-                .style('padding-top', '20px');
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom);
 
             if (data.nodes && data.links) {
+
+                var canvas = svg.append('g')
+                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
                 var offset = {left: 0, right: 0, margin: 6};
                 var name = {};
                 var scale = d3.scale.linear().domain([0, width]);
-
-
-                var ellipseText = function(text, maximum) {
-                    // Ellipse the text with '...' if its longer than the given maximum
-                    text.each(function(d) {
-                        var self = d3.select(this);
-                        var text = d.name;
-                        self.text(text);
-                        var textLength = this.getComputedTextLength();
-                        while (textLength > maximum && (text.length > 0)) {
-                            text = text.slice(0, -1);
-                            self.text(text + '...');
-                            textLength = this.getComputedTextLength();
-                        }
-                    });
-                };
-
-                var adjustOffset = function(name, offset, width) {
-                    // Calculate the text widths (offsets) and limit them to a maximum
-                    if (!offset.initial) {
-                        // Compute and store the full text widths once
-                        offset.left = d3.max(name.left[0], function(d) { return d.getBBox().width;}) || 0;
-                        offset.right = d3.max(name.right[0], function(d) { return d.getBBox().width;}) || 0;
-                        offset.initial = {};
-                        offset.initial.left = offset.left;
-                        offset.initial.right = offset.right;
-                    }
-                    offset.left = offset.initial.left;
-                    offset.right = offset.initial.right;
-                    var maximum = Math.round(width / (2 + (offset.left ? 1 : 0) + (offset.right ? 1 : 0)));
-                    if (offset.left > maximum) {
-                        offset.left = maximum;
-                    }
-                    if (offset.right > maximum) {
-                        offset.right = maximum;
-                    }
-                    ellipseText(name.left, offset.left);
-                    ellipseText(name.right, offset.left);
-                };
-
-                var adjustScale = function(scale, width, offset, inverse) {
-                    // Adjusts the scale to fit the sankey diagram within the new limits
-                    // (width - offsets - margins)
-                    scale.range([
-                        offset.left + offset.margin,
-                        width - offset.right - offset.margin - options.nodeWidth
-                    ]);
-                    if (inverse) {
-                        scale.range([
-                            width - offset.left - offset.margin - options.nodeWidth,
-                            offset.right + offset.margin
-                        ]);
-                    }
-                };
 
                 var sankey = d3.sankey()
                     .nodeWidth(options.nodeWidth)
@@ -114,7 +122,7 @@
 
                 // Add the nodes <g><rect><text></g>
                 var count = 0;
-                var node = svg.append('g').selectAll('.node')
+                var node = canvas.append('g').selectAll('.node')
                     .data(data.nodes)
                     .enter().append('g')
                     .attr('class', 'node')
@@ -187,7 +195,7 @@
                     inverse ? -options.nodeWidth : 0,
                     inverse ? options.nodeWidth : 0
                 );
-                var link = svg.append('g').selectAll('.link')
+                var link = canvas.append('g').selectAll('.link')
                     .data(data.links)
                     .enter().append('path')
                     .attr('class', 'link')
@@ -251,8 +259,8 @@
                     d3.select(window).on('resize.sankey', function() {
                         if (node && link && path) {
                             // Resize
-                            width = $(container).width();
-                            svg.attr('width', width);
+                            width = $(container).width() - margin.left - margin.right;
+                            svg.attr('width', width + margin.left + margin.right);
 
                             adjustOffset(name, offset, width);
                             adjustScale(scale, width, offset, inverse);
