@@ -1,21 +1,18 @@
-// A bar chart with horizontal bars, optionally a vertical line to indicate
-// a majority and hover effects.
 //
-// Each line consists of the following parts:
-//
-//      TEXT [========== BAR ====== VALUE / VALUE2 ] VALUE / VALUE2
-//           ^- Offset
-//
-// See https://bost.ocks.org/mike/chart for the reusable charts pattern.
+// A map.
 //
 var ballotMap = function(params) {
     var data = {};
     var mapdata = {};
     var canton = '';
-    var height = 80;
+    var height = 0;
+    var width = 0;
     var interactive = false;
     var yay = 'Yay';
     var nay = 'Nay';
+    var options = {
+        fontFamily: 'sans-serif',
+    };
 
     if (params) {
         if (params.data) data = params.data;
@@ -23,17 +20,19 @@ var ballotMap = function(params) {
         if (params.canton) canton = params.canton;
         if (params.interactive) interactive = params.interactive;
         if (params.height) height = params.height;
+        if (params.width) width = params.width;
         if (params.yay) yay = params.yay;
         if (params.nay) nay = params.nay;
+        if (params.options) options = params.options;
     }
 
     var chart = function(container) {
 
         var svg = d3.select(container).append('svg')
-            .attr('xmlns', "http://www.w3.org/2000/svg")
+            .attr('xmlns', 'http://www.w3.org/2000/svg')
             .attr('version', '1.1');
 
-        if (data && mapdata && canton) {
+        if (data && mapdata) {
 
             var path = d3.geo.path().projection(null);
 
@@ -50,7 +49,7 @@ var ballotMap = function(params) {
 
             var scale = d3.scale.linear()
                 .domain([30, 49.9999999, 50.000001, 70])
-                .range(["#ca0020", "#f4a582", "#92c5de", "#0571b0"]);
+                .range(['#ca0020', '#f4a582', '#92c5de', '#0571b0']);
 
             // Add tooltips
             var tooltip = null;
@@ -120,7 +119,8 @@ var ballotMap = function(params) {
             if (interactive) {
                 municipalities
                     .on('mouseover', tooltip.show)
-                    .on('mouseout', tooltip.hide);
+                    .on('mouseout', tooltip.hide)
+                    .on('click', tooltip.show);
             }
 
             // Add lakes
@@ -178,36 +178,20 @@ var ballotMap = function(params) {
                 .attr('x', legend_scale(80))
                 .attr('y', Math.round(2.5 * bbox.height / 40))
                 .style('font-size', Math.round(1.5 * bbox.height / 40) + 'px')
+                .style('font-family', options.fontFamily)
                 .text(yay);
             legend.append('text')
                 .attr('x', legend_scale(20) + legend_scale.rangeBand())
                 .attr('y', Math.round(2.5 * bbox.height / 40))
                 .style('text-anchor', 'end')
                 .style('font-size', Math.round(1.5 * bbox.height / 40) + 'px')
+                .style('font-family', options.fontFamily)
                 .text(nay);
-
-            bbox = svg[0][0].getBBox();
-
-            svg.attr('viewBox',
-                [bbox.x, bbox.y, bbox.width, bbox.height].join(' ')
-            );
-
-            // browsers other than ie figure out a nice size by themselves
-            // if (is_ie()) {
-            //     svg.attr('width', 470);
-            //     svg.attr('height', 470 * (bbox.height/bbox.width));
-            // }
-
-            height = Math.floor(500 * (bbox.height/bbox.width)) + 70;
-
-            if (interactive) {
-                svg.call(tooltip);
-            }
 
             // move each element up when it's selected (there's no z-index in
             // svg) and make sure the others are deselected
             if (interactive) {
-                map.find('.municipality path').each(function(ix, path) {
+                $(container).find('.municipality path').each(function(ix, path) {
                     $(path).on('mouseenter', function() {
                         $('.municipality path.selected').each(
                             function() {
@@ -222,14 +206,40 @@ var ballotMap = function(params) {
                     });
                 });
             }
+
+            // Add tooltips
+            if (interactive) {
+                svg.call(tooltip);
+            }
+
+            // Set size
+            width = width || $(container).width();
+            bbox = svg[0][0].getBBox();
+            svg.attr('viewBox',
+                [bbox.x, bbox.y, bbox.width, bbox.height].join(' ')
+            );
+            height = Math.floor(width * (bbox.height/bbox.width)) + 70;
+            svg.attr('width', width).attr('height', height);
+
+            // Relayout on resize
+            if (interactive) {
+                d3.select(window).on('resize.ballotmap', function() {
+                    width = $(container).width();
+                    bbox = svg[0][0].getBBox();
+                    height = Math.floor(width * (bbox.height/bbox.width)) + 70;
+                    svg.attr('width', width).attr('height', height);
+                });
+            }
         }
         return chart;
     };
 
-    chart.height = function(value) {
-        if (!arguments.length) return height;
-        height = value;
-        return chart;
+    chart.width = function() {
+        return width;
+    };
+
+    chart.height = function() {
+        return height;
     };
 
     return chart;

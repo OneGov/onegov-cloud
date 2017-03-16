@@ -1,6 +1,5 @@
-// A bar chart with grouped vertcial bars.
 //
-// See https://bost.ocks.org/mike/chart for the reusable charts pattern.
+// A bar chart with grouped vertcial bars.
 //
 (function(root, factory) {
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
@@ -13,12 +12,16 @@
         var data = {};
         var margin = {top: 20, right: 10, bottom: 20, left: 10};
         var height = 400 - margin.top - margin.bottom;
-        var width = 720 - margin.left - margin.right;
+        var width = 0;
         var options = {
             axisHeight: 30,
             barOuterWidth: 25,
             barInnerWidth: 22,
-            tickWidth: 5
+            tickWidth: 5,
+            fontSize: '14px',
+            fontFamily: 'sans-serif',
+            colorActive: '#0571b0',
+            colorInactive: '#999'
         };
         var interactive = false;
 
@@ -37,6 +40,8 @@
                 .attr('xmlns', "http://www.w3.org/2000/svg")
                 .attr('version', '1.1')
                 .style('shape-rendering', 'crispEdges');
+
+            width = width || ($(container).width() - margin.left - margin.right);
 
             if (data.results) {
 
@@ -89,8 +94,8 @@
                         });
                     label.append('text')
                         .text(function(d) { return d; })
-                        .style('font-size', '14px')
-                        .style('font-family', 'sans-serif')
+                        .style('font-size', options.fontSize)
+                        .style('font-family', options.fontFamily)
                         .style('text-anchor', 'middle');
 
                     // Add the axis ...
@@ -110,9 +115,9 @@
                     axis.front.append('text')
                         .text(data.maximum.front + data.axis_units.front)
                         .attr('x', 2 * options.tickWidth)
-                        .attr('y', 14)
-                        .style('font-size', '14px')
-                        .style('font-family', 'sans-serif')
+                        .attr('y', options.fontSize)
+                        .style('font-size', options.fontSize)
+                        .style('font-family', options.fontFamily)
                         .style('text-anchor', 'start');
 
                     // ... back
@@ -134,9 +139,9 @@
                     axis.back.append('text')
                         .text(data.maximum.back + data.axis_units.back)
                         .attr('x', -2 * options.tickWidth)
-                        .attr('y', 14)
-                        .style('font-size', '14px')
-                        .style('font-family', 'sans-serif')
+                        .attr('y', options.fontSize)
+                        .style('font-size', options.fontSize)
+                        .style('font-family', options.fontFamily)
                         .style('text-anchor', 'end');
 
                     axis.all = canvas.selectAll('.axis');
@@ -156,7 +161,7 @@
                             return height - options.axisHeight - scale.y.back(d.value.back) + 1;
                         })
                         .style('fill', function(d) {
-                            return d.active ? '#0571b0' : '#999';
+                            return d.active ? options.colorActive : options.colorInactive;
                         });
 
                     // ... front
@@ -208,12 +213,12 @@
                             bar.all.filter(function(s) { return !(s.group === d.group && s.item === d.item); })
                                 .transition()
                                 .duration(700)
-                        		.style('opacity', 0.1);
+                        		    .style('opacity', 0.1);
                         });
                         bar.all.on('mouseout', function(d) {
                             bar.all.transition()
                                 .duration(700)
-                        		.style('opacity', 1);
+                        		    .style('opacity', 1);
                         });
 
                         // ... on x axis labels
@@ -221,12 +226,12 @@
                             bar.all.filter(function(s) { return s.group !== d; })
                                 .transition()
                                 .duration(700)
-                        		.style('opacity', 0.1);
+                        		    .style('opacity', 0.1);
                         });
                         label.on('mouseout', function(d) {
                             bar.all.transition()
                                 .duration(700)
-                        		.style('opacity', 1);
+                        		    .style('opacity', 1);
                         });
 
                         // ... on y axis
@@ -234,18 +239,18 @@
                             bar.back
                                 .transition()
                                 .duration(700)
-                        		.style('opacity', 0.1);
+                        		    .style('opacity', 0.1);
                         });
                         axis.back.on('mouseover', function(d) {
                             bar.front
                                 .transition()
                                 .duration(700)
-                        		.style('opacity', 0.1);
+                        		    .style('opacity', 0.1);
                         });
                         axis.all.on('mouseout', function(d) {
                             bar.all.transition()
                                 .duration(700)
-                        		.style('opacity', 1);
+                        	      .style('opacity', 1);
                         });
                     }
 
@@ -280,16 +285,12 @@
             return chart;
         };
 
-        chart.width = function(value) {
-            if (!arguments.length) return width + margin.left + margin.right;
-            width = value - margin.left - margin.right;
-            return chart;
+        chart.width = function() {
+            return width + margin.left + margin.right;
         };
 
-        chart.height = function(value) {
-            if (!arguments.length) return height + margin.top + margin.bottom;
-            height = value - margin.top - margin.bottom;
-            return chart;
+        chart.height = function() {
+            return height + margin.top + margin.bottom;
         };
 
         return chart;
