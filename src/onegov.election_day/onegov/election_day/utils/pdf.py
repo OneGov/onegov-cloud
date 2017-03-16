@@ -6,13 +6,11 @@ from pdfrw.toreportlab import makerl
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
 from reportlab.platypus import Flowable
-from reportlab.platypus import Image
 from reportlab.platypus import Paragraph
 from reportlab.platypus import Table
 from reportlab.platypus import PageTemplate
 from reportlab.platypus import Frame
 from reportlab.platypus import NextPageTemplate
-from svglib.svglib import svg2rlg
 from reportlab.lib.units import cm
 
 
@@ -155,17 +153,6 @@ class Pdf(PDFDocument):
                 factor * height * self.doc.width / width
             )
 
-    def image(self, filelike, factor=1.0):
-        """ Add a Base64 encoded image and fit it to the page. """
-
-        img = Image(filelike)
-        if img.imageWidth and img.imageHeight:
-            img.drawWidth, img.drawHeight = self.fit_size(
-                img.imageWidth, img.imageHeight, factor
-            )
-
-            self.story.append(img)
-
     def pdf(self, filelike, factor=1.0):
         """ Adds a PDF and fit it to the page. """
 
@@ -179,33 +166,12 @@ class Pdf(PDFDocument):
 
             self.story.append(img)
 
-    def svg(self, filelike, factor=1.0):
-        """ Add a SVG and fit it to the page.
-
-        This unfortunately doesn't work well. The svglib can't produce a good
-        drawing out of our SVGs, the text might end white and reportlab might
-        trip on file description stuff :/.
-        """
-
-        drawing = svg2rlg(filelike)
-
-        if drawing.width and drawing.height:
-            width, height = self.fit_size(
-                drawing.width, drawing.height, factor
-            )
-            drawing.scale(width / drawing.width, height / drawing.height)
-            drawing.width = width
-            drawing.height = height
-
-            self.story.append(drawing)
-
     def table(self, data, columns, style=None, ratios=False):
         """ Adds a table where every cell is wrapped in a paragraph so that
         the cells are wrappable.
 
         """
 
-        # todo: this is not full width!
         if columns == 'even':
             columns = None
             if len(data):

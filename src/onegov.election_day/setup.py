@@ -49,8 +49,7 @@ setup(
         'raven',
         'reportlab',
         'requests',
-        'rjsmin',
-        'svglib'
+        'rjsmin'
     ],
     extras_require=dict(
         test=[
