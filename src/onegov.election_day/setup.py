@@ -42,11 +42,15 @@ setup(
         'onegov.foundation>=0.0.4',
         'onegov.shared>=0.2.0',
         'onegov.user',
+        'pdfdocument',
+        'pdfrw',
         'phonenumbers',
         'pyyaml',
         'raven',
+        'reportlab',
         'requests',
-        'rjsmin'
+        'rjsmin',
+        'svglib'
     ],
     extras_require=dict(
         test=[

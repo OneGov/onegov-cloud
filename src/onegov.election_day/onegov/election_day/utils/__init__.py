@@ -1,3 +1,4 @@
+from hashlib import sha256
 from onegov.ballot import Election, Vote
 from onegov.election_day.models import ArchivedResult
 
@@ -187,3 +188,17 @@ def add_local_results(source, target, principal, session):
                 target.local_answer = answer
                 target.local_yeas_percentage = yeas
                 target.local_nays_percentage = 100 - yeas
+
+
+def pdf_filename(item, locale):
+    """ Generates a filename from an election or vote:
+
+        ['election' or 'vote'][hash of id].[timestamp].[locale].pdf
+
+    """
+    return '{}-{}.{}.{}.pdf'.format(
+        'election' if isinstance(item, Election) else 'vote',
+        sha256(item.id.encode('utf-8')).hexdigest(),
+        int(item.last_result_change.timestamp()),
+        locale
+    )
