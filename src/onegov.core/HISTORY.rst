@@ -1,6 +1,12 @@
 Changelog
 ---------
 
+- Improves the performance of some code hotspots.
+  [href]
+
+- Adds the ability to directly provide a filestorage object.
+  [href]
+
 - Improves the performance of the csv parser.
   [href]
 

@@ -15,6 +15,7 @@ from collections import Iterable
 from contextlib import contextmanager
 from cProfile import Profile
 from datetime import datetime
+from functools import lru_cache
 from importlib import import_module
 from itertools import groupby, tee
 from onegov.core import log
@@ -143,6 +144,16 @@ def timing(name=None):
         print('{} ms'.format(duration))
 
 
+@lru_cache(maxsize=32)
+def module_path_root(module):
+    if isinstance(module, str):
+        module = importlib.import_module(module)
+
+    assert module is not None
+
+    return os.path.dirname(inspect.getfile(module))
+
+
 def module_path(module, subpath):
     """ Returns a subdirectory in the given python module.
 
@@ -153,14 +164,7 @@ def module_path(module, subpath):
         Subpath below that python module. Leading slashes ('/') are ignored.
     """
 
-    subpath = subpath.strip('/')
-
-    if isinstance(module, str):
-        module = importlib.import_module(module)
-
-    assert module is not None
-
-    parent = os.path.dirname(inspect.getfile(module))
+    parent = module_path_root(module)
     path = os.path.join(parent, subpath)
 
     # always be paranoid with path manipulation

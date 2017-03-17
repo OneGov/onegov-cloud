@@ -325,16 +325,15 @@ class SessionManager(object):
 
         # the instance is shared with all classes, loaded or created
         def share_with_class(target, *args, **kwargs):
-            nonlocal self
             target.session_manager = weakref.proxy(self)
 
         # and it is shared with all query types, at which point there is
         # no type available yet.
         def share_with_query(query):
-            nonlocal self
+            session_manager = weakref.proxy(self)
 
             for desc in query.column_descriptions:
-                desc['type'].session_manager = weakref.proxy(self)
+                desc['type'].session_manager = session_manager
 
         event.listen(Query, 'before_compile', share_with_query, retval=False)
 
