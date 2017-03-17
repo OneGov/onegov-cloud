@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves the performance of the csv parser.
+  [href]
+
 0.38.1 (2017-03-10)
 ~~~~~~~~~~~~~~~~~~~
 

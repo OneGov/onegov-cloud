@@ -12,6 +12,7 @@ from csv import Error as CsvError
 from csv import reader as csv_reader
 from csv import writer as csv_writer
 from editdistance import eval as distance
+from functools import lru_cache
 from io import BytesIO, StringIO
 from itertools import permutations
 from onegov.core import errors
@@ -108,6 +109,7 @@ class CSVFile(object):
             )
         )
 
+    @lru_cache(maxsize=128)
     def as_valid_identifier(self, value):
         result = normalize_header(value)
         for invalid in '- .':
