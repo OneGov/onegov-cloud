@@ -92,7 +92,7 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
     def identity_secret(self):
         return self.app.identity_secret
 
-    def link_prefix(self):
+    def link_prefix(self, *args, **kwargs):
         """ Override the `link_prefix` with the application base path provided
         by onegov.server, because the default link_prefix contains the
         hostname, which is not useful in our case - we'll add the hostname

@@ -50,7 +50,7 @@ setup(
         'isodate',
         'lazy-object-proxy',
         'mailthon>=0.1.1',
-        'morepath>=0.17',
+        'morepath>=0.18',
         'more.transaction>=0.5',
         'more.webassets>=0.3.1',
         'networkx',

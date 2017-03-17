@@ -37,10 +37,10 @@ class HtmlHandleFormAction(HtmlAction):
             return {}  # template variables
 
     """
-    def __init__(self, model, form, render=None, template=None,
+    def __init__(self, model, form, render=None, template=None, load=None,
                  permission=None, internal=False, **predicates):
         self.form = form
-        super().__init__(model, render, template, permission, internal,
+        super().__init__(model, render, template, load, permission, internal,
                          **predicates)
 
     def perform(self, obj, *args, **kwargs):
