@@ -8,6 +8,7 @@ import transaction
 
 from _pytest.monkeypatch import MonkeyPatch
 from elasticsearch import Elasticsearch
+from fs.memoryfs import MemoryFS
 from functools import lru_cache
 from mirakuru import HTTPExecutor as HTTPExecutorBase
 from onegov.core.crypto import hash_password
@@ -306,3 +307,8 @@ def smtp(smtp_server):
 @pytest.yield_fixture(scope="session")
 def test_password():
     return hash_password('hunter2')
+
+
+@pytest.yield_fixture(scope="session")
+def long_lived_filestorage():
+    return MemoryFS()

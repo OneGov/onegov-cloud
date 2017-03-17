@@ -42,7 +42,15 @@ def random_namespace():
     return 'test_' + uuid4().hex
 
 
-def create_app(app_class, request, use_elasticsearch=False):
+def create_app(app_class, request,
+               use_elasticsearch=False, reuse_filestorage=True):
+
+    # filestorage can be reused between tries as it is nowadays mainly (if not
+    # exclusively) used by the theme compiler
+    if reuse_filestorage:
+        filestorage_object = request.getfixturevalue('long_lived_filestorage')
+    else:
+        filestorage_object = None
 
     if not app_class.is_committed():
         scan_morepath_modules(app_class)
@@ -60,6 +68,7 @@ def create_app(app_class, request, use_elasticsearch=False):
     app.configure_application(
         dsn=request.getfixturevalue('postgres_dsn'),
         filestorage='fs.memoryfs.MemoryFS',
+        filestorage_object=filestorage_object,
         depot_backend='depot.io.memory.MemoryFileStorage',
         identity_secure=False,
         disable_memcached=True,
@@ -69,7 +78,9 @@ def create_app(app_class, request, use_elasticsearch=False):
 
     app.set_application_id(app.namespace + '/test')
     app.clear_request_cache()
-    app.bind_depot()
+
+    if hasattr(app, 'bind_depot'):
+        app.bind_depot()
 
     # cronjobs leave lingering sessions open, in real life this is not a
     # problem, but in testing it leads to connection pool exhaustion
