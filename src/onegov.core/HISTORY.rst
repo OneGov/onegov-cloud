@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.38.2 (2017-03-17)
+~~~~~~~~~~~~~~~~~~~
 
 - Improves the performance of some code hotspots.
   [href]
