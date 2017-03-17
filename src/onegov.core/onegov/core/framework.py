@@ -364,6 +364,10 @@ class Framework(TransactionApp, WebassetsApp, OrmCacheApp, ServerApplication):
 
     def configure_filestorage(self, **cfg):
 
+        if 'filestorage_object' in cfg:
+            self._global_file_storage = cfg['filestorage_object']
+            return
+
         if 'filestorage' in cfg:
             filestorage_class = load_class(cfg.get('filestorage'))
             filestorage_options = cfg.get('filestorage_options', {})
