@@ -1,15 +1,12 @@
-import morepath
-import onegov.core
-import onegov.election_day
 import os.path
 import pytest
 import textwrap
 import transaction
 
 from onegov.core.crypto import hash_password
-from onegov.core.utils import scan_morepath_modules
+from onegov.election_day import ElectionDayApp
 from onegov.user import User
-from uuid import uuid4
+from onegov.testing.utils import create_app
 
 
 @pytest.fixture(scope='session')
@@ -18,26 +15,12 @@ def election_day_password():
     return hash_password('hunter2')
 
 
-def create_app(postgres_dsn, temporary_directory, election_day_password,
-               canton="", municipality="", use_maps="false"):
+def create_election_day(request, canton="", municipality="", use_maps="false"):
 
-    scan_morepath_modules(onegov.election_day.ElectionDayApp)
-    morepath.commit(onegov.election_day.ElectionDayApp)
+    tmp = request.getfixturevalue('temporary_directory')
 
-    app = onegov.election_day.ElectionDayApp()
-    app.namespace = 'test_' + uuid4().hex
-    app.configure_application(
-        dsn=postgres_dsn,
-        filestorage='fs.osfs.OSFS',
-        filestorage_options={
-            'root_path': os.path.join(temporary_directory, 'file-storage'),
-            'create': True
-        },
-        identity_secure=False,
-        disable_memcached=True,
-        sms_directory=os.path.join(temporary_directory, 'sms'),
-    )
-    app.set_application_id(app.namespace + '/' + 'test')
+    app = create_app(ElectionDayApp, request, use_smtp=False)
+    app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
 
     app.filestorage.settext('principal.yml', textwrap.dedent("""
         name: Kanton Govikon
@@ -50,7 +33,7 @@ def create_app(postgres_dsn, temporary_directory, election_day_password,
 
     app.session().add(User(
         username='admin@example.org',
-        password_hash=election_day_password,
+        password_hash=request.getfixturevalue('election_day_password'),
         role='admin'
     ))
 
@@ -60,56 +43,40 @@ def create_app(postgres_dsn, temporary_directory, election_day_password,
 
 
 @pytest.fixture(scope="function")
-def election_day_app(postgres_dsn, temporary_directory, election_day_password):
+def election_day_app(request):
 
-    app = create_app(
-        postgres_dsn, temporary_directory, election_day_password, "zg"
-    )
+    app = create_election_day(request, "zg")
     yield app
     app.session_manager.dispose()
 
 
 @pytest.fixture(scope="function")
-def election_day_app_gr(postgres_dsn, temporary_directory,
-                        election_day_password):
+def election_day_app_gr(request):
 
-    app = create_app(
-        postgres_dsn, temporary_directory, election_day_password, "gr"
-    )
+    app = create_election_day(request, "gr")
     yield app
     app.session_manager.dispose()
 
 
 @pytest.fixture(scope="function")
-def election_day_app_sg(postgres_dsn, temporary_directory,
-                        election_day_password):
+def election_day_app_sg(request):
 
-    app = create_app(
-        postgres_dsn, temporary_directory, election_day_password, "sg"
-    )
+    app = create_election_day(request, "sg")
     yield app
     app.session_manager.dispose()
 
 
 @pytest.fixture(scope="function")
-def election_day_app_bern(postgres_dsn, temporary_directory,
-                          election_day_password):
+def election_day_app_bern(request):
 
-    app = create_app(
-        postgres_dsn, temporary_directory, election_day_password, "",
-        "'351'", "true"
-    )
+    app = create_election_day(request, "", "'351'", "true")
     yield app
     app.session_manager.dispose()
 
 
 @pytest.fixture(scope="function")
-def election_day_app_kriens(postgres_dsn, temporary_directory,
-                            election_day_password):
+def election_day_app_kriens(request):
 
-    app = create_app(
-        postgres_dsn, temporary_directory, election_day_password, "",
-        "'1059'", "false"
-    )
+    app = create_election_day(request, "", "'1059'", "false")
     yield app
     app.session_manager.dispose()
