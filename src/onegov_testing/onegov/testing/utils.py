@@ -42,8 +42,8 @@ def random_namespace():
     return 'test_' + uuid4().hex
 
 
-def create_app(app_class, request,
-               use_elasticsearch=False, reuse_filestorage=True):
+def create_app(app_class, request, use_elasticsearch=False,
+               reuse_filestorage=True, use_smtp=True):
 
     # filestorage can be reused between tries as it is nowadays mainly (if not
     # exclusively) used by the theme compiler
@@ -86,14 +86,15 @@ def create_app(app_class, request,
     # problem, but in testing it leads to connection pool exhaustion
     app.settings.cronjobs = Bunch(enabled=False)
 
-    smtp = request.getfixturevalue('smtp')
+    if use_smtp:
+        smtp = request.getfixturevalue('smtp')
 
-    app.mail_host, app.mail_port = smtp.address
-    app.mail_sender = 'mails@govikon.ch'
-    app.mail_force_tls = False
-    app.mail_username = None
-    app.mail_password = None
-    app.mail_use_directory = False
-    app.smtp = smtp
+        app.mail_host, app.mail_port = smtp.address
+        app.mail_sender = 'mails@govikon.ch'
+        app.mail_force_tls = False
+        app.mail_username = None
+        app.mail_password = None
+        app.mail_use_directory = False
+        app.smtp = smtp
 
     return app
