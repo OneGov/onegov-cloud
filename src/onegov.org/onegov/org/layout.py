@@ -9,7 +9,7 @@ from onegov.core.static import StaticFile
 from onegov.core.utils import linkify
 from onegov.event import OccurrenceCollection
 from onegov.form import FormCollection, FormSubmissionFile, render_field
-from onegov.libres import ResourceCollection
+from onegov.newsletter import NewsletterCollection, RecipientCollection
 from onegov.org import _
 from onegov.org import utils
 from onegov.org.elements import DeleteLink, Link, LinkGroup
@@ -27,7 +27,7 @@ from onegov.org.models import (
     SiteCollection,
 )
 from onegov.org.theme.org_theme import user_options
-from onegov.newsletter import NewsletterCollection, RecipientCollection
+from onegov.reservation import ResourceCollection
 from onegov.people import PersonCollection
 from onegov.ticket import TicketCollection
 from onegov.user import Auth, UserCollection

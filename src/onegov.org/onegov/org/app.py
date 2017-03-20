@@ -7,7 +7,6 @@ from onegov.core import Framework, utils
 from onegov.core.orm import orm_cached
 from onegov.file import DepotApp
 from onegov.gis import MapboxApp
-from onegov.libres import LibresIntegration
 from onegov.org import directives
 from onegov.org.homepage_widgets import transform_homepage_structure
 from onegov.org.initial_content import create_new_organisation
@@ -15,6 +14,7 @@ from onegov.org.models import Topic, Organisation
 from onegov.org.request import OrgRequest
 from onegov.org.theme import OrgTheme
 from onegov.page import Page, PageCollection
+from onegov.reservation import LibresIntegration
 from onegov.search import ElasticsearchApp
 from onegov.ticket import TicketCollection
 from sqlalchemy import desc

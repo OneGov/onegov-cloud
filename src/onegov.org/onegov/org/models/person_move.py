@@ -1,6 +1,6 @@
 from onegov.page import Page
 from onegov.form import FormDefinition
-from onegov.libres.models import Resource
+from onegov.reservation.models import Resource
 
 
 class PersonMove(object):

@@ -16,8 +16,8 @@ from onegov.form import (
     CompleteFormSubmission,
     PendingFormSubmission
 )
-from onegov.libres import ResourceCollection
-from onegov.libres.models import Resource
+from onegov.reservation import ResourceCollection
+from onegov.reservation.models import Resource
 from onegov.newsletter import (
     Newsletter,
     NewsletterCollection,

@@ -4,7 +4,7 @@ import os
 from onegov.core.utils import module_path, rchop
 from onegov.event import EventCollection, OccurrenceCollection
 from onegov.form import FormCollection
-from onegov.libres import ResourceCollection
+from onegov.reservation import ResourceCollection
 from onegov.page import PageCollection
 
 

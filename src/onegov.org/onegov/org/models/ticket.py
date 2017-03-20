@@ -4,7 +4,7 @@ from onegov.core import utils
 from onegov.core.templates import render_macro
 from onegov.event import EventCollection
 from onegov.form import FormSubmissionCollection
-from onegov.libres import Resource
+from onegov.reservation import Resource
 from onegov.org import _
 from onegov.org.elements import DeleteLink, Link, LinkGroup
 from onegov.org.layout import DefaultLayout, EventLayout

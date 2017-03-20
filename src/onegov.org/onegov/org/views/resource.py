@@ -8,8 +8,8 @@ from itertools import groupby
 from libres.db.models import Reservation
 from onegov.core.security import Public, Private
 from onegov.form import FormSubmission
-from onegov.libres import ResourceCollection
-from onegov.libres.models import Resource
+from onegov.reservation import ResourceCollection
+from onegov.reservation.models import Resource
 from onegov.org import _, OrgApp, utils
 from onegov.org.elements import Link
 from onegov.org.forms import (

@@ -3,15 +3,15 @@ import os
 import yaml
 
 from datetime import datetime, timedelta
+from functools import lru_cache
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
 from onegov.file import FileSetCollection, FileCollection
 from onegov.form import FormCollection
-from onegov.libres import ResourceCollection
 from onegov.org.models import Organisation
 from onegov.page import PageCollection
+from onegov.reservation import ResourceCollection
 from sedate import as_datetime
-from functools import lru_cache
 
 
 @lru_cache(maxsize=1)

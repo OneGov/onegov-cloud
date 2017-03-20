@@ -5,10 +5,10 @@ from libres.db.models import Reservation
 from onegov.core.templates import render_template
 from onegov.form import FormSubmission
 from onegov.form.parser.core import parse_form
-from onegov.libres import Resource, ResourceCollection
 from onegov.org import _, OrgApp
 from onegov.org.layout import DefaultMailLayout
 from onegov.org.models import ResourceRecipient, ResourceRecipientCollection
+from onegov.reservation import Resource, ResourceCollection
 from onegov.ticket import Ticket, TicketCollection
 from onegov.user import User, UserCollection
 from sedate import replace_timezone, to_timezone, utcnow, align_date_to_day

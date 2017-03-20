@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from onegov.core.utils import Bunch
 from onegov.ticket import Handler, Ticket, TicketCollection
 from onegov.user import UserCollection
-from onegov.libres import ResourceCollection
+from onegov.reservation import ResourceCollection
 from webtest import TestApp as Client
 from sedate import ensure_timezone
 from onegov.form import FormSubmissionCollection

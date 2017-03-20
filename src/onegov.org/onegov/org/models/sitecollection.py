@@ -1,5 +1,5 @@
 from onegov.form.models import FormDefinition
-from onegov.libres.models import Resource
+from onegov.reservation.models import Resource
 from onegov.org.models.file import ImageSet
 from onegov.org.models.page import News, Topic
 from sqlalchemy.orm import defer

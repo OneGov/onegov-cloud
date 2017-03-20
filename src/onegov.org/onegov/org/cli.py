@@ -12,9 +12,9 @@ from datetime import date, datetime, timedelta
 from libres.modules.errors import InvalidEmailAddress, AlreadyReservedError
 from onegov.core.cli import command_group, pass_group_context, abort
 from onegov.form import FormCollection
-from onegov.libres import ResourceCollection
 from onegov.org.formats import DigirezDB
 from onegov.org.models import Organisation
+from onegov.reservation import ResourceCollection
 from onegov.ticket import TicketCollection
 from onegov.user import UserCollection, User
 from sqlalchemy import create_engine

@@ -4,7 +4,7 @@ from onegov.org import _
 from wtforms import StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, Email
-from onegov.libres import Resource, ResourceCollection
+from onegov.reservation import Resource, ResourceCollection
 
 
 WEEKDAYS = (

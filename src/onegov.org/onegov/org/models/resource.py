@@ -4,7 +4,7 @@ from datetime import datetime
 from libres.db.models import Reservation
 from onegov.core.orm.mixins import meta_property, content_property
 from onegov.core.orm.types import UUID
-from onegov.libres.models import Resource
+from onegov.reservation.models import Resource
 from onegov.form.models import FormSubmission
 from onegov.org.models.extensions import (
     ContactExtension,
