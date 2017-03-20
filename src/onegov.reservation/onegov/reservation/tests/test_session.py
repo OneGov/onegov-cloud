@@ -4,7 +4,7 @@ from datetime import datetime
 from libres import new_scheduler
 from onegov.core.framework import Framework
 from onegov.core.utils import scan_morepath_modules
-from onegov.libres import LibresIntegration, ResourceCollection
+from onegov.reservation import LibresIntegration, ResourceCollection
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from uuid import uuid4

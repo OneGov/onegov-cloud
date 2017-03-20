@@ -2,7 +2,7 @@ import pytest
 import transaction
 
 from datetime import datetime
-from onegov.libres.models import Resource
+from onegov.reservation.models import Resource
 from uuid import uuid4
 
 

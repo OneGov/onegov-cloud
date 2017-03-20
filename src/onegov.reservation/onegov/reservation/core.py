@@ -1,6 +1,6 @@
 from libres.context.registry import create_default_registry
 from libres.db.models import ORMBase
-from onegov.libres.collection import ResourceCollection
+from onegov.reservation.collection import ResourceCollection
 from uuid import UUID
 
 

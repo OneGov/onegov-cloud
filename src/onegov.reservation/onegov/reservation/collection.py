@@ -1,5 +1,5 @@
 from onegov.core.utils import normalize_for_url
-from onegov.libres.models import Resource
+from onegov.reservation.models import Resource
 from uuid import uuid4
 
 

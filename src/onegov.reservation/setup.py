@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-name = 'onegov.libres'
+name = 'onegov.reservation'
 description = (
     'Libres integration for OneGov Cloud.'
 )
@@ -22,7 +22,7 @@ setup(
     version=version,
     description=description,
     long_description=get_long_description(),
-    url='http://github.com/OneGov/onegov.libres',
+    url='http://github.com/OneGov/onegov.reservation',
     author='Seantis GmbH',
     author_email='info@seantis.ch',
     license='GPLv2',
@@ -45,7 +45,7 @@ setup(
     ),
     entry_points={
         'onegov': [
-            'upgrade = onegov.libres.upgrade'
+            'upgrade = onegov.reservation.upgrade'
         ]
     },
     classifiers=[

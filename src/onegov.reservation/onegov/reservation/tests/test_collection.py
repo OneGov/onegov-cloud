@@ -1,7 +1,7 @@
 import pytest
 
 from datetime import date, datetime
-from onegov.libres import ResourceCollection
+from onegov.reservation import ResourceCollection
 
 
 def test_resource_collection(libres_context):

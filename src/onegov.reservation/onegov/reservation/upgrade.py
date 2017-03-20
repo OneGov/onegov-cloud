@@ -3,7 +3,7 @@ upgraded on the server. See :class:`onegov.core.upgrade.upgrade_task`.
 
 """
 from onegov.core.upgrade import upgrade_task
-from onegov.libres import LibresIntegration
+from onegov.reservation import LibresIntegration
 from sqlalchemy import Column, Text
 
 
