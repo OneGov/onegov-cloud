@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Improves testing performance.
+  [href]
+
 1.6.0 (2017-03-06)
 ~~~~~~~~~~~~~~~~~~~
 
