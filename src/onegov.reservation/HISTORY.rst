@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Renames package from onegov.libres to onegov.reservation to avoid ambiguity
+  at the namespace level.
+  [href]
+
 0.3.0 (2016-06-24)
 ~~~~~~~~~~~~~~~~~~~
 
