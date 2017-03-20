@@ -4,7 +4,7 @@ name = 'onegov.reservation'
 description = (
     'Libres integration for OneGov Cloud.'
 )
-version = '0.3.0'
+version = '0.4.0'
 
 
 def get_long_description():
