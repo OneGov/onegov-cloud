@@ -35,8 +35,8 @@ setup(
         'cached_property',
         'onegov.core>=0.37.0',
         'onegov.foundation',
-        'onegov.libres',
         'onegov.org>=0.3.3',
+        'onegov.reservation',
         'onegov.town>=1.12.3'
     ],
     extras_require=dict(

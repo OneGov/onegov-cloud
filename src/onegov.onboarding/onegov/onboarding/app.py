@@ -1,7 +1,7 @@
 from onegov.core import Framework, utils
 from onegov.file import DepotApp
-from onegov.libres import LibresIntegration
 from onegov.onboarding.theme import OnboardingTheme
+from onegov.reservation import LibresIntegration
 
 
 class OnboardingApp(Framework, LibresIntegration, DepotApp):
