@@ -8,8 +8,9 @@ from sqlalchemy import Column, Text
 
 
 def run_upgrades(context):
-    """ onegov.libres is a bit special because it defines its tables through
-    its own declarative base. This is due to libres requireing its own base.
+    """ onegov.reservation is a bit special because it defines its tables
+    through its own declarative base. This is due to libres requireing its own
+    base.
 
     As a consequence, not all applications loaded in the current process have
     all the tables for all the modules (which is usually the case for all

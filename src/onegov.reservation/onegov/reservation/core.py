@@ -49,13 +49,13 @@ class LibresIntegration(object):
 
     @staticmethod
     def libres_context_from_session_manager(registry, session_manager):
-        if registry.is_existing_context('onegov.libres'):
-            return registry.get_context('onegov.libres')
+        if registry.is_existing_context('onegov.reservation'):
+            return registry.get_context('onegov.reservation')
 
-        context = registry.register_context('onegov.libres')
+        context = registry.register_context('onegov.reservation')
         context.set_service('session_provider', lambda ctx: session_manager)
 
-        # onegov.libres uses uuids for the resources, so we don't need to
+        # onegov.reservation uses uuids for the resources, so we don't need to
         # generate anything, we can just reuse the id (which is passed as the
         # name)
         def uuid_generator(name):
