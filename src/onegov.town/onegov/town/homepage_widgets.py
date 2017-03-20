@@ -1,5 +1,5 @@
 from onegov.form import FormCollection
-from onegov.libres import ResourceCollection
+from onegov.reservation import ResourceCollection
 from onegov.org.elements import Link, LinkGroup
 from onegov.org.models import AtoZPages, ImageSetCollection
 from onegov.people import PersonCollection

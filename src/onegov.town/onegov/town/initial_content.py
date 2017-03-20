@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from onegov.core.utils import module_path
 from onegov.event import EventCollection
-from onegov.libres import ResourceCollection
+from onegov.reservation import ResourceCollection
 from onegov.org.initial_content import add_builtin_forms
 from onegov.org.initial_content import builtin_form_definitions
 from onegov.org.initial_content import add_filesets, add_pages, load_content
