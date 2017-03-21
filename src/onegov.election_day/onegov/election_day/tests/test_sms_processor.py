@@ -1,6 +1,6 @@
 import os
 
-from onegov.election_day.sms_processor import SmsQueueProcessor
+from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 from unittest.mock import Mock
 
 

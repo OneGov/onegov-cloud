@@ -530,58 +530,20 @@ def test_view_headerless(election_day_app):
     upload_vote(client)
     upload_majorz_election(client, zg=True)
 
-    ballot = election_day_app.session().query(Ballot).one().id
-
     for path in (
         '/',
         '/archive/2013',
-        '/election/majorz-election/lists',
         '/election/majorz-election/candidates',
-        '/election/majorz-election/connections',
+        '/election/majorz-election/districts',
         '/election/majorz-election/statistics',
+        '/election/majorz-election/data',
         '/vote/vote',
     ):
-        assert 'frame_resizer' not in client.get(path)
-        assert 'frame_resizer' in client.get(path + '?headerless')
-        assert 'frame_resizer' in client.get(path)
-        assert 'frame_resizer' not in client.get(path + '?headerful')
-        assert 'frame_resizer' not in client.get(path)
-
-    for path in (
-        '/archive/2013/json',
-        '/election/majorz-election/candidates-data',
-        '/election/majorz-election/connections-data',
-        '/election/majorz-election/data-csv',
-        '/election/majorz-election/data-json',
-        '/election/majorz-election/data-xlsx',
-        '/election/majorz-election/json',
-        '/election/majorz-election/lists-data',
-        '/election/majorz-election/summary',
-        '/json',
-        '/ballot/{}/by-entity'.format(ballot),
-        '/vote/vote/data-csv',
-        '/vote/vote/data-json',
-        '/vote/vote/data-xlsx',
-        '/vote/vote/json',
-        '/vote/vote/summary',
-    ):
-        assert 'frame_resizer' not in client.get(path)
-        assert 'frame_resizer' not in client.get(path + '?headerless')
-        assert 'frame_resizer' not in client.get(path)
-        assert 'frame_resizer' not in client.get(path + '?headerful')
-        assert 'frame_resizer' not in client.get(path)
-
-    for path in (
-        '/election/majorz-election/candidates-chart',
-        '/election/majorz-election/lists-chart',
-        '/election/majorz-election/connections-chart',
-        '/ballot/{}/map'.format(ballot),
-    ):
-        assert 'frame_resizer' in client.get(path)
-        assert 'frame_resizer' in client.get(path + '?headerless')
-        assert 'frame_resizer' in client.get(path)
-        assert 'frame_resizer' in client.get(path + '?headerful')
-        assert 'frame_resizer' in client.get(path)
+        assert 'manage-links' in client.get(path)
+        assert 'manage-links' not in client.get(path + '?headerless')
+        assert 'manage-links' not in client.get(path)
+        assert 'manage-links' in client.get(path + '?headerful')
+        assert 'manage-links' in client.get(path)
 
 
 def test_view_subscription(election_day_app):

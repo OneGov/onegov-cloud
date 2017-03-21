@@ -229,7 +229,6 @@ def get_ballot_map_asset():
     yield 'd3.chart.map.js'
     yield 'topojson.js'
     yield 'embed.js'
-    # yield 'ballot-map.js'
     yield 'ballot-map.js'
 
 
