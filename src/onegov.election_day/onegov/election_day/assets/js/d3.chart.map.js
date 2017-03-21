@@ -11,6 +11,9 @@ var ballotMap = function(params) {
     var yay = 'Yay';
     var nay = 'Nay';
     var options = {
+        legendHeight: 10,
+        legendMargin: 30,
+        fontSizePx: 14,
         fontFamily: 'sans-serif',
     };
 
@@ -28,9 +31,12 @@ var ballotMap = function(params) {
 
     var chart = function(container) {
 
+        width = width || $(container).width();
+
         var svg = d3.select(container).append('svg')
             .attr('xmlns', 'http://www.w3.org/2000/svg')
-            .attr('version', '1.1');
+            .attr('version', '1.1')
+            .attr('width', width);
 
         if (data && mapdata) {
 
@@ -154,14 +160,15 @@ var ballotMap = function(params) {
             // Get the bounding box
             var bbox = svg[0][0].getBBox();
 
-            // Add the legend
+            // Add the legend (we need to up/downscale the elements)
+            var fit_scale = bbox.width / width;
             var legend_values = [80, 70, 60, 50.001, 49.999, 40, 30, 20];
             var legend_scale = d3.scale.ordinal()
                 .domain(legend_values)
                 .rangeRoundBands([0.2 * bbox.width, 0.8 * bbox.width]);
             var legend = svg.append('g')
                 .attr('transform', function(d) {
-                    return 'translate(0,' + Math.round(bbox.height / 10) + ')';
+                    return 'translate(0,' + Math.round(fit_scale * options.legendMargin) + ')';
                 });
             legend.selectAll('.legend_item')
                 .data(legend_values).enter()
@@ -170,21 +177,21 @@ var ballotMap = function(params) {
                     return legend_scale(d);
                 })
                 .attr('width', legend_scale.rangeBand())
-                .attr('height', Math.round(bbox.height / 40))
+                .attr('height', Math.round(fit_scale * options.legendHeight))
                 .style('fill', function(d) {
                     return scale(d);
                 });
             legend.append('text')
                 .attr('x', legend_scale(80))
-                .attr('y', Math.round(2.5 * bbox.height / 40))
-                .style('font-size', Math.round(1.5 * bbox.height / 40) + 'px')
+                .attr('y', Math.round(fit_scale * (options.legendHeight + 1.5 * options.fontSizePx)))
+                .style('font-size', Math.round(fit_scale * options.fontSizePx) + 'px')
                 .style('font-family', options.fontFamily)
                 .text(yay);
             legend.append('text')
                 .attr('x', legend_scale(20) + legend_scale.rangeBand())
-                .attr('y', Math.round(2.5 * bbox.height / 40))
+                .attr('y', Math.round(fit_scale * (options.legendHeight + 1.5 * options.fontSizePx)))
                 .style('text-anchor', 'end')
-                .style('font-size', Math.round(1.5 * bbox.height / 40) + 'px')
+                .style('font-size', Math.round(fit_scale * options.fontSizePx) + 'px')
                 .style('font-family', options.fontFamily)
                 .text(nay);
 
@@ -213,18 +220,18 @@ var ballotMap = function(params) {
             }
 
             // Set size
-            width = width || $(container).width();
             bbox = svg[0][0].getBBox();
             svg.attr('viewBox',
                 [bbox.x, bbox.y, bbox.width, bbox.height].join(' ')
             );
             height = Math.floor(width * (bbox.height/bbox.width)) + 70;
-            svg.attr('width', width).attr('height', height);
+            svg.attr('height', height);
 
             // Relayout on resize
             if (interactive) {
                 d3.select(window).on('resize.ballotmap', function() {
                     width = $(container).width();
+                    svg.attr('width', width).attr('height', height);
                     bbox = svg[0][0].getBBox();
                     height = Math.floor(width * (bbox.height/bbox.width)) + 70;
                     svg.attr('width', width).attr('height', height);
