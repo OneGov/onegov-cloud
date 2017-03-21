@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Supports newlines in Excel outputs on all platforms.
+  [href]
+
 0.38.3 (2017-03-20)
 ~~~~~~~~~~~~~~~~~~~
 

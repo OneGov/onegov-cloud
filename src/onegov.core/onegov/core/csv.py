@@ -368,12 +368,14 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
 
     with tempfile.NamedTemporaryFile() as file:
         workbook = Workbook(file.name, options={'constant_memory': True})
+        cellformat = workbook.add_format({'text_wrap': True})
+
         worksheet = workbook.add_worksheet()
 
         fields = fields or get_keys_from_list_of_dicts(rows, key, reverse)
 
         # write the header
-        worksheet.write_row(0, 0, fields)
+        worksheet.write_row(0, 0, fields, cellformat)
 
         # keep track of the maximum character width
         column_widths = [estimate_width(field) for field in fields]
@@ -386,11 +388,14 @@ def convert_list_of_dicts_to_xlsx(rows, fields=None, key=None, reverse=False):
                     estimate_width(str(value))
                 )
 
+                if isinstance(value, str):
+                    value = value.replace('\r', '')
+
                 yield value
 
         # write the rows
         for r, row in enumerate(rows, start=1):
-            worksheet.write_row(r, 0, values(row))
+            worksheet.write_row(r, 0, values(row), cellformat)
 
         # set the column widths
         for col, width in enumerate(column_widths):
