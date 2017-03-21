@@ -48,6 +48,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
+    // require('fs').writeFile("grouped@1.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(1);
     expect(chart.width()).toBe(1);
@@ -66,6 +67,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
+    // require('fs').writeFile("grouped@2.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(200);
@@ -84,6 +86,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
+    // require('fs').writeFile("grouped@500.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(500);
@@ -102,6 +105,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
+    // require('fs').writeFile("grouped@700.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(700);
@@ -120,6 +124,7 @@ describe('Grouped bar chart', () => {
       }
     });
     chart(document.body);
+    // require('fs').writeFile("grouped@2k.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(2000);
@@ -146,12 +151,13 @@ describe('Grouped bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("grouped@w.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
     expect(chart.height()).toBe(400);
     expect(chart.width()).toBe(700);
   });
 
-  it('doen\'t render a svg with missing parameters', () => {
+  it('doesn\'t render a svg with missing parameters', () => {
     var document = jsdom.jsdom();
     var chart = groupedChart({
       width: 700,

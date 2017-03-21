@@ -20,6 +20,10 @@ Install jest and run it::
     npm install
     npm t
 
+To update the snapshots, run::
+
+    npm t -- -u
+
 Conventions
 -----------
 

@@ -95,7 +95,10 @@
 
         var chart = function(container) {
 
-            width = width || ($(container).width() - margin.left - margin.right);
+            // Try to read a default width from the container if none is given
+            if ((typeof $ !== 'undefined') && !width) {
+                width = $(container).width() - margin.left - margin.right;
+            }
 
             var svg = d3.select(container).append('svg')
                 .attr('xmlns', 'http://www.w3.org/2000/svg')
@@ -279,11 +282,11 @@
         };
 
         chart.width = function() {
-            return width;
+            return width + margin.left + margin.right;
         };
 
         chart.height = function() {
-            return height;
+            return height + margin.top + margin.bottom;
         };
 
         return chart;

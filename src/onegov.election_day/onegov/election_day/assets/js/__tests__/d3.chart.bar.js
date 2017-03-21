@@ -8,8 +8,8 @@ describe('Bar chart', () => {
     var chart = barChart();
     chart(document.body);
     expect(document.svg(d3)).toMatchSnapshot();
-    expect(chart.height()).toBe(0);
-    expect(chart.width()).toBe(0);
+    expect(chart.height()).toBe(0+40);
+    expect(chart.width()).toBe(0+20);
   });
 
   it('renders a svg @0', () => {
@@ -39,9 +39,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar@0.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(18*24);
-    expect(chart.width()).toBe(0);
+    expect(chart.height()).toBe(18*24+40);
+    expect(chart.width()).toBe(0+20);
   });
 
   it('renders a svg @100', () => {
@@ -71,9 +72,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar@100.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(18*24);
-    expect(chart.width()).toBe(100);
+    expect(chart.height()).toBe(18*24+40);
+    expect(chart.width()).toBe(100+20);
   });
 
   it('renders a svg @500', () => {
@@ -103,9 +105,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar@500.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(18*24);
-    expect(chart.width()).toBe(500);
+    expect(chart.height()).toBe(18*24+40);
+    expect(chart.width()).toBe(500+20);
   });
 
   it('renders a svg @700', () => {
@@ -135,9 +138,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar@700.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(18*24);
-    expect(chart.width()).toBe(700);
+    expect(chart.height()).toBe(18*24+40);
+    expect(chart.width()).toBe(700+20);
   });
 
   it('renders a svg @2000', () => {
@@ -167,9 +171,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar@2000.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(18*24);
-    expect(chart.width()).toBe(2000);
+    expect(chart.height()).toBe(18*24+40);
+    expect(chart.width()).toBe(2000+20);
   });
 
   it('renders a svg with majority line @0', () => {
@@ -190,9 +195,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar_m@0.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(8*24);
-    expect(chart.width()).toBe(700);
+    expect(chart.height()).toBe(8*24+40);
+    expect(chart.width()).toBe(700+20);
   });
 
   it('renders a svg with majority line @1', () => {
@@ -213,9 +219,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar_m@1.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(8*24);
-    expect(chart.width()).toBe(700);
+    expect(chart.height()).toBe(8*24+40);
+    expect(chart.width()).toBe(700+20);
   });
 
   it('renders a svg with majority line @50%', () => {
@@ -236,9 +243,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar_m@50p.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(8*24);
-    expect(chart.width()).toBe(700);
+    expect(chart.height()).toBe(8*24+40);
+    expect(chart.width()).toBe(700+20);
   });
 
   it('renders a svg with majority line @100%', () => {
@@ -259,9 +267,10 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar_m@100p.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(8*24);
-    expect(chart.width()).toBe(700);
+    expect(chart.height()).toBe(8*24+40);
+    expect(chart.width()).toBe(700+20);
   });
 
   it('renders a svg with majority line @120%', () => {
@@ -282,8 +291,9 @@ describe('Bar chart', () => {
         ]}
     });
     chart(document.body);
+    // require('fs').writeFile("bar_m@120p.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
-    expect(chart.height()).toBe(8*24);
-    expect(chart.width()).toBe(700);
+    expect(chart.height()).toBe(8*24+40);
+    expect(chart.width()).toBe(700+20);
   });
 });
