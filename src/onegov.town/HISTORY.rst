@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+1.12.4 (2017-03-21)
+~~~~~~~~~~~~~~~~~~~~~
+
 - Replaces onegov.libres with onegov.reservation.
   [href]
 
