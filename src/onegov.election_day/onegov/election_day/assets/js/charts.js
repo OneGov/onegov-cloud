@@ -6,16 +6,6 @@ var initBarChart = function(el) {
             interactive: true
         })(el);
 
-        var download_link = $(el).data('download-link');
-        if (download_link) {
-            appendSvgDownloadLink(
-                el,
-                $(el).html(),
-                data.title,
-                download_link
-            );
-        }
-
         var embed_link = $(el).data('embed-link');
         var embed_source = $(el).data('embed-source');
         if (embed_link && embed_source) {
@@ -40,16 +30,6 @@ var initSankeyChart = function(el) {
             inverse: inverse
         })(el);
 
-        var download_link = $(el).data('download-link');
-        if (download_link) {
-            appendSvgDownloadLink(
-                el,
-                $(el).html(),
-                data.title,
-                download_link
-            );
-        }
-
         var embed_link = $(el).data('embed-link');
         var embed_source = $(el).data('embed-source');
         if (embed_link && embed_source) {
@@ -71,16 +51,6 @@ var initGroupedChart = function(el) {
             data: data,
             interactive: true
         })(el);
-
-        var download_link = $(el).data('download-link');
-        if (download_link) {
-            appendSvgDownloadLink(
-                el,
-                $(el).html(),
-                data.title,
-                download_link
-            );
-        }
 
         var embed_link = $(el).data('embed-link');
         var embed_source = $(el).data('embed-source');

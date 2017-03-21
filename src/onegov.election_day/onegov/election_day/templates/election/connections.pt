@@ -19,13 +19,16 @@
             <div class="row">
                 <div class="small-12 small-centered large-10 columns">
                     <figure>
-                        <div class="sankey-chart" i18n:attributes="data-download-link; data-embed-link"
+                        <div class="sankey-chart"
+                            i18n:attributes="data-embed-link"
                             data-dataurl="${request.link(election, name='connections-data')}"
                             data-inverse="true"
-                            data-download-link="Download"
                             data-embed-link="Embed"
                             data-embed-source="${request.link(election, name='connections-chart')}">
                         </div>
+                        <a class="svg-download" tal:condition="layout.svg_path" href="${layout.svg_link}">
+                            <i class="fa fa-download"></i><tal:block i18n:translate="">Download</tal:block>
+                        </a>
                         <figcaption i18n:translate="figcaption_connections">
                             The diagram shows the distribution of votes and seats on list and sublists.
                             The bars on the left correspond to the list connections, the bars in the

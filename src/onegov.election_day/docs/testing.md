@@ -67,6 +67,26 @@ It's important to test the code manually, to see visual flaws etc. One can use t
             - [ ] *ToDo: Define typical scenarios*
             - [ ] Does a round trip produce the same results?
                   - [ ] For RT and RF of the above variants
+- [ ] Do the embedded maps and charts look ok?
+      - [ ] Ballot Maps
+      - [ ] Candidates Bar Charts
+      - [ ] List Bar Charts
+      - [ ] List Connection Charts
+      - [ ] Panachage Charts
+      - [ ] Party Charts
+- [ ] Do the PDFs look ok?
+      - [ ] Simple Votes 
+      - [ ] Complex Votes
+      - [ ] Majorz Elections
+      - [ ] Proporz Elections with historical party data
+      - [ ] Proporz Elections with historical party data
+- [ ] Do the SVGs look ok?
+      - [ ] Ballot Maps
+      - [ ] Candidates Bar Charts
+      - [ ] List Bar Charts
+      - [ ] List Connection Charts
+      - [ ] Panachage Charts
+      - [ ] Party Charts
 
 
 

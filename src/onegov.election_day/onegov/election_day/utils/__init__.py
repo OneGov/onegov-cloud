@@ -1,5 +1,5 @@
 from hashlib import sha256
-from onegov.ballot import Election, Vote
+from onegov.ballot import Election, Vote, Ballot
 from onegov.election_day.models import ArchivedResult
 
 
@@ -193,7 +193,7 @@ def add_local_results(source, target, principal, session):
 def pdf_filename(item, locale):
     """ Generates a filename from an election or vote:
 
-        ['election' or 'vote'][hash of id].[timestamp].[locale].pdf
+        ['election' or 'vote']-[hash of id].[timestamp].[locale].pdf
 
     """
     return '{}-{}.{}.{}.pdf'.format(
@@ -202,3 +202,22 @@ def pdf_filename(item, locale):
         int(item.last_result_change.timestamp()),
         locale
     )
+
+
+def svg_filename(item, type_, locale=None):
+    """ Generates a filename from an election, ballot or vote:
+
+        ['election' or 'vote']-[hash of id].[type_].[timestamp].[locale].svg
+
+    """
+
+    if isinstance(item, Ballot):
+        name = 'ballot'
+        hash = str(item.id)
+        ts = int(item.vote.last_result_change.timestamp())
+    else:
+        name = 'election' if isinstance(item, Election) else 'vote'
+        hash = sha256(item.id.encode('utf-8')).hexdigest()
+        ts = int(item.last_result_change.timestamp())
+
+    return '{}-{}.{}.{}.{}.svg'.format(name, hash, ts, type_, locale or 'any')

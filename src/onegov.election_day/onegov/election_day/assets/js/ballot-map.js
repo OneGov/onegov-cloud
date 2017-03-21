@@ -17,16 +17,6 @@
                         nay: nay
                     })(el);
 
-                    var download_link = $(el).data('download-link');
-                    if (download_link) {
-                        appendSvgDownloadLink(
-                            el,
-                            $(el).find('svg')[0].outerHTML,
-                            'map',
-                            download_link
-                        );
-                    }
-
                     var embed_link = $(el).data('embed-link');
                     var embed_source = $(el).data('embed-source');
                     if (embed_link && embed_source) {

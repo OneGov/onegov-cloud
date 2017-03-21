@@ -6,9 +6,11 @@ from onegov.ballot import VoteCollection
 from onegov.core.i18n import SiteLocale
 from onegov.core.layout import ChameleonLayout
 from onegov.core.static import StaticFile
+from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import SubscriberCollection
+from onegov.election_day.utils import svg_filename
 from onegov.user import Auth
 
 
@@ -110,6 +112,10 @@ class DefaultLayout(Layout):
 
 class ElectionsLayout(Layout):
 
+    def __init__(self, model, request, tab=None):
+        super().__init__(model, request)
+        self.tab = tab
+
     @cached_property
     def all_tabs(self):
         return (
@@ -208,12 +214,43 @@ class ElectionsLayout(Layout):
             ) for tab in self.all_tabs if self.visible(tab)
         )
 
-    def __init__(self, model, request, tab=None):
-        super().__init__(model, request)
-        self.tab = tab
+    @cached_property
+    def svg_path(self):
+        """ Returns the path to the SVG or None, if it is not available. """
+
+        path = '{}/{}'.format(
+            self.request.app.configuration.get('svg_directory', 'svg'),
+            svg_filename(self.model, self.tab)
+        )
+        if self.request.app.filestorage.exists(path):
+            return path
+
+        return None
+
+    @cached_property
+    def svg_link(self):
+        """ Returns a link to the SVG download view. """
+
+        return self.request.link(self.model, name='{}-svg'.format(self.tab))
+
+    @cached_property
+    def svg_name(self):
+        """ Returns a nice to read SVG filename. """
+
+        return '{}.svg'.format(
+            normalize_for_url(
+                '{}-{}'.format(
+                    self.model.id, self.request.translate(self.title())
+                )
+            )
+        )
 
 
 class VotesLayout(Layout):
+
+    def __init__(self, model, request, tab='proposal'):
+        super().__init__(model, request)
+        self.tab = tab
 
     def title(self, tab=None):
         tab = self.tab if tab is None else tab
@@ -306,9 +343,37 @@ class VotesLayout(Layout):
             )
         )
 
-    def __init__(self, model, request, tab='proposal'):
-        super().__init__(model, request)
-        self.tab = tab
+    @cached_property
+    def svg_path(self):
+        """ Returns the path to the SVG file or None, if it is not available.
+        """
+
+        path = '{}/{}'.format(
+            self.request.app.configuration.get('svg_directory', 'svg'),
+            svg_filename(self.ballot, 'map', self.request.locale)
+        )
+        if self.request.app.filestorage.exists(path):
+            return path
+
+        return None
+
+    @cached_property
+    def svg_link(self):
+        """ Returns a link to the SVG download view. """
+
+        return self.request.link(self.ballot, name='svg')
+
+    @cached_property
+    def svg_name(self):
+        """ Returns a nice to read SVG filename. """
+
+        return '{}.svg'.format(
+            normalize_for_url(
+                '{}-{}'.format(
+                    self.model.id, self.request.translate(self.title())
+                )
+            )
+        )
 
 
 class ManageLayout(DefaultLayout):

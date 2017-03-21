@@ -404,7 +404,6 @@ figcaption {
 .svg-download {
     display: block;
     font-size: .8rem;
-    margin-top: 1em;
     text-align: right;
 
     i.fa {
@@ -425,6 +424,8 @@ figcaption {
 
     code {
         display: block;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
         padding: 1em;
         word-break: break-all;
     }

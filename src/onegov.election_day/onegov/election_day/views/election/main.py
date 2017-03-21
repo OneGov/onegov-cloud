@@ -29,6 +29,14 @@ def view_election_json(self, request):
     def add_last_modified(response):
         add_last_modified_header(response, self.last_result_change)
 
+    embed = {'candidates': request.link(self, 'candidates-chart')}
+    charts = {'candidates': request.link(self, 'candidates-svg')}
+    layout = ElectionsLayout(self, request)
+    for item in ('lists', 'connections', 'panachage', 'parties'):
+        if layout.visible(item):
+            embed[item] = request.link(self, '{}-chart'.format(item))
+            charts[item] = request.link(self, '{}-svg'.format(item))
+
     data = {
         'date': self.date.isoformat(),
         'domain': self.domain,
@@ -70,13 +78,11 @@ def view_election_json(self, request):
         },
         'election_type': self.type,
         'url': request.link(self),
-        'embed': [
-            request.link(self, 'lists-chart'),
-            request.link(self, 'connections-chart'),
-            request.link(self, 'panachage-chart'),
-        ] if self.type == 'proporz' else [
-            request.link(self, 'candidates-chart'),
-        ],
+        'embed': embed,
+        'media': {
+            'pdf': request.link(self, 'pdf'),
+            'charts': charts
+        } if self.counted else {},
         'data': {
             'json': request.link(self, 'data-json'),
             'csv': request.link(self, 'data-csv'),

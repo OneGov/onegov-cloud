@@ -29,19 +29,19 @@ Onegov Election Day follows PEP8 as close as possible. To test for it run::
 
 Onegov Election Day uses `Semantic Versioning <http://semver.org/>`_
 
-PDF Generation
+Media Generation
 --------------
 
-A `Renderer <https://github.com/seantis/d3-renderer>`_ (which renders the D3
-scripts) is needed to generate the PDFs.
+A `Renderer <https://github.com/seantis/d3-renderer>`_ which renders the D3
+scripts is needed to generate the PDFs and SVGs.
 
 Specify the address of the running server in the YAML, e.g.::
 
     d3-renderer: 'http://localhost:1337'
 
-And generate the PDFs using the CLI::
+And generate the PDFs or SVGs using the CLI:
 
-    onegov-election-day --select /onegov_election_day/* generate-pdf
+    onegov-election-day --select /onegov_election_day/* generate-media
 
 
 Build Status

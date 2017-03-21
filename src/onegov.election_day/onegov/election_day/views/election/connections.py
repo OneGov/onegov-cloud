@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from morepath.request import Response
 from onegov.ballot import Election
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
@@ -110,3 +111,22 @@ def view_election_connections(self, request):
         'layout': ElectionsLayout(self, request, 'connections'),
         'connections': get_connection_results(self, object_session(self)),
     }
+
+
+@ElectionDayApp.json(model=Election, permission=Public, name='connections-svg')
+def view_election_connections_svg(self, request):
+    """ View the connections as SVG. """
+
+    layout = ElectionsLayout(self, request, 'connections')
+    if not layout.svg_path:
+        return Response(status='503 Service Unavailable')
+
+    content = None
+    with request.app.filestorage.open(layout.svg_path, 'r') as f:
+        content = f.read()
+
+    return Response(
+        content,
+        content_type='application/svg; charset=utf-8',
+        content_disposition='inline; filename={}'.format(layout.svg_name)
+    )

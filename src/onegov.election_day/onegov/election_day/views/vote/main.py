@@ -70,8 +70,8 @@ def view_vote_json(self, request):
         'domain': self.domain,
         'last_modified': self.last_result_change.isoformat(),
         'progress': {
-            'counted': (self.progress[0] or 0) / (self.ballots.count() or 1),
-            'total': (self.progress[1] or 0) / (self.ballots.count() or 1)
+            'counted': self.progress[0],
+            'total': self.progress[1]
         },
         'related_link': (self.meta or {}).get('related_link', ''),
         'title': self.title_translations,
@@ -123,10 +123,19 @@ def view_vote_json(self, request):
             } for ballot in self.ballots
         ],
         'url': request.link(self),
-        'embed': [
-            request.link(ballot, 'map') for ballot in self.ballots
-            if request.app.principal.use_maps
-        ],
+        'embed': {
+            ballot.type: request.link(ballot, 'map')
+            for ballot in self.ballots if request.app.principal.use_maps
+
+        },
+        'media': {
+            'pdf': request.link(self, 'pdf'),
+            'maps': {
+                ballot.type: request.link(ballot, 'svg')
+                for ballot in self.ballots if request.app.principal.use_maps
+
+            }
+        } if self.counted else {},
         'data': {
             'json': request.link(self, 'data-json'),
             'csv': request.link(self, 'data-csv'),

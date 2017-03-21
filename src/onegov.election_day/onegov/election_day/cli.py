@@ -7,9 +7,9 @@ import os
 
 from onegov.core.cli import command_group, pass_group_context
 from onegov.election_day.models import ArchivedResult
-from onegov.election_day.pdf_generator import PdfGenerator
-from onegov.election_day.sms_processor import SmsQueueProcessor
 from onegov.election_day.utils import add_local_results
+from onegov.election_day.utils.media_generator import MediaGenerator
+from onegov.election_day.utils.sms_processor import SmsQueueProcessor
 
 
 cli = command_group()
@@ -104,23 +104,25 @@ def send_sms(username, password, sentry, originator):
     return send
 
 
-@cli.command('generate-pdf')
+@cli.command('generate-media')
+@click.option('--pdf/--no-pdf', default=True)
+@click.option('--svg/--no-svg', default=True)
 @click.option('--force/--no-force', default=False)
 @click.option('--cleanup/--no-cleanup', default=True)
-def generate_pdf(force, cleanup):
-    """ Generates the PDF for the selected instances
+def generate_media(pdf, svg, force, cleanup):
+    """ Generates the PDF and/or SVGs for the selected instances
 
-        onegov-election-day --select '/onegov_election_day/zg' generate-pdf
+        onegov-election-day --select '/onegov_election_day/zg' generate-media
 
     """
     def generate(request, app):
-        if not app.principal or not app.configuration.get('d3-renderer'):
+        if not app.principal or not app.configuration.get('d3_renderer'):
             return
 
-        lockfilename = app.configuration.get(
-            'pdf_generation_lockfile', './pdf_generation_lockfile'
-        )
-        lockfile = open(lockfilename, 'w+')
+        if not pdf and not svg:
+            return
+
+        lockfile = open('.lock-{}'.format(app.schema), 'w+')
 
         try:
             fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
@@ -128,7 +130,11 @@ def generate_pdf(force, cleanup):
             pass
         else:
             try:
-                PdfGenerator(app).run(force, cleanup)
+                media_generator = MediaGenerator(app, force, cleanup)
+                if pdf:
+                    media_generator.create_pdfs()
+                if svg:
+                    media_generator.create_svgs()
             finally:
                 fcntl.flock(lockfile, fcntl.LOCK_UN)
 

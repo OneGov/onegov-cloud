@@ -1,3 +1,4 @@
+from morepath.request import Response
 from onegov.ballot import Election, List
 from onegov.core.security import Public
 from onegov.election_day import ElectionDayApp
@@ -77,3 +78,22 @@ def view_election_lists(self, request):
         'layout': ElectionsLayout(self, request, 'lists'),
         'lists': get_list_results(self, object_session(self)),
     }
+
+
+@ElectionDayApp.json(model=Election, permission=Public, name='lists-svg')
+def view_election_lists_svg(self, request):
+    """ View the lists as SVG. """
+
+    layout = ElectionsLayout(self, request, 'lists')
+    if not layout.svg_path:
+        return Response(status='503 Service Unavailable')
+
+    content = None
+    with request.app.filestorage.open(layout.svg_path, 'r') as f:
+        content = f.read()
+
+    return Response(
+        content,
+        content_type='application/svg; charset=utf-8',
+        content_disposition='inline; filename={}'.format(layout.svg_name)
+    )

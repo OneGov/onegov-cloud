@@ -55,8 +55,8 @@ class Pdf(PDFDocument):
         height = 29.7 * cm
         margin_left = 2.5 * cm
         margin_right = 2.5 * cm
-        margin_top = 2.5 * cm
-        margin_bottom = 2 * cm
+        margin_top = 3 * cm
+        margin_bottom = 3 * cm
 
         full_frame = Frame(
             margin_left,
@@ -139,18 +139,20 @@ class Pdf(PDFDocument):
     def fit_size(self, width, height, factor=1.0):
         """ Returns the given width and height so that it fits on the page. """
 
+        doc_width = self.doc.width
+        doc_height = self.doc.height * 0.9  # we cannot use the full height
         image_ratio = width / height
-        page_ratio = self.doc.width / self.doc.height
+        page_ratio = doc_width / doc_height
 
         if page_ratio > image_ratio:
             return (
-                factor * width * self.doc.height / height,
-                factor * self.doc.height
+                factor * width * doc_height / height,
+                factor * doc_height
             )
         else:
             return (
-                factor * self.doc.width,
-                factor * height * self.doc.width / width
+                factor * doc_width,
+                factor * height * doc_width / width
             )
 
     def pdf(self, filelike, factor=1.0):
