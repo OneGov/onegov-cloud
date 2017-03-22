@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Enable messages to attendees of cancelled occasions.
+  [href]
+
 - Fixes no error showing for the first attendee added by a member.
   [href]
 

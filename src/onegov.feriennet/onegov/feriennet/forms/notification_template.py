@@ -7,9 +7,10 @@ from onegov.feriennet.layout import DefaultLayout
 from onegov.form import Form
 from onegov.form.fields import MultiCheckboxField
 from onegov.user import User, UserCollection
-from sqlalchemy import distinct
+from sqlalchemy import distinct, or_, func, and_
 from wtforms.fields import StringField, TextAreaField, RadioField
 from wtforms.validators import InputRequired
+from uuid import uuid4
 
 
 class NotificationTemplateForm(Form):
@@ -99,18 +100,39 @@ class NotificationTemplateSendForm(Form):
 
         return list(u.username for u in q)
 
-    def recipients_by_occasion(self, occasions):
+    def recipients_by_occasion_query(self, occasions):
         bookings = BookingCollection(self.request.app.session())
 
         q = bookings.query()
         q = q.join(Period)
-        q = q.filter(Booking.occasion_id.in_(occasions))
-        q = q.filter(Booking.state == 'accepted')
+        q = q.join(Booking.occasion)
+        if occasions:
+            q = q.filter(Booking.occasion_id.in_(occasions))
+        else:
+            q = q.filter(Booking.occasion_id == uuid4())
+        q = q.filter(or_(
+            and_(Occasion.cancelled == False, Booking.state == 'accepted'),
+            and_(Occasion.cancelled == True, Booking.state == 'cancelled')
+        ))
         q = q.filter(Period.active == True)
         q = q.filter(Period.confirmed == True)
+
+        return q
+
+    def recipients_by_occasion(self, occasions):
+        q = self.recipients_by_occasion_query(occasions)
         q = q.with_entities(distinct(Booking.username).label('username'))
 
         return list(b.username for b in q)
+
+    def recipients_count_by_occasion(self, occasions):
+        q = self.recipients_by_occasion_query(occasions)
+        q = q.with_entities(
+            Booking.occasion_id,
+            func.count(Booking.occasion_id).label('count')
+        )
+        q = q.group_by(Booking.occasion_id)
+        return {r.occasion_id: r.count for r in q}
 
     def populate_occasion(self):
         q = OccasionCollection(self.request.app.session()).query()
@@ -124,9 +146,25 @@ class NotificationTemplateSendForm(Form):
 
         layout = DefaultLayout(self.model, self.request)
 
+        occasions = tuple(q)
+        recipients = self.recipients_count_by_occasion(
+            [o.id for o in occasions]
+        )
+
         def choice(occasion):
+            if occasion.cancelled:
+                template = _(
+                    "${title} (cancelled) "
+                    "<small>${dates}, ${count} Attendees</small>"
+                )
+            else:
+                template = _(
+                    "${title} "
+                    "<small>${dates}, ${count} Attendees</small>"
+                )
+
             return occasion.id.hex, self.request.translate(_(
-                '${title} <small>${dates}, ${count} Attendees</small>',
+                template,
                 mapping={
                     'title': occasion.activity.title,
                     'dates': ', '.join(
@@ -135,9 +173,9 @@ class NotificationTemplateSendForm(Form):
                             d.localized_end
                         ) for d in occasion.dates
                     ),
-                    'count': occasion.attendee_count
+                    'count': recipients.get(occasion.id, 0)
                 }
             ))
 
         assert not self.occasion.choices
-        self.occasion.choices = tuple(choice(o) for o in q)
+        self.occasion.choices = [choice(o) for o in occasions]
