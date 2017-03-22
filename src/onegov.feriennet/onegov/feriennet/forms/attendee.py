@@ -132,10 +132,6 @@ class AttendeeSignupForm(AttendeeBase):
     def is_new(self):
         return self.attendee.data == 'other'
 
-    @property
-    def css_class(self):
-        return len(self.attendee.choices) == 1 and 'hide-attendee'
-
     @cached_property
     def user(self):
         users = UserCollection(self.request.app.session())

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes no error showing for the first attendee added by a member.
+  [href]
+
 0.6.1 (2017-03-21)
 ~~~~~~~~~~~~~~~~~~~
 
