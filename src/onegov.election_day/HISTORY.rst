@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds PDF and SVG generations.
+  [msom]
+
 1.6.1 (2017-03-20)
 ~~~~~~~~~~~~~~~~~~~
 
