@@ -1,4 +1,6 @@
-from onegov.ballot import Election, Vote
+from datetime import date
+from freezegun import freeze_time
+from onegov.ballot import Ballot, Election, Vote
 from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.layout import Layout
 from onegov.election_day.layout import ManageElectionsLayout
@@ -8,6 +10,7 @@ from onegov.election_day.layout import ManageVotesLayout
 from onegov.election_day.layout import VotesLayout
 from onegov.election_day.models import Subscriber
 from onegov.election_day.tests import DummyRequest
+from unittest.mock import Mock
 
 
 def test_layout_principal():
@@ -91,7 +94,7 @@ def test_layout_links():
     assert layout_de.logout_link == 'Auth/logout'
 
 
-def test_elections_layout():
+def test_elections_layout(session):
     layout = ElectionsLayout(None, DummyRequest())
 
     assert layout.all_tabs == (
@@ -126,8 +129,67 @@ def test_elections_layout():
     assert not layout.counted
     assert list(layout.menu) == []
 
+    with freeze_time("2014-01-01 12:00"):
+        election = Election(
+            title="Election",
+            domain='federation',
+            type='proporz',
+            date=date(2011, 1, 1),
+        )
+        session.add(election)
+        session.flush()
+        ts = (
+            '4b9e99d2bd5e48d9a569e5f82175d1d2ed59105f8d82a12dc51b673ff12dc1f2'
+            '.1388577600'
+        )
 
-def test_votes_layout():
+        request = DummyRequest()
+        request.app.filestorage = Mock()
+
+        layout = ElectionsLayout(election, request)
+        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
+        assert layout.svg_path == 'svg/election-{}.None.any.svg'.format(ts)
+        assert layout.svg_link == 'Election/None-svg'
+        assert layout.svg_name == 'election.svg'
+
+        layout = ElectionsLayout(election, request, 'lists')
+        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
+        assert layout.svg_path == 'svg/election-{}.lists.any.svg'.format(ts)
+        assert layout.svg_link == 'Election/lists-svg'
+        assert layout.svg_name == 'election-lists.svg'
+
+        layout = ElectionsLayout(election, request, 'candidates')
+        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
+        assert layout.svg_path == 'svg/election-{}.candidates.any.svg'.format(
+            ts
+        )
+        assert layout.svg_link == 'Election/candidates-svg'
+        assert layout.svg_name == 'election-candidates.svg'
+
+        layout = ElectionsLayout(election, request, 'connections')
+        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
+        assert layout.svg_path == 'svg/election-{}.connections.any.svg'.format(
+            ts
+        )
+        assert layout.svg_link == 'Election/connections-svg'
+        assert layout.svg_name == 'election-list-connections.svg'
+
+        layout = ElectionsLayout(election, request, 'panachage')
+        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
+        assert layout.svg_path == 'svg/election-{}.panachage.any.svg'.format(
+            ts
+        )
+        assert layout.svg_link == 'Election/panachage-svg'
+        assert layout.svg_name == 'election-panachage.svg'
+
+        layout = ElectionsLayout(election, request, 'parties')
+        assert layout.pdf_path == 'pdf/election-{}.de.pdf'.format(ts)
+        assert layout.svg_path == 'svg/election-{}.parties.any.svg'.format(ts)
+        assert layout.svg_link == 'Election/parties-svg'
+        assert layout.svg_name == 'election-parties.svg'
+
+
+def test_votes_layout(session):
     layout = VotesLayout(Vote(), DummyRequest())
 
     assert layout.title() == 'Proposal'
@@ -140,6 +202,51 @@ def test_votes_layout():
     assert not layout.has_results
     assert not layout.counted
     assert list(layout.menu) == []
+
+    with freeze_time("2014-01-01 12:00"):
+        vote = Vote(
+            title="Vote",
+            domain='federation',
+            date=date(2011, 1, 1),
+        )
+        proposal = Ballot(type="proposal")
+        vote.ballots.append(proposal)
+        counter = Ballot(type="counter-proposal")
+        vote.ballots.append(counter)
+        tie = Ballot(type="tie-breaker")
+        vote.ballots.append(tie)
+        session.add(vote)
+        session.flush()
+
+        ts = '1388577600'
+        vh = 'ab274474a6aa82c100dddca63977facb556f66f489fb558c044a456f9ba919ce'
+
+        request = DummyRequest()
+        request.app.filestorage = Mock()
+
+        layout = VotesLayout(vote, request)
+        assert layout.pdf_path == 'pdf/vote-{}.{}.de.pdf'.format(vh, ts)
+        assert layout.svg_path == 'svg/ballot-{}.{}.map.de.svg'.format(
+            proposal.id, ts
+        )
+        assert layout.svg_link == 'Ballot/svg'
+        assert layout.svg_name == 'vote-proposal.svg'
+
+        layout = VotesLayout(vote, request, 'counter-proposal')
+        assert layout.pdf_path == 'pdf/vote-{}.{}.de.pdf'.format(vh, ts)
+        assert layout.svg_path == 'svg/ballot-{}.{}.map.de.svg'.format(
+            counter.id, ts
+        )
+        assert layout.svg_link == 'Ballot/svg'
+        assert layout.svg_name == 'vote-counter-proposal.svg'
+
+        layout = VotesLayout(vote, request, 'tie-breaker')
+        assert layout.pdf_path == 'pdf/vote-{}.{}.de.pdf'.format(vh, ts)
+        assert layout.svg_path == 'svg/ballot-{}.{}.map.de.svg'.format(
+            tie.id, ts
+        )
+        assert layout.svg_link == 'Ballot/svg'
+        assert layout.svg_name == 'vote-tie-breaker.svg'
 
 
 def test_manage_layout():

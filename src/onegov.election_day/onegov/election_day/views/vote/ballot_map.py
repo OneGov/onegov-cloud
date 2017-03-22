@@ -11,25 +11,6 @@ def view_ballot_by_entity(self, request):
     return self.percentage_by_entity()
 
 
-@ElectionDayApp.json(model=Ballot, permission=Public, name='svg')
-def view_ballot_svg(self, request):
-    """ View the ballot as SVG. """
-
-    layout = VotesLayout(self.vote, request, tab=self.type)
-    if not layout.svg_path:
-        return Response(status='503 Service Unavailable')
-
-    content = None
-    with request.app.filestorage.open(layout.svg_path, 'r') as f:
-        content = f.read()
-
-    return Response(
-        content,
-        content_type=('application/svg; charset=utf-8'),
-        content_disposition='inline; filename={}'.format(layout.svg_name)
-    )
-
-
 @ElectionDayApp.html(model=Ballot, template='embed.pt', permission=Public,
                      name='map')
 def view_ballot_as_map(self, request):
@@ -48,3 +29,22 @@ def view_ballot_as_map(self, request):
             'map': request.link(self, name='by-entity')
         } if request.app.principal.use_maps else {}
     }
+
+
+@ElectionDayApp.json(model=Ballot, permission=Public, name='svg')
+def view_ballot_svg(self, request):
+    """ View the ballot as SVG. """
+
+    layout = VotesLayout(self.vote, request, tab=self.type)
+    if not layout.svg_path:
+        return Response(status='503 Service Unavailable')
+
+    content = None
+    with request.app.filestorage.open(layout.svg_path, 'r') as f:
+        content = f.read()
+
+    return Response(
+        content,
+        content_type=('application/svg; charset=utf-8'),
+        content_disposition='inline; filename={}'.format(layout.svg_name)
+    )

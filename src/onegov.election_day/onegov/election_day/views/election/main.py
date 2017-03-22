@@ -7,7 +7,6 @@ from onegov.election_day import ElectionDayApp
 from onegov.election_day.layout import ElectionsLayout
 from onegov.election_day.utils import add_last_modified_header
 from onegov.election_day.utils import get_election_summary
-from onegov.election_day.utils import pdf_filename
 from onegov.election_day.views.election import get_candidates_results
 from onegov.election_day.views.election import get_connection_results
 from onegov.election_day.views.election.lists import get_list_results
@@ -168,22 +167,18 @@ def view_election_summary(self, request):
 def view_election_pdf(self, request):
     """ View the generated PDF. """
 
-    path = '{}/{}'.format(
-        request.app.configuration.get('pdf_directory', 'pdf'),
-        pdf_filename(self, request.locale)
-    )
-    if not request.app.filestorage.exists(path):
+    layout = ElectionsLayout(self, request)
+
+    if not layout.pdf_path:
         return Response(status='503 Service Unavailable')
 
     content = None
-    with request.app.filestorage.open(path, 'rb') as f:
+    with request.app.filestorage.open(layout.pdf_path, 'rb') as f:
         content = f.read()
 
     return Response(
         content,
-        content_type=(
-            'application/pdf'
-        ),
+        content_type='application/pdf',
         content_disposition='inline; filename={}.pdf'.format(
             normalize_for_url(self.title)
         )

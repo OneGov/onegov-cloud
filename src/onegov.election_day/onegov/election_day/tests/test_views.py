@@ -7,9 +7,11 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import Subscriber
 from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
+from onegov.election_day.tests import upload_proporz_election
 from onegov.election_day.tests import upload_vote
 from onegov.testing import utils
 from webtest import TestApp as Client
+from unittest.mock import patch
 
 
 COLUMNS = [
@@ -514,7 +516,7 @@ def test_view_notifications_elections(election_day_app_gr):
     client.get('/election/majorz-election/trigger').form.submit()
     assert "erneut auslösen" in client.get('/election/majorz-election/trigger')
 
-    upload_majorz_election(client, False)
+    upload_majorz_election(client)
     assert "erneut auslösen" not in client.get(
         '/election/majorz-election/trigger'
     )
@@ -527,7 +529,7 @@ def test_view_headerless(election_day_app):
     login(client)
 
     upload_vote(client)
-    upload_majorz_election(client, zg=True)
+    upload_majorz_election(client, canton='zg')
 
     for path in (
         '/',
@@ -604,3 +606,106 @@ def test_view_manage_subscription(election_day_app):
 
     manage = manage.click('Löschen').form.submit()
     assert '+41791112233' not in manage
+
+
+def test_view_pdf(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    upload_vote(client)
+    upload_majorz_election(client, canton='zg')
+    upload_proporz_election(client, canton='zg')
+
+    paths = (
+        '/vote/vote/pdf',
+        '/election/majorz-election/pdf',
+        '/election/proporz-election/pdf',
+    )
+    for path in paths:
+        assert client.get(path, expect_errors=True).status_code == 503
+
+    pdf = '%PDF-1.6'.encode('utf-8')
+    election_day_app.filestorage.makedir('pdf')
+    with election_day_app.filestorage.open('pdf/test.pdf', 'wb') as f:
+        f.write(pdf)
+
+    filenames = []
+    with patch('onegov.election_day.layout.pdf_filename',
+               return_value='test.pdf'):
+        for path in paths:
+            result = client.get(path)
+            assert result.body == pdf
+            assert result.headers['Content-Type'] == 'application/pdf'
+            assert result.headers['Content-Length'] == '8'
+            assert result.headers['Content-Disposition'].startswith(
+                'inline; filename='
+            )
+            filenames.append(
+                result.headers['Content-Disposition'].split('filename=')[1]
+            )
+
+    assert sorted(filenames) == [
+        'majorz-election.pdf',
+        'proporz-election.pdf',
+        'vote.pdf'
+    ]
+
+
+def test_view_svg(election_day_app):
+    client = Client(election_day_app)
+    client.get('/locale/de_CH').follow()
+
+    login(client)
+
+    upload_vote(client)
+    upload_majorz_election(client, canton='zg')
+    upload_proporz_election(client, canton='zg')
+
+    paths = (
+        client.get('/vote/vote/json').json['media']['maps']['proposal'],
+        '/election/majorz-election/candidates-svg',
+        '/election/proporz-election/lists-svg',
+        '/election/proporz-election/candidates-svg',
+        '/election/proporz-election/panachage-svg',
+        '/election/proporz-election/connections-svg',
+        '/election/proporz-election/parties-svg',
+    )
+    for path in paths:
+        assert client.get(path, expect_errors=True).status_code == 503
+
+    svg = (
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<svg xmlns="http://www.w3.org/2000/svg" version="1.0" ></svg>'
+    ).encode('utf-8')
+    election_day_app.filestorage.makedir('svg')
+    with election_day_app.filestorage.open('svg/test.svg', 'wb') as f:
+        f.write(svg)
+
+    filenames = []
+    with patch('onegov.election_day.layout.svg_filename',
+               return_value='test.svg'):
+        for path in paths:
+            result = client.get(path)
+            assert result.body == svg
+            assert result.headers['Content-Type'] == (
+                'application/svg; charset=utf-8'
+            )
+            assert result.headers['Content-Length'] == '99'
+            assert result.headers['Content-Disposition'].startswith(
+                'inline; filename='
+            )
+            filenames.append(
+                result.headers['Content-Disposition'].split('filename=')[1]
+            )
+
+    assert sorted(filenames) == [
+        'majorz-election-candidates.svg',
+        'proporz-election-candidates.svg',
+        'proporz-election-list-connections.svg',
+        'proporz-election-lists.svg',
+        'proporz-election-panachage.svg',
+        'proporz-election-parties.svg',
+        'vote-proposal.svg'
+    ]

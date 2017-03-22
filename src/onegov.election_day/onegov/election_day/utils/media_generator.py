@@ -42,8 +42,8 @@ class MediaGenerator():
         self.app = app
         self.force = force
         self.cleanup = cleanup
-        self.pdf_dir = self.app.configuration.get('pdf_directory', 'pdf')
-        self.svg_dir = self.app.configuration.get('svg_directory', 'svg')
+        self.pdf_dir = 'pdf'
+        self.svg_dir = 'svg'
         self.renderer = app.configuration.get('d3_renderer').rstrip('/')
         self.session = self.app.session()
 

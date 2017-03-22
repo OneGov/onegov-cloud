@@ -10,7 +10,7 @@ from onegov.core.utils import normalize_for_url
 from onegov.election_day import _
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.collections import SubscriberCollection
-from onegov.election_day.utils import svg_filename
+from onegov.election_day.utils import pdf_filename, svg_filename
 from onegov.user import Auth
 
 
@@ -215,11 +215,21 @@ class ElectionsLayout(Layout):
         )
 
     @cached_property
+    def pdf_path(self):
+        """ Returns the path to the PDF file or None, if it is not available.
+        """
+
+        path = 'pdf/{}'.format(pdf_filename(self.model, self.request.locale))
+        if self.request.app.filestorage.exists(path):
+            return path
+
+        return None
+
+    @cached_property
     def svg_path(self):
         """ Returns the path to the SVG or None, if it is not available. """
 
-        path = '{}/{}'.format(
-            self.request.app.configuration.get('svg_directory', 'svg'),
+        path = 'svg/{}'.format(
             svg_filename(self.model, self.tab)
         )
         if self.request.app.filestorage.exists(path):
@@ -240,7 +250,7 @@ class ElectionsLayout(Layout):
         return '{}.svg'.format(
             normalize_for_url(
                 '{}-{}'.format(
-                    self.model.id, self.request.translate(self.title())
+                    self.model.id, self.title() or ''
                 )
             )
         )
@@ -344,12 +354,22 @@ class VotesLayout(Layout):
         )
 
     @cached_property
+    def pdf_path(self):
+        """ Returns the path to the PDF file or None, if it is not available.
+        """
+
+        path = 'pdf/{}'.format(pdf_filename(self.model, self.request.locale))
+        if self.request.app.filestorage.exists(path):
+            return path
+
+        return None
+
+    @cached_property
     def svg_path(self):
         """ Returns the path to the SVG file or None, if it is not available.
         """
 
-        path = '{}/{}'.format(
-            self.request.app.configuration.get('svg_directory', 'svg'),
+        path = 'svg/{}'.format(
             svg_filename(self.ballot, 'map', self.request.locale)
         )
         if self.request.app.filestorage.exists(path):
@@ -370,7 +390,7 @@ class VotesLayout(Layout):
         return '{}.svg'.format(
             normalize_for_url(
                 '{}-{}'.format(
-                    self.model.id, self.request.translate(self.title())
+                    self.model.id, self.title() or ''
                 )
             )
         )

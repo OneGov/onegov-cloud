@@ -88,7 +88,7 @@ def upload_vote(client, create=True):
     return upload
 
 
-def upload_majorz_election(client, create=True, zg=False):
+def upload_majorz_election(client, create=True, canton='gr'):
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Majorz Election'
@@ -115,22 +115,22 @@ def upload_majorz_election(client, create=True, zg=False):
         "Stimmen,"
         "Anzahl Gemeinden\n"
     )
-    if zg:
-        csv += (
-            "2,1711,Zug,56,25,0,4,1,0,1,Gewaehlt,"
-            "Engler,Stefan,20,1 von 125\n"
-        )
-        csv += (
-            "2,1710,Walchwil,56,25,0,4,1,0,2,Gewaehlt,"
-            "Schmid,Martin,18,1 von 125\n"
-        )
-    else:
+    if canton == 'gr':
         csv += (
             "2,3503,Mutten,56,25,0,4,1,0,1,Gewaehlt,"
             "Engler,Stefan,20,1 von 125\n"
         )
         csv += (
             "2,3503,Mutten,56,25,0,4,1,0,2,Gewaehlt,"
+            "Schmid,Martin,18,1 von 125\n"
+        )
+    if canton == 'zg':
+        csv += (
+            "2,1711,Zug,56,25,0,4,1,0,1,Gewaehlt,"
+            "Engler,Stefan,20,1 von 125\n"
+        )
+        csv += (
+            "2,1710,Walchwil,56,25,0,4,1,0,2,Gewaehlt,"
             "Schmid,Martin,18,1 von 125\n"
         )
     csv = csv.encode('utf-8')
@@ -144,7 +144,7 @@ def upload_majorz_election(client, create=True, zg=False):
     return upload
 
 
-def upload_proporz_election(client, create=True):
+def upload_proporz_election(client, create=True, canton='gr'):
     if create:
         new = client.get('/manage/elections/new-election')
         new.form['election_de'] = 'Proporz Election'
@@ -185,14 +185,24 @@ def upload_proporz_election(client, create=True):
         "02 CVP,"
         "Anzahl Gemeinden\n"
     )
-    csv += (
-        "5,3503,Mutten,56,32,1,0,1,1,FDP,1,1,0,0,0,0,0,8,0,101,"
-        "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
-    )
-    csv += (
-        "5,3503,Mutten,56,32,1,0,1,2,CVP,1,2,0,1,0,5,0,0,0,201,"
-        "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n"
-    )
+    if canton == 'gr':
+        csv += (
+            "5,3503,Mutten,56,32,1,0,1,1,FDP,1,1,0,0,0,0,0,8,0,101,"
+            "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
+        )
+        csv += (
+            "5,3503,Mutten,56,32,1,0,1,2,CVP,1,2,0,1,0,5,0,0,0,201,"
+            "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n"
+        )
+    elif canton == 'zg':
+        csv += (
+            "5,1711,Mutten,56,32,1,0,1,1,FDP,1,1,0,0,0,0,0,8,0,101,"
+            "nicht gewählt,Casanova,Angela,0,0,0,0,1,1 von 125\n"
+        )
+        csv += (
+            "5,1711,Mutten,56,32,1,0,1,2,CVP,1,2,0,1,0,5,0,0,0,201,"
+            "nicht gewählt,Caluori,Corina,1,0,1,2,0,1 von 125\n"
+        )
     csv = csv.encode('utf-8')
 
     csv_parties = (
