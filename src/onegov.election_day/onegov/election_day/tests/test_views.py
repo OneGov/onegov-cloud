@@ -3,7 +3,6 @@ import transaction
 
 from datetime import date
 from freezegun import freeze_time
-from onegov.ballot import Ballot
 from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.models import Subscriber
 from onegov.election_day.tests import login
