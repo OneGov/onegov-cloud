@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.38.4 (2017-03-23)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes slashes not being stripped from the subpath in module_path.
   [href]
