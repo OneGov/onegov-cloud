@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.6.2 (2017-03-23)
+~~~~~~~~~~~~~~~~~~~
+
 - Enable messages to attendees of cancelled occasions.
   [href]
 
