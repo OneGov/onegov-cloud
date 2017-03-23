@@ -127,12 +127,21 @@ class BookingCollection(GenericCollection):
         else:
             block_rest = False
 
+        # block the overlapping bookings
         for b in bookings:
-            if block_rest or b.overlaps(booking):
+            if b.overlaps(booking):
+                if b.state == 'cancelled':
+                    continue
+
                 if b.state == 'accepted':
                     raise RuntimeError("Conflict with booking {}".format(b.id))
 
-                if b.state == 'cancelled':
+                b.state = 'blocked'
+
+        # if we reached the limit, block *all* bookings
+        if block_rest:
+            for b in bookings:
+                if b.state in ('cancelled', 'accepted'):
                     continue
 
                 b.state = 'blocked'

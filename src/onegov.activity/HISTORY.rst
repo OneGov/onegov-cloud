@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes accept_booking falsly claiming a booking was in conflict.
+  [href]
+
 0.8.0 (2017-03-14)
 ~~~~~~~~~~~~~~~~~~~
 

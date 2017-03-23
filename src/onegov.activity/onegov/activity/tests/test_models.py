@@ -1201,6 +1201,15 @@ def test_accept_booking(session, owner):
         spots=(0, 2)
     )
 
+    o4 = occasions.add(
+        start=datetime(2016, 10, 5, 15),
+        end=datetime(2016, 10, 5, 16),
+        timezone="Europe/Zurich",
+        activity=sport,
+        period=period,
+        spots=(0, 2)
+    )
+
     a1 = attendees.add(
         user=owner,
         name="Dustin Henderson",
@@ -1293,6 +1302,24 @@ def test_accept_booking(session, owner):
 
     with pytest.raises(RuntimeError) as e:
         bookings.accept_booking(bookings.add(owner, a1, o3))
+
+    assert "The booking limit has been reached" in str(e)
+
+    transaction.abort()
+
+    # there was a regression which lead to an error before the booking limit
+    # was reached (accepted bookings were assumed to be in conflict)
+    period = periods.active()
+    period.all_inclusive = True
+    period.max_bookings_per_attendee = 2
+
+    b1 = bookings.add(owner, a1, o1)
+    bookings.accept_booking(b1)
+    b2 = bookings.add(owner, a1, o3)
+    bookings.accept_booking(b2)
+
+    with pytest.raises(RuntimeError) as e:
+        bookings.accept_booking(bookings.add(owner, a1, o4))
 
     assert "The booking limit has been reached" in str(e)
 
