@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Fixes slashes not being stripped from the subpath in module_path.
+  [href]
+
 - Supports newlines in Excel outputs on all platforms.
   [href]
 

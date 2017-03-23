@@ -1,6 +1,7 @@
 import json
 import onegov.core
 import os.path
+import pytest
 import transaction
 
 from onegov.core import utils
@@ -61,7 +62,11 @@ def test_touch(temporary_directory):
 def test_module_path():
     path = utils.module_path('onegov.core', 'utils.py')
     assert path == utils.module_path(onegov.core, 'utils.py')
+    assert path == utils.module_path(onegov.core, '/utils.py')
     assert os.path.isfile(path)
+
+    with pytest.raises(AssertionError):
+        utils.module_path(onegov.core, '../passwd')
 
 
 def test_linkify():

@@ -165,7 +165,7 @@ def module_path(module, subpath):
     """
 
     parent = module_path_root(module)
-    path = os.path.join(parent, subpath)
+    path = os.path.join(parent, subpath.strip('/'))
 
     # always be paranoid with path manipulation
     assert is_subpath(parent, path)
