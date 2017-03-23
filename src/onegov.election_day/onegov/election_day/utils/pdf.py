@@ -19,6 +19,7 @@ class InlinePDF(Flowable):
 
     def __init__(self, pdf_file, width):
         Flowable.__init__(self)
+        pdf_file.seek(0)
         page = PdfReader(pdf_file, decompress=False).pages[0]
         self.page = pagexobj(page)
         self.scale = width / self.page.BBox[2]

@@ -83,6 +83,20 @@ class MediaGenerator():
         translator = self.app.translations.get(locale)
         return text.interpolate(translator.gettext(text))
 
+    def remove(self, directory, files):
+        """ Safely removes the given files from the directory. Allows to use
+        wildcards.
+
+        """
+        if not files:
+            return
+
+        fs = self.app.filestorage
+        for file in fs.filterdir(directory, files=files):
+            path = '{}/{}'.format(directory, file.name)
+            if fs.exists(path) and not file.is_dir:
+                fs.remove(path)
+
     def get_chart(self, chart, fmt, data, width=1000, params=None):
         """ Returns the requested chart from the d3-render service as a
         PNG/PDF/SVG.
@@ -680,9 +694,10 @@ class MediaGenerator():
         items.extend(self.session.query(Vote).all())
 
         # Read existing PDFs
-        if not self.app.filestorage.exists(self.pdf_dir):
-            self.app.filestorage.makedir(self.pdf_dir)
-        existing = self.app.filestorage.listdir(self.pdf_dir)
+        fs = self.app.filestorage
+        if not fs.exists(self.pdf_dir):
+            fs.makedir(self.pdf_dir)
+        existing = fs.listdir(self.pdf_dir)
 
         # Generate the PDFs
         for locale in self.app.locales:
@@ -690,22 +705,22 @@ class MediaGenerator():
                 filename = pdf_filename(item, locale)
                 if (self.force or filename not in existing) and item.counted:
                     path = '{}/{}'.format(self.pdf_dir, filename)
-                    if self.app.filestorage.exists(path):
-                        self.app.filestorage.remove(path)
+                    if fs.exists(path):
+                        fs.remove(path)
                     try:
                         self.generate_pdf(item, path, locale)
                         log.info("{} created".format(filename))
                     except Exception as ex:
                         # Don't leave probably broken PDFs laying around
-                        if self.app.filestorage.exists(path):
-                            self.app.filestorage.remove(path)
+                        if fs.exists(path):
+                            fs.remove(path)
                         raise ex
 
         # Delete old PDFs
         if self.cleanup:
-            existing = self.app.filestorage.listdir(self.pdf_dir)
+            existing = fs.listdir(self.pdf_dir)
             existing = dict(groupbylist(
-                existing,
+                sorted(existing),
                 key=lambda a: a.split('.')[0]
             ))
 
@@ -714,25 +729,24 @@ class MediaGenerator():
                 pdf_filename(item, '').split('.')[0] for item in items
             ]
             for id in set(existing.keys()) - set(created):
-                for name in existing[id]:
-                    self.app.filestorage.remove(
-                        '{}/{}'.format(self.pdf_dir, name)
-                    )
+                self.remove(self.pdf_dir, existing[id])
 
             # Delete old files
             for files in existing.values():
                 files = sorted(files, reverse=True)
-                for name in files[len(self.app.locales):]:
-                    self.app.filestorage.remove(
-                        '{}/{}'.format(self.pdf_dir, name)
-                    )
+                self.remove(self.pdf_dir, files[len(self.app.locales):])
 
     def generate_svg(self, item, type_, locale=None):
         """ Creates the requested SVG. """
 
+        is_election = isinstance(item, Election)
+
         assert type_ in (
             'lists', 'candidates', 'connections', 'parties', 'panachage', 'map'
         )
+
+        if not self.app.filestorage.exists(self.svg_dir):
+            self.app.filestorage.makedir(self.svg_dir)
 
         existing = self.app.filestorage.listdir(self.svg_dir)
         filename = svg_filename(item, type_, locale)
@@ -745,33 +759,33 @@ class MediaGenerator():
             self.app.filestorage.remove(path)
 
         chart = None
-        if type_ == 'lists':
+        if type_ == 'lists' and is_election:
             data = view_election_lists_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('bar', 'svg', data)
 
-        if type_ == 'candidates':
+        if type_ == 'candidates' and is_election:
             data = view_election_candidates_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('bar', 'svg', data)
 
-        if type_ == 'connections':
+        if type_ == 'connections' and is_election:
             data = view_election_connections_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart('sankey', 'svg', data,
                                        params={'inverse': True})
 
-        if type_ == 'parties':
+        if type_ == 'parties' and is_election:
             data = view_election_parties_data(item, None)
             if data and data.get('results'):
                 chart = self.get_chart('grouped', 'svg', data)
 
-        if type_ == 'panachage':
+        if type_ == 'panachage' and is_election:
             data = view_election_panachage_data(item, None)
             if data and data.get('links') and data.get('nodes'):
                 chart = self.get_chart('sankey', 'svg', data)
 
-        if type_ == 'map':
+        if type_ == 'map' and not is_election:
             data = item.percentage_by_entity()
             params = {
                 'yay': self.translate(_('Yay'), locale),
@@ -785,8 +799,6 @@ class MediaGenerator():
                 copyfileobj(chart, f)
             log.info("{} created".format(filename))
 
-        return filename
-
     def create_svgs(self):
         """ Generates all SVGs for the given application.
 
@@ -798,8 +810,9 @@ class MediaGenerator():
         """
 
         # Read existing SVGs
-        if not self.app.filestorage.exists(self.svg_dir):
-            self.app.filestorage.makedir(self.svg_dir)
+        fs = self.app.filestorage
+        if not fs.exists(self.svg_dir):
+            fs.makedir(self.svg_dir)
 
         # Generate the SVGs
         for election in self.session.query(Election):
@@ -821,9 +834,9 @@ class MediaGenerator():
 
         # Delete old SVGs
         if self.cleanup:
-            existing = self.app.filestorage.listdir(self.svg_dir)
+            existing = fs.listdir(self.svg_dir)
             existing = dict(groupbylist(
-                existing,
+                sorted(existing),
                 key=lambda a: a.split('.')[0]
             ))
 
@@ -835,18 +848,20 @@ class MediaGenerator():
                 self.session.query(Ballot).all() +
                 self.session.query(Vote).all()
             ]
-            for id in set(existing.keys()) - set(created):
-                for name in existing[id]:
-                    self.app.filestorage.remove(
-                        '{}/{}'.format(self.svg_dir, name)
-                    )
+            diff = set(existing.keys()) - set(created)
+            files = ['{}*'.format(file) for file in diff if file]
+            self.remove(self.svg_dir, files)
+            if '' in existing:
+                self.remove(self.svg_dir, existing[''])
 
             # Delete old files
             for files in existing.values():
                 if len(files):
                     files = sorted(files, reverse=True)
-                    ts = files[0].split('.')[1]
-                    for name in [f for f in files if ts not in f]:
-                        self.app.filestorage.remove(
-                            '{}/{}'.format(self.svg_dir, name)
-                        )
+                    try:
+                        ts = str(int(files[0].split('.')[1]))
+                    except (IndexError, ValueError):
+                        pass
+                    else:
+                        files = [f for f in files if ts not in f]
+                        self.remove(self.svg_dir, files)

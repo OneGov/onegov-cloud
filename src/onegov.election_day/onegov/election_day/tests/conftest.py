@@ -21,6 +21,7 @@ def create_election_day(request, canton="", municipality="", use_maps="false"):
 
     app = create_app(ElectionDayApp, request, use_smtp=False)
     app.configuration['sms_directory'] = os.path.join(tmp, 'sms')
+    app.configuration['d3_renderer'] = 'http://localhost:1337'
 
     app.filestorage.settext('principal.yml', textwrap.dedent("""
         name: Kanton Govikon
