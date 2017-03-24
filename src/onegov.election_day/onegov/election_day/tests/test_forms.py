@@ -71,11 +71,6 @@ def test_vote_form_choices(election_day_app):
 
 
 def test_vote_form_model(election_day_app):
-
-    election_day_app.session_manager.set_locale(
-        default_locale='de_CH', current_locale='de_CH'
-    )
-
     model = Vote()
     model.title = 'Vote (DE)'
     model.title_translations['de_CH'] = 'Vote (DE)'
@@ -132,11 +127,6 @@ def test_election_form_choices(election_day_app):
 
 
 def test_election_form_model(election_day_app):
-
-    election_day_app.session_manager.set_locale(
-        default_locale='de_CH', current_locale='de_CH'
-    )
-
     model = Election()
     model.title = 'Election (DE)'
     model.title_translations['de_CH'] = 'Election (DE)'

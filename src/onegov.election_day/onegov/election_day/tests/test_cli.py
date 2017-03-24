@@ -9,8 +9,7 @@ from onegov.election_day.models import ArchivedResult
 from unittest.mock import patch
 
 
-def test_add_instance(postgres_dsn, temporary_directory):
-
+def write_config(path, postgres_dsn, temporary_directory):
     cfg = {
         'applications': [
             {
@@ -26,77 +25,70 @@ def test_add_instance(postgres_dsn, temporary_directory):
                             temporary_directory
                         ),
                         'create': 'true'
-                    }
+                    },
+                    'sms_directory': '{}/sms'.format(
+                        temporary_directory
+                    ),
+                    'd3_renderer': 'http://localhost:1337'
                 },
             }
         ]
     }
-    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    with open(cfg_path, 'w') as f:
+    with open(path, 'w') as f:
         f.write(yaml.dump(cfg))
 
-    principal = {
-        'name': 'Govikon',
-        'canton': 'be',
+
+def write_principal(temporary_directory, principal, entity='be', params=None):
+    params = params or {}
+    params.update({
+        'name': principal,
         'color': '#fff',
         'logo': 'canton-be.svg',
-    }
-    principal_path = os.path.join(
-        temporary_directory, 'file-storage/onegov_election_day-govikon'
+    })
+    if len(entity) == 2:
+        params['canton'] = entity
+    else:
+        params['municipality'] = entity
+    path = os.path.join(
+        temporary_directory,
+        'file-storage/onegov_election_day-{}'.format(principal.lower())
     )
-    os.makedirs(principal_path)
-    with open(os.path.join(principal_path, 'principal.yml'), 'w') as f:
-        f.write(yaml.dump(principal, default_flow_style=False))
+    os.makedirs(path)
+    with open(os.path.join(path, 'principal.yml'), 'w') as f:
+        f.write(
+            yaml.dump(params, default_flow_style=False)
+        )
 
+
+def run_command(cfg_path, principal, commands):
     runner = CliRunner()
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_election_day/govikon',
-        'add',
-    ])
+    return runner.invoke(cli, [
+        '--config', cfg_path,
+        '--select', '/onegov_election_day/{}'.format(principal),
+    ] + commands)
+
+
+def test_add_instance(postgres_dsn, temporary_directory):
+
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, postgres_dsn, temporary_directory)
+    write_principal(temporary_directory, 'Govikon')
+
+    result = run_command(cfg_path, 'govikon', ['add'])
     assert result.exit_code == 0
     assert "Instance was created successfully" in result.output
 
-    runner = CliRunner()
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_election_day/govikon',
-        'add',
-    ])
+    result = run_command(cfg_path, 'govikon', ['add'])
     assert result.exit_code == 1
     assert "This selector may not reference an existing path" in result.output
 
 
 def test_add_instance_missing_config(postgres_dsn, temporary_directory):
 
-    cfg = {
-        'applications': [
-            {
-                'path': '/onegov_election_day/*',
-                'application': 'onegov.election_day.ElectionDayApp',
-                'namespace': 'onegov_election_day',
-                'configuration': {
-                    'dsn': postgres_dsn,
-                    'depot_backend': 'depot.io.memory.MemoryFileStorage',
-                    'filestorage': 'fs.osfs.OSFS',
-                    'filestorage_options': {
-                        'root_path': '{}/file-storage'.format(
-                            temporary_directory
-                        ),
-                        'create': 'true'
-                    }
-                },
-            }
-        ]
-    }
-
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    with open(cfg_path, 'w') as f:
-        f.write(yaml.dump(cfg))
+    write_config(cfg_path, postgres_dsn, temporary_directory)
 
-    runner = CliRunner()
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_election_day/govikon',
-        'add',
-    ])
+    result = run_command(cfg_path, 'govikon', ['add'])
     assert result.exit_code == 0
     assert "principal.yml not found" in result.output
     assert "Instance was created successfully" in result.output
@@ -104,80 +96,28 @@ def test_add_instance_missing_config(postgres_dsn, temporary_directory):
 
 def test_fetch(postgres_dsn, temporary_directory, session_manager):
 
-    runner = CliRunner()
-
-    cfg = {
-        'applications': [
-            {
-                'path': '/onegov_election_day/*',
-                'application': 'onegov.election_day.ElectionDayApp',
-                'namespace': 'onegov_election_day',
-                'configuration': {
-                    'dsn': postgres_dsn,
-                    'depot_backend': 'depot.io.memory.MemoryFileStorage',
-                    'filestorage': 'fs.osfs.OSFS',
-                    'filestorage_options': {
-                        'root_path': '{}/file-storage'.format(
-                            temporary_directory
-                        ),
-                        'create': 'true'
-                    }
-                },
-            }
-        ]
-    }
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    with open(cfg_path, 'w') as f:
-        f.write(yaml.dump(cfg))
+    write_config(cfg_path, postgres_dsn, temporary_directory)
 
     assert 'onegov_election_day-thun' not in session_manager.list_schemas()
     assert 'onegov_election_day-bern' not in session_manager.list_schemas()
     assert 'onegov_election_day-be' not in session_manager.list_schemas()
 
-    principals = {
-        'be': {
-            'name': 'Kanton Bern',
-            'canton': 'be',
-            'color': '#fff',
-            'logo': 'canton-be.svg',
-            'fetch': {
-                'bern': ['municipality'],
-                'thun': ['municipality']
-            }
-        },
-        'bern': {
-            'name': 'Stadt Bern',
-            'municipality': '351',
-            'color': '#fff',
-            'logo': 'municipality-351.svg',
-            'fetch': {
-                'be': ['federation', 'canton'],
-            }
-        },
-        'thun': {
-            'name': 'Stadt Thun',
-            'municipality': '942',
-            'color': '#fff',
-            'logo': 'municipality-942.svg',
-            'fetch': {}
+    write_principal(
+        temporary_directory, 'BE', params={
+            'fetch': {'bern': ['municipality'], 'thun': ['municipality']}
         }
-    }
-    for principal in principals:
-        principal_path = os.path.join(
-            temporary_directory,
-            'file-storage/onegov_election_day-{}'.format(principal)
-        )
-        os.makedirs(principal_path)
-        with open(os.path.join(principal_path, 'principal.yml'), 'w') as f:
-            f.write(yaml.dump(principals[principal], default_flow_style=False))
+    )
+    write_principal(
+        temporary_directory, 'Bern', entity='351', params={
+            'fetch': {'be': ['federation', 'canton']}
+        }
+    )
+    write_principal(temporary_directory, 'Thun', entity='942')
 
-        result = runner.invoke(cli, [
-            '--config', cfg_path,
-            '--select', '/onegov_election_day/{}'.format(principal),
-            'add',
-        ])
-        assert result.exit_code == 0
-        assert "Instance was created successfully" in result.output
+    assert run_command(cfg_path, 'be', ['add']).exit_code == 0
+    assert run_command(cfg_path, 'bern', ['add']).exit_code == 0
+    assert run_command(cfg_path, 'thun', ['add']).exit_code == 0
 
     assert 'onegov_election_day-thun' in session_manager.list_schemas()
     assert 'onegov_election_day-bern' in session_manager.list_schemas()
@@ -293,21 +233,13 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
     assert get_session('bern').query(ArchivedResult).count() == 5
     assert get_session('thun').query(ArchivedResult).count() == 4
 
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_election_day/be',
-        'fetch',
-    ])
-    assert result.exit_code == 0
+    assert run_command(cfg_path, 'be', ['fetch']).exit_code == 0
 
     assert get_session('be').query(ArchivedResult).count() == 12 + 4
     assert get_session('bern').query(ArchivedResult).count() == 5
     assert get_session('thun').query(ArchivedResult).count() == 4
 
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_election_day/bern',
-        'fetch',
-    ])
-    assert result.exit_code == 0
+    assert run_command(cfg_path, 'bern', ['fetch']).exit_code == 0
 
     assert get_session('be').query(ArchivedResult).count() == 12 + 4
     assert get_session('bern').query(ArchivedResult).count() == 5 + 12
@@ -332,11 +264,7 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
         'nays_percentage': 12.5
     }
 
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_election_day/thun',
-        'fetch',
-    ])
-    assert result.exit_code == 0
+    assert run_command(cfg_path, 'thun', ['fetch']).exit_code == 0
 
     assert get_session('be').query(ArchivedResult).count() == 12 + 4
     assert get_session('bern').query(ArchivedResult).count() == 5 + 12
@@ -345,73 +273,25 @@ def test_fetch(postgres_dsn, temporary_directory, session_manager):
 
 def test_send_sms(postgres_dsn, temporary_directory):
 
-    schema = 'onegov_election_day-govikon'
     cfg_path = os.path.join(temporary_directory, 'onegov.yml')
-    with open(cfg_path, 'w') as f:
-        f.write(yaml.dump({
-            'applications': [
-                {
-                    'path': '/onegov_election_day/*',
-                    'application': 'onegov.election_day.ElectionDayApp',
-                    'namespace': 'onegov_election_day',
-                    'configuration': {
-                        'dsn': postgres_dsn,
-                        'depot_backend': 'depot.io.memory.MemoryFileStorage',
-                        'filestorage': 'fs.osfs.OSFS',
-                        'filestorage_options': {
-                            'root_path': '{}/file-storage'.format(
-                                temporary_directory
-                            ),
-                            'create': 'true'
-                        },
-                        'sms_directory': '{}/sms'.format(
-                            temporary_directory
-                        ),
-                    },
-                }
-            ]
-        }))
+    write_config(cfg_path, postgres_dsn, temporary_directory)
+    write_principal(temporary_directory, 'Govikon')
+    assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
 
-    principal_path = os.path.join(temporary_directory, 'file-storage', schema)
-    os.makedirs(principal_path)
-    with open(os.path.join(principal_path, 'principal.yml'), 'w') as f:
-        f.write(
-            yaml.dump({
-                'name': 'Govikon',
-                'canton': 'be',
-                'color': '#fff',
-                'logo': 'canton-be.svg',
-            }, default_flow_style=False)
-        )
-
-    runner = CliRunner()
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_election_day/govikon',
-        'add',
-    ])
-    assert result.exit_code == 0
-    assert "Instance was created successfully" in result.output
-
-    sms_path = os.path.join(temporary_directory, 'sms', schema)
+    sms_path = os.path.join(
+        temporary_directory, 'sms', 'onegov_election_day-govikon'
+    )
     os.makedirs(sms_path)
 
     # no sms yet
-    runner = CliRunner()
-    result = runner.invoke(cli, [
-        '--config', cfg_path, '--select', '/onegov_election_day/govikon',
-        'send_sms', 'username', 'password'
-    ])
-    assert result.exit_code == 0
+    send_sms = ['send_sms', 'username', 'password']
+    assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
 
     with open(os.path.join(sms_path, '+417772211.000000'), 'w') as f:
         f.write('Fancy new results!')
 
     with patch('requests.post') as post:
-        runner = CliRunner()
-        result = runner.invoke(cli, [
-            '--config', cfg_path, '--select', '/onegov_election_day/govikon',
-            'send_sms', 'username', 'password'
-        ])
+        assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
         assert post.called
         assert post.call_args[0] == (
             'https://json.aspsms.com/SendSimpleTextSMS',
@@ -425,4 +305,71 @@ def test_send_sms(postgres_dsn, temporary_directory):
                 'UserName': 'username'
             }
         }
-        assert result.exit_code == 0
+
+
+def test_generate_media(postgres_dsn, temporary_directory, session_manager):
+
+    def add_vote(number):
+        vote = Vote(
+            id='vote-{}'.format(number),
+            title='vote-{}'.format(number),
+            domain='canton',
+            date=date(2015, 6, number)
+        )
+        vote.ballots.append(Ballot(type='proposal'))
+        vote.proposal.results.append(
+            BallotResult(
+                group='x', entity_id=1, counted=True, yeas=30, nays=10
+            )
+        )
+        session_manager.set_current_schema('onegov_election_day-govikon')
+        session = session_manager.session()
+        session.add(vote)
+        session.flush()
+        transaction.commit()
+
+    cfg_path = os.path.join(temporary_directory, 'onegov.yml')
+    write_config(cfg_path, postgres_dsn, temporary_directory)
+    write_principal(temporary_directory, 'Govikon', entity='1200')
+    assert run_command(cfg_path, 'govikon', ['add']).exit_code == 0
+
+    pdf_path = os.path.join(
+        temporary_directory, 'file-storage/onegov_election_day-govikon/pdf'
+    )
+    svg_path = os.path.join(
+        temporary_directory, 'file-storage/onegov_election_day-govikon/svg'
+    )
+
+    assert run_command(cfg_path, 'govikon', ['generate-media']).exit_code == 0
+    assert os.path.exists(pdf_path)
+    assert os.path.exists(svg_path)
+    assert os.listdir(pdf_path) == []
+    assert os.listdir(svg_path) == []
+
+    add_vote(1)
+
+    generate_media = ['generate-media', '--no-svg']
+    assert run_command(cfg_path, 'govikon', generate_media).exit_code == 0
+    assert len(os.listdir(pdf_path)) == 4
+    assert os.listdir(svg_path) == []
+
+    add_vote(2)
+
+    generate_media = ['generate-media', '--no-pdf']
+    assert run_command(cfg_path, 'govikon', generate_media).exit_code == 0
+    assert len(os.listdir(pdf_path)) == 4
+    assert os.listdir(svg_path) == []
+
+    add_vote(3)
+    assert run_command(cfg_path, 'govikon', ['generate-media']).exit_code == 0
+    assert len(os.listdir(pdf_path)) == 12
+    assert os.listdir(svg_path) == []
+
+    file_path = os.path.join(pdf_path, os.listdir(pdf_path)[0])
+    ts = os.stat(file_path).st_mtime
+
+    generate_media = ['generate-media', '--force']
+    assert run_command(cfg_path, 'govikon', generate_media).exit_code == 0
+    assert len(os.listdir(pdf_path)) == 12
+    assert os.listdir(svg_path) == []
+    assert os.stat(file_path).st_mtime > ts

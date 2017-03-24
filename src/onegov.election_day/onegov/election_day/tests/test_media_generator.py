@@ -85,12 +85,12 @@ def add_majorz_election(session):
     return election
 
 
-def add_proporz_election(session):
+def add_proporz_election(session, year=2015):
     election = Election(
         title='Proporz Election',
         domain='federation',
         type='proporz',
-        date=date(2015, 6, 14),
+        date=date(year, 6, 14),
         number_of_mandates=1,
         counted_entities=1,
         total_entities=1
@@ -189,6 +189,7 @@ def add_proporz_election(session):
     connection_2.children.append(subconnection)
     election.list_connections.append(connection_1)
     election.list_connections.append(connection_2)
+    election.list_connections.append(subconnection)
     list_1.connection_id = connection_1.id
     list_2.connection_id = connection_2.id
     list_3.connection_id = subconnection.id
@@ -197,23 +198,25 @@ def add_proporz_election(session):
     return election
 
 
-def add_vote(session):
+def add_vote(session, type_):
     vote = Vote(title='Vote', domain='federation', date=date(2015, 6, 18))
     vote.ballots.append(Ballot(type='proposal'))
-    vote.ballots.append(Ballot(type='counter-proposal'))
-    vote.ballots.append(Ballot(type='tie-breaker'))
+    if type_ == 'complex':
+        vote.ballots.append(Ballot(type='counter-proposal'))
+        vote.ballots.append(Ballot(type='tie-breaker'))
     session.add(vote)
     session.flush()
 
-    vote.proposal.results.append(
-        BallotResult(group='x', yeas=0, nays=100, counted=True, entity_id=1)
-    )
-    vote.counter_proposal.results.append(
-        BallotResult(group='x', yeas=100, nays=0, counted=True, entity_id=1)
-    )
-    vote.tie_breaker.results.append(
-        BallotResult(group='x', yeas=0, nays=0, counted=True, entity_id=1)
-    )
+    vote.proposal.results.append(BallotResult(
+        group='x', yeas=0, nays=100, counted=True, entity_id=1
+    ))
+    if type_ == 'complex':
+        vote.counter_proposal.results.append(BallotResult(
+            group='x', yeas=90, nays=10, counted=True, entity_id=1
+        ))
+        vote.tie_breaker.results.append(BallotResult(
+            group='x', yeas=0, nays=0, counted=True, entity_id=1
+        ))
     session.flush()
 
     return vote
@@ -313,15 +316,11 @@ def test_get_chart(election_day_app):
         assert post.call_args[0] == ('http://localhost:1337/d3/pdf',)
 
 
-def test_generate_majorz_election_pdf(session, election_day_app):
-
-    election_day_app.session_manager.set_locale(
-        default_locale='de_CH', current_locale='de_CH'
-    )
-
-    election = add_majorz_election(session)
-
+def test_generate_pdf_election(session, election_day_app):
     generator = MediaGenerator(election_day_app, False, False)
+
+    # Majorz election
+    election = add_majorz_election(session)
     with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
         for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
             gc.reset_mock()
@@ -331,16 +330,31 @@ def test_generate_majorz_election_pdf(session, election_day_app):
             with election_day_app.filestorage.open('election.pdf', 'rb') as f:
                 assert len(PdfReader(f, decompress=False).pages) == 3
 
-
-def test_generate_proporz_election_pdf(session, election_day_app):
-
-    election_day_app.session_manager.set_locale(
-        default_locale='de_CH', current_locale='de_CH'
-    )
-
+    # Proporz election
     election = add_proporz_election(session)
+    with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
+        for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+            gc.reset_mock()
+            generator.generate_pdf(election, 'election.pdf', locale)
 
-    generator = MediaGenerator(election_day_app, False, False)
+            assert gc.call_count == 5
+            with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+                assert len(PdfReader(f, decompress=False).pages) == 7
+
+    # Proporz election with deltas
+    add_proporz_election(session, year=2011)
+    with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
+        for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+            gc.reset_mock()
+            generator.generate_pdf(election, 'election.pdf', locale)
+
+            assert gc.call_count == 5
+            with election_day_app.filestorage.open('election.pdf', 'rb') as f:
+                assert len(PdfReader(f, decompress=False).pages) == 7
+
+    # Proporz election with more than one entitiy
+    election.counted_entities = 5
+    election.total_entities = 5
     with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
         for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
             gc.reset_mock()
@@ -351,15 +365,35 @@ def test_generate_proporz_election_pdf(session, election_day_app):
                 assert len(PdfReader(f, decompress=False).pages) == 7
 
 
-def test_generate_vote_pdf(session, election_day_app):
-
-    election_day_app.session_manager.set_locale(
-        default_locale='de_CH', current_locale='de_CH'
-    )
-
-    vote = add_vote(session)
-
+def test_generate_pdf_vote(session, election_day_app):
     generator = MediaGenerator(election_day_app, False, False)
+
+    # Simple vote
+    vote = add_vote(session, 'simple')
+    with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
+        for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+            gc.reset_mock()
+            generator.generate_pdf(vote, 'vote.pdf', locale)
+
+            assert gc.call_count == 1
+            with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+                assert len(PdfReader(f, decompress=False).pages) == 2
+
+    # Simple vote with more than one entity
+    vote.proposal.results.append(BallotResult(
+        group='y', yeas=200, nays=0, counted=True, entity_id=1
+    ))
+    with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
+        for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
+            gc.reset_mock()
+            generator.generate_pdf(vote, 'vote.pdf', locale)
+
+            assert gc.call_count == 1
+            with election_day_app.filestorage.open('vote.pdf', 'rb') as f:
+                assert len(PdfReader(f, decompress=False).pages) == 3
+
+    # Complex vote
+    vote = add_vote(session, 'complex')
     with patch.object(generator, 'get_chart', return_value=pdf_chart()) as gc:
         for locale in ('de_CH', 'fr_CH', 'it_CH', 'rm_CH'):
             gc.reset_mock()
@@ -371,11 +405,6 @@ def test_generate_vote_pdf(session, election_day_app):
 
 
 def test_generate_pdf_long_title(session, election_day_app):
-
-    election_day_app.session_manager.set_locale(
-        default_locale='de_CH', current_locale='de_CH'
-    )
-
     title = """This is a very long title so that it breaks the header line to
     a second line which must also be ellipsed.
 
@@ -433,7 +462,7 @@ def test_generate_svg(election_day_app, session):
             generator.generate_svg(item, 'panachage', 'de_CH')
             generator.generate_svg(item, 'map', 'de_CH')
 
-            item = add_vote(session).proposal
+            item = add_vote(session, 'complex').proposal
             generator.generate_svg(item, 'lists', 'de_CH')
             generator.generate_svg(item, 'candidates', 'de_CH')
             generator.generate_svg(item, 'connections', 'de_CH')
@@ -471,9 +500,6 @@ def test_generate_svg(election_day_app, session):
 def test_create_pdfs(election_day_app):
     generator = MediaGenerator(election_day_app, False, False)
     session = election_day_app.session()
-    election_day_app.session_manager.set_locale(
-        default_locale='de_CH', current_locale='de_CH'
-    )
     fs = election_day_app.filestorage
 
     chart = pdf_chart()
@@ -485,7 +511,7 @@ def test_create_pdfs(election_day_app):
 
         majorz_election = add_majorz_election(session)
         proporz_election = add_proporz_election(session)
-        vote = add_vote(session)
+        vote = add_vote(session, 'complex')
 
         generator.create_pdfs()
         assert gc.call_count == 36
@@ -543,9 +569,6 @@ def test_create_pdfs(election_day_app):
 def test_create_svgs(election_day_app):
     generator = MediaGenerator(election_day_app, False, False)
     session = election_day_app.session()
-    election_day_app.session_manager.set_locale(
-        default_locale='de_CH', current_locale='de_CH'
-    )
     fs = election_day_app.filestorage
 
     chart = StringIO('<svg></svg>')
@@ -557,7 +580,7 @@ def test_create_svgs(election_day_app):
 
         majorz_election = add_majorz_election(session)
         proporz_election = add_proporz_election(session)
-        vote = add_vote(session)
+        vote = add_vote(session, 'complex')
 
         generator.create_svgs()
         assert gc.call_count == 18
