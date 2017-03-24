@@ -1,10 +1,12 @@
 import os
 import port_for
 import pytest
+import shlex
 import shutil
 import subprocess
 import tempfile
 import transaction
+import urllib3
 
 from _pytest.monkeypatch import MonkeyPatch
 from elasticsearch import Elasticsearch
@@ -186,64 +188,70 @@ def temporary_path(temporary_directory):
 
 
 @pytest.fixture(scope="session")
-def es_process():
-    binary = os.environ.get('ES_BINARY', None)
+def es_default_version():
+    return '5.2.2'
 
-    if not binary:
-        binary = subprocess.check_output(['which', 'elasticsearch'])
-        binary = binary.decode('utf-8').rstrip('\n')
 
-    assert Path(binary).exists()
+@pytest.fixture(scope="session")
+def es_version(es_default_version):
+    return os.environ.get('ES_VERSION', es_default_version)
 
+
+@pytest.fixture(scope="session")
+def es_archive(es_version):
+    archive = '/tmp/elasticsearch-{}.tar.gz'.format(es_version)
+
+    if not os.path.exists(archive):
+        if es_version.startswith('5'):
+            url = """
+                https://artifacts.elastic.co/
+                downloads/elasticsearch/elasticsearch-{}.tar.gz
+            """
+        else:
+            url = """
+                https://download.elastic.co/
+                elasticsearch/elasticsearch/elasticsearch-{}.tar.gz
+            """
+
+        url = url.format(es_version).replace(' ', '').replace('\n', '')
+
+        http = urllib3.PoolManager()
+
+        with http.request('GET', url, preload_content=False) as r:
+            with open(archive, 'wb') as f:
+                shutil.copyfileobj(r, f)
+
+    return archive
+
+
+@pytest.fixture(scope="session")
+def es_binary(es_archive):
+    path = tempfile.mkdtemp()
+
+    try:
+        process = subprocess.Popen(
+            shlex.split("tar xzvf {} --strip-components=1".format(es_archive)),
+            cwd=path
+        )
+        assert process.wait() == 0
+        yield os.path.join(path, 'bin/elasticsearch')
+    finally:
+        print(path)
+        import pdb; pdb.set_trace()
+        shutil.rmtree(path)
+
+
+@pytest.fixture(scope="session")
+def es_process(es_binary, es_version):
     port = port_for.select_random()
-    cluster_name = 'es_cluster_{}'.format(port)
+    pid = es_binary + '.pid'
 
-    base = tempfile.mkdtemp()
-    home = os.path.join(base, 'home')
-    logs = os.path.join(base, 'logs')
-    work = os.path.join(base, 'work')
-    conf = os.path.join(base, 'conf')
-    pid = os.path.join(base, 'cluster.pid')
+    command = "{binary} -p {pidfile} --http.port={port}"
 
-    for path in (home, logs, work, conf):
-        os.mkdir(path)
+    if es_version.startswith('5'):
+        command = command.replace('--', '-E')
 
-    # this logging config is required to successfully launch elasticsearch
-    with open(os.path.join(conf, 'logging.yml'), 'w') as f:
-        f.write("""
-            es.logger.level: ERROR
-            rootLogger: ERROR, console
-
-            appender:
-                console:
-                    type: console
-                    layout:
-                        type: consolePattern
-                        conversionPattern: "[%d{ISO8601}][%-5p][%-25c] %m%n"
-        """)
-
-    command = """
-        {binary} -p {pidfile}
-        --http.port={port}
-        --path.home={home}
-        --default.path.logs={logs}
-        --default.path.work={work}
-        --default.path.conf={conf}
-        --cluster.name={cluster_name}
-        --network.publish_host='127.0.0.1'
-        --discovery.zen.ping.multicast.enabled=false
-        --action.auto_create_index=false
-        --security.manager.enabled=false
-    """.format(
-        binary=binary,
-        pidfile=pid,
-        port=port,
-        home=home,
-        logs=logs,
-        work=work,
-        conf=conf,
-        cluster_name=cluster_name,
-    )
+    command = command.format(binary=es_binary, pidfile=pid, port=port)
 
     url = 'http://127.0.0.1:{}'.format(port)
     executor = HTTPExecutor(command, url)
@@ -253,7 +261,6 @@ def es_process():
 
     executor.stop()
     executor.kill()
-    shutil.rmtree(base)
 
 
 @pytest.fixture(scope="function")
