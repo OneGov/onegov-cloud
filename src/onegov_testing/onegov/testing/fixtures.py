@@ -28,7 +28,7 @@ class HTTPExecutor(HTTPExecutorBase):
             pass
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def monkeysession(request):
     mp = MonkeyPatch()
     yield mp
@@ -81,7 +81,7 @@ def cache_password_hashing(monkeysession):
         'onegov.core.crypto.password.bcrypt_sha256.verify', cached_verify)
 
 
-@pytest.yield_fixture(scope="session")
+@pytest.fixture(scope="session")
 def postgres():
     """ Starts a postgres server using `testing.postgresql \
     <https://pypi.python.org/pypi/testing.postgresql/>`_ once per test session.
@@ -93,7 +93,7 @@ def postgres():
     postgres.stop()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def postgres_dsn(postgres):
     """ Returns a dsn to a temporary postgres server. Cleans up the database
     after running the tests.
@@ -129,7 +129,7 @@ def postgres_dsn(postgres):
     engine.dispose()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def session_manager(postgres_dsn):
     """ Provides a :class:`onegov.core.orm.session_manager.SessionManager`
     setup with :func:`postgres_dsn`.
@@ -153,7 +153,7 @@ def session_manager(postgres_dsn):
     mgr.dispose()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def session(session_manager):
     """ Provides an SQLAlchemy session, scoped to a random schema.
 
@@ -169,7 +169,7 @@ def session(session_manager):
     yield session_manager.session()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def temporary_directory():
     """ Provides a temporary directory that is removed after the test. """
     directory = tempfile.mkdtemp()
@@ -177,7 +177,7 @@ def temporary_directory():
     shutil.rmtree(directory)
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def temporary_path(temporary_directory):
     """ Same as :func:`temporary_directory`, but providing a ``Path`` instead
     of a string. """
@@ -185,7 +185,7 @@ def temporary_path(temporary_directory):
     yield Path(temporary_directory)
 
 
-@pytest.yield_fixture(scope="session")
+@pytest.fixture(scope="session")
 def es_process():
     binary = os.environ.get('ES_BINARY', None)
 
@@ -256,7 +256,7 @@ def es_process():
     shutil.rmtree(base)
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def es_url(es_process):
     """ Provides an url to an elasticsearch cluster that is guaranteed to be
     empty at the beginning of each test.
@@ -270,13 +270,13 @@ def es_url(es_process):
     es.indices.delete(index='*')
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def es_client(es_url):
     """ Provides an elasticsearch client. """
     yield Elasticsearch(es_url)
 
 
-@pytest.yield_fixture(scope="session")
+@pytest.fixture(scope="session")
 def smtp_server():
     # replacement for smtpserver fixture, which also works on Python 3.5
     # see https://bitbucket.org/pytest-dev/pytest-localserver
@@ -298,17 +298,17 @@ def smtp_server():
     server.stop()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def smtp(smtp_server):
     yield smtp_server
     del smtp_server.outbox[:]
 
 
-@pytest.yield_fixture(scope="session")
+@pytest.fixture(scope="session")
 def test_password():
     return hash_password('hunter2')
 
 
-@pytest.yield_fixture(scope="session")
+@pytest.fixture(scope="session")
 def long_lived_filestorage():
     return MemoryFS()
