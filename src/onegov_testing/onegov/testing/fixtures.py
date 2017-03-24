@@ -236,8 +236,6 @@ def es_binary(es_archive):
         assert process.wait() == 0
         yield os.path.join(path, 'bin/elasticsearch')
     finally:
-        print(path)
-        import pdb; pdb.set_trace()
         shutil.rmtree(path)
 
 
