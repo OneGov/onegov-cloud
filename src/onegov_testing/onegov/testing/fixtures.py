@@ -231,7 +231,9 @@ def es_binary(es_archive):
     try:
         process = subprocess.Popen(
             shlex.split("tar xzvf {} --strip-components=1".format(es_archive)),
-            cwd=path
+            cwd=path,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         assert process.wait() == 0
         yield os.path.join(path, 'bin/elasticsearch')
