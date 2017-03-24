@@ -274,7 +274,7 @@ def test_alternate_id_property(es_url, postgres_dsn):
 
         es_id = 'name'
         es_properties = {
-            'fullname': {'type': 'string'},
+            'fullname': {'type': 'text'},
         }
         es_language = 'en'
         es_public = True
@@ -518,5 +518,5 @@ def test_suggestions(es_url, postgres_dsn):
     }
 
     assert set(app.es_suggestions(query='w', languages=['en'])) == {
-        'Jeff Winger'
+        'Winger Jeff'
     }

@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Drops support for Elasticsearch 2.x and adds support for Elasticsearch 5.x.
+  [href]
+
 0.6.4 (2016-09-21)
 ~~~~~~~~~~~~~~~~~~~
 

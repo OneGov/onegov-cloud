@@ -129,7 +129,7 @@ class ElasticsearchApp(morepath.App):
 
         # by default, do not include any fields (this will still include
         # the id and the type, which is enough for the orm querying)
-        search = search.source(exclude=['*'])
+        search = search.source(excludes=['*'])
 
         return search
 
@@ -166,24 +166,28 @@ class ElasticsearchApp(morepath.App):
         else:
             context = ['public']
 
-        result = self.es_client.suggest(
-            index=self.es_indices(languages=languages, types=types),
-            body={
-                'suggestions': {
-                    'text': query,
-                    'completion': {
-                        'field': 'es_suggestion',
-                        'context': {
-                            'es_public_categories': context
-                        }
-                    },
+        search = self.es_search(
+            languages=languages,
+            types=types,
+            include_private=include_private
+        )
+
+        search = search.suggest(
+            name='es_suggestion',
+            text=query,
+            completion={
+                'field': 'es_suggestion',
+                'contexts': {
+                    'es_suggestion_context': context
                 }
             }
         )
 
+        result = search.execute_suggest()
+
         suggestions = []
 
-        for suggestion in result.get('suggestions', []):
+        for suggestion in result.es_suggestion:
             for item in suggestion['options']:
                 suggestions.append(item['text'])
 

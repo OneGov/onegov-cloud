@@ -24,7 +24,7 @@ def test_index_manager_assertions(es_client):
     ixmgr = IndexManager(hostname='test.example.org', es_client=es_client)
 
     page = TypeMapping('page', {
-        'title': {'type': 'string'}
+        'title': {'type': 'text'}
     })
 
     with pytest.raises(AssertionError):
@@ -53,7 +53,7 @@ def test_index_manager_separation(es_client):
     bar = IndexManager(hostname='bar', es_client=es_client)
 
     page = TypeMapping('page', {
-        'title': {'type': 'string'}
+        'title': {'type': 'text'}
     })
 
     foo.ensure_index('foo', 'en', page)
@@ -69,7 +69,7 @@ def test_index_creation(es_client):
     ixmgr = IndexManager(hostname='example.org', es_client=es_client)
 
     page = TypeMapping('page', {
-        'title': {'type': 'string'}
+        'title': {'type': 'text'}
     })
 
     # create an index
@@ -97,8 +97,8 @@ def test_index_creation(es_client):
     # if we change a mapping (which we won't usually do at runtime), we
     # should get a new index
     new_page = TypeMapping('page', {
-        'title': {'type': 'string'},
-        'body': {'type': 'string'}
+        'title': {'type': 'text'},
+        'body': {'type': 'text'}
     })
     index = ixmgr.ensure_index(
         schema='foo-bar',
@@ -180,56 +180,42 @@ def test_mapping_for_language():
 
     assert mapping.for_language('en') == {
         'title': {
-            'type': 'string',
+            'type': 'text',
             'analyzer': 'english'
         },
         'es_public': {
             'type': 'boolean',
-            'index': 'not_analyzed',
             'include_in_all': False
-        },
-        'es_public_categories': {
-            'include_in_all': False,
-            'index': 'not_analyzed',
-            'type': 'string'
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
-            'context': {
-                'es_public_categories': {
-                    'path': 'es_public_categories',
+            'contexts': [
+                {
+                    'name': 'es_suggestion_context',
                     'type': 'category'
                 }
-            },
-            'payloads': True,
+            ],
             'type': 'completion'
         }
     }
 
     assert mapping.for_language('de') == {
         'title': {
-            'type': 'string',
+            'type': 'text',
             'analyzer': 'german'
         },
         'es_public': {
             'type': 'boolean',
-            'index': 'not_analyzed',
             'include_in_all': False
-        },
-        'es_public_categories': {
-            'include_in_all': False,
-            'index': 'not_analyzed',
-            'type': 'string'
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
-            'context': {
-                'es_public_categories': {
-                    'path': 'es_public_categories',
+            'contexts': [
+                {
+                    'name': 'es_suggestion_context',
                     'type': 'category'
                 }
-            },
-            'payloads': True,
+            ],
             'type': 'completion'
         }
     }
@@ -238,7 +224,6 @@ def test_mapping_for_language():
         'title': {
             'properties': {
                 'type': 'localized',
-                'index': 'not_analyzed'
             }
         }
     })
@@ -246,30 +231,22 @@ def test_mapping_for_language():
     assert mapping.for_language('de') == {
         'title': {
             'properties': {
-                'type': 'string',
+                'type': 'text',
                 'analyzer': 'german',
-                'index': 'not_analyzed'
             }
         },
         'es_public': {
             'type': 'boolean',
-            'index': 'not_analyzed',
             'include_in_all': False
-        },
-        'es_public_categories': {
-            'include_in_all': False,
-            'index': 'not_analyzed',
-            'type': 'string'
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
-            'context': {
-                'es_public_categories': {
-                    'path': 'es_public_categories',
+            'contexts': [
+                {
+                    'name': 'es_suggestion_context',
                     'type': 'category'
                 }
-            },
-            'payloads': True,
+            ],
             'type': 'completion'
         }
     }
@@ -285,29 +262,22 @@ def test_mapping_for_language():
     assert mapping.for_language('en') == {
         'title': {
             'properties': {
-                'type': 'string',
+                'type': 'text',
                 'analyzer': 'english_html'
             }
         },
         'es_public': {
             'type': 'boolean',
-            'index': 'not_analyzed',
             'include_in_all': False
-        },
-        'es_public_categories': {
-            'include_in_all': False,
-            'index': 'not_analyzed',
-            'type': 'string'
         },
         'es_suggestion': {
             'analyzer': 'autocomplete',
-            'context': {
-                'es_public_categories': {
-                    'path': 'es_public_categories',
+            'contexts': [
+                {
+                    'name': 'es_suggestion_context',
                     'type': 'category'
                 }
-            },
-            'payloads': True,
+            ],
             'type': 'completion'
         }
     }
@@ -322,7 +292,7 @@ def test_orm_event_translator_properties():
         es_properties = {
             'title': {'type': 'localized'},
             'body': {'type': 'localized'},
-            'tags': {'type': 'string'},
+            'tags': {'type': 'text'},
             'date': {'type': 'date'},
             'published': {'type': 'boolean'},
             'likes': {'type': 'long'}
@@ -378,10 +348,11 @@ def test_orm_event_translator_properties():
                 'likes': 1000,
                 'published': True,
                 'es_public': True,
-                'es_public_categories': ['public'],
                 'es_suggestion': {
                     'input': ['About'],
-                    'output': 'About'
+                    'contexts': {
+                        'es_suggestion_context': ['public']
+                    }
                 }
             }
         }
@@ -453,10 +424,10 @@ def test_type_mapping_registry():
 
     registry = TypeMappingRegistry()
     registry.register_type('page', {
-        'title': {'type': 'string'}
+        'title': {'type': 'text'}
     })
     registry.register_type('comment', {
-        'comment': {'type': 'string'}
+        'comment': {'type': 'text'}
     })
 
     assert set(t.name for t in registry) == {'page', 'comment'}
@@ -530,7 +501,7 @@ def test_indexer_process(es_client):
 def test_extra_analyzers(es_client):
 
     page = TypeMapping('page', {
-        'title': {'type': 'string'}
+        'title': {'type': 'text'}
     })
 
     ixmgr = IndexManager(hostname='foo.bar', es_client=es_client)

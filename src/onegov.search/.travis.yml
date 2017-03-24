@@ -3,10 +3,6 @@ python: "3.5"
 cache: pip
 
 env:
-    - TOXENV=py34 DEPLOY=no ES_VERSION=2.2.2
-    - TOXENV=py35 DEPLOY=no ES_VERSION=2.2.2
-    - TOXENV=py34 DEPLOY=yes ES_VERSION=2.4.3
-    - TOXENV=py35 DEPLOY=no ES_VERSION=2.4.3
     - TOXENV=py34 DEPLOY=yes ES_VERSION=5.2.2
     - TOXENV=py35 DEPLOY=no ES_VERSION=5.2.2
 

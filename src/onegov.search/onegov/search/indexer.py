@@ -133,7 +133,7 @@ class Indexer(object):
     def process_task(self, task):
         try:
             getattr(self, task['action'])(task)
-        except TransportError:
+        except TransportError as e:
             log.exception("Failure during elasticsearch index task")
             return False
 
@@ -202,28 +202,18 @@ class TypeMapping(object):
     def add_defaults(self, mapping):
         mapping['es_public'] = {
             'type': 'boolean',
-            'index': 'not_analyzed',
             'include_in_all': False
         }
 
-        # contains ['public'] if public or ['private'] if private - used
-        # because completion categories don't work with booleans if we want
-        # to query for both true and false
-        mapping['es_public_categories'] = {
-            'type': 'string',
-            'index': 'not_analyzed',
-            'include_in_all': False
-        }
         mapping['es_suggestion'] = {
             'analyzer': 'autocomplete',
             'type': 'completion',
-            'payloads': True,
-            'context': {
-                'es_public_categories': {
-                    'type': 'category',
-                    'path': 'es_public_categories'
+            'contexts': [
+                {
+                    'name': 'es_suggestion_context',
+                    'type': 'category'
                 }
-            }
+            ]
         }
         return mapping
 
@@ -241,7 +231,7 @@ class TypeMapping(object):
 
     def supplement_analyzer(self, dictionary, language):
         """ Iterate through the dictionary found in the type mapping and
-        replace the 'localized' type with a 'string' type that includes a
+        replace the 'localized' type with a 'text' type that includes a
         language specific analyzer.
 
         """
@@ -258,7 +248,7 @@ class TypeMapping(object):
 
         if supplement:
             assert 'analyzer' not in dictionary
-            dictionary[key] = 'string'
+            dictionary[key] = 'text'
             dictionary['analyzer'] = ES_ANALYZER_MAP[supplement]
 
         return dictionary
@@ -550,7 +540,7 @@ class ORMEventTranslator(object):
 
         for prop, mapping in mapping.items():
 
-            if prop in ('es_public_categories', 'es_suggestion'):
+            if prop == 'es_suggestion':
                 continue
 
             convert = self.converters.get(mapping['type'], lambda v: v)
@@ -562,21 +552,21 @@ class ORMEventTranslator(object):
                 translation['properties'][prop] = convert(raw)
 
         if obj.es_public:
-            translation['properties']['es_public_categories'] = ['public']
+            contexts = {'es_suggestion_context': ['public']}
         else:
-            translation['properties']['es_public_categories'] = ['private']
+            contexts = {'es_suggestion_context': ['private']}
 
         suggestion = obj.es_suggestion
 
         if is_non_string_iterable(suggestion):
             translation['properties']['es_suggestion'] = {
                 'input': suggestion,
-                'output': suggestion[0]
+                'contexts': contexts
             }
         else:
             translation['properties']['es_suggestion'] = {
                 'input': [suggestion],
-                'output': suggestion,
+                'contexts': contexts
             }
 
         self.put(translation)

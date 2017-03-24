@@ -1,5 +1,5 @@
 from elasticsearch_dsl import Search as BaseSearch
-from elasticsearch_dsl.result import Result as BaseResult
+from elasticsearch_dsl.response import Hit as BaseHit
 from elasticsearch_dsl.response import Response as BaseResponse
 
 
@@ -31,7 +31,7 @@ class Search(BaseSearch):
                     continue
 
                 if mapping.name not in self._doc_type_map:
-                    self._doc_type_map[mapping.name] = Result.bind(
+                    self._doc_type_map[mapping.name] = Hit.bind(
                         mapping.model, self.session
                     )
 
@@ -160,7 +160,7 @@ def explanation_value(explanation, text):
             return result
 
 
-class Result(BaseResult):
+class Hit(BaseHit):
     """ Extends a single result with additional methods to query the SQLAlchemy
     models behind the results.
 
@@ -169,13 +169,13 @@ class Result(BaseResult):
     @classmethod
     def bind(cls, model, session):
 
-        class BoundResult(cls):
+        class BoundHit(cls):
             pass
 
-        BoundResult.model = model
-        BoundResult.session = session
+        BoundHit.model = model
+        BoundHit.session = session
 
-        return BoundResult
+        return BoundHit
 
     def query(self):
         """ Returns the SQLAlchemy query for this result. """
