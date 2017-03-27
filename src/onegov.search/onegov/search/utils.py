@@ -104,3 +104,27 @@ def related_types(model):
                     return related_types(parentclass)
 
     return result
+
+
+def es5_compatible_mapping(mapping):
+    """ Takes a dictionary of elasticsearch properties and changes strings
+    into text/keywords depending on their configuration.
+
+    """
+
+    def transform(value):
+        if value.get('type') != 'string':
+            return value
+
+        if value.get('index') == 'not_analyzed':
+            value = {k: v for k, v in value.items() if k != 'index'}
+            value['type'] = 'keyword'
+        else:
+            value = {k: v for k, v in value.items()}
+            value['type'] = 'text'
+
+        return value
+
+    return {
+        key: transform(value) for key, value in mapping.items()
+    }
