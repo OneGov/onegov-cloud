@@ -383,7 +383,8 @@ class IndexManager(object):
                 mapping.name: {'properties': mapping.for_language(language)}
             },
             'settings': {
-                'analysis': ANALYSIS_CONFIG
+                'analysis': ANALYSIS_CONFIG,
+                'index.mapper.dynamic': False
             }
         })
 
