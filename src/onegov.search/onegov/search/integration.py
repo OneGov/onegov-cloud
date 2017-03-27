@@ -187,7 +187,7 @@ class ElasticsearchApp(morepath.App):
 
         suggestions = []
 
-        for suggestion in result.es_suggestion:
+        for suggestion in getattr(result, 'es_suggestion', []):
             for item in suggestion['options']:
                 suggestions.append(item['text'])
 
