@@ -2,26 +2,30 @@ language: python
 python: "3.5"
 cache: pip
 
-env:
-    - TOXENV=py34 DEPLOY=yes ES_VERSION=5.2.2
-    - TOXENV=py35 DEPLOY=no ES_VERSION=5.2.2
+addons:
+  apt:
+    packages:
+      - oracle-java8-set-default
 
-    - TOXENV=pep8 DEPLOY=no
+env:
+  - TOXENV=py34 DEPLOY=yes ES_VERSION=5.2.2
+  - TOXENV=py35 DEPLOY=no ES_VERSION=5.2.2
+  - TOXENV=pep8 DEPLOY=no
 
 install: ./.travis-install.sh
 
 script:
-    - tox -e $TOXENV
+  - tox -e $TOXENV
 
 after_success:
-    - if [ "$DEPLOY" = 'yes' ]; then coveralls; fi
+  - if [ "$DEPLOY" = 'yes' ]; then coveralls; fi
 
 deploy:
-    provider: pypi
-    distributions: "sdist bdist_wheel"
-    user: seantis
-    password:
-      secure: "A4ZoPbnr1x2C4wtxyYjLO+QiOPLyy6p5aHqxfRu5qS3voKMqjdzMVMh4HEAPleAVuse03ez/SPpY4c2RJyqc1KEjjX4r7FdBoKUndsU5A8mxlDDjLYXF7iq39iBaFp3H7kQhWZJfbH0p9XGn/SFoFYo9tIBoCzExgLqJvfJiG8ZR1m/tVnRgImpu1vv+XbKdOIfm8IFknjdPQk4hag7gu88ticrw1ExwExhjIpPVUqvsgE/rC86IC73+0ERae/cyGMhzlHL5VnAwSjMH0scJ5vyHixYjUejEO8mEN3fZ5gNc9eAbuPvR6inz4B4S6GAziEdsiwbz9auMtZWTd+eZ6qOOidv5ZJa02s+n44ZonOcvmoD551GlzGK++REjlEYjl8QNxtJWFISEVjHrCHXQ012BTH2zfkuhMut2qeRrFVFC7FnMkSv6ldWu9FGFJro52IN7+1H9yWk58NDjHfOAzR0NhputW3hBUkDoyfq0gFRvQCkssTjeFQJJJQycF1QEdCun04SgdAgjjrJ85iwstjskVoapETm52kTzoC3MCqpkfUusto2/Hsvyb1a5Hkrf7nXx+SHHNWKwcF7I9hNMVtr9w/8QvOb71U2nriIcoJOUPrbffzTmJND5lj22iwzvresc3CWPGoKyhxXrpTsF4WZXTS2PGn5V4KTj+E1Ko+c="
-    on:
-        tags: true
-        condition: $DEPLOY = yes
+  provider: pypi
+  distributions: "sdist bdist_wheel"
+  user: seantis
+  password:
+    secure: "A4ZoPbnr1x2C4wtxyYjLO+QiOPLyy6p5aHqxfRu5qS3voKMqjdzMVMh4HEAPleAVuse03ez/SPpY4c2RJyqc1KEjjX4r7FdBoKUndsU5A8mxlDDjLYXF7iq39iBaFp3H7kQhWZJfbH0p9XGn/SFoFYo9tIBoCzExgLqJvfJiG8ZR1m/tVnRgImpu1vv+XbKdOIfm8IFknjdPQk4hag7gu88ticrw1ExwExhjIpPVUqvsgE/rC86IC73+0ERae/cyGMhzlHL5VnAwSjMH0scJ5vyHixYjUejEO8mEN3fZ5gNc9eAbuPvR6inz4B4S6GAziEdsiwbz9auMtZWTd+eZ6qOOidv5ZJa02s+n44ZonOcvmoD551GlzGK++REjlEYjl8QNxtJWFISEVjHrCHXQ012BTH2zfkuhMut2qeRrFVFC7FnMkSv6ldWu9FGFJro52IN7+1H9yWk58NDjHfOAzR0NhputW3hBUkDoyfq0gFRvQCkssTjeFQJJJQycF1QEdCun04SgdAgjjrJ85iwstjskVoapETm52kTzoC3MCqpkfUusto2/Hsvyb1a5Hkrf7nXx+SHHNWKwcF7I9hNMVtr9w/8QvOb71U2nriIcoJOUPrbffzTmJND5lj22iwzvresc3CWPGoKyhxXrpTsF4WZXTS2PGn5V4KTj+E1Ko+c="
+  on:
+    tags: true
+    condition: $DEPLOY = yes
