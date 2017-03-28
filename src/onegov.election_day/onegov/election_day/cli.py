@@ -122,7 +122,12 @@ def generate_media(pdf, svg, force, cleanup):
         if not pdf and not svg:
             return
 
-        lockfile = open('.lock-{}'.format(app.schema), 'w+')
+        lockfile = open(
+            '{}/.lock-{}'.format(
+                app.configuration.get('lockfile_path', '.').rstrip('/'),
+                app.schema
+            ), 'w+'
+        )
 
         try:
             fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)

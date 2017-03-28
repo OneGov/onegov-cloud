@@ -29,6 +29,7 @@ def write_config(path, postgres_dsn, temporary_directory):
                     'sms_directory': '{}/sms'.format(
                         temporary_directory
                     ),
+                    'lockfile_path': temporary_directory,
                     'd3_renderer': 'http://localhost:1337'
                 },
             }
