@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Switches to Elasticsearch 5.
+  [href]
+
 1.12.4 (2017-03-21)
 ~~~~~~~~~~~~~~~~~~~~~
 
