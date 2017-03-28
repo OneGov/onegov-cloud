@@ -49,7 +49,7 @@ setup(
         'onegov.people>=0.0.7',
         'onegov.recipient',
         'onegov.reservation>=0.3.0',
-        'onegov.search>=0.6.2',
+        'onegov.search>=1.0.0',
         'onegov.shared',
         'onegov.ticket>=0.4.1',
         'onegov.user',

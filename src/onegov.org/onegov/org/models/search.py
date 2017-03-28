@@ -16,9 +16,7 @@ class Search(Pagination):
     @cached_property
     def available_documents(self):
         search = self.request.app.es_search_by_request(self.request)
-        search = search.params(search_type="count")
-
-        return search.execute().hits.total
+        return search.count()
 
     @cached_property
     def explain(self):
@@ -43,6 +41,9 @@ class Search(Pagination):
 
     @cached_property
     def batch(self):
+        if not self.query:
+            return None
+
         search = self.request.app.es_search_by_request(
             request=self.request,
             explain=self.explain
@@ -79,7 +80,7 @@ class Search(Pagination):
 
     @cached_property
     def subset_count(self):
-        return self.cached_subset.hits.total
+        return self.cached_subset and self.cached_subset.hits.total or 0
 
     def suggestions(self):
         return tuple(self.request.app.es_suggestions_by_request(

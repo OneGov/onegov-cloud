@@ -23,7 +23,7 @@ def search(self, request):
             'count': self.subset_count
         })
     except TransportError:
-        log.warning("Elasticsearch cluster is offline")
+        log.exception("Elasticsearch cluster is offline")
         return {
             'title': _("Search Unavailable"),
             'layout': layout,
