@@ -19,7 +19,7 @@ class VacationActivity(Activity, CoordinatesExtension, ORMSearchable):
         'title': {'type': 'localized'},
         'lead': {'type': 'localized'},
         'text': {'type': 'localized_html'},
-        'organiser': {'type': 'string'}
+        'organiser': {'type': 'text'}
     }
 
     @property
