@@ -147,7 +147,7 @@ class ElectionsLayout(Layout):
         if tab == 'panachage':
             return _("Panachage")
         if tab == 'data':
-            return _("Open Data")
+            return _("Downloads")
 
         return ''
 
@@ -272,7 +272,7 @@ class VotesLayout(Layout):
         if tab == 'tie-breaker':
             return _("Tie-Breaker")
         if tab == 'data':
-            return _("Open Data")
+            return _("Downloads")
 
         return ''
 
