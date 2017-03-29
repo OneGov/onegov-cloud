@@ -62,7 +62,7 @@ class MediaGenerator():
             },
             'map': {
                 'main': 'ballotMap',
-                'scripts': ('underscore.js', 'topojson.js', 'd3.chart.map.js'),
+                'scripts': ('topojson.js', 'd3.chart.map.js'),
             }
         }
 

@@ -224,10 +224,10 @@ def get_bar_chart_asset():
 @ElectionDayApp.webasset('ballot_map')
 def get_ballot_map_asset():
     yield 'jquery.js'
+    yield 'topojson.js'
     yield 'd3.js'
     yield 'd3.tip.js'
     yield 'd3.chart.map.js'
-    yield 'topojson.js'
     yield 'embed.js'
     yield 'ballot-map.js'
 
@@ -240,7 +240,6 @@ def get_common_asset():
     yield 'jquery.tablesorter.staticRow.js'
     yield 'fastclick.js'
     yield 'foundation.js'
-    yield 'underscore.js'
     yield 'stacktable.js'
     yield 'iframeResizer.contentWindow.js'
     yield 'common.js'
