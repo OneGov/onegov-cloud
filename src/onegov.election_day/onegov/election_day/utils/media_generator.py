@@ -571,8 +571,6 @@ class MediaGenerator():
                         style=table_style_factoids
                     )
                     pdf.spacer()
-                    if summarize:
-                        pdf.spacer()
 
                     # Results
                     if not summarize:
@@ -604,7 +602,8 @@ class MediaGenerator():
                         )
                         pdf.spacer()
 
-                    if summarize:
+                    else:
+                        pdf.spacer()
                         pdf.table(
                             [[
                                 translate(_('Electoral District')),
@@ -627,25 +626,7 @@ class MediaGenerator():
                             [None, 2.3 * cm, 2 * cm, 2 * cm],
                             style=table_style_results(2)
                         )
-
-                    # Map
-                    if self.app.principal.use_maps:
                         pdf.pagebreak()
-                        data = ballot.percentage_by_entity()
-                        params = {
-                            'yay': translate(_('Yay')),
-                            'nay': translate(_('Nay')),
-                        }
-                        year = item.date.year
-                        pdf.pdf(
-                            self.get_map('pdf', data, year, params=params),
-                            0.8
-                        )
-                        pdf.pagebreak()
-                    else:
-                        pdf.spacer()
-
-                    if summarize:
                         pdf.table(
                             [[
                                 translate(_('Electoral District')),
@@ -669,7 +650,23 @@ class MediaGenerator():
                             [None, 2.5 * cm, 2.5 * cm, 2.5 * cm, 2.5 * cm],
                             style=table_style_results(1)
                         )
+
+                    # Map
+                    if self.app.principal.use_maps:
                         pdf.pagebreak()
+                        data = ballot.percentage_by_entity()
+                        params = {
+                            'yay': translate(_('Yay')),
+                            'nay': translate(_('Nay')),
+                        }
+                        year = item.date.year
+                        pdf.pdf(
+                            self.get_map('pdf', data, year, params=params),
+                            0.8
+                        )
+                        pdf.pagebreak()
+                    else:
+                        pdf.spacer()
 
             # Add related link
             link = (item.meta or {}).get('related_link', '')
