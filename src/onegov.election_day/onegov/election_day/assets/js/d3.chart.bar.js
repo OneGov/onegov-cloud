@@ -11,6 +11,7 @@
 }(this, function(d3) {
     return function(params) {
         var data = {};
+        var margin = {top: 20, right: 10, bottom: 20, left: 10};
         var height = 0;
         var width = 0;
         var interactive = false;
