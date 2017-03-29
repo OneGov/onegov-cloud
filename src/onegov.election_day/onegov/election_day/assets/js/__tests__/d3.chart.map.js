@@ -140,7 +140,7 @@ describe('Map', () => {
     });
 
     chart(document.body);
-    require('fs').writeFile("map_c@500.svg", document.svg());
+    // require('fs').writeFile("map_c@500.svg", document.svg());
     expect(document.svg()).toMatchSnapshot();
     expect(chart.width()).toBe(500);
   });

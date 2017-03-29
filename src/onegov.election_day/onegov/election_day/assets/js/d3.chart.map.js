@@ -45,7 +45,6 @@
             // Try to read a default width from the container if none is given
             if ((typeof $ !== 'undefined') && !width) {
                 width = $(container).width();
-                // width = $(container).width() - margin.left - margin.right;
             }
 
             var svg = d3.select(container).append('svg')
@@ -172,47 +171,56 @@
                     .style('fill', 'none')
                     .attr('d', path);
 
-                // Get the bounding box
-                var bbox = svg[0][0].getBBox();
-
                 // Add the legend (we need to up/downscale the elements)
-                var fit_scale = bbox.width / width;
-                var legend_values = [80, 70, 60, 50.001, 49.999, 40, 30, 20];
-                var legend_scale = d3.scale.ordinal()
-                    .domain(legend_values)
-                    .rangeRoundBands([0.2 * bbox.width, 0.8 * bbox.width]);
+                var bboxMap = svg[0][0].getBBox();
+                var unitScale = d3.scale.linear()
+                    .rangeRound([0, bboxMap.width / (width - margin.left - margin.right)]);
+                var legendValues = [80, 70, 60, 50.001, 49.999, 40, 30, 20];
+                var legendScale = d3.scale.ordinal()
+                    .domain(legendValues)
+                    .rangeRoundBands([0.2 * bboxMap.width, 0.8 * bboxMap.width]);
                 var legend = svg.append('g')
                     .attr('transform', function(d) {
-                        return 'translate(0,' + Math.round(fit_scale * options.legendMargin) + ')';
+                        return 'translate(0,' + unitScale(options.legendMargin) + ')';
                     });
-                legend.selectAll('.legend_item')
-                    .data(legend_values).enter()
+                var legendItems = legend.selectAll('.legend_item')
+                    .data(legendValues).enter()
                     .append('rect')
-                    .attr('x', function(d) {
-                        return legend_scale(d);
-                    })
-                    .attr('width', legend_scale.rangeBand())
-                    .attr('height', Math.round(fit_scale * options.legendHeight))
-                    .style('fill', function(d) {
-                        return scale(d);
-                    });
-                legend.append('text')
-                    .attr('x', legend_scale(80))
-                    .attr('y', Math.round(fit_scale * (options.legendHeight + 1.5 * options.fontSizePx)))
-                    .style('font-size', Math.round(fit_scale * options.fontSizePx) + 'px')
+                    .attr('x', function(d) {return legendScale(d);})
+                    .attr('width', legendScale.rangeBand())
+                    .attr('height', unitScale(options.legendHeight))
+                    .style('fill', function(d) {return scale(d);});
+                var text_yay = legend.append('text')
+                    .attr('x', legendScale(80))
+                    .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
+                    .style('font-size', unitScale(options.fontSizePx) + 'px')
                     .style('font-family', options.fontFamily)
                     .text(yay);
-                legend.append('text')
-                    .attr('x', legend_scale(20) + legend_scale.rangeBand())
-                    .attr('y', Math.round(fit_scale * (options.legendHeight + 1.5 * options.fontSizePx)))
+                var text_nay = legend.append('text')
+                    .attr('x', legendScale(20) + legendScale.rangeBand())
+                    .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
                     .style('text-anchor', 'end')
-                    .style('font-size', Math.round(fit_scale * options.fontSizePx) + 'px')
+                    .style('font-size',unitScale(options.fontSizePx) + 'px')
                     .style('font-family', options.fontFamily)
                     .text(nay);
 
-                // move each element up when it's selected (there's no z-index in
-                // svg) and make sure the others are deselected
+                // Set size
+                bbox = svg[0][0].getBBox();
+                height = Math.floor(width * (bbox.height/bbox.width));
+                svg.attr('height', height)
+                   .attr('viewBox',
+                    [
+                      bbox.x - unitScale(margin.left),
+                      bbox.y - unitScale(margin.top),
+                      bbox.width + unitScale(margin.left) + unitScale(margin.right),
+                      bbox.height + unitScale(margin.top) + unitScale(margin.bottom)
+                    ].join(' ')
+                );
+
+
                 if (interactive) {
+                    // move each element up when it's selected (there's no z-index in
+                    // svg) and make sure the others are deselecte
                     $(container).find('.municipality path').each(function(ix, path) {
                         $(path).on('mouseenter', function() {
                             $('.municipality path.selected').each(
@@ -227,30 +235,44 @@
                             $(this).attr('class', $(this).attr('class').replace('selected', ''));
                         });
                     });
-                }
 
-                // Add tooltips
-                if (interactive) {
+                    // Add tooltips
                     svg.call(tooltip);
-                }
 
-                // Set size
-                bbox = svg[0][0].getBBox();
-                svg.attr('viewBox',
-                    [bbox.x, bbox.y, bbox.width, bbox.height].join(' ')
-                );
-                // height = Math.floor(width * (bbox.height/bbox.width)) + 70;
-                height = Math.floor(width * (bbox.height/bbox.width));
-                svg.attr('height', height);
-
-                // Relayout on resize
-                if (interactive) {
+                    // Relayout on resize
                     d3.select(window).on('resize.ballotmap', function() {
                         width = $(container).width();
-                        svg.attr('width', width).attr('height', height);
+                        unitScale.rangeRound([0, bboxMap.width / (width - margin.left - margin.right)]);
+                        legendScale.rangeRoundBands([0.2 * bboxMap.width, 0.8 * bboxMap.width]);
+                        legend.attr('transform', function(d) {
+                                return 'translate(0,' + unitScale(options.legendMargin) + ')';
+                            });
+                        legendItems.attr('x', function(d) {return legendScale(d);})
+                            .attr('width', legendScale.rangeBand())
+                            .attr('height', unitScale(options.legendHeight))
+                            .style('fill', function(d) {return scale(d);});
+                        text_yay.attr('x', legendScale(80))
+                            .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
+                            .style('font-size', unitScale(options.fontSizePx) + 'px');
+                        text_nay.attr('x', legendScale(20) + legendScale.rangeBand())
+                            .attr('y', unitScale(options.legendHeight + 1.5 * options.fontSizePx))
+                            .style('font-size', unitScale(options.fontSizePx) + 'px');
+
                         bbox = svg[0][0].getBBox();
-                        height = Math.floor(width * (bbox.height/bbox.width)) + 70;
-                        svg.attr('width', width).attr('height', height);
+
+                        height = Math.floor(width * (bbox.height/bbox.width));
+
+
+                        svg.attr('width', width)
+                           .attr('height', height)
+                           .attr('viewBox',
+                            [
+                              bbox.x - unitScale(margin.left),
+                              bbox.y - unitScale(margin.top),
+                              bbox.width + unitScale(margin.left) + unitScale(margin.right),
+                              bbox.height + unitScale(margin.top) + unitScale(margin.bottom)
+                            ].join(' ')
+                        );
                     });
                 }
             }
