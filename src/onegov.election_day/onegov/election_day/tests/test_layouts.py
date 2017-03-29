@@ -110,7 +110,7 @@ def test_elections_layout(session):
     assert layout.title('connections') == 'List connections'
     assert layout.title('parties') == 'Parties'
     assert layout.title('statistics') == 'Election statistics'
-    assert layout.title('data') == 'Open Data'
+    assert layout.title('data') == 'Downloads'
     assert layout.title('panachage') == 'Panachage'
 
     layout = ElectionsLayout(Election(type='majorz'), DummyRequest())
@@ -197,7 +197,7 @@ def test_votes_layout(session):
     assert layout.title('proposal') == 'Proposal'
     assert layout.title('counter-proposal') == 'Counter Proposal'
     assert layout.title('tie-breaker') == 'Tie-Breaker'
-    assert layout.title('data') == 'Open Data'
+    assert layout.title('data') == 'Downloads'
 
     assert not layout.has_results
     assert not layout.counted
