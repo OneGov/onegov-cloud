@@ -3,6 +3,10 @@ Changelog
 
 Unreleased
 ~~~~~~~~~~
+
+- Fixes vote model returning integers in some instances.
+  [msom]
+
 1.3.0 (2017-03-06)
 ~~~~~~~~~~~~~~~~~~~
 

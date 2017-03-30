@@ -103,15 +103,21 @@ class Vote(Base, TimestampMixin, DerivedBallotsCount, DomainOfInfluenceMixin,
     #: proposal, a counter proposal and a tie breaker)
     @property
     def proposal(self):
-        return self.ballots.count() and self.ballots[0]
+        if self.ballots.count() >= 1:
+            return self.ballots[0]
+        return None
 
     @property
     def counter_proposal(self):
-        return self.ballots.count() == 3 and self.ballots[1]
+        if self.ballots.count() == 3:
+            return self.ballots[1]
+        return None
 
     @property
     def tie_breaker(self):
-        return self.ballots.count() == 3 and self.ballots[2]
+        if self.ballots.count() == 3:
+            return self.ballots[2]
+        return None
 
     @observes('title_translations')
     def title_observer(self, translations):
