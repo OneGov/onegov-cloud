@@ -72,7 +72,8 @@ metal:define-macro="layout">
                 <tal:block condition="layout.logout_link" >
                     <span i18n:translate>You are logged in: </span>
                     <a href="${layout.manage_link}" i18n:translate>Manage</a> |
-                    <a href="${layout.logout_link}" i18n:translate>Logout</a>
+                    <a href="${layout.logout_link}" i18n:translate>Logout</a><br>
+                    <a href="https://github.com/OneGov/onegov.election_day/blob/master/HISTORY.rst#changelog">v${layout.app_version}</a><br>
                 </tal:block>
             </div>
         </div>

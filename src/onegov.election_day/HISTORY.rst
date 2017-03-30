@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Shows app version and link to the changelog in the backend.
+  [msom]
+
 1.7.0 (2017-03-29)
 ~~~~~~~~~~~~~~~~~~~
 

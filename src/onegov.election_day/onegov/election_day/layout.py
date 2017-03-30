@@ -21,6 +21,10 @@ class Layout(ChameleonLayout):
         self.request.include('common')
 
     @cached_property
+    def app_version(self):
+        return self.app.settings.core.theme.version
+
+    @cached_property
     def principal(self):
         return self.request.app.principal
 
