@@ -820,14 +820,9 @@ class MediaGenerator():
                 self.generate_svg(election, 'parties')
                 self.generate_svg(election, 'panachage')
         if self.app.principal.use_maps:
-            for vote in self.session.query(Vote):
+            for ballot in self.session.query(Ballot):
                 for locale in self.app.locales:
-                    self.generate_svg(
-                        vote.proposal, 'map', locale
-                    )
-                    if vote.counter_proposal:
-                        self.generate_svg(vote.counter_proposal, 'map', locale)
-                        self.generate_svg(vote.tie_breaker, 'map', locale)
+                    self.generate_svg(ballot, 'map', locale)
 
         # Delete old SVGs
         if self.cleanup:
