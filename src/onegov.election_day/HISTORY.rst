@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.2 (2017-03-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Fixes media generator trying to generate empty votes.
   [msom]
