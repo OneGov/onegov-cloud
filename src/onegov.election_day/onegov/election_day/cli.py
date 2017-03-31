@@ -1,8 +1,6 @@
 """ Provides commands used to initialize election day websites. """
 
 import click
-import fcntl
-import io
 import os
 
 from onegov.core.cli import command_group, pass_group_context
@@ -11,6 +9,7 @@ from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.media_generator import MediaGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
+from pathlib import Path
 from raven import Client
 
 
@@ -125,16 +124,14 @@ def generate_media(pdf, svg, force, cleanup, sentry):
         if not pdf and not svg:
             return
 
-        lockfile = open(
-            '{}/.lock-{}'.format(
-                app.configuration.get('lockfile_path', '.').rstrip('/'),
-                app.schema
-            ), 'w+'
-        )
+        lockfile = Path(os.path.join(
+            app.configuration.get('lockfile_path', ''),
+            '.lock-{}'.format(app.schema)
+        ))
 
         try:
-            fcntl.flock(lockfile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except io.BlockingIOError:
+            lockfile.touch(exist_ok=False)
+        except OSError:
             pass
         else:
             try:
@@ -154,6 +151,6 @@ def generate_media(pdf, svg, force, cleanup, sentry):
                             exc_info=True
                         )
             finally:
-                fcntl.flock(lockfile, fcntl.LOCK_UN)
+                lockfile.unlink()
 
     return generate

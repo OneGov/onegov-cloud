@@ -4,6 +4,9 @@ Changelog
 - Adds sentry support to generate media command.
   [msom]
 
+- Uses touch files instead of file locking for media generation.
+  [msom]
+
 1.7.2 (2017-03-31)
 ~~~~~~~~~~~~~~~~~~~
 
