@@ -6,10 +6,12 @@ import io
 import os
 
 from onegov.core.cli import command_group, pass_group_context
+from onegov.election_day import log
 from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.media_generator import MediaGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
+from raven import Client
 
 
 cli = command_group()
@@ -109,7 +111,8 @@ def send_sms(username, password, sentry, originator):
 @click.option('--svg/--no-svg', default=True)
 @click.option('--force/--no-force', default=False)
 @click.option('--cleanup/--no-cleanup', default=True)
-def generate_media(pdf, svg, force, cleanup):
+@click.option('--sentry')
+def generate_media(pdf, svg, force, cleanup, sentry):
     """ Generates the PDF and/or SVGs for the selected instances
 
         onegov-election-day --select '/onegov_election_day/zg' generate-media
@@ -135,11 +138,21 @@ def generate_media(pdf, svg, force, cleanup):
             pass
         else:
             try:
+                client = Client(sentry) if sentry else None
                 media_generator = MediaGenerator(app, force, cleanup)
-                if pdf:
-                    media_generator.create_pdfs()
-                if svg:
-                    media_generator.create_svgs()
+                try:
+                    if pdf:
+                        media_generator.create_pdfs()
+                    if svg:
+                        media_generator.create_svgs()
+                except:
+                    if client:
+                        client.captureException()
+                    else:
+                        log.error(
+                            "Error while generating media",
+                            exc_info=True
+                        )
             finally:
                 fcntl.flock(lockfile, fcntl.LOCK_UN)
 
