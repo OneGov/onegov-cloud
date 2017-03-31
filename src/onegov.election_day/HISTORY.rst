@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.3 (2017-03-31)
+~~~~~~~~~~~~~~~~~~~
 
 - Adds sentry support to generate media command.
   [msom]
