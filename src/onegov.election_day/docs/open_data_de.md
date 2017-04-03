@@ -152,7 +152,7 @@ Name|Beschreibung
 `type`|`proposal` (Vorschlag), `counter-proposal` (Gegenvorschlag) or `tie-breaker` (Stichfrage).
 `group`|Woher das Resultat kommt. Das kann der Bezirk und die Gemeinde, getrennt mittels eines Schrägstrichs, der Name der Stadt und der Name des Kreises, ebenfalls getrennt mittels eines Schrägstrichts, oder ein einfacher Gemeinde Name sein. All dies hängt vom jeweiligen Kanton ab.
 `entity_id`|Die ID der Gemeinde. Der Wert `0` steht für Auslandschweizer.
-`counted`|Wahr wenn das Resultat ausgezählt wurde. Falsch wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
+`counted`|Wahr, wenn das Resultat ausgezählt wurde. Falsch, wenn das Resultat noch nicht bekannt ist (die Werte sind noch nicht korrekt).
 `yeas`|Die Anzahl Ja Stimmen
 `nays`|Die Anzahl Nein Stimmen
 `invalid`|Die Anzahl ungültiger Stimmen
