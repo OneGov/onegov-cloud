@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Adds missing JavaScript library.
+  [msom]
+
 1.7.3 (2017-03-31)
 ~~~~~~~~~~~~~~~~~~~
 

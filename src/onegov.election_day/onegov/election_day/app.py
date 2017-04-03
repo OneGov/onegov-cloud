@@ -240,6 +240,7 @@ def get_common_asset():
     yield 'jquery.tablesorter.staticRow.js'
     yield 'fastclick.js'
     yield 'foundation.js'
+    yield 'underscore.js'
     yield 'stacktable.js'
     yield 'iframeResizer.contentWindow.js'
     yield 'common.js'
