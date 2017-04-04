@@ -189,7 +189,7 @@ def temporary_path(temporary_directory):
 
 @pytest.fixture(scope="session")
 def es_default_version():
-    return '5.2.2'
+    return '5.3.0'
 
 
 @pytest.fixture(scope="session")
