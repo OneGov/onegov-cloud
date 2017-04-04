@@ -129,7 +129,8 @@
                     .data(data.nodes)
                     .enter().append('g')
                     .attr('class', 'node')
-                    .attr('id', function(d) { return 'node-' + count++; });
+                    .attr('id', function(d) { return 'node-' + count++; })
+                    .filter(function(d) { return d.sourceLinks.length || d.targetLinks.length; });
 
                 // ... the bar
                 var bar = node.append('rect')

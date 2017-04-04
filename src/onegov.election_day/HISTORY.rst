@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Hides empty sankey nodes.
+  [msom]
+
 1.7.4 (2017-04-03)
 ~~~~~~~~~~~~~~~~~~~
 
