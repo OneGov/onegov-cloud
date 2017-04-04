@@ -513,7 +513,7 @@ def test_extra_analyzers(es_client):
 
     result = es_client.indices.analyze(
         index=index,
-        body='Do you <em>really</em> want to continue?',
+        body={'text': 'Do you <em>really</em> want to continue?'},
         analyzer='english_html'
     )
     assert [v['token'] for v in result['tokens']] == [
@@ -522,7 +522,7 @@ def test_extra_analyzers(es_client):
 
     result = es_client.indices.analyze(
         index=index,
-        body='Möchten Sie <em>wirklich</em> weiterfahren?',
+        body={'text': 'Möchten Sie <em>wirklich</em> weiterfahren?'},
         analyzer='german_html'
     )
     assert [v['token'] for v in result['tokens']] == [
