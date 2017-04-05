@@ -268,7 +268,7 @@ class CoreRequest(IncludeRequest, ReturnToMixin):
             form_class = self.app.modules.i18n.get_translation_bound_form(
                 form_class, translate)
 
-            meta['locales'] = {self.locale, 'en'} if self.locale else {}
+            meta['locales'] = [self.locale, 'en'] if self.locale else []
 
         if csrf_support:
             meta['csrf'] = True
