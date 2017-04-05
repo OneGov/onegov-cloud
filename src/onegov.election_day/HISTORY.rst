@@ -4,6 +4,9 @@ Changelog
 - Hides empty sankey nodes.
   [msom]
 
+- Fixes translations of form error messages.
+  [msom]
+
 1.7.4 (2017-04-03)
 ~~~~~~~~~~~~~~~~~~~
 
