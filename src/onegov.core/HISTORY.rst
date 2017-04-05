@@ -1,5 +1,9 @@
 Changelog
 ---------
+
+- Fixes (builtin) translations of WTForms.
+  [msom]
+
 0.38.4 (2017-03-23)
 ~~~~~~~~~~~~~~~~~~~
 

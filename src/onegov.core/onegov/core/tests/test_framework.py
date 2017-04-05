@@ -16,6 +16,7 @@ from onegov.server import Config, Server
 from unittest.mock import patch
 from webtest import TestApp as Client
 from wtforms import Form, StringField
+from wtforms.validators import InputRequired
 
 
 def test_set_application_id():
@@ -454,6 +455,42 @@ def test_get_form():
     client = Client(app)
     assert client.get('/plain').text == 'not-called'
     assert client.get('/on-request').text == 'called'
+
+
+def test_get_localized_form():
+
+    class LocalizedForm(Form):
+        name = StringField('Name', validators=[InputRequired()])
+
+    class App(Framework):
+        locales = {}
+
+    @App.path(path='/')
+    class Root(object):
+        pass
+
+    @App.form(model=Root, form=LocalizedForm, name='form')
+    def view_get_form(self, request, form):
+        assert form.model is self
+        assert form.request is request
+        assert form.validate() == False
+        return form.errors['name'][0]
+
+    App.commit()
+
+    app = App()
+    app.application_id = 'test'
+    app.configure_application(
+        identity_secure=False,
+        disable_memcached=True,
+        csrf_time_limit=60
+    )
+
+    client = Client(app)
+    assert client.get('/form').text == 'This field is required.'
+
+    App.locales = {'de'}
+    assert client.get('/form').text == 'Dieses Feld wird benötigt.'
 
 
 def test_send_email(smtp):
