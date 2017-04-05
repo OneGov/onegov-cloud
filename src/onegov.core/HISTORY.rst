@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.38.7 (2017-04-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Put the English fallback on translated forms at the back.
   [msom]
