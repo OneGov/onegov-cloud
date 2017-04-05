@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.38.6 (2017-04-05)
+~~~~~~~~~~~~~~~~~~~
 
 - Use English als default fallback on translated forms.
   [msom]
