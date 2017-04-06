@@ -63,7 +63,8 @@ def edit_vote(self, request, form):
         archive.update(self, request)
         return morepath.redirect(layout.manage_model_link)
 
-    form.apply_model(self)
+    if not form.errors:
+        form.apply_model(self)
 
     return {
         'layout': layout,

@@ -123,6 +123,7 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
             empty = int(line.leere_sz or 0)
         except ValueError:
             line_errors.append(_("Could not read the empty votes"))
+
         # the invalid votes
         try:
             invalid = int(line.ungultige_sz or 0)

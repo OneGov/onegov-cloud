@@ -520,19 +520,10 @@ ul.breadcrumbs {
     Manage view actions
 */
 ul.actions {
-    list-style-type: none;
-    margin: 0;
-    white-space: nowrap;
+    list-style-type: circle;
 
     li {
-        display: inline-block;
-        float: left;
         font-size: $table-row-font-size;
-
-        + li::before {
-            content: '| ';
-            padding-left: .3em;
-        }
     }
 }
 

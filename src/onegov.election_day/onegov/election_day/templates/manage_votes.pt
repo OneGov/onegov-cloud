@@ -44,14 +44,14 @@
                         <td tal:condition="vote.domain == 'canton'" i18n:translate>Cantonal</td>
                         <td tal:condition="vote.domain == 'municipality'" i18n:translate>Communal</td>
                         <td>
-                            <ul class="actions">
+                            <ul class="actions" tal:define="autoimport python:vote.meta.get('upload_type', 'manual') != 'manual'">
                                 <li>
                                     <a i18n:translate="" class="action-view" href="${request.link(vote)}">View</a>
                                 </li>
                                 <li>
                                     <a i18n:translate="" class="action-edit" href="${request.link(vote, 'edit')}">Edit</a>
                                 </li>
-                                <li>
+                                <li tal:condition="not: autoimport" >
                                     <a i18n:translate="" class="action-upload" href="${request.link(vote, 'upload')}">Upload results</a>
                                 </li>
                                 <li tal:condition="layout.principal.notifications">

@@ -9,6 +9,7 @@ from onegov.election_day.models import ArchivedResult
 from onegov.election_day.utils import add_local_results
 from onegov.election_day.utils.media_generator import MediaGenerator
 from onegov.election_day.utils.sms_processor import SmsQueueProcessor
+from onegov.election_day.utils.wabsti_importer import WabstiImporter
 from pathlib import Path
 from raven import Client
 
@@ -81,9 +82,9 @@ def fetch(group_context):
 @cli.command()
 @click.argument('username')
 @click.argument('password')
-@click.option('--sentry')
 @click.option('--originator')
-def send_sms(username, password, sentry, originator):
+@click.option('--sentry')
+def send_sms(username, password, originator, sentry):
     """ Sends the SMS in the smsdir for a given instance. For example:
 
         onegov-election-day --select '/onegov_election_day/zg' send_sms
@@ -126,7 +127,7 @@ def generate_media(pdf, svg, force, cleanup, sentry):
 
         lockfile = Path(os.path.join(
             app.configuration.get('lockfile_path', ''),
-            '.lock-{}'.format(app.schema)
+            '.lock-{}-media'.format(app.schema)
         ))
 
         try:
@@ -135,22 +136,65 @@ def generate_media(pdf, svg, force, cleanup, sentry):
             pass
         else:
             try:
-                client = Client(sentry) if sentry else None
                 media_generator = MediaGenerator(app, force, cleanup)
-                try:
-                    if pdf:
-                        media_generator.create_pdfs()
-                    if svg:
-                        media_generator.create_svgs()
-                except:
-                    if client:
-                        client.captureException()
-                    else:
-                        log.error(
-                            "Error while generating media",
-                            exc_info=True
-                        )
-            finally:
-                lockfile.unlink()
+                if pdf:
+                    media_generator.create_pdfs()
+                if svg:
+                    media_generator.create_svgs()
+            except Exception as e:
+                log.error(
+                    "An exception happened while generating media files",
+                    exc_info=True
+                )
+                if sentry:
+                    Client(sentry).captureException()
+                raise(e)
+        finally:
+            lockfile.unlink()
 
     return generate
+
+
+@cli.command('import-wabsti')
+@click.option('--sentry')
+def import_wabsti(sentry):
+    """ Import the files uploaded via FTP using WabstCExport.
+
+        onegov-election-day --select '/onegov_election_day/zg' import-wabsti
+
+    """
+    def import_(request, app):
+        lockfile = Path(os.path.join(
+            app.configuration.get('lockfile_path', ''),
+            '.lock-{}-import'.format(app.schema)
+        ))
+
+        try:
+            lockfile.touch(exist_ok=False)
+        except OSError:
+            pass
+        else:
+            try:
+                importer = WabstiImporter(app)
+                for errors in importer.process():
+                    if errors:
+                        message = ';'.join(
+                            error.error.interpolate() for error in errors
+                        )
+                        if sentry:
+                            Client(sentry).captureMessage(message)
+                        log.error(message)
+
+            except Exception as e:
+                log.error(
+                    "An exception happened while importing wabsti files",
+                    exc_info=True
+                )
+                if sentry:
+                    Client(sentry).captureException()
+                raise(e)
+
+        finally:
+            lockfile.unlink()
+
+    return import_
