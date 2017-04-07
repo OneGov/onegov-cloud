@@ -1,15 +1,13 @@
 Changelog
 ---------
-1.7.5 (2017-04-07)
-~~~~~~~~~~~~~~~~~~~
 
 - Shows the filename of the import errors.
   [msom]
 
-- Renames the send sms command.
-  [msom]
+1.7.5 (2017-04-07)
+~~~~~~~~~~~~~~~~~~~
 
-- Adds sentry option for fetch command.
+- Shows the filename of the import errors.
   [msom]
 
 - Renames the send sms command.
