@@ -1,15 +1,19 @@
 Changelog
 ---------
+
+- Configures logging for CLI.
+  [msom]
+
 0.38.7 (2017-04-05)
 ~~~~~~~~~~~~~~~~~~~
 
-- Put the English fallback on translated forms at the back.
+- Puts the English fallback on translated forms at the back.
   [msom]
 
 0.38.6 (2017-04-05)
 ~~~~~~~~~~~~~~~~~~~
 
-- Use English als default fallback on translated forms.
+- Uses English als default fallback on translated forms.
   [msom]
 
 0.38.5 (2017-04-05)

@@ -524,7 +524,10 @@ def command_group():
             })
 
         server = Server(
-            Config({'applications': applications}),
+            Config({
+                'applications': applications,
+                'logging': group_context.config.logging
+            }),
             configure_morepath=False
         )
 
