@@ -12,6 +12,12 @@ Changelog
 - Adds sentry option for fetch command.
   [msom]
 
+- Renames the send sms command.
+  [msom]
+
+- Adds sentry option for fetch command.
+  [msom]
+
 - Hides empty sankey nodes.
   [msom]
 
