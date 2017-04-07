@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-- Adds support for automatic import of votes using the Wabsti format.
+- Shows the filename of the import errors.
   [msom]
 
 - Hides empty sankey nodes.

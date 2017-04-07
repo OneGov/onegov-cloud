@@ -5,11 +5,13 @@ from onegov.election_day.formats import FileImportError, load_csv
 
 def parse_party_results_file(file, mimetype, errors):
     party_results = []
+    filename = _("Party results")
 
     # The party results file has one party per line
     if file and mimetype:
         csv, error = load_csv(
-            file, mimetype, expected_headers=['Partei', 'Sitze', 'Stimmen']
+            file, mimetype, expected_headers=['Partei', 'Sitze', 'Stimmen'],
+            filename=filename
         )
         if error:
             errors.append(error)
@@ -23,7 +25,8 @@ def parse_party_results_file(file, mimetype, errors):
                     errors.append(
                         FileImportError(
                             error=_("Invalid values"),
-                            line=line.rownumber
+                            line=line.rownumber,
+                            filename=filename
                         )
                     )
                 else:

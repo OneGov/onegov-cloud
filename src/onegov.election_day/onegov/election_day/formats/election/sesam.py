@@ -246,13 +246,16 @@ def import_file(entities, election, file, mimetype,
 
     """
     majorz = election.type == 'majorz'
+    filename = _("Results")
     if majorz:
         csv, error = load_csv(
-            file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_MAJORZ
+            file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_MAJORZ,
+            filename=filename
         )
     else:
         csv, error = load_csv(
-            file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_PROPORZ
+            file, mimetype, expected_headers=HEADERS_COMMON + HEADERS_PROPORZ,
+            filename=filename
         )
     if error:
         return {'status': 'error', 'errors': [error]}
@@ -288,7 +291,9 @@ def import_file(entities, election, file, mimetype,
         # Pass the errors and continue to next line
         if line_errors:
             errors.extend(
-                FileImportError(error=err, line=line.rownumber)
+                FileImportError(
+                    error=err, line=line.rownumber, filename=filename
+                )
                 for err in line_errors
             )
             continue

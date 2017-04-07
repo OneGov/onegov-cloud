@@ -7,14 +7,6 @@
         <h1>${title}</h1>
         <h2 class="subheader" i18n:translate="">Upload results</h2>
 
-        <tal:block condition="status == 'open'">
-            <div class="panel">
-                <i class="fa fa-info-circle"></i>
-                <span i18n:translate="">Please use the following format:</span><br>
-                <a href="${layout.format_description_link}" i18n:translate="">Format Description</a>
-            </div>
-        </tal:block>
-
         <div class="after-upload" tal:condition="status == 'ok'">
             <div class="alert-box success" i18n:translate="">
                 Your results were uploaded successfully.
@@ -37,6 +29,7 @@
             </div>
             <ul>
                 <li tal:repeat="error results['errors']">
+                    <span class="error-line" tal:condition="error.filename">${error.filename}</span>
                     <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
                     <span class="error-message">${error.error}</span>
                 </li>
@@ -48,7 +41,13 @@
             <tal:block tal:condition="form.error_message|nothing" i18n:translate="">${form.error_message}</tal:block>
         </div>
 
-        <div tal:condition="status != 'success'">
+        <div tal:condition="status != 'ok'">
+            <div class="panel">
+                <i class="fa fa-info-circle"></i>
+                <span i18n:translate="">Please use the following format:</span>
+                <a href="${layout.format_description_link}" i18n:translate="">Format Description</a>
+            </div>
+
             <div metal:use-macro="layout.macros['form']" />
         </div>
 

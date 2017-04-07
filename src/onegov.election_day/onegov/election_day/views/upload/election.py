@@ -9,8 +9,8 @@ from onegov.election_day.collections import ArchivedResultCollection
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.forms import UploadElectionForm
 from onegov.election_day.layout import ManageElectionsLayout
-from onegov.election_day.formats.election.onegov_ballot import (
-    import_file as import_onegov_file
+from onegov.election_day.formats.election.internal import (
+    import_file as import_internal_file
 )
 from onegov.election_day.formats.election.wabsti import (
     import_file as import_wabsti_file
@@ -52,7 +52,7 @@ def view_upload(self, request, form):
             entities = principal.entities[self.date.year]
             parties = len(form.parties.data)
             if form.file_format.data == 'internal':
-                result = import_onegov_file(
+                result = import_internal_file(
                     entities,
                     self,
                     form.results.raw_data[0].file,

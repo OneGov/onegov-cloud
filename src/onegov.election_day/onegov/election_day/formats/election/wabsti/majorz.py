@@ -132,7 +132,10 @@ def import_file(entities, election, file, mimetype,
     results = []
 
     # This format has one entity per line and every candidate as row
-    csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
+    filename = _("Results")
+    csv, error = load_csv(
+        file, mimetype, expected_headers=HEADERS, filename=filename
+    )
     if error:
         errors.append(error)
     else:
@@ -154,7 +157,9 @@ def import_file(entities, election, file, mimetype,
             # Pass the errors and continue to next line
             if line_errors:
                 errors.extend(
-                    FileImportError(error=err, line=line.rownumber)
+                    FileImportError(
+                        error=err, line=line.rownumber, filename=filename
+                    )
                     for err in line_errors
                 )
                 continue
@@ -162,9 +167,11 @@ def import_file(entities, election, file, mimetype,
             results.append(result)
 
     # The results file has one elected candidate per line
+    filename = _("Elected Candidates")
     if elected_file and elected_mimetype:
         csv, error = load_csv(
-            elected_file, elected_mimetype, expected_headers=HEADERS_RESULT
+            elected_file, elected_mimetype, expected_headers=HEADERS_RESULT,
+            filename=filename
         )
         if error:
             errors.append(error)
@@ -180,7 +187,8 @@ def import_file(entities, election, file, mimetype,
                     errors.append(
                         FileImportError(
                             error=_("Unknown candidate"),
-                            line=line.rownumber
+                            line=line.rownumber,
+                            filename=filename
                         )
                     )
 

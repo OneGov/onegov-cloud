@@ -564,15 +564,19 @@ form {
 
 
 /*
+    Alert boxes
+*/
+
+.alert-box {
+    font-size: 1rem;
+}
+
+
+/*
     Upload errors
 */
 
 .after-upload {
-    h3 {
-        font-size: 1em;
-        font-weight: bold;
-    }
-
     ul {
         list-style-type: none;
         margin-left: 0;
