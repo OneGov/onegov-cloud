@@ -1,5 +1,7 @@
 Changelog
 ---------
+0.39.0 (2017-04-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Configures logging for CLI.
   [msom]
