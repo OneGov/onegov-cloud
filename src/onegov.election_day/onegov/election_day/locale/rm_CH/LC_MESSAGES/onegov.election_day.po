@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-29 12:55+0200\n"
+"POT-Creation-Date: 2017-04-07 11:00+0200\n"
 "PO-Revision-Date: 2017-03-29 13:10+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -88,8 +88,14 @@ msgstr "Nagina datoteca XLS/XLSX valaivla."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr "La datoteca XLS/XLSX cuntegna cellas betg sustegnidas."
 
+msgid "Party results"
+msgstr "Resultats da las partidas"
+
 msgid "Invalid values"
 msgstr "Valurs nunvalaivlas"
+
+msgid "Results"
+msgstr "Resultats"
 
 msgid "Invalid election values"
 msgstr "Datas electoralas nunvalaivlas"
@@ -118,6 +124,9 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 
 msgid "No data found"
 msgstr "Chattà naginas datas"
+
+msgid "Elected Candidates"
+msgstr "Candidat(a)s elegid(a)s"
 
 msgid "Unknown candidate"
 msgstr "Candidat(a) nunenconuschent(a)"
@@ -155,6 +164,11 @@ msgstr "Dapli vuschs entradas che persunas cun dretg da votar."
 
 msgid "Invalid ballot type"
 msgstr "Tip da votaziun nunvalaivel"
+
+msgid ""
+"The specified vote ('SortWahlkreis'/'SortGeschaeft') is not present in the "
+"data"
+msgstr ""
 
 msgid "Election (German)"
 msgstr "Elecziun (tudestg)"
@@ -198,15 +212,6 @@ msgstr "Numer da telefon"
 msgid "File format"
 msgstr "Format da la datoteca"
 
-msgid "Results"
-msgstr "Resultats"
-
-msgid "Elected Candidates"
-msgstr "Candidat(a)s elegid(a)s"
-
-msgid "Party results"
-msgstr "Resultats da las partidas"
-
 msgid "Complete"
 msgstr "Resultat eruì cumplettamain"
 
@@ -237,6 +242,9 @@ msgstr "Project cun cuntraproposta"
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
 
+msgid "Upload"
+msgstr ""
+
 msgid "Vote (German)"
 msgstr "Votaziun (tudestg)"
 
@@ -248,6 +256,21 @@ msgstr "Votaziun (talian)"
 
 msgid "Vote (Romansh)"
 msgstr "Votaziun (rumantsch)"
+
+msgid "Automatic upload (Wabsti): 'SortWahlkreis'"
+msgstr ""
+
+msgid "Automatic upload (Wabsti): 'SortGeschaeft'"
+msgstr ""
+
+msgid "Automatic upload (Wabsti): Folder"
+msgstr ""
+
+msgid "Manual"
+msgstr ""
+
+msgid "Automatic (Wabsti)"
+msgstr ""
 
 #, python-format
 msgid "New results are available on ${url}"
@@ -520,9 +543,6 @@ msgstr "Nova votaziun"
 msgid "No votes yet."
 msgstr "I n'èn registradas anc naginas votaziuns."
 
-msgid "Please use the following format:"
-msgstr "Duvrai per plaschair il suandant format:"
-
 msgid "Your results were uploaded successfully."
 msgstr "Voss resultats èn vegnids chargiads si cun success."
 
@@ -538,23 +558,8 @@ msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
 msgid "Line"
 msgstr "Lingia"
 
-msgid "No errors found in proposal"
-msgstr "Chattà nagins sbagls en la proposta"
-
-msgid "Errors found in proposal"
-msgstr "Chattà sbagls en la proposta"
-
-msgid "No errors found in counter proposal"
-msgstr "Chattà nagins sbagls en la cuntraproposta"
-
-msgid "Errors found in counter proposal"
-msgstr "Chattà sbagls en la cuntraproposta"
-
-msgid "No errors found in tie-breaker"
-msgstr "Chattà nagins sbagls en la dumonda decisiva"
-
-msgid "Errors found in tie-breaker"
-msgstr "Chattà sbagls en la dumonda decisiva"
+msgid "Please use the following format:"
+msgstr "Duvrai per plaschair il suandant format:"
 
 msgid "Embed"
 msgstr "incorporar"

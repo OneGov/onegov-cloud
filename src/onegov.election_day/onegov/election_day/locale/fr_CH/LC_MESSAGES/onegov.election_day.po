@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-29 12:55+0200\n"
+"POT-Creation-Date: 2017-04-07 11:00+0200\n"
 "PO-Revision-Date: 2017-03-29 13:06+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -88,8 +88,14 @@ msgstr "Fichier xls/xlsx non valide."
 msgid "The xls/xlsx file contains unsupported cells."
 msgstr "Le fichier xls/xlsx contient des cellules non supportées."
 
+msgid "Party results"
+msgstr "Résultats des partis"
+
 msgid "Invalid values"
 msgstr "Valeurs non valides"
+
+msgid "Results"
+msgstr "Résultats"
 
 msgid "Invalid election values"
 msgstr "Valeurs des élections non valides"
@@ -118,6 +124,9 @@ msgstr "Valeurs de connexion de liste non valides"
 
 msgid "No data found"
 msgstr "Pas de données trouvées"
+
+msgid "Elected Candidates"
+msgstr "Candidats élus"
 
 msgid "Unknown candidate"
 msgstr "Candidat inconnu"
@@ -155,6 +164,11 @@ msgstr "Plus de votes que d'électeurs"
 
 msgid "Invalid ballot type"
 msgstr "Type de scrutin invalide"
+
+msgid ""
+"The specified vote ('SortWahlkreis'/'SortGeschaeft') is not present in the "
+"data"
+msgstr ""
 
 msgid "Election (German)"
 msgstr "Election (allemand)"
@@ -198,15 +212,6 @@ msgstr "Téléphone"
 msgid "File format"
 msgstr "Format de fichier"
 
-msgid "Results"
-msgstr "Résultats"
-
-msgid "Elected Candidates"
-msgstr "Candidats élus"
-
-msgid "Party results"
-msgstr "Résultats des partis"
-
 msgid "Complete"
 msgstr "Terminé"
 
@@ -237,6 +242,9 @@ msgstr "Vote avec contre-projet"
 msgid "Not a valid phone number."
 msgstr "N'est pas un numéro de téléphone valide."
 
+msgid "Upload"
+msgstr ""
+
 msgid "Vote (German)"
 msgstr "Vote (allemand)"
 
@@ -248,6 +256,21 @@ msgstr "Vote (italien)"
 
 msgid "Vote (Romansh)"
 msgstr "Vote (roumain)"
+
+msgid "Automatic upload (Wabsti): 'SortWahlkreis'"
+msgstr ""
+
+msgid "Automatic upload (Wabsti): 'SortGeschaeft'"
+msgstr ""
+
+msgid "Automatic upload (Wabsti): Folder"
+msgstr ""
+
+msgid "Manual"
+msgstr ""
+
+msgid "Automatic (Wabsti)"
+msgstr ""
 
 #, python-format
 msgid "New results are available on ${url}"
@@ -484,9 +507,6 @@ msgstr "Nouvelle votation"
 msgid "No votes yet."
 msgstr "Pas de votations actuellement"
 
-msgid "Please use the following format:"
-msgstr "Veuillez utiliser le format suivant:"
-
 msgid "Your results were uploaded successfully."
 msgstr "Vos résultats ont été correctement mis à jour."
 
@@ -502,23 +522,8 @@ msgstr "Vos résultats n'ont pas pu être mis à jour."
 msgid "Line"
 msgstr "Ligne"
 
-msgid "No errors found in proposal"
-msgstr "Pas d'erreurs trouvées dans l'initiative."
-
-msgid "Errors found in proposal"
-msgstr "Erreurs trouvées dans l'initiative."
-
-msgid "No errors found in counter proposal"
-msgstr "Pas d'erreurs trouvées dans le contre-projet."
-
-msgid "Errors found in counter proposal"
-msgstr "Erreurs trouvées dans le contre-projet."
-
-msgid "No errors found in tie-breaker"
-msgstr "Pas d'erreurs trouvées dans le jeu décisif."
-
-msgid "Errors found in tie-breaker"
-msgstr "Erreurs trouvées dans le jeu décisif."
+msgid "Please use the following format:"
+msgstr "Veuillez utiliser le format suivant:"
 
 msgid "Embed"
 msgstr "Intégration"
