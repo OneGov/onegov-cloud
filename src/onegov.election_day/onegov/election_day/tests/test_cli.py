@@ -285,7 +285,7 @@ def test_send_sms(postgres_dsn, temporary_directory):
     os.makedirs(sms_path)
 
     # no sms yet
-    send_sms = ['send_sms', 'username', 'password']
+    send_sms = ['send-sms', 'username', 'password']
     assert run_command(cfg_path, 'govikon', send_sms).exit_code == 0
 
     with open(os.path.join(sms_path, '+417772211.000000'), 'w') as f:

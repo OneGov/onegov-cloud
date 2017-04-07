@@ -4,7 +4,7 @@ Changelog
 - Shows the filename of the import errors.
   [msom]
 
-- Shows the filename of the import errors.
+- Renames the send sms command.
   [msom]
 
 - Hides empty sankey nodes.
