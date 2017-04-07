@@ -74,21 +74,24 @@ def import_exporter(vote, district, number, entities,
     # Read the files
     votes_static, error = load_csv(
         file_votes_static, mimetype_votes_static,
-        expected_headers=HEADERS_VOTES_STATIC
+        expected_headers=HEADERS_VOTES_STATIC,
+        filename='votes_static'
     )
     if error:
         errors.append(error)
 
     entities_static, error = load_csv(
         file_entities_static, mimetype_entities_static,
-        expected_headers=HEADERS_ENTITIES_STATIC
+        expected_headers=HEADERS_ENTITIES_STATIC,
+        filename='entities_static'
     )
     if error:
         errors.append(error)
 
     entities_results, error = load_csv(
         file_entities, mimetype_entities,
-        expected_headers=HEADERS_ENTITIES
+        expected_headers=HEADERS_ENTITIES,
+        filename='entities_results'
     )
     if error:
         errors.append(error)
@@ -104,10 +107,13 @@ def import_exporter(vote, district, number, entities,
     ]
     if not len(types):
         errors.append(
-            FileImportError(_(
-                "The specified vote ('SortWahlkreis'/'SortGeschaeft') is not "
-                "present in the data"
-            ))
+            FileImportError(
+                _(
+                    "The specified vote ('SortWahlkreis'/'SortGeschaeft') is "
+                    "not present in the data"
+                ),
+                filename='votes_static'
+            )
         )
         return {'proposal': {'status': 'error', 'errors': errors}}
 
@@ -158,7 +164,9 @@ def import_exporter(vote, district, number, entities,
         # Pass the line errors
         if line_errors:
             errors.extend(
-                FileImportError(error=err, line=line.rownumber)
+                FileImportError(
+                    error=err, line=line.rownumber, filename='entities_static'
+                )
                 for err in line_errors
             )
         else:
@@ -244,7 +252,9 @@ def import_exporter(vote, district, number, entities,
         # Pass the line errors
         if line_errors:
             errors.extend(
-                FileImportError(error=err, line=line.rownumber)
+                FileImportError(
+                    error=err, line=line.rownumber, filename='entities_results'
+                )
                 for err in line_errors
             )
             continue
