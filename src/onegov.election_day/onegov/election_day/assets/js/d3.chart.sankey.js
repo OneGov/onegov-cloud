@@ -75,7 +75,7 @@
                 offset.right = maximum;
             }
             ellipseText(name.left, offset.left);
-            ellipseText(name.right, offset.left);
+            ellipseText(name.right, offset.right);
         };
 
         var adjustScale = function(scale, width, offset, inverse) {

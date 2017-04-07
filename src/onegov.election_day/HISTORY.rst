@@ -10,6 +10,9 @@ Changelog
 - Hides empty sankey nodes.
   [msom]
 
+- Fixes text ellipsis on sankey nodes.
+  [msom]
+
 - Fixes translations of form error messages.
   [msom]
 
