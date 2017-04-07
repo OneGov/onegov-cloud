@@ -1,5 +1,7 @@
 Changelog
 ---------
+1.7.5 (2017-04-07)
+~~~~~~~~~~~~~~~~~~~
 
 - Shows the filename of the import errors.
   [msom]
