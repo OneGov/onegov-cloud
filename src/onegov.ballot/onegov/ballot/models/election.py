@@ -818,7 +818,7 @@ class CandidateResult(Base, TimestampMixin):
         UUID, ForeignKey(ElectionResult.id), nullable=False
     )
 
-    #: the canidate this result belongs to
+    #: the candidate this result belongs to
     candidate_id = Column(UUID, ForeignKey(Candidate.id), nullable=False)
 
 
