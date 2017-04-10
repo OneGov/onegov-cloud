@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-10 13:21+0200\n"
+"POT-Creation-Date: 2017-04-10 13:31+0200\n"
 "PO-Revision-Date: 2017-03-29 13:05+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -125,6 +125,19 @@ msgstr "Valori della lista delle connessioni non validi"
 msgid "No data found"
 msgstr "Nessun dato trovato"
 
+msgid "Invalid id"
+msgstr "ID non valido"
+
+#, python-format
+msgid "${name} was found twice"
+msgstr "${name} figura due volte"
+
+msgid "Could not read the elegible voters"
+msgstr "Impossibile leggere 'Aventi diritto di voto'"
+
+msgid "Could not read the invalid votes"
+msgstr "Impossibile leggere 'Schede nulle'"
+
 msgid "Elected Candidates"
 msgstr "Candidati eletti"
 
@@ -134,27 +147,14 @@ msgstr "Candidato non conosciuto"
 msgid "Missing municipality/district"
 msgstr "Località/Distretto mancante"
 
-#, python-format
-msgid "${name} was found twice"
-msgstr "${name} figura due volte"
-
-msgid "Invalid id"
-msgstr "ID non valido"
-
 msgid "Could not read yeas"
 msgstr "Impossibile leggere 'SÌ'"
 
 msgid "Could not read nays"
 msgstr "Impossibile leggere 'NO'"
 
-msgid "Could not read the elegible voters"
-msgstr "Impossibile leggere 'Aventi diritto di voto'"
-
 msgid "Could not read the empty votes"
 msgstr "Impossibile leggere 'Schede bianche'"
-
-msgid "Could not read the invalid votes"
-msgstr "Impossibile leggere 'Schede nulle'"
 
 msgid "No elegible voters"
 msgstr "Nessun avente diritto di voto"
@@ -168,6 +168,9 @@ msgstr "Tipo di scheda non valido"
 msgid ""
 "The specified vote ('SortWahlkreis'/'SortGeschaeft') is not present in the "
 "data"
+msgstr ""
+
+msgid "Upload"
 msgstr ""
 
 msgid "Election (German)"
@@ -200,11 +203,26 @@ msgstr "Tipo"
 msgid "Related link"
 msgstr "Ulteriori informazioni"
 
+msgid "Automatic upload (Wabsti): 'SortWahlkreis'"
+msgstr ""
+
+msgid "Automatic upload (Wabsti): 'SortGeschaeft'"
+msgstr ""
+
+msgid "Automatic upload (Wabsti): Folder"
+msgstr ""
+
 msgid "Election based on proportional representation"
 msgstr "Sistema proporzionale"
 
 msgid "Majority system"
 msgstr "Sistema maggioritario"
+
+msgid "Manual"
+msgstr ""
+
+msgid "Automatic (Wabsti)"
+msgstr ""
 
 msgid "Phone number"
 msgstr "Numero di telefono"
@@ -242,9 +260,6 @@ msgstr "Votazione con controprogetto"
 msgid "Not a valid phone number."
 msgstr "Non è un numero di telefono valido."
 
-msgid "Upload"
-msgstr ""
-
 msgid "Vote (German)"
 msgstr "Votazione (tedesco)"
 
@@ -256,21 +271,6 @@ msgstr "Votazione (italiano)"
 
 msgid "Vote (Romansh)"
 msgstr "Votazione (romancio)"
-
-msgid "Automatic upload (Wabsti): 'SortWahlkreis'"
-msgstr ""
-
-msgid "Automatic upload (Wabsti): 'SortGeschaeft'"
-msgstr ""
-
-msgid "Automatic upload (Wabsti): Folder"
-msgstr ""
-
-msgid "Manual"
-msgstr ""
-
-msgid "Automatic (Wabsti)"
-msgstr ""
 
 #, python-format
 msgid "New results are available on ${url}"
@@ -689,3 +689,6 @@ msgstr "Elimina votazione"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'anno ${year} non viene ancora supportato"
+
+#~ msgid "This ballot has fewer results than the others"
+#~ msgstr "Questo progetto contiene meno risultati rispetto agli altri."

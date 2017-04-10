@@ -1,7 +1,7 @@
 from onegov.ballot import Candidate, CandidateResult, ElectionResult
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
-from sqlalchemy.orm import object_session
+from onegov.election_day.formats.election import clear_election
 from uuid import uuid4
 
 
@@ -103,7 +103,7 @@ def import_exporter_files(election, district, number, entities,
         errors.append(error)
 
     if errors:
-        return {'status': 'error', 'errors': errors}
+        return errors
 
     # Read the results
     added_entities = {}
@@ -288,23 +288,17 @@ def import_exporter_files(election, district, number, entities,
         added_results[entity_id][candidate_id] = votes
 
     if errors:
-        return {'status': 'error', 'errors': errors}
+        return errors
 
     if added_results:
-        session = object_session(election)
+        clear_election(election)
 
-        for connection in election.list_connections:
-            session.delete(connection)
-        for list in election.lists:
-            session.delete(list)
-        for candidate in election.candidates:
-            session.delete(candidate)
+        election.counted_entities = len(added_results.keys())
+        election.total_entities = len(entities)
 
         for candidate in added_candidates.values():
             election.candidates.append(candidate)
 
-        for result in election.results:
-            session.delete(result)
         for entity_id in added_results.keys():
             entity = added_entities[entity_id]
             result = ElectionResult(
@@ -327,8 +321,4 @@ def import_exporter_files(election, district, number, entities,
                 )
             election.results.append(result)
 
-        election.counted_entities = len(added_results.keys())
-        election.total_entities = len(entities)
-        election.absolute_majority = None
-
-    return {'status': 'ok', 'errors': errors}
+    return []

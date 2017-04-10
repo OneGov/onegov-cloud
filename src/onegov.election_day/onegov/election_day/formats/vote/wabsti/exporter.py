@@ -2,7 +2,7 @@ from onegov.ballot import Ballot, BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
 from onegov.election_day.formats.vote import guessed_group
-from sqlalchemy.orm import object_session
+from onegov.election_day.formats.vote import clear_ballot
 
 
 HEADERS_VOTES_STATIC = (
@@ -97,7 +97,7 @@ def import_exporter_files(vote, district, number, entities,
         errors.append(error)
 
     if errors:
-        return {'proposal': {'status': 'error', 'errors': errors}}
+        return errors
 
     # Get the vote type
     domain = vote.domain
@@ -115,7 +115,7 @@ def import_exporter_files(vote, district, number, entities,
                 filename='votes_static'
             )
         )
-        return {'proposal': {'status': 'error', 'errors': errors}}
+        return errors
 
     used_ballot_types = ['proposal']
     if types[0] == 'SGGVSF':
@@ -276,7 +276,7 @@ def import_exporter_files(vote, district, number, entities,
                 )
 
     if errors:
-        return {'proposal': {'status': 'error', 'errors': errors}}
+        return errors
 
     for ballot_type in used_ballot_types:
         # Add the entities present in the static data but not in the results
@@ -315,16 +315,10 @@ def import_exporter_files(vote, district, number, entities,
             if not ballot:
                 ballot = Ballot(type=ballot_type)
                 vote.ballots.append(ballot)
-            session = object_session(vote)
-            for result in ballot.results:
-                session.delete(result)
+
+            clear_ballot(ballot)
+
             for result in ballot_results[ballot_type]:
                 ballot.results.append(result)
 
-    return {
-        ballot_type: {
-            'status': 'ok',
-            'errors': errors if ballot_type == 'proposal' else [],
-            'records': len(added_entities)
-        } for ballot_type in used_ballot_types
-    }
+    return []

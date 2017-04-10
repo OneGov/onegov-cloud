@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-10 13:21+0200\n"
+"POT-Creation-Date: 2017-04-10 13:31+0200\n"
 "PO-Revision-Date: 2017-03-29 13:10+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -125,6 +125,19 @@ msgstr "Datas nunvalaivlas da colliaziuns da glistas"
 msgid "No data found"
 msgstr "Chattà naginas datas"
 
+msgid "Invalid id"
+msgstr "ID nunvalaivel"
+
+#, python-format
+msgid "${name} was found twice"
+msgstr "${name} è avant maun duas giadas"
+
+msgid "Could not read the elegible voters"
+msgstr "I n'è betg stà pussaivel da leger las 'persunas cun dretg da votar'"
+
+msgid "Could not read the invalid votes"
+msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar nunvalaivels'"
+
 msgid "Elected Candidates"
 msgstr "Candidat(a)s elegid(a)s"
 
@@ -134,27 +147,14 @@ msgstr "Candidat(a) nunenconuschent(a)"
 msgid "Missing municipality/district"
 msgstr "Lieu che manca"
 
-#, python-format
-msgid "${name} was found twice"
-msgstr "${name} è avant maun duas giadas"
-
-msgid "Invalid id"
-msgstr "ID nunvalaivel"
-
 msgid "Could not read yeas"
 msgstr "I n'è betg stà pussaivel da leger las 'vuschs affirmativas'"
 
 msgid "Could not read nays"
 msgstr "I n'è betg stà pussaivel da leger las 'vuschs negativas'"
 
-msgid "Could not read the elegible voters"
-msgstr "I n'è betg stà pussaivel da leger las 'persunas cun dretg da votar'"
-
 msgid "Could not read the empty votes"
 msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar vids'"
-
-msgid "Could not read the invalid votes"
-msgstr "I n'è betg stà pussaivel da leger ils 'cedels da votar nunvalaivels'"
 
 msgid "No elegible voters"
 msgstr "Naginas persunas cun dretg da votar"
@@ -168,6 +168,9 @@ msgstr "Tip da votaziun nunvalaivel"
 msgid ""
 "The specified vote ('SortWahlkreis'/'SortGeschaeft') is not present in the "
 "data"
+msgstr ""
+
+msgid "Upload"
 msgstr ""
 
 msgid "Election (German)"
@@ -200,11 +203,26 @@ msgstr "Gener"
 msgid "Related link"
 msgstr "Ulteriuras infurmaziuns"
 
+msgid "Automatic upload (Wabsti): 'SortWahlkreis'"
+msgstr ""
+
+msgid "Automatic upload (Wabsti): 'SortGeschaeft'"
+msgstr ""
+
+msgid "Automatic upload (Wabsti): Folder"
+msgstr ""
+
 msgid "Election based on proportional representation"
 msgstr "Elecziun da proporz"
 
 msgid "Majority system"
 msgstr "Elecziun da maiorz"
+
+msgid "Manual"
+msgstr ""
+
+msgid "Automatic (Wabsti)"
+msgstr ""
 
 msgid "Phone number"
 msgstr "Numer da telefon"
@@ -242,9 +260,6 @@ msgstr "Project cun cuntraproposta"
 msgid "Not a valid phone number."
 msgstr "Numer da telefon nunvalaivel."
 
-msgid "Upload"
-msgstr ""
-
 msgid "Vote (German)"
 msgstr "Votaziun (tudestg)"
 
@@ -256,21 +271,6 @@ msgstr "Votaziun (talian)"
 
 msgid "Vote (Romansh)"
 msgstr "Votaziun (rumantsch)"
-
-msgid "Automatic upload (Wabsti): 'SortWahlkreis'"
-msgstr ""
-
-msgid "Automatic upload (Wabsti): 'SortGeschaeft'"
-msgstr ""
-
-msgid "Automatic upload (Wabsti): Folder"
-msgstr ""
-
-msgid "Manual"
-msgstr ""
-
-msgid "Automatic (Wabsti)"
-msgstr ""
 
 #, python-format
 msgid "New results are available on ${url}"
@@ -731,3 +731,6 @@ msgstr "Stizzar la votaziun"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
+
+#~ msgid "This ballot has fewer results than the others"
+#~ msgstr "Quest project ha main resultats ch'ils auters projects."
