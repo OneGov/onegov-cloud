@@ -190,7 +190,11 @@ def import_wabsti(sentry):
                 for errors in importer.process():
                     if errors:
                         message = ';'.join(
-                            error.error.interpolate() for error in errors
+                            '{} {}: {}'.format(
+                                error.filename,
+                                error.line,
+                                error.error.interpolate()
+                            ) for error in errors
                         )
                         if sentry:
                             Client(sentry).captureMessage(message)

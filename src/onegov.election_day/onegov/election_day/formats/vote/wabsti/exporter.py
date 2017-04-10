@@ -59,10 +59,10 @@ def line_is_relevant(line, domain, district, number):
     )
 
 
-def import_exporter(vote, district, number, entities,
-                    file_votes_static, mimetype_votes_static,
-                    file_entities_static, mimetype_entities_static,
-                    file_entities, mimetype_entities):
+def import_exporter_files(vote, district, number, entities,
+                          file_votes_static, mimetype_votes_static,
+                          file_entities_static, mimetype_entities_static,
+                          file_entities, mimetype_entities):
     """ Tries to import the files in the given folder.
 
     We assume that the files there have been uploaded via FTP using the
