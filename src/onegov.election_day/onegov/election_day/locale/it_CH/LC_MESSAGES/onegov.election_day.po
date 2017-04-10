@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-07 11:00+0200\n"
+"POT-Creation-Date: 2017-04-10 13:21+0200\n"
 "PO-Revision-Date: 2017-03-29 13:05+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -470,6 +470,12 @@ msgstr "Il formato dei dati è descritto qui:"
 msgid "Format Description"
 msgstr "Descrizione del formato"
 
+msgid "Your results could not be uploaded."
+msgstr "I Suoi risultati non hanno potuto essere caricati."
+
+msgid "Line"
+msgstr "Riga"
+
 msgid "New Election"
 msgstr "Nuova elezione"
 
@@ -514,12 +520,6 @@ msgstr "Clicca qui per attivare le notifiche"
 
 msgid "Click here to see the updated results page."
 msgstr "Cliccare qui per visualizzare la pagina con i risultati aggiornati."
-
-msgid "Your results could not be uploaded."
-msgstr "I Suoi risultati non hanno potuto essere caricati."
-
-msgid "Line"
-msgstr "Riga"
 
 msgid "Please use the following format:"
 msgstr "Utilizzi per favore il formato seguente:"
@@ -689,6 +689,3 @@ msgstr "Elimina votazione"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'anno ${year} non viene ancora supportato"
-
-msgid "This ballot has fewer results than the others"
-msgstr "Questo progetto contiene meno risultati rispetto agli altri."

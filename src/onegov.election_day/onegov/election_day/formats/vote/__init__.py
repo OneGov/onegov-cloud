@@ -1,3 +1,6 @@
+from sqlalchemy.orm import object_session
+
+
 BALLOT_TYPES = {'proposal', 'counter-proposal', 'tie-breaker'}
 
 HEADERS = [
@@ -10,6 +13,12 @@ HEADERS = [
     'Leere Stimmzettel',
     'Ungültige Stimmzettel'
 ]
+
+
+def clear_ballot(ballot):
+    session = object_session(ballot)
+    for result in ballot.results:
+        session.delete(result)
 
 
 def guessed_group(entity, other):

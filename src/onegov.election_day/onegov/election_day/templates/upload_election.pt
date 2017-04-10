@@ -7,7 +7,7 @@
         <h1>${title}</h1>
         <h2 class="subheader" i18n:translate="">Upload results</h2>
 
-        <div class="after-upload" tal:condition="status == 'ok'">
+        <div class="after-upload" tal:condition="status == 'success'">
             <div class="alert-box success" i18n:translate="">
                 Your results were uploaded successfully.
             </div>
@@ -23,25 +23,14 @@
             </p>
         </div>
 
-        <div class="after-upload" tal:condition="status == 'error'">
-            <div class="alert-box alert" i18n:translate="">
-                Your results could not be uploaded.
-            </div>
-            <ul>
-                <li tal:repeat="error results['errors']">
-                    <span class="error-line" tal:condition="error.filename">${error.filename}</span>
-                    <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
-                    <span class="error-message">${error.error}</span>
-                </li>
-            </ul>
-        </div>
+        <div metal:use-macro="layout.macros['upload_errors']" />
 
         <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
             <tal:block tal:condition="not:form.error_message|nothing" i18n:translate="">The form contains errors. Please check the fields marked in red.</tal:block>
             <tal:block tal:condition="form.error_message|nothing" i18n:translate="">${form.error_message}</tal:block>
         </div>
 
-        <div tal:condition="status != 'ok'">
+        <div tal:condition="status != 'success'">
             <div class="panel">
                 <i class="fa fa-info-circle"></i>
                 <span i18n:translate="">Please use the following format:</span>

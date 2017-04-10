@@ -25,7 +25,7 @@ from onegov.election_day.formats.election.sesam import (
                      form=UploadElectionForm)
 def view_upload(self, request, form):
 
-    result = {}
+    errors = []
 
     # Remove wabsti and sesam for municipalities for the moment
     if request.app.principal.domain == 'municipality':
@@ -34,25 +34,23 @@ def view_upload(self, request, form):
             if choice[0] != 'wabsti' and choice[0] != 'sesam'
         ]
 
+    status = 'open'
     if form.submitted(request):
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, map_required=False):
-            result = {
-                'status': 'error',
-                'errors': [
-                    FileImportError(
-                        _(
-                            "The year ${year} is not yet supported",
-                            mapping={'year': self.date.year}
-                        )
+            errors = [
+                FileImportError(
+                    _(
+                        "The year ${year} is not yet supported",
+                        mapping={'year': self.date.year}
                     )
-                ]
-            }
+                )
+            ]
         else:
             entities = principal.entities[self.date.year]
             parties = len(form.parties.data)
             if form.file_format.data == 'internal':
-                result = import_internal_file(
+                errors = import_internal_file(
                     entities,
                     self,
                     form.results.raw_data[0].file,
@@ -61,7 +59,7 @@ def view_upload(self, request, form):
                     form.parties.data['mimetype'] if parties else None
                 )
             elif form.file_format.data == 'sesam':
-                result = import_sesam_file(
+                errors = import_sesam_file(
                     entities,
                     self,
                     form.results.raw_data[0].file,
@@ -75,7 +73,7 @@ def view_upload(self, request, form):
                 connections = len(form.connections.data)
                 stats = len(form.statistics.data)
                 elected = len(form.elected.data)
-                result = import_wabsti_file(
+                errors = import_wabsti_file(
                     entities,
                     self,
                     form.results.raw_data[0].file,
@@ -99,24 +97,20 @@ def view_upload(self, request, form):
             archive = ArchivedResultCollection(request.app.session())
             archive.update(self, request)
 
+            if errors:
+                status = 'error'
+                transaction.abort()
+            else:
+                status = 'success'
+                request.app.pages_cache.invalidate()
+                request.app.send_hipchat(
+                    request.app.principal.name,
+                    'New results available: <a href="{}">{}</a>'.format(
+                        request.link(self), self.title
+                    )
+                )
+
     form.apply_model(self)
-
-    if result:
-        status = result['status']
-    else:
-        status = 'open'
-
-    if status == 'error':
-        transaction.abort()
-
-    if status == 'ok':
-        request.app.pages_cache.invalidate()
-        request.app.send_hipchat(
-            request.app.principal.name,
-            'New results available: <a href="{}">{}</a>'.format(
-                request.link(self), self.title
-            )
-        )
 
     layout = ManageElectionsLayout(self, request)
 
@@ -126,7 +120,7 @@ def view_upload(self, request, form):
         'shortcode': self.shortcode,
         'form': form,
         'cancel': layout.manage_model_link,
-        'results': result,
+        'errors': errors,
         'status': status,
         'election': self
     }

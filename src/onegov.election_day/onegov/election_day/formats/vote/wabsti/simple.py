@@ -1,8 +1,8 @@
 from onegov.ballot import Ballot, BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
+from onegov.election_day.formats.vote import clear_ballot
 from onegov.election_day.formats.vote import guessed_group
-from sqlalchemy.orm import object_session
 
 
 HEADERS = [
@@ -26,17 +26,12 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
     """ Tries to import the given csv, xls or xlsx file.
 
     :return:
-        A dictionary of dictionaries containing the status and a list of
-        errors if any.
-
-    For example::
-
-        {'proposal': {'status': 'ok', 'errors': []}}
+        A list containing errors.
 
     """
     csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
     if error:
-        return {'proposal': {'status': 'error', 'errors': [error]}}
+        return [error]
 
     used_ballot_types = ['proposal']
     if complex:
@@ -169,19 +164,13 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
                 )
 
     if errors:
-        return {'proposal': {'status': 'error', 'errors': errors}}
+        return errors
 
     if (
         not any((len(results) for results in ballot_results.values())) and not
         skipped
     ):
-        return {
-            'proposal': {
-                'status': 'fail',
-                'errors': [FileImportError(_("No data found"))],
-                'records': 0
-            }
-        }
+        return [FileImportError(_("No data found"))]
 
     for ballot_type in used_ballot_types:
         remaining = (
@@ -204,16 +193,10 @@ def import_file(entities, vote, file, mimetype, vote_number, complex):
             if not ballot:
                 ballot = Ballot(type=ballot_type)
                 vote.ballots.append(ballot)
-            session = object_session(vote)
-            for result in ballot.results:
-                session.delete(result)
+
+            clear_ballot(ballot)
+
             for result in ballot_results[ballot_type]:
                 ballot.results.append(result)
 
-    return {
-        ballot_type: {
-            'status': 'ok',
-            'errors': errors if ballot_type == 'proposal' else [],
-            'records': len(added_entity_ids)
-        } for ballot_type in used_ballot_types
-    }
+    return []

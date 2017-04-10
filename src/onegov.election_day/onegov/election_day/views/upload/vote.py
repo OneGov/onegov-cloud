@@ -25,7 +25,7 @@ from onegov.election_day.formats.vote.wabsti import (
                      permission=Private, form=UploadVoteForm)
 def view_upload(self, request, form):
 
-    results = {}
+    errors = []
 
     # if the vote already has results, do not give the user the choice to
     # switch between the dif
@@ -43,31 +43,29 @@ def view_upload(self, request, form):
             if choice[0] != 'wabsti'
         ]
 
+    status = 'open'
     if form.submitted(request):
         principal = request.app.principal
         if not principal.is_year_available(self.date.year, principal.use_maps):
-            results['proposal'] = {
-                'status': 'error',
-                'errors': [
-                    FileImportError(
-                        _(
-                            "The year ${year} is not yet supported",
-                            mapping={'year': self.date.year}
-                        )
+            errors = [
+                FileImportError(
+                    _(
+                        "The year ${year} is not yet supported",
+                        mapping={'year': self.date.year}
                     )
-                ]
-            }
+                )
+            ]
         else:
             entities = principal.entities.get(self.date.year, [])
             if form.file_format.data == 'internal':
-                results = import_internal_file(
+                errors = import_internal_file(
                     entities,
                     self,
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
             elif form.file_format.data == 'wabsti':
-                results = import_wabsti_file(
+                errors = import_wabsti_file(
                     entities,
                     self,
                     form.proposal.raw_data[0].file,
@@ -83,13 +81,14 @@ def view_upload(self, request, form):
 
                 for ballot_type in ballot_types:
                     field = getattr(form, ballot_type.replace('-', '_'))
-
-                    results[ballot_type] = import_default_file(
-                        entities,
-                        self,
-                        ballot_type,
-                        field.raw_data[0].file,
-                        field.data['mimetype']
+                    errors.extend(
+                        import_default_file(
+                            entities,
+                            self,
+                            ballot_type,
+                            field.raw_data[0].file,
+                            field.data['mimetype']
+                        )
                     )
             else:
                 raise NotImplementedError("Unsupported import format")
@@ -97,40 +96,18 @@ def view_upload(self, request, form):
             archive = ArchivedResultCollection(request.app.session())
             archive.update(self, request)
 
-    if results:
-        if all(r['status'] == 'ok' for r in results.values()):
-
-            records = max(r['records'] for r in results.values())
-
-            # make sure all imports have the same amount of records
-            for result in results.values():
-                if result['records'] < records:
-                    result['status'] = 'error'
-                    result['errors'].append(
-                        FileImportError(
-                            _("This ballot has fewer results than the others")
-                        )
-                    )
-                    status = 'error'
-                    break
-            else:
-                status = 'success'
-        else:
+        if errors:
             status = 'error'
-    else:
-        status = 'open'
-
-    if status == 'error':
-        transaction.abort()
-
-    if status == 'success':
-        request.app.pages_cache.invalidate()
-        request.app.send_hipchat(
-            request.app.principal.name,
-            'New results available: <a href="{}">{}</a>'.format(
-                request.link(self), self.title
+            transaction.abort()
+        else:
+            status = 'success'
+            request.app.pages_cache.invalidate()
+            request.app.send_hipchat(
+                request.app.principal.name,
+                'New results available: <a href="{}">{}</a>'.format(
+                    request.link(self), self.title
+                )
             )
-        )
 
     layout = ManageVotesLayout(self, request)
 
@@ -138,10 +115,9 @@ def view_upload(self, request, form):
         'layout': layout,
         'title': self.title,
         'shortcode': self.shortcode,
-        'subtitle': _("Upload results"),
         'form': form,
         'cancel': layout.manage_model_link,
-        'results': results,
+        'errors': errors,
         'status': status,
         'vote': self
     }

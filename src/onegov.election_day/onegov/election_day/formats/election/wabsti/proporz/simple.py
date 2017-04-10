@@ -1,16 +1,15 @@
-from onegov.ballot import (
-    Candidate,
-    CandidateResult,
-    ElectionResult,
-    List,
-    ListConnection,
-    ListResult,
-    PanachageResult
-)
+from onegov.ballot import Candidate
+from onegov.ballot import CandidateResult
+from onegov.ballot import ElectionResult
+from onegov.ballot import List
+from onegov.ballot import ListConnection
+from onegov.ballot import ListResult
+from onegov.ballot import PanachageResult
 from onegov.election_day import _
-from onegov.election_day.formats import FileImportError, load_csv
+from onegov.election_day.formats import FileImportError
+from onegov.election_day.formats import load_csv
+from onegov.election_day.formats.election import clear_election
 from onegov.election_day.formats.election import parse_party_results_file
-from sqlalchemy.orm import object_session
 from uuid import uuid4
 
 
@@ -367,48 +366,37 @@ def import_file(entities, election, file, mimetype,
         errors.append(FileImportError(_("No data found")))
 
     if errors:
-        return {'status': 'error', 'errors': errors}
+        return errors
 
     if results:
+        clear_election(election)
+
         election.counted_entities = len(results)
         election.total_entities = 0
 
-        session = object_session(election)
-
-        for connection in election.list_connections:
-            session.delete(connection)
         for connection in connections.values():
             election.list_connections.append(connection)
         for connection in subconnections.values():
             election.list_connections.append(connection)
 
-        for list_ in election.lists:
-            session.delete(list_)
         for list_ in lists.values():
             election.lists.append(list_)
-
             if list_.list_id in panachage:
                 for source, votes in panachage[list_.list_id].items():
                     list_.panachage_results.append(
                         PanachageResult(source_list_id=source, votes=votes)
                     )
 
-        for candidate in election.candidates:
-            session.delete(candidate)
         for candidate in candidates.values():
             election.candidates.append(candidate)
 
-        for result in election.results:
-            session.delete(result)
         for result in results.values():
             id = result.entity_id
             for list_result in list_results.get(id, {}).values():
                 result.list_results.append(list_result)
             election.results.append(result)
 
-        for result in election.party_results:
-            session.delete(result)
         for result in party_results:
             election.party_results.append(result)
 
-    return {'status': 'ok', 'errors': errors}
+    return []

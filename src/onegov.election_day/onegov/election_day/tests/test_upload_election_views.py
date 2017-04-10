@@ -1386,22 +1386,22 @@ def test_upload_election_temporary_results_proporz(election_day_app):
     csv = '\n'.join((
         HEADER_COLUMNS_INTERNAL,
         (
-            'election,2015-01-01,proporz,2,0,2,11,Baar,1701,14119,7462,77,196,'
+            'election,2015-01-01,proporz,2,,2,11,Baar,1701,14119,7462,77,196,'
             '273,7189,122,0,14256,ALG,1,0,1435,,,Lustenberger,Andreas,101,'
             'False,948'
         ),
         (
-            'election,2015-01-01,proporz,2,0,2,11,Baar,1701,14119,7462,77,196,'
+            'election,2015-01-01,proporz,2,,2,11,Baar,1701,14119,7462,77,196,'
             '273,7189,122,0,14256,ALG,1,0,1435,,,Schriber-Neiger,Hanni,102,'
             'False,208'
         ),
         (
-            'election,2015-01-01,proporz,2,0,2,11,Cham,1702,9926,4863,0,161,'
+            'election,2015-01-01,proporz,2,,2,11,Cham,1702,9926,4863,0,161,'
             '161,4702,50,0,9354,ALG,1,0,533,,,Lustenberger,Andreas,101,'
             'False,290'
         ),
         (
-            'election,2015-01-01,proporz,2,0,2,11,Cham,1702,9926,4863,0,161,'
+            'election,2015-01-01,proporz,2,,2,11,Cham,1702,9926,4863,0,161,'
             '161,4702,50,0,9354,ALG,1,0,533,,,Schriber-Neiger,Hanni,102,'
             'False,105'
         ),
@@ -1854,7 +1854,7 @@ def test_upload_election_expats_proporz(election_day_app):
     csv = '\n'.join((
         HEADER_COLUMNS_INTERNAL,
         (
-            'election,2015-01-01,proporz,2,0,1,12,Auslandschweizer,0,14119,'
+            'election,2015-01-01,proporz,2,,1,12,Auslandschweizer,0,14119,'
             '7462,77,196,273,7189,122,0,14256,ALG,1,0,1435,,,'
             'Lustenberger,Andreas,101,False,948'
         )

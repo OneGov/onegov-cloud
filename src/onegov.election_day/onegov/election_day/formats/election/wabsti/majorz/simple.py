@@ -1,11 +1,10 @@
-from onegov.ballot import (
-    Candidate,
-    CandidateResult,
-    ElectionResult,
-)
+from onegov.ballot import Candidate
+from onegov.ballot import CandidateResult
+from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats import FileImportError, load_csv
-from sqlalchemy.orm import object_session
+from onegov.election_day.formats import FileImportError
+from onegov.election_day.formats import load_csv
+from onegov.election_day.formats.election import clear_election
 from uuid import uuid4
 
 
@@ -196,28 +195,19 @@ def import_file(entities, election, file, mimetype,
         errors.append(FileImportError(_("No data found")))
 
     if errors:
-        return {'status': 'error', 'errors': errors}
+        return errors
 
     if results:
+        clear_election(election)
+
         election.number_of_mandates = mandates
         election.counted_entities = len(results)
         election.total_entities = 0
 
-        session = object_session(election)
-
-        for connection in election.list_connections:
-            session.delete(connection)
-        for list in election.lists:
-            session.delete(list)
-        for candidate in election.candidates:
-            session.delete(candidate)
-
         for candidate in candidates.values():
             election.candidates.append(candidate)
 
-        for result in election.results:
-            session.delete(result)
         for result in results:
             election.results.append(result)
 
-    return {'status': 'ok', 'errors': errors}
+    return []

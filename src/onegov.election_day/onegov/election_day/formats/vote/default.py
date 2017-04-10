@@ -1,8 +1,9 @@
 from onegov.ballot import Ballot, BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
-from onegov.election_day.formats.vote import BALLOT_TYPES, guessed_group
-from sqlalchemy.orm import object_session
+from onegov.election_day.formats.vote import BALLOT_TYPES
+from onegov.election_day.formats.vote import clear_ballot
+from onegov.election_day.formats.vote import guessed_group
 
 
 HEADERS = [
@@ -21,11 +22,8 @@ def import_file(entities, vote, ballot_type, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file to the given ballot
     result type.
 
-    :return: A dictionary containing the status and a list of errors if any.
-    For example::
-
-        {'status': 'ok', 'errors': []}
-        {'status': 'fail': 'errors': ['x on line y is z']}
+    :return:
+        A list containing errors.
 
     """
     assert ballot_type in BALLOT_TYPES
@@ -40,7 +38,7 @@ def import_file(entities, vote, ballot_type, file, mimetype):
         file, mimetype, expected_headers=HEADERS, filename=filename
     )
     if error:
-        return {'status': 'error', 'errors': [error]}
+        return [error]
 
     ballot = next((b for b in vote.ballots if b.type == ballot_type), None)
 
@@ -197,17 +195,12 @@ def import_file(entities, vote, ballot_type, file, mimetype):
             )
 
     if errors:
-        return {'status': 'fail', 'errors': errors, 'records': 0}
+        return errors
 
     if ballot_results:
-        session = object_session(vote)
-        for result in ballot.results:
-            session.delete(result)
+        clear_ballot(ballot)
+
         for result in ballot_results:
             ballot.results.append(result)
 
-    return {
-        'status': 'ok',
-        'errors': errors,
-        'records': len(added_entity_ids)
-    }
+    return []

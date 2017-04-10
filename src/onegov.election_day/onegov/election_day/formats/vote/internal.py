@@ -1,8 +1,9 @@
 from onegov.ballot import Ballot, BallotResult
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
-from onegov.election_day.formats.vote import BALLOT_TYPES, guessed_group
-from sqlalchemy.orm import object_session
+from onegov.election_day.formats.vote import BALLOT_TYPES
+from onegov.election_day.formats.vote import clear_ballot
+from onegov.election_day.formats.vote import guessed_group
 
 
 HEADERS = [
@@ -22,20 +23,15 @@ def import_file(entities, vote, file, mimetype):
     """ Tries to import the given csv, xls or xlsx file.
 
     :return:
-        A dictionary of dictionaries containing the status and a list of
-        errors if any.
-
-    For example::
-
-        {'proposal': {'status': 'ok', 'errors': []}}
+        A list containing errors.
 
     """
     csv, error = load_csv(file, mimetype, expected_headers=HEADERS)
     if error:
-        return {'proposal': {'status': 'error', 'errors': [error]}}
+        return [error]
 
     ballot_results = {}
-    errors = {}
+    errors = []
     added_entity_ids = {}
     added_groups = {}
     ballot_types = set()
@@ -48,7 +44,6 @@ def import_file(entities, vote, file, mimetype):
         if ballot_type not in BALLOT_TYPES:
             line_errors.append(_("Invalid ballot type"))
         ballot_types.add(ballot_type)
-        errors.setdefault(ballot_type, [])
         added_entity_ids.setdefault(ballot_type, set())
         added_groups.setdefault(ballot_type, set())
         ballot_results.setdefault(ballot_type, [])
@@ -135,14 +130,14 @@ def import_file(entities, vote, file, mimetype):
 
         # pass the errors
         if line_errors:
-            errors[ballot_type].extend(
+            errors.extend(
                 FileImportError(error=err, line=line.rownumber)
                 for err in line_errors
             )
             continue
 
         # all went well (only keep doing this as long as there are no errors)
-        if not errors[ballot_type]:
+        if not errors:
             ballot_results[ballot_type].append(
                 BallotResult(
                     group=group,
@@ -156,23 +151,11 @@ def import_file(entities, vote, file, mimetype):
                 )
             )
 
-    if any((len(results) for results in errors.values())):
-        return {
-            ballot_type: {
-                'status': 'fail',
-                'errors': errors[ballot_type],
-                'records': 0
-            } for ballot_type in ballot_types
-        }
+    if errors:
+        return errors
 
     if not any((len(results) for results in ballot_results.values())):
-        return {
-            'proposal': {
-                'status': 'fail',
-                'errors': [FileImportError(_("No data found"))],
-                'records': 0
-            }
-        }
+        return [FileImportError(_("No data found"))]
 
     for ballot_type in ballot_types:
         remaining = (
@@ -195,16 +178,10 @@ def import_file(entities, vote, file, mimetype):
             if not ballot:
                 ballot = Ballot(type=ballot_type)
                 vote.ballots.append(ballot)
-            session = object_session(vote)
-            for result in ballot.results:
-                session.delete(result)
+
+            clear_ballot(ballot)
+
             for result in ballot_results[ballot_type]:
                 ballot.results.append(result)
 
-    return {
-        ballot_type: {
-            'status': 'ok',
-            'errors': errors[ballot_type],
-            'records': len(added_entity_ids[ballot_type])
-        } for ballot_type in ballot_types
-    }
+    return []

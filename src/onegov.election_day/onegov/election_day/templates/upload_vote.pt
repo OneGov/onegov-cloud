@@ -5,14 +5,14 @@
     <tal:block metal:fill-slot="content">
         <span class="shortcode large" tal:condition="shortcode|nothing">${shortcode}</span>
         <h1>${title}</h1>
-        <h2 class="subheader">${subtitle}</h2>
+        <h2 class="subheader" i18n:translate="">Upload results</h2>
 
         <div class="after-upload" tal:condition="status == 'success'">
             <div class="alert-box success" i18n:translate="">
                 Your results were uploaded successfully.
             </div>
 
-            <div tal:condition="layout.principal.notifications"  class="panel callout radius">
+            <div tal:condition="layout.principal.notifications" class="panel callout radius">
                 <p>
                     <strong><a href="${request.link(vote, 'trigger')}" i18n:translate="">Click here to trigger the notifications</a></strong>
                 </p>
@@ -21,39 +21,9 @@
             <p>
                 <a href="${request.link(vote)}" i18n:translate="">Click here to see the updated results page.</a>
             </p>
-
         </div>
 
-        <div class="after-upload" tal:condition="status == 'error'">
-
-            <div class="alert-box alert" i18n:translate="">
-                Your results could not be uploaded.
-            </div>
-
-            <ul>
-                <tal:block tal:condition="'proposal' in results">
-                    <li tal:repeat="error results['proposal']['errors']">
-                        <span class="error-line" tal:condition="error.filename">${error.filename}</span>
-                        <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
-                        <span class="error-message">${error.error}</span>
-                    </li>
-                </tal:block>
-                <tal:block tal:condition="'counter-proposal' in results">
-                    <li tal:repeat="error results['counter-proposal']['errors']">
-                        <span class="error-line" tal:condition="error.filename">${error.filename}</span>
-                        <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
-                        <span class="error-message">${error.error}</span>
-                    </li>
-                </tal:block>
-                <tal:block tal:condition="'tie-breaker' in results">
-                    <li tal:repeat="error results['tie-breaker']['errors']">
-                        <span class="error-line" tal:condition="error.filename">${error.filename}</span>
-                        <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
-                        <span class="error-message">${error.error}</span>
-                    </li>
-                </tal:block>
-            </ul>
-        </div>
+        <div metal:use-macro="layout.macros['upload_errors']" />
 
         <div tal:condition="form.error_message|form.errors|nothing" data-alert class="alert-box alert">
             <tal:block tal:condition="not:form.error_message|nothing" i18n:translate="">The form contains errors. Please check the fields marked in red.</tal:block>

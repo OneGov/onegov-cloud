@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-07 11:00+0200\n"
+"POT-Creation-Date: 2017-04-10 13:21+0200\n"
 "PO-Revision-Date: 2017-03-29 13:10+0200\n"
 "Last-Translator: Fabian Reinhard <fabian.reinhard@seantis.ch>\n"
 "Language-Team: \n"
@@ -507,6 +507,12 @@ msgstr "Il format da las datas è descrit qua:"
 msgid "Format Description"
 msgstr "descripziun dal format"
 
+msgid "Your results could not be uploaded."
+msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
+
+msgid "Line"
+msgstr "Lingia"
+
 msgid "New Election"
 msgstr "Nova elecziun"
 
@@ -551,12 +557,6 @@ msgstr "Cliccar qua per trametter communicaziuns als abunents."
 
 msgid "Click here to see the updated results page."
 msgstr "Cliccai qua per mussar la pagina cun ils resultats actualisads."
-
-msgid "Your results could not be uploaded."
-msgstr "Voss resultats n'han displaschaivlamain betg pudì vegnir chargiads si."
-
-msgid "Line"
-msgstr "Lingia"
 
 msgid "Please use the following format:"
 msgstr "Duvrai per plaschair il suandant format:"
@@ -731,6 +731,3 @@ msgstr "Stizzar la votaziun"
 #, python-format
 msgid "The year ${year} is not yet supported"
 msgstr "L'onn ${year} na vegn anc betg sustegnì"
-
-msgid "This ballot has fewer results than the others"
-msgstr "Quest project ha main resultats ch'ils auters projects."

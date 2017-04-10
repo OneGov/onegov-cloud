@@ -321,4 +321,19 @@
     <p><span i18n:translate="">The format of the data is described here:</span> <a href="${layout.opendata_link}"><span i18n:translate="">Format Description</span></a>.</p>
 </metal:open_data_download>
 
+<metal:upload_errors define-macro="upload_errors" i18n:domain="onegov.election_day">
+    <div class="after-upload" tal:condition="errors">
+        <div class="alert-box alert" i18n:translate="">
+            Your results could not be uploaded.
+        </div>
+        <ul>
+            <li tal:repeat="error errors">
+                <span class="error-line" tal:condition="error.filename">${error.filename}</span>
+                <span class="error-line" tal:condition="error.line"><span i18n:translate="">Line </span>${error.line}</span>
+                <span class="error-message">${error.error}</span>
+            </li>
+        </ul>
+    </div>
+</metal:upload_errors>
+
 </body>

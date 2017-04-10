@@ -1,6 +1,25 @@
 from onegov.ballot import PartyResult
 from onegov.election_day import _
 from onegov.election_day.formats import FileImportError, load_csv
+from sqlalchemy.orm import object_session
+
+
+def clear_election(election):
+    election.counted_entities = 0
+    election.total_entities = 0
+    election.absolute_majority = None
+
+    session = object_session(election)
+    for connection in election.list_connections:
+        session.delete(connection)
+    for list_ in election.lists:
+        session.delete(list_)
+    for candidate in election.candidates:
+        session.delete(candidate)
+    for result in election.results:
+        session.delete(result)
+    for result in election.party_results:
+        session.delete(result)
 
 
 def parse_party_results_file(file, mimetype, errors):
