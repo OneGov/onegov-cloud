@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+- Adds a beneficiary to the bank account.
+  [href]
+
 0.7.0 (2017-03-28)
 ~~~~~~~~~~~~~~~~~~~
 

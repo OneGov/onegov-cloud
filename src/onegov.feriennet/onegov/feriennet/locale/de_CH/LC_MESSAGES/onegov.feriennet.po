@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-03-22 14:52+0100\n"
+"POT-Creation-Date: 2017-04-11 09:42+0200\n"
 "PO-Revision-Date: 2017-03-02 09:40+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -599,7 +599,16 @@ msgid "Website address including http:// or https://"
 msgstr "Webseiten-Adresse inklusive http:// oder https://"
 
 msgid "Bank Account (IBAN)"
-msgstr ""
+msgstr "Bank Konto (IBAN)"
+
+msgid "Bank Beneficiary"
+msgstr "Bank Begünstigter"
+
+msgid "Payment"
+msgstr "Zahlungen"
+
+msgid "A beneficiary is required if a bank account is given."
+msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
 
 msgid "Mr."
 msgstr "Herr"
@@ -913,6 +922,9 @@ msgstr "Benutzer"
 
 msgid "Bank Transfer"
 msgstr "Bank-Überweisung"
+
+msgid "Beneficiary"
+msgstr "Begünstigter"
 
 msgid "Notice"
 msgstr "Mitteilung"

@@ -52,6 +52,10 @@
                                         <span>${account}</span>
                                     </li>
                                     <li>
+                                        <span i18n:translate>Beneficiary</span>
+                                        <span>${beneficiary}</span>
+                                    </li>
+                                    <li>
                                         <span i18n:translate>Amount</span>
                                         <span>${'{:.2f}'.format(details.outstanding)} CHF</span>
                                     </li>

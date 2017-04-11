@@ -90,6 +90,10 @@ class UserProfileForm(Form):
         validators=[Stdnum(format='iban')]
     )
 
+    bank_beneficiary = StringField(
+        label=_("Bank Beneficiary"),
+    )
+
     daily_ticket_statistics = BooleanField(
         _("Send a daily status e-mail.")
     )
@@ -112,6 +116,13 @@ class UserProfileForm(Form):
             if numbers < 9 or chars < 5:
                 raise ValidationError(
                     _("Please enter both a phone number and a name"))
+
+    def ensure_beneificary_if_bank_account(self):
+        if self.bank_account.data and not self.bank_beneficiary.data:
+            self.bank_beneficiary.errors.append(_(
+                "A beneficiary is required if a bank account is given."
+            ))
+            return False
 
     def populate_obj(self, model):
         super().populate_obj(model)

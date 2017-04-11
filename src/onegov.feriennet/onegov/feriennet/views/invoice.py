@@ -44,6 +44,8 @@ def view_my_invoices(self, request):
     account = request.app.org.bank_account
     account = account and iban.format(account)
 
+    beneficiary = request.app.org.bank_beneficiary
+
     return {
         'title': title,
         'layout': InvoiceLayout(self, request, title),
@@ -51,5 +53,6 @@ def view_my_invoices(self, request):
         'user': user,
         'bills': bills,
         'model': self,
-        'account': account
+        'account': account,
+        'beneficiary': beneficiary
     }

@@ -1840,6 +1840,7 @@ def test_import_account_statement(feriennet_app):
 
     settings = page.click('Einstellungen', index=1)
     settings.form['bank_account'] = 'CH6309000000250097798'
+    settings.form['bank_beneficiary'] = 'Initech'
     settings = settings.form.submit()
 
     page = page.click('Rechnungen')
