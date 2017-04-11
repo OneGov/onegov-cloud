@@ -193,18 +193,11 @@ def import_wabsti(sentry):
         else:
             try:
                 importer = WabstiImporter(app)
-                for errors in importer.process():
-                    if errors:
-                        message = ';'.join(
-                            '{} {}: {}'.format(
-                                error.filename,
-                                error.line,
-                                error.error.interpolate()
-                            ) for error in errors
-                        )
+                for error in importer.process():
+                    if error:
                         if sentry:
-                            Client(sentry).captureMessage(message)
-                        log.error(message)
+                            Client(sentry).captureMessage(error)
+                        log.error(error)
 
             except Exception as e:
                 log.error(

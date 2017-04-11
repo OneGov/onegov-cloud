@@ -16,6 +16,29 @@ class WabstiImporter():
         self.dir = app.configuration.get('wabsti_import_dir')
         assert self.dir
 
+    def transform_errors(self, errors, item, folder):
+        """ Transforms a list of FileImportErrors to an error message and adds
+        additional informations.
+
+        """
+        if not errors:
+            return None
+
+        return "Error while importing {} to {} '{}' ({}): {}".format(
+            folder,
+            item.__class__.__name__.lower(),
+            item.id,
+            self.app.schema,
+            ';'.join(
+                '{} ({}:{})'.format(
+                    error.error.interpolate(),
+                    error.filename,
+                    error.line
+                )
+                for error in errors
+            )
+        )
+
     def process(self):
         """ Tries to import all votes which defined the according fields
         for auto import. Returns the results as it is used in the web interface
@@ -30,11 +53,12 @@ class WabstiImporter():
         if not existing:
             return
 
+        principal = self.app.principal
+
         for vote in self.session.query(Vote):
             if not (vote.meta or {}).get('upload_type') == 'wabsti':
                 continue
 
-            principal = self.app.principal
             if not principal.is_year_available(vote.date.year,
                                                principal.use_maps):
                 log.warning(
@@ -71,24 +95,19 @@ class WabstiImporter():
                     open(fn_e, 'rb') as f_e:
 
                 entities = principal.entities.get(vote.date.year, {})
-                results = import_vote(
+                errors = import_vote(
                     vote, district, number, entities,
                     f_vs, 'text/plain',
                     f_es, 'text/plain',
                     f_e, 'text/plain'
                 )
 
-                errors = []
-                for result in results.values():
-                    errors.extend(result['errors'])
-
-                yield errors
+                yield self.transform_errors(errors, vote, folder)
 
         for election in self.session.query(Election).filter_by(type='majorz'):
             if not (election.meta or {}).get('upload_type') == 'wabsti':
                 continue
 
-            principal = self.app.principal
             if not principal.is_year_available(election.date.year,
                                                map_required=False):
                 log.warning(
@@ -129,7 +148,7 @@ class WabstiImporter():
                     open(fn_c, 'rb') as f_c, open(fn_cr, 'rb') as f_cr:
 
                 entities = principal.entities.get(election.date.year, {})
-                results = import_majorz(
+                errors = import_majorz(
                     election, district, number, entities,
                     f_es, 'text/plain',
                     f_e, 'text/plain',
@@ -137,4 +156,4 @@ class WabstiImporter():
                     f_cr, 'text/plain'
                 )
 
-                yield results['errors']
+                yield self.transform_errors(errors, election, folder)
