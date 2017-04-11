@@ -71,6 +71,17 @@ def test_vote_form_choices(election_day_app):
     ]
 
 
+def test_vote_form_choices_municipality(election_day_app_bern):
+    assert VoteForm().domain.choices == None
+
+    form = VoteForm()
+    form.set_domain(election_day_app_bern.principal)
+    assert sorted(form.domain.choices) == [
+        ('canton', 'Cantonal'), ('federation', 'Federal'),
+        ('municipality', 'Communal')
+    ]
+
+
 def test_vote_form_model(election_day_app):
     model = Vote()
     model.title = 'Vote (DE)'
@@ -127,6 +138,17 @@ def test_election_form_choices(election_day_app):
     ]
 
 
+def test_election_form_choices_municipality(election_day_app_bern):
+    assert ElectionForm().domain.choices == None
+
+    form = ElectionForm()
+    form.set_domain(election_day_app_bern.principal)
+    assert sorted(form.domain.choices) == [
+        ('canton', 'Cantonal'), ('federation', 'Federal'),
+        ('municipality', 'Communal')
+    ]
+
+
 def test_election_form_model(election_day_app):
     model = Election()
     model.title = 'Election (DE)'
@@ -164,6 +186,7 @@ def test_election_form_model(election_day_app):
     form.shortcode.data = 'yz'
     form.election_type.data = 'majorz'
     form.mandates.data = 2
+    form.absolute_majority.data = 10000
     form.related_link.data = 'http://ur.l'
 
     form.update_model(model)
@@ -178,6 +201,7 @@ def test_election_form_model(election_day_app):
     assert model.shortcode == 'yz'
     assert model.type == 'majorz'
     assert model.number_of_mandates == 2
+    assert model.absolute_majority == 10000
     assert model.meta['related_link'] == 'http://ur.l'
 
 
