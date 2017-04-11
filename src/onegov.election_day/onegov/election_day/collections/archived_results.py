@@ -106,7 +106,11 @@ class ArchivedResultCollection(object):
                 )
                 return self.by_date(date_)
             except (TypeError, ValueError):
-                return self.by_year(self.date)
+                try:
+                    return self.by_year(int(self.date))
+                except ValueError:
+                    return self.latest()
+
         else:
             query = self.query()
             query = query.filter(ArchivedResult.date == date_)
