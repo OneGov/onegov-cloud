@@ -81,6 +81,7 @@ def test_view_manage(election_day_app):
     assert "Elect a new president" in manage
     edit = manage.click('Bearbeiten')
     edit.form['election_de'] = 'Elect a new federal councillor'
+    edit.form['absolute_majority'] = None
     manage = edit.form.submit().follow()
 
     assert "Elect a new federal councillor" in manage
