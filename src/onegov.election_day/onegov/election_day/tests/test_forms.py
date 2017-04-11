@@ -5,6 +5,7 @@ from onegov.ballot import Election, Vote
 from onegov.election_day.forms.election import ElectionForm
 from onegov.election_day.forms.subscribe import SubscribeForm
 from onegov.election_day.forms.upload import UploadElectionForm
+from onegov.election_day.forms.upload import UploadElectionPartyResultsForm
 from onegov.election_day.forms.upload import UploadVoteForm
 from onegov.election_day.forms.validators import ValidPhoneNumber
 from onegov.election_day.forms.vote import VoteForm
@@ -232,7 +233,6 @@ def test_upload_election_form():
     form.apply_model(Election(type='majorz'))
     assert form.connections.render_kw['data-depends-on'] == ff('none')
     assert form.statistics.render_kw['data-depends-on'] == ff('none')
-    assert form.parties.render_kw['data-depends-on'] == ff('none')
 
     assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
     assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
@@ -241,7 +241,6 @@ def test_upload_election_form():
     form.apply_model(Election(type='proporz'))
     assert form.connections.render_kw['data-depends-on'] == ff('wabsti')
     assert form.statistics.render_kw['data-depends-on'] == ff('wabsti')
-    assert 'data-depends-on' not in form.parties.render_kw
 
     assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
     assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
@@ -251,7 +250,6 @@ def test_upload_election_form():
     form.apply_model(Election(type='proporz'))
     assert form.connections.render_kw['data-depends-on'] == ff('wabsti')
     assert form.statistics.render_kw['data-depends-on'] == ff('wabsti')
-    assert 'data-depends-on' not in form.parties.render_kw
 
     assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
     assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
@@ -260,8 +258,18 @@ def test_upload_election_form():
     form.apply_model(Election(type='majorz'))
     assert form.connections.render_kw['data-depends-on'] == ff('none')
     assert form.statistics.render_kw['data-depends-on'] == ff('none')
-    assert form.parties.render_kw['data-depends-on'] == ff('none')
 
     assert form.elected.render_kw['data-depends-on'] == ff('wabsti')
     assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
     assert form.majority.render_kw['data-depends-on'] == ff('!internal')
+
+
+def test_upload_party_results_form():
+    form = UploadElectionPartyResultsForm()
+    assert not form.validate()
+
+    form = UploadElectionPartyResultsForm(
+        DummyPostData({'parties': 'internal'})
+    )
+    form.parties.data = {'mimetype': 'text/plain'}
+    assert form.validate()

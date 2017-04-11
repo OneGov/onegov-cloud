@@ -22,9 +22,17 @@ def clear_election(election):
         session.delete(result)
 
 
-def parse_party_results_file(file, mimetype, errors):
+def import_party_results_file(election, file, mimetype):
+    """ Tries to import the given file.
+
+    :return:
+        A list containing errors.
+
+    """
+
     party_results = []
     filename = _("Party results")
+    errors = []
 
     # The party results file has one party per line
     if file and mimetype:
@@ -57,4 +65,14 @@ def parse_party_results_file(file, mimetype, errors):
                         )
                     )
 
-    return party_results
+    if errors:
+        return errors
+
+    session = object_session(election)
+    for result in election.party_results:
+        session.delete(result)
+
+    for result in party_results:
+        election.party_results.append(result)
+
+    return

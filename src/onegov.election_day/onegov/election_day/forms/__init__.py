@@ -1,6 +1,7 @@
 from onegov.election_day.forms.election import ElectionForm
 from onegov.election_day.forms.subscribe import SubscribeForm
 from onegov.election_day.forms.upload import UploadElectionForm
+from onegov.election_day.forms.upload import UploadElectionPartyResultsForm
 from onegov.election_day.forms.upload import UploadVoteForm
 from onegov.election_day.forms.vote import VoteForm
 from onegov.form import Form
@@ -20,6 +21,7 @@ __all__ = [
     'SubscribeForm',
     'TriggerNotificationForm',
     'UploadElectionForm',
+    'UploadElectionPartyResultsForm',
     'UploadVoteForm',
     'VoteForm'
 ]

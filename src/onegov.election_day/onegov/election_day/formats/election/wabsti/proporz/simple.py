@@ -9,7 +9,6 @@ from onegov.election_day import _
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats import load_csv
 from onegov.election_day.formats.election import clear_election
-from onegov.election_day.formats.election import parse_party_results_file
 from uuid import uuid4
 
 
@@ -183,8 +182,7 @@ def import_file(entities, election, file, mimetype,
                 connections_file=None,
                 connections_mimetype=None,
                 elected_file=None, elected_mimetype=None,
-                statistics_file=None, statistics_mimetype=None,
-                parties_file=None, parties_mimetype=None):
+                statistics_file=None, statistics_mimetype=None):
     errors = []
     candidates = {}
     lists = {}
@@ -358,10 +356,6 @@ def import_file(entities, election, file, mimetype,
                         results[entity_id].invalid_ballots = invalid_ballots
                         results[entity_id].blank_votes = blank_votes
 
-    party_results = parse_party_results_file(
-        parties_file, parties_mimetype, errors
-    )
-
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
@@ -395,8 +389,5 @@ def import_file(entities, election, file, mimetype,
             for list_result in list_results.get(id, {}).values():
                 result.list_results.append(list_result)
             election.results.append(result)
-
-        for result in party_results:
-            election.party_results.append(result)
 
     return []

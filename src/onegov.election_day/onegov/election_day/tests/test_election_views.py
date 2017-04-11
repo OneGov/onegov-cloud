@@ -3,6 +3,7 @@ from freezegun import freeze_time
 from onegov.election_day.tests import login
 from onegov.election_day.tests import upload_majorz_election
 from onegov.election_day.tests import upload_proporz_election
+from onegov.election_day.tests import upload_party_results
 from webtest import TestApp as Client
 from webtest.forms import Upload
 
@@ -138,6 +139,7 @@ def test_view_election_parties(election_day_app_gr):
     assert '/election/majorz-election/parties' in chart
 
     upload_proporz_election(client)
+    upload_party_results(client)
 
     main = client.get('/election/proporz-election/parties')
     assert '<h3>Parteien</h3>' in main
@@ -222,10 +224,14 @@ def test_view_election_parties_historical(election_day_app_gr):
         upload = client.get('/election/{}/upload'.format(id))
         upload.form['file_format'] = 'sesam'
         upload.form['results'] = Upload('data.csv', csv, mime)
+        upload = upload.form.submit()
+        assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
+        upload = client.get('/election/{}/upload-party-results'.format(id))
         upload.form['parties'] = Upload('parties.csv', csv_parties, mime)
         upload = upload.form.submit()
-
         assert "Ihre Resultate wurden erfolgreich hochgeladen" in upload
+
         export = client.get('/election/{}/data-parties'.format(id)).text
         assert results in export
 

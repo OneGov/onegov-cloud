@@ -9,7 +9,6 @@ from onegov.election_day import _
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats import load_csv
 from onegov.election_day.formats.election import clear_election
-from onegov.election_day.formats.election import parse_party_results_file
 from uuid import uuid4
 
 
@@ -196,8 +195,7 @@ def parse_connection(line, errors):
         return connection, subconnection
 
 
-def import_file(entities, election, file, mimetype,
-                parties_file=None, parties_mimetype=None):
+def import_file(entities, election, file, mimetype):
     """ Tries to import the given file (sesam format).
 
     :return:
@@ -281,10 +279,6 @@ def import_file(entities, election, file, mimetype,
         if not majorz:
             candidate.list_id = list_.id
 
-    party_results = parse_party_results_file(
-        parties_file, parties_mimetype, errors
-    )
-
     if not errors and not results:
         errors.append(FileImportError(_("No data found")))
 
@@ -320,8 +314,5 @@ def import_file(entities, election, file, mimetype,
             for list_result in list_results.get(id, {}).values():
                 result.list_results.append(list_result)
             election.results.append(result)
-
-        for result in party_results:
-            election.party_results.append(result)
 
     return []

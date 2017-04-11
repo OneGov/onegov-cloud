@@ -1,11 +1,14 @@
 Changelog
 ---------
 
-- Allow to set the absolute majority of majorz elections without uploading
+- Allows to upload the party results independently of the other results.
+  [msom]
+
+- Allows to set the absolute majority of majorz elections without uploading
   results.
   [msom]
 
-- Fix providing giving an invalid archive date throwing an error.
+- Fixs providing giving an invalid archive date throwing an error.
   [msom]
 
 - Fix providing giving an invalid archive date throwing an error.
