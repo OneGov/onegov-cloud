@@ -49,6 +49,10 @@ class SettingsForm(Form):
         fieldset=_("Payment"),
         validators=[Stdnum(format='iban')]
     )
+    bank_beneficiary = StringField(
+        label=_("Bank Beneficiary"),
+        fieldset=_("Payment"),
+    )
     contact = TextAreaField(
         label=_("Contact"),
         description=_("The address and phone number of the municipality"),
@@ -184,6 +188,13 @@ class SettingsForm(Form):
                 options[key] = user_options[key]
 
         return options
+
+    def ensure_beneificary_if_bank_account(self):
+        if self.bank_account.data and not self.bank_beneficiary.data:
+            self.bank_beneficiary.errors.append(_(
+                "A beneficiary is required if a bank account is given."
+            ))
+            return False
 
     @theme_options.setter
     def theme_options(self, options):

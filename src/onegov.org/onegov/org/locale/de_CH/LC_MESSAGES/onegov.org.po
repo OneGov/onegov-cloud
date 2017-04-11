@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE 1.0\n"
-"POT-Creation-Date: 2017-02-27 16:00+0100\n"
+"POT-Creation-Date: 2017-04-11 09:35+0200\n"
 "PO-Revision-Date: 2017-03-02 09:52+0100\n"
 "Last-Translator: Denis Krienbühl <denis.krienbuehl@seantis.ch>\n"
 "Language-Team: German\n"
@@ -647,6 +647,9 @@ msgstr "Bankkonto (IBAN)"
 msgid "Payment"
 msgstr "Zahlungen"
 
+msgid "Bank Beneficiary"
+msgstr "Bank Begünstigter"
+
 msgid "Contact"
 msgstr "Kontakt"
 
@@ -730,6 +733,9 @@ msgstr "JavaScript für Web-Statistik"
 
 msgid "Advanced"
 msgstr "Erweitert"
+
+msgid "A beneficiary is required if a bank account is given."
+msgstr "Ein Begünstigter ist nötig wenn ein Bank Konto angegeben wird."
 
 msgid "E-Mail Address"
 msgstr "E-Mail Adresse"
@@ -1932,14 +1938,14 @@ msgstr "Benutzerverwaltung"
 msgid "New User"
 msgstr "Neuer Benutzer"
 
-msgid "An account was created for you"
-msgstr "Ein Konto wurde für Sie erstellt"
-
 msgid "The user was created successfully"
 msgstr "Der Benutzer wurde erfolgreich erstellt"
 
 msgid "A user with this e-mail address already exists"
 msgstr "Ein Benutzer mit dieser E-Mail Adresse existiert bereits"
+
+msgid "An account was created for you"
+msgstr "Ein Konto wurde für Sie erstellt"
 
 msgid "You have been successfully unsubscribed from all regular emails."
 msgstr "Sie wurden erfolgreich von allen regelmässigen E-Mails abgemeldet."

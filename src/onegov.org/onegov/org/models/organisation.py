@@ -48,6 +48,7 @@ class Organisation(Base, TimestampMixin):
     homepage_structure = meta_property('homepage_structure')
     homepage_cover = meta_property('homepage_cover')
     bank_account = meta_property('bank_account')
+    bank_beneficiary = meta_property('bank_beneficiary')
 
     @contact.setter
     def contact(self, value):
