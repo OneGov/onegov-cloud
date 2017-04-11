@@ -95,26 +95,32 @@ def fetch(group_context, sentry):
 @click.argument('password')
 @click.option('--originator')
 @click.option('--sentry')
-def send_sms(username, password, originator, sentry):
+@pass_group_context
+def send_sms(group_context, username, password, originator, sentry):
     """ Sends the SMS in the smsdir for a given instance. For example:
 
         onegov-election-day --select '/onegov_election_day/zg' send_sms
             'info@seantis.ch' 'top-secret'
 
     """
-    def send(request, app):
-        path = os.path.join(app.configuration['sms_directory'], app.schema)
-        if os.path.exists(path):
-            qp = SmsQueueProcessor(
-                path,
-                username,
-                password,
-                sentry,
-                originator
-            )
-            qp.send_messages()
+    schemas = list(group_context.matches)
+    for appcfg in group_context.appcfgs:
+        sms_dir = appcfg.configuration.get('sms_directory')
+        if not sms_dir:
+            continue
 
-    return send
+        for schema in group_context.available_schemas(appcfg):
+            if '/' + schema.replace('-', '/') in schemas:
+                path = os.path.join(sms_dir, schema)
+                if os.path.exists(path):
+                    qp = SmsQueueProcessor(
+                        path,
+                        username,
+                        password,
+                        sentry,
+                        originator
+                    )
+                    qp.send_messages()
 
 
 @cli.command('generate-media')
