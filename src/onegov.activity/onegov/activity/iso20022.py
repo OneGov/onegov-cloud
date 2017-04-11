@@ -53,7 +53,7 @@ class Transaction(object):
 
     @property
     def code(self):
-        return extract_code(self.note)
+        return extract_code(self.booking_text) or extract_code(self.note)
 
     @property
     def order(self):
@@ -144,6 +144,9 @@ def extract_code(text):
     :return: The code without formatting and in lowercase or None
 
     """
+
+    if text is None:
+        return None
 
     text = text.replace('\n', '').strip()
 
