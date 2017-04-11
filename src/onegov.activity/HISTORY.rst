@@ -1,6 +1,9 @@
 Changelog
 ---------
 
+0.8.2 (2017-04-11)
+~~~~~~~~~~~~~~~~~~~
+
 - Fixes reference code in ISO20022 statements not being detected in some cases.
   [href]
 
