@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- Allow to set the absolute majority of majorz elections without uploading
+  results.
+  [msom]
+
 - Fix providing giving an invalid archive date throwing an error.
   [msom]
 
