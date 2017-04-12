@@ -75,6 +75,27 @@ class ElectionForm(Form):
         depends_on=('election_type', 'majorz'),
     )
 
+    upload_type = RadioField(
+        _("Upload"),
+        choices=[
+            ('manual', _("Manual")),
+            ('wabsti', _("Automatic (Wabsti)")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        default='manual'
+    )
+
+    upload_wabsti_district = StringField(
+        label=_("Automatic upload (Wabsti): 'SortWahlkreis'"),
+        validators=[
+            Optional(),
+            NumberRange(min=1)
+        ],
+        depends_on=('election_type', 'majorz'),
+    )
+
     def set_domain(self, principal):
         self.domain.choices = [
             (key, text)

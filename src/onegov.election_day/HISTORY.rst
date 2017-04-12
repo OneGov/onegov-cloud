@@ -15,6 +15,20 @@ Changelog
 - Fixs providing giving an invalid archive date throwing an error.
   [msom]
 
+- The type of vote (simple vs complex with counter proposal and tie-breaker)
+  is set on the add/edit vote form instead of the upload form.
+  [msom]
+
+- Allows to upload the party results independently of the other results.
+  [msom]
+
+- Allows to set the absolute majority of majorz elections without uploading
+  results.
+  [msom]
+
+- Fixs providing giving an invalid archive date throwing an error.
+  [msom]
+
 1.7.5 (2017-04-07)
 ~~~~~~~~~~~~~~~~~~~
 
