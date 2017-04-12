@@ -1,6 +1,10 @@
-from onegov.ballot import Candidate, CandidateResult, ElectionResult
+from onegov.ballot import Candidate
+from onegov.ballot import CandidateResult
+from onegov.ballot import ElectionResult
 from onegov.election_day import _
-from onegov.election_day.formats import FileImportError, load_csv
+from onegov.election_day.formats import EXPATS
+from onegov.election_day.formats import FileImportError
+from onegov.election_day.formats import load_csv
 from onegov.election_day.formats.election import clear_election
 from uuid import uuid4
 
@@ -51,8 +55,11 @@ def line_is_relevant(line, number, district=None):
 def get_entity_id(line, entities):
     entity_id = int(line.sortgemeinde or 0)
     sub_entity_id = int(line.sortgemeindesub or 0)
-    if entity_id not in entities and sub_entity_id in entities:
-        return sub_entity_id
+    if entity_id not in entities:
+        if sub_entity_id in entities:
+            entity_id = sub_entity_id
+        elif entity_id in EXPATS or sub_entity_id in EXPATS:
+            entity_id = 0
     return entity_id
 
 

@@ -1,6 +1,9 @@
-from onegov.ballot import Ballot, BallotResult
+from onegov.ballot import Ballot
+from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats import FileImportError, load_csv
+from onegov.election_day.formats import EXPATS
+from onegov.election_day.formats import FileImportError
+from onegov.election_day.formats import load_csv
 from onegov.election_day.formats.vote import clear_ballot
 
 
@@ -78,8 +81,11 @@ def import_exporter_files(vote, district, number, entities,
         except ValueError:
             line_errors.append(_("Invalid id"))
         else:
-            if entity_id not in entities and sub_entity_id in entities:
-                entity_id = sub_entity_id
+            if entity_id not in entities:
+                if sub_entity_id in entities:
+                    entity_id = sub_entity_id
+                elif entity_id in EXPATS or sub_entity_id in EXPATS:
+                    entity_id = 0
 
             if entity_id in added_entities:
                 line_errors.append(
