@@ -76,31 +76,38 @@ class WabstiImporter():
                 )
                 continue
 
-            fn_vs = os.path.join(folder, 'SGStatic_Geschaefte.csv')
-            fn_es = os.path.join(folder, 'SGStatic_Gemeinden.csv')
-            fn_e = os.path.join(folder, 'SG_Gemeinden.csv')
+            fn = os.path.join(folder, 'SG_Gemeinden.csv')
             files_exist = [
-                os.path.exists(fn_vs),
-                os.path.exists(fn_es),
-                os.path.exists(fn_e)
+
             ]
-            if not all(files_exist):
-                if any(files_exist):
-                    log.warning(
-                        'Not all expected files present in {}'.format(folder)
-                    )
+            if not os.path.exists(fn):
+                log.warning(
+                    'Not all expected files present in {}'.format(folder)
+                )
                 continue
 
-            with open(fn_vs, 'rb') as f_vs, open(fn_es, 'rb') as f_es,  \
-                    open(fn_e, 'rb') as f_e:
-
+            with open(fn, 'rb') as f:
                 entities = principal.entities.get(vote.date.year, {})
                 errors = import_vote(
                     vote, district, number, entities,
-                    f_vs, 'text/plain',
-                    f_es, 'text/plain',
-                    f_e, 'text/plain'
+                    f, 'text/plain'
                 )
+
+                if not errors:
+                    # todo: update archive
+                    #       -> we might need to adjust the update method
+                    #       of the archived result collection to make the
+                    #       request optional (in which case the depeding
+                    #       values are NOT updated) as we cannot provide
+                    #       the real URL
+                    # todo: hipchat notification
+                    #       -> we need to get the git URL from the archive!
+                    # todo: app.pages_cache
+                    #       -> do this with a dirty flag
+
+                    log.info("Imported {} to vote {}/{}".format(
+                        folder, self.app.schema, vote.id
+                    ))
 
                 yield self.transform_errors(errors, vote, folder)
 
@@ -155,5 +162,14 @@ class WabstiImporter():
                     f_c, 'text/plain',
                     f_cr, 'text/plain'
                 )
+
+                if not errors:
+                    # todo: update archive
+                    # todo: hipchat notification
+                    # todo: app.pages_cache
+
+                    log.info("Imported {} to election {}/{}".format(
+                        folder, self.app.schema, election.id
+                    ))
 
                 yield self.transform_errors(errors, election, folder)
