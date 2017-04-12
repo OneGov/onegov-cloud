@@ -29,12 +29,7 @@ def view_upload(self, request, form):
 
     errors = []
 
-    # Remove wabsti and sesam for municipalities for the moment
-    if request.app.principal.domain == 'municipality':
-        form.file_format.choices = [
-            choice for choice in form.file_format.choices
-            if choice[0] != 'wabsti' and choice[0] != 'sesam'
-        ]
+    form.adjust(request.app.principal, self)
 
     status = 'open'
     if form.submitted(request):
@@ -104,8 +99,6 @@ def view_upload(self, request, form):
                         request.link(self), self.title
                     )
                 )
-
-    form.apply_model(self)
 
     layout = ManageElectionsLayout(self, request)
 

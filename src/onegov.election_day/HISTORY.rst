@@ -1,6 +1,10 @@
 Changelog
 ---------
 
+- The type of vote (simple vs complex with counter proposal and tie-breaker)
+  is set on the add/edit vote form instead of the upload form.
+  [msom]
+
 - Allows to upload the party results independently of the other results.
   [msom]
 

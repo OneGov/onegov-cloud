@@ -35,6 +35,7 @@ def test_upload_vote_all_or_nothing(election_day_app):
     new.form['vote_de'] = 'Bacon, yea or nay?'
     new.form['date'] = date(2015, 1, 1)
     new.form['domain'] = 'federation'
+    new.form['vote_type'] = 'complex'
     new.form.submit()
     assert archive.query().one().progress == (0, 0)
 
@@ -43,7 +44,6 @@ def test_upload_vote_all_or_nothing(election_day_app):
     # an error
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'complex'
 
     passes = '\n'.join((
         ','.join(COLUMNS),
@@ -98,7 +98,6 @@ def test_upload_vote_success(election_day_app):
     # an error
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
 
     csv = '\n'.join((
         ','.join(COLUMNS),
@@ -159,7 +158,6 @@ def test_upload_vote_validation(election_day_app):
     assert archive.query().one().progress == (0, 0)
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
 
     # invalid file
     upload.form['proposal'] = Upload('data.csv', b'text', 'text/plain')
@@ -347,7 +345,6 @@ def test_upload_vote_unknown_result(election_day_app):
     # an error
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
 
     proposal = '\n'.join((
         ','.join(COLUMNS),
@@ -368,7 +365,6 @@ def test_upload_vote_unknown_result(election_day_app):
 
     # adding unknown results should override existing results
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
 
     proposal = '\n'.join((
         ','.join(COLUMNS),
@@ -399,7 +395,6 @@ def test_upload_vote_year_unavailable(election_day_app):
     new.form.submit()
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
 
     csv = '\n'.join((','.join(COLUMNS),))
     upload.form['proposal'] = Upload(
@@ -430,7 +425,6 @@ def test_upload_vote_roundtrip(election_day_app):
     # an error
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
 
     csv = '\n'.join((
         ','.join(COLUMNS),
@@ -493,7 +487,6 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
         csv = f.extractfile(f.next()).read()
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
     upload.form['file_format'] = 'wabsti'
     upload.form['vote_number'] = '3'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
@@ -511,7 +504,6 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
     assert "194'469" in results
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
     upload.form['file_format'] = 'wabsti'
     upload.form['vote_number'] = '4'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
@@ -529,10 +521,10 @@ def test_upload_vote_wabsti(election_day_app_sg, tar_file):
     new.form['vote_de'] = 'Complex vote'
     new.form['date'] = date(2016, 6, 6)
     new.form['domain'] = 'federation'
+    new.form['vote_type'] = 'complex'
     new.form.submit()
 
     upload = client.get('/vote/complex-vote/upload')
-    upload.form['type'] = 'complex'
     upload.form['file_format'] = 'wabsti'
     upload.form['vote_number'] = '3'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
@@ -579,7 +571,6 @@ def test_upload_vote_invalidate_cache(election_day_app):
     # an error
 
     upload = client.get('/vote/bacon-yea-or-nay/upload')
-    upload.form['type'] = 'simple'
 
     csv = '\n'.join((
         ','.join(COLUMNS),
@@ -641,7 +632,6 @@ def test_upload_vote_temporary_results(election_day_app):
         ',1709,Unterägeri,1096,2083,5245,18,1',
     )).encode('utf-8')
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
     assert archive.query().one().progress == (2, 11)
@@ -663,7 +653,6 @@ def test_upload_vote_temporary_results(election_day_app):
         'proposal,Unterägeri,1709,True,1096,2083,1,18,5245',
     )).encode('utf-8')
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
     upload.form['file_format'] = 'internal'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -684,7 +673,6 @@ def test_upload_vote_temporary_results(election_day_app):
         '1,Unterägeri,1709,0.6,1096,2083,1,18,5245,0,0,0,0',
     )).encode('utf-8')
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
     upload.form['file_format'] = 'wabsti'
     upload.form['vote_number'] = '1'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
@@ -780,7 +768,6 @@ def test_upload_communal_vote(election_day_app_kriens):
     assert archive.query().one().progress == (0, 0)
 
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
 
     csv = '\n'.join((
         ','.join(COLUMNS),
@@ -816,7 +803,6 @@ def test_upload_communal_vote_districts(election_day_app_bern):
     assert archive.query().one().progress == (0, 0)
 
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
 
     csv = '\n'.join((
         ','.join(COLUMNS),
@@ -859,7 +845,6 @@ def test_upload_vote_with_expats(election_day_app):
         ',0,Auslandschweizer,10,20,30,0,0',
     )).encode('utf-8')
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
 
@@ -875,7 +860,6 @@ def test_upload_vote_with_expats(election_day_app):
         'proposal,Auslandschweizer,0,True,10,20,0,0,30',
     )).encode('utf-8')
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
     upload.form['file_format'] = 'internal'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
     assert 'erfolgreich hochgeladen' in upload.form.submit()
@@ -893,7 +877,6 @@ def test_upload_vote_with_expats(election_day_app):
         '1,Auslandschweizer,1700,100.0,10,20,0,0,30,0,0,0,0',
     )).encode('utf-8')
     upload = client.get('/vote/vote/upload')
-    upload.form['type'] = 'simple'
     upload.form['file_format'] = 'wabsti'
     upload.form['vote_number'] = '1'
     upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
@@ -924,7 +907,6 @@ def test_upload_vote_notify_hipchat(election_day_app):
 
         # Hipchat not set
         upload = client.get('/vote/vote/upload')
-        upload.form['type'] = 'simple'
         upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
 
@@ -936,7 +918,6 @@ def test_upload_vote_notify_hipchat(election_day_app):
         election_day_app.hipchat_room_id = '1234'
 
         upload = client.get('/vote/vote/upload')
-        upload.form['type'] = 'simple'
         upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
         assert 'erfolgreich hochgeladen' in upload.form.submit()
 

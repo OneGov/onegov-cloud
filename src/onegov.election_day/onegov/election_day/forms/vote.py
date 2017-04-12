@@ -40,6 +40,18 @@ class VoteForm(Form):
         ]
     )
 
+    vote_type = RadioField(
+        _("Type"),
+        choices=[
+            ('simple', _("Simple Vote")),
+            ('complex', _("Vote with Counter-Proposal")),
+        ],
+        validators=[
+            InputRequired()
+        ],
+        default='simple'
+    )
+
     related_link = URLField(
         label=_("Related link")
     )
@@ -109,10 +121,7 @@ class VoteForm(Form):
         if not model.meta:
             model.meta = {}
         model.meta['related_link'] = self.related_link.data
-        model.meta['upload_type'] = self.upload_type.data
-        model.meta['upload_wabsti_district'] = self.upload_wabsti_district.data
-        model.meta['upload_wabsti_number'] = self.upload_wabsti_number.data
-        model.meta['upload_wabsti_folder'] = self.upload_wabsti_folder.data
+        model.meta['vote_type'] = self.vote_type.data
 
     def apply_model(self, model):
         self.vote_de.data = model.title_translations['de_CH']
@@ -126,13 +135,4 @@ class VoteForm(Form):
 
         meta_data = model.meta or {}
         self.related_link.data = meta_data.get('related_link', '')
-        self.upload_type.data = meta_data.get('upload_type', 'manual')
-        self.upload_wabsti_district.data = meta_data.get(
-            'upload_wabsti_district', ''
-        )
-        self.upload_wabsti_number.data = meta_data.get(
-            'upload_wabsti_number', ''
-        )
-        self.upload_wabsti_folder.data = meta_data.get(
-            'upload_wabsti_folder', ''
-        )
+        self.vote_type.data = meta_data.get('vote_type', 'simple')

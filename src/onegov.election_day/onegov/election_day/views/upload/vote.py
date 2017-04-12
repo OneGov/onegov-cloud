@@ -27,14 +27,7 @@ def view_upload(self, request, form):
 
     errors = []
 
-    # if the vote already has results, do not give the user the choice to
-    # switch between the dif
-    if self.counter_proposal:
-        form.type.choices = form.type.choices[1:]
-        form.type.data = 'complex'
-    elif self.proposal:
-        form.type.choices = form.type.choices[:1]
-        form.type.data = 'simple'
+    form.adjust(request.app.principal, self)
 
     # Remove wabsti for municipalities for the moment
     if request.app.principal.domain == 'municipality':
@@ -64,6 +57,11 @@ def view_upload(self, request, form):
                     form.proposal.raw_data[0].file,
                     form.proposal.data['mimetype']
                 )
+                if not self.meta:
+                    self.meta = {}
+                self.meta['vote_type'] = 'simple'
+                if self.counter_proposal:
+                    self.meta['vote_type'] = 'complex'
             elif form.file_format.data == 'wabsti':
                 errors = import_wabsti_file(
                     entities,
@@ -73,6 +71,11 @@ def view_upload(self, request, form):
                     form.vote_number.data,
                     form.data['type'] == 'complex'
                 )
+                if not self.meta:
+                    self.meta = {}
+                self.meta['vote_type'] = 'simple'
+                if self.counter_proposal:
+                    self.meta['vote_type'] = 'complex'
             elif form.file_format.data == 'default':
                 if form.data['type'] == 'simple':
                     ballot_types = ('proposal', )

@@ -9,6 +9,7 @@ from onegov.election_day.forms.upload import UploadElectionPartyResultsForm
 from onegov.election_day.forms.upload import UploadVoteForm
 from onegov.election_day.forms.validators import ValidPhoneNumber
 from onegov.election_day.forms.vote import VoteForm
+from onegov.election_day.models import Principal
 from wtforms.validators import ValidationError
 
 
@@ -61,21 +62,16 @@ def test_subscribe_form():
         ).formatted_phone_number == '+41791112233'
 
 
-def test_vote_form_choices(election_day_app):
-    assert VoteForm().domain.choices == None
-
+def test_vote_form_domains():
     form = VoteForm()
-    form.set_domain(election_day_app.principal)
+    assert form.domain.choices == None
+
+    form.set_domain(Principal('be', None, None, canton='be'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal')
     ]
 
-
-def test_vote_form_choices_municipality(election_day_app_bern):
-    assert VoteForm().domain.choices == None
-
-    form = VoteForm()
-    form.set_domain(election_day_app_bern.principal)
+    form.set_domain(Principal('bern', None, None, municipality='351'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal'),
         ('municipality', 'Communal')
@@ -92,7 +88,10 @@ def test_vote_form_model(election_day_app):
     model.date = date.today()
     model.domain = 'federation'
     model.shortcode = 'xy'
-    model.meta = {'related_link': 'http://u.rl'}
+    model.meta = {
+        'related_link': 'http://u.rl',
+        'vote_type': 'simple'
+    }
 
     form = VoteForm()
     form.apply_model(model)
@@ -105,6 +104,7 @@ def test_vote_form_model(election_day_app):
     assert form.domain.data == 'federation'
     assert form.shortcode.data == 'xy'
     assert form.related_link.data == 'http://u.rl'
+    assert form.vote_type.data == 'simple'
 
     form.vote_de.data = 'A Vote (DE)'
     form.vote_fr.data = 'A Vote (FR)'
@@ -114,6 +114,7 @@ def test_vote_form_model(election_day_app):
     form.domain.data = 'canton'
     form.shortcode.data = 'yz'
     form.related_link.data = 'http://ur.l'
+    form.vote_type.data = 'complex'
 
     form.update_model(model)
 
@@ -126,23 +127,19 @@ def test_vote_form_model(election_day_app):
     assert model.domain == 'canton'
     assert model.shortcode == 'yz'
     assert model.meta['related_link'] == 'http://ur.l'
+    assert model.meta['vote_type'] == 'complex'
 
 
-def test_election_form_choices(election_day_app):
+def test_election_form_domains():
+    form = ElectionForm()
     assert ElectionForm().domain.choices == None
 
-    form = ElectionForm()
-    form.set_domain(election_day_app.principal)
+    form.set_domain(Principal('be', None, None, canton='be'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal')
     ]
 
-
-def test_election_form_choices_municipality(election_day_app_bern):
-    assert ElectionForm().domain.choices == None
-
-    form = ElectionForm()
-    form.set_domain(election_day_app_bern.principal)
+    form.set_domain(Principal('bern', None, None, municipality='351'))
     assert sorted(form.domain.choices) == [
         ('canton', 'Cantonal'), ('federation', 'Federal'),
         ('municipality', 'Communal')
@@ -206,38 +203,128 @@ def test_election_form_model(election_day_app):
 
 
 def test_upload_vote_form():
-    form = UploadVoteForm(DummyPostData({
-        'file_format': 'internal'
+    cantonal_principal = Principal('be', None, None, canton='be')
+    communal_principal = Principal('bern', None, None, municipality='351')
+
+    simple_vote = Vote()
+    simple_vote.meta = {'vote_type': 'simple'}
+    complex_vote = Vote()
+    complex_vote.meta = {'vote_type': 'complex'}
+
+    # Test limitation of file formats
+    form = UploadVoteForm()
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'default', 'internal', 'wabsti'
+    ]
+    form.adjust(cantonal_principal, simple_vote)
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'default', 'internal', 'wabsti'
+    ]
+    form.adjust(communal_principal, simple_vote)
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'default', 'internal'
+    ]
+
+    # Test preseting of vote type
+    form = UploadVoteForm()
+    assert sorted(f[0] for f in form.type.choices) == ['complex', 'simple']
+    form.adjust(cantonal_principal, simple_vote)
+    assert sorted(f[0] for f in form.type.choices) == ['simple']
+    form.adjust(cantonal_principal, complex_vote)
+    assert sorted(f[0] for f in form.type.choices) == ['complex']
+
+    # Test required fields
+    form = UploadVoteForm()
+    form.adjust(cantonal_principal, simple_vote)
+    form.process(DummyPostData({
+        'file_format': 'default',
+        'type': form.type.data
     }))
     form.proposal.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    form = UploadVoteForm(DummyPostData({
+    form = UploadVoteForm()
+    form.adjust(cantonal_principal, complex_vote)
+    form.process(DummyPostData({
         'file_format': 'default',
-        'type': 'simple'
+        'type': form.type.data
     }))
     form.proposal.data = {'mimetype': 'text/plain'}
-    assert form.validate()
-
-    form = UploadVoteForm(DummyPostData({
-        'file_format': 'default',
-        'type': 'complex'
-    }))
-    form.proposal.data = {'mimetype': 'text/plain'}
+    assert not form.validate()
     form.counter_proposal.data = {'mimetype': 'text/plain'}
     form.tie_breaker.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
-    form = UploadVoteForm(DummyPostData({
+    form = UploadVoteForm()
+    form.adjust(cantonal_principal, simple_vote)
+    form.process(DummyPostData({
+        'file_format': 'internal',
+        'type': form.type.data
+    }))
+    form.proposal.data = {'mimetype': 'text/plain'}
+    assert form.validate()
+
+    form = UploadVoteForm()
+    form.adjust(cantonal_principal, complex_vote)
+    form.process(DummyPostData({
+        'file_format': 'internal',
+        'type': form.type.data
+    }))
+    form.proposal.data = {'mimetype': 'text/plain'}
+    assert form.validate()
+
+    form = UploadVoteForm()
+    form.adjust(cantonal_principal, simple_vote)
+    form.process(DummyPostData({
         'file_format': 'wabsti',
-        'type': 'simple',
-        'vote_number': 1
+        'type': form.type.data
+    }))
+    form.proposal.data = {'mimetype': 'text/plain'}
+    assert not form.validate()
+
+    form = UploadVoteForm()
+    form.adjust(cantonal_principal, simple_vote)
+    form.process(DummyPostData({
+        'file_format': 'wabsti',
+        'type': form.type.data,
+        'vote_number': 1,
+    }))
+    form.proposal.data = {'mimetype': 'text/plain'}
+    assert form.validate()
+
+    form = UploadVoteForm()
+    form.adjust(cantonal_principal, complex_vote)
+    form.process(DummyPostData({
+        'file_format': 'wabsti',
+        'type': form.type.data,
+        'vote_number': 1,
     }))
     form.proposal.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
 
 def test_upload_election_form():
+    cantonal_principal = Principal('be', None, None, canton='be')
+    communal_principal = Principal('bern', None, None, municipality='351')
+
+    majorz_election = Election(type='majorz')
+    proporz_election = Election(type='proporz')
+
+    # Test limitation of file formats
+    form = UploadElectionForm()
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'internal', 'sesam', 'wabsti'
+    ]
+    form.adjust(cantonal_principal, majorz_election)
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'internal', 'sesam', 'wabsti'
+    ]
+    form.adjust(communal_principal, majorz_election)
+    assert sorted(f[0] for f in form.file_format.choices) == [
+        'internal'
+    ]
+
+    # Test required fields
     form = UploadElectionForm(DummyPostData({'file_format': 'internal'}))
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
@@ -250,11 +337,12 @@ def test_upload_election_form():
     form.results.data = {'mimetype': 'text/plain'}
     assert form.validate()
 
+    # test dynamic dependencies
     def ff(x):
         return 'file_format/{}'.format(x)
 
     form = UploadElectionForm()
-    form.apply_model(Election(type='majorz'))
+    form.adjust(cantonal_principal, majorz_election)
     assert form.connections.render_kw['data-depends-on'] == ff('none')
     assert form.statistics.render_kw['data-depends-on'] == ff('none')
 
@@ -262,7 +350,7 @@ def test_upload_election_form():
     assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
     assert form.majority.render_kw['data-depends-on'] == ff('!internal')
 
-    form.apply_model(Election(type='proporz'))
+    form.adjust(cantonal_principal, proporz_election)
     assert form.connections.render_kw['data-depends-on'] == ff('wabsti')
     assert form.statistics.render_kw['data-depends-on'] == ff('wabsti')
 
@@ -271,7 +359,7 @@ def test_upload_election_form():
     assert form.majority.render_kw['data-depends-on'] == ff('none')
 
     form = UploadElectionForm()
-    form.apply_model(Election(type='proporz'))
+    form.adjust(cantonal_principal, proporz_election)
     assert form.connections.render_kw['data-depends-on'] == ff('wabsti')
     assert form.statistics.render_kw['data-depends-on'] == ff('wabsti')
 
@@ -279,7 +367,7 @@ def test_upload_election_form():
     assert form.complete.render_kw['data-depends-on'] == ff('wabsti')
     assert form.majority.render_kw['data-depends-on'] == ff('none')
 
-    form.apply_model(Election(type='majorz'))
+    form.adjust(cantonal_principal, majorz_election)
     assert form.connections.render_kw['data-depends-on'] == ff('none')
     assert form.statistics.render_kw['data-depends-on'] == ff('none')
 

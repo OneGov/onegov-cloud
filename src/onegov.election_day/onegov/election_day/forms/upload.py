@@ -91,8 +91,22 @@ class UploadElectionForm(Form):
         ]
     )
 
-    def apply_model(self, model):
-        if model.type == 'majorz':
+    def adjust(self, principal, election):
+        """ Adjusts the form to the given principal and election.
+
+        - Wabsti and SESAM format are removed if it is a communal instance.
+        - Connections and statistics are not used for majorz elections
+        - Absoulte majority is not used for proporz elections.
+
+        """
+
+        if principal.domain == 'municipality':
+            self.file_format.choices = [
+                choice for choice in self.file_format.choices
+                if choice[0] != 'wabsti' and choice[0] != 'sesam'
+            ]
+
+        if election.type == 'majorz':
             self.connections.render_kw['data-depends-on'] = 'file_format/none'
             self.statistics.render_kw['data-depends-on'] = 'file_format/none'
             self.majority.render_kw['data-depends-on'] = (
@@ -187,3 +201,30 @@ class UploadVoteForm(Form):
             NumberRange(min=1)
         ]
     )
+
+    def adjust(self, principal, vote):
+        """ Adjusts the form to the given principal and vote.
+
+        - Wabsti format is removed if it is a communal instance.
+        - The vote type (simple/complex) is copied from the vote
+
+        """
+
+        if principal.domain == 'municipality':
+            self.file_format.choices = [
+                ('default', _("Default")),
+                ('internal', _("OneGov Cloud")),
+            ]
+        else:
+            self.file_format.choices = [
+                ('default', _("Default")),
+                ('wabsti', _("Wabsti")),
+                ('internal', _("OneGov Cloud")),
+            ]
+
+        if (vote.meta or {}).get('vote_type', 'simple') == 'complex':
+            self.type.choices = [('complex', _("Vote with Counter-Proposal"))]
+            self.type.data = 'complex'
+        else:
+            self.type.choices = [('simple', _("Simple Vote"))]
+            self.type.data = 'simple'
