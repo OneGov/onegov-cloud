@@ -29,6 +29,9 @@ Changelog
   results.
   [msom]
 
+- Use special, reserved numbers for expats.
+  [msom]
+
 - Fixs providing giving an invalid archive date throwing an error.
   [msom]
 
