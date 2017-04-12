@@ -1,6 +1,9 @@
-from onegov.ballot import Ballot, BallotResult
+from onegov.ballot import Ballot
+from onegov.ballot import BallotResult
 from onegov.election_day import _
-from onegov.election_day.formats import FileImportError, load_csv
+from onegov.election_day.formats import EXPATS
+from onegov.election_day.formats import FileImportError
+from onegov.election_day.formats import load_csv
 from onegov.election_day.formats.vote import BALLOT_TYPES
 from onegov.election_day.formats.vote import clear_ballot
 from onegov.election_day.formats.vote import guessed_group
@@ -64,6 +67,9 @@ def import_file(entities, vote, file, mimetype):
         except ValueError:
             line_errors.append(_("Invalid id"))
         else:
+            if entity_id not in entities and entity_id in EXPATS:
+                entity_id = 0
+
             if entity_id in added_entity_ids[ballot_type]:
                 line_errors.append(
                     _("${name} was found twice", mapping={

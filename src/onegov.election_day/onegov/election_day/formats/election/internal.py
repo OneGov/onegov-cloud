@@ -6,6 +6,7 @@ from onegov.ballot import ListConnection
 from onegov.ballot import ListResult
 from onegov.ballot import PanachageResult
 from onegov.election_day import _
+from onegov.election_day.formats import EXPATS
 from onegov.election_day.formats import FileImportError
 from onegov.election_day.formats import load_csv
 from onegov.election_day.formats.election import clear_election
@@ -69,6 +70,9 @@ def parse_election_result(line, errors, entities):
     except ValueError:
         errors.append(_("Invalid entity values"))
     else:
+        if entity_id not in entities and entity_id in EXPATS:
+            entity_id = 0
+
         if entity_id and entity_id not in entities:
             errors.append(_(
                 "${name} is unknown",

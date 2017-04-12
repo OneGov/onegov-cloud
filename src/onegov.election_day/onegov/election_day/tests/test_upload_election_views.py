@@ -1712,104 +1712,105 @@ def test_upload_election_expats_majorz(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    # SESAM: not supported
+    for id_ in (0, 9170):
+        # SESAM: todo
 
-    # Wabsti: EinheitBez = Auslandschweizer, BFS unknown
-    csv = '\n'.join((
-        (
-            'AnzMandate,'
-            'BFS,'
-            'EinheitBez,'
-            'StimmBer,'
-            'StimmAbgegeben,'
-            'StimmLeer,'
-            'StimmUngueltig,'
-            'StimmGueltig,'
-            'KandID_1,'
-            'KandName_1,'
-            'KandVorname_1,'
-            'Stimmen_1,'
-            'KandResultArt_1,'
-            'KandID_2,'
-            'KandName_2,'
-            'KandVorname_2,'
-            'Stimmen_2,'
-            'KandResultArt_2,'
-            'KandID_3,'
-            'KandName_3,'
-            'KandVorname_3,'
-            'Stimmen_3,'
-            'KandResultArt_3,'
-            'KandID_4,'
-            'KandName_4,'
-            'KandVorname_4,'
-            'Stimmen_4,'
-            'KandResultArt_4'
-        ),
-        (
-            '7,1700,Auslandschweizer,13567,40,0,0,40,1,Hegglin,Peter,36,2,2,'
-            'Hürlimann,Urs,25,2,1000,Leere Zeilen,,18,9,1001,'
-            'Ungültige Stimmen,,0,9'
-        )
-    )).encode('utf-8')
-    upload = client.get('/election/election/upload')
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
+        # Wabsti
+        csv = '\n'.join((
+            (
+                'AnzMandate,'
+                'BFS,'
+                'EinheitBez,'
+                'StimmBer,'
+                'StimmAbgegeben,'
+                'StimmLeer,'
+                'StimmUngueltig,'
+                'StimmGueltig,'
+                'KandID_1,'
+                'KandName_1,'
+                'KandVorname_1,'
+                'Stimmen_1,'
+                'KandResultArt_1,'
+                'KandID_2,'
+                'KandName_2,'
+                'KandVorname_2,'
+                'Stimmen_2,'
+                'KandResultArt_2,'
+                'KandID_3,'
+                'KandName_3,'
+                'KandVorname_3,'
+                'Stimmen_3,'
+                'KandResultArt_3,'
+                'KandID_4,'
+                'KandName_4,'
+                'KandVorname_4,'
+                'Stimmen_4,'
+                'KandResultArt_4'
+            ),
+            (
+                '7,{},Auslandschweizer,13567,40,0,0,40,1,Hegglin,Peter,36,2,2,'
+                'Hürlimann,Urs,25,2,1000,Leere Zeilen,,18,9,1001,'
+                'Ungültige Stimmen,,0,9'
+            ).format(id_)
+        )).encode('utf-8')
+        upload = client.get('/election/election/upload')
+        upload.form['file_format'] = 'wabsti'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
 
-    result_wabsti = client.get('/election/election/data-csv').text
-    assert 'Auslandschweizer,0,13567' in result_wabsti
+        result_wabsti = client.get('/election/election/data-csv').text
+        assert 'Auslandschweizer,0,13567' in result_wabsti
 
-    # Onegov internal: entity_id = 0
-    csv = '\n'.join((
-        (
-            'election_title,'
-            'election_date,'
-            'election_type,'
-            'election_mandates,'
-            'election_absolute_majority,'
-            'election_counted_entities,'
-            'election_total_entities,'
-            'entity_name,'
-            'entity_id,'
-            'entity_elegible_voters,'
-            'entity_received_ballots,'
-            'entity_blank_ballots,'
-            'entity_invalid_ballots,'
-            'entity_unaccounted_ballots,'
-            'entity_accounted_ballots,'
-            'entity_blank_votes,'
-            'entity_invalid_votes,'
-            'entity_accounted_votes,'
-            'list_name,'
-            'list_id,'
-            'list_number_of_mandates,'
-            'list_votes,'
-            'list_connection,'
-            'list_connection_parent,'
-            'candidate_family_name,'
-            'candidate_first_name,'
-            'candidate_id,'
-            'candidate_elected,'
-            'candidate_votes'
-        ),
-        (
-            'majorz,2015-01-01,majorz,7,,1,12,Auslandschweizer,0,13567,40,0,0,'
-            '0,40,18,0,262,,,,0,,,Hegglin,Peter,1,False,36'
-        ),
-        (
-            'majorz,2015-01-01,majorz,7,,1,12,Auslandschweizer,0,13567,40,0,0,'
-            '0,40,18,0,262,,,,0,,,Hürlimann,Urs,2,False,25'
-        )
-    )).encode('utf-8')
-    upload = client.get('/election/election/upload')
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
+        # Onegov internal
+        csv = '\n'.join((
+            (
+                'election_title,'
+                'election_date,'
+                'election_type,'
+                'election_mandates,'
+                'election_absolute_majority,'
+                'election_counted_entities,'
+                'election_total_entities,'
+                'entity_name,'
+                'entity_id,'
+                'entity_elegible_voters,'
+                'entity_received_ballots,'
+                'entity_blank_ballots,'
+                'entity_invalid_ballots,'
+                'entity_unaccounted_ballots,'
+                'entity_accounted_ballots,'
+                'entity_blank_votes,'
+                'entity_invalid_votes,'
+                'entity_accounted_votes,'
+                'list_name,'
+                'list_id,'
+                'list_number_of_mandates,'
+                'list_votes,'
+                'list_connection,'
+                'list_connection_parent,'
+                'candidate_family_name,'
+                'candidate_first_name,'
+                'candidate_id,'
+                'candidate_elected,'
+                'candidate_votes'
+            ),
+            (
+                'majorz,2015-01-01,majorz,7,,1,12,Auslandschweizer,{},13567'
+                ',40,0,0,0,40,18,0,262,,,,0,,,Hegglin,Peter,1,False,36'
+            ).format(id_),
+            (
+                'majorz,2015-01-01,majorz,7,,1,12,Auslandschweizer,{},13567'
+                ',40,0,0,0,40,18,0,262,,,,0,,,Hürlimann,Urs,2,False,25'
+            ).format(id_)
+        )).encode('utf-8')
+        upload = client.get('/election/election/upload')
+        upload.form['file_format'] = 'internal'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
 
-    result_onegov = client.get('/election/election/data-csv').text
+        result_onegov = client.get('/election/election/data-csv').text
 
-    assert result_onegov == result_wabsti.replace('1,0', '1,12')
+        assert result_onegov == result_wabsti.replace('1,0', '1,12')
 
 
 def test_upload_election_expats_proporz(election_day_app):
@@ -1826,47 +1827,50 @@ def test_upload_election_expats_proporz(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    # SESAM: not supported
+    for id_ in (0, 9170):
+        # SESAM: todo
 
-    # Wabsti:  Einheit_Name = Auslandschweizer, Einheit_BFS unknown
-    csv = '\n'.join((
-        HEADER_COLUMNS_WABSTI_PROPORZ,
-        '1700,Auslandschweizer,Lustenberger,Andreas,101,1,ALG,948,1435',
-    )).encode('utf-8')
-    csv_stat = '\n'.join((
-        (
-            'Einheit_BFS,Einheit_Name,StimBerTotal,WZEingegangen,WZLeer,'
-            'WZUngueltig,StmWZVeraendertLeerAmtlLeer'
-        ),
-        '1700,Auslandschweizer,14119,7462,77,196,122',
-    )).encode('utf-8')
+        # Wabsti
+        csv = '\n'.join((
+            HEADER_COLUMNS_WABSTI_PROPORZ,
+            (
+                '{},Auslandschweizer,Lustenberger,Andreas,101,1,ALG,948,1435'
+            ).format(id_),
+        )).encode('utf-8')
+        csv_stat = '\n'.join((
+            (
+                'Einheit_BFS,Einheit_Name,StimBerTotal,WZEingegangen,WZLeer,'
+                'WZUngueltig,StmWZVeraendertLeerAmtlLeer'
+            ),
+            '{},Auslandschweizer,14119,7462,77,196,122'.format(id_),
+        )).encode('utf-8')
 
-    upload = client.get('/election/election/upload')
-    upload.form['file_format'] = 'wabsti'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    upload.form['statistics'] = Upload('data.csv', csv_stat, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
+        upload = client.get('/election/election/upload')
+        upload.form['file_format'] = 'wabsti'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        upload.form['statistics'] = Upload('data.csv', csv_stat, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
 
-    result_wabsti = client.get('/election/election/data-csv').text
-    assert 'Auslandschweizer,0' in result_wabsti
+        result_wabsti = client.get('/election/election/data-csv').text
+        assert 'Auslandschweizer,0' in result_wabsti
 
-    # Onegov internal: entity_id = 0
-    csv = '\n'.join((
-        HEADER_COLUMNS_INTERNAL,
-        (
-            'election,2015-01-01,proporz,2,,1,12,Auslandschweizer,0,14119,'
-            '7462,77,196,273,7189,122,0,14256,ALG,1,0,1435,,,'
-            'Lustenberger,Andreas,101,False,948'
-        )
-    )).encode('utf-8')
-    upload = client.get('/election/election/upload')
-    upload.form['file_format'] = 'internal'
-    upload.form['results'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
+        # Onegov internal
+        csv = '\n'.join((
+            HEADER_COLUMNS_INTERNAL,
+            (
+                'election,2015-01-01,proporz,2,,1,12,Auslandschweizer,{},'
+                '14119,7462,77,196,273,7189,122,0,14256,ALG,1,0,1435,,,'
+                'Lustenberger,Andreas,101,False,948'
+            ).format(id_)
+        )).encode('utf-8')
+        upload = client.get('/election/election/upload')
+        upload.form['file_format'] = 'internal'
+        upload.form['results'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
 
-    result_onegov = client.get('/election/election/data-csv').text
+        result_onegov = client.get('/election/election/data-csv').text
 
-    assert result_onegov.replace('1,12', '1,0') == result_wabsti
+        assert result_onegov.replace('1,12', '1,0') == result_wabsti
 
 
 def test_upload_election_notify_hipchat(election_day_app):

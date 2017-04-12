@@ -11,6 +11,12 @@ from onegov.election_day import _
 from xlrd import XLRDError
 
 
+EXPATS = (
+    # These are used by the BFS but not in the official data!
+    9170,  # sg
+)
+
+
 class FileImportError(object):
     __slots__ = ['filename', 'line', 'error']
 

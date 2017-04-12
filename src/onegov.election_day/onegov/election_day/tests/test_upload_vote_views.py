@@ -839,51 +839,52 @@ def test_upload_vote_with_expats(election_day_app):
     new.form['domain'] = 'federation'
     new.form.submit()
 
-    # simple: ID = 0
-    csv = '\n'.join((
-        ','.join(COLUMNS),
-        ',0,Auslandschweizer,10,20,30,0,0',
-    )).encode('utf-8')
-    upload = client.get('/vote/vote/upload')
-    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
+    for id_ in (0, 9170):
+        # simple
+        csv = '\n'.join((
+            ','.join(COLUMNS),
+            ',{},Auslandschweizer,10,20,30,0,0'.format(id_),
+        )).encode('utf-8')
+        upload = client.get('/vote/vote/upload')
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
 
-    result_standard = client.get('/vote/vote/data-csv').text
-    assert 'Auslandschweizer,0' in result_standard
+        result_standard = client.get('/vote/vote/data-csv').text
+        assert 'Auslandschweizer,0' in result_standard
 
-    # onegov: entity_id = 0
-    csv = '\n'.join((
-        (
-            'type,group,entity_id,counted,yeas,nays,invalid,empty,'
-            'elegible_voters'
-        ),
-        'proposal,Auslandschweizer,0,True,10,20,0,0,30',
-    )).encode('utf-8')
-    upload = client.get('/vote/vote/upload')
-    upload.form['file_format'] = 'internal'
-    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
+        # onegov
+        csv = '\n'.join((
+            (
+                'type,group,entity_id,counted,yeas,nays,invalid,empty,'
+                'elegible_voters'
+            ),
+            'proposal,Auslandschweizer,{},True,10,20,0,0,30'.format(id_),
+        )).encode('utf-8')
+        upload = client.get('/vote/vote/upload')
+        upload.form['file_format'] = 'internal'
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
 
-    result_internal = client.get('/vote/vote/data-csv').text
-    assert result_standard == result_internal
+        result_internal = client.get('/vote/vote/data-csv').text
+        assert result_standard == result_internal
 
-    # wabsti: Name = Auslandschweizer, Bfs-Nr. unknown
-    csv = '\n'.join((
-        (
-            'Vorlage-Nr.,Gemeinde,BfS-Nr.,StimmBet,Ja,Nein,ungültige SZ,'
-            'leere SZ,Stimmberechtigte,GegenvJa,GegenvNein,StichfrJa,'
-            'StichfrNein'
-        ),
-        '1,Auslandschweizer,1700,100.0,10,20,0,0,30,0,0,0,0',
-    )).encode('utf-8')
-    upload = client.get('/vote/vote/upload')
-    upload.form['file_format'] = 'wabsti'
-    upload.form['vote_number'] = '1'
-    upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
-    assert 'erfolgreich hochgeladen' in upload.form.submit()
+        # wabsti
+        csv = '\n'.join((
+            (
+                'Vorlage-Nr.,Gemeinde,BfS-Nr.,StimmBet,Ja,Nein,ungültige SZ,'
+                'leere SZ,Stimmberechtigte,GegenvJa,GegenvNein,StichfrJa,'
+                'StichfrNein'
+            ),
+            '1,Auslandschweizer,{},100.0,10,20,0,0,30,0,0,0,0'.format(id_),
+        )).encode('utf-8')
+        upload = client.get('/vote/vote/upload')
+        upload.form['file_format'] = 'wabsti'
+        upload.form['vote_number'] = '1'
+        upload.form['proposal'] = Upload('data.csv', csv, 'text/plain')
+        assert 'erfolgreich hochgeladen' in upload.form.submit()
 
-    result_wabsti = client.get('/vote/vote/data-csv').text
-    assert result_standard == result_wabsti
+        result_wabsti = client.get('/vote/vote/data-csv').text
+        assert result_standard == result_wabsti
 
 
 def test_upload_vote_notify_hipchat(election_day_app):
